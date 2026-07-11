@@ -1,0 +1,94 @@
+.leg-page {
+  --leg-bg-top: #1a1411;
+  --leg-bg-bottom: #0c0907;
+  --leg-panel: rgba(33, 25, 21, 0.88);
+  --leg-panel-strong: rgba(18, 13, 11, 0.92);
+  --leg-border: rgba(216, 179, 138, 0.22);
+  --leg-border-strong: rgba(255, 123, 195, 0.42);
+  --leg-text: #ffffff;
+  --leg-muted: rgba(255, 255, 255, 0.72);
+  --leg-brown: #d8b38a;
+  --leg-pink: #ff7bc3;
+  --leg-rose: #f3a0c7;
+
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+  color: var(--leg-text);
+  background:
+    linear-gradient(135deg, rgba(255, 123, 195, 0.1) 0%, transparent 28%),
+    linear-gradient(225deg, rgba(216, 179, 138, 0.13) 0%, transparent 32%),
+    linear-gradient(180deg, var(--leg-bg-top) 0%, var(--leg-bg-bottom) 100%);
+}
+
+.leg-shell {
+  width: min(36rem, 100%);
+  border: 0.0625rem solid var(--leg-border);
+  border-radius: 1.375rem;
+  padding: 2rem;
+  background:
+    linear-gradient(160deg, rgba(255, 123, 195, 0.07), transparent 38%),
+    linear-gradient(180deg, var(--leg-panel) 0%, var(--leg-panel-strong) 100%);
+  box-shadow: 0 1.4rem 3.2rem rgba(0, 0, 0, 0.28);
+}
+
+.leg-kicker {
+  margin-bottom: 0.65rem;
+  color: var(--leg-brown);
+  font-size: 0.78rem;
+  font-weight: 850;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.leg-shell h1 {
+  margin: 0;
+  color: var(--leg-pink);
+  font-family: 'Comic Sans MS', 'Comic Sans', 'Chalkboard SE', 'Trebuchet MS',
+    sans-serif;
+  font-size: clamp(2.7rem, 8vw, 5rem);
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: 0;
+}
+
+.leg-copy {
+  max-width: 29rem;
+  margin-top: 1rem;
+  color: var(--leg-muted);
+  font-size: 1.04rem;
+}
+
+.leg-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65em;
+  margin-top: 1.5rem;
+  border: 0.0625rem solid var(--leg-border-strong);
+  border-radius: 0.5rem;
+  padding: 0.58em 0.72em;
+  color: var(--leg-rose);
+  background: rgba(255, 123, 195, 0.08);
+  font-size: 0.9rem;
+}
+
+.leg-status span {
+  color: var(--leg-brown);
+  font-weight: 850;
+}
+
+.leg-status strong {
+  color: var(--leg-text);
+  font-weight: 750;
+}
+
+@media (max-width: 36rem) {
+  .leg-page {
+    padding: 1rem;
+  }
+
+  .leg-shell {
+    padding: 1.35rem;
+  }
+}
