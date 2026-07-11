@@ -18,8 +18,8 @@ SA_KEY="${1:-}"
 # echo; echo; echo
 
 if [[ -z "$SA_KEY" ]]; then
-  echo "Expected service account JSON as arg 1." >&2
-  exit 1
+	echo "Expected service account JSON as arg 1." >&2
+	exit 1
 fi
 
 cd app
@@ -31,8 +31,8 @@ gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS
 project_id="$(jq -r .project_id "$GOOGLE_APPLICATION_CREDENTIALS")"
 
 if [[ "$project_id" != "lottaendgames" ]]; then
-  echo "Expected SA key for project lottaendgames, got $project_id" >&2
-  exit 1
+	echo "Expected SA key for project lottaendgames, got $project_id" >&2
+	exit 1
 fi
 
 cat <<EOF2 >firebase.json
