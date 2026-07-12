@@ -33,10 +33,9 @@ const chapters: ChapterFixture[] = [
   { number: '9', sections: getChapterSections('9') },
 ]
 
-// Chapters 10-13 have normalized OCR notation and diagram labels, but their
-// diagrams are not FEN-verified yet. They stay out of the strict SAN playback
-// audit until those captions are promoted to position sections with extracted
-// FENs.
+// Chapters 10-13 currently have partial extracted diagram FENs, but the strict
+// SAN playback audit stays scoped to chapters whose diagram anchors and OCR
+// notation are fully verified. Run the extractor before promoting more captions.
 
 const sanScanPattern =
   /(?<![A-Za-z0-9])((\d+)\s*(\.\.\.|\.)\s*)?((?:O-O-O|O-O|0-0-0|0-0|[KQRBN]?[a-h]?[1-8]?x?[a-h][1-8](?:=?[QRBN])?|[a-h]x[a-h][1-8](?:=?[QRBN])?|[a-h][1-8](?:=?[QRBN])?)(?:[+#])?(?:[!?]+|=)?)/g

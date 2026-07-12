@@ -30,12 +30,27 @@ type ChapterPayload = {
   schemaVersion: number
 }
 
+type DiagramExtractionReportEntry = {
+  chapter: number
+  fen?: string
+  label: string
+  number: string
+  reason?: string
+  status: 'kept-caption' | 'promoted' | 'promoted-with-warnings'
+}
+
 const chapterPayload = JSON.parse(
   readFileSync(
     new URL(`../../public/${chapterPayloadPath}`, import.meta.url),
     'utf8',
   ),
 ) as ChapterPayload
+const diagramExtractionReport = JSON.parse(
+  readFileSync(
+    new URL('./pdf/diagram_extraction_report.json', import.meta.url),
+    'utf8',
+  ),
+) as DiagramExtractionReportEntry[]
 const chapterSections = getChapterSections('5')
 const chapterSixSections = getChapterSections('6')
 const chapterSevenSections = getChapterSections('7')
@@ -114,6 +129,10 @@ const chapterSixPositionNumbers = new Set(
 const chapterSevenPositionNumbers = getPositionNumbers(chapterSevenSections)
 const chapterEightPositionNumbers = getPositionNumbers(chapterEightSections)
 const chapterNinePositionNumbers = getPositionNumbers(chapterNineSections)
+const chapterTenPositionNumbers = getPositionNumbers(chapterTenSections)
+const chapterElevenPositionNumbers = getPositionNumbers(chapterElevenSections)
+const chapterTwelvePositionNumbers = getPositionNumbers(chapterTwelveSections)
+const chapterThirteenPositionNumbers = getPositionNumbers(chapterThirteenSections)
 const chapterTenCaptions = getCaptions(chapterTenSections)
 const chapterElevenCaptions = getCaptions(chapterElevenSections)
 const chapterTwelveCaptions = getCaptions(chapterTwelveSections)
@@ -216,10 +235,13 @@ assertNoSplitWordArtifacts('10', chapterTenSections)
 assertNoSplitWordArtifacts('11', chapterElevenSections)
 assertNoSplitWordArtifacts('12', chapterTwelveSections)
 assertNoSplitWordArtifacts('13', chapterThirteenSections)
-assert.equal(chapterTenCaptions.has('Position 10.2'), true)
+assert.equal(chapterTenPositionNumbers.has('10.2'), true)
 assert.equal(chapterElevenCaptions.has('Position 11.1'), true)
-assert.equal(chapterTwelveCaptions.has('Position 12.1'), true)
-assert.equal(chapterThirteenCaptions.has('Position 13.4'), true)
+assert.equal(chapterTwelvePositionNumbers.has('12.1'), true)
+assert.equal(chapterThirteenPositionNumbers.has('13.4'), true)
+assert.equal(chapterElevenPositionNumbers.has('12.1'), false)
+assert.equal(chapterThirteenPositionNumbers.has('13.24'), true)
+assertDiagramExtractionReport()
 
 assert.deepEqual(findMove(moveTokens, '1.Kg5!').path, ['Kg5'])
 
@@ -576,6 +598,102 @@ function getCaptions(sections: RawChapterSection[]) {
     sections
       .filter((section) => section.type === 'caption')
       .map((section) => section.content as string),
+  )
+}
+
+function assertDiagramExtractionReport() {
+  const chaptersById = new Map<string, RawChapterSection[]>([
+    ['10', chapterTenSections],
+    ['11', chapterElevenSections],
+    ['12', chapterTwelveSections],
+    ['13', chapterThirteenSections],
+  ])
+  const positionNumbersByChapter = new Map<string, Set<string>>([
+    ['10', chapterTenPositionNumbers],
+    ['11', chapterElevenPositionNumbers],
+    ['12', chapterTwelvePositionNumbers],
+    ['13', chapterThirteenPositionNumbers],
+  ])
+  const captionsByChapter = new Map<string, Set<string>>([
+    ['10', chapterTenCaptions],
+    ['11', chapterElevenCaptions],
+    ['12', chapterTwelveCaptions],
+    ['13', chapterThirteenCaptions],
+  ])
+  const promotedRows = diagramExtractionReport.filter(
+    ({ status }) => status === 'promoted' || status === 'promoted-with-warnings',
+  )
+  const keptRows = diagramExtractionReport.filter(
+    ({ status }) => status === 'kept-caption',
+  )
+
+  assert.ok(
+    promotedRows.length >= 80,
+    'Expected the extraction report to document promoted chapter 10-13 diagrams.',
+  )
+
+  for (const [chapterId, sections] of chaptersById) {
+    assertNoDuplicatePositionNumbers(chapterId, sections)
+  }
+
+  for (const row of promotedRows) {
+    const chapterId = String(row.chapter)
+    const positionNumbers = positionNumbersByChapter.get(chapterId)
+
+    assert.ok(positionNumbers, `Unexpected extracted chapter ${chapterId}.`)
+    assert.ok(row.fen, `${row.label} should include an extracted FEN.`)
+    assert.equal(
+      positionNumbers.has(row.number),
+      true,
+      `${row.label} should be promoted to a position section.`,
+    )
+  }
+
+  for (const row of keptRows) {
+    const chapterId = String(row.chapter)
+    const captions = captionsByChapter.get(chapterId)
+
+    assert.ok(captions, `Unexpected kept-caption chapter ${chapterId}.`)
+    assert.equal(typeof row.reason, 'string')
+    assert.equal(
+      captions.has(row.label),
+      true,
+      `${row.label} should remain a caption when extraction keeps it.`,
+    )
+  }
+
+  for (const [chapterId, captions] of captionsByChapter) {
+    for (const caption of captions) {
+      if (!/^(Analysis diagram|Position) \d+\./.test(caption)) {
+        continue
+      }
+
+      assert.equal(
+        keptRows.some(
+          (row) => String(row.chapter) === chapterId && row.label === caption,
+        ),
+        true,
+        `${caption} should have a kept-caption report entry.`,
+      )
+    }
+  }
+}
+
+function assertNoDuplicatePositionNumbers(
+  chapterNumber: string,
+  sections: RawChapterSection[],
+) {
+  const positionNumbers = sections
+    .filter((section) => section.type === 'position')
+    .map((section) => (section.content as { number: string }).number)
+  const duplicates = positionNumbers.filter(
+    (number, index) => positionNumbers.indexOf(number) !== index,
+  )
+
+  assert.deepEqual(
+    duplicates,
+    [],
+    `Chapter ${chapterNumber} should not have duplicate position numbers.`,
   )
 }
 

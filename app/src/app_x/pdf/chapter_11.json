@@ -24,7 +24,19 @@
   },
   {
     "type": "text",
-    "content": "where simplifications were possible. That is why it is important to be sure that this is a draw, an easy draw in normal circumstances, and how to draw.\nThe best defensive procedure consists in starting with the Philidor Position and then making a timely switch to K&H.\n1.Kb7 Kg6 2.:a.b6\nThis is the difference when compared to positions with just one pawn. White can offer a rook exchange and 'break' the Philidor Defence. If we do not know the theory, we tend to be scared, especially if we have analysed this position 'from a distance'. That concern may lead us to make wrong simplifying decisions. Therefore,\nyou should take a close look at the sequence and lay the ghosts to rest for good.\n2.. Kg4!\n.\nThis move is important now. The only available method is K&H, but Black has to capture the second pawn when he puts the rook at the rear of the pawn. Of course,\nthe pawn ending is lost; other moves mess up things, though they may still be enough for a draw.\nDvoretsky considers 2...Kg1?! losing, on account of3.Kc6! Kc1+ 4.Kd6+- and now 4...Kc8 5.Ka6 Kb8 6.Ke6 Kc8 7.d6 Kb8 8.Ka1 Kc8 9.Kh1, but in this line3... Kc8! holds. 2...Kg7?! also loses, according to Dvoretsky: 3 Rb8+! Kc7 4. Ka8\nM\nAnalysis diagram 11.24... Kg1! (4...Kg6? is indeed losing: 5.d6+ Kd7 6.Ka7+ Kd8 7.Kc6+-) 5.Ka7+\nKc8 6.Kc6 Kc1+ 7.Kd6 Rc4! and the rook reaches the right defensive position again, but Black is still in trouble. 8.Ke5 Kb4! (8... Kd8 is natural but loses on ac count of 9.Ka6! Kb4 10.Kd6 Kc8 l 1. Ka8+ Kb7 12.Kc5! (a difficult and important intermediate move. Now Black will not be able to reach the right defensive set-up) 12... Kb1 13.Kh8 Kc7 14.Kh7+ Kc8 15.Kc6 Kc1+ 16.Kd6 and two pawns render the K&H defence useless. You do not need to remember, not even to analyse, this long and complex variation, but it is instructive) 9.Ka6 Kd7.In conclusion, other moves are possible, but you should not complicate your life in these endings. If there is a clear procedure, the best you can do is adopt this proce dure and not deviate.\n3.d6\n3.Kc6 is more logical, but leads to positions already seen in the previous chapter:\n3... Kd4 4Rb8+ (4.Kd6 Kc8 5.Kc6+ Kd8 6.Ra6 Kc8 7.R!a8+ Kb7 8 J ld8\nRrh4! = o g Side) 4...Ke7= K&H.\nL n"
+    "content": "where simplifications were possible. That is why it is important to be sure that this is a draw, an easy draw in normal circumstances, and how to draw.\nThe best defensive procedure consists in starting with the Philidor Position and then making a timely switch to K&H.\n1.Kb7 Kg6 2.:a.b6\nThis is the difference when compared to positions with just one pawn. White can offer a rook exchange and 'break' the Philidor Defence. If we do not know the theory, we tend to be scared, especially if we have analysed this position 'from a distance'. That concern may lead us to make wrong simplifying decisions. Therefore,\nyou should take a close look at the sequence and lay the ghosts to rest for good.\n2.. Kg4!\n.\nThis move is important now. The only available method is K&H, but Black has to capture the second pawn when he puts the rook at the rear of the pawn. Of course,\nthe pawn ending is lost; other moves mess up things, though they may still be enough for a draw.\nDvoretsky considers 2...Kg1?! losing, on account of3.Kc6! Kc1+ 4.Kd6+- and now 4...Kc8 5.Ka6 Kb8 6.Ke6 Kc8 7.d6 Kb8 8.Ka1 Kc8 9.Kh1, but in this line3... Kc8! holds. 2...Kg7?! also loses, according to Dvoretsky: 3 Rb8+! Kc7 4. Ka8\nM"
+  },
+  {
+    "type": "position",
+    "content": {
+      "number": "11.2",
+      "fen": "R7/2k3R1/8/2KP4/3P4/8/8/8 w - - 0 1",
+      "caption": "Analysis diagram 11.2"
+    }
+  },
+  {
+    "type": "text",
+    "content": "4... Kg1! (4...Kg6? is indeed losing: 5.d6+ Kd7 6.Ka7+ Kd8 7.Kc6+-) 5.Ka7+\nKc8 6.Kc6 Kc1+ 7.Kd6 Rc4! and the rook reaches the right defensive position again, but Black is still in trouble. 8.Ke5 Kb4! (8... Kd8 is natural but loses on ac count of 9.Ka6! Kb4 10.Kd6 Kc8 l 1. Ka8+ Kb7 12.Kc5! (a difficult and important intermediate move. Now Black will not be able to reach the right defensive set-up) 12... Kb1 13.Kh8 Kc7 14.Kh7+ Kc8 15.Kc6 Kc1+ 16.Kd6 and two pawns render the K&H defence useless. You do not need to remember, not even to analyse, this long and complex variation, but it is instructive) 9.Ka6 Kd7.In conclusion, other moves are possible, but you should not complicate your life in these endings. If there is a clear procedure, the best you can do is adopt this proce dure and not deviate.\n3.d6\n3.Kc6 is more logical, but leads to positions already seen in the previous chapter:\n3... Kd4 4Rb8+ (4.Kd6 Kc8 5.Kc6+ Kd8 6.Ra6 Kc8 7.R!a8+ Kb7 8 J ld8\nRrh4! = o g Side) 4...Ke7= K&H.\nL n"
   },
   {
     "type": "ending",
@@ -38,8 +50,12 @@
     "content": "3.Kh6 (intending Kd6) 3... Kd7! 4.Kh7+ Kd8= and now 5.Kd6 would allow\nBlack to adopt the Philidor Defence again, and5.Kc6 would allow K&H.\n3.. Rg1!\nThe rook can now move to deliver rear checks, while the d4 pawn is just a tiny shelter for the king, but cannot offer winning chances.\n4.Kc6 Rc1+ 5.Kd5 Rh1 6Rb8+ Kd7 7Rb7+ Kd8 8.d7 gh5+ (8...Ke7=)\n9.Kc6 Rh6+ 1 o.Kc5 bth5+ 11.d5 Rh6 12.d6 Rxd6!=\nSecond-rank defence\nAfter having seen the last example, a terrible question may immediately arise: if the\nK&H defence is the only valid procedure for these endings and this procedure did not work against knight's pawns... what happens then if our opponent has two doubled knight pawns? Will first-rank defence work? No need to worry: we are go ing to compare procedures and differences, and then draw conclusions.\nFirstly, first-rank defence is useless against two pawns, as the stronger side may trade rooks in favourable conditions (in the next diagram, the manoeuvre would be\n... g 2 -Kf3 -Itfl).\nSecondly, and more reassuring: the stronger side cannot break the Philidor Position with a knight's pawn, since there is not enough room.\nThirdly, if, as in our first example, the Philidor Position cannot be achieved, there are alternatives to K&H that are actually valid against other pawns.\nAgainst two knight's pawns the defending side must be careful and set up a differ ent defensive position which we can name the Second-rank defence."
   },
   {
-    "type": "caption",
-    "content": "Position 11.3"
+    "type": "position",
+    "content": {
+      "number": "11.3",
+      "fen": "8/6p1/8/8/1R4pk/r7/6K1/8 w - - 0 1",
+      "caption": "Position 11.3"
+    }
   },
   {
     "type": "text",
@@ -57,8 +73,12 @@
     "content": "The experience gathered in many games, as well as the analyses published in several books, above all the classical work by Levenfish and Smyslov Theory of Rook End ings, conclude that, when the defending king is cut off on the back rank, the ending is usually lost. The variations are not easy but, as usual, defence is more difficult than attack.\nFirst we will see that the ending is lost if both pawns have reached the 6th rank:"
   },
   {
-    "type": "caption",
-    "content": "Position 11.4"
+    "type": "position",
+    "content": {
+      "number": "11.4",
+      "fen": "6k1/1R6/5P1P/6K1/8/8/8/R7 w - - 0 1",
+      "caption": "Position 11.4"
+    }
   },
   {
     "type": "moves",
@@ -72,8 +92,12 @@
     }
   },
   {
-    "type": "caption",
-    "content": "Position 11.5"
+    "type": "position",
+    "content": {
+      "number": "11.5",
+      "fen": "6k1/1R6/7P/5PK1/8/8/8/2r5 b - - 0 1",
+      "caption": "Position 11.5"
+    }
   },
   {
     "type": "text",
@@ -91,24 +115,48 @@
     "content": "100 Endgames You M u s t Know\nHere the interesting point is that classical defensive procedures fail:\n1) Philidor Defence: if Black just waits, White pushes his h-pawn to the 6th rank and then does the same with the f-pawn.\n2) K&H Defence presents the same problem.\n3) An attack on the h-pawn fails because there is no time to capture it and then go to the long side to deliver distant effective checks.\nWe can draw an interesting conclusion from all this:\nConclusion: When the defending king is cut off on the back rank, a bishop's pawn on the 5th rank is the best winning asset.\nB ishop's pawn on the 4th ran k.\nDraw White wins Draw\nWhen the bishop's pawn is on the 4th rank, the position of the rook makes a differ ence. The first diagram is very interesting. As we will see in the next example, this position may arise after a normal sequence of play. Black draws by means of a sim ple procedure: the rook alternates checks and attacks on the h-pawn (I.. l:.g1+\n.\n2.Kf6.Bh1). This resource does not work in the second position, as White can simply answer 2.f5, ignoring the threat on his h-pawn. If the h-pawn has not reached the 5th rank, the defence works again.\nWhen the pawns are less advanced and, above all, when the defending king has not been pushed to the back rank, drawing chances increase.\nThe next position is taken from the game Gligoric-Smyslov, analysed in several books. It constitutes a perfect outline of the defensive ideas. If you study this example carefully, you should be able to handle this ending in an actual game. As the game progresses, I will point out the most important details.\nFirst point: The black rook is well placed on the 5th rank, where it disturbs the enemy king's advances. If both pawns reach the 5th rank, the rook is best placed in\n(\nthe corner a 1 or b1)."
   },
   {
-    "type": "caption",
-    "content": "Position 11.6"
+    "type": "position",
+    "content": {
+      "number": "11.6",
+      "fen": "8/6k1/R7/1r5P/5PK1/8/8/8 w - - 0 1",
+      "caption": "Position 11.6"
+    }
   },
   {
     "type": "text",
-    "content": "Gligoric - Smyslov\nMoscow, 1947\n1.Kg6+ (1.f5 Kb1!) 1...Kf7!\nSecond point: 'If other circumstances are equal, the defending king is better placed on the f-file rather than on the h-file? However, 1...Kh7?! is not losing either.\n2.Kg5\nDriving the black rook off the 5th rank. Instead, pushing the pawns just leaves the white king without a shelter: 2.f5 Kb1! Third point: As soon as the two pawns reach the 5th rank, the defending rook gets ready to deliver rear checks. 3.Kg5\n.Rrg1+ 4.Kh6 Kf1 5.Kg7+ Kf6 6.Kg8 Kf7= White cannot make further progress.\n2...Rrb1!\n.\nFourth point: The defending rook stays in the left corner, ready to deliver rear and side checks.\nWe have reached a critical situation:\nPosition 11.73 Rc5.The white rook again has plenty of space. White now threatens 4.Kg5 and then to push the black king to the back rank. In the next few moves, the struggle to avoid being pushed to the 8th rank will be decisive.\nIn the previous ending we learnt that the position is lost if the king is pushed to the back rank and the pawns are already on the 5th rank. Pushing the h-pawn is another interesting attempt. The analysis here is quite complex, so in the next diagram we will study this possibility alone.\n3.<it>f6\n..\nThe logical answer to oppose White's intentions.\n4Rc6+\nNow the rook will not cover 5th-rank side checks.\n4...Kg7!\nThe idea is to avoid king opposition, since in that case the black king would be pushed to the back rank. For example: 4.. Stiff7? S.Kg5! (threatening Rc7) S....r! g1+ 6.Kf5\nand the black king has to retreat to the 8th rank, as 6...Kg7? fails to 7Rg6++-.\n5.<it>g5 k:rg1+! (forced) 6.Kf5 k:ra 17.k:rc7+ (7.Kg6+ K£7=) 7.<it>h6 (always avoid\n..\nthe back rank) 8.k:re7 (8.Kf6 Kh5=) 8...k:rb1\nThe black rook waits in the lower left corner. At the moment the pawn cannot be captured, but White cannot manoeuvre freely either.\n9Re8 (9.Kf6 Kh5=) 9...Kg7\n9... Ra1, just waiting, was still possible.\n1 O.k:re5 I:ta 111 Rd5 Kf1\nThe only unthematic move played by Smyslov in this ending. This is not exactly a mistake, but keeping the rook in the corner would be the standard procedure: 11...Kb1!.\n1 2Rd4 k:ra 1\nBack to the right defensive spot.\n13.k:rd6 Ka5+ 14.<it>g4 k:ra1\nIt is worth pointing out that Black could return to the starting position with 14...Rb5.\n15.k:re6 k:rg1+ 16.<it>f5 k:ra1 17.h6+"
+    "content": "Gligoric - Smyslov\nMoscow, 1947\n1.Kg6+ (1.f5 Kb1!) 1...Kf7!\nSecond point: 'If other circumstances are equal, the defending king is better placed on the f-file rather than on the h-file? However, 1...Kh7?! is not losing either.\n2.Kg5\nDriving the black rook off the 5th rank. Instead, pushing the pawns just leaves the white king without a shelter: 2.f5 Kb1! Third point: As soon as the two pawns reach the 5th rank, the defending rook gets ready to deliver rear checks. 3.Kg5\n.Rrg1+ 4.Kh6 Kf1 5.Kg7+ Kf6 6.Kg8 Kf7= White cannot make further progress.\n2...Rrb1!\n.\nFourth point: The defending rook stays in the left corner, ready to deliver rear and side checks.\nWe have reached a critical situation:"
   },
   {
-    "type": "caption",
-    "content": "Analysis diagram 11.8"
+    "type": "position",
+    "content": {
+      "number": "11.7",
+      "fen": "8/5k2/8/6RP/5PK1/8/8/1r6 w - - 0 1",
+      "caption": "Position 11.7"
+    }
+  },
+  {
+    "type": "text",
+    "content": "3.Rc5.The white rook again has plenty of space. White now threatens 4.Kg5 and then to push the black king to the back rank. In the next few moves, the struggle to avoid being pushed to the 8th rank will be decisive.\nIn the previous ending we learnt that the position is lost if the king is pushed to the back rank and the pawns are already on the 5th rank. Pushing the h-pawn is another interesting attempt. The analysis here is quite complex, so in the next diagram we will study this possibility alone.\n3.<it>f6\n..\nThe logical answer to oppose White's intentions.\n4Rc6+\nNow the rook will not cover 5th-rank side checks.\n4...Kg7!\nThe idea is to avoid king opposition, since in that case the black king would be pushed to the back rank. For example: 4.. Stiff7? S.Kg5! (threatening Rc7) S....r! g1+ 6.Kf5\nand the black king has to retreat to the 8th rank, as 6...Kg7? fails to 7Rg6++-.\n5.<it>g5 k:rg1+! (forced) 6.Kf5 k:ra 17.k:rc7+ (7.Kg6+ K£7=) 7.<it>h6 (always avoid\n..\nthe back rank) 8.k:re7 (8.Kf6 Kh5=) 8...k:rb1\nThe black rook waits in the lower left corner. At the moment the pawn cannot be captured, but White cannot manoeuvre freely either.\n9Re8 (9.Kf6 Kh5=) 9...Kg7\n9... Ra1, just waiting, was still possible.\n1 O.k:re5 I:ta 111 Rd5 Kf1\nThe only unthematic move played by Smyslov in this ending. This is not exactly a mistake, but keeping the rook in the corner would be the standard procedure: 11...Kb1!.\n1 2Rd4 k:ra 1\nBack to the right defensive spot.\n13.k:rd6 Ka5+ 14.<it>g4 k:ra1\nIt is worth pointing out that Black could return to the starting position with 14...Rb5.\n15.k:re6 k:rg1+ 16.<it>f5 k:ra1 17.h6+"
+  },
+  {
+    "type": "position",
+    "content": {
+      "number": "11.8",
+      "fen": "8/6k1/4R2P/5K2/5P2/8/8/r7 w - - 0 1",
+      "caption": "Analysis diagram 11.8"
+    }
   },
   {
     "type": "text",
     "content": "At last White decides to commit himself. The Rook + Pawn vs. Rook ending we will reach in a few moves is a theoretical draw.\n\nAnother important point: when a pawn reaches the 6th rank, the defending king must get in front of it. 17...Kf7?! is also possible, since Black would not lose here with the king on the back rank (as in the previous ending): 18.Rb6 (intending a side check) 18...n as + 19.Kg4 Ra1 20.Kg5 llg l + 21.Kf5 and the black king is pushed to the back rank, but after 21...ll a l (intending side checks) 22.Kb7+ Kg8\n23.Kg6 Kg1+ 24. Kf6.tih1! it is a draw.\n\n1 8Rd6 Ka2 (waiting move) 19.Kg5 Kg2+ (hindering the king 's advance)\n20.Kf6\nThis leads to a theoretically drawn ending. 20.Kh5 Kh2+ =; 20.Kf5 l'la2=.\n20...Kh6! 21.Ke7+ Kh7\n21... Kg7 is also enough t o draw, as long as Black is aware o f a tactical detail: 22.f5\nKe2+ 23._ge6 l'lf2! (not 23.. Rh2?? 24.f6+ Kh7 2 S.f7+-) 24.f6+ Kg6 2 S J Ke1\nKa2! = long-side defence.\n22.f5 Ke2+ 23JKte6 Ka2 (long-side defence) 24.f6\nWe have seen a similar position with the king 's pawn (Ending 58). White threatens\nKf8, winning. Black must occupy the back rank.\n24...Ra8! 25.Kf7 Kh6!\nIfw e compare this position with Ending 58, this is the right move here. The differ ence is that here 2 S... Kb8 would also draw, because the black rook has more space and can still enj oy distant effectiveness.\n26.Re1 Ka7+ 27JJ..e7 Ra8 28.Rd7 Kh7 29Rd1 l:la7+ 30.Ke6:a6+ 31 Rd6\nnaa 32R:d4 Kgs 33Rg4+ Kfa\nDraw, at last. An impressive exhibition of endgame skill by Smyslov, which will al low us to draw some conclusions after studying the following positions.\nAn i m portant variation. Pushi ng the rook's pawn"
   },
   {
-    "type": "caption",
-    "content": "Position 11.9"
+    "type": "position",
+    "content": {
+      "number": "11.9",
+      "fen": "8/5k2/7P/6R1/5PK1/8/8/1r6 w - - 0 1",
+      "caption": "Position 11.9"
+    }
   },
   {
     "type": "text",
@@ -126,24 +174,36 @@
     "content": "Th ird scenario\nThis comes as a real surprise the first time one hears of it. OK, two doubled pawns may be not enough to win, and two isolated pawns, two close pawns can be suc cessfully stopped but... two connected pawns! They should win! It looks ridiculous.\nHowever, it is quite common that the defending king gets in between the pawns,\nblocking them. Kling and Horwitz had already studied this position with rook and knight's pawns in 185 1.Actually, once the defending side sets up the blockade,\nthere is not much to be done. Here the connected pawns are far less dangerous than the drawish rook and bishop's pawns."
   },
   {
-    "type": "caption",
-    "content": "Position 11.10"
+    "type": "position",
+    "content": {
+      "number": "11.10",
+      "fen": "8/8/r5kP/6P1/1R3K2/8/8/8 w - - 0 1",
+      "caption": "Position 11.10"
+    }
   },
   {
     "type": "moves",
     "content": "1 J1d4.:Ib6 2Rd8!\nFirst White has to get the black king out of his strong position: the rook will as sume this task.\n2...Rib4+ 3.Ke5\nIf the white king moves back, Black can deliver more checks or play the same as in the game.\n3..Rb7!\nSome more checks were also possible, but the easiest way is to attack the g-pawn. At the same time, the rook controls two important squares, g 7 and h7.3...Kg5?? loses on the spot to 4.h7+-.\n3.. Rg4? also loses, though this is more difficult: 4..Bg8+ Kh7 5.Kf5! +-.\nWith3....Bb5+?! Black just complicates his life: 4..Bd5.Bb7 5.Ke6 and, despite the white king 's progress, Black can still draw: 5....Bb6+ 6.Ke7.Bb7+ 7..Bd7 Mb5\n(threatening.Bg5) 8.h7 I:1.b8! =.\n4.f.tg8+ (4.Kf4 would be a repetition) 4...Kh7 5.f.te8 Kg6\nHere we are again. Black had a little trick to force the draw: 5..Rb5+ 6.Kf6 f.txg5!.\n6.Kf4 f.tb4+ 7.Ke5 1:lb7=\nNevertheless, if we move the whole position towards the centre of the board,\nWhite can break the blockade.\n\nCentral connected pawns"
   },
   {
-    "type": "caption",
-    "content": "Position 11.11"
+    "type": "position",
+    "content": {
+      "number": "11.11",
+      "fen": "8/8/r4kP1/5P2/1R3K2/8/8/8 w - - 0 1",
+      "caption": "Position 11.11"
+    }
   },
   {
     "type": "moves",
     "content": "Here White can force a winning pawn endgame.\n1.:Ie4 Kb6 2.Ke6+!\nQuite simple. You just have to take into account the position of your king (for in stance, if the king were on g4the ending would be drawn).\n2.. Rxe6 3.fxe6 wxe6 4.Kg5+-\nThis example may lead you to think that this blockade only works near the edge of the board, but it is not so.\nAnother example of centra l pawns\nWe close this chapter with one example where the blockade succeeds against cen tral pawns, but just because the white king is cut off."
   },
   {
-    "type": "caption",
-    "content": "Position 11.12"
+    "type": "position",
+    "content": {
+      "number": "11.12",
+      "fen": "R7/P5k1/8/8/8/6P1/6K1/r7 w - - 0 1",
+      "caption": "Position 11.12"
+    }
   },
   {
     "type": "text",
@@ -178,9 +238,5 @@
   {
     "type": "text",
     "content": "Fifth scenario\nThis is probably the least-known scenario, though the most common in practice.\nThere are some drawing positions involving a- and h-pawns, the most important one being an extension of the Vancura Defence.\n1.. Re4!\nThe only move to draw. This move is very important: Black adopts a Vancura defensive set-up and prevents the white rook from coming out of its passive position in front of the pawn.\nFrom now onwards, defence is quite easy, as White cannot really make further progress. On the other hand, if Black adopts a wrong defensive set-up, White wins rather comfortably. If you quickly check your database, you will see that the latter is the most frequent scenario in practice.\n1. l:la l? 2.Kf4 Kh7 3.Ke5 Kg7 4.a5 Kh7 5.a6 and, as we know from Ending 66,\n..\nWhite wins even without the h-pawn.\n2.a5\nOr 2.h5 Kh7 3.Kf3 Rh4 4.Ke3 llxh5 (Black captures the pawn and has time to set up the correct defence) 5.Kd4 Rg5 6.Kc4 Kg4+! (only move!) 7.Kb5 R.g5+\n8.Kb4 Kg4+ 9.Kc5 Kf4- Vancura.\n2...Re5!\nKeeping the Vancura Position.\n3.'iitf3 Kh5 4.Kg3 Kc5 5.a6 Kc6! 6.Kf4\nAs soon as White pushes the a-pawn one step further, the black rook will be trans ferred to the rear of the pawn and we will reach Ending 76.s... Kh7 7.Ke5 nbs a.Kd5 Kg6 9.'tt c5 Kf6 10.Kb5.tU5+! 11.Kb6 Kf6+!\nWhen the white king moves far from the a-pawn, the series of checks may end.\nThere is no way to make progress.\n\nAfter many chapters, we come back to pawn endings. Now we will deal with posi tions where there is more than one pawn on the board.\nDespite the limited material, pawn endings are usually quite complex and demand a great amount of calculation, to the extent that the advice of some players is to avoid, if possible, pawn endings for the realisation of the advantage. The reason is that it is easy to miss a tactical subtlety there. This old fox's advice is supported by statistics: pawn endings present the lowest draw rates.\nAnother outstanding feature is the low number of important theoretical posi tions. On the other hand, there are many important themes to know and master.\nTherefore, this is the only chapter where we will analyse positions with many pawns on the board, as that is the only way to illustrate in an appropriate way certain topics I consider basic.\nSection 1. Ki Rg2 pawns vs. Ki ng\n+\nWe already know what happens with a single pawn. Obviously, a king with two pawns almost always wins (95 %, according to our stats). This figure would be even higher if we left aside those cases where the capture of one of the pawns is forced.\nWe can distinguish three scenarios:\n1) Connected pawns. Here both pawns defend each other and then the king approaches to give them support. The ending is always won unless a pawn is captured. The only important thing to know is this: if we have a rook's pawn on the 7th rank, we have to give it up in order to promote the knight's pawn.\n2) Doubled pawns (Ending 77)\n3) Isolated pawns (Ending 78)"
-  },
-  {
-    "type": "caption",
-    "content": "Position 12.1"
   }
 ]

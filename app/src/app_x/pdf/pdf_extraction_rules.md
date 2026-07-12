@@ -104,6 +104,14 @@ If a chapter has normalized text but an unverified diagram, keep the printed lab
 
 For chapters 10-13, run `python3 scripts/normalize_chapters_10_13.py` after changing the raw OCR-backed text or the normalization rules.
 
+For diagram extraction from rendered PDF images, run:
+
+```bash
+python3 scripts/promote_extracted_diagrams.py
+```
+
+That script trains on verified chapter 5-9 diagrams, crops later diagrams by their printed board border, and promotes only simple, legal-looking chapter 10-13 captions to `position` sections. Captions with printed markers, ambiguous template matches, missing kings, duplicate kings, or pawns on impossible ranks must remain captions until the diagram can be represented with a verified `fen` plus explicit `markers`.
+
 ## Captions And Sources
 
 Use `caption` for nearby diagram source text, composer names, years, and small labels that are not prose or moves. A caption may be a string or an object. Prefer a string unless structured fields are clearly helpful.

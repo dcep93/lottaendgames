@@ -1,0 +1,1309 @@
+[
+  {
+    "chapter": 10,
+    "fen": "3K4/3P1k2/8/8/8/8/7r/4R3 w - - 0 1",
+    "issues": [],
+    "label": "Position 10.2",
+    "number": "10.2",
+    "status": "promoted"
+  },
+  {
+    "chapter": 10,
+    "fen": "3K4/3P2k1/8/8/5R2/8/2r5/8 w - - 0 1",
+    "issues": [],
+    "label": "Position 10.3",
+    "number": "10.3",
+    "status": "promoted"
+  },
+  {
+    "chapter": 10,
+    "fen": "4K3/4P1k1/8/8/8/8/r7/5R2 w - - 0 1",
+    "issues": [],
+    "label": "Position 10.4",
+    "number": "10.4",
+    "status": "promoted"
+  },
+  {
+    "chapter": 10,
+    "fen": "4k3/7R/8/3KPr2/8/8/8/8 w - - 0 1",
+    "issues": [],
+    "label": "Position 10.6",
+    "number": "10.6",
+    "status": "promoted"
+  },
+  {
+    "chapter": 10,
+    "fen": "5k2/7R/4K3/4P3/8/8/8/3r4 w - - 0 1",
+    "issues": [],
+    "label": "Analysis diagram 10.7",
+    "number": "10.7",
+    "status": "promoted"
+  },
+  {
+    "chapter": 10,
+    "fen": "4R3/2k5/4K3/4P3/8/8/4r3/8 w - - 0 1",
+    "issues": [],
+    "label": "Analysis diagram 10.8",
+    "number": "10.8",
+    "status": "promoted"
+  },
+  {
+    "chapter": 10,
+    "fen": "r7/3RK1k1/4P3/8/8/8/8/8 w - - 0 1",
+    "issues": [],
+    "label": "Position 10.9",
+    "number": "10.9",
+    "status": "promoted"
+  },
+  {
+    "chapter": 10,
+    "fen": "r7/4K1k1/3RP3/8/8/8/8/8 w - - 0 1",
+    "issues": [],
+    "label": "Analysis diagram 10.10",
+    "number": "10.10",
+    "status": "promoted"
+  },
+  {
+    "chapter": 10,
+    "fen": "1R6/R3K1k1/4P3/8/8/8/8/8 w - - 0 1",
+    "issues": [],
+    "label": "Position 10.11",
+    "number": "10.11",
+    "status": "promoted"
+  },
+  {
+    "chapter": 10,
+    "fen": "3K4/1r6/4Pk2/8/8/8/8/R7 w - - 0 1",
+    "issues": [],
+    "label": "Analysis diagram 10.12",
+    "number": "10.12",
+    "status": "promoted"
+  },
+  {
+    "chapter": 10,
+    "fen": "7R/8/4k3/8/2P5/2K5/8/3R4 b - - 0 1",
+    "issues": [
+      {
+        "piece": "R",
+        "square": "h8",
+        "distance": 0.182,
+        "nextDistance": 0.194
+      }
+    ],
+    "label": "Position 10.13",
+    "number": "10.13",
+    "status": "promoted-with-warnings"
+  },
+  {
+    "chapter": 10,
+    "fen": "2r5/4k3/K7/8/2PR4/8/8/8 b - - 0 1",
+    "issues": [],
+    "label": "Analysis diagram 10.14",
+    "number": "10.14",
+    "status": "promoted"
+  },
+  {
+    "chapter": 10,
+    "fen": "2r5/8/5k2/8/2P5/2K5/8/4R3 w - - 0 1",
+    "issues": [],
+    "label": "Position 10.15",
+    "number": "10.15",
+    "status": "promoted"
+  },
+  {
+    "chapter": 10,
+    "fen": "3R4/8/k7/8/3P4/3K4/8/1R6 w - - 0 1",
+    "issues": [],
+    "label": "Position 10.16",
+    "number": "10.16",
+    "status": "promoted"
+  },
+  {
+    "chapter": 10,
+    "fen": "1R6/8/8/2R5/1P1k4/1K6/8/8 w - - 0 1",
+    "issues": [],
+    "label": "Position 10.17",
+    "number": "10.17",
+    "status": "promoted"
+  },
+  {
+    "chapter": 10,
+    "fen": "2r5/8/8/3R4/2P1k3/2K5/8/8 b - - 0 1",
+    "issues": [],
+    "label": "Position 10.18",
+    "number": "10.18",
+    "status": "promoted"
+  },
+  {
+    "chapter": 10,
+    "fen": "8/8/4B3/8/8/8/8/8 w - - 0 1",
+    "issues": [
+      {
+        "piece": "B",
+        "square": "e6",
+        "distance": 0.209,
+        "nextDistance": 0.213
+      }
+    ],
+    "label": "Position 10.19",
+    "number": "10.19",
+    "reason": "ambiguous piece classification",
+    "status": "kept-caption"
+  },
+  {
+    "chapter": 10,
+    "fen": null,
+    "issues": [],
+    "label": "Position 10.20",
+    "number": null,
+    "reason": "no extracted board paired with this label",
+    "status": "kept-caption"
+  },
+  {
+    "chapter": 10,
+    "fen": "4r3/8/8/5R2/4P1k1/4K3/8/8 w - - 0 1",
+    "issues": [],
+    "label": "Position 10.21",
+    "number": "10.21",
+    "status": "promoted"
+  },
+  {
+    "chapter": 10,
+    "fen": "R3p3/4Pk2/P3p3/4k3/4p3/4k3/4p1K1/r3k3 w - - 0 1",
+    "issues": [
+      {
+        "piece": "p",
+        "square": "e8",
+        "distance": 0.257,
+        "nextDistance": 0.275
+      },
+      {
+        "piece": "P",
+        "square": "e7",
+        "distance": 0.224,
+        "nextDistance": 0.225
+      },
+      {
+        "piece": "k",
+        "square": "e5",
+        "distance": 0.22,
+        "nextDistance": 0.228
+      },
+      {
+        "piece": "r",
+        "square": "a1",
+        "distance": 0.208,
+        "nextDistance": 0.211
+      }
+    ],
+    "label": "Position 10.23",
+    "number": "10.23",
+    "reason": "ambiguous piece classification",
+    "status": "kept-caption"
+  },
+  {
+    "chapter": 10,
+    "fen": "R7/6k1/P3p3/5pkp/5npk/4kKkp/3npkpk/r7 w - - 0 1",
+    "issues": [
+      {
+        "piece": "k",
+        "square": "g5",
+        "distance": 0.232,
+        "nextDistance": 0.236
+      },
+      {
+        "piece": "n",
+        "square": "f4",
+        "distance": 0.23,
+        "nextDistance": 0.231
+      },
+      {
+        "piece": "k",
+        "square": "h4",
+        "distance": 0.231,
+        "nextDistance": 0.236
+      },
+      {
+        "piece": "k",
+        "square": "e3",
+        "distance": 0.227,
+        "nextDistance": 0.228
+      },
+      {
+        "piece": "k",
+        "square": "g3",
+        "distance": 0.229,
+        "nextDistance": 0.234
+      },
+      {
+        "piece": "n",
+        "square": "d2",
+        "distance": 0.229,
+        "nextDistance": 0.23
+      },
+      {
+        "piece": "k",
+        "square": "f2",
+        "distance": 0.224,
+        "nextDistance": 0.23
+      },
+      {
+        "piece": "k",
+        "square": "h2",
+        "distance": 0.232,
+        "nextDistance": 0.238
+      }
+    ],
+    "label": "Position 10.24",
+    "number": "10.24",
+    "reason": "ambiguous piece classification",
+    "status": "kept-caption"
+  },
+  {
+    "chapter": 10,
+    "fen": "8/P6R/5k2/r7/4K3/8/8/8 w - - 0 1",
+    "issues": [],
+    "label": "Analysis diagram 10.25",
+    "number": "10.25",
+    "status": "promoted"
+  },
+  {
+    "chapter": 10,
+    "fen": "K3p3/P3Kk2/4p3/4k3/4p3/4k3/4p3/1r2k3 w - - 0 1",
+    "issues": [
+      {
+        "piece": "p",
+        "square": "e8",
+        "distance": 0.253,
+        "nextDistance": 0.274
+      },
+      {
+        "piece": "K",
+        "square": "e7",
+        "distance": 0.224,
+        "nextDistance": 0.227
+      },
+      {
+        "piece": "k",
+        "square": "e5",
+        "distance": 0.221,
+        "nextDistance": 0.228
+      },
+      {
+        "piece": "k",
+        "square": "e3",
+        "distance": 0.217,
+        "nextDistance": 0.228
+      },
+      {
+        "piece": "k",
+        "square": "e1",
+        "distance": 0.217,
+        "nextDistance": 0.223
+      }
+    ],
+    "label": "Position 10.26",
+    "number": "10.26",
+    "reason": "ambiguous piece classification",
+    "status": "kept-caption"
+  },
+  {
+    "chapter": 10,
+    "fen": "8/1K1k4/2R5/P7/8/8/8/7r w - - 0 1",
+    "issues": [],
+    "label": "Position 10.27",
+    "number": "10.27",
+    "status": "promoted"
+  },
+  {
+    "chapter": 11,
+    "fen": null,
+    "issues": [],
+    "label": "Position 11.1",
+    "number": null,
+    "reason": "no extracted board paired with this label",
+    "status": "kept-caption"
+  },
+  {
+    "chapter": 11,
+    "fen": "R7/2k3R1/8/2KP4/3P4/8/8/8 w - - 0 1",
+    "issues": [],
+    "label": "Analysis diagram 11.2",
+    "number": "11.2",
+    "status": "promoted"
+  },
+  {
+    "chapter": 11,
+    "fen": "8/6p1/8/8/1R4pk/r7/6K1/8 w - - 0 1",
+    "issues": [
+      {
+        "piece": "r",
+        "square": "a3",
+        "distance": 0.19,
+        "nextDistance": 0.193
+      }
+    ],
+    "label": "Position 11.3",
+    "number": "11.3",
+    "status": "promoted-with-warnings"
+  },
+  {
+    "chapter": 11,
+    "fen": "6k1/1R6/5P1P/6K1/8/8/8/R7 w - - 0 1",
+    "issues": [
+      {
+        "piece": "R",
+        "square": "a1",
+        "distance": 0.219,
+        "nextDistance": 0.225
+      }
+    ],
+    "label": "Position 11.4",
+    "number": "11.4",
+    "status": "promoted-with-warnings"
+  },
+  {
+    "chapter": 11,
+    "fen": "6k1/1R6/7P/5PK1/8/8/8/2r5 b - - 0 1",
+    "issues": [],
+    "label": "Position 11.5",
+    "number": "11.5",
+    "status": "promoted"
+  },
+  {
+    "chapter": 11,
+    "fen": "8/6k1/R7/1r5P/5PK1/8/8/8 w - - 0 1",
+    "issues": [],
+    "label": "Position 11.6",
+    "number": "11.6",
+    "status": "promoted"
+  },
+  {
+    "chapter": 11,
+    "fen": "8/5k2/8/6RP/5PK1/8/8/1r6 w - - 0 1",
+    "issues": [],
+    "label": "Position 11.7",
+    "number": "11.7",
+    "status": "promoted"
+  },
+  {
+    "chapter": 11,
+    "fen": "8/6k1/4R2P/5K2/5P2/8/8/r7 w - - 0 1",
+    "issues": [
+      {
+        "piece": "r",
+        "square": "a1",
+        "distance": 0.205,
+        "nextDistance": 0.206
+      }
+    ],
+    "label": "Analysis diagram 11.8",
+    "number": "11.8",
+    "status": "promoted-with-warnings"
+  },
+  {
+    "chapter": 11,
+    "fen": "8/5k2/7P/6R1/5PK1/8/8/1r6 w - - 0 1",
+    "issues": [],
+    "label": "Position 11.9",
+    "number": "11.9",
+    "status": "promoted"
+  },
+  {
+    "chapter": 11,
+    "fen": "8/8/r5kP/6P1/1R3K2/8/8/8 w - - 0 1",
+    "issues": [],
+    "label": "Position 11.10",
+    "number": "11.10",
+    "status": "promoted"
+  },
+  {
+    "chapter": 11,
+    "fen": "8/8/r4kP1/5P2/1R3K2/8/8/8 w - - 0 1",
+    "issues": [],
+    "label": "Position 11.11",
+    "number": "11.11",
+    "status": "promoted"
+  },
+  {
+    "chapter": 11,
+    "fen": "R7/P5k1/8/8/8/6P1/6K1/r7 w - - 0 1",
+    "issues": [
+      {
+        "piece": "r",
+        "square": "a1",
+        "distance": 0.198,
+        "nextDistance": 0.206
+      }
+    ],
+    "label": "Position 11.12",
+    "number": "11.12",
+    "status": "promoted-with-warnings"
+  },
+  {
+    "chapter": 11,
+    "fen": "R7/P5k1/8/8/8/6P1/6K1/r7 w - - 0 1",
+    "issues": [
+      {
+        "piece": "r",
+        "square": "a1",
+        "distance": 0.198,
+        "nextDistance": 0.206
+      }
+    ],
+    "label": "Position 11.12",
+    "number": "11.12",
+    "reason": "duplicate printed position label",
+    "status": "kept-caption"
+  },
+  {
+    "chapter": 12,
+    "fen": "8/1k6/8/1P6/1P6/1K6/8/8 w - - 0 1",
+    "issues": [],
+    "label": "Position 12.1",
+    "number": "12.1",
+    "status": "promoted"
+  },
+  {
+    "chapter": 12,
+    "fen": "8/8/8/5k2/5P1P/8/8/K7 w - - 0 1",
+    "issues": [],
+    "label": "Position 12.2",
+    "number": "12.2",
+    "status": "promoted"
+  },
+  {
+    "chapter": 12,
+    "fen": "8/8/2k5/8/P2P4/8/8/7K b - - 0 1",
+    "issues": [],
+    "label": "Position 12.3",
+    "number": "12.3",
+    "status": "promoted"
+  },
+  {
+    "chapter": 12,
+    "fen": "k7/8/pppkp3/nPnpn3/8/8/7K/8 w - - 0 1",
+    "issues": [
+      {
+        "piece": "k",
+        "square": "d6",
+        "distance": 0.226,
+        "nextDistance": 0.227
+      },
+      {
+        "piece": "n",
+        "square": "c5",
+        "distance": 0.206,
+        "nextDistance": 0.213
+      },
+      {
+        "piece": "n",
+        "square": "e5",
+        "distance": 0.212,
+        "nextDistance": 0.214
+      }
+    ],
+    "label": "Position 12.4",
+    "number": "12.4",
+    "reason": "ambiguous piece classification",
+    "status": "kept-caption"
+  },
+  {
+    "chapter": 12,
+    "fen": "8/2Pp4/1kpkpkpP/1pnpPpnp/5nk1/8/8/8 w - - 0 1",
+    "issues": [
+      {
+        "piece": "P",
+        "square": "c7",
+        "distance": 0.21,
+        "nextDistance": 0.215
+      },
+      {
+        "piece": "p",
+        "square": "d7",
+        "distance": 0.298,
+        "nextDistance": 0.3
+      },
+      {
+        "piece": "k",
+        "square": "b6",
+        "distance": 0.216,
+        "nextDistance": 0.216
+      },
+      {
+        "piece": "k",
+        "square": "d6",
+        "distance": 0.223,
+        "nextDistance": 0.223
+      },
+      {
+        "piece": "k",
+        "square": "f6",
+        "distance": 0.213,
+        "nextDistance": 0.218
+      },
+      {
+        "piece": "p",
+        "square": "g6",
+        "distance": 0.251,
+        "nextDistance": 0.275
+      },
+      {
+        "piece": "P",
+        "square": "h6",
+        "distance": 0.221,
+        "nextDistance": 0.227
+      },
+      {
+        "piece": "n",
+        "square": "c5",
+        "distance": 0.202,
+        "nextDistance": 0.211
+      },
+      {
+        "piece": "p",
+        "square": "f5",
+        "distance": 0.247,
+        "nextDistance": 0.271
+      },
+      {
+        "piece": "n",
+        "square": "g5",
+        "distance": 0.211,
+        "nextDistance": 0.212
+      },
+      {
+        "piece": "p",
+        "square": "h5",
+        "distance": 0.261,
+        "nextDistance": 0.271
+      }
+    ],
+    "label": "Position 12.5",
+    "number": "12.5",
+    "reason": "ambiguous piece classification",
+    "status": "kept-caption"
+  },
+  {
+    "chapter": 12,
+    "fen": "8/8/8/7k/3p2p1/3P4/6KP/8 w - - 0 1",
+    "issues": [],
+    "label": "Position 12.6",
+    "number": "12.6",
+    "status": "promoted"
+  },
+  {
+    "chapter": 12,
+    "fen": "8/8/8/5p2/3k4/5P2/8/6K1 w - - 0 1",
+    "issues": [],
+    "label": "Position 12.7",
+    "number": "12.7",
+    "status": "promoted"
+  },
+  {
+    "chapter": 12,
+    "fen": "8/1p6/1P6/8/1P5K/8/8/1k6 w - - 0 1",
+    "issues": [
+      {
+        "piece": "P",
+        "square": "b4",
+        "distance": 0.228,
+        "nextDistance": 0.229
+      }
+    ],
+    "label": "Position 12.8",
+    "number": "12.8",
+    "status": "promoted-with-warnings"
+  },
+  {
+    "chapter": 12,
+    "fen": "8/p1P2K2/P7/8/8/8/1k5k/8 w - - 0 1",
+    "issues": [
+      {
+        "piece": "P",
+        "square": "c7",
+        "distance": 0.232,
+        "nextDistance": 0.232
+      }
+    ],
+    "label": "Position 12.9",
+    "number": "12.9",
+    "reason": "ambiguous piece classification",
+    "status": "kept-caption"
+  },
+  {
+    "chapter": 12,
+    "fen": "8/8/5p2/8/4P1k1/8/7K/8 w - - 0 1",
+    "issues": [],
+    "label": "Position 12.10",
+    "number": "12.10",
+    "status": "promoted"
+  },
+  {
+    "chapter": 12,
+    "fen": "8/6p1/7k/8/1K6/8/1P6/8 w - - 0 1",
+    "issues": [],
+    "label": "Position 12.11",
+    "number": "12.11",
+    "status": "promoted"
+  },
+  {
+    "chapter": 12,
+    "fen": "7K/8/k1P5/7p/8/8/8/8 w - - 0 1",
+    "issues": [],
+    "label": "Position 12.12",
+    "number": "12.12",
+    "status": "promoted"
+  },
+  {
+    "chapter": 12,
+    "fen": "8/5p2/2k5/K7/8/1P6/8/8 b - - 0 1",
+    "issues": [],
+    "label": "Position 12.13",
+    "number": "12.13",
+    "status": "promoted"
+  },
+  {
+    "chapter": 12,
+    "fen": "8/8/1P6/K2k4/5p2/8/8/8 w - - 0 1",
+    "issues": [],
+    "label": "Analysis diagram 12.14",
+    "number": "12.14",
+    "status": "promoted"
+  },
+  {
+    "chapter": 12,
+    "fen": "8/8/3k3p/3P3P/2K5/8/8/8 w - - 0 1",
+    "issues": [],
+    "label": "Position 12.15",
+    "number": "12.15",
+    "status": "promoted"
+  },
+  {
+    "chapter": 12,
+    "fen": "8/8/8/1k5p/7P/1PK5/8/8 w - - 0 1",
+    "issues": [],
+    "label": "Position 12.16",
+    "number": "12.16",
+    "status": "promoted"
+  },
+  {
+    "chapter": 12,
+    "fen": "8/8/4k1K1/8/7P/8/8/8 w - - 0 1",
+    "issues": [],
+    "label": "Position 12.17",
+    "number": "12.17",
+    "status": "promoted"
+  },
+  {
+    "chapter": 12,
+    "fen": "5n2/5p2/5n2/1k3p1p/5n1P/5p2/5n2/5p2 w - - 0 1",
+    "issues": [
+      {
+        "piece": "p",
+        "square": "f7",
+        "distance": 0.288,
+        "nextDistance": 0.3
+      },
+      {
+        "piece": "p",
+        "square": "f5",
+        "distance": 0.267,
+        "nextDistance": 0.287
+      },
+      {
+        "piece": "p",
+        "square": "f3",
+        "distance": 0.26,
+        "nextDistance": 0.284
+      }
+    ],
+    "label": "Position 12.18",
+    "number": "12.18",
+    "reason": "ambiguous piece classification",
+    "status": "kept-caption"
+  },
+  {
+    "chapter": 12,
+    "fen": "8/p7/P7/8/8/3k4/3P4/3K4 w - - 0 1",
+    "issues": [],
+    "label": "Position 12.19",
+    "number": "12.19",
+    "status": "promoted"
+  },
+  {
+    "chapter": 12,
+    "fen": "8/8/p7/P7/3k4/3P4/3K4/8 w - - 0 1",
+    "issues": [],
+    "label": "Position 12.20",
+    "number": "12.20",
+    "status": "promoted"
+  },
+  {
+    "chapter": 12,
+    "fen": "8/8/p7/k1K5/8/3P4/8/8 w - - 0 1",
+    "issues": [],
+    "label": "Analysis diagram 12.21",
+    "number": "12.21",
+    "status": "promoted"
+  },
+  {
+    "chapter": 12,
+    "fen": "8/8/8/p7/P7/3k4/3P4/3K4 w - - 0 1",
+    "issues": [],
+    "label": "Position 12.22",
+    "number": "12.22",
+    "status": "promoted"
+  },
+  {
+    "chapter": 12,
+    "fen": "5k2/5P1p/4K3/8/8/8/7P/8 w - - 0 1",
+    "issues": [],
+    "label": "Position 12.23",
+    "number": "12.23",
+    "status": "promoted"
+  },
+  {
+    "chapter": 12,
+    "fen": "2k5/8/p1P5/3K4/8/8/8/8 w - - 0 1",
+    "issues": [],
+    "label": "Position 12.24",
+    "number": "12.24",
+    "status": "promoted"
+  },
+  {
+    "chapter": 12,
+    "fen": null,
+    "issues": [],
+    "label": "Position 12.25",
+    "number": null,
+    "reason": "no extracted board paired with this label",
+    "status": "kept-caption"
+  },
+  {
+    "chapter": 12,
+    "fen": "8/8/6kp/8/5KP1/8/7P/8 w - - 0 1",
+    "issues": [],
+    "label": "Analysis diagram 12.26",
+    "number": "12.26",
+    "status": "promoted"
+  },
+  {
+    "chapter": 12,
+    "fen": "8/8/5k1p/8/5KPP/8/8/8 b - - 0 1",
+    "issues": [],
+    "label": "Analysis diagram 12.27",
+    "number": "12.27",
+    "status": "promoted"
+  },
+  {
+    "chapter": 12,
+    "fen": "6k1/7p/7K/8/8/6P1/7P/8 w - - 0 1",
+    "issues": [],
+    "label": "Analysis diagram 12.28",
+    "number": "12.28",
+    "status": "promoted"
+  },
+  {
+    "chapter": 12,
+    "fen": "8/7p/5k2/8/5K2/8/7P/8 w - - 0 1",
+    "issues": [],
+    "label": "Position 12.29",
+    "number": "12.29",
+    "status": "promoted"
+  },
+  {
+    "chapter": 12,
+    "fen": "8/7p/5k2/8/5K2/6P1/7P/8 w - - 0 1",
+    "issues": [],
+    "label": "Position 12.30",
+    "number": "12.30",
+    "status": "promoted"
+  },
+  {
+    "chapter": 12,
+    "fen": "8/7p/8/5k2/8/5K2/6PP/8 w - - 0 1",
+    "issues": [
+      {
+        "piece": "P",
+        "square": "g2",
+        "distance": 0.134,
+        "nextDistance": 0.141
+      }
+    ],
+    "label": "Position 12.31",
+    "number": "12.31",
+    "status": "promoted-with-warnings"
+  },
+  {
+    "chapter": 12,
+    "fen": "8/6k1/8/p2p3P/8/8/2K5/8 b - - 0 1",
+    "issues": [
+      {
+        "piece": "P",
+        "square": "h5",
+        "distance": 0.131,
+        "nextDistance": 0.138
+      }
+    ],
+    "label": "Position 12.32",
+    "number": "12.32",
+    "status": "promoted-with-warnings"
+  },
+  {
+    "chapter": 12,
+    "fen": "8/7k/p1p1p1pP/2k3P1/2p5/2K5/8/8 w - - 0 1",
+    "issues": [
+      {
+        "piece": "p",
+        "square": "c6",
+        "distance": 0.265,
+        "nextDistance": 0.267
+      },
+      {
+        "piece": "P",
+        "square": "h6",
+        "distance": 0.14,
+        "nextDistance": 0.15
+      },
+      {
+        "piece": "k",
+        "square": "c5",
+        "distance": 0.23,
+        "nextDistance": 0.23
+      },
+      {
+        "piece": "P",
+        "square": "g5",
+        "distance": 0.136,
+        "nextDistance": 0.141
+      },
+      {
+        "piece": "p",
+        "square": "c4",
+        "distance": 0.246,
+        "nextDistance": 0.272
+      }
+    ],
+    "label": "Position 12.33",
+    "number": "12.33",
+    "reason": "ambiguous piece classification",
+    "status": "kept-caption"
+  },
+  {
+    "chapter": 12,
+    "fen": "8/7k/6pP/6P1/8/p1p5/8/1K6 w - - 0 1",
+    "issues": [],
+    "label": "Position 12.34",
+    "number": "12.34",
+    "status": "promoted"
+  },
+  {
+    "chapter": 12,
+    "fen": "8/8/8/1p2kPp1/6P1/4K3/8/8 w - - 0 1",
+    "issues": [],
+    "label": "Position 12.35",
+    "number": "12.35",
+    "status": "promoted"
+  },
+  {
+    "chapter": 12,
+    "fen": "8/8/8/p3kPp1/6P1/4K3/8/8 w - - 0 1",
+    "issues": [],
+    "label": "Position 12.36",
+    "number": "12.36",
+    "status": "promoted"
+  },
+  {
+    "chapter": 12,
+    "fen": "8/8/2p1kPp1/6P1/4K3/8/8/8 w - - 0 1",
+    "issues": [],
+    "label": "Position 12.37",
+    "number": "12.37",
+    "status": "promoted"
+  },
+  {
+    "chapter": 12,
+    "fen": "8/8/3k4/1p2p3/1P2K3/8/7P/8 w - - 0 1",
+    "issues": [],
+    "label": "Position 12.38",
+    "number": "12.38",
+    "status": "promoted"
+  },
+  {
+    "chapter": 12,
+    "fen": "8/1p6/4k1p1/1p6/1P2KPP1/8/8/8 w - - 0 1",
+    "issues": [],
+    "label": "Position 12.39",
+    "number": "12.39",
+    "status": "promoted"
+  },
+  {
+    "chapter": 12,
+    "fen": "8/5p2/4kp2/1p6/1P2KPP1/8/8/8 w - - 0 1",
+    "issues": [],
+    "label": "Position 12.40",
+    "number": "12.40",
+    "status": "promoted"
+  },
+  {
+    "chapter": 12,
+    "fen": "8/ppp5/8/PPP5/8/4k3/8/4K3 b - - 0 1",
+    "issues": [],
+    "label": "Position 12.41",
+    "number": "12.41",
+    "status": "promoted"
+  },
+  {
+    "chapter": 12,
+    "fen": "8/7p/8/4kpPP/8/8/4K3/8 w - - 0 1",
+    "issues": [],
+    "label": "Position 12.42",
+    "number": "12.42",
+    "status": "promoted"
+  },
+  {
+    "chapter": 13,
+    "fen": "8/8/8/8/4k3/8/6K1/6B1 w - - 0 1",
+    "issues": [
+      {
+        "piece": "B",
+        "square": "g1",
+        "distance": 0.152,
+        "nextDistance": 0.164
+      }
+    ],
+    "label": "Position 13.4",
+    "number": "13.4",
+    "status": "promoted-with-warnings"
+  },
+  {
+    "chapter": 13,
+    "fen": "8/B3P3/3K1kp1/5p2/8/8/8/8 w - - 0 1",
+    "issues": [
+      {
+        "piece": "P",
+        "square": "e7",
+        "distance": 0.214,
+        "nextDistance": 0.215
+      }
+    ],
+    "label": "Analysis diagram 13.6",
+    "number": "13.6",
+    "status": "promoted-with-warnings"
+  },
+  {
+    "chapter": 13,
+    "fen": "3k4/1pPpRp2/3K4/3B4/8/8/8/5R2 w - - 0 1",
+    "issues": [
+      {
+        "piece": "p",
+        "square": "b7",
+        "distance": 0.254,
+        "nextDistance": 0.274
+      },
+      {
+        "piece": "P",
+        "square": "c7",
+        "distance": 0.231,
+        "nextDistance": 0.232
+      },
+      {
+        "piece": "p",
+        "square": "d7",
+        "distance": 0.253,
+        "nextDistance": 0.275
+      },
+      {
+        "piece": "p",
+        "square": "f7",
+        "distance": 0.254,
+        "nextDistance": 0.275
+      }
+    ],
+    "label": "Position 13.7",
+    "number": "13.7",
+    "status": "promoted-with-warnings"
+  },
+  {
+    "chapter": 13,
+    "fen": "3k4/1R6/3K4/3B4/8/8/8/2R5 w - - 0 1",
+    "issues": [
+      {
+        "piece": "R",
+        "square": "c1",
+        "distance": 0.201,
+        "nextDistance": 0.212
+      }
+    ],
+    "label": "Position 13.8",
+    "number": "13.8",
+    "status": "promoted-with-warnings"
+  },
+  {
+    "chapter": 13,
+    "fen": "2k5/3r4/2K5/2B5/8/8/4R3/8 w - - 0 1",
+    "issues": [],
+    "label": "Position 13.9",
+    "number": "13.9",
+    "status": "promoted"
+  },
+  {
+    "chapter": 13,
+    "fen": "1k6/2R5/1K6/1B6/8/8/8/3R4 w - - 0 1",
+    "issues": [],
+    "label": "Position 13.10",
+    "number": "13.10",
+    "status": "promoted"
+  },
+  {
+    "chapter": 13,
+    "fen": "k7/1r6/K7/B7/8/8/2R5/8 w - - 0 1",
+    "issues": [],
+    "label": "Position 13.11",
+    "number": "13.11",
+    "status": "promoted"
+  },
+  {
+    "chapter": 13,
+    "fen": "3P4/8/5k2/R7/4BK1k/8/7R/4k3 w - - 0 1",
+    "issues": [
+      {
+        "piece": "P",
+        "square": "d8",
+        "distance": 0.222,
+        "nextDistance": 0.224
+      },
+      {
+        "piece": "k",
+        "square": "h4",
+        "distance": 0.218,
+        "nextDistance": 0.227
+      },
+      {
+        "piece": "k",
+        "square": "e1",
+        "distance": 0.212,
+        "nextDistance": 0.224
+      }
+    ],
+    "label": "Position 13.12",
+    "number": "13.12",
+    "reason": "ambiguous piece classification",
+    "status": "kept-caption"
+  },
+  {
+    "chapter": 13,
+    "fen": "8/4k3/6R1/R2B4/3K4/8/8/8 w - - 0 1",
+    "issues": [],
+    "label": "Analysis diagram 13.13",
+    "number": "13.13",
+    "status": "promoted"
+  },
+  {
+    "chapter": 13,
+    "fen": "4k3/6R1/8/4K3/4B3/8/4r3/8 w - - 0 1",
+    "issues": [],
+    "label": "Analysis diagram 13.14",
+    "number": "13.14",
+    "status": "promoted"
+  },
+  {
+    "chapter": 13,
+    "fen": "8/8/8/r2BK2k/8/8/8/6R1 w - - 0 1",
+    "issues": [],
+    "label": "Analysis diagram 13.15",
+    "number": "13.15",
+    "status": "promoted"
+  },
+  {
+    "chapter": 13,
+    "fen": "8/6R1/7B/3K4/7k/8/4r3/8 b - - 0 1",
+    "issues": [],
+    "label": "Position 13.16",
+    "number": "13.16",
+    "status": "promoted"
+  },
+  {
+    "chapter": 13,
+    "fen": "8/7R/8/8/4KBk1/8/6r1/8 w - - 0 1",
+    "issues": [],
+    "label": "Analysis diagram 13.17",
+    "number": "13.17",
+    "status": "promoted"
+  },
+  {
+    "chapter": 13,
+    "fen": "8/8/8/8/8/R4KB1/6r1/5k2 w - - 0 1",
+    "issues": [],
+    "label": "Analysis diagram 13.18",
+    "number": "13.18",
+    "status": "promoted"
+  },
+  {
+    "chapter": 13,
+    "fen": "5k2/1R6/8/4KP2/2b5/8/8/8 w - - 0 1",
+    "issues": [],
+    "label": "Position 13.19",
+    "number": "13.19",
+    "status": "promoted"
+  },
+  {
+    "chapter": 13,
+    "fen": "5k2/1R6/4pP2/3b2K1/2p5/1p6/p7/8 w - - 0 1",
+    "issues": [],
+    "label": "Analysis diagram 13.20",
+    "number": "13.20",
+    "status": "promoted"
+  },
+  {
+    "chapter": 13,
+    "fen": "7k/R7/7P/5pK1/4p3/3p4/2b5/1p6 w - - 0 1",
+    "issues": [
+      {
+        "piece": "p",
+        "square": "f5",
+        "distance": 0.251,
+        "nextDistance": 0.274
+      }
+    ],
+    "label": "Position 13.21",
+    "number": "13.21",
+    "reason": "ambiguous piece classification",
+    "status": "kept-caption"
+  },
+  {
+    "chapter": 13,
+    "fen": "7k/1R6/8/5pKP/4p3/3p4/2b5/1p6 w - - 0 1",
+    "issues": [
+      {
+        "piece": "p",
+        "square": "f5",
+        "distance": 0.249,
+        "nextDistance": 0.274
+      }
+    ],
+    "label": "Position 13.22",
+    "number": "13.22",
+    "reason": "ambiguous piece classification",
+    "status": "kept-caption"
+  },
+  {
+    "chapter": 13,
+    "fen": "6k1/6R1/7K/7P/8/3b4/8/8 w - - 0 1",
+    "issues": [],
+    "label": "Analysis diagram 13.23",
+    "number": "13.23",
+    "status": "promoted"
+  },
+  {
+    "chapter": 13,
+    "fen": "7k/R7/8/6K1/7P/8/2b5/8 w - - 0 1",
+    "issues": [],
+    "label": "Position 13.24",
+    "number": "13.24",
+    "status": "promoted"
+  },
+  {
+    "chapter": 13,
+    "fen": "8/4k3/4p3/3r4/4K3/7k/8/8 w - - 0 1",
+    "issues": [
+      {
+        "piece": "k",
+        "square": "h3",
+        "distance": 0.249,
+        "nextDistance": 0.283
+      }
+    ],
+    "label": "Position 13.25",
+    "number": "13.25",
+    "reason": "ambiguous piece classification",
+    "status": "kept-caption"
+  },
+  {
+    "chapter": 13,
+    "fen": "6k1/8/4pk2/3r4/6K1/8/8/8 w - - 0 1",
+    "issues": [
+      {
+        "piece": "k",
+        "square": "g8",
+        "distance": 0.256,
+        "nextDistance": 0.304
+      }
+    ],
+    "label": "Position 13.26",
+    "number": "13.26",
+    "reason": "ambiguous piece classification",
+    "status": "kept-caption"
+  },
+  {
+    "chapter": 13,
+    "fen": "8/2K5/4p3/3k1r2/6K1/8/8/8 w - - 0 1",
+    "issues": [
+      {
+        "piece": "K",
+        "square": "c7",
+        "distance": 0.215,
+        "nextDistance": 0.217
+      }
+    ],
+    "label": "Analysis diagram 13.27",
+    "number": "13.27",
+    "reason": "ambiguous piece classification",
+    "status": "kept-caption"
+  },
+  {
+    "chapter": 13,
+    "fen": "4k3/4p3/3R4/4K3/7K/8/8/8 w - - 0 1",
+    "issues": [
+      {
+        "piece": "R",
+        "square": "d6",
+        "distance": 0.181,
+        "nextDistance": 0.193
+      },
+      {
+        "piece": "K",
+        "square": "h4",
+        "distance": 0.217,
+        "nextDistance": 0.227
+      }
+    ],
+    "label": "Position 13.28",
+    "number": "13.28",
+    "reason": "ambiguous piece classification",
+    "status": "kept-caption"
+  },
+  {
+    "chapter": 13,
+    "fen": "8/1k6/p5k1/1r6/1K6/8/8/8 w - - 0 1",
+    "issues": [
+      {
+        "piece": "k",
+        "square": "g6",
+        "distance": 0.25,
+        "nextDistance": 0.283
+      }
+    ],
+    "label": "Position 13.29",
+    "number": "13.29",
+    "reason": "ambiguous piece classification",
+    "status": "kept-caption"
+  },
+  {
+    "chapter": 13,
+    "fen": "kR6/8/p1KK4/8/8/8/8/8 w - - 0 1",
+    "issues": [
+      {
+        "piece": "K",
+        "square": "d6",
+        "distance": 0.219,
+        "nextDistance": 0.228
+      }
+    ],
+    "label": "Analysis diagram 13.30",
+    "number": "13.30",
+    "reason": "ambiguous piece classification",
+    "status": "kept-caption"
+  }
+]

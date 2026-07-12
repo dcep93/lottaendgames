@@ -437,7 +437,14 @@ function tokenizeMoveText(content: string): ParseToken[] {
     const prefix = match[1] ? display.slice(0, display.length - match[4].length) : ''
     const san = normalizeSan(match[4])
 
-    if (!shouldTokenizeMoveCandidate(match, content.slice(cursor, index), tokens)) {
+    if (
+      !shouldTokenizeMoveCandidate(
+        match,
+        content.slice(cursor, index),
+        content.slice(index + display.length),
+        tokens,
+      )
+    ) {
       appendTextToken(tokens, content.slice(cursor, index + display.length))
       cursor = index + display.length
       continue
@@ -481,9 +488,14 @@ function appendTextToken(tokens: ParseToken[], text: string) {
 function shouldTokenizeMoveCandidate(
   match: RegExpMatchArray,
   precedingText: string,
+  followingText: string,
   tokens: ParseToken[],
 ) {
   if (hasProseMoveBlocker(precedingText)) {
+    return false
+  }
+
+  if (/^\s*-\s*[a-h][1-8]/.test(followingText)) {
     return false
   }
 
@@ -497,6 +509,10 @@ function shouldTokenizeMoveCandidate(
     return isMoveContinuationText(precedingText)
   }
 
+  if (/^[KQRBN]/.test(normalizeSan(match[4]))) {
+    return true
+  }
+
   return (
     /\.\.\.\s*$/.test(precedingText) ||
     /\bwith\s+(?:simply\s+)?$/i.test(precedingText)
@@ -504,7 +520,7 @@ function shouldTokenizeMoveCandidate(
 }
 
 function hasProseMoveBlocker(text: string) {
-  return /(?:\b(?:by means of|followed by|the threat is|threatening|which would allow|would allow)\s*(?:\.\.\.)?\s*)$/i.test(
+  return /(?:\b(?:by means of|followed by|forcing|manoeuvre|such as|the threat is|threatening|which would allow|would allow)\s*(?:\.\.\.)?\s*)$/i.test(
     text,
   )
 }
