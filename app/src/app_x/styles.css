@@ -26,7 +26,7 @@
 }
 
 .leg-reader-shell {
-  width: min(70rem, 100%);
+  width: min(82rem, 100%);
   margin: 0 auto;
 }
 
@@ -212,6 +212,61 @@
     linear-gradient(140deg, rgba(255, 123, 195, 0.06), transparent 42%),
     var(--leg-panel);
   box-shadow: 0 1rem 2.4rem rgba(0, 0, 0, 0.22);
+}
+
+.leg-position-study {
+  display: grid;
+  grid-template-columns: clamp(9rem, 30%, 22rem) minmax(0, 1fr);
+  gap: 1rem;
+  align-items: start;
+  width: min(78rem, 100%);
+  margin: 0.5rem 0;
+}
+
+.leg-position-study.is-board-only {
+  grid-template-columns: minmax(12rem, 20rem);
+}
+
+.leg-position-study-board {
+  position: sticky;
+  top: 1rem;
+  max-height: calc(100svh - 2rem);
+}
+
+.leg-position-study-content {
+  display: grid;
+  gap: 1rem;
+  max-height: calc(100svh - 2rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 0.35rem;
+  scrollbar-gutter: stable;
+}
+
+.leg-position-study .leg-position-card {
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+  width: 100%;
+  margin: 0;
+  padding: 0.85rem;
+}
+
+.leg-position-study .leg-position-copy {
+  gap: 0.5rem;
+}
+
+.leg-position-study .leg-position-copy figcaption strong,
+.leg-position-study .leg-position-reset {
+  font-size: 1.7rem;
+}
+
+.leg-position-study .leg-position-copy p {
+  font-size: 0.9rem;
+  line-height: 1.35;
+}
+
+.leg-position-study .leg-board-wrap {
+  width: 100%;
 }
 
 .leg-position-card.is-active-position {
@@ -402,6 +457,17 @@
     padding: 1rem;
   }
 
+  .leg-position-study {
+    grid-template-columns: clamp(7.4rem, 34%, 10rem) minmax(0, 1fr);
+    gap: 0.75rem;
+    width: 100%;
+  }
+
+  .leg-position-study-board,
+  .leg-position-study-content {
+    max-height: calc(100svh - 1.5rem);
+  }
+
   .leg-position-card {
     grid-template-columns: 1fr;
   }
@@ -415,6 +481,25 @@
 @media (max-width: 32rem) {
   .leg-page {
     padding: 0.75rem;
+  }
+
+  .leg-position-study {
+    grid-template-columns: clamp(6.75rem, 36%, 8.75rem) minmax(0, 1fr);
+    gap: 0.6rem;
+  }
+
+  .leg-position-study .leg-position-card {
+    padding: 0.55rem;
+  }
+
+  .leg-position-study .leg-position-copy figcaption span,
+  .leg-position-study .leg-position-copy p {
+    font-size: 0.72rem;
+  }
+
+  .leg-position-study .leg-position-copy figcaption strong,
+  .leg-position-study .leg-position-reset {
+    font-size: 1.35rem;
   }
 
   .leg-position-card,

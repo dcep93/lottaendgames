@@ -180,6 +180,34 @@ NOISE_REPLACEMENTS = [
     ("nar row", "narrow"),
     ("considere rations", "considerations"),
     ("coord inated", "coordinated"),
+    ("de fence", "defence"),
+    ("de fender", "defender"),
+    ("de fending", "defending"),
+    ("be tween", "between"),
+    ("oc cupy", "occupy"),
+    ("suc ceeds", "succeeds"),
+    ("ex ample", "example"),
+    ("How ever", "However"),
+    ("posi tions", "positions"),
+    ("op position", "opposition"),
+    ("be hind", "behind"),
+    ("pro motion", "promotion"),
+    ("pa tient", "patient"),
+    ("de tail", "detail"),
+    ("an swer", "answer"),
+    ("re sponsibility", "responsibility"),
+    ("ch ecks", "checks"),
+    ("deliv ering", "delivering"),
+    ("sup ported", "supported"),
+    ("promo tion", "promotion"),
+    ("proce dure", "procedure"),
+    ("fol lows", "follows"),
+    ("quick est", "quickest"),
+    ("adj acent", "adjacent"),
+    ("Al though", "Although"),
+    ("can not", "cannot"),
+    ("dual-pur pose", "dual-purpose"),
+    ("domi nant", "dominant"),
     ("momen ts", "moments"),
     ("Ke1l-known", "well-known"),
     ("Ke1l", "well"),
@@ -1011,6 +1039,12 @@ def clean_final_ocr_notation_collisions(text: str) -> str:
     text = text.replace("9.d8Qa1 if 10.Qd2+!+-", "9.d8=Q a1=Q 10.Qd2+!+-")
     text = text.replace("9.d8Qa2 10.Qd4+-", "9.d8=Q a2 10.Qd4+-")
     text = text.replace("3.Kd5? Wxfs 4.Kc5", "3.Kd5? Kxf5 4.Kc5")
+    text = text.replace("b4the moment", "b4 the moment")
+    text = text.replace("hS pawn", "h5 pawn")
+    text = text.replace("the hS pawn", "the h5 pawn")
+    text = text.replace("from h 1", "from h1")
+    text = text.replace("on fl", "on f1")
+    text = text.replace("1...£4!", "1...f4!")
     text = text.replace("1.Kg6...As", "1.Kg6. As")
     text = text.replace("will be5.Kh6", "will be 5.Kh6")
     text = text.replace("7.c;tJes c;tJf7 8.c;tJfs c;tJg7 9.c;tJe6!", "7.Ke5 Kf7 8.Kf5 Kg7 9.Ke6!")
@@ -1025,6 +1059,21 @@ def clean_final_ocr_notation_collisions(text: str) -> str:
     text = text.replace("1...f xgS", "1...fxg5")
     text = text.replace("3.Kfs Ke7", "3.Kf5 Ke7")
     text = text.replace("bS pawn", "b5 pawn")
+    text = text.replace("cS, dS and eS", "c5, d5 and e5")
+    text = text.replace("key squares cS and dS", "key squares c5 and d5")
+    text = text.replace("attacks cS and dS", "attacks c5 and d5")
+    text = text.replace("square is dS", "square is d5")
+    text = text.replace("from cS to c4", "from c5 to c4")
+    text = text.replace("the g 7 pawn", "the g7 pawn")
+    text = text.replace("1...g S", "1...g5")
+    text = text.replace("4...g 55.b6", "4...g5 5.b6")
+    text = text.replace("5...g 56.b6", "5...g5 6.b6")
+    text = text.replace("7.rJiia7", "7.Ka7")
+    text = text.replace("9.b8K+", "9.b8Q+")
+    text = text.replace("2.b4 W£73.b5", "2.b4 Kf7 3.b5")
+    text = text.replace("3.b5 cJile7", "3.b5 Ke7")
+    text = text.replace("<JidS", "Kd5")
+    text = text.replace("square is cS", "square is c5")
     text = text.replace("4...h 55.g5+", "4...h5 5.g5+")
     text = text.replace("4...h 65.Kg4!", "4...h6 5.Kg4!")
     text = text.replace("1...h 62.g4+ c;t?gs 3.c;t?g3! hS", "1...h6 2.g4+ Kg5 3.Kg3! h5")
@@ -1076,6 +1125,10 @@ def clean_final_ocr_notation_collisions(text: str) -> str:
     )
     text = text.replace("Threatening RIc6 and Kg5", "Threatening Rc6 and Kg5")
     text = text.replace("5.Rc7\nThreatening RIc6", "5.Rc7\nThreatening Rc6")
+    text = text.replace(
+        "6.Kf5 k:ra 17.k:rc7+ (7.Kg6+ K£7=)",
+        "6.Kf5 Ra1 7.Rc7+ (7.Kg6+ Kf7=)",
+    )
     text = text.replace("8.cJfe4 RIhS 9.RIa7 RIh 110.RId7", "8.Ke4 Rh5 9.Ra7 Rh1 10.Rd7")
     text = text.replace("13.Ke7 cJfxh7=", "13.Ke7 Kxh7=")
     text = text.replace("6...RIg1+? 7.Kf3 RIh 1", "6...Rg1+? 7.Kf3 Rh1")
@@ -1163,6 +1216,7 @@ def clean_final_ocr_notation_collisions(text: str) -> str:
     text = text.replace("2...K £73.Rh8", "2...Kf7 3.Rh8")
     text = text.replace("with2...Kh7?", "with 2...Kh7?")
     text = text.replace("6...Rb7.Ka7.That is the\nI +\npoint", "6...Rb7+ 7.Ka7. That is the point")
+    text = text.replace("1.Kf6 Re1 2JJ.g3 I!e2", "1.Kf6 Re1 2.Rg3 Re2")
     text = text.replace("7.Kb6 l:Rf6+ a.Ka7", "7.Kb6 Rf6+ 8.Ka7")
     text = text.replace("11.Kd4 a:ts", "11.Kd4 Rf5")
     text = text.replace("with3...J ie2+?!", "with 3...Re2+?!")
@@ -1230,6 +1284,7 @@ def clean_final_ocr_notation_collisions(text: str) -> str:
     text = text.replace("Rf.g8", "Rg8")
     text = text.replace("28.tLlf5 <J;th8.If", "28.Nf5 Kh8. If")
     text = text.replace("28.tLlf5 <J;th8. If", "28.Nf5 Kh8. If")
+    text = text.replace("19... <J;t g7", "19...Kg7")
     text = text.replace("1..J lb5", "1...Rb5")
     text = text.replace("3.Rra6 Kc5", "3.Ra6 Rc5")
     text = text.replace("4.Kd3 Rrc7", "4.Bd3 Rc7")
@@ -1375,6 +1430,12 @@ def clean_final_ocr_notation_collisions(text: str) -> str:
         "1.Qh8+ Kd7 2.'ii'f8 Ke6+ 3.Kd5 Kd6+ 4.Kc5 Kf6",
         "1.Qh8+ Kd7 2.Qf8 Re6+ 3.Kd5 Rd6+ 4.Kc5 Rf6",
     )
+    text = text.replace("were safe", "we're safe")
+    text = text.replace("2.Kh6.Now", "2.Kh6. Now")
+    text = text.replace("2...Bc4.B)", "2...Bc4. B)")
+    text = text.replace("b l -h7", "b1-h7")
+    text = text.replace("there is no way to due to stalemate resources", "there is no way to win due to stalemate resources")
+    text = text.replace("+-\n2.Kh6", "+-\n\n2.Kh6")
     text = text.replace(
         "4...Rd2?! 5.Kb6 l:!.d6+? (5...l:!. b2+! is still a draw) 6.Kb7, threatening Qc8",
         "4...Rd2?! 5.Kb6 Rd6+? (5...Rb2+! is still a draw) 6.Kb7, threatening Qc8",

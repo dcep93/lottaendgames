@@ -63,6 +63,24 @@ type ActiveBoardState = {
   preferredNextByCursor: Record<string, string>
 }
 
+type IndexedChapterSection = {
+  index: number
+  section: RawChapterSection
+}
+
+type ChapterRenderItem =
+  | {
+      index: number
+      section: RawChapterSection
+      type: 'section'
+    }
+  | {
+      contentSections: IndexedChapterSection[]
+      index: number
+      positionSection: PositionSection
+      type: 'positionGroup'
+    }
+
 export default function ChapterViewer() {
   const [activeChapterId, setActiveChapterId] = useState(chapterTabs[0].id)
   const [chapterPayload, setChapterPayload] = useState<ChapterPayload | null>(
@@ -78,6 +96,10 @@ export default function ChapterViewer() {
     null
   const preparedChapter = activeChapter ?? emptyPreparedChapter
   const chapterSections = preparedChapter.sections
+  const chapterRenderItems = useMemo(
+    () => buildChapterRenderItems(chapterSections),
+    [chapterSections],
+  )
   const playback = preparedChapter.playback
   const navigationByPosition = preparedChapter.navigationByPosition
   const initialPositionFens = preparedChapter.initialPositionFens
@@ -323,18 +345,30 @@ export default function ChapterViewer() {
           </aside>
         ) : activeChapter ? (
           <article className="leg-chapter">
-            {chapterSections.map((section, index) => (
-              <SectionRenderer
-                index={index}
-                key={`${section.type}-${index}`}
-                activeBoards={activeBoards}
-                activePositionNumber={activePositionNumber}
-                onMoveClick={handleMoveClick}
-                onPositionReset={handlePositionReset}
-                playback={playback}
-                section={section}
-              />
-            ))}
+            {chapterRenderItems.map((item) =>
+              item.type === 'positionGroup' ? (
+                <PositionStudyGroup
+                  activeBoards={activeBoards}
+                  activePositionNumber={activePositionNumber}
+                  group={item}
+                  key={`position-group-${item.positionSection.content.number}-${item.index}`}
+                  onMoveClick={handleMoveClick}
+                  onPositionReset={handlePositionReset}
+                  playback={playback}
+                />
+              ) : (
+                <SectionRenderer
+                  index={item.index}
+                  key={`${item.section.type}-${item.index}`}
+                  activeBoards={activeBoards}
+                  activePositionNumber={activePositionNumber}
+                  onMoveClick={handleMoveClick}
+                  onPositionReset={handlePositionReset}
+                  playback={playback}
+                  section={item.section}
+                />
+              ),
+            )}
           </article>
         ) : (
           <aside className="leg-load-state">Loading chapter data...</aside>
@@ -347,6 +381,55 @@ export default function ChapterViewer() {
         />
       </div>
     </main>
+  )
+}
+
+function buildChapterRenderItems(
+  sections: RawChapterSection[],
+): ChapterRenderItem[] {
+  const items: ChapterRenderItem[] = []
+  let index = 0
+
+  while (index < sections.length) {
+    const section = sections[index]
+
+    if (section.type !== 'position') {
+      items.push({ index, section, type: 'section' })
+      index += 1
+      continue
+    }
+
+    const contentSections: IndexedChapterSection[] = []
+    let nextIndex = index + 1
+
+    while (
+      nextIndex < sections.length &&
+      !isPositionGroupBoundary(sections[nextIndex])
+    ) {
+      contentSections.push({
+        index: nextIndex,
+        section: sections[nextIndex],
+      })
+      nextIndex += 1
+    }
+
+    items.push({
+      contentSections,
+      index,
+      positionSection: section as PositionSection,
+      type: 'positionGroup',
+    })
+    index = nextIndex
+  }
+
+  return items
+}
+
+function isPositionGroupBoundary(section: RawChapterSection) {
+  return (
+    section.type === 'position' ||
+    section.type === 'ending' ||
+    section.type === 'title'
   )
 }
 
@@ -373,6 +456,65 @@ function prepareChapter(chapter: ChapterDefinition): PreparedChapter {
     positionCount: chapter.sections.filter((section) => section.type === 'position')
       .length,
   }
+}
+
+function PositionStudyGroup({
+  activeBoards,
+  activePositionNumber,
+  group,
+  onMoveClick,
+  onPositionReset,
+  playback,
+}: {
+  activeBoards: Record<string, ActiveBoardState>
+  activePositionNumber: string | null
+  group: Extract<ChapterRenderItem, { type: 'positionGroup' }>
+  onMoveClick: (token: Extract<TextPlaybackToken, { type: 'move' }>) => void
+  onPositionReset: (positionNumber: string) => void
+  playback: ReturnType<typeof buildChapterPlayback>
+}) {
+  const positionNumber = group.positionSection.content.number
+
+  return (
+    <section
+      className={
+        group.contentSections.length > 0
+          ? 'leg-position-study'
+          : 'leg-position-study is-board-only'
+      }
+      aria-labelledby={`position-${positionNumber}-heading`}
+    >
+      <div className="leg-position-study-board">
+        <PositionCard
+          activeBoard={activeBoards[positionNumber]}
+          activePositionNumber={activePositionNumber}
+          hasPlayback={playback.playablePositions.has(positionNumber)}
+          headingId={`position-${positionNumber}-heading`}
+          onReset={onPositionReset}
+          section={group.positionSection}
+        />
+      </div>
+      {group.contentSections.length > 0 ? (
+        <div
+          aria-label={`Content for position ${positionNumber}`}
+          className="leg-position-study-content"
+        >
+          {group.contentSections.map(({ index, section }) => (
+            <SectionRenderer
+              activeBoards={activeBoards}
+              activePositionNumber={activePositionNumber}
+              index={index}
+              key={`${section.type}-${index}`}
+              onMoveClick={onMoveClick}
+              onPositionReset={onPositionReset}
+              playback={playback}
+              section={section}
+            />
+          ))}
+        </div>
+      ) : null}
+    </section>
+  )
 }
 
 function ChapterSelector({
@@ -515,12 +657,14 @@ function PositionCard({
   activeBoard,
   activePositionNumber,
   hasPlayback,
+  headingId,
   onReset,
   section,
 }: {
   activeBoard?: ActiveBoardState
   activePositionNumber: string | null
   hasPlayback: boolean
+  headingId?: string
   onReset: (positionNumber: string) => void
   section: PositionSection
 }) {
@@ -542,13 +686,14 @@ function PositionCard({
             <button
               aria-label={`Reset position ${number}`}
               className="leg-position-reset"
+              id={headingId}
               onClick={() => onReset(number)}
               type="button"
             >
               {number}
             </button>
           ) : (
-            <strong>{number}</strong>
+            <strong id={headingId}>{number}</strong>
           )}
         </figcaption>
         {caption ? <p>{caption}</p> : null}

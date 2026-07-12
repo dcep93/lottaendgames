@@ -199,13 +199,17 @@ def filter_running_lines(raw_line: str) -> str:
 
 def normalize_chess_glyphs(text: str) -> str:
     king_glyphs = [
+        r"®",
         r"<;t>",
         r"<iit",
+        r"<ii\?",
         r"<it>",
         r"<it",
         r"<tit",
         r"c;i;",
         r"rJi",
+        r"<J;\.;",
+        r"<Ji",
         r"<J;t",
         r"w(?=[a-h][1-8])",
         r"W(?=\s*[a-h][1-8])",
@@ -359,6 +363,51 @@ def normalize_common_words(text: str) -> str:
         ("possib1e", "possible"),
         ("pro motion", "promotion"),
         ("ob structed", "obstructed"),
+        ("consuRed", "consulted"),
+        ("com mon", "common"),
+        ("op position", "opposition"),
+        ("oth ers", "others"),
+        ("excep tion", "exception"),
+        ("ri val", "rival"),
+        ("be fore", "before"),
+        ("posi tions", "positions"),
+        ("pawnshould", "pawn should"),
+        ("usu ally", "usually"),
+        ("aReady", "already"),
+        ("aRerna tives", "alternatives"),
+        ("aRhough", "although"),
+        ("aRernative", "alternative"),
+        ("resuR", "result"),
+        ("rea son", "reason"),
+        ("Posi tion", "Position"),
+        ("mark ed", "marked"),
+        ("de fence", "defence"),
+        ("de fending", "defending"),
+        ("Fi nal", "Final"),
+        ("au tomatic", "automatic"),
+        ("ex ploiting", "exploiting"),
+        ("the oretical", "theoretical"),
+        ("opp osition", "opposition"),
+        ("oppo sition", "opposition"),
+        ("opposi tion", "opposition"),
+        ("re treat", "retreat"),
+        ("deci sive", "decisive"),
+        ("con clusion", "conclusion"),
+        ("out ofr each", "out of reach"),
+        ("every thing", "everything"),
+        ("subtle ties", "subtleties"),
+        ("from the. key", "from the key"),
+        ("opposi-\n\n8.", "opposition.\n8."),
+        ("in front ofthepawn", "in front of the pawn"),
+        ("centralfiles", "central files"),
+        ("con trols", "controls"),
+        ("hi-corner", "h1-corner"),
+        ("c2-dl-el-f2", "c2-d1-e1-f2"),
+        ("e2-d4-b3-c1.1.", "e2-d4-b3-c1. 1."),
+        ("re source", "resource"),
+        ("defend ing", "defending"),
+        ("be tween", "between"),
+        ("£7", "f7"),
         ("ifp ossible", "if possible"),
         ("position ofk ing", "position of king"),
         ("cannote", "can note"),
@@ -390,6 +439,16 @@ def normalize_common_words(text: str) -> str:
         ("c1 Q", "c1=Q"),
         ("g1 Q", "g1=Q"),
         ("h8Q", "h8=Q"),
+        ("1 O. Qf3+", "10. Qf3+"),
+        ("3..'Kf6+ 4.\\bg8 \\be6!-+", "3...Kf6+ 4.Kg8 Ke6!-+"),
+        ("1.... W g8.2.", "1...Kg8 2."),
+        ("1.... W g8.2", "1...Kg8 2"),
+        ("1 Kg8 2.", "1...Kg8 2."),
+        ("1... Kh7.1.", "1...Kh7. 1."),
+        ("4.a7Kc7", "4.a7 Kc7"),
+        ("4.e7Kd7", "4.e7 Kd7"),
+        ("5. Kh7 1-0... Key", "5. Kh7 1-0. Key"),
+        ("3.g6...", "3.g6."),
     ]
 
     for before, after in replacements:
@@ -423,8 +482,14 @@ def normalize_spacing(text: str) -> str:
     text = re.sub(r"(?<![A-Za-z])([1-9])\s*\.\s+(?=[KQRBNOa-h])", r"\1.", text)
     text = re.sub(r"(?<![A-Za-z])([1-9])\s*\.\.\s+(?=[KQRBNOa-h])", r"\1...", text)
     text = re.sub(r"(?<![A-Za-z])([1-9])\.\.\s*(?=[KQRBNOa-h])", r"\1...", text)
+    text = re.sub(r"\b2\.\s*R\.\s*Je3\s*\+", "2.Ne3+", text)
+    text = text.replace("\\bg8", "Kg8")
+    text = text.replace("\\bg6", "Kg6")
+    text = text.replace("\\be6", "Ke6")
+    text = text.replace("3..'Kf6+", "3...Kf6+")
     text = re.sub(r"\s+([,.;:!?])", r"\1", text)
     text = re.sub(r"([.!?])([A-Z])", r"\1 \2", text)
+    text = re.sub(r"\b([1-9]) O\.", r"\g<1>0.", text)
     return text
 
 
@@ -512,6 +577,7 @@ def flush_pending_text(sections: list[dict[str, Any]], pending: list[str]) -> No
 
 
 def normalize_final_section_text(text: str) -> str:
+    text = re.sub(r"\b2\.\s*R\.\s*Je3\s*\+", "2.Ne3+", text)
     text = re.sub(r"(?<![A-Za-z])([1-9])\.\.\s*(?=[KQRBNOa-h])", r"\1...", text)
     return text
 
