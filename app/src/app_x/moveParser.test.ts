@@ -253,6 +253,10 @@ assertNoSplitWordArtifacts('10', chapterTenSections)
 assertNoSplitWordArtifacts('11', chapterElevenSections)
 assertNoSplitWordArtifacts('12', chapterTwelveSections)
 assertNoSplitWordArtifacts('13', chapterThirteenSections)
+assertNoNotationOcrArtifacts('10', chapterTenSections)
+assertNoNotationOcrArtifacts('11', chapterElevenSections)
+assertNoNotationOcrArtifacts('12', chapterTwelveSections)
+assertNoNotationOcrArtifacts('13', chapterThirteenSections)
 assert.equal(chapterTenPositionNumbers.has('10.1'), true)
 assert.equal(chapterTenPositionNumbers.has('10.2'), true)
 assert.equal(chapterElevenPositionNumbers.has('11.1'), true)
@@ -839,6 +843,37 @@ function assertNoSplitWordArtifacts(
     foundArtifacts,
     [],
     `Chapter ${chapterNumber} should not contain known split-word PDF text artifacts.`,
+  )
+}
+
+function assertNoNotationOcrArtifacts(
+  chapterNumber: string,
+  sections: RawChapterSection[],
+) {
+  const text = JSON.stringify(sections)
+  const artifacts = [
+    'J ie2',
+    'RId1',
+    'RIe1',
+    'RIg1',
+    'RIg l',
+    'RIh',
+    'c;tJ',
+    'cJf',
+    'dS +',
+    'gS fS',
+    'h 55.g5',
+    'h 65.Kg4',
+    'l:la l',
+    'ria l',
+    'Wxfs',
+  ]
+  const foundArtifacts = artifacts.filter((artifact) => text.includes(artifact))
+
+  assert.deepEqual(
+    foundArtifacts,
+    [],
+    `Chapter ${chapterNumber} should not contain known OCR-damaged notation.`,
   )
 }
 
