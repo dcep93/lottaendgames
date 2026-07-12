@@ -1,0 +1,212 @@
+[
+  {
+    "type": "title",
+    "content": "Bishop vs. Knight: one pawn on the board"
+  },
+  {
+    "type": "text",
+    "content": "After Rook endgames, the most common endgames are Bishop vs. Knight. With many pawns on the board, these endings are very interesting from a strategic point of view.\n\nOn the contrary, Bishop vs. Knight theoretical battles with just one pawn on the board are less interesting from a practical point of view; therefore, this will be one of the shortest chapters in the book.\n\nThese endings are less interesting because either they can be easily solved, in most positions, or it is difficult to set useful rules to solve them. We can say these endings are richer in tactics, maybe due to the presence of a knight or the inherent knight/bishop imbalance.\n\nSection 1. Knight + Pawn vs. Bishop\n\nLet us first focus on this case, the most interesting one. Compared to the previous chapter, here the bishop manages to draw with great ease. This theoretical impression is confirmed by the statistics. More problems arise when struggling against a rook's pawn and, especially, when one of the two control diagonals is too short."
+  },
+  {
+    "type": "ending",
+    "content": {
+      "number": "37",
+      "text": "Central pawn"
+    }
+  },
+  {
+    "type": "position",
+    "content": {
+      "number": "8.1",
+      "caption": "Cheron",
+      "fen": "1K6/4B3/8/8/8/2n2p2/5k2/8 w - - 0 1"
+    }
+  },
+  {
+    "type": "text",
+    "content": "As we have just said, these endings are rich in tactics and small details can change the final result. There are not many theoretical conclusions to draw: the analysis of just one position is enough to grasp the main points.\n\nHere, there are great drawing chances even when the defending king is far away, especially if his bishop can move along two quite long diagonals. The general rule states that if the two diagonals are 5 squares long there is no need for king support. Actually, the bishop cannot lose unless its own king is an obstacle. This is so because the knight has difficulties in setting up screens, as we will see now. Thus the bishop gets time to choose the best diagonal.\n\nIf one diagonal is less than 4 squares long, the attacking king can manoeuvre with his knight to dominate it completely. Then the bishop needs king support but, as we will see in this example, support arrives in time even if the king is far away. The shorter the diagonals, the greater the winning chances for the knight.\n\nThis is an extreme case. White draws here, but loses with his king on a8."
+  },
+  {
+    "type": "moves",
+    "content": "1.Bc5+!\n\nA logical move: the bishop moves to the longest diagonal.\n\n1.Bh4+?, placing the bishop on the shorter diagonal, was losing because the bishop will be ousted before the king can arrive. 1...Kg2 2.Kc7 Ne4 (threatening 3...Ng3) 3.Be1 Nc5 4.Kd6 Nd3 5.Bh4 Kh3! Knight and king control two squares apiece. That is the most they can do, but now the bishop has to retreat. This scenario would not be possible on a 5-square diagonal.\n\n1...Ke2 2.Bg1!\n\nA very difficult move that only analysis can justify. The aim is to quickly bring the king via the c7-square, which was tactically prevented by ...Nd5 and ...Ne3. For instance: 2.Kc7? Nd5+ 3.Kd6 Ne3-+. If 2.Kc8? Nd1! 3.Bg1 Nf2 4.Kd7 Kf1 5.Bh2 Ng4 6.Bg3 (6.Kd6 Ne3-+) 6...Kg2 7.Bh4 Kh3! 8.Be1 Ne5+ 9.Ke6 Nd3 and king and knight control all 4 squares on the crucial diagonal.\n\n2...Nd1\n\nThis is necessary in order to drive the white bishop off the long diagonal. The knight heads for the f2-square.\n\n3.Kc7! Nf2 4.Bh2!\n\nAbsolutely necessary: now the bishop will choose the best diagonal depending on where the knight jumps. 4.Kd6? Kf1 5.Bh2 Nd3 6.Bg3 Kg2 7.Bh4 Kh3 again dominating all 4 squares. 4.Kd7? Kf1 5.Bh2 Ng4 6.Bg3 (6.Kd6 Ne3 7.Bg3 Nf5-+) 6...Kg2 7.Be1 Ne5+! 8.Ke6 Nd3 9.Bh4 Kh3-+.\n\n4...Kf1\n\nLogical: the king moves to the other side of the pawn. Other moves do not work either, but some care is needed: 4...Ng4 5.Bg1! The first point: if the knight retreats to g4, the bishop can return to the long diagonal. 4...Nh3 5.Bg3! The second point: the knight is ill-placed on the h3-square; Black needs one more tempo to dominate all squares on the short diagonal. 5...Nf4 6.Kd6 Nh5 7.Bh4 Ng7 8.Ke5!= Just in time! White has prevented the lethal blow ...Nf5."
+  },
+  {
+    "type": "position",
+    "content": {
+      "number": "8.2",
+      "fen": "8/2K5/8/8/8/5p2/5n1B/5k2 w - - 0 5"
+    }
+  },
+  {
+    "type": "moves",
+    "content": "5.Be5!\n\nA curious, but at the same time logical and necessary move. The black king has relinquished control of e3, so the bishop gets ready to return to the longer diagonal. Any other move would allow Black to drive the bishop off. For example: 5.Kc6 Ng4 6.Bd6 Ke2 (trying to set up a screen on e3) 7.Bg3 Ne3 followed by ...Nf5, driving the bishop off.\n\nIf you have doubts regarding other moves, you can check the variations as an interesting and useful exercise.\n\n5...Ng4 6.Bd4 Ke2 7.Bg1! 1/2-1/2\n\nThis wonderful study can help us get some interesting ideas. Perhaps just one example is not enough to consider them conclusive, but the analysis of similar positions proves their validity."
+  },
+  {
+    "type": "panel",
+    "content": {
+      "title": "Conclusions",
+      "text": "1) When the bishop has two stopping diagonals consisting of 5 squares, there is no need of king support.\n2) When the shorter diagonal consists of 4 squares, the bishop can be driven off the stopping diagonals. This is by no means easy, so the defending king only loses if he is too far away.\n3) If the shorter diagonal consists of less than 4 squares, winning chances are increased."
+    }
+  },
+  {
+    "type": "ending",
+    "content": {
+      "number": "38",
+      "text": "The rook's pawn"
+    }
+  },
+  {
+    "type": "position",
+    "content": {
+      "number": "8.3",
+      "caption": "Lloyd, 1860",
+      "fen": "8/8/8/8/B6n/7p/6k1/4K3 w - - 0 1"
+    }
+  },
+  {
+    "type": "text",
+    "content": "Rook's pawns pose more difficulties for the defence. This is logical: one of the stopping diagonals can be very short, or even disappear when the pawn reaches the 7th rank. This case arises quite often, and it contains an unexpected resource which is worth knowing.\n\nBlack threatens to place his king on g1 and his knight on g2 to close the only stopping diagonal. White's position looks hopeless; however, there is a hidden resource."
+  },
+  {
+    "type": "moves",
+    "content": "1.Bd7!\n\nWhite must force the pawn to the 7th rank to apply the drawing procedure. 1.Bc6+ Kg1 2.Bd5 Ng2++- and the pawn promotes.\n\n1...h2 2.Bc6+ Kg1\n\n2...Nf3+ 3.Ke2=.\n\n3.Bh1!!\n\nOnly move; the threat was ...Ng2."
+  },
+  {
+    "type": "position",
+    "content": {
+      "number": "8.4",
+      "fen": "8/8/8/8/7n/7p/8/4Kk1B b - - 0 3"
+    }
+  },
+  {
+    "type": "moves",
+    "content": "3...Kxh1\n\n3...Ng2+ 4.Ke2 Nf4+ 5.Ke1= does not work either. Now the black king cannot leave the corner due to the knight's inherent inability to lose time. But where do we move the white king now? There is a rule to simplify our calculation: we must move the king to a square of the same colour as the knight; thus the knight will be able to check the king, but not to control the opposite-coloured square.\n\n4.Kf2!\n\nNow the black king is trapped. Instead, 4.Kf1? Nf5 5.Kf2 Ng3-+ leads to a quick zugzwang.\n\n4...Nf3 5.Kf1 Nd2+ 6.Kf2 Ne4+ 7.Kf1 1/2-1/2\n\nA brilliant and impressive study by Sam Lloyd which can make us wrongly think that this ending is always a draw with a rook's pawn. This is only true when the defending king is close enough."
+  },
+  {
+    "type": "text",
+    "content": "When the defending king is further away"
+  },
+  {
+    "type": "position",
+    "content": {
+      "number": "8.5",
+      "caption": "Stein - Dorfman, USSR, 1970",
+      "fen": "8/8/5B2/8/1n6/8/p1k1K3/8 b - - 0 1"
+    }
+  },
+  {
+    "type": "text",
+    "content": "I have chosen a position from an actual game to show that this endgame is not very well known despite its theoretical importance. The difference between this position and the previous one is that the defending king is further away. This allows Black to trap the bishop without the white king reaching a drawing position."
+  },
+  {
+    "type": "moves",
+    "content": "1...Nd3 (the threat is ...Nb2) 2.Ba1 Nb2\n\nIf we compare this position to that in the previous example, they are very similar, but different. The white king is a little further away, and thus his black counterpart can avoid being trapped in the corner.\n\n3.Ke1\n\n3.Ke3 is answered by 3...Na4! 4.Kd4 (4.Ke2 Kc1, reaching the position of the main line after 4th move) 4...Kb1 5.Kd3 Nc5+ (5...Kxa1? 6.Kc2=) 6.Kc3 (6.Kd2 Nb3+) 6...Kxa1 and it is easy to see that the white king cannot reach the blocking square of the same colour as the knight: 7.Kc2 Nb3-+.\n\n3...Na4!\n\nThe game continued 3...Kb1? 4.Kd2 and, as shown in Lloyd's study, it is a draw. 4...Kxa1 5.Kc1! Nc4 6.Kc2.\n\n4.Ke2 Kc1\n\nLosing a tempo to keep the black pieces on their ideal squares. That is, the king next to b1 and the knight just one step away from b2, but ready to get to b3 delivering some checks on the way. Now the white king has to leave the most elastic square, e2, and all alternatives have drawbacks.\n\n5.Ke1\n\nOther moves are less stubborn: 5.Kd3 Kb1 6.Kd2 Nb2 - see main line, 8th move; 5.Ke3 Kb1 6.Kd3 (6.Kd2 Nb2) 6...Nc5+! and now we have reached the annotations to the 3rd move.\n\n5...Nc5! 6.Ke2\n\nIf 6.Bg7, the knight blocks the diagonal with tempo: 6...Nd3+ 7.Ke2 Nb2-+.\n\n6...Kb1\n\nIt is essential that the white king cannot reach his best square, d2.\n\n7.Kd1 (7.Bg7 Na4-+) 7...Nd3 8.Kd2 Nb2"
+  },
+  {
+    "type": "position",
+    "content": {
+      "number": "8.6",
+      "caption": "Analysis diagram",
+      "fen": "8/8/8/8/8/8/pn1K4/Bk6 w - - 0 9"
+    }
+  },
+  {
+    "type": "moves",
+    "content": "We are back in the continuation mentioned in the comment after Black's third move, only with White to move. Black's play was aimed at reaching this zugzwang position.\n\n9.Kc3 Kxa1 10.Kc2 Nd3-+"
+  },
+  {
+    "type": "panel",
+    "content": {
+      "title": "Conclusion",
+      "text": "With a rook's pawn, there are reasonable winning chances but, if the defending king is near, the strong side must not rush to drive the bishop out of the corner."
+    }
+  },
+  {
+    "type": "text",
+    "content": "Section 2. Bishop + Pawn vs. Knight\n\nIf the knight is the weaker side, losing chances increase. That is consistent with the greater mobility of a bishop over a knight on an open board. We can distinguish three scenarios:\n\nFirst scenario: The defending king manages to stand in front of the pawn on a square opposite to the bishop's colour. Then it is an ironclad draw unless the knight is trapped. There is no need for examples of this.\n\nIf the king cannot get in front of the pawn, the blockade must be performed by the knight. King support is needed because, if the king is far away, the knight will be ousted from its blockading position, unless there is a chance of a knight fork.\n\nSecond scenario: Both king and knight control a square opposite from the colour of the bishop to stop the pawn. Apparently, this is a safe set-up for the defending side, but there are many zugzwang positions with the pawn on the 7th rank and, occasionally, on the 6th rank.\n\nThird scenario: The knight controls one square with some support from the king, but this blockade is not solid. Here the result depends on the stability of the knight, which can be ousted by sometimes complicated tactics. Usually the attacking side has to force a zugzwang."
+  },
+  {
+    "type": "ending",
+    "content": {
+      "number": "39",
+      "text": "The pawn is on the 7th rank"
+    }
+  },
+  {
+    "type": "text",
+    "content": "Zugzwang, stalemate or perpetual check"
+  },
+  {
+    "type": "position",
+    "content": {
+      "number": "8.7a",
+      "fen": "2K5/3Pkn2/8/8/8/5B2/8/8 w - - 0 1"
+    }
+  },
+  {
+    "type": "text",
+    "content": "Apparently, Black can successfully defend this position because he can control the d8-square with both king and knight. However, this is not true. Actually, Black's best drawing chances involve the threat of a check on d6."
+  },
+  {
+    "type": "moves",
+    "content": "1.Kc7!\n\nParrying the drawing threat. An immediate attack on the knight, 1.Bd5?, would be a big mistake: 1...Nd6+ 2.Kc7 Ne8+ 3.Kc8 Nd6+=. Apart from the text move, only 1.Bc6! wins, preventing checks on e8 and b5.\n\n1...Nd8 2.Bd5+-\n\nZugzwang leads to the immediate loss of the knight."
+  },
+  {
+    "type": "caption",
+    "content": "Knight blockades series"
+  },
+  {
+    "type": "position",
+    "content": {
+      "number": "knight-blockades-series-1",
+      "caption": "White wins, no matter who moves.",
+      "fen": "6nK/4k1P1/8/5B2/8/8/8/8 w - - 0 1"
+    }
+  },
+  {
+    "type": "position",
+    "content": {
+      "number": "knight-blockades-series-2",
+      "caption": "Draw, no matter who moves.",
+      "fen": "5Kn1/5Pk1/8/5B2/8/8/8/8 w - - 0 1"
+    }
+  },
+  {
+    "type": "position",
+    "content": {
+      "number": "knight-blockades-series-3",
+      "caption": "White wins, no matter who moves.",
+      "fen": "8/6nK/5kP1/8/6B1/8/8/8 w - - 0 1"
+    }
+  },
+  {
+    "type": "panel",
+    "content": {
+      "title": "Conclusion",
+      "text": "When the pawn is on the 7th rank, passive defence usually loses due to zugzwang. The defending side has two possible drawing resources: 1) perpetual check with the knight, and 2) stalemate, when the pawn is close to the edge of the board."
+    }
+  },
+  {
+    "type": "text",
+    "content": "When the pawn is less advanced, zugzwang is impossible if the defending king and knight control the square in front of the pawn, the opposite colour to the bishop. Then a type of position arises which is interesting only when the position of the knight is unstable. Here zugzwang can help the analysis, but it is impossible to set a general rule. Each case requires calculation.\n\nTherefore, we present just one example. It can be a guide for further study, but not a source of theoretical conclusions."
+  },
+  {
+    "type": "ending",
+    "content": {
+      "number": "40",
+      "text": "Unstable position of the controlling knight"
+    }
+  },
+  {
+    "type": "position",
+    "content": {
+      "number": "8.7b",
+      "caption": "V. Bron, 1955",
+      "fen": "8/4K3/3P1n2/3k4/8/8/2B5/8 w - - 0 1"
+    }
+  },
+  {
+    "type": "moves",
+    "content": "1.Bb3+ Kc5\n\nIf 1...Ke5 2.Be6 and zugzwang.\n\n2.Ba2\n\nOther bishop moves also win; instead, 2.Ke6? allows the knight to relocate, which would make zugzwang impossible. 2...Nh7! 3.Ke7 Nf8= and the black king just moves around the pawn. 4.Bc2 Kc6 and now: A) 5.Bb1 Kd5! (5...Kc5? 6.Be4 zugzwang) 6.Bd3 Kc6!=; B) 5.Ba4+ Kc5 6.Be8 Kd5 7.Bf7+ Kc6 8.Bh5 Kc5!=.\n\n2...Kc6\n\n2...Ng4 3.Bb1 Nf6 4.Be4+- Ng8+ 5.Kd7 Nf6+ 6.Ke6 as in the final position.\n\n3.Ke6 Nh7\n\n3...Kc5 4.Bb1 (or 4.Bd5 Nh7 5.Ke7).\n\n4.Bd5+ Kc5 5.Ke7 Nf6\n\n5...Nf8 6.Be4+- another zugzwang position, also winning.\n\n6.Bf3 Ng8+ 7.Ke6 Nf6 8.Be4!+-\n\nZugzwang. In this type of position, the only useful conclusion is that no theoretical rules can be established. Accurate calculation is essential, and searching zugzwang positions is very useful."
+  }
+]

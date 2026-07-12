@@ -2,6 +2,7 @@ export type ChapterSection =
   | CaptionSection
   | EndingSection
   | MovesSection
+  | PanelSection
   | PositionSection
   | TextSection
   | TitleSection
@@ -29,6 +30,14 @@ export type MovesSection = {
   type: 'moves'
 }
 
+export type PanelSection = {
+  content: {
+    text: string
+    title: string
+  }
+  type: 'panel'
+}
+
 export type PositionMarker = {
   meaning: string
   square: string
@@ -37,6 +46,7 @@ export type PositionMarker = {
 
 export type PositionSection = {
   content: {
+    alternateFens?: string[]
     caption?: string
     fen: string
     markers?: PositionMarker[]

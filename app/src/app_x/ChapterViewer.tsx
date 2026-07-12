@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { MutableRefObject } from 'react'
-import chapterData from './pdf/chapter_5.json'
+import chapterManifest from './chapterManifest.json'
+import { chapterPayloadPath } from './chapterPayloadManifest'
 import type {
   CaptionSection,
   EndingSection,
   MovesSection,
+  PanelSection,
   PositionSection,
   RawChapterSection,
   TextSection,
@@ -24,7 +26,20 @@ import {
 } from './playbackNavigation'
 import { isOneMoveFenTransition } from './playbackPaths'
 
-const chapterSections = chapterData as RawChapterSection[]
+type ChapterDefinition = {
+  id: string
+  label: string
+  sections: RawChapterSection[]
+}
+
+type ChapterPayload = {
+  chapters: ChapterDefinition[]
+  contentHash: string
+  schemaVersion: number
+}
+
+const chapterTabs = chapterManifest
+const emptyChapterSections: RawChapterSection[] = []
 
 type ActiveBoardState = {
   activeMoveId: string | null
@@ -36,7 +51,22 @@ type ActiveBoardState = {
 }
 
 export default function ChapterViewer() {
-  const playback = useMemo(() => buildChapterPlayback(chapterSections), [])
+  const [activeChapterId, setActiveChapterId] = useState(chapterTabs[0].id)
+  const [chapterPayload, setChapterPayload] = useState<ChapterPayload | null>(
+    null,
+  )
+  const [chapterLoadError, setChapterLoadError] = useState<string | null>(null)
+  const activeChapter =
+    chapterPayload?.chapters.find((chapter) => chapter.id === activeChapterId) ??
+    null
+  const activeChapterTab =
+    chapterTabs.find((chapter) => chapter.id === activeChapterId) ??
+    chapterTabs[0]
+  const chapterSections = activeChapter?.sections ?? emptyChapterSections
+  const playback = useMemo(
+    () => buildChapterPlayback(chapterSections),
+    [chapterSections],
+  )
   const navigationByPosition = useMemo(
     () => buildPlaybackNavigation(playback),
     [playback],
@@ -50,7 +80,7 @@ export default function ChapterViewer() {
 
       return positions
     }, {})
-  }, [])
+  }, [chapterSections])
   const [activeBoards, setActiveBoards] = useState<
     Record<string, ActiveBoardState>
   >({})
@@ -64,6 +94,57 @@ export default function ChapterViewer() {
   const endingCount = chapterSections.filter(
     (section) => section.type === 'ending',
   ).length
+  const chapterTitle =
+    (
+      chapterSections.find(
+        (section) => section.type === 'title',
+      ) as TitleSection | undefined
+    )?.content ?? activeChapterTab.label
+
+  function handleChapterSelect(chapterId: string) {
+    if (chapterId === activeChapterId) {
+      return
+    }
+
+    cancelMoveAnimationFrame(moveAnimationFrameRef)
+    setActiveChapterId(chapterId)
+    setActiveBoards({})
+    setActivePositionNumber(null)
+  }
+
+  useEffect(() => {
+    let isMounted = true
+
+    fetch(`${import.meta.env.BASE_URL}${chapterPayloadPath}`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Chapter payload request failed: ${response.status}`)
+        }
+
+        return response.json() as Promise<ChapterPayload>
+      })
+      .then((payload) => {
+        if (!isMounted) {
+          return
+        }
+
+        setChapterPayload(payload)
+        setChapterLoadError(null)
+      })
+      .catch((error: unknown) => {
+        if (!isMounted) {
+          return
+        }
+
+        setChapterLoadError(
+          error instanceof Error ? error.message : 'Chapter payload failed.',
+        )
+      })
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
@@ -152,6 +233,82 @@ export default function ChapterViewer() {
     }
   }, [])
 
+  function handleMoveClick(token: Extract<TextPlaybackToken, { type: 'move' }>) {
+    const navigation = navigationByPosition.get(token.positionNumber)
+    const initialFen = initialPositionFens[token.positionNumber]
+    const parentFen = navigation
+      ? getParentFenForNavigationNode(navigation, token.id, initialFen)
+      : undefined
+    const preferredNextUpdates = navigation
+      ? getPreferredNextUpdates(navigation, token.id)
+      : {}
+
+    setActivePositionNumber(token.positionNumber)
+    cancelMoveAnimationFrame(moveAnimationFrameRef)
+    setActiveBoards((currentBoards) => {
+      const currentBoard =
+        currentBoards[token.positionNumber] ?? createInitialBoardState(initialFen)
+
+      if (!parentFen) {
+        return {
+          ...currentBoards,
+          [token.positionNumber]: createMoveBoardState(
+            currentBoard,
+            token,
+            preferredNextUpdates,
+            currentBoard.fen,
+            false,
+          ),
+        }
+      }
+
+      return {
+        ...currentBoards,
+        [token.positionNumber]: createParentStagingBoardState(
+          currentBoard,
+          token,
+          parentFen,
+          preferredNextUpdates,
+        ),
+      }
+    })
+
+    if (parentFen) {
+      moveAnimationFrameRef.current = window.requestAnimationFrame(() => {
+        setActiveBoards((currentBoards) => {
+          const currentBoard =
+            currentBoards[token.positionNumber] ??
+            createInitialBoardState(initialFen)
+
+          return {
+            ...currentBoards,
+            [token.positionNumber]: createMoveBoardState(
+              currentBoard,
+              token,
+              {},
+              parentFen,
+              true,
+            ),
+          }
+        })
+        moveAnimationFrameRef.current = null
+      })
+    }
+  }
+
+  function handlePositionReset(positionNumber: string) {
+    setActivePositionNumber(positionNumber)
+    cancelMoveAnimationFrame(moveAnimationFrameRef)
+    setActiveBoards((currentBoards) => {
+      return {
+        ...currentBoards,
+        [positionNumber]: createInitialBoardState(
+          initialPositionFens[positionNumber],
+        ),
+      }
+    })
+  }
+
   return (
     <main className="leg-page">
       <div className="leg-reader-shell">
@@ -159,110 +316,84 @@ export default function ChapterViewer() {
           <p className="leg-kicker">Lotta Endgames</p>
           <h1>100 Endgames You Must Know</h1>
           <p className="leg-reader-subtitle">
-            Chapter 5 rendered from structured JSON, with boards generated from
-            FEN and printed diagram markers overlaid.
+            {activeChapterTab.label}: {chapterTitle}, rendered from structured
+            JSON with playable boards.
           </p>
+          <ChapterSelector
+            activeChapterId={activeChapterId}
+            chapters={chapterTabs}
+            label="Top chapter selector"
+            onSelect={handleChapterSelect}
+          />
           <div className="leg-reader-meta" aria-label="Chapter summary">
             <span>{chapterSections.length} sections</span>
             <span>{endingCount} endings</span>
             <span>{positionCount} boards</span>
           </div>
         </header>
-        <article className="leg-chapter">
-          {chapterSections.map((section, index) => (
-            <SectionRenderer
-              index={index}
-              key={`${section.type}-${index}`}
-              activeBoards={activeBoards}
-              activePositionNumber={activePositionNumber}
-              onMoveClick={(token) => {
-                const navigation = navigationByPosition.get(token.positionNumber)
-                const initialFen = initialPositionFens[token.positionNumber]
-                const parentFen = navigation
-                  ? getParentFenForNavigationNode(
-                      navigation,
-                      token.id,
-                      initialFen,
-                    )
-                  : undefined
-                const preferredNextUpdates = navigation
-                  ? getPreferredNextUpdates(navigation, token.id)
-                  : {}
-
-                setActivePositionNumber(token.positionNumber)
-                cancelMoveAnimationFrame(moveAnimationFrameRef)
-                setActiveBoards((currentBoards) => {
-                  const currentBoard =
-                    currentBoards[token.positionNumber] ??
-                    createInitialBoardState(initialFen)
-
-                  if (!parentFen) {
-                    return {
-                      ...currentBoards,
-                      [token.positionNumber]: createMoveBoardState(
-                        currentBoard,
-                        token,
-                        preferredNextUpdates,
-                        currentBoard.fen,
-                        false,
-                      ),
-                    }
-                  }
-
-                  return {
-                    ...currentBoards,
-                    [token.positionNumber]: createParentStagingBoardState(
-                      currentBoard,
-                      token,
-                      parentFen,
-                      preferredNextUpdates,
-                    ),
-                  }
-                })
-
-                if (parentFen) {
-                  moveAnimationFrameRef.current = window.requestAnimationFrame(
-                    () => {
-                      setActiveBoards((currentBoards) => {
-                        const currentBoard =
-                          currentBoards[token.positionNumber] ??
-                          createInitialBoardState(initialFen)
-
-                        return {
-                          ...currentBoards,
-                          [token.positionNumber]: createMoveBoardState(
-                            currentBoard,
-                            token,
-                            {},
-                            parentFen,
-                            true,
-                          ),
-                        }
-                      })
-                      moveAnimationFrameRef.current = null
-                    },
-                  )
-                }
-              }}
-              onPositionReset={(positionNumber) => {
-                setActivePositionNumber(positionNumber)
-                cancelMoveAnimationFrame(moveAnimationFrameRef)
-                setActiveBoards((currentBoards) => {
-                  return {
-                    ...currentBoards,
-                    [positionNumber]: createInitialBoardState(
-                      initialPositionFens[positionNumber],
-                    ),
-                  }
-                })
-              }}
-              playback={playback}
-              section={section}
-            />
-          ))}
-        </article>
+        {chapterLoadError ? (
+          <aside className="leg-load-state" role="alert">
+            {chapterLoadError}
+          </aside>
+        ) : activeChapter ? (
+          <article className="leg-chapter">
+            {chapterSections.map((section, index) => (
+              <SectionRenderer
+                index={index}
+                key={`${section.type}-${index}`}
+                activeBoards={activeBoards}
+                activePositionNumber={activePositionNumber}
+                onMoveClick={handleMoveClick}
+                onPositionReset={handlePositionReset}
+                playback={playback}
+                section={section}
+              />
+            ))}
+          </article>
+        ) : (
+          <aside className="leg-load-state">Loading chapter data...</aside>
+        )}
+        <ChapterSelector
+          activeChapterId={activeChapterId}
+          chapters={chapterTabs}
+          label="Bottom chapter selector"
+          onSelect={handleChapterSelect}
+        />
       </div>
     </main>
+  )
+}
+
+function ChapterSelector({
+  activeChapterId,
+  chapters,
+  label,
+  onSelect,
+}: {
+  activeChapterId: string
+  chapters: Array<{ id: string; label: string }>
+  label: string
+  onSelect: (chapterId: string) => void
+}) {
+  return (
+    <nav aria-label={label} className="leg-chapter-selector">
+      {chapters.map((chapter) => (
+        <button
+          aria-current={chapter.id === activeChapterId ? 'page' : undefined}
+          className={
+            chapter.id === activeChapterId
+              ? 'leg-chapter-tab is-active'
+              : 'leg-chapter-tab'
+          }
+          data-chapter-id={chapter.id}
+          key={chapter.id}
+          onClick={() => onSelect(chapter.id)}
+          type="button"
+        >
+          {chapter.label}
+        </button>
+      ))}
+    </nav>
   )
 }
 
@@ -318,6 +449,18 @@ function SectionRenderer({
             movesSection.content
           )}
         </p>
+      )
+    }
+    case 'panel': {
+      const panelSection = section as PanelSection
+      return (
+        <PanelBlock
+          activeBoards={activeBoards}
+          activePositionNumber={activePositionNumber}
+          onMoveClick={onMoveClick}
+          section={panelSection}
+          tokens={playbackTokens}
+        />
       )
     }
     case 'position':
@@ -398,16 +541,6 @@ function PositionCard({
           )}
         </figcaption>
         {caption ? <p>{caption}</p> : null}
-        {markers?.length ? (
-          <ul className="leg-marker-list">
-            {markers.map((marker, index) => (
-              <li key={`${marker.square}-${marker.symbol}-${index}`}>
-                <span>{marker.square}</span>
-                {marker.meaning}
-              </li>
-            ))}
-          </ul>
-        ) : null}
       </div>
       <ChessBoard
         animateNextMove={activeBoard?.animateNextMove}
@@ -415,8 +548,39 @@ function PositionCard({
         markers={markers}
         number={number}
       />
-      <p className="leg-fen">{activeBoard?.fen ?? fen}</p>
     </figure>
+  )
+}
+
+function PanelBlock({
+  activeBoards,
+  activePositionNumber,
+  onMoveClick,
+  section,
+  tokens,
+}: {
+  activeBoards: Record<string, ActiveBoardState>
+  activePositionNumber: string | null
+  onMoveClick: (token: Extract<TextPlaybackToken, { type: 'move' }>) => void
+  section: PanelSection
+  tokens?: TextPlaybackToken[]
+}) {
+  return (
+    <aside className="leg-panel-callout">
+      <h3>{section.content.title}</h3>
+      <p>
+        {tokens ? (
+          <InlinePlayback
+            activeBoards={activeBoards}
+            activePositionNumber={activePositionNumber}
+            onMoveClick={onMoveClick}
+            tokens={tokens}
+          />
+        ) : (
+          section.content.text
+        )}
+      </p>
+    </aside>
   )
 }
 

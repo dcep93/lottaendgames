@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "test": "tsx src/app_x/moveParser.test.ts"
+    "test": "tsx src/app_x/moveParser.test.ts",
+    "test:content": "tsx src/app_x/contentAudit.test.ts"
   },
   "dependencies": {
     "chess.js": "^1.4.0",

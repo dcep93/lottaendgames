@@ -247,8 +247,11 @@
     "content": "1.Rh5+ Let us check that, if Black is to move, there is no time for White: 1...c4! 2.Rh5+ Kd4 3.Kc6 (trying to push the king does not work: Black is not even forced to underpromote to a knight. Trying to outflank the opponent does not work either: the white king will fail) 3...c3 4.Rh4+ (4.Kb5 c2 5.Rh1 Kc3 6.Ka4 Kb2=) 4...Kd3 5.Kd5 c2=. Nevertheless, were the rook in a better position, White could win even if it was Black's turn. The first and the last square on the file are the best ones to help the king. I recommend this Exercise: check that White is actually winning, even with Black to move, if the rook occupies one of the marked squares. 1...Kd4 2.Kc6! This new resource allows the strong king to lift the blockade. Now the white king will go round and appear on the other side of the pawn. 2...c4 3.Kb5 Other moves also win, but visually this is more suitable for the chosen technique. 3...c3 4.Kb4 c2 5.Rc5 5.Rh1 is also winning. 5...Kd3 6.Kb3 and the pawn is lost."
   },
   {
-    "type": "text",
-    "content": "Summary of interesting ideas: 1) Pushing the defending king from the rear does not work against b-, c-, d-, e-, f- and g-pawns: underpromotion to a knight saves the day. 2) In those cases, outflanking is the right way. 3) The strong king has no time to outflank his opponent when the pawn is on the 5th rank, unless the rook is at the rear of the pawn. 4) With a knight's pawn stalemate themes can occur. The study of these last positions has provided us with a good knowledge of the scenarios where the stronger side's king is at the rear of the pawn. However, if we want to fix this knowledge in our minds, examining the next series of positions should be both enjoyable and useful. Here we compare the results with different locations of the rook and the advances of the pawn. Just observe and reflect. If you are not sure about the statements, try to calculate the variations in your mind: it will be a useful Exercise. If you have more doubts, play it on the board. In any case, do not go further unless all your doubts have been solved."
+    "type": "panel",
+    "content": {
+      "title": "Summary of interesting ideas",
+      "text": "1) Pushing the defending king from the rear does not work against b-, c-, d-, e-, f- and g-pawns: underpromotion to a knight saves the day. 2) In those cases, outflanking is the right way. 3) The strong king has no time to outflank his opponent when the pawn is on the 5th rank, unless the rook is at the rear of the pawn. 4) With a knight's pawn stalemate themes can occur. The study of these last positions has provided us with a good knowledge of the scenarios where the stronger side's king is at the rear of the pawn. However, if we want to fix this knowledge in our minds, examining the next series of positions should be both enjoyable and useful. Here we compare the results with different locations of the rook and the advances of the pawn. Just observe and reflect. If you are not sure about the statements, try to calculate the variations in your mind: it will be a useful Exercise. If you have more doubts, play it on the board. In any case, do not go further unless all your doubts have been solved."
+    }
   },
   {
     "type": "caption",
@@ -370,8 +373,11 @@
     "content": "1.Ra2+! Again, the black king enjoys an ideal position to support his pawn, so this check is very annoying. Other moves do not suffice to win: 1.Ra8 e3 2.Rf8+ Kg1! 3.Re8 Kf2 4.Kh2 e2 5.Rf8+ Ke3=; 1.Kg4 e3 2.Rh1 e2 3.Rh2+ Ke3=. 1...Kf3 If 1...Kf1 2.Kg3 and the pawn is lost. Now the kings are opposing: the position is ripe for a rear check and a subsequent push. 2.Ra8 e3 3.Rf8+ Ke2 4.Kg2+-"
   },
   {
-    "type": "text",
-    "content": "Summary of interesting ideas: 1) When both kings are on the same side of the pawn, the main resources are shoulder-charging and rook checks. 2) With a normal rook position, the strong side wins if his king takes side opposition before the pawn reaches the 6th rank (see side-push series after Ending 28)."
+    "type": "panel",
+    "content": {
+      "title": "Summary of interesting ideas",
+      "text": "1) When both kings are on the same side of the pawn, the main resources are shoulder-charging and rook checks. 2) With a normal rook position, the strong side wins if his king takes side opposition before the pawn reaches the 6th rank (see side-push series after Ending 28)."
+    }
   },
   {
     "type": "ending",

@@ -6,3 +6,5 @@ service_account.json
 app/gac.json
 app/firebase.json
 app/.firebaserc
+__pycache__/
+*.pyc

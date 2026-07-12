@@ -100,6 +100,10 @@ export function getParentFenForNavigationNode(
     return undefined
   }
 
+  if (node.parentFen) {
+    return node.parentFen
+  }
+
   if (!node.previousId) {
     return initialFen
   }
