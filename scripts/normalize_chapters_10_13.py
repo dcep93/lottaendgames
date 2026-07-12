@@ -181,6 +181,18 @@ NOISE_REPLACEMENTS = [
     ("considere rations", "considerations"),
     ("coord inated", "coordinated"),
     ("momen ts", "moments"),
+    ("Ke1l-known", "well-known"),
+    ("Ke1l", "well"),
+    ("Ke8ker", "weaker"),
+    ("Ke8re", "were"),
+    ("Ke8n", "when"),
+    ("Kh8t", "what"),
+    ("were going", "we are going"),
+    ("were just", "we are just"),
+    ("whenalysed", "we analysed"),
+    ("Kfa3.Rb7", "Kf8 3.Rb7"),
+    ("Ke8ssume", "we assume"),
+    ("Ka1k", "walk"),
 ]
 
 ROOK_GLYPHS = [
@@ -346,6 +358,11 @@ def split_structural_text(section_type: str, text: str) -> list[dict[str, Any]]:
         return [{"type": section_type, "content": text}]
 
     text = re.sub(
+        r"(Position\s+\d{1,2}\.\d)(\d)(?=\s+(?:[KQRBNRJ]|[a-h][1-8]|[a-h]x))",
+        r"\1\n\2",
+        text,
+    )
+    text = re.sub(
         r"(?<!\n)(Position\s+\d{1,2}\.\d+[a-z]?)(?=\s)",
         r"\n\1\n",
         text,
@@ -484,11 +501,30 @@ def remove_repeated_title(text: str, chapter: int) -> str:
 
 def normalize_chess_notation(text: str) -> str:
     text = text.replace("0-0-0", "O-O-O").replace("0-0", "O-O")
+    text = re.sub(
+        r"(?m)^(\d{1,2})\s+((?:[KQRBNR]|[a-h])\S*.*?)\n\.\.",
+        r"\1...\2",
+        text,
+    )
     text = re.sub(r"\bl\s*\.\s*\.\s*", "1...", text)
     text = re.sub(r"\bl\s*\.", "1.", text)
+    text = re.sub(r"(?<![A-Za-z])S\s*\.", "5.", text)
+    text = re.sub(r"\b([1-9])\s*[oO]\s*\.", r"\g<1>0.", text)
     text = re.sub(r"(?<=\d)\s+\.\s+\.\s+\.", "...", text)
+    text = re.sub(r"(?<=\d)\s*\.\.\s+(?=[KQRBNOa-h])", "...", text)
     text = re.sub(r"(?<=\d)\s+\.\s+", ".", text)
     text = re.sub(r"(?<=\d)\s+\.\.\.\s+", "...", text)
+    text = re.sub(r"(?<=[a-z])(?=\d{1,2}\s*(?:\.|\.\.\.))", " ", text)
+    text = re.sub(
+        r"(?<![A-Za-z0-9.])(\d{1,2})\s+(?=(?:[KQRBNO]|[a-h][1-8]|[a-h]x))",
+        r"\1.",
+        text,
+    )
+    text = re.sub(
+        r"(?<![A-Za-z0-9.])(\d{1,2})(?=(?:[KQRBNO][a-h1-8x]|[a-h][1-8]|[a-h]x))",
+        r"\1.",
+        text,
+    )
     text = re.sub(r"(?<=\d)\s+(?=[?!+,=])", "", text)
 
     text = replace_piece_glyphs(text, ROOK_GLYPHS, "R")
@@ -496,7 +532,13 @@ def normalize_chess_notation(text: str) -> str:
     text = replace_piece_glyphs(text, QUEEN_GLYPHS, "Q")
     text = clean_remaining_chess_font_glyphs(text)
 
-    text = re.sub(r"(?<![A-Za-z])(?:W|<;t>|\\t>|�)\s*([a-h])\s*([1-8])", r"K\1\2", text)
+    text = re.sub(
+        r"(?<![A-Za-z])(?:W|w|®|<;t>|\\t>|�|\\b)\s*x?\s*([a-h])\s*([1-8aS])(?=[^A-Za-z0-9]|$)",
+        lambda match: "K"
+        + match.group(1)
+        + normalize_square_rank(match.group(2)),
+        text,
+    )
     text = re.sub(r"(?<![A-Za-z])([KQRBN])\s+([a-h])\s*([1-8])", r"\1\2\3", text)
     text = re.sub(r"(?<![A-Za-z])([KQRBN])x\s*([a-h])\s*([1-8])", r"\1x\2\3", text)
     text = re.sub(r"(?<![A-Za-z])([a-h])\s*x\s*([a-h])\s*([1-8])", r"\1x\2\3", text)
@@ -513,17 +555,32 @@ def normalize_chess_notation(text: str) -> str:
 
 def clean_remaining_chess_font_glyphs(text: str) -> str:
     text = re.sub(
+        r"(?<![A-Za-z])J�\.\s*([a-h])\s*([1-8])",
+        r"R\1\2",
+        text,
+    )
+    text = re.sub(
+        r"(?<![A-Za-z])JK\.\s*([a-h])\s*([1-8])",
+        r"R\1\2",
+        text,
+    )
+    text = re.sub(
+        r"(?<![A-Za-z])R\.\s*([a-h])\s*([1-8])",
+        r"R\1\2",
+        text,
+    )
+    text = re.sub(
         r"(?<![A-Za-z])(?:J::r|J::|J:|J\�|J\!|J\[|J\(|J;|J|l:I|l:r|l:t|l::|l:|I:r|:C:|:Q:|:a|\.M|\.C:|\.t:i|\.U|\.Uh)\s*([a-h])\s*([lI1-8S])",
         lambda match: "R" + match.group(1) + normalize_square_rank(match.group(2)),
         text,
     )
     text = re.sub(
-        r"(?<![A-Za-z])(?:<;t>|\\t>|�|W)\s*x?\s*([a-h])\s*([lI1-8S])",
+        r"(?<![A-Za-z])(?:<;t>|\\t>|�|W|w|®|\\b)\s*x?\s*([a-h])\s*([lI1-8aS])(?=[^A-Za-z0-9]|$)",
         lambda match: "K" + match.group(1) + normalize_square_rank(match.group(2)),
         text,
     )
     text = re.sub(
-        r"(?<![A-Za-z])(?:<;t>|\\t>|�|W)\s+([a-h])(?=[,.;:)!?=+\s])",
+        r"(?<![A-Za-z])(?:<;t>|\\t>|�|W|w|®|\\b)\s+([a-h])(?=[,.;:)!?=+\s])",
         r"K\1",
         text,
     )
@@ -555,11 +612,13 @@ def clean_remaining_chess_font_glyphs(text: str) -> str:
         .replace("<;t>", "K")
         .replace("\\t>", "K")
         .replace("�", "K")
+        .replace("\\b", "K")
     )
     text = re.sub(r"(?<![A-Za-z])R\s*([a-h])\s*([lI])", r"R\g<1>1", text)
     text = re.sub(r"(?<![A-Za-z])R\s*([a-h])\s*S", r"R\g<1>5", text)
     text = re.sub(r"(?<![A-Za-z])K\s*([a-h])\s*([lI])", r"K\g<1>1", text)
     text = re.sub(r"(?<![A-Za-z])K\s*([a-h])\s*S", r"K\g<1>5", text)
+    text = re.sub(r"(?<![A-Za-z])Kfa(?=[^A-Za-z0-9]|$)", "Kf8", text)
     return text
 
 
@@ -569,6 +628,9 @@ def normalize_square_rank(rank: str) -> str:
 
     if rank == "S":
         return "5"
+
+    if rank == "a":
+        return "8"
 
     return rank
 
