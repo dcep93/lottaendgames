@@ -110,6 +110,9 @@ VERIFIED_DIAGRAM_FENS = {
     # white rook color, but the rendered PDF diagram and adjacent line
     # 1...Ra8 confirm Black is the side with that rook.
     "Position 10.17": "1r6/8/8/2R5/1P1k4/1K6/8/8 b - - 0 1",
+    # Position 10.21 is followed by 1...Ra8 2.Rc5 in the source. The diagram
+    # classifier recovered the pieces but assigned the wrong side to move.
+    "Position 10.21": "4r3/8/8/5R2/4P1k1/4K3/8/8 b - - 0 1",
     # Analysis diagram 11.2 renders a black rook on g7, but the printed glyph
     # is close enough to the white rook template that the classifier chooses
     # the wrong color. Keep this correction tied to the rendered PDF diagram so
@@ -155,8 +158,9 @@ VERIFIED_DIAGRAM_FENS = {
 
 VERIFIED_DIAGRAM_MARKERS = {
     "Position 1.9": [
-        {"square": "f6", "symbol": "*", "meaning": "as printed"},
-        {"square": "g6", "symbol": "*", "meaning": "as printed"},
+        {"square": "e6", "symbol": "*", "meaning": "key square"},
+        {"square": "f6", "symbol": "*", "meaning": "key square"},
+        {"square": "g6", "symbol": "*", "meaning": "key square"},
     ],
     "Position 1.11": [
         {"square": "c6", "symbol": "*", "meaning": "as printed"},
@@ -238,6 +242,7 @@ VERIFIED_DIAGRAM_PRESERVE_TURN = {
     "Position 1.16",
     "Position 3.7",
     "Analysis diagram 3.8",
+    "Position 10.21",
     "Position 13.8",
     "Analysis diagram 13.30",
 }
@@ -275,8 +280,10 @@ def main() -> None:
                             position["fen"],
                             sections[section_index + 1 : section_index + 4],
                         ),
-                        "caption": content.get("caption", existing_label),
                     }
+                    caption = content.get("caption")
+                    if caption and caption != f"Position {content['number']}":
+                        position_content["caption"] = caption
                     if position.get("markers"):
                         position_content["markers"] = position["markers"]
                     section = {
@@ -313,8 +320,9 @@ def main() -> None:
                         position["fen"],
                         sections[section_index + 1 : section_index + 4],
                     ),
-                    "caption": position["label"],
                 }
+                if not position["label"].startswith("Position "):
+                    position_content["caption"] = position["label"]
                 if position.get("markers"):
                     position_content["markers"] = position["markers"]
                 rewritten.append(

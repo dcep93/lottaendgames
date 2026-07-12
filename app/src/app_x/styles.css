@@ -137,8 +137,8 @@
 }
 
 .leg-prose,
-.leg-moves,
 .leg-ending,
+.leg-section-heading,
 .leg-section-caption,
 .leg-unknown {
   width: min(48rem, 100%);
@@ -150,16 +150,6 @@
   color: var(--leg-soft);
   font-size: 1.04rem;
   line-height: 1.68;
-}
-
-.leg-moves {
-  border-left: 0.18rem solid var(--leg-border-strong);
-  padding: 0.9rem 1rem;
-  color: #fff6ef;
-  background: rgba(255, 123, 195, 0.07);
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: 1rem;
-  line-height: 1.62;
 }
 
 .leg-ending {
@@ -196,6 +186,16 @@
 
 .leg-section-caption {
   margin-top: 0.6rem;
+}
+
+.leg-section-heading {
+  margin: 1rem 0 0.15rem;
+  color: var(--leg-brown);
+  font-family: 'Comic Sans MS', 'Comic Sans', 'Chalkboard SE', 'Trebuchet MS',
+    sans-serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.2;
 }
 
 .leg-position-card {
@@ -238,7 +238,6 @@
   gap: 1rem;
   max-height: calc(100svh - 2rem);
   overflow-y: auto;
-  overscroll-behavior: contain;
   padding-right: 0.35rem;
   scrollbar-gutter: stable;
 }
@@ -329,6 +328,19 @@
   font-weight: 750;
 }
 
+.leg-position-copy .leg-position-subtitle {
+  color: var(--leg-text);
+  font-family: 'Comic Sans MS', 'Comic Sans', 'Chalkboard SE', 'Trebuchet MS',
+    sans-serif;
+  font-size: 1rem;
+  line-height: 1.25;
+}
+
+.leg-position-copy .leg-position-caption {
+  font-size: 0.84rem;
+  line-height: 1.35;
+}
+
 .leg-board-wrap {
   width: min(100%, 20rem);
 }
@@ -340,13 +352,27 @@
   background: var(--leg-board-light);
 }
 
+.leg-board-link {
+  display: block;
+  color: inherit;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.leg-board-link:focus-visible {
+  border-radius: 0.35rem;
+  outline: 0.18rem solid var(--leg-pink);
+  outline-offset: 0.22rem;
+}
+
 .leg-board-stage [data-piece],
 .leg-board-stage [id*='-square-'] {
-  cursor: default !important;
+  cursor: inherit !important;
 }
 
 .leg-board-marker-layer {
   position: absolute;
+  z-index: 5;
   inset: 0;
   display: grid;
   grid-template-columns: repeat(8, 1fr);
@@ -398,29 +424,20 @@
 }
 
 .leg-panel-callout {
-  width: min(58rem, 100%);
-  border: 0.11rem solid rgba(216, 179, 138, 0.72);
-  border-radius: 0.75rem;
-  padding: 1rem;
-  background:
-    linear-gradient(140deg, rgba(255, 123, 195, 0.12), transparent 45%),
-    linear-gradient(0deg, rgba(216, 179, 138, 0.1), rgba(216, 179, 138, 0.1)),
-    var(--leg-panel);
-  box-shadow: 0 1rem 2.4rem rgba(0, 0, 0, 0.24);
-}
-
-.leg-panel-callout h3 {
-  margin: 0 0 0.7rem;
-  color: var(--leg-brown);
-  font-size: 0.95rem;
-  font-weight: 950;
-  text-transform: uppercase;
+  width: min(48rem, 100%);
+  border-left: 0.18rem solid var(--leg-border-strong);
+  padding: 0.9rem 1rem;
+  color: #fff6ef;
+  background: rgba(255, 123, 195, 0.07);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1rem;
+  line-height: 1.62;
 }
 
 .leg-panel-callout p {
   margin: 0;
-  color: var(--leg-text);
-  line-height: 1.65;
+  color: inherit;
+  font: inherit;
 }
 
 .leg-move-token {
@@ -503,7 +520,7 @@
   }
 
   .leg-position-card,
-  .leg-moves {
+  .leg-panel-callout {
     padding: 0.75rem;
   }
 

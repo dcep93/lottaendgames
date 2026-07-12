@@ -29,7 +29,7 @@
     }
   },
   {
-    "type": "moves",
+    "type": "text",
     "content": "1.b6\n\n1.a7 Ra1 2.b6+- also brings promotion.\n\nIf Black moves, this is the winning plan:\n\n1) Transfer the rook to the rear of the more advanced pawn.\n2) Attack the other pawn and capture both. That is: 1...Ra1 2.Kg3 Ra5 and wins.\n\n1...Rb1 (1...Rf6 2.b7+-) 2.a7+-"
   },
   {
@@ -66,7 +66,7 @@
     }
   },
   {
-    "type": "moves",
+    "type": "text",
     "content": "1.Ke5 Ra1 2.Kd5 Re1 3.d7+ Ke7"
   },
   {
@@ -85,7 +85,7 @@
     "content": "Here White needs to exploit zugzwang themes on many occasions. First, a waiting move."
   },
   {
-    "type": "moves",
+    "type": "text",
     "content": "1.Ra1! Kc3 2.Ke3 Kc2 3.Rh1\n\nZugzwang again.\n\n3...Kc3 4.Rc1+ Kb2 5.Kd2+- and the pawns are captured."
   },
   {
@@ -93,7 +93,7 @@
     "content": "Things change if we move this position more than one file to the left."
   },
   {
-    "type": "caption",
+    "type": "heading",
     "content": "Rook vs. 2 Pawns series"
   },
   {
@@ -144,7 +144,7 @@
     "content": "Here the plans for both players are clear:\n\nThe side with the pawns will try to push one, exchange it for the rook and then promote the other pawn.\n\nThe side with the rook will try to bring the king closer, then sacrifice the rook for the more advanced pawn and capture the other with the king.\n\nHowever, this is not a simple race or a tempi count: the rook has many resources to hinder the pawns' progress. I do not think that many players would intuitively place their bets on the rook in the diagram position. A simple count justifies this lack of confidence, but a deeper analysis turns the tables."
   },
   {
-    "type": "moves",
+    "type": "text",
     "content": "1...Rf3!\n\nA powerful resource worth taking into account: the rook prevents the king moving to g7 to push the f-pawn, which is closest to the black king, as then Black could not attack the g-pawn. The alternatives are:\n\n1...Rg3 2.Kg7! This is the key move, and a very important resource for the king in supporting his pawns. Dvoretsky calls this method 'a change of the leader'. The king secures the advance of his f-pawn and wins, which otherwise would be impossible (2.g7 Kd4 3.Kf7 Ke5 is an easy draw). 2...Kd4 3.f6 Ke5 4.f7 Rf3 5.f8=Q The f-pawn promotes without the black king attacking the g-pawn.\n\nTherefore, Rg3 seems to be a waste of time; 1...Kd4 looks better, but again: 2.Kg7! The same idea as in the previous line, but a more elaborate execution. Other moves only lead to a draw. 2...Ke5 3.f6 Rf3 (3...Ke6 4.f7) 4.f7+- This is the problem: Black cannot exploit the extra time to attack the backward pawn (i.e. the g6 pawn) with the king, so he loses.\n\n2.g7\n\n2.Ke6 Rg3! and neither pawn can advance; 2.Ke5 looks nonsensical compared to 2.Ke6, but it has a hidden idea: 2...Rg3! 3.f6!?\n\nThe point. Now, if the rook captures the g-pawn, the f-pawn advances and Ending 29 (where the rook loses) arises. But after 3...Rg5!= Black will sacrifice the rook for the two pawns (3...Rxg6?? 4.f7+- Ending 29).\n\n2...Rg3\n\nThe rook has lost a tempo, but the king is closer to the backward pawn.\n\n3.Kf7 Kd4 4.f6\n\n4.g8=Q Rxg8 5.Kxg8 Ke5=.\n\n4...Ke5="
   },
   {
@@ -156,14 +156,15 @@
   },
   {
     "type": "text",
-    "content": "Though further analysis is not necessary, we should look at the position closely, because this is the most typical extreme situation in this endgame. This is the situation that Black has been aiming for ever since his paradoxical first move: the rook controls the advanced pawn's promotion, whereas the king keeps an eye on the backward pawn. It is an immediate draw. Dvoretsky calls this situation the 'tail-hook', an expression used by pilots and a very visual metaphor.\n\nThe series of checks"
+    "content": "Though further analysis is not necessary, we should look at the position closely, because this is the most typical extreme situation in this endgame. This is the situation that Black has been aiming for ever since his paradoxical first move: the rook controls the advanced pawn's promotion, whereas the king keeps an eye on the backward pawn. It is an immediate draw. Dvoretsky calls this situation the 'tail-hook', an expression used by pilots and a very visual metaphor."
   },
   {
     "type": "position",
     "content": {
       "number": "6.6",
       "caption": "Lariño - Picazo, La Roda, 2006",
-      "fen": "5K2/7R/8/6kp/6p1/8/8/8 b - - 0 1"
+      "fen": "5K2/7R/8/6kp/6p1/8/8/8 b - - 0 1",
+      "subtitle": "The series of checks"
     }
   },
   {
@@ -171,11 +172,11 @@
     "content": "This position comes from an actual game. Once again, we can see that, although White's position looks desperate because the king is far away from the promotion squares, there are plenty of resources for the rook. In concrete, this example shows the effectiveness of a series of checks to clear the way for the 'tail-hook'."
   },
   {
-    "type": "moves",
+    "type": "text",
     "content": "1...g3\n\n1...h4, the other logical advance, leads to a draw as well.\n\nA) 2.Rg7+ Bringing the king closer also leads to a draw, but this move (less intuitive in appearance) reveals the idea in a clearer way: the king approaches through the g- and h-files until he makes contact with the backward pawn. 2...Kf4 3.Rf7+ Kg3 4.Kg7 h3 5.Kg6! (it is important to leave the h-file open in case Rh7 is needed) 5...Kh2 (5...h2 6.Rh7 Kg2 7.Kg5 g3 8.Kg4=) 6.Kg5 g3 7.Kh4 g2 8.Rg7=;\n\nB) 2.Ke7 h3 3.Ke6 Kf4 4.Kd5 Kg3 (4...g3 5.Rh4+=) 5.Ke4 Kh2 6.Rg7 g3 7.Kf3 g2 8.Kf2 Kh1 9.Rg6 h2 10.Rxg2=.\n\n2.Ke7"
   },
   {
-    "type": "moves",
+    "type": "text",
     "content": "It is logical to bring the king closer, but again it is clearer to start by delivering rook checks: 2.Rg7+ Kf4 3.Rf7+ Kg4 4.Rg7+ Kf3 (4...Kh3 5.Kf7 g2 6.Rg5! h4 7.Kg6 Kh2 8.Kh5 h3 9.Kh4) 5.Rf7+ Kg2 6.Rh7.\n\n2...h4 3.Ke6 Kg4"
   },
   {
@@ -191,7 +192,7 @@
     "content": "This is the position that makes this ending interesting."
   },
   {
-    "type": "moves",
+    "type": "text",
     "content": "4.Ke5?\n\nWhite plays a logical move (to bring the king closer)... and reaches a losing position. It was necessary to switch to the other plan: the rook delivers checks and the king tries to get in contact with the backward pawn.\n\n4.Rg7+! Kf3 (4...Kf4 5.Rh7 g2 6.Rxh4+=; 4...Kh3 5.Kf5 Kh2 6.Kg4=) 5.Rf7+ Kg2 (5...Ke3 6.Rg7! hindering the pawns' advance: 6...Kf2 7.Rf7+ Kg1 8.Rh7!) 6.Kf5 h3 7.Kg4 (the king contacts the pawn: draw) 7...h2 8.Rh7 Kf2 9.Kf4=.\n\n4...g2?\n\nReturning the favour right away. Calculations are very complex here. Placing both pawns on the 6th rank was winning, though there were some mating traps to avoid: 4...h3! 5.Ke4 (5.Rg7+ Kf3 6.Rf7+ Ke2! and the pawns promote without aid) 5...h2 6.Rh8 (6.Rg7+ Kh5! 7.Kf4 g2-+) 6...g2 7.Rg8+ Kh5! (the king flees from mate; 7...Kh3? 8.Kf3 g1=N+!=) 8.Kf5 Kh6 9.Kf6 Kh7-+.\n\n5.Ke4 Kh3 6.Rg7 Kh2 7.Kf4?\n\n7.Kf3! h3 8.Kf2 Kh1=.\n\n7...h3 8.Kf3 g1=Q 0-1"
   }
 ]

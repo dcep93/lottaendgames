@@ -5,6 +5,7 @@ import { getSquareIndex } from './fen'
 type ChessBoardProps = {
   animateNextMove?: boolean
   fen: string
+  lichessUrl: string | null
   markers?: PositionMarker[]
   number: string
 }
@@ -12,48 +13,64 @@ type ChessBoardProps = {
 export default function ChessBoard({
   animateNextMove = false,
   fen,
+  lichessUrl,
   markers = [],
   number,
 }: ChessBoardProps) {
   const boardId = `position-${number.replace(/[^a-z0-9_-]/gi, '-')}`
+  const board = (
+    <div
+      aria-label={`Chess position ${number}`}
+      className="leg-board-stage"
+      data-animate-next-move={animateNextMove ? 'true' : 'false'}
+      role="img"
+    >
+      <Chessboard
+        options={{
+          id: boardId,
+          allowDragging: false,
+          animationDurationInMs: animateNextMove ? 220 : 0,
+          boardOrientation: 'white',
+          boardStyle: {
+            border: '0.14rem solid rgba(255, 255, 255, 0.14)',
+            borderRadius: '0.35rem',
+            boxShadow: '0 0.8rem 1.8rem rgba(0, 0, 0, 0.28)',
+            overflow: 'hidden',
+            width: '100%',
+          },
+          darkSquareStyle: { backgroundColor: 'var(--leg-board-dark)' },
+          lightSquareStyle: { backgroundColor: 'var(--leg-board-light)' },
+          position: fen,
+          showAnimations: animateNextMove,
+          showNotation: false,
+        }}
+      />
+      <div className="leg-board-marker-layer">
+        {markers.map((marker, markerIndex) => (
+          <BoardMarker
+            key={`${marker.square}-${marker.symbol}-${markerIndex}`}
+            marker={marker}
+          />
+        ))}
+      </div>
+    </div>
+  )
 
   return (
     <div className="leg-board-wrap">
-      <div
-        aria-label={`Chess position ${number}`}
-        className="leg-board-stage"
-        data-animate-next-move={animateNextMove ? 'true' : 'false'}
-        role="img"
-      >
-        <Chessboard
-          options={{
-            id: boardId,
-            allowDragging: false,
-            animationDurationInMs: animateNextMove ? 220 : 0,
-            boardOrientation: 'white',
-            boardStyle: {
-              border: '0.14rem solid rgba(255, 255, 255, 0.14)',
-              borderRadius: '0.35rem',
-              boxShadow: '0 0.8rem 1.8rem rgba(0, 0, 0, 0.28)',
-              overflow: 'hidden',
-              width: '100%',
-            },
-            darkSquareStyle: { backgroundColor: 'var(--leg-board-dark)' },
-            lightSquareStyle: { backgroundColor: 'var(--leg-board-light)' },
-            position: fen,
-            showAnimations: animateNextMove,
-            showNotation: false,
-          }}
-        />
-        <div className="leg-board-marker-layer">
-          {markers.map((marker, markerIndex) => (
-            <BoardMarker
-              key={`${marker.square}-${marker.symbol}-${markerIndex}`}
-              marker={marker}
-            />
-          ))}
-        </div>
-      </div>
+      {lichessUrl ? (
+        <a
+          aria-label={`Open position ${number} line on Lichess`}
+          className="leg-board-link"
+          href={lichessUrl}
+          rel="noreferrer"
+          target="_blank"
+        >
+          {board}
+        </a>
+      ) : (
+        board
+      )}
     </div>
   )
 }

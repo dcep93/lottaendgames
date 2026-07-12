@@ -40,6 +40,29 @@ cat <<EOF2 >firebase.json
   "hosting": {
     "public": "dist",
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "headers": [
+      {
+        "source": "/app_x/chapter-runtime.*.json",
+        "headers": [{
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }]
+      },
+      {
+        "source": "/assets/**",
+        "headers": [{
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }]
+      },
+      {
+        "source": "/index.html",
+        "headers": [{
+          "key": "Cache-Control",
+          "value": "no-cache"
+        }]
+      }
+    ],
     "rewrites": [{
       "source": "**",
       "destination": "/index.html"

@@ -5,6 +5,8 @@ import chapterManifest from './chapterManifest.json'
 import {
   chapterPayloadContentHash,
   chapterPayloadPath,
+  chapterSourcePayloadContentHash,
+  chapterSourcePayloadPath,
 } from './chapterPayloadManifest'
 import type { RawChapterSection } from './chapterTypes'
 import {
@@ -28,6 +30,7 @@ type ChapterPayload = {
   }>
   contentHash: string
   schemaVersion: number
+  sourceContentHash: string
 }
 
 type DiagramExtractionReportEntry = {
@@ -78,7 +81,7 @@ const moveSectionIndex = positionFiveOneIndex + 1
 const proseSectionIndex = positionFiveOneIndex + 2
 const positionFiveThreeMoveSectionIndex = chapterSections.findIndex(
   (section) =>
-    section.type === 'moves' &&
+    section.type === 'text' &&
     typeof section.content === 'string' &&
     section.content.startsWith('1.Rg5!'),
 )
@@ -90,19 +93,19 @@ const positionFiveTenTextSectionIndex = chapterSections.findIndex(
 )
 const positionFiveTenContinuationMoveSectionIndex = chapterSections.findIndex(
   (section) =>
-    section.type === 'moves' &&
+    section.type === 'text' &&
     typeof section.content === 'string' &&
     section.content.startsWith('1...e4 2.Re1!'),
 )
 const positionFiveElevenMoveSectionIndex = chapterSections.findIndex(
   (section) =>
-    section.type === 'moves' &&
+    section.type === 'text' &&
     typeof section.content === 'string' &&
     section.content.startsWith('1.Rc7+!'),
 )
 const positionSixSixMoveSectionIndex = chapterSixSections.findIndex(
   (section) =>
-    section.type === 'moves' &&
+    section.type === 'text' &&
     typeof section.content === 'string' &&
     section.content.startsWith('1...g3'),
 )
@@ -167,26 +170,27 @@ const ignoredSanMisses: Set<string> = new Set([
   '6:31:Rh7',
   '7:11:Bf3',
   '7:22:Kg6',
-  '7:31:Ke8',
-  '8:5:3...Ng3',
-  '8:5:Ne3',
-  '8:5:Nf5',
-  '8:7:Nf5',
-  '8:12:Ng2',
-  '8:18:Nb2',
-  '9:37:Kf5',
-  '9:42:Kf5',
-  '9:47:Ka2',
-  '9:49:Bf5',
+  '7:30:Ke8',
+  '8:7:3...Ng3',
+  '8:7:Ne3',
+  '8:9:Nf5',
+  '8:14:Ng2',
+  '8:19:Nb2',
+  '9:39:Kf5',
+  '9:45:Kf5',
   '9:49:Ka2',
+  '9:51:Bf5',
+  '9:51:Ka2',
 ])
 
 assert.equal(positionFiveOneIndex, 4)
-assert.equal(chapterPayload.schemaVersion, 1)
+assert.equal(chapterPayload.schemaVersion, 2)
 assert.match(chapterPayload.contentHash, /^sha256:[a-f0-9]{64}$/)
 assert.equal(chapterPayload.contentHash, getPayloadContentHash(chapterPayload))
 assert.equal(chapterPayload.contentHash, chapterPayloadContentHash)
-assert.match(chapterPayloadPath, /^app_x\/chapters\.[a-f0-9]{16}\.json$/)
+assert.match(chapterPayloadPath, /^app_x\/chapter-runtime\.[a-f0-9]{16}\.json$/)
+assert.equal(chapterPayload.sourceContentHash, chapterSourcePayloadContentHash)
+assert.match(chapterSourcePayloadPath, /^generated\/chapters\.[a-f0-9]{16}\.json$/)
 assert.deepEqual(
   chapterPayload.chapters.map(({ id, label }) => ({ id, label })),
   chapterManifest,
@@ -215,14 +219,31 @@ assert.deepEqual(scanUnclickableSan('6', chapterSixSections), [])
 assert.deepEqual(scanUnclickableSan('7', chapterSevenSections), [])
 assert.deepEqual(scanUnclickableSan('8', chapterEightSections), [])
 assert.deepEqual(scanUnclickableSan('9', chapterNineSections), [])
-assert.equal(panelSections.length, 2)
-for (const section of panelSections) {
+assert.equal(panelSections.length, 3)
+const summaryPanels = panelSections.filter(
+  (section) =>
+    (section.content as { title?: unknown }).title ===
+    'Summary of interesting ideas',
+)
+assert.equal(summaryPanels.length, 2)
+for (const section of summaryPanels) {
   const content = section.content as { text?: unknown; title?: unknown }
   assert.equal(content.title, 'Summary of interesting ideas')
   assert.equal(typeof content.text, 'string')
   const panelText = content.text as string
   assert.equal(panelText.includes('Summary of interesting ideas:'), false)
 }
+const chapterFiveConclusion = panelSections.find(
+  (section) =>
+    (section.content as { title?: unknown }).title === 'Conclusion',
+)
+assert.ok(chapterFiveConclusion)
+assert.equal(
+  (chapterFiveConclusion.content as { text: string }).text.includes(
+    'dramatically decreased',
+  ),
+  true,
+)
 assert.equal(chapterSixPanels.length, 1)
 assert.equal(
   (chapterSixPanels[0].content as { title: string }).title,
@@ -825,8 +846,10 @@ function validateChapter(sections: RawChapterSection[]) {
 
     if (section.type === 'panel') {
       const content = section.content as { text?: unknown; title?: unknown }
-      assert.equal(typeof content.title, 'string')
       assert.equal(typeof content.text, 'string')
+      if (content.title !== undefined) {
+        assert.equal(typeof content.title, 'string')
+      }
     }
 
     if (section.type === 'position') {

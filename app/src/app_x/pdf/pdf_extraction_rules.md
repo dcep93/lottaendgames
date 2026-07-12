@@ -16,7 +16,7 @@ The app runtime does not import these per-chapter source files directly. After c
 python3 scripts/build_chapter_payload.py
 ```
 
-The generated runtime file is `app/public/app_x/chapters.<hash>.json` and includes `schemaVersion`, a deterministic `contentHash`, and every chapter's sections. `app/src/app_x/chapterPayloadManifest.ts` points the viewer and tests at the current hashed file. Vite should serve that file as a public asset instead of bundling chapter JSON into the main JavaScript chunk. The URL changes when chapter content changes, so browser/CDN caches can keep long-lived copies without serving stale chapter content after a deploy. A single chapter payload under 2 MB is acceptable.
+The builder retains a non-served source payload at `app/src/app_x/generated/chapters.<hash>.json`. It also writes the served runtime payload to `app/public/app_x/chapter-runtime.<hash>.json`. The runtime payload includes `schemaVersion`, deterministic content hashes, every chapter's sections, and precomputed playback/render metadata so the browser does not need to parse SAN or build playable move tokens after the JSON loads. `app/src/app_x/chapterPayloadManifest.ts` points the viewer and tests at the current hashed runtime file, and also records the retained source payload path. Vite should serve the runtime file as a public asset instead of bundling chapter JSON into the main JavaScript chunk. The URL changes when chapter content changes, so browser/CDN caches can keep long-lived copies without serving stale chapter content after a deploy.
 
 Chapter IDs and labels live in `app/src/app_x/chapterManifest.json`. The payload builder and viewer both use that manifest, so update it when adding or renaming chapters.
 
@@ -28,11 +28,12 @@ Every section must have:
 ## Section Types
 
 - `title`: chapter title as a string.
-- `text`: prose paragraph or a small group of continuous prose paragraphs as a string.
+- `text`: ordinary prose and chess analysis as a string. Clickable moves are
+  derived from the content and position context.
 - `ending`: `{ "number": "21", "text": "Kings do not push. Just counting" }`.
+- `heading`: a visible standalone topic heading as a string.
 - `position`: a diagram position object.
 - `caption`: diagram source, composer, year, or nearby caption text.
-- `moves`: chess analysis or move sequence text when it is clearer as its own section.
 - `panel`: visibly boxed or callout content, such as a summary panel.
 - `note`: extraction note for unavoidable ambiguity. Use sparingly.
 
@@ -40,11 +41,22 @@ Every section must have:
 
 Preserve the printed chapter order. Section objects should appear in the same order a reader encounters them.
 
+Ending banners are artwork and are not present in the PDF's selectable text.
+`repair_pdf_structure.py` records their printed page and vertical source
+coordinates, aligns the surrounding PDF words with the JSON words, and inserts
+each `ending` immediately before the first aligned content below its banner. If
+the banner falls inside an extracted prose block, the repair splits that block at
+the source boundary. Do not infer an ending boundary from the first diagram.
+
+An ending closes the preceding board group. A heading and introduction printed
+after an ending banner but before the next diagram remain standalone, full-width
+content. Board grouping begins only at the next `position` section.
+
 Omit running headers, page numbers, table-of-contents remnants, and repeated book titles unless they are part of the chapter content.
 
 ## Paragraphs
 
-Use `text` for prose. Preserve full paragraph text. Adjacent short paragraphs may be grouped when they form one continuous explanation before the next structural element.
+Use `text` for prose and move sequences. Preserve full paragraph text. Adjacent short paragraphs may be grouped when they form one continuous explanation before the next structural element.
 
 Fix obvious OCR spacing errors, especially around punctuation and chess words, while preserving the author's wording.
 
@@ -71,6 +83,11 @@ Every `position` section must include:
 - `number`: the printed position number, such as `"5.1"`.
 - `fen`: a best-effort FEN string for the pieces only.
 
+A position may include `subtitle` when a printed heading directly introduces
+that diagram. Do not put the generic printed label `Position N` in `caption`;
+the position number already renders that label. Reserve `caption` for genuine
+context such as a source, composer, date, or analysis-diagram note.
+
 Use normal FEN fields when they are not known from the diagram:
 
 - active color: infer from surrounding move text when possible, otherwise use `"w"`;
@@ -80,6 +97,9 @@ Use normal FEN fields when they are not known from the diagram:
 - fullmove: `"1"`.
 
 Printed diagram symbols that are not pieces and cannot be represented in FEN belong in `markers`.
+Markers remain present even when they share a square with a piece. The marker
+layer renders above pieces, so an annotation such as the e6 key-square asterisk
+in Position 1.9 must not be omitted from JSON.
 
 Example:
 
@@ -122,11 +142,16 @@ That script trains on verified chapter 5-9 diagrams, crops diagrams by their pri
 
 ## Captions And Sources
 
-Use `caption` for nearby diagram source text, composer names, years, and small labels that are not prose or moves. A caption may be a string or an object. Prefer a string unless structured fields are clearly helpful.
+Use `caption` for nearby diagram source text, composer names, years, and small labels that are not prose. A caption may be a string or an object. Prefer a string unless structured fields are clearly helpful.
 
-## Moves
+## Move Playback
 
-Use `moves` for analysis lines and move sequences that would be hard to read inside a prose block. Keep the text human-readable and repair only obvious OCR spacing problems.
+Keep move sequences in `text` sections. Keep the text human-readable and repair only obvious extraction spacing problems.
+
+The generated source and runtime payloads must contain no `moves` sections. The
+source text audit rejects known split-word artifacts, broken glyphs, joined
+sentences, isolated scan debris, and line-break hyphenation. Compare ambiguous
+wording with the PDF's embedded selectable text rather than introducing OCR.
 
 Clickable move playback is for moves actually played in the main line or an explicit variation. Do not treat threat notes or prose square references as required clickable moves unless the text presents them as a playable variation.
 
@@ -155,7 +180,22 @@ Example:
 }
 ```
 
-The `title` is the printed panel heading without trailing punctuation such as a colon. The `text` is the full panel body. Do not summarize or flatten panel content into ordinary prose.
+The optional `title` is the printed panel heading without trailing punctuation
+such as a colon. Untitled boxes omit `title` rather than inventing one. The
+`text` is the full panel body. Do not summarize or flatten panel content into
+ordinary prose.
+
+PDF vector borders, word coordinates, fonts, and rendered pages are the source
+of truth for classifying boxes and headings. Run the curated structural repair
+after extraction or normalization changes:
+
+```bash
+python3 scripts/repair_pdf_structure.py
+```
+
+The script writes `pdf_structure_audit.json`, removes cross-chapter spillover,
+recovers classified panels and headings, attaches position subtitles, removes
+redundant position captions, and preserves verified marker overlays.
 
 ## QA
 

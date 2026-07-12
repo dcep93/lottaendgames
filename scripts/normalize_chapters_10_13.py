@@ -459,12 +459,6 @@ def split_panels(text: str) -> list[dict[str, Any]]:
 
 
 def guess_text_type(text: str) -> str:
-    compact = " ".join(text.split())
-    move_like = len(re.findall(r"(?:^|\s)\d+\s*(?:\.|\.\.\.)", compact))
-
-    if move_like >= 2 and len(compact) < 1600:
-        return "moves"
-
     return "text"
 
 

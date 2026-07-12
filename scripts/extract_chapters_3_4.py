@@ -583,11 +583,6 @@ def normalize_final_section_text(text: str) -> str:
 
 
 def guess_text_type(text: str) -> str:
-    move_like = len(re.findall(r"(?:^|\s)\d+\s*(?:\.|\.\.\.)", text))
-
-    if move_like >= 2 and len(text) < 1800:
-        return "moves"
-
     return "text"
 
 

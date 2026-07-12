@@ -26,7 +26,7 @@
     "content": "Here we have what we could classify as the First Case: the stronger side's king near his pawn and ready to offer a bishop trade, and the defending king far away. Then the stronger side usually wins with a standard manoeuvre: driving off the enemy bishop from the diagonals which cross the pawn's path."
   },
   {
-    "type": "moves",
+    "type": "text",
     "content": "1.Bf3\n\nWhite is ready to move the bishop to c6, the ideal square. Trying to trade bishops on d7 also wins, but then the black bishop could relocate and offer resistance from the other diagonal, and the driving-off process would be longer. It is easy to see that, in order to drive off the defending bishop, the bishop swap has to be arranged where it does not interfere with the advance of the pawn. While this is obvious, the consequences are important for the theory of this ending.\n\n1...Ba4 2.Bc6\n\nThe black bishop has to leave or allow the exchange.\n\n2...Bxc6 3.Kxc6 Ke8 4.Kc7\n\nAnd the pawn promotes. It has been easy."
   },
   {
@@ -59,7 +59,7 @@
     "content": "This is what we could name the Second Case: the defending king has reached rear opposition. From his position he hinders an essential manoeuvre: now the stronger side cannot offer a bishop trade without obstructing the pawn. The driving-off manoeuvre does not work now:"
   },
   {
-    "type": "moves",
+    "type": "text",
     "content": "1.Bd7\n\nThis is the only square available for the bishop exchange: on c8 White would lose the pawn. The black bishop moves away but gets ready to occupy the other diagonal, a4-e8.\n\n1...Bf1 2.Bg4 Bb5\n\nIt becomes apparent now that, if the black king did not control c6, White would have the winning manoeuvre Bf3-c6, but now it is impossible.\n\n3.Bd7 Be2 4.Bc6 Bg4\n\nIt is an ironclad draw."
   },
   {
@@ -92,7 +92,7 @@
     "content": "This position belongs to the Third Case. The defending king is behind the pawn, similar to the second case; however, a special feature will help us distinguish between the second and third cases.\n\nOne of the diagonals is very short. How short? Less than 4 squares long. That is the point. Let us see why, so that we can learn the rule and thus guess the exceptions."
   },
   {
-    "type": "moves",
+    "type": "text",
     "content": "1.Bc8\n\nThe first stage of the winning plan is driving off the black bishop from the long diagonal.\n\n1...Be4 2.Bb7 Bd3\n\nOr 2...Bf5 3.Bf3 Bc8 4.Be2 zugzwang.\n\n3.Bf3 Ba6 4.Bg4!\n\nZugzwang. There is no good move for the king, and the short diagonal is controlled by White: two squares by the king and one by the bishop. The bishop can just take one square away from its counterpart; therefore, the king must take care of two."
   },
   {
@@ -118,7 +118,7 @@
     "content": "If we apply the previous rules, Position 7.4 is quite easy to understand. Where should the white king go? It is logical: where he can control more squares of the short diagonal."
   },
   {
-    "type": "moves",
+    "type": "text",
     "content": "1.Ke8?\n\nLet us look at the wrong move and make sure that it is impossible to win that way. 1.Kg8! Kg6 2.Bf8 wins in the same fashion as in the previous example.\n\n1...Ke6\n\nAdopting rear opposition, an easy and known method, from the beginning. We have plenty of time, so here we could play first ...Kg6 or ...Kf5. However, at the key moment, when the white bishop goes to e7, the black king should always be ready to get to e6.\n\n2.Bf8 Bf4 3.Bb4 Bh6 4.Bd2 Bg7\n\nThe bishop has one more square.\n\n5.Be3\n\nSemi-zugzwang. Black has to move the king, but nothing happens.\n\n5...Kd6 6.Bd2 Ke6\n\nTime to go back. Other king moves would lose, since they would allow the white king to make it to the other side of the pawn. 6...Kd5 7.Ke7 Kc6 (or 7...Be5 8.Kf8!) 8.Ke6 and, with the king on the other side of the pawn, White wins.\n\n7.Bc3 Bh6\n\nDraw. There is no way to make progress. The white king controls just one square on the short diagonal, so it is impossible to win."
   },
   {
@@ -141,7 +141,7 @@
     }
   },
   {
-    "type": "moves",
+    "type": "text",
     "content": "1...Kd7?!\n\nThe black player shows his ignorance of the basic drawing procedure, thus making life difficult for himself. The simplest defensive plan was 1...Kd5! 2.Kg6 Ke4 3.Bc7 Kf3 4.Bd8 Kg4= and the black king makes it to the rear of the pawn, getting the opposition.\n\n2.Kg6 Ke8!\n\nNow there was no time to get to the g4-square, but it is still a draw. Black can try another drawing procedure. It is less well known and more delicate, but worth knowing, in case one reaches a position where the rear opposition defence is not available. The king heads for the g8-square.\n\n3.Bf4\n\nTrying to cut the black king's path to f8 would not work. Black just waits: 3.Bd6 Bd4=.\n\n3...Bd4?\n\nHowever, Black fails to find the second defensive method as well. The correct move was 3...Kf8! 4.Bh6+ Kg8! The key point is that when the black king is here, White cannot offer the bishop exchange on g5, since it leads to a drawn pawn endgame. 5.Bg5 Bd4 6.Bf6. As usual, if the attacking side offers a bishop exchange in front of the pawn, the defending bishop just switches to another diagonal. 6...Bf2 7.Be5 Bh4 8.Bf4 Bd8 9.Bg5. This confirms the draw but, anyway, there is no way to make progress: 9...Bxg5 10.Kxg5 Kf7=.\n\n4.Bh6!+-\n\nAnd Black resigned, maybe because the game was adjourned here. In any case, victory comes easily, since White cannot offer the bishop exchange without obstructing his pawn: 4...Ke7 5.Bg7 Bc5 6.f6++; 4...Bc3 5.Bg7 Bb4 6.f6+-."
   },
   {
@@ -152,15 +152,12 @@
     }
   },
   {
-    "type": "text",
-    "content": "Revision of some assorted themes"
-  },
-  {
     "type": "position",
     "content": {
       "number": "7.6",
       "caption": "Averbakh, 1972",
-      "fen": "6k1/3b4/3P1K2/8/8/8/8/3B4 w - - 0 1"
+      "fen": "6k1/3b4/3P1K2/8/8/8/8/3B4 w - - 0 1",
+      "subtitle": "Revision of some assorted themes"
     }
   },
   {
@@ -168,7 +165,7 @@
     "content": "An interesting position. We can revise some of the themes previously introduced and note some well known tricks."
   },
   {
-    "type": "moves",
+    "type": "text",
     "content": "1.Bh5!?\n\nThe only attempt to win. If White allows Ke8, the black king reaches d8, with an immediate draw.\n\n1...Bh3\n\nThere are two possible winning attempts. Black has to be careful in either case.\n\n2.Ke5!?\n\nThe most dangerous winning attempt. Black can draw if he grasps White's plan and knows the defensive technique of transferring the king to the rear of the pawn. The white plan is to take his king to the c7-square. Black's only defence involves transferring his king to c5. There is time enough for this, but Black will not do it unless he knows what is going on.\n\n2.Bg6!? White tries to win by trading bishops on f5. It looks like a terrible threat, but it is easy to prevent: 2...Bd7! Only move. Note that the position would be more dangerous with a knight's pawn. Then a zugzwang would arise, because the bishop could not go to the short diagonal. Now the bishop can move along the other diagonal. 3.Bf5 is not losing either, but it is important to point out that, with a knight's pawn, the corresponding move would lose.\n\n2...Bd7?!\n\nWaiting means just losing, though this move does not bring immediate disaster. 2...Kg7! If we know Endings 33 and 34, we can understand this is the right defensive procedure for Black.\n\n3.Kd5 Ba4?\n\nIt was not too late for the king to arrive: 3...Kg7! 4.Kc5 Kf6 5.Kb6 Ke5 6.Kc7 Bh3. Just in time.\n\n4.Kc5 Bd7 5.Kb6 Ba4 6.Kc7+-\n\nSee Ending 33."
   }
 ]

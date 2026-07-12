@@ -79,12 +79,7 @@ export function buildChapterPlayback(
       return
     }
 
-    if (
-      !context ||
-      (section.type !== 'moves' &&
-        section.type !== 'panel' &&
-        section.type !== 'text')
-    ) {
+    if (!context || (section.type !== 'panel' && section.type !== 'text')) {
       return
     }
 
@@ -93,7 +88,7 @@ export function buildChapterPlayback(
       contexts,
       context,
       content,
-      section.type === 'moves' && !hasParsedPlayableSincePosition,
+      hasNumberedMoveText(content) && !hasParsedPlayableSincePosition,
       sectionIndex,
     )
     const parsedTokens = context.parse(content, sectionIndex)
@@ -131,6 +126,7 @@ export function buildChapterPlayback(
       selectedContext.positionNumber,
       sectionIndex,
     )
+    tokens = assignMoveTokenIds(tokens, sectionIndex)
 
     if (tokens.some((token) => token.type === 'move')) {
       if (selectedContext === context) {
@@ -146,6 +142,20 @@ export function buildChapterPlayback(
     playablePositions,
     tokensBySectionIndex,
   }
+}
+
+function assignMoveTokenIds(
+  tokens: TextPlaybackToken[],
+  sectionIndex: number,
+) {
+  return tokens.map((token, tokenIndex) =>
+    token.type === 'move'
+      ? {
+          ...token,
+          id: `${token.positionNumber}-${sectionIndex}-${tokenIndex}`,
+        }
+      : token,
+  )
 }
 
 function createUpcomingPositionContext(

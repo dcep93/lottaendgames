@@ -1,7 +1,7 @@
 export type ChapterSection =
   | CaptionSection
   | EndingSection
-  | MovesSection
+  | HeadingSection
   | PanelSection
   | PositionSection
   | TextSection
@@ -25,15 +25,15 @@ export type EndingSection = {
   type: 'ending'
 }
 
-export type MovesSection = {
+export type HeadingSection = {
   content: string
-  type: 'moves'
+  type: 'heading'
 }
 
 export type PanelSection = {
   content: {
     text: string
-    title: string
+    title?: string
   }
   type: 'panel'
 }
@@ -51,6 +51,7 @@ export type PositionSection = {
     fen: string
     markers?: PositionMarker[]
     number: string
+    subtitle?: string
   }
   type: 'position'
 }

@@ -1,0 +1,1408 @@
+{
+  "schemaVersion": 2,
+  "referenceCase": "Position 1.9",
+  "endingBoundaries": [
+    {
+      "chapter": "1",
+      "ending": "1",
+      "page": 27,
+      "targetStartsWith": "Position 1.1",
+      "targetType": "position"
+    },
+    {
+      "chapter": "1",
+      "ending": "2",
+      "page": 29,
+      "targetStartsWith": "Opposition",
+      "targetType": "heading"
+    },
+    {
+      "chapter": "1",
+      "ending": "3",
+      "page": 33,
+      "targetStartsWith": "Position 1.9",
+      "targetType": "position"
+    },
+    {
+      "chapter": "1",
+      "ending": "4",
+      "page": 37,
+      "targetStartsWith": "Position 1.14",
+      "targetType": "position"
+    },
+    {
+      "chapter": "1",
+      "ending": "5",
+      "page": 38,
+      "targetStartsWith": "Unfortunately for the strong side, standing in the pawn's path is not the only w",
+      "targetType": "text"
+    },
+    {
+      "chapter": "1",
+      "ending": "6",
+      "page": 39,
+      "targetStartsWith": "The ending Rook vs. Bishop is usually a draw. However, the defender has to be ca",
+      "targetType": "text"
+    },
+    {
+      "chapter": "1",
+      "ending": "7",
+      "page": 40,
+      "targetStartsWith": "The other corner is a completely different story. It is so easy to defend this e",
+      "targetType": "text"
+    },
+    {
+      "chapter": "1",
+      "ending": "8",
+      "page": 41,
+      "targetStartsWith": "When fighting against a rook, the knight may have more trouble than the bishop.\n",
+      "targetType": "text"
+    },
+    {
+      "chapter": "1",
+      "ending": "9",
+      "page": 42,
+      "targetStartsWith": "Things are radically different when the king and the knight are at one corner of",
+      "targetType": "text"
+    },
+    {
+      "chapter": "3",
+      "ending": "10",
+      "page": 51,
+      "targetStartsWith": "Position 3.1",
+      "targetType": "position"
+    },
+    {
+      "chapter": "3",
+      "ending": "11",
+      "page": 53,
+      "targetStartsWith": "As readers have probably noticed, so far we have only dealt with pawns on the 4\n",
+      "targetType": "text"
+    },
+    {
+      "chapter": "3",
+      "ending": "12",
+      "page": 54,
+      "targetStartsWith": "As usual, the theoretical approach is different when dealing with a rook's pawn.",
+      "targetType": "text"
+    },
+    {
+      "chapter": "3",
+      "ending": "13",
+      "page": 55,
+      "targetStartsWith": "The barrier",
+      "targetType": "heading"
+    },
+    {
+      "chapter": "3",
+      "ending": "14",
+      "page": 57,
+      "targetStartsWith": "There is a very exceptional situation, where the knight, with the king's aid, ca",
+      "targetType": "text"
+    },
+    {
+      "chapter": "3",
+      "ending": "15",
+      "page": 58,
+      "targetStartsWith": "The second square on the long diagonal (here the b7-square; it could be g7, b2 o",
+      "targetType": "text"
+    },
+    {
+      "chapter": "4",
+      "ending": "16",
+      "page": 59,
+      "targetStartsWith": "Position 4.1",
+      "targetType": "position"
+    },
+    {
+      "chapter": "4",
+      "ending": "17",
+      "page": 60,
+      "targetStartsWith": "Position 4.3",
+      "targetType": "position"
+    },
+    {
+      "chapter": "4",
+      "ending": "18",
+      "page": 62,
+      "targetStartsWith": "With a bishop's pawn, stalemate resources also occur, but the scenario is a bit ",
+      "targetType": "text"
+    },
+    {
+      "chapter": "4",
+      "ending": "19",
+      "page": 65,
+      "targetStartsWith": "This chapter could end here, since all essential circumstances about the struggl",
+      "targetType": "text"
+    },
+    {
+      "chapter": "4",
+      "ending": "20",
+      "page": 67,
+      "targetStartsWith": "Position 4.13",
+      "targetType": "position"
+    },
+    {
+      "chapter": "5",
+      "ending": "21",
+      "page": 68,
+      "targetStartsWith": "In order to solve these endings, the first approximate method is counting tempi:",
+      "targetType": "text"
+    },
+    {
+      "chapter": "5",
+      "ending": "22",
+      "page": 69,
+      "targetStartsWith": "When the king and his pawn are still further from promotion (in general, wheneve",
+      "targetType": "text"
+    },
+    {
+      "chapter": "5",
+      "ending": "23",
+      "page": 71,
+      "targetStartsWith": "Underpromotion to a knight",
+      "targetType": "heading"
+    },
+    {
+      "chapter": "5",
+      "ending": "24",
+      "page": 74,
+      "targetStartsWith": "As we have seen, the rook needs support from the king to control and capture the",
+      "targetType": "text"
+    },
+    {
+      "chapter": "5",
+      "ending": "25",
+      "page": 76,
+      "targetStartsWith": "Outflanking. The importance of zugzwang",
+      "targetType": "heading"
+    },
+    {
+      "chapter": "5",
+      "ending": "26",
+      "page": 77,
+      "targetStartsWith": "As we already know, near the edge of the board pawns follow their own rules. Thi",
+      "targetType": "text"
+    },
+    {
+      "chapter": "5",
+      "ending": "27",
+      "page": 79,
+      "targetStartsWith": "Knight at the corner = lost",
+      "targetType": "heading"
+    },
+    {
+      "chapter": "5",
+      "ending": "28",
+      "page": 80,
+      "targetStartsWith": "Stalemate in the corner",
+      "targetType": "heading"
+    },
+    {
+      "chapter": "5",
+      "ending": "29",
+      "page": 82,
+      "targetStartsWith": "So far we have seen examples where the rook was trying to win, but there is one ",
+      "targetType": "text"
+    },
+    {
+      "chapter": "6",
+      "ending": "30",
+      "page": 83,
+      "targetStartsWith": "Extreme position. Rook behind the pawns\n\nWhen kings play no part, the rook usual",
+      "targetType": "text"
+    },
+    {
+      "chapter": "6",
+      "ending": "31",
+      "page": 84,
+      "targetStartsWith": "Stronger side's king in front of the pawns\n\nWhen the king and the rook work toge",
+      "targetType": "text"
+    },
+    {
+      "chapter": "6",
+      "ending": "32",
+      "page": 85,
+      "targetStartsWith": "The king is in contact with the less advanced pawn. ('the tail-hook')\n\nWhen the ",
+      "targetType": "text"
+    },
+    {
+      "chapter": "7",
+      "ending": "33",
+      "page": 89,
+      "targetStartsWith": "Position 7.1",
+      "targetType": "position"
+    },
+    {
+      "chapter": "7",
+      "ending": "34",
+      "page": 90,
+      "targetStartsWith": "Position 7.2",
+      "targetType": "position"
+    },
+    {
+      "chapter": "7",
+      "ending": "35",
+      "page": 91,
+      "targetStartsWith": "Position 7.3",
+      "targetType": "position"
+    },
+    {
+      "chapter": "7",
+      "ending": "36",
+      "page": 93,
+      "targetStartsWith": "There are not many studies about this situation, but I have found some mistakes ",
+      "targetType": "text"
+    },
+    {
+      "chapter": "8",
+      "ending": "37",
+      "page": 96,
+      "targetStartsWith": "Position 8.1",
+      "targetType": "position"
+    },
+    {
+      "chapter": "8",
+      "ending": "38",
+      "page": 98,
+      "targetStartsWith": "Position 8.3",
+      "targetType": "position"
+    },
+    {
+      "chapter": "8",
+      "ending": "39",
+      "page": 101,
+      "targetStartsWith": "Position 8.7a",
+      "targetType": "position"
+    },
+    {
+      "chapter": "8",
+      "ending": "40",
+      "page": 103,
+      "targetStartsWith": "Position 8.7b",
+      "targetType": "position"
+    },
+    {
+      "chapter": "9",
+      "ending": "41",
+      "page": 105,
+      "targetStartsWith": "Position 9.1",
+      "targetType": "position"
+    },
+    {
+      "chapter": "9",
+      "ending": "42",
+      "page": 106,
+      "targetStartsWith": "The evaluation of the endgame changes if the pawns are further from promotion. T",
+      "targetType": "text"
+    },
+    {
+      "chapter": "9",
+      "ending": "43",
+      "page": 109,
+      "targetStartsWith": "In our last example we saw that setting up the defence can be difficult. Also, w",
+      "targetType": "text"
+    },
+    {
+      "chapter": "9",
+      "ending": "44",
+      "page": 111,
+      "targetStartsWith": "Position 9.9",
+      "targetType": "position"
+    },
+    {
+      "chapter": "9",
+      "ending": "45",
+      "page": 112,
+      "targetStartsWith": "Here the defensive procedure is simple too.\n\n1.Kd5\n\nIf the black pieces switched",
+      "targetType": "text"
+    },
+    {
+      "chapter": "9",
+      "ending": "46",
+      "page": 113,
+      "targetStartsWith": "All endings in this section are won in the same fashion. While the bishop defend",
+      "targetType": "text"
+    },
+    {
+      "chapter": "9",
+      "ending": "47",
+      "page": 114,
+      "targetStartsWith": "Position 9.12",
+      "targetType": "position"
+    },
+    {
+      "chapter": "9",
+      "ending": "48",
+      "page": 117,
+      "targetStartsWith": "There is still one more case with pawns separated by two files: where one of the",
+      "targetType": "text"
+    },
+    {
+      "chapter": "9",
+      "ending": "49",
+      "page": 118,
+      "targetStartsWith": "Let us start with knight and bishop's pawns. The worst scenario for the stronger",
+      "targetType": "text"
+    },
+    {
+      "chapter": "9",
+      "ending": "50",
+      "page": 119,
+      "targetStartsWith": "When the defending bishop controls the last-but-one step of the knight's pawn, b",
+      "targetType": "text"
+    },
+    {
+      "chapter": "9",
+      "ending": "51",
+      "page": 120,
+      "targetStartsWith": "After the previous examples, to say that life is easier for the stronger side wi",
+      "targetType": "text"
+    },
+    {
+      "chapter": "10",
+      "ending": "52",
+      "page": 124,
+      "targetStartsWith": "DT: Distant rear checks, cut-off king",
+      "targetType": "heading"
+    },
+    {
+      "chapter": "10",
+      "ending": "53",
+      "page": 125,
+      "targetStartsWith": "DT: Distant rear checks",
+      "targetType": "heading"
+    },
+    {
+      "chapter": "10",
+      "ending": "54",
+      "page": 127,
+      "targetStartsWith": "DT: Distant side checks",
+      "targetType": "heading"
+    },
+    {
+      "chapter": "10",
+      "ending": "55",
+      "page": 128,
+      "targetStartsWith": "Position 10.5\nNow we will see some defensive techniques that complement Philidor",
+      "targetType": "text"
+    },
+    {
+      "chapter": "10",
+      "ending": "56",
+      "page": 129,
+      "targetStartsWith": "DT: Rook in the rear of the pawn. Side checks",
+      "targetType": "heading"
+    },
+    {
+      "chapter": "10",
+      "ending": "57",
+      "page": 132,
+      "targetStartsWith": "DT: Side checks",
+      "targetType": "heading"
+    },
+    {
+      "chapter": "10",
+      "ending": "58",
+      "page": 134,
+      "targetStartsWith": "Position 10.11",
+      "targetType": "position"
+    },
+    {
+      "chapter": "10",
+      "ending": "59",
+      "page": 136,
+      "targetStartsWith": "DT: Frontal checks, rook swap",
+      "targetType": "heading"
+    },
+    {
+      "chapter": "10",
+      "ending": "60",
+      "page": 138,
+      "targetStartsWith": "DT: Frontal checks",
+      "targetType": "heading"
+    },
+    {
+      "chapter": "10",
+      "ending": "61",
+      "page": 140,
+      "targetStartsWith": "A logical question arises: when the king is cut off along the file, is the long ",
+      "targetType": "text"
+    },
+    {
+      "chapter": "10",
+      "ending": "62",
+      "page": 141,
+      "targetStartsWith": "Position 10.17",
+      "targetType": "position"
+    },
+    {
+      "chapter": "10",
+      "ending": "63",
+      "page": 143,
+      "targetStartsWith": "Position 10.20",
+      "targetType": "caption"
+    },
+    {
+      "chapter": "10",
+      "ending": "64",
+      "page": 144,
+      "targetStartsWith": "This is actually an example of long-side defence, but I have included it here be",
+      "targetType": "text"
+    },
+    {
+      "chapter": "10",
+      "ending": "65",
+      "page": 145,
+      "targetStartsWith": "DT: Rear checks. Rook in the rear of the pawn",
+      "targetType": "heading"
+    },
+    {
+      "chapter": "10",
+      "ending": "66",
+      "page": 146,
+      "targetStartsWith": "DT: Distant (side) checks\nWe know now why the pawn should only reach the 7th ran",
+      "targetType": "text"
+    },
+    {
+      "chapter": "10",
+      "ending": "67",
+      "page": 150,
+      "targetStartsWith": "DT: Attacking king trapped, distant checks",
+      "targetType": "heading"
+    },
+    {
+      "chapter": "10",
+      "ending": "68",
+      "page": 152,
+      "targetStartsWith": "We have seen that having the enemy king cut off by less than four files is not e",
+      "targetType": "text"
+    },
+    {
+      "chapter": "11",
+      "ending": "69",
+      "page": 153,
+      "targetStartsWith": "Position 11.1",
+      "targetType": "position"
+    },
+    {
+      "chapter": "11",
+      "ending": "70",
+      "page": 155,
+      "targetStartsWith": "Second-rank defence",
+      "targetType": "heading"
+    },
+    {
+      "chapter": "11",
+      "ending": "71",
+      "page": 157,
+      "targetStartsWith": "The experience gathered in many games, as well as the analyses published in seve",
+      "targetType": "text"
+    },
+    {
+      "chapter": "11",
+      "ending": "72",
+      "page": 158,
+      "targetStartsWith": "Position 11.5",
+      "targetType": "position"
+    },
+    {
+      "chapter": "11",
+      "ending": "73",
+      "page": 160,
+      "targetStartsWith": "When the pawns are less advanced and, above all, when the defending king has not",
+      "targetType": "text"
+    },
+    {
+      "chapter": "11",
+      "ending": "74",
+      "page": 165,
+      "targetStartsWith": "This comes as a real surprise the first time one hears of it. OK, two doubled pa",
+      "targetType": "text"
+    },
+    {
+      "chapter": "11",
+      "ending": "75",
+      "page": 167,
+      "targetStartsWith": "This is perhaps the best-known drawing scenario. Although most of us have seen i",
+      "targetType": "text"
+    },
+    {
+      "chapter": "11",
+      "ending": "76",
+      "page": 168,
+      "targetStartsWith": "This is probably the least-known scenario, though the most common in practice.\nT",
+      "targetType": "text"
+    },
+    {
+      "chapter": "12",
+      "ending": "77",
+      "page": 169,
+      "targetStartsWith": "Position 12.1",
+      "targetType": "position"
+    },
+    {
+      "chapter": "12",
+      "ending": "78",
+      "page": 170,
+      "targetStartsWith": "Here the winning chances are great, too. The only situation worth studying occur",
+      "targetType": "text"
+    },
+    {
+      "chapter": "12",
+      "ending": "79",
+      "page": 172,
+      "targetStartsWith": "Position 12.4",
+      "targetType": "caption"
+    },
+    {
+      "chapter": "12",
+      "ending": "80",
+      "page": 174,
+      "targetStartsWith": "Occupying a key square does not guarantee victory. Remember that it only leads t",
+      "targetType": "text"
+    },
+    {
+      "chapter": "12",
+      "ending": "81",
+      "page": 177,
+      "targetStartsWith": "Position 12.10",
+      "targetType": "position"
+    },
+    {
+      "chapter": "12",
+      "ending": "82",
+      "page": 177,
+      "targetStartsWith": "Most positions where both sides have passed pawns are simple, as they are mainly",
+      "targetType": "text"
+    },
+    {
+      "chapter": "12",
+      "ending": "83",
+      "page": 181,
+      "targetStartsWith": "The result of this ending is determined by several factors:\n1) How advanced the ",
+      "targetType": "text"
+    },
+    {
+      "chapter": "12",
+      "ending": "84",
+      "page": 184,
+      "targetStartsWith": "If the passed pawn is on the central file nearest to the blocked rook's pawns, i",
+      "targetType": "text"
+    },
+    {
+      "chapter": "12",
+      "ending": "85",
+      "page": 187,
+      "targetStartsWith": "This is another interesting endgame, which presents some subtleties and occurs r",
+      "targetType": "text"
+    },
+    {
+      "chapter": "12",
+      "ending": "86",
+      "page": 188,
+      "targetStartsWith": "If White has already moved his rook's pawn, the ending is still won if Black has",
+      "targetType": "text"
+    },
+    {
+      "chapter": "12",
+      "ending": "87",
+      "page": 190,
+      "targetStartsWith": "This ending deserves our attention for several reasons: first, it occurs quite o",
+      "targetType": "text"
+    },
+    {
+      "chapter": "12",
+      "ending": "88",
+      "page": 196,
+      "targetStartsWith": "The floating square",
+      "targetType": "heading"
+    },
+    {
+      "chapter": "12",
+      "ending": "89",
+      "page": 198,
+      "targetStartsWith": "In pawn endings, a protected passed pawn is always a great asset, especially whe",
+      "targetType": "text"
+    },
+    {
+      "chapter": "12",
+      "ending": "90",
+      "page": 200,
+      "targetStartsWith": "Another important asset in a pawn ending is a distant passed pawn. This is becau",
+      "targetType": "text"
+    },
+    {
+      "chapter": "12",
+      "ending": "91",
+      "page": 201,
+      "targetStartsWith": "Crippled majority",
+      "targetType": "heading"
+    },
+    {
+      "chapter": "12",
+      "ending": "92",
+      "page": 202,
+      "targetStartsWith": "With many, mobile, pawns on the board, and far from the kings, we should always ",
+      "targetType": "text"
+    },
+    {
+      "chapter": "13",
+      "ending": "93",
+      "page": 204,
+      "targetStartsWith": "We start with the black sheep of all checkmates against a lone king. This ending",
+      "targetType": "text"
+    },
+    {
+      "chapter": "13",
+      "ending": "94",
+      "page": 209,
+      "targetStartsWith": "Winning chances necessarily (apart from blunders, of course) involve pushing the",
+      "targetType": "text"
+    },
+    {
+      "chapter": "13",
+      "ending": "95",
+      "page": 213,
+      "targetStartsWith": "In the starting position of most R+B vs. R endings, the defending king can be an",
+      "targetType": "text"
+    },
+    {
+      "chapter": "13",
+      "ending": "96",
+      "page": 217,
+      "targetStartsWith": "As we have stated, the Cochrane Defence works extremely well on the central file",
+      "targetType": "text"
+    },
+    {
+      "chapter": "13",
+      "ending": "97",
+      "page": 219,
+      "targetStartsWith": "In spite of the great material advantage, a rook and a pawn are unable to win ag",
+      "targetType": "text"
+    },
+    {
+      "chapter": "13",
+      "ending": "98",
+      "page": 221,
+      "targetStartsWith": "Here defence is even easier. The defender just has to keep his bishop along the ",
+      "targetType": "text"
+    },
+    {
+      "chapter": "13",
+      "ending": "99",
+      "page": 224,
+      "targetStartsWith": "This struggle is one of the most frequent among the ' different material relatio",
+      "targetType": "text"
+    },
+    {
+      "chapter": "13",
+      "ending": "100",
+      "page": 227,
+      "targetStartsWith": "Here the fortress with the 2nd-rank pawn does not work. This is logical, as ther",
+      "targetType": "text"
+    }
+  ],
+  "recoveredVectorBoxPanels": [
+    {
+      "chapter": "1",
+      "page": 29,
+      "title": "Rule of the square",
+      "textStartsWith": "Rule of the square:"
+    },
+    {
+      "chapter": "1",
+      "page": 31,
+      "title": null,
+      "textStartsWith": "In a King + Pawn vs. King ending, king opposition is decisive"
+    },
+    {
+      "chapter": "1",
+      "page": 34,
+      "title": null,
+      "textStartsWith": "If the strong king occupies one of the key squares"
+    },
+    {
+      "chapter": "1",
+      "page": 36,
+      "title": null,
+      "textStartsWith": "If the pawn has not reached the 5th rank"
+    },
+    {
+      "chapter": "1",
+      "page": 38,
+      "title": "Conclusion",
+      "textStartsWith": "Conclusion: With a rook's pawn"
+    },
+    {
+      "chapter": "1",
+      "page": 40,
+      "title": "Conclusion",
+      "textStartsWith": "Conclusion: In order to draw against a rook's pawn"
+    },
+    {
+      "chapter": "1",
+      "page": 44,
+      "title": "Conclusion",
+      "textStartsWith": "Conclusion: In the battle Knight vs. Rook"
+    },
+    {
+      "chapter": "4",
+      "page": 61,
+      "title": "Conclusion",
+      "textStartsWith": "Conclusion: The queen wins against an ordinary pawn"
+    },
+    {
+      "chapter": "4",
+      "page": 64,
+      "title": "Conclusion",
+      "textStartsWith": "Conclusion: Just like in the positions against the rook's pawn"
+    },
+    {
+      "chapter": "5",
+      "page": 80,
+      "title": "Conclusion",
+      "textStartsWith": "Conclusion: If the defender's king can be forced"
+    },
+    {
+      "chapter": "11",
+      "page": 157,
+      "title": "Conclusion of the first scenario. Doubled pawns",
+      "textStartsWith": "Conclusion of the first scenario. Doubled pawns:"
+    },
+    {
+      "chapter": "11",
+      "page": 160,
+      "title": "Conclusion",
+      "textStartsWith": "Conclusion: The bishop's pawn must not reach"
+    },
+    {
+      "chapter": "11",
+      "page": 161,
+      "title": "Conclusion",
+      "textStartsWith": "Conclusion: When the defending king is cut off"
+    },
+    {
+      "chapter": "11",
+      "page": 165,
+      "title": null,
+      "textStartsWith": "1) The king should avoid being trapped on the back rank"
+    },
+    {
+      "chapter": "12",
+      "page": 188,
+      "title": "Conclusion",
+      "textStartsWith": "Conclusion: The stronger side always wins"
+    },
+    {
+      "chapter": "12",
+      "page": 200,
+      "title": "Conclusion",
+      "textStartsWith": "Conclusion: A king can defend a pawn"
+    },
+    {
+      "chapter": "13",
+      "page": 222,
+      "title": "Conclusion",
+      "textStartsWith": "Conclusion: A rook and a 6th-rank rook's or bishop's pawn"
+    },
+    {
+      "chapter": "13",
+      "page": 228,
+      "title": null,
+      "textStartsWith": "1) With any pawn on the second rank"
+    }
+  ],
+  "subtitles": [
+    {
+      "chapter": "1",
+      "position": "1.7",
+      "text": "Losing the opposition"
+    },
+    {
+      "chapter": "1",
+      "position": "1.8",
+      "text": "Knight's pawn"
+    },
+    {
+      "chapter": "1",
+      "position": "1.10",
+      "text": "Knight's pawn"
+    },
+    {
+      "chapter": "1",
+      "position": "1.11",
+      "text": "Key squares when the pawn has not reached the 5th rank"
+    },
+    {
+      "chapter": "1",
+      "position": "1.12",
+      "text": "The distant opposition"
+    },
+    {
+      "chapter": "1",
+      "position": "1.13",
+      "text": "Using reserve moves"
+    },
+    {
+      "chapter": "1",
+      "position": "1.15",
+      "text": "Quantity is not quality"
+    },
+    {
+      "chapter": "4",
+      "position": "4.1",
+      "text": "The winning procedure"
+    },
+    {
+      "chapter": "4",
+      "position": "4.2",
+      "text": "When the strong king is an obstacle"
+    },
+    {
+      "chapter": "4",
+      "position": "4.3",
+      "text": "Stalemate themes"
+    },
+    {
+      "chapter": "4",
+      "position": "4.8",
+      "text": "King on the wrong side"
+    },
+    {
+      "chapter": "4",
+      "position": "4.9",
+      "text": "Checkmate on d7"
+    },
+    {
+      "chapter": "4",
+      "position": "4.12",
+      "text": "The same trick, on the other side"
+    },
+    {
+      "chapter": "6",
+      "position": "6.6",
+      "text": "The series of checks"
+    },
+    {
+      "chapter": "7",
+      "position": "7.6",
+      "text": "Revision of some assorted themes"
+    },
+    {
+      "chapter": "8",
+      "position": "8.5",
+      "text": "When the defending king is further away"
+    },
+    {
+      "chapter": "8",
+      "position": "8.7a",
+      "text": "Zugzwang, stalemate or perpetual check"
+    },
+    {
+      "chapter": "9",
+      "position": "9.2",
+      "text": "The bishop in front of the pawns"
+    },
+    {
+      "chapter": "9",
+      "position": "9.3",
+      "text": "Rook and knight's pawns"
+    },
+    {
+      "chapter": "9",
+      "position": "9.4",
+      "text": "The winning procedure"
+    },
+    {
+      "chapter": "9",
+      "position": "9.12",
+      "text": "The defending bishop has control over the promotion square"
+    },
+    {
+      "chapter": "9",
+      "position": "9.15",
+      "text": "The attacking bishop has control over the promotion square"
+    },
+    {
+      "chapter": "9",
+      "position": "9.17",
+      "text": "Outflanking on the edge"
+    },
+    {
+      "chapter": "10",
+      "position": "10.17",
+      "text": "Knight's pawn"
+    },
+    {
+      "chapter": "10",
+      "position": "10.18",
+      "text": "Bishop's pawn"
+    },
+    {
+      "chapter": "11",
+      "position": "11.1",
+      "text": "First scenario"
+    },
+    {
+      "chapter": "11",
+      "position": "11.9",
+      "text": "An important variation. Pushing the rook's pawn"
+    },
+    {
+      "chapter": "11",
+      "position": "11.11",
+      "text": "Central connected pawns"
+    },
+    {
+      "chapter": "12",
+      "position": "12.2",
+      "text": "Mutual defence"
+    },
+    {
+      "chapter": "12",
+      "position": "12.10",
+      "text": "Giving up the pawn to change key squares"
+    },
+    {
+      "chapter": "12",
+      "position": "12.12",
+      "text": "Reti's study"
+    },
+    {
+      "chapter": "12",
+      "position": "12.16",
+      "text": "Blocked pawns not on the 5th rank yet"
+    },
+    {
+      "chapter": "12",
+      "position": "12.19",
+      "text": "Blocked pawn on the 6th rank"
+    },
+    {
+      "chapter": "12",
+      "position": "12.20",
+      "text": "Blocked pawn on the 5th rank"
+    },
+    {
+      "chapter": "12",
+      "position": "12.22",
+      "text": "Blocked pawn on the 4th rank"
+    },
+    {
+      "chapter": "12",
+      "position": "12.36",
+      "text": "The defending pawn is two files out of the square"
+    },
+    {
+      "chapter": "12",
+      "position": "12.37",
+      "text": "Protected passed pawn on the 6th rank"
+    },
+    {
+      "chapter": "12",
+      "position": "12.42",
+      "text": "Preparing a breakthrough. An innocent couple of pawns"
+    },
+    {
+      "chapter": "13",
+      "position": "13.7",
+      "text": "Philidor Position"
+    },
+    {
+      "chapter": "13",
+      "position": "13.8",
+      "text": "Same position shifted one file to the left (Lolli)"
+    },
+    {
+      "chapter": "13",
+      "position": "13.9",
+      "text": "Same position, knight's file (Lolli)"
+    },
+    {
+      "chapter": "13",
+      "position": "13.11",
+      "text": "Same position, rook's file"
+    },
+    {
+      "chapter": "13",
+      "position": "13.21",
+      "text": "Pawn on the 6th rank"
+    },
+    {
+      "chapter": "13",
+      "position": "13.22",
+      "text": "Pawn on the 5th rank"
+    },
+    {
+      "chapter": "13",
+      "position": "13.24",
+      "text": "Pawn on the 4th rank"
+    },
+    {
+      "chapter": "13",
+      "position": "13.25",
+      "text": "The winning manoeuvre"
+    }
+  ],
+  "standaloneHeadings": [
+    {
+      "chapter": "1",
+      "text": "Blocking the way and supporting the pawn with the king"
+    },
+    {
+      "chapter": "1",
+      "text": "Opposition"
+    },
+    {
+      "chapter": "1",
+      "text": "Both endings mixed in a recent game"
+    },
+    {
+      "chapter": "3",
+      "text": "Lateral control"
+    },
+    {
+      "chapter": "3",
+      "text": "The barrier"
+    },
+    {
+      "chapter": "3",
+      "text": "Exceptional positions"
+    },
+    {
+      "chapter": "4",
+      "text": "The strong king is near"
+    },
+    {
+      "chapter": "4",
+      "text": "The winning zone for the king. Defending king on the right side"
+    },
+    {
+      "chapter": "8",
+      "text": "Section 1. Knight + Pawn vs. Bishop"
+    },
+    {
+      "chapter": "8",
+      "text": "Section 2. Bishop + Pawn vs. Knight"
+    },
+    {
+      "chapter": "8",
+      "text": "First scenario"
+    },
+    {
+      "chapter": "8",
+      "text": "Second scenario"
+    },
+    {
+      "chapter": "8",
+      "text": "Third scenario"
+    },
+    {
+      "chapter": "9",
+      "text": "Section 1. Connected pawns"
+    },
+    {
+      "chapter": "9",
+      "text": "Section 2. Separated pawns. The three drawing scenarios"
+    },
+    {
+      "chapter": "9",
+      "text": "Section 3. Pawns separated by two files"
+    },
+    {
+      "chapter": "9",
+      "text": "Section 4. Pawns separated by three files"
+    },
+    {
+      "chapter": "10",
+      "text": "Practical aspects"
+    },
+    {
+      "chapter": "10",
+      "text": "Technical aspects"
+    },
+    {
+      "chapter": "10",
+      "text": "Section 1. Basic endings"
+    },
+    {
+      "chapter": "10",
+      "text": "Section 2. Pawn on 5th rank or less"
+    },
+    {
+      "chapter": "10",
+      "text": "Section 3. Cutting off the king along files"
+    },
+    {
+      "chapter": "10",
+      "text": "Section 4. Cutting off the king along ranks"
+    },
+    {
+      "chapter": "10",
+      "text": "Section 5. The rook's pawn"
+    },
+    {
+      "chapter": "10",
+      "text": "DT: Distant rear checks, cut-off king"
+    },
+    {
+      "chapter": "10",
+      "text": "DT: Distant rear checks"
+    },
+    {
+      "chapter": "10",
+      "text": "DT: Distant side checks"
+    },
+    {
+      "chapter": "10",
+      "text": "DT: Side checks"
+    },
+    {
+      "chapter": "10",
+      "text": "DT: Rook in the rear of the pawn. Side checks"
+    },
+    {
+      "chapter": "10",
+      "text": "DT: Attacking king trapped, distant checks"
+    },
+    {
+      "chapter": "10",
+      "text": "DT: Frontal checks, rook swap"
+    },
+    {
+      "chapter": "10",
+      "text": "DT: Frontal checks"
+    },
+    {
+      "chapter": "10",
+      "text": "DT: Rear checks. Rook in the rear of the pawn"
+    },
+    {
+      "chapter": "10",
+      "text": "Summary of section"
+    },
+    {
+      "chapter": "10",
+      "text": "Summary of the ideas in this ending for the strong side"
+    },
+    {
+      "chapter": "10",
+      "text": "Some ideas about cutting off"
+    },
+    {
+      "chapter": "10",
+      "text": "Summary: cutting the king off along a rank"
+    },
+    {
+      "chapter": "11",
+      "text": "Second-rank defence"
+    },
+    {
+      "chapter": "11",
+      "text": "Second scenario"
+    },
+    {
+      "chapter": "11",
+      "text": "Series about rook and bishop's pawns"
+    },
+    {
+      "chapter": "11",
+      "text": "Defending king cut off on the back rank; bishop's pawn on the 6th rank"
+    },
+    {
+      "chapter": "11",
+      "text": "Bishop's pawn on the 5th rank"
+    },
+    {
+      "chapter": "11",
+      "text": "Bishop's pawn on the 4th rank"
+    },
+    {
+      "chapter": "11",
+      "text": "Third scenario"
+    },
+    {
+      "chapter": "11",
+      "text": "Another example of central pawns"
+    },
+    {
+      "chapter": "11",
+      "text": "Fourth scenario"
+    },
+    {
+      "chapter": "11",
+      "text": "Fifth scenario"
+    },
+    {
+      "chapter": "12",
+      "text": "Section 1. King + 2 pawns vs. King"
+    },
+    {
+      "chapter": "12",
+      "text": "Section 2. King + Pawn vs. King + Pawn"
+    },
+    {
+      "chapter": "12",
+      "text": "Section 3. Two pawns vs. one"
+    },
+    {
+      "chapter": "12",
+      "text": "Section 4. Multi-pawn endgames. Some themes in pawn endings"
+    },
+    {
+      "chapter": "12",
+      "text": "Delaying the capture"
+    },
+    {
+      "chapter": "12",
+      "text": "Reserving squares to attack"
+    },
+    {
+      "chapter": "12",
+      "text": "With more pawns on the board"
+    },
+    {
+      "chapter": "12",
+      "text": "Manoeuvres previous to the capture of the pawn. The king's multiple routes"
+    },
+    {
+      "chapter": "12",
+      "text": "Drawing the king to a certain square"
+    },
+    {
+      "chapter": "12",
+      "text": "Drawing lines"
+    },
+    {
+      "chapter": "12",
+      "text": "All pawns are on the 2nd rank"
+    },
+    {
+      "chapter": "12",
+      "text": "Same position, White to move"
+    },
+    {
+      "chapter": "12",
+      "text": "A pawn is already advanced"
+    },
+    {
+      "chapter": "12",
+      "text": "An important defensive position"
+    },
+    {
+      "chapter": "12",
+      "text": "The floating square"
+    },
+    {
+      "chapter": "12",
+      "text": "Pawns separated by three files"
+    },
+    {
+      "chapter": "12",
+      "text": "Pawns separated by one file"
+    },
+    {
+      "chapter": "12",
+      "text": "Crippled majority"
+    },
+    {
+      "chapter": "12",
+      "text": "Pawn majority on one wing, doubled pawn on the other"
+    },
+    {
+      "chapter": "13",
+      "text": "Rook + Bishop vs. Rook"
+    },
+    {
+      "chapter": "13",
+      "text": "The defensive set-up"
+    }
+  ],
+  "chapterSpilloversRemoved": [
+    "10",
+    "11",
+    "12"
+  ],
+  "markerOverlays": [
+    {
+      "chapter": "1",
+      "position": "1.9",
+      "square": "e6"
+    }
+  ],
+  "countsByChapter": {
+    "1": {
+      "headings": 3,
+      "panels": 7,
+      "positions": 25,
+      "subtitles": 7
+    },
+    "3": {
+      "headings": 3,
+      "panels": 0,
+      "positions": 10,
+      "subtitles": 0
+    },
+    "4": {
+      "headings": 2,
+      "panels": 2,
+      "positions": 13,
+      "subtitles": 6
+    },
+    "5": {
+      "headings": 13,
+      "panels": 3,
+      "positions": 24,
+      "subtitles": 0
+    },
+    "6": {
+      "headings": 1,
+      "panels": 1,
+      "positions": 10,
+      "subtitles": 1
+    },
+    "7": {
+      "headings": 0,
+      "panels": 4,
+      "positions": 6,
+      "subtitles": 1
+    },
+    "8": {
+      "headings": 6,
+      "panels": 3,
+      "positions": 11,
+      "subtitles": 2
+    },
+    "9": {
+      "headings": 4,
+      "panels": 10,
+      "positions": 20,
+      "subtitles": 6
+    },
+    "10": {
+      "headings": 20,
+      "panels": 2,
+      "positions": 20,
+      "subtitles": 2
+    },
+    "11": {
+      "headings": 10,
+      "panels": 4,
+      "positions": 12,
+      "subtitles": 3
+    },
+    "12": {
+      "headings": 19,
+      "panels": 3,
+      "positions": 36,
+      "subtitles": 10
+    },
+    "13": {
+      "headings": 2,
+      "panels": 3,
+      "positions": 27,
+      "subtitles": 8
+    }
+  }
+}

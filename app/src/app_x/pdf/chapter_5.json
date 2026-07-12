@@ -26,7 +26,7 @@
     }
   },
   {
-    "type": "moves",
+    "type": "text",
     "content": "1.Kg5! If he had the move, Black could draw by 1...c3 2.Kg5 c2 3.Rc8 Kb3 4.Kf4 Kb2=. 1...c3 2.Kf4 c2 3.Rc8 Kb3 4.Ke3 Kb2 5.Kd2 and White has arrived in time, as our simple counts had anticipated."
   },
   {
@@ -34,7 +34,7 @@
     "content": "Everything looks easy but, even in this position, if White changes the move order and starts 1.Rc8?, Black can interfere with White's plan and draw thanks to a brilliant move: 1...Kc3! We will see later the virtues of this move. In practical play, things are hardly ever that easy. In the next examples we will discover the different resources both sides have at their disposal in order to 'interfere with the natural course of events'."
   },
   {
-    "type": "caption",
+    "type": "heading",
     "content": "Kings push... a bit"
   },
   {
@@ -112,7 +112,7 @@
     "content": "This position is very easy to solve, on the basis of the same principles as the previous one. With this we can complete our view of the issue. Euwe studied these positions in the 1930s and stated that, in 5.2, White only draws when the king occupies one of the marked squares, and wins in any other case. For instance, in this diagram it takes the king 5 tempi to arrive to control promotion, whereas Black needs 4 to secure it. That means White arrives on time if he has the turn. The study of this diagram makes us think that there is a large area where a simple count works. It can work even if the king is on the same file as the defender, unless his way is blocked, as here."
   },
   {
-    "type": "moves",
+    "type": "text",
     "content": "1.Ke6 e3 2.Kd5 e2 3.Kd4 Kf3 4.Kd3 Kf2 5.Kd2 1-0"
   },
   {
@@ -138,7 +138,7 @@
     "content": "In the diagram position, both circumstances occur, so cutting the king off wins. Moreover, the white king is so far away that this is the only way to win."
   },
   {
-    "type": "moves",
+    "type": "text",
     "content": "1.Rg5! It is plain to see that the white king cannot arrive in time: 1.Rg8? Kc5! (1...Kb5 also works; instead, 1...a4? 2.Rg5!) 2.Kg7 a4 3.Kf6 a3 4.Ke5 Kc4 5.Ke4 a2 6.Ra8 Kb3 7.Kd3 Kb2 and draw; we will come back later to this position. Ending 28. 1...a4 The king cannot go further. The only alternative, pushing the pawn, is also useless. 2.Kg7 a3 3.Rg3! And the pawn dies. If we take a look at the manoeuvre, we can understand why cutting the king off a rank further brings nothing. 3...a2 4.Ra3+-"
   },
   {
@@ -146,7 +146,7 @@
     "content": "In order to fix these ideas in your mind, have a look at the following three positions and their statements. If you have doubts, do this Exercise: think about the statements until you are sure they are correct."
   },
   {
-    "type": "caption",
+    "type": "heading",
     "content": "Cutting the king off series"
   },
   {
@@ -185,7 +185,7 @@
     }
   },
   {
-    "type": "caption",
+    "type": "heading",
     "content": "Underpromotion to a knight"
   },
   {
@@ -200,7 +200,7 @@
     }
   },
   {
-    "type": "moves",
+    "type": "text",
     "content": "1.Rh4+ Kc3 2.Kc5 With 2.Kb5 White can try to go round the pawn, but there is no time: 2...b3 3.Ka4 b2 and the white king lacks one tempo. 2...b3 3.Rh3+ Kc2 4.Kc4 b2 5.Rh2+ Kc1 The only move with a central pawn. In the case of a knight's pawn there is another resource, based on the stalemate motif. Here there is an easier way to draw: 5...Kb1! 6.Kb3 Ka1! 7.Rxb2 stalemate. It is important to take this motif into account. 6.Kc3 The checkmate threat hinders promotion. In this position, many players think they win straight away, so Black's answer comes as a shock. 6...b1N+! The only move, but enough to save the game. Now the easiest way to keep the knight safe is to keep it as close to the king as possible. This usually involves playing only moves. We have already seen this scenario in Ending 8. Therefore, we also know that the knight would be lost if it had come from a rook's pawn."
   },
   {
@@ -208,11 +208,11 @@
     "content": "This resource works with any other pawn. The consequences of this are important: pushing the defending king from the rear is useless. That is why pushing the king from one side (left or right) is more productive, as we will see in the following examples."
   },
   {
-    "type": "moves",
+    "type": "text",
     "content": "7.Kd3 Na3 8.Kc3 Nb1+ 9.Kb3 Nd2+ 10.Kc3 Nb1+ 11.Kd3 Na3 12.Ra2 Nb1 13.Rc2+ Kd1 14.Rg2 Kc1="
   },
   {
-    "type": "caption",
+    "type": "heading",
     "content": "Outflanking"
   },
   {
@@ -243,7 +243,7 @@
     "content": "Here both kings and pawn are placed one rank higher than in the previous example, so the white king has time for a new try: outflanking."
   },
   {
-    "type": "moves",
+    "type": "text",
     "content": "1.Rh5+ Let us check that, if Black is to move, there is no time for White: 1...c4! 2.Rh5+ Kd4 3.Kc6 (trying to push the king does not work: Black is not even forced to underpromote to a knight. Trying to outflank the opponent does not work either: the white king will fail) 3...c3 4.Rh4+ (4.Kb5 c2 5.Rh1 Kc3 6.Ka4 Kb2=) 4...Kd3 5.Kd5 c2=. Nevertheless, were the rook in a better position, White could win even if it was Black's turn. The first and the last square on the file are the best ones to help the king. I recommend this Exercise: check that White is actually winning, even with Black to move, if the rook occupies one of the marked squares. 1...Kd4 2.Kc6! This new resource allows the strong king to lift the blockade. Now the white king will go round and appear on the other side of the pawn. 2...c4 3.Kb5 Other moves also win, but visually this is more suitable for the chosen technique. 3...c3 4.Kb4 c2 5.Rc5 5.Rh1 is also winning. 5...Kd3 6.Kb3 and the pawn is lost."
   },
   {
@@ -254,7 +254,7 @@
     }
   },
   {
-    "type": "caption",
+    "type": "heading",
     "content": "King's opposed at the rear"
   },
   {
@@ -301,15 +301,15 @@
     }
   },
   {
+    "type": "heading",
+    "content": "Shoulder-charging"
+  },
+  {
     "type": "ending",
     "content": {
       "number": "24",
       "text": "Stronger side's king on one side"
     }
-  },
-  {
-    "type": "caption",
-    "content": "Shoulder-charging"
   },
   {
     "type": "text",
@@ -327,11 +327,11 @@
     "content": "Many times, in order to help the rook, the king has to stand in front of his opponent and then the enemy king is pushed one rank (or file) back by means of a rook check. The purpose of this manoeuvre is twofold: 1) To bring our king closer. 2) To restrict the enemy king's (and/or pawn's) mobility. We will name this way of struggling for a key zone 'shoulder-charging' or just 'pushing'. Of course, all winning chances are for the rook, but only in the long run. Sometimes there is no time to exploit the advantage."
   },
   {
-    "type": "moves",
+    "type": "text",
     "content": "1.Kg4! Visually the best move, though not the only way to win. The white king tries to reach the g3-square on the next move and then push the enemy king. The threat is Re1+. If you have realised that 1.Kh4! is the other winning move, it means you have grasped the essence of the kings' struggle. The point is that, if White succeeds in establishing a king opposition on e3 and g3 (1...Ke3 2.Kg3 as in the game), Black will not escape from the checks. 1...Ke3 1...d3?! allows White to push the king: 2.Re1+ Kd4 3.Kf3 d2 4.Rd1 Kd3 5.Kf2+-. 2.Kg3! Again, using opposition to push the black king, who cannot escape because he must stay near his pawn. The immediate check does not work: 2.Re1+?! Kf2!? and White must go back to the right path 3.Rd1! Ke3 4.Kg3. 2...d3 3.Re1+ Kd2 4.Kf2+- And the white king has made it to the key zone and can aid his rook."
   },
   {
-    "type": "caption",
+    "type": "heading",
     "content": "The time-gaining check"
   },
   {
@@ -350,11 +350,11 @@
     "content": "This is a typical scenario. The black king occupies an optimal position to secure the pawn's path to promotion. Therefore, there is no time to lose: the white rook must be immediately transferred to the rear of the pawn. Mind the enemy king! Do not deliver this check if he can improve his position! Advice for the defender: Be careful not to advance the king before the pawn!"
   },
   {
-    "type": "moves",
+    "type": "text",
     "content": "1.Rf8+! Other moves only draw. For instance: 1.Kd3 g3 2.Rf8+ (2.Kd2 g2 3.Rf8+ Kg3!=) 2...Ke1!= the king avoids blocking his own pawn. 1...Ke2 2.Rg8! Kf3 3.Kd3 (shoulder-charging!) 3...g3 4.Rf8+ Kg2 5.Ke2+-"
   },
   {
-    "type": "caption",
+    "type": "heading",
     "content": "Shoulder-charging and time-gaining check"
   },
   {
@@ -369,7 +369,7 @@
     "content": "This is a simple example of a perfect combination of the two main attacking resources when both kings stand on the same side of the pawn."
   },
   {
-    "type": "moves",
+    "type": "text",
     "content": "1.Ra2+! Again, the black king enjoys an ideal position to support his pawn, so this check is very annoying. Other moves do not suffice to win: 1.Ra8 e3 2.Rf8+ Kg1! 3.Re8 Kf2 4.Kh2 e2 5.Rf8+ Ke3=; 1.Kg4 e3 2.Rh1 e2 3.Rh2+ Ke3=. 1...Kf3 If 1...Kf1 2.Kg3 and the pawn is lost. Now the kings are opposing: the position is ripe for a rear check and a subsequent push. 2.Ra8 e3 3.Rf8+ Ke2 4.Kg2+-"
   },
   {
@@ -387,7 +387,7 @@
     }
   },
   {
-    "type": "caption",
+    "type": "heading",
     "content": "Outflanking. The importance of zugzwang"
   },
   {
@@ -407,7 +407,7 @@
     "content": "This famous Réti composition illustrates a zugzwang situation that holds theoretical value."
   },
   {
-    "type": "moves",
+    "type": "text",
     "content": "1.Re2! or 1.Re3. For the time being, we are more interested in analysing the natural move 1.Re1? and then 1...e4!"
   },
   {
@@ -423,7 +423,7 @@
     "content": "Here is the zugzwang position we want to discuss. King opposition prevents the white king from approaching the pawn; any rook move on the first rank allows the pawn to move forward; a rook move to e2 or e3, or a check on f1, will only allow Black to gain time. 2.Ke7 is the most logical attempt: the white king tries to outflank his opponent (2.Rf1+ Kg4! 3.Ke6 e3 4.Ke5 e2 (the aforementioned gain of time) 5.Ra1 Kf3 6.Kd4 Kf2=). 2...Ke5! Maintaining the king opposition is essential. This is another zugzwang position: White's outflanking succeeds against any other move: 2...Kf4? 3.Ke6 e3 4.Kd5 Kf3 5.Kd4 e2 6.Kd3 and the king has succeeded. 3.Kd7 Kd5!= Keeping the opposition and the zugzwang. There is no way to make progress."
   },
   {
-    "type": "moves",
+    "type": "text",
     "content": "1...e4 2.Re1! If you have paid attention to all the previous comments and lines, you will easily understand the rest. Black cannot keep the opposition. It is a mutual zugzwang. 2...Ke5 3.Ke7! Now the black king has to allow outflanking. 3...Kf4 4.Kd6 Kf3 5.Kd5 e3 6.Kd4+-"
   },
   {
@@ -446,12 +446,15 @@
     }
   },
   {
-    "type": "moves",
+    "type": "text",
     "content": "1.Rc7+! A time-gaining check. Note that the king and the pawn are placed the same way as in 5.6, that is, the best position to secure the advance; therefore, this check is most annoying. 1...Kb3 With this move we can see the problems of the knight's pawn. 1...Kd3 fails to 2.Rb7 and White has won time: 2...Kc4 3.Kc7 b4 4.Kb6! (outflanking) 4...b3 5.Ka5 Kc3 6.Ka4 b2 7.Ka3. A completely successful example of outflanking. 2.Kd7 The meaning of 1...Kb3 is clearly seen in 2.Rb7? b4 3.Kc7 Kc3! and compared to 1...Kd3 2.Rb7= Black has won a tempo. 2...b4 3.Kd6! An important point. The white king approaches the pawn but, at the same time, hinders the black king's way out to the 'right side of the knight's pawn'. 3.Kc6? would be a typical mistake in view of 3...Kc4! (shoulder-charging) 4.Kb6+ Kd3 and now that distractions have ended, it is time to count: Black needs 4 tempi to promote, whereas White needs 5 to control the b1-square with both pieces; therefore, it is a draw. 5.Ka5 b3 6.Rb7 Kc2 7.Ka4 b2=. 3...Ka2 Here comes disaster. Of course, the black king must get out of the pawn's way, but the rook's file is too narrow. 4.Kc5! The c-file does not matter anymore. 4.Kd5 was also winning. Even 4.Ra7+?! wins. Though a little more awkward, this move shows how annoying it is for Black that his king is in front of his pawn. 4...Kb2 5.Rc7! Now this is the only winning move, hindering the black king's 'right way' out. (5.Kc5? Kc3!=) 5...b3 6.Kd5 Ka1 7.Kc4 b2 8.Ra7+! and the black king must obstruct his pawn again, thus losing, in the same manner as in the main line. 4...b3 5.Kb4! The white king uses and abuses the awkward position of his black counterpart. Now 5.Ra7+ or 5.Kc4 would win as well. 5...b2 6.Ra7+ With any other pawn, the black king could move leftwards, but now he has to obstruct his pawn. 6...Kb1 7.Kb3! Kc1 8.Rc7+ Kb1 This is another special feature of the knight's pawn, in this case in Black's favour: stalemate chances. But here it can be avoided. 9.Rb7 Always be careful! Not 9.Rc2?? Ka1!=. 9...Kc1 10.Ka2+-"
   },
   {
-    "type": "text",
-    "content": "Conclusion: If the defender's king can be forced in front of his knight's (or rook's) pawn, his chances are dramatically decreased."
+    "type": "panel",
+    "content": {
+      "text": "If the defender's king can be forced in front of his knight's (or rook's) pawn, his chances are dramatically decreased.",
+      "title": "Conclusion"
+    }
   },
   {
     "type": "ending",
@@ -461,7 +464,7 @@
     }
   },
   {
-    "type": "caption",
+    "type": "heading",
     "content": "Knight at the corner = lost"
   },
   {
@@ -480,7 +483,7 @@
     "content": "There are no subtleties here. White wins straightforwardly."
   },
   {
-    "type": "moves",
+    "type": "text",
     "content": "1.Rh4+! Kb3 2.Kb5 a3 3.Rh3+ Kb2 4.Kb4 a2 5.Rh2+ Kb1 6.Kb3! a1N+ (6...a1Q 7.Rh1 mate) 7.Kc3+- And the knight is lost."
   },
   {
@@ -495,7 +498,7 @@
     }
   },
   {
-    "type": "caption",
+    "type": "heading",
     "content": "Stalemate in the corner"
   },
   {
@@ -510,7 +513,7 @@
     "content": "A rook's pawn cannot save the game by underpromoting to a knight; however, the stalemate chances make up for this drawback. That causes some players to pin their drawing hopes on the rook's pawn, but that is a mistake."
   },
   {
-    "type": "moves",
+    "type": "text",
     "content": "1.Rb8+ Ka1! The king hides behind the pawn and is stalemated; therefore, there is no time for the white king to approach the pawn, and it is a draw. It would also be a draw with any other pawn. With any other pawn, 1...Ka3? would be the right square to draw, but here the edge of the board hinders promotion: 2.Kc2!+- No matter what Black promotes to, White will capture it. 2.Ra8 (2.Kc2 is stalemate) 2...Kb2 3.Rb8+ Ka1! 4.Rc8 Kb2="
   },
   {
@@ -518,7 +521,7 @@
     "content": "Let us now see what happens with the lateral push if we move both kings and the pawn one rank up."
   },
   {
-    "type": "caption",
+    "type": "heading",
     "content": "The extreme position"
   },
   {
@@ -533,7 +536,7 @@
     "content": "In a Rook vs. Rook's Pawn ending, this is a key position you have to learn by heart. Most positions with no clear winner end up in this situation during analysis. This is an extreme position because, with Black to move, it is a draw, whereas White wins if he has the move (with simply Rb8). Moreover, as shown in the following series of twin diagrams, things change if we move the pieces one rank up or down. It does not matter where the white rook is (the exception is the b8-square)."
   },
   {
-    "type": "moves",
+    "type": "text",
     "content": "1...Kb2! Avoiding the push. 1...a2? 2.Rb8+ Ka3 3.Kc2! and wins because a knight in the corner is always lost: 3...a1N+ 4.Kc3+-. 2.Rb8+ Other moves do not bring success either: 2.Kd2 a2! (Ending 28) 3.Rb8+ Ka1! Stalemate motifs!; 2.Rh2+ Kb3!= Typical: when the rook is misplaced (not ready to check from the file), the best policy is to obstruct the enemy king (2...Kb1? 3.Kc3+-; 2...Kc1? 3.Kc3). 2...Kc1! Since there is no time to prepare a stalemate, obstructing the pawn is pointless. 3.Kc3 (3.Ra8 Kb2) 3...a2 4.Ra8 Kb1 5.Rb8+ Kc1!= Beware of overconfidence in stalemate: that would work with the white king on d2, but now 5...Ka1?? fails to 6.Rf8 and mate."
   },
   {
@@ -541,7 +544,7 @@
     "content": "Conclusion: The rook's pawn is not worse than the others against the lateral king push, thanks to stalemate chances."
   },
   {
-    "type": "caption",
+    "type": "heading",
     "content": "Lateral push positions"
   },
   {
@@ -607,7 +610,7 @@
     "content": "If the side having a rook is to move, given the positions occupied by both kings and the pawn, there are just two squares where the rook loses: those two marked on the board, f5 and b5. The winning sequence is long, but clear. The first move has to be a rook check hindering immediate promotion."
   },
   {
-    "type": "moves",
+    "type": "text",
     "content": "1...Rf6+ 2.Kd5! First subtlety: not 2.Kd7 Rf1!=. 2...Rf5+ 3.Kd4 And not 3.Kc4 Rf1=. Apparently, the white king cannot flee from the checks, but there is one square where he can hide: b7. We just need a way to cross the c-file. 3...Rf4+ 4.Kd3 Rf3+ 5.Kc2 Rf2+ 6.Kb3! That is the way! Now the king hides on the b7-square without trouble. 6...Rf3+ 7.Kb4 Rf4+ 8.Kb5 Rf5+ 9.Kb6 Rf6+ 10.Kb7 1-0"
   },
   {
