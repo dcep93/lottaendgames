@@ -3,12 +3,18 @@ import type { PositionMarker } from './chapterTypes'
 import { getSquareIndex } from './fen'
 
 type ChessBoardProps = {
+  animateNextMove?: boolean
   fen: string
   markers?: PositionMarker[]
   number: string
 }
 
-export default function ChessBoard({ fen, markers = [], number }: ChessBoardProps) {
+export default function ChessBoard({
+  animateNextMove = false,
+  fen,
+  markers = [],
+  number,
+}: ChessBoardProps) {
   const boardId = `position-${number.replace(/[^a-z0-9_-]/gi, '-')}`
 
   return (
@@ -16,13 +22,14 @@ export default function ChessBoard({ fen, markers = [], number }: ChessBoardProp
       <div
         aria-label={`Chess position ${number}`}
         className="leg-board-stage"
+        data-animate-next-move={animateNextMove ? 'true' : 'false'}
         role="img"
       >
         <Chessboard
           options={{
             id: boardId,
             allowDragging: false,
-            animationDurationInMs: 0,
+            animationDurationInMs: animateNextMove ? 220 : 0,
             boardOrientation: 'white',
             boardStyle: {
               border: '0.14rem solid rgba(255, 255, 255, 0.14)',
@@ -34,7 +41,7 @@ export default function ChessBoard({ fen, markers = [], number }: ChessBoardProp
             darkSquareStyle: { backgroundColor: 'var(--leg-board-dark)' },
             lightSquareStyle: { backgroundColor: 'var(--leg-board-light)' },
             position: fen,
-            showAnimations: false,
+            showAnimations: animateNextMove,
             showNotation: false,
           }}
         />
