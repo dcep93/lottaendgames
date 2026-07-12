@@ -27,6 +27,7 @@ type CandidateToken = {
   moveNumber: number | null
   prefix: string
   san: string
+  startsVariation: boolean
   type: 'candidate'
 }
 
@@ -50,6 +51,8 @@ type BranchCandidate = {
   score: number
   sourceIndex: number
 }
+
+type FallbackParseMode = 'current' | 'pending-return'
 
 const movePattern =
   /(?<![A-Za-z0-9])((\d+)\s*(\.\.\.|\.)\s*)?((?:O-O-O|O-O|0-0-0|0-0|[KQRBN]?[a-h]?[1-8]?x?[a-h][1-8](?:=?[QRBN])?|[a-h]x[a-h][1-8](?:=?[QRBN])?|[a-h][1-8](?:=?[QRBN])?)(?:[+#])?(?:[!?]+|=)?)/g
@@ -93,11 +96,42 @@ export function buildChapterPlayback(
       section.type === 'moves' && !hasParsedPlayableSincePosition,
       sectionIndex,
     )
-    const tokens = context.parse(content, sectionIndex)
+    const parsedTokens = context.parse(content, sectionIndex)
+    let selectedContext = context
+    let tokens = resolveUnresolvedTextTokens(
+      parsedTokens,
+      contexts,
+      context,
+      sectionIndex,
+    )
+
+    if (!tokens.some((token) => token.type === 'move')) {
+      const upcomingPositionContext = createUpcomingPositionContext(
+        sections,
+        sectionIndex,
+      )
+
+      if (upcomingPositionContext) {
+        const upcomingTokens = resolveUnresolvedTextTokens(
+          upcomingPositionContext.parse(content, sectionIndex),
+          [upcomingPositionContext],
+          upcomingPositionContext,
+          sectionIndex,
+        )
+
+        if (upcomingTokens.some((token) => token.type === 'move')) {
+          selectedContext = upcomingPositionContext
+          tokens = upcomingTokens
+        }
+      }
+    }
 
     if (tokens.some((token) => token.type === 'move')) {
-      hasParsedPlayableSincePosition = true
-      playablePositions.add(context.positionNumber)
+      if (selectedContext === context) {
+        hasParsedPlayableSincePosition = true
+      }
+
+      playablePositions.add(selectedContext.positionNumber)
       tokensBySectionIndex.set(sectionIndex, tokens)
     }
   })
@@ -106,6 +140,24 @@ export function buildChapterPlayback(
     playablePositions,
     tokensBySectionIndex,
   }
+}
+
+function createUpcomingPositionContext(
+  sections: RawChapterSection[],
+  sectionIndex: number,
+) {
+  const nextSection = sections[sectionIndex + 1]
+
+  if (nextSection?.type !== 'position') {
+    return null
+  }
+
+  const position = nextSection as PositionSection
+  return new PositionContext(
+    position.content.number,
+    position.content.fen,
+    position.content.alternateFens,
+  )
 }
 
 function chooseContextForContent(
@@ -169,6 +221,106 @@ function countUnresolvedSan(tokens: TextPlaybackToken[]) {
 
     return count + Array.from(token.text.matchAll(movePattern)).length
   }, 0)
+}
+
+function resolveUnresolvedTextTokens(
+  tokens: TextPlaybackToken[],
+  contexts: PositionContext[],
+  activeContext: PositionContext,
+  sectionIndex: number,
+): TextPlaybackToken[] {
+  const resolvedTokens: TextPlaybackToken[] = []
+
+  for (let index = 0; index < tokens.length; index += 1) {
+    const token = tokens[index]
+
+    if (token.type === 'move') {
+      resolvedTokens.push(token)
+      continue
+    }
+
+    let text = token.text
+
+    while (tokens[index + 1]?.type === 'text') {
+      index += 1
+      text += (tokens[index] as Extract<TextPlaybackToken, { type: 'text' }>).text
+    }
+
+    resolvedTokens.push(
+      ...resolveUnresolvedTextToken(
+        text,
+        contexts,
+        activeContext,
+        sectionIndex,
+      ),
+    )
+  }
+
+  return resolvedTokens
+}
+
+function resolveUnresolvedTextToken(
+  text: string,
+  contexts: PositionContext[],
+  activeContext: PositionContext,
+  sectionIndex: number,
+): TextPlaybackToken[] {
+  if (!hasNumberedMoveText(text)) {
+    return [{ text, type: 'text' }]
+  }
+
+  const originalUnresolvedSanCount = countUnresolvedSan([{ text, type: 'text' }])
+
+  if (!originalUnresolvedSanCount) {
+    return [{ text, type: 'text' }]
+  }
+
+  const bestFallback = contexts
+    .flatMap((context, contextIndex) => {
+      if (context === activeContext) {
+        return []
+      }
+
+      return context
+        .previewFallbackParses(text, sectionIndex)
+        .map((preview) => ({
+          context,
+          contextIndex,
+          mode: preview.mode,
+          moveCount: preview.tokens.filter((token) => token.type === 'move')
+            .length,
+            unresolvedSanCount: countUnresolvedSan(preview.tokens),
+        }))
+    })
+    .filter((candidate) => candidate.moveCount > 0)
+    .sort((left, right) => {
+      if (left.unresolvedSanCount !== right.unresolvedSanCount) {
+        return left.unresolvedSanCount - right.unresolvedSanCount
+      }
+
+      if (left.moveCount !== right.moveCount) {
+        return right.moveCount - left.moveCount
+      }
+
+      return right.contextIndex - left.contextIndex
+    })[0]
+
+  if (
+    !bestFallback ||
+    bestFallback.unresolvedSanCount >= originalUnresolvedSanCount
+  ) {
+    return [{ text, type: 'text' }]
+  }
+
+  return bestFallback.context.parseFallbackText(
+    text,
+    sectionIndex,
+    bestFallback.mode,
+  )
+}
+
+function hasNumberedMoveText(text: string) {
+  return /\b\d+\s*(?:\.\.\.|\.)/.test(text)
 }
 
 function getPlayableText(section: RawChapterSection) {
@@ -248,6 +400,41 @@ class PositionContext {
     return context
   }
 
+  previewFallbackParses(text: string, sectionIndex: number) {
+    const previews: Array<{
+      mode: FallbackParseMode
+      tokens: TextPlaybackToken[]
+    }> = [
+      {
+        mode: 'current',
+        tokens: this.clone().parse(text, sectionIndex),
+      },
+    ]
+
+    if (this.variationReturnStack[0]) {
+      const pendingReturnContext = this.clone()
+      pendingReturnContext.activatePendingVariationReturn()
+      previews.push({
+        mode: 'pending-return',
+        tokens: pendingReturnContext.parse(text, sectionIndex),
+      })
+    }
+
+    return previews
+  }
+
+  parseFallbackText(
+    text: string,
+    sectionIndex: number,
+    mode: FallbackParseMode,
+  ) {
+    if (mode === 'pending-return') {
+      this.activatePendingVariationReturn()
+    }
+
+    return this.parse(text, sectionIndex)
+  }
+
   parse(content: string, sectionIndex: number): TextPlaybackToken[] {
     const parseTokens = tokenizeMoveText(content)
 
@@ -269,7 +456,10 @@ class PositionContext {
         }
       }
 
-      if (!candidate.fromCurrent && !this.variationReturnStack.length) {
+      if (
+        (!candidate.fromCurrent || token.startsVariation) &&
+        !this.variationReturnStack.length
+      ) {
         this.variationReturnStack.push(this.branch)
       }
 
@@ -413,6 +603,15 @@ class PositionContext {
 
     this.branchHistory.push(branch)
   }
+
+  private activatePendingVariationReturn() {
+    const branch = this.variationReturnStack[0]
+    this.variationReturnStack.length = 0
+
+    if (branch) {
+      this.branch = branch
+    }
+  }
 }
 
 function getNextCandidate(parseTokens: ParseToken[], tokenIndex: number) {
@@ -459,6 +658,9 @@ function tokenizeMoveText(content: string): ParseToken[] {
       moveNumber: match[2] ? Number(match[2]) : null,
       prefix,
       san,
+      startsVariation:
+        isVariationIntroText(content.slice(cursor, index)) ||
+        isVariationIntroContinuation(content.slice(index + display.length)),
       type: 'candidate',
     })
     cursor = index + display.length
@@ -491,11 +693,15 @@ function shouldTokenizeMoveCandidate(
   followingText: string,
   tokens: ParseToken[],
 ) {
-  if (hasProseMoveBlocker(precedingText)) {
+  if (isProseMoveReference(precedingText)) {
     return false
   }
 
-  if (/^\s*-\s*[a-h][1-8]/.test(followingText)) {
+  if (isProseMoveReferenceContinuation(followingText)) {
+    return false
+  }
+
+  if (/^\s*-\s*(?:[KQRBN])?[a-h][1-8]/.test(followingText)) {
     return false
   }
 
@@ -519,8 +725,26 @@ function shouldTokenizeMoveCandidate(
   )
 }
 
-function hasProseMoveBlocker(text: string) {
-  return /(?:\b(?:by means of|followed by|forcing|manoeuvre|such as|the threat is|threatening|which would allow|would allow)\s*(?:\.\.\.)?\s*)$/i.test(
+export function isProseMoveReference(text: string) {
+  return /(?:\b(?:answer|as|by means of|followed by|for example|forcing|intending|manoeuvre|such as|the threat (?:is|was)|threat|threatens|threatened|threatening|which would allow|would allow)\s*(?:\.\.\.)?\s*)$/i.test(
+    text,
+  )
+}
+
+export function isProseMoveReferenceContinuation(text: string) {
+  return /^\s*(?:is|was|would be|will be)\s+(?:a\s+)?(?:threat|idea|manoeuvre|resource|possibility)\b/i.test(
+    text,
+  )
+}
+
+function isVariationIntroText(text: string) {
+  return /\b(?:after|alternative|another way|for instance|if|instead|or also|the only alternative|trap|would be|would lead|would lose|would win)\b[^.\n]*$/i.test(
+    text,
+  )
+}
+
+function isVariationIntroContinuation(text: string) {
+  return /^\s*(?:would be|would lead|would lose|would win|loses\b|wins\b)/i.test(
     text,
   )
 }

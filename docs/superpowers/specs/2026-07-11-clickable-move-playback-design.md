@@ -66,6 +66,8 @@ The board reset affordance is the position number in the position card. It shoul
 
 Unresolved move candidates remain plain text. Parser failures should not break chapter rendering. If a whole position context cannot be parsed, its board and prose should still render in the current static form.
 
+SAN-shaped prose references remain plain text when they describe threats, intentions, manoeuvres, examples, or conditional ideas rather than actual played or variation moves. For example, “threatening 3...Ng3” and “the bishop goes to e7” are reading notes, not clickable playback targets, even if a legal path could be reconstructed elsewhere.
+
 ## Testing
 
 - Add focused parser tests for Position 5.1 examples: `Kg5`, `Kb3` in its local line, `Kd2`, `Rc8?`, and `Kc3!`.

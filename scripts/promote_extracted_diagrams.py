@@ -50,6 +50,82 @@ TRAINING_EXCLUDES = {
     "9.18",
 }
 
+VERIFIED_DIAGRAM_FENS = {
+    # Analysis diagram 11.2 renders a black rook on g7, but the printed glyph
+    # is close enough to the white rook template that the classifier chooses
+    # the wrong color. Keep this correction tied to the rendered PDF diagram so
+    # regenerated JSON stays source-derived instead of hand-patched.
+    "Analysis diagram 11.2": "R7/2k3r1/8/2KP4/3P4/8/8/8 w - - 0 1",
+    # Position 13.4 contains the bishop on g1 and knight on h1. The knight is
+    # missed by the template classifier, but the following printed line starts
+    # with Nh1-g3/Nh1-f2, confirming the rendered diagram state.
+    "Position 13.4": "8/8/8/8/4k3/8/6K1/6BN w - - 0 1",
+    # Analysis diagram 13.5 has route-line artwork over a simple four-piece
+    # bishop-and-knight mate position.
+    "Analysis diagram 13.5": "2k5/B1N5/2K5/8/8/8/8/8 b - - 0 16",
+    # Analysis diagram 13.6 is a marker diagram in the bishop-and-knight mate.
+    # The classifier mistakes the stars for pawns and misses the knight.
+    "Analysis diagram 13.6": "8/B3N3/3K1k2/8/8/8/8/8 w - - 0 20",
+    # Position 13.7 has printed star markers on the 7th rank; the classifier
+    # read them as pawns and also chose the wrong rook color on e7.
+    "Position 13.7": "3k4/4r3/3K4/3B4/8/8/8/5R2 w - - 0 1",
+    # Position 13.8 is after 4...Rc1 in the Philidor R+B vs R line, so the
+    # rook on c1 is black and White is to move despite the following text
+    # beginning with alternatives to Black's previous move.
+    "Position 13.8": "3k4/1R6/3K4/3B4/8/8/8/2r5 w - - 0 5",
+    # Position 13.10 has the defending rook on c7 and the attacking rook on
+    # d1; the classifier promoted the black rook as a white rook.
+    "Position 13.10": "1k6/2r5/1K6/1B6/8/8/8/3R4 w - - 0 1",
+    # Position 13.12 includes three printed star markers; the classifier read
+    # those as pieces and rejected the otherwise simple Cochrane Defence board.
+    "Position 13.12": "8/8/5k2/r7/4BK2/8/7R/8 b - - 0 1",
+    # The queen-vs-rook+pawn diagrams use a queen glyph that sits close to the
+    # king template, so the classifier kept these as captions. The FENs below
+    # are verified against the rendered PDF diagrams and the adjacent move text.
+    "Position 13.25": "8/4k3/4p3/3r4/4K3/7Q/8/8 w - - 0 1",
+    "Position 13.26": "6Q1/8/4pk2/3r4/6K1/8/8/8 b - - 0 4",
+    "Analysis diagram 13.27": "8/2Q5/4p3/3k1r2/6K1/8/8/8 b - - 0 11",
+    "Position 13.28": "4k3/4p3/3r4/4K3/7Q/8/8/8 w - - 0 1",
+    "Position 13.29": "8/1k6/p5Q1/1r6/1K6/8/8/8 w - - 0 1",
+    "Analysis diagram 13.30": "kr6/8/p1KQ4/8/8/8/8/8 b - - 0 10",
+    # Positions 13.21 and 13.22 print star markers on the bishop diagonal.
+    # The classifier treated those stars as pawns, so keep only the real pieces.
+    "Position 13.21": "7k/R7/7P/6K1/8/8/2b5/8 w - - 0 1",
+    "Position 13.22": "7k/1R6/8/6KP/8/8/2b5/8 w - - 0 1",
+}
+
+VERIFIED_DIAGRAM_MARKERS = {
+    "Analysis diagram 13.6": [
+        {"square": "g6", "symbol": "*", "meaning": "as printed"},
+        {"square": "f5", "symbol": "*", "meaning": "as printed"},
+    ],
+    "Position 13.7": [
+        {"square": "b7", "symbol": "*", "meaning": "as printed"},
+        {"square": "c7", "symbol": "*", "meaning": "as printed"},
+        {"square": "d7", "symbol": "*", "meaning": "as printed"},
+        {"square": "f7", "symbol": "*", "meaning": "as printed"},
+    ],
+    "Position 13.12": [
+        {"square": "d8", "symbol": "*", "meaning": "as printed"},
+        {"square": "h4", "symbol": "*", "meaning": "as printed"},
+        {"square": "e1", "symbol": "*", "meaning": "as printed"},
+    ],
+    "Position 13.21": [
+        {"square": "b1", "symbol": "*", "meaning": "as printed"},
+        {"square": "d3", "symbol": "*", "meaning": "as printed"},
+        {"square": "e4", "symbol": "*", "meaning": "as printed"},
+        {"square": "f5", "symbol": "*", "meaning": "as printed"},
+    ],
+    "Position 13.22": [
+        {"square": "b1", "symbol": "*", "meaning": "as printed"},
+        {"square": "d3", "symbol": "*", "meaning": "as printed"},
+        {"square": "e4", "symbol": "*", "meaning": "as printed"},
+        {"square": "f5", "symbol": "*", "meaning": "as printed"},
+    ],
+}
+
+VERIFIED_DIAGRAM_PRESERVE_TURN = {"Position 13.8", "Analysis diagram 13.30"}
+
 
 def main() -> None:
     TMP_DIR.mkdir(parents=True, exist_ok=True)
@@ -75,10 +151,26 @@ def main() -> None:
                 content = section["content"]
                 promoted_numbers.add(content["number"])
                 position = extracted.get(existing_label)
+                if position and should_promote(existing_label, position):
+                    position_content = {
+                        "number": content["number"],
+                        "fen": get_position_fen_for_section(
+                            existing_label,
+                            position["fen"],
+                            sections[section_index + 1 : section_index + 4],
+                        ),
+                        "caption": content.get("caption", existing_label),
+                    }
+                    if position.get("markers"):
+                        position_content["markers"] = position["markers"]
+                    section = {
+                        "type": "position",
+                        "content": position_content,
+                    }
                 report.append(
                     {
                         "chapter": chapter,
-                        "fen": content["fen"],
+                        "fen": section["content"]["fen"],
                         "issues": position.get("issues") if position else [],
                         "label": existing_label,
                         "number": content["number"],
@@ -98,17 +190,21 @@ def main() -> None:
                 and should_promote(label or "", position)
                 and position["number"] not in promoted_numbers
             ):
+                position_content = {
+                    "number": position["number"],
+                    "fen": get_position_fen_for_section(
+                        position["label"],
+                        position["fen"],
+                        sections[section_index + 1 : section_index + 4],
+                    ),
+                    "caption": position["label"],
+                }
+                if position.get("markers"):
+                    position_content["markers"] = position["markers"]
                 rewritten.append(
                     {
                         "type": "position",
-                        "content": {
-                            "number": position["number"],
-                            "fen": with_inferred_turn(
-                                position["fen"],
-                                sections[section_index + 1 : section_index + 4],
-                            ),
-                            "caption": position["label"],
-                        },
+                        "content": position_content,
                     }
                 )
                 report.append(
@@ -242,17 +338,28 @@ def extract_chapter_positions(
             boards = extract_page_boards(page_number, page)
 
             for label in labels:
-                board = nearest_board(label, boards, max_distance=45)
+                # Some later-chapter labels sit below or beside the board rather
+                # than just above it; keep pairing permissive and let the
+                # legality/ambiguity checks decide whether promotion is safe.
+                board = nearest_board(label, boards, max_distance=80)
                 if not board:
                     continue
 
                 fen, issues = fen_from_board(board["image"], templates)
-                extracted[label["label"]] = {
+                if label["label"] in VERIFIED_DIAGRAM_FENS:
+                    fen = VERIFIED_DIAGRAM_FENS[label["label"]]
+                    issues = []
+                extracted_position = {
                     "fen": fen,
                     "issues": issues,
                     "label": label["label"],
                     "number": label["number"],
                 }
+                if label["label"] in VERIFIED_DIAGRAM_MARKERS:
+                    extracted_position["markers"] = VERIFIED_DIAGRAM_MARKERS[
+                        label["label"]
+                    ]
+                extracted[label["label"]] = extracted_position
 
     return extracted
 
@@ -389,7 +496,7 @@ def crop_board_border(image: Image.Image) -> Image.Image:
             if count > 0.55 * height or count > 260
         )
     ]
-    best: tuple[int, int, int, int, int] | None = None
+    best: tuple[float, int, int, int, int, int] | None = None
 
     for top in row_lines:
         for bottom in row_lines:
@@ -409,12 +516,16 @@ def crop_board_border(image: Image.Image) -> Image.Image:
                     if not 0.82 <= board_width / board_height <= 1.18:
                         continue
 
+                    aspect_error = abs(1 - board_width / board_height)
                     score = board_width + board_height
-                    if best is None or score > best[0]:
-                        best = (score, left, top, right, bottom)
+                    if best is None or (aspect_error, -score) < (
+                        best[0],
+                        -best[1],
+                    ):
+                        best = (aspect_error, score, left, top, right, bottom)
 
     if best:
-        _, left, top, right, bottom = best
+        _, _, left, top, right, bottom = best
         padding = 2
         return image.crop(
             (
@@ -808,11 +919,22 @@ def with_inferred_turn(fen: str, next_sections: list[dict[str, Any]]) -> str:
             text = str(section.get("content"))
             break
 
-    first_move = re.search(r"\b1\s*(\.\.\.|\.)", text)
+    first_move = re.search(r"\b\d+\s*(\.\.\.|\.)", text)
     turn = "b" if first_move and first_move.group(1) == "..." else "w"
     parts = fen.split()
     parts[1] = turn
     return " ".join(parts)
+
+
+def get_position_fen_for_section(
+    label: str,
+    fen: str,
+    next_sections: list[dict[str, Any]],
+) -> str:
+    if label in VERIFIED_DIAGRAM_PRESERVE_TURN:
+        return fen
+
+    return with_inferred_turn(fen, next_sections)
 
 
 if __name__ == "__main__":

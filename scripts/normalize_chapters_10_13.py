@@ -453,6 +453,7 @@ def clean_text(text: str) -> str:
     text = clean_common_noise(text)
     text = normalize_spacing(text)
     text = clean_header_collisions(text)
+    text = clean_final_ocr_notation_collisions(text)
     return text.strip()
 
 
@@ -567,6 +568,9 @@ def normalize_chess_notation(text: str) -> str:
     text = re.sub(r"([a-h])\s+([1-8])(?=\s*(?:[!?+=#)]|$|[,.;]))", r"\1\2", text)
     text = re.sub(r"(?<=\d)\s*'\s*i[VY¥]\s*\+", "=Q+", text)
     text = re.sub(r"(?<=\d)\s*'\s*i[VY¥]", "=Q", text)
+    text = clean_late_ocr_notation_collisions(text)
+    text = re.sub(r"\bon account of(?=\d)", "on account of ", text)
+    text = re.sub(r"\bin this line(?=\d)", "in this line ", text)
     return text
 
 
@@ -661,12 +665,229 @@ def clean_known_ocr_notation_collisions(text: str) -> str:
     text = text.replace("Rta8", "Ra8")
     text = text.replace("Rtd8", "Rd8")
     text = text.replace("Rrd7", "Rd7")
+    text = text.replace("ldcS", "Rc5")
+    text = text.replace("7.Kb7 Rc8 8.Kb6 Rc8", "7.Kb7 Rc5 8.Kb6 Rc8")
+    text = text.replace("Ric8", "Rc8")
     text = text.replace("3...J la1?", "3...Ra1?")
     text = text.replace("3...J lb8?", "3...Rb8?")
     text = text.replace("2...JU1+", "2...Rf1+")
     text = text.replace("2...a: f1+!", "2...Rf1+!")
+    text = text.replace("1.Kb7 Kg6 2.:a.b6", "1.Rb7 Rg6 2.Rb6")
+    text = text.replace("2...Kg4!\n.", "2...Rg4!")
+    text = text.replace("2...Kg1?! losing, on account of3.Kc6! Kc1+", "2...Rg1?! losing, on account of 3.Kc6! Rc1+")
+    text = text.replace(
+        "4.Kd6+- and now 4...Kc8 5.Ka6 Kb8 6.Ke6 Kc8 7.d6 Kb8 8.Ka1 Kc8 9.Kh1",
+        "4.Kd6+- and now 4...Rc8 5.Ra6 Rb8 6.Ke6 Rc8 7.d6 Rb8 8.Ra1 Rc8 9.Rh1",
+    )
+    text = text.replace("but in this line3...Kc8! holds", "but in this line 3...Kc8! holds")
+    text = text.replace("2...Kg7?! also loses, according to Dvoretsky: 3.Rb8+! Kc7 4.Ka8", "2...Rg7?! also loses, according to Dvoretsky: 3.Rb8+! Kc7 4.Ra8")
+    text = text.replace(
+        "4...Kg1! (4...Kg6? is indeed losing: 5.d6+ Kd7 6.Ka7+ Kd8 7.Kc6+-) 5.Ka7+\nKc8 6.Kc6 Kc1+ 7.Kd6 Rc4!",
+        "4...Rg1! (4...Rg6? is indeed losing: 5.d6+ Kd7 6.Ra7+ Kd8 7.Kc6+-) 5.Ra7+\nKc8 6.Kc6 Rc1+ 7.Kd6 Rc4!",
+    )
+    text = text.replace(
+        "8.Ke5 Kb4! (8...Kd8 is natural but loses on ac count of 9.Ka6! Kb4 10.Kd6 Kc8 11.Ka8+ Kb7 12.Kc5!",
+        "8.Ke5 Rb4! (8...Kd8 is natural but loses on account of 9.Ra6! Rb4 10.Kd6 Kc8 11.Ra8+ Kb7 12.Kc5!",
+    )
+    text = text.replace(
+        "12...Kb1 13.Kh8 Kc7 14.Kh7+ Kc8 15.Kc6 Kc1+ 16.Kd6",
+        "12...Rb1 13.Rh8 Kc7 14.Rh7+ Kc8 15.Kc6 Rc1+ 16.Kd6",
+    )
+    text = text.replace(") 9.Ka6 Kd7.In conclusion", ") 9.Ra6 Kd7. In conclusion")
+    text = text.replace(
+        "6.Ra6 Kc8 7.R!a8+ Kb7 8 J ld8\nRrh4! = o g Side",
+        "6.Ra6 Kc8 7.Ra8+ Kb7 8.Rd8 Rh4!= Long Side",
+    )
+    text = text.replace("3...Kd4 4.Rb8+", "3...Rxd4 4.Rb8+")
+    text = text.replace("4.Kd6 Kc8 5.Kc6+ Kd8", "4.Kd6 4...Kc8 5.Kc6 Kd8")
+    text = text.replace("2...RHI", "2...Rh1")
+    text = text.replace("Rf.g7", "Rg7")
+    text = text.replace("Rf.g5", "Rg5")
+    text = text.replace("Rf.e7", "Re7")
+    text = text.replace("Rf.e8", "Re8")
+    text = text.replace("Rf.e6", "Re6")
+    text = text.replace("Rf.a1", "Ra1")
+    text = text.replace("Rf.a2", "Ra2")
+    text = text.replace("Rf.a5", "Ra5")
+    text = text.replace("Rf.a6", "Ra6")
+    text = text.replace("Rf.a8", "Ra8")
+    text = text.replace("Rf.xh6", "Rxh6")
+    text = text.replace("Rf.h1", "Rh1")
+    text = text.replace("Rf.fl", "Rf1")
+    text = text.replace("1.gb8?", "1.Rb8?")
+    text = text.replace("8.d7 gh5+", "8.d7 Rh5+")
+    text = text.replace("10.Kc5 bth5+", "10.Kc5 Rh5+")
+    text = text.replace("and5.Kc6", "and 5.Kc6")
+    text = text.replace("3.Rg7.Kg3", "3.Rg7 Kg3")
+    text = text.replace("5....r! g1+", "5...Rg1+")
+    text = text.replace("Ii xf5", "Rxf5")
+    text = text.replace("Iie2+", "Re2+")
+    text = text.replace("Iie8+", "Re8+")
+    text = text.replace("Iif2", "Rf2")
+    text = text.replace("Ii f2", "Rf2")
+    text = text.replace("Iia2", "Ra2")
+    text = text.replace("IiaS", "Ra5")
+    text = text.replace("Iia8", "Ra8")
+    text = text.replace("l:la1", "Ra1")
+    text = text.replace("l:la7", "Ra7")
+    text = text.replace("l:la8", "Ra8")
+    text = text.replace("l:lb1", "Rb1")
+    text = text.replace("l:lc1", "Rc1")
+    text = text.replace("l:lh7", "Rh7")
+    text = text.replace("l:lh8", "Rh8")
+    text = text.replace("l:lg8", "Rg8")
+    text = text.replace("l:i. b1+", "Rb1+")
+    text = text.replace("l:l h8+", "Rh8+")
+    text = text.replace("l:l xb 19.a8=Q", "Rxb1 9.a8=Q")
+    text = text.replace("7R;[b6+!", "7.Rb6+!")
+    text = text.replace("SRa6?", "8.Ra6?")
     text = text.replace("With6.Ra7", "With 6.Ra7")
     text = text.replace("Ke8lready", "we already")
+    text = text.replace("10) Ke8rrange", "10) Arrange")
+    text = text.replace("2.tt.Rf2!", "2.Nf2!")
+    text = text.replace("5.t2Rg3", "5.Ng3")
+    text = text.replace("6.t2lf5+", "6.Nf5+")
+    text = text.replace("9.t2Rd6!", "9.Nd6!")
+    text = text.replace("10.t2Rb5", "10.Nb5")
+    text = text.replace("10.t2Rd6+!", "10.Nd6+!")
+    text = text.replace(
+        "11.<J;;>c6 <J;;>as 12.jLd 4 <J;t b4 13.t2Re3",
+        "11.Kc6 Ka8 12.Bd4 Kb4 13.Ne3",
+    )
+    text = text.replace(
+        "ever, it requires analysis as well. 11.Kc6 Ka8 12.Bd4 Kb4 13.Ne3",
+        "10...Kb8\n10...Ka6 is a somewhat illogical attempt to flee towards the mating corner. However, it requires analysis as well. 11.Kc6 Ka5 12.Bd4 Kb4 13.Ne3",
+    )
+    text = text.replace("28.tLlf5 <J;th8.If", "28.Nf5 Kh8. If")
+    text = text.replace(
+        "29.Jtcs <J;tg8 30.tLlh6+ <J;th8 3 I.Jtd4 mate.",
+        "29.Bc5 Kg8 30.Nh6+ Kh8 31.Bd4 mate.",
+    )
+    text = text.replace("19.t2Re7 <J;tf6", "19.Ne7 Kf6")
+    text = text.replace("Analysis diagra m 13.5", "Analysis diagram 13.5")
+    text = text.replace(
+        "Step 4: The king occupies the pivotal square. The rest of the ending is purely me chanical.\n\nStep 5:",
+        "Step 4: The king occupies the pivotal square. The rest of the ending is purely mechanical.\n11...Ka8 12.Nd6\n\nStep 5:",
+    )
+    text = text.replace(
+        "Step 5: The knight gets ready t o drive the king off the corner from the c7 -square.\n\nStep 6:",
+        "Step 5: The knight gets ready to drive the king off the corner from the c7-square.\n12...Kb8 13.Nb5 Ka8 14.Nc7+ Kb8 15.Bd4 Kc8 16.Ba7\n\nStep 6:",
+    )
+    text = text.replace(
+        "Who do you think was the inventor of this manoeuvre? Yes, it was Philidor!\n\nAnd now the king must make a decision.",
+        "Who do you think was the inventor of this manoeuvre? Yes, it was Philidor!\n16...Kd8 17.Nd5 Ke8 18.Kd6\n\nAnd now the king must make a decision.",
+    )
+    text = text.replace(
+        "In practical play, the main concern for\nWhite is the attempt to escape. It is also the longest line.\n\nBy now, the knight must complete the first cycle.",
+        "In practical play, the main concern for\nWhite is the attempt to escape. It is also the longest line.\n18...Kf7\n18...Kd8 is weaker. Here the knight repeats its manoeuvre (7th-5th and 5th-7th).\nBy now, the knight must complete the first cycle.",
+    )
+    text = text.replace(
+        "19.Ke7 Ke8 20.Ke6 Kd8\n21.Kb6+",
+        "19.Ne7 Ke8 20.Ke6 Kd8\n21.Bb6+",
+    )
+    text = text.replace("22.Kc7\n(zugzwang again)", "22.Bc7\n(zugzwang again)")
+    text = text.replace("22...Kf8 23.Kf5", "22...Kf8 23.Nf5")
+    text = text.replace("23...Ke8\n24.Kg7+", "23...Ke8\n24.Ng7+")
+    text = text.replace("(26.Ke6 Kh7 27.Kf4 Kg8", "(26.Ne6 Kh7 27.Bf4 Kg8")
+    text = text.replace("30.Kf8+ Kh8 31.Ke5 mate", "30.Nf8+ Kh8 31.Be5 mate")
+    text = text.replace("26...Kf8 27.Kd6+", "26...Kf8 27.Bd6+")
+    text = text.replace("28.tLlf5 <J;th8.If", "28.Nf5 Kh8. If")
+    text = text.replace("28.tLlf5 Kh8.If", "28.Nf5 Kh8. If")
+    text = text.replace("20.li,e3!", "20.Be3!")
+    text = text.replace("21.li,g5", "21.Bg5")
+    text = text.replace("2 I... <J;t g 7", "21...Kg7")
+    text = text.replace("22.<J;te6", "22.Ke6")
+    text = text.replace("22.t2Rc6", "22.Nc6")
+    text = text.replace("23.t2Re5+", "23.Ne5+")
+    text = text.replace("26.Jth6!", "26.Bh6!")
+    text = text.replace("K98", "Kg8")
+    text = text.replace("28.li,h6", "28.Bh6")
+    text = text.replace("29.li,f8", "29.Bf8")
+    text = text.replace("32.t2Rg4", "32.Ng4")
+    text = text.replace("33.li,g7+", "33.Bg7+")
+    text = text.replace("34.tt:Rf6", "34.Nf6")
+    text = text.replace("1.5.f8+!", "1.Rf8+!")
+    text = text.replace("1...a:ea2.Rf7", "1...Re8 2.Rf7")
+    text = text.replace("1 ... a:ea 2Jlf7", "1...Re8 2.Rf7")
+    text = text.replace("2.Re2!", "2...Re2!")
+    text = text.replace("White threatens Ka7 -Ka8", "White threatens Ra7-Ra8")
+    text = text.replace("3.5.h7! Re1!", "3.Rh7! Re1!")
+    text = text.replace("3.S.h7! lie1 !", "3.Rh7! Re1!")
+    text = text.replace("2...Kc8?! 3.Ka7 Rd8+ 4.c;!tc6 Kb8 5.Kb7+ c;!ta8", "2...Kc8?! 3.Ra7 Rd8+ 4.Kc6 Kb8 5.Rb7+ Ka8")
+    text = text.replace("2...Kc8?! 3.Ka7 Rd8+ 4.Kc6 Kb8 5.Kb7+ Ka8", "2...Kc8?! 3.Ra7 Rd8+ 4.Kc6 Kb8 5.Rb7+ Ka8")
+    text = text.replace("5...c;!t c8 6.Ke6+", "5...Kc8 6.Be6+")
+    text = text.replace("5...Kc8 6.Ke6+", "5...Kc8 6.Be6+")
+    text = text.replace("6.Rb5 c;!ta7\n7.Ra5+ Kb8 8.c;!tb6+-", "6.Rb5 Ka7\n7.Ra5+ Kb8 8.Kb6+-")
+    text = text.replace("2...Kh8?! 3..U.a7 Kh6+", "2...Kh8?! 3.Ra7 Kh6+")
+    text = text.replace("2...Kh8?! 3.Ra7 Kh6+\n4.Ke6", "2...Rh8?! 3.Ra7 Rh6+\n4.Be6")
+    text = text.replace("3...Ke3 4.Rd7+ This", "3...Ke3 4.Rd7+ This")
+    text = text.replace("4...c;!t e8", "4...Ke8")
+    text = text.replace("4...Kc8 5.Ka7+- and mate, as Rb3", "4...Kc8 5.Ra7+- and mate, as Rb3")
+    text = text.replace("lethal threat Kc6+", "lethal threat Bc6+")
+    text = text.replace("6.Kf7+ (again a time-gaining check)", "6.Rf7+ (again a time-gaining check)")
+    text = text.replace("6...c;!t e8 7.Rf4!", "6...Ke8 7.Rf4!")
+    text = text.replace("threatening7.Kc6", "threatening 7.Kc6")
+    text = text.replace("threatening 7.Kc6", "threatening 7.Bc6")
+    text = text.replace("4..Rc1", "4...Rc1")
+    text = text.replace("8.Ke4! +-", "8.Be4!+-")
+    text = text.replace("4.Kb3 Ke2!", "4.Bb3 Re2!")
+    text = text.replace("4...c;!t c8 5.Ka7 Kb1", "4...Kc8 5.Ra7 Rb1")
+    text = text.replace("4...Kc8 5.Ka7 Kb1", "4...Kc8 5.Ra7 Rb1")
+    text = text.replace("6.:l:H7!", "6.Rh7!")
+    text = text.replace("6...c;!t b8", "6...Kb8")
+    text = text.replace("6...Kb6+ 7.Kc6", "6...Rb6+ 7.Bc6")
+    text = text.replace("7.Kf8+ c;!ta7", "7.Rf8+ Ka7")
+    text = text.replace("8.Ra8+ c;!tb6", "8.Ra8+ Kb6")
+    text = text.replace("9.Kb8+ +-", "9.Rb8++-")
+    text = text.replace("5..tb3!!", "5.Bb3!!")
+    text = text.replace("5..Rc3", "5...Rc3")
+    text = text.replace("7.Rh4 Iie 1", "7.Rh4 Re1")
+    text = text.replace("8..Rd7+", "8.Rd7+")
+    text = text.replace("10..Rb7+", "10.Rb7+")
+    text = text.replace("11.R(b4", "11.Rb4")
+    text = text.replace("11...KdB", "11...Kd8")
+    text = text.replace("end of the3... Ii e3", "end of the 3...Re3")
+    text = text.replace("1.Ke8+ Kd8 2.Ke7 Kd2", "1.Re8+ 1...Rd8 2.Re7 2...Rd2")
+    text = text.replace("2...J lh8", "2...Rh8")
+    text = text.replace("5.Kd6 l:lh 16.Rg7 Rc1+", "5.Kd6 Rh1 6.Rg7 Rc1+")
+    text = text.replace("7.Kc5 l:lb 18.Rg4", "7.Bc5 Rb1 8.Rg4")
+    text = text.replace(
+        "3.Kf7 Kd1 4.Ka7 Kb1 5.Ka3 Kb3 6.Kd6 Kc3+ 7.Kc5 Kb3 8.Kc7+ Kb8 9.Kh7\nKa5 10.Ka7+",
+        "3.Rf7 Rd1 4.Ra7 Rb1 5.Ba3 Rb3 6.Bd6 Rc3+ 7.Bc5 Rb3 8.Rc7+ Kb8 9.Rh7\nKa8 10.Ra7+",
+    )
+    text = text.replace("10...Kb8 11.Ka4 Kc8\n12.Kb4+-", "10...Kb8 11.Ra4 Kc8\n12.Bb4+-")
+    text = text.replace("1.Kd8+ Kc8 2.Kd7 Kc1 3.Kf7 Kc2 4.Kg7", "1.Rd8+ Rc8 2.Rd7 Rc1 3.Rf7 Rc2 4.Rg7")
+    text = text.replace("4...Kc1 5.Ka4!", "4...Rc1 5.Ba4!")
+    text = text.replace("5...Kc3 (5...Rb1+", "5...Rc3 (5...Rb1+")
+    text = text.replace("6.Kc6;g_b3+! 7.Kb5 Kc3! 8.Kc6 Kb3+ 9.Kc5", "6.Bc6 Rb3+! 7.Bb5 Rc3! 8.Bc6 Rb3+ 9.Kc5")
+    text = text.replace("9...Rf.b1", "9...Rb1")
+    text = text.replace("10.Ad5", "10.Bd5")
+    text = text.replace("10...Rf1!", "10...Rf1!")
+    text = text.replace("12.R'!e7", "12.Re7")
+    text = text.replace("Rh1 l 7.Kd5 Rh6+", "Rh1 17.Bd5 Rh6+")
+    text = text.replace("11..J U6+! 12.Ae6 1:lf1 13.:C:g8+", "11...Rf6+! 12.Be6 Rf1 13.Rg8+")
+    text = text.replace("14.Ad5 Kd1", "14.Bd5 Rd1")
+    text = text.replace("15. .Ma8+", "15.Ra8+")
+    text = text.replace("16Jlb8+", "16.Rb8+")
+    text = text.replace("17J:ra8+", "17.Ra8+")
+    text = text.replace("18Jla2 l:rb1", "18.Ra2 Rb1")
+    text = text.replace("1..J lb1", "1...Rb1")
+    text = text.replace("1.Rh2 (1.Rc8+.i:!Rb8 2.Rc7 Rb7!)", "1.Rh2 (1.Rc8+ Rb8 2.Rc7 Rb7!)")
+    text = text.replace("1...Ra7+ 2.Kb6 Rb7+ 3.Kc6 Rb1\n4.Kc3! Rb7 5 J Kg2!", "1...Ra7+ 2.Kb6 Rb7+ 3.Kc6 Rb1\n4.Bc3! Rb7 5.Rg2!")
+    text = text.replace("2.Rh6 (2.Rh3 Rb7 3.Kb6?? Ra7+! =) 2.Rb7 3.Ab6.Ra7+ 4.Kb5 1:lf7 5.Kc6 Rf8 6.Ac7 Rg8 7.Ad6 1:le8 8.Rh1+-", "2.Rh6 (2.Rh3 Rb7 3.Bb6?? Ra7+!=) 2...Rb7 3.Bb6 Ra7+ 4.Kb5 Rf7 5.Kc6 Rf8 6.Bc7 Rg8 7.Bd6 Re8 8.Rh1+-")
+    text = text.replace("5.i?Le3?", "5.Be3?")
+    text = text.replace(".ric5+ 7.Ke5", "Rc5+ 7.Ke5")
+    text = text.replace("h;thal", "lethal")
+    text = text.replace("7.i?Lf4+", "7.Bf4+")
+    text = text.replace("8.:blc1", "8.Rc1")
+    text = text.replace("11.i?Lg3!?", "11.Bg3!?")
+    text = text.replace("1 2JU3+", "12.Rf3+")
+    text = text.replace("14...J ie2!", "14...Re2!")
+    text = text.replace("18.. ki:e2=", "18...Re2=")
+    text = text.replace("19 J Ka1", "19.Ra1")
+    text = text.replace("22Ri:e4", "22.Rxe4")
+    text = text.replace("25.Kh3.Rc2", "25.Kh3 Rc2")
+    text = text.replace("1.f2-1.f2", "1/2-1/2")
     text = re.sub(r"(?<![A-Za-z])([KQRBN])([a-h])\s+([1-8])", r"\1\2\3", text)
     text = text.replace(
         "4..J Ke1+ 5.Kd6Rd1+ 6.Ke6Re1+ 7.Kd5Rd1+",
@@ -689,6 +910,266 @@ def clean_known_ocr_notation_collisions(text: str) -> str:
         r"(?<![A-Za-z])(?:\.t:i:?|t:i:?|JK:|R:)\s*x?\s*([a-h])\s*([lIit1-8S])(?=[,.;:)!?=+\s-]|$)",
         lambda match: "R" + match.group(1) + normalize_square_rank(match.group(2)),
         text,
+    )
+    return text
+
+
+def clean_late_ocr_notation_collisions(text: str) -> str:
+    # Repairs that only become visible after generic chess-font glyph handling.
+    text = text.replace(
+        "2...Kg1?! losing, on account of3.Kc6! Kc1+",
+        "2...Rg1?! losing, on account of 3.Kc6! Rc1+",
+    )
+    text = text.replace(
+        "4.Kd6+- and now 4...Kc8 5.Ka6 Kb8 6.Ke6 Kc8 7.d6 Kb8 8.Ka1 Kc8 9.Kh1",
+        "4.Kd6+- and now 4...Rc8 5.Ra6 Rb8 6.Ke6 Rc8 7.d6 Rb8 8.Ra1 Rc8 9.Rh1",
+    )
+    text = text.replace(
+        "but in this line3...Kc8! holds",
+        "but in this line 3...Kc8! holds",
+    )
+    text = text.replace(
+        "4.Kd6+- and now 4...Kc8 5.Ra6 Kb8 6.Ke6 Kc8 7.d6 Kb8 8.Ra1 Kc8 9.Rh1",
+        "4.Kd6+- and now 4...Rc8 5.Ra6 Rb8 6.Ke6 Rc8 7.d6 Rb8 8.Ra1 Rc8 9.Rh1",
+    )
+    text = text.replace(
+        "but in this line 3...Kc8! holds",
+        "but in this line 3...Kc8! holds",
+    )
+    text = text.replace(
+        "but in this line 3...Rc8! holds",
+        "but in this line 3...Kc8! holds",
+    )
+    return text
+
+
+def clean_final_ocr_notation_collisions(text: str) -> str:
+    text = text.replace(
+        "but in this line 3...Rc8! holds",
+        "but in this line 3...Kc8! holds",
+    )
+    text = text.replace(") 9.Ka6 Kd7.In conclusion", ") 9.Ra6 Kd7. In conclusion")
+    text = text.replace("1...a:ea2.Rf7", "1...Re8 2.Rf7")
+    text = text.replace("1.Re8+ Kd8 2.Re7 Rd2", "1.Re8+ 1...Rd8 2.Re7 2...Rd2")
+    text = text.replace("The threat i s... Re2", "The threat is ...Re2")
+    text = text.replace("25.Kh3.Rc2", "25.Kh3 Rc2")
+    text = text.replace("and5.Kc6", "and 5.Kc6")
+    text = text.replace("if2...Ra2+", "if 2...Ra2+")
+    text = text.replace("2...g 53.Rb2\ng3", "2...g5 3.Rb2\ng3")
+    text = text.replace("Black intends.. Rf4-f2", "Black intends ...Rf4-f2")
+    text = text.replace("3.Rg7.Kg3", "3.Rg7 Kg3")
+    text = text.replace("4.Kf1 Rta l +", "4.Kf1 Ra1+")
+    text = text.replace("gxf1 K+", "gxf1=Q+")
+    text = text.replace("Rf.h 15.Kg6", "Rh1 5.Kg6")
+    text = text.replace("6...Rf. a 17.f6", "6...Ra1 7.f6")
+    text = text.replace("Rf.aS +", "Ra8+")
+    text = text.replace("2...Rf. a 13.Re7", "2...Ra1 3.Re7")
+    text = text.replace("4..Re2+", "4...Re2+")
+    text = text.replace("4...Rf. a5+", "4...Ra5+")
+    text = text.replace("Rf.aS 7.Kg6", "Ra8 7.Kg6")
+    text = text.replace("Rf.e5", "Re5")
+    text = text.replace("Rf.e2+", "Re2+")
+    text = text.replace("Rf.g8", "Rg8")
+    text = text.replace("28.tLlf5 <J;th8.If", "28.Nf5 Kh8. If")
+    text = text.replace("28.tLlf5 <J;th8. If", "28.Nf5 Kh8. If")
+    text = text.replace("1..J lb5", "1...Rb5")
+    text = text.replace("3.Rra6 Kc5", "3.Ra6 Rc5")
+    text = text.replace("4.Kd3 Rrc7", "4.Bd3 Rc7")
+    text = text.replace("6.Kd4 Rrg5", "6.Kd4 Rg5")
+    text = text.replace("7.Ke4 Kh5 8.Rrg6!la5", "7.Be4 Rh5 8.Rg6 Ra5")
+    text = text.replace("10.Ke5 Ke1+ 11.i,e4 Re2", "10.Ke5 Re1+ 11.Be4 Re2")
+    text = text.replace("1 2Rig7+ Ke8", "12.Rg7+ Ke8")
+    text = text.replace("1 3RRa7 Re1", "13.Ra7 Re1")
+    text = text.replace("15.i,f5", "15.Bf5")
+    text = text.replace(
+        "Let us compare this situation to the starting position.",
+        "15...Re7 16.Ra8+ Kf7 17.Ra1 Kf6 18.Bc8\nLet us compare this situation to the starting position.",
+    )
+    text = text.replace(
+        "15...Re7 16.Ra8+ Kf7 17.Ra1 Kf6 18.Bc8\n15...Re7 16.Ra8+ Kf7 17.Ra1 Kf6 18.Bc8\nLet us compare this situation to the starting position.",
+        "15...Re7 16.Ra8+ Kf7 17.Ra1 Kf6 18.Bc8\nLet us compare this situation to the starting position.",
+    )
+    text = re.sub(
+        r"(15\.\.\.Re7 16\.Ra8\+ Kf7 17\.Ra1 Kf6 18\.Bc8)\s+\1(?=\s+Let us compare)",
+        r"\1",
+        text,
+    )
+    text = text.replace(
+        "Black keeps the white king cut off for some moves.\n\n24.Kd5",
+        "Black keeps the white king cut off for some moves.\n\n18...Re5+ 19.Kd6 Re2 20.Rf1+ Kg5 21.Bb7 Re3 22.Kd5 Re2 23.Kd4 Re7\n24.Bd5",
+    )
+    text = text.replace(
+        "18...Re5+ 19.Kd6 Re2 20.Rf1+ Kg5 21.Bb7 Re3 22.Bd5 Re2 23.Bd4 Re7\n24.Kd5 Re8 25.Rh7 Rb8",
+        "18...Re5+ 19.Kd6 Re2 20.Rf1+ Kg5 21.Bb7 Re3 22.Kd5 Re2 23.Kd4 Re7\n24.Bd5 Re8 25.Rf7 Rb8",
+    )
+    text = text.replace("24.Kd5 Ue8 25JH7 Ub8", "24.Bd5 Re8 25.Rf7 Rb8")
+    text = text.replace("24.Bd5 Ue8 25JH7 Ub8", "24.Bd5 Re8 25.Rf7 Rb8")
+    text = text.replace("25...Re1 26..i,e4 lda l 27.Ke5 ldaS + 28..i,ds l:lbS", "25...Re1 26.Be4 Rd1 27.Ke5 Rd5+ 28.Bd5 Rb5")
+    text = text.replace("26.<ifJe5.:tb5 27.Rf1Ra5 28.Rg1+ <ifJh5", "26.Ke5 Rb5 27.Rf1 Ra5 28.Rg1+ Kh5")
+    text = text.replace("29.Rh1+ <iii;g5", "29.Rh1+ Kg5")
+    text = text.replace("30...<ifJh5 31.M.g 1 I;lb5 32.<ifJd4", "30...Kh5 31.Rg1 Rb5 32.Kd4")
+    text = text.replace("30...Kh5 31.Bg1 Rb5 32.Kd4", "30...Kh5 31.Rg1 Rb5 32.Kd4")
+    text = text.replace("32...<ifJh6 33.Ke4Rg5", "32...Kh6 33.Ke4 Rg5")
+    text = text.replace("34.Itf1 <iii;g 7", "34.Rf1 Kg7")
+    text = text.replace("35.Kf5 Kf6", "35.Bf5 Kf6")
+    text = text.replace("38.Kd7+ <ifJf6", "38.Kd7+ Kf6")
+    text = text.replace("37.Rd1.:tg2", "37.Rd1 Rg2")
+    text = text.replace("39.Itd6+ <JJe7", "39.Rd6+ Ke7")
+    text = text.replace("40.M.e6+ <ifJf7 41.Ra6Re2+ 42.<ifJd5 <JJe7", "40.Be6+ Kf7 41.Ra6 Re2+ 42.Kd5 Ke7")
+    text = text.replace("43.Ke4 Itd2+ 44.<ifJe5 Ite2", "43.Ke4 Rd2+ 44.Ke5 Re2")
+    text = text.replace("12.45..:te6+ <ifJd 7 46JKr h 6 <ifJe7", "12. 45.Re6+ Kd7 46.Rh6 Ke7")
+    text = text.replace("48..:ta7 Ite1 49.<ifJd5", "48.Ra7 Re1 49.Kd5")
+    text = text.replace("50.Kf5 (5.O.Rb7 Ke8)", "50.Bf5 (50.Rb7 Ke8)")
+    text = text.replace("50... Ite7 1.f2-1h", "50...Re7 1/2-1/2")
+    text = text.replace("7.Kc5 Rb1 8.Rg4", "7.Bc5 Rb1 8.Rg4")
+    text = text.replace(
+        "3.Rf7 Rd1 4.Ra7 Rb1 5.Ra3 Rb3 6.Kd6 Rc3+ 7.Kc5 Rb3 8.Rc7+ Kb8 9.Rh7\nKa5 10.Ra7+",
+        "3.Rf7 Rd1 4.Ra7 Rb1 5.Ba3 Rb3 6.Bd6 Rc3+ 7.Bc5 Rb3 8.Rc7+ Kb8 9.Rh7\nKa8 10.Ra7+",
+    )
+    text = text.replace(
+        "10...Kb8 11.Ra4 Kc8\n12.Rb4+-",
+        "10...Kb8 11.Ra4 Kc8\n12.Bb4+-",
+    )
+    text = text.replace(
+        "17.Bd5 Rh6+ =.\n\n17.Ra8+ Kb6 18.Ra2 Rb1 reaching the second-rank defence",
+        "17.Bd5 Rh6+=.\n\n11...Rf6+! 12.Be6 Rf1 13.Rg8+ Ka7! 14.Bd5 Rd1 15.Ra8+ Kb6 16.Rb8+ Ka7\n17.Ra8+ Kb6 18.Ra2 Rb1 reaching the second-rank defence",
+    )
+    text = text.replace(
+        "The idea is... Kg2.2.Kf4:ig2 3.:ih7+ Kg4 4.Ke4",
+        "The idea is...Rg2. 2.Kf4 Rg2 3.Rh7+ Kg4 4.Ke4",
+    )
+    text = text.replace("Rc5+ 7.Ke5 and White's set-up is lethal.", "Rc5+ 7.Be5 and White's set-up is lethal.")
+    text = text.replace(
+        "11...Kf1! (11...Kd1! =) 12.Rf3+\n\ntry.\n\nNow i t would b e wrong",
+        "11...Kf1! (11...Kd1!=) 12.Rf3+\n12.Kf3 Rf2+!= is a well-known stalemate resource; White does not want to try.\n12...Ke2 13.Re3+ Kd2!\nNow it would be wrong",
+    )
+    text = text.replace("13...Kf1?? 14.Ke1+#", "13...Kf1?? 14.Re1+#")
+    text = text.replace("14.Kf3?! Rg3+ =.", "14.Kf3?! Rxg3+=.")
+    text = text.replace("26.Ka5 Ka2", "26.Ka5 Ra2")
+    text = text.replace("4.Rb1 iLdS 5.Rg1+", "4.Rb1 Bd5 5.Rg1+")
+    text = text.replace("(I.. Bg8?", "(1...Bg8?")
+    text = text.replace("iLxf7", "Bxf7")
+    text = text.replace("2.\\itf4", "2.Kf4")
+    text = text.replace("4Ri:c7 Ba2!", "4.Rc7 Ba2!")
+    text = text.replace("7JJ.a7\nIf7.f7 Kf7! =", "7.Ra7\nIf 7.f7 Bxf7!=")
+    text = text.replace("7...Kc4=", "7...Bc4=")
+    text = text.replace("1.Ra7 itd3", "1.Ra7 Bd3")
+    text = text.replace("with1...Bb3?", "with 1...Bb3?")
+    text = text.replace("3.l:f.g7+", "3.Rg7+")
+    text = text.replace("5.l:f.c8+", "5.Rc8+")
+    text = text.replace("3.Ka8+ Bg8", "3.Ra8+ Bg8")
+    text = text.replace("5.h6.idS 6.Ka7+", "5.h6 Bd5 6.Ra7+")
+    text = text.replace("7.l:f.e7!", "7.Re7!")
+    text = text.replace("3.1Ia8+ Kf7", "3.Ra8+ Kf7")
+    text = text.replace("view of3...Kh8 4.1Id7+-", "view of 3...Kh8 4.Rd7+-")
+    text = text.replace("4...jlc2!", "4...Bc2!")
+    text = text.replace("SRKg6", "5.Rg6")
+    text = text.replace("3...Kf5!\nAgain, this move is easy to find in view of3...Kh8", "3...Kf8!\nAgain, this move is easy to find in view of 3...Kh8")
+    text = text.replace("3...Kf5!\nAgain, this move is easy to find in view of 3...Kh8", "3...Kf8!\nAgain, this move is easy to find in view of 3...Kh8")
+    text = text.replace("8.Kg5 ilxg6=.", "8.Kg5 Bxg6=.")
+    text = text.replace(
+        "1.Kh6 Kg8 2.Rg7+ Kf8 3.1Ig3 Kf7 4.Kh5 Kf6 (4...Bb1 s Jlgs Bc2 6.Kg4+-;\n"
+        "4...Kf8 s. ligs ild l + 6.Kg6 Kg8 7.Rc5+-) 5.1Ig5 Bd1+ (5...il fs 6.Kh6 Bd3\n"
+        "7.1Ig3 Be4 8.Re3 ildS 9.1Ie2 Kf7 10.Kh7+-) 6.Kh6 Kf7 7.!Ig7+ Kf8 (7...Kf6\n"
+        "8.Kg1 Be2 9.:gg2 ild l 10.Rf2+ +-) 8.Kg6 Bh5+ 9.Kf6+-",
+        "1.Kh6 Kg8 2.Rg7+ Kf8 3.Rg3 Kf7 4.Kh5 Kf6 (4...Bb1 5.Rg5 Bc2 6.Kg4+-;\n"
+        "4...Kf8 5.Rg5 Bd1+ 6.Kg6 Kg8 7.Rc5+-) 5.Rg5 Bd1+ (5...Bf5 6.Kh6 Bd3\n"
+        "7.Rg3 Be4 8.Re3 Bd5 9.Re2 Kf7 10.Kh7+-) 6.Kh6 Kf7 7.Rg7+ Kf8 (7...Kf6\n"
+        "8.Rg1 Be2 9.Rg2 Bd1 10.Rf2++-) 8.Kg6 Bh5+ 9.Kf6+-",
+    )
+    text = text.replace("7...Kf6\n8.Kg1 Be2 9.Rg2", "7...Kf6\n8.Rg1 Be2 9.Rg2")
+    text = text.replace("6.Qe8.tieS + 7.Kf4::t:fS +", "6.Qe8 Re5+ 7.Kf4 Rf5+")
+    text = text.replace("8...JU5 9.Qd8+", "8...Rf5 9.Qd8+")
+    text = text.replace(
+        "Attacking the pawn and forcing the black king to hinder his own rook. 10.Kg3!\n"
+        "wins faster thanks to zugzwang, but continuing the queen manoeuvre is more the matic.",
+        "Attacking the pawn and forcing the black king to hinder his own rook. 10.Kg3!\n"
+        "wins faster thanks to zugzwang, but continuing the queen manoeuvre is more thematic.\n"
+        "10...Kd5 11.Qc7!",
+    )
+    text = text.replace(
+        "11...Ke4\n\n13, only faster.\n12.Qd6!",
+        "11...Ke4\n11...Re5 12.Qd7+ Ke4 13.Qd6 leads to the same position as the note to move 13, only faster.\n12.Qd6!",
+    )
+    text = text.replace(
+        "12.Qd6!\nThe white queen exerts more pressure.\n\nThe position",
+        "12.Qd6!\nThe white queen exerts more pressure.\n\n12...Re5\nThe position",
+    )
+    text = text.replace(
+        "After 14.Kf5 Kd8 the simplest way would be 15.Kd5 Re7 16.Ra8+ Kc7",
+        "After 14.Kf5 Kd8 the simplest way would be 15.Bd5 Re7 16.Ra8+ Kc7",
+    )
+    text = text.replace(
+        "and the king leaves the edge of the board.\n\nIt is important to note",
+        "and the king leaves the edge of the board.\n\n14...Kf8!\nIt is important to note",
+    )
+    text = text.replace(
+        "13...Rg5+ 14.Kh4 Re5\n\n14.Kf3 Kd5 15.'ii'f8+",
+        "13...Rg5+ 14.Kh4 Re5 15.Kg4!+- with total zugzwang.\n\n14.Kf3 Rd5 15.Qf8+",
+    )
+    text = text.replace(
+        "Finally White succeeds in driving the king away from the pawn, so the black infant will be captured in a few moves.\n\npawn dies.",
+        "Finally White succeeds in driving the king away from the pawn, so the black infant will be captured in a few moves.\n\n"
+        "15...Kg6 (15...Ke5? 16.Qf4 mate) 16.Ke4 Rf5 17.Qe7 Rf6 18.Ke5+- and the\n"
+        "pawn dies.",
+    )
+    text = text.replace(
+        "1.Qh8+ Kd7 2.'ii'f8 Ke6+ 3.Kd5 Kd6+ 4.Kc5 Kf6",
+        "1.Qh8+ Kd7 2.Qf8 Re6+ 3.Kd5 Rd6+ 4.Kc5 Rf6",
+    )
+    text = text.replace(
+        "4...Rd2?! 5.Kb6 l:!.d6+? (5...l:!. b2+! is still a draw) 6.Kb7, threatening Qc8",
+        "4...Rd2?! 5.Kb6 Rd6+? (5...Rb2+! is still a draw) 6.Kb7, threatening Qc8",
+    )
+    text = text.replace(
+        "6...l:!. f6 7.'li'c8+\nKd6 8.'li'g4 l:!.f8 9.'li'd4+ Ke6 10.Kc7 l:!.f6 11.'li'c4+! \\tieS 12.Kd7+-",
+        "6...Rf6 7.Qc8+\nKd6 8.Qg4 Rf8 9.Qd4+ Ke6 10.Kc7 Rf6 11.Qc4+! Ke5 12.Kd7+-",
+    )
+    text = text.replace("4.it'd6 Ka7", "4.Qd6 Ka7")
+    text = text.replace("5.'ifcS + Ka8 6.it'd6 Ka7", "5.Qc5+ Ka8 6.Qd6 Ka7")
+    text = text.replace("1.Ka7 2.Qf7+Rb7!", "1...Ka7 2.Qf7+ Rb7!")
+    text = text.replace("9.Kc6.Rb8", "9.Kc6 Rb8")
+    text = text.replace("1 I.Qd8+ Ka7", "11.Qd8+ Ka7")
+    text = text.replace("Kas", "Ka8")
+    text = text.replace("7.'i:VeS+ Ka7", "7.Qe8+ Ka7")
+    text = text.replace("10.'i:VhS+ Ka7 11.'i:VdS", "10.Qh8+ Ka7 11.Qd8")
+    text = text.replace("The only move - but enough.\n18.Kg4", "17...Rf2+!\nThe only move - but enough.\n18.Kg4")
+    text = text.replace(
+        "18.Ke4 would lead to a repetition.\n\nTransferring the rook",
+        "18.Ke4 would lead to a repetition.\n\n18...Rc2\nTransferring the rook",
+    )
+    text = text.replace("18...Kd2=", "18...Rd2=")
+    text = text.replace("not 18.Rg2? 19.Ra1 Ke2", "not 18...Rg2? 19.Ra1+ Ke2")
+    text = re.sub(r"(?:17\.\.\.Rf2\+!\n){2,}", "17...Rf2+!\n", text)
+    text = text.replace("and the\n+\n...\nrook is trapped.", "and the\nrook is trapped.")
+    text = text.replace("23.Kd6 Kf1", "23.Bd6 Kf1")
+    text = text.replace("24.Kb4 Rg2+ 25.Kh3 Rc2 26.Ka5 Ra2 27.Kb6?!", "24.Bb4 Rg2+ 25.Kh3 Rc2 26.Ba5 Ra2 27.Bb6?!")
+    text = text.replace("27...Ra3+ 28.Kg4 Kg3+", "27...Ra3+ 28.Kg4 Rg3+")
+    text = text.replace("1.'Rc7 Kd3!", "1.Rc7 Bd3!")
+    text = text.replace("1...Kb3? loses easily: 2.h7 Kd5", "1...Bb3? loses easily: 2.h7 Bd5")
+    text = text.replace("1...Kb3? loses easily: 2.h7 Bd5", "1...Bb3? loses easily: 2.h7 Bd5")
+    text = text.replace("Or also 1...Kh7? 2.Rc8+ Kg8", "Or also 1...Bh7? 2.Rc8+ Bg8")
+    text = text.replace("Kh7 4.Kd7+ Kh8", "Kh7 4.Rd7+ Kh8")
+    text = text.replace("2.Kf6 Ke4 3.h7 Kh7=", "2.Kf6 Be4 3.h7 Bxh7=")
+    text = text.replace("33.Ke4 33...Rg5", "33.Ke4 Rg5")
+    text = text.replace("34.Rf1 34...Kg7 35.Bf5 35...Kf6 36.Ke4 36...Ke7 37.Rd1 37...Rg2 38.Kd7+ 38...Kf6 39.Rd6+ 39...Ke7", "34.Rf1 Kg7 35.Bf5 Kf6 36.Ke4 Ke7 37.Rd1 Rg2 38.Kd7+ Kf6 39.Rd6+ Ke7")
+    text = text.replace("40.Be6+ 40...Kf7 41.Ra6 41...Re2+ 42.Kd5 42...Ke7", "40.Be6+ Kf7 41.Ra6 Re2+ 42.Kd5 Ke7")
+    text = text.replace("43.Ke4 43...Rd2+ 44.Ke5 44...Re2", "43.Ke4 Rd2+ 44.Ke5 Re2")
+    text = text.replace("45.Re6+ 45...Kd7 46.Rh6 46...Ke7 47.Rh7+ 47...Ke8 48.Ra7 48...Re1 49.Kd5", "45.Re6+ Kd7 46.Rh6 Ke7 47.Rh7+ Ke8 48.Ra7 Re1 49.Kd5")
+    text = text.replace("...<J;;>d7 with jLd6", "...Kd7 with Bd6")
+    text = text.replace("9.Nd6! <J;;>d7 10.Nb5", "9.Nd6! Kd7 10.Nb5")
+    text = text.replace("threatening7.Bc6", "threatening 7.Bc6")
+    text = text.replace("If7.f7", "If 7.f7")
+    text = text.replace("view of3...Kh8", "view of 3...Kh8")
+    text = text.replace("Kg8= White", "Kg8=. White")
+    text = text.replace("aS -square....Ka7", "a5-square. 1...Ka7")
+    text = text.replace("aS -square. 1...Ka7", "a5-square. 1...Ka7")
+    text = text.replace("1.Kc4the", "1.Kc4 the")
+    text = text.replace("3.Qc7\nKb7", "3.Qc7\nRb7")
+    text = text.replace("triangle a8-b8-a7.5.Qe3+", "triangle a8-b8-a7. 8.Qe3+")
+    text = text.replace(
+        "2.Rh6 (2.Rh3 Rb7 3.Kb6?? Ra7+! =) 2.Rb7 3.Ab6.Ra7+ 4.Kb5 1:lf7 5.Kc6 Rf8 6.Ac7 Rg8 7.Ad6 1:le8 8.Rh1+-",
+        "2.Rh6 (2.Rh3 Rb7 3.Bb6?? Ra7+!=) 2...Rb7 3.Bb6 Ra7+ 4.Kb5 Rf7 5.Kc6 Rf8 6.Bc7 Rg8 7.Bd6 Re8 8.Rh1+-",
     )
     return text
 
@@ -768,9 +1249,45 @@ def insert_intro(sections: list[dict[str, Any]], intro: str) -> None:
         ),
         len(sections),
     )
+    preserved_positions = [
+        section
+        for section in sections[1:first_ending_index]
+        if section.get("type") == "position"
+        and isinstance(section.get("content"), dict)
+        and isinstance(section["content"].get("caption"), str)
+    ]
     del sections[1:first_ending_index]
     intro_sections = split_structural_text("text", intro)
+    intro_sections = restore_intro_positions(intro_sections, preserved_positions)
     sections[1:1] = intro_sections
+
+
+def restore_intro_positions(
+    intro_sections: list[dict[str, Any]],
+    preserved_positions: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    if not preserved_positions:
+        return intro_sections
+
+    positions_by_caption = {
+        section["content"]["caption"]: section for section in preserved_positions
+    }
+    restored: list[dict[str, Any]] = []
+    restored_captions: set[str] = set()
+
+    for section in intro_sections:
+        if section.get("type") == "caption" and section.get("content") in positions_by_caption:
+            caption = section["content"]
+            restored.append(positions_by_caption[caption])
+            restored_captions.add(caption)
+        else:
+            restored.append(section)
+
+    for caption, position in positions_by_caption.items():
+        if caption not in restored_captions:
+            restored.append(position)
+
+    return restored
 
 
 def merge_adjacent_text(sections: list[dict[str, Any]]) -> list[dict[str, Any]]:

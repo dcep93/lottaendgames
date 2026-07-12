@@ -137,6 +137,24 @@ const chapterTenCaptions = getCaptions(chapterTenSections)
 const chapterElevenCaptions = getCaptions(chapterElevenSections)
 const chapterTwelveCaptions = getCaptions(chapterTwelveSections)
 const chapterThirteenCaptions = getCaptions(chapterThirteenSections)
+const chapterTenPlayback = buildChapterPlayback(chapterTenSections)
+const chapterElevenPlayback = buildChapterPlayback(chapterElevenSections)
+const chapterTenPhilidorTokens = getChapterMoveTokens(
+  chapterTenPlayback,
+  chapterTenSections.findIndex(
+    (section) =>
+      typeof section.content === 'string' &&
+      section.content.includes('The text move threatens 3.Kd6'),
+  ),
+)
+const chapterElevenAnalysisTokens = getChapterMoveTokens(
+  chapterElevenPlayback,
+  chapterElevenSections.findIndex(
+    (section) =>
+      typeof section.content === 'string' &&
+      section.content.startsWith('4...Rg1!'),
+  ),
+)
 const sanScanPattern =
   /(?<![A-Za-z0-9])((\d+)\s*(\.\.\.|\.)\s*)?((?:O-O-O|O-O|0-0-0|0-0|[KQRBN]?[a-h]?[1-8]?x?[a-h][1-8](?:=?[QRBN])?|[a-h]x[a-h][1-8](?:=?[QRBN])?|[a-h][1-8](?:=?[QRBN])?)(?:[+#])?(?:[!?]+|=)?)/g
 const ignoredSanMisses: Set<string> = new Set([
@@ -237,12 +255,21 @@ assertNoSplitWordArtifacts('12', chapterTwelveSections)
 assertNoSplitWordArtifacts('13', chapterThirteenSections)
 assert.equal(chapterTenPositionNumbers.has('10.1'), true)
 assert.equal(chapterTenPositionNumbers.has('10.2'), true)
-assert.equal(chapterElevenCaptions.has('Position 11.1'), true)
+assert.equal(chapterElevenPositionNumbers.has('11.1'), true)
 assert.equal(chapterTwelvePositionNumbers.has('12.1'), true)
 assert.equal(chapterThirteenPositionNumbers.has('13.4'), true)
 assert.equal(chapterElevenPositionNumbers.has('12.1'), false)
 assert.equal(chapterThirteenPositionNumbers.has('13.24'), true)
 assertDiagramExtractionReport()
+assert.equal(
+  chapterTenPhilidorTokens.filter((token) => token.display === '3.Kd6').length,
+  1,
+)
+assert.equal(
+  findMove(chapterElevenAnalysisTokens, '4...Rg1!').positionNumber,
+  '11.2',
+)
+assert.equal(findMove(chapterElevenAnalysisTokens, '3.d6').positionNumber, '11.1')
 
 assert.deepEqual(findMove(moveTokens, '1.Kg5!').path, ['Kg5'])
 
@@ -575,6 +602,20 @@ function getChapterSixMoveTokens(sectionIndex: number) {
 
   if (!tokens) {
     assert.fail(`Expected chapter 6 playback tokens for section ${sectionIndex}`)
+  }
+
+  return tokens.filter(isMoveToken)
+}
+
+function getChapterMoveTokens(
+  scannedPlayback: ReturnType<typeof buildChapterPlayback>,
+  sectionIndex: number,
+) {
+  assert.notEqual(sectionIndex, -1, 'Expected chapter move section to exist.')
+  const tokens = scannedPlayback.tokensBySectionIndex.get(sectionIndex)
+
+  if (!tokens) {
+    assert.fail(`Expected playback tokens for section ${sectionIndex}`)
   }
 
   return tokens.filter(isMoveToken)

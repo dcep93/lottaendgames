@@ -109,7 +109,7 @@
   },
   {
     "type": "text",
-    "content": "These pawns are not blocked yet, but they will be soon. The black king has a domi nant position, so the white pawn is lost. But, as I said before, losing the pawn does not imply losing the game. Now we will see why: after capturing the white pawn,\nBlack still has to promote his.\n1.f4!\nThe only move to save the game. Now the black king must capture the pawn on f4,\nwhich is not one of the key squares to promote the f5 pawn. Therefore, White has time to force a drawn King + Pawn vs. King ending.\nInstead, 1.Kf2?? would be a terrible and rather common blunder, provoked by our instinctive desire to defend the pawn. 1...£4! The black pawn moves immediately to the 5th rank. Thus, when the black king captures the white pawn, he will already oc cupy one of the key squares to promote. 2.Ke2 Kc3 3.Kf2 Kd3 4.Kg2 Ke3 5.Kg1\nKf3 (capturing the pawn on a key square) 6.Kf1 Ke3 7.Ke1 f3 8.Kf1 f2 -+.\n\n1...Ke4 2.Kg2!\nWaiting to take the opposition when the black king captures the pawn on f4. 2. \\i?f2??\nwould be a terrible mistake: 2...\\i? xf4 and the black king reaches the key squares.\n2...Kf4 (2... \\i? e3 3.\\i?fl does not change things) 3.Kf2\nBlack has captured the enemy pawn, but will not be able to promote his.\n3...Ke4 4.Ke2 f4 5.Kf2 f3 6.Kf1 Ke3 7.Ke1 f2+ 8.Kf1 Kf3\n1.f2-1.f2\nCases like this, when the king captures the pawn but the resulting ending is not won, can be really complex. Then the king manoeuvres previous to the capture of the pawn are very interesting. Nevertheless, if we have fully understood the king 's multiple routes (see Introduction), everything is clear.\nManoeuvres previous to the capture of the pawn. The king's multiple routes\nWhen the pawns are not so advanced, or were dealing with rook's pawns, king ma noeuvres prior to the capture of the pawn are far more interesting than the resulting ending. Here both kings try to shoulder their opponent away, exploiting a peculiarity of the chessboard we called in the introduction 'the king's multiple routes'."
+    "content": "These pawns are not blocked yet, but they will be soon. The black king has a domi nant position, so the white pawn is lost. But, as I said before, losing the pawn does not imply losing the game. Now we will see why: after capturing the white pawn,\nBlack still has to promote his.\n1.f4!\nThe only move to save the game. Now the black king must capture the pawn on f4,\nwhich is not one of the key squares to promote the f5 pawn. Therefore, White has time to force a drawn King + Pawn vs. King ending.\nInstead, 1.Kf2?? would be a terrible and rather common blunder, provoked by our instinctive desire to defend the pawn. 1...£4! The black pawn moves immediately to the 5th rank. Thus, when the black king captures the white pawn, he will already oc cupy one of the key squares to promote. 2.Ke2 Kc3 3.Kf2 Kd3 4.Kg2 Ke3 5.Kg1\nKf3 (capturing the pawn on a key square) 6.Kf1 Ke3 7.Ke1 f3 8.Kf1 f2 -+.\n\n1...Ke4 2.Kg2!\nWaiting to take the opposition when the black king captures the pawn on f4. 2. \\i?f2??\nwould be a terrible mistake: 2...\\i? xf4 and the black king reaches the key squares.\n2...Kf4 (2... \\i? e3 3.\\i?fl does not change things) 3.Kf2\nBlack has captured the enemy pawn, but will not be able to promote his.\n3...Ke4 4.Ke2 f4 5.Kf2 f3 6.Kf1 Ke3 7.Ke1 f2+ 8.Kf1 Kf3\n1/2-1/2\nCases like this, when the king captures the pawn but the resulting ending is not won, can be really complex. Then the king manoeuvres previous to the capture of the pawn are very interesting. Nevertheless, if we have fully understood the king 's multiple routes (see Introduction), everything is clear.\nManoeuvres previous to the capture of the pawn. The king's multiple routes\nWhen the pawns are not so advanced, or were dealing with rook's pawns, king ma noeuvres prior to the capture of the pawn are far more interesting than the resulting ending. Here both kings try to shoulder their opponent away, exploiting a peculiarity of the chessboard we called in the introduction 'the king's multiple routes'."
   },
   {
     "type": "position",
@@ -244,7 +244,7 @@
     "type": "position",
     "content": {
       "number": "12.17",
-      "fen": "8/8/4k1K1/8/7P/8/8/8 w - - 0 1",
+      "fen": "8/8/4k1K1/8/7P/8/8/8 b - - 0 1",
       "caption": "Position 12.17"
     }
   },
@@ -299,7 +299,7 @@
     "type": "position",
     "content": {
       "number": "12.21",
-      "fen": "8/8/p7/k1K5/8/3P4/8/8 w - - 0 1",
+      "fen": "8/8/p7/k1K5/8/3P4/8/8 b - - 0 1",
       "caption": "Analysis diagram 12.21"
     }
   },
@@ -448,7 +448,7 @@
     "type": "position",
     "content": {
       "number": "12.31",
-      "fen": "8/7p/8/5k2/8/5K2/6PP/8 w - - 0 1",
+      "fen": "8/7p/8/5k2/8/5K2/6PP/8 b - - 0 1",
       "caption": "Position 12.31"
     }
   },
@@ -505,7 +505,7 @@
     "type": "position",
     "content": {
       "number": "12.34",
-      "fen": "8/7k/6pP/6P1/8/p1p5/8/1K6 w - - 0 1",
+      "fen": "8/7k/6pP/6P1/8/p1p5/8/1K6 b - - 0 1",
       "caption": "Position 12.34"
     }
   },

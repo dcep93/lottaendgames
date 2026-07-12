@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "contentHash": "sha256:5e80c4c3457fcc7937c50531d731f919ca53a4ce49030d5d5b0bebdda1c971ed",
+  "contentHash": "sha256:bda3239166457262a5001df14149e055bee11d1229ec6179a8dd59a35c7aac3d",
   "chapters": [
     {
       "id": "5",
@@ -1727,7 +1727,7 @@
           "type": "position",
           "content": {
             "number": "10.2",
-            "fen": "3K4/3P1k2/8/8/8/8/7r/4R3 w - - 0 1",
+            "fen": "3K4/3P1k2/8/8/8/8/7r/4R3 b - - 0 1",
             "caption": "Position 10.2"
           }
         },
@@ -1905,7 +1905,7 @@
           "type": "position",
           "content": {
             "number": "10.13",
-            "fen": "7R/8/4k3/8/2P5/2K5/8/3R4 b - - 0 1",
+            "fen": "7R/8/4k3/8/2P5/2K5/8/3R4 w - - 0 1",
             "caption": "Position 10.13"
           }
         },
@@ -1930,7 +1930,7 @@
         },
         {
           "type": "text",
-          "content": "The point. The black king is far from the eS -square and cannot attack the white rook in time. 6...Ke6 7.Kb7 ldcS 8.Kb6 Rc8 9.c5.The white pawn is already on the 5th rank and Black lacks side checks from the long side, so the ending is lost.\n1...J Kb8?! This move is not logical, as it allows the advance of the pawn, but it is also enough to draw. 2.c5!? Ke7! and Black manages to propose a timely rook swap:\n3.Kc4 Rd8!.\n1...Ke5? Cutting the white king off along a rank is not enough with the black king here. However, this is the right move when the black rook is on c8.2.c5 Rh4 3.Rd8\nRg4 4.Kb3 (fleeing from a check along the c-file. After these preparatory moves,\nthe pawn is unstoppable) 4...Rh4 5.c6 Rh6 (5...Rh7 6.Kc4) 6.c7+-.\n2.Kb4 Rb8+!\nA new resource: frontal checks to restrain the pawn. Note that frontal checks re quire the same distance as side checks to be successful. Therefore, since the rook and the pawn are separated by 4 files, distant effectiveness applies.\n3.Kc5 Rc8+ 4.Kb5 Kb8+! 5.Ka6\n5.Ka5!? is a good trick. Too n1any checks are wrong. As a general rule, an attack on the defenceless pawn is better than a check. 5...Ra8+? (5...Rc8! is the only chance,\nstopping the pawn and the king) 6.Kb6! and distant Kffectiveness disappears:\n6...Rb8+ (6...Ric8 7.c5+-) 7.Kc7 and the pawn goes forward.\n5...Rc8!\nAgain, too many checks fail. 5...Ra8+? loses to 6.Kb7 Ra2 7.c5+-.\n6.Rd4 Ke5!\nThe point! Now it is a draw, as the white rook cannot defend the pawn and cut the king off at the same time.\n7.Rd5+ (7.Rh4 Rb8=) 7...Ke6 8.Kb5 Rb8+! 9.Ka4 Rc8 10.Kb4 Kb8+ 11.Kb5\nRh8\nBlack gets ready to move the king into the drawing zone and reach the Philidor Po sition.\n12.Rb7!?\nTrying to cut the king off along the rank. 12.Rd5 Rb8+ =.\n12...Kd6 13.Kb5 Rh5+ 14.Kb6 Rc5! 15.Rd7+ Kd7 16.Kc5 Kc7 1.f2-1h\nDT: Fronta l checks\nIn our last example we saw that, when the king is cut off by one file, the defending side is able to get a draw if he manages to place the rook and the king in their right positions. A question immediately arises: what happens if the king is cut off by two files?"
+          "content": "The point. The black king is far from the eS -square and cannot attack the white rook in time. 6...Ke6 7.Kb7 Rc5 8.Kb6 Rc8 9.c5.The white pawn is already on the 5th rank and Black lacks side checks from the long side, so the ending is lost.\n1...J Kb8?! This move is not logical, as it allows the advance of the pawn, but it is also enough to draw. 2.c5!? Ke7! and Black manages to propose a timely rook swap:\n3.Kc4 Rd8!.\n1...Ke5? Cutting the white king off along a rank is not enough with the black king here. However, this is the right move when the black rook is on c8.2.c5 Rh4 3.Rd8\nRg4 4.Kb3 (fleeing from a check along the c-file. After these preparatory moves,\nthe pawn is unstoppable) 4...Rh4 5.c6 Rh6 (5...Rh7 6.Kc4) 6.c7+-.\n2.Kb4 Rb8+!\nA new resource: frontal checks to restrain the pawn. Note that frontal checks re quire the same distance as side checks to be successful. Therefore, since the rook and the pawn are separated by 4 files, distant effectiveness applies.\n3.Kc5 Rc8+ 4.Kb5 Kb8+! 5.Ka6\n5.Ka5!? is a good trick. Too n1any checks are wrong. As a general rule, an attack on the defenceless pawn is better than a check. 5...Ra8+? (5...Rc8! is the only chance,\nstopping the pawn and the king) 6.Kb6! and distant Kffectiveness disappears:\n6...Rb8+ (6...Rc8 7.c5+-) 7.Kc7 and the pawn goes forward.\n5...Rc8!\nAgain, too many checks fail. 5...Ra8+? loses to 6.Kb7 Ra2 7.c5+-.\n6.Rd4 Ke5!\nThe point! Now it is a draw, as the white rook cannot defend the pawn and cut the king off at the same time.\n7.Rd5+ (7.Rh4 Rb8=) 7...Ke6 8.Kb5 Rb8+! 9.Ka4 Rc8 10.Kb4 Kb8+ 11.Kb5\nRh8\nBlack gets ready to move the king into the drawing zone and reach the Philidor Po sition.\n12.Rb7!?\nTrying to cut the king off along the rank. 12.Rd5 Rb8+ =.\n12...Kd6 13.Kb5 Rh5+ 14.Kb6 Rc5! 15.Rd7+ Kd7 16.Kc5 Kc7 1.f2-1h\nDT: Fronta l checks\nIn our last example we saw that, when the king is cut off by one file, the defending side is able to get a draw if he manages to place the rook and the king in their right positions. A question immediately arises: what happens if the king is cut off by two files?"
         },
         {
           "type": "position",
@@ -1942,7 +1942,7 @@
         },
         {
           "type": "text",
-          "content": "Here the ending is won with a bishop's or a central pawn. The winning procedure was discovered by Grigoriev and carries his name. When I explain the manoeuvre,\nit will become self-evident why it fails with a knight's pawn. Anyway, you can check it as an Exercise. It is worth studying and understanding the manoeuvre, as you will not forget it. Then, in an actual game, you just have to check whether you can apply this procedure or not. This is more sensible than trying to learn by heart which pawns and how many files are necessary to win. That would be a mess and you are likely to forget it as time elapses.\n1.Kb4 l:lb8+ 2.Ka5 Kc8!?\nwe already know that an attack on the pawn is more accurate than an excess of checks. 2...J la8+?! 3.Kb6 Rb8+ 4.Kc7+- loses quickly.\n3.Kb5 l:lb8+ 4.Ka6!\nThe white king reaches his ideal square. Here the king i s ready to defend the pawn on its way from the 4th rank to promotion, as well as to disturb the black rook from the b7 -square. This is the first stage in Grigoriev's combined method. Note that with a knight's pawn, this would be impossible.\n4...1:1.c8 (4...Ra8+?! 5.Kb7 and the pawn goes ahead) 5.Rc1!\nOnce the king has reached the 6th rank, the rook goes behind the pawn to give it support. This is the second stage in Grigoriev's method. The black king fails to help his rook in time. 5.Re4 would also win, but the winning procedure is more diffi cult and I do not recommend it. However, it is worth knowing that this resource is available: 5...Kf5 6.Rh4 Ke6 7.Kb7 ldcS 8.Kb6 Rc8 9.c5+-.\n5...Ke7 6.Kb7:acs 7.Kb6 Rt.h5\n7...Rc8 8.c5+-. Once more, when the pawn has reached the 5th rank and the king cannot stand in its way due to the unfortunate position of the rook, the ending is lost. The Lucena Position will arise on the board.\n8.c5 Kd8\nA logical but useless attempt to reach the Philidor Position.\n9.Rd1+ Kc8 10.Rg1!\nBlack cannot reach either the K&H or the Philidor Position, so the ending is lost.\n\no\nNow we will see why a back-rank waiting strategy fails against a bishop's pawn.\n12.l'la1! This simple move is impossible if we shift the position to the left."
+          "content": "Here the ending is won with a bishop's or a central pawn. The winning procedure was discovered by Grigoriev and carries his name. When I explain the manoeuvre,\nit will become self-evident why it fails with a knight's pawn. Anyway, you can check it as an Exercise. It is worth studying and understanding the manoeuvre, as you will not forget it. Then, in an actual game, you just have to check whether you can apply this procedure or not. This is more sensible than trying to learn by heart which pawns and how many files are necessary to win. That would be a mess and you are likely to forget it as time elapses.\n1.Kb4 l:lb8+ 2.Ka5 Kc8!?\nwe already know that an attack on the pawn is more accurate than an excess of checks. 2...J la8+?! 3.Kb6 Rb8+ 4.Kc7+- loses quickly.\n3.Kb5 l:lb8+ 4.Ka6!\nThe white king reaches his ideal square. Here the king i s ready to defend the pawn on its way from the 4th rank to promotion, as well as to disturb the black rook from the b7 -square. This is the first stage in Grigoriev's combined method. Note that with a knight's pawn, this would be impossible.\n4...1:1.c8 (4...Ra8+?! 5.Kb7 and the pawn goes ahead) 5.Rc1!\nOnce the king has reached the 6th rank, the rook goes behind the pawn to give it support. This is the second stage in Grigoriev's method. The black king fails to help his rook in time. 5.Re4 would also win, but the winning procedure is more diffi cult and I do not recommend it. However, it is worth knowing that this resource is available: 5...Kf5 6.Rh4 Ke6 7.Kb7 Rc5 8.Kb6 Rc8 9.c5+-.\n5...Ke7 6.Kb7:acs 7.Kb6 Rt.h5\n7...Rc8 8.c5+-. Once more, when the pawn has reached the 5th rank and the king cannot stand in its way due to the unfortunate position of the rook, the ending is lost. The Lucena Position will arise on the board.\n8.c5 Kd8\nA logical but useless attempt to reach the Philidor Position.\n9.Rd1+ Kc8 10.Rg1!\nBlack cannot reach either the K&H or the Philidor Position, so the ending is lost.\n\no\nNow we will see why a back-rank waiting strategy fails against a bishop's pawn.\n12.l'la1! This simple move is impossible if we shift the position to the left."
         },
         {
           "type": "ending",
@@ -2097,7 +2097,7 @@
           "type": "position",
           "content": {
             "number": "10.25",
-            "fen": "8/P6R/5k2/r7/4K3/8/8/8 w - - 0 1",
+            "fen": "8/P6R/5k2/r7/4K3/8/8/8 b - - 0 1",
             "caption": "Analysis diagram 10.25"
           }
         },
@@ -2122,7 +2122,7 @@
         },
         {
           "type": "text",
-          "content": "1.Rh2!\nOnce the pawn has reached the 7th rank, the rook heads for the b8-square. The j ourney takes three moves, no matter the chosen route. The defending king has to stay on the 2nd rank, as the white rook would get to b8 in just two moves with the black king on the 3rd rank, thus winning even if the black king was one file closer to the pawn.\n1...Ke7 2.Rh8 Kd6!?\nA good move, trying to make it difficult for the white king to get out via the a- and b-files. 2...Kd7 loses faster: 3.Rb8 Ra1 4.Kb7! (4.Rb7+? Kc8= and the white king will not come out of the corner. If you do not know this position, it is worth trying different alternatives, as you may reach this ending in your (blitz) games;\n5.Rb2 Kc7 6.Rc2+ Kd7 7.Kb7 Rb1+ 8.Ka6 Ra1+ 9.Kb6 ldb l + 10.Kc5 lda l =)\n4... l:i. b1+ 5.Ka6 Ra1+ 6.Kb6 Rb1+ 7.Kc5+-.\n3.Rb8\nThe rook arrives just in time to offer an exchange and help the white king out,\nwhich would be impossible if the black king were on c6 or c7.3..Ra1 4.Kb7 Rb1+ 5.Kc8!\n5.Ka6 Ra1 6.Kb6 Rb1+ 7.Ka5 l:la1+ and White will not make progress here.\n+\n5...Rc1+ 6.Kd8 Rh1!\nThis resource creates the maximum difficulties. In case of6...J ig 1 the rook is not far enough away: 7.Ke8! l:lg8+ 8.Kf7+-.\n7R;[b6+!\nThe only way. 7.Ke8? l:lh8+ 8.Kf7 l:lh7+ = and the pawn is lost; or 7.Kc8 l:lc1+\nrepeating.\n7...Kc5 8.Rc6+!!\nThis check is necessary to force the king to choose. SRa6? Ilh8+ 9.Kc7 Rh7+\n10.Kd8 l:lh8+ 11.Ke7 l:lh7+ 12.Kf8 Kh8+ 13.Kf7 Ka8! 14.Ke7 Kb5 15.l:la l\nKb6=; 5.Rb5? l:lh8+ 9.Kc7 l:lh7+ =; 5.Rb1!? would also win, but then a Queen vs. Rook ending arises. 8... l:l xb 19.a8=Q+-.\n8...Kb5\n8...Kd5 9.Ra6 (9.Rc8 Kd6) 9... l:l h8+ 10.Kc7! (10.Ke7?! l:lh7+! 11.Kf8 l:lh8+\n12.Kg7? l:la8=) 10... l:lh7+ 11.Kb6+-.\n9.Rc8! Rh8+ 10.Kc7 Rh7+ 11.Kb8\nAnd the pawn promotes.\nS ary of the ideas in this ending for the strong side:\numm\n1) When the king is in front of his pawn, the enemy king must remain cut off as far from the pawn as possible.\n2) If the weaker side's king is cut off on the f-file (or c-file for an h-pawn), the winning plan is to push the pawn to the 7th rank and then take the king out of the corner with the aid of the rook."
+          "content": "1.Rh2!\nOnce the pawn has reached the 7th rank, the rook heads for the b8-square. The j ourney takes three moves, no matter the chosen route. The defending king has to stay on the 2nd rank, as the white rook would get to b8 in just two moves with the black king on the 3rd rank, thus winning even if the black king was one file closer to the pawn.\n1...Ke7 2.Rh8 Kd6!?\nA good move, trying to make it difficult for the white king to get out via the a- and b-files. 2...Kd7 loses faster: 3.Rb8 Ra1 4.Kb7! (4.Rb7+? Kc8= and the white king will not come out of the corner. If you do not know this position, it is worth trying different alternatives, as you may reach this ending in your (blitz) games;\n5.Rb2 Kc7 6.Rc2+ Kd7 7.Kb7 Rb1+ 8.Ka6 Ra1+ 9.Kb6 ldb l + 10.Kc5 lda l =)\n4...Rb1+ 5.Ka6 Ra1+ 6.Kb6 Rb1+ 7.Kc5+-.\n3.Rb8\nThe rook arrives just in time to offer an exchange and help the white king out,\nwhich would be impossible if the black king were on c6 or c7.3..Ra1 4.Kb7 Rb1+ 5.Kc8!\n5.Ka6 Ra1 6.Kb6 Rb1+ 7.Ka5 Ra1+ and White will not make progress here.\n+\n5...Rc1+ 6.Kd8 Rh1!\nThis resource creates the maximum difficulties. In case of6...J ig 1 the rook is not far enough away: 7.Ke8! Rg8+ 8.Kf7+-.\n7.Rb6+!\nThe only way. 7.Ke8? Rh8+ 8.Kf7 Rh7+ = and the pawn is lost; or 7.Kc8 Rc1+\nrepeating.\n7...Kc5 8.Rc6+!!\nThis check is necessary to force the king to choose. 8.Ra6? Ilh8+ 9.Kc7 Rh7+\n10.Kd8 Rh8+ 11.Ke7 Rh7+ 12.Kf8 Kh8+ 13.Kf7 Ka8! 14.Ke7 Kb5 15.l:la l\nKb6=; 5.Rb5? Rh8+ 9.Kc7 Rh7+ =; 5.Rb1!? would also win, but then a Queen vs. Rook ending arises. 8...Rxb1 9.a8=Q+-.\n8...Kb5\n8...Kd5 9.Ra6 (9.Rc8 Kd6) 9...Rh8+ 10.Kc7! (10.Ke7?! Rh7+! 11.Kf8 Rh8+\n12.Kg7? Ra8=) 10...Rh7+ 11.Kb6+-.\n9.Rc8! Rh8+ 10.Kc7 Rh7+ 11.Kb8\nAnd the pawn promotes.\nS ary of the ideas in this ending for the strong side:\numm\n1) When the king is in front of his pawn, the enemy king must remain cut off as far from the pawn as possible.\n2) If the weaker side's king is cut off on the f-file (or c-file for an h-pawn), the winning plan is to push the pawn to the 7th rank and then take the king out of the corner with the aid of the rook."
         },
         {
           "type": "ending",
@@ -2162,8 +2162,12 @@
           "content": "In rook endings, there are many positions where two pawns are not enough to win.\nOnly opposite-coloured bishop endings present a higher drawish trend.\nThose positions where a rook and two pawns cannot win against a lone rook offer great theoretical-practical interest for many reasons:\nA) They occur quite often.\nB) Some are not easy to play unless you know the basic ideas.\nC) They are a useful introduction to rook endings with more pawns on the board. Concepts such as a passive rook for the stronger side and an active rook for the weaker side are especially important.\nIn order to study these endings we are going to distinguish five interesting scenarios with great drawing chances. These are the following:\n1) Doubled pawns.\n2) Rook and bishop's pawns on the same wing.\n3) Connected pawns blocked by the enemy king.\n4) Attacking rook stuck in front on the 7th-rank pawn.\n5) Pawns stopped by the Vancura Defence.\nThis classification does not cover all possible drawish positions, but it includes the most important and frequent ones. Anyway, one should never diagnose as a win a position where the pieces of the stronger side occupy passive positions.\nFirst scenario"
         },
         {
-          "type": "caption",
-          "content": "Position 11.1"
+          "type": "position",
+          "content": {
+            "number": "11.1",
+            "fen": "3k4/6R1/7r/2KP4/3P4/8/8/8 w - - 0 1",
+            "caption": "Position 11.1"
+          }
         },
         {
           "type": "text",
@@ -2178,19 +2182,19 @@
         },
         {
           "type": "moves",
-          "content": "where simplifications were possible. That is why it is important to be sure that this is a draw, an easy draw in normal circumstances, and how to draw.\nThe best defensive procedure consists in starting with the Philidor Position and then making a timely switch to K&H.\n1.Kb7 Kg6 2.:a.b6\nThis is the difference when compared to positions with just one pawn. White can offer a rook exchange and 'break' the Philidor Defence. If we do not know the theory, we tend to be scared, especially if we have analysed this position 'from a distance'. That concern may lead us to make wrong simplifying decisions. Therefore,\nyou should take a close look at the sequence and lay the ghosts to rest for good.\n2...Kg4!\n.\nThis move is important now. The only available method is K&H, but Black has to capture the second pawn when he puts the rook at the rear of the pawn. Of course,\nthe pawn ending is lost; other moves mess up things, though they may still be enough for a draw.\nDvoretsky considers 2...Kg1?! losing, on account of3.Kc6! Kc1+ 4.Kd6+- and now 4...Kc8 5.Ka6 Kb8 6.Ke6 Kc8 7.d6 Kb8 8.Ka1 Kc8 9.Kh1, but in this line3...Kc8! holds. 2...Kg7?! also loses, according to Dvoretsky: 3.Rb8+! Kc7 4.Ka8\nM"
+          "content": "where simplifications were possible. That is why it is important to be sure that this is a draw, an easy draw in normal circumstances, and how to draw.\nThe best defensive procedure consists in starting with the Philidor Position and then making a timely switch to K&H.\n1.Rb7 Rg6 2.Rb6\nThis is the difference when compared to positions with just one pawn. White can offer a rook exchange and 'break' the Philidor Defence. If we do not know the theory, we tend to be scared, especially if we have analysed this position 'from a distance'. That concern may lead us to make wrong simplifying decisions. Therefore,\nyou should take a close look at the sequence and lay the ghosts to rest for good.\n2...Rg4!\nThis move is important now. The only available method is K&H, but Black has to capture the second pawn when he puts the rook at the rear of the pawn. Of course,\nthe pawn ending is lost; other moves mess up things, though they may still be enough for a draw.\nDvoretsky considers 2...Rg1?! losing, on account of 3.Kc6! Rc1+ 4.Kd6+- and now 4...Rc8 5.Ra6 Rb8 6.Ke6 Rc8 7.d6 Rb8 8.Ra1 Rc8 9.Rh1, but in this line 3...Kc8! holds. 2...Rg7?! also loses, according to Dvoretsky: 3.Rb8+! Kc7 4.Ra8\nM"
         },
         {
           "type": "position",
           "content": {
             "number": "11.2",
-            "fen": "R7/2k3R1/8/2KP4/3P4/8/8/8 w - - 0 1",
+            "fen": "R7/2k3r1/8/2KP4/3P4/8/8/8 b - - 0 1",
             "caption": "Analysis diagram 11.2"
           }
         },
         {
           "type": "moves",
-          "content": "4...Kg1! (4...Kg6? is indeed losing: 5.d6+ Kd7 6.Ka7+ Kd8 7.Kc6+-) 5.Ka7+\nKc8 6.Kc6 Kc1+ 7.Kd6 Rc4! and the rook reaches the right defensive position again, but Black is still in trouble. 8.Ke5 Kb4! (8...Kd8 is natural but loses on ac count of 9.Ka6! Kb4 10.Kd6 Kc8 11.Ka8+ Kb7 12.Kc5! (a difficult and important intermediate move. Now Black will not be able to reach the right defensive set-up) 12...Kb1 13.Kh8 Kc7 14.Kh7+ Kc8 15.Kc6 Kc1+ 16.Kd6 and two pawns render the K&H defence useless. You do not need to remember, not even to analyse, this long and complex variation, but it is instructive) 9.Ka6 Kd7.In conclusion, other moves are possible, but you should not complicate your life in these endings. If there is a clear procedure, the best you can do is adopt this proce dure and not deviate.\n3.d6\n3.Kc6 is more logical, but leads to positions already seen in the previous chapter:\n3...Kd4 4.Rb8+ (4.Kd6 Kc8 5.Kc6+ Kd8 6.Ra6 Kc8 7.R!a8+ Kb7 8 J ld8\nRrh4! = o g Side) 4...Ke7= K&H.\nL n"
+          "content": "4...Rg1! (4...Rg6? is indeed losing: 5.d6+ Kd7 6.Ra7+ Kd8 7.Kc6+-) 5.Ra7+\nKc8 6.Kc6 Rc1+ 7.Kd6 Rc4! and the rook reaches the right defensive position again, but Black is still in trouble. 8.Ke5 Rb4! (8...Kd8 is natural but loses on account of 9.Ra6! Rb4 10.Kd6 Kc8 11.Ra8+ Kb7 12.Kc5! (a difficult and important intermediate move. Now Black will not be able to reach the right defensive set-up) 12...Rb1 13.Rh8 Kc7 14.Rh7+ Kc8 15.Kc6 Rc1+ 16.Kd6 and two pawns render the K&H defence useless. You do not need to remember, not even to analyse, this long and complex variation, but it is instructive) 9.Ra6 Kd7. In conclusion, other moves are possible, but you should not complicate your life in these endings. If there is a clear procedure, the best you can do is adopt this proce dure and not deviate.\n3.d6\n3.Kc6 is more logical, but leads to positions already seen in the previous chapter:\n3...Rxd4 4.Rb8+ (4.Kd6 4...Kc8 5.Kc6 Kd8 6.Ra6 Kc8 7.Ra8+ Kb7 8.Rd8 Rh4!= Long Side) 4...Ke7= K&H.\nL n"
         },
         {
           "type": "ending",
@@ -2201,7 +2205,7 @@
         },
         {
           "type": "moves",
-          "content": "3.Kh6 (intending Kd6) 3...Kd7! 4.Kh7+ Kd8= and now 5.Kd6 would allow\nBlack to adopt the Philidor Defence again, and5.Kc6 would allow K&H.\n3...Rg1!\nThe rook can now move to deliver rear checks, while the d4 pawn is just a tiny shelter for the king, but cannot offer winning chances.\n4.Kc6 Rc1+ 5.Kd5 Rh1 6.Rb8+ Kd7 7.Rb7+ Kd8 8.d7 gh5+ (8...Ke7=)\n9.Kc6 Rh6+ 10.Kc5 bth5+ 11.d5 Rh6 12.d6 Rxd6!=\nSecond-rank defence\nAfter having seen the last example, a terrible question may immediately arise: if the\nK&H defence is the only valid procedure for these endings and this procedure did not work against knight's pawns... what happens then if our opponent has two doubled knight pawns? Will first-rank defence work? No need to worry: we are going to compare procedures and differences, and then draw conclusions.\nFirstly, first-rank defence is useless against two pawns, as the stronger side may trade rooks in favourable conditions (in the next diagram, the manoeuvre would be\n... g 2 -Kf3 -Itfl).\nSecondly, and more reassuring: the stronger side cannot break the Philidor Position with a knight's pawn, since there is not enough room.\nThirdly, if, as in our first example, the Philidor Position cannot be achieved, there are alternatives to K&H that are actually valid against other pawns.\nAgainst two knight's pawns the defending side must be careful and set up a differ ent defensive position which we can name the Second-rank defence."
+          "content": "3.Kh6 (intending Kd6) 3...Kd7! 4.Kh7+ Kd8= and now 5.Kd6 would allow\nBlack to adopt the Philidor Defence again, and 5.Kc6 would allow K&H.\n3...Rg1!\nThe rook can now move to deliver rear checks, while the d4 pawn is just a tiny shelter for the king, but cannot offer winning chances.\n4.Kc6 Rc1+ 5.Kd5 Rh1 6.Rb8+ Kd7 7.Rb7+ Kd8 8.d7 Rh5+ (8...Ke7=)\n9.Kc6 Rh6+ 10.Kc5 Rh5+ 11.d5 Rh6 12.d6 Rxd6!=\nSecond-rank defence\nAfter having seen the last example, a terrible question may immediately arise: if the\nK&H defence is the only valid procedure for these endings and this procedure did not work against knight's pawns... what happens then if our opponent has two doubled knight pawns? Will first-rank defence work? No need to worry: we are going to compare procedures and differences, and then draw conclusions.\nFirstly, first-rank defence is useless against two pawns, as the stronger side may trade rooks in favourable conditions (in the next diagram, the manoeuvre would be\n... g 2 -Kf3 -Itfl).\nSecondly, and more reassuring: the stronger side cannot break the Philidor Position with a knight's pawn, since there is not enough room.\nThirdly, if, as in our first example, the Philidor Position cannot be achieved, there are alternatives to K&H that are actually valid against other pawns.\nAgainst two knight's pawns the defending side must be careful and set up a differ ent defensive position which we can name the Second-rank defence."
         },
         {
           "type": "position",
@@ -2213,7 +2217,7 @@
         },
         {
           "type": "text",
-          "content": "Kolesnikov - Bocharov\nSochi 2004\nThis game constitutes a warning against careless play.\n1.gb8?\nAfter this, the white king is pushed to the back rank and Black wins thanks to the second pawn. Therefore, the defending king should avoid being pushed to the back rank. Then the right move is:\n1.Kb2! This set-up is impregnable because Black has no room on the kingside. It would also work against a central or bishop 's pawn, but it is not so advisable.\n\n1...Ra4 2.Rc2 (White can easily turn to the Philidor Position now: 2.Rb3 and there is no way to break it; if2...Ra2+ 3.Kg1 g3 4.Rb8 and rear checks) 2...g 53.Rb2\ng3 Black intends.. Rf4-f2 with a winning pawn endgame, and this threat can break\nWhite's set-up. Nevertheless, we know that the pawn must reach the 6th rank after the king has done so; now we switch to a well-known defensive procedure: rear checks. 4.Rb8=.\nI..Rrb7? White captures the pawn, but we know that this loses. 1...Ra2+ 2.Kg1\nKh3 3.Rg7.Kg3 (reaching a position we have already seen in the previous chap ter) 4.Kf1 Rta l + 5.Ke2 Rg1! -+.\n1...Ra2+ 2.Kg1 Kh3 3.Rb3+ g3 4.Rb1\nThe only option, but now we will see why first-rank defence does not work against two doubled pawns.\n4...J';la3 5.Rc1 g5 6.Rb1 g4 7.Rc1 g2 8.Rb1 Rf3 9.Ra1 Rf1+ 10.Rf1 gxf1 K+\n11.Kf1 Kh2\nAnd the second pawn promotes.\nConclusion of the first scenario. Doubled pawns:\n1) Against central pawns, defence starts by the Philidor\nPosition; when a rook exchange offer breaks it, the defending side must turn to K&H, but putting the rook on the same rank as the less advanced pawn, in order to capture it.\n2) Against knight's pawns, the defending king must avoid being pushed to the back rank. This can be achieved by means of the Philidor Position (the stronger side cannot break it now) or by second-rank defence. The latter consists in keeping the king and the rook on the second rank until the pawn reaches the 6th rank.\n3) Against rook's pawns, defence is quite easy.\nSecond scenario\nThe second drawing scenario is very famous... but little-known. Almost every player knows that this ending, with rook and bishop 's pawns, is a draw; however,\nmost fear reaching this position, and they are right.\nCertainly, to defend this ending, it is not enough to know that it is drawn; not even to know the best defensive set-ups, or the Rook + Pawn vs. Rook endings that may arise on the board at any time. Of course, all this is necessary, but not enough.\nYou will also need patience, tenacity and constant alertness.\nIn any case, this ending will one day occur in one of your games and knowledge of the accurate defensive technique is undoubtedly useful. Life is far easier for the attacking side.\nLet us start with a difficult situation for the defending side: the king is cut off on the back rank. Then we will deal with the normal defensive procedure."
+          "content": "Kolesnikov - Bocharov\nSochi 2004\nThis game constitutes a warning against careless play.\n1.Rb8?\nAfter this, the white king is pushed to the back rank and Black wins thanks to the second pawn. Therefore, the defending king should avoid being pushed to the back rank. Then the right move is:\n1.Kb2! This set-up is impregnable because Black has no room on the kingside. It would also work against a central or bishop 's pawn, but it is not so advisable.\n\n1...Ra4 2.Rc2 (White can easily turn to the Philidor Position now: 2.Rb3 and there is no way to break it; if 2...Ra2+ 3.Kg1 g3 4.Rb8 and rear checks) 2...g5 3.Rb2\ng3 Black intends ...Rf4-f2 with a winning pawn endgame, and this threat can break\nWhite's set-up. Nevertheless, we know that the pawn must reach the 6th rank after the king has done so; now we switch to a well-known defensive procedure: rear checks. 4.Rb8=.\nI..Rrb7? White captures the pawn, but we know that this loses. 1...Ra2+ 2.Kg1\nKh3 3.Rg7 Kg3 (reaching a position we have already seen in the previous chap ter) 4.Kf1 Ra1+ 5.Ke2 Rg1! -+.\n1...Ra2+ 2.Kg1 Kh3 3.Rb3+ g3 4.Rb1\nThe only option, but now we will see why first-rank defence does not work against two doubled pawns.\n4...J';la3 5.Rc1 g5 6.Rb1 g4 7.Rc1 g2 8.Rb1 Rf3 9.Ra1 Rf1+ 10.Rf1 gxf1=Q+\n11.Kf1 Kh2\nAnd the second pawn promotes.\nConclusion of the first scenario. Doubled pawns:\n1) Against central pawns, defence starts by the Philidor\nPosition; when a rook exchange offer breaks it, the defending side must turn to K&H, but putting the rook on the same rank as the less advanced pawn, in order to capture it.\n2) Against knight's pawns, the defending king must avoid being pushed to the back rank. This can be achieved by means of the Philidor Position (the stronger side cannot break it now) or by second-rank defence. The latter consists in keeping the king and the rook on the second rank until the pawn reaches the 6th rank.\n3) Against rook's pawns, defence is quite easy.\nSecond scenario\nThe second drawing scenario is very famous... but little-known. Almost every player knows that this ending, with rook and bishop 's pawns, is a draw; however,\nmost fear reaching this position, and they are right.\nCertainly, to defend this ending, it is not enough to know that it is drawn; not even to know the best defensive set-ups, or the Rook + Pawn vs. Rook endings that may arise on the board at any time. Of course, all this is necessary, but not enough.\nYou will also need patience, tenacity and constant alertness.\nIn any case, this ending will one day occur in one of your games and knowledge of the accurate defensive technique is undoubtedly useful. Life is far easier for the attacking side.\nLet us start with a difficult situation for the defending side: the king is cut off on the back rank. Then we will deal with the normal defensive procedure."
         },
         {
           "type": "ending",
@@ -2255,7 +2259,7 @@
         },
         {
           "type": "text",
-          "content": "White threatens f5 -f6, reaching the position in our previous example. So...\n1...Kg1+ 2.Kf6\nNow Black can follow three possible paths: to stay behind the h-pawn, to stay be hind the f-pawn, or to wait. All are stubborn, but all lose.\n2...Kh1\n2...RHI 3.Rf.g7+ Kh8 (3...Kf8 4.Rf.g5 Rf.h 15.Kg6+-) 4.Rf.e7 Kg8 5.Rf.e8+! Kh7\n6.Ke6 Kh6 (6...Rf. a 17.f6 Rf.a6+ 8.Kf5 Rf.aS + 9.Rf.e5 Rf.a8 10.f7+-) 7.f6 and pro motion cannot be stopped, as 7...Ke1+ leads to a lost endgame.\n2...Rf. a 13.Rf.e7 Rf.a2 4.Ke5 (the king gives way to the pawn. Instead, 4.Ke6?\nKa6+=) 4..Re2+ (4...Rf. a5+ 5.Kf4 Ra4+ 6.Kg5 Rf.aS 7.Kg6) 5.Kd6 Rf2 6.Ke6\nIie2+ 7.Kd7 and now:\nA) 7... Ii f2 8.Iie8+ Kh7 (8...Kf7 9.h7+-) 9.Ke6 Rf.e2+ 10.Kf7 Iia2 11.f6\nRa7+ 12.Ke6 Ra6+ 13.Kf5 IiaS + 14.Re5+- and the f-pawn cannot be stopped;\nB) 7...Rd2+ 8.Ke8 Iif2 9.Re5 Kh7 10.Kf7 Kh6 11.Rf.e6+ Kh7 12.f6 Rf.a2 and the black rook cannot reach the back rank (thus drawing, as we saw in Ending 58)\nin time. 13.Kf8! +-. If it is the stronger side's king which reaches the 8th rank, the ending is won.\n3.Kg7+ Kf8\n3...Kh8 4.Rf.e7 Rf.xh6+ 5.Kf7 Rf.a6 (once again, the rook cannot reach the back rank.\nThe reason now is the unfortunate position of the black king. 6.f6 Kh7 7.Kf8+ (the stronger side's king is on the 8th rank...) 7...Kg6 8.f7 Kf6 9.Kg8! +-.\n4.Kg6 Kg1+ 5.Kh7 Kf1 6.Ka7 Kg1 (6... Ii xf5 7.Kg6! Rf.fl 8.Rf.a8+ Ke7 9.h7+-)\n7.f6 Kg2 8.Kg7 Kf2 9.Kg6+-\nWhen the checks are over, Black cannot stop the manoeuvre h6-h7 followed by Rf.g8.We have seen that two pawns on the 6th rank lead to an easy win and, if the bishop's pawn is on the 5th rank and the rook's pawn is on the 6th rank, a very complex and accurate sequence makes victory possible. One of the aims of this book is that the reader obtains the maximum knowledge from the minimum analysis (see the intro duction). Nevertheless, we cannot avoid complex analyses in some positions.\n\nThese two examples have shown the more complicated manoeuvres but, if we do not study more positions, we will probably get a wrong impression of other posi tions. Despite what it seems, and what many books say, a defending king cut off on the back rank does not automatically lose.\nTherefore, we are going to complete the picture with three series of diagrams. The analysis is simple if we know the previous examples. The defending side is to move in all of them.\nSeries about rook and bishop's pawns.\nDefending ki ng cut off on the back rank; bishop's pawn on the 6th rank.\nDraw White wins Draw\nIf you check the winning method studied for the first position and the variation commented on the 7th move, you will become convinced that the second and the third are a draw. If the h-pawn is less advanced, it is also a draw.\nConclusion: The bishop's pawn must not reach the 6th rank before the rook's pawn has done so.\nBishop's pawn on the 5th rank.\nWhite wins White wins White wins\nAnalysed Same procedure Same procedure"
+          "content": "White threatens f5 -f6, reaching the position in our previous example. So...\n1...Kg1+ 2.Kf6\nNow Black can follow three possible paths: to stay behind the h-pawn, to stay be hind the f-pawn, or to wait. All are stubborn, but all lose.\n2...Kh1\n2...Rh1 3.Rg7+ Kh8 (3...Kf8 4.Rg5 Rh1 5.Kg6+-) 4.Re7 Kg8 5.Re8+! Kh7\n6.Ke6 Kh6 (6...Ra1 7.f6 Ra6+ 8.Kf5 Ra8+ 9.Re5 Ra8 10.f7+-) 7.f6 and pro motion cannot be stopped, as 7...Ke1+ leads to a lost endgame.\n2...Ra1 3.Re7 Ra2 4.Ke5 (the king gives way to the pawn. Instead, 4.Ke6?\nKa6+=) 4...Re2+ (4...Ra5+ 5.Kf4 Ra4+ 6.Kg5 Ra8 7.Kg6) 5.Kd6 Rf2 6.Ke6\nRe2+ 7.Kd7 and now:\nA) 7...Rf2 8.Re8+ Kh7 (8...Kf7 9.h7+-) 9.Ke6 Re2+ 10.Kf7 Ra2 11.f6\nRa7+ 12.Ke6 Ra6+ 13.Kf5 Ra5+ 14.Re5+- and the f-pawn cannot be stopped;\nB) 7...Rd2+ 8.Ke8 Rf2 9.Re5 Kh7 10.Kf7 Kh6 11.Re6+ Kh7 12.f6 Ra2 and the black rook cannot reach the back rank (thus drawing, as we saw in Ending 58)\nin time. 13.Kf8! +-. If it is the stronger side's king which reaches the 8th rank, the ending is won.\n3.Kg7+ Kf8\n3...Kh8 4.Re7 Rxh6+ 5.Kf7 Ra6 (once again, the rook cannot reach the back rank.\nThe reason now is the unfortunate position of the black king. 6.f6 Kh7 7.Kf8+ (the stronger side's king is on the 8th rank...) 7...Kg6 8.f7 Kf6 9.Kg8! +-.\n4.Kg6 Kg1+ 5.Kh7 Kf1 6.Ka7 Kg1 (6...Rxf5 7.Kg6! Rf1 8.Ra8+ Ke7 9.h7+-)\n7.f6 Kg2 8.Kg7 Kf2 9.Kg6+-\nWhen the checks are over, Black cannot stop the manoeuvre h6-h7 followed by Rg8.We have seen that two pawns on the 6th rank lead to an easy win and, if the bishop's pawn is on the 5th rank and the rook's pawn is on the 6th rank, a very complex and accurate sequence makes victory possible. One of the aims of this book is that the reader obtains the maximum knowledge from the minimum analysis (see the intro duction). Nevertheless, we cannot avoid complex analyses in some positions.\n\nThese two examples have shown the more complicated manoeuvres but, if we do not study more positions, we will probably get a wrong impression of other posi tions. Despite what it seems, and what many books say, a defending king cut off on the back rank does not automatically lose.\nTherefore, we are going to complete the picture with three series of diagrams. The analysis is simple if we know the previous examples. The defending side is to move in all of them.\nSeries about rook and bishop's pawns.\nDefending ki ng cut off on the back rank; bishop's pawn on the 6th rank.\nDraw White wins Draw\nIf you check the winning method studied for the first position and the variation commented on the 7th move, you will become convinced that the second and the third are a draw. If the h-pawn is less advanced, it is also a draw.\nConclusion: The bishop's pawn must not reach the 6th rank before the rook's pawn has done so.\nBishop's pawn on the 5th rank.\nWhite wins White wins White wins\nAnalysed Same procedure Same procedure"
         },
         {
           "type": "ending",
@@ -2290,19 +2294,19 @@
         },
         {
           "type": "text",
-          "content": "3.Rc5.The white rook again has plenty of space. White now threatens 4.Kg5 and then to push the black king to the back rank. In the next few moves, the struggle to avoid being pushed to the 8th rank will be decisive.\nIn the previous ending Ke1earnt that the position is lost if the king is pushed to the back rank and the pawns are already on the 5th rank. Pushing the h-pawn is another interesting attempt. The analysis here is quite complex, so in the next diagram we will study this possibility alone.\n3.<it>f6\n..\nThe logical answer to oppose White's intentions.\n4.Rc6+\nNow the rook will not cover 5th-rank side checks.\n4...Kg7!\nThe idea is to avoid king opposition, since in that case the black king would be pushed to the back rank. For example: 4.. Stiff7? 5.Kg5! (threatening Rc7) 5....r! g1+ 6.Kf5\nand the black king has to retreat to the 8th rank, as 6...Kg7? fails to 7.Rg6++-.\n5.<it>g5 k:rg1+! (forced) 6.Kf5 k:ra 17.k:rc7+ (7.Kg6+ K£7=) 7.<it>h6 (always avoid\n..\nthe back rank) 8.k:re7 (8.Kf6 Kh5=) 8...k:rb1\nThe black rook waits in the lower left corner. At the moment the pawn cannot be captured, but White cannot manoeuvre freely either.\n9.Re8 (9.Kf6 Kh5=) 9...Kg7\n9...Ra1, just waiting, was still possible.\n10.k:re5 I:ta 111 Rd5 Kf1\nThe only unthematic move played by Smyslov in this ending. This is not exactly a mistake, but keeping the rook in the corner would be the standard procedure: 11...Kb1!.\n12.Rd4 k:ra1.Back to the right defensive spot.\n13.k:rd6 Ka5+ 14.<it>g4 k:ra1\nIt is worth pointing out that Black could return to the starting position with 14...Rb5.\n15.k:re6 k:rg1+ 16.<it>f5 k:ra1 17.h6+"
+          "content": "3.Rc5.The white rook again has plenty of space. White now threatens 4.Kg5 and then to push the black king to the back rank. In the next few moves, the struggle to avoid being pushed to the 8th rank will be decisive.\nIn the previous ending Ke1earnt that the position is lost if the king is pushed to the back rank and the pawns are already on the 5th rank. Pushing the h-pawn is another interesting attempt. The analysis here is quite complex, so in the next diagram we will study this possibility alone.\n3.<it>f6\n..\nThe logical answer to oppose White's intentions.\n4.Rc6+\nNow the rook will not cover 5th-rank side checks.\n4...Kg7!\nThe idea is to avoid king opposition, since in that case the black king would be pushed to the back rank. For example: 4.. Stiff7? 5.Kg5! (threatening Rc7) 5...Rg1+ 6.Kf5\nand the black king has to retreat to the 8th rank, as 6...Kg7? fails to 7.Rg6++-.\n5.<it>g5 k:rg1+! (forced) 6.Kf5 k:ra 17.k:rc7+ (7.Kg6+ K£7=) 7.<it>h6 (always avoid\n..\nthe back rank) 8.k:re7 (8.Kf6 Kh5=) 8...k:rb1\nThe black rook waits in the lower left corner. At the moment the pawn cannot be captured, but White cannot manoeuvre freely either.\n9.Re8 (9.Kf6 Kh5=) 9...Kg7\n9...Ra1, just waiting, was still possible.\n10.k:re5 I:ta 111 Rd5 Kf1\nThe only unthematic move played by Smyslov in this ending. This is not exactly a mistake, but keeping the rook in the corner would be the standard procedure: 11...Kb1!.\n12.Rd4 k:ra1.Back to the right defensive spot.\n13.k:rd6 Ka5+ 14.<it>g4 k:ra1\nIt is worth pointing out that Black could return to the starting position with 14...Rb5.\n15.k:re6 k:rg1+ 16.<it>f5 k:ra1 17.h6+"
         },
         {
           "type": "position",
           "content": {
             "number": "11.8",
-            "fen": "8/6k1/4R2P/5K2/5P2/8/8/r7 w - - 0 1",
+            "fen": "8/6k1/4R2P/5K2/5P2/8/8/r7 b - - 0 1",
             "caption": "Analysis diagram 11.8"
           }
         },
         {
           "type": "text",
-          "content": "At last White decides to commit himself. The Rook + Pawn vs. Rook ending we will reach in a few moves is a theoretical draw.\n\nAnother important point: when a pawn reaches the 6th rank, the defending king must get in front of it. 17...Kf7?! is also possible, since Black would not lose here with the king on the back rank (as in the previous ending): 18.Rb6 (intending a side check) 18...n as + 19.Kg4 Ra1 20.Kg5 Rg1+ 21.Kf5 and the black king is pushed to the back rank, but after 21...Ra1 (intending side checks) 22.Kb7+ Kg8\n23.Kg6 Kg1+ 24.Kf6.tih1! it is a draw.\n\n18.Rd6 Ka2 (waiting move) 19.Kg5 Kg2+ (hindering the king 's advance)\n20.Kf6\nThis leads to a theoretically drawn ending. 20.Kh5 Kh2+ =; 20.Kf5 l'la2=.\n20...Kh6! 21.Ke7+ Kh7\n21...Kg7 is also enough t o draw, as long as Black is aware o f a tactical detail: 22.f5\nKe2+ 23._ge6 l'lf2! (not 23...Rh2?? 24.f6+ Kh7 25.f7+-) 24.f6+ Kg6 2 S J Ke1\nKa2! = long-side defence.\n22.f5 Ke2+ 23JKte6 Ka2 (long-side defence) 24.f6\nWe have seen a similar position with the king 's pawn (Ending 58). White threatens\nKf8, winning. Black must occupy the back rank.\n24...Ra8! 25.Kf7 Kh6!\nIfw e compare this position with Ending 58, this is the right move here. The differ ence is that here 25...Kb8 would also draw, because the black rook has more space and can still enj oy distant effectiveness.\n26.Re1 Ka7+ 27JJ..e7 Ra8 28.Rd7 Kh7 29.Rd1 l:la7+ 30.Ke6Ra6+ 31.Rd6\nnaa 32.Rd4 Kgs 33.Rg4+ Kf8\nDraw, at last. An impressive exhibition of endgame skill by Smyslov, which will al low us to draw some conclusions after studying the following positions.\nAn i m portant variation. Pushi ng the rook's pawn"
+          "content": "At last White decides to commit himself. The Rook + Pawn vs. Rook ending we will reach in a few moves is a theoretical draw.\n\nAnother important point: when a pawn reaches the 6th rank, the defending king must get in front of it. 17...Kf7?! is also possible, since Black would not lose here with the king on the back rank (as in the previous ending): 18.Rb6 (intending a side check) 18...n as + 19.Kg4 Ra1 20.Kg5 Rg1+ 21.Kf5 and the black king is pushed to the back rank, but after 21...Ra1 (intending side checks) 22.Kb7+ Kg8\n23.Kg6 Kg1+ 24.Kf6.tih1! it is a draw.\n\n18.Rd6 Ka2 (waiting move) 19.Kg5 Kg2+ (hindering the king 's advance)\n20.Kf6\nThis leads to a theoretically drawn ending. 20.Kh5 Kh2+ =; 20.Kf5 l'la2=.\n20...Kh6! 21.Ke7+ Kh7\n21...Kg7 is also enough t o draw, as long as Black is aware o f a tactical detail: 22.f5\nKe2+ 23._ge6 l'lf2! (not 23...Rh2?? 24.f6+ Kh7 25.f7+-) 24.f6+ Kg6 2 S J Ke1\nKa2! = long-side defence.\n22.f5 Ke2+ 23JKte6 Ka2 (long-side defence) 24.f6\nWe have seen a similar position with the king 's pawn (Ending 58). White threatens\nKf8, winning. Black must occupy the back rank.\n24...Ra8! 25.Kf7 Kh6!\nIfw e compare this position with Ending 58, this is the right move here. The differ ence is that here 25...Kb8 would also draw, because the black rook has more space and can still enj oy distant effectiveness.\n26.Re1 Ka7+ 27JJ..e7 Ra8 28.Rd7 Kh7 29.Rd1 Ra7+ 30.Ke6Ra6+ 31.Rd6\nnaa 32.Rd4 Kgs 33.Rg4+ Kf8\nDraw, at last. An impressive exhibition of endgame skill by Smyslov, which will al low us to draw some conclusions after studying the following positions.\nAn i m portant variation. Pushi ng the rook's pawn"
         },
         {
           "type": "position",
@@ -2509,7 +2513,7 @@
         },
         {
           "type": "text",
-          "content": "These pawns are not blocked yet, but they will be soon. The black king has a domi nant position, so the white pawn is lost. But, as I said before, losing the pawn does not imply losing the game. Now we will see why: after capturing the white pawn,\nBlack still has to promote his.\n1.f4!\nThe only move to save the game. Now the black king must capture the pawn on f4,\nwhich is not one of the key squares to promote the f5 pawn. Therefore, White has time to force a drawn King + Pawn vs. King ending.\nInstead, 1.Kf2?? would be a terrible and rather common blunder, provoked by our instinctive desire to defend the pawn. 1...£4! The black pawn moves immediately to the 5th rank. Thus, when the black king captures the white pawn, he will already oc cupy one of the key squares to promote. 2.Ke2 Kc3 3.Kf2 Kd3 4.Kg2 Ke3 5.Kg1\nKf3 (capturing the pawn on a key square) 6.Kf1 Ke3 7.Ke1 f3 8.Kf1 f2 -+.\n\n1...Ke4 2.Kg2!\nWaiting to take the opposition when the black king captures the pawn on f4. 2. \\i?f2??\nwould be a terrible mistake: 2...\\i? xf4 and the black king reaches the key squares.\n2...Kf4 (2... \\i? e3 3.\\i?fl does not change things) 3.Kf2\nBlack has captured the enemy pawn, but will not be able to promote his.\n3...Ke4 4.Ke2 f4 5.Kf2 f3 6.Kf1 Ke3 7.Ke1 f2+ 8.Kf1 Kf3\n1.f2-1.f2\nCases like this, when the king captures the pawn but the resulting ending is not won, can be really complex. Then the king manoeuvres previous to the capture of the pawn are very interesting. Nevertheless, if we have fully understood the king 's multiple routes (see Introduction), everything is clear.\nManoeuvres previous to the capture of the pawn. The king's multiple routes\nWhen the pawns are not so advanced, or were dealing with rook's pawns, king ma noeuvres prior to the capture of the pawn are far more interesting than the resulting ending. Here both kings try to shoulder their opponent away, exploiting a peculiarity of the chessboard we called in the introduction 'the king's multiple routes'."
+          "content": "These pawns are not blocked yet, but they will be soon. The black king has a domi nant position, so the white pawn is lost. But, as I said before, losing the pawn does not imply losing the game. Now we will see why: after capturing the white pawn,\nBlack still has to promote his.\n1.f4!\nThe only move to save the game. Now the black king must capture the pawn on f4,\nwhich is not one of the key squares to promote the f5 pawn. Therefore, White has time to force a drawn King + Pawn vs. King ending.\nInstead, 1.Kf2?? would be a terrible and rather common blunder, provoked by our instinctive desire to defend the pawn. 1...£4! The black pawn moves immediately to the 5th rank. Thus, when the black king captures the white pawn, he will already oc cupy one of the key squares to promote. 2.Ke2 Kc3 3.Kf2 Kd3 4.Kg2 Ke3 5.Kg1\nKf3 (capturing the pawn on a key square) 6.Kf1 Ke3 7.Ke1 f3 8.Kf1 f2 -+.\n\n1...Ke4 2.Kg2!\nWaiting to take the opposition when the black king captures the pawn on f4. 2. \\i?f2??\nwould be a terrible mistake: 2...\\i? xf4 and the black king reaches the key squares.\n2...Kf4 (2... \\i? e3 3.\\i?fl does not change things) 3.Kf2\nBlack has captured the enemy pawn, but will not be able to promote his.\n3...Ke4 4.Ke2 f4 5.Kf2 f3 6.Kf1 Ke3 7.Ke1 f2+ 8.Kf1 Kf3\n1/2-1/2\nCases like this, when the king captures the pawn but the resulting ending is not won, can be really complex. Then the king manoeuvres previous to the capture of the pawn are very interesting. Nevertheless, if we have fully understood the king 's multiple routes (see Introduction), everything is clear.\nManoeuvres previous to the capture of the pawn. The king's multiple routes\nWhen the pawns are not so advanced, or were dealing with rook's pawns, king ma noeuvres prior to the capture of the pawn are far more interesting than the resulting ending. Here both kings try to shoulder their opponent away, exploiting a peculiarity of the chessboard we called in the introduction 'the king's multiple routes'."
         },
         {
           "type": "position",
@@ -2644,7 +2648,7 @@
           "type": "position",
           "content": {
             "number": "12.17",
-            "fen": "8/8/4k1K1/8/7P/8/8/8 w - - 0 1",
+            "fen": "8/8/4k1K1/8/7P/8/8/8 b - - 0 1",
             "caption": "Position 12.17"
           }
         },
@@ -2699,7 +2703,7 @@
           "type": "position",
           "content": {
             "number": "12.21",
-            "fen": "8/8/p7/k1K5/8/3P4/8/8 w - - 0 1",
+            "fen": "8/8/p7/k1K5/8/3P4/8/8 b - - 0 1",
             "caption": "Analysis diagram 12.21"
           }
         },
@@ -2848,7 +2852,7 @@
           "type": "position",
           "content": {
             "number": "12.31",
-            "fen": "8/7p/8/5k2/8/5K2/6PP/8 w - - 0 1",
+            "fen": "8/7p/8/5k2/8/5K2/6PP/8 b - - 0 1",
             "caption": "Position 12.31"
           }
         },
@@ -2905,7 +2909,7 @@
           "type": "position",
           "content": {
             "number": "12.34",
-            "fen": "8/7k/6pP/6P1/8/p1p5/8/1K6 w - - 0 1",
+            "fen": "8/7k/6pP/6P1/8/p1p5/8/1K6 b - - 0 1",
             "caption": "Position 12.34"
           }
         },
@@ -3063,25 +3067,49 @@
           "type": "position",
           "content": {
             "number": "13.4",
-            "fen": "8/8/8/8/4k3/8/6K1/6B1 w - - 0 1",
+            "fen": "8/8/8/8/4k3/8/6K1/6BN w - - 0 1",
             "caption": "Position 13.4"
           }
         },
         {
           "type": "text",
-          "content": "This is one of the worst starting positions for White, as his pieces are far from the centre of the board. With perfect play, White mates in 30 moves. Our play will not be perfect but logical, so we will waste 4 moves on the way.\nAnyway, every time we waste a move, I will announce it. If then you find the quick est move more logical, that is fine. For Black, we will always show (in the main line) the best and most stubborn answers. First, we will define our plan:\n1) Transferring our king to the centre, to drive the black king off2) Transferring the knight to the centre as well, since it is a short-range piece.\n3) Pushing the black king to the edge, where he will head for a corner opposite to the bishop 's colour (otherwise, checkmate comes sooner). We will call this corner a Safe Corner. Here, it is the a8 -square.\n4) Our king occupies a square on the long diagonal opposite to the corner (here,\nthe c6-square). We will call this spot the Pivotal Square.\n5) The knight drives the black king off the Safe Corner from c7 or b6.6) The bishop drives the black king off the square adj acent to the corner from a 7\nor b8.7) We force the black king to a corner of the bishop 's colour (Mating Corner) by means of an accurate manoeuvre. We will give more details when the moment comes.\n8) The black king is locked in the cage. See Position 13.3.9) The white king stays a knight's jump away from the corner (f7 or g6). We will call this spot the Mating Square.\n10) Ke8rrange the checkmate, which will come by two consecutive checks, one with each piece.\nThe execution of Step 7 requires special attention.\n1.Kg3 Step 1: Transferring the king to the centre.\n1...Ke5 2.Kf3 2.tt.Rf2! saves a move, but I stick to the plan.\n2...Kd5 3.Kf4 Kd6 4.Ke4 Kc6 5.t2Rg3\nOnce the white king has reached one of the 4 central squares, we go to Step 2: Cen tralising the knight.\n5...Kd6 6.t2lf5+ Kc6 7.Ke5 Kd7 8.Kd5 Kc7 9.Kc5\nStep 3: We push the black king to the edge. Here were very likely to waste moves,\nas the quickest moves are not directly related to pushing the king. But this move fol lows a clear logic. The bishop gets ready to answer...<J;;>d7 with jLd6, pushing the king to the edge straight away. 9.t2Rd6! <J;;>d7 10.t2Rb5 saves one move, but I cannot see that it follows a logical plan.\n9...Kb7 10.Kd6\nThis move pushes the black king. Again, 10.t2Rd6+! would save a move.\n\never, it requires analysis as well. 11.<J;;>c6 <J;;>as 12.jLd 4 <J;t b4 13.t2Re3 and the pieces have set up a barrier which (with the aid of the white king) will definitely lock the black king near the mating corner.\n11.Kc6\n\nStep 4: The king occupies the pivotal square. The rest of the ending is purely me chanical.\n\nStep 5: The knight gets ready t o drive the king off the corner from the c7 -square.\n\nStep 6: The black king is driven off the square adj acent to the safe corner.\nAnalysis diagra m 13.5\n(Knight's route)\nThe next phase is the most difficult in practical play. You should learn it by heart,\nbut it is not so difficult if, after some analysis, you follow its logic.\nOur task is to force the black king from the safe corner to the mating corner. In one variation the king leaves the edge and it looks like he manages to run into open field, but we have to be aware of this possibility and spoil his plans. We have a simple move to stop the king, and it is always the same.\nRemember this procedure by the moment. The knight must be on c7, as here, in order to drive the king off the corner, and from there its route will be the one marked in the diagram. The knight will go from the 7th rank to the 5th, and then from the 5th to the 7th, at least once, drawing a Then the route will de\nV.\npend on the black king's decision at the critical moment. Against stubborn re sistance (the king stays on the edge) the knight must repeat the jump from the\n7th to the 5th and from the 5th back to the 7th (thus drawing a full W); if the king tries to escape, the white pieces will first set up a barrier and then the knight will move to build the cage.\nWho do you think was the inventor of this manoeuvre? Yes, it was Philidor!\n\nAnd now the king must make a decision. In practical play, the main concern for\nWhite is the attempt to escape. It is also the longest line.\n\nBy now, the knight must complete the first cycle. 19.Ke7 Ke8 20.Ke6 Kd8\n21.Kb6+ (again, the bishop drives the king off a black square) 21...Ke8 22.Kc7\n(zugzwang again) 22...Kf8 23.Kf5 (the knight repeats the route) 23...Ke8\n24.Kg7+ Kf8 25.Kf6 Kg8 26.Kg6 (26.Ke6 Kh7 27.Kf4 Kg8 28.Kg6 Kh8\n29.Kf7 Kh7 30.Kf8+ Kh8 31.Ke5 mate) 26...Kf8 27.Kd6+ (and again the bishop watches the black squares) 27...Kg8.By the way, the white king occupies the mating square. And now White just has to prepare two consecutive checks to deliver checkmate: 28.tLlf5 <J;th8.If we deliver two checks, the king escapes, doesn't he? OK, so waste a move! 29.Jtcs <J;tg8 30.tLlh6+ <J;th8 3 I.Jtd4 mate.\n19.t2Re7 <J;tf6"
+          "content": "This is one of the worst starting positions for White, as his pieces are far from the centre of the board. With perfect play, White mates in 30 moves. Our play will not be perfect but logical, so we will waste 4 moves on the way.\nAnyway, every time we waste a move, I will announce it. If then you find the quick est move more logical, that is fine. For Black, we will always show (in the main line) the best and most stubborn answers. First, we will define our plan:\n1) Transferring our king to the centre, to drive the black king off2) Transferring the knight to the centre as well, since it is a short-range piece.\n3) Pushing the black king to the edge, where he will head for a corner opposite to the bishop 's colour (otherwise, checkmate comes sooner). We will call this corner a Safe Corner. Here, it is the a8 -square.\n4) Our king occupies a square on the long diagonal opposite to the corner (here,\nthe c6-square). We will call this spot the Pivotal Square.\n5) The knight drives the black king off the Safe Corner from c7 or b6.6) The bishop drives the black king off the square adj acent to the corner from a 7\nor b8.7) We force the black king to a corner of the bishop 's colour (Mating Corner) by means of an accurate manoeuvre. We will give more details when the moment comes.\n8) The black king is locked in the cage. See Position 13.3.9) The white king stays a knight's jump away from the corner (f7 or g6). We will call this spot the Mating Square.\n10) Arrange the checkmate, which will come by two consecutive checks, one with each piece.\nThe execution of Step 7 requires special attention.\n1.Kg3 Step 1: Transferring the king to the centre.\n1...Ke5 2.Kf3 2.Nf2! saves a move, but I stick to the plan.\n2...Kd5 3.Kf4 Kd6 4.Ke4 Kc6 5.Ng3\nOnce the white king has reached one of the 4 central squares, we go to Step 2: Cen tralising the knight.\n5...Kd6 6.Nf5+ Kc6 7.Ke5 Kd7 8.Kd5 Kc7 9.Kc5\nStep 3: We push the black king to the edge. Here were very likely to waste moves,\nas the quickest moves are not directly related to pushing the king. But this move fol lows a clear logic. The bishop gets ready to answer...Kd7 with Bd6, pushing the king to the edge straight away. 9.Nd6! Kd7 10.Nb5 saves one move, but I cannot see that it follows a logical plan.\n9...Kb7 10.Kd6\nThis move pushes the black king. Again, 10.Nd6+! would save a move.\n\n10...Kb8\n10...Ka6 is a somewhat illogical attempt to flee towards the mating corner. However, it requires analysis as well. 11.Kc6 Ka5 12.Bd4 Kb4 13.Ne3 and the pieces have set up a barrier which (with the aid of the white king) will definitely lock the black king near the mating corner.\n11.Kc6\n\nStep 4: The king occupies the pivotal square. The rest of the ending is purely mechanical.\n11...Ka8 12.Nd6\n\nStep 5: The knight gets ready to drive the king off the corner from the c7-square.\n12...Kb8 13.Nb5 Ka8 14.Nc7+ Kb8 15.Bd4 Kc8 16.Ba7\n\nStep 6: The black king is driven off the square adj acent to the safe corner."
+        },
+        {
+          "type": "position",
+          "content": {
+            "number": "13.5",
+            "fen": "2k5/B1N5/2K5/8/8/8/8/8 b - - 0 16",
+            "caption": "Analysis diagram 13.5"
+          }
+        },
+        {
+          "type": "text",
+          "content": "(Knight's route)\nThe next phase is the most difficult in practical play. You should learn it by heart,\nbut it is not so difficult if, after some analysis, you follow its logic.\nOur task is to force the black king from the safe corner to the mating corner. In one variation the king leaves the edge and it looks like he manages to run into open field, but we have to be aware of this possibility and spoil his plans. We have a simple move to stop the king, and it is always the same.\nRemember this procedure by the moment. The knight must be on c7, as here, in order to drive the king off the corner, and from there its route will be the one marked in the diagram. The knight will go from the 7th rank to the 5th, and then from the 5th to the 7th, at least once, drawing a Then the route will de\nV.\npend on the black king's decision at the critical moment. Against stubborn re sistance (the king stays on the edge) the knight must repeat the jump from the\n7th to the 5th and from the 5th back to the 7th (thus drawing a full W); if the king tries to escape, the white pieces will first set up a barrier and then the knight will move to build the cage.\nWho do you think was the inventor of this manoeuvre? Yes, it was Philidor!\n16...Kd8 17.Nd5 Ke8 18.Kd6\n\nAnd now the king must make a decision. In practical play, the main concern for\nWhite is the attempt to escape. It is also the longest line.\n18...Kf7\n18...Kd8 is weaker. Here the knight repeats its manoeuvre (7th-5th and 5th-7th).\nBy now, the knight must complete the first cycle. 19.Ne7 Ke8 20.Ke6 Kd8\n21.Bb6+ (again, the bishop drives the king off a black square) 21...Ke8 22.Bc7\n(zugzwang again) 22...Kf8 23.Nf5 (the knight repeats the route) 23...Ke8\n24.Ng7+ Kf8 25.Kf6 Kg8 26.Kg6 (26.Ne6 Kh7 27.Bf4 Kg8 28.Kg6 Kh8\n29.Kf7 Kh7 30.Nf8+ Kh8 31.Be5 mate) 26...Kf8 27.Bd6+ (and again the bishop watches the black squares) 27...Kg8.By the way, the white king occupies the mating square. And now White just has to prepare two consecutive checks to deliver checkmate: 28.Nf5 Kh8. If we deliver two checks, the king escapes, doesn't he? OK, so waste a move! 29.Bc5 Kg8 30.Nh6+ Kh8 31.Bd4 mate.\n19.Ne7 Kf6"
         },
         {
           "type": "position",
           "content": {
             "number": "13.6",
-            "fen": "8/B3P3/3K1kp1/5p2/8/8/8/8 w - - 0 1",
-            "caption": "Analysis diagram 13.6"
+            "fen": "8/B3N3/3K1k2/8/8/8/8/8 w - - 0 20",
+            "caption": "Analysis diagram 13.6",
+            "markers": [
+              {
+                "square": "g6",
+                "symbol": "*",
+                "meaning": "as printed"
+              },
+              {
+                "square": "f5",
+                "symbol": "*",
+                "meaning": "as printed"
+              }
+            ]
           }
         },
         {
           "type": "text",
-          "content": "Apparently, the king has succeeded; just an optical illusion. Note that the knight controls two squares. I am sure you already know which square is the bishop's re sponsibility (g5) and, therefore, which is the right move here (Position 13.2). In the event of 19... <J;t g7, the same move would be good, as then the bishop would control the h6-square so that the king could not escape.\n20.li,e3!\nThis is relatively the most difficult move in this ending, but only if you did not know it. On the right, the bishop and the knight set up a barrier hindering the king 's way out; on the left, the white king cuts the way.\n20...Kf7 21.li,g5\nThe bishop starts to build the cage.\n21...Ke8 (2 I... <J;t g 7 allows an easier win: 22.<J;te6) 22.t2Rc6\nThe knight joins the bishop in building the cage.\n22...Kf7 23.t2Re5+ Ke8 24.Ke6\nThe cage is ready Now have another look at Position 13.3.24...Kf8 25.Kd7 Kg8 26.Ke8\n26.Jth6! saves a move. This makes sense, as a new cage is built, but I find the king move more natural.\n26...Kg7 27.Ke7 K98 28.li,h6 Kh7 29.li,f8 Kg8 30.Ke8 Kh8 31.Kf7\nThe king occupies the mating square.\n31...Kh7 32.t2Rg4 (setting up the checkmate...) 32...Kh8 33.li,g7+ Kh7 34.tt:Rf6\nmate\nNow have a quiet look at Positions 13.5, 13.6 and 13.3.Do not try to memorise them. Just think about the significance of each of them. They represent 3 critical moments in the mating execution following the classical procedure. With any other procedure, they would be almost unavoidable.\nRook + B ishop vs. Rook\nThe Rook + Bishop vs. Rook ending is quite common in tournament practice. Al though most positions are evaluated by theory as drawn, the stronger side usually"
+          "content": "Apparently, the king has succeeded; just an optical illusion. Note that the knight controls two squares. I am sure you already know which square is the bishop's re sponsibility (g5) and, therefore, which is the right move here (Position 13.2). In the event of 19... <J;t g7, the same move would be good, as then the bishop would control the h6-square so that the king could not escape.\n20.Be3!\nThis is relatively the most difficult move in this ending, but only if you did not know it. On the right, the bishop and the knight set up a barrier hindering the king 's way out; on the left, the white king cuts the way.\n20...Kf7 21.Bg5\nThe bishop starts to build the cage.\n21...Ke8 (21...Kg7 allows an easier win: 22.Ke6) 22.Nc6\nThe knight joins the bishop in building the cage.\n22...Kf7 23.Ne5+ Ke8 24.Ke6\nThe cage is ready Now have another look at Position 13.3.24...Kf8 25.Kd7 Kg8 26.Ke8\n26.Bh6! saves a move. This makes sense, as a new cage is built, but I find the king move more natural.\n26...Kg7 27.Ke7 Kg8 28.Bh6 Kh7 29.Bf8 Kg8 30.Ke8 Kh8 31.Kf7\nThe king occupies the mating square.\n31...Kh7 32.Ng4 (setting up the checkmate...) 32...Kh8 33.Bg7+ Kh7 34.Nf6\nmate\nNow have a quiet look at Positions 13.5, 13.6 and 13.3.Do not try to memorise them. Just think about the significance of each of them. They represent 3 critical moments in the mating execution following the classical procedure. With any other procedure, they would be almost unavoidable.\nRook + B ishop vs. Rook\nThe Rook + Bishop vs. Rook ending is quite common in tournament practice. Al though most positions are evaluated by theory as drawn, the stronger side usually"
         },
         {
           "type": "ending",
@@ -3098,25 +3126,47 @@
           "type": "position",
           "content": {
             "number": "13.7",
-            "fen": "3k4/1pPpRp2/3K4/3B4/8/8/8/5R2 w - - 0 1",
-            "caption": "Position 13.7"
+            "fen": "3k4/4r3/3K4/3B4/8/8/8/5R2 w - - 0 1",
+            "caption": "Position 13.7",
+            "markers": [
+              {
+                "square": "b7",
+                "symbol": "*",
+                "meaning": "as printed"
+              },
+              {
+                "square": "c7",
+                "symbol": "*",
+                "meaning": "as printed"
+              },
+              {
+                "square": "d7",
+                "symbol": "*",
+                "meaning": "as printed"
+              },
+              {
+                "square": "f7",
+                "symbol": "*",
+                "meaning": "as printed"
+              }
+            ]
           }
         },
         {
           "type": "text",
-          "content": "White plays and wins. The winning sequence is long and complex, so difficult to remember, especially if we consider that many years may pass before this position arises in one of our games. Therefore, it is worth analysing this ending carefully and fixing its basic ideas in our mind. Then were likely to be able to replay the winning sequence on the board if we have enough time. The first thing to notice is that the white king and his bishop have set up a screen to cover most of the squares surrounding the black king.\n\n1.5.f8+!\nThe first move is obvious: White seizes control of the 2nd rank from the black rook.\n1...a:ea2.Rf7\nNow Black has a tough choice. White threatens Ka7 -Ka8, so the black rook must leave the back rank. The difficulty lies in deciding between e3, e2 or e1.2.Re2!\n.\nThis is the best square, because now the rook will check the white king from a black square and the white bishop cannot stop it. This idea may help us remember the sequence in the future. Now White must play a waiting move and force the black rook to leave its ideal spot. Other moves lose quickly, but the variations are in teresting, as attacking manoeuvres are recurrent.\n2...Kc8?! 3.Ka7 Rd8+ 4.c;!tc6 Kb8 5.Kb7+ c;!ta8 (5...c;!t c8 6.Ke6+) 6.Rb5 c;!ta7\n7.Ra5+ Kb8 8.c;!tb6+- and Black cannot avoid checkmate; 2...Kh8?! 3..U.a7 Kh6+\n4.Ke6 with a quick finish.\n3.5.h7! Re1!\nKing moves would lose and the rook would not be as efficient on the e3 -square. For instance: 3...Ke3 4.Rd7+ This time-winning check, intending to place the rook on the 4th rank with the lethal threat Kc6+, is one of the standard resources in this position. Black treads a narrow path: 4...c;!t e8 (4...Kc8 5.Ka7+- and mate, as Rb3\nis impossible) 5.Ra7 Kf8 6.Kf7+ (again a time-gaining check) 6...c;!t e8 7.Rf4!\n(threatening7.Kc6) 7...Kd8 (7...Rd3 8.Kg4) 8.Ke4! +- The point. The black rook is now impotent: no checks, no way back to the back rank and no defence against the mating threat.\n4.Rb7\nAnother typical resource: the rook is transferred to the other wing. Now the black rook has fewer squares than after 4.Kb3 Ke2!, when it returns to its ideal defensive rank.\n4..Rc1"
+          "content": "White plays and wins. The winning sequence is long and complex, so difficult to remember, especially if we consider that many years may pass before this position arises in one of our games. Therefore, it is worth analysing this ending carefully and fixing its basic ideas in our mind. Then were likely to be able to replay the winning sequence on the board if we have enough time. The first thing to notice is that the white king and his bishop have set up a screen to cover most of the squares surrounding the black king.\n\n1.Rf8+!\nThe first move is obvious: White seizes control of the 2nd rank from the black rook.\n1...Re8 2.Rf7\nNow Black has a tough choice. White threatens Ra7-Ra8, so the black rook must leave the back rank. The difficulty lies in deciding between e3, e2 or e1.2...Re2!\n.\nThis is the best square, because now the rook will check the white king from a black square and the white bishop cannot stop it. This idea may help us remember the sequence in the future. Now White must play a waiting move and force the black rook to leave its ideal spot. Other moves lose quickly, but the variations are in teresting, as attacking manoeuvres are recurrent.\n2...Kc8?! 3.Ra7 Rd8+ 4.Kc6 Kb8 5.Rb7+ Ka8 (5...Kc8 6.Be6+) 6.Rb5 Ka7\n7.Ra5+ Kb8 8.Kb6+- and Black cannot avoid checkmate; 2...Rh8?! 3.Ra7 Rh6+\n4.Be6 with a quick finish.\n3.Rh7! Re1!\nKing moves would lose and the rook would not be as efficient on the e3 -square. For instance: 3...Ke3 4.Rd7+ This time-winning check, intending to place the rook on the 4th rank with the lethal threat Bc6+, is one of the standard resources in this position. Black treads a narrow path: 4...Ke8 (4...Kc8 5.Ra7+- and mate, as Rb3\nis impossible) 5.Ra7 Kf8 6.Rf7+ (again a time-gaining check) 6...Ke8 7.Rf4!\n(threatening 7.Bc6) 7...Kd8 (7...Rd3 8.Kg4) 8.Be4!+- The point. The black rook is now impotent: no checks, no way back to the back rank and no defence against the mating threat.\n4.Rb7\nAnother typical resource: the rook is transferred to the other wing. Now the black rook has fewer squares than after 4.Bb3 Re2!, when it returns to its ideal defensive rank.\n4...Rc1"
         },
         {
           "type": "position",
           "content": {
             "number": "13.8",
-            "fen": "3k4/1R6/3K4/3B4/8/8/8/2R5 w - - 0 1",
+            "fen": "3k4/1R6/3K4/3B4/8/8/8/2r5 w - - 0 5",
             "caption": "Position 13.8"
           }
         },
         {
           "type": "text",
-          "content": "4...c;!t c8 5.Ka7 Kb1 6.:l:H7! (the rook moves once more to the other wing) 6...c;!t b8\n(6...Kb6+ 7.Kc6) 7.Kf8+ c;!ta7 8.Ra8+ c;!tb6 9.Kb8+ +- winning the rook.\n5..tb3!!\n.\nThe great point of the ending. The bishop controls the d 1 -square, avoiding a rook check, and the c2 -square, hindering the black rook's path to the seventh rank.\nMoreover, Black is in zugzwang now: the king cannot move and the rook must move to a less favourable position.\n\n5..Rc3\n5...Kc8 6.Rb4 (threatening Ke6) 6...Kd8 7.Rh4 Iie 1 (7...Kc8 8.Kd5 Kb8 9.Ra4\nand mate) 8.Ka4! (another great move, threatening mate and controlling the d 1 -square at the same time) 8...Kc8 9.Rb4+- and Black is defenceless against Kd7.6.Ke6 (posing a mating threat) 6...Rd3+ 7.Kd5\nDue to the mating threat, the black rook cannot return to its defensive position.\n7...Rc3.Now White has a similar manoeuvre as the one explained against 3...Re3.8..Rd7+ (again this time-winning check comes handy) 8...Kc8 (8...Ke8 9.Rg7+-\nand mate, as Rf3 is impossible) 9.Rh7 Kb8 10..Rb7+ (winning time again)\n.\n10...Kc8 11.R(b4 (threatening Ke6 and preparing the next move) 11...KdB\n(11...Rd3 12.Ra4+-) 12.Kc4!+-\nThis is almost the same position as at the end of the3... Ii e3 line.\nIf you have carefully followed the analysis, you are likely to be able to find the win ning sequence right now without checking the book. However, probably you have also realised that it is extremely complex and impossible to keep in our long-term memory.\nMany grandmasters have gone astray after reaching the Philidor Position. Moreover,\nduring a Spanish Team Championship years ago (Ponferrada 199 2), a game\nCelaya-San Claudio was adj ourned and then some grandmasters tried unsuccess fully to replay the winning sequence. That is why I consider a summary of the main ideas necessary If we fix these ideas and we have enough time and concentration,\nwe will be able to find the right moves on the board.\nSummary of main ideas:\nThe best ranks for defence are the 2nd and the 1st (from\nBlack's side of the board, the 7th and 8th ranks)\nThe best one is the second rank, as the checking square for the rook is the opposite colour to the bishop's.\nIn order to drive the defending rook off the 2nd rank,\nzugzwang is necessary.\nOnce the defending rook has relinquished the 2nd rank,\nthe strong side must combine time-winning checks,\nswitching the rook from one wing to the other (thus worsening the defending rook's position), in order to prepare the critical bishop's move.\nThe critical bishop's move must control the defending rook's checking square.\nSame position shifted one fi le to the left (Lolli)\nPhilidor's method is equally winning on the 4 central files; however, on the bishop 's file some new variations arise. This analysis was carried out by Lolli. We present it here without comments."
+          "content": "4...Kc8 5.Ra7 Rb1 6.Rh7! (the rook moves once more to the other wing) 6...Kb8\n(6...Rb6+ 7.Bc6) 7.Rf8+ Ka7 8.Ra8+ Kb6 9.Rb8++- winning the rook.\n5.Bb3!!\n.\nThe great point of the ending. The bishop controls the d 1 -square, avoiding a rook check, and the c2 -square, hindering the black rook's path to the seventh rank.\nMoreover, Black is in zugzwang now: the king cannot move and the rook must move to a less favourable position.\n\n5...Rc3\n5...Kc8 6.Rb4 (threatening Ke6) 6...Kd8 7.Rh4 Re1 (7...Kc8 8.Kd5 Kb8 9.Ra4\nand mate) 8.Ka4! (another great move, threatening mate and controlling the d 1 -square at the same time) 8...Kc8 9.Rb4+- and Black is defenceless against Kd7.6.Ke6 (posing a mating threat) 6...Rd3+ 7.Kd5\nDue to the mating threat, the black rook cannot return to its defensive position.\n7...Rc3.Now White has a similar manoeuvre as the one explained against 3...Re3.8.Rd7+ (again this time-winning check comes handy) 8...Kc8 (8...Ke8 9.Rg7+-\nand mate, as Rf3 is impossible) 9.Rh7 Kb8 10.Rb7+ (winning time again)\n.\n10...Kc8 11.Rb4 (threatening Ke6 and preparing the next move) 11...Kd8\n(11...Rd3 12.Ra4+-) 12.Kc4!+-\nThis is almost the same position as at the end of the3... Ii e3 line.\nIf you have carefully followed the analysis, you are likely to be able to find the win ning sequence right now without checking the book. However, probably you have also realised that it is extremely complex and impossible to keep in our long-term memory.\nMany grandmasters have gone astray after reaching the Philidor Position. Moreover,\nduring a Spanish Team Championship years ago (Ponferrada 199 2), a game\nCelaya-San Claudio was adj ourned and then some grandmasters tried unsuccess fully to replay the winning sequence. That is why I consider a summary of the main ideas necessary If we fix these ideas and we have enough time and concentration,\nwe will be able to find the right moves on the board.\nSummary of main ideas:\nThe best ranks for defence are the 2nd and the 1st (from\nBlack's side of the board, the 7th and 8th ranks)\nThe best one is the second rank, as the checking square for the rook is the opposite colour to the bishop's.\nIn order to drive the defending rook off the 2nd rank,\nzugzwang is necessary.\nOnce the defending rook has relinquished the 2nd rank,\nthe strong side must combine time-winning checks,\nswitching the rook from one wing to the other (thus worsening the defending rook's position), in order to prepare the critical bishop's move.\nThe critical bishop's move must control the defending rook's checking square.\nSame position shifted one fi le to the left (Lolli)\nPhilidor's method is equally winning on the 4 central files; however, on the bishop 's file some new variations arise. This analysis was carried out by Lolli. We present it here without comments."
         },
         {
           "type": "position",
@@ -3128,19 +3178,19 @@
         },
         {
           "type": "moves",
-          "content": "1.Ke8+ Kd8 2.Ke7 Kd2\n2...J lh8 is another defensive method not possible on the central files; it also fails here: 3.Ra7 Kb8 4.Rb7+ Ka8 (4...Kc8 5.Kd6+-) 5.Kd6 l:lh 16.Rg7 l:lc1+\n7.Kc5 l:lb 18.Rg4 and Black cannot stop the mating sequence starting with Ka4.\n3.Kf7 Kd1 4.Ka7 Kb1 5.Ka3 Kb3 6.Kd6 Kc3+ 7.Kc5 Kb3 8.Kc7+ Kb8 9.Kh7\nKa5 10.Ka7+ (10.Rh4 wins one move quicker) 10...Kb8 11.Ka4 Kc8\n12.Kb4+-\nSame position, kn ig ht's fi le (Lolli)"
+          "content": "1.Re8+ 1...Rd8 2.Re7 2...Rd2\n2...Rh8 is another defensive method not possible on the central files; it also fails here: 3.Ra7 Kb8 4.Rb7+ Ka8 (4...Kc8 5.Kd6+-) 5.Kd6 Rh1 6.Rg7 Rc1+\n7.Bc5 Rb1 8.Rg4 and Black cannot stop the mating sequence starting with Ka4.\n3.Rf7 Rd1 4.Ra7 Rb1 5.Ba3 Rb3 6.Bd6 Rc3+ 7.Bc5 Rb3 8.Rc7+ Kb8 9.Rh7\nKa8 10.Ra7+ (10.Rh4 wins one move quicker) 10...Kb8 11.Ra4 Kc8\n12.Bb4+-\nSame position, kn ig ht's fi le (Lolli)"
         },
         {
           "type": "position",
           "content": {
             "number": "13.10",
-            "fen": "1k6/2R5/1K6/1B6/8/8/8/3R4 w - - 0 1",
+            "fen": "1k6/2r5/1K6/1B6/8/8/8/3R4 w - - 0 1",
             "caption": "Position 13.10"
           }
         },
         {
           "type": "moves",
-          "content": "However, Philidor's method does not work on the knight's file. This position is known as Lolli's Position and it is a draw. Since Black's moves are forced, which sometimes makes things easier, we can use it as a defensive resource when in trouble.\nIt is very important to note that here, the defender should move the king towards the corner of the same colour as the bishop. You could think that this is a safe draw ing method, and it is, actually, if you are a computer, but Black is on a knife edge, so\nI do not recommend it. In principle, you do not need to study this method. I will show you some lines with a few comments.\n1.Kd8+ Kc8 2.Kd7 Kc1 3.Kf7 Kc2 4.Kg7\nWaiting strategy leads to nothing, as there is no zugzwang.\n4...Kc1 5.Ka4!\nThe most dangerous move.\n5...Kc3 (5...Rb1+ also draws, but the text is more illustrative for our purposes)\n6.Kc6;g_b3+! 7.Kb5 Kc3! 8.Kc6 Kb3+ 9.Kc5"
+          "content": "However, Philidor's method does not work on the knight's file. This position is known as Lolli's Position and it is a draw. Since Black's moves are forced, which sometimes makes things easier, we can use it as a defensive resource when in trouble.\nIt is very important to note that here, the defender should move the king towards the corner of the same colour as the bishop. You could think that this is a safe draw ing method, and it is, actually, if you are a computer, but Black is on a knife edge, so\nI do not recommend it. In principle, you do not need to study this method. I will show you some lines with a few comments.\n1.Rd8+ Rc8 2.Rd7 Rc1 3.Rf7 Rc2 4.Rg7\nWaiting strategy leads to nothing, as there is no zugzwang.\n4...Rc1 5.Ba4!\nThe most dangerous move.\n5...Rc3 (5...Rb1+ also draws, but the text is more illustrative for our purposes)\n6.Bc6 Rb3+! 7.Bb5 Rc3! 8.Bc6 Rb3+ 9.Kc5"
         },
         {
           "type": "ending",
@@ -3151,7 +3201,7 @@
         },
         {
           "type": "moves",
-          "content": "The king heads for d6 and Black cannot stop him.\n9...Rf.b1\nOther moves may also draw but, as we said, it is better to have a clear idea and the edge of the board is a good reference.\n10.Ad5\nIf 10.Kd6, the only move is 10...Rf1!.\n\nBlack has to be ready to deliver checks on the 6th rank.\n11.Kd6\nBuilding a sort of Philidor Position with the black king on b8 instead of d8.An other attempt would be 11.Rb7+!? Kc8 12.R'!e7 Kb8! 13.Kb6 Rc1! 14.Ke6\nRb1+ 15.Kc6 Rc1+ 16.Kd6 Rh1 l 7.Kd5 Rh6+ =.\n\n17.Ra8+ Kb6 18.Ra2 Rb1 reaching the second-rank defence (see below).\nSame position, rook's fi le"
+          "content": "The king heads for d6 and Black cannot stop him.\n9...Rb1\nOther moves may also draw but, as we said, it is better to have a clear idea and the edge of the board is a good reference.\n10.Bd5\nIf 10.Kd6, the only move is 10...Rf1!.\n\nBlack has to be ready to deliver checks on the 6th rank.\n11.Kd6\nBuilding a sort of Philidor Position with the black king on b8 instead of d8.An other attempt would be 11.Rb7+!? Kc8 12.Re7 Kb8! 13.Kb6 Rc1! 14.Ke6\nRb1+ 15.Kc6 Rc1+ 16.Kd6 Rh1 17.Bd5 Rh6+=.\n\n11...Rf6+! 12.Be6 Rf1 13.Rg8+ Ka7! 14.Bd5 Rd1 15.Ra8+ Kb6 16.Rb8+ Ka7\n17.Ra8+ Kb6 18.Ra2 Rb1 reaching the second-rank defence (see below).\nSame position, rook's fi le"
         },
         {
           "type": "position",
@@ -3163,27 +3213,48 @@
         },
         {
           "type": "text",
-          "content": "The position on the rook's file is also lost. I present here the analysis without com ments. The winning procedure is very similar to that used in the case of the bishop's file.\n1.Rh2 (1.Rc8+.i:!Rb8 2.Rc7 Rb7!) 1..J lb1 (1...Ra7+ 2.Kb6 Rb7+ 3.Kc6 Rb1\n4.Kc3! Rb7 5 J Kg2! +-) 2.Rh6 (2.Rh3 Rb7 3.Kb6?? Ra7+! =) 2.Rb7 3.Ab6.Ra7+ 4.Kb5 1:lf7 5.Kc6 Rf8 6.Ac7 Rg8 7.Ad6 1:le8 8.Rh1+-\nIn the starting position of most R+B vs. R endings, the defending king can be any where, far from the edge of the board. There are many possible moves, and there fore it is impossible to carry out a thorough analysis. Nevertheless, if you want to succeed in this ending, you need to know some key manoeuvres which work as patterns. We will study these ideas from the defender 's point of view, showing that with accurate play he can hold. The first idea we must get rid of is that the king has to stay near the centre of the board. Sooner or later, the defending king will have to move to the edge of the board and when that happens, it should be in the most favourable conditions.\nThere are two well-known defensive procedures:\n1) Second-rank defence.\n2) Cochrane Defence.\nThough both are correct, the stronger side has enough resources to cause trouble.\nFrom a normal position, the simplest way to defend this ending is adopting the\nCochrane Defence. In this example we are going to see what this defensive method involves, and I will try to provide you with some landmarks so that you can find your way to this position and stick to it.\nThe features of the Cochrane Defence are the following:\nthe rook pins the bishop on one of the central files (or ranks) in a way that the distance between the kings is one rank (or file) longer than in the Philidor Position, as shown in positions 13.14 or 13.15.To achieve this, Black must focus now on the 4 central lines (e- and d-files, 4th and\n5th ranks) and know beforehand which sides his king and rook must occupy at the critical moment. The 3 marked squares (apart from the one the rook occupies now)\nrepresent the possibilities for the rook; therefore, the king must stay in the opposite zone."
+          "content": "The position on the rook's file is also lost. I present here the analysis without com ments. The winning procedure is very similar to that used in the case of the bishop's file.\n1.Rh2 (1.Rc8+ Rb8 2.Rc7 Rb7!) 1...Rb1 (1...Ra7+ 2.Kb6 Rb7+ 3.Kc6 Rb1\n4.Bc3! Rb7 5.Rg2! +-) 2.Rh6 (2.Rh3 Rb7 3.Bb6?? Ra7+!=) 2...Rb7 3.Bb6 Ra7+ 4.Kb5 Rf7 5.Kc6 Rf8 6.Bc7 Rg8 7.Bd6 Re8 8.Rh1+-\nIn the starting position of most R+B vs. R endings, the defending king can be any where, far from the edge of the board. There are many possible moves, and there fore it is impossible to carry out a thorough analysis. Nevertheless, if you want to succeed in this ending, you need to know some key manoeuvres which work as patterns. We will study these ideas from the defender 's point of view, showing that with accurate play he can hold. The first idea we must get rid of is that the king has to stay near the centre of the board. Sooner or later, the defending king will have to move to the edge of the board and when that happens, it should be in the most favourable conditions.\nThere are two well-known defensive procedures:\n1) Second-rank defence.\n2) Cochrane Defence.\nThough both are correct, the stronger side has enough resources to cause trouble.\nFrom a normal position, the simplest way to defend this ending is adopting the\nCochrane Defence. In this example we are going to see what this defensive method involves, and I will try to provide you with some landmarks so that you can find your way to this position and stick to it.\nThe features of the Cochrane Defence are the following:\nthe rook pins the bishop on one of the central files (or ranks) in a way that the distance between the kings is one rank (or file) longer than in the Philidor Position, as shown in positions 13.14 or 13.15.To achieve this, Black must focus now on the 4 central lines (e- and d-files, 4th and\n5th ranks) and know beforehand which sides his king and rook must occupy at the critical moment. The 3 marked squares (apart from the one the rook occupies now)\nrepresent the possibilities for the rook; therefore, the king must stay in the opposite zone."
         },
         {
-          "type": "caption",
-          "content": "Position 13.12"
+          "type": "position",
+          "content": {
+            "number": "13.12",
+            "fen": "8/8/5k2/r7/4BK2/8/7R/8 b - - 0 1",
+            "caption": "Position 13.12",
+            "markers": [
+              {
+                "square": "d8",
+                "symbol": "*",
+                "meaning": "as printed"
+              },
+              {
+                "square": "h4",
+                "symbol": "*",
+                "meaning": "as printed"
+              },
+              {
+                "square": "e1",
+                "symbol": "*",
+                "meaning": "as printed"
+              }
+            ]
+          }
         },
         {
           "type": "moves",
-          "content": "Budnikov - Novik\nMoscow 1991\n1..J lb5\nFor the moment, Black can wait. The best waiting strategy involves cutting the king's way with the rook to force White to use the bishop to cross.\n2.Rh6+ Ke7\nFor the moment, Black should always move towards the centre.\n3.Rra6 Kc5 (continuing to wait) 4.Kd3 Rrc7 5.Ke5 Rc5+ 6.Kd4 Rrg5 (keep on waiting with the rook on the 5th rank) 7.Ke4 Kh5 8.Rrg6!la5 9.Kd5!?\n."
+          "content": "Budnikov - Novik\nMoscow 1991\n1...Rb5\nFor the moment, Black can wait. The best waiting strategy involves cutting the king's way with the rook to force White to use the bishop to cross.\n2.Rh6+ Ke7\nFor the moment, Black should always move towards the centre.\n3.Ra6 Rc5 (continuing to wait) 4.Bd3 Rc7 5.Ke5 Rc5+ 6.Kd4 Rg5 (keep on waiting with the rook on the 5th rank) 7.Be4 Rh5 8.Rg6 Ra5 9.Kd5!?\n."
         },
         {
           "type": "position",
           "content": {
             "number": "13.13",
-            "fen": "8/4k3/6R1/R2B4/3K4/8/8/8 w - - 0 1",
+            "fen": "8/4k3/6R1/R2B4/3K4/8/8/8 b - - 0 1",
             "caption": "Analysis diagram 13.13"
           }
         },
         {
           "type": "moves",
-          "content": "White has no other way to make progress. This is the first critical moment. The white king is going to reach the 5th rank. Black turns immediately to the 4 ideal squares for his rook. Only one lies in the zone opposite to the black king, so that is where the rook goes.\n9...Ra1!\n.\nActually, all sensible moves draw, but this follows our defensive method.\n10.Ke5 Ke1+ 11.i,e4 Re2\nAs long as the white bishop is pinned, waiting is the best strategy.\n1 2Rig7+ Ke8\nAll moves draw, but the simplest way is to keep the kings opposed until White leaves the pin."
+          "content": "White has no other way to make progress. This is the first critical moment. The white king is going to reach the 5th rank. Black turns immediately to the 4 ideal squares for his rook. Only one lies in the zone opposite to the black king, so that is where the rook goes.\n9...Ra1!\n.\nActually, all sensible moves draw, but this follows our defensive method.\n10.Ke5 Re1+ 11.Be4 Re2\nAs long as the white bishop is pinned, waiting is the best strategy.\n12.Rg7+ Ke8\nAll moves draw, but the simplest way is to keep the kings opposed until White leaves the pin."
         },
         {
           "type": "position",
@@ -3195,7 +3266,7 @@
         },
         {
           "type": "moves",
-          "content": "This is the standard position for the Cochrane Defence. You should study it care fully, as it can save you many half points. The rook pins the bishop, preventing\nWhite from reaching the Philidor Position, while the king just waits on the edge of the same file.\n1 3RRa7 Re1 (waiting) 14.Kd5!?\nWhite has to break Black's waiting set-up and so he moves his king. Now the black king must move in the opposite direction. After 14.Kf5 Kd8 the simplest way would be 15.Kd5 Re7 16.Ra8+ Kc7 and the king leaves the edge of the board.\n\nIt is important to note that 14...Kd8? would be losing: 15.Kd6! +- and White reaches the Philidor Position.\n15.i,f5\n\nWe have reached an intermediate stage. The white king still does not threaten to oppose his black counterpart, and that will take White many moves, but this 'innocuous' phase can be dangerous. Some guidance is necessary here. The simplest way to draw is the second-rank defence, which also allows Black to get his king out of the edge.\n\nLet us compare this situation to the starting position. The black king is on the same square. The white king is again cut off, then along the 5th rank, now along the e-file. Black keeps the white king cut off for some moves.\n\n24.Kd5 Ue8 25JH7 Ub8\nThe rook gets ready to pin the bishop once more and move to the side opposite to the file where the black king is. Another way of doing the same, perhaps more nat ural, would be: 25...Re1 26..i,e4 lda l 27.Ke5 ldaS + 28..i,ds l:lbS, reaching the same position as in the game after move 26.26.<ifJe5.:tb5 27.Rf1Ra5 28.Rg1+ <ifJh5"
+          "content": "This is the standard position for the Cochrane Defence. You should study it care fully, as it can save you many half points. The rook pins the bishop, preventing\nWhite from reaching the Philidor Position, while the king just waits on the edge of the same file.\n13.Ra7 Re1 (waiting) 14.Kd5!?\nWhite has to break Black's waiting set-up and so he moves his king. Now the black king must move in the opposite direction. After 14.Kf5 Kd8 the simplest way would be 15.Bd5 Re7 16.Ra8+ Kc7 and the king leaves the edge of the board.\n\n14...Kf8!\nIt is important to note that 14...Kd8? would be losing: 15.Kd6! +- and White reaches the Philidor Position.\n15.Bf5\n\nWe have reached an intermediate stage. The white king still does not threaten to oppose his black counterpart, and that will take White many moves, but this 'innocuous' phase can be dangerous. Some guidance is necessary here. The simplest way to draw is the second-rank defence, which also allows Black to get his king out of the edge.\n\n15...Re7 16.Ra8+ Kf7 17.Ra1 Kf6 18.Bc8\nLet us compare this situation to the starting position. The black king is on the same square. The white king is again cut off, then along the 5th rank, now along the e-file. Black keeps the white king cut off for some moves.\n\n18...Re5+ 19.Kd6 Re2 20.Rf1+ Kg5 21.Bb7 Re3 22.Kd5 Re2 23.Kd4 Re7\n24.Bd5 Re8 25.Rf7 Rb8\nThe rook gets ready to pin the bishop once more and move to the side opposite to the file where the black king is. Another way of doing the same, perhaps more nat ural, would be: 25...Re1 26.Be4 Rd1 27.Ke5 Rd5+ 28.Bd5 Rb5, reaching the same position as in the game after move 26.26.Ke5 Rb5 27.Rf1 Ra5 28.Rg1+ Kh5"
         },
         {
           "type": "position",
@@ -3207,7 +3278,7 @@
         },
         {
           "type": "moves",
-          "content": "And, again, we have reached the basic defensive position of the Cochrane Defence.\n29.Rh1+ <iii;g5 30.Rb1\nWhite plays around, but Black is fully awake and waits.\n30...<ifJh5 31.M.g 1 I;lb5 32.<ifJd4\nOnce again, White unpins his bishop, and once more Black then moves his king in the opposite direction.\n32...<ifJh6 33.Ke4Rg5\nAnd again the rook stands in the middle, freeing the black king from the edge.\n34.Itf1 <iii;g 7 35.Kf5 Kf6 36.Ke4 Ke7 37.Rd1.:tg2 38.Kd7+ <ifJf6 39.Itd6+ <JJe7\n40.M.e6+ <ifJf7 41.Ra6Re2+ 42.<ifJd5 <JJe7\nThe rook and the king stand on the two extremes of the file.\n43.Ke4 Itd2+ 44.<ifJe5 Ite2\nWe have the basic defensive position of the Cochrane Defence for the third time.\nThis position is almost the same as in position 13.14 after move 12.45..:te6+ <ifJd 7 46JKr h 6 <ifJe7 47.Rh7+ Ke8 48..:ta7 Ite1 49.<ifJd5 (unpinning the bishop) 49...Kf8\nThe king moves in the opposite direction and back to the start.\n50.Kf5 (5.O.Rb7 Ke8) 50... Ite7 1.f2-1h"
+          "content": "And, again, we have reached the basic defensive position of the Cochrane Defence.\n29.Rh1+ Kg5 30.Rb1\nWhite plays around, but Black is fully awake and waits.\n30...Kh5 31.Rg1 Rb5 32.Kd4\nOnce again, White unpins his bishop, and once more Black then moves his king in the opposite direction.\n32...Kh6 33.Ke4 Rg5\nAnd again the rook stands in the middle, freeing the black king from the edge.\n34.Rf1 Kg7 35.Bf5 Kf6 36.Ke4 Ke7 37.Rd1 Rg2 38.Kd7+ Kf6 39.Rd6+ Ke7\n40.Be6+ Kf7 41.Ra6 Re2+ 42.Kd5 Ke7\nThe rook and the king stand on the two extremes of the file.\n43.Ke4 Rd2+ 44.Ke5 Re2\nWe have the basic defensive position of the Cochrane Defence for the third time.\nThis position is almost the same as in position 13.14 after move 12. 45.Re6+ Kd7 46.Rh6 Ke7 47.Rh7+ Ke8 48.Ra7 Re1 49.Kd5 (unpinning the bishop) 49...Kf8\nThe king moves in the opposite direction and back to the start.\n50.Bf5 (50.Rb7 Ke8) 50...Re7 1/2-1/2"
         },
         {
           "type": "ending",
@@ -3230,19 +3301,19 @@
         },
         {
           "type": "moves",
-          "content": "Garcia Gonzalez\nBalashov\nLen ingrad 1977\n1...Kh3!\nInstead of playing neutral moves which may lead to dangerous positions, Black im mediately seeks a defensive procedure. The idea is... Kg2.2.Kf4:ig2 3.:ih7+ Kg4 4.Ke4\nThis is one of the basic positions of the second-rank defence. Although Black has apparently fallen into zugzwang, he has a simple way to hold. The fact that the situ ation is extreme can help us find our way, but even experienced players may go astray in this ending.\n\n100 Endgames You M u s t Kn o w"
+          "content": "Garcia Gonzalez\nBalashov\nLen ingrad 1977\n1...Kh3!\nInstead of playing neutral moves which may lead to dangerous positions, Black im mediately seeks a defensive procedure. The idea is...Rg2. 2.Kf4 Rg2 3.Rh7+ Kg4 4.Ke4\nThis is one of the basic positions of the second-rank defence. Although Black has apparently fallen into zugzwang, he has a simple way to hold. The fact that the situ ation is extreme can help us find our way, but even experienced players may go astray in this ending.\n\n100 Endgames You M u s t Kn o w"
         },
         {
           "type": "position",
           "content": {
             "number": "13.17",
-            "fen": "8/7R/8/8/4KBk1/8/6r1/8 w - - 0 1",
+            "fen": "8/7R/8/8/4KBk1/8/6r1/8 b - - 0 1",
             "caption": "Analysis diagram 13.17"
           }
         },
         {
           "type": "moves",
-          "content": "4...Rc2?\nA surprising mistake that allows White to reach the Philidor Position. The obvious way was correct: 4...Re2+! 5.Ke3 Rg2 and Black holds. For instance: 6.Rg7+ Kh3\n7.Kg5 <j;>g4 8.Rg8 Kg3 9.Kf4+ Kh3 10.Rh8+ Kg4 and we have the same positi on with White to move, but White cannot cause trouble.\n5.i?Le3?\nWhite misses an opportunity to reach the Philidor Position. 5.Rg7+ Kh4 6.Kf5\n.ric5+ 7.Ke5 and White's set-up is h;thal.\n5...Rg2\nBlack returns to the right way.\n6.Rh1\nAnother interesting, but well-known, zugzwang attempt. Once again, despite the distressing appearance of Black's position, he manages to draw by keeping both pieces on the second rank by means of only moves.\n6...Kg3! (6..Rg3! =) 7.i?Lf4+ Kf2\nBlack shifts from the g-file to the genuine 'second-rank', maybe because it is easier to record the moves on the score sheet... 7...Kg4=.\n8.:blc1 Ke2 9.Rc3 Kf2 10.Ra3 Ke2 11.i?Lg3!?\nThis is the zugzwang position we mentioned in the introduction. Again, Black has only one method, but it is simple and safe.\n11...Kf1! (11...Kd1! =) 1 2JU3+\n\ntry.\n\nNow i t would b e wrong to play 13...Kf1?? 14.Ke1+#. The threat i s... Re2, forcing an immediate draw.\n14.Kd4\n14.Kf3?! Rg3+ =.\n\nThe king may move to the 1st rank as long as it is guaranteed that he will quickly return to the second rank.\nAnyway, it was not forced: 14...J ie2! 15.Ka3 Kc2=.\n15.Ra3 Ke2 16.Ke4 Kf1 17.Kf3\nAt last White decides to try the stalemate resource."
+          "content": "4...Rc2?\nA surprising mistake that allows White to reach the Philidor Position. The obvious way was correct: 4...Re2+! 5.Ke3 Rg2 and Black holds. For instance: 6.Rg7+ Kh3\n7.Kg5 <j;>g4 8.Rg8 Kg3 9.Kf4+ Kh3 10.Rh8+ Kg4 and we have the same positi on with White to move, but White cannot cause trouble.\n5.Be3?\nWhite misses an opportunity to reach the Philidor Position. 5.Rg7+ Kh4 6.Kf5\nRc5+ 7.Be5 and White's set-up is lethal.\n5...Rg2\nBlack returns to the right way.\n6.Rh1\nAnother interesting, but well-known, zugzwang attempt. Once again, despite the distressing appearance of Black's position, he manages to draw by keeping both pieces on the second rank by means of only moves.\n6...Kg3! (6..Rg3! =) 7.Bf4+ Kf2\nBlack shifts from the g-file to the genuine 'second-rank', maybe because it is easier to record the moves on the score sheet... 7...Kg4=.\n8.Rc1 Ke2 9.Rc3 Kf2 10.Ra3 Ke2 11.Bg3!?\nThis is the zugzwang position we mentioned in the introduction. Again, Black has only one method, but it is simple and safe.\n11...Kf1! (11...Kd1!=) 12.Rf3+\n12.Kf3 Rf2+!= is a well-known stalemate resource; White does not want to try.\n12...Ke2 13.Re3+ Kd2!\nNow it would be wrong to play 13...Kf1?? 14.Re1+#. The threat is...Re2, forcing an immediate draw.\n14.Kd4\n14.Kf3?! Rxg3+=.\n\nThe king may move to the 1st rank as long as it is guaranteed that he will quickly return to the second rank.\nAnyway, it was not forced: 14...Re2! 15.Ka3 Kc2=.\n15.Ra3 Ke2 16.Ke4 Kf1 17.Kf3\nAt last White decides to try the stalemate resource."
         },
         {
           "type": "ending",
@@ -3255,13 +3326,13 @@
           "type": "position",
           "content": {
             "number": "13.18",
-            "fen": "8/8/8/8/8/R4KB1/6r1/5k2 w - - 0 1",
+            "fen": "8/8/8/8/8/R4KB1/6r1/5k2 b - - 0 1",
             "caption": "Analysis diagram 13.18"
           }
         },
         {
           "type": "moves",
-          "content": "The only move - but enough.\n18.Kg4\n18.Ke4 would lead to a repetition.\n\nTransferring the rook to the other side; almost every rook move on the 2nd rank draws: 18.. ki:e2=; 18...Kd2= - but not 18.Rg2? 19 J Ka1 Ke2 20.Kh3 and the\n+\n...\nrook is trapped.\n19.Re3 Re2 20.Rf3+ Kg2 21.Rf4 Ra2 22Ri:e4 Rc2\nThe black rook always keeps an eye on the 2nd rank, while White is running out of ideas.\n23.Kd6 Kf1\nBlack gets ready for second-rank checks. A waiting strategy was still possible:\n23...Ra2=.\n24.Kb4 Rg2+ 25.Kh3.Rc2 26.Ka5 Ka2 27.Kb6?!\nWhite creates a stalemate theme, and Black uses it to drive the white king off and gain some moves.\n27...Ra3+ 28.Kg4 Kg3+ 29.Kf4 Rf3+ 30.Ke5 Kg2 31.Re2+ Kg3 1.f2-1.f2\nIn spite of the great material advantage, a rook and a pawn are unable to win against a lone bishop in certain positions. Apart from those situations where the pawn is lost by force, or a few positions where the defending side is unable to capture the pawn but forces the stronger side to a passive defence, a rook and a pawn usually win against a minor piece.\nNevertheless, in the case of a bishop, there are some positions where the rook can not break the defence. All of them occur near the bishop's 'right' corner (see End ing7).\nThe first drawn position involves a 6th-rank bishop's pawn. Let us have a look at the following diagram:"
+          "content": "17...Rf2+!\nThe only move - but enough.\n18.Kg4\n18.Ke4 would lead to a repetition.\n\n18...Rc2\nTransferring the rook to the other side; almost every rook move on the 2nd rank draws: 18...Re2=; 18...Rd2= - but not 18...Rg2? 19.Ra1+ Ke2 20.Kh3 and the rook is trapped.\n19.Re3 Re2 20.Rf3+ Kg2 21.Rf4 Ra2 22.Rxe4 Rc2\nThe black rook always keeps an eye on the 2nd rank, while White is running out of ideas.\n23.Bd6 Kf1\nBlack gets ready for second-rank checks. A waiting strategy was still possible:\n23...Ra2=.\n24.Bb4 Rg2+ 25.Kh3 Rc2 26.Ba5 Ra2 27.Bb6?!\nWhite creates a stalemate theme, and Black uses it to drive the white king off and gain some moves.\n27...Ra3+ 28.Kg4 Rg3+ 29.Kf4 Rf3+ 30.Ke5 Kg2 31.Re2+ Kg3 1/2-1/2\nIn spite of the great material advantage, a rook and a pawn are unable to win against a lone bishop in certain positions. Apart from those situations where the pawn is lost by force, or a few positions where the defending side is unable to capture the pawn but forces the stronger side to a passive defence, a rook and a pawn usually win against a minor piece.\nNevertheless, in the case of a bishop, there are some positions where the rook can not break the defence. All of them occur near the bishop's 'right' corner (see End ing7).\nThe first drawn position involves a 6th-rank bishop's pawn. Let us have a look at the following diagram:"
         },
         {
           "type": "position",
@@ -3273,7 +3344,7 @@
         },
         {
           "type": "moves",
-          "content": "1.f6?\nA gross mistake. White could easily win if the king moved ahead of the pawn, a well-known rule applied to other endgames: 1.Kf6 Kg8 2.Ke7 Kg7 3.f6+ Kg6\n4.Rb1 iLdS 5.Rg1+, followed by f6-f7.Now Black can draw relatively comfortably, just by following this rule: 'The bishop must stay along the a2-g8 diagonal, avoiding the gS- and -squares and thus f7\nbeing able to deliver a check if the white king moves to g6. ' Here's how:\n1...Ba2 (I.. Bg8? - as we have said, this square is mined: 2.f7! iLxf7 3.Kf6+-)\n.\n2.\\itf4\n2.f7 is an interesting attempt, but now Black is not forced to capture immediately.\n2...Kg7!, followed by Bf7=.\n2...Bc4\nApparently, all moves are OK, but Black should not play carelessly. 2...Kg8? leads to an instructive defeat: 3.Kf5 Bc4 4.Kg6 Bd3+ 5.Kh6 and as now both black pieces are misplaced, there is no time to stop f6-f7: 5...Kf8 (5...Bc4 6.f7+! +-) 6.f7 Be4\n7.Rc7 Bb1 8.Rc1! (8.Kg5? allows 8...Kg7=) 8...Ba2 9.Kg6 iLxf7+ 10.Kf6+-.\nThis line illustrates that, if the defending pieces do not occupy their ideal squares all the time, the stronger side can cause trouble.\n3.Kg5 Bd5!\nThis is the only move here. The black bishop must always have a check when the white king occupies g6, and White cannot control the whole diagonal. The bishop must always stay on one of the marked squares except when delivering a check."
+          "content": "1.f6?\nA gross mistake. White could easily win if the king moved ahead of the pawn, a well-known rule applied to other endgames: 1.Kf6 Kg8 2.Ke7 Kg7 3.f6+ Kg6\n4.Rb1 Bd5 5.Rg1+, followed by f6-f7.Now Black can draw relatively comfortably, just by following this rule: 'The bishop must stay along the a2-g8 diagonal, avoiding the gS- and -squares and thus f7\nbeing able to deliver a check if the white king moves to g6. ' Here's how:\n1...Ba2 (1...Bg8? - as we have said, this square is mined: 2.f7! Bxf7 3.Kf6+-)\n.\n2.Kf4\n2.f7 is an interesting attempt, but now Black is not forced to capture immediately.\n2...Kg7!, followed by Bf7=.\n2...Bc4\nApparently, all moves are OK, but Black should not play carelessly. 2...Kg8? leads to an instructive defeat: 3.Kf5 Bc4 4.Kg6 Bd3+ 5.Kh6 and as now both black pieces are misplaced, there is no time to stop f6-f7: 5...Kf8 (5...Bc4 6.f7+! +-) 6.f7 Be4\n7.Rc7 Bb1 8.Rc1! (8.Kg5? allows 8...Kg7=) 8...Ba2 9.Kg6 Bxf7+ 10.Kf6+-.\nThis line illustrates that, if the defending pieces do not occupy their ideal squares all the time, the stronger side can cause trouble.\n3.Kg5 Bd5!\nThis is the only move here. The black bishop must always have a check when the white king occupies g6, and White cannot control the whole diagonal. The bishop must always stay on one of the marked squares except when delivering a check."
         },
         {
           "type": "position",
@@ -3285,7 +3356,7 @@
         },
         {
           "type": "moves",
-          "content": "4Ri:c7 Ba2! 5.Kg6 Bb1+! 6.Kh6 Ba2!"
+          "content": "4.Rc7 Ba2! 5.Kg6 Bb1+! 6.Kh6 Ba2!"
         },
         {
           "type": "ending",
@@ -3295,24 +3366,76 @@
           }
         },
         {
-          "type": "text",
-          "content": "Now there is time to return to the diagonal.\n7JJ.a7\nIf7.f7 Kf7! = When the king is on the h6-square, the pawn can be captured.\n7...Kc4=\nThere is no way to make progress.\nPawn on the 6th ra n k\nHere defence i s even easier. The defender just has t o keep his bishop along the diag onal controlling the pawn's advance (here, the h7 -square) and capture the pawn when it reaches that square. Then Ending 7 arises."
+          "type": "moves",
+          "content": "Now there is time to return to the diagonal.\n7.Ra7\nIf 7.f7 Bxf7!= When the king is on the h6-square, the pawn can be captured.\n7...Bc4=\nThere is no way to make progress.\nPawn on the 6th ra n k\nHere defence i s even easier. The defender just has t o keep his bishop along the diag onal controlling the pawn's advance (here, the h7 -square) and capture the pawn when it reaches that square. Then Ending 7 arises."
         },
         {
-          "type": "caption",
-          "content": "Position 13.21"
+          "type": "position",
+          "content": {
+            "number": "13.21",
+            "fen": "7k/R7/7P/6K1/8/8/2b5/8 w - - 0 1",
+            "caption": "Position 13.21",
+            "markers": [
+              {
+                "square": "b1",
+                "symbol": "*",
+                "meaning": "as printed"
+              },
+              {
+                "square": "d3",
+                "symbol": "*",
+                "meaning": "as printed"
+              },
+              {
+                "square": "e4",
+                "symbol": "*",
+                "meaning": "as printed"
+              },
+              {
+                "square": "f5",
+                "symbol": "*",
+                "meaning": "as printed"
+              }
+            ]
+          }
         },
         {
           "type": "moves",
-          "content": "1.'Rc7 Kd3!\n1...Kb3? loses easily: 2.h7 Kd5 3.Kh6+-. Or also 1...Kh7? 2.Rc8+ Kg8 3.Rd8\nKh7 4.Kd7+ Kh8 5.Kg6+-.\n2.Kf6 Ke4 3.h7 Kh7=\nConclusion: A rook and a 6th-rank rook's or bishop's pawn cannot win against a bishop near the bishop's right corner.\nOther pawns win, but the ending with the central pawn is also quite difficult.\nTherefore, when possible, it is better to move the king ahead of the pawn.\nPawn on the 5th ran k\nWhen the pawn i s o n the 5th rank, the ending i s still drawn, but i t requires a more accurate defence. This has caused many strong players to go astray. See Position"
+          "content": "1.Rc7 Bd3!\n1...Bb3? loses easily: 2.h7 Bd5 3.Kh6+-. Or also 1...Bh7? 2.Rc8+ Bg8 3.Rd8\nKh7 4.Rd7+ Kh8 5.Kg6+-.\n2.Kf6 Be4 3.h7 Bxh7=\nConclusion: A rook and a 6th-rank rook's or bishop's pawn cannot win against a bishop near the bishop's right corner.\nOther pawns win, but the ending with the central pawn is also quite difficult.\nTherefore, when possible, it is better to move the king ahead of the pawn.\nPawn on the 5th ran k\nWhen the pawn i s o n the 5th rank, the ending i s still drawn, but i t requires a more accurate defence. This has caused many strong players to go astray. See Position"
         },
         {
-          "type": "caption",
-          "content": "Position 13.22"
+          "type": "position",
+          "content": {
+            "number": "13.22",
+            "fen": "7k/1R6/8/6KP/8/8/2b5/8 w - - 0 1",
+            "caption": "Position 13.22",
+            "markers": [
+              {
+                "square": "b1",
+                "symbol": "*",
+                "meaning": "as printed"
+              },
+              {
+                "square": "d3",
+                "symbol": "*",
+                "meaning": "as printed"
+              },
+              {
+                "square": "e4",
+                "symbol": "*",
+                "meaning": "as printed"
+              },
+              {
+                "square": "f5",
+                "symbol": "*",
+                "meaning": "as printed"
+              }
+            ]
+          }
         },
         {
           "type": "moves",
-          "content": "The first important rule to know is something we could infer from the previous ex ample: 'The bishop must occupy the diagonal where it can control the pawn's advance to the 7th rank:\n1.Ra7 itd3\nLeaving the right diagonal with1...Bb3? is careless and it will be punished. How ever, this is a quite frequent mistake, the reason probably being the similarity be tween this position and the Rook vs. Bishop ending, which leads to the erroneous feeling that, as long as our bishop can cover the check, were safe. 2.Kh6.Now there is no time for the bishop to return to the saving diagonal:\nA) 2...Kg8 3.l:f.g7+ Kh8 (3...Kf8 4.Kg6 followed by Kf6, h6, h7 and h8)\n4.Rc7 (controlling the c2 check and threatening Kg6) 4...Ba2 5.l:f.c8+ leads to similar positions to the variation 2...Bc4.B) 2...Bc4 3.Ka8+ Bg8 4.Kg5 Kh7 (4...Kg7 5.h6+ is similar) 5.h6.idS 6.Ka7+\nKh8 7.l:f.e7! (the rook covers the square the bishop needs in order to return to the right diagonal, and at the same time avoids a well-known trap which only works when the rook is on the a7 -square. This trap has occurred in some actual games: 7.h7? Be4\n8.Kh6 Bb7!! = and there is no way to due to stalemate resources: 9.Ra4 Be4!).\nwin\n7...Bg8 8.Kg6 Bc4 9.h7 followed by checkmate on the 8th rank.\n+-\n2.Kh6 Kg8!\nKnowing that the bishop must not leave the b l -h7 diagonal, this odd-looking move is easy to find. If we ignore that rule, it is very easy to fall into the 'logical' de fence mentioned in the previous note.\n3.l:f.g7+"
+          "content": "The first important rule to know is something we could infer from the previous ex ample: 'The bishop must occupy the diagonal where it can control the pawn's advance to the 7th rank:\n1.Ra7 Bd3\nLeaving the right diagonal with 1...Bb3? is careless and it will be punished. How ever, this is a quite frequent mistake, the reason probably being the similarity be tween this position and the Rook vs. Bishop ending, which leads to the erroneous feeling that, as long as our bishop can cover the check, were safe. 2.Kh6.Now there is no time for the bishop to return to the saving diagonal:\nA) 2...Kg8 3.Rg7+ Kh8 (3...Kf8 4.Kg6 followed by Kf6, h6, h7 and h8)\n4.Rc7 (controlling the c2 check and threatening Kg6) 4...Ba2 5.Rc8+ leads to similar positions to the variation 2...Bc4.B) 2...Bc4 3.Ra8+ Bg8 4.Kg5 Kh7 (4...Kg7 5.h6+ is similar) 5.h6 Bd5 6.Ra7+\nKh8 7.Re7! (the rook covers the square the bishop needs in order to return to the right diagonal, and at the same time avoids a well-known trap which only works when the rook is on the a7 -square. This trap has occurred in some actual games: 7.h7? Be4\n8.Kh6 Bb7!! = and there is no way to due to stalemate resources: 9.Ra4 Be4!).\nwin\n7...Bg8 8.Kg6 Bc4 9.h7 followed by checkmate on the 8th rank.\n+-\n2.Kh6 Kg8!\nKnowing that the bishop must not leave the b l -h7 diagonal, this odd-looking move is easy to find. If we ignore that rule, it is very easy to fall into the 'logical' de fence mentioned in the previous note.\n3.Rg7+"
         },
         {
           "type": "position",
@@ -3324,7 +3447,7 @@
         },
         {
           "type": "moves",
-          "content": "3.1Ia8+ Kf7 and, though the black king has left the corner, his white counterpart cannot get in: 4.Kg5 Bc2 5.h6.It is interesting to know that, even with this dispo sition of pieces, Black is able to draw.\n3...Kf5!\nAgain, this move is easy to find in view of3...Kh8 4.1Id7+- winning. Now the black king is out of the corner, but any white move would allow him back.\n4.Rg3\nIntending to take the white king off the h-file, and preventing the black king from returning to the h8 -square. However, this double purpose fails against an accurate defence.\n4...jlc2!\n4...Bb1 would also draw, but only these two moves work; Black should avoid the trap 4...Be4? allowing the white king off the h-file: 5.Kg5! +- Kg8?! 6.Kf4+.\nSRKg6\nAnother attempt t o trick Black, but there i s no reason t o capture the rook.\n5...Bd3 6.Kh7\nThreatening Kh8, winning; the rook cannot be captured, but..\n.\n6...Kf7!\nThe only move, and enough to draw.\n7.Kh6 Kf8 8.Rg1\n8.Kg5 ilxg6=. Here Black can capture the rook.\n8...Bc2 9.Kg5 Kg8=\nWhite has already tried everything.\nPawn on the 4th ran k"
+          "content": "3.Ra8+ Kf7 and, though the black king has left the corner, his white counterpart cannot get in: 4.Kg5 Bc2 5.h6.It is interesting to know that, even with this dispo sition of pieces, Black is able to draw.\n3...Kf8!\nAgain, this move is easy to find in view of 3...Kh8 4.Rd7+- winning. Now the black king is out of the corner, but any white move would allow him back.\n4.Rg3\nIntending to take the white king off the h-file, and preventing the black king from returning to the h8 -square. However, this double purpose fails against an accurate defence.\n4...Bc2!\n4...Bb1 would also draw, but only these two moves work; Black should avoid the trap 4...Be4? allowing the white king off the h-file: 5.Kg5! +- Kg8?! 6.Kf4+.\n5.Rg6\nAnother attempt t o trick Black, but there i s no reason t o capture the rook.\n5...Bd3 6.Kh7\nThreatening Kh8, winning; the rook cannot be captured, but..\n.\n6...Kf7!\nThe only move, and enough to draw.\n7.Kh6 Kf8 8.Rg1\n8.Kg5 Bxg6=. Here Black can capture the rook.\n8...Bc2 9.Kg5 Kg8=\nWhite has already tried everything.\nPawn on the 4th ran k"
         },
         {
           "type": "position",
@@ -3336,7 +3459,7 @@
         },
         {
           "type": "moves",
-          "content": "When the pawn is on the 4th rank, or less advanced, the ending is won. The win ning sequence is too long to learn by heart but, if you have carefully studied the two previous endings, you will be able to find it over the board. I present here the analysis without comments.\n1.Kh6 Kg8 2.Rg7+ Kf8 3.1Ig3 Kf7 4.Kh5 Kf6 (4...Bb1 s Jlgs Bc2 6.Kg4+-;\n4...Kf8 s. ligs ild l + 6.Kg6 Kg8 7.Rc5+-) 5.1Ig5 Bd1+ (5...il fs 6.Kh6 Bd3\n7.1Ig3 Be4 8.Re3 ildS 9.1Ie2 Kf7 10.Kh7+-) 6.Kh6 Kf7 7.!Ig7+ Kf8 (7...Kf6\n8.Kg1 Be2 9.:gg2 ild l 10.Rf2+ +-) 8.Kg6 Bh5+ 9.Kf6+-"
+          "content": "When the pawn is on the 4th rank, or less advanced, the ending is won. The win ning sequence is too long to learn by heart but, if you have carefully studied the two previous endings, you will be able to find it over the board. I present here the analysis without comments.\n1.Kh6 Kg8 2.Rg7+ Kf8 3.Rg3 Kf7 4.Kh5 Kf6 (4...Bb1 5.Rg5 Bc2 6.Kg4+-;\n4...Kf8 5.Rg5 Bd1+ 6.Kg6 Kg8 7.Rc5+-) 5.Rg5 Bd1+ (5...Bf5 6.Kh6 Bd3\n7.Rg3 Be4 8.Re3 Bd5 9.Re2 Kf7 10.Kh7+-) 6.Kh6 Kf7 7.Rg7+ Kf8 (7...Kf6\n8.Rg1 Be2 9.Rg2 Bd1 10.Rf2++-) 8.Kg6 Bh5+ 9.Kf6+-"
         },
         {
           "type": "ending",
@@ -3350,36 +3473,52 @@
           "content": "This struggle is one of the most frequent among the ' different material relations'\nsection (123 7 games in my database). Despite the material imbalance, drawing chances are quite high. In practice, among 123 7 games, 367 were drawn, which represents about 30%.\nThe theory i s complex. Here we will only deal with a few important positions.\nThen, I will present a chart and some advice on handling the possible scenarios.\nYou can find a detailed study on this ending in the excellent work Fundamental Chess\nEndings, by Muller & Lamprecht.\nThe defending side has drawing chances in these two cases:\n1) When the.rook defends and pushes the pawn from the rear; we will not study this case. The pawn must be at least on the 6th rank to draw.\n2) Building a fortress; we will see how in the next two positions.\nIf the defender fails to coordinate his forces in one of these two ways, the ending is usually lost.\nThe win n i ng manoeuvre"
         },
         {
-          "type": "caption",
-          "content": "Position 13.25"
+          "type": "position",
+          "content": {
+            "number": "13.25",
+            "fen": "8/4k3/4p3/3r4/4K3/7Q/8/8 w - - 0 1",
+            "caption": "Position 13.25"
+          }
         },
         {
           "type": "moves",
-          "content": "In this first example, we are going to see the winning procedure from a normal po sition. Since the white king is cut off and all defending pieces are close, Black is able to put up resistance.\n1.Kf4\nThe king moves so that later the rook cannot win time by delivering checks. The winning manoeuvre could also start with the queen-checking phase, and the re sulting position would be the same after some moves, for instance: 1.Qh7+ Kf6\n2.Qg8 Ke7 3.Qg7+ Kd6 4.Qf8+ Kd7 5.Qf7+ Kd6 6.Qe8.tieS + 7.Kf4::t:fS +\n8.Kg4+-.\n1...Rf5+ 2.Kg4 Kd5\nBlack has nothing better to do than wait.\n3.Qh7+ Kf6 (3...Ke8 leads to exactly the same position on move 6: 4.Qg8+ Ke7\n5.Qg7+ Ke8 6.Qf6+-) 4.Qg8!"
+          "content": "In this first example, we are going to see the winning procedure from a normal po sition. Since the white king is cut off and all defending pieces are close, Black is able to put up resistance.\n1.Kf4\nThe king moves so that later the rook cannot win time by delivering checks. The winning manoeuvre could also start with the queen-checking phase, and the re sulting position would be the same after some moves, for instance: 1.Qh7+ Kf6\n2.Qg8 Ke7 3.Qg7+ Kd6 4.Qf8+ Kd7 5.Qf7+ Kd6 6.Qe8 Re5+ 7.Kf4 Rf5+\n8.Kg4+-.\n1...Rf5+ 2.Kg4 Kd5\nBlack has nothing better to do than wait.\n3.Qh7+ Kf6 (3...Ke8 leads to exactly the same position on move 6: 4.Qg8+ Ke7\n5.Qg7+ Ke8 6.Qf6+-) 4.Qg8!"
         },
         {
-          "type": "caption",
-          "content": "Position 13.26"
-        },
-        {
-          "type": "moves",
-          "content": "The first important position. Queen checks have finished, but Qf8+ is a threat. As we will see, for this manoeuvre the queen needs two ranks behind the pawn.\nTherefore, with the pawn on the 2nd rank the position is drawn. The queen needs two files near the pawn as well, so with a knight's pawn the position is also drawn.\n4...Ke7 5.Qg7+ Ke8 6.Qf6 Kd7 7.Qf7+ Kd6 8.Qe8!\nOnce again, a quiet move on the 8th rank, intending a check on the d8-square.\n8...JU5 9.Qd8+ Kc6 10.Qe7\nAttacking the pawn and forcing the black king to hinder his own rook. 10.Kg3!\nwins faster thanks to zugzwang, but continuing the queen manoeuvre is more the matic."
-        },
-        {
-          "type": "caption",
-          "content": "Analysis diagram 13.27"
+          "type": "position",
+          "content": {
+            "number": "13.26",
+            "fen": "6Q1/8/4pk2/3r4/6K1/8/8/8 b - - 0 4",
+            "caption": "Position 13.26"
+          }
         },
         {
           "type": "moves",
-          "content": "Zugzwang. Black's pieces have more and more coordination problems.\n11...Ke4\n\n13, only faster.\n12.Qd6!\nThe white queen exerts more pressure.\n\nThe position of the defending pieces is tragicomic and will collapse if White man ages to transfer the move to Black.\n13.Kg3 Kf5\nThe black king tries to reach the other side, in view of 13...Rg5+ 14.Kh4 Re5\n\n14.Kf3 Kd5 15.'ii'f8+\nFinally White succeeds in driving the king away from the pawn, so the black infant will be captured in a few moves.\n\npawn dies.\nThe defensive set-up\nAs seen in the previous example, the queen needs two ranks behind the pawn in or der to carry out the winning manoeuvre.\nHere nothing can be done against the fortress set up by Black. The rook can move back and forth between the f6- and d6-squares and the king just has to escape from every check."
+          "content": "The first important position. Queen checks have finished, but Qf8+ is a threat. As we will see, for this manoeuvre the queen needs two ranks behind the pawn.\nTherefore, with the pawn on the 2nd rank the position is drawn. The queen needs two files near the pawn as well, so with a knight's pawn the position is also drawn.\n4...Ke7 5.Qg7+ Ke8 6.Qf6 Kd7 7.Qf7+ Kd6 8.Qe8!\nOnce again, a quiet move on the 8th rank, intending a check on the d8-square.\n8...Rf5 9.Qd8+ Kc6 10.Qe7\nAttacking the pawn and forcing the black king to hinder his own rook. 10.Kg3!\nwins faster thanks to zugzwang, but continuing the queen manoeuvre is more thematic.\n10...Kd5 11.Qc7!"
         },
         {
-          "type": "caption",
-          "content": "Position 13.28"
+          "type": "position",
+          "content": {
+            "number": "13.27",
+            "fen": "8/2Q5/4p3/3k1r2/6K1/8/8/8 b - - 0 11",
+            "caption": "Analysis diagram 13.27"
+          }
         },
         {
           "type": "moves",
-          "content": "1.Qh8+ Kd7 2.'ii'f8 Ke6+ 3.Kd5 Kd6+ 4.Kc5 Kf6\nThere is nothing to do. White would win if his king could reach the 7th or 8th ranks,\nbut only if he penetrates through the wing where the black king is. For instance:\n4...Rd2?! 5.Kb6 l:!.d6+? (5...l:!. b2+! is still a draw) 6.Kb7, threatening Qc8 and provoking the collapse of the black set-up in a similar way as in the previous exam ple. However, the white king on the g7 -square would be harmless. 6...l:!. f6 7.'li'c8+\nKd6 8.'li'g4 l:!.f8 9.'li'd4+ Ke6 10.Kc7 l:!.f6 11.'li'c4+! \\tieS 12.Kd7+-.\n5.Qa8 Kd6 6.Qb7+ Kd8= -there is no way to make progress.\nSummary: Queen vs. Rook + Pawn (from b- to g-fi le)\nYou do not need to know a lot of manoeuvres, because the result always depends on the ability of the defending army to coordinate and build a fortress, and on the success or failure in bringing the fortress down. Defensive manoeuvres are rather obvious. Attacking manoeuvres can be really complex, but they are always based on the same idea: breaking the coordination between the defending forces by means of zugzwang and a gradual queen penetration.\nFor this reason I consider that, although a study of each position is not necessary, it is quite useful to know in which positions the fortress succeeds and in which posi tions it fails. Leaving aside the rook's pawn, with which we will deal in the follow ing ending, and considering defensive fortresses of the same type as Position 13.27\nor 13.28:"
+          "content": "Zugzwang. Black's pieces have more and more coordination problems.\n11...Ke4\n11...Re5 12.Qd7+ Ke4 13.Qd6 leads to the same position as the note to move 13, only faster.\n12.Qd6!\nThe white queen exerts more pressure.\n\n12...Re5\nThe position of the defending pieces is tragicomic and will collapse if White man ages to transfer the move to Black.\n13.Kg3 Kf5\nThe black king tries to reach the other side, in view of 13...Rg5+ 14.Kh4 Re5 15.Kg4!+- with total zugzwang.\n\n14.Kf3 Rd5 15.Qf8+\nFinally White succeeds in driving the king away from the pawn, so the black infant will be captured in a few moves.\n\n15...Kg6 (15...Ke5? 16.Qf4 mate) 16.Ke4 Rf5 17.Qe7 Rf6 18.Ke5+- and the pawn dies.\nThe defensive set-up\nAs seen in the previous example, the queen needs two ranks behind the pawn in or der to carry out the winning manoeuvre.\nHere nothing can be done against the fortress set up by Black. The rook can move back and forth between the f6- and d6-squares and the king just has to escape from every check."
+        },
+        {
+          "type": "position",
+          "content": {
+            "number": "13.28",
+            "fen": "4k3/4p3/3r4/4K3/7Q/8/8/8 w - - 0 1",
+            "caption": "Position 13.28"
+          }
+        },
+        {
+          "type": "moves",
+          "content": "1.Qh8+ Kd7 2.Qf8 Re6+ 3.Kd5 Rd6+ 4.Kc5 Rf6\nThere is nothing to do. White would win if his king could reach the 7th or 8th ranks,\nbut only if he penetrates through the wing where the black king is. For instance:\n4...Rd2?! 5.Kb6 Rd6+? (5...Rb2+! is still a draw) 6.Kb7, threatening Qc8 and provoking the collapse of the black set-up in a similar way as in the previous exam ple. However, the white king on the g7 -square would be harmless. 6...Rf6 7.Qc8+\nKd6 8.Qg4 Rf8 9.Qd4+ Ke6 10.Kc7 Rf6 11.Qc4+! Ke5 12.Kd7+-.\n5.Qa8 Kd6 6.Qb7+ Kd8= -there is no way to make progress.\nSummary: Queen vs. Rook + Pawn (from b- to g-fi le)\nYou do not need to know a lot of manoeuvres, because the result always depends on the ability of the defending army to coordinate and build a fortress, and on the success or failure in bringing the fortress down. Defensive manoeuvres are rather obvious. Attacking manoeuvres can be really complex, but they are always based on the same idea: breaking the coordination between the defending forces by means of zugzwang and a gradual queen penetration.\nFor this reason I consider that, although a study of each position is not necessary, it is quite useful to know in which positions the fortress succeeds and in which posi tions it fails. Leaving aside the rook's pawn, with which we will deal in the follow ing ending, and considering defensive fortresses of the same type as Position 13.27\nor 13.28:"
         },
         {
           "type": "ending",
@@ -3393,20 +3532,28 @@
           "content": "1) With any pawn on the second rank, the ending is drawn. Exception: the attacking king has crossed the 6th rank and occupies the same wing as the defending king.\n2) With a knight's pawn, no matter on which rank, the ending is always drawn. With a 3rd-rank pawn the de fender should keep his king behind the pawn.\nThe remaining cases are lost.\nHere the fortress with the 2nd-rank pawn does not work. This is logical, as there is just one protected point for the rook, and less room for the king.\nSo, you may assume that the ending with a rook's pawn is always lost. However, this is not so. There is one tough position with the pawn on the 3rd rank, but you need to know some details. This ending presents one of the highest percentage of mistakes in actual games, even among 260 0+ players.\nThe diagram position represents one of the main dilemmas of this ending. Only a few players solve it correctly. what is the best spot for the king? The rook's or the bishop's file? Intuition speaks against imprisoning the king, but..."
         },
         {
-          "type": "caption",
-          "content": "Position 13.29"
+          "type": "position",
+          "content": {
+            "number": "13.29",
+            "fen": "8/1k6/p5Q1/1r6/1K6/8/8/8 w - - 0 1",
+            "caption": "Position 13.29"
+          }
         },
         {
           "type": "moves",
-          "content": "1.Kc4?\nI choose the wrong move as the main line because it presents more subtleties. 1.Ka4!\nis an easy win, as Black cannot avoid zugzwang and then the white king reaches the aS -square....Ka7 2.Qc6 Rb7 3.Qc5+ Ka8 4.it'd6 Ka7 5.Qd4+ Ka8 6.Ka5+-.\nl\nAfter 1.Kc4the position is drawn, but most players lose.\n.\n1.Ka7 2.Qf7+Rb7!\n..\nAlmost everybody prefers to keep the rook on the bS-square as long as possible, which is sound, but the rook must move to b7 when the moment comes. My advice is: keep your rook on b 7 unless you are forced to move it, as then the saving moves are easy.\nLet us see the defensive moves which, apparently, are more natural: 2...Ka8 3.Qc7\nKb7 4.Qc6 Ka7 5.'ifcS + Ka8 6.it'd6 Ka7 7.Qd4+ Ka8 8.Kc5.The stronger side's king always manages to reach the 5th file thanks to zugzwang, but he is not really dangerous yet. The problems emerge when he reaches the back rank, especially the c8-square, and cannot be immediately ousted. 8...Rb5+ 9.Kc6.Rb8\n\n10.Qd6 (if 10.Kc7, the king reaches the 8th rank but cannot stay there for long:\n\nAn important moment. When the queen controls b8, thus preventing a future rook check which would drive the white king off the c8-square, Black cannot allow the white king's penetration. Therefore, he must transfer the rook to the key defensive square."
+          "content": "1.Kc4?\nI choose the wrong move as the main line because it presents more subtleties. 1.Ka4!\nis an easy win, as Black cannot avoid zugzwang and then the white king reaches the a5-square. 1...Ka7 2.Qc6 Rb7 3.Qc5+ Ka8 4.Qd6 Ka7 5.Qd4+ Ka8 6.Ka5+-.\nl\nAfter 1.Kc4 the position is drawn, but most players lose.\n.\n1...Ka7 2.Qf7+ Rb7!\n..\nAlmost everybody prefers to keep the rook on the bS-square as long as possible, which is sound, but the rook must move to b7 when the moment comes. My advice is: keep your rook on b 7 unless you are forced to move it, as then the saving moves are easy.\nLet us see the defensive moves which, apparently, are more natural: 2...Ka8 3.Qc7\nRb7 4.Qc6 Ka7 5.Qc5+ Ka8 6.Qd6 Ka7 7.Qd4+ Ka8 8.Kc5.The stronger side's king always manages to reach the 5th file thanks to zugzwang, but he is not really dangerous yet. The problems emerge when he reaches the back rank, especially the c8-square, and cannot be immediately ousted. 8...Rb5+ 9.Kc6 Rb8\n\n10.Qd6 (if 10.Kc7, the king reaches the 8th rank but cannot stay there for long:\n\nAn important moment. When the queen controls b8, thus preventing a future rook check which would drive the white king off the c8-square, Black cannot allow the white king's penetration. Therefore, he must transfer the rook to the key defensive square."
         },
         {
-          "type": "caption",
-          "content": "Analysis diagram 13.30"
+          "type": "position",
+          "content": {
+            "number": "13.30",
+            "fen": "kr6/8/p1KQ4/8/8/8/8/8 b - - 0 10",
+            "caption": "Analysis diagram 13.30"
+          }
         },
         {
           "type": "moves",
-          "content": "14.Qc7+- and White wins; the same goes for 10...Rb5 11.Kc7 and the rest)\n1 I.Qd8+ Ka7 12.Qd4+ Ka8= as in the main line.\n3.Qf2+ Kas 4.Qe3 Kb5 5.Kc5 Ka7 6.Kc6+ Kas 7.'i:VeS+ Ka7\nThe black rook remains on the b7 -square as long as possible and the king moves back and forth in the triangle a8-b8-a7.5.Qe3+ Kas 9.Qd4 Kb5 10.'i:VhS+ Ka7 11.'i:VdS\nFinally White decides to force the enemy rook out of b7.Only the queen on the back rank can do this, but then White will not be able to keep his king within the winning zone. 11.Qc8 Rb5 12.Kd7 Rb7+ runs like the main line.\nNow the black rook has to move. The most natural square is enough for an easy draw, though it is not the only move.\n\nWhen the queen moves, the white king receives checks from b7 and b8 until he leaves the two back ranks. Otherwise, the king cannot reach the back rank."
+          "content": "14.Qc7+- and White wins; the same goes for 10...Rb5 11.Kc7 and the rest)\n11.Qd8+ Ka7 12.Qd4+ Ka8= as in the main line.\n3.Qf2+ Ka8 4.Qe3 Kb5 5.Kc5 Ka7 6.Kc6+ Ka8 7.Qe8+ Ka7\nThe black rook remains on the b7 -square as long as possible and the king moves back and forth in the triangle a8-b8-a7. 8.Qe3+ Ka8 9.Qd4 Kb5 10.Qh8+ Ka7 11.Qd8\nFinally White decides to force the enemy rook out of b7.Only the queen on the back rank can do this, but then White will not be able to keep his king within the winning zone. 11.Qc8 Rb5 12.Kd7 Rb7+ runs like the main line.\nNow the black rook has to move. The most natural square is enough for an easy draw, though it is not the only move.\n\nWhen the queen moves, the white king receives checks from b7 and b8 until he leaves the two back ranks. Otherwise, the king cannot reach the back rank."
         },
         {
           "type": "panel",

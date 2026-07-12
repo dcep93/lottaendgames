@@ -4,6 +4,8 @@ import { chapterPayloadPath } from '../src/app_x/chapterPayloadManifest'
 import type { RawChapterSection } from '../src/app_x/chapterTypes'
 import {
   buildChapterPlayback,
+  isProseMoveReference,
+  isProseMoveReferenceContinuation,
   type TextPlaybackToken,
 } from '../src/app_x/moveParser'
 
@@ -154,9 +156,13 @@ function classifySanMiss(
   index: number,
 ): SanMissReason {
   const precedingText = text.slice(Math.max(0, index - 80), index)
+  const followingText = text.slice(index + display.length, index + display.length + 80)
   const snippet = getSnippet(text, index, display.length)
 
-  if (hasProseReferenceBefore(precedingText)) {
+  if (
+    isProseMoveReference(precedingText) ||
+    isProseMoveReferenceContinuation(followingText)
+  ) {
     return 'prose-reference'
   }
 
@@ -169,12 +175,6 @@ function classifySanMiss(
   }
 
   return 'branch-or-anchor'
-}
-
-function hasProseReferenceBefore(text: string) {
-  return /(?:\b(?:by means of|followed by|for example|forcing|intending|manoeuvre|such as|the threat is|threatening|which would allow|would allow)\s*(?:\.\.\.)?\s*)$/i.test(
-    text,
-  )
 }
 
 function shouldIgnoreSanDisplay(display: string, text: string, index: number) {
