@@ -247,10 +247,16 @@ assert.equal(getEndingNumbers(chapterThreeSections).at(0), '10')
 assert.equal(getEndingNumbers(chapterThreeSections).at(-1), '15')
 assert.equal(getEndingNumbers(chapterFourSections).at(0), '16')
 assert.equal(getEndingNumbers(chapterFourSections).at(-1), '20')
-assert.equal(getCaptions(chapterThreeSections).has('Position 3.1'), true)
-assert.equal(getCaptions(chapterThreeSections).has('Position 3.10'), true)
-assert.equal(getCaptions(chapterFourSections).has('Position 4.1'), true)
-assert.equal(getCaptions(chapterFourSections).has('Position 4.13'), true)
+assert.deepEqual(
+  [...getPositionNumbers(chapterThreeSections)],
+  Array.from({ length: 10 }, (_, index) => `3.${index + 1}`),
+)
+assert.deepEqual(
+  [...getPositionNumbers(chapterFourSections)],
+  Array.from({ length: 13 }, (_, index) => `4.${index + 1}`),
+)
+assert.equal(getCaptions(chapterThreeSections).size, 0)
+assert.equal(getCaptions(chapterFourSections).size, 0)
 assert.equal(chapterSevenPositionNumbers.has('7.1'), true)
 assert.equal(chapterSevenPositionNumbers.has('7.6'), true)
 assert.equal(chapterSevenPlayback.playablePositions.has('7.1'), true)

@@ -325,6 +325,7 @@ def normalize_common_words(text: str) -> str:
         ("dQfer", "differ"),
         ("dQficult", "difficult"),
         ("DQficult", "Difficult"),
+        ("difficuR", "difficult"),
         ("pawnstraight", "pawn straight"),
         ("hinder ing", "hindering"),
         ("go ing", "going"),
@@ -363,12 +364,14 @@ def normalize_common_words(text: str) -> str:
         ("cannote", "can note"),
         ("a2)", "2)"),
         ("2.lt. Je3+", "2.Ne3+"),
+        ("2. R. Je3+", "2.Ne3+"),
         ("5Jtjd1", "5.Nd1+"),
         ("2.tb cS", "2.Nc5"),
         ("t. Nf3", "1.Nf3"),
         ("<1Jel", "Ne1"),
         ("lNhl", "Nh1"),
         ("Kxhl", "Kxh1"),
+        ("Wxh1", "Kxh1"),
         ("N3!", "Ng3!"),
         ("Q'f", "Qf"),
         ("Q'h", "Qh"),
@@ -405,6 +408,7 @@ def normalize_spacing(text: str) -> str:
     text = re.sub(r"(?<![A-Za-z])l\s*\.", "1.", text)
     text = re.sub(r"(?<![A-Za-z])I\)", "1)", text)
     text = re.sub(r"(?<![A-Za-z])S(?=[.+\-])", "5", text)
+    text = re.sub(r"(?<![A-Za-z])s\.\s*(?=[KQRBNOa-h])", "5.", text)
     text = re.sub(r"(?<=\d)\s*/\s*(?=[KQRBNOa-h])", ".", text)
     text = re.sub(r"(?<=[a-z)])(?=\d{1,2}\s*(?:\.|\.\.\.))", " ", text)
     text = re.sub(r"(?<=[!?+=])(?=\d{1,2}\s*(?:\.|\.\.\.))", " ", text)
@@ -412,11 +416,13 @@ def normalize_spacing(text: str) -> str:
     text = re.sub(r"\b([KQRBN])([a-h])l\b", r"\1\g<2>1", text)
     text = re.sub(r"\b([KQRBN][a-h])\s+([1-8])", r"\1\2", text)
     text = re.sub(r"\b([a-h])\s+([1-8])(?=\s*=?[QRBN])", r"\1\2", text)
+    text = re.sub(r"\bfl\b", "f1", text)
     text = re.sub(r"(?<![A-Za-z])1\s+b2!\s*\.\s*\.\.", "1...b2!", text)
     text = re.sub(r"(?<![A-Za-z])([KQRBN])\s+([a-h])\s+([1-8])", r"\1\2\3", text)
     text = re.sub(r"(?<![A-Za-z])([a-h])\s+([1-8])(?=\s*[,.;:)!?=+\-]|$)", r"\1\2", text)
     text = re.sub(r"(?<![A-Za-z])([1-9])\s*\.\s+(?=[KQRBNOa-h])", r"\1.", text)
     text = re.sub(r"(?<![A-Za-z])([1-9])\s*\.\.\s+(?=[KQRBNOa-h])", r"\1...", text)
+    text = re.sub(r"(?<![A-Za-z])([1-9])\.\.\s*(?=[KQRBNOa-h])", r"\1...", text)
     text = re.sub(r"\s+([,.;:!?])", r"\1", text)
     text = re.sub(r"([.!?])([A-Z])", r"\1 \2", text)
     return text
@@ -496,13 +502,18 @@ def flush_pending_text(sections: list[dict[str, Any]], pending: list[str]) -> No
     if not pending:
         return
 
-    text = "\n\n".join(pending).strip()
+    text = normalize_final_section_text("\n\n".join(pending).strip())
     pending.clear()
 
     if not text:
         return
 
     sections.append({"type": guess_text_type(text), "content": text})
+
+
+def normalize_final_section_text(text: str) -> str:
+    text = re.sub(r"(?<![A-Za-z])([1-9])\.\.\s*(?=[KQRBNOa-h])", r"\1...", text)
+    return text
 
 
 def guess_text_type(text: str) -> str:

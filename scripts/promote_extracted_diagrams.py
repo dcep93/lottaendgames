@@ -80,6 +80,32 @@ VERIFIED_DIAGRAM_FENS = {
     "Position 1.23": "r7/8/8/8/8/6k1/6N1/7K w - - 0 1",
     "Position 1.24": "8/8/8/8/8/5K2/7R/4nk2 w - - 0 1",
     "Position 1.25": "8/7R/8/8/8/8/4K1n1/6k1 b - - 0 11",
+    # Chapters 3 and 4 are early educational diagrams with the same noisy
+    # square texture as Chapter 1. These FENs are verified from targeted PDF
+    # renders; stars, borders, and printed zone labels live in markers.
+    "Position 3.1": "8/8/K7/8/8/1k6/1N1p4/8 w - - 0 1",
+    "Position 3.2": "8/8/8/8/5N2/7K/3p4/3k4 w - - 0 1",
+    "Position 3.3": "8/8/8/8/4N3/1p5K/8/1k6 b - - 0 1",
+    "Position 3.4": "8/8/K7/4N3/8/7p/7k/8 w - - 0 1",
+    "Position 3.5": "K7/8/8/5N2/8/3k3p/8/8 w - - 0 1",
+    "Analysis diagram 3.6": "8/1K6/8/8/8/3k2N1/7p/8 b - - 0 2",
+    "Position 3.7": "8/2K5/8/8/4N3/2k5/7p/8 b - - 0 1",
+    "Analysis diagram 3.8": "8/2K5/8/8/3k4/5N1p/8/8 b - - 0 2",
+    "Position 3.9": "8/8/8/8/8/p7/2K1N3/k7 w - - 0 1",
+    "Position 3.10": "4k3/1n6/8/P7/8/8/7K/8 w - - 0 1",
+    "Position 4.1": "6K1/8/3Q4/8/8/8/5kp1/8 w - - 0 1",
+    "Position 4.2": "2Q5/3K4/8/8/8/8/3kp3/8 w - - 0 1",
+    "Position 4.3": "8/5K1P/8/8/3q4/8/8/2k5 w - - 0 1",
+    "Position 4.4": "8/6KP/8/4k3/3q4/8/8/8 w - - 0 1",
+    "Analysis diagram 4.5": "6KQ/4q1k1/8/8/8/8/8/8 w - - 0 1",
+    "Position 4.6": "8/5P2/3K4/8/8/1k6/8/q7 w - - 0 1",
+    "Position 4.7": "8/5PK1/8/6k1/8/8/q7/8 b - - 0 1",
+    "Position 4.8": "8/4KP2/8/8/6k1/8/8/q7 b - - 0 1",
+    "Position 4.9": "8/4KP2/8/1k6/8/8/8/q7 b - - 0 1",
+    "Position 4.10": "8/8/8/3K4/4Q3/8/2p5/1k6 w - - 0 1",
+    "Analysis diagram 4.11": "8/8/8/3K4/8/4Q3/1kp5/8 b - - 0 4",
+    "Position 4.12": "8/8/8/4K3/1Q6/8/2pk4/8 w - - 0 1",
+    "Position 4.13": "8/8/8/8/8/k2K4/2Q5/q7 w - - 0 1",
     # Position 10.17 has a black rook on b8. The template classifier picked the
     # white rook color, but the rendered PDF diagram and adjacent line
     # 1...Ra8 confirm Black is the side with that rook.
@@ -146,6 +172,39 @@ VERIFIED_DIAGRAM_MARKERS = {
         {"square": "b2", "symbol": "*", "meaning": "as printed"},
         {"square": "b1", "symbol": "*", "meaning": "as printed"},
     ],
+    "Position 3.4": [
+        {"square": "g4", "symbol": "*", "meaning": "as printed"},
+        {"square": "e3", "symbol": "*", "meaning": "as printed"},
+        {"square": "f1", "symbol": "*", "meaning": "as printed"},
+    ],
+    "Analysis diagram 3.6": [
+        {"square": "e4", "symbol": "*", "meaning": "as printed"},
+        {"square": "e3", "symbol": "*", "meaning": "as printed"},
+        {"square": "d2", "symbol": "*", "meaning": "as printed"},
+        {"square": "e2", "symbol": "*", "meaning": "as printed"},
+    ],
+    "Analysis diagram 3.8": [
+        {"square": "e5", "symbol": "*", "meaning": "as printed"},
+        {"square": "e4", "symbol": "*", "meaning": "as printed"},
+        {"square": "d3", "symbol": "*", "meaning": "as printed"},
+        {"square": "e3", "symbol": "*", "meaning": "as printed"},
+    ],
+    "Position 4.4": [
+        {"square": "f7", "symbol": "2", "meaning": "as printed"},
+        {"square": "g6", "symbol": "2", "meaning": "as printed"},
+    ],
+    "Position 4.7": [
+        {"square": "e7", "symbol": "2", "meaning": "as printed"},
+        {"square": "g6", "symbol": "2", "meaning": "as printed"},
+    ],
+    "Position 4.8": [
+        {"square": "d7", "symbol": "2", "meaning": "as printed"},
+        {"square": "g6", "symbol": "2", "meaning": "as printed"},
+    ],
+    "Position 4.9": [
+        {"square": "d7", "symbol": "2", "meaning": "as printed"},
+        {"square": "g6", "symbol": "2", "meaning": "as printed"},
+    ],
     "Analysis diagram 13.6": [
         {"square": "g6", "symbol": "*", "meaning": "as printed"},
         {"square": "f5", "symbol": "*", "meaning": "as printed"},
@@ -177,6 +236,8 @@ VERIFIED_DIAGRAM_MARKERS = {
 
 VERIFIED_DIAGRAM_PRESERVE_TURN = {
     "Position 1.16",
+    "Position 3.7",
+    "Analysis diagram 3.8",
     "Position 13.8",
     "Analysis diagram 13.30",
 }
@@ -865,7 +926,7 @@ def should_promote(label: str, position: dict[str, Any]) -> bool:
     chapter = int(position["number"].split(".")[0])
     if pieces.count("K") != 1 or pieces.count("k") != 1:
         return False
-    if chapter == 3 and "N" not in pieces:
+    if chapter == 3 and not any(piece in pieces for piece in ("N", "n")):
         return False
     if chapter == 4 and not any(piece in pieces for piece in ("Q", "q")):
         return False
@@ -886,7 +947,7 @@ def get_rejection_reason(label: str, position: dict[str, Any] | None) -> str:
     chapter = int(position["number"].split(".")[0])
     if pieces.count("K") != 1 or pieces.count("k") != 1:
         return "expected exactly one white king and one black king"
-    if chapter == 3 and "N" not in pieces:
+    if chapter == 3 and not any(piece in pieces for piece in ("N", "n")):
         return "missing chapter 3 knight"
     if chapter == 4 and not any(piece in pieces for piece in ("Q", "q")):
         return "missing chapter 4 queen"

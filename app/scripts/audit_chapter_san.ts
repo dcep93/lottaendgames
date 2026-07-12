@@ -50,7 +50,7 @@ const chapterPayload = JSON.parse(
 ) as ChapterPayload
 const selectedChapterIds = chapterIds.length
   ? chapterIds
-  : strictMode
+  : strictMode || options.has('--all')
     ? chapterPayload.chapters.map((chapter) => chapter.id)
     : ['10', '11', '12', '13']
 
