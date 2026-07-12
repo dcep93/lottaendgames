@@ -187,8 +187,15 @@ NOISE_REPLACEMENTS = [
     ("Ke8re", "were"),
     ("Ke8n", "when"),
     ("Kh8t", "what"),
+    ("Ke1eft", "we left"),
+    ("Ke1ook", "we look"),
     ("were going", "we are going"),
+    ("were go ing", "we are going"),
     ("were just", "we are just"),
+    ("Here were.", "Here we are."),
+    ("Section 1.King 2 pawns vs. King\n+\nWe", "Section 1. King + 2 pawns vs. King\n\nWe"),
+    ("Section 1.Ki Rg2 pawns vs. Ki ng\n+\nwe", "Section 1. King + 2 pawns vs. King\n\nWe"),
+    ("Section 2.Ki ng Pawn vs. Ki ng Pawn\n+ +", "Section 2. King + Pawn vs. King + Pawn"),
     ("whenalysed", "we analysed"),
     ("Kfa3.Rb7", "Kf8 3.Rb7"),
     ("Ke8ssume", "we assume"),
@@ -508,10 +515,19 @@ def normalize_chess_notation(text: str) -> str:
     )
     text = re.sub(r"\bl\s*\.\s*\.\s*", "1...", text)
     text = re.sub(r"\bl\s*\.", "1.", text)
+    text = re.sub(r"\bl\s+1\s*\.", "11.", text)
+    text = re.sub(r"\b1\s+I\s*\.\s*\.", "11...", text)
+    text = re.sub(r"\bl\s*[oO]\s*\.", "10.", text)
     text = re.sub(r"(?<![A-Za-z])S\s*\.", "5.", text)
+    text = re.sub(r"(?<![A-Za-z])S\s+(?=(?:[KQRBNO]|[a-h][1-8]|[a-h]x))", "5.", text)
+    text = re.sub(r"(?<![A-Za-z])s\.\s*(?=(?:[KQRBNO]|[a-h][1-8]|[a-h]x))", "5.", text)
     text = re.sub(r"\b([1-9])\s*[oO]\s*\.", r"\g<1>0.", text)
+    text = re.sub(r"(?<=\d)/(?=[KQRBNOa-h])", ".", text)
+    text = re.sub(r"(?<=\d)\.\.\.\.\s*(?=[KQRBNOa-h])", "...", text)
     text = re.sub(r"(?<=\d)\s+\.\s+\.\s+\.", "...", text)
-    text = re.sub(r"(?<=\d)\s*\.\.\s+(?=[KQRBNOa-h])", "...", text)
+    text = re.sub(r"(?<=\d)\s*\.\.\s+(?=[KQRBNOa-hJIl:.])", "...", text)
+    text = re.sub(r"(?<=\d)\.\s+(?=[KQRBNOa-h])", ".", text)
+    text = re.sub(r"(?<=\d)\.\.\.\s+(?=[KQRBNOa-h])", "...", text)
     text = re.sub(r"(?<=\d)\s+\.\s+", ".", text)
     text = re.sub(r"(?<=\d)\s+\.\.\.\s+", "...", text)
     text = re.sub(r"(?<=[a-z])(?=\d{1,2}\s*(?:\.|\.\.\.))", " ", text)
@@ -531,6 +547,7 @@ def normalize_chess_notation(text: str) -> str:
     text = replace_piece_glyphs(text, BISHOP_GLYPHS, "B")
     text = replace_piece_glyphs(text, QUEEN_GLYPHS, "Q")
     text = clean_remaining_chess_font_glyphs(text)
+    text = clean_known_ocr_notation_collisions(text)
 
     text = re.sub(
         r"(?<![A-Za-z])(?:W|w|®|<;t>|\\t>|�|\\b)\s*x?\s*([a-h])\s*([1-8aS])(?=[^A-Za-z0-9]|$)",
@@ -570,12 +587,12 @@ def clean_remaining_chess_font_glyphs(text: str) -> str:
         text,
     )
     text = re.sub(
-        r"(?<![A-Za-z])(?:J::r|J::|J:|J\�|J\!|J\[|J\(|J;|J|l:I|l:r|l:t|l::|l:|I:r|:C:|:Q:|:a|\.M|\.C:|\.t:i|\.U|\.Uh)\s*([a-h])\s*([lI1-8S])",
+        r"(?<![A-Za-z])(?:J::r|J::|J:|J\�|J\!|J\[|J\(|J;|J|l:I|l:i|l:r|l:t|l::|l:|I:r|:C:|:Q:|:a|\.M|\.C:|\.t:i:?|\.U|\.Uh)\s*([a-h])\s*([lIi1-8S])",
         lambda match: "R" + match.group(1) + normalize_square_rank(match.group(2)),
         text,
     )
     text = re.sub(
-        r"(?<![A-Za-z])(?:<;t>|\\t>|�|W|w|®|\\b)\s*x?\s*([a-h])\s*([lI1-8aS])(?=[^A-Za-z0-9]|$)",
+        r"(?<![A-Za-z])(?:<;t>|\\t>|�|W|w|®|\\b)\s*x?\s*([a-h])\s*([lIi1-8aS])(?=[^A-Za-z0-9]|$)",
         lambda match: "K" + match.group(1) + normalize_square_rank(match.group(2)),
         text,
     )
@@ -585,7 +602,7 @@ def clean_remaining_chess_font_glyphs(text: str) -> str:
         text,
     )
     text = re.sub(
-        r"(?<![A-Za-z])([KQRBNR])\s*([a-h])\s*([lI])(?=[,.;:)!?=+\s])",
+        r"(?<![A-Za-z])([KQRBNR])\s*([a-h])\s*([lIi])(?=[,.;:)!?=+\s])",
         r"\1\g<2>1",
         text,
     )
@@ -615,15 +632,69 @@ def clean_remaining_chess_font_glyphs(text: str) -> str:
         .replace("\\b", "K")
     )
     text = re.sub(r"(?<![A-Za-z])R\s*([a-h])\s*([lI])", r"R\g<1>1", text)
+    text = re.sub(r"(?<![A-Za-z])R\s*([a-h])\s*i", r"R\g<1>1", text)
     text = re.sub(r"(?<![A-Za-z])R\s*([a-h])\s*S", r"R\g<1>5", text)
     text = re.sub(r"(?<![A-Za-z])K\s*([a-h])\s*([lI])", r"K\g<1>1", text)
+    text = re.sub(r"(?<![A-Za-z])K\s*([a-h])\s*i", r"K\g<1>1", text)
     text = re.sub(r"(?<![A-Za-z])K\s*([a-h])\s*S", r"K\g<1>5", text)
     text = re.sub(r"(?<![A-Za-z])Kfa(?=[^A-Za-z0-9]|$)", "Kf8", text)
     return text
 
 
+def clean_known_ocr_notation_collisions(text: str) -> str:
+    # Exact or notation-shaped repairs where the PDF text layer maps chess-font
+    # pieces to ordinary letters. Keep these narrow: they should not touch prose.
+    text = text.replace("1...Rg i?! 2.Kd6 Kd1+? 3.Ke6", "1...Rg1?! 2.Kd6 Rd1+? 3.Ke6")
+    text = text.replace("1...Rg1?! 2.Kd6 Kd1+? 3.Ke6", "1...Rg1?! 2.Kd6 Rd1+? 3.Ke6")
+    text = text.replace("4.!lh7", "4.Rh7")
+    text = text.replace("\n2.Rg1!\n.\n", "\n2...Rg1!\n")
+    text = text.replace("3.Iia7 Iie l!", "3.Ra7 Re1!")
+    text = text.replace("4JH7+!", "4.Rh7+!")
+    text = text.replace("Iie 16.Kf6", "Re1 6.Kf6")
+    text = text.replace("5.Iid7 Re1", "5.Rd7 Re1")
+    text = text.replace("8JKKh8+", "8.Rh8+")
+    text = text.replace("9.lie8!?", "9.Re8!?")
+    text = text.replace("17.l:ig l Rh7+", "17.Rg1 Rh7+")
+    text = text.replace("1.:S:d8", "1.Rd8")
+    text = text.replace("2.\n:C.\nd7", "2.Rd7")
+    text = text.replace("3.Kes Ra5+", "3.Ke5 Ra5+")
+    text = text.replace("Rta8", "Ra8")
+    text = text.replace("Rtd8", "Rd8")
+    text = text.replace("Rrd7", "Rd7")
+    text = text.replace("3...J la1?", "3...Ra1?")
+    text = text.replace("3...J lb8?", "3...Rb8?")
+    text = text.replace("2...JU1+", "2...Rf1+")
+    text = text.replace("2...a: f1+!", "2...Rf1+!")
+    text = text.replace("With6.Ra7", "With 6.Ra7")
+    text = text.replace("Ke8lready", "we already")
+    text = re.sub(r"(?<![A-Za-z])([KQRBN])([a-h])\s+([1-8])", r"\1\2\3", text)
+    text = text.replace(
+        "4..J Ke1+ 5.Kd6Rd1+ 6.Ke6Re1+ 7.Kd5Rd1+",
+        "4...Re1+ 5.Kd6 Rd1+ 6.Ke6 Re1+ 7.Kd5 Rd1+",
+    )
+    text = text.replace(
+        "4..J Ke1+ 5.Kd6 Rd1+ 6.Ke6 Re1+ 7.Kd5 Rd1+",
+        "4...Re1+ 5.Kd6 Rd1+ 6.Ke6 Re1+ 7.Kd5 Rd1+",
+    )
+    text = text.replace(
+        "4..J Ke1+ 5.Kd6.Rd1+ 6.Ke6.Re1+ 7.Kd5.Rd1+",
+        "4...Re1+ 5.Kd6 Rd1+ 6.Ke6 Re1+ 7.Kd5 Rd1+",
+    )
+    text = re.sub(
+        r"(?<![A-Za-z])(?:l:i:?|l:\.|li|ll|tl|I:t|:)\s*x?\s*([a-h])\s*([lIit1-8S])(?=[,.;:)!?=+\s-]|$)",
+        lambda match: "R" + match.group(1) + normalize_square_rank(match.group(2)),
+        text,
+    )
+    text = re.sub(
+        r"(?<![A-Za-z])(?:\.t:i:?|t:i:?|JK:|R:)\s*x?\s*([a-h])\s*([lIit1-8S])(?=[,.;:)!?=+\s-]|$)",
+        lambda match: "R" + match.group(1) + normalize_square_rank(match.group(2)),
+        text,
+    )
+    return text
+
+
 def normalize_square_rank(rank: str) -> str:
-    if rank in {"l", "I"}:
+    if rank in {"l", "I", "i", "t"}:
         return "1"
 
     if rank == "S":
@@ -665,6 +736,8 @@ def clean_common_noise(text: str) -> str:
         r"Position \1.\2",
         text,
     )
+    text = re.sub(r"\b(Section\s+\d+\.)\s*(?=[A-Z])", r"\1 ", text)
+    text = re.sub(r"\b(Ending\s+\d+)\.(?=[A-Z])", r"\1. ", text)
     text = text.replace("7 th", "7th").replace("6 th", "6th").replace("5 th", "5th")
     text = text.replace("4 th", "4th").replace("3 rd", "3rd").replace("2 nd", "2nd")
     text = text.replace("1 st", "1st")
