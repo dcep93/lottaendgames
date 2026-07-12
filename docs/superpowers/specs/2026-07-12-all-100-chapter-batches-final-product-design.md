@@ -2,11 +2,11 @@
 
 ## Goal
 
-Turn Lotta Endgames from a chapter sample into a complete, snappy reader for all 100 endgames. The final app should feel consistent across chapters, render chapter switches quickly, keep boards playable where the source line can be reconstructed, and make remaining non-clickable text an intentional content decision rather than an accident.
+Turn Lotta Endgames from a chapter sample into a complete, snappy reader for all 100 endgames. The job is not complete at "all chapters are present"; it must also finalize the app with a strict perfect pass that drives the SAN audit to zero unresolved misses. The final app should feel consistent across chapters, render chapter switches quickly, keep all reconstructable played and variation moves clickable, and make any non-clickable prose an explicit audited design choice.
 
 ## Product Bar
 
-The first product-complete milestone is all 100 endgames available in the app from the single async, content-hashed chapter payload. Each chapter should render through the same components and data flow, regardless of whether it came from the early hand-built extraction or a later batch pipeline.
+The product-complete milestone is all 100 endgames available in the app from the single async, content-hashed chapter payload, with zero unresolved SAN audit misses across the included content. Each chapter should render through the same components and data flow, regardless of whether it came from the early hand-built extraction or a later batch pipeline.
 
 The current descriptive banner text is not useful as primary page chrome. Chapter pages should lead with the existing styled chapter title treatment only, using the brown/pink/Comic Sans-inflected visual language already established below it. Any metadata-like text should be removed from the main reading surface unless it helps navigation or debugging.
 
@@ -27,6 +27,8 @@ Process the remaining book in committed batches:
 
 Each batch should be shippable on its own. A batch includes extraction, normalization, safe diagram promotion, payload regeneration, tests, and a commit. JSON should remain generated from the pipeline; do not hand-patch chapter JSON when a source extraction or normalization rule is the real fix.
 
+After the final chapter batch lands, continue directly into finalization rather than stopping. Finalization includes clearing the strict audit to zero unresolved misses, removing the current page-banner copy, fixing chapter-switch performance, and verifying the full app acceptance criteria.
+
 ## Extraction Rules
 
 Use PDF text extraction as the first text source whenever it is cleaner than OCR output. OCR-style repairs belong in extraction/normalization scripts and should be narrow enough to explain from the source text. Diagram promotion must stay conservative: promote a diagram to a `position` only when the FEN is verified from the rendered diagram or another reliable source. Ambiguous or marker-heavy diagrams remain captions/panels until they can be safely resolved.
@@ -37,7 +39,9 @@ Panels such as summaries and conclusions should be represented as structured `pa
 
 For batch completion, all generated clickable move tokens must replay legally through `chess.js`, and obvious OCR-damaged SAN-like text must be repaired or categorized. Actual played moves and explicit variation moves should be clickable when their parent position is reconstructable. Prose threats and explanatory references, such as "threatening ...Ng3" or "the bishop goes to e7", remain intentionally non-clickable unless they are also presented as played variation moves.
 
-Later today, do a strict "perfect app" pass aimed at zero audit misses. That pass may require promoting additional diagrams, adding verified alternate FEN anchors, improving branch reconstruction, or making the audit smarter about intentionally non-clickable prose. The target is zero unresolved audit output, not merely fewer broken clickable tokens.
+The strict final pass must produce zero unresolved audit misses. Reaching that bar may require promoting additional diagrams, adding verified alternate FEN anchors, improving branch reconstruction, correcting source extraction rules, or making the audit represent intentionally non-clickable prose as verified exclusions. The target is a clean audit, not merely fewer broken clickable tokens.
+
+Verified prose exclusions must be discoverable in code or docs and should not hide real move-line failures. If the audit ignores a SAN-like token, it must be because that token is intentionally prose-only or otherwise documented as non-playable source content.
 
 ## Performance And Consistency
 
@@ -60,6 +64,21 @@ The completed reader should include:
 
 Search is a good final polish feature after all chapters load reliably, but it should not block content completion.
 
+## Finalization Pass
+
+Once chapters 5-100 are included, run a dedicated finalization pass that finishes the app as a product. This pass must:
+
+- make the strict audit cover all included chapters;
+- drive the strict audit to zero unresolved misses;
+- remove or replace the current explanatory chapter banner so the styled chapter title is the page title;
+- profile chapter selection and eliminate redundant playback/navigation parsing;
+- memoize derived chapter data by chapter identity and payload hash;
+- confirm chapters 5-9 and 10-100 use the same rendering path;
+- verify that no debug extraction artifacts are visible in the reader;
+- run the full local verification suite.
+
+The finalization pass is part of the job, not a separate optional future project.
+
 ## Testing And Verification
 
 For every content batch, run:
@@ -73,7 +92,7 @@ For every content batch, run:
 
 Tests should not be added to GitHub workflows unless explicitly requested. Codex should run the relevant tests locally whenever extraction, normalization, payload, parser, or viewer code changes.
 
-The audit output should remain useful while work is in progress: categorize misses by branch/anchor, OCR, spacing, prose reference, and unparsed section. For the final zero-miss pass, convert remaining categories into either fixed clickability, verified intentional exclusions, or stricter test failures.
+The audit output should remain useful while work is in progress: categorize misses by branch/anchor, OCR, spacing, prose reference, and unparsed section. During finalization, convert every remaining category into fixed clickability, verified intentional exclusions, or stricter test failures. The final audit command should pass without unresolved misses.
 
 ## Acceptance Criteria
 
@@ -85,5 +104,5 @@ The final product is ready when:
 - the reader uses one coherent visual and rendering system;
 - no source-debug banner, visible FEN footer, or marker-detail clutter appears in the reading view;
 - all clickable moves replay legally from their parent FEN;
-- the strict audit has zero unresolved misses after the final pass;
+- the strict audit has zero unresolved misses across all included chapters;
 - local tests, lint, build, and whitespace checks pass.
