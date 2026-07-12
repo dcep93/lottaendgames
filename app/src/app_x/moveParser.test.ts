@@ -51,6 +51,9 @@ const diagramExtractionReport = JSON.parse(
     'utf8',
   ),
 ) as DiagramExtractionReportEntry[]
+const chapterOneSections = getChapterSections('1')
+const chapterThreeSections = getChapterSections('3')
+const chapterFourSections = getChapterSections('4')
 const chapterSections = getChapterSections('5')
 const chapterSixSections = getChapterSections('6')
 const chapterSevenSections = getChapterSections('7')
@@ -126,6 +129,7 @@ const chapterSixPositionNumbers = new Set(
     .filter((section) => section.type === 'position')
     .map((section) => (section.content as { number: string }).number),
 )
+const chapterOnePositionNumbers = getPositionNumbers(chapterOneSections)
 const chapterSevenPositionNumbers = getPositionNumbers(chapterSevenSections)
 const chapterEightPositionNumbers = getPositionNumbers(chapterEightSections)
 const chapterNinePositionNumbers = getPositionNumbers(chapterNineSections)
@@ -195,6 +199,9 @@ assert.equal(positionSixSixMoveSectionIndex, 31)
 assert.equal(playback.playablePositions.has('5.1'), true)
 assert.ok(positionFiveOneNavigation, 'Expected navigation for position 5.1')
 validateChapter(chapterSections)
+validateChapter(chapterOneSections)
+validateChapter(chapterThreeSections)
+validateChapter(chapterFourSections)
 validateChapter(chapterSixSections)
 validateChapter(chapterSevenSections)
 validateChapter(chapterEightSections)
@@ -225,6 +232,25 @@ assert.equal(chapterSixPositionNumbers.has('6.1'), true)
 assert.equal(chapterSixPositionNumbers.has('6.7'), true)
 assert.equal(chapterSixPlayback.playablePositions.has('6.1'), true)
 assert.equal(chapterSixPlayback.playablePositions.has('6.6'), true)
+assert.equal(getEndingNumbers(chapterOneSections).at(0), '1')
+assert.equal(getEndingNumbers(chapterOneSections).at(-1), '9')
+assert.deepEqual(
+  [...chapterOnePositionNumbers],
+  Array.from({ length: 25 }, (_, index) => `1.${index + 1}`),
+)
+assert.equal(getCaptions(chapterOneSections).size, 0)
+assert.deepEqual(
+  chapterPayload.chapters.flatMap(({ sections }) => getEndingNumbers(sections)),
+  Array.from({ length: 100 }, (_, index) => String(index + 1)),
+)
+assert.equal(getEndingNumbers(chapterThreeSections).at(0), '10')
+assert.equal(getEndingNumbers(chapterThreeSections).at(-1), '15')
+assert.equal(getEndingNumbers(chapterFourSections).at(0), '16')
+assert.equal(getEndingNumbers(chapterFourSections).at(-1), '20')
+assert.equal(getCaptions(chapterThreeSections).has('Position 3.1'), true)
+assert.equal(getCaptions(chapterThreeSections).has('Position 3.10'), true)
+assert.equal(getCaptions(chapterFourSections).has('Position 4.1'), true)
+assert.equal(getCaptions(chapterFourSections).has('Position 4.13'), true)
 assert.equal(chapterSevenPositionNumbers.has('7.1'), true)
 assert.equal(chapterSevenPositionNumbers.has('7.6'), true)
 assert.equal(chapterSevenPlayback.playablePositions.has('7.1'), true)
@@ -246,14 +272,23 @@ assert.equal(getEndingNumbers(chapterTwelveSections).at(-1), '92')
 assert.equal(getEndingNumbers(chapterThirteenSections).at(0), '93')
 assert.equal(getEndingNumbers(chapterThirteenSections).at(-1), '100')
 assertNoExtractionArtifacts('10', chapterTenSections)
+assertNoExtractionArtifacts('1', chapterOneSections)
+assertNoExtractionArtifacts('3', chapterThreeSections)
+assertNoExtractionArtifacts('4', chapterFourSections)
 assertNoExtractionArtifacts('11', chapterElevenSections)
 assertNoExtractionArtifacts('12', chapterTwelveSections)
 assertNoExtractionArtifacts('13', chapterThirteenSections)
 assertNoSplitWordArtifacts('10', chapterTenSections)
+assertNoSplitWordArtifacts('1', chapterOneSections)
+assertNoSplitWordArtifacts('3', chapterThreeSections)
+assertNoSplitWordArtifacts('4', chapterFourSections)
 assertNoSplitWordArtifacts('11', chapterElevenSections)
 assertNoSplitWordArtifacts('12', chapterTwelveSections)
 assertNoSplitWordArtifacts('13', chapterThirteenSections)
 assertNoNotationOcrArtifacts('10', chapterTenSections)
+assertNoNotationOcrArtifacts('1', chapterOneSections)
+assertNoNotationOcrArtifacts('3', chapterThreeSections)
+assertNoNotationOcrArtifacts('4', chapterFourSections)
 assertNoNotationOcrArtifacts('11', chapterElevenSections)
 assertNoNotationOcrArtifacts('12', chapterTwelveSections)
 assertNoNotationOcrArtifacts('13', chapterThirteenSections)
@@ -649,18 +684,27 @@ function getCaptions(sections: RawChapterSection[]) {
 
 function assertDiagramExtractionReport() {
   const chaptersById = new Map<string, RawChapterSection[]>([
+    ['1', chapterOneSections],
+    ['3', chapterThreeSections],
+    ['4', chapterFourSections],
     ['10', chapterTenSections],
     ['11', chapterElevenSections],
     ['12', chapterTwelveSections],
     ['13', chapterThirteenSections],
   ])
   const positionNumbersByChapter = new Map<string, Set<string>>([
+    ['1', chapterOnePositionNumbers],
+    ['3', getPositionNumbers(chapterThreeSections)],
+    ['4', getPositionNumbers(chapterFourSections)],
     ['10', chapterTenPositionNumbers],
     ['11', chapterElevenPositionNumbers],
     ['12', chapterTwelvePositionNumbers],
     ['13', chapterThirteenPositionNumbers],
   ])
   const captionsByChapter = new Map<string, Set<string>>([
+    ['1', getCaptions(chapterOneSections)],
+    ['3', getCaptions(chapterThreeSections)],
+    ['4', getCaptions(chapterFourSections)],
     ['10', chapterTenCaptions],
     ['11', chapterElevenCaptions],
     ['12', chapterTwelveCaptions],

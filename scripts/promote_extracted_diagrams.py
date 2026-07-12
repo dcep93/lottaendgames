@@ -19,6 +19,7 @@ from pathlib import Path
 from typing import Any
 
 import pdfplumber
+import pypdfium2 as pdfium
 from PIL import Image, ImageOps
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -28,11 +29,11 @@ TMP_DIR = ROOT / "tmp/pdfs/extracted_diagrams"
 REPORT_PATH = PDF_DIR / "diagram_extraction_report.json"
 DPI = 240
 CELL_SIZE = 20
+TARGET_CHAPTERS = (1, 3, 4, 10, 11, 12, 13)
+TARGET_PAGE_RANGE = range(28, 230)
 
 resolved_pdftoppm = shutil.which("pdftoppm")
-if not resolved_pdftoppm:
-    raise RuntimeError("pdftoppm is required to extract PDF diagrams.")
-PDFTOPPM = Path(resolved_pdftoppm)
+PDFTOPPM = Path(resolved_pdftoppm) if resolved_pdftoppm else None
 
 TRAINING_EXCLUDES = {
     # Marker diagrams and previously identified bad or ambiguous source FENs.
@@ -51,6 +52,38 @@ TRAINING_EXCLUDES = {
 }
 
 VERIFIED_DIAGRAM_FENS = {
+    # Chapter 1 uses small pedagogical diagrams with square shading and
+    # printed key-square markers. The generic classifier reads those markers as
+    # pieces, so these placements are verified from targeted PDF renders.
+    "Position 1.1": "6k1/8/8/8/8/8/P7/7K w - - 0 1",
+    "Position 1.2": "6k1/8/8/8/P7/8/8/7K b - - 0 1",
+    "Position 1.3": "8/4k3/2K5/8/8/8/1P6/8 w - - 0 1",
+    "Position 1.4": "5k2/8/5PK1/8/8/8/8/8 w - - 0 1",
+    "Position 1.5": "6k1/8/5PK1/8/8/8/8/8 w - - 0 1",
+    "Position 1.6": "k7/8/2P5/K7/8/8/8/8 w - - 0 1",
+    "Position 1.7": "8/6k1/4P3/6K1/8/8/8/8 w - - 0 1",
+    "Position 1.8": "8/8/8/8/8/5kp1/7K/8 w - - 0 1",
+    "Position 1.9": "5k2/8/4K3/5P2/8/8/8/8 w - - 0 1",
+    "Position 1.10": "7k/5K2/8/6P1/8/8/8/8 w - - 0 1",
+    "Position 1.11": "5k2/8/8/8/3PK3/8/8/8 w - - 0 1",
+    "Position 1.12": "8/8/8/1kp5/8/8/8/K7 w - - 0 1",
+    "Position 1.13": "8/6k1/8/6K1/8/6P1/8/8 w - - 0 1",
+    "Position 1.14": "8/8/8/8/8/6kp/8/6K1 w - - 0 1",
+    "Position 1.15": "8/7p/7p/7p/7p/6kp/7p/6K1 w - - 0 1",
+    "Position 1.16": "8/8/8/8/p7/k7/2K5/8 w - - 0 1",
+    "Position 1.17": "6k1/5R2/6K1/8/8/8/8/6b1 w - - 0 1",
+    "Position 1.18": "7k/R7/7K/8/8/1b6/8/8 w - - 0 1",
+    "Position 1.19": "8/8/8/8/8/3k4/r7/3NK3 w - - 0 1",
+    "Analysis diagram 1.20": "8/8/8/3N4/8/5k2/2r5/4K3 b - - 0 4",
+    "Position 1.21": "8/8/8/8/8/6k1/r7/6NK w - - 0 1",
+    "Position 1.22": "8/8/8/8/8/6k1/r7/6KN w - - 0 1",
+    "Position 1.23": "r7/8/8/8/8/6k1/6N1/7K w - - 0 1",
+    "Position 1.24": "8/8/8/8/8/5K2/7R/4nk2 w - - 0 1",
+    "Position 1.25": "8/7R/8/8/8/8/4K1n1/6k1 b - - 0 11",
+    # Position 10.17 has a black rook on b8. The template classifier picked the
+    # white rook color, but the rendered PDF diagram and adjacent line
+    # 1...Ra8 confirm Black is the side with that rook.
+    "Position 10.17": "1r6/8/8/2R5/1P1k4/1K6/8/8 b - - 0 1",
     # Analysis diagram 11.2 renders a black rook on g7, but the printed glyph
     # is close enough to the white rook template that the classifier chooses
     # the wrong color. Keep this correction tied to the rendered PDF diagram so
@@ -95,6 +128,24 @@ VERIFIED_DIAGRAM_FENS = {
 }
 
 VERIFIED_DIAGRAM_MARKERS = {
+    "Position 1.9": [
+        {"square": "f6", "symbol": "*", "meaning": "as printed"},
+        {"square": "g6", "symbol": "*", "meaning": "as printed"},
+    ],
+    "Position 1.11": [
+        {"square": "c6", "symbol": "*", "meaning": "as printed"},
+        {"square": "d6", "symbol": "*", "meaning": "as printed"},
+        {"square": "e6", "symbol": "*", "meaning": "as printed"},
+    ],
+    "Position 1.12": [
+        {"square": "b3", "symbol": "*", "meaning": "as printed"},
+        {"square": "c3", "symbol": "*", "meaning": "as printed"},
+        {"square": "d3", "symbol": "*", "meaning": "as printed"},
+    ],
+    "Position 1.16": [
+        {"square": "b2", "symbol": "*", "meaning": "as printed"},
+        {"square": "b1", "symbol": "*", "meaning": "as printed"},
+    ],
     "Analysis diagram 13.6": [
         {"square": "g6", "symbol": "*", "meaning": "as printed"},
         {"square": "f5", "symbol": "*", "meaning": "as printed"},
@@ -124,7 +175,11 @@ VERIFIED_DIAGRAM_MARKERS = {
     ],
 }
 
-VERIFIED_DIAGRAM_PRESERVE_TURN = {"Position 13.8", "Analysis diagram 13.30"}
+VERIFIED_DIAGRAM_PRESERVE_TURN = {
+    "Position 1.16",
+    "Position 13.8",
+    "Analysis diagram 13.30",
+}
 
 
 def main() -> None:
@@ -134,7 +189,7 @@ def main() -> None:
     report: list[dict[str, Any]] = []
     promoted_count = 0
 
-    for chapter in range(10, 14):
+    for chapter in TARGET_CHAPTERS:
         path = PDF_DIR / f"chapter_{chapter}.json"
         sections: list[dict[str, Any]] = json.loads(path.read_text())
         sections = split_embedded_labels(sections, extracted)
@@ -150,7 +205,7 @@ def main() -> None:
             if existing_label:
                 content = section["content"]
                 promoted_numbers.add(content["number"])
-                position = extracted.get(existing_label)
+                position = extracted.get(existing_label) or verified_position(existing_label)
                 if position and should_promote(existing_label, position):
                     position_content = {
                         "number": content["number"],
@@ -183,7 +238,7 @@ def main() -> None:
                 continue
 
             label = caption_label(section)
-            position = extracted.get(label or "")
+            position = extracted.get(label or "") or verified_position(label or "")
 
             if (
                 position
@@ -324,12 +379,12 @@ def extract_chapter_positions(
     extracted: dict[str, dict[str, Any]] = {}
 
     with pdfplumber.open(PDF) as pdf:
-        for page_number in range(125, 230):
+        for page_number in TARGET_PAGE_RANGE:
             page = pdf.pages[page_number - 1]
             labels = [
                 label
                 for label in extract_labels(page)
-                if 10 <= int(label["number"].split(".")[0]) <= 13
+                if int(label["number"].split(".")[0]) in TARGET_CHAPTERS
             ]
 
             if not labels:
@@ -343,6 +398,18 @@ def extract_chapter_positions(
                 # legality/ambiguity checks decide whether promotion is safe.
                 board = nearest_board(label, boards, max_distance=80)
                 if not board:
+                    if label["label"] in VERIFIED_DIAGRAM_FENS:
+                        extracted_position = {
+                            "fen": VERIFIED_DIAGRAM_FENS[label["label"]],
+                            "issues": [],
+                            "label": label["label"],
+                            "number": label["number"],
+                        }
+                        if label["label"] in VERIFIED_DIAGRAM_MARKERS:
+                            extracted_position["markers"] = VERIFIED_DIAGRAM_MARKERS[
+                                label["label"]
+                            ]
+                        extracted[label["label"]] = extracted_position
                     continue
 
                 fen, issues = fen_from_board(board["image"], templates)
@@ -364,11 +431,37 @@ def extract_chapter_positions(
     return extracted
 
 
+def verified_position(label: str) -> dict[str, Any] | None:
+    if label not in VERIFIED_DIAGRAM_FENS:
+        return None
+
+    number_match = re.search(r"(\d+\.\d+)", label)
+    if not number_match:
+        return None
+
+    position: dict[str, Any] = {
+        "fen": VERIFIED_DIAGRAM_FENS[label],
+        "issues": [],
+        "label": label,
+        "number": number_match.group(1),
+    }
+    if label in VERIFIED_DIAGRAM_MARKERS:
+        position["markers"] = VERIFIED_DIAGRAM_MARKERS[label]
+    return position
+
+
 def render_page(page_number: int) -> Image.Image:
     prefix = TMP_DIR / f"p{page_number}"
+    pdfium_cache = TMP_DIR / f"p{page_number}.png"
     matches = list(TMP_DIR.glob(f"p{page_number}-*.png"))
 
-    if not matches:
+    if matches:
+        return Image.open(matches[0]).convert("RGB")
+
+    if pdfium_cache.exists():
+        return Image.open(pdfium_cache).convert("RGB")
+
+    if PDFTOPPM:
         subprocess.run(
             [
                 str(PDFTOPPM),
@@ -387,8 +480,14 @@ def render_page(page_number: int) -> Image.Image:
             stderr=subprocess.DEVNULL,
         )
         matches = list(TMP_DIR.glob(f"p{page_number}-*.png"))
+        if matches:
+            return Image.open(matches[0]).convert("RGB")
 
-    return Image.open(matches[0]).convert("RGB")
+    pdf = pdfium.PdfDocument(PDF)
+    page = pdf[page_number - 1]
+    image = page.render(scale=DPI / 72).to_pil().convert("RGB")
+    image.save(pdfium_cache)
+    return image
 
 
 def extract_page_boards(
@@ -763,7 +862,12 @@ def should_promote(label: str, position: dict[str, Any]) -> bool:
 
     placement = position["fen"].split()[0]
     pieces = [char for char in placement if char.isalpha()]
+    chapter = int(position["number"].split(".")[0])
     if pieces.count("K") != 1 or pieces.count("k") != 1:
+        return False
+    if chapter == 3 and "N" not in pieces:
+        return False
+    if chapter == 4 and not any(piece in pieces for piece in ("Q", "q")):
         return False
     if any(char in placement.split("/")[0] + placement.split("/")[-1] for char in "Pp"):
         return False
@@ -779,8 +883,13 @@ def get_rejection_reason(label: str, position: dict[str, Any] | None) -> str:
 
     placement = position["fen"].split()[0]
     pieces = [char for char in placement if char.isalpha()]
+    chapter = int(position["number"].split(".")[0])
     if pieces.count("K") != 1 or pieces.count("k") != 1:
         return "expected exactly one white king and one black king"
+    if chapter == 3 and "N" not in pieces:
+        return "missing chapter 3 knight"
+    if chapter == 4 and not any(piece in pieces for piece in ("Q", "q")):
+        return "missing chapter 4 queen"
     if any(char in placement.split("/")[0] + placement.split("/")[-1] for char in "Pp"):
         return "pawn on impossible promotion rank"
 

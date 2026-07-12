@@ -1,7 +1,723 @@
 {
   "schemaVersion": 1,
-  "contentHash": "sha256:6d9643abedaf7038207b1358a39f2f41e0340fb9e5adedf0bfaaaeeeee20f494",
+  "contentHash": "sha256:5d302c98769e88e4a321a67832ca165d3d6ab83860fba703bab3652cd49035c4",
   "chapters": [
+    {
+      "id": "1",
+      "label": "Chapter 1",
+      "sections": [
+        {
+          "type": "title",
+          "content": "Basic endings"
+        },
+        {
+          "type": "text",
+          "content": "This chapter is a small bonus in the book. My first idea was that basic endings are well known and therefore our study should start from the next level. However, it is true that some basic endings are either not so well known or only at a superficial level. Therefore, I decided to add a preliminary chapter dealing with those basic endings which, according to some trainers whom I consuRed, pose problems to beginners. I also thought that it could help many trainers at the elementary level. Of course, experienced players can skip this section.\nA great part of this chapter is devoted to King + Pawn vs. King endings. Most players handle these endings with confidence, but some have trouble in less com mon positions. Very often the problem lies in the overuse of the theory of the op position. While opposition is a very useful concept and its best field of application is Pawn endings, its value is sometimes overestimated.\nKing + Pawn vs. King endings are best explained by means of the key squares theory, using opposition at the right time and adapting its value to each situation. I assume the reader knows the basic mates and the Bishop + Wrong Rook's Pawn ending. In any case, a perfect demonstration of these endings can be found in many books."
+        },
+        {
+          "type": "ending",
+          "content": {
+            "number": "1",
+            "text": "The rule of the square"
+          }
+        },
+        {
+          "type": "position",
+          "content": {
+            "number": "1.1",
+            "fen": "6k1/8/8/8/8/8/P7/7K w - - 0 1",
+            "caption": "Position 1.1"
+          }
+        },
+        {
+          "type": "text",
+          "content": "The first question we have to answer in King + Pawn vs. King endings is this: Can the pawn promote without the aid of the king?\nCalculating the race between the pawn and the enemy king is enough to answer this question. This calculation is not complicated but, anyway, experience has taught us a simple way to solve the problem at a glance: the so-called 'rule of the square'. This rule helps us calculate and can be applied to any other endgame which presents the same race situation.\n1.a4!"
+        },
+        {
+          "type": "position",
+          "content": {
+            "number": "1.2",
+            "fen": "6k1/8/8/8/P7/8/8/7K b - - 0 1",
+            "caption": "Position 1.2"
+          }
+        },
+        {
+          "type": "moves",
+          "content": "After the pawn advances, we draw an imaginary square that reaches the 8th rank. In this example the vertices of the square are a4-a8-e8-e4.\n1... Kf7\nOf course, the black king tries to prevent promotion. Now we are ready to state the main rule.\nRule of the square: If the king can reach the square of the pawn, then he can capture the pawn; if not, the pawn promotes.\nIf, when recalling the rule, we doubt whether the king must reach the square with his move or he must aReady be inside, we shall observe this: if the king chased the pawn from the rear (in this example it might be from b3), should he be inside the square before moving? Of course not: therefore, it would be the same if the king came from farther away, be it from the pawn's rear or from its side.\n2.a5\nIt is clear that, in this case, the enemy king has not reached the square of the pawn,\nso White wins.\n2... Ke6 3.a6 Kd6 4.a7Kc7 5.a8Q 1-0\nBlocking the way and supporting the pawn with the king let us now look at Position 1.3. The black king has clearly reached the square. Now the pawn can promote only with the aid of the king. The easiest way is by blocking the enemy king's way.\nThis concept of blocking appears very often in pawn endings, but also in many oth ers, and it is at the core of Rook vs. Pawn endings.\nWe can now state the second rule, which works with almost all pawns, the excep tion being the rook's pawn.\nWhen possible, the stronger side's king will prevent its ri val from standing in front of the pawn. If he succeeds, the pawn promotes."
+        },
+        {
+          "type": "position",
+          "content": {
+            "number": "1.3",
+            "fen": "8/4k3/2K5/8/8/8/1P6/8 w - - 0 1",
+            "caption": "Position 1.3"
+          }
+        },
+        {
+          "type": "moves",
+          "content": "1. Kc7!\nPreventing... Kc8 followed by... Kb8 to stand in the pawn's way. Besides, from this square the king secures the pawn's path to b8.\n1... Ke6\nSince the black king cannot get in front of the pawn, he tries to attack the pawn be fore it reaches the secure zone (b6-b7- b8).\nLet us use this example to point out that, if the stronger side's king has secured the side opposition on the 7th rank, the defender will not be able to disturb the pawn.\n2.b4 ®d5 3.b5 1-0\nOpposition\nWe have just seen what happens in the two simplest cases:\n1) When the king does not support the pawn.\n2) When the king supports the pawn by preventing the enemy king from standing in its way.\nHowever, the most interesting situation in a King + Pawn vs. King ending occurs when the defending king occupies a key square in front of the pawn. Then, every thing depends on the relative position of the kings."
+        },
+        {
+          "type": "ending",
+          "content": {
+            "number": "2",
+            "text": "The pawn is on the 6th rank"
+          }
+        },
+        {
+          "type": "position",
+          "content": {
+            "number": "1.4",
+            "fen": "5k2/8/5PK1/8/8/8/8/8 w - - 0 1",
+            "caption": "Position 1.4"
+          }
+        },
+        {
+          "type": "moves",
+          "content": "The first important position, which we must fix in our minds, occurs when the pawn has reached the 6th rank and is only two steps away from the promotion square. Despite the proximity of the 8th rank, we will need to examine some posi tions before we grasp all the important details. In Position 1.4 (previous page), the pawn can take its two last steps almost automatically.\n1.f7!\nThe pawn moves ahead and Black must retreat his king; the white king can thus support promotion.\n1... ®e 72.®g7! 1-0\nHowever, the resuR changes completely if in Position 1.4 it is Black's turn. The rea son is that the pawn cannot promote if both kings are opposed when the pawn reaches the 7th rank. Then we say that they are in opposition, like here after\nBlack's first move:\n1... ®g8!"
+        },
+        {
+          "type": "position",
+          "content": {
+            "number": "1.5",
+            "fen": "6k1/8/5PK1/8/8/8/8/8 w - - 0 1",
+            "caption": "Position 1.5"
+          }
+        },
+        {
+          "type": "text",
+          "content": "Now the kings are opposed and in this situation, almost always, the side that has the opposition has the advantage, and the side to move is at a disadvantage.\nAs stated above, opposition has gained an excessive prestige; in some cases it is not so useful. If we want to make the most of it, and not to let it deceive us, we just have to notice how it suits us in each case.\nIn a King + Pawn vs. King ending, king opposition is deci sive when the pawn is on the 6th rank.\nThis is the first important pattern we must recognise.\n2.f7+\nHere the pawn moves ahead but cannot promote. Anyway, other moves would not win against an accurate defence. For instance: 2. Kg5 Kf7! (2... Kf8 is also good).\nThe safest way for the defender is to stay on the two squares available in front of pawn. This fortress cannot be broken. If you have not done this before, it is the worth observing and analysing this simple sequence: 3. Kf5 Kf8! (staying in front of the pawn is always the simplest way) 4. Kf4 Kf7! 5. Kf5 Kf8 6. Ke6 (if the de fending king has always waited in front of the pawn, it is possible to get the opposi-\n\n8. Kf6 stalemate, as in the main line.\n2... Kf8!\nIn contrast with Position 1.4, White is to move and to prevent the loss of the pawn,\nhe must stalemate Black's king.\n3. Kf6 and draw by stalemate.\nIn this ending we have seen that, if the defending king takes the opposition when the pawn is on the 6th rank, the pawn cannot promote. If we go deeper, we also see that the major obstacle for the white king has been his own pawn. Therefore, we can conclude that:\n1) The stronger side must not push the pawn too quickly.\n2) The pawnshould only reach the 6th rank in one of these two scenarios:\na) its path to promotion is clear, or b) its advance causes the kings to be opposed (but usu ally this only happens when the king has reached the\n6th rank before the pawn)\nLet us have a look at two more positions to consolidate some ideas related to the\n6th-rank opposition. Then, our next positions will focus on how to manoeuvre be fore the pawn reaches the 6th rank."
+        },
+        {
+          "type": "position",
+          "content": {
+            "number": "1.6",
+            "fen": "k7/8/2P5/K7/8/8/8/8 w - - 0 1",
+            "caption": "Position 1.6"
+          }
+        },
+        {
+          "type": "moves",
+          "content": "Regardless of the starting position of the kings: when the pawn is on the 6th rank,\ntheir manoeuvres are driven by opposition, as we will see in the analysis diagram and in the following position:\n1. Ka6!\nTaking the opposition. Not 1. Kb6?? Kb8! and it is Black who takes the opposition.\n1... Kb8 2. Kb6! Kc8\n2... Ka8 may be a clever attempt to induce a mistake, exploiting the proximity of.\nthe edge of the board, but fails against accurate play: 3. Kc7! (3.c7?? would be a gross mistake) 3... Ka7 4. Kd7 and the pawn promotes.\n3.c7 Kd7 4. Kb7 and the pawn promotes.\n\nLosing the opposition"
+        },
+        {
+          "type": "position",
+          "content": {
+            "number": "1.7",
+            "fen": "8/6k1/4P3/6K1/8/8/8/8 w - - 0 1",
+            "caption": "Position 1.7"
+          }
+        },
+        {
+          "type": "moves",
+          "content": "Most mistakes made in King + Pawn vs. Pawn endings occur in this position. The reason is that this situation is just provisional: the black king cannot keep the oppo sition because the pawn controls the f7 -square. As stated above, the best squares for the lone king are those in front of the pawn. Otherwise, he may not get there in the right circumstances. This occurs in the next example, which is also important to find out why opposition is sometimes useless. Black loses, no matter who has the move. If Black is to move, the white king will immediately take the opposition on the 6th rank; if White is to move...\n1. Kf5!\nNow, wherever the black king moves, he loses the opposition. The important con clusion is:\nOnce we take the opposition, we lose it one of the squares we need is out ofr each.\nif\n1... Kg8 (1..<Ji f8 2.<Jif6) 2. Kg6! Kf8 3.®f6 The white king has gained the impor.\ntant 6th-rank opposition and wins. 3... ®e8 4.e7®d7 5.®f71-0\nOne last example to make sure that we have taken into consideration all the subtle ties of this ending. Not all pawns work the same. As we get closer to the edge of the board, pawns usually have their own rules. Therefore, I will devote a special section to the rook's pawn. The knight's pawn is not so exceptional, but nevertheless it presents some peculiarities due to the proximity of the edge of the board.\nKnight's pawn"
+        },
+        {
+          "type": "position",
+          "content": {
+            "number": "1.8",
+            "fen": "8/8/8/8/8/5kp1/7K/8 w - - 0 1",
+            "caption": "Position 1.8"
+          }
+        },
+        {
+          "type": "moves",
+          "content": "Let us have a look at the position: It is White's turn and he cannot take the opposi tion, while we know that if the king moves in front of the pawn he will have to re treat from his blocking position on his next move. This position would be lost if\nBlack had a central pawn, but with a knight's pawn White can be saved thanks to a special detail.\n1. Kh1!\nThe right move. This relative position of the kings, called diagonal opposition, usu ally does not help much, but works in this case.\n1... Kf2\nThis move would secure promotion with any other pawn, but now the white king is in stalemate and the position is drawn. The pawn cannot promote against other moves either, since the white king comes back to his impregnable position in front ofthepawn: 1... Kg4 2. Kg2!="
+        },
+        {
+          "type": "ending",
+          "content": {
+            "number": "3",
+            "text": "Key squares"
+          }
+        },
+        {
+          "type": "position",
+          "content": {
+            "number": "1.9",
+            "fen": "5k2/8/4K3/5P2/8/8/8/8 w - - 0 1",
+            "caption": "Position 1.9",
+            "markers": [
+              {
+                "square": "f6",
+                "symbol": "*",
+                "meaning": "as printed"
+              },
+              {
+                "square": "g6",
+                "symbol": "*",
+                "meaning": "as printed"
+              }
+            ]
+          }
+        },
+        {
+          "type": "moves",
+          "content": "When the pawn has not reached the 6th rank yet, the analysis grows in complexity,\nbut there are very clear rules. If we know them, we will play the ending with accu racy and we will quickly know whether the pawn promotes or not. The essential concept here is that of key squares. But what are key squares and what is their ef fect?\nIf the strong king occupies one of the key squares, the pawn promotes. When the pawn is on the 5th rank, its key squares are those three in front ( e6, f6 and g6, marked in the diagram).\nSince the king has reached one of them, White wins:\n1. Kf6!\n\nOf course not 1.f6?? Ke8! taking the opposition and thus drawing. As we have said, there is no need to hurry to push the pawn. The white king must pave the way first.\n1... Ke8\nThe black king has retreated from the pawn's path. What is the move that secures promotion?\n2. Kg7!\nNow the pawn's path is clear and promotion comes in three moves.\n2. Ke7 3.f6+ Ke6 4.f71-0... If, in the starting position, the white king had been on g6, 1. Kf6 would have led to the same position; if on f6, White wins with 1. Ke6 Ke8 2.f6, taking the opposi tion in the key situation: when the pawn reaches the 6th rank.\nWere it Black's turn in any of the three examples, White would win by means of one of those two manoeuvres: either supporting the pawn from the 7th rank or taking the opposition.\nTherefore, we have seen that White wins if his king reaches any key square. That will condition our previous play.\nKnight's pawn"
+        },
+        {
+          "type": "position",
+          "content": {
+            "number": "1.10",
+            "fen": "7k/5K2/8/6P1/8/8/8/8 w - - 0 1",
+            "caption": "Position 1.10"
+          }
+        },
+        {
+          "type": "moves",
+          "content": "Once again, the knight's pawn poses extra difficuRies, but the key square rule still applies. We just need to be slightly more careful.\n1. Kg6!\nThe king must go to the other side to skip annoying stalemate tricks. The aRerna tives are: 1.g6? stalemate; 1. Kf6 This move does not let victory slip but, if Black plays accurately, White has to return to the starting position. 1... Kh7! ( 1.... W g8.2. Kg6 Kh8 3. Kf7 Kh7 4.g6+ Kh8 5.g7++-) 2.g6+?? (this move does miss the victory, as we have seen in Position 1.8. 2. Kf7! is the correct move, returning to the starting position) 2... Kh8! Now the pawn cannot be stopped.\n1 Kg8 2. Kh6 <J;.;h5 3.g6...\nWith the king at this side of the pawn, promotion runs smoothly, as shown in Posi tion 1.4.\n3. Kg8 4.g7 Kf7 5. Kh7 1-0... Key squares when the pawn has not reached the 5th rank"
+        },
+        {
+          "type": "position",
+          "content": {
+            "number": "1.11",
+            "fen": "5k2/8/8/8/3PK3/8/8/8 w - - 0 1",
+            "caption": "Position 1.11",
+            "markers": [
+              {
+                "square": "c6",
+                "symbol": "*",
+                "meaning": "as printed"
+              },
+              {
+                "square": "d6",
+                "symbol": "*",
+                "meaning": "as printed"
+              },
+              {
+                "square": "e6",
+                "symbol": "*",
+                "meaning": "as printed"
+              }
+            ]
+          }
+        },
+        {
+          "type": "moves",
+          "content": "If the pawn has not reached the 5th rank, its key squares are two ranks ahead.\nFor example, for a pawn on the 4th rank, the key squares are on the 6th rank; in the diagram, c6, d6 and e6. But the rule still applies: if the white king occupies one, the pawn promotes. The key squares for a pawn on the 5th rank are the same as on the\n4th rank. For a pawn on the 2nd or 3rd rank that rule (the key squares are two ranks ahead) is still valid. That is, for a d3 pawn, the key squares would be e5, d5 and c5;\nfor a d2 pawn, e4, d4 and c4.\nIn the diagram position, the white king easily reaches one of the key squares, but sometimes opposition plays a role, causing the fight for the squares to be harder.\n1. Kd5!\nHeading for the key square c6. 1. Ke5?? would be a mistake: in the position after.. Ke7, opposition would be useful in the standard way: it prevents the enemy 1.\nking from going further, in this case, from reaching the key squares.\n1... Ke72. Kc6\nOnce White has occupied one of the key squares, the pawn promotes; we aReady know the procedure.\n2... Kd8 3. Kd6 Kc8 4. Ke7 Kc7 5.d5 Kc8 6.d6 Kb7 7.d7 1-0\nTrying to analyse what would have happened if Black were to move in the starting position is a simple and interesting Exercise.\nThe distant opposition"
+        },
+        {
+          "type": "position",
+          "content": {
+            "number": "1.12",
+            "fen": "8/8/8/1kp5/8/8/8/K7 w - - 0 1",
+            "caption": "Position 1.12",
+            "markers": [
+              {
+                "square": "b3",
+                "symbol": "*",
+                "meaning": "as printed"
+              },
+              {
+                "square": "c3",
+                "symbol": "*",
+                "meaning": "as printed"
+              },
+              {
+                "square": "d3",
+                "symbol": "*",
+                "meaning": "as printed"
+              }
+            ]
+          }
+        },
+        {
+          "type": "moves",
+          "content": "In the diagram position the fight for the key squares is tougher. We aReady know that, for a 4th-rank pawn, the key squares are two ranks ahead; in this case, b3, c3\nand d3 (mark ed in the diagram).\nWe also know that opposition prevents the enemy king from going further, so if the strong king reaches the 5th rank and then his counterpart takes the opposition from the 2nd rank, the former will not make progress or occupy the key squares. However,\nif the white king moves to the 2nd rank, it is Black who takes the opposition. What to do then? Sometimes we can succeed thanks to the so-called distant opposition.\n1. Kb1!\nWhen both kings are on the same file separated by an odd number of squares (3 or\n5), we talk about distant opposition. This is an effective way to restrict the enemy king's progress. For example, in this case the black king can gain a rank, but no more,\nas then his white counterpart will oppose him, taking the direct opposition. Thus the white king prevents him from advancing two ranks and getting to the key squares.\nIt is interesting to note that Black cannot win, even if it were again White's turn.\nDistant opposition can be lost, the same as direct opposition (see Position 1.7), if some squares are out of reach. Now White would play Kc1 and Black would lose the opposition because... Kc5 is impossible.\n1... Kb4\nIf 1... Kc4, then 2. Kc2, always taking the opposition and hindering progress.\n2. Kb2!\nImmediately taking the direct opposition, thus preventing the king from reaching the key squares.\n2...c 4 3. Kc2 c3 4. Kc1 Kb3 5. Kb1 c2+ 6. Kc1 Kc3=\nUsing reserve moves"
+        },
+        {
+          "type": "position",
+          "content": {
+            "number": "1.13",
+            "fen": "8/6k1/8/6K1/8/6P1/8/8 w - - 0 1",
+            "caption": "Position 1.13"
+          }
+        },
+        {
+          "type": "moves",
+          "content": "Remember that the key squares for a 3rd-rank pawn are two ranks ahead. Thus,\nhere the key squares are f5, g5 and h5. The white king is aReady there, so White should win, but how to outflank the opposing king?\nThis is possible thanks to a reserve move with the pawn.\n1.g4\nAs the kings are opposed, White pushes the pawn, giving Black the move. Thus the white king will reach the new key squares on the following move.\n\n1... Kh7.1. K£7 2. Kh6 would not change matters...\n2. Kf6\nNow the king has occupied the key squares for the pawn on the 4th or even the 5th rank. Thus, the pawn could go that far, but there is an easier way.\n2... Kh8\n2... Kh6 3.g5+ Kh7 4. K£7; 2... Kg8 3. Kg6 Kf8 4. Kh7 and the pawn's path is clear.\n3. Kg6 Kg8\nThe black king takes the opposition again, but once more White has a reserve move.\n4.g5! <ii?h8 5. Kf7\nand the pawn promotes straight away:\n5... Kh7 6.g6+ ®h6 7.g7 1-0"
+        },
+        {
+          "type": "ending",
+          "content": {
+            "number": "4",
+            "text": "The rook's pawn. Defending king in front of the pawn"
+          }
+        },
+        {
+          "type": "position",
+          "content": {
+            "number": "1.14",
+            "fen": "8/8/8/8/8/6kp/8/6K1 w - - 0 1",
+            "caption": "Position 1.14"
+          }
+        },
+        {
+          "type": "moves",
+          "content": "So far, everything we have said is valid for all pawns with the exception of the rook's pawn, which deserves special attention.\nIn a pawn ending, the rook's pawn is the most difficuR to promote. It requires its path to be clear. The reason is the possibility of a stalemate when the pawn reaches the 7th rank supported by the king, no matter from where. This new situation ren ders useless all our rules about the range, the opposition and the key squares stated in the previous endings.\nIn this position it doesn't matter who is to move: this is always a draw.\n1. Kh1\nWhite loses the opposition, but no matter: there is a.s talemate.\n1... h2\nstalemate.\nConclusion: With a rook's pawn, if the defender's king stands on the way, it is a draw.\n\nQuantity is not quality"
+        },
+        {
+          "type": "position",
+          "content": {
+            "number": "1.15",
+            "fen": "8/7p/7p/7p/7p/6kp/7p/6K1 w - - 0 1",
+            "caption": "Position 1.15"
+          }
+        },
+        {
+          "type": "moves",
+          "content": "Though we are studying single-pawn endings, exceptionally I will show you this diagram - an imaginary position, it cannot be reached in an actual game! - to illus trate the idea that there is little hope of promoting a rook's pawn.\nWe can see here that if the defending king stands in the pawn's path, not even 6\nrook's pawns are enough to win.\n1. Kh1 Kf3 2. Kxh2 Kg4 3. Kh1 Kg3 4. Kg1 h2+ What else? 5. Kh1 Kg4 6. Kxh2\nh3 7. Kh1 Kg3 8. Kg1 h4 9. Kh1 h5 1 O. Kg1 h6 11. Kh1 Kf3 12. Kh2 Kg4\n13. Kh1 Kg3 14. Kg1 h2+ 15. Kh1\nAnd again the only way to avoid stalemate is giving up the pawn and so either we lose all pawns or we cannot advance them.\nUnfortunately for the strong side, standing in the pawn's path is not the only way for the defender to draw this ending. The vicinity of the edge of the board can also dramatically restrict the mobility of the stronger side's king.."
+        },
+        {
+          "type": "ending",
+          "content": {
+            "number": "5",
+            "text": "Imprisoning the stronger side's king"
+          }
+        },
+        {
+          "type": "position",
+          "content": {
+            "number": "1.16",
+            "fen": "8/8/8/8/p7/k7/2K5/8 w - - 0 1",
+            "caption": "Position 1.16",
+            "markers": [
+              {
+                "square": "b2",
+                "symbol": "*",
+                "meaning": "as printed"
+              },
+              {
+                "square": "b1",
+                "symbol": "*",
+                "meaning": "as printed"
+              }
+            ]
+          }
+        },
+        {
+          "type": "moves",
+          "content": "position Black 1... Kb2, securing the pawn's path to pro\nIn the diagram threatens motion. But it is White's turn:\n1. Kc1! 1... Kb2 and threatening 2. Wbl.\nPreventing\n1... Ka2\n\nThe only way to prevent the white king from getting in the pawn's way. However,\nafter this move the black king loses his mobility and will not be able to let his pawn advance. 1...a 4 2. Wbl a3 3. Ka1 leads to a well known drawn position.\n2. Kc2!\nNow White will not allow the king out of the corner. The rest is quite easy.\n2... a4 (2... Ka3 3. Kb1=) 3. Kc1 a3 4. Kc2 Ka1 5. Kc1\nNothing can be done. The king cannot get out and, if Black pushes the pawn, his king is stalemated.\nThis is so clear that we could add many doubled rook's pawns to the diagram and still Black could not win.\nConclusion: In order to draw against a rook's pawn, plac ing the King in front of the pawn is enough, but occupy ing one of the two nearest squares on the bishop's file also works. In this example, the c1- and c2-squares.\nThe ending Rook vs. Bishop is usually a draw. However, the defender has to be care ful with some positions when the king is pushed to the edge of the board. This is especially dangerous when the king is pushed to the wrong corner.\nIn a Rook vs. Bishop ending, the wrong corner is the cor ner of the same colour as the squares on which the bishop moves."
+        },
+        {
+          "type": "ending",
+          "content": {
+            "number": "6",
+            "text": "Rook vs. Bishop. The wrong corner"
+          }
+        },
+        {
+          "type": "position",
+          "content": {
+            "number": "1.17",
+            "fen": "6k1/5R2/6K1/8/8/8/8/6b1 w - - 0 1",
+            "caption": "Position 1.17"
+          }
+        },
+        {
+          "type": "moves",
+          "content": "In the diagram position, the black king cannot move away from the corner and\nBlack loses, no matter where the bishop is.\n1. Rf1\nThe winning plan is to force the bishop out of its safe place behind the white king,\nthus winning time to threaten checkmate on the 8th rank. I.l:!b7?? threatening\n\n1... Kh2\nTrying to stay in the safe zone, but there are not enough squares, as we will see in three moves. Other moves lose quickly. For instance: 1.... Kd4 2.ldd 1 Kb6 3 Jib 1\nKc7 4.lic1 and Black cannot hinder the 8th-rank check any more.\nN:rh1 K9a aJK91 Kh2 4.1:1:92\nThe rook takes control over two of the safe squares; a discovered check with the king mines a third one (the f4-square). Therefore, the bishop is forced out to open field, and the white rook can exploit its position to win a decisive tempo.\n4... Kd6 (4... Kf4 5. Kf5++-) 5. Kd2 Ke7 s.;g:c2 (6. Rd7? Kf8 draws)... Kf8\n\n7Rc8 and Black is checkmated.\nThe other corner is a completely different story. It is so easy to defend this ending from the right corner that going there straight away is a perfectly sound idea."
+        },
+        {
+          "type": "ending",
+          "content": {
+            "number": "7",
+            "text": "Rook vs. Bishop. The right corner"
+          }
+        },
+        {
+          "type": "position",
+          "content": {
+            "number": "1.18",
+            "fen": "7k/R7/7K/8/8/1b6/8/8 w - - 0 1",
+            "caption": "Position 1.18"
+          }
+        },
+        {
+          "type": "moves",
+          "content": "The black king stands in the corner, while the bishop is ready to interpose on g8\nin case of a check. Then White would have to let the bishop move to avoid stalemate, and the position would be repeated. There are no serious winning chances.\n1. Ra8+ Kg8\nNow either the rook or the king must release the pressure on the enemy pieces to avoid stalemate.\nN:la7\n2. Kg5 Kg7 3. Ra7+ Kh8 4. Kg6 Kc4 5.lia3 Kd5 6. Rh3+ Kg8 7. Re3 Kh8 is similar.\n2... Kb3 3. Kg6\n3.ldh7+ Kg8 4. Rb7 Kd5. The bishop always has enough squares at its disposal along the a2-g8 diagonal.\n3... Kc4\n\nThe only concern for the defender is that his bishop has enough distance to check the enemy king from the b l-h7 diagonal if necessary. Thus 3. Ke6?? would be bad due..\nto 4. Rh7+ Kg8 SRle7 winning. The position is safe once this danger is averted.\n4JKh7+ Kg8 5.l:.c7.td3+ 6. Kh6.te4=\nWhen fighting against a rook, the knight may have more trouble than the bishop.\nNevertheless, most positions are drawn. In this ending, keeping the knight close to the king is the best policy. If the knight is separated from the king, it can be lost."
+        },
+        {
+          "type": "ending",
+          "content": {
+            "number": "8",
+            "text": "Rook vs. Knight. At the edge of the board"
+          }
+        },
+        {
+          "type": "position",
+          "content": {
+            "number": "1.19",
+            "fen": "8/8/8/8/8/3k4/r7/3NK3 w - - 0 1",
+            "caption": "Position 1.19"
+          }
+        },
+        {
+          "type": "moves",
+          "content": "No problems for White, though both the king and the knight have been driven to the edge of the board. Not so when they are in the corner. Moreover, this position has great theoretical importance, as it usually occurs as a resuR of a Rook vs. Pawn endgame, as we will see in the corresponding section.\nWhen the knight and the king are together on the edge, moves are usually forced,\nbut then there is a lower risk of blundering. The knight should not be separated from the king in any circumstances, though this does not necessarily imply an au tomatic defeat. The first move is clearly forced.\n1. Nf2+ Ke3\nThe next move is also forced, following the rule of keeping together knight and king, aRhough the check on g4 does not lose here.\n2. Nd1+ Kf3\nNow White has two options that may lead to the same position some moves later.\n3. Nc3\n3. Kf1 Ke2 4.4Jc3, and either the king or the knight will return on the next move.\nThis is the only case when the king and the knight are separated for a moment.\n3... l:.c2 4. Nd1\nLet's see what would happen if the knight preferred to ride in the open field.\n4. Nds??"
+        },
+        {
+          "type": "position",
+          "content": {
+            "number": "1.20",
+            "fen": "8/8/8/3N4/8/5k2/2r5/4K3 b - - 0 4",
+            "caption": "Analysis diagram 1.20"
+          }
+        },
+        {
+          "type": "moves",
+          "content": "Once the knight has moved away from the king, it is very likely to be lost. That is the case here, though very often the process of trapping the knight presents tactical difficuRies. The stronger side must restrict the knight's movements, as well as ex ploiting double threats and pins to close the trap.\n4... Rc4 (depriving the knight of the b4-square. It must go even further away) 5. Nb6\n(if 5. Nf6 Rd4, taking away most of the squares for the knight: 6. Nh7 <t>f4 7. Nf8\n<t>f5-+) 5....1lb4 6. Nc8 (there is noway back: 6. Nd5 Re4+ 7.<t>f1 Rd4 8. Nc3\nRd3-+) 6... Rb7! (all the knight moves are controlled directly or indirectly) 7. Kd2\n(7. Nd6 lie7+ 8. Kf1.:ld7-+) 7... Kf4 and the black king moves over to capture the knight: 8. Ke2 Ke5-+. Concrete analysis is complicated, but the important thing to remember is that separating the knight from the king should be avoided at all costs.\n4... Rte2+ The only way to divide the white army, but just for a moment.\n5. Kf1 Rh2 6. Ke1 The king comes back immediately. 6... Rc2 7. Kf1=\nThings are radically different when the king and the knight are at one corner of the board, no matter who occupies the corner-square. Their mobility is then restricted and the position becomes immediately lost. Even if the knight occupies the g2-square (an especially unfortunate square for the knight) most cases resuR a defeat.\nin"
+        },
+        {
+          "type": "ending",
+          "content": {
+            "number": "9",
+            "text": "Rook vs. Knight. In the corner"
+          }
+        },
+        {
+          "type": "position",
+          "content": {
+            "number": "1.21",
+            "fen": "8/8/8/8/8/6k1/r7/6NK w - - 0 1",
+            "caption": "Position 1.21"
+          }
+        },
+        {
+          "type": "position",
+          "content": {
+            "number": "1.22",
+            "fen": "8/8/8/8/8/6k1/r7/6KN w - - 0 1",
+            "caption": "Position 1.22"
+          }
+        },
+        {
+          "type": "position",
+          "content": {
+            "number": "1.23",
+            "fen": "r7/8/8/8/8/6k1/6N1/7K w - - 0 1",
+            "caption": "Position 1.23"
+          }
+        },
+        {
+          "type": "text",
+          "content": "There is no need for a deep analysis and it does not matter which side is to move: in all these positions White loses the knight straight away.\nThe third diagram is specially impressive: the knight is not even on the edge of the board, but it is lost anyway. This is our first example of a 'knight's dumb square'\nit will not be the last.\nand its effects, but\nConclusion: In the battle Knight vs. Rook there are two scenarios the defender should avoid:\n1) The knight is separated from the king\n2) Both pieces are trapped in the corner (even if the knight is on the g2 -square).\nBoth endings mixed in a recent game\nI have presented here a Rook vs. Knight ending because the basic ideas are 1) sim ple and 2) a must for all players.\nIt is true, though, that the trapping phase can sometimes be complicated. Also,\nsome positions with the king and the knight on the edge require an accurate de fence, aRhough those cases follow the general rule that the defender only loses if one of the pieces is in the corner.\nWhen I was rounding off this book, two top players played a surprising endgame whose resuR amazed everyone who likes studying chess (or so I thought). It is a re markable ending, because it contains the ideas shown in the previous two endings and illustrates the difficuRies of certain positions when the king and the knight are on the edge. Therefore, I thought it was worth including it here aRhough, due to its complexity, I do not recommend learning it by heart, like the previous ones. I will not comment in detail on all possible lines for the same reason."
+        },
+        {
+          "type": "position",
+          "content": {
+            "number": "1.24",
+            "fen": "8/8/8/8/8/5K2/7R/4nk2 w - - 0 1",
+            "caption": "Position 1.24"
+          }
+        },
+        {
+          "type": "text",
+          "content": "Kamsky- Bacrot\nSofia 2006\nBacrot had reached this position after an accurate defence of first a Rook + Pawn vs.\nRook + Pawn, and then a Rook + Pawn vs. Rook ending (see Question 28 in the Fi nal Test). He has just promoted to a knight, which, as we shall see in Ending 23, is the standard way of saving these positions. Now he has a supposedly well known drawn ending. I assumed that at this point he relaxed, and he was probably in time trouble.\n\nNevertheless, there is a special circumstance, which is interesting for us from a the oretical point of view: the knight is 'within range' of its dumb square (g2) and the king is placed on the knight's side next to that square. Defending this ending is somewhat difficuR.\n1.<.t>g3 Nd3 Nld2 Ne1 3R!:f2+ Kg1 4JU8 Ng2\nSo far everything has been forced. Now Black's troubles start. The knight must go to the dumb square or move away from the king. Intuitively the natural option is\n4 Nd3?, which loses due to 5. Kf3 Ne1+ 6. Ke2+-. On the contrary, 4 Nc2......\nleads to a draw, which I consider the easiest way, but over the board one tends to avoid taking the knight so far away: 5. Kf3 Kf1= with no real problems for Black.\nThus, some logical doubts arise: may it be that, if we promote on that square and have the king on that side of the board, the knight is forced to go to the dumb square, thus losing? Well, it is not so, but it is worth noting the difficuRies.\n5. Kf3 Kf1?\nActually, this is the losing move. That should not be surprising: with the knight on the g2-square, the defender is very likely to lose. The correct defence, not easy to find, was 5.. Nh4+ 6. Ke3 Kg2 7.. Rg8+ Kh3 8. Kf2 Kh2= and in practice Black.\nhas managed to return to the starting position.\n6. Kg3+?\nKamsky misses his first chance to win: 6.. Rf7!.\n6... Kg1 7. Kf3 Kf1? 8. Rf7!\nAn amazing zugzwang position.\n8... Ne1+ 9. Ke3+ Kg1 (9... Kg2 10. Ke2+-) 10. Ke2 Ng2 11. Rh7"
+        },
+        {
+          "type": "position",
+          "content": {
+            "number": "1.25",
+            "fen": "8/7R/8/8/8/8/4K1n1/6k1 b - - 0 11",
+            "caption": "Position 1.25"
+          }
+        },
+        {
+          "type": "moves",
+          "content": "11... Nf4+ 12. Kf3 Nd3 13. Rh4 Ne5+ 14. Ke2?\nJust an example of how difficuR this stage is, we aReady know from Position 1.20.\n14. Ke3!+-.\n14... Kg2! 15Re4 Nf7? (I... Nd7!=) 16. Re7 Nd6 17. Rg7+ Kh3 18. Kf3 Kh4\ns\n19. Kf4 Kh5 20Rte7 Nc4 21 Jde6 Nd2 2N:!:c6 Nb3 23. Ke3 Kg4 24. Rc4+ Kg3\n25Rtc3 Na5 26. Ke4+ Kf2 27. Kd5 Nb7 28Rtb3 Nd8 29. Rb8 1-0"
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "label": "Chapter 3",
+      "sections": [
+        {
+          "type": "title",
+          "content": "Knight vs. Pawn"
+        },
+        {
+          "type": "text",
+          "content": "Let us start with something relatively easy. Once the most basic endings are mastered, our next goal must be to handle without hesitation any ending where a single piece struggles with a pawn. Among this group, Bishop endings are trivial: we just have to check whether the bishop can control any square in the pawn's path.\nOn the contrary, Rook endings are the most complex ones. Knight and Queen endings are in the middle of the scale.\nLet us start with the knight. We can say that this is the easiest section in the book. However, it is as important as all the rest. Learning to handle with accuracy certain key positions where a knight fights against a pawn may be profitable in two ways:\n1) We will quickly calculate simplifying sequences from more complex ending.\na2) We will accurately 'glimpse' more complex positions where the same struggle between a knight and a passed pawn occurs, aRhough there is more material on the board.\nAn extra benefit will be that our confidence (that is, the opposite state to insecurity) will grow, which will help us prevent many mistakes."
+        },
+        {
+          "type": "ending",
+          "content": {
+            "number": "10",
+            "text": "Knight vs. 7th-rank pawn"
+          }
+        },
+        {
+          "type": "caption",
+          "content": "Position 3.1"
+        },
+        {
+          "type": "moves",
+          "content": "1. Nd1\nThe only move. As we will see, it is also a good one. Controlling the pawn is easier once the knight stands in front of it. Now the knight can manoeuvre at both sides of the pawn. It is easy to see that Black cannot create trouble anymore.\n1... Kc2 2. Nf2!\nThe easiest way: the knight moves away from the enemy king, thus avoiding trouble. 2. R. Je3+ would also be a draw.\n2... Kc3!\n\nNow the black king will have to go a long way to attack the knight.\n3. Ka6 Kd4 4. Kb5 Ke3 5. Nd1+ Ke2 6. Nb2!\n+\nAnd the same situation as in the second movement arises, only on the other side of the pawn. It is a clear draw.\nIt is easy to see that if we place the pawn some steps back or on the adjacent files,\nthe resuR and the manoeuvres are the same. So far we can conclude that, if the knight manages to stand in front of the pawn, the position is drawn against any pawn on the 4 central files, even if the pawn has reached the 7th rank.\nLater on we will extend and clarify this rule.\nLateral control\nA question must immediately arise: What if the knight cannot get in front of the pawn, but can control the promotion square?"
+        },
+        {
+          "type": "caption",
+          "content": "Position 3.2"
+        },
+        {
+          "type": "text",
+          "content": "As shown by analysis, if we can choose we must control the pawn from the rank, or,\nto provide a graphic idea, to control the pawn from the side rather than from the rear.\nIn the diagram position, the knight must be transferred to the second rank, so that it can enter two circuits: one to stop the pawn and the other to capture the pawn. In this case, e2-c3-a2 or e2-d4-b3-c1.1. Ne2+!\nThe right move. As we said, the knight is transferred to a side of the pawn. The alternative was losing: 1. Nd3+?? Kd2! and the knight is driven off the right circuit,\nafter which the pawn promotes. The last try is 2. Nc5!?, a typical calculation mistake in this ending. We may have thought that this move is enough to draw, but this is an illusion. 2... Kc3! Avoiding the trick, threatening to promote the pawn and controlling both 'good' squares for the knight (d3 and b3). 3. Ne4+ Kd3. Any legal move would win now, but this is the shortest way to put an end to the knight's kicking. 4. Nc5+ Kc4 and the pawn promotes.\n1.. Kd2. This allows a draw straight away, but in case of 1. Kd1, the knight could get to its..\nideal square to control the pawn from the other side (here, the a2-square):\n2. Nc3+! Kd2 3. Na2=; other king moves pose no problems for White.\n2. Nd4! c1=Q 3. Nb3+=\n\nConclusion: Against a 7th-rank pawn on any of the 4 centralfiles:\n1) If the knight can stand in front of the pawn, it is a draw.\n2) If not, the knight must at least 'laterally' control the promotion square to draw.\n3) If the knight can neither stand in front of the pawn nor\n'laterally' control the promotion square from the same rank on which the pawn stands, the pawn promotes.\nAs readers have probably noticed, so far we have only deaR with pawns on the 4\ncentral files. The reason is that there are some exceptions when dealing with the other pawns. This is due to the proximity to the corners of the board, which limit the knight's freedom of movement on both sides of the pawn."
+        },
+        {
+          "type": "ending",
+          "content": {
+            "number": "11",
+            "text": "The knight's pawn"
+          }
+        },
+        {
+          "type": "caption",
+          "content": "Position 3.3"
+        },
+        {
+          "type": "text",
+          "content": "1...b2!\nA superb move, very easy to find if we know that, when facing a 7th-rank knight's pawn, the knight cannot succeed unless it stands in front of the pawn.\nThe idea of 1... Kc2? is very logical: to prevent the knight from coming close to the pawn. However, this is an instructive mistake which is worth analysing: what if the knight moves in front of the pawn? 2. Nd6! An important tactical subtlety, hindering the immediate advance of the pawn. The knight moves temporarily away from the pawn: this is a common device in this kind of struggle. 2... Kc3 (2...b 2\n3. Nc4=; 2... Kd3 3. Nb5 followed by Na3 - draw) 3. Ne4+ Kd4 (in the event of\n3... Kd3, White gives up his knight for the pawn straight away; 3... Kc2 is just a repetition). 4. Nd2 b2 5. Nb1. Now the knight is in front of the pawn and we will see that it is a draw, despite the fact that its mobility is reduced compared to previous endings against central pawns. 5... Kd3 6. Kg2 Kc2 7. Na3+ Kb3 8. Nb1=.\nThe blockade cannot be lifted.\n\n2. Nd2+\n2. Nc3+ loses in the same fashion as against central pawns: 2... Kc2 3. Nb5 Kb3\n4. Nd4+ Kc3 s. Nb5+ Kb4-+.\n2... Kc1!\nThis is the point! Against a knight's pawn, there is no 'good square' on the other side of the pawn.\n3. Nb3+ Kd1 and the pawn promotes.\nConclusion: Against a 7th-rank knight's pawn:\n1) If the knight can stand in front of the pawn, it is a draw.\n2) If not, the pawn promotes.\nAs usual, the theoretical approach is different when dealing with a rook's pawn.\nThe rook's pawn is the most dangerous scenario for a knight. This is because the edge of the board is closer, and so the mobility problems for the knight increase.\nLet us start with the 6th-rank rook's pawn. Here the drawing chances are similar to those seen against a 7th-rank central pawn.\nThere are no problems for the knight if it can stand in front of the pawn; however,\nif the knight fails and just controls the square in the pawn's path, it must find the right circuit in order to save the game. Here the circuit is g4-e3-fl-h2."
+        },
+        {
+          "type": "ending",
+          "content": {
+            "number": "12",
+            "text": "The 6th-rank rook's pawn"
+          }
+        },
+        {
+          "type": "caption",
+          "content": "Position 3.4"
+        },
+        {
+          "type": "moves",
+          "content": "1. Ng4+!\nThe knight enters the right circuit.\n1. Nc4 draws as well, thanks to a small tactical device. It is worth noting it due to its paradoxical nature: in the starting position, White draws with the knight on e5, far from the pawn, but not with the knight on h4, close to the pawn. A series of checks helps the knight cross the board at great speed, but to do so the knight needs to find the right circuit: that is impossible starting from h4. 1... Kg2 (I.. Kg1 2. Ne5! The.\n\n1... Kg3 2. Ne3=) 2. Ne3+=.\nThe obvious t. Nf3+? fails. Here the knight enters a bad circuit and eventually is expelled. 1... Kg2 2. Nh4+ (2. Ne1+ Kg3-+) 2... Kf2-+ and the pawn promotes.\n1... Kg3 2. Ne3 Kf3 3. Nf1 Kf2 4. Nh2\nThe knight remains inside the right circuit, that is, h2-fl-e3-g4 and the black king cannot drive it away. Draw.\nConclusion: The knight draws against a 6th-rank rook's pawn if it can stand in front of it. If the knight just con trols the pawn's path, it needs to enter the right circuit to draw, that is, for the hi-corner, g4-e3-f1. From the f3-square, the knight fails.\nThe barrier\nNow only the struggle between a knight and a 7th-rank rook's pawn remains to be studied. Here the king can always drive the knight away, or capture it. There are more drawing chances than we may think at first sight, and they depend on the knight getting help from the king."
+        },
+        {
+          "type": "ending",
+          "content": {
+            "number": "13",
+            "text": "The 7th-rank rook's pawn"
+          }
+        },
+        {
+          "type": "caption",
+          "content": "Position 3.5"
+        },
+        {
+          "type": "moves",
+          "content": "The black pawn is about to reach the 7th rank, while the white king is very far away\nIt looks like a critical situation for White... but it is a draw!\n1. Ng3! h2\n1.. Ke3 2. Nf1+, and the knight makes it to h2..\n2. Kb7"
+        },
+        {
+          "type": "caption",
+          "content": "Analysis diagram 3.6"
+        },
+        {
+          "type": "moves",
+          "content": "The black king seems very close to the pawn, but things are not that easy when he tries to come closer. The knight has set up a barrier (the marked squares). To cross the barrier, the black king must give up the pawn. To go round it, there are two possible routes: d4-e5-f4 or c2-dl-el-f2. Both allow the white king to come closer.\nIt is interesting to note that the essential (and solid) part of the barrier are the d2-e2-e3-e4-squares, which form an L-shape.\n2... Kd4. The aRernative way is also very long. 2... Kc2 3. Kc6 Kd1 4. Kd5 Ke1 5. Ke4 Kf2\n6. Kf4=.\n3. Kc6 Ke5 4. Kc5 ( 4. Nh1 Ke4 s. Kc5=) 4... Kf4 5. Nh1 Kf3 6. Kd4 Kg2 7. Ke3!\nJust in time! The white king can occupy the f2-square.\n7... Wxh1 8. Kf2=\nThe other barrier"
+        },
+        {
+          "type": "caption",
+          "content": "Position 3.7"
+        },
+        {
+          "type": "moves",
+          "content": "This position belongs to the final part of one of Grigoriev's studies, but can easily arise in a game.\nStarting from the e4-square the knight can stop the pawn, and set up barriers from the f2-square as well as from the g3-square. Depending on the position of the enemy king, the knight will choose the most suitable location.\n1.. Kc2. The king anticipates the barrier and gets ready to go round it, but here that is not enough, because the white king will be able to defend the knight from the f4-square.\n\n3. Kd6 Kd1 4. Ke5 Ke1 5. Kf4=. 1. Kd4?! 2. Nf2!.."
+        },
+        {
+          "type": "caption",
+          "content": "Analysis diagram 3.8"
+        },
+        {
+          "type": "moves",
+          "content": "Here appears a different barrier, the most troublesome for Black given his king's position. Once again, the core of the barrier is L-shaped (the e5-, e4-, e3- and d3-squares). (2. Ng3? loses to 2... Ke5! 3. Kc6 Kf4 4. Nh1 Kf3-+ 5. Kd5 Kg2\n6. Ke4 and the white king will not get to the f2-square) 2... Kc3 the king starts going round the barrier. 3. Kd6 Kd2 4. Ke5 Ke2 5. Nh1 Kf3 6. Kd4 Kg2 7. Ke3\nKxh1 8. Kf2=\n2. Ng3! (2. Nf2? Kd2-+) 2... Kd1 3. Kd6 Ke1 4. Ke5 Kf2 5. Kf4=\nConclusion: The knight alone cannot stop a 7th-rank rook's pawn. However, its ability to set up a barrier can be enough to hold out while waiting for the king's aid,\nassuming the white king is close enough.\nExceptional positions\nThere are at least two settings that any player should know. One favours the knight;\nthe other favours the pawn.\nThere is a very exceptional situation, where the knight, with the king's aid, can eventually checkmate the enemy king. This happens when the enemy king is stuck in front of a 6th- (or 7th-)rank rook's pawn. The sequence is always quick,\nand requires some accuracy due to the stalemate chances. The knowledge of this ending mainly helps us not to fall into this position due to a blind desire for victory.\nI have never seen this position in an actual game, and it is not likely to arise, unless the side with the pawn blunders. Spanish IM Sergio Estremera told me that he had"
+        },
+        {
+          "type": "ending",
+          "content": {
+            "number": "14",
+            "text": "King + Knight checkmate"
+          }
+        },
+        {
+          "type": "caption",
+          "content": "Position 3.9"
+        },
+        {
+          "type": "moves",
+          "content": "1. Nc1! a2 (only legal move) 2. Nb3 mate\nThe winning sequence can be more complicated, for example, if the knight occupies another square; however, if this happens, and we are familiar with the ending,\nit is always easy to find the correct winning path.\nThe second square on the long diagonal (here the b7- square; it could be g7, b2 or g2) can be named as the knight's dumb square. Here the knight's mobility is very poor, despite not being on the edge of the board. As we saw in Ending 9, this is usually a losing position against a rook, and here the knight is powerless against a threatening pawn."
+        },
+        {
+          "type": "ending",
+          "content": {
+            "number": "15",
+            "text": "The knight's dumb square"
+          }
+        },
+        {
+          "type": "caption",
+          "content": "Position 3.10"
+        },
+        {
+          "type": "moves",
+          "content": "In this extreme case, the knight occupies the worst square we could find. Not only does the knight not stop the pawn, but it also prevents the black king from doing so.\n1.a6 2.a7\nweB +-"
+        }
+      ]
+    },
+    {
+      "id": "4",
+      "label": "Chapter 4",
+      "sections": [
+        {
+          "type": "title",
+          "content": "Queen vs. Pawn"
+        },
+        {
+          "type": "text",
+          "content": "The content of this chapter is rather easy. If you study these examples thoroughly,\nyou will be able to calculate quickly a simplifying sequence from a more complicated position, and to apply these ideas to positions with more pawns. Most players think they have mastered these endings. However, very often this is not the case. Instead, they know some basic ideas but ignore very important details.\nI have seen strong club players or even grandmasters lose lots of half points in the endings we will see right now.\nNo problems when solving exercises 3, 14 and 24 in the test? Then perhaps you have mastered the content of this chapter. If you had problems in the test, though, I am sure you can improve things.\nThe ending Queen vs. Pawn crops up quite often, usually as a resuR of a pawn race. It looks easy to calculate, but it is rich in subtleties. Fortunately, you can easily fix these subtleties in your mind, as they are really striking.\nThe winning procedure"
+        },
+        {
+          "type": "ending",
+          "content": {
+            "number": "16",
+            "text": "Queen vs. 7th-rank pawn"
+          }
+        },
+        {
+          "type": "caption",
+          "content": "Position 4.1"
+        },
+        {
+          "type": "moves",
+          "content": "White's task is quite easy. For the time being, the queen must check the enemy king to prevent promotion.\n1. Qf4+ The queen approaches the pawn. 1... Ke2 2. Qg3!\nThis move is necessary. Repeating checks does not help progress, as the black king just hangs around e2 and f2.\n2... Kf1 3. Qf3+\nThe point! Now the black king must go in front of the pawn.\n3... Kg1 4. Kg7 The white king approaches the pawn. 4... Kh2 5. Qf2 The same as before, to bring the king a bit closer. 5... Kh1 6. Qh4+ Kg1 7. Kg6 Kf1 8. Qf4+\nKe2 9. Qg3! The same again. 9... Kf1 1 O. Qf3+ Kg1 11. Kg5 Kh2\nOnce the king has arrived, it is easy to find a mating pattern. Here the proximity to the edge of the board helps.\n\n12. Kh4! g1=Q 13. Qh3 mate\nAs we have seen, in a normal position the queen wins against a 7th-rank pawn\n(even more so when the pawn is on 6th rank or even further back). However, in the next examples we will see that there are exceptions due to these two factors:\nA) Stalemate themes.\nB) The queen is hindered by her own king.\nWhen the strong king is an obstacle"
+        },
+        {
+          "type": "caption",
+          "content": "Position 4.2"
+        },
+        {
+          "type": "text",
+          "content": "We have here our first exception. Sometimes it is the king who hinders his queen.\nEven if White is to move, he cannot win as there is not a single check available for the queen. This is a typical scenario after a pawn race.\nConclusion: The queen wins against an ordinary pawn\n(on b-, d-, e- or g-files) on the 7th rank, as long as she can check the enemy king.\nStalemate themes"
+        },
+        {
+          "type": "ending",
+          "content": {
+            "number": "17",
+            "text": "Queen vs. 7th-rank rook's pawn"
+          }
+        },
+        {
+          "type": "caption",
+          "content": "Position 4.3"
+        },
+        {
+          "type": "moves",
+          "content": "Let us see the second exception: with a rook's or a bishop's pawn, there are stalemate themes on the board. Let us start with the rook's pawn. The queen has checks,\nbut forcing the king in front of his pawn is useless, since then he will be stalemated and there will not be time to bring the black king closer.\n1. Kg8 Qd8+ 2. Kg7 Qg5+ 3. Kf7 Qh6 4. Kg8 Qg6+ 5. Kh8!\nThe point. The black queen must move to lift the stalemate and then the white king will come out of the h8-square, thus threatening with promotion again.\n5... Kd2 stalemate.\nNow we will see the exception to the exception. As seen in Ending 16, the queen alone is not enough to win. She needs her king to set up a mating net. Therefore,\nthe king must be near. But how near?\nThe strong king is near\nMany books will show you the line that divides the board into a winning zone and a drawing zone, but will you remember it? My experience says 'no'. Forget about awful irregular geometrical figures and try to understand the core of this ending,\nby analysing the two lines we see in this example. Then, we will draw our conclusion."
+        },
+        {
+          "type": "caption",
+          "content": "Position 4.4"
+        },
+        {
+          "type": "moves",
+          "content": "We have chosen this position because the black king occupies a square that allows\nBlack to win with any of the two following standard procedures:\n1. Qd7+ 2. Kg6 Qe6+ 3. Kg7Qe7+..\nSetting up one of the winning manoeuvres. This is the aRernative way, and you should study it as well, since if the king were on another square (say d6) it would be the only way: 3..'Kf6+ 4.\\bg8 \\be6!-+ The king stands a step away from the.\nkey square £7. To avoid being checkmated on the next move, White must promote to a knight. We see in this variation that the £7 -square is the key to checkmate\nWhite.\n4. Qg8 ( 4.\\bg6 Qf8-+) 4... Kf6!\nIn this line the king approaches the second key square, g6, which he must occupy immediately after White promotes.\n5.h8=Q+ Kg6-+\nAn important position to know."
+        },
+        {
+          "type": "caption",
+          "content": "Analysis diagram 4.5"
+        },
+        {
+          "type": "text",
+          "content": "Despite having a brand new queen and the move, White cannot avoid being checkmated because his royal couple is poorly placed.\nConclusion: In order to win against a 7th-rank rook's pawn, the strong king must be just two steps away from any of the two key squares: (here or g6).\nf7\nWith a bishop's pawn, stalemate resources also occur, but the scenario is a bit more complex, since the king can be placed at both sides of his pawn, and drawing chances differ then. In this first example, we are going to see the main defensive resources when the enemy king is far away."
+        },
+        {
+          "type": "ending",
+          "content": {
+            "number": "18",
+            "text": "Queen vs. 7th-rank bishop's pawn"
+          }
+        },
+        {
+          "type": "caption",
+          "content": "Position 4.6"
+        },
+        {
+          "type": "moves",
+          "content": "1. Ke7!\nThe king secures promotion. It is worth noting that promoting straight away is not always a good idea: 1.f8=Q?? Qa3+-+.\n1... Ke5+\nThe queen starts approaching the pawn in the fashion we know.\n2. Kd7 Kf6 3. Ke8 Ke6+ 4. Kf8\nThis allows the black king to come a step nearer.\n\n4... Kc4 5. Kg7!.\nBut now the white king has made it to the other side of the pawn, which, as we will see, is the right one. White cannot win tempi to bring his king nearer anymore.\n5... Qe7 6. Kg8 Qg5+ 7. Kh8 Qf6+ 8. Kg8 Qg6+ 9. Kh8!\nThe point: White threatens to promote and 9... Qxf7 is a stalemate.\nConclusion: Just like in the positions against the rook's pawn, the queen needs her king's aid to win against a\n7th-rank bishop's pawn.\nHere we can note some interesting generalisations with no need to add new diagrams:\nFirst, if the queen is unable to check in the starting position, a rook's or a bishop's pawn could draw even on the 6th rank. However, in practice, on an empty board, this only applies to the bishop's pawn.\nSecond, and very important in practical play: since stalemate is the only drawing re source, there are no chances whatsoever when the defender has another pawn.\nThe winning zone for the king. Defending king on the right side\nThe question is the same as in the rook's pawn example: how near must the king be? Now the answer depends on the defending king being on the right or the wrong side of the pawn. With the king on the right side, the winning zone is narrower than in the case of the rook's pawn. This is because it is not possible to win by means of a king's quiet move after the pawn promotes.\nLet us see the possible manoeuvres and try to extract a rule."
+        },
+        {
+          "type": "caption",
+          "content": "Position 4.7"
+        },
+        {
+          "type": "moves",
+          "content": "1... Qa7! 2. Kh8 (2. Kg8 is the same) 2... Kg6 3.f8Q\nNow the black queen checkmates, but it has to be on this move, because the white queen is not restricted by the edge of the board anymore. Therefore, the stronger side's king has just one move to reach the key square g6.\nThere is another winning position, when the stronger side's king can hinder promotion with just one move (that is, from the e7- square).\n3... Qh7mate\n\nConclusion: In order to win against a 7th-rank bishop's pawn, when the defending king is on the 'right side' (near the corner), the stronger side's king must be one step away from one of the two key squares, g6 or e7.\nKing on the wrong side"
+        },
+        {
+          "type": "caption",
+          "content": "Position 4.8"
+        },
+        {
+          "type": "moves",
+          "content": "Against a 7th-rank bishop's pawn, when the defending king is on the wrong side of the pawn, the winning zone is much larger, even larger than it was against a rook's pawn. As we will see, there are two mating patterns. One involves the king defend ing the queen from the d2-square and the other involves forcing the defending king to the other side and reaching the position we have aReady seen with the strong king on g6. Here is the winning procedure bringing the king to g6.\nThe first phase is easy to understand: we must force the enemy king to the other side.\n1... Ka7+ 2. Ke8 Kb8+ 3. Ke7 Ke5+ 4. Kd7 Kf6 5. Ke8 Ke6+ 6. Kf8 Kg5!\nBlack has gained a tempo and the king uses it to make it to g6.\n7. Kg7 Ke7!\n7... Qd7?! 8. Kh8!? and Black must try again, since his king cannot move further now.\n8. Kg8 Kg6-+ and after promotion comes checkmate.\nLet us see what happens if the stronger side's king is on the other side of the board.\nCheckmate on d7"
+        },
+        {
+          "type": "caption",
+          "content": "Position 4.9"
+        },
+        {
+          "type": "moves",
+          "content": "When the king is inside the winning zone, but two steps away from d7, we must play carefully to prevent the enemy king from reaching the right side without losing tempi.\n1... Qa3+!\n\nActually other checks are also winning, but then accuracy is needed on the next move. For instance: 1.. Qa7+ 2. Kf8 (2. Kf6 Qd4+!) and now only 2... Qg1 works..\n2. Ke8\n2. Kf6 Qf8-+ is just too easy.\n2... Qa8+ 3. Ke7Qe4+! 4. Kf8\nTrying to make it to the other side. 4. Kf6 Kd4+ 5. Ke7 Qg7 6. Ke8 Kc6-+.\n4... Qh7!\nThough the enemy king is in front of the pawn, we must not hurry to bring our king closer. Now our goal is to hinder the enemy king's route to the 'right side'.\n4... Kc6? 5. Kg7 and it is easy to see that, since the black king is more than one step away from e7 or g6, the position is drawn.\n5. Ke8\nThe white king is on the fatal square and the black queen can reach d7 in one move;\ntherefore, it is time to bring the king closer.\n5... Kc6! 6.f8Q Qd7 mate\nConclusion: When fighting against a 7th-rank bishop's pawn with the defending king on the wrong side of the pawn, the queen wins if her king is just two steps away from one of the two key squares (here, d7 and g6).\nThis chapter could end here, since all essential circumstances about the struggle be tween a queen and a pawn have been considered and there are no more exceptions.\nHowever, I have seen too many players falling for this trick, so here come two more positions."
+        },
+        {
+          "type": "ending",
+          "content": {
+            "number": "19",
+            "text": "A too-frequent trick"
+          }
+        },
+        {
+          "type": "caption",
+          "content": "Position 4.10"
+        },
+        {
+          "type": "moves",
+          "content": "We have here a 7th-rank bishop's pawn, and the white king is out of the winning zone (though close to it). Therefore, it is a draw, but there are a couple of tricks worth knowing. If the white player is an expert, he will very likely try to take us to the critical position after going round and round.\n\n1. Qb3+ Ka1! 2. Qe3 Kb1 3. Qe4 Kb2\nThe black king must be confused: let's try the trick!\n4. Qe2"
+        },
+        {
+          "type": "caption",
+          "content": "Analysis diagram 4.11"
+        },
+        {
+          "type": "moves",
+          "content": "4... Ka1!\nThe principled move. 4... Kb?? is a typical mistake here that allows the main trick:\n\n5. Kc4!! c1=Q+ 6. Kb3+- and, even though the black queen has more space on c1 than on a1, nevertheless she cannot stop checkmate.\n4... Kc3?? does not work either, since after 5. Qe5+! the king is forced to the wrong side and his white counterpart is automatically inside the 'new' winning zone.\n5. Kc4 c1=Q+ 6. Kb3 Qb1+ Only move, but not enough to draw.\nThe same trick, on the other side"
+        },
+        {
+          "type": "caption",
+          "content": "Position 4.12"
+        },
+        {
+          "type": "moves",
+          "content": "You can try the same trick on the other side of the pawn. In practical play, winning chances are even higher, because the defence is more difficuR. The white king is out of the winning zone, so it is a draw.\n1. Qb2 (first phase: confuse the opponent, as we know) 1... Kd1 2. Qb3 Kd2\n3. Qa2!? (time to set the trap) 3... Kc3!\nVery awkward... and only move! DifficuR to find if you don't know the position well.\n3... Kd1?? The natural move, but at the same time a mistake that leads to a familiar end. 4. Kd4! c1=Q 5. Kd3+-; 3... Kd3?? is not enough due to 4. Qb2 and Black will.\nhave to allow a pin to avoid 5. Qc1.4... Kd2 and the white king seizes the opportunity to enter the winning zone: 5. Ke4+-.\n4. Qa1+ Kd2="
+        },
+        {
+          "type": "ending",
+          "content": {
+            "number": "20",
+            "text": "Queen vs. Queen"
+          }
+        },
+        {
+          "type": "caption",
+          "content": "Position 4.13"
+        },
+        {
+          "type": "moves",
+          "content": "Strictly speaking, this is not a struggle between a queen and a pawn, but actually it is a very useful position that we should study in this chapter, since it usually occurs as a resuR of a pawn race.\nThe first thing to note is that, aRhough both players have promoted, it does not mean the game is a draw. Losing chances do exist, especially if we have promoted in the corner of the board. Then, when the queen is still on the edge, it may be obstructed by her king, and captured. Another possibility is a mating net. In these cases the analysis is rather simple. We have aReady seen examples in this chapter.\nMore possibilities arise when the stronger side's king is fairly close, specifically on the spot shown in the diagram (for this corner, the d3- or c4-squares; the f4- or e3 -squares if promotion occurred on h1).\nThis example is worth a thorough study; it can be taken as the standard pattern for similar positions.\n1. Qc5+! Ka2\nThe most stubborn answer. 1... Ka4?! 2. Qa7++-; 1.... Kb3 2. Qb5+ Ka3 3. Qa5+\nKb2 4. Qb4+ also leads to the main line; 1.... Kb2 2. Qb4+ shortens the main line.\n2. Qc4+!\nAfter 2. Qa7+? Kb1= White cannot get back to the right path.\nThis variation is very important, as it shows us two things:\n1) Not every starting position for the white queen works.\n2) The defender must head for this relative position of king and queen if possible.\n2... Ka3 (2... Kb2 3. Qb4+) 3. Qa6+ Kb2 4. Qb5+ Ka3 ( 4... Kc1 5. Qc4+ Kb2\n6. Qb4+ the same position again) 5. Qa5+ Kb2 6.'i:Vb4+ Ka2 (6... Kc1 7. Qd2+\nKb1 8. Qc2 mate) 7. Kc2! reaching a known winning position."
+        }
+      ]
+    },
     {
       "id": "5",
       "label": "Chapter 5",
@@ -1989,7 +2705,7 @@
           "type": "position",
           "content": {
             "number": "10.17",
-            "fen": "1R6/8/8/2R5/1P1k4/1K6/8/8 w - - 0 1",
+            "fen": "1r6/8/8/2R5/1P1k4/1K6/8/8 b - - 0 1",
             "caption": "Position 10.17"
           }
         },

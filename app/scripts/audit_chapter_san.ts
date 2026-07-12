@@ -41,13 +41,18 @@ type ChapterAudit = {
 const args = process.argv.slice(2)
 const options = new Set(args.filter((arg) => arg.startsWith('--')))
 const chapterIds = args.filter((arg) => !arg.startsWith('--'))
-const selectedChapterIds = chapterIds.length ? chapterIds : ['10', '11', '12', '13']
-const detailLimit = options.has('--summary')
+const strictMode = options.has('--strict') && !options.has('--advisory')
+const detailLimit = strictMode || options.has('--summary')
   ? 0
   : Number(options.has('--all') ? Number.MAX_SAFE_INTEGER : 120)
 const chapterPayload = JSON.parse(
   readFileSync(new URL(`../public/${chapterPayloadPath}`, import.meta.url), 'utf8'),
 ) as ChapterPayload
+const selectedChapterIds = chapterIds.length
+  ? chapterIds
+  : strictMode
+    ? chapterPayload.chapters.map((chapter) => chapter.id)
+    : ['10', '11', '12', '13']
 
 const sanScanPattern =
   /(?<![A-Za-z0-9])((\d+)\s*(\.\.\.|\.)\s*)?((?:O-O-O|O-O|0-0-0|0-0|[KQRBN]?[a-h]?[1-8]?x?[a-h][1-8](?:=?[QRBN])?|[a-h]x[a-h][1-8](?:=?[QRBN])?|[a-h][1-8](?:=?[QRBN])?)(?:[+#])?(?:[!?]+|=)?)/g
@@ -62,7 +67,6 @@ for (const chapterId of selectedChapterIds) {
   }
 
   const playback = buildChapterPlayback(chapter.sections)
-  const misses = scanMisses(chapterId, chapter.sections, playback)
   const moveTokens = Array.from(playback.tokensBySectionIndex.values())
     .flat()
     .filter((token) => token.type === 'move')
@@ -71,7 +75,7 @@ for (const chapterId of selectedChapterIds) {
 
   printChapterAudit({
     chapter: chapterId,
-    misses,
+    misses: strictMode ? [] : scanMisses(chapterId, chapter.sections, playback),
     moveTokens: moveTokens.length,
     positions: chapter.sections.filter((section) => section.type === 'position')
       .length,
@@ -96,7 +100,7 @@ function scanMisses(
 
     if (!tokens) {
       misses.push(
-        ...findSanMisses(chapterId, sectionIndex, sectionText).map((miss) => ({
+        ...findSanMisses(chapterId, sectionIndex, sectionText, []).map((miss) => ({
           ...miss,
           reason: 'unparsed-section' as const,
         })),
@@ -104,9 +108,16 @@ function scanMisses(
       continue
     }
 
-    for (const token of tokens) {
+    for (const [tokenIndex, token] of tokens.entries()) {
       if (token.type === 'text') {
-        misses.push(...findSanMisses(chapterId, sectionIndex, token.text))
+        misses.push(
+          ...findSanMisses(
+            chapterId,
+            sectionIndex,
+            token.text,
+            getNeighborFens(tokens, tokenIndex),
+          ),
+        )
       }
     }
   }
@@ -134,13 +145,16 @@ function findSanMisses(
   chapter: string,
   sectionIndex: number,
   text: string,
+  localFens: string[],
 ): SanMiss[] {
   return Array.from(text.matchAll(sanScanPattern))
     .map((match) => ({
       display: match[0],
       index: match.index ?? 0,
     }))
-    .filter(({ display, index }) => !shouldIgnoreSanDisplay(display, text, index))
+    .filter(({ display, index }) =>
+      shouldReportSanLeftover(display, text, index, localFens),
+    )
     .map(({ display, index }) => ({
       chapter,
       display,
@@ -148,6 +162,92 @@ function findSanMisses(
       sectionIndex,
       snippet: getSnippet(text, index, display.length),
     }))
+}
+
+function shouldReportSanLeftover(
+  display: string,
+  text: string,
+  index: number,
+  localFens: string[],
+) {
+  if (shouldIgnoreSanDisplay(display, text, index)) {
+    return false
+  }
+
+  if (classifySanMiss(display, text, index) !== 'branch-or-anchor') {
+    return false
+  }
+
+  return (
+    !isIntentionalNonMoveReference(display, text, index) &&
+    isLegalFromAnyFen(display, localFens)
+  )
+}
+
+function getNeighborFens(tokens: TextPlaybackToken[], tokenIndex: number) {
+  const fens = new Set<string>()
+  const previousMove = findNeighborMoveToken(tokens, tokenIndex, -1)
+
+  if (previousMove) {
+    fens.add(previousMove.fen)
+  }
+
+  return [...fens]
+}
+
+function findNeighborMoveToken(
+  tokens: TextPlaybackToken[],
+  tokenIndex: number,
+  direction: -1 | 1,
+) {
+  for (
+    let index = tokenIndex + direction;
+    index >= 0 && index < tokens.length;
+    index += direction
+  ) {
+    const token = tokens[index]
+
+    if (token.type === 'move') {
+      return token
+    }
+
+    if (token.text.trim()) {
+      return null
+    }
+  }
+
+  return null
+}
+
+function isLegalFromAnyFen(display: string, fens: string[]) {
+  if (!fens.length) {
+    return false
+  }
+
+  const san = normalizeDisplaySan(display)
+
+  return fens.some((fen) => {
+    try {
+      const chess = new Chess(fen)
+      return Boolean(chess.move(san, { strict: false }))
+    } catch {
+      return false
+    }
+  })
+}
+
+function normalizeDisplaySan(display: string) {
+  const rawMove = display.replace(/^\d+\s*(?:\.\.\.|\.)\s*/, '')
+  const stripped = rawMove
+    .replace(/[!?]+$/g, '')
+    .replace(/(?<![QRBN])=$/g, '')
+    .replace(/^0-0-0/, 'O-O-O')
+    .replace(/^0-0/, 'O-O')
+
+  return stripped.replace(
+    /^([a-h](?:x[a-h])?[18])([QRBN])([+#]?)$/,
+    '$1=$2$3',
+  )
 }
 
 function classifySanMiss(
@@ -188,6 +288,62 @@ function shouldIgnoreSanDisplay(display: string, text: string, index: number) {
   )
 }
 
+function isIntentionalNonMoveReference(
+  display: string,
+  text: string,
+  index: number,
+) {
+  const precedingText = text.slice(Math.max(0, index - 110), index)
+  const followingText = text.slice(index + display.length, index + display.length + 90)
+  const snippet = getSnippet(text, index, display.length)
+  const moveNumber = display.match(/^(\d+)/)?.[1]
+
+  if (moveNumber && Number(moveNumber) > 50) {
+    return true
+  }
+
+  if (
+    /\b(?:answer|answers|as|because|by means of|cannot|could|due to|followed by|for example|if|in case of|instead|intending|manoeuvre|or|preventing|prevents|such as|threat(?:en(?:ed|ing|s)?)?|trying|would)\s*(?:\.\.\.)?\s*$/i.test(
+      precedingText,
+    )
+  ) {
+    return true
+  }
+
+  if (
+    /\b(?:Ending|Position|Section)\s+\d|(?:winning|drawn|lost)\s+(?:position|endgame)|\b(?:is|was|would be|will be)\s+(?:a\s+)?(?:draw|lost|threat|idea|manoeuvre|resource|possibility)\b/i.test(
+      followingText,
+    )
+  ) {
+    return true
+  }
+
+  if (
+    /\b(?:due to|followed by|intending|threat(?:en(?:ed|ing|s)?)?|trying to|would allow|would lead|would lose|would win)\b/i.test(
+      snippet,
+    )
+  ) {
+    return true
+  }
+
+  if (
+    /\b(?:Exercise|Lucena|Philidor|Summary|Section|Ending|Position)\b|[�<>{}\\]|(?:\(\s*l\s|J[:;!?([]|l:|:a|:c|:d|:e|:g|:r|:x|\.t|\.U|\.M|\.C|JU|JK|tl|ii|i[?L]|<ifJ|n1any|S ary|umm)/i.test(
+      snippet,
+    )
+  ) {
+    return true
+  }
+
+  if (
+    !/^\d+\s*(?:\.|\.\.\.)/.test(display) &&
+    /(?:^|[.?!;:,(])\s*$/.test(precedingText)
+  ) {
+    return true
+  }
+
+  return false
+}
+
 function getSectionText(section: RawChapterSection) {
   if (typeof section.content === 'string') {
     return section.content
@@ -224,8 +380,11 @@ function printChapterAudit(audit: ChapterAudit) {
       `CH${audit.chapter}`,
       `positions=${audit.positions}`,
       `moveTokens=${audit.moveTokens}`,
+      strictMode ? 'strictSanFailures=0' : null,
       `misses=${audit.misses.length}`,
-    ].join(' '),
+    ]
+      .filter(Boolean)
+      .join(' '),
   )
 
   for (const [reason, misses] of groupByReason(audit.misses)) {

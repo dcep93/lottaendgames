@@ -33,23 +33,22 @@ const chapters: ChapterFixture[] = [
   { number: '9', sections: getChapterSections('9') },
 ]
 
-// Chapters 10-13 currently have partial extracted diagram FENs, but the strict
-// SAN playback audit stays scoped to chapters whose diagram anchors and OCR
-// notation are fully verified. Run the extractor before promoting more captions.
+// Strict SAN playback stays scoped to chapters whose diagram anchors and OCR
+// notation are fully verified. Newly extracted chapters first enter the payload
+// as structured text/captions, then join this audit after their diagrams promote
+// to verified position FENs.
 
 const sanScanPattern =
   /(?<![A-Za-z0-9])((\d+)\s*(\.\.\.|\.)\s*)?((?:O-O-O|O-O|0-0-0|0-0|[KQRBN]?[a-h]?[1-8]?x?[a-h][1-8](?:=?[QRBN])?|[a-h]x[a-h][1-8](?:=?[QRBN])?|[a-h][1-8](?:=?[QRBN])?)(?:[+#])?(?:[!?]+|=)?)/g
 
 const ignoredSanMisses: Record<string, string> = {
   '5:44:Re1+': 'Threat text: "The threat is Re1+".',
-  '6:26:Rg3': 'Prose reference: "Rg3 seems to be a waste of time".',
   '6:31:Rh7': 'Prose reference: "in case Rh7 is needed".',
   '7:11:Bf3': 'Prose manoeuvre reference: "Bf3-c6".',
   '7:22:Kg6': 'Prose alternative: "we could play first ...Kg6".',
   '7:31:Ke8': 'Prose reference: "If White allows Ke8".',
   '8:5:3...Ng3': 'Threat text: "threatening 3...Ng3".',
   '8:5:Ne3': 'Prose reference to a tactical prevention.',
-  '8:5:Nf5': 'Prose reference to a tactical blow.',
   '8:7:Nf5': 'Prose reference: "followed by ...Nf5".',
   '8:12:Ng2': 'Threat text: "the threat was ...Ng2".',
   '8:18:Nb2': 'Threat text: "the threat is ...Nb2".',

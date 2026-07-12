@@ -126,6 +126,12 @@ export function buildChapterPlayback(
       }
     }
 
+    tokens = resolveAdjacentTextMoveTokens(
+      tokens,
+      selectedContext.positionNumber,
+      sectionIndex,
+    )
+
     if (tokens.some((token) => token.type === 'move')) {
       if (selectedContext === context) {
         hasParsedPlayableSincePosition = true
@@ -309,7 +315,12 @@ function resolveUnresolvedTextToken(
     !bestFallback ||
     bestFallback.unresolvedSanCount >= originalUnresolvedSanCount
   ) {
-    return [{ text, type: 'text' }]
+    return resolveLooseNumberedMoveTokens(
+      text,
+      contexts,
+      activeContext,
+      sectionIndex,
+    )
   }
 
   return bestFallback.context.parseFallbackText(
@@ -317,6 +328,186 @@ function resolveUnresolvedTextToken(
     sectionIndex,
     bestFallback.mode,
   )
+}
+
+function resolveLooseNumberedMoveTokens(
+  text: string,
+  contexts: PositionContext[],
+  activeContext: PositionContext,
+  sectionIndex: number,
+): TextPlaybackToken[] {
+  const parseTokens = tokenizeMoveText(text)
+  const resolvedTokens: TextPlaybackToken[] = []
+  const contextOrder = [
+    activeContext,
+    ...contexts.filter((context) => context !== activeContext).reverse(),
+  ]
+  let resolvedMoveCount = 0
+
+  for (const [tokenIndex, token] of parseTokens.entries()) {
+    if (token.type === 'text') {
+      resolvedTokens.push(token)
+      continue
+    }
+
+    if (!token.moveNumber) {
+      resolvedTokens.push({
+        text: token.display,
+        type: 'text',
+      })
+      continue
+    }
+
+    const context = contextOrder.find((candidateContext) =>
+      candidateContext
+        .clone()
+        .parseLooseCandidate(token, sectionIndex, tokenIndex),
+    )
+    const resolvedToken = context?.parseLooseCandidate(
+      token,
+      sectionIndex,
+      tokenIndex,
+    )
+
+    if (!resolvedToken) {
+      resolvedTokens.push({
+        text: token.display,
+        type: 'text',
+      })
+      continue
+    }
+
+    resolvedMoveCount += 1
+    resolvedTokens.push(resolvedToken)
+  }
+
+  return resolvedMoveCount ? resolvedTokens : [{ text, type: 'text' }]
+}
+
+function resolveAdjacentTextMoveTokens(
+  tokens: TextPlaybackToken[],
+  positionNumber: string,
+  sectionIndex: number,
+): TextPlaybackToken[] {
+  const resolvedTokens: TextPlaybackToken[] = []
+
+  for (const [tokenIndex, token] of tokens.entries()) {
+    if (token.type === 'move') {
+      resolvedTokens.push(token)
+      continue
+    }
+
+    const previousMove = findPreviousMoveToken(resolvedTokens)
+
+    if (!previousMove) {
+      resolvedTokens.push(token)
+      continue
+    }
+
+    resolvedTokens.push(
+      ...resolveTextMovesFromBranch(
+        token.text,
+        {
+          fen: previousMove.fen,
+          path: previousMove.path,
+        },
+        positionNumber,
+        sectionIndex,
+        tokenIndex,
+      ),
+    )
+  }
+
+  return resolvedTokens
+}
+
+function resolveTextMovesFromBranch(
+  text: string,
+  branch: Branch,
+  positionNumber: string,
+  sectionIndex: number,
+  sourceTokenIndex: number,
+): TextPlaybackToken[] {
+  const parseTokens = tokenizeMoveText(text)
+  const resolvedTokens: TextPlaybackToken[] = []
+  let currentBranch = branch
+  let resolvedMoveCount = 0
+
+  for (const [parseTokenIndex, token] of parseTokens.entries()) {
+    if (token.type === 'text') {
+      appendPlaybackTextToken(resolvedTokens, token.text)
+      continue
+    }
+
+    const applied = applyAdjacentTokenMove(currentBranch, token)
+
+    if (!applied) {
+      appendPlaybackTextToken(resolvedTokens, token.display)
+      continue
+    }
+
+    currentBranch = applied.branch
+    resolvedMoveCount += 1
+    resolvedTokens.push({
+      display: token.display,
+      fen: applied.branch.fen,
+      id: `${positionNumber}-${sectionIndex}-adjacent-${sourceTokenIndex}-${parseTokenIndex}`,
+      parentFen: applied.parentFen,
+      path: applied.branch.path,
+      positionNumber,
+      san: token.san,
+      type: 'move',
+    })
+  }
+
+  return resolvedMoveCount ? resolvedTokens : [{ text, type: 'text' }]
+}
+
+function applyAdjacentTokenMove(branch: Branch, token: CandidateToken) {
+  const normalizedBranch =
+    token.moveNumber
+      ? withFullmove(branch, token.moveNumber)
+      : branch
+  const nextBranch = applyMove(normalizedBranch, token.san)
+
+  if (!nextBranch) {
+    return null
+  }
+
+  return {
+    branch: nextBranch,
+    parentFen: normalizedBranch.fen,
+  }
+}
+
+function findPreviousMoveToken(tokens: TextPlaybackToken[]) {
+  for (let index = tokens.length - 1; index >= 0; index -= 1) {
+    const token = tokens[index]
+
+    if (token.type === 'move') {
+      return token
+    }
+
+    if (token.text.trim()) {
+      return null
+    }
+  }
+
+  return null
+}
+
+function appendPlaybackTextToken(tokens: TextPlaybackToken[], text: string) {
+  const previousToken = tokens[tokens.length - 1]
+
+  if (previousToken?.type === 'text') {
+    previousToken.text += text
+    return
+  }
+
+  tokens.push({
+    text,
+    type: 'text',
+  })
 }
 
 function hasNumberedMoveText(text: string) {
@@ -477,6 +668,39 @@ class PositionContext {
         type: 'move',
       }
     })
+  }
+
+  parseLooseCandidate(
+    token: CandidateToken,
+    sectionIndex: number,
+    tokenIndex: number,
+  ): TextPlaybackToken | null {
+    const candidate = this.resolveCandidate(token, [token], 0)
+
+    if (!candidate) {
+      return null
+    }
+
+    if (
+      (!candidate.fromCurrent || token.startsVariation) &&
+      !this.variationReturnStack.length
+    ) {
+      this.variationReturnStack.push(this.branch)
+    }
+
+    this.branch = candidate.branch
+    this.rememberBranch(this.branch)
+
+    return {
+      display: token.display,
+      fen: candidate.branch.fen,
+      id: `${this.positionNumber}-${sectionIndex}-${tokenIndex}`,
+      parentFen: candidate.parentFen,
+      path: candidate.branch.path,
+      positionNumber: this.positionNumber,
+      san: token.san,
+      type: 'move',
+    }
   }
 
   private resolveCandidate(

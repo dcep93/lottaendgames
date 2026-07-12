@@ -38,8 +38,21 @@ type ChapterPayload = {
   schemaVersion: number
 }
 
+type PreparedChapter = ChapterDefinition & {
+  endingCount: number
+  initialPositionFens: Record<string, string>
+  navigationByPosition: ReturnType<typeof buildPlaybackNavigation>
+  playback: ReturnType<typeof buildChapterPlayback>
+  positionCount: number
+}
+
 const chapterTabs = chapterManifest
 const emptyChapterSections: RawChapterSection[] = []
+const emptyPreparedChapter = prepareChapter({
+  id: '',
+  label: '',
+  sections: emptyChapterSections,
+})
 
 type ActiveBoardState = {
   activeMoveId: string | null
@@ -56,31 +69,18 @@ export default function ChapterViewer() {
     null,
   )
   const [chapterLoadError, setChapterLoadError] = useState<string | null>(null)
+  const preparedChapters = useMemo(
+    () => chapterPayload?.chapters.map(prepareChapter) ?? [],
+    [chapterPayload],
+  )
   const activeChapter =
-    chapterPayload?.chapters.find((chapter) => chapter.id === activeChapterId) ??
+    preparedChapters.find((chapter) => chapter.id === activeChapterId) ??
     null
-  const activeChapterTab =
-    chapterTabs.find((chapter) => chapter.id === activeChapterId) ??
-    chapterTabs[0]
-  const chapterSections = activeChapter?.sections ?? emptyChapterSections
-  const playback = useMemo(
-    () => buildChapterPlayback(chapterSections),
-    [chapterSections],
-  )
-  const navigationByPosition = useMemo(
-    () => buildPlaybackNavigation(playback),
-    [playback],
-  )
-  const initialPositionFens = useMemo(() => {
-    return chapterSections.reduce<Record<string, string>>((positions, section) => {
-      if (section.type === 'position') {
-        const position = section as PositionSection
-        positions[position.content.number] = position.content.fen
-      }
-
-      return positions
-    }, {})
-  }, [chapterSections])
+  const preparedChapter = activeChapter ?? emptyPreparedChapter
+  const chapterSections = preparedChapter.sections
+  const playback = preparedChapter.playback
+  const navigationByPosition = preparedChapter.navigationByPosition
+  const initialPositionFens = preparedChapter.initialPositionFens
   const [activeBoards, setActiveBoards] = useState<
     Record<string, ActiveBoardState>
   >({})
@@ -88,18 +88,8 @@ export default function ChapterViewer() {
     string | null
   >(null)
   const moveAnimationFrameRef = useRef<number | null>(null)
-  const positionCount = chapterSections.filter(
-    (section) => section.type === 'position',
-  ).length
-  const endingCount = chapterSections.filter(
-    (section) => section.type === 'ending',
-  ).length
-  const chapterTitle =
-    (
-      chapterSections.find(
-        (section) => section.type === 'title',
-      ) as TitleSection | undefined
-    )?.content ?? activeChapterTab.label
+  const positionCount = preparedChapter.positionCount
+  const endingCount = preparedChapter.endingCount
 
   function handleChapterSelect(chapterId: string) {
     if (chapterId === activeChapterId) {
@@ -315,10 +305,6 @@ export default function ChapterViewer() {
         <header className="leg-reader-header">
           <p className="leg-kicker">Lotta Endgames</p>
           <h1>100 Endgames You Must Know</h1>
-          <p className="leg-reader-subtitle">
-            {activeChapterTab.label}: {chapterTitle}, rendered from structured
-            JSON with playable boards.
-          </p>
           <ChapterSelector
             activeChapterId={activeChapterId}
             chapters={chapterTabs}
@@ -362,6 +348,31 @@ export default function ChapterViewer() {
       </div>
     </main>
   )
+}
+
+function prepareChapter(chapter: ChapterDefinition): PreparedChapter {
+  const playback = buildChapterPlayback(chapter.sections)
+  const initialPositionFens = chapter.sections.reduce<Record<string, string>>(
+    (positions, section) => {
+      if (section.type === 'position') {
+        const position = section as PositionSection
+        positions[position.content.number] = position.content.fen
+      }
+
+      return positions
+    },
+    {},
+  )
+  return {
+    ...chapter,
+    endingCount: chapter.sections.filter((section) => section.type === 'ending')
+      .length,
+    initialPositionFens,
+    navigationByPosition: buildPlaybackNavigation(playback),
+    playback,
+    positionCount: chapter.sections.filter((section) => section.type === 'position')
+      .length,
+  }
 }
 
 function ChapterSelector({

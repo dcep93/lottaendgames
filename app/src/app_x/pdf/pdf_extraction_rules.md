@@ -104,6 +104,14 @@ If a chapter has normalized text but an unverified diagram, keep the printed lab
 
 For chapters 10-13, run `python3 scripts/normalize_chapters_10_13.py` after changing the raw OCR-backed text or the normalization rules.
 
+For chapters 1, 3, and 4, run:
+
+```bash
+python3 scripts/extract_chapters_3_4.py
+```
+
+Those early chapters do not expose inline `Ending N` headings in the body text, so the extractor inserts `ending` sections from the PDF table of contents at the matching printed position boundaries. Diagram labels remain `caption` sections until their FENs are verified from the rendered diagrams.
+
 For diagram extraction from rendered PDF images, run:
 
 ```bash
@@ -128,6 +136,8 @@ Examples:
 - `when the white bishop goes to e7` is prose, not SAN.
 
 If a threat or prose reference is important enough to become playable, represent the missing line as an explicit variation in the chapter text instead of relying on the parser to infer it.
+
+The no-leftovers SAN scanner reports only actionable leftovers: residual SAN-looking text that can legally play from the immediately previous rendered move state. OCR fragments, prose threats, and branch references without a reconstructable preceding state should be filtered with reusable rules rather than one-off ignores.
 
 ## Panels
 

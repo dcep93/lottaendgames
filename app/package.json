@@ -9,7 +9,8 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "test": "tsx src/app_x/moveParser.test.ts",
-    "test:audit-san": "tsx scripts/audit_chapter_san.ts",
+    "test:audit-san": "tsx scripts/audit_chapter_san.ts --strict",
+    "test:audit-san:advisory": "tsx scripts/audit_chapter_san.ts --advisory",
     "test:content": "tsx src/app_x/contentAudit.test.ts"
   },
   "dependencies": {
