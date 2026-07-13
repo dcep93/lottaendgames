@@ -4,6 +4,7 @@ export type ChapterSection =
   | HeadingSection
   | PanelSection
   | PositionSection
+  | ProblemSection
   | TextSection
   | TitleSection
 
@@ -54,6 +55,18 @@ export type PositionSection = {
     subtitle?: string
   }
   type: 'position'
+}
+
+export type ProblemSection = {
+  content: {
+    fen: string
+    markers?: PositionMarker[]
+    number: string
+    prompt: string
+    solution: string
+    solutionFen?: string
+  }
+  type: 'problem'
 }
 
 export type TextSection = {

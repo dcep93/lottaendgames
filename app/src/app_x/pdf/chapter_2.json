@@ -1,0 +1,240 @@
+[
+  {
+    "type": "title",
+    "content": "Basic Test"
+  },
+  {
+    "type": "problem",
+    "content": {
+      "number": "2.01",
+      "prompt": "White to move. Is it a draw?",
+      "fen": "8/8/K7/N7/8/7p/7k/8 w - - 0 1",
+      "solution": "Yes, 1. Nc4! Kg2 2. Ne3+ Kf2\n3. Ng4+= The white knight enters the right circuit."
+    }
+  },
+  {
+    "type": "problem",
+    "content": {
+      "number": "2.02",
+      "prompt": "White to move. Is it a draw?",
+      "fen": "8/8/K7/8/7N/7p/7k/8 w - - 0 1",
+      "solution": "No. 1. Nf3+ Kg2 2. Ne1+\nKg3-+ the pawn promotes."
+    }
+  },
+  {
+    "type": "problem",
+    "content": {
+      "number": "2.03",
+      "prompt": "White to move. Is it a draw?",
+      "fen": "7Q/8/8/3K4/8/8/2pk4/8 w - - 0 1",
+      "solution": "No, because the king is inside the winning zone. 1. Qd4+ Ke2 2. Qc3\nKd1 3. Qd3+ Kc1 4. Kc4! Kb2\n5.Qb3+ Ka1 6. Qc3+ Kb1 7. Kb3\ne1=Q 8. Qd3+ Ka1 9. Qa6+ Kb1\n10. Qa2 mate."
+    }
+  },
+  {
+    "type": "problem",
+    "content": {
+      "number": "2.04",
+      "prompt": "Black to move. What should you play and with which result?",
+      "fen": "4k3/R7/5K2/4P3/8/8/8/1r6 b - - 0 1",
+      "solution": "1...Re1! Since it is impossible to get to Philidor's position, Black tries\nK&H, other moves lose. See Ending 56."
+    }
+  },
+  {
+    "type": "problem",
+    "content": {
+      "number": "2.05",
+      "prompt": "White to move. What should you play and with which result?",
+      "fen": "8/2K5/8/8/3kN3/8/7p/8 w - - 0 1",
+      "solution": "1.Nf2! Setting up a barrier. 1...Kc3 (1...Ke3 2.Ng4+; 1...Ke5 2.Ng4+) 2.Kd6 Kd2 3.Ke5 Ke2 4.Nh1 Kf3 5.Kd4! Kg2 6.Ke3 Kxh1 7.Kf2=."
+    }
+  },
+  {
+    "type": "problem",
+    "content": {
+      "number": "2.06",
+      "prompt": "Black to move. Is it a draw?",
+      "fen": "3b4/8/2K5/1P6/3B4/8/4k3/8 b - - 0 1",
+      "solution": "Yes: the black king takes the rear opposition. 4... Kd3! 5.Bb6 Bg5\n6.Bc7 Be3 7.Bd6 (7. Kb7!? Kc4\n8.Ka6 Kb3! 9.Bb6 Bg5 10.Bf2 Bd8\n11.Be1 Ka4!=) 7... Kc4!=."
+    }
+  },
+  {
+    "type": "problem",
+    "content": {
+      "number": "2.07",
+      "prompt": "White to move. Is it a draw?",
+      "fen": "8/7K/6P1/6k1/8/2b5/8/2B5 w - - 0 1",
+      "solution": "White wins because the h6-f8 diagonal has just 3 squares. 1.Bh6 Kh5\n2.Bg7 Bd2 3.Bd4 Bh6 4.Be3 Bf8\n5.Bd2 Kg4 6.Bh6+-."
+    }
+  },
+  {
+    "type": "problem",
+    "content": {
+      "number": "2.08",
+      "prompt": "Black to move. Is 1...Bc4 a good or a bad move? Or is it irrelevant?",
+      "fen": "8/6k1/8/1b2PP2/4K3/8/8/3B4 b - - 0 1",
+      "solution": "1...Bc4 is a mistake, the correct move is 1...Bd7 (1...Bc4? 2.Bg5 Bb3\n3.Kd4 Ba2 4. Kc5 Bb3 5. Kd6 Bc4\n6.e6++-) 2.Bg5 Bc8!= 3. Kf4\nBd7=."
+    }
+  },
+  {
+    "type": "problem",
+    "content": {
+      "number": "2.09",
+      "prompt": "White to move. Is it a draw?",
+      "fen": "8/1PbB4/8/6k1/4K3/5P2/8/8 w - - 0 1",
+      "solution": "It is a draw: the black bishop controls both enemy pawns from the same diagonal and the blockade cannot be lifted. 1.Bc8 Bh2 2. Kd5 Kf6 3. Kc6\nKe7 4. Kb6 Bb8! 5.Bg4 Kd6 6.Bh3\nKe7 7. Kc6 Bf4=."
+    }
+  },
+  {
+    "type": "problem",
+    "content": {
+      "number": "2.10",
+      "prompt": "Black to move. Is it a draw?",
+      "fen": "8/6k1/p5p1/8/8/1B3K2/3b4/8 b - - 0 1",
+      "solution": "No. Black wins: his pawns are far apart for the defender to cope. For example: 1... Kf6 2.Kg4 Ke5 3.Bc2 g5\n4.Bd3 a5 5.Bc2 Kd4 6. Kf3 Kc3\n7.Bd1 Kb4 8. Ke2 Bf4 9. Kd3 a4\n10.Kc2 a3 11. Kb1 Kc3 12.Ka2 Bd6\n13.Bg4 Kd2 14.Kb1 Ke3 15.Ka2 Kf4\n16.Bd1 g4 and so on."
+    }
+  },
+  {
+    "type": "problem",
+    "content": {
+      "number": "2.11",
+      "prompt": "White to move. What should you play and with which result?",
+      "fen": "3R4/4K3/8/8/3pk3/8/8/8 w - - 0 1",
+      "solution": "White wins by outflanking his opponent: 1. Kd6! d3 2. Kc5 Ke3 3. Kc4\nd2 4. Kc3+-."
+    }
+  },
+  {
+    "type": "problem",
+    "content": {
+      "number": "2.12",
+      "prompt": "Black to move. Is it a draw?",
+      "fen": "R7/8/8/8/8/pk1K4/8/8 b - - 0 1",
+      "solution": "Yes, 1... Kb2! (1...a2? 2. Rb8+\nKa3 3. Kc2 a1N+ 4. Kc3+-) 2. Rb8+\nKc1! 3.Ra8 Kb2 4. Kd2 a2 5. Rb8+\nKa1! (5... Ka3 6. Kc2+-) 6. Kc2=."
+    }
+  },
+  {
+    "type": "problem",
+    "content": {
+      "number": "2.13",
+      "prompt": "White to move. Can he win?",
+      "fen": "R7/4k3/P7/8/8/8/6K1/r7 w - - 0 1",
+      "solution": "1.a7! Kf7 (1...Kd6 2. Rd8++-)\n2. Rh8+-."
+    }
+  },
+  {
+    "type": "problem",
+    "content": {
+      "number": "2.14",
+      "prompt": "White to move. Is it worth playing on?",
+      "fen": "8/3K4/8/8/8/4p3/2Pk4/8 w - - 0 1",
+      "solution": "White can draw: 1.c4 e2 2.c5 e1=Q\n3.c6 Black has no checks and the white pawn reaches the 7th rank."
+    }
+  },
+  {
+    "type": "problem",
+    "content": {
+      "number": "2.15",
+      "prompt": "White to move. Can he win?",
+      "fen": "8/3Pk3/8/1K3P2/8/8/8/8 w - - 0 1",
+      "solution": "Yes, 1. Kc6! Kd8 2. Kd5 Kxd7\n3.f6+-."
+    }
+  },
+  {
+    "type": "problem",
+    "content": {
+      "number": "2.16",
+      "prompt": "White to move. What should he do and with which result?",
+      "fen": "8/8/8/3p4/5k2/3P4/8/2K5 w - - 0 1",
+      "solution": "1.d4! (1. Kd2?? d4 2. Ke2 Kg3\n3.Kd2 Kf3 4.Ke2 Ke3 5.Ke1 Kxd3 6.Kd1 Kc3 7.Ke1 d3-+) 1... Ke4\n2.Kc2 Kxd4 3. Kd2!=."
+    }
+  },
+  {
+    "type": "problem",
+    "content": {
+      "number": "2.17",
+      "prompt": "White to move. Can he draw?",
+      "fen": "7K/8/8/8/8/2p4N/8/2k5 w - - 0 1",
+      "solution": "Yes, by finding the right circuit for the knight. 1. Nf4! ( 1. Nf2?? c2\n2. Nd3+ Kd2 3.Nc5 Kc3 4. Ne4+\nKb4 5. Nf2 Kc4-+)...c2 2.Ne2+!\nKd2 (2... Kd1 3. Nc3+ Kd2 4.Na2)\n3. Nd4=."
+    }
+  },
+  {
+    "type": "problem",
+    "content": {
+      "number": "2.18",
+      "prompt": "White to move. Can he win?",
+      "fen": "2k5/8/8/8/6P1/8/8/4K3 w - - 0 1",
+      "solution": "1. Kf2! is the only way to reach the key squares. 1... Kd7 2. Kg3 Ke6\n3. Kh4 Kf6 4. Kh5 Kg7 5. Kg5 Kf7\n6. Kh6+-."
+    }
+  },
+  {
+    "type": "problem",
+    "content": {
+      "number": "2.19",
+      "prompt": "White to move. What is the correct result?",
+      "fen": "8/6P1/8/8/5K2/8/6k1/7q w - - 0 1",
+      "solution": "Draw. 1.g8=Q+ Kf1! (1... Kf2\n2. Qa2+ Kf1 3. Qb1+ Kg2 4. Qc2+\nKh3 5. Qd3+ Kg2 6. Qe2+ Kg1\n7. Kg3+-) 2. Qc4+ Kg1! 3. Qc1+\nKh2!=."
+    }
+  },
+  {
+    "type": "problem",
+    "content": {
+      "number": "2.20",
+      "prompt": "White to move. Can he win?",
+      "fen": "r7/8/8/3k4/PK6/8/8/7R w - - 0 1",
+      "solution": "Yes, by cutting the king off:\n1. Rh5! See Ending 62 (1. Rc1 Kd5=\nsee Ending 59)."
+    }
+  },
+  {
+    "type": "problem",
+    "content": {
+      "number": "2.21",
+      "prompt": "White to move. What is the correct result?",
+      "fen": "8/8/8/3kp3/8/8/8/3K4 w - - 0 1",
+      "solution": "Draw. 1. Ke1!= Ke4 2. Ke2."
+    }
+  },
+  {
+    "type": "problem",
+    "content": {
+      "number": "2.22",
+      "prompt": "White to move. Can he win?",
+      "fen": "8/8/1k5p/8/1P5P/1K6/8/8 w - - 0 1",
+      "solution": "1.h5!+- See Ending 83 (1. Kc4\nh5=)."
+    }
+  },
+  {
+    "type": "problem",
+    "content": {
+      "number": "2.23",
+      "prompt": "Suppose you have already spent 30 of your 50 moves to get here. It is time to be accurate. What would you do?",
+      "fen": "8/2k4B/4K3/4N3/8/8/8/8 w - - 0 1",
+      "solution": "1.Nd7! Also winning in less than\n20 moves are the moves Bc2 and Kd5;\nbut the text move is pure tactics.\n1... Kc6 (1... Kb7 2.Bd3) 2.Bd3 closing the way out 2... Kc7 3.i.b5! Kd8\n4. Nf6 Kc7 5. Nd5+ building the cage.\n5...Kd8 6. Kd6 Kc8 7. Ke7 Kb7\n8. Kd7 Kb8 9.Ba6 Ka7 10.Bc8 Kb8\n11. Nb4 Ka7 12.Kc7 Ka8 13.Bb7+\nKa7 14.Nc6 mate. See Ending 93."
+    }
+  },
+  {
+    "type": "problem",
+    "content": {
+      "number": "2.24",
+      "prompt": "White to move. Can he draw?",
+      "fen": "8/5KPq/8/8/3k4/8/8/8 w - - 0 1",
+      "solution": "Yes, because the black king is out of the winning zone, but White needs to find an only and paradoxical move.\n1. Kf6!= (1. Ke8? Kd5 2.f8=Q Ke6-+;\n1. Ke6? Qg7 2. Ke7 Ke5-+)."
+    }
+  },
+  {
+    "type": "problem",
+    "content": {
+      "number": "2.25",
+      "prompt": "Black to move. Can he draw?",
+      "fen": "8/5R2/K7/8/5pk1/8/8/8 b - - 0 1",
+      "solution": "Yes, Black draws if he knows the\n'shoulder-charging' idea. (Ending 24)\n1... Kf3!! (1...f3? loses: 2. Kb5 Kg3\n3. Kc4 f2 4. Kd3 Kg2 5. Ke2 and\nWhite arrives in time; we will see this rule in Ending 21) 2. Kb5 Ke3 3. Kc4\nf3 4. Re7+ Kd2!=."
+    }
+  },
+  {
+    "type": "problem",
+    "content": {
+      "number": "2.26",
+      "prompt": "Black to move. Would you trade queens on c5 to win?",
+      "fen": "8/8/3Q1p2/1q1P4/3k4/8/8/2K5 b - - 0 1",
+      "solution": "No. White can keep the opposition. 1... Qc5+?? (1... Qc4+ wins)\n2. Qxc5+ Kxc5 3. Kd2 Kd6 4. Ke3!\nKe5 5. Kd2! (keeping the opposition is more important than taking a pawn).\n5...Kd6 6. Ke3 Kxd5 7. Kxd3= Suba-Huerga, Benidorm 2007."
+    }
+  }
+]

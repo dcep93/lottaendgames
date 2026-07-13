@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { renderToStaticMarkup } from 'react-dom/server'
-import { PanelBlock, ProseBlock } from './ChapterViewer'
-import type { PanelSection } from './chapterTypes'
+import { PanelBlock, ProblemStudyGroup, ProseBlock } from './ChapterViewer'
+import type { PanelSection, ProblemSection } from './chapterTypes'
 import type { TextPlaybackToken } from './moveParser'
 
 const activeBoards = {}
@@ -79,5 +79,46 @@ assert.equal(
   untitledPanelMarkup,
   '<aside class="leg-panel-callout"><p>An untitled callout.</p></aside>',
 )
+
+const problemSection: ProblemSection = {
+  content: {
+    fen: '6k1/8/8/8/8/8/P7/7K w - - 0 1',
+    number: '2.01',
+    prompt: 'White to move. Is it a draw?',
+    solution: 'Play 1.a4!',
+  },
+  type: 'problem',
+}
+const problemProps = {
+  activeBoards,
+  activePositionNumber: null,
+  index: 1,
+  navigationByPosition: new Map(),
+  onMoveClick,
+  onPositionReset: () => undefined,
+  onToggleSolution: () => undefined,
+  playback: {
+    playablePositions: new Set(['2.01']),
+    tokensBySectionIndex: new Map([[1, moveTokens]]),
+  },
+  section: problemSection,
+}
+const hiddenProblemMarkup = renderToStaticMarkup(
+  <ProblemStudyGroup {...problemProps} revealed={false} />,
+)
+assert.match(hiddenProblemMarkup, /aria-expanded="false"/)
+assert.match(hiddenProblemMarkup, />Show solution<\/button>/)
+assert.match(hiddenProblemMarkup, /data-playable="false"/)
+assert.doesNotMatch(hiddenProblemMarkup, /leg-move-token/)
+assert.doesNotMatch(hiddenProblemMarkup, /Play 1\.a4/)
+
+const revealedProblemMarkup = renderToStaticMarkup(
+  <ProblemStudyGroup {...problemProps} revealed />,
+)
+assert.match(revealedProblemMarkup, /aria-expanded="true"/)
+assert.match(revealedProblemMarkup, />Hide solution<\/button>/)
+assert.match(revealedProblemMarkup, /data-playable="true"/)
+assert.match(revealedProblemMarkup, /leg-move-token/)
+assert.match(revealedProblemMarkup, /Play /)
 
 console.log('viewer presentation tests passed')

@@ -3,17 +3,18 @@ import { Chess } from 'chess.js'
 import { chapterPayloadPath } from '../src/app_x/chapterPayloadManifest'
 import type { RawChapterSection } from '../src/app_x/chapterTypes'
 import {
-  buildChapterPlayback,
+  hydrateRuntimeChapter,
+  type HydratedChapter,
+  type RuntimeChapterDefinition,
+} from '../src/app_x/chapterRuntime'
+import {
   isProseMoveReference,
   isProseMoveReferenceContinuation,
   type TextPlaybackToken,
 } from '../src/app_x/moveParser'
 
 type ChapterPayload = {
-  chapters: Array<{
-    id: string
-    sections: RawChapterSection[]
-  }>
+  chapters: RuntimeChapterDefinition[]
 }
 
 type SanMiss = {
@@ -66,7 +67,7 @@ for (const chapterId of selectedChapterIds) {
     throw new Error(`Chapter ${chapterId} is not in the chapter payload.`)
   }
 
-  const playback = buildChapterPlayback(chapter.sections)
+  const playback = hydrateRuntimeChapter(chapter).playback
   const moveTokens = Array.from(playback.tokensBySectionIndex.values())
     .flat()
     .filter((token) => token.type === 'move')
@@ -77,15 +78,14 @@ for (const chapterId of selectedChapterIds) {
     chapter: chapterId,
     misses: strictMode ? [] : scanMisses(chapterId, chapter.sections, playback),
     moveTokens: moveTokens.length,
-    positions: chapter.sections.filter((section) => section.type === 'position')
-      .length,
+    positions: chapter.positionCount,
   })
 }
 
 function scanMisses(
   chapterId: string,
   sections: RawChapterSection[],
-  playback: ReturnType<typeof buildChapterPlayback>,
+  playback: HydratedChapter['playback'],
 ) {
   const misses: SanMiss[] = []
 
@@ -357,6 +357,16 @@ function getSectionText(section: RawChapterSection) {
     typeof section.content.text === 'string'
   ) {
     return section.content.text
+  }
+
+  if (
+    section.type === 'problem' &&
+    section.content &&
+    typeof section.content === 'object' &&
+    'solution' in section.content &&
+    typeof section.content.solution === 'string'
+  ) {
+    return section.content.solution
   }
 
   return ''

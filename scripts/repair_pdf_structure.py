@@ -492,6 +492,381 @@ TEXT_REPAIRS = (
 )
 
 
+# Corrections found by reading each chapter's structured text against the source.
+# Keep these chapter-scoped: chess prose repeats many short phrases, and a global
+# replacement can silently alter an unrelated ending.
+CHAPTER_TEXT_REPAIRS: dict[str, tuple[tuple[str, str], ...]] = {
+    "1": (
+        ("let us now look at Position 1.3.", "Let us now look at Position 1.3."),
+        ("b6-b7- b8", "b6-b7-b8"),
+        ("1... Ke72. Kg7!", "1... Ke7 2. Kg7!"),
+        ("proximity of.\nthe edge", "proximity of the edge"),
+        ("available in front of pawn", "available in front of the pawn"),
+        (
+            "in the position after.. Ke7, opposition would be useful in the standard way: "
+            "it prevents the enemy 1.\nking",
+            "in the position after 1... Ke7, opposition would be useful in the standard way: "
+            "it prevents the enemy king",
+        ),
+        ("1... Ke72. Kc6", "1... Ke7 2. Kc6"),
+        ("2...c 4", "2...c4"),
+        (
+            "1... Kh7.1. Kf7 2. Kh6 would not change matters...",
+            "1... Kh7 (1... Kf7 2. Kh6 would not change matters...)",
+        ),
+        (
+            "1.Rb7?? threatening\n\n1... Kh2",
+            "1.Rb7?? threatening mate would be a gross mistake: after 1... Kf8 the "
+            "black king cannot be forced back to the wrong corner.\n1... Kh2",
+        ),
+        (
+            "This is our first example of a 'knight's dumb square'\nit will not be the last.\n"
+            "and its effects, but",
+            "This is our first example of a 'knight's dumb square' and its effects, but "
+            "it will not be the last.",
+        ),
+        ("Kamsky- Bacrot", "Kamsky - Bacrot"),
+        ("Black.\nhas managed", "Black has managed"),
+        ("6.Rf7!.", "6.Rf7!"),
+    ),
+    "3": (
+        ("c1.1. Ne2+!", "c1.\n1. Ne2+!"),
+        ("its..\nideal square", "its ideal square"),
+        ("2...b 2", "2...b2"),
+        ("very far away\n", "very far away.\n"),
+        (
+            "the essential (and solid) part of the barrier are the",
+            "the essential (and solid) part of the barrier is the",
+        ),
+        (
+            "1...Kc2. The king anticipates the barrier and gets ready to go round it, but "
+            "here that is not enough, because the white king will be able to defend the "
+            "knight from the f4-square.\n\n3. Kd6 Kd1 4. Ke5 Ke1 5. Kf4=. 1. Kd4?! "
+            "2. Nf2!..",
+            "1...Kc2. The king anticipates the barrier and gets ready to go round it, but "
+            "here that is not enough, because the white king will be able to defend the "
+            "knight from the f4-square.\n1...Kd3?! 2.Ng3!= (and here is the barrier "
+            "position we have just seen) 2...Kc2 3.Kd6 Kd1 4.Ke5 Ke1 5.Kf4=.\n"
+            "1.Kd4?! 2.Nf2!",
+        ),
+        (
+            "game. this position in one blitz game on ICC (Internet Chess Club), but then "
+            "his opponent just left his flag to fall; those familiar with ICC blitz rules "
+            "know the result of the game.",
+            "game.",
+        ),
+        (
+            "Spanish IM Sergio Estremera told me that he had",
+            "Spanish IM Sergio Estremera told me that he had this position in one blitz "
+            "game on ICC (Internet Chess Club), but then his opponent just left his flag "
+            "to fall; those familiar with ICC blitz rules know the result of the game.",
+        ),
+    ),
+    "4": (
+        ("A) .\nB) The queen", "A) Stalemate themes.\nB) The queen"),
+        ("Ending16", "Ending 16"),
+        ("works..", "works."),
+        ("4... Kb??", "4... Kb1??"),
+        ("1.... Kb3", "1... Kb3"),
+        ("1.... Kb2", "1... Kb2"),
+        ("5. Kg7!.", "5. Kg7!"),
+    ),
+    "5": (
+        ("\nwe are going", "\nWe are going"),
+        ("King's opposed at the rear", "Kings opposed at the rear"),
+        ("The King's pressure", "The king's pressure"),
+    ),
+    "7": (
+        (
+            "two squares by the king and one by the bishop. The bishop can just",
+            "two squares by the king and one by the bishop. Let us pay attention to this "
+            "situation once again. The bishop can just",
+        ),
+        (
+            "Time to go back. Other king moves would lose",
+            "Time to go back. It is interesting to note that other king moves would lose",
+        ),
+    ),
+    "9": (
+        (
+            "On the 6th rank, the pawns usually win.  is quite easy",
+            "On the 6th rank, the pawns usually win. The winning procedure is quite easy",
+        ),
+    ),
+    "10": (
+        ("1 00 points", "100 points"),
+        ("1 00\npoints", "100 points"),
+        (
+            "the rules we will state for these cases not necessarily apply",
+            "the rules we will state for these cases do not necessarily apply",
+        ),
+        ("The black rook gets ready Otherwise", "The black rook gets ready. Otherwise"),
+        ("end game theory", "endgame theory"),
+        ("this method is l not possible", "this method is not possible"),
+        ("and/ or", "and/or"),
+        ("\nwhat ", "\nWhat "),
+        ("\nwell,", "\nWell,"),
+        ("what happens with other pawns?", "What happens with other pawns?"),
+        ("well, no,", "Well, no,"),
+        ("4.Kf6 Ke8.4...Kc7", "4.Kf6 Ke8. 4...Kc7"),
+        ("position after move 3.7...Kd5", "position after move 3. 7...Kd5"),
+        (
+            "10...Rf2+ 11.Ke7 Rh2 12.Rf8+-, hindering side checks. The threat is "
+            "e5-e6, which would lead to a Lucena Position) 12.Rf8+-, hindering side "
+            "checks. The threat is e5-e6, which would lead to a",
+            "10...Rf2+ 11.Ke7 Rh2 12.Rf8+-, hindering side checks. The threat is "
+            "e5-e6, which would lead to a Lucena Position)",
+        ),
+        (
+            "10...Rf2+ 11.Ke7 Rh2\nLucena Position)",
+            "10...Rf2+ 11.Ke7 Rh2 12.Rf8+-, hindering side checks. The threat is "
+            "e5-e6, which would lead to a Lucena Position)",
+        ),
+        (
+            "10...Rf2+ 11.Ke7 Rh2",
+            "10...Rf2+ 11.Ke7 Rh2 12.Rf8+-, hindering side checks. The threat is "
+            "e5-e6, which would lead to a Lucena Position)",
+        ),
+        ("Lucena Position) 11.Rg8!", "11.Rg8!"),
+        (
+            "11...Rh7+\n\n(White has several winning moves) 15...Kd8",
+            "11...Rh7+ 12.Rg7 Rh8 13.Ke7 (13.e6? Kd6 14.e7 Kd7=) 13...Kc6 "
+            "14.e6 Kc7 15.Kf6+ (White has several winning moves) 15...Kd8",
+        ),
+        (
+            "15...Kd6 16.Rd7+ Kc6\n\nreaching the Lucena Position",
+            "15...Kd6 16.Rd7+ Kc6 17.Rd1 Rh6+ 18.Kf7 Rh7+ 19.Kg6 Rh2 20.e7 Re2 "
+            "21.Kf7 Rf2+ 22.Ke8, reaching the Lucena Position",
+        ),
+        ("for example:...Kg6", "for example: 3...Kg6"),
+        ("5.e7.Kf7", "5.e7 Kf7"),
+        ("start ing", "starting"),
+        ("\nwe're back", "\nWe're back"),
+        ("2.e7.Kf7", "2.e7 Kf7"),
+        ("3.e7.Rd1+", "3.e7 Rd1+"),
+        ("5.Kd6.Rb6+", "5.Kd6 Rb6+"),
+        ("6.Kd7.Rb7+", "6.Kd7 Rb7+"),
+        ("intending... Kf8 or...Kf6", "intending ...Kf8 or ...Kf6"),
+        ("10.e7- Lucena", "10.e7+- Lucena"),
+        ("\nwhat happens", "\nWhat happens"),
+        ("4th rank\n", "4th rank.\n"),
+        ("get ting", "getting"),
+        ("9.c5.The", "9.c5. The"),
+        (
+            "9.Rd1+ Kc8 10.Rg1! 10...Rh8 (10...Rh6+ 11.c6+-) 11.c6 Rf8\n"
+            "Black cannot reach either the K&H or the Philidor Position, so the ending is lost.",
+            "9.Rd1+ Kc8 10.Rg1!\nBlack cannot reach either the K&H or the Philidor "
+            "Position, so the ending is lost.\n10...Rh8 (10...Rh6+ 11.c6+-) 11.c6 Rf8",
+        ),
+        (
+            "12.Ra1! This simple move is impossible if we shift the position to the left. "
+            "12...Kb8 13.c7+ Kc8 14.Ra8+ 1-0 12...Kb8 13.c7+ Kc8 14.Ra8+ 1-0",
+            "12.Ra1! This simple move is impossible if we shift the position to the left. "
+            "12...Kb8 13.c7+ Kc8 14.Ra8+ 1-0",
+        ),
+        (
+            "12.Ra1! This simple move is impossible if we shift the position to the left.",
+            "12.Ra1! This simple move is impossible if we shift the position to the left. "
+            "12...Kb8 13.c7+ Kc8 14.Ra8+ 1-0",
+        ),
+        ("\nwe ", "\nWe "),
+        ("c6-square. we are going", "c6-square. We are going"),
+        ("3.Kd5.Rd8+", "3.Kd5 Rd8+"),
+        (
+            "3) The strong side the enemy king off by three files: applying the Combined "
+            "Method,\ncuts the ending won with any pawn on the 3rd or 4th rank, but not "
+            "on the 2nd.\nis",
+            "3) The strong side cuts the enemy king off by three files: applying the "
+            "Combined Method, the ending is won with any pawn on the 3rd or 4th rank, "
+            "but not on the 2nd.",
+        ),
+        ("3rd - rank", "3rd-rank"),
+        ("disposal..", "disposal."),
+        ("cutting the king off 3...Kf4", "cutting the king off; 3...Kf4"),
+        ("Kf4.The", "Kf4. The"),
+        ("allow... Kf5", "allow ...Kf5"),
+        ("g7- h7.So", "g7-h7. So"),
+        ("Rh8.Thus", "Rh8. Thus"),
+        ("1924.But", "1924. But"),
+        ("Kb7 -a7", "Kb7-a7"),
+        ("a8.3.Ke4", "a8. 3.Ke4"),
+        ("Vancura Defence (I I)", "Vancura Defence (II)"),
+        ("what would happen", "What would happen"),
+        ("what if Black", "What if Black"),
+        ("a 1 and g7.As", "a1 and g7. As"),
+        (
+            "2...Ra5!?\nenough to draw; in terms of analysis this is the most interesting "
+            "move, though\nStill not the easiest one.",
+            "2...Ra5!?\nStill enough to draw; in terms of analysis this is the most "
+            "interesting move, though not the easiest one.",
+        ),
+        ("b4.Now", "b4. Now"),
+        ("at tacking", "attacking"),
+        ("Kd5 -c6", "Kd5-c6"),
+        ("'cut ting off the enemy king '", "'cutting off the enemy king'"),
+    ),
+    "11": (
+        ("e8.Apparently", "e8. Apparently"),
+        ("Rg8.We", "Rg8. We"),
+        ("corner a1 or b1).", "corner (a1 or b1)."),
+        ("f-file?", "f-file.'"),
+        ("3.Rc5.The", "3.Rc5. The"),
+        ("12.Rd4 Ra1.Back", "12.Rd4 Ra1. Back"),
+        ("185 1.Actually", "1851. Actually"),
+        ("Here were again.", "Here we are again."),
+        ("for in stance", "for instance"),
+        ("Ending76", "Ending 76"),
+    ),
+    "12": (
+        ("Ending77", "Ending 77"),
+        ("Ending78", "Ending 78"),
+        ("would g o", "would go"),
+        ("8.b S", "8.b5"),
+        ("stale mate", "stalemate"),
+        (
+            "Two pawns separated by one file can defend each other long as the king does "
+            "not attack the more advanced one.\nas",
+            "Two pawns separated by one file can defend each other as long as the king "
+            "does not attack the more advanced one.",
+        ),
+        ("move 1.The", "move 1. The"),
+        ("one of them,\nwill capture", "one of them will capture"),
+        ("I.Kd6", "1.Kd6"),
+        ("ex change", "exchange"),
+        (
+            "but it may also win.\nhappen with other pawns",
+            "but it may also happen with other pawns",
+        ),
+        ("b2.The", "b2. The"),
+        ("c7.An", "c7. An"),
+        (
+            "the first king to reach the key squares for the enemy pawn capture the pawn.\nwill",
+            "the first king to reach the key squares for the enemy pawn will capture the pawn.",
+        ),
+        ("h2.Apparently", "h2. Apparently"),
+        ("7 S %", "75%"),
+        ("are5 0%", "are 50%"),
+        ("whatever rule", "Whatever rule"),
+        ("deter mine", "determine"),
+        ("f8.Therefore", "f8. Therefore"),
+        ("kings ' routes", "kings' routes"),
+        ("side 's", "side's"),
+        ("9.d8=Qa2", "9.d8=Q a2"),
+        ("2..Kd4", "2...Kd4"),
+        ("h3.In", "h3. In"),
+        ("b6.On", "b6. On"),
+        ("threat ens", "threatens"),
+        ("c8.Again", "c8. Again"),
+        ("fol low", "follow"),
+        ("c7.2.Kc4", "c7. 2.Kc4"),
+        ("d5.Black", "d5. Black"),
+        ("Kf6.Black", "Kf6. Black"),
+        ("h2 -h3", "h2-h3"),
+        ("h2 -h4", "h2-h4"),
+        ("out flank", "outflank"),
+        ("Very of ten", "Very often"),
+        ("counter part", "counterpart"),
+        ("vic tory", "victory"),
+        ("4.g3.Now", "4.g3. Now"),
+        ("diagram 12. 27thanks", "diagram 12.27 thanks"),
+        (
+            "Exceptionally, I will show the same position again. we are going to analyse position",
+            "Exceptionally, I will show the same position again. We are going to analyse "
+            "Position 12.25 again, but this time it is White's turn.",
+        ),
+        ("even ifi t", "even if it"),
+        ("White 's", "White's"),
+        ("h6.1...", "h6. 1..."),
+        ("1...h 62.g3!", "1...h6 2.g3!"),
+        ("4...h 65.Kf4", "4...h6 5.Kf4"),
+        ("g3.White", "g3. White"),
+        ("\nwhat else?", "\nWhat else?"),
+        ("It took long time", "It took a long time"),
+        ("play...h7 -h6", "play ...h7-h6"),
+        ("into full point", "into a full point"),
+        ("1...a 4", "1...a4"),
+        ("3.Kb4+- d4 4.Ka4", "3.Kb4+- 3...d4 4.Ka4"),
+        ("back rank).", "back rank."),
+        ("1...Kh8.The", "1...Kh8. The"),
+        ("Kd6- the white king", "Kd6 - the white king"),
+        ("may involve c several", "may involve several"),
+    ),
+    "13": (
+        ("endgame theory Here", "endgame theory. Here"),
+        ("13. 1-13.3", "13.1-13.3"),
+        ("that, is", "that is"),
+        ("The cage is ready Now", "The cage is ready. Now"),
+        ("13.3.24...", "13.3. 24..."),
+        ("13.3.Do", "13.3. Do"),
+        ("known as the  and its defining", "known as the Philidor Position and its defining"),
+        ("e1.2...Re2", "e1. 2...Re2"),
+        ("threatening7.Bc6", "threatening 7.Bc6"),
+        ("Kd7.6.Ke6", "Kd7. 6.Ke6"),
+        ("Re3.8.Rd7", "Re3. 8.Rd7"),
+        ("Building a sort of  with", "Building a sort of Philidor Position with"),
+        ("defender 's", "defender's"),
+        ("longer than in the ,", "longer than in the Philidor Position,"),
+        ("13.15.To", "13.15. To"),
+        ("preventing White from reaching the ,", "preventing White from reaching the Philidor Position,"),
+        ("White from reaching the ,", "White from reaching the Philidor Position,"),
+        ("White reaches the .", "White reaches the Philidor Position."),
+        ("move 26.26.Ke5", "move 26. 26.Ke5"),
+        ("he may end up in the  if", "he may end up in the Philidor Position if"),
+        ("reach the .", "reach the Philidor Position."),
+        ("The threat is...Re2", "The threat is ...Re2"),
+        ("End ing7", "Ending 7"),
+        (
+            "avoiding the g5- and -squares and thus f7\nbeing able",
+            "avoiding the g5- and f7-squares and thus being able",
+        ),
+        ("g6. ' Here's", "g6.' Here's"),
+        ("See Position 13.22. 13.22.", "See Position 13.22."),
+        ("See Position", "See Position 13.22."),
+        (
+            "advance to the 7th rank:\n",
+            "advance to the 7th rank:'\n",
+        ),
+        ("h6.It", "h6. It"),
+        ("' different material relations'", "'different material relations'"),
+        ("among1237", "among 1237"),
+        ("= -there", "= - there"),
+        ("one of the highest percentage of mistakes", "one of the highest percentages of mistakes"),
+        ("reach the 5th file thanks", "reach the 5th rank thanks"),
+        (
+            "10.Qd6 (if 10.Kc7, the king reaches the 8th rank but cannot stay there for long:\n\n"
+            "An important moment.",
+            "10.Qd6 (if 10.Kc7, the king reaches the 8th rank but cannot stay there for "
+            "long: 10...Rb7+ 11.Kc8 Rb8+=).\nAn important moment.",
+        ),
+        (
+            "he must transfer the rook to the key defensive square.\n\n14.Qc7+-",
+            "he must transfer the rook to the key defensive square.\n10...Rb7! "
+            "(instead, 10...Ra7? 11.Kc7 Rb7+ 12.Kc8 Rb8 13.Qd7+ Ka8 14.Qc7+-",
+        ),
+        (
+            "10...Rb7! (instead, 10...Ra7? 11.Kc7 Rb7+ 12.Kc8 Rb8 13.Qd7+ Ka8 "
+            "10...Rb7! (instead, 10...Ra7? 11.Kc7 Rb7+ 12.Kc8 Rb8 13.Qd7+ Ka8 "
+            "14.Qc7+- and White wins; the same goes for 10...Rb5 11.Kc7 and the rest)",
+            "10...Rb7! (instead, 10...Ra7? 11.Kc7 Rb7+ 12.Kc8 Rb8 13.Qd7+ Ka8 "
+            "14.Qc7+- and White wins; the same goes for 10...Rb5 11.Kc7 and the rest)",
+        ),
+        (
+            "14.Qc7+- and White wins; the same goes for 10...Rb5 11.Kc7 and the rest)",
+            "10...Rb7! (instead, 10...Ra7? 11.Kc7 Rb7+ 12.Kc8 Rb8 13.Qd7+ Ka8 "
+            "14.Qc7+- and White wins; the same goes for 10...Rb5 11.Kc7 and the rest)",
+        ),
+        (
+            "Now the black rook has to move. The most natural square is enough for an easy "
+            "draw, though it is not the only move.\n\nWhen the queen moves",
+            "Now the black rook has to move. The most natural square is enough for an easy "
+            "draw, though it is not the only move.\n11...Rb5 12.Qc8 Rb6+ 13.Kc7 Rb5=\n"
+            "When the queen moves",
+        ),
+        ("on the 3rdrank", "on the 3rd rank"),
+    ),
+}
+
+
 def main() -> None:
     manifest = json.loads((PDF_DIR.parent / "chapterManifest.json").read_text())
     chapters: dict[str, list[dict[str, Any]]] = {}
@@ -697,22 +1072,26 @@ def trim_chapter_spillovers(chapters: dict[str, list[dict[str, Any]]]) -> None:
 def repair_english_extraction(
     chapters: dict[str, list[dict[str, Any]]],
 ) -> None:
-    for sections in chapters.values():
+    for chapter_id, sections in chapters.items():
         for section in sections:
             content = section.get("content")
             if isinstance(content, str):
-                section["content"] = repair_text(content)
+                section["content"] = repair_text(content, chapter_id)
                 continue
             if not isinstance(content, dict):
                 continue
             for key, value in content.items():
                 if key in {"fen", "number"} or not isinstance(value, str):
                     continue
-                content[key] = repair_text(value)
+                content[key] = repair_text(value, chapter_id)
 
 
-def repair_text(text: str) -> str:
+def repair_text(text: str, chapter_id: str) -> str:
     for before, after in TEXT_REPAIRS:
+        text = text.replace(before, after)
+    for before, after in CHAPTER_TEXT_REPAIRS.get(chapter_id, ()):
+        if before in after and after in text:
+            continue
         text = text.replace(before, after)
     text = re.sub(r"\b([a-h][1-8])\s+-square\b", r"\1-square", text)
     text = re.sub(r"\b([a-h][1-8])-\s+square\b", r"\1-square", text)

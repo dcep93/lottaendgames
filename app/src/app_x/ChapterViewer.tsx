@@ -14,12 +14,13 @@ import type {
   HeadingSection,
   PanelSection,
   PositionSection,
+  ProblemSection,
   RawChapterSection,
   TextSection,
   TitleSection,
 } from './chapterTypes'
 import ChessBoard from './ChessBoard'
-import { buildLichessAnalysisUrl } from './lichess'
+import { buildLichessAnalysisUrl, buildLichessEditorUrl } from './lichess'
 import type { TextPlaybackToken } from './moveParser'
 import {
   getNextNavigationNode,
@@ -78,6 +79,18 @@ export default function ChapterViewer() {
   const [activePositionNumber, setActivePositionNumber] = useState<
     string | null
   >(null)
+  const [revealedSolutions, setRevealedSolutions] = useState<
+    Record<string, boolean>
+  >({})
+  const problemNumbers = useMemo(
+    () =>
+      new Set(
+        chapterSections
+          .filter((section) => section.type === 'problem')
+          .map((section) => (section as ProblemSection).content.number),
+      ),
+    [chapterSections],
+  )
   const moveAnimationFrameRef = useRef<number | null>(null)
   const positionCount = preparedChapter.positionCount
   const endingCount = preparedChapter.endingCount
@@ -91,6 +104,7 @@ export default function ChapterViewer() {
     setActiveChapterId(chapterId)
     setActiveBoards({})
     setActivePositionNumber(null)
+    setRevealedSolutions({})
   }
 
   useEffect(() => {
@@ -137,7 +151,8 @@ export default function ChapterViewer() {
       }
 
       const visibleActivePosition =
-        activePositionNumber && isPositionCardVisible(activePositionNumber)
+        activePositionNumber &&
+        isPlayablePositionCardVisible(activePositionNumber)
           ? activePositionNumber
           : getFirstVisiblePlayablePositionNumber()
 
@@ -215,6 +230,13 @@ export default function ChapterViewer() {
   }, [])
 
   function handleMoveClick(token: Extract<TextPlaybackToken, { type: 'move' }>) {
+    if (
+      problemNumbers.has(token.positionNumber) &&
+      !revealedSolutions[token.positionNumber]
+    ) {
+      return
+    }
+
     const navigation = navigationByPosition.get(token.positionNumber)
     const initialFen = initialPositionFens[token.positionNumber]
     const parentFen = navigation
@@ -290,6 +312,33 @@ export default function ChapterViewer() {
     })
   }
 
+  function handleSolutionToggle(problem: ProblemSection) {
+    const number = problem.content.number
+    const willReveal = !revealedSolutions[number]
+
+    cancelMoveAnimationFrame(moveAnimationFrameRef)
+    setRevealedSolutions((current) => ({
+      ...current,
+      [number]: willReveal,
+    }))
+    setActiveBoards((current) => {
+      if (willReveal) {
+        return {
+          ...current,
+          [number]: createInitialBoardState(initialPositionFens[number]),
+        }
+      }
+
+      const next = { ...current }
+      delete next[number]
+      return next
+    })
+
+    if (!willReveal && activePositionNumber === number) {
+      setActivePositionNumber(null)
+    }
+  }
+
   return (
     <main className="leg-page">
       <div className="leg-reader-shell">
@@ -329,6 +378,25 @@ export default function ChapterViewer() {
                   playback={playback}
                   sections={chapterSections}
                 />
+              ) : chapterSections[item.index].type === 'problem' ? (
+                <ProblemStudyGroup
+                  activeBoards={activeBoards}
+                  activePositionNumber={activePositionNumber}
+                  index={item.index}
+                  key={`problem-${item.index}`}
+                  navigationByPosition={navigationByPosition}
+                  onMoveClick={handleMoveClick}
+                  onPositionReset={handlePositionReset}
+                  onToggleSolution={handleSolutionToggle}
+                  playback={playback}
+                  revealed={Boolean(
+                    revealedSolutions[
+                      (chapterSections[item.index] as ProblemSection).content
+                        .number
+                    ],
+                  )}
+                  section={chapterSections[item.index] as ProblemSection}
+                />
               ) : (
                 <SectionRenderer
                   index={item.index}
@@ -355,6 +423,87 @@ export default function ChapterViewer() {
         ) : null}
       </div>
     </main>
+  )
+}
+
+export function ProblemStudyGroup({
+  activeBoards,
+  activePositionNumber,
+  index,
+  navigationByPosition,
+  onMoveClick,
+  onPositionReset,
+  onToggleSolution,
+  playback,
+  revealed,
+  section,
+}: {
+  activeBoards: Record<string, ActiveBoardState>
+  activePositionNumber: string | null
+  index: number
+  navigationByPosition: HydratedChapter['navigationByPosition']
+  onMoveClick: (token: Extract<TextPlaybackToken, { type: 'move' }>) => void
+  onPositionReset: (positionNumber: string) => void
+  onToggleSolution: (problem: ProblemSection) => void
+  playback: HydratedChapter['playback']
+  revealed: boolean
+  section: ProblemSection
+}) {
+  const { fen, markers, number, prompt, solutionFen } = section.content
+  const tokens = playback.tokensBySectionIndex.get(index)
+  const positionSection: PositionSection = {
+    type: 'position',
+    content: { fen, markers, number, subtitle: prompt },
+  }
+
+  return (
+    <section
+      aria-labelledby={`problem-${number}-heading`}
+      className="leg-position-study leg-test-problem"
+    >
+      <div className="leg-position-study-board">
+        <PositionCard
+          activeBoard={revealed ? activeBoards[number] : undefined}
+          activePositionNumber={activePositionNumber}
+          hasPlayback={revealed && playback.playablePositions.has(number)}
+          headingId={`problem-${number}-heading`}
+          headingLabel="Problem"
+          lichessInitialFen={revealed ? solutionFen ?? fen : fen}
+          navigation={revealed ? navigationByPosition.get(number) : undefined}
+          onReset={onPositionReset}
+          section={positionSection}
+        />
+      </div>
+      <div
+        aria-label={`Solution for problem ${number}`}
+        className={
+          revealed
+            ? 'leg-position-study-content leg-test-solution is-revealed'
+            : 'leg-position-study-content leg-test-solution'
+        }
+      >
+        <button
+          aria-controls={`problem-${number}-solution`}
+          aria-expanded={revealed}
+          className="leg-solution-toggle"
+          onClick={() => onToggleSolution(section)}
+          type="button"
+        >
+          {revealed ? 'Hide solution' : 'Show solution'}
+        </button>
+        {revealed ? (
+          <div id={`problem-${number}-solution`}>
+            <ProseBlock
+              activeBoards={activeBoards}
+              activePositionNumber={activePositionNumber}
+              content={section.content.solution}
+              onMoveClick={onMoveClick}
+              tokens={tokens}
+            />
+          </div>
+        ) : null}
+      </div>
+    </section>
   )
 }
 
@@ -527,6 +676,8 @@ function SectionRenderer({
           section={section as PositionSection}
         />
       )
+    case 'problem':
+      return null
     case 'text': {
       const textSection = section as TextSection
       return (
@@ -557,6 +708,8 @@ function PositionCard({
   activePositionNumber,
   hasPlayback,
   headingId,
+  headingLabel = 'Position',
+  lichessInitialFen,
   navigation,
   onReset,
   section,
@@ -565,6 +718,8 @@ function PositionCard({
   activePositionNumber: string | null
   hasPlayback: boolean
   headingId?: string
+  headingLabel?: string
+  lichessInitialFen?: string
   navigation?: PositionNavigation
   onReset: (positionNumber: string) => void
   section: PositionSection
@@ -572,14 +727,25 @@ function PositionCard({
   const { caption, fen, markers, number, subtitle } = section.content
   const isActive = activePositionNumber === number
   const lichessUrl = useMemo(
-    () =>
+    () => {
+      const initialFen = lichessInitialFen ?? fen
+
+      return (
       buildLichessAnalysisUrl({
         currentCursorId: activeBoard?.cursorId ?? null,
-        initialFen: fen,
+        initialFen,
         navigation,
         preferredNextByCursor: activeBoard?.preferredNextByCursor ?? {},
-      }),
-    [activeBoard?.cursorId, activeBoard?.preferredNextByCursor, fen, navigation],
+      }) ?? buildLichessEditorUrl(initialFen)
+      )
+    },
+    [
+      activeBoard?.cursorId,
+      activeBoard?.preferredNextByCursor,
+      fen,
+      lichessInitialFen,
+      navigation,
+    ],
   )
 
   return (
@@ -592,7 +758,7 @@ function PositionCard({
     >
       <div className="leg-position-copy">
         <figcaption>
-          <span>Position</span>
+          <span>{headingLabel}</span>
           {hasPlayback ? (
             <button
               aria-label={`Reset position ${number}`}
@@ -812,10 +978,12 @@ function getPositionCards() {
   )
 }
 
-function isPositionCardVisible(positionNumber: string) {
+function isPlayablePositionCardVisible(positionNumber: string) {
   const card = getPositionCard(positionNumber)
 
-  return card ? isElementVisibleInViewport(card) : false
+  return card?.dataset.playable === 'true'
+    ? isElementVisibleInViewport(card)
+    : false
 }
 
 function isElementVisibleInViewport(element: HTMLElement) {

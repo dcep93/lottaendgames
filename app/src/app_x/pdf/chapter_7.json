@@ -93,7 +93,7 @@
   },
   {
     "type": "text",
-    "content": "1.Bc8\n\nThe first stage of the winning plan is driving off the black bishop from the long diagonal.\n\n1...Be4 2.Bb7 Bd3\n\nOr 2...Bf5 3.Bf3 Bc8 4.Be2 zugzwang.\n\n3.Bf3 Ba6 4.Bg4!\n\nZugzwang. There is no good move for the king, and the short diagonal is controlled by White: two squares by the king and one by the bishop. The bishop can just take one square away from its counterpart; therefore, the king must take care of two."
+    "content": "1.Bc8\n\nThe first stage of the winning plan is driving off the black bishop from the long diagonal.\n\n1...Be4 2.Bb7 Bd3\n\nOr 2...Bf5 3.Bf3 Bc8 4.Be2 zugzwang.\n\n3.Bf3 Ba6 4.Bg4!\n\nZugzwang. There is no good move for the king, and the short diagonal is controlled by White: two squares by the king and one by the bishop. Let us pay attention to this situation once again. The bishop can just take one square away from its counterpart; therefore, the king must take care of two."
   },
   {
     "type": "panel",
@@ -119,7 +119,7 @@
   },
   {
     "type": "text",
-    "content": "1.Ke8?\n\nLet us look at the wrong move and make sure that it is impossible to win that way. 1.Kg8! Kg6 2.Bf8 wins in the same fashion as in the previous example.\n\n1...Ke6\n\nAdopting rear opposition, an easy and known method, from the beginning. We have plenty of time, so here we could play first ...Kg6 or ...Kf5. However, at the key moment, when the white bishop goes to e7, the black king should always be ready to get to e6.\n\n2.Bf8 Bf4 3.Bb4 Bh6 4.Bd2 Bg7\n\nThe bishop has one more square.\n\n5.Be3\n\nSemi-zugzwang. Black has to move the king, but nothing happens.\n\n5...Kd6 6.Bd2 Ke6\n\nTime to go back. Other king moves would lose, since they would allow the white king to make it to the other side of the pawn. 6...Kd5 7.Ke7 Kc6 (or 7...Be5 8.Kf8!) 8.Ke6 and, with the king on the other side of the pawn, White wins.\n\n7.Bc3 Bh6\n\nDraw. There is no way to make progress. The white king controls just one square on the short diagonal, so it is impossible to win."
+    "content": "1.Ke8?\n\nLet us look at the wrong move and make sure that it is impossible to win that way. 1.Kg8! Kg6 2.Bf8 wins in the same fashion as in the previous example.\n\n1...Ke6\n\nAdopting rear opposition, an easy and known method, from the beginning. We have plenty of time, so here we could play first ...Kg6 or ...Kf5. However, at the key moment, when the white bishop goes to e7, the black king should always be ready to get to e6.\n\n2.Bf8 Bf4 3.Bb4 Bh6 4.Bd2 Bg7\n\nThe bishop has one more square.\n\n5.Be3\n\nSemi-zugzwang. Black has to move the king, but nothing happens.\n\n5...Kd6 6.Bd2 Ke6\n\nTime to go back. It is interesting to note that other king moves would lose, since they would allow the white king to make it to the other side of the pawn. 6...Kd5 7.Ke7 Kc6 (or 7...Be5 8.Kf8!) 8.Ke6 and, with the king on the other side of the pawn, White wins.\n\n7.Bc3 Bh6\n\nDraw. There is no way to make progress. The white king controls just one square on the short diagonal, so it is impossible to win."
   },
   {
     "type": "ending",

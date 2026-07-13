@@ -66,6 +66,9 @@ for (const chapter of payload.chapters) {
   }
 }
 
+assertProblemChapter('2', 26)
+assertProblemChapter('14', 36)
+
 for (const boundary of structureAudit.endingBoundaries) {
   const chapter = getChapter(boundary.chapter)
   const endingIndex = chapter.sections.findIndex(
@@ -222,6 +225,36 @@ function validateSection(chapterId: string, section: RawChapterSection) {
       `Chapter ${chapterId} position ${number} repeats its number as a caption`,
     )
   }
+
+
+  if (section.type === 'problem') {
+    assert.equal(isRecord(section.content), true)
+    if (!isRecord(section.content)) {
+      return
+    }
+    for (const field of ['number', 'prompt', 'fen', 'solution']) {
+      assert.equal(
+        typeof section.content[field],
+        'string',
+        `Chapter ${chapterId} problem is missing ${field}`,
+      )
+      assert.notEqual(String(section.content[field]).trim(), '')
+    }
+  }
+}
+
+function assertProblemChapter(chapterId: string, expectedCount: number) {
+  const problems = getChapter(chapterId).sections.filter(
+    (section) => section.type === 'problem' && isRecord(section.content),
+  )
+  assert.equal(problems.length, expectedCount)
+  assert.deepEqual(
+    problems.map((section) => (section.content as Record<string, unknown>).number),
+    Array.from(
+      { length: expectedCount },
+      (_, index) => `${chapterId}.${String(index + 1).padStart(2, '0')}`,
+    ),
+  )
 }
 
 function getChapter(chapterId: string) {

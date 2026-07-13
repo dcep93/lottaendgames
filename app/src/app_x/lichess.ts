@@ -53,6 +53,16 @@ export function buildLichessAnalysisUrl(
   }
 }
 
+export function buildLichessEditorUrl(fen: string) {
+  const fields = fen.trim().split(/\s+/)
+
+  if (fields.length < 4 || !fields[0].includes('/')) {
+    return null
+  }
+
+  return `https://lichess.org/editor/${fields.slice(0, 4).join('_')}`
+}
+
 function selectCompleteLine(input: LichessAnalysisInput) {
   const nodes: NavigationNode[] = []
   const visitedNodeIds = new Set<string>()

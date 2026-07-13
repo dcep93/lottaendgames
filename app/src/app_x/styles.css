@@ -268,6 +268,43 @@
   width: 100%;
 }
 
+.leg-test-solution {
+  align-content: start;
+  min-height: 4.25rem;
+  border-left: 0.18rem solid rgba(216, 179, 138, 0.48);
+  padding: 0.75rem 0.9rem;
+  background: rgba(255, 123, 195, 0.045);
+}
+
+.leg-test-solution.is-revealed {
+  border-left-color: var(--leg-pink);
+  background: rgba(255, 123, 195, 0.075);
+}
+
+.leg-solution-toggle {
+  width: fit-content;
+  border: 0.0625rem solid var(--leg-border-strong);
+  border-radius: 0.35rem;
+  padding: 0.48rem 0.72rem;
+  color: #140d12;
+  background: var(--leg-brown);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 850;
+}
+
+.leg-solution-toggle:hover,
+.leg-solution-toggle:focus-visible {
+  border-color: var(--leg-pink);
+  outline: 0.16rem solid rgba(255, 123, 195, 0.34);
+  outline-offset: 0.14rem;
+}
+
+.leg-test-solution .leg-prose {
+  margin-top: 0;
+}
+
 .leg-position-card.is-active-position {
   border-color: rgba(216, 179, 138, 0.82);
   background:

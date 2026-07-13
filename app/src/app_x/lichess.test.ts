@@ -6,7 +6,7 @@ import {
   hydrateRuntimeChapter,
   type RuntimeChapterPayload,
 } from './chapterRuntime'
-import { buildLichessAnalysisUrl } from './lichess'
+import { buildLichessAnalysisUrl, buildLichessEditorUrl } from './lichess'
 import {
   getPreferredNextUpdates,
   type NavigationNode,
@@ -93,6 +93,12 @@ assert.equal(
   }),
   null,
 )
+
+assert.equal(
+  buildLichessEditorUrl('8/8/1k6/8/P2P4/8/8/8 b - - 0 1'),
+  'https://lichess.org/editor/8/8/1k6/8/P2P4/8/8/8_b_-_-',
+)
+assert.equal(buildLichessEditorUrl('not a fen'), null)
 assert.equal(
   buildLichessAnalysisUrl(
     {
