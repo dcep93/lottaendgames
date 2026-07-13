@@ -350,7 +350,7 @@ export default function ChapterViewer() {
             chapters={chapterTabs}
             label="Top chapter selector"
             onSelect={handleChapterSelect}
-            variant="contents"
+            variant="select"
           />
           {activeChapter ? (
             <div className="leg-reader-meta" aria-label="Chapter summary">
@@ -586,13 +586,36 @@ export function ChapterSelector({
   chapters: Array<{ id: string; label: string; name: string }>
   label: string
   onSelect: (chapterId: string) => void
-  variant: 'compact' | 'contents'
+  variant: 'compact' | 'select'
 }) {
+  if (variant === 'select') {
+    return (
+      <label className="leg-chapter-picker">
+        <span className="leg-chapter-picker-label">Chapter</span>
+        <select
+          aria-label={label}
+          className="leg-chapter-select"
+          onChange={(event) => {
+            const chapterId = event.currentTarget.value
+
+            if (chapters.some((chapter) => chapter.id === chapterId)) {
+              onSelect(chapterId)
+            }
+          }}
+          value={activeChapterId}
+        >
+          {chapters.map((chapter) => (
+            <option key={chapter.id} value={chapter.id}>
+              {chapter.label} - {chapter.name}
+            </option>
+          ))}
+        </select>
+      </label>
+    )
+  }
+
   return (
-    <nav
-      aria-label={label}
-      className={`leg-chapter-selector is-${variant}`}
-    >
+    <nav aria-label={label} className="leg-chapter-selector is-compact">
       {chapters.map((chapter) => (
         <button
           aria-current={chapter.id === activeChapterId ? 'page' : undefined}
@@ -606,14 +629,7 @@ export function ChapterSelector({
           onClick={() => onSelect(chapter.id)}
           type="button"
         >
-          {variant === 'contents' ? (
-            <span className="leg-chapter-row">
-              <span className="leg-chapter-number">{chapter.label}</span>
-              <span className="leg-chapter-name">{chapter.name}</span>
-            </span>
-          ) : (
-            chapter.label
-          )}
+          {chapter.label}
         </button>
       ))}
     </nav>

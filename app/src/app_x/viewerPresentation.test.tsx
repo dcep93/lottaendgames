@@ -24,17 +24,27 @@ const chapterChoices = [
 ]
 const contentsMarkup = renderToStaticMarkup(
   <ChapterSelector
-    activeChapterId="1"
+    activeChapterId="2"
     chapters={chapterChoices}
-    label="Contents"
+    label="Top chapter selector"
     onSelect={() => undefined}
-    variant="contents"
+    variant="select"
   />,
 )
-assert.match(contentsMarkup, /leg-chapter-selector is-contents/)
-assert.match(contentsMarkup, /leg-chapter-row/)
-assert.match(contentsMarkup, />Chapter 1</)
-assert.match(contentsMarkup, />Basic endings</)
+assert.match(contentsMarkup, /leg-chapter-picker/)
+assert.match(
+  contentsMarkup,
+  /<select[^>]*aria-label="Top chapter selector"[^>]*>/,
+)
+assert.match(
+  contentsMarkup,
+  /<option value="1">Chapter 1 - Basic endings<\/option>/,
+)
+assert.match(
+  contentsMarkup,
+  /<option value="2" selected="">Chapter 2 - Basic Test<\/option>/,
+)
+assert.doesNotMatch(contentsMarkup, /leg-chapter-row/)
 
 const compactSelectorMarkup = renderToStaticMarkup(
   <ChapterSelector

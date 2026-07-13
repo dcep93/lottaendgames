@@ -94,40 +94,42 @@
   margin: 0.25rem 0 1rem;
 }
 
-.leg-chapter-selector.is-contents {
+.leg-chapter-picker {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  gap: 0.35rem;
+  width: min(32rem, 100%);
+  margin: 0.25rem 0 1rem;
 }
 
-.leg-chapter-selector.is-contents .leg-chapter-tab {
+.leg-chapter-picker-label {
+  color: var(--leg-brown);
+  font-size: 0.78rem;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.leg-chapter-select {
   width: 100%;
-  padding: 0;
-  text-align: left;
-}
-
-.leg-chapter-row {
-  display: grid;
-  grid-template-columns: 6.75rem minmax(0, 1fr);
-  align-items: baseline;
-  gap: 0.75rem;
-  min-width: 0;
-  padding: 0.58rem 0.72rem;
-}
-
-.leg-chapter-number {
-  color: inherit;
-  white-space: nowrap;
-}
-
-.leg-chapter-name {
-  min-width: 0;
+  min-height: 2.85rem;
+  border: 0.0625rem solid var(--leg-border);
+  border-radius: 0.5rem;
+  padding: 0.65rem 0.8rem;
   color: var(--leg-text);
-  font-weight: 650;
-  overflow-wrap: anywhere;
+  background: #1c1312;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 750;
+  color-scheme: dark;
 }
 
-.leg-chapter-tab.is-active .leg-chapter-name {
-  color: #140d12;
+.leg-chapter-select:hover {
+  border-color: var(--leg-brown);
+}
+
+.leg-chapter-select:focus-visible {
+  outline: 0.125rem solid var(--leg-pink);
+  outline-offset: 0.125rem;
 }
 
 .leg-reader-shell > .leg-chapter-selector {
