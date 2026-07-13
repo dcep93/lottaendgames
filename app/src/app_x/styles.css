@@ -94,6 +94,42 @@
   margin: 0.25rem 0 1rem;
 }
 
+.leg-chapter-selector.is-contents {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.leg-chapter-selector.is-contents .leg-chapter-tab {
+  width: 100%;
+  padding: 0;
+  text-align: left;
+}
+
+.leg-chapter-row {
+  display: grid;
+  grid-template-columns: 6.75rem minmax(0, 1fr);
+  align-items: baseline;
+  gap: 0.75rem;
+  min-width: 0;
+  padding: 0.58rem 0.72rem;
+}
+
+.leg-chapter-number {
+  color: inherit;
+  white-space: nowrap;
+}
+
+.leg-chapter-name {
+  min-width: 0;
+  color: var(--leg-text);
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+
+.leg-chapter-tab.is-active .leg-chapter-name {
+  color: #140d12;
+}
+
 .leg-reader-shell > .leg-chapter-selector {
   margin-top: 1.4rem;
   margin-bottom: 0;
@@ -216,41 +252,45 @@
 
 .leg-position-study {
   display: grid;
-  grid-template-columns: clamp(9rem, 30%, 22rem) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
   gap: 1rem;
-  align-items: start;
   width: min(78rem, 100%);
+  max-height: calc(100svh - 2rem);
   margin: 0.5rem 0;
+  overflow: hidden;
 }
 
 .leg-position-study.is-board-only {
-  grid-template-columns: minmax(12rem, 20rem);
+  grid-template-rows: auto;
+  width: min(58rem, 100%);
+  max-height: none;
 }
 
-.leg-position-study-board {
-  position: sticky;
-  top: 1rem;
-  max-height: calc(100svh - 2rem);
+.leg-position-study-header {
+  min-width: 0;
 }
 
 .leg-position-study-content {
   display: grid;
+  min-height: 0;
   gap: 1rem;
-  max-height: calc(100svh - 2rem);
   overflow-y: auto;
   padding-right: 0.35rem;
   scrollbar-gutter: stable;
 }
 
 .leg-position-study .leg-position-card {
-  grid-template-columns: 1fr;
-  gap: 0.75rem;
+  grid-template-columns: minmax(12rem, 22rem) minmax(0, 1fr);
+  grid-template-areas: 'board copy';
+  gap: 1rem;
   width: 100%;
   margin: 0;
   padding: 0.85rem;
 }
 
 .leg-position-study .leg-position-copy {
+  grid-area: copy;
   gap: 0.5rem;
 }
 
@@ -265,6 +305,7 @@
 }
 
 .leg-position-study .leg-board-wrap {
+  grid-area: board;
   width: 100%;
 }
 
@@ -512,14 +553,14 @@
   }
 
   .leg-position-study {
-    grid-template-columns: clamp(8.25rem, 34%, 10rem) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
     gap: 0.75rem;
     width: 100%;
+    max-height: calc(100svh - 1.5rem);
   }
 
-  .leg-position-study-board,
-  .leg-position-study-content {
-    max-height: calc(100svh - 1.5rem);
+  .leg-position-study .leg-position-card {
+    grid-template-columns: minmax(10rem, 48%) minmax(0, 1fr);
   }
 
   .leg-position-card {
@@ -538,11 +579,12 @@
   }
 
   .leg-position-study {
-    grid-template-columns: clamp(7.5rem, 36%, 8.75rem) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
     gap: 0.6rem;
   }
 
   .leg-position-study .leg-position-card {
+    grid-template-columns: minmax(9rem, 48%) minmax(0, 1fr);
     padding: 0.55rem;
   }
 

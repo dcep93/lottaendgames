@@ -86,7 +86,48 @@ for (const chapter of chapterManifest) {
   })
 }
 
+assertChapterIncludes(
+  '7',
+  'The winning sequence is easy to analyse and I suggest doing it as an Exercise.',
+)
+assertChapterIncludes('7', '6...Ba4? would lose a tempo and the game')
+assertChapterIncludes('8', 'Let us have a look at the following example')
+assertChapterIncludes(
+  '8',
+  'Recommended Exercise: Look carefully at the following series about knight blockade',
+)
+assertChapterIncludes(
+  '9',
+  'We will divide our study material into positions with separated pawns and positions with connected pawns.',
+)
+assertChapterIncludes('9', 'Final summary')
+assertChapterIncludes('9', 'When pawns are separated by TWO files')
+assertChapterIncludes(
+  '12',
+  '12.Kg6 Kf4 13.Kxh6 Kf5 14.Kg7+- and the pawn promotes.',
+)
+
 console.log('source text audit passed')
+
+function assertChapterIncludes(chapterId: string, expected: string) {
+  const sections = JSON.parse(
+    readFileSync(
+      new URL(`./pdf/chapter_${chapterId}.json`, import.meta.url),
+      'utf8',
+    ),
+  ) as RawChapterSection[]
+  const chapterText = sections.flatMap(textualValues).join('\n')
+
+  assert.equal(
+    normalizeText(chapterText).includes(normalizeText(expected)),
+    true,
+    `Chapter ${chapterId} is missing source passage: ${expected}`,
+  )
+}
+
+function normalizeText(value: string) {
+  return value.replace(/[\u2018\u2019]/g, "'").replace(/\s+/g, ' ').trim()
+}
 
 function textualValues(section: RawChapterSection) {
   if (typeof section.content === 'string') {

@@ -321,7 +321,7 @@
       "chapter": "9",
       "ending": "46",
       "page": 113,
-      "targetStartsWith": "All endings in this section are won in the same fashion. While the bishop defend",
+      "targetStartsWith": "1.f4 Getting past the diagonal h2-b8, along which the black bishop could stop",
       "targetType": "text"
     },
     {
@@ -747,6 +747,48 @@
       "textStartsWith": "Conclusion: In the battle Knight vs. Rook"
     },
     {
+      "chapter": "1",
+      "page": 28,
+      "title": null,
+      "textStartsWith": "When possible, the stronger side's king"
+    },
+    {
+      "chapter": "1",
+      "page": 31,
+      "title": null,
+      "textStartsWith": "1) The stronger side must not push"
+    },
+    {
+      "chapter": "1",
+      "page": 39,
+      "title": null,
+      "textStartsWith": "In a Rook vs. Bishop ending, the wrong corner"
+    },
+    {
+      "chapter": "3",
+      "page": 53,
+      "title": "Conclusion",
+      "textStartsWith": "Conclusion: Against a 7th-rank pawn"
+    },
+    {
+      "chapter": "3",
+      "page": 54,
+      "title": "Conclusion",
+      "textStartsWith": "Conclusion: Against a 7th-rank knight's pawn"
+    },
+    {
+      "chapter": "3",
+      "page": 55,
+      "title": "Conclusion",
+      "textStartsWith": "Conclusion: The knight draws against a 6th-rank rook's pawn"
+    },
+    {
+      "chapter": "3",
+      "page": 57,
+      "title": "Conclusion",
+      "textStartsWith": "Conclusion: The knight alone cannot stop a 7th-rank rook's pawn"
+    },
+    {
       "chapter": "4",
       "page": 61,
       "title": "Conclusion",
@@ -759,10 +801,58 @@
       "textStartsWith": "Conclusion: Just like in the positions against the rook's pawn"
     },
     {
+      "chapter": "4",
+      "page": 62,
+      "title": "Conclusion",
+      "textStartsWith": "Conclusion: In order to win against a 7th-rank rook's pawn"
+    },
+    {
+      "chapter": "4",
+      "page": 65,
+      "title": "Conclusion",
+      "textStartsWith": "Conclusion: In order to win against a 7th-rank bishop's pawn"
+    },
+    {
+      "chapter": "4",
+      "page": 66,
+      "title": "Conclusion",
+      "textStartsWith": "Conclusion: When fighting against a 7th-rank bishop's pawn"
+    },
+    {
       "chapter": "5",
       "page": 80,
       "title": "Conclusion",
       "textStartsWith": "Conclusion: If the defender's king can be forced"
+    },
+    {
+      "chapter": "10",
+      "page": 125,
+      "title": "Summary",
+      "textStartsWith": "In the Philidor Position"
+    },
+    {
+      "chapter": "10",
+      "page": 135,
+      "title": "Summary of section",
+      "textStartsWith": "This section deals with those positions"
+    },
+    {
+      "chapter": "10",
+      "page": 140,
+      "title": "Summary",
+      "textStartsWith": "1) The stronger side cuts off the enemy king by one file"
+    },
+    {
+      "chapter": "10",
+      "page": 149,
+      "title": "Summary: cutting the king off along a rank",
+      "textStartsWith": "The defending king can only be cut off along a rank"
+    },
+    {
+      "chapter": "10",
+      "page": 151,
+      "title": "Summary of the ideas in this ending for the strong side",
+      "textStartsWith": "1) When the king is in front of his pawn"
     },
     {
       "chapter": "11",
@@ -801,6 +891,24 @@
       "textStartsWith": "Conclusion: A king can defend a pawn"
     },
     {
+      "chapter": "12",
+      "page": 186,
+      "title": "Summary of Ending 84",
+      "textStartsWith": "Summary of Ending 84: When the pawn is blocked"
+    },
+    {
+      "chapter": "12",
+      "page": 189,
+      "title": "Conclusion",
+      "textStartsWith": "Conclusion: The ending with two blocked rook's pawns"
+    },
+    {
+      "chapter": "12",
+      "page": 195,
+      "title": "Conclusions",
+      "textStartsWith": "Conclusions: 1) The stronger side should keep his pawns"
+    },
+    {
       "chapter": "13",
       "page": 222,
       "title": "Conclusion",
@@ -811,6 +919,18 @@
       "page": 228,
       "title": null,
       "textStartsWith": "1) With any pawn on the second rank"
+    },
+    {
+      "chapter": "13",
+      "page": 212,
+      "title": "Summary of main ideas",
+      "textStartsWith": "Summary of main ideas: The best ranks for defence"
+    },
+    {
+      "chapter": "13",
+      "page": 231,
+      "title": "Summary",
+      "textStartsWith": "Summary: To build a fortress with a rook's pawn"
     }
   ],
   "subtitles": [
@@ -1180,19 +1300,7 @@
     },
     {
       "chapter": "10",
-      "text": "Summary of section"
-    },
-    {
-      "chapter": "10",
-      "text": "Summary of the ideas in this ending for the strong side"
-    },
-    {
-      "chapter": "10",
       "text": "Some ideas about cutting off"
-    },
-    {
-      "chapter": "10",
-      "text": "Summary: cutting the king off along a rank"
     },
     {
       "chapter": "11",
@@ -1334,19 +1442,19 @@
   "countsByChapter": {
     "1": {
       "headings": 3,
-      "panels": 7,
+      "panels": 10,
       "positions": 25,
       "subtitles": 7
     },
     "3": {
       "headings": 3,
-      "panels": 0,
+      "panels": 4,
       "positions": 10,
       "subtitles": 0
     },
     "4": {
       "headings": 2,
-      "panels": 2,
+      "panels": 5,
       "positions": 13,
       "subtitles": 6
     },
@@ -1375,14 +1483,14 @@
       "subtitles": 2
     },
     "9": {
-      "headings": 4,
+      "headings": 5,
       "panels": 10,
       "positions": 20,
       "subtitles": 6
     },
     "10": {
-      "headings": 20,
-      "panels": 2,
+      "headings": 17,
+      "panels": 5,
       "positions": 20,
       "subtitles": 2
     },
@@ -1394,13 +1502,13 @@
     },
     "12": {
       "headings": 19,
-      "panels": 3,
+      "panels": 5,
       "positions": 36,
       "subtitles": 10
     },
     "13": {
       "headings": 2,
-      "panels": 3,
+      "panels": 4,
       "positions": 27,
       "subtitles": 8
     }

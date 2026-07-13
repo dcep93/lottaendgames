@@ -53,7 +53,13 @@
   },
   {
     "type": "text",
-    "content": "Let us now look at Position 1.3. The black king has clearly reached the square. Now the pawn can promote only with the aid of the king. The easiest way is by blocking the enemy king's way.\nThis concept of blocking appears very often in pawn endings, but also in many others, and it is at the core of Rook vs. Pawn endings.\nWe can now state the second rule, which works with almost all pawns, the exception being the rook's pawn.\nWhen possible, the stronger side's king will prevent its rival from standing in front of the pawn. If he succeeds, the pawn promotes."
+    "content": "Let us now look at Position 1.3. The black king has clearly reached the square. Now the pawn can promote only with the aid of the king. The easiest way is by blocking the enemy king's way.\nThis concept of blocking appears very often in pawn endings, but also in many others, and it is at the core of Rook vs. Pawn endings.\nWe can now state the second rule, which works with almost all pawns, the exception being the rook's pawn."
+  },
+  {
+    "type": "panel",
+    "content": {
+      "text": "When possible, the stronger side's king will prevent its rival from standing in front of the pawn. If he succeeds, the pawn promotes."
+    }
   },
   {
     "type": "position",
@@ -111,7 +117,17 @@
   },
   {
     "type": "text",
-    "content": "This is the first important pattern we must recognise.\n2.f7+\nHere the pawn moves ahead but cannot promote. Anyway, other moves would not win against an accurate defence. For instance: 2. Kg5 Kf7! (2... Kf8 is also good).\nThe safest way for the defender is to stay on the two squares available in front of the pawn. This fortress cannot be broken. If you have not done this before, it is worth observing and analysing this simple sequence: 3. Kf5 Kf8! (staying in front of the pawn is always the simplest way) 4. Kf4 Kf7! 5. Kf5 Kf8 6. Ke6 (if the defending king has always waited in front of the pawn, it is possible to get the opposition now that the enemy king must retreat from that file) 6... Ke8! 7.f7+ Kf8\n8. Kf6 stalemate, as in the main line.\n2... Kf8!\nIn contrast with Position 1.4, White is to move and to prevent the loss of the pawn,\nhe must stalemate Black's king.\n3. Kf6 and draw by stalemate.\nIn this ending we have seen that, if the defending king takes the opposition when the pawn is on the 6th rank, the pawn cannot promote. If we go deeper, we also see that the major obstacle for the white king has been his own pawn. Therefore, we can conclude that:\n1) The stronger side must not push the pawn too quickly.\n2) The pawn should only reach the 6th rank in one of these two scenarios:\na) its path to promotion is clear, or b) its advance causes the kings to be opposed (but usually this only happens when the king has reached the\n6th rank before the pawn)\nLet us have a look at two more positions to consolidate some ideas related to the\n6th-rank opposition. Then, our next positions will focus on how to manoeuvre before the pawn reaches the 6th rank."
+    "content": "This is the first important pattern we must recognise.\n2.f7+\nHere the pawn moves ahead but cannot promote. Anyway, other moves would not win against an accurate defence. For instance: 2. Kg5 Kf7! (2... Kf8 is also good).\nThe safest way for the defender is to stay on the two squares available in front of the pawn. This fortress cannot be broken. If you have not done this before, it is worth observing and analysing this simple sequence: 3. Kf5 Kf8! (staying in front of the pawn is always the simplest way) 4. Kf4 Kf7! 5. Kf5 Kf8 6. Ke6 (if the defending king has always waited in front of the pawn, it is possible to get the opposition now that the enemy king must retreat from that file) 6... Ke8! 7.f7+ Kf8\n8. Kf6 stalemate, as in the main line.\n2... Kf8!\nIn contrast with Position 1.4, White is to move and to prevent the loss of the pawn,\nhe must stalemate Black's king.\n3. Kf6 and draw by stalemate.\nIn this ending we have seen that, if the defending king takes the opposition when the pawn is on the 6th rank, the pawn cannot promote. If we go deeper, we also see that the major obstacle for the white king has been his own pawn. Therefore, we can conclude that:"
+  },
+  {
+    "type": "panel",
+    "content": {
+      "text": "1) The stronger side must not push the pawn too quickly.\n2) The pawn should only reach the 6th rank in one of these two scenarios:\na) its path to promotion is clear, or b) its advance causes the kings to be opposed (but usually this only happens when the king has reached the\n6th rank before the pawn)"
+    }
+  },
+  {
+    "type": "text",
+    "content": "Let us have a look at two more positions to consolidate some ideas related to the\n6th-rank opposition. Then, our next positions will focus on how to manoeuvre before the pawn reaches the 6th rank."
   },
   {
     "type": "position",
@@ -368,7 +384,13 @@
   },
   {
     "type": "text",
-    "content": "The ending Rook vs. Bishop is usually a draw. However, the defender has to be careful with some positions when the king is pushed to the edge of the board. This is especially dangerous when the king is pushed to the wrong corner.\nIn a Rook vs. Bishop ending, the wrong corner is the corner of the same colour as the squares on which the bishop moves."
+    "content": "The ending Rook vs. Bishop is usually a draw. However, the defender has to be careful with some positions when the king is pushed to the edge of the board. This is especially dangerous when the king is pushed to the wrong corner."
+  },
+  {
+    "type": "panel",
+    "content": {
+      "text": "In a Rook vs. Bishop ending, the wrong corner is the corner of the same colour as the squares on which the bishop moves."
+    }
   },
   {
     "type": "position",

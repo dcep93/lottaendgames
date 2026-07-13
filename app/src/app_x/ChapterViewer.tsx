@@ -350,6 +350,7 @@ export default function ChapterViewer() {
             chapters={chapterTabs}
             label="Top chapter selector"
             onSelect={handleChapterSelect}
+            variant="contents"
           />
           {activeChapter ? (
             <div className="leg-reader-meta" aria-label="Chapter summary">
@@ -419,6 +420,7 @@ export default function ChapterViewer() {
             chapters={chapterTabs}
             label="Bottom chapter selector"
             onSelect={handleChapterSelect}
+            variant="compact"
           />
         ) : null}
       </div>
@@ -461,7 +463,7 @@ export function ProblemStudyGroup({
       aria-labelledby={`problem-${number}-heading`}
       className="leg-position-study leg-test-problem"
     >
-      <div className="leg-position-study-board">
+      <div className="leg-position-study-header">
         <PositionCard
           activeBoard={revealed ? activeBoards[number] : undefined}
           activePositionNumber={activePositionNumber}
@@ -507,7 +509,7 @@ export function ProblemStudyGroup({
   )
 }
 
-function PositionStudyGroup({
+export function PositionStudyGroup({
   activeBoards,
   activePositionNumber,
   group,
@@ -538,7 +540,7 @@ function PositionStudyGroup({
       }
       aria-labelledby={`position-${positionNumber}-heading`}
     >
-      <div className="leg-position-study-board">
+      <div className="leg-position-study-header">
         <PositionCard
           activeBoard={activeBoards[positionNumber]}
           activePositionNumber={activePositionNumber}
@@ -573,19 +575,24 @@ function PositionStudyGroup({
   )
 }
 
-function ChapterSelector({
+export function ChapterSelector({
   activeChapterId,
   chapters,
   label,
   onSelect,
+  variant,
 }: {
   activeChapterId: string
-  chapters: Array<{ id: string; label: string }>
+  chapters: Array<{ id: string; label: string; name: string }>
   label: string
   onSelect: (chapterId: string) => void
+  variant: 'compact' | 'contents'
 }) {
   return (
-    <nav aria-label={label} className="leg-chapter-selector">
+    <nav
+      aria-label={label}
+      className={`leg-chapter-selector is-${variant}`}
+    >
       {chapters.map((chapter) => (
         <button
           aria-current={chapter.id === activeChapterId ? 'page' : undefined}
@@ -599,7 +606,14 @@ function ChapterSelector({
           onClick={() => onSelect(chapter.id)}
           type="button"
         >
-          {chapter.label}
+          {variant === 'contents' ? (
+            <span className="leg-chapter-row">
+              <span className="leg-chapter-number">{chapter.label}</span>
+              <span className="leg-chapter-name">{chapter.name}</span>
+            </span>
+          ) : (
+            chapter.label
+          )}
         </button>
       ))}
     </nav>

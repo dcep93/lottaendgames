@@ -91,6 +91,10 @@
     "content": "3...Kxh1\n\n3...Ng2+ 4.Ke2 Nf4+ 5.Ke1= does not work either. Now the black king cannot leave the corner due to the knight's inherent inability to lose time. But where do we move the white king now? There is a rule to simplify our calculation: we must move the king to a square of the same colour as the knight; thus the knight will be able to check the king, but not to control the opposite-coloured square.\n\n4.Kf2!\n\nNow the black king is trapped. Instead, 4.Kf1? Nf5 5.Kf2 Ng3-+ leads to a quick zugzwang.\n\n4...Nf3 5.Kf1 Nd2+ 6.Kf2 Ne4+ 7.Kf1 1/2-1/2\n\nA brilliant and impressive study by Sam Lloyd which can make us wrongly think that this ending is always a draw with a rook's pawn. This is only true when the defending king is close enough."
   },
   {
+    "type": "text",
+    "content": "Let us have a look at the following example:"
+  },
+  {
     "type": "position",
     "content": {
       "number": "8.5",
@@ -180,6 +184,10 @@
   {
     "type": "text",
     "content": "1.Kc7!\n\nParrying the drawing threat. An immediate attack on the knight, 1.Bd5?, would be a big mistake: 1...Nd6+ 2.Kc7 Ne8+ 3.Kc8 Nd6+=. Apart from the text move, only 1.Bc6! wins, preventing checks on e8 and b5.\n\n1...Nd8 2.Bd5+-\n\nZugzwang leads to the immediate loss of the knight."
+  },
+  {
+    "type": "text",
+    "content": "Recommended Exercise: Look carefully at the following series about knight blockade and check their statements. This will help you fix your knowledge of these positions."
   },
   {
     "type": "heading",

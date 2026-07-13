@@ -1,11 +1,82 @@
 import assert from 'node:assert/strict'
 import { renderToStaticMarkup } from 'react-dom/server'
-import { PanelBlock, ProblemStudyGroup, ProseBlock } from './ChapterViewer'
-import type { PanelSection, ProblemSection } from './chapterTypes'
+import {
+  ChapterSelector,
+  PanelBlock,
+  PositionStudyGroup,
+  ProblemStudyGroup,
+  ProseBlock,
+} from './ChapterViewer'
+import type {
+  PanelSection,
+  PositionSection,
+  ProblemSection,
+  RawChapterSection,
+} from './chapterTypes'
 import type { TextPlaybackToken } from './moveParser'
 
 const activeBoards = {}
 const onMoveClick = () => undefined
+
+const chapterChoices = [
+  { id: '1', label: 'Chapter 1', name: 'Basic endings' },
+  { id: '2', label: 'Chapter 2', name: 'Basic Test' },
+]
+const contentsMarkup = renderToStaticMarkup(
+  <ChapterSelector
+    activeChapterId="1"
+    chapters={chapterChoices}
+    label="Contents"
+    onSelect={() => undefined}
+    variant="contents"
+  />,
+)
+assert.match(contentsMarkup, /leg-chapter-selector is-contents/)
+assert.match(contentsMarkup, /leg-chapter-row/)
+assert.match(contentsMarkup, />Chapter 1</)
+assert.match(contentsMarkup, />Basic endings</)
+
+const compactSelectorMarkup = renderToStaticMarkup(
+  <ChapterSelector
+    activeChapterId="1"
+    chapters={chapterChoices}
+    label="Chapters"
+    onSelect={() => undefined}
+    variant="compact"
+  />,
+)
+assert.match(compactSelectorMarkup, /leg-chapter-selector is-compact/)
+assert.doesNotMatch(compactSelectorMarkup, /Basic endings/)
+
+const positionSection: PositionSection = {
+  content: {
+    fen: '6k1/8/8/8/8/8/P7/7K w - - 0 1',
+    number: '1.1',
+    subtitle: 'A sample position',
+  },
+  type: 'position',
+}
+const positionStudyMarkup = renderToStaticMarkup(
+  <PositionStudyGroup
+    activeBoards={activeBoards}
+    activePositionNumber={null}
+    group={{ contentIndexes: [1], index: 0, type: 'positionGroup' }}
+    navigationByPosition={new Map()}
+    onMoveClick={onMoveClick}
+    onPositionReset={() => undefined}
+    playback={{ playablePositions: new Set(), tokensBySectionIndex: new Map() }}
+    sections={[
+      positionSection,
+      { content: 'Associated prose.', type: 'text' },
+    ] as RawChapterSection[]}
+  />,
+)
+assert.match(positionStudyMarkup, /leg-position-study-header/)
+assert.match(positionStudyMarkup, /leg-position-study-content/)
+assert.ok(
+  positionStudyMarkup.indexOf('leg-position-study-header') <
+    positionStudyMarkup.indexOf('leg-position-study-content'),
+)
 
 const proseMarkup = renderToStaticMarkup(
   <ProseBlock
@@ -106,6 +177,8 @@ const problemProps = {
 const hiddenProblemMarkup = renderToStaticMarkup(
   <ProblemStudyGroup {...problemProps} revealed={false} />,
 )
+assert.match(hiddenProblemMarkup, /leg-position-study-header/)
+assert.match(hiddenProblemMarkup, /leg-position-study-content/)
 assert.match(hiddenProblemMarkup, /aria-expanded="false"/)
 assert.match(hiddenProblemMarkup, />Show solution<\/button>/)
 assert.match(hiddenProblemMarkup, /data-playable="false"/)

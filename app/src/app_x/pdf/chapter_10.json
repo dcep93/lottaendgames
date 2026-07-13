@@ -285,16 +285,11 @@
     "content": "6.e7! Rb8+ (6...Re7?! 7.Rf1+) 7.Kc7 Re8 8.Kd6! Rb8 9.Rf1+ Kg7 10.Kc7\nRa8 11.Ra1! Re8 12.Kd7+-.\n6.Kc7 Rb2 7.Re1!\nSecuring promotion, which would not happen with the black king on g7. 7...Rc2+ 8.Kd7 Rd2+ 9.Ke8 Ra2\n9...Kg7 10.e7+- Lucena.\n10.e7+-\nWinning as in the Lucena Position."
   },
   {
-    "type": "heading",
-    "content": "Summary of section"
-  },
-  {
-    "type": "text",
-    "content": "This section deals with those positions where the pawn has crossed the mid-line of the board and the defending side cannot reach the Philidor Position.\nA) If the defending king stands in front of the pawn, there are drawing chances even though the Philidor Position is out of reach. However, you must remember that rules for the central and bishop's pawn do not apply to the knight's pawn. In the latter case, passive back-rank defence is the only option. Against a central pawn, the drawing technique is K&H."
-  },
-  {
-    "type": "text",
-    "content": "B) If the defending king cannot stand in front of the pawn, the only valid method\n(apart from a few exceptional positions) involves transferring the rook to the long side so that it has distant effectiveness.\nDepending on how advanced the pawn is, the defending side will have more or less time to arrange the ideal set-up for his pieces:\n1) Against a pawn on the 7th rank, the defending rook has to deliver checks that cannot be covered by its counterpart.\n2) Against a pawn on the 6th rank, distant effectiveness is enough; in some cases,\nthe rook must not leave the back rank.\n3) Against a pawn on the 5th rank there are more chances for the defender to get distant effectiveness, but difficulties may arise if the key file is under control of the enemy rook.\nNow you can read again the sentence that introduced this section, which is an extremely concise summary of the study of all these positions. This idea alone may serve us to find our way through these endings, and clear guidelines are the basis of correct choices."
+    "type": "panel",
+    "content": {
+      "title": "Summary of section",
+      "text": "This section deals with those positions where the pawn has crossed the mid-line of the board and the defending side cannot reach the Philidor Position.\nA) If the defending king stands in front of the pawn, there are drawing chances even though the Philidor Position is out of reach. However, you must remember that rules for the central and bishop's pawn do not apply to the knight's pawn. In the latter case, passive back-rank defence is the only option. Against a central pawn, the drawing technique is K&H.\nB) If the defending king cannot stand in front of the pawn, the only valid method\n(apart from a few exceptional positions) involves transferring the rook to the long side so that it has distant effectiveness.\nDepending on how advanced the pawn is, the defending side will have more or less time to arrange the ideal set-up for his pieces:\n1) Against a pawn on the 7th rank, the defending rook has to deliver checks that cannot be covered by its counterpart.\n2) Against a pawn on the 6th rank, distant effectiveness is enough; in some cases,\nthe rook must not leave the back rank.\n3) Against a pawn on the 5th rank there are more chances for the defender to get distant effectiveness, but difficulties may arise if the key file is under control of the enemy rook.\nNow you can read again the sentence that introduced this section, which is an extremely concise summary of the study of all these positions. This idea alone may serve us to find our way through these endings, and clear guidelines are the basis of correct choices."
+    }
   },
   {
     "type": "heading",
@@ -502,12 +497,11 @@
     "content": "Other moves do not bring anything either: 2.Kd4 Ka4+ 3.Ke5 Ka5+ 4.Kf6 Ka6+\n5.Kf7 Ka4=; 2.Kf7 Ka3+ 3.Kd4 Ka4+ 4.Kd5 Ka5+ 5.Kd6 Ka6+ 6.Kc5 Ka5+=.\n2.Rd8 3.Rd5 Ra8 4.Kd4 Kf4. The easiest way: the black king approaches the pawn.\n5.Rf5+ Kg4=\nWhite has to allow ...Kf5 or suffer checks from the black rook."
   },
   {
-    "type": "heading",
-    "content": "Summary: cutting the king off along a rank"
-  },
-  {
-    "type": "text",
-    "content": "The defending king can only be cut off along a rank on the long side. In other cases,\nthe position is not dangerous if the defending rook occupies the long side.\nThe cut is perfect if the defending king stands on the same rank as the pawn, and imperfect if the defending king is one rank ahead of the pawn.\nIn the Perfect Cut scenario, the ending is always won with a knight's or a bishop's pawn, even if the pawn is still on the 2nd rank. To win with a central pawn, the pawn must be at least on the 4th rank.\nIn the Imperfect Cut scenario, the ending is drawn if the defending rook occupies the file adjacent to the pawn. Besides, more defensive resources are available against a central pawn."
+    "type": "panel",
+    "content": {
+      "title": "Summary: cutting the king off along a rank",
+      "text": "The defending king can only be cut off along a rank on the long side. In other cases,\nthe position is not dangerous if the defending rook occupies the long side.\nThe cut is perfect if the defending king stands on the same rank as the pawn, and imperfect if the defending king is one rank ahead of the pawn.\nIn the Perfect Cut scenario, the ending is always won with a knight's or a bishop's pawn, even if the pawn is still on the 2nd rank. To win with a central pawn, the pawn must be at least on the 4th rank.\nIn the Imperfect Cut scenario, the ending is drawn if the defending rook occupies the file adjacent to the pawn. Besides, more defensive resources are available against a central pawn."
+    }
   },
   {
     "type": "heading",
@@ -603,12 +597,11 @@
     "content": "1.Rh2!\nOnce the pawn has reached the 7th rank, the rook heads for the b8-square. The journey takes three moves, no matter the chosen route. The defending king has to stay on the 2nd rank, as the white rook would get to b8 in just two moves with the black king on the 3rd rank, thus winning even if the black king was one file closer to the pawn.\n1...Ke7 2.Rh8 Kd6!?\nA good move, trying to make it difficult for the white king to get out via the a- and b-files. 2...Kd7 loses faster: 3.Rb8 Ra1 4.Kb7! (4.Rb7+? Kc8= and the white king will not come out of the corner. If you do not know this position, it is worth trying different alternatives, as you may reach this ending in your (blitz) games;\n5.Rb2 Kc7 6.Rc2+ Kd7 7.Kb7 Rb1+ 8.Ka6 Ra1+ 9.Kb6 Rb1+ 10.Kc5 Ra1=)\n4...Rb1+ 5.Ka6 Ra1+ 6.Kb6 Rb1+ 7.Kc5+-.\n3.Rb8\nThe rook arrives just in time to offer an exchange and help the white king out,\nwhich would be impossible if the black king were on c6 or c7. 3...Ra1 4.Kb7 Rb1+ 5.Kc8!\n5.Ka6 Ra1 6.Kb6 Rb1+ 7.Ka5 Ra1+ and White will not make progress here.\n5...Rc1+ 6.Kd8 Rh1!\nThis resource creates the maximum difficulties. In case of 6...Rg1 the rook is not far enough away: 7.Ke8! Rg8+ 8.Kf7+-.\n7.Rb6+!\nThe only way. 7.Ke8? Rh8+ 8.Kf7 Rh7+ = and the pawn is lost; or 7.Kc8 Rc1+\nrepeating.\n7...Kc5 8.Rc6+!!\nThis check is necessary to force the king to choose. 8.Ra6? Rh8+ 9.Kc7 Rh7+\n10.Kd8 Rh8+ 11.Ke7 Rh7+ 12.Kf8 Kh8+ 13.Kf7 Ka8! 14.Ke7 Kb5 15.Ra1\nKb6=; 5.Rb5? Rh8+ 9.Kc7 Rh7+ =; 5.Rb1!? would also win, but then a Queen vs. Rook ending arises. 8...Rxb1 9.a8=Q+-.\n8...Kb5\n8...Kd5 9.Ra6 (9.Rc8 Kd6) 9...Rh8+ 10.Kc7! (10.Ke7?! Rh7+! 11.Kf8 Rh8+\n12.Kg7? Ra8=) 10...Rh7+ 11.Kb6+-.\n9.Rc8! Rh8+ 10.Kc7 Rh7+ 11.Kb8\nAnd the pawn promotes."
   },
   {
-    "type": "heading",
-    "content": "Summary of the ideas in this ending for the strong side"
-  },
-  {
-    "type": "text",
-    "content": "1) When the king is in front of his pawn, the enemy king must remain cut off as far from the pawn as possible.\n2) If the weaker side's king is cut off on the f-file (or c-file for an h-pawn), the winning plan is to push the pawn to the 7th rank and then take the king out of the corner with the aid of the rook."
+    "type": "panel",
+    "content": {
+      "title": "Summary of the ideas in this ending for the strong side",
+      "text": "1) When the king is in front of his pawn, the enemy king must remain cut off as far from the pawn as possible.\n2) If the weaker side's king is cut off on the f-file (or c-file for an h-pawn), the winning plan is to push the pawn to the 7th rank and then take the king out of the corner with the aid of the rook."
+    }
   },
   {
     "type": "ending",

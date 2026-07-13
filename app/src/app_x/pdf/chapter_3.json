@@ -42,7 +42,14 @@
   },
   {
     "type": "text",
-    "content": "As shown by analysis, if we can choose we must control the pawn from the rank, or,\nto provide a graphic idea, to control the pawn from the side rather than from the rear.\nIn the diagram position, the knight must be transferred to the second rank, so that it can enter two circuits: one to stop the pawn and the other to capture the pawn. In this case, e2-c3-a2 or e2-d4-b3-c1.\n1. Ne2+!\nThe right move. As we said, the knight is transferred to a side of the pawn. The alternative was losing: 1. Nd3+?? Kd2! and the knight is driven off the right circuit,\nafter which the pawn promotes. The last try is 2. Nc5!?, a typical calculation mistake in this ending. We may have thought that this move is enough to draw, but this is an illusion. 2... Kc3! Avoiding the trick, threatening to promote the pawn and controlling both 'good' squares for the knight (d3 and b3). 3. Ne4+ Kd3. Any legal move would win now, but this is the shortest way to put an end to the knight's kicking. 4. Nc5+ Kc4 and the pawn promotes.\n1...Kd2. This allows a draw straight away, but in case of 1. Kd1, the knight could get to its ideal square to control the pawn from the other side (here, the a2-square):\n2. Nc3+! Kd2 3. Na2=; other king moves pose no problems for White.\n2. Nd4! c1=Q 3. Nb3+=\n\nConclusion: Against a 7th-rank pawn on any of the 4 central files:\n1) If the knight can stand in front of the pawn, it is a draw.\n2) If not, the knight must at least 'laterally' control the promotion square to draw.\n3) If the knight can neither stand in front of the pawn nor\n'laterally' control the promotion square from the same rank on which the pawn stands, the pawn promotes."
+    "content": "As shown by analysis, if we can choose we must control the pawn from the rank, or,\nto provide a graphic idea, to control the pawn from the side rather than from the rear.\nIn the diagram position, the knight must be transferred to the second rank, so that it can enter two circuits: one to stop the pawn and the other to capture the pawn. In this case, e2-c3-a2 or e2-d4-b3-c1.\n1. Ne2+!\nThe right move. As we said, the knight is transferred to a side of the pawn. The alternative was losing: 1. Nd3+?? Kd2! and the knight is driven off the right circuit,\nafter which the pawn promotes. The last try is 2. Nc5!?, a typical calculation mistake in this ending. We may have thought that this move is enough to draw, but this is an illusion. 2... Kc3! Avoiding the trick, threatening to promote the pawn and controlling both 'good' squares for the knight (d3 and b3). 3. Ne4+ Kd3. Any legal move would win now, but this is the shortest way to put an end to the knight's kicking. 4. Nc5+ Kc4 and the pawn promotes.\n1...Kd2. This allows a draw straight away, but in case of 1. Kd1, the knight could get to its ideal square to control the pawn from the other side (here, the a2-square):\n2. Nc3+! Kd2 3. Na2=; other king moves pose no problems for White.\n2. Nd4! c1=Q 3. Nb3+="
+  },
+  {
+    "type": "panel",
+    "content": {
+      "title": "Conclusion",
+      "text": "Against a 7th-rank pawn on any of the 4 central files:\n1) If the knight can stand in front of the pawn, it is a draw.\n2) If not, the knight must at least 'laterally' control the promotion square to draw.\n3) If the knight can neither stand in front of the pawn nor\n'laterally' control the promotion square from the same rank on which the pawn stands, the pawn promotes."
+    }
   },
   {
     "type": "ending",
@@ -64,7 +71,14 @@
   },
   {
     "type": "text",
-    "content": "1...b2!\nA superb move, very easy to find if we know that, when facing a 7th-rank knight's pawn, the knight cannot succeed unless it stands in front of the pawn.\nThe idea of 1... Kc2? is very logical: to prevent the knight from coming close to the pawn. However, this is an instructive mistake which is worth analysing: what if the knight moves in front of the pawn? 2. Nd6! An important tactical subtlety, hindering the immediate advance of the pawn. The knight moves temporarily away from the pawn: this is a common device in this kind of struggle. 2... Kc3 (2...b2\n3. Nc4=; 2... Kd3 3. Nb5 followed by Na3 - draw) 3. Ne4+ Kd4 (in the event of\n3... Kd3, White gives up his knight for the pawn straight away; 3... Kc2 is just a repetition). 4. Nd2 b2 5. Nb1. Now the knight is in front of the pawn and we will see that it is a draw, despite the fact that its mobility is reduced compared to previous endings against central pawns. 5... Kd3 6. Kg2 Kc2 7. Na3+ Kb3 8. Nb1=.\nThe blockade cannot be lifted.\n\n2. Nd2+\n2. Nc3+ loses in the same fashion as against central pawns: 2... Kc2 3. Nb5 Kb3\n4. Nd4+ Kc3 5. Nb5+ Kb4-+.\n2... Kc1!\nThis is the point! Against a knight's pawn, there is no 'good square' on the other side of the pawn.\n3. Nb3+ Kd1 and the pawn promotes.\nConclusion: Against a 7th-rank knight's pawn:\n1) If the knight can stand in front of the pawn, it is a draw.\n2) If not, the pawn promotes."
+    "content": "1...b2!\nA superb move, very easy to find if we know that, when facing a 7th-rank knight's pawn, the knight cannot succeed unless it stands in front of the pawn.\nThe idea of 1... Kc2? is very logical: to prevent the knight from coming close to the pawn. However, this is an instructive mistake which is worth analysing: what if the knight moves in front of the pawn? 2. Nd6! An important tactical subtlety, hindering the immediate advance of the pawn. The knight moves temporarily away from the pawn: this is a common device in this kind of struggle. 2... Kc3 (2...b2\n3. Nc4=; 2... Kd3 3. Nb5 followed by Na3 - draw) 3. Ne4+ Kd4 (in the event of\n3... Kd3, White gives up his knight for the pawn straight away; 3... Kc2 is just a repetition). 4. Nd2 b2 5. Nb1. Now the knight is in front of the pawn and we will see that it is a draw, despite the fact that its mobility is reduced compared to previous endings against central pawns. 5... Kd3 6. Kg2 Kc2 7. Na3+ Kb3 8. Nb1=.\nThe blockade cannot be lifted.\n\n2. Nd2+\n2. Nc3+ loses in the same fashion as against central pawns: 2... Kc2 3. Nb5 Kb3\n4. Nd4+ Kc3 5. Nb5+ Kb4-+.\n2... Kc1!\nThis is the point! Against a knight's pawn, there is no 'good square' on the other side of the pawn.\n3. Nb3+ Kd1 and the pawn promotes."
+  },
+  {
+    "type": "panel",
+    "content": {
+      "title": "Conclusion",
+      "text": "Against a 7th-rank knight's pawn:\n1) If the knight can stand in front of the pawn, it is a draw.\n2) If not, the pawn promotes."
+    }
   },
   {
     "type": "ending",
@@ -103,7 +117,14 @@
   },
   {
     "type": "text",
-    "content": "1. Ng4+!\nThe knight enters the right circuit.\n1. Nc4 draws as well, thanks to a small tactical device. It is worth noting it due to its paradoxical nature: in the starting position, White draws with the knight on e5, far from the pawn, but not with the knight on h4, close to the pawn. A series of checks helps the knight cross the board at great speed, but to do so the knight needs to find the right circuit: that is impossible starting from h4. 1...Kg2 (1...Kg1 2.Ne5! The point! Now the pawn cannot advance and the knight reaches g4: 2...Kf1 3.Ng4!=; 1...Kg3 2. Ne3=) 2. Ne3+=.\nThe obvious 1.Nf3+? fails. Here the knight enters a bad circuit and eventually is expelled. 1... Kg2 2. Nh4+ (2. Ne1+ Kg3-+) 2... Kf2-+ and the pawn promotes.\n1... Kg3 2. Ne3 Kf3 3. Nf1 Kf2 4. Nh2\nThe knight remains inside the right circuit, that is, h2-f1-e3-g4 and the black king cannot drive it away. Draw.\nConclusion: The knight draws against a 6th-rank rook's pawn if it can stand in front of it. If the knight just controls the pawn's path, it needs to enter the right circuit to draw, that is, for the h1-corner, g4-e3-f1. From the f3-square, the knight fails."
+    "content": "1. Ng4+!\nThe knight enters the right circuit.\n1. Nc4 draws as well, thanks to a small tactical device. It is worth noting it due to its paradoxical nature: in the starting position, White draws with the knight on e5, far from the pawn, but not with the knight on h4, close to the pawn. A series of checks helps the knight cross the board at great speed, but to do so the knight needs to find the right circuit: that is impossible starting from h4. 1...Kg2 (1...Kg1 2.Ne5! The point! Now the pawn cannot advance and the knight reaches g4: 2...Kf1 3.Ng4!=; 1...Kg3 2. Ne3=) 2. Ne3+=.\nThe obvious 1.Nf3+? fails. Here the knight enters a bad circuit and eventually is expelled. 1... Kg2 2. Nh4+ (2. Ne1+ Kg3-+) 2... Kf2-+ and the pawn promotes.\n1... Kg3 2. Ne3 Kf3 3. Nf1 Kf2 4. Nh2\nThe knight remains inside the right circuit, that is, h2-f1-e3-g4 and the black king cannot drive it away. Draw."
+  },
+  {
+    "type": "panel",
+    "content": {
+      "title": "Conclusion",
+      "text": "The knight draws against a 6th-rank rook's pawn if it can stand in front of it. If the knight just controls the pawn's path, it needs to enter the right circuit to draw, that is, for the h1-corner, g4-e3-f1. From the f3-square, the knight fails."
+    }
   },
   {
     "type": "ending",
@@ -208,7 +229,14 @@
   },
   {
     "type": "text",
-    "content": "Here appears a different barrier, the most troublesome for Black given his king's position. Once again, the core of the barrier is L-shaped (the e5-, e4-, e3- and d3-squares). (2. Ng3? loses to 2... Ke5! 3. Kc6 Kf4 4. Nh1 Kf3-+ 5. Kd5 Kg2\n6. Ke4 and the white king will not get to the f2-square) 2... Kc3 the king starts going round the barrier. 3. Kd6 Kd2 4. Ke5 Ke2 5. Nh1 Kf3 6. Kd4 Kg2 7. Ke3\nKxh1 8. Kf2=\n2. Ng3! (2. Nf2? Kd2-+) 2... Kd1 3. Kd6 Ke1 4. Ke5 Kf2 5. Kf4=\nConclusion: The knight alone cannot stop a 7th-rank rook's pawn. However, its ability to set up a barrier can be enough to hold out while waiting for the king's aid,\nassuming the white king is close enough."
+    "content": "Here appears a different barrier, the most troublesome for Black given his king's position. Once again, the core of the barrier is L-shaped (the e5-, e4-, e3- and d3-squares). (2. Ng3? loses to 2... Ke5! 3. Kc6 Kf4 4. Nh1 Kf3-+ 5. Kd5 Kg2\n6. Ke4 and the white king will not get to the f2-square) 2... Kc3 the king starts going round the barrier. 3. Kd6 Kd2 4. Ke5 Ke2 5. Nh1 Kf3 6. Kd4 Kg2 7. Ke3\nKxh1 8. Kf2=\n2. Ng3! (2. Nf2? Kd2-+) 2... Kd1 3. Kd6 Ke1 4. Ke5 Kf2 5. Kf4="
+  },
+  {
+    "type": "panel",
+    "content": {
+      "title": "Conclusion",
+      "text": "The knight alone cannot stop a 7th-rank rook's pawn. However, its ability to set up a barrier can be enough to hold out while waiting for the king's aid,\nassuming the white king is close enough."
+    }
   },
   {
     "type": "heading",

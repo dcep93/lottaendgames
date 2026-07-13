@@ -105,7 +105,14 @@
   },
   {
     "type": "text",
-    "content": "Despite having a brand new queen and the move, White cannot avoid being checkmated because his royal couple is poorly placed.\nConclusion: In order to win against a 7th-rank rook's pawn, the strong king must be just two steps away from any of the two key squares (here f7 or g6)."
+    "content": "Despite having a brand new queen and the move, White cannot avoid being checkmated because his royal couple is poorly placed."
+  },
+  {
+    "type": "panel",
+    "content": {
+      "title": "Conclusion",
+      "text": "In order to win against a 7th-rank rook's pawn, the strong king must be just two steps away from any of the two key squares (here f7 or g6)."
+    }
   },
   {
     "type": "ending",
@@ -169,7 +176,14 @@
   },
   {
     "type": "text",
-    "content": "1... Qa7! 2. Kh8 (2. Kg8 is the same) 2... Kg6 3.f8Q\nNow the black queen checkmates, but it has to be on this move, because the white queen is not restricted by the edge of the board anymore. Therefore, the stronger side's king has just one move to reach the key square g6.\nThere is another winning position, when the stronger side's king can hinder promotion with just one move (that is, from the e7-square).\n3... Qh7 mate\n\nConclusion: In order to win against a 7th-rank bishop's pawn, when the defending king is on the 'right side' (near the corner), the stronger side's king must be one step away from one of the two key squares, g6 or e7."
+    "content": "1... Qa7! 2. Kh8 (2. Kg8 is the same) 2... Kg6 3.f8Q\nNow the black queen checkmates, but it has to be on this move, because the white queen is not restricted by the edge of the board anymore. Therefore, the stronger side's king has just one move to reach the key square g6.\nThere is another winning position, when the stronger side's king can hinder promotion with just one move (that is, from the e7-square).\n3... Qh7 mate"
+  },
+  {
+    "type": "panel",
+    "content": {
+      "title": "Conclusion",
+      "text": "In order to win against a 7th-rank bishop's pawn, when the defending king is on the 'right side' (near the corner), the stronger side's king must be one step away from one of the two key squares, g6 or e7."
+    }
   },
   {
     "type": "position",
@@ -217,7 +231,14 @@
   },
   {
     "type": "text",
-    "content": "When the king is inside the winning zone, but two steps away from d7, we must play carefully to prevent the enemy king from reaching the right side without losing tempi.\n1... Qa3+!\n\nActually other checks are also winning, but then accuracy is needed on the next move. For instance: 1...Qa7+ 2. Kf8 (2. Kf6 Qd4+!) and now only 2... Qg1 works.\n2. Ke8\n2. Kf6 Qf8-+ is just too easy.\n2... Qa8+ 3. Ke7 Qe4+! 4. Kf8\nTrying to make it to the other side. 4. Kf6 Kd4+ 5. Ke7 Qg7 6. Ke8 Kc6-+.\n4... Qh7!\nThough the enemy king is in front of the pawn, we must not hurry to bring our king closer. Now our goal is to hinder the enemy king's route to the 'right side'.\n4... Kc6? 5. Kg7 and it is easy to see that, since the black king is more than one step away from e7 or g6, the position is drawn.\n5. Ke8\nThe white king is on the fatal square and the black queen can reach d7 in one move;\ntherefore, it is time to bring the king closer.\n5... Kc6! 6.f8Q Qd7 mate\nConclusion: When fighting against a 7th-rank bishop's pawn with the defending king on the wrong side of the pawn, the queen wins if her king is just two steps away from one of the two key squares (here, d7 and g6)."
+    "content": "When the king is inside the winning zone, but two steps away from d7, we must play carefully to prevent the enemy king from reaching the right side without losing tempi.\n1... Qa3+!\n\nActually other checks are also winning, but then accuracy is needed on the next move. For instance: 1...Qa7+ 2. Kf8 (2. Kf6 Qd4+!) and now only 2... Qg1 works.\n2. Ke8\n2. Kf6 Qf8-+ is just too easy.\n2... Qa8+ 3. Ke7 Qe4+! 4. Kf8\nTrying to make it to the other side. 4. Kf6 Kd4+ 5. Ke7 Qg7 6. Ke8 Kc6-+.\n4... Qh7!\nThough the enemy king is in front of the pawn, we must not hurry to bring our king closer. Now our goal is to hinder the enemy king's route to the 'right side'.\n4... Kc6? 5. Kg7 and it is easy to see that, since the black king is more than one step away from e7 or g6, the position is drawn.\n5. Ke8\nThe white king is on the fatal square and the black queen can reach d7 in one move;\ntherefore, it is time to bring the king closer.\n5... Kc6! 6.f8Q Qd7 mate"
+  },
+  {
+    "type": "panel",
+    "content": {
+      "title": "Conclusion",
+      "text": "When fighting against a 7th-rank bishop's pawn with the defending king on the wrong side of the pawn, the queen wins if her king is just two steps away from one of the two key squares (here, d7 and g6)."
+    }
   },
   {
     "type": "ending",

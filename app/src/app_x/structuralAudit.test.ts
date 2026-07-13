@@ -6,6 +6,15 @@ import type { RawChapterSection } from './chapterTypes'
 
 type StructureAudit = {
   chapterSpilloversRemoved: string[]
+  countsByChapter: Record<
+    string,
+    {
+      headings: number
+      panels: number
+      positions: number
+      subtitles: number
+    }
+  >
   endingBoundaries: Array<{
     chapter: string
     ending: string
@@ -61,6 +70,25 @@ for (const chapter of payload.chapters) {
     `Chapter ${chapter.id} source still contains a moves section`,
   )
 
+  const expectedCounts = structureAudit.countsByChapter[chapter.id]
+  if (expectedCounts) {
+    assert.deepEqual(
+      {
+        headings: sourceSections.filter(({ type }) => type === 'heading').length,
+        panels: sourceSections.filter(({ type }) => type === 'panel').length,
+        positions: sourceSections.filter(({ type }) => type === 'position').length,
+        subtitles: sourceSections.filter(
+          (section) =>
+            section.type === 'position' &&
+            isRecord(section.content) &&
+            typeof section.content.subtitle === 'string',
+        ).length,
+      },
+      expectedCounts,
+      `Chapter ${chapter.id} structure count drifted from the PDF audit`,
+    )
+  }
+
   for (const section of chapter.sections) {
     validateSection(chapter.id, section)
   }
@@ -107,7 +135,14 @@ for (const expected of structureAudit.standaloneHeadings) {
 }
 
 for (const expected of structureAudit.recoveredVectorBoxPanels) {
-  const start = normalize(expected.textStartsWith).split(' ').slice(0, 5).join(' ')
+  const expectedTitle = 'title' in expected ? expected.title ?? '' : ''
+  const normalizedTitlePrefix = normalize(`${expectedTitle}:`)
+  const normalizedExpectedText = normalize(expected.textStartsWith)
+  const start = (
+    normalizedExpectedText.startsWith(normalizedTitlePrefix)
+      ? normalizedExpectedText.slice(normalizedTitlePrefix.length).trim()
+      : normalizedExpectedText
+  ).split(' ').slice(0, 5).join(' ')
   assert.equal(
     getChapter(expected.chapter).sections.some((section) => {
       if (section.type !== 'panel' || !isRecord(section.content)) {
@@ -115,12 +150,12 @@ for (const expected of structureAudit.recoveredVectorBoxPanels) {
       }
 
       const title = typeof section.content.title === 'string'
-        ? `${section.content.title} `
+        ? section.content.title
         : ''
       const text = typeof section.content.text === 'string'
         ? section.content.text
         : ''
-      return normalize(`${title}${text}`).startsWith(start)
+      return title === expectedTitle && normalize(text).startsWith(start)
     }),
     true,
     `Expected recovered panel in chapter ${expected.chapter}: ${expected.textStartsWith}`,

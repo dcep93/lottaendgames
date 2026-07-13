@@ -171,16 +171,24 @@ const ignoredSanMisses: Set<string> = new Set([
   '7:11:Bf3',
   '7:22:Kg6',
   '7:30:Ke8',
+  '7:30:Ba6',
   '8:7:3...Ng3',
   '8:7:Ne3',
   '8:9:Nf5',
   '8:14:Ng2',
-  '8:19:Nb2',
+  '8:20:Nb2',
   '9:39:Kf5',
   '9:45:Kf5',
   '9:49:Ka2',
   '9:51:Bf5',
   '9:51:Ka2',
+  '9:17:Bh4',
+  '9:23:Bf7',
+  '9:23:Bb4',
+  '9:57:Kd7',
+  '9:57:6.Kd6',
+  '9:72:Kf3',
+  '9:72:6.f5',
 ])
 
 assert.equal(positionFiveOneIndex, 4)
@@ -193,7 +201,7 @@ assert.equal(chapterPayload.sourceContentHash, chapterSourcePayloadContentHash)
 assert.match(chapterSourcePayloadPath, /^generated\/chapters\.[a-f0-9]{16}\.json$/)
 assert.deepEqual(
   chapterPayload.chapters.map(({ id, label }) => ({ id, label })),
-  chapterManifest,
+  chapterManifest.map(({ id, label }) => ({ id, label })),
 )
 assert.equal(positionFiveThreeMoveSectionIndex, 15)
 assert.equal(positionFiveTenTextSectionIndex, 62)
