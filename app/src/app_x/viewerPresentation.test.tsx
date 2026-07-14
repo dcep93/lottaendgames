@@ -6,6 +6,7 @@ import {
   PositionStudyGroup,
   ProblemStudyGroup,
   ProseBlock,
+  ReaderMeta,
 } from './ChapterViewer'
 import InstructionalDiagram from './InstructionalDiagram'
 import TableBlock from './TableBlock'
@@ -52,7 +53,14 @@ assert.match(tableMarkup, /<caption>Endgame statistics<\/caption>/)
 assert.match(tableMarkup, /<th scope="col">Type of ending<\/th>/)
 assert.match(tableMarkup, /<th scope="row">Rooks<\/th>/)
 
+const bibliographyMetaMarkup = renderToStaticMarkup(
+  <ReaderMeta endingCount={0} positionCount={0} sectionCount={20} />,
+)
+assert.match(bibliographyMetaMarkup, />20 sections</)
+assert.doesNotMatch(bibliographyMetaMarkup, /endings|boards/)
+
 const chapterChoices = [
+  { id: 'introduction', label: 'Introduction', name: 'Introduction' },
   { id: '1', label: 'Chapter 1', name: 'Basic endings' },
   { id: '2', label: 'Chapter 2', name: 'Basic Test' },
 ]
@@ -69,6 +77,10 @@ assert.match(contentsMarkup, /leg-chapter-picker/)
 assert.match(
   contentsMarkup,
   /<select[^>]*aria-label="Top chapter selector"[^>]*>/,
+)
+assert.match(
+  contentsMarkup,
+  /<option value="introduction">Introduction<\/option>/,
 )
 assert.match(
   contentsMarkup,

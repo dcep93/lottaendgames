@@ -187,6 +187,17 @@ assertChapterIncludes(
   'introduction',
   'And now it is time to start with our study of the 100 theoretical positions',
 )
+assertChapterIncludes('15', 'Draw. One of the most surprising fortresses.')
+assertChapterIncludes('15', 'A false fortress. Black can force one of the pawns')
+assertChapterIncludes('15', "A rook's pawn on the second rank works wonders.")
+assertChapterIncludes('15', 'The knights can win thanks to the enemy pawn')
+assertChapterIncludes('15', '2 Bishops vs. Knight. Won.')
+assertChapterIncludes('bibliography', 'Secrets of Rook Endings')
+assertChapterIncludes('bibliography', 'Fundamental Chess Endings')
+assertChapterIncludes(
+  'bibliography',
+  'the best endgame book ever published to date',
+)
 
 console.log('source text audit passed')
 

@@ -131,6 +131,7 @@ function buildChapterRenderItems(
 function isPositionGroupBoundary(section: RawChapterSection) {
   return (
     section.type === 'position' ||
+    section.type === 'heading' ||
     section.type === 'ending' ||
     section.type === 'title'
   )

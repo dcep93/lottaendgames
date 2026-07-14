@@ -101,4 +101,84 @@ assert.deepEqual(
   ['I.1', 'I.2', 'I.3', 'I.4', 'I.5', 'I.6'],
 )
 
+assert.deepEqual(
+  book.parts.map(({ id }) => id),
+  [
+    'introduction',
+    '1',
+    '2',
+    '3',
+    '4',
+    '5',
+    '6',
+    '7',
+    '8',
+    '9',
+    '10',
+    '11',
+    '12',
+    '13',
+    '14',
+    '15',
+    'bibliography',
+  ],
+)
+
+const appendix = book.parts.find(({ id }) => id === '15')
+assert.ok(appendix, 'Expected Chapter 15 - Appendix')
+assert.deepEqual(
+  appendix.sections
+    .filter(({ type }) => type === 'heading')
+    .map(({ content }) => content),
+  [
+    'Fortresses',
+    'Queen vs. 2 Minor Pieces',
+    'Queen vs. Rook (and pawns)',
+    'Rook vs. Bishop',
+    'Different material relations: correct results',
+    "Troitsky's Line",
+  ],
+)
+assert.deepEqual(
+  appendix.sections
+    .filter(({ type }) => type === 'position')
+    .map(({ content }) => (content as { number: string }).number),
+  Array.from({ length: 19 }, (_, index) => `F${index + 1}`),
+)
+assert.equal(
+  appendix.sections.some(
+    ({ content, type }) =>
+      type === 'diagram' &&
+      (content as { number?: string }).number === 'troitsky-line',
+  ),
+  true,
+)
+
+const bibliography = book.parts.find(({ id }) => id === 'bibliography')
+assert.ok(bibliography, 'Expected Bibliography')
+assert.deepEqual(
+  bibliography.sections
+    .filter(({ type }) => type === 'heading')
+    .map(({ content }) => content),
+  [
+    'Rey Ardid',
+    'Averbakh',
+    'John Nunn',
+    'Paul Keres: Practical Chess Endings (Batsford)',
+    'Levenfish & Smyslov: Rook Endings (Batsford)',
+    'Ilya Maizelis: Pawn Endings (Batsford)',
+    'Muller & Lamprecht: Secrets of Pawn Endings (Everyman)',
+    'Muller & Lamprecht: Fundamental Chess Endings (Gambit)',
+    "Mark Dvoretsky: Dvoretsky's Endgame Manual (Russell Enterprises)",
+  ],
+)
+
+assert.equal(
+  book.parts.flatMap(({ sections }) => sections).filter(
+    ({ type }) =>
+      type === 'diagram' || type === 'position' || type === 'problem',
+  ).length,
+  333,
+)
+
 console.log('book source audit passed')

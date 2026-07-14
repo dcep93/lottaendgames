@@ -1,2 +1,2 @@
-export const chapterPayloadContentHash = 'sha256:3d895cf14a54c5f09c27e90a9ccc0d8773787d450a956c5bf60d4e35f0a43032'
-export const chapterPayloadPath = 'app_x/chapter-runtime.3d895cf14a54c5f0.json'
+export const chapterPayloadContentHash = 'sha256:a76308066d7d8b6418f1a71f70bebc410e24f75231c3b8c0a70de2d6903f474f'
+export const chapterPayloadPath = 'app_x/chapter-runtime.a76308066d7d8b64.json'

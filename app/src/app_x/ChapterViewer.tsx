@@ -364,11 +364,11 @@ export default function ChapterViewer() {
                 onSelect={handleChapterSelect}
                 variant="select"
               />
-              <div className="leg-reader-meta" aria-label="Chapter summary">
-                <span>{chapterSections.length} sections</span>
-                <span>{endingCount} endings</span>
-                <span>{positionCount} boards</span>
-              </div>
+              <ReaderMeta
+                endingCount={endingCount}
+                positionCount={positionCount}
+                sectionCount={chapterSections.length}
+              />
             </>
           ) : null}
         </header>
@@ -437,6 +437,24 @@ export default function ChapterViewer() {
         ) : null}
       </div>
     </main>
+  )
+}
+
+export function ReaderMeta({
+  endingCount,
+  positionCount,
+  sectionCount,
+}: {
+  endingCount: number
+  positionCount: number
+  sectionCount: number
+}) {
+  return (
+    <div className="leg-reader-meta" aria-label="Part summary">
+      <span>{sectionCount} sections</span>
+      {endingCount > 0 ? <span>{endingCount} endings</span> : null}
+      {positionCount > 0 ? <span>{positionCount} boards</span> : null}
+    </div>
   )
 }
 
@@ -603,7 +621,7 @@ export function ChapterSelector({
   if (variant === 'select') {
     return (
       <label className="leg-chapter-picker">
-        <span className="leg-chapter-picker-label">Chapter</span>
+        <span className="leg-chapter-picker-label">Contents</span>
         <select
           aria-label={label}
           className="leg-chapter-select"
@@ -618,7 +636,9 @@ export function ChapterSelector({
         >
           {chapters.map((chapter) => (
             <option key={chapter.id} value={chapter.id}>
-              {chapter.label} - {chapter.name}
+              {chapter.label === chapter.name
+                ? chapter.label
+                : `${chapter.label} - ${chapter.name}`}
             </option>
           ))}
         </select>
