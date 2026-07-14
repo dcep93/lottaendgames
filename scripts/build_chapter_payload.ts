@@ -9,8 +9,8 @@ import {
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { buildRuntimeChapter } from '../app/src/app_x/chapterRuntimeBuild'
+import { validateBookSource } from '../app/src/app_x/bookSourceValidation'
 import type { RuntimeChapterPayload } from '../app/src/app_x/chapterRuntime'
-import type { BookSource } from '../app/src/app_x/chapterTypes'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const pdfDir = resolve(root, 'app/src/app_x/pdf')
@@ -20,9 +20,9 @@ const payloadManifestPath = resolve(
   'app/src/app_x/chapterPayloadManifest.ts',
 )
 
-const bookSource = JSON.parse(
-  readFileSync(resolve(pdfDir, 'book.json'), 'utf8'),
-) as BookSource
+const bookSource = validateBookSource(
+  JSON.parse(readFileSync(resolve(pdfDir, 'book.json'), 'utf8')),
+)
 const sourceChapters = bookSource.parts
 const sourceContentHash = getContentHash(sourceChapters)
 const runtimeChapters = sourceChapters.map(buildRuntimeChapter)
