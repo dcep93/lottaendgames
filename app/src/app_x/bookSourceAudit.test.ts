@@ -5,7 +5,7 @@ import { existsSync, readFileSync } from 'node:fs'
 type BookSource = {
   parts: Array<{
     id: string
-    sections: unknown[]
+    sections: Array<{ content: unknown; type: string }>
   }>
   schemaVersion: number
 }
@@ -32,6 +32,7 @@ const book = JSON.parse(
 ) as BookSource
 
 assert.equal(book.schemaVersion, 1)
+assert.equal(book.parts[0]?.id, 'introduction')
 
 for (const [partId, expectedHash] of Object.entries(expectedSectionHashes)) {
   const part = book.parts.find(({ id }) => id === partId)
@@ -57,5 +58,47 @@ for (let chapter = 1; chapter <= 14; chapter += 1) {
     `The retired chapter_${chapter}.json source must not return`,
   )
 }
+
+const introduction = book.parts.find(({ id }) => id === 'introduction')
+assert.ok(introduction, 'Expected the complete Introduction')
+assert.deepEqual(
+  introduction.sections
+    .filter(({ type }) => type === 'heading')
+    .map(({ content }) => content),
+  [
+    'The relative importance of the endgame',
+    'The study of the endgame',
+    'The content of this book',
+    'How to study this book',
+    'The attitude to study',
+    'Memorising rules',
+    'Extreme positions',
+    'Step by step',
+    'Second Test',
+    "'Standing on the shoulders of giants'",
+    'Introduction to the study of the endgame',
+    'Statistics',
+    "Pieces' mobility",
+    'The routes of the pieces',
+    "The knight's strange routes",
+    "The king's multiple routes",
+    "The knight's domination",
+    'The concept of a fortress. Some elementary examples',
+  ],
+)
+assert.equal(
+  introduction.sections.filter(({ type }) => type === 'table').length,
+  1,
+)
+assert.equal(
+  introduction.sections.filter(({ type }) => type === 'diagram').length,
+  7,
+)
+assert.deepEqual(
+  introduction.sections
+    .filter(({ type }) => type === 'position')
+    .map(({ content }) => (content as { number: string }).number),
+  ['I.1', 'I.2', 'I.3', 'I.4', 'I.5', 'I.6'],
+)
 
 console.log('book source audit passed')

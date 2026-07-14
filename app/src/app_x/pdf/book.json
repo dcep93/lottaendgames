@@ -2,6 +2,2205 @@
   "schemaVersion": 1,
   "parts": [
     {
+      "id": "introduction",
+      "label": "Introduction",
+      "name": "Introduction",
+      "sections": [
+        {
+          "type": "title",
+          "content": "Introduction"
+        },
+        {
+          "type": "heading",
+          "content": "The relative importance of the endgame"
+        },
+        {
+          "type": "text",
+          "content": "In my first years in the world of chess, I used to read a lot about the importance of a good knowledge of endgames and the futility of studying openings. I used to find this kind of statement not only in Capablanca's works, but also in many articles from magazines of that time: sentences like 'Grandmasters' greater understanding is most clearly noticeable in the endgame' and similar things. Strategy used to receive the same, or similar, treatment when compared to tactics. You could read sentences like 'Grandmasters spend much more time in developing plans rather than in calculating variations' and so forth. That could be the reason why I, who spent almost my whole time during the games in calculating variations accurately, and devoted much more time to the study of openings rather than the endgame, could not even imagine that I would one day become a grandmaster.\nIt took me a long time to discover that all those recommendations were fairly exaggerated, but perhaps I should be grateful to them, as I do not know whether, otherwise, I would have paid to the endgame the attention this stage of the game truly deserves. My concern about those statements by famous players led me to devote some time to the study of the endgame, which eventually I enjoyed.\nIt is true, however, that it was not easy. One of my first decisions, a rather drastic one, actually, was to buy Rook Endings, by Levenfish & Smyslov, a book as excellent as it is boring. I had to start reading it several times, as I found it extremely difficult to get beyond the first one or two chapters. Nevertheless, in the end I managed to absorb some of the material.\nRecently, the openings have taken over as overwhelmingly the main area of chess study. All great players spend most of their time researching new variations, in order to surprise their opponents and obtain as large an advantage (or as small a disadvantage) as possible, before the game itself really begins. But do not be fooled: it is not that these players have discovered that there is no value in studying the endgame, merely that they have already done their homework and at least have a good command of the most important endings. Of course, there are some 'distinguished' exceptions, as you can see now and then in a few of the games and examples in this book, in which top players seriously misplay basic endgames, but, generally speaking, top players have good endgame technique. The fact is that the number of important theoretical endgames, and especially those which are of practical relevance, is much smaller than the field of openings. Those top players have already 'paid their dues', as it were, that is, they have studied the necessary endgame material in the past, and now they can devote greater efforts to other aspects of the game, without fear of losing unnecessary half-points in the endgame, during tournaments.\nTherefore, if you intend to reach a certain rating, I will not say that a good command of the endgame is essential, but it is certainly very useful. On the other hand, if you neglect this part of the game, many half points, or even full points, will now and then elude you. And you will rarely get wins in the opening to make up for those lost (half-)points, as nowadays everyone comes to their games armed to the teeth with opening preparation. To put it simply: a player who reaches a certain level as regards theory, strategy and tactics, will lose many points if his mastery of the endgame does not correspond with that same level. Thus, the study of the endgame will be the most straightforward way to improve his rating. If his mastery of the endgame is at the same level as his other skills, this effort would not be so profitable, but my experience suggests that this is not the case with most players.\nWhy is this? Well, any player with some years of experience, even if his rating is below 2000, knows the story: 'Studying the endgame is boring'; 'Half (if not 90%) of the endings I look at are quickly forgotten'; 'I can't find a book with good explanations'; and, perhaps the smartest excuse of all, 'My games never reach the endgame!' This is especially true of the games of players who avoid the endgame deliberately, sometimes by means of excessively risky play in the middlegame; such players often lose in the middlegame, as a direct result, although they generally explain away their defeats by blaming them on 'tactical blunders', or 'time-trouble', or some similar excuse.\nThis tendency to neglect the endgame has grown as the rates of play have become faster and adjournments have been eliminated. Previously, adjournments allowed deep analysis of positions (often endings) and helped players to develop their endgame technique and their appreciation of the endgame. Moreover, accurate play in endgames was possible with enough time on the clock, and those games were worth analysing, as they were fine works of art, where we could improve our overall chess understanding. Now it is rare that an ending is played with reasonable time on the clock, which leads to real comedies of errors. Consequently, the analysis of contemporary endgames is often more useful as Laughter Therapy than as a chess lesson. But precisely due to that lack of time on the clock, a good command of basic endgames is even more necessary than ever. If you are running out of time and do not have a clue about how to handle the position, the game is much more likely to end in disaster.\nWhen I wrote this book, my intention was to help those players willing to devote some effort to correct this (almost chronic) situation. This book can help but, let us be honest: there are neither magical formulae, nor wisdom pills: your own personal effort is essential. So I thought a lot about how to conduct the study, and why many excellent books had failed before. My main hypothesis is that most endgame books have been written as reference books, that is, compiling and presenting knowledge without the least intention of explaining. Most such books cover the ground very rapidly, and thus provoke their readers to read them equally fast. That is why I have set out to explain the endings slowly and I recommend their study be slow as well."
+        },
+        {
+          "type": "heading",
+          "content": "The study of the endgame"
+        },
+        {
+          "type": "text",
+          "content": "First, I consider the approach towards the study of the endgame must be multi-staged and always keep the same pace as the player's overall playing level. Therefore, the different stages must be separated in time, if necessary.\nIn the first stage, it is enough to master the basic checkmates, King + Pawn vs. King endings, and to know which main material relations are winning or not; in addition, a few exceptional and frequent situations, such as the Bishop + Wrong Rook's Pawn ending, etc.\nA second step in this first stage would involve the Philidor and Lucena Positions in Rook + Pawn vs. Rook endings, as well as some more ideas in pawn endings and opposite-coloured bishop endings. In this book, this would amount to Chapter 1 and Endings 41, 42, 44, 45, 46, 65, 79, 80, 82, 86, 89, 90, 91 and 92.\nAlmost any amateur who is willing to put in a small amount of work, is able to achieve this (though unfortunately, for some people it takes too many years) and actually that is enough until the moment one reaches, say, a FIDE rating of around 1900-2000. Beyond that point, greater endgame skill is a must. At this stage, problems usually arise, but the upside is that this extension of a player's endgame skill will usually be enough at least until he becomes an International Master with a rating of around 2400. However, do not get me wrong: I am not saying that all IMs have done this, nor am I saying that any player who does it will automatically become an IM.\nAt this stage (2000 FIDE) we should move to the second phase and then the first thing to do is to acquire an exact knowledge of some theoretical endings. Otherwise, even players keen on simple positions who have a good command of the most typical themes will often hesitate when they have to shift to a simpler ending, thus spoiling their previous efforts. Moreover, some typical endgame themes will be necessary here, but most are learned from the study of basic positions.\nThe 'exact endings' we need to remember are just a few. Besides, some are really easy to memorise, and others could be considered as marginal in view of their comparative rarity in practice. They are just a few, but you must know them well. This fundamental knowledge and the confidence we acquire with it is the starting point to study other positions of greater complexity or to turn a technical advantage into victory.\nAfter we have acquired a good command of the basic endings comes the third phase. In it, we will study in more depth some endgame themes which we will find easier, as they do not demand exact memorisation. Only when you master the basic endings and are familiar with the most important (that is, most frequent) themes can you jump to the next phase: the study of multi-piece endgame strategy. These endings are sometimes called practical endings (although all endings are practical) and many excellent books have been devoted to them, such as Shereshevsky's Endgame Strategy. Throughout history, players such as Lasker, Rubinstein, Capablanca, Smyslov, Kortchnoi, Karpov, Andersson and many others have shown a remarkable technique in practical endings. Their games are the best source of learning. Of course, their games are not the only possible source of endgame skill, and usually players acquire additional experience from their own games, which helps them improve in all directions at the same time."
+        },
+        {
+          "type": "heading",
+          "content": "The content of this book"
+        },
+        {
+          "type": "text",
+          "content": "I intend to devote this book to the second phase, that is, the study of the 'exact endings', as I consider it the most neglected (perhaps because it is the least exciting) area. However, I am aware of the difficulties of this task. I have tried to summarise the most useful positions among the numerous endings, and to reduce them to a figure and volume that could be handled by a practical player as well as trainers or coaches. The final result was the symbolic number 100. Perhaps some endings deserved to appear in this book but were left out; perhaps some are included in the book but should not appear. In any case, everyone may have his opinion, but this has been my choice.\nAs stated in the title, my intention was to include only 'the endings we all should know'. The reader may well wonder: which ones? The answer may be controversial, but these were the criteria used, in order of importance:\n1) To be frequently encountered in practice.\n2) To be capable of clear analysis (and therefore, easier to remember).\n3) To contain ideas that can be applied to similar, or even more complex, positions.\nThus this book was not intended as an encyclopedia, dealing with all known endings and used as a reference book, but as a practical tool which allows the reader to improve his knowledge of the theoretical endgames most likely to arise in an actual game.\nWhen we play a simple ending, our train of thought leads us to reduce it to a familiar position. Until we have achieved this, we will have doubts. My aim when selecting positions for this book was to include those familiar positions we easily and frequently reach, so that they can guide our train of thought when playing. With a good command of these positions, we will play with more confidence, and mistakes will be less likely to occur. Taking all this into account, I have left out the basic checkmates (I assume they are known) and other endings such as Queen + Pawn vs. Queen and Knight + Pawn vs. Knight. The reason is that tactics play a more important role than ideas, and also that these endings are not so frequently encountered, so their study is not very useful. On the contrary, I have emphasised rook endings, as well as opposite-coloured bishop endings; the former are the most frequent, the latter are the clearest.\nIn some cases, just very few, I have included positions almost impossible to learn by heart and whose analysis is complex. The reason was that, either I considered those endings important, or they are relevant from a practical point of view, or they influence the understanding of other endings. These cases are labelled in each chapter as especially difficult, and they must be studied in a different way.\nOnce the selection was complete, I tried to explain the endings in a clear fashion. I intended the explanations to be easy to learn and remember for a practical player, and useful for a trainer in his lessons. How did I plan to do this? I will give a more detailed explanation in the next section."
+        },
+        {
+          "type": "heading",
+          "content": "How to study this book"
+        },
+        {
+          "type": "text",
+          "content": "The best approach depends on the level of each player, that is, his overall strength and his previous endgame knowledge. However, such a particular guide would be exhausting, so I will give you a more general explanation. I assume that each reader will adapt it to his personal circumstances and, once the book is in your hands, you are always free to do whatever suits you best.\nAfter years of coaching, my experience and the views of some colleagues have convinced me of the need for an introductory section presenting a chapter on basic endings. These positions are very well known but, even so, I have noticed certain conceptual errors in some players. Thus, the readers who hesitate in these endings can start from the basics, whilst those readers who consider that they have already mastered these endings (I think this will be true of most readers) can skip this part.\nThen you have the first test. We call it the Basic Test. The positions are very simple, with little material. A 1st Category player should be able to solve all correctly. These positions do not require great calculation. If you find some difficult, that means you lack some knowledge of endgame theory. The test constitutes an interesting exercise previous to the reading. I will now tell you why: first, the effort required to solve these positions will be useful training for practical play, since knowing the theory is not enough, you have to be able to apply that theory to an actual game. Moreover, each reader will find some of these positions more difficult than others. Thus he will get an idea of his weak points and can pay more attention to those positions when he reaches them in his study.\nAnd last, I am a firm supporter of the Japanese (Chinese, according to some sources) saying: If I hear - I forget, if I see - I remember, if I do - I understand. That is, only when we ourselves have done something do we reach the level of mastery, that allows us to repeat the task without difficulties.\nAt the risk of boring the reader, I will give just one more example: imagine you are in a new city and have to go for the first time, for example, from the hotel to the playing hall. If a friend (or a GPS) leads you, you are likely to fail to repeat the route (depending on the difficulty); however, if you go on your own, you will keep the route in your mind forever. This idea can be successfully applied to the theoretical study of each ending, as we will repeat when the moment comes. Later, from Chapter 3 onwards, comes the study of the important theoretical positions. These are organised in chapters regarding the material on the board, and sometimes in sections within one chapter regarding the important ideas involved."
+        },
+        {
+          "type": "heading",
+          "content": "The attitude to study"
+        },
+        {
+          "type": "text",
+          "content": "Before you start to study each chapter, some ideas should be clear. Each position we learn will be useful forever; at least that is the idea. In contrast with openings, the theoretical status of these positions will not change and no new moves will appear. In some cases, a new, clearer playing procedure may be discovered. The final result will nevertheless be the same. Taking this into account, we should study each example until we fully understand it. How?\nThe first thing to do is to observe the position without prejudices. The only previous idea must be: one side tries to win (generally, by promoting a pawn) and the other side tries to draw.\nSecond, before we read the theoretical sequence, a look at the diagram proves useful, followed by the question 'What would I play here?' This procedure follows the Japanese wise saying previously stated and we will experience its benefits.\nOnce we have thought about the position and decided on what we would ourselves play, we start replaying the analysis. This is best done on a board. Think that this learning is intended to last your whole life: do not be lazy and rely on reading from the diagram - get out your board and pieces! Of course, many players can follow the analysis blindly, but I recommend you do not try to be too smart. Even if you devote all your attention, some endings require some repetitions and are likely to be forgotten. Do not make things worse by laziness.\nNow you are in the ideal frame of mind to learn an ending. Let us move ahead. Every time you replay a move, try to understand 'why'. This may bore you, but think that many endings require a few moves, and some of them have obvious goals. I repeat: 'To know why you play a move is essential', otherwise you risk forgetting the right procedure, or applying it wrongly in a similar but not identical position. Analysing the endings with a friend, or at the chess club, would be ideal, as then you can discuss the moves and thus reinforce your understanding. If that is impossible, understanding each move is even more necessary."
+        },
+        {
+          "type": "heading",
+          "content": "Memorising rules"
+        },
+        {
+          "type": "text",
+          "content": "I try to explain each example in a clear way, and a way that you can memorise forever. To achieve this goal, I try to focus on guiding ideas and realise what helped me remember throughout the years, or why I have forgotten (several times) a particular ending. Sometimes the same procedure works in many different starting positions, but the final result depends on the position of (sometimes more than) one piece. I do not trust geometrical lines marking an irregular area of the board. Those may be OK for a reference book on theory, or for a scientific research, but we are talking about a sport! And some cases are tough to remember. In my opinion, the best procedure is to find out why the procedure sometimes works and sometimes does not. The reason should help us state a rule, which has to be as simple as possible. If you find and understand that rule, you will be able to remember the ending accurately; if you do not find such a rule, you will have an approximate idea which could be useful to guide your calculations, but not to acquire a perfect knowledge.\nTherefore, try to draw conclusions from each ending and try to extract something essential which aids your memory. The same goes for the exceptions: if there is an exception, there must be a reason; if we understand the reason, we will not have problems, but if we do not, we will never realise that it is an exception.\nKortchnoi declares himself keener on exceptions than on rules. I think that is a nod from a practical player, as he is practical at the highest level. Actually, exceptions are rules as well, only that their field of application is narrower. Probably he is more keen on exceptions because they are more unknown ... to his opponents.\nIn order to remember a certain procedure or rule, a useful technique is to give it a name, even an abstract name. Of course, this works better when the name is related to the situation. Then it will be extremely useful.\nThat is why I try to give names, or highlight some ideas from all positions. That is why almost all positions have a heading. That is also why I have tried to gather all the names existing for the manoeuvres I show, and invent some more. The names are useful: they may carry no meaning, but they can help us, imperfect humans, remember everything."
+        },
+        {
+          "type": "heading",
+          "content": "Extreme positions"
+        },
+        {
+          "type": "text",
+          "content": "In some endings, I have tried to emphasise certain positions which I call extreme positions. As the name suggests, these are extreme situations where the line between a win and a draw is really narrow; a slight change in the position of at least one of the pieces would alter the result.\nMemorising extreme positions is useful indeed. If a more advantageous situation occurs in one of our games, we will be aware that the result is favourable to us (and vice versa, if the situation is less advantageous), and in these positions calculation is rather simple once we know the result.\nOn the contrary, if we have doubts about the exact position a piece should occupy for us to win (or draw), mistakes are likely to appear due to lack of time, tiredness or the anxiety caused by the doubts.\nFor other examples I present at the same time some similar diagrams with different results. Usually the analysis of one position is enough to understand why this slight alteration in the position produces a different result. However, it is interesting to see all the diagrams in order to fix your memory. We could say that extreme positions are like a lighthouse guiding our analysis in an obscure position. Without them, we could only use clearly defined positions to find our way, and thus chances of calculation mistakes would be multiplied.\nNow and then, after the analysis comes the study of a similar, but slightly altered, position. The observation of the influence of such small alterations in the result is an efficient tool to understand the position. Or sometimes the text suggests analysing some lines as a complementary exercise. Such an exercise should be simple once the ending has been studied and constitutes an entertaining and economical way to check our understanding of the ideas. Moreover, if we compare the effect of small alterations on the result, we will become aware of the limitations of the rules acquired. Thus, when a similar situation arises in one of our games it will be easier to imagine to what extent are these rules modified, or whether their application works or not."
+        },
+        {
+          "type": "heading",
+          "content": "Step by step"
+        },
+        {
+          "type": "text",
+          "content": "Even if you follow all my advice on the techniques to study the endgame, and give all your attention to the task at hand, some endings (a few), will be really tough. They are simply too abstract and their full depth is impossible to grasp the first time you meet them. No matter how much effort and attention you put in, some endings, especially rook endings, will be partly forgotten after some time, and you will have to go over them some months later. Do not feel bad about this: you are not the only one to experience it. Things will get much clearer after you have refreshed your knowledge a couple of times and the tough endings have occurred in some of your games. At last, you will find that they become fixed in your mind.\nI must acknowledge that endings are somewhat boring and abstract, and are not precisely rich in combinations; however, there are some tricks worth knowing which can work as a reference. That is why I do not recommend doing too much at one session, and reading the book in one go until you learn all the endings included. You should take the book in small doses. Do not study more than one chapter in just one go; then, let some days go by before you start with another chapter. I know I am continuously repeating the same, but again: when you study an example, always try to understand it thoroughly.\nAfter you have learnt one type of ending, you can start with another one. Everything depends on the available time, on your attention and on your previous knowledge, which very often can do part of the job for you. Perhaps you should divide into two or more parts those chapters devoted to rook endings. Of course those chapters are very likely to need some revision after some time. Do not be afraid to revise them, everybody needs it; the second or third time you revise an ending, most things should remain clear."
+        },
+        {
+          "type": "heading",
+          "content": "Second Test"
+        },
+        {
+          "type": "text",
+          "content": "Once you have finished with the chapters on theory, then comes another test. I recommend your taking this second test when you have read the whole book, or even better, after some weeks. Anyway, of course every reader can use the material as he prefers.\nThis second test is slightly more difficult than the first one, although some positions belong to the same level. Most questions require some previous calculation before the position is reduced to one of the known examples, but a little calculation will always be enough to find the solution, which will be based on one of the endings analysed in the book. By taking this test, you will be able to identify the positions which you find tougher; in any case, if you do not find difficulties, the test will be a good way to practise and fix your learning. Taking the test and then checking some incorrect answers is very likely to improve your playing strength. The effects of taking the test and revising your knowledge may be as useful as the reading of the whole book.\nApart from the two tests, I mention Recommended Exercises in several sections of the book. In most cases, these exercises involve the analysis of positions similar to those just seen, with some slight changes in the position of the pieces. In contrast with other books, these extra exercises are always easy and their resolution will help you understand the material studied and, therefore, will help fix it in your memory. Anyway, even if you find the word exercise very unpleasant, when you meet one of the recommended exercises you should wonder: do I have doubts about this position? If not, you may skip this exercise; however, if your answer is affirmative, it is better to do the exercise to prevent this doubt from revisiting you one day in the form of a lost half-point."
+        },
+        {
+          "type": "heading",
+          "content": "'Standing on the shoulders of giants'"
+        },
+        {
+          "type": "text",
+          "content": "Many readers probably know this famous sentence by Isaac Newton: 'If I have seen further it is by standing on the shoulders of giants'. There could not be a better description for the elaboration and study of a book on endgame theory.\nWithout the work, sometimes impressive, carried out in the past by some players and theoreticians, endgame theory could have been still very green when the Nalimov Tablebases appeared.\nI think some of them must be mentioned here, though their names will appear throughout the book linked to essential manoeuvres.\nIn this giants' hall of fame, Philidor occupies a prominent position. His precise analyses of the basic endings Rook + Pawn vs. Rook and Rook + Bishop vs. Rook, as well as the essential manoeuvre in the Bishop + Knight checkmate, and many others, are simply unbelievable at a time when there were neither previous books, nor theoreticians at his disposal to help him improve his analyses by adding ideas. Later, the names Centurini, Cheron, Euwe, Grigoriev, Levenfish and Averbakh are impossible to ignore.\nIn contemporary times, many endings can be checked by means of Nalimov Tablebases (Turbo Endgame), an excellent tool which has corrected some errors in previous theory.\nNevertheless, the efforts carried out in past analyses cannot be compared to our quick verifications, and the fact that computers have found so few mistakes in their analysis, is certainly to their credit."
+        },
+        {
+          "type": "heading",
+          "content": "Introduction to the study of the endgame"
+        },
+        {
+          "type": "text",
+          "content": "Before we start working with concrete positions, I consider that there are some data and concepts worth knowing. Some will be an aid in our practical decisions and others will make it easier to understand the logic behind some of the endings; finally, some will just help us acquire a more global vision of all this."
+        },
+        {
+          "type": "heading",
+          "content": "Statistics"
+        },
+        {
+          "type": "text",
+          "content": "Nowadays, databases make it easier to create statistics. I remember some book in my youth stating that 10% of games involved a rook ending. That seemed to me exaggerated, but actually it is not that exaggerated. (I have recently read that 20%! of the games involve a rook ending but, of course, that was an ad from an endgame book, and we know how these things work).\nThe following chart shows the number of games for each kind of ending and, in some cases, the percentage of drawn games. These statistics have been created using a database with 4 million games (of course, some are duplicated and some results are wrong, but I do not think that matters much for the general idea). The first column refers to the material; if it is Rooks it refers to endings where each side has a rook and any number of pawns; when it says Rook + Pawn vs. Rook it means Rook + Pawn vs. Rook. The second column shows the number of games, and the third the percentage over the whole database (4 million). The fourth column shows the number of drawn games and the fifth the percentage of drawn games."
+        },
+        {
+          "type": "table",
+          "content": {
+            "caption": "Endgame statistics",
+            "columns": [
+              "Type of ending",
+              "Games",
+              "% games",
+              "Drawn games",
+              "% drawn"
+            ],
+            "rows": [
+              [
+                "Rooks",
+                "320,548",
+                "8.01",
+                "120,610",
+                "37.63"
+              ],
+              [
+                "Queens",
+                "69,340",
+                "1.73",
+                "28,766",
+                "41.49"
+              ],
+              [
+                "Knights",
+                "57,578",
+                "1.44",
+                "21,751",
+                "37.78"
+              ],
+              [
+                "same-col. Bishops",
+                "60,639",
+                "1.52",
+                "23,128",
+                "38.14"
+              ],
+              [
+                "opp.-col. Bishops",
+                "42,759",
+                "1.07",
+                "24,813",
+                "58.03"
+              ],
+              [
+                "Knight vs. Bishop",
+                "123,791",
+                "3.09",
+                "42,308",
+                "34.18"
+              ],
+              [
+                "Pawns",
+                "120,136",
+                "3",
+                "32,279",
+                "26.87"
+              ],
+              [
+                "Total 1",
+                "794,791",
+                "19.87",
+                "293,655",
+                "36.95"
+              ],
+              [
+                "Rook + Pawn vs. Rook",
+                "26,065",
+                "0.65",
+                "13,989",
+                "53.67"
+              ],
+              [
+                "Rook + 2 Pawns vs. Rook",
+                "21,486",
+                "0.54",
+                "4,216",
+                "19.62"
+              ],
+              [
+                "Queen + Pawn vs. Queen",
+                "3,749",
+                "0.09",
+                "2,077",
+                "55.40"
+              ],
+              [
+                "Knight + Pawn vs. Knight",
+                "2,207",
+                "0.06",
+                "1,575",
+                "69.38"
+              ],
+              [
+                "Bishop + Pawn vs. same-coloured Bishop",
+                "1,299",
+                "0.03",
+                "694",
+                "53.43"
+              ],
+              [
+                "Bishop + Pawn vs. opposite-coloured Bishop",
+                "369",
+                "0.01",
+                "332",
+                "89.97"
+              ],
+              [
+                "Bishop + 2 Pawns vs. opposite-coloured Bishop",
+                "1,698",
+                "0.04",
+                "730",
+                "42.99"
+              ],
+              [
+                "Bishop + Pawn vs. Knight",
+                "1,346",
+                "0.03",
+                "930",
+                "69.09"
+              ],
+              [
+                "Knight + Pawn vs. Bishop",
+                "2,184",
+                "0.05",
+                "1,656",
+                "75.82"
+              ],
+              [
+                "King + Pawn vs. King",
+                "12,257",
+                "0.31",
+                "6,141",
+                "50.10"
+              ],
+              [
+                "King + 2 Pawns vs. King + Pawn",
+                "18,263",
+                "0.46",
+                "4,837",
+                "26.49"
+              ],
+              [
+                "King + 2 Pawns vs. King",
+                "4,098",
+                "0.1",
+                "216",
+                "5.27"
+              ],
+              [
+                "King + Pawn vs. King + Pawn",
+                "10,809",
+                "0.27",
+                "5,954",
+                "55.08"
+              ],
+              [
+                "Total 2",
+                "105,893",
+                "2.64",
+                "43,347",
+                "40.93"
+              ],
+              [
+                "Rook + Bishop vs. Rook",
+                "1,846",
+                "0.02",
+                "1,040",
+                "56.34"
+              ],
+              [
+                "Bishop + Knight vs. King",
+                "712",
+                "0.04",
+                "135",
+                "18.96"
+              ],
+              [
+                "Knight vs. Pawn",
+                "1,698",
+                "0.04",
+                "1,488",
+                "87.63"
+              ],
+              [
+                "Queen vs. Pawn",
+                "4,320",
+                "0.1",
+                "475",
+                "11.00"
+              ],
+              [
+                "Rook vs. Pawn",
+                "5,704",
+                "0.14",
+                "2,790",
+                "48.91"
+              ],
+              [
+                "Rook vs. 2 Pawns",
+                "5,226",
+                "0.13",
+                "2,007",
+                "38.40"
+              ],
+              [
+                "Queen vs. Rook + Pawn",
+                "1,237",
+                "0.03",
+                "367",
+                "29.67"
+              ]
+            ]
+          }
+        },
+        {
+          "type": "text",
+          "content": "The first thing that catches our attention is the confirmation of the overwhelming frequency of rook endings. 8% of the games involve a one-rook ending! If we add double-rook endings or Rook vs. Minor Piece, it will surely reach the 10% mark. If you have bad rook-ending technique, you should be worried. The saying 'All rook endings are drawn' is not so accurate. That was probably a joke, or its validity was not checked. As could be expected, opposite-coloured bishop endings are the most drawish (58%), but rook endings are at the same level as the rest. Pawn endings are the least drawish. Take notice! Swapping all the material is not always the safest way to draw.\nHowever, there must be some truth in the famous saying about rook endings and draws! I think there is. The feeling that all rook endings are drawn comes from the fact that, in other endings, an experienced player is able to see whether the ending is drawn or not, so he just plays and if the game is drawn he already expected that. On the contrary, very often we play a rook ending thinking our advantage is enough to win, but then we fail to do so. Therefore, 'All rook endings are drawn!' really means that rook endings are tough and the defender can always pose problems, especially when his pieces become active.\nAs for theoretical endings, with one or two pawns per player at most, rook endings do not justify their drawish reputation either. Will the reason be, in part, that many players ignore them? In any case, the most drawish endings, after opposite-coloured bishops endings, are Knight + Pawn vs. Bishop. This has some logic, as the knight is inferior to the bishop when the board is empty.\nThe biggest surprises come in the section 'Different Material Relations', especially the astonishing 19% of Bishop + Knight vs. Lone King endings that were drawn!! (and I can tell you some of the players were grandmasters!); the 44% of Rook + Bishop vs. Rook endings won, despite the drawish nature of this ending, is also outstanding. I will come back later to the statistics of this section.\nIn any case, the fact that 20% of the games lead to endgame struggles between equally strong pieces (including pawn endings, which are also, not entirely without reason, called king endings), clearly illustrates the importance of this phase of the game and can make us suspect that many half points are lost on the way. Nevertheless, this last statement cannot be reflected in statistics, as that would require Shakespeare's Monkeys' analytical powers."
+        },
+        {
+          "type": "heading",
+          "content": "Pieces' mobility"
+        },
+        {
+          "type": "text",
+          "content": "In order to study single-piece endings, you should notice some of the specific features of the pieces and, above all, their limitations. In the following series of diagrams (one for each piece), figures indicate the number of squares dominated by the piece. A simple observation may tell us some interesting things.\nA rook dominates the same number of squares in the centre as at the corner; therefore, it makes perfect sense that it often moves to the edge of the board, as the enemy pieces cannot easily attack the rook there.\nA bishop's mobility is reduced, though not dramatically, as it moves far from the centre; on the edge of the board, the bishop's mobility is almost reduced to 50%.\nNaturally, the queen always dominates as many squares as a rook + a bishop; therefore, her activity is hardly reduced.\nThe piece whose mobility suffers a serious reduction as it moves far from the centre is the knight; in the centre, a knight dominates 8 squares, which are reduced to just 2 (a 75% loss) at the corner and 50% on most squares on the edge of the board. Special attention should be paid to the square diagonal to the corner (g2, b2, g7, b7) where the knight just dominates 4 squares as well; this is an especially unfortunate spot for a knight, as we will see throughout the book, and for that reason we will call it 'the knight's dumb square'."
+        },
+        {
+          "type": "diagram",
+          "content": {
+            "number": "intro-rook-mobility",
+            "label": "The rook",
+            "fen": "8/8/8/8/8/8/8/8",
+            "markers": [
+              {
+                "square": "a8",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "b8",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "c8",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "d8",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "e8",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "f8",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "g8",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "h8",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "a7",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "b7",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "c7",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "d7",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "e7",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "f7",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "g7",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "h7",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "a6",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "b6",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "c6",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "d6",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "e6",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "f6",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "g6",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "h6",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "a5",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "b5",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "c5",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "d5",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "e5",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "f5",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "g5",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "h5",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "a4",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "b4",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "c4",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "d4",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "e4",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "f4",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "g4",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "h4",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "a3",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "b3",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "c3",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "d3",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "e3",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "f3",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "g3",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "h3",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "a2",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "b2",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "c2",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "d2",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "e2",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "f2",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "g2",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "h2",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "a1",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "b1",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "c1",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "d1",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "e1",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "f1",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "g1",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              },
+              {
+                "square": "h1",
+                "symbol": "14",
+                "meaning": "Squares dominated by a rook",
+                "variant": "label"
+              }
+            ]
+          }
+        },
+        {
+          "type": "diagram",
+          "content": {
+            "number": "intro-bishop-mobility",
+            "label": "The bishop",
+            "fen": "8/8/8/8/8/8/8/8",
+            "markers": [
+              {
+                "square": "a8",
+                "symbol": "7",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "b8",
+                "symbol": "7",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "c8",
+                "symbol": "7",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "d8",
+                "symbol": "7",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "e8",
+                "symbol": "7",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "f8",
+                "symbol": "7",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "g8",
+                "symbol": "7",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "h8",
+                "symbol": "7",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "a7",
+                "symbol": "7",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "b7",
+                "symbol": "9",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "c7",
+                "symbol": "9",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "d7",
+                "symbol": "9",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "e7",
+                "symbol": "9",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "f7",
+                "symbol": "9",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "g7",
+                "symbol": "9",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "h7",
+                "symbol": "7",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "a6",
+                "symbol": "7",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "b6",
+                "symbol": "9",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "c6",
+                "symbol": "11",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "d6",
+                "symbol": "11",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "e6",
+                "symbol": "11",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "f6",
+                "symbol": "11",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "g6",
+                "symbol": "9",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "h6",
+                "symbol": "7",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "a5",
+                "symbol": "7",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "b5",
+                "symbol": "9",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "c5",
+                "symbol": "11",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "d5",
+                "symbol": "13",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "e5",
+                "symbol": "13",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "f5",
+                "symbol": "11",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "g5",
+                "symbol": "9",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "h5",
+                "symbol": "7",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "a4",
+                "symbol": "7",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "b4",
+                "symbol": "9",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "c4",
+                "symbol": "11",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "d4",
+                "symbol": "13",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "e4",
+                "symbol": "13",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "f4",
+                "symbol": "11",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "g4",
+                "symbol": "9",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "h4",
+                "symbol": "7",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "a3",
+                "symbol": "7",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "b3",
+                "symbol": "9",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "c3",
+                "symbol": "11",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "d3",
+                "symbol": "11",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "e3",
+                "symbol": "11",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "f3",
+                "symbol": "11",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "g3",
+                "symbol": "9",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "h3",
+                "symbol": "7",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "a2",
+                "symbol": "7",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "b2",
+                "symbol": "9",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "c2",
+                "symbol": "9",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "d2",
+                "symbol": "9",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "e2",
+                "symbol": "9",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "f2",
+                "symbol": "9",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "g2",
+                "symbol": "9",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "h2",
+                "symbol": "7",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "a1",
+                "symbol": "7",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "b1",
+                "symbol": "7",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "c1",
+                "symbol": "7",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "d1",
+                "symbol": "7",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "e1",
+                "symbol": "7",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "f1",
+                "symbol": "7",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "g1",
+                "symbol": "7",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              },
+              {
+                "square": "h1",
+                "symbol": "7",
+                "meaning": "Squares dominated by a bishop",
+                "variant": "label"
+              }
+            ]
+          }
+        },
+        {
+          "type": "diagram",
+          "content": {
+            "number": "intro-queen-mobility",
+            "label": "The queen",
+            "fen": "8/8/8/8/8/8/8/8",
+            "markers": [
+              {
+                "square": "a8",
+                "symbol": "21",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "b8",
+                "symbol": "21",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "c8",
+                "symbol": "21",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "d8",
+                "symbol": "21",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "e8",
+                "symbol": "21",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "f8",
+                "symbol": "21",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "g8",
+                "symbol": "21",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "h8",
+                "symbol": "21",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "a7",
+                "symbol": "21",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "b7",
+                "symbol": "23",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "c7",
+                "symbol": "23",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "d7",
+                "symbol": "23",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "e7",
+                "symbol": "23",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "f7",
+                "symbol": "23",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "g7",
+                "symbol": "23",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "h7",
+                "symbol": "21",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "a6",
+                "symbol": "21",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "b6",
+                "symbol": "23",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "c6",
+                "symbol": "25",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "d6",
+                "symbol": "25",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "e6",
+                "symbol": "25",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "f6",
+                "symbol": "25",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "g6",
+                "symbol": "23",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "h6",
+                "symbol": "21",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "a5",
+                "symbol": "21",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "b5",
+                "symbol": "23",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "c5",
+                "symbol": "25",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "d5",
+                "symbol": "27",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "e5",
+                "symbol": "27",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "f5",
+                "symbol": "25",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "g5",
+                "symbol": "23",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "h5",
+                "symbol": "21",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "a4",
+                "symbol": "21",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "b4",
+                "symbol": "23",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "c4",
+                "symbol": "25",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "d4",
+                "symbol": "27",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "e4",
+                "symbol": "27",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "f4",
+                "symbol": "25",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "g4",
+                "symbol": "23",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "h4",
+                "symbol": "21",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "a3",
+                "symbol": "21",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "b3",
+                "symbol": "23",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "c3",
+                "symbol": "25",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "d3",
+                "symbol": "25",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "e3",
+                "symbol": "25",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "f3",
+                "symbol": "25",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "g3",
+                "symbol": "23",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "h3",
+                "symbol": "21",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "a2",
+                "symbol": "21",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "b2",
+                "symbol": "23",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "c2",
+                "symbol": "23",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "d2",
+                "symbol": "23",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "e2",
+                "symbol": "23",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "f2",
+                "symbol": "23",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "g2",
+                "symbol": "23",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "h2",
+                "symbol": "21",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "a1",
+                "symbol": "21",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "b1",
+                "symbol": "21",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "c1",
+                "symbol": "21",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "d1",
+                "symbol": "21",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "e1",
+                "symbol": "21",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "f1",
+                "symbol": "21",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "g1",
+                "symbol": "21",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              },
+              {
+                "square": "h1",
+                "symbol": "21",
+                "meaning": "Squares dominated by a queen",
+                "variant": "label"
+              }
+            ]
+          }
+        },
+        {
+          "type": "diagram",
+          "content": {
+            "number": "intro-knight-mobility",
+            "label": "The knight",
+            "fen": "8/8/8/8/8/8/8/8",
+            "markers": [
+              {
+                "square": "a8",
+                "symbol": "2",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "b8",
+                "symbol": "3",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "c8",
+                "symbol": "4",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "d8",
+                "symbol": "4",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "e8",
+                "symbol": "4",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "f8",
+                "symbol": "4",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "g8",
+                "symbol": "3",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "h8",
+                "symbol": "2",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "a7",
+                "symbol": "3",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "b7",
+                "symbol": "4",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "c7",
+                "symbol": "6",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "d7",
+                "symbol": "6",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "e7",
+                "symbol": "6",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "f7",
+                "symbol": "6",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "g7",
+                "symbol": "4",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "h7",
+                "symbol": "3",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "a6",
+                "symbol": "4",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "b6",
+                "symbol": "6",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "c6",
+                "symbol": "8",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "d6",
+                "symbol": "8",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "e6",
+                "symbol": "8",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "f6",
+                "symbol": "8",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "g6",
+                "symbol": "6",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "h6",
+                "symbol": "4",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "a5",
+                "symbol": "4",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "b5",
+                "symbol": "6",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "c5",
+                "symbol": "8",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "d5",
+                "symbol": "8",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "e5",
+                "symbol": "8",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "f5",
+                "symbol": "8",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "g5",
+                "symbol": "6",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "h5",
+                "symbol": "4",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "a4",
+                "symbol": "4",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "b4",
+                "symbol": "6",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "c4",
+                "symbol": "8",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "d4",
+                "symbol": "8",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "e4",
+                "symbol": "8",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "f4",
+                "symbol": "8",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "g4",
+                "symbol": "6",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "h4",
+                "symbol": "4",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "a3",
+                "symbol": "4",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "b3",
+                "symbol": "6",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "c3",
+                "symbol": "8",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "d3",
+                "symbol": "8",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "e3",
+                "symbol": "8",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "f3",
+                "symbol": "8",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "g3",
+                "symbol": "6",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "h3",
+                "symbol": "4",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "a2",
+                "symbol": "3",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "b2",
+                "symbol": "4",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "c2",
+                "symbol": "6",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "d2",
+                "symbol": "6",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "e2",
+                "symbol": "6",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "f2",
+                "symbol": "6",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "g2",
+                "symbol": "4",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "h2",
+                "symbol": "3",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "a1",
+                "symbol": "2",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "b1",
+                "symbol": "3",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "c1",
+                "symbol": "4",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "d1",
+                "symbol": "4",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "e1",
+                "symbol": "4",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "f1",
+                "symbol": "4",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "g1",
+                "symbol": "3",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              },
+              {
+                "square": "h1",
+                "symbol": "2",
+                "meaning": "Squares dominated by a knight",
+                "variant": "label"
+              }
+            ]
+          }
+        },
+        {
+          "type": "heading",
+          "content": "The routes of the pieces"
+        },
+        {
+          "type": "text",
+          "content": "Another variable that can give us information about the pieces' mobility is the number of moves they need to reach a given square. A queen, a rook or a bishop will always need a maximum of 2 moves to reach any square on an empty board. Of course, the bishop is limited to squares of the same colour as those which it occupies. That speed is very relevant when it comes to stopping passed pawns. Thus, these three are long-range pieces. On the contrary, kings and knights are short-range pieces, and they need too many moves to cross the board. Thus, very often they find a passed pawn is out of reach.\nHowever, the king and the knight present some differences. If you have a look at the following charts, you will find that sometimes the knight needs less moves to get to a certain square on the opposite wing than to one next to it.\nThus the so-called knight's circuits appear: 'efficient' routes to reach the right squares. However, if the knight is out of those circuits, it will remain out of play."
+        },
+        {
+          "type": "heading",
+          "content": "The knight's strange routes"
+        },
+        {
+          "type": "text",
+          "content": "In the following chart, numbers in italics indicate the moves a knight needs to get to that square from g2; the others indicate the moves it needs from a1. Smaller numbers indicate the different routes the knight may follow."
+        },
+        {
+          "type": "diagram",
+          "content": {
+            "number": "intro-knight-routes",
+            "label": "The knight's strange routes",
+            "fen": "8/8/8/8/8/8/6N1/N7",
+            "markers": [
+              {
+                "square": "a8",
+                "symbol": "4",
+                "meaning": "Moves from g2 as printed",
+                "variant": "label"
+              },
+              {
+                "square": "f8",
+                "symbol": "4",
+                "meaning": "Moves from g2 as printed",
+                "variant": "label"
+              },
+              {
+                "square": "h8",
+                "symbol": "6",
+                "meaning": "Moves from a1 as printed",
+                "variant": "label"
+              },
+              {
+                "square": "g7",
+                "symbol": "4",
+                "meaning": "Moves from g2 as printed",
+                "variant": "label"
+              },
+              {
+                "square": "h6",
+                "symbol": "4",
+                "meaning": "Moves from g2 as printed",
+                "variant": "label"
+              },
+              {
+                "square": "f3",
+                "symbol": "2",
+                "meaning": "Route step as printed",
+                "variant": "label"
+              },
+              {
+                "square": "g3",
+                "symbol": "3",
+                "meaning": "Route step as printed",
+                "variant": "label"
+              },
+              {
+                "square": "h3",
+                "symbol": "2",
+                "meaning": "Route step as printed",
+                "variant": "label"
+              },
+              {
+                "square": "a2",
+                "symbol": "3",
+                "meaning": "Route step as printed",
+                "variant": "label"
+              },
+              {
+                "square": "b2",
+                "symbol": "4",
+                "meaning": "Route step as printed",
+                "variant": "label"
+              },
+              {
+                "square": "f2",
+                "symbol": "3",
+                "meaning": "Route step as printed",
+                "variant": "label"
+              },
+              {
+                "square": "h2",
+                "symbol": "3",
+                "meaning": "Route step as printed",
+                "variant": "label"
+              },
+              {
+                "square": "b1",
+                "symbol": "3",
+                "meaning": "Route step as printed",
+                "variant": "label"
+              },
+              {
+                "square": "f1",
+                "symbol": "2",
+                "meaning": "Route step as printed",
+                "variant": "label"
+              },
+              {
+                "square": "g1",
+                "symbol": "3",
+                "meaning": "Route step as printed",
+                "variant": "label"
+              },
+              {
+                "square": "h1",
+                "symbol": "4",
+                "meaning": "Route step as printed",
+                "variant": "label"
+              }
+            ]
+          }
+        },
+        {
+          "type": "text",
+          "content": "One thing that stands out is that the knight needs 4 moves to go from a1 to b2 (the dumb square), and also 4 to reach the other end of the board. We can also see that the knight always needs an odd number of moves to reach a different-coloured square, and an even number to reach a same-coloured square. That is a consequence of the fact that a knight jumps to a different-coloured square in each move. This is an important feature, since very often the knight is unable to 'lose a move', something the other pieces can perfectly well do. Thus the knight is less efficient and can more easily fall into zugzwang (several examples appear in Chapter 7)."
+        },
+        {
+          "type": "heading",
+          "content": "The king's multiple routes"
+        },
+        {
+          "type": "diagram",
+          "content": {
+            "number": "intro-king-routes",
+            "label": "The king's multiple routes",
+            "fen": "8/8/8/8/K7/8/8/k7",
+            "markers": [
+              {
+                "square": "h8",
+                "symbol": "7",
+                "meaning": "Moves from a1 as printed",
+                "variant": "label"
+              },
+              {
+                "square": "a5",
+                "symbol": "1",
+                "meaning": "Route step as printed",
+                "variant": "label"
+              },
+              {
+                "square": "b5",
+                "symbol": "1",
+                "meaning": "Route step as printed",
+                "variant": "label"
+              },
+              {
+                "square": "b4",
+                "symbol": "1",
+                "meaning": "Route step as printed",
+                "variant": "label"
+              },
+              {
+                "square": "g4",
+                "symbol": "6",
+                "meaning": "Route step as printed",
+                "variant": "label"
+              },
+              {
+                "square": "h4",
+                "symbol": "7",
+                "meaning": "Route step as printed",
+                "variant": "label"
+              },
+              {
+                "square": "a3",
+                "symbol": "1",
+                "meaning": "Route step as printed",
+                "variant": "label"
+              },
+              {
+                "square": "b3",
+                "symbol": "1",
+                "meaning": "Route step as printed",
+                "variant": "label"
+              }
+            ]
+          }
+        },
+        {
+          "type": "text",
+          "content": "On the contrary, the king is more constant. It takes him 7 moves to move from one end of the board to another (also, from one corner to another). This is extremely slow, when compared to the other pieces, and makes him very vulnerable when struggling against distant passed pawns. However, in contrast with the knight, the king always needs more moves to reach a distant square than one nearby.\nNevertheless, one of the most interesting features of the king's mobility is that he usually can choose among many different routes to reach a distant square. In this chart, let us take the white king from a4 to h4; the extreme routes, as well as the most straightforward one, are marked, but the king has many other routes ... up to 393 possible routes!!!! Of course, the more diagonally he has to go, the narrower is his choice. Finally, a king on a1 needs 7 moves to move to the opposite corner and has just one available route (through the long black diagonal).\nThis feature is shared by the knight, but then the practical implications are minor. In the case of the king, the influence in practical play is tremendous: when the king has a clear goal, such as reaching a concrete square, this ability allows him to choose among different routes playing dual-purpose moves. The most frequent 'second purpose' is standing in the enemy king's way, as illustrated in many examples in Chapter 5 and then Chapter 11. That is why the ability of 'shouldering away' is so important in those endings where the king plays an active role."
+        },
+        {
+          "type": "heading",
+          "content": "The knight's domination"
+        },
+        {
+          "type": "text",
+          "content": "Another important feature of pieces' mobility, with special incidence for the knight, is the concept of domination. It is a situation where a piece 'dominates' all possible moves of an enemy piece and, therefore, reduces its options for efficient play.\nWhen the board is more or less empty (and that almost always happens in the endgame), the piece more likely to suffer domination is the knight; however, when the board is more populated any piece can suffer it."
+        },
+        {
+          "type": "diagram",
+          "content": {
+            "number": "intro-knight-domination",
+            "label": "The knight's domination",
+            "fen": "n7/1K5n/8/5R2/3R4/4B2n/1n6/8"
+          }
+        },
+        {
+          "type": "text",
+          "content": "In this diagram we can see 4 examples of domination: Kb7 dominates Na8, Rd4 dominates Nb2, Rf5 dominates Nh7 (this is important to trap the knight in the Rook vs. Knight ending) and last Be3 dominates Nh3. Very often a knight's domination by a bishop is relevant because, if the knight manages to get free (for instance, with the aid of the king), an eventual exchange may be decisive."
+        },
+        {
+          "type": "heading",
+          "content": "The concept of a fortress. Some elementary examples"
+        },
+        {
+          "type": "text",
+          "content": "Another essential concept when dealing with elementary endings is that of the fortress.\nA fortress is a position where one side has a great material superiority but his opponent can hold with simple, though in some cases accurate, waiting moves.\nFortresses may arise with many pieces on the board, although in that case the positions are always partially or completely blocked.\nTherefore the natural territory of fortresses is the endgame and some of their frequent (though not essential) features are the following:\n1) Pawn breakthroughs do not exist (or those rarely found are useless).\n2) When the strong side has passed pawns, they are firmly blocked.\n3) The stronger side's king cannot penetrate, either because he is cut off or because the edge of the board is near.\n4) Zugzwang positions cannot be forced, which implies a defensive set-up with available waiting moves.\nSome of the endings analysed in this book can be considered fortresses; others are definitely fortresses, even though they are not always considered like that. Chapter 15, above all, shows many positions that can be classified as fortresses. Actually, this is the most natural defensive technique when the material disadvantage is great.\nI would say that the main feature of a fortress is that defending is easy, and therefore the analysis is almost obvious. A position which does not fulfil this requirement can have the same practical effects, but a different approach for human intuition.\nThere is no need to know all fortresses discovered by endgame theory, as many of them are rather strange; however, it is useful to know some of them, as they determine the final result of endings with an heterogeneous material relation on the board. That is why I present a small appendix, purely visual but worth observing, apart from the next series of examples.\nNevertheless, the best procedure is to absorb the idea and be able to imagine on your own the positions where the fortress can be adopted.\nNow we will see some related positions, without analysis. If you have doubts regarding the statements, do not hesitate to check your doubts with personal analysis. Remember: you only understand something when you have done it yourself."
+        },
+        {
+          "type": "position",
+          "content": {
+            "number": "I.1",
+            "fen": "8/1b6/8/8/8/5k1p/7P/6K1 w - - 0 1"
+          }
+        },
+        {
+          "type": "text",
+          "content": "Draw, but White should avoid 1.Kh1??. We could add blocked pawns for White on the h2-b8 diagonal, and for Black on the h3-c8 diagonal, and the result would not change."
+        },
+        {
+          "type": "position",
+          "content": {
+            "number": "I.2",
+            "fen": "8/8/1b6/8/8/5k1p/7P/6K1 w - - 0 1"
+          }
+        },
+        {
+          "type": "text",
+          "content": "Draw, as long as the white king does not leave the corner."
+        },
+        {
+          "type": "position",
+          "content": {
+            "number": "I.3",
+            "fen": "8/8/1n6/8/8/5k1p/7P/6K1 w - - 0 1"
+          }
+        },
+        {
+          "type": "text",
+          "content": "Draw, as long as the white king does not leave the corner."
+        },
+        {
+          "type": "position",
+          "content": {
+            "number": "I.4",
+            "fen": "8/1b6/8/8/8/4k1p1/6P1/5K2 w - - 0 1"
+          }
+        },
+        {
+          "type": "text",
+          "content": "Draw, as long as the white king does not leave the corner."
+        },
+        {
+          "type": "position",
+          "content": {
+            "number": "I.5",
+            "fen": "8/8/1b6/8/8/4k1p1/6P1/5K2 w - - 0 1"
+          }
+        },
+        {
+          "type": "text",
+          "content": "Draw, as long as the white king does not leave the corner. More pawns could be added."
+        },
+        {
+          "type": "position",
+          "content": {
+            "number": "I.6",
+            "fen": "8/8/1n6/8/8/4k1p1/6P1/5K2 w - - 0 1"
+          }
+        },
+        {
+          "type": "text",
+          "content": "Black wins (You can check it, as an interesting Exercise).\nThese ideas will be recurrent throughout the book. I recommend coming back to the introduction to refresh your memory when necessary.\nAnd now it is time to start with our study of the 100 theoretical positions we have selected as the most useful for the tournament player."
+        }
+      ]
+    },
+    {
       "id": "1",
       "label": "Chapter 1",
       "name": "Basic endings",

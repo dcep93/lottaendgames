@@ -172,6 +172,21 @@ assertChapterIncludes(
 )
 assertChapterExcludes('13', '38.Kd7+ Kf6')
 assertChapterExcludes('14', '100.Kc5 Ke4')
+assertChapterIncludes('introduction', 'The relative importance of the endgame')
+assertChapterIncludes(
+  'introduction',
+  'If I hear - I forget, if I see - I remember, if I do - I understand.',
+)
+assertChapterIncludes('introduction', "the knight's dumb square")
+assertChapterIncludes('introduction', 'up to 393 possible routes')
+assertChapterIncludes(
+  'introduction',
+  'A fortress is a position where one side has a great material superiority',
+)
+assertChapterIncludes(
+  'introduction',
+  'And now it is time to start with our study of the 100 theoretical positions',
+)
 
 console.log('source text audit passed')
 
@@ -214,10 +229,22 @@ function textualValues(section: RawChapterSection) {
   if (!section.content || typeof section.content !== 'object') {
     return []
   }
-  return Object.entries(section.content)
-    .filter(
-      ([key, value]) =>
-        key !== 'fen' && key !== 'number' && typeof value === 'string',
-    )
-    .map(([, value]) => value as string)
+  return collectText(section.content)
+}
+
+function collectText(value: unknown, key = ''): string[] {
+  if (typeof value === 'string') {
+    return ['fen', 'number', 'solutionFen', 'square', 'symbol'].includes(key)
+      ? []
+      : [value]
+  }
+  if (Array.isArray(value)) {
+    return value.flatMap((entry) => collectText(entry, key))
+  }
+  if (!value || typeof value !== 'object') {
+    return []
+  }
+  return Object.entries(value).flatMap(([entryKey, entryValue]) =>
+    collectText(entryValue, entryKey),
+  )
 }
