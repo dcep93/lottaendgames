@@ -15,8 +15,12 @@
     }
   },
   {
+    "type": "heading",
+    "content": "Extreme position. Rook behind the pawns"
+  },
+  {
     "type": "text",
-    "content": "Extreme position. Rook behind the pawns\n\nWhen kings play no part, the rook usually captures the pawns unless they are far advanced.\n\nThis is the extreme position where neither king plays a part. White wins if it is his turn, and loses if it is Black to move. There is no happy medium. Play is easy in both cases."
+    "content": "When kings play no part, the rook usually captures the pawns unless they are far advanced.\n\nThis is the extreme position where neither king plays a part. White wins if it is his turn, and loses if it is Black to move. There is no happy medium. Play is easy in both cases."
   },
   {
     "type": "position",
@@ -44,8 +48,12 @@
     }
   },
   {
+    "type": "heading",
+    "content": "Rook in front of the pawns"
+  },
+  {
     "type": "text",
-    "content": "Rook in front of the pawns\n\nIf the rook is in front of the pawns (i.e. here on the g8-square) there are some differences to note. If the pawns start, the result is the same. However, if the rook starts, Black can stop the pawns (here, with ...Ra8) but not capture them. Then, the king race will be decisive."
+    "content": "If the rook is in front of the pawns (i.e. here on the g8-square) there are some differences to note. If the pawns start, the result is the same. However, if the rook starts, Black can stop the pawns (here, with ...Ra8) but not capture them. Then, the king race will be decisive."
   },
   {
     "type": "ending",
@@ -55,8 +63,12 @@
     }
   },
   {
+    "type": "heading",
+    "content": "Stronger side's king in front of the pawns"
+  },
+  {
     "type": "text",
-    "content": "Stronger side's king in front of the pawns\n\nWhen the king and the rook work together to stop the pawns, they usually win. If the stronger side's king achieves a position in front of the pawns, not even the most favourable scenario (except, of course, promotion) can save the game for the defender. The analysis of 6.2 is very simple."
+    "content": "When the king and the rook work together to stop the pawns, they usually win. If the stronger side's king achieves a position in front of the pawns, not even the most favourable scenario (except, of course, promotion) can save the game for the defender. The analysis of 6.2 is very simple."
   },
   {
     "type": "position",
@@ -71,7 +83,15 @@
   },
   {
     "type": "text",
-    "content": "And the pawns are captured.\n\nStronger side's king on one side of the pawns\n\nIf the stronger side's king only manages to stand on one side of the promotion squares and the other king supports his pawns, things are more complicated."
+    "content": "And the pawns are captured."
+  },
+  {
+    "type": "heading",
+    "content": "Stronger side's king on one side of the pawns"
+  },
+  {
+    "type": "text",
+    "content": "If the stronger side's king only manages to stand on one side of the promotion squares and the other king supports his pawns, things are more complicated."
   },
   {
     "type": "position",
@@ -128,8 +148,12 @@
     }
   },
   {
+    "type": "heading",
+    "content": "The king is in contact with the less advanced pawn. ('the tail-hook')"
+  },
+  {
     "type": "text",
-    "content": "The king is in contact with the less advanced pawn. ('the tail-hook')\n\nWhen the king supports his pawns, and his counterpart is far from them, the pawns can win. However, the rook has more resources than one usually thinks, as we will see in the following examples:"
+    "content": "When the king supports his pawns, and his counterpart is far from them, the pawns can win. However, the rook has more resources than one usually thinks, as we will see in the following examples:"
   },
   {
     "type": "position",
@@ -159,12 +183,15 @@
     "content": "Though further analysis is not necessary, we should look at the position closely, because this is the most typical extreme situation in this endgame. This is the situation that Black has been aiming for ever since his paradoxical first move: the rook controls the advanced pawn's promotion, whereas the king keeps an eye on the backward pawn. It is an immediate draw. Dvoretsky calls this situation the 'tail-hook', an expression used by pilots and a very visual metaphor."
   },
   {
+    "type": "heading",
+    "content": "The series of checks"
+  },
+  {
     "type": "position",
     "content": {
       "number": "6.6",
       "caption": "Lariño - Picazo, La Roda, 2006",
-      "fen": "5K2/7R/8/6kp/6p1/8/8/8 b - - 0 1",
-      "subtitle": "The series of checks"
+      "fen": "5K2/7R/8/6kp/6p1/8/8/8 b - - 0 1"
     }
   },
   {
@@ -183,7 +210,7 @@
     "type": "position",
     "content": {
       "number": "6.7",
-      "caption": "Analysis diagram",
+      "caption": "Analysis diagram 6.7",
       "fen": "8/7R/4K3/8/6kp/6p1/8/8 w - - 0 1"
     }
   },

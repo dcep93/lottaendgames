@@ -190,7 +190,7 @@
   },
   {
     "type": "text",
-    "content": "we are going to see a tough fight from which we can draw some important conclusions. The strong king pushes his counterpart from the rear, while the rook occupies its most frequent position: the side attack. Here the main defensive resource is underpromoting to a knight, whereas the main attacking motif is going round. Let us start with Position 5.4, where White is to move. The white king is pushing the enemy king, who in turn blocks his way. There is no time for going round the pawn (a device we will see in the next example), so the only way to make progress seems to be a combination of rook checks and moving the king forward."
+    "content": "We are going to see a tough fight from which we can draw some important conclusions. The strong king pushes his counterpart from the rear, while the rook occupies its most frequent position: the side attack. Here the main defensive resource is underpromoting to a knight, whereas the main attacking motif is going round. Let us start with Position 5.4, where White is to move. The white king is pushing the enemy king, who in turn blocks his way. There is no time for going round the pawn (a device we will see in the next example), so the only way to make progress seems to be a combination of rook checks and moving the king forward."
   },
   {
     "type": "position",
@@ -250,8 +250,12 @@
     "type": "panel",
     "content": {
       "title": "Summary of interesting ideas",
-      "text": "1) Pushing the defending king from the rear does not work against b-, c-, d-, e-, f- and g-pawns: underpromotion to a knight saves the day. 2) In those cases, outflanking is the right way. 3) The strong king has no time to outflank his opponent when the pawn is on the 5th rank, unless the rook is at the rear of the pawn. 4) With a knight's pawn stalemate themes can occur. The study of these last positions has provided us with a good knowledge of the scenarios where the stronger side's king is at the rear of the pawn. However, if we want to fix this knowledge in our minds, examining the next series of positions should be both enjoyable and useful. Here we compare the results with different locations of the rook and the advances of the pawn. Just observe and reflect. If you are not sure about the statements, try to calculate the variations in your mind: it will be a useful Exercise. If you have more doubts, play it on the board. In any case, do not go further unless all your doubts have been solved."
+      "text": "1) Pushing the defending king from the rear does not work against b-, c-, d-, e-, f- and g-pawns: underpromotion to a knight saves the day. 2) In those cases, outflanking is the right way. 3) The strong king has no time to outflank his opponent when the pawn is on the 5th rank, unless the rook is at the rear of the pawn. 4) With a knight's pawn stalemate themes can occur."
     }
+  },
+  {
+    "type": "text",
+    "content": "The study of these last positions has provided us with a good knowledge of the scenarios where the stronger side's king is at the rear of the pawn. However, if we want to fix this knowledge in our minds, examining the next series of positions should be both enjoyable and useful. Here we compare the results with different locations of the rook and the advances of the pawn. Just observe and reflect. If you are not sure about the statements, try to calculate the variations in your mind: it will be a useful Exercise. If you have more doubts, play it on the board. In any case, do not go further unless all your doubts have been solved."
   },
   {
     "type": "heading",
@@ -301,15 +305,15 @@
     }
   },
   {
-    "type": "heading",
-    "content": "Shoulder-charging"
-  },
-  {
     "type": "ending",
     "content": {
       "number": "24",
       "text": "Stronger side's king on one side"
     }
+  },
+  {
+    "type": "heading",
+    "content": "Shoulder-charging"
   },
   {
     "type": "text",
@@ -487,8 +491,11 @@
     "content": "1.Rh4+! Kb3 2.Kb5 a3 3.Rh3+ Kb2 4.Kb4 a2 5.Rh2+ Kb1 6.Kb3! a1N+ (6...a1Q 7.Rh1 mate) 7.Kc3+- And the knight is lost."
   },
   {
-    "type": "text",
-    "content": "Conclusion: The king pushing from the rear is a very effective attacking technique against a rook's pawn, in combination with rook checks. Remember that it is not so effective against other pawns."
+    "type": "panel",
+    "content": {
+      "title": "Conclusion",
+      "text": "The king pushing from the rear is a very effective attacking technique against a rook's pawn, in combination with rook checks. Remember that it is not so effective against other pawns."
+    }
   },
   {
     "type": "ending",
@@ -540,8 +547,11 @@
     "content": "1...Kb2! Avoiding the push. 1...a2? 2.Rb8+ Ka3 3.Kc2! and wins because a knight in the corner is always lost: 3...a1N+ 4.Kc3+-. 2.Rb8+ Other moves do not bring success either: 2.Kd2 a2! (Ending 28) 3.Rb8+ Ka1! Stalemate motifs!; 2.Rh2+ Kb3!= Typical: when the rook is misplaced (not ready to check from the file), the best policy is to obstruct the enemy king (2...Kb1? 3.Kc3+-; 2...Kc1? 3.Kc3). 2...Kc1! Since there is no time to prepare a stalemate, obstructing the pawn is pointless. 3.Kc3 (3.Ra8 Kb2) 3...a2 4.Ra8 Kb1 5.Rb8+ Kc1!= Beware of overconfidence in stalemate: that would work with the white king on d2, but now 5...Ka1?? fails to 6.Rf8 and mate."
   },
   {
-    "type": "text",
-    "content": "Conclusion: The rook's pawn is not worse than the others against the lateral king push, thanks to stalemate chances."
+    "type": "panel",
+    "content": {
+      "title": "Conclusion",
+      "text": "The rook's pawn is not worse than the others against the lateral king push, thanks to stalemate chances."
+    }
   },
   {
     "type": "heading",

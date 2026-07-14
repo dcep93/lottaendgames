@@ -104,7 +104,11 @@
   },
   {
     "type": "text",
-    "content": "Of course, this rule only applies when the pawn has to cross the last blockade square. If the pawn is less advanced and there is yet another blockade square, the stronger side succeeds only in crossing the first obstacle. Victory will depend on the success or failure of the new defensive set-up on the next blockade square.\n\nFollowing this rule about the length of the diagonals, some theoretical studies present a borderline between drawn and winning positions depending on how advanced the pawn is. These borderlines are not my cup of tea, though I cannot deny they have certain theoretical interest. I think it is better to remember why things happen.\n\nAn apparent exception. 3-square diagonal. The attacking king controls just one square."
+    "content": "Of course, this rule only applies when the pawn has to cross the last blockade square. If the pawn is less advanced and there is yet another blockade square, the stronger side succeeds only in crossing the first obstacle. Victory will depend on the success or failure of the new defensive set-up on the next blockade square.\n\nFollowing this rule about the length of the diagonals, some theoretical studies present a borderline between drawn and winning positions depending on how advanced the pawn is. These borderlines are not my cup of tea, though I cannot deny they have certain theoretical interest. I think it is better to remember why things happen."
+  },
+  {
+    "type": "heading",
+    "content": "An apparent exception. 3-square diagonal. The attacking king controls just one square."
   },
   {
     "type": "position",
@@ -142,7 +146,7 @@
   },
   {
     "type": "text",
-    "content": "1...Kd7?!\n\nThe black player shows his ignorance of the basic drawing procedure, thus making life difficult for himself. The simplest defensive plan was 1...Kd5! 2.Kg6 Ke4 3.Bc7 Kf3 4.Bd8 Kg4= and the black king makes it to the rear of the pawn, getting the opposition.\n\n2.Kg6 Ke8!\n\nNow there was no time to get to the g4-square, but it is still a draw. Black can try another drawing procedure. It is less well known and more delicate, but worth knowing, in case one reaches a position where the rear opposition defence is not available. The king heads for the g8-square.\n\n3.Bf4\n\nTrying to cut the black king's path to f8 would not work. Black just waits: 3.Bd6 Bd4=.\n\n3...Bd4?\n\nHowever, Black fails to find the second defensive method as well. The correct move was 3...Kf8! 4.Bh6+ Kg8! The key point is that when the black king is here, White cannot offer the bishop exchange on g5, since it leads to a drawn pawn endgame. 5.Bg5 Bd4 6.Bf6. As usual, if the attacking side offers a bishop exchange in front of the pawn, the defending bishop just switches to another diagonal. 6...Bf2 7.Be5 Bh4 8.Bf4 Bd8 9.Bg5. This confirms the draw but, anyway, there is no way to make progress: 9...Bxg5 10.Kxg5 Kf7=.\n\n4.Bh6!+-\n\nAnd Black resigned, maybe because the game was adjourned here. In any case, victory comes easily, since White cannot offer the bishop exchange without obstructing his pawn: 4...Ke7 5.Bg7 Bc5 6.f6++; 4...Bc3 5.Bg7 Bb4 6.f6+-."
+    "content": "1...Kd7?!\n\nThe black player shows his ignorance of the basic drawing procedure, thus making life difficult for himself. The simplest defensive plan was 1...Kd5! 2.Kg6 Ke4 3.Bc7 Kf3 4.Bd8 Kg4= and the black king makes it to the rear of the pawn, getting the opposition.\n\n2.Kg6 Ke8!\n\nNow there was no time to get to the g4-square, but it is still a draw. Black can try another drawing procedure. It is less well known and more delicate, but worth knowing, in case one reaches a position where the rear opposition defence is not available. The king heads for the g8-square.\n\n3.Bf4\n\nTrying to cut the black king's path to f8 would not work. Black just waits: 3.Bd6 Bd4=.\n\n3...Bd4?\n\nHowever, Black fails to find the second defensive method as well. The correct move was 3...Kf8! 4.Bh6+ Kg8! The key point is that when the black king is here, White cannot offer the bishop exchange on g5, since it leads to a drawn pawn endgame. 5.Bg5 Bd4 6.Bf6. As usual, if the attacking side offers a bishop exchange in front of the pawn, the defending bishop just switches to another diagonal. 6...Bf2 7.Be5 Bh4 8.Bf4 Bd8 9.Bg5. This confirms the draw but, anyway, there is no way to make progress: 9...Bxg5 10.Kxg5 Kf7=.\n\n4.Bh6!+-\n\nAnd Black resigned, maybe because the game was adjourned here. In any case, victory comes easily, since White cannot offer the bishop exchange without obstructing his pawn: 4...Ke7 5.Bg7 Bc5 6.f6++-; 4...Bc3 5.Bg7 Bb4 6.f6+-."
   },
   {
     "type": "panel",
@@ -152,12 +156,15 @@
     }
   },
   {
+    "type": "heading",
+    "content": "Revision of some assorted themes"
+  },
+  {
     "type": "position",
     "content": {
       "number": "7.6",
       "caption": "Averbakh, 1972",
-      "fen": "5k2/3b4/3P1K2/8/8/8/8/3B4 w - - 0 1",
-      "subtitle": "Revision of some assorted themes"
+      "fen": "5k2/3b4/3P1K2/8/8/8/8/3B4 w - - 0 1"
     }
   },
   {

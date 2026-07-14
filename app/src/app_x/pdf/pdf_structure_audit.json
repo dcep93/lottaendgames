@@ -167,8 +167,8 @@
       "chapter": "5",
       "ending": "24",
       "page": 74,
-      "targetStartsWith": "As we have seen, the rook needs support from the king to control and capture the",
-      "targetType": "text"
+      "targetStartsWith": "Shoulder-charging",
+      "targetType": "heading"
     },
     {
       "chapter": "5",
@@ -209,22 +209,22 @@
       "chapter": "6",
       "ending": "30",
       "page": 83,
-      "targetStartsWith": "Extreme position. Rook behind the pawns\n\nWhen kings play no part, the rook usual",
-      "targetType": "text"
+      "targetStartsWith": "Extreme position. Rook behind the pawns",
+      "targetType": "heading"
     },
     {
       "chapter": "6",
       "ending": "31",
       "page": 84,
-      "targetStartsWith": "Stronger side's king in front of the pawns\n\nWhen the king and the rook work toge",
-      "targetType": "text"
+      "targetStartsWith": "Stronger side's king in front of the pawns",
+      "targetType": "heading"
     },
     {
       "chapter": "6",
       "ending": "32",
       "page": 85,
-      "targetStartsWith": "The king is in contact with the less advanced pawn. ('the tail-hook')\n\nWhen the ",
-      "targetType": "text"
+      "targetStartsWith": "The king is in contact with the less advanced pawn. ('the tail-hook')",
+      "targetType": "heading"
     },
     {
       "chapter": "7",
@@ -314,22 +314,22 @@
       "chapter": "9",
       "ending": "45",
       "page": 112,
-      "targetStartsWith": "Here the defensive procedure is simple too.\n\n1.Kd5\n\nIf the black pieces switched",
+      "targetStartsWith": "Here the defensive procedure is simple too.",
       "targetType": "text"
     },
     {
       "chapter": "9",
       "ending": "46",
       "page": 113,
-      "targetStartsWith": "1.f4 Getting past the diagonal h2-b8, along which the black bishop could stop",
+      "targetStartsWith": "All endings in this section are won in the same fashion.",
       "targetType": "text"
     },
     {
       "chapter": "9",
       "ending": "47",
       "page": 114,
-      "targetStartsWith": "Position 9.12",
-      "targetType": "position"
+      "targetStartsWith": "The defending bishop has control over the promotion square",
+      "targetType": "heading"
     },
     {
       "chapter": "9",
@@ -342,8 +342,8 @@
       "chapter": "9",
       "ending": "49",
       "page": 118,
-      "targetStartsWith": "Let us start with knight and bishop's pawns. The worst scenario for the stronger",
-      "targetType": "text"
+      "targetStartsWith": "Outflanking on the edge",
+      "targetType": "heading"
     },
     {
       "chapter": "9",
@@ -825,6 +825,18 @@
       "textStartsWith": "Conclusion: If the defender's king can be forced"
     },
     {
+      "chapter": "5",
+      "page": 79,
+      "title": "Conclusion",
+      "textStartsWith": "Conclusion: The king pushing from the rear"
+    },
+    {
+      "chapter": "5",
+      "page": 81,
+      "title": "Conclusion",
+      "textStartsWith": "Conclusion: The rook's pawn is not worse"
+    },
+    {
       "chapter": "10",
       "page": 125,
       "title": "Summary",
@@ -1000,54 +1012,9 @@
       "text": "The same trick, on the other side"
     },
     {
-      "chapter": "6",
-      "position": "6.6",
-      "text": "The series of checks"
-    },
-    {
-      "chapter": "7",
-      "position": "7.6",
-      "text": "Revision of some assorted themes"
-    },
-    {
-      "chapter": "8",
-      "position": "8.5",
-      "text": "When the defending king is further away"
-    },
-    {
       "chapter": "8",
       "position": "8.7a",
       "text": "Zugzwang, stalemate or perpetual check"
-    },
-    {
-      "chapter": "9",
-      "position": "9.2",
-      "text": "The bishop in front of the pawns"
-    },
-    {
-      "chapter": "9",
-      "position": "9.3",
-      "text": "Rook and knight's pawns"
-    },
-    {
-      "chapter": "9",
-      "position": "9.4",
-      "text": "The winning procedure"
-    },
-    {
-      "chapter": "9",
-      "position": "9.12",
-      "text": "The defending bishop has control over the promotion square"
-    },
-    {
-      "chapter": "9",
-      "position": "9.15",
-      "text": "The attacking bishop has control over the promotion square"
-    },
-    {
-      "chapter": "9",
-      "position": "9.17",
-      "text": "Outflanking on the edge"
     },
     {
       "chapter": "10",
@@ -1203,6 +1170,42 @@
       "text": "The winning zone for the king. Defending king on the right side"
     },
     {
+      "chapter": "6",
+      "text": "Extreme position. Rook behind the pawns"
+    },
+    {
+      "chapter": "6",
+      "text": "Rook in front of the pawns"
+    },
+    {
+      "chapter": "6",
+      "text": "Stronger side's king in front of the pawns"
+    },
+    {
+      "chapter": "6",
+      "text": "Stronger side's king on one side of the pawns"
+    },
+    {
+      "chapter": "6",
+      "text": "Rook vs. 2 Pawns series"
+    },
+    {
+      "chapter": "6",
+      "text": "The king is in contact with the less advanced pawn. ('the tail-hook')"
+    },
+    {
+      "chapter": "6",
+      "text": "The series of checks"
+    },
+    {
+      "chapter": "7",
+      "text": "An apparent exception. 3-square diagonal. The attacking king controls just one square."
+    },
+    {
+      "chapter": "7",
+      "text": "Revision of some assorted themes"
+    },
+    {
       "chapter": "8",
       "text": "Section 1. Knight + Pawn vs. Bishop"
     },
@@ -1212,19 +1215,31 @@
     },
     {
       "chapter": "8",
-      "text": "First scenario"
-    },
-    {
-      "chapter": "8",
-      "text": "Second scenario"
-    },
-    {
-      "chapter": "8",
-      "text": "Third scenario"
+      "text": "When the defending king is further away"
     },
     {
       "chapter": "9",
       "text": "Section 1. Connected pawns"
+    },
+    {
+      "chapter": "9",
+      "text": "The bishop in front of the pawns"
+    },
+    {
+      "chapter": "9",
+      "text": "Rook and knight's pawns"
+    },
+    {
+      "chapter": "9",
+      "text": "The winning procedure"
+    },
+    {
+      "chapter": "9",
+      "text": "The defensive procedure"
+    },
+    {
+      "chapter": "9",
+      "text": "Pawns on the 4th rank"
     },
     {
       "chapter": "9",
@@ -1236,7 +1251,27 @@
     },
     {
       "chapter": "9",
+      "text": "The defending bishop has control over the promotion square"
+    },
+    {
+      "chapter": "9",
+      "text": "The attacking bishop has control over the promotion square"
+    },
+    {
+      "chapter": "9",
       "text": "Section 4. Pawns separated by three files"
+    },
+    {
+      "chapter": "9",
+      "text": "Outflanking on the edge"
+    },
+    {
+      "chapter": "9",
+      "text": "The knight's pawn is further back"
+    },
+    {
+      "chapter": "9",
+      "text": "Final summary"
     },
     {
       "chapter": "10",
@@ -1464,33 +1499,33 @@
     },
     "5": {
       "headings": 13,
-      "panels": 3,
+      "panels": 5,
       "positions": 24,
       "subtitles": 0
     },
     "6": {
-      "headings": 1,
+      "headings": 7,
       "panels": 1,
       "positions": 10,
-      "subtitles": 1
+      "subtitles": 0
     },
     "7": {
-      "headings": 0,
+      "headings": 2,
       "panels": 4,
       "positions": 6,
-      "subtitles": 1
+      "subtitles": 0
     },
     "8": {
-      "headings": 6,
+      "headings": 4,
       "panels": 3,
       "positions": 11,
-      "subtitles": 2
+      "subtitles": 1
     },
     "9": {
-      "headings": 5,
+      "headings": 14,
       "panels": 10,
       "positions": 20,
-      "subtitles": 6
+      "subtitles": 0
     },
     "10": {
       "headings": 17,

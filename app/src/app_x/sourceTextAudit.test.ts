@@ -96,10 +96,17 @@ assertChapterIncludes(
   '8',
   'Recommended Exercise: Look carefully at the following series about knight blockade',
 )
+assertChapterIncludes('8', 'When the defending king is further away')
+assertChapterIncludes('8', 'First scenario: The defending king manages')
 assertChapterIncludes(
   '9',
   'We will divide our study material into positions with separated pawns and positions with connected pawns.',
 )
+assertChapterIncludes('9', '1) A bishop check to force the enemy king')
+assertChapterIncludes('9', '3...Ba2 4.Kd2')
+assertChapterIncludes('9', '5.Kc3 followed by Kb4, Kc5 and d5')
+assertChapterIncludes('9', 'This pawn structure allows wins')
+assertChapterIncludes('9', '13...Kd7 14.Kf6 Bh5')
 assertChapterIncludes('9', 'Final summary')
 assertChapterIncludes('9', 'When pawns are separated by TWO files')
 assertChapterIncludes(
@@ -126,6 +133,17 @@ assertChapterIncludes('4', '1... Qe5+')
 assertChapterIncludes('4', '2. Kd7 Qf6 3. Ke8 Qe6+ 4. Kf8')
 assertChapterIncludes('4', '3. Ke7 Qe5+ 4. Kd7 Qf6 5. Ke8 Qe6+')
 assertChapterIncludes('4', '4. Kf6 Qd4+ 5. Ke7 Qg7')
+assertChapterIncludes('5', 'We are going to see a tough fight')
+assertChapterIncludes('5', 'The study of these last positions has provided us')
+assertChapterIncludes('5', 'The king pushing from the rear is a very effective')
+assertChapterIncludes('5', "The rook's pawn is not worse than the others")
+assertChapterIncludes('6', 'Extreme position. Rook behind the pawns')
+assertChapterIncludes('6', "Stronger side's king on one side of the pawns")
+assertChapterIncludes('6', 'The series of checks')
+assertChapterIncludes('6', 'Analysis diagram 6.7')
+assertChapterIncludes('7', 'An apparent exception. 3-square diagonal')
+assertChapterIncludes('7', '6.f6++-')
+assertChapterIncludes('7', 'Revision of some assorted themes')
 
 console.log('source text audit passed')
 

@@ -95,12 +95,15 @@
     "content": "Let us have a look at the following example:"
   },
   {
+    "type": "heading",
+    "content": "When the defending king is further away"
+  },
+  {
     "type": "position",
     "content": {
       "number": "8.5",
       "caption": "Stein - Dorfman, USSR, 1970",
-      "fen": "8/8/5B2/8/1n6/8/p1k1K3/8 b - - 0 1",
-      "subtitle": "When the defending king is further away"
+      "fen": "8/8/5B2/8/1n6/8/p1k1K3/8 b - - 0 1"
     }
   },
   {
@@ -136,31 +139,7 @@
   },
   {
     "type": "text",
-    "content": "If the knight is the weaker side, losing chances increase. That is consistent with the greater mobility of a bishop over a knight on an open board. We can distinguish three scenarios:"
-  },
-  {
-    "type": "heading",
-    "content": "First scenario"
-  },
-  {
-    "type": "text",
-    "content": "The defending king manages to stand in front of the pawn on a square opposite to the bishop's colour. Then it is an ironclad draw unless the knight is trapped. There is no need for examples of this.\n\nIf the king cannot get in front of the pawn, the blockade must be performed by the knight. King support is needed because, if the king is far away, the knight will be ousted from its blockading position, unless there is a chance of a knight fork."
-  },
-  {
-    "type": "heading",
-    "content": "Second scenario"
-  },
-  {
-    "type": "text",
-    "content": "Both king and knight control a square opposite from the colour of the bishop to stop the pawn. Apparently, this is a safe set-up for the defending side, but there are many zugzwang positions with the pawn on the 7th rank and, occasionally, on the 6th rank."
-  },
-  {
-    "type": "heading",
-    "content": "Third scenario"
-  },
-  {
-    "type": "text",
-    "content": "The knight controls one square with some support from the king, but this blockade is not solid. Here the result depends on the stability of the knight, which can be ousted by sometimes complicated tactics. Usually the attacking side has to force a zugzwang."
+    "content": "If the knight is the weaker side, losing chances increase. That is consistent with the greater mobility of a bishop over a knight on an open board. We can distinguish three scenarios:\n\nFirst scenario: The defending king manages to stand in front of the pawn on a square opposite to the bishop's colour. Then it is an ironclad draw unless the knight is trapped. There is no need for examples of this.\n\nIf the king cannot get in front of the pawn, the blockade must be performed by the knight. King support is needed because, if the king is far away, the knight will be ousted from its blockading position, unless there is a chance of a knight fork.\n\nSecond scenario: Both king and knight control a square opposite from the colour of the bishop to stop the pawn. Apparently, this is a safe set-up for the defending side, but there are many zugzwang positions with the pawn on the 7th rank and, occasionally, on the 6th rank.\n\nThird scenario: The knight controls one square with some support from the king, but this blockade is not solid. Here the result depends on the stability of the knight, which can be ousted by sometimes complicated tactics. Usually the attacking side has to force a zugzwang."
   },
   {
     "type": "ending",
