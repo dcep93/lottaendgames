@@ -2,12 +2,14 @@ import assert from 'node:assert/strict'
 import { renderToStaticMarkup } from 'react-dom/server'
 import {
   ChapterSelector,
+  EndingBlock,
   PanelBlock,
   PositionStudyGroup,
   ProblemStudyGroup,
   ProseBlock,
   ReaderMeta,
 } from './ChapterViewer'
+import ModuleSelector from '../ModuleSelector'
 import InstructionalDiagram from './InstructionalDiagram'
 import TableBlock from './TableBlock'
 import type {
@@ -20,6 +22,15 @@ import type { TextPlaybackToken } from './moveParser'
 
 const activeBoards = {}
 const onMoveClick = () => undefined
+const onAnchorSelect = () => undefined
+
+const moduleSelectorMarkup = renderToStaticMarkup(
+  <ModuleSelector activeModule="book" onNavigate={() => undefined} />,
+)
+assert.match(moduleSelectorMarkup, /aria-label="Modules"/)
+assert.match(moduleSelectorMarkup, /href="\/book\/intro"/)
+assert.match(moduleSelectorMarkup, /href="\/mate"/)
+assert.match(moduleSelectorMarkup, /aria-current="page"[^>]*>Book</)
 
 const diagramMarkup = renderToStaticMarkup(
   <InstructionalDiagram
@@ -118,6 +129,7 @@ const positionStudyMarkup = renderToStaticMarkup(
     activePositionNumber={null}
     group={{ contentIndexes: [1], index: 0, type: 'positionGroup' }}
     navigationByPosition={new Map()}
+    onAnchorSelect={onAnchorSelect}
     onMoveClick={onMoveClick}
     onPositionReset={() => undefined}
     playback={{ playablePositions: new Set(), tokensBySectionIndex: new Map() }}
@@ -129,6 +141,7 @@ const positionStudyMarkup = renderToStaticMarkup(
 )
 assert.match(positionStudyMarkup, /leg-position-study-header/)
 assert.match(positionStudyMarkup, /leg-position-study-content/)
+assert.match(positionStudyMarkup, /id="p1\.1"/)
 assert.ok(
   positionStudyMarkup.indexOf('leg-position-study-header') <
     positionStudyMarkup.indexOf('leg-position-study-content'),
@@ -140,6 +153,7 @@ const comparisonPositionMarkup = renderToStaticMarkup(
     activePositionNumber={null}
     group={{ contentIndexes: [], index: 0, type: 'positionGroup' }}
     navigationByPosition={new Map()}
+    onAnchorSelect={onAnchorSelect}
     onMoveClick={onMoveClick}
     onPositionReset={() => undefined}
     playback={{ playablePositions: new Set(), tokensBySectionIndex: new Map() }}
@@ -158,6 +172,18 @@ const comparisonPositionMarkup = renderToStaticMarkup(
 assert.match(comparisonPositionMarkup, /<strong[^>]*>Draw<\/strong>/)
 assert.doesNotMatch(comparisonPositionMarkup, />Position</)
 assert.doesNotMatch(comparisonPositionMarkup, />comparison\.1</)
+
+const endingMarkup = renderToStaticMarkup(
+  <EndingBlock
+    onAnchorSelect={onAnchorSelect}
+    section={{
+      content: { number: '1', text: 'The rule of the square' },
+      type: 'ending',
+    }}
+  />,
+)
+assert.match(endingMarkup, /id="e1"/)
+assert.match(endingMarkup, /href="#e1"/)
 
 const proseMarkup = renderToStaticMarkup(
   <ProseBlock
@@ -260,6 +286,7 @@ const hiddenProblemMarkup = renderToStaticMarkup(
 )
 assert.match(hiddenProblemMarkup, /leg-position-study-header/)
 assert.match(hiddenProblemMarkup, /leg-position-study-content/)
+assert.match(hiddenProblemMarkup, /id="p2\.01"/)
 assert.match(hiddenProblemMarkup, /aria-expanded="false"/)
 assert.match(hiddenProblemMarkup, />Show solution<\/button>/)
 assert.match(hiddenProblemMarkup, /data-playable="false"/)

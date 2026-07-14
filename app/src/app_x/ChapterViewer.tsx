@@ -1,5 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import type { MutableRefObject } from 'react'
+import type { MouseEvent, MutableRefObject, ReactNode } from 'react'
+import {
+  bookEndingAnchorId,
+  bookPositionAnchorId,
+} from '../routing'
 import { chapterPayloadPath } from './chapterPayloadManifest'
 import {
   hydrateRuntimeChapter,
@@ -59,8 +63,19 @@ type ActiveBoardState = {
   preferredNextByCursor: Record<string, string>
 }
 
-export default function ChapterViewer() {
-  const [activeChapterId, setActiveChapterId] = useState<string | null>(null)
+export default function ChapterViewer({
+  anchorId,
+  chapterId: activeChapterId,
+  moduleSelector,
+  onAnchorSelect,
+  onChapterSelect,
+}: {
+  anchorId: string | null
+  chapterId: string
+  moduleSelector: ReactNode
+  onAnchorSelect: (anchorId: string) => void
+  onChapterSelect: (chapterId: string) => void
+}) {
   const [chapterPayload, setChapterPayload] =
     useState<RuntimeChapterPayload | null>(null)
   const [chapterLoadError, setChapterLoadError] = useState<string | null>(null)
@@ -97,6 +112,7 @@ export default function ChapterViewer() {
     [chapterSections],
   )
   const moveAnimationFrameRef = useRef<number | null>(null)
+  const anchorAnimationFrameRef = useRef<number | null>(null)
   const positionCount = preparedChapter.positionCount
   const endingCount = preparedChapter.endingCount
 
@@ -106,11 +122,11 @@ export default function ChapterViewer() {
     }
 
     window.scrollTo({ behavior: 'auto', left: 0, top: 0 })
-    cancelMoveAnimationFrame(moveAnimationFrameRef)
-    setActiveChapterId(chapterId)
+    cancelAnimationFrameRef(moveAnimationFrameRef)
     setActiveBoards({})
     setActivePositionNumber(null)
     setRevealedSolutions({})
+    onChapterSelect(chapterId)
   }
 
   useEffect(() => {
@@ -130,11 +146,6 @@ export default function ChapterViewer() {
         }
 
         setChapterPayload(payload)
-        setActiveChapterId((current) =>
-          current && payload.chapters.some(({ id }) => id === current)
-            ? current
-            : (payload.chapters[0]?.id ?? null),
-        )
         setChapterLoadError(null)
       })
       .catch((error: unknown) => {
@@ -151,6 +162,38 @@ export default function ChapterViewer() {
       isMounted = false
     }
   }, [])
+
+  useEffect(() => {
+    cancelAnimationFrameRef(moveAnimationFrameRef)
+    setActiveBoards({})
+    setActivePositionNumber(null)
+    setRevealedSolutions({})
+  }, [activeChapterId])
+
+  useEffect(() => {
+    if (!activeChapter) {
+      return
+    }
+
+    cancelAnimationFrameRef(anchorAnimationFrameRef)
+    anchorAnimationFrameRef.current = window.requestAnimationFrame(() => {
+      const anchorTarget = anchorId
+        ? document.getElementById(anchorId)
+        : null
+
+      if (anchorTarget) {
+        anchorTarget.scrollIntoView({ block: 'start' })
+      } else {
+        window.scrollTo({ behavior: 'auto', left: 0, top: 0 })
+      }
+
+      anchorAnimationFrameRef.current = null
+    })
+
+    return () => {
+      cancelAnimationFrameRef(anchorAnimationFrameRef)
+    }
+  }, [activeChapter, anchorId])
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
@@ -178,7 +221,7 @@ export default function ChapterViewer() {
       }
 
       event.preventDefault()
-      cancelMoveAnimationFrame(moveAnimationFrameRef)
+      cancelAnimationFrameRef(moveAnimationFrameRef)
       setActivePositionNumber(visibleActivePosition)
       setActiveBoards((currentBoards) => {
         const currentBoard =
@@ -236,7 +279,7 @@ export default function ChapterViewer() {
 
   useEffect(() => {
     return () => {
-      cancelMoveAnimationFrame(moveAnimationFrameRef)
+      cancelAnimationFrameRef(moveAnimationFrameRef)
     }
   }, [])
 
@@ -258,7 +301,7 @@ export default function ChapterViewer() {
       : {}
 
     setActivePositionNumber(token.positionNumber)
-    cancelMoveAnimationFrame(moveAnimationFrameRef)
+    cancelAnimationFrameRef(moveAnimationFrameRef)
     setActiveBoards((currentBoards) => {
       const currentBoard =
         currentBoards[token.positionNumber] ?? createInitialBoardState(initialFen)
@@ -312,7 +355,8 @@ export default function ChapterViewer() {
 
   function handlePositionReset(positionNumber: string) {
     setActivePositionNumber(positionNumber)
-    cancelMoveAnimationFrame(moveAnimationFrameRef)
+    onAnchorSelect(bookPositionAnchorId(positionNumber))
+    cancelAnimationFrameRef(moveAnimationFrameRef)
     setActiveBoards((currentBoards) => {
       return {
         ...currentBoards,
@@ -327,7 +371,7 @@ export default function ChapterViewer() {
     const number = problem.content.number
     const willReveal = !revealedSolutions[number]
 
-    cancelMoveAnimationFrame(moveAnimationFrameRef)
+    cancelAnimationFrameRef(moveAnimationFrameRef)
     setRevealedSolutions((current) => ({
       ...current,
       [number]: willReveal,
@@ -353,6 +397,7 @@ export default function ChapterViewer() {
   return (
     <main className="leg-page">
       <div className="leg-reader-shell">
+        {moduleSelector}
         <header className="leg-reader-header">
           <p className="leg-kicker">Lotta Endgames</p>
           <h1>100 Endgames You Must Know</h1>
@@ -387,6 +432,7 @@ export default function ChapterViewer() {
                   group={item}
                   key={`position-group-${item.index}`}
                   navigationByPosition={navigationByPosition}
+                  onAnchorSelect={onAnchorSelect}
                   onMoveClick={handleMoveClick}
                   onPositionReset={handlePositionReset}
                   playback={playback}
@@ -418,6 +464,7 @@ export default function ChapterViewer() {
                   activeBoards={activeBoards}
                   activePositionNumber={activePositionNumber}
                   navigationByPosition={navigationByPosition}
+                  onAnchorSelect={onAnchorSelect}
                   onMoveClick={handleMoveClick}
                   onPositionReset={handlePositionReset}
                   playback={playback}
@@ -493,6 +540,7 @@ export function ProblemStudyGroup({
     <section
       aria-labelledby={`problem-${number}-heading`}
       className="leg-position-study leg-test-problem"
+      id={bookPositionAnchorId(number)}
     >
       <div className="leg-position-study-header">
         <PositionCard
@@ -545,6 +593,7 @@ export function PositionStudyGroup({
   activePositionNumber,
   group,
   navigationByPosition,
+  onAnchorSelect,
   onMoveClick,
   onPositionReset,
   playback,
@@ -554,6 +603,7 @@ export function PositionStudyGroup({
   activePositionNumber: string | null
   group: Extract<RuntimeChapterRenderItem, { type: 'positionGroup' }>
   navigationByPosition: HydratedChapter['navigationByPosition']
+  onAnchorSelect: (anchorId: string) => void
   onMoveClick: (token: Extract<TextPlaybackToken, { type: 'move' }>) => void
   onPositionReset: (positionNumber: string) => void
   playback: HydratedChapter['playback']
@@ -570,6 +620,7 @@ export function PositionStudyGroup({
           : 'leg-position-study is-board-only'
       }
       aria-labelledby={`position-${positionNumber}-heading`}
+      id={bookPositionAnchorId(positionNumber)}
     >
       <div className="leg-position-study-header">
         <PositionCard
@@ -594,6 +645,7 @@ export function PositionStudyGroup({
               index={index}
               key={`${sections[index].type}-${index}`}
               navigationByPosition={navigationByPosition}
+              onAnchorSelect={onAnchorSelect}
               onMoveClick={onMoveClick}
               onPositionReset={onPositionReset}
               playback={playback}
@@ -669,11 +721,35 @@ export function ChapterSelector({
   )
 }
 
+export function EndingBlock({
+  onAnchorSelect,
+  section,
+}: {
+  onAnchorSelect: (anchorId: string) => void
+  section: EndingSection
+}) {
+  const anchorId = bookEndingAnchorId(section.content.number)
+
+  return (
+    <section className="leg-ending" id={anchorId}>
+      <a
+        className="leg-ending-anchor"
+        href={`#${anchorId}`}
+        onClick={(event) => handleAnchorClick(event, anchorId, onAnchorSelect)}
+      >
+        Ending {section.content.number}
+      </a>
+      <strong>{section.content.text}</strong>
+    </section>
+  )
+}
+
 function SectionRenderer({
   activeBoards,
   activePositionNumber,
   index,
   navigationByPosition,
+  onAnchorSelect,
   onMoveClick,
   onPositionReset,
   playback,
@@ -683,6 +759,7 @@ function SectionRenderer({
   activePositionNumber: string | null
   index: number
   navigationByPosition: HydratedChapter['navigationByPosition']
+  onAnchorSelect: (anchorId: string) => void
   onMoveClick: (token: Extract<TextPlaybackToken, { type: 'move' }>) => void
   onPositionReset: (positionNumber: string) => void
   playback: HydratedChapter['playback']
@@ -701,13 +778,10 @@ function SectionRenderer({
       const endingSection = section as EndingSection
 
       return (
-        <section
-          className="leg-ending"
-          id={`ending-${endingSection.content.number}`}
-        >
-          <span>Ending {endingSection.content.number}</span>
-          <strong>{endingSection.content.text}</strong>
-        </section>
+        <EndingBlock
+          onAnchorSelect={onAnchorSelect}
+          section={endingSection}
+        />
       )
     }
     case 'heading': {
@@ -768,6 +842,25 @@ function SectionRenderer({
         </aside>
       )
   }
+}
+
+function handleAnchorClick(
+  event: MouseEvent<HTMLAnchorElement>,
+  anchorId: string,
+  onAnchorSelect: (anchorId: string) => void,
+) {
+  if (
+    event.button !== 0 ||
+    event.metaKey ||
+    event.ctrlKey ||
+    event.shiftKey ||
+    event.altKey
+  ) {
+    return
+  }
+
+  event.preventDefault()
+  onAnchorSelect(anchorId)
 }
 
 function PositionCard({
@@ -1017,7 +1110,7 @@ function createParentStagingBoardState(
   }
 }
 
-function cancelMoveAnimationFrame(
+function cancelAnimationFrameRef(
   frameRef: MutableRefObject<number | null>,
 ) {
   if (frameRef.current === null) {
