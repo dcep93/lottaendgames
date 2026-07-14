@@ -105,6 +105,7 @@ export default function ChapterViewer() {
       return
     }
 
+    window.scrollTo({ behavior: 'auto', left: 0, top: 0 })
     cancelMoveAnimationFrame(moveAnimationFrameRef)
     setActiveChapterId(chapterId)
     setActiveBoards({})
