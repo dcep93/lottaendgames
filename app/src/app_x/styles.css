@@ -480,6 +480,17 @@
   text-shadow: 0 0.06rem 0 rgba(246, 229, 202, 0.5);
 }
 
+.leg-board-marker--label {
+  display: grid;
+  place-items: center;
+  color: #140d12;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: clamp(0.56rem, 1.35vw, 0.82rem);
+  font-weight: 800;
+  line-height: 1;
+  text-align: center;
+}
+
 .leg-board-marker-glyph {
   display: block;
   line-height: 0.75;
@@ -518,6 +529,73 @@
   margin: 0;
   color: inherit;
   font: inherit;
+}
+
+.leg-instructional-diagram {
+  display: grid;
+  gap: 0.65rem;
+  width: min(28rem, 100%);
+  margin: 0.5rem 0;
+}
+
+.leg-instructional-diagram figcaption {
+  color: var(--leg-brown);
+  font-family: 'Comic Sans MS', 'Comic Sans', 'Chalkboard SE', 'Trebuchet MS',
+    sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.leg-instructional-diagram .leg-board-wrap {
+  width: 100%;
+}
+
+.leg-table-wrap {
+  width: min(58rem, 100%);
+  max-width: 100%;
+  overflow-x: auto;
+  border: 0.0625rem solid var(--leg-border);
+  border-radius: 0.4rem;
+}
+
+.leg-table {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--leg-soft);
+  background: var(--leg-panel-strong);
+  font-size: 0.92rem;
+  line-height: 1.4;
+}
+
+.leg-table caption {
+  padding: 0.8rem 0.9rem;
+  color: var(--leg-brown);
+  background: var(--leg-panel-soft);
+  font-family: 'Comic Sans MS', 'Comic Sans', 'Chalkboard SE', 'Trebuchet MS',
+    sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  text-align: left;
+}
+
+.leg-table th,
+.leg-table td {
+  border-top: 0.0625rem solid var(--leg-border);
+  padding: 0.62rem 0.75rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.leg-table thead th {
+  position: sticky;
+  top: 0;
+  color: var(--leg-text);
+  background: #2a1e19;
+}
+
+.leg-table tbody th {
+  color: var(--leg-brown);
+  font-weight: 750;
 }
 
 .leg-move-token {
@@ -611,5 +689,10 @@
 
   .leg-prose {
     font-size: 1rem;
+  }
+
+  .leg-table th,
+  .leg-table td {
+    min-width: 6.75rem;
   }
 }

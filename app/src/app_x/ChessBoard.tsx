@@ -4,6 +4,7 @@ import { getSquareIndex } from './fen'
 
 type ChessBoardProps = {
   animateNextMove?: boolean
+  ariaLabel?: string
   fen: string
   lichessUrl: string | null
   markers?: PositionMarker[]
@@ -12,6 +13,7 @@ type ChessBoardProps = {
 
 export default function ChessBoard({
   animateNextMove = false,
+  ariaLabel,
   fen,
   lichessUrl,
   markers = [],
@@ -20,7 +22,7 @@ export default function ChessBoard({
   const boardId = `position-${number.replace(/[^a-z0-9_-]/gi, '-')}`
   const board = (
     <div
-      aria-label={`Chess position ${number}`}
+      aria-label={ariaLabel ?? `Chess position ${number}`}
       className="leg-board-stage"
       data-animate-next-move={animateNextMove ? 'true' : 'false'}
       role="img"
@@ -82,9 +84,10 @@ function BoardMarker({ marker }: { marker: PositionMarker }) {
     return null
   }
 
-  const markerClass =
-    marker.symbol === 'outlined square'
-      ? 'leg-board-marker leg-board-marker--outline'
+  const markerClass = marker.symbol === 'outlined square'
+    ? 'leg-board-marker leg-board-marker--outline'
+    : marker.variant === 'label'
+      ? 'leg-board-marker leg-board-marker--label'
       : 'leg-board-marker leg-board-marker--badge'
 
   return (

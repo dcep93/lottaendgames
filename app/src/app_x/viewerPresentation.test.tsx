@@ -7,6 +7,8 @@ import {
   ProblemStudyGroup,
   ProseBlock,
 } from './ChapterViewer'
+import InstructionalDiagram from './InstructionalDiagram'
+import TableBlock from './TableBlock'
 import type {
   PanelSection,
   PositionSection,
@@ -17,6 +19,38 @@ import type { TextPlaybackToken } from './moveParser'
 
 const activeBoards = {}
 const onMoveClick = () => undefined
+
+const diagramMarkup = renderToStaticMarkup(
+  <InstructionalDiagram
+    section={{
+      type: 'diagram',
+      content: {
+        number: 'intro-rook-mobility',
+        label: 'The rook',
+        fen: '8/8/8/3R4/8/8/8/8',
+      },
+    }}
+  />,
+)
+assert.match(diagramMarkup, />The rook</)
+assert.doesNotMatch(diagramMarkup, /href=/)
+assert.match(diagramMarkup, /The rook instructional chess diagram/)
+
+const tableMarkup = renderToStaticMarkup(
+  <TableBlock
+    section={{
+      type: 'table',
+      content: {
+        caption: 'Endgame statistics',
+        columns: ['Type of ending', 'Games'],
+        rows: [['Rooks', '320,548']],
+      },
+    }}
+  />,
+)
+assert.match(tableMarkup, /<caption>Endgame statistics<\/caption>/)
+assert.match(tableMarkup, /<th scope="col">Type of ending<\/th>/)
+assert.match(tableMarkup, /<th scope="row">Rooks<\/th>/)
 
 const chapterChoices = [
   { id: '1', label: 'Chapter 1', name: 'Basic endings' },

@@ -9,16 +9,20 @@ import {
 } from './chapterRuntime'
 import type {
   CaptionSection,
+  DiagramSection,
   EndingSection,
   HeadingSection,
   PanelSection,
   PositionSection,
   ProblemSection,
   RawChapterSection,
+  TableSection,
   TextSection,
   TitleSection,
 } from './chapterTypes'
 import ChessBoard from './ChessBoard'
+import InstructionalDiagram from './InstructionalDiagram'
+import TableBlock from './TableBlock'
 import { buildLichessAnalysisUrl, buildLichessEditorUrl } from './lichess'
 import type { TextPlaybackToken } from './moveParser'
 import {
@@ -670,6 +674,8 @@ function SectionRenderer({
       const captionSection = section as CaptionSection
       return <p className="leg-section-caption">{captionSection.content}</p>
     }
+    case 'diagram':
+      return <InstructionalDiagram section={section as DiagramSection} />
     case 'ending': {
       const endingSection = section as EndingSection
 
@@ -716,6 +722,8 @@ function SectionRenderer({
       )
     case 'problem':
       return null
+    case 'table':
+      return <TableBlock section={section as TableSection} />
     case 'text': {
       const textSection = section as TextSection
       return (
