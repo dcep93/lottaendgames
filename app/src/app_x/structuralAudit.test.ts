@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { chapterPayloadPath } from './chapterPayloadManifest'
 import type { RuntimeChapterPayload } from './chapterRuntime'
-import type { RawChapterSection } from './chapterTypes'
+import type { BookSource, RawChapterSection } from './chapterTypes'
 
 type StructureAudit = {
   chapterSpilloversRemoved: string[]
@@ -40,6 +40,9 @@ const payload = JSON.parse(
 const structureAudit = JSON.parse(
   readFileSync(new URL('./pdf/pdf_structure_audit.json', import.meta.url), 'utf8'),
 ) as StructureAudit
+const book = JSON.parse(
+  readFileSync(new URL('./pdf/book.json', import.meta.url), 'utf8'),
+) as BookSource
 const allSections = payload.chapters.flatMap((chapter) => chapter.sections)
 
 assert.equal(structureAudit.schemaVersion, 2)
@@ -58,12 +61,9 @@ assert.equal(structureAudit.endingBoundaries.length, 100)
 assert.equal(allSections.some((section) => section.type === 'moves'), false)
 
 for (const chapter of payload.chapters) {
-  const sourceSections = JSON.parse(
-    readFileSync(
-      new URL(`./pdf/chapter_${chapter.id}.json`, import.meta.url),
-      'utf8',
-    ),
-  ) as RawChapterSection[]
+  const sourcePart = book.parts.find(({ id }) => id === chapter.id)
+  assert.ok(sourcePart, `Expected source part ${chapter.id}`)
+  const sourceSections = sourcePart.sections
   assert.equal(
     sourceSections.some((section) => section.type === 'moves'),
     false,

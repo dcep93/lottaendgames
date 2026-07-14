@@ -26,6 +26,7 @@ export type RuntimeChapterDefinition = {
   id: string
   initialPositionFens: Record<string, string>
   label: string
+  name: string
   playback: SerializedChapterPlayback
   positionCount: number
   renderItems: RuntimeChapterRenderItem[]

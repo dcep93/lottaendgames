@@ -1,12 +1,26 @@
 export type ChapterSection =
   | CaptionSection
+  | DiagramSection
   | EndingSection
   | HeadingSection
   | PanelSection
   | PositionSection
   | ProblemSection
+  | TableSection
   | TextSection
   | TitleSection
+
+export type BookSource = {
+  parts: BookPartSource[]
+  schemaVersion: 1
+}
+
+export type BookPartSource = {
+  id: string
+  label: string
+  name: string
+  sections: RawChapterSection[]
+}
 
 export type RawChapterSection = {
   content: unknown
@@ -16,6 +30,16 @@ export type RawChapterSection = {
 export type CaptionSection = {
   content: string
   type: 'caption'
+}
+
+export type DiagramSection = {
+  content: {
+    fen: string
+    label: string
+    markers?: PositionMarker[]
+    number: string
+  }
+  type: 'diagram'
 }
 
 export type EndingSection = {
@@ -43,6 +67,7 @@ export type PositionMarker = {
   meaning: string
   square: string
   symbol: string
+  variant?: 'badge' | 'label'
 }
 
 export type PositionSection = {
@@ -68,6 +93,15 @@ export type ProblemSection = {
     solutionFen?: string
   }
   type: 'problem'
+}
+
+export type TableSection = {
+  content: {
+    caption: string
+    columns: string[]
+    rows: string[][]
+  }
+  type: 'table'
 }
 
 export type TextSection = {

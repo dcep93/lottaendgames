@@ -1,7 +1,6 @@
 {
   "schemaVersion": 1,
-  "contentHash": "sha256:b51ad2bf4d27559148a6faf6411642316caba1c81ebf658254ff81418643dcb7",
-  "chapters": [
+  "parts": [
     {
       "id": "1",
       "label": "Chapter 1",

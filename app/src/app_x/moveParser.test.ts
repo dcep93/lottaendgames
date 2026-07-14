@@ -1,14 +1,11 @@
 import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
-import chapterManifest from './chapterManifest.json'
 import {
   chapterPayloadContentHash,
   chapterPayloadPath,
-  chapterSourcePayloadContentHash,
-  chapterSourcePayloadPath,
 } from './chapterPayloadManifest'
-import type { RawChapterSection } from './chapterTypes'
+import type { BookSource, RawChapterSection } from './chapterTypes'
 import {
   buildChapterPlayback,
   isProseMoveReference,
@@ -50,6 +47,9 @@ const chapterPayload = JSON.parse(
     'utf8',
   ),
 ) as ChapterPayload
+const book = JSON.parse(
+  readFileSync(new URL('./pdf/book.json', import.meta.url), 'utf8'),
+) as BookSource
 const diagramExtractionReport = JSON.parse(
   readFileSync(
     new URL('./pdf/diagram_extraction_report.json', import.meta.url),
@@ -181,11 +181,15 @@ assert.match(chapterPayload.contentHash, /^sha256:[a-f0-9]{64}$/)
 assert.equal(chapterPayload.contentHash, getPayloadContentHash(chapterPayload))
 assert.equal(chapterPayload.contentHash, chapterPayloadContentHash)
 assert.match(chapterPayloadPath, /^app_x\/chapter-runtime\.[a-f0-9]{16}\.json$/)
-assert.equal(chapterPayload.sourceContentHash, chapterSourcePayloadContentHash)
-assert.match(chapterSourcePayloadPath, /^generated\/chapters\.[a-f0-9]{16}\.json$/)
+assert.equal(
+  chapterPayload.sourceContentHash,
+  `sha256:${createHash('sha256')
+    .update(canonicalStringify(book.parts))
+    .digest('hex')}`,
+)
 assert.deepEqual(
   chapterPayload.chapters.map(({ id, label }) => ({ id, label })),
-  chapterManifest.map(({ id, label }) => ({ id, label })),
+  book.parts.map(({ id, label }) => ({ id, label })),
 )
 for (const sectionIndex of [
   positionFiveThreeMoveSectionIndex,

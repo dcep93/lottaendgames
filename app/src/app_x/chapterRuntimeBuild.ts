@@ -16,6 +16,7 @@ import {
 type SourceChapterDefinition = {
   id: string
   label: string
+  name: string
   sections: RawChapterSection[]
 }
 
@@ -49,7 +50,10 @@ export function buildRuntimeChapter(
       tokensBySectionIndex: Array.from(playback.tokensBySectionIndex),
     } satisfies SerializedChapterPlayback,
     positionCount: chapter.sections.filter(
-      (section) => section.type === 'position' || section.type === 'problem',
+      (section) =>
+        section.type === 'diagram' ||
+        section.type === 'position' ||
+        section.type === 'problem',
     ).length,
     renderItems: buildChapterRenderItems(chapter.sections),
   }

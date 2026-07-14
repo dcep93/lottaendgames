@@ -1,7 +1,10 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-import chapterManifest from './chapterManifest.json'
-import type { RawChapterSection } from './chapterTypes'
+import type { BookSource, RawChapterSection } from './chapterTypes'
+
+const book = JSON.parse(
+  readFileSync(new URL('./pdf/book.json', import.meta.url), 'utf8'),
+) as BookSource
 
 const bannedFragments = [
   'Same procedure5ame',
@@ -42,13 +45,8 @@ const bannedFragments = [
 ]
 const isolatedArtifact = /^(?:\.{1,3}|\.\.•|[OoW+]|\+-|•• •••|=,)$/m
 
-for (const chapter of chapterManifest) {
-  const sections = JSON.parse(
-    readFileSync(
-      new URL(`./pdf/chapter_${chapter.id}.json`, import.meta.url),
-      'utf8',
-    ),
-  ) as RawChapterSection[]
+for (const chapter of book.parts) {
+  const sections = chapter.sections
 
   assert.equal(
     sections.some((section) => section.type === 'moves'),
@@ -178,12 +176,7 @@ assertChapterExcludes('14', '100.Kc5 Ke4')
 console.log('source text audit passed')
 
 function assertChapterIncludes(chapterId: string, expected: string) {
-  const sections = JSON.parse(
-    readFileSync(
-      new URL(`./pdf/chapter_${chapterId}.json`, import.meta.url),
-      'utf8',
-    ),
-  ) as RawChapterSection[]
+  const sections = getPart(chapterId).sections
   const chapterText = sections.flatMap(textualValues).join('\n')
 
   assert.equal(
@@ -194,12 +187,7 @@ function assertChapterIncludes(chapterId: string, expected: string) {
 }
 
 function assertChapterExcludes(chapterId: string, unexpected: string) {
-  const sections = JSON.parse(
-    readFileSync(
-      new URL(`./pdf/chapter_${chapterId}.json`, import.meta.url),
-      'utf8',
-    ),
-  ) as RawChapterSection[]
+  const sections = getPart(chapterId).sections
   const chapterText = sections.flatMap(textualValues).join('\n')
 
   assert.equal(
@@ -207,6 +195,12 @@ function assertChapterExcludes(chapterId: string, unexpected: string) {
     false,
     `Chapter ${chapterId} still contains source passage: ${unexpected}`,
   )
+}
+
+function getPart(partId: string) {
+  const part = book.parts.find(({ id }) => id === partId)
+  assert.ok(part, `Expected book part ${partId}`)
+  return part
 }
 
 function normalizeText(value: string) {

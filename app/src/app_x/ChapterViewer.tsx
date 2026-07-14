@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { MutableRefObject } from 'react'
-import chapterManifest from './chapterManifest.json'
 import { chapterPayloadPath } from './chapterPayloadManifest'
 import {
   hydrateRuntimeChapter,
@@ -31,13 +30,13 @@ import {
 } from './playbackNavigation'
 import { isOneMoveFenTransition } from './playbackPaths'
 
-const chapterTabs = chapterManifest
 const emptyChapterSections: RawChapterSection[] = []
 const emptyPreparedChapter = hydrateRuntimeChapter({
   endingCount: 0,
   id: '',
   initialPositionFens: {},
   label: '',
+  name: '',
   playback: {
     playablePositions: [],
     tokensBySectionIndex: [],
@@ -57,13 +56,14 @@ type ActiveBoardState = {
 }
 
 export default function ChapterViewer() {
-  const [activeChapterId, setActiveChapterId] = useState(chapterTabs[0].id)
+  const [activeChapterId, setActiveChapterId] = useState<string | null>(null)
   const [chapterPayload, setChapterPayload] =
     useState<RuntimeChapterPayload | null>(null)
   const [chapterLoadError, setChapterLoadError] = useState<string | null>(null)
   const activeChapter =
     chapterPayload?.chapters.find((chapter) => chapter.id === activeChapterId) ??
     null
+  const chapterTabs = chapterPayload?.chapters ?? []
   const preparedChapter = useMemo(
     () =>
       activeChapter ? hydrateRuntimeChapter(activeChapter) : emptyPreparedChapter,
@@ -125,6 +125,11 @@ export default function ChapterViewer() {
         }
 
         setChapterPayload(payload)
+        setActiveChapterId((current) =>
+          current && payload.chapters.some(({ id }) => id === current)
+            ? current
+            : (payload.chapters[0]?.id ?? null),
+        )
         setChapterLoadError(null)
       })
       .catch((error: unknown) => {
@@ -346,19 +351,21 @@ export default function ChapterViewer() {
         <header className="leg-reader-header">
           <p className="leg-kicker">Lotta Endgames</p>
           <h1>100 Endgames You Must Know</h1>
-          <ChapterSelector
-            activeChapterId={activeChapterId}
-            chapters={chapterTabs}
-            label="Top chapter selector"
-            onSelect={handleChapterSelect}
-            variant="select"
-          />
           {activeChapter ? (
-            <div className="leg-reader-meta" aria-label="Chapter summary">
-              <span>{chapterSections.length} sections</span>
-              <span>{endingCount} endings</span>
-              <span>{positionCount} boards</span>
-            </div>
+            <>
+              <ChapterSelector
+                activeChapterId={activeChapter.id}
+                chapters={chapterTabs}
+                label="Top chapter selector"
+                onSelect={handleChapterSelect}
+                variant="select"
+              />
+              <div className="leg-reader-meta" aria-label="Chapter summary">
+                <span>{chapterSections.length} sections</span>
+                <span>{endingCount} endings</span>
+                <span>{positionCount} boards</span>
+              </div>
+            </>
           ) : null}
         </header>
         {chapterLoadError ? (
@@ -417,7 +424,7 @@ export default function ChapterViewer() {
         ) : null}
         {activeChapter ? (
           <ChapterSelector
-            activeChapterId={activeChapterId}
+            activeChapterId={activeChapter.id}
             chapters={chapterTabs}
             label="Bottom chapter selector"
             onSelect={handleChapterSelect}
