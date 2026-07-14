@@ -8,6 +8,10 @@
     "content": "In rook endings, there are many positions where two pawns are not enough to win.\nOnly opposite-coloured bishop endings present a higher drawish trend.\nThose positions where a rook and two pawns cannot win against a lone rook offer great theoretical-practical interest for many reasons:\nA) They occur quite often.\nB) Some are not easy to play unless you know the basic ideas.\nC) They are a useful introduction to rook endings with more pawns on the board. Concepts such as a passive rook for the stronger side and an active rook for the weaker side are especially important.\nIn order to study these endings we are going to distinguish five interesting scenarios with great drawing chances. These are the following:\n1) Doubled pawns.\n2) Rook and bishop's pawns on the same wing.\n3) Connected pawns blocked by the enemy king.\n4) Attacking rook stuck in front on the 7th-rank pawn.\n5) Pawns stopped by the Vancura Defence.\nThis classification does not cover all possible drawish positions, but it includes the most important and frequent ones. Anyway, one should never diagnose as a win a position where the pieces of the stronger side occupy passive positions."
   },
   {
+    "type": "heading",
+    "content": "First scenario"
+  },
+  {
     "type": "ending",
     "content": {
       "number": "69",
@@ -136,8 +140,32 @@
     "content": "Defending king cut off on the back rank; bishop's pawn on the 6th rank"
   },
   {
+    "type": "position",
+    "content": {
+      "number": "11.series.6.1",
+      "displayLabel": "Draw",
+      "fen": "6k1/1R6/5P1P/6K1/8/8/8/r7 b - - 0 1"
+    }
+  },
+  {
+    "type": "position",
+    "content": {
+      "number": "11.series.6.2",
+      "displayLabel": "White wins",
+      "fen": "6k1/1R6/5P2/6KP/8/8/8/r7 b - - 0 1"
+    }
+  },
+  {
+    "type": "position",
+    "content": {
+      "number": "11.series.6.3",
+      "displayLabel": "Draw",
+      "fen": "6k1/1R6/5P2/6K1/7P/8/8/r7 b - - 0 1"
+    }
+  },
+  {
     "type": "text",
-    "content": "Draw White wins Draw\nIf you check the winning method studied for the first position and the variation commented on the 7th move, you will become convinced that the second and the third are a draw. If the h-pawn is less advanced, it is also a draw."
+    "content": "If you check the winning method studied for the first position and the variation commented on the 7th move, you will become convinced that the second and the third are a draw. If the h-pawn is less advanced, it is also a draw."
   },
   {
     "type": "panel",
@@ -151,8 +179,31 @@
     "content": "Bishop's pawn on the 5th rank"
   },
   {
-    "type": "text",
-    "content": "White wins White wins White wins\nAnalysed Same procedure Same procedure"
+    "type": "position",
+    "content": {
+      "number": "11.series.5.1",
+      "displayLabel": "White wins",
+      "caption": "Analysed",
+      "fen": "6k1/1R6/7P/5PK1/8/8/8/r7 b - - 0 1"
+    }
+  },
+  {
+    "type": "position",
+    "content": {
+      "number": "11.series.5.2",
+      "displayLabel": "White wins",
+      "caption": "Same procedure",
+      "fen": "6k1/1R6/8/5PKP/8/8/8/r7 b - - 0 1"
+    }
+  },
+  {
+    "type": "position",
+    "content": {
+      "number": "11.series.5.3",
+      "displayLabel": "White wins",
+      "caption": "Same procedure",
+      "fen": "6k1/1R6/8/5PK1/7P/8/8/r7 b - - 0 1"
+    }
   },
   {
     "type": "text",
@@ -170,8 +221,32 @@
     "content": "Bishop's pawn on the 4th rank"
   },
   {
+    "type": "position",
+    "content": {
+      "number": "11.series.4.1",
+      "displayLabel": "Draw",
+      "fen": "6k1/1R6/7P/6K1/5P2/8/8/r7 b - - 0 1"
+    }
+  },
+  {
+    "type": "position",
+    "content": {
+      "number": "11.series.4.2",
+      "displayLabel": "White wins",
+      "fen": "6k1/1R6/8/6KP/5P2/8/8/r7 b - - 0 1"
+    }
+  },
+  {
+    "type": "position",
+    "content": {
+      "number": "11.series.4.3",
+      "displayLabel": "Draw",
+      "fen": "6k1/1R6/8/6K1/5P1P/8/8/r7 b - - 0 1"
+    }
+  },
+  {
     "type": "text",
-    "content": "Draw White wins Draw\nWhen the bishop's pawn is on the 4th rank, the position of the rook makes a difference. The first diagram is very interesting. As we will see in the next example, this position may arise after a normal sequence of play. Black draws by means of a simple procedure: the rook alternates checks and attacks on the h-pawn (1...Rg1+\n2.Kf6 Rh1). This resource does not work in the second position, as White can simply answer 2.f5, ignoring the threat on his h-pawn. If the h-pawn has not reached the 5th rank, the defence works again."
+    "content": "When the bishop's pawn is on the 4th rank, the position of the rook makes a difference. The first diagram is very interesting. As we will see in the next example, this position may arise after a normal sequence of play. Black draws by means of a simple procedure: the rook alternates checks and attacks on the h-pawn (1...Rg1+\n2.Kf6 Rh1). This resource does not work in the second position, as White can simply answer 2.f5, ignoring the threat on his h-pawn. If the h-pawn has not reached the 5th rank, the defence works again."
   },
   {
     "type": "ending",
@@ -309,12 +384,21 @@
     "content": "This is perhaps the best-known drawing scenario. Although most of us have seen it in our games, it still comes as a surprise. If a passed pawn reaches the 7th rank and the attacking rook is in front of it, the rook becomes completely passive and then the stronger side finds great difficulties in turning such a large material advantage\n(two pawns) into victory."
   },
   {
-    "type": "caption",
-    "content": "Position 11.12"
+    "type": "position",
+    "content": {
+      "number": "11.13",
+      "fen": "R7/P5k1/8/8/8/6P1/6K1/r7 w - - 0 1"
+    }
   },
   {
     "type": "text",
-    "content": "The best-known case involves a rook's pawn on the 7th rank, but it is not the only possibility.\nThe analysis is quite easy: the black pieces just occupy their ideal positions (rook on a-file and king on g7 or h7) and wait. The rook must be ready to deliver checks if the white king arrives to defend the a-pawn.\nA second pawn, as here the g-pawn, does not change the result, as it cannot be used to take the black king out of the safe zone.\n1.Kf3 Ra2 2.Ke4 Ra1 3.Kd5 Ra2 4.Kc6 Ra1 5.Kb6 Rb1+ 6.Kc6 Ra1 7.g4\nRa2 8.g5 Ra1 9.g6 Ra2\nOf course, Black does not want to capture the pawn at all.\n10.Kb7 Rb2+=\nWe can easily observe that, if the second white pawn was on the h-file, White could not win either. Not even if White had doubled pawns on the h-file. In those cases,\nthe pawn stuck on the 7th rank could be on any other file.\nFinally, the ending would be won if the second white pawn were on any other file,\nfor instance the f-file. White would win by just pushing the pawn.\nConclusion: Think twice before you push a pawn to the\n7th rank with your rook in front of it. It can ruin a winning position even if you have more pawns."
+    "content": "The best-known case involves a rook's pawn on the 7th rank, but it is not the only possibility.\nThe analysis is quite easy: the black pieces just occupy their ideal positions (rook on a-file and king on g7 or h7) and wait. The rook must be ready to deliver checks if the white king arrives to defend the a-pawn.\nA second pawn, as here the g-pawn, does not change the result, as it cannot be used to take the black king out of the safe zone.\n1.Kf3 Ra2 2.Ke4 Ra1 3.Kd5 Ra2 4.Kc6 Ra1 5.Kb6 Rb1+ 6.Kc6 Ra1 7.g4\nRa2 8.g5 Ra1 9.g6 Ra2\nOf course, Black does not want to capture the pawn at all.\n10.Kb7 Rb2+=\nWe can easily observe that, if the second white pawn was on the h-file, White could not win either. Not even if White had doubled pawns on the h-file. In those cases,\nthe pawn stuck on the 7th rank could be on any other file.\nFinally, the ending would be won if the second white pawn were on any other file,\nfor instance the f-file. White would win by just pushing the pawn."
+  },
+  {
+    "type": "panel",
+    "content": {
+      "text": "Conclusion: Think twice before you push a pawn to the 7th rank with your rook in front of it. It can ruin a winning position even if you have more pawns."
+    }
   },
   {
     "type": "heading",
@@ -329,6 +413,17 @@
   },
   {
     "type": "text",
-    "content": "This is probably the least-known scenario, though the most common in practice.\nThere are some drawing positions involving a- and h-pawns, the most important one being an extension of the Vancura Defence.\n1...Re4!\nThe only move to draw. This move is very important: Black adopts a Vancura defensive set-up and prevents the white rook from coming out of its passive position in front of the pawn.\nFrom now onwards, defence is quite easy, as White cannot really make further progress. On the other hand, if Black adopts a wrong defensive set-up, White wins rather comfortably. If you quickly check your database, you will see that the latter is the most frequent scenario in practice.\n1.Ra1? 2.Kf4 Kh7 3.Ke5 Kg7 4.a5 Kh7 5.a6 and, as we know from Ending 66,\nWhite wins even without the h-pawn.\n2.a5\nOr 2.h5 Kh7 3.Kf3 Rh4 4.Ke3 Rh5 (Black captures the pawn and has time to set up the correct defence) 5.Kd4 Rg5 6.Kc4 Rg4+! (only move!) 7.Kb5 Rg5+\n8.Kb4 Rg4+ 9.Kc5 Kf4- Vancura.\n2...Re5!\nKeeping the Vancura Position.\n3.Kf3 Kh5 4.Kg3 Kc5 5.a6 Kc6! 6.Kf4\nAs soon as White pushes the a-pawn one step further, the black rook will be transferred to the rear of the pawn and we will reach Ending 76. 6...Kh7 7.Ke5 Rb5+ 8.Kd5 Kg6 9.Kc5 Kf6 10.Kb5 Rb5+! 11.Kb6 Rf6+!\nWhen the white king moves far from the a-pawn, the series of checks may end.\nThere is no way to make progress."
+    "content": "This is probably the least-known scenario, though the most common in practice."
+  },
+  {
+    "type": "position",
+    "content": {
+      "number": "11.14",
+      "fen": "R7/6k1/8/8/P6P/6K1/8/4r3 b - - 0 1"
+    }
+  },
+  {
+    "type": "text",
+    "content": "There are some drawing positions involving a- and h-pawns, the most important one being an extension of the Vancura Defence.\n1...Re4!\nThe only move to draw. This move is very important: Black adopts a Vancura defensive set-up and prevents the white rook from coming out of its passive position in front of the pawn.\nFrom now onwards, defence is quite easy, as White cannot really make further progress. On the other hand, if Black adopts a wrong defensive set-up, White wins rather comfortably. If you quickly check your database, you will see that the latter is the most frequent scenario in practice.\n1...Ra1? 2.Kf4 Kh7 3.Ke5 Kg7 4.a5 Kh7 5.a6 and, as we know from Ending 66, White wins even without the h-pawn.\n2.a5\nOr 2.h5 Kh7 3.Kf3 Rh4 4.Ke3 Rxh5 (Black captures the pawn and has time to set up the correct defence) 5.Kd4 Rg5 6.Kc4 Rg4+! (only move!) 7.Kb5 Rg5+ 8.Kb4 Rg4+ 9.Kc5 Rg4 - Vancura.\n2...Re5!\nKeeping the Vancura Position.\n3.Kf3 Rh5 4.Kg3 Rc5 5.a6 Rc6! 6.Kf4\nAs soon as White pushes the a-pawn one step further, the black rook will be transferred to the rear of the pawn and we will reach Ending 76. 6...Rh7 7.Ke5 Rb6 8.Kd5 Rg6 9.Kc5 Rf6 10.Kb5 Rf5+! 11.Kb6 Rf6+!\nWhen the white king moves far from the a-pawn, the series of checks may end.\nThere is no way to make progress."
   }
 ]

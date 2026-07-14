@@ -960,14 +960,33 @@ function shouldTokenizeMoveCandidate(
 }
 
 export function isProseMoveReference(text: string) {
-  return /(?:\b(?:answer|as|by means of|followed by|for example|forcing|intending|manoeuvre|such as|the threat (?:is|was)|threat|threatens|threatened|threatening|which would allow|would allow)\s*(?:\.\.\.)?\s*)$/i.test(
+  return /(?:\b(?:allows?|allowed|answer|as|blow|by means of|followed by|for example|forcing|i\.e\.|in case|intending|manoeuvre|play first|prevented by|such as|the threat (?:is|was)|threat|threatens|threatened|threatening|which would allow|would allow)\s*(?:\.\.\.)?\s*)$/i.test(
     text,
   )
 }
 
 export function isProseMoveReferenceContinuation(text: string) {
-  return /^\s*(?:is|was|would be|will be)\s+(?:a\s+)?(?:threat|idea|manoeuvre|resource|possibility)\b/i.test(
+  return /^\s*(?:(?:is|was|would be|will be)\s+(?:a\s+)?(?:threat|idea|manoeuvre|resource|possibility)\b|would\s+(?:allow|hinder|prevent)\b)/i.test(
     text,
+  )
+}
+
+export function isProseSanReference(
+  text: string,
+  index: number,
+  displayLength: number,
+) {
+  const precedingText = text.slice(0, index)
+  const followingText = text.slice(index + displayLength)
+
+  return (
+    isProseMoveReference(precedingText) ||
+    isProseMoveReferenceContinuation(followingText) ||
+    /\b(?:by means of|followed by|plan|route|path)\b[^.!?;\n]*$/i.test(
+      precedingText,
+    ) ||
+    /\band\s*(?:\.\.\.)?$/i.test(precedingText) ||
+    /^\s*-\s*(?:[KQRBN])?[a-h][1-8]/.test(followingText)
   )
 }
 

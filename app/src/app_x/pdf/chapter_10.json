@@ -13,7 +13,7 @@
   },
   {
     "type": "text",
-    "content": "I am sure the reader, no matter how experienced, has already noticed the frequency with which rook endings arise in his games (8% according to statistics) and has had time to regret how his lack of technique or basic knowledge made him lose a number of half points. Accurate play in rook endings is a very important indicator of a chess player's strength. I will not say, as Kortchnoi in his excellent book Practical Rook Endings, that after reading this book your Elo rating will increase with 100 points. Things are not that easy, and neither is rating the only way to evaluate a player, not even his playing strength, nor are rook endings the only way to measure rating. Nevertheless, I assure you that serious work on rook endings will notably improve your results.\nOf course, most rook endings arising in a game start with many pawns on the board. However, it is by no means rare for them to end up in a simple Rook + Pawn vs. Rook (see statistics) and very often the basic positions we will study here (especially the Philidor and Lucena Positions) appear on the board. Apart from that, the study of Rook + Pawn vs. Rook is the first and essential step to understanding endings with more pawns on the board. All in all, I have no alternative but to advise you to read this (and the following) chapter with the utmost attention.\nGiven its special complexity, I have divided this chapter into many sections. I\nrecommend that you take it easy and study each section separately. Besides, be sure that you master one section before you jump to the next, although the last one (on the rook's pawn) is more independent and can be studied at the beginning."
+    "content": "I am sure the reader, no matter how experienced, has already noticed the frequency with which rook endings arise in his games (8% according to statistics) and has had time to regret how his lack of technique or basic knowledge made him lose a number of half points. Accurate play in rook endings is a very important indicator of a chess player's strength. I will not say, as Kortchnoi in his excellent book Practical Rook Endings, that after reading this book your Elo rating will increase with 100 points. Things are not that easy, and neither is rating the only way to evaluate a player, not even his playing strength, nor are rook endings the only way to measure rating. Nevertheless, I assure you that serious work on rook endings will notably improve your results.\n\nOf course, most rook endings arising in a game start with many pawns on the board. However, it is by no means rare for them to end up in a simple Rook + Pawn vs. Rook (see statistics) and very often the basic positions we will study here (especially the Philidor and Lucena Positions) appear on the board. Apart from that, the study of Rook + Pawn vs. Rook is the first and essential step to understanding endings with more pawns on the board. All in all, I have no alternative but to advise you to read this (and the following) chapter with the utmost attention.\n\nGiven its special complexity, I have divided this chapter into many sections. I recommend that you take it easy and study each section separately. Besides, be sure that you master one section before you jump to the next, although the last one (on the rook's pawn) is more independent and can be studied at the beginning."
   },
   {
     "type": "heading",
@@ -21,11 +21,7 @@
   },
   {
     "type": "text",
-    "content": "Just as in other endings, the rook's pawn is very special. However, here the differences are so many that we will devote a whole section to them (Section 6). Let us start with those endings that involve any other pawn. I warn the reader that the rules we will state for these cases do not necessarily apply to the rook's pawn. Of course, a sensible extrapolation is always possible.\nAs in other single-pawn endings, the stronger side strives to promote his pawn\n(in some exceptional positions, mate threats are an extra possibility), whereas the defending side has more varied resources than in the endings we have so far studied.\nI consider a sensible way to organise our knowledge of rook endings would be to make the reader well aware of the resources available for the defending side:"
-  },
-  {
-    "type": "text",
-    "content": "where can they be successfully adopted and where they do not work. Therefore, the examples will present, apart from the title, a reference to the main defensive technique, with the label 'DT'. The understanding of the technique will help us extrapolate and guess the exceptions."
+    "content": "Just as in other endings, the rook's pawn is very special. However, here the differences are so many that we will devote a whole section to them (Section 6). Let us start with those endings that involve any other pawn. I warn the reader that the rules we will state for these cases do not necessarily apply to the rook's pawn. Of course, a sensible extrapolation is always possible.\n\nAs in other single-pawn endings, the stronger side strives to promote his pawn (in some exceptional positions, mate threats are an extra possibility), whereas the defending side has more varied resources than in the endings we have so far studied.\n\nI consider a sensible way to organise our knowledge of rook endings would be to make the reader well aware of the resources available for the defending side: where can they be successfully adopted and where they do not work. Therefore, the examples will present, apart from the title, a reference to the main defensive technique, with the label 'DT'. The understanding of the technique will help us extrapolate and guess the exceptions."
   },
   {
     "type": "heading",
@@ -33,7 +29,7 @@
   },
   {
     "type": "text",
-    "content": "In this section we will study two positions which are the most important ones in endgame theory. There are no excuses for not having a perfect knowledge of them;\nbesides, ignorance can make you lose points!"
+    "content": "In this section we will study two positions which are the most important ones in endgame theory. There are no excuses for not having a perfect knowledge of them; besides, ignorance can make you lose points!"
   },
   {
     "type": "ending",
@@ -44,11 +40,11 @@
   },
   {
     "type": "heading",
-    "content": "DT: Distant rear checks, cut-off king"
+    "content": "DT: Distant (rear) checks, cut-off king"
   },
   {
     "type": "text",
-    "content": "A first approach to classify these endings is the position of the defending king. If he stands in the pawn's path, the defender is already halfway to salvation. Once we have reached this position, there are several drawing systems, but the so-called\nPhilidor Position is the easiest one and it works against all pawns. Here it is:"
+    "content": "A first approach to classify these endings is the position of the defending king. If he stands in the pawn's path, the defender is already halfway to salvation. Once we have reached this position, there are several drawing systems, but the so-called Philidor Position is the easiest one and it works against all pawns. Here it is:"
   },
   {
     "type": "position",
@@ -66,11 +62,18 @@
     "content": "Some players fear an eventual rook swap, but it is easy to see that the result would always be a drawn King + Pawn vs. King endgame: if rooks are swapped on c6, the black king gets to e7 and draws; there is no way to swap rooks on d6 or e6 (with the black king on d8) because... how could the white rook occupy those squares?\nThe text move threatens 3.Kd6, winning, but...\n2...Rg1!\nThe point! As soon as the pawn reaches the 6th rank, the white king loses his shield against rear checks. The black rook gets ready. Otherwise, 3.Ke6 would follow.\n3.Kd6 Rd1+! 4.Ke5 Re1+ 5.Kf6 Rf1+\nThe white king lacks a shield against checks, so the ending is drawn. This simple position, known since the 18th century, is perhaps the most important one in endgame theory. A great number of rook endings eventually lead to this position, and it is usually enough to secure the draw."
   },
   {
+    "type": "text",
+    "content": "Summing up:"
+  },
+  {
     "type": "panel",
     "content": {
-      "title": "Summary",
-      "text": "In the Philidor Position, the defending king has to stand in front of the pawn (on the 1st or 2nd rank, depending on the position of the enemy rook) while the rook waits on the 3rd rank for the pawn to advance. Once the pawn has advanced, the rook gets ready to deliver rear checks,\nand the attacking king cannot find a refuge.\nA question may arise: does Philidor's position work on the 4th or 5th rank as well or not? The answer is: yes, it also works, but manuals always show the example on the 3rd rank because that is the extreme situation. Anyway, do not complicate yourself too much: the Philidor Position is secure and simple to play. Therefore, if you reach a Rook + Pawn vs. Rook ending, you must try to adopt it.\nHowever, this is not always possible, so it is important to know other defensive resources."
+      "text": "In the Philidor Position, the defending king has to stand in front of the pawn (on the 1st or 2nd rank, depending on the position of the enemy rook) while the rook waits on the 3rd rank for the pawn to advance. Once the pawn has advanced, the rook gets ready to deliver rear checks, and the attacking king cannot find a refuge."
     }
+  },
+  {
+    "type": "text",
+    "content": "A question may arise: does Philidor's position work on the 4th or 5th rank as well or not? The answer is: yes, it also works, but manuals always show the example on the 3rd rank because that is the extreme situation. Anyway, do not complicate yourself too much: the Philidor Position is secure and simple to play. Therefore, if you reach a Rook + Pawn vs. Rook ending, you must try to adopt it.\n\nHowever, this is not always possible, so it is important to know other defensive resources."
   },
   {
     "type": "ending",
@@ -81,7 +84,7 @@
   },
   {
     "type": "heading",
-    "content": "DT: Distant rear checks"
+    "content": "DT: Distant (rear) checks"
   },
   {
     "type": "text",
@@ -96,7 +99,7 @@
   },
   {
     "type": "text",
-    "content": "In the diagram position the pawn has already reached the 7th rank and we will study the final part of the winning procedure. This position is very important because the stronger side will always be able to get here if the defensive techniques\n(Philidor being the most important) cannot be applied.\nWhen the stronger side's king is on the 8th rank and the pawn on the 7th rank, the only efficient defence consists in transferring the rook to the 'long' side, a method we will see in our first example. If the defending rook is unable to deliver checks from the long side, the ending is lost.\nThis position owes its name to Lucena, and it would not be a good idea to change that name because names are useful for teaching and learning. However, this ending does not actually appear in the famous book by Lucena dated 1497, the first book on modern chess, of which there are still some copies left.\n1...Rc2\nNow the white king cannot get out, but Black is not saved either. White has three winning methods at his disposal, but I recommend that you pay attention to the main line, because this procedure can be applied against any pawn (the obvious exception being the rook's pawn) and it is the most instructive.\n2.Rf1+\nFirst step: The black king is cut off one more file.\n2...Kg7! (2.Ke6 3.Ke8+-) 3.Rf4!"
+    "content": "In the diagram position the pawn has already reached the 7th rank and we will study the final part of the winning procedure. This position is very important because the stronger side will always be able to get here if the defensive techniques\n(Philidor being the most important) cannot be applied.\nWhen the stronger side's king is on the 8th rank and the pawn on the 7th rank, the only efficient defence consists in transferring the rook to the 'long' side, a method we will see in our first example. If the defending rook is unable to deliver checks from the long side, the ending is lost.\nThis position owes its name to Lucena, and it would not be a good idea to change that name because names are useful for teaching and learning. However, this ending does not actually appear in the famous book by Lucena dated 1497, the first book on modern chess, of which there are still some copies left.\n1...Rc2\nNow the white king cannot get out, but Black is not saved either. White has three winning methods at his disposal, but I recommend that you pay attention to the main line, because this procedure can be applied against any pawn (the obvious exception being the rook's pawn) and it is the most instructive.\n2.Rf1+\nFirst step: The black king is cut off one more file.\n2...Kg7! (2...Ke6 3.Ke8+-) 3.Rf4!"
   },
   {
     "type": "position",
@@ -126,7 +129,7 @@
   },
   {
     "type": "heading",
-    "content": "DT: Distant side checks"
+    "content": "DT: Distant (side) checks"
   },
   {
     "type": "text",
@@ -136,12 +139,12 @@
     "type": "position",
     "content": {
       "number": "10.4",
-      "fen": "4K3/4P1k1/8/8/8/8/r7/5R2 w - - 0 1"
+      "fen": "4K3/4P1k1/8/8/8/8/r7/5R2 b - - 0 1"
     }
   },
   {
     "type": "text",
-    "content": "1.Ra8+! 2.Kd7 Ra7+! 3.Kd8 Ra8+ 4.Kc7 Ra7+\nHere, it is easy to note that, with a shorter distance (just one file), this check would be impossible. Then we realise that, to enjoy such a distance from the enemy king, the rook has to be on the long side of the board and, therefore, the defending king has to be on the short side. Note that the pawn divides the board into two unequal parts.\nThis is the famous 'long side' in rook endings. When the rook and the pawn are separated by three files, the rook succeeds. This rule of distant effectiveness is important because it also applies in the case of rear and frontal checks, as we will see in Ending 59. Its application in practical play is enormous, since very often the defending king has been forced to choose one side of the board. In most cases the best side for the king is the short one, in order to leave the long side for the rook. Here, it is the only chance. Thus we can establish another valuable rule: 'In order to avoid the\nLucena Position, the only reliable resource is the long side'.\n5.Kd6 Ra6+ 6.Kc5 Re6!=\nIf the king goes too far from the pawn, the pawn is lost. Also note that Black would lose if his king were on the first rank due to 7.Rf8."
+    "content": "1...Ra8+! 2.Kd7 Ra7+! 3.Kd8 Ra8+ 4.Kc7 Ra7+\nHere, it is easy to note that, with a shorter distance (just one file), this check would be impossible. Then we realise that, to enjoy such a distance from the enemy king, the rook has to be on the long side of the board and, therefore, the defending king has to be on the short side. Note that the pawn divides the board into two unequal parts.\nThis is the famous 'long side' in rook endings. When the rook and the pawn are separated by three files, the rook succeeds. This rule of distant effectiveness is important because it also applies in the case of rear and frontal checks, as we will see in Ending 59. Its application in practical play is enormous, since very often the defending king has been forced to choose one side of the board. In most cases the best side for the king is the short one, in order to leave the long side for the rook. Here, it is the only chance. Thus we can establish another valuable rule: 'In order to avoid the\nLucena Position, the only reliable resource is the long side'.\n5.Kd6 Ra6+ 6.Kc5 Re6!=\nIf the king goes too far from the pawn, the pawn is lost. Also note that Black would lose if his king were on the first rank due to 7.Rf8."
   },
   {
     "type": "ending",
@@ -151,12 +154,19 @@
     }
   },
   {
-    "type": "text",
-    "content": "Position 10.5\nNow we will see some defensive techniques that complement Philidor. First we will deal with the knight's pawn. This pawn and the rook's pawn allow an alternative and even more simple defensive technique."
+    "type": "position",
+    "content": {
+      "number": "10.5",
+      "fen": "1k6/7R/8/KP6/8/8/8/2r5 w - - 0 1"
+    }
   },
   {
     "type": "text",
-    "content": "1.Ka6.\nWe can see that the Philidor method does not apply here.\n1...Kc8!\nThis is the alternative method - in this position, the only one. The king stands in front of the pawn while the rook just stays on the first rank. It is important to realise that this procedure does not work against a bishop's or central pawn, because then there is more room for the attacking side on the left of the pawn. Given that clue,\nthe reader should be able to discover the winning procedure with a bishop's pawn.\nYou can check it as an Exercise.\n2.b6 Kf8 3.Rb7+ Ka5!\nBlack has to be careful until the end: 3...Kc8? loses to 4.Ka7+-.\n4.Ra7+ Kb8 5.Kh7 Kg8\nIt is easy to see that White cannot make further progress."
+    "content": "Now we will see some defensive techniques that complement Philidor. First we will deal with the knight's pawn. This pawn and the rook's pawn allow an alternative and even more simple defensive technique."
+  },
+  {
+    "type": "text",
+    "content": "1.Ka6\nWe can see that the Philidor method does not apply here.\n1...Rc8!\nThis is the alternative method - in this position, the only one. The king stands in front of the pawn while the rook just stays on the first rank. It is important to realise that this procedure does not work against a bishop's or central pawn, because then there is more room for the attacking side on the left of the pawn. Given that clue,\nthe reader should be able to discover the winning procedure with a bishop's pawn.\nYou can check it as an Exercise.\n2.b6 Rf8 3.Rb7+ Ka8!\nBlack has to be careful until the end: 3...Kc8? loses to 4.Ka7+-.\n4.Ra7+ Kb8 5.Rh7 Rg8\nIt is easy to see that White cannot make further progress."
   },
   {
     "type": "ending",
@@ -318,7 +328,7 @@
     "type": "position",
     "content": {
       "number": "10.13",
-      "fen": "7R/8/4k3/8/2P5/2K5/8/3R4 w - - 0 1"
+      "fen": "7r/8/4k3/8/2P5/2K5/8/3R4 b - - 0 1"
     }
   },
   {
@@ -378,7 +388,7 @@
     "type": "position",
     "content": {
       "number": "10.16",
-      "fen": "3R4/8/k7/8/3P4/3K4/8/1R6 w - - 0 1"
+      "fen": "3r4/8/k7/8/3P4/3K4/8/1R6 w - - 0 1"
     }
   },
   {
@@ -445,11 +455,15 @@
   },
   {
     "type": "text",
-    "content": "As we will see in our next example, this procedure does NOT work with a 3rd- or\n2nd-rank central pawn.\nPerfect Cut with a 3rd-rank central pawn"
+    "content": "As we will see in our next example, this procedure does NOT work with a 3rd- or 2nd-rank central pawn."
   },
   {
-    "type": "caption",
-    "content": "Position 10.19"
+    "type": "position",
+    "content": {
+      "number": "10.19",
+      "fen": "3r4/8/8/7R/8/3P1k2/3K4/8 b - - 0 1",
+      "subtitle": "Perfect Cut with a 3rd-rank central pawn"
+    }
   },
   {
     "type": "text",
@@ -463,8 +477,11 @@
     }
   },
   {
-    "type": "caption",
-    "content": "Position 10.20"
+    "type": "position",
+    "content": {
+      "number": "10.20",
+      "fen": "2r5/8/7R/4k3/2P5/2K5/8/8 b - - 0 1"
+    }
   },
   {
     "type": "text",
@@ -527,6 +544,21 @@
     "content": "This is one of the most famous positions in rook endings. When the attacking rook stands in front of the pawn, the pawn can always reach the 7th rank, and this means an immediate win or a very easy defence. The defending side has two opposite strategies: if he has time, he will move the king towards the pawn to capture it. If not, he must move the king in the opposite direction and keep him on g7 or h7."
   },
   {
+    "type": "position",
+    "content": {
+      "number": "10.22",
+      "fen": "R7/P4k2/8/8/8/8/6K1/r7 b - - 0 1",
+      "markers": [
+        { "square": "b7", "symbol": "*", "meaning": "defensive zone" },
+        { "square": "c7", "symbol": "*", "meaning": "defensive zone" },
+        { "square": "g7", "symbol": "*", "meaning": "defensive zone" },
+        { "square": "h7", "symbol": "*", "meaning": "defensive zone" },
+        { "square": "b6", "symbol": "*", "meaning": "defensive zone" },
+        { "square": "c6", "symbol": "*", "meaning": "defensive zone" }
+      ]
+    }
+  },
+  {
     "type": "text",
     "content": "1...Kg7!\nThe defender has to place his king on g7 or h7. Then the stronger side cannot make further progress. Let us check that all alternatives fail: 1...Ra3?? 2.Rh8! +-;\n1...Ke6?? 2.Re8+ +-; 1...Ke7?? 2.Rh8+-.\nNow the rook cannot move; therefore, the only plan available for White is to support the pawn with the king, and that is what he does.\n2.Kf3 Kh7 3.Ke4 Kg7 4.Kd5 Kh7 5.Kc6 Kg7 6.Kb6 Rb1+!\nWhen the white king gets in contact with the pawn, the black rook will start delivering rear checks, as the white king lacks a shelter.\n7.Ka6 Ra1+ 8.Kb5 Kh7\nThere is no way to make progress; it is an easy draw. It is interesting to check how,\nwhen the pawn has already reached the 7th rank, it is impossible to win even with an extra h- or g-pawn. We will see that in the next chapter."
   },
@@ -538,20 +570,40 @@
     }
   },
   {
-    "type": "text",
-    "content": "DT: Distant (side) checks\nWe know now why the pawn should only reach the 7th rank if the black king cannot stand on g7-h7. So... what to do with it? If the pawn is not advanced, the defending king will come and capture it. Therefore, the best procedure is to take the pawn to the 6th rank, where it can be quite safe."
+    "type": "heading",
+    "content": "DT: Distant (side) checks"
   },
   {
-    "type": "caption",
-    "content": "Position 10.23"
+    "type": "text",
+    "content": "We know now why the pawn should only reach the 7th rank if the black king cannot stand on g7-h7. So... what to do with it? If the pawn is not advanced, the defending king will come and capture it. Therefore, the best procedure is to take the pawn to the 6th rank, where it can be quite safe."
+  },
+  {
+    "type": "position",
+    "content": {
+      "number": "10.23",
+      "fen": "R7/5k2/P7/8/8/8/6K1/r7 b - - 0 1",
+      "markers": [
+        { "square": "e8", "symbol": "*", "meaning": "mined file" },
+        { "square": "e7", "symbol": "*", "meaning": "mined file" },
+        { "square": "e6", "symbol": "*", "meaning": "mined file" },
+        { "square": "e5", "symbol": "*", "meaning": "mined file" },
+        { "square": "e4", "symbol": "*", "meaning": "mined file" },
+        { "square": "e3", "symbol": "*", "meaning": "mined file" },
+        { "square": "e2", "symbol": "*", "meaning": "mined file" },
+        { "square": "e1", "symbol": "*", "meaning": "mined file" }
+      ]
+    }
   },
   {
     "type": "text",
     "content": "The king is close to the safety zone g7 -h7 and can get there if the pawn reaches the\n7th rank. First question: can he go to capture the pawn?\n1...Kg7\nAnswer: No! 1...Ke7? 2.a7! and the king gets trapped halfway; he cannot go back, as he will not get to the safe zone in time, but he has no time to reach the pawn: 2...Kf7 3.Rh8. Thus we can say that, when the pawn is on the 6th rank, the e-file is mined for the black king; if he has not crossed this file before, he cannot do it anymore.\nSince the black king cannot approach the pawn, he gets into the safe zone instead.\nAnd now? We know White should not push the pawn but... is there something else to do? Yes, there is! Actually, this position was considered a win for White for a long time. Even the best chess players in the world were sure about this assessment,\nuntil a player named Vancura found an astonishing defensive resource in 1924. But let us speak first about White's winning plan. The pawn can now be used as a shield against checks, and thus White has a winning plan: the king goes to the a7-square, the rook comes out and the pawn promotes. On the other hand, it is difficult to find the right defensive plan if you don't know the position: the fact that even the best chess players in the world could not find it for many years is evidence of that.\n2.Kf3\nTrying to carry out the plan in the most straightforward way. Black will lose if he just waits. Other moves are possible, and the analysis of all king options is rather complex. For the moment we are just going to grasp the idea.\n2...Rf1+\nThe starting point of the Vancura Defence. This moment is important and we must consider other options that may appear in an actual game. In our next example we will come to this.\nLet us see what happens if Black just waits with 2...Kh7?, as in the previous endings with the pawn on the 7th rank. This plan illustrates all possibilities apart from the Vancura Defence: 3.Ke4 Kg7 4.Kd5 Kh7 5.Kc6 Kg7 6.Kb6 (now the king defends the pawn and the rook threatens to come out) 6...Rb7+ 7.Ka7. That is the point: the white king has a shelter. The rook will come out now and then the pawn promotes: 7...Kh7 8.Rb8 Ra1 9.Rb6 followed by Kb7-a7 and a8. 3.Ke4 Rf6!!\nThis is the point of the Vancura Defence: the rook attacks the 6th-rank pawn laterally; thus, if the white king approaches the pawn, the rook can deliver checks and the king cannot use the pawn as shelter. On the other hand, if the pawn is pushed,\ncreating the threat Rg8, the black rook will immediately come back to the previous position, which we already know is drawn. Once we know the technique, its application is so simple that we just need a little care to avoid blundering. Let us consider some options:\n4.Kd5 (4.Ke5 (threatening 5.Rg8) 4...Rb6 5.Kd5 Rf6=; 4.a7 Ra6! =) 4...Rb6\n5.Kc5 Rf6 6.Kb5\nWhite threatens to take the rook out.\n6...Rf5+\nNow comes the series of checks.\n\n7.Kb6 Rf6+ 8.Ka7 Rf7+ 9.Kb6 Rf6+ 10.Kc5 Rf5+ 11.Kd4 Rf5\nIt is an ironclad draw.\nVancura Defence (II)\nNow that we know the Vancura Defence, it is easy to apply. Nevertheless, a quick look at databases may show you that many titled players have lost this drawn position. This is a clear demonstration of: if you do not know this, you will not find it over the board."
   },
   {
-    "type": "caption",
-    "content": "Position 10.24"
+    "type": "position",
+    "content": {
+      "number": "10.24",
+      "fen": "R7/6k1/P7/8/8/5K2/8/r7 b - - 0 1"
+    }
   },
   {
     "type": "text",
@@ -570,8 +622,10 @@
     "content": "7...Kg6!!\nAbsolutely paradoxical (at first sight, as usual). The point is that the black rook must not leave the 4th rank, due to Kd5-c6, etc, and tactical problems arise if the black king hurries to the queenside. 7...Ke6? 8.Rh6+! Kd7 9.Rh8! +- a known motif brilliantly executed.\n8.Rc7 Kf6 9.Kd4 Ke6 10.Kc4 Kd6=\nThese variations are not exhaustive, but in my view they illustrate the situation quite well and help us draw some ideas to find our way in actual games.\nYou can play this endgame correctly with a good knowledge of the main themes and accurate calculation.\nLet us summarise the main ideas from the perspective of the defender:"
   },
   {
-    "type": "text",
-    "content": "1) The rook must go to the 3rd rank. Otherwise, the ending is lost, as the attacking king hides on a7.\n2) If the rook can reach the 3rd rank by means of a check,\nthere is no need for deep calculation.\n3) If the rook cannot use a check, transferring the rook to its place in time is not enough. White will then have one tempo to activate his rook, and Black will have to calculate: a) some tactical tricks and b) a king race towards the queenside.\n4) If the rook cannot use a check, at least it should prevent the advance of the stronger side's king as much as possible."
+    "type": "panel",
+    "content": {
+      "text": "1) The rook must go to the 3rd rank. Otherwise, the ending is lost, as the attacking king hides on a7.\n2) If the rook can reach the 3rd rank by means of a check, there is no need for deep calculation.\n3) If the rook cannot use a check, transferring the rook to its place in time is not enough. White will then have one tempo to activate his rook, and Black will have to calculate: a) some tactical tricks and b) a king race towards the queenside.\n4) If the rook cannot use a check, at least it should prevent the advance of the stronger side's king as much as possible."
+    }
   },
   {
     "type": "ending",
@@ -586,11 +640,24 @@
   },
   {
     "type": "text",
-    "content": "we are going to see now what happens when the attacking king is in front of his pawn. We will start with positions with the pawn on the 7th rank. If the pawn is less advanced, it can be pushed without support from the rook, whose task is 'cutting off the enemy king'. On the other hand, if the attacking king supports his pawn but tries not to stand in front of it, the enemy rook will force him to do so by means of checks.\nThis is the most important position in Rook + Rook's Pawn vs. Rook endings. In order to win, the strong side needs to have the enemy king cut off on the f-file (or the c-file in the case of an h-pawn). If this cut is achieved when the pawn is less advanced, the pawn can be easily pushed later on. If this cut cannot be achieved, the best attacking procedure is to use the rook as a screen for the king before the enemy king approaches.\nThe winning sequence is long and complex but relatively easy to find over the board, if the clock allows you, once you know that the position is won."
+    "content": "We are going to see now what happens when the attacking king is in front of his pawn. We will start with positions with the pawn on the 7th rank. If the pawn is less advanced, it can be pushed without support from the rook, whose task is 'cutting off the enemy king'. On the other hand, if the attacking king supports his pawn but tries not to stand in front of it, the enemy rook will force him to do so by means of checks.\nThis is the most important position in Rook + Rook's Pawn vs. Rook endings. In order to win, the strong side needs to have the enemy king cut off on the f-file (or the c-file in the case of an h-pawn). If this cut is achieved when the pawn is less advanced, the pawn can be easily pushed later on. If this cut cannot be achieved, the best attacking procedure is to use the rook as a screen for the king before the enemy king approaches.\nThe winning sequence is long and complex but relatively easy to find over the board, if the clock allows you, once you know that the position is won."
   },
   {
-    "type": "caption",
-    "content": "Position 10.26"
+    "type": "position",
+    "content": {
+      "number": "10.26",
+      "fen": "K7/P4k2/8/8/8/8/4R3/1r6 w - - 0 1",
+      "markers": [
+        { "square": "e8", "symbol": "*", "meaning": "cut-off file" },
+        { "square": "e7", "symbol": "*", "meaning": "cut-off file" },
+        { "square": "e6", "symbol": "*", "meaning": "cut-off file" },
+        { "square": "e5", "symbol": "*", "meaning": "cut-off file" },
+        { "square": "e4", "symbol": "*", "meaning": "cut-off file" },
+        { "square": "e3", "symbol": "*", "meaning": "cut-off file" },
+        { "square": "e2", "symbol": "*", "meaning": "cut-off file" },
+        { "square": "e1", "symbol": "*", "meaning": "cut-off file" }
+      ]
+    }
   },
   {
     "type": "text",
@@ -623,6 +690,6 @@
   },
   {
     "type": "text",
-    "content": "Here we have the critical position where the king and the rook support the pawn. If\nWhite is to move, 1.a6 wins, as the pawn is unstoppable: 1...Rb1+ 2.Rb6 Rc1 3.a7\nRc7+ 4.Ka6 Rc8 5.Rb8+-.\nIf Black is to move, accurate play saves the game. Obviously, White's victory is easier if the black king is farther away or the pawn is more advanced.\nIf we keep this position in mind, we will be able to solve this kind of ending correctly, though there are many subtleties.\n1...Rb1+! 2.Rb6 Rc1!\nThis is the ideal position for the rook to deliver checks.\n3.a6\n3.Rb2 makes sense, as White threatens 4.Rd2 and frees more squares for the king:\n3...J ic7+ 4.Kb6 Kc8! = and the black king stands in front of the pawn or blocks the white king's way out.\n3...Rc7+ 4.Ka8 Rc8+ 5.Ka7 (5.Rb8 Rc1 (not 5...Kc7? 6.a7+- and double zugzwang) 6.a7 Kc7! =) 5...Rc7+ 6.Rb7 Kc8! 7.Kb6 Rc1 8.Rh7 Rb1+ 9.Ka7\nRa1=\nThere is no way to make progress."
+    "content": "Here we have the critical position where the king and the rook support the pawn. If\nWhite is to move, 1.a6 wins, as the pawn is unstoppable: 1...Rb1+ 2.Rb6 Rc1 3.a7\nRc7+ 4.Ka6 Rc8 5.Rb8+-.\nIf Black is to move, accurate play saves the game. Obviously, White's victory is easier if the black king is farther away or the pawn is more advanced.\nIf we keep this position in mind, we will be able to solve this kind of ending correctly, though there are many subtleties.\n1...Rb1+! 2.Rb6 Rc1!\nThis is the ideal position for the rook to deliver checks.\n3.a6\n3.Rb2 makes sense, as White threatens 4.Rd2 and frees more squares for the king:\n3...Rc7+ 4.Kb6 Kc8! = and the black king stands in front of the pawn or blocks the white king's way out.\n3...Rc7+ 4.Ka8 Rc8+ 5.Ka7 (5.Rb8 Rc1 (not 5...Kc7? 6.a7+- and double zugzwang) 6.a7 Kc7! =) 5...Rc7+ 6.Rb7 Kc8! 7.Kb6 Rc1 8.Rh7 Rb1+ 9.Ka7\nRa1=\nThere is no way to make progress."
   }
 ]

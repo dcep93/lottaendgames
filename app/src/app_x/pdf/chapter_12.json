@@ -91,8 +91,21 @@
     }
   },
   {
-    "type": "caption",
-    "content": "Position 12.4"
+    "type": "position",
+    "content": {
+      "number": "12.4",
+      "fen": "k7/8/1p6/1P6/8/8/7K/8 w - - 0 1",
+      "markers": [
+        { "square": "a6", "symbol": "*", "meaning": "key square" },
+        { "square": "c6", "symbol": "*", "meaning": "key square" },
+        { "square": "d6", "symbol": "*", "meaning": "key square" },
+        { "square": "e6", "symbol": "*", "meaning": "key square" },
+        { "square": "a5", "symbol": "*", "meaning": "key square" },
+        { "square": "c5", "symbol": "*", "meaning": "key square" },
+        { "square": "d5", "symbol": "*", "meaning": "key square" },
+        { "square": "e5", "symbol": "*", "meaning": "key square" }
+      ]
+    }
   },
   {
     "type": "text",
@@ -107,8 +120,25 @@
     "content": "When both kings can occupy the key squares for their enemy pawns, a mutual zugzwang may arise. The first king to attack the enemy pawn must reserve (if he can) the important square for attack and defence, which in this position is d6 for\nWhite and f5 for Black."
   },
   {
-    "type": "caption",
-    "content": "Position 12.5"
+    "type": "position",
+    "content": {
+      "number": "12.5",
+      "fen": "8/2K5/4p3/4P3/6k1/8/8/8 w - - 0 1",
+      "markers": [
+        { "square": "b6", "symbol": "*", "meaning": "key square" },
+        { "square": "c6", "symbol": "*", "meaning": "key square" },
+        { "square": "d6", "symbol": "*", "meaning": "key square" },
+        { "square": "f6", "symbol": "*", "meaning": "key square" },
+        { "square": "g6", "symbol": "*", "meaning": "key square" },
+        { "square": "h6", "symbol": "*", "meaning": "key square" },
+        { "square": "b5", "symbol": "*", "meaning": "key square" },
+        { "square": "c5", "symbol": "*", "meaning": "key square" },
+        { "square": "d5", "symbol": "*", "meaning": "key square" },
+        { "square": "f5", "symbol": "*", "meaning": "key square" },
+        { "square": "g5", "symbol": "*", "meaning": "key square" },
+        { "square": "h5", "symbol": "*", "meaning": "key square" }
+      ]
+    }
   },
   {
     "type": "text",
@@ -175,8 +205,15 @@
     "content": "In this position, White will not be able to capture the black pawn, so he will have to think about defence, which implies reaching the key square b4 the moment the black king captures the b6 pawn.\nSince Black needs 5 moves to capture the pawn and White needs 6 to reach b4, we can conclude that White will succeed if he is to move. However, this could be a rash conclusion, as not all routes work the same.\nAs we know from the introduction, the white king has 141 possible routes from h4\nto b4. However, only one works in this position! Of course, the right route is the farthest from the one chosen by the black king.\n1.Kg3!\n1.Kg4? Kc2! (the black king has multiple routes as well, and so he chooses one to shoulder away his counterpart) 2.Kf3 Kd3! (forcing the white king to lose a tempo) 3.Kf2 Kc4 4.Ke2 Kb5 5.Kd3 Kxb6 6.Kc3 Kb5 -+.\n1...Kc2 2.Kf2! Kd3 3.Ke1 Kc4 4.Kd2 Kb5 5.Kc3 Kxb6 6.Kb4 and White succeeds.\nNow it is easy to see that, had the white king been on h5 in the starting position,\nWhite would be lost because, though there would be multiple routes to reach b4 in 6\n\nmoves, none of them would have worked. On the contrary, from h1 the white king would comfortably reach his goal, despite there being fewer routes available. One last remark: if the black king were on f1, White would lose. If all this is clear for you,\nthen you have a good understanding of the king's routes and the shouldering-away technique. If you have doubts, it is worth checking everything as an Exercise.\nRook's pawn\nHere it is easier for the defending side to reach the key squares, as trapping the strong king on the rook file is enough to draw.\nDo not be scared by the sight of two black kings. Let us compare two situations.\nFirst, imagine the position with the king on b2. The white king needs 5 moves to capture the a7 pawn and the black king has to reach c7 on that moment. Also 5\nmoves, but White can shoulder away the black king."
   },
   {
-    "type": "caption",
-    "content": "Position 12.9"
+    "type": "position",
+    "content": {
+      "number": "12.9",
+      "fen": "8/p4K2/P7/8/8/8/1k6/8 w - - 0 1",
+      "markers": [
+        { "square": "c7", "symbol": "*", "meaning": "key square" },
+        { "square": "h2", "symbol": "\u265a", "meaning": "alternative black king location" }
+      ]
+    }
   },
   {
     "type": "text",
@@ -328,8 +365,21 @@
     "content": "This is the position after 1.b4? in Position 12.16. At last we can draw on the board the lines which help us know whether the ending is won or not, as well as explain them:"
   },
   {
-    "type": "caption",
-    "content": "Position 12.18"
+    "type": "position",
+    "content": {
+      "number": "12.18",
+      "fen": "8/8/8/1k5p/1P5P/2K5/8/8 b - - 0 1",
+      "markers": [
+        { "square": "f8", "symbol": "*", "meaning": "collision line" },
+        { "square": "f7", "symbol": "*", "meaning": "collision line" },
+        { "square": "f6", "symbol": "*", "meaning": "collision line" },
+        { "square": "f5", "symbol": "*", "meaning": "collision line" },
+        { "square": "f4", "symbol": "*", "meaning": "collision line" },
+        { "square": "f3", "symbol": "*", "meaning": "collision line" },
+        { "square": "f2", "symbol": "*", "meaning": "collision line" },
+        { "square": "f1", "symbol": "*", "meaning": "collision line" }
+      ]
+    }
   },
   {
     "type": "text",
@@ -479,8 +529,11 @@
     "content": "All pawns are on the 2nd rank"
   },
   {
-    "type": "caption",
-    "content": "Position 12.25"
+    "type": "position",
+    "content": {
+      "number": "12.25",
+      "fen": "8/8/7p/5k2/5K2/8/6PP/8 b - - 0 1"
+    }
   },
   {
     "type": "text",
@@ -625,8 +678,16 @@
     "content": "Pawns separated by three files"
   },
   {
-    "type": "caption",
-    "content": "Position 12.33"
+    "type": "position",
+    "content": {
+      "number": "12.33",
+      "fen": "8/7k/8/p3p1pP/6P1/2K5/8/8 w - - 0 1",
+      "markers": [
+        { "square": "c6", "symbol": "*", "meaning": "control square" },
+        { "square": "c5", "symbol": "*", "meaning": "control square" },
+        { "square": "c4", "symbol": "*", "meaning": "control square" }
+      ]
+    }
   },
   {
     "type": "text",

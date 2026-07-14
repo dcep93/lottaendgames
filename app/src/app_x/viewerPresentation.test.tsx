@@ -88,6 +88,31 @@ assert.ok(
     positionStudyMarkup.indexOf('leg-position-study-content'),
 )
 
+const comparisonPositionMarkup = renderToStaticMarkup(
+  <PositionStudyGroup
+    activeBoards={activeBoards}
+    activePositionNumber={null}
+    group={{ contentIndexes: [], index: 0, type: 'positionGroup' }}
+    navigationByPosition={new Map()}
+    onMoveClick={onMoveClick}
+    onPositionReset={() => undefined}
+    playback={{ playablePositions: new Set(), tokensBySectionIndex: new Map() }}
+    sections={[
+      {
+        content: {
+          displayLabel: 'Draw',
+          fen: '6k1/8/8/8/8/8/P7/7K w - - 0 1',
+          number: 'comparison.1',
+        },
+        type: 'position',
+      },
+    ] as RawChapterSection[]}
+  />,
+)
+assert.match(comparisonPositionMarkup, /<strong[^>]*>Draw<\/strong>/)
+assert.doesNotMatch(comparisonPositionMarkup, />Position</)
+assert.doesNotMatch(comparisonPositionMarkup, />comparison\.1</)
+
 const proseMarkup = renderToStaticMarkup(
   <ProseBlock
     activeBoards={activeBoards}

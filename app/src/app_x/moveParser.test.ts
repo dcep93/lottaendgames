@@ -11,6 +11,8 @@ import {
 import type { RawChapterSection } from './chapterTypes'
 import {
   buildChapterPlayback,
+  isProseMoveReference,
+  isProseSanReference,
   type TextPlaybackToken,
 } from './moveParser'
 import {
@@ -109,6 +111,12 @@ const positionSixSixMoveSectionIndex = chapterSixSections.findIndex(
     typeof section.content === 'string' &&
     section.content.startsWith('1...g3'),
 )
+const rookInFrontMoveSectionIndex = chapterSixSections.findIndex(
+  (section) =>
+    section.type === 'text' &&
+    typeof section.content === 'string' &&
+    section.content.includes('here, with ...Ra8'),
+)
 const moveTokens = getMoveTokens(moveSectionIndex)
 const proseTokens = getMoveTokens(proseSectionIndex)
 const cuttingOffTokens = getMoveTokens(positionFiveThreeMoveSectionIndex)
@@ -117,7 +125,7 @@ const zugzwangContinuationTokens = getMoveTokens(
   positionFiveTenContinuationMoveSectionIndex,
 )
 const kopaevTokens = getMoveTokens(positionFiveElevenMoveSectionIndex)
-const rookInFrontTokens = getChapterSixMoveTokens(8)
+const rookInFrontTokens = getChapterSixMoveTokens(rookInFrontMoveSectionIndex)
 const seriesOfChecksTokens = getChapterSixMoveTokens(positionSixSixMoveSectionIndex)
 const positionFiveOneNavigation = navigationByPosition.get('5.1')
 const positionFiveOneInitialFen = '4R3/8/7K/8/1kp5/8/8/8 w - - 0 1'
@@ -164,34 +172,10 @@ const chapterElevenAnalysisTokens = getChapterMoveTokens(
 )
 const sanScanPattern =
   /(?<![A-Za-z0-9])((\d+)\s*(\.\.\.|\.)\s*)?((?:O-O-O|O-O|0-0-0|0-0|[KQRBN]?[a-h]?[1-8]?x?[a-h][1-8](?:=?[QRBN])?|[a-h]x[a-h][1-8](?:=?[QRBN])?|[a-h][1-8](?:=?[QRBN])?)(?:[+#])?(?:[!?]+|=)?)/g
-const ignoredSanMisses: Set<string> = new Set([
-  '5:44:Re1+',
-  '6:26:Rg3',
-  '6:31:Rh7',
-  '7:11:Bf3',
-  '7:22:Kg6',
-  '7:30:Ke8',
-  '7:30:Ba6',
-  '8:7:3...Ng3',
-  '8:7:Ne3',
-  '8:9:Nf5',
-  '8:14:Ng2',
-  '8:20:Nb2',
-  '9:39:Kf5',
-  '9:45:Kf5',
-  '9:49:Ka2',
-  '9:51:Bf5',
-  '9:51:Ka2',
-  '9:17:Bh4',
-  '9:23:Bf7',
-  '9:23:Bb4',
-  '9:57:Kd7',
-  '9:57:6.Kd6',
-  '9:72:Kf3',
-  '9:72:6.f5',
-])
 
 assert.equal(positionFiveOneIndex, 4)
+assert.equal(isProseMoveReference('which was tactically prevented by ...'), true)
+assert.equal(isProseMoveReference('prevented the lethal blow ...'), true)
 assert.equal(chapterPayload.schemaVersion, 2)
 assert.match(chapterPayload.contentHash, /^sha256:[a-f0-9]{64}$/)
 assert.equal(chapterPayload.contentHash, getPayloadContentHash(chapterPayload))
@@ -203,11 +187,15 @@ assert.deepEqual(
   chapterPayload.chapters.map(({ id, label }) => ({ id, label })),
   chapterManifest.map(({ id, label }) => ({ id, label })),
 )
-assert.equal(positionFiveThreeMoveSectionIndex, 15)
-assert.equal(positionFiveTenTextSectionIndex, 62)
-assert.equal(positionFiveTenContinuationMoveSectionIndex, 63)
-assert.equal(positionFiveElevenMoveSectionIndex, 67)
-assert.equal(positionSixSixMoveSectionIndex, 31)
+for (const sectionIndex of [
+  positionFiveThreeMoveSectionIndex,
+  positionFiveTenTextSectionIndex,
+  positionFiveTenContinuationMoveSectionIndex,
+  positionFiveElevenMoveSectionIndex,
+  positionSixSixMoveSectionIndex,
+]) {
+  assert.notEqual(sectionIndex, -1)
+}
 assert.equal(playback.playablePositions.has('5.1'), true)
 assert.ok(positionFiveOneNavigation, 'Expected navigation for position 5.1')
 validateChapter(chapterSections)
@@ -227,13 +215,20 @@ assert.deepEqual(scanUnclickableSan('6', chapterSixSections), [])
 assert.deepEqual(scanUnclickableSan('7', chapterSevenSections), [])
 assert.deepEqual(scanUnclickableSan('8', chapterEightSections), [])
 assert.deepEqual(scanUnclickableSan('9', chapterNineSections), [])
-assert.equal(panelSections.length, 3)
+assert.equal(panelSections.length, 5)
 const summaryPanels = panelSections.filter(
   (section) =>
     (section.content as { title?: unknown }).title ===
     'Summary of interesting ideas',
 )
 assert.equal(summaryPanels.length, 2)
+assert.equal(
+  panelSections.filter(
+    (section) =>
+      (section.content as { title?: unknown }).title === 'Conclusion',
+  ).length,
+  3,
+)
 for (const section of summaryPanels) {
   const content = section.content as { text?: unknown; title?: unknown }
   assert.equal(content.title, 'Summary of interesting ideas')
@@ -672,6 +667,7 @@ function getMoveTokens(sectionIndex: number) {
 }
 
 function getChapterSixMoveTokens(sectionIndex: number) {
+  assert.notEqual(sectionIndex, -1, 'Expected chapter 6 move section to exist.')
   const tokens = chapterSixPlayback.tokensBySectionIndex.get(sectionIndex)
 
   if (!tokens) {
@@ -1025,7 +1021,7 @@ function scanUnclickableSan(
     }
   }
 
-  return misses.filter((miss) => !ignoredSanMisses.has(miss))
+  return misses
 }
 
 function getSectionText(section: RawChapterSection) {
@@ -1058,6 +1054,10 @@ function findSanDisplays(text: string) {
 
 function shouldIgnoreSanDisplay(display: string, text: string, index: number) {
   if (/^\d+$/.test(display)) {
+    return true
+  }
+
+  if (isProseSanReference(text, index, display.length)) {
     return true
   }
 

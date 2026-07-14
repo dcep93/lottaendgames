@@ -144,6 +144,36 @@ assertChapterIncludes('6', 'Analysis diagram 6.7')
 assertChapterIncludes('7', 'An apparent exception. 3-square diagonal')
 assertChapterIncludes('7', '6.f6++-')
 assertChapterIncludes('7', 'Revision of some assorted themes')
+assertChapterIncludes('10', 'DT: Distant (rear) checks, cut-off king')
+assertChapterIncludes('10', 'DT: Distant (side) checks')
+assertChapterIncludes(
+  '10',
+  'We are going to see now what happens when the attacking king is in front of his pawn.',
+)
+assertChapterIncludes('11', 'Conclusion: Think twice before you push a pawn')
+assertChapterIncludes('11', 'White wins')
+assertChapterIncludes(
+  '13',
+  'The second-rank defence consists in placing both rook and king on the second rank.',
+)
+assertChapterIncludes('13', '38.Rd7+ Kf6')
+assertChapterIncludes('13', 'Pawn on the 6th rank')
+assertChapterIncludes('13', 'The winning manoeuvre')
+assertChapterIncludes(
+  '14',
+  '58.Qb4+ Ke2 59.Qe4+ Kd2 60.Qd4+ Kc1 61.Qg3 Kb1',
+)
+assertChapterIncludes('14', '100.Bc5 Ke4 101.Kf2')
+assertChapterIncludes(
+  '14',
+  'Find mistakes in the following moves: 90...Kh7 91.Qe4+ Kh8',
+)
+assertChapterIncludes(
+  '14',
+  "The PDF incorrectly prints 'Black to move.'",
+)
+assertChapterExcludes('13', '38.Kd7+ Kf6')
+assertChapterExcludes('14', '100.Kc5 Ke4')
 
 console.log('source text audit passed')
 
@@ -160,6 +190,22 @@ function assertChapterIncludes(chapterId: string, expected: string) {
     normalizeText(chapterText).includes(normalizeText(expected)),
     true,
     `Chapter ${chapterId} is missing source passage: ${expected}`,
+  )
+}
+
+function assertChapterExcludes(chapterId: string, unexpected: string) {
+  const sections = JSON.parse(
+    readFileSync(
+      new URL(`./pdf/chapter_${chapterId}.json`, import.meta.url),
+      'utf8',
+    ),
+  ) as RawChapterSection[]
+  const chapterText = sections.flatMap(textualValues).join('\n')
+
+  assert.equal(
+    normalizeText(chapterText).includes(normalizeText(unexpected)),
+    false,
+    `Chapter ${chapterId} still contains source passage: ${unexpected}`,
   )
 }
 

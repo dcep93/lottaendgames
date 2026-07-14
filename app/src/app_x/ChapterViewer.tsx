@@ -65,7 +65,8 @@ export default function ChapterViewer() {
     chapterPayload?.chapters.find((chapter) => chapter.id === activeChapterId) ??
     null
   const preparedChapter = useMemo(
-    () => (activeChapter ? hydrateRuntimeChapter(activeChapter) : emptyPreparedChapter),
+    () =>
+      activeChapter ? hydrateRuntimeChapter(activeChapter) : emptyPreparedChapter,
     [activeChapter],
   )
   const chapterSections = preparedChapter.sections
@@ -754,19 +755,20 @@ function PositionCard({
   onReset: (positionNumber: string) => void
   section: PositionSection
 }) {
-  const { caption, fen, markers, number, subtitle } = section.content
+  const { caption, displayLabel, fen, markers, number, subtitle } =
+    section.content
   const isActive = activePositionNumber === number
   const lichessUrl = useMemo(
     () => {
       const initialFen = lichessInitialFen ?? fen
 
       return (
-      buildLichessAnalysisUrl({
-        currentCursorId: activeBoard?.cursorId ?? null,
-        initialFen,
-        navigation,
-        preferredNextByCursor: activeBoard?.preferredNextByCursor ?? {},
-      }) ?? buildLichessEditorUrl(initialFen)
+        buildLichessAnalysisUrl({
+          currentCursorId: activeBoard?.cursorId ?? null,
+          initialFen,
+          navigation,
+          preferredNextByCursor: activeBoard?.preferredNextByCursor ?? {},
+        }) ?? buildLichessEditorUrl(initialFen)
       )
     },
     [
@@ -788,19 +790,23 @@ function PositionCard({
     >
       <div className="leg-position-copy">
         <figcaption>
-          <span>{headingLabel}</span>
+          {displayLabel ? null : <span>{headingLabel}</span>}
           {hasPlayback ? (
             <button
-              aria-label={`Reset position ${number}`}
+              aria-label={
+                displayLabel
+                  ? `Reset ${displayLabel} board`
+                  : `Reset position ${number}`
+              }
               className="leg-position-reset"
               id={headingId}
               onClick={() => onReset(number)}
               type="button"
             >
-              {number}
+              {displayLabel ?? number}
             </button>
           ) : (
-            <strong id={headingId}>{number}</strong>
+            <strong id={headingId}>{displayLabel ?? number}</strong>
           )}
         </figcaption>
         {subtitle ? <p className="leg-position-subtitle">{subtitle}</p> : null}

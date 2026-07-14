@@ -172,6 +172,51 @@ assert.deepEqual(
 )
 assert.equal(getPosition('1', '1.10').content.subtitle, "Knight's pawn")
 
+const chapterElevenComparisonPositions = getChapter('11').sections.filter(
+  (section) =>
+    section.type === 'position' &&
+    isRecord(section.content) &&
+    String(section.content.number).startsWith('11.series.'),
+)
+assert.equal(chapterElevenComparisonPositions.length, 9)
+assert.deepEqual(
+  chapterElevenComparisonPositions.map(
+    (section) => (section.content as Record<string, unknown>).displayLabel,
+  ),
+  [
+    'Draw',
+    'White wins',
+    'Draw',
+    'White wins',
+    'White wins',
+    'White wins',
+    'Draw',
+    'White wins',
+    'Draw',
+  ],
+)
+
+const positionThirteenTwenty = getPosition('13', '13.20')
+assert.equal(
+  positionThirteenTwenty.content.fen,
+  '5k2/1R6/5P2/3b2K1/8/8/8/8 w - - 0 4',
+)
+assert.deepEqual(
+  (positionThirteenTwenty.content.markers as Array<{ square: string }>).map(
+    ({ square }) => square,
+  ),
+  ['b1', 'b2', 'c3', 'e4'],
+)
+
+assert.equal(
+  getProblem('14', '14.22').content.fen,
+  '8/7p/8/6K1/3k2PP/8/2b5/8 b - - 0 54',
+)
+assert.equal(
+  getProblem('14', '14.29').content.fen,
+  '8/8/2pr4/R7/8/1k6/4K3/8 w - - 0 69',
+)
+
 const chapterOne = getChapter('1')
 const endingTwoIndex = chapterOne.sections.findIndex(
   (section) =>
@@ -306,6 +351,20 @@ function getPosition(chapterId: string, positionNumber: string) {
       candidate.content.number === positionNumber,
   )
   assert.ok(section, `Expected position ${positionNumber}`)
+  assert.equal(isRecord(section.content), true)
+  return section as RawChapterSection & {
+    content: Record<string, unknown>
+  }
+}
+
+function getProblem(chapterId: string, problemNumber: string) {
+  const section = getChapter(chapterId).sections.find(
+    (candidate) =>
+      candidate.type === 'problem' &&
+      isRecord(candidate.content) &&
+      candidate.content.number === problemNumber,
+  )
+  assert.ok(section, `Expected problem ${problemNumber}`)
   assert.equal(isRecord(section.content), true)
   return section as RawChapterSection & {
     content: Record<string, unknown>

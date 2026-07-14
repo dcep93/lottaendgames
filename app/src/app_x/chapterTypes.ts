@@ -49,6 +49,7 @@ export type PositionSection = {
   content: {
     alternateFens?: string[]
     caption?: string
+    displayLabel?: string
     fen: string
     markers?: PositionMarker[]
     number: string

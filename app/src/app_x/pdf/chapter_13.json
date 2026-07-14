@@ -261,7 +261,7 @@
   },
   {
     "type": "text",
-    "content": "And, again, we have reached the basic defensive position of the Cochrane Defence.\n29.Rh1+ Kg5 30.Rb1\nWhite plays around, but Black is fully awake and waits.\n30...Kh5 31.Rg1 Rb5 32.Kd4\nOnce again, White unpins his bishop, and once more Black then moves his king in the opposite direction.\n32...Kh6 33.Ke4 Rg5\nAnd again the rook stands in the middle, freeing the black king from the edge.\n34.Rf1 Kg7 35.Bf5 Kf6 36.Ke4 Ke7 37.Rd1 Rg2 38.Kd7+ Kf6 39.Rd6+ Ke7\n40.Be6+ Kf7 41.Ra6 Re2+ 42.Kd5 Ke7\nThe rook and the king stand on the two extremes of the file.\n43.Ke4 Rd2+ 44.Ke5 Re2\nWe have the basic defensive position of the Cochrane Defence for the third time.\nThis position is almost the same as in position 13.14 after move 12. 45.Re6+ Kd7 46.Rh6 Ke7 47.Rh7+ Ke8 48.Ra7 Re1 49.Kd5 (unpinning the bishop) 49...Kf8\nThe king moves in the opposite direction and back to the start.\n50.Bf5 (50.Rb7 Ke8) 50...Re7 1/2-1/2"
+    "content": "And, again, we have reached the basic defensive position of the Cochrane Defence.\n29.Rh1+ Kg5 30.Rb1\nWhite plays around, but Black is fully awake and waits.\n30...Kh5 31.Rg1 Rb5 32.Kd4\nOnce again, White unpins his bishop, and once more Black then moves his king in the opposite direction.\n32...Kh6 33.Ke4 Rg5\nAnd again the rook stands in the middle, freeing the black king from the edge.\n34.Rf1 Kg7 35.Bf5 Kf6 36.Ke4 Ke7 37.Rd1 Rg2 38.Rd7+ Kf6 39.Rd6+ Ke7\n40.Be6+ Kf7 41.Ra6 Re2+ 42.Kd5 Ke7\nThe rook and the king stand on the two extremes of the file.\n43.Ke4 Rd2+ 44.Ke5 Re2\nWe have the basic defensive position of the Cochrane Defence for the third time.\nThis position is almost the same as in position 13.14 after move 12. 45.Re6+ Kd7 46.Rh6 Ke7 47.Rh7+ Ke8 48.Ra7 Re1 49.Kd5 (unpinning the bishop) 49...Kf8\nThe king moves in the opposite direction and back to the start.\n50.Bf5 (50.Rb7 Ke8) 50...Re7 1/2-1/2"
   },
   {
     "type": "ending",
@@ -272,7 +272,17 @@
   },
   {
     "type": "text",
-    "content": "As we have stated, the Cochrane Defence works extremely well on the central files,\nand it is rather easy to achieve from a normal position.\nWhen the starting position of the king is more delicate, or when a careless defence makes it impossible to use the main defensive method, it is sometimes still possible to adopt the so-called second-rank defence.\nThis is a simple and unbreakable defensive set-up, despite its somewhat worrying appearance.\nThe second-rank defence consists in placing both rook and king on the second rank. When a check forces the king to the first rank, an immediate rook-swap offer emerges on the board, which allows the king to come back to the 2nd rank on the following move.\nThe king may also be forced to the first rank by means of zugzwang, but then the defending side can hold thanks to stalemate resources.\nIn the following position, the black king is already locked on the edge of the board.\nThough no concrete threats can be seen, he may end up in the Philidor Position if he is not careful. It is time to use the second-rank defence."
+    "content": "As we have stated, the Cochrane Defence works extremely well on the central files,\nand it is rather easy to achieve from a normal position.\nWhen the starting position of the king is more delicate, or when a careless defence makes it impossible to use the main defensive method, it is sometimes still possible to adopt the so-called second-rank defence.\nThis is a simple and unbreakable defensive set-up, despite its somewhat worrying appearance."
+  },
+  {
+    "type": "panel",
+    "content": {
+      "text": "The second-rank defence consists in placing both rook and king on the second rank. When a check forces the king to the first rank, an immediate rook-swap offer emerges on the board, which allows the king to come back to the 2nd rank on the following move.\nThe king may also be forced to the first rank by means of zugzwang, but then the defending side can hold thanks to stalemate resources."
+    }
+  },
+  {
+    "type": "text",
+    "content": "In the following position, the black king is already locked on the edge of the board.\nThough no concrete threats can be seen, he may end up in the Philidor Position if he is not careful. It is time to use the second-rank defence."
   },
   {
     "type": "position",
@@ -335,8 +345,30 @@
     "type": "position",
     "content": {
       "number": "13.20",
-      "fen": "5k2/1R6/4pP2/3b2K1/2p5/1p6/p7/8 w - - 0 1",
-      "caption": "Analysis diagram 13.20"
+      "fen": "5k2/1R6/5P2/3b2K1/8/8/8/8 w - - 0 4",
+      "caption": "Analysis diagram 13.20",
+      "markers": [
+        {
+          "square": "b1",
+          "symbol": "*",
+          "meaning": "as printed"
+        },
+        {
+          "square": "b2",
+          "symbol": "*",
+          "meaning": "as printed"
+        },
+        {
+          "square": "c3",
+          "symbol": "*",
+          "meaning": "as printed"
+        },
+        {
+          "square": "e4",
+          "symbol": "*",
+          "meaning": "as printed"
+        }
+      ]
     }
   },
   {
@@ -353,6 +385,10 @@
       "number": "98",
       "text": "Rook + rook's pawn vs. Bishop"
     }
+  },
+  {
+    "type": "heading",
+    "content": "Pawn on the 6th rank"
   },
   {
     "type": "text",
@@ -384,8 +420,7 @@
           "symbol": "*",
           "meaning": "as printed"
         }
-      ],
-      "subtitle": "Pawn on the 6th rank"
+      ]
     }
   },
   {
@@ -398,6 +433,10 @@
       "text": "A rook and a 6th-rank rook's or bishop's pawn cannot win against a bishop near the bishop's right corner.\nOther pawns win, but the ending with the central pawn is also quite difficult.\nTherefore, when possible, it is better to move the king ahead of the pawn.",
       "title": "Conclusion"
     }
+  },
+  {
+    "type": "heading",
+    "content": "Pawn on the 5th rank"
   },
   {
     "type": "text",
@@ -429,8 +468,7 @@
           "symbol": "*",
           "meaning": "as printed"
         }
-      ],
-      "subtitle": "Pawn on the 5th rank"
+      ]
     }
   },
   {
@@ -450,11 +488,14 @@
     "content": "3.Ra8+ Kf7 and, though the black king has left the corner, his white counterpart cannot get in: 4.Kg5 Bc2 5.h6. It is interesting to know that, even with this disposition of pieces, Black is able to draw.\n3...Kf8!\nAgain, this move is easy to find in view of 3...Kh8 4.Rd7+- winning. Now the black king is out of the corner, but any white move would allow him back.\n4.Rg3\nIntending to take the white king off the h-file, and preventing the black king from returning to the h8-square. However, this double purpose fails against an accurate defence.\n4...Bc2!\n4...Bb1 would also draw, but only these two moves work; Black should avoid the trap 4...Be4? allowing the white king off the h-file: 5.Kg5! +- Kg8?! 6.Kf4+.\n5.Rg6\nAnother attempt to trick Black, but there is no reason to capture the rook.\n5...Bd3 6.Kh7\nThreatening Kh8, winning; the rook cannot be captured, but...\n6...Kf7!\nThe only move, and enough to draw.\n7.Kh6 Kf8 8.Rg1\n8.Kg5 Bxg6=. Here Black can capture the rook.\n8...Bc2 9.Kg5 Kg8=\nWhite has already tried everything."
   },
   {
+    "type": "heading",
+    "content": "Pawn on the 4th rank"
+  },
+  {
     "type": "position",
     "content": {
       "number": "13.24",
-      "fen": "7k/R7/8/6K1/7P/8/2b5/8 w - - 0 1",
-      "subtitle": "Pawn on the 4th rank"
+      "fen": "7k/R7/8/6K1/7P/8/2b5/8 w - - 0 1"
     }
   },
   {
@@ -473,11 +514,14 @@
     "content": "This struggle is one of the most frequent among the 'different material relations'\nsection (1237 games in my database). Despite the material imbalance, drawing chances are quite high. In practice, among 1237 games, 367 were drawn, which represents about 30%.\nThe theory is complex. Here we will only deal with a few important positions.\nThen, I will present a chart and some advice on handling the possible scenarios.\nYou can find a detailed study on this ending in the excellent work Fundamental Chess\nEndings, by Muller & Lamprecht.\nThe defending side has drawing chances in these two cases:\n1) When the rook defends and pushes the pawn from the rear; we will not study this case. The pawn must be at least on the 6th rank to draw.\n2) Building a fortress; we will see how in the next two positions.\nIf the defender fails to coordinate his forces in one of these two ways, the ending is usually lost."
   },
   {
+    "type": "heading",
+    "content": "The winning manoeuvre"
+  },
+  {
     "type": "position",
     "content": {
       "number": "13.25",
-      "fen": "8/4k3/4p3/3r4/4K3/7Q/8/8 w - - 0 1",
-      "subtitle": "The winning manoeuvre"
+      "fen": "8/4k3/4p3/3r4/4K3/7Q/8/8 w - - 0 1"
     }
   },
   {
@@ -524,7 +568,15 @@
   },
   {
     "type": "text",
-    "content": "1.Qh8+ Kd7 2.Qf8 Re6+ 3.Kd5 Rd6+ 4.Kc5 Rf6\nThere is nothing to do. White would win if his king could reach the 7th or 8th ranks,\nbut only if he penetrates through the wing where the black king is. For instance:\n4...Rd2?! 5.Kb6 Rd6+? (5...Rb2+! is still a draw) 6.Kb7, threatening Qc8 and provoking the collapse of the black set-up in a similar way as in the previous example. However, the white king on the g7-square would be harmless. 6...Rf6 7.Qc8+\nKd6 8.Qg4 Rf8 9.Qd4+ Ke6 10.Kc7 Rf6 11.Qc4+! Ke5 12.Kd7+-.\n5.Qa8 Kd6 6.Qb7+ Kd8= - there is no way to make progress.\nSummary: Queen vs. Rook + Pawn (from b- to g-file)\nYou do not need to know a lot of manoeuvres, because the result always depends on the ability of the defending army to coordinate and build a fortress, and on the success or failure in bringing the fortress down. Defensive manoeuvres are rather obvious. Attacking manoeuvres can be really complex, but they are always based on the same idea: breaking the coordination between the defending forces by means of zugzwang and a gradual queen penetration.\nFor this reason I consider that, although a study of each position is not necessary, it is quite useful to know in which positions the fortress succeeds and in which positions it fails. Leaving aside the rook's pawn, with which we will deal in the following ending, and considering defensive fortresses of the same type as Position 13.27\nor 13.28:"
+    "content": "1.Qh8+ Kd7 2.Qf8 Re6+ 3.Kd5 Rd6+ 4.Kc5 Rf6\nThere is nothing to do. White would win if his king could reach the 7th or 8th ranks,\nbut only if he penetrates through the wing where the black king is. For instance:\n4...Rd2?! 5.Kb6 Rd6+? (5...Rb2+! is still a draw) 6.Kb7, threatening Qc8 and provoking the collapse of the black set-up in a similar way as in the previous example. However, the white king on the g7-square would be harmless. 6...Rf6 7.Qc8+\nKd6 8.Qg4 Rf8 9.Qd4+ Ke6 10.Kc7 Rf6 11.Qc4+! Ke5 12.Kd7+-.\n5.Qa8 Kd6 6.Qb7+ Kd8= - there is no way to make progress."
+  },
+  {
+    "type": "heading",
+    "content": "Summary: Queen vs. Rook + Pawn (from b- to g-file)"
+  },
+  {
+    "type": "text",
+    "content": "You do not need to know a lot of manoeuvres, because the result always depends on the ability of the defending army to coordinate and build a fortress, and on the success or failure in bringing the fortress down. Defensive manoeuvres are rather obvious. Attacking manoeuvres can be really complex, but they are always based on the same idea: breaking the coordination between the defending forces by means of zugzwang and a gradual queen penetration.\nFor this reason I consider that, although a study of each position is not necessary, it is quite useful to know in which positions the fortress succeeds and in which positions it fails. Leaving aside the rook's pawn, with which we will deal in the following ending, and considering defensive fortresses of the same type as Position 13.27\nor 13.28:"
   },
   {
     "type": "panel",

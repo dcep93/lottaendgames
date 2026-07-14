@@ -3,7 +3,11 @@ import { readFileSync } from 'node:fs'
 import { Chess } from 'chess.js'
 import { chapterPayloadPath } from './chapterPayloadManifest'
 import type { RawChapterSection } from './chapterTypes'
-import { buildChapterPlayback, type TextPlaybackToken } from './moveParser'
+import {
+  buildChapterPlayback,
+  isProseSanReference,
+  type TextPlaybackToken,
+} from './moveParser'
 
 type ChapterFixture = {
   number: string
@@ -41,45 +45,9 @@ const chapters: ChapterFixture[] = [
 const sanScanPattern =
   /(?<![A-Za-z0-9])((\d+)\s*(\.\.\.|\.)\s*)?((?:O-O-O|O-O|0-0-0|0-0|[KQRBN]?[a-h]?[1-8]?x?[a-h][1-8](?:=?[QRBN])?|[a-h]x[a-h][1-8](?:=?[QRBN])?|[a-h][1-8](?:=?[QRBN])?)(?:[+#])?(?:[!?]+|=)?)/g
 
-const ignoredSanMisses: Record<string, string> = {
-  '5:44:Re1+': 'Threat text: "The threat is Re1+".',
-  '6:31:Rh7': 'Prose reference: "in case Rh7 is needed".',
-  '7:11:Bf3': 'Prose manoeuvre reference: "Bf3-c6".',
-  '7:22:Kg6': 'Prose alternative: "we could play first ...Kg6".',
-  '7:30:Ke8': 'Prose reference: "If White allows Ke8".',
-  '7:30:Ba6': 'Prose analogy to the corresponding knight-pawn position.',
-  '8:7:3...Ng3': 'Threat text: "threatening 3...Ng3".',
-  '8:7:Ne3': 'Prose reference to a tactical prevention.',
-  '8:9:Nf5': 'Prose reference: "followed by ...Nf5".',
-  '8:14:Ng2': 'Threat text: "the threat was ...Ng2".',
-  '8:20:Nb2': 'Threat text: "the threat is ...Nb2".',
-  '9:39:Kf5': 'Prose plan reference: "by means of f3-f4 and Kf5".',
-  '9:45:Kf5': 'Prose example: "Other moves, such as Kf5".',
-  '9:49:Ka2': 'Threat text: "threatening ...Ka2".',
-  '9:51:Bf5': 'Threat/forcing prose, not a played move.',
-  '9:51:Ka2': 'Conditional prose, not a played move.',
-  '9:17:Bh4': 'Prose plan reference following the Be1 variation.',
-  '9:23:Bf7': 'Prose reference to a key defensive square.',
-  '9:23:Bb4': 'Prose plan reference following the analysed line.',
-  '9:57:Kd7': 'Prose response to the hypothetical bishop move Bc7.',
-  '9:57:6.Kd6': 'Threat text, not a played move.',
-  '9:72:Kf3': 'Prose route reference: Kf3-g3-h4.',
-  '9:72:6.f5': 'Threat text, not a played move.',
-}
-
-const seenIgnoredSanMisses = new Set<string>()
-
 for (const chapter of chapters) {
   auditChapter(chapter)
 }
-
-assert.deepEqual(
-  [...Object.keys(ignoredSanMisses)].filter(
-    (key) => !seenIgnoredSanMisses.has(key),
-  ),
-  [],
-  'Every content-audit SAN ignore should still correspond to a found prose/threat token.',
-)
 
 console.log('content audit passed')
 
@@ -128,17 +96,8 @@ function auditChapter({ number, sections }: ChapterFixture) {
     }
   }
 
-  const unexpectedMisses = unplayableSanDisplays.filter((miss) => {
-    if (miss in ignoredSanMisses) {
-      seenIgnoredSanMisses.add(miss)
-      return false
-    }
-
-    return true
-  })
-
   assert.deepEqual(
-    unexpectedMisses,
+    unplayableSanDisplays,
     [],
     `Chapter ${number} has SAN-looking text that was not converted to a playable move token.`,
   )
@@ -187,6 +146,10 @@ function findSanDisplays(text: string) {
 
 function shouldIgnoreSanDisplay(display: string, text: string, index: number) {
   if (/^\d+$/.test(display)) {
+    return true
+  }
+
+  if (isProseSanReference(text, index, display.length)) {
     return true
   }
 

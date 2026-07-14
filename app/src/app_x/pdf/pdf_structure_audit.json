@@ -363,29 +363,29 @@
       "chapter": "10",
       "ending": "52",
       "page": 124,
-      "targetStartsWith": "DT: Distant rear checks, cut-off king",
+      "targetStartsWith": "DT: Distant (rear) checks, cut-off king",
       "targetType": "heading"
     },
     {
       "chapter": "10",
       "ending": "53",
       "page": 125,
-      "targetStartsWith": "DT: Distant rear checks",
+      "targetStartsWith": "DT: Distant (rear) checks",
       "targetType": "heading"
     },
     {
       "chapter": "10",
       "ending": "54",
       "page": 127,
-      "targetStartsWith": "DT: Distant side checks",
+      "targetStartsWith": "DT: Distant (side) checks",
       "targetType": "heading"
     },
     {
       "chapter": "10",
       "ending": "55",
       "page": 128,
-      "targetStartsWith": "Position 10.5\nNow we will see some defensive techniques that complement Philidor",
-      "targetType": "text"
+      "targetStartsWith": "Position 10.5",
+      "targetType": "position"
     },
     {
       "chapter": "10",
@@ -441,7 +441,7 @@
       "ending": "63",
       "page": 143,
       "targetStartsWith": "Position 10.20",
-      "targetType": "caption"
+      "targetType": "position"
     },
     {
       "chapter": "10",
@@ -461,8 +461,8 @@
       "chapter": "10",
       "ending": "66",
       "page": 146,
-      "targetStartsWith": "DT: Distant (side) checks\nWe know now why the pawn should only reach the 7th ran",
-      "targetType": "text"
+      "targetStartsWith": "DT: Distant (side) checks",
+      "targetType": "heading"
     },
     {
       "chapter": "10",
@@ -553,7 +553,7 @@
       "ending": "79",
       "page": 172,
       "targetStartsWith": "Position 12.4",
-      "targetType": "caption"
+      "targetType": "position"
     },
     {
       "chapter": "12",
@@ -685,8 +685,8 @@
       "chapter": "13",
       "ending": "98",
       "page": 221,
-      "targetStartsWith": "Here defence is even easier. The defender just has to keep his bishop along the ",
-      "targetType": "text"
+      "targetStartsWith": "Pawn on the 6th rank",
+      "targetType": "heading"
     },
     {
       "chapter": "13",
@@ -839,7 +839,7 @@
     {
       "chapter": "10",
       "page": 125,
-      "title": "Summary",
+      "title": null,
       "textStartsWith": "In the Philidor Position"
     },
     {
@@ -867,6 +867,12 @@
       "textStartsWith": "1) When the king is in front of his pawn"
     },
     {
+      "chapter": "10",
+      "page": 149,
+      "title": null,
+      "textStartsWith": "1) The rook must go to the 3rd rank"
+    },
+    {
       "chapter": "11",
       "page": 157,
       "title": "Conclusion of the first scenario. Doubled pawns",
@@ -889,6 +895,12 @@
       "page": 165,
       "title": null,
       "textStartsWith": "1) The king should avoid being trapped on the back rank"
+    },
+    {
+      "chapter": "11",
+      "page": 168,
+      "title": null,
+      "textStartsWith": "Conclusion: Think twice before you push a pawn to the 7th rank"
     },
     {
       "chapter": "12",
@@ -937,6 +949,12 @@
       "page": 212,
       "title": "Summary of main ideas",
       "textStartsWith": "Summary of main ideas: The best ranks for defence"
+    },
+    {
+      "chapter": "13",
+      "page": 217,
+      "title": null,
+      "textStartsWith": "The second-rank defence consists in placing both rook and king"
     },
     {
       "chapter": "13",
@@ -1027,6 +1045,11 @@
       "text": "Bishop's pawn"
     },
     {
+      "chapter": "10",
+      "position": "10.19",
+      "text": "Perfect Cut with a 3rd-rank central pawn"
+    },
+    {
       "chapter": "11",
       "position": "11.1",
       "text": "First scenario"
@@ -1110,26 +1133,6 @@
       "chapter": "13",
       "position": "13.11",
       "text": "Same position, rook's file"
-    },
-    {
-      "chapter": "13",
-      "position": "13.21",
-      "text": "Pawn on the 6th rank"
-    },
-    {
-      "chapter": "13",
-      "position": "13.22",
-      "text": "Pawn on the 5th rank"
-    },
-    {
-      "chapter": "13",
-      "position": "13.24",
-      "text": "Pawn on the 4th rank"
-    },
-    {
-      "chapter": "13",
-      "position": "13.25",
-      "text": "The winning manoeuvre"
     }
   ],
   "standaloneHeadings": [
@@ -1303,15 +1306,15 @@
     },
     {
       "chapter": "10",
-      "text": "DT: Distant rear checks, cut-off king"
+      "text": "DT: Distant (rear) checks, cut-off king"
     },
     {
       "chapter": "10",
-      "text": "DT: Distant rear checks"
+      "text": "DT: Distant (rear) checks"
     },
     {
       "chapter": "10",
-      "text": "DT: Distant side checks"
+      "text": "DT: Distant (side) checks"
     },
     {
       "chapter": "10",
@@ -1340,6 +1343,10 @@
     {
       "chapter": "10",
       "text": "Some ideas about cutting off"
+    },
+    {
+      "chapter": "11",
+      "text": "First scenario"
     },
     {
       "chapter": "11",
@@ -1463,7 +1470,27 @@
     },
     {
       "chapter": "13",
+      "text": "Pawn on the 6th rank"
+    },
+    {
+      "chapter": "13",
+      "text": "Pawn on the 5th rank"
+    },
+    {
+      "chapter": "13",
+      "text": "Pawn on the 4th rank"
+    },
+    {
+      "chapter": "13",
+      "text": "The winning manoeuvre"
+    },
+    {
+      "chapter": "13",
       "text": "The defensive set-up"
+    },
+    {
+      "chapter": "13",
+      "text": "Summary: Queen vs. Rook + Pawn (from b- to g-file)"
     }
   ],
   "chapterSpilloversRemoved": [
@@ -1528,28 +1555,28 @@
       "subtitles": 0
     },
     "10": {
-      "headings": 17,
-      "panels": 5,
-      "positions": 20,
-      "subtitles": 2
+      "headings": 18,
+      "panels": 6,
+      "positions": 27,
+      "subtitles": 3
     },
     "11": {
-      "headings": 10,
-      "panels": 4,
-      "positions": 12,
+      "headings": 11,
+      "panels": 5,
+      "positions": 23,
       "subtitles": 3
     },
     "12": {
       "headings": 19,
       "panels": 5,
-      "positions": 36,
+      "positions": 42,
       "subtitles": 10
     },
     "13": {
-      "headings": 2,
-      "panels": 4,
+      "headings": 7,
+      "panels": 5,
       "positions": 27,
-      "subtitles": 8
+      "subtitles": 4
     }
   }
 }
