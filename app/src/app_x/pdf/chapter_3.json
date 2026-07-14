@@ -42,7 +42,7 @@
   },
   {
     "type": "text",
-    "content": "As shown by analysis, if we can choose we must control the pawn from the rank, or,\nto provide a graphic idea, to control the pawn from the side rather than from the rear.\nIn the diagram position, the knight must be transferred to the second rank, so that it can enter two circuits: one to stop the pawn and the other to capture the pawn. In this case, e2-c3-a2 or e2-d4-b3-c1.\n1. Ne2+!\nThe right move. As we said, the knight is transferred to a side of the pawn. The alternative was losing: 1. Nd3+?? Kd2! and the knight is driven off the right circuit,\nafter which the pawn promotes. The last try is 2. Nc5!?, a typical calculation mistake in this ending. We may have thought that this move is enough to draw, but this is an illusion. 2... Kc3! Avoiding the trick, threatening to promote the pawn and controlling both 'good' squares for the knight (d3 and b3). 3. Ne4+ Kd3. Any legal move would win now, but this is the shortest way to put an end to the knight's kicking. 4. Nc5+ Kc4 and the pawn promotes.\n1...Kd2. This allows a draw straight away, but in case of 1. Kd1, the knight could get to its ideal square to control the pawn from the other side (here, the a2-square):\n2. Nc3+! Kd2 3. Na2=; other king moves pose no problems for White.\n2. Nd4! c1=Q 3. Nb3+="
+    "content": "As shown by analysis, if we can choose we must control the pawn from the rank, or,\nto provide a graphic idea, to control the pawn from the side rather than from the rear.\nIn the diagram position, the knight must be transferred to the second rank, so that it can enter two circuits: one to stop the pawn and the other to capture the pawn. In this case, e2-c3-a2 or e2-d4-b3-c1.\n1. Ne2+!\nThe right move. As we said, the knight is transferred to a side of the pawn. The alternative was losing: 1. Nd3+?? Kd2! and the knight is driven off the right circuit,\nafter which the pawn promotes. The last try is 2. Nc5!?, a typical calculation mistake in this ending. We may have thought that this move is enough to draw, but this is an illusion. 2... Kc3! Avoiding the trick, threatening to promote the pawn and controlling both 'good' squares for the knight (d3 and b3). 3. Ne4+ Kd3. Any legal move would win now, but this is the shortest way to put an end to the knight's kicking. 4. Nc5+ Kc4 and the pawn promotes.\n1...Kd2. This allows a draw straight away, but in case of 1...Kd1, the knight could get to its ideal square to control the pawn from the other side (here, the a2-square):\n2. Nc3+! Kd2 3. Na2=; other king moves pose no problems for White.\n2. Nd4! c1=Q 3. Nb3+="
   },
   {
     "type": "panel",
@@ -184,7 +184,11 @@
   },
   {
     "type": "text",
-    "content": "The black king seems very close to the pawn, but things are not that easy when he tries to come closer. The knight has set up a barrier (the marked squares). To cross the barrier, the black king must give up the pawn. To go round it, there are two possible routes: d4-e5-f4 or c2-d1-e1-f2. Both allow the white king to come closer.\nIt is interesting to note that the essential (and solid) part of the barrier is the d2-e2-e3-e4-squares, which form an L-shape.\n2... Kd4. The alternative way is also very long. 2... Kc2 3. Kc6 Kd1 4. Kd5 Ke1 5. Ke4 Kf2\n6. Kf4=.\n3. Kc6 Ke5 4. Kc5 ( 4. Nh1 Ke4 5. Kc5=) 4... Kf4 5. Nh1 Kf3 6. Kd4 Kg2 7. Ke3!\nJust in time! The white king can occupy the f2-square.\n7... Kxh1 8. Kf2=\nThe other barrier"
+    "content": "The black king seems very close to the pawn, but things are not that easy when he tries to come closer. The knight has set up a barrier (the marked squares). To cross the barrier, the black king must give up the pawn. To go round it, there are two possible routes: d4-e5-f4 or c2-d1-e1-f2. Both allow the white king to come closer.\nIt is interesting to note that the essential (and solid) part of the barrier is the d2-e2-e3-e4-squares, which form an L-shape.\n2... Kd4. The alternative way is also very long. 2... Kc2 3. Kc6 Kd1 4. Kd5 Ke1 5. Ke4 Kf2\n6. Kf4=.\n3. Kc6 Ke5 4. Kc5 ( 4. Nh1 Ke4 5. Kc5=) 4... Kf4 5. Nh1 Kf3 6. Kd4 Kg2 7. Ke3!\nJust in time! The white king can occupy the f2-square.\n7... Kxh1 8. Kf2="
+  },
+  {
+    "type": "heading",
+    "content": "The other barrier"
   },
   {
     "type": "position",
@@ -195,7 +199,7 @@
   },
   {
     "type": "text",
-    "content": "This position belongs to the final part of one of Grigoriev's studies, but can easily arise in a game.\nStarting from the e4-square the knight can stop the pawn, and set up barriers from the f2-square as well as from the g3-square. Depending on the position of the enemy king, the knight will choose the most suitable location.\n1...Kc2. The king anticipates the barrier and gets ready to go round it, but here that is not enough, because the white king will be able to defend the knight from the f4-square.\n1...Kd3?! 2.Ng3!= (and here is the barrier position we have just seen) 2...Kc2 3.Kd6 Kd1 4.Ke5 Ke1 5.Kf4=.\n1.Kd4?! 2.Nf2!"
+    "content": "This position belongs to the final part of one of Grigoriev's studies, but can easily arise in a game.\nStarting from the e4-square the knight can stop the pawn, and set up barriers from the f2-square as well as from the g3-square. Depending on the position of the enemy king, the knight will choose the most suitable location.\n1...Kc2. The king anticipates the barrier and gets ready to go round it, but here that is not enough, because the white king will be able to defend the knight from the f4-square.\n1...Kd3?! 2.Ng3!= (and here is the barrier position we have just seen) 2...Kc2 3.Kd6 Kd1 4.Ke5 Ke1 5.Kf4=.\n1...Kd4?! 2.Nf2!"
   },
   {
     "type": "position",

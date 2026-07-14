@@ -106,6 +106,26 @@ assertChapterIncludes(
   '12',
   '12.Kg6 Kf4 13.Kxh6 Kf5 14.Kg7+- and the pawn promotes.',
 )
+assertChapterIncludes('1', '2...Ke7 3.f6+ Ke6 4.f7 1-0')
+assertChapterIncludes('1', '1... Kg8 2. Kh6 Kh8 3.g6')
+assertChapterIncludes('1', '3...Kg8 4.g7 Kf7 5. Kh7 1-0')
+assertChapterIncludes('1', 'Preventing 1...Kb2 and threatening 2.Kb1.')
+assertChapterIncludes('1', '2... Bb3 3. Kg6')
+assertChapterIncludes('1', '3... Bc4')
+assertChapterIncludes('1', 'Thus 3...Be6?? would be bad')
+assertChapterIncludes('1', '3. Kf1 Re2 4.Nc3')
+assertChapterIncludes('1', 'Kamsky - Bacrot, Sofia 2006')
+assertChapterIncludes('2', '1...c2 2.Ne2+!')
+assertChapterIncludes('2', '3.Bb5! Kd8')
+assertChapterIncludes('3', 'in case of 1...Kd1')
+assertChapterIncludes('3', 'The other barrier')
+assertChapterIncludes('3', '1...Kd4?! 2.Nf2!')
+assertChapterIncludes('4', '1... Qd7+ 2. Kg6 Qe6+ 3. Kg7 Qe7+')
+assertChapterIncludes('4', '3... Qf6+ 4. Kg8 Ke6!')
+assertChapterIncludes('4', '1... Qe5+')
+assertChapterIncludes('4', '2. Kd7 Qf6 3. Ke8 Qe6+ 4. Kf8')
+assertChapterIncludes('4', '3. Ke7 Qe5+ 4. Kd7 Qf6 5. Ke8 Qe6+')
+assertChapterIncludes('4', '4. Kf6 Qd4+ 5. Ke7 Qg7')
 
 console.log('source text audit passed')
 

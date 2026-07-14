@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "contentHash": "sha256:d984d527aadebd107ffc112c6d8703c274b438502eb4fac4c8ae867a180610e2",
+  "contentHash": "sha256:62269701969552b405a691ae3118cce3f8e03eee9e58da9e341eb3ed93d84054",
   "chapters": [
     {
       "id": "1",
@@ -210,12 +210,12 @@
         {
           "type": "panel",
           "content": {
-            "text": "If the strong king occupies one of the key squares, the pawn promotes. When the pawn is on the 5th rank, its key squares are those three in front ( e6, f6 and g6, marked in the diagram)."
+            "text": "If the strong king occupies one of the key squares, the pawn promotes. When the pawn is on the 5th rank, its key squares are those three in front (e6, f6 and g6, marked in the diagram)."
           }
         },
         {
           "type": "text",
-          "content": "Since the king has reached one of them, White wins:\n1. Kf6!\n\nOf course not 1.f6?? Ke8! taking the opposition and thus drawing. As we have said, there is no need to hurry to push the pawn. The white king must pave the way first.\n1... Ke8\nThe black king has retreated from the pawn's path. What is the move that secures promotion?\n2. Kg7!\nNow the pawn's path is clear and promotion comes in three moves.\n2.Ke7 3.f6+ Ke6 4.f7 1-0... If, in the starting position, the white king had been on g6, 1. Kf6 would have led to the same position; if on f6, White wins with 1. Ke6 Ke8 2.f6, taking the opposition in the key situation: when the pawn reaches the 6th rank.\nWere it Black's turn in any of the three examples, White would win by means of one of those two manoeuvres: either supporting the pawn from the 7th rank or taking the opposition.\nTherefore, we have seen that White wins if his king reaches any key square. That will condition our previous play."
+          "content": "Since the king has reached one of them, White wins:\n1. Kf6!\n\nOf course not 1.f6?? Ke8! taking the opposition and thus drawing. As we have said, there is no need to hurry to push the pawn. The white king must pave the way first.\n1... Ke8\nThe black king has retreated from the pawn's path. What is the move that secures promotion?\n2. Kg7!\nNow the pawn's path is clear and promotion comes in three moves.\n2...Ke7 3.f6+ Ke6 4.f7 1-0\nIf, in the starting position, the white king had been on g6, 1. Kf6 would have led to the same position; if on f6, White wins with 1. Ke6 Ke8 2.f6, taking the opposition in the key situation: when the pawn reaches the 6th rank.\nWere it Black's turn in any of the three examples, White would win by means of one of those two manoeuvres: either supporting the pawn from the 7th rank or taking the opposition.\nTherefore, we have seen that White wins if his king reaches any key square. That will condition our previous play."
         },
         {
           "type": "position",
@@ -227,7 +227,7 @@
         },
         {
           "type": "text",
-          "content": "Once again, the knight's pawn poses extra difficulties, but the key square rule still applies. We just need to be slightly more careful.\n1. Kg6!\nThe king must go to the other side to skip annoying stalemate tricks. The alternatives are: 1.g6? stalemate; 1. Kf6 This move does not let victory slip but, if Black plays accurately, White has to return to the starting position. 1... Kh7! ( 1...Kg8 2.Kg6 Kh8 3. Kf7 Kh7 4.g6+ Kh8 5.g7++-) 2.g6+?? (this move does miss the victory, as we have seen in Position 1.8. 2. Kf7! is the correct move, returning to the starting position) 2... Kh8! Now the pawn cannot be stopped.\n1... Kg8 2. Kh6 Kh5 3.g6...\nWith the king at this side of the pawn, promotion runs smoothly, as shown in Position 1.4.\n3. Kg8 4.g7 Kf7 5. Kh7 1-0..."
+          "content": "Once again, the knight's pawn poses extra difficulties, but the key square rule still applies. We just need to be slightly more careful.\n1. Kg6!\nThe king must go to the other side to skip annoying stalemate tricks. The alternatives are: 1.g6? stalemate; 1. Kf6 This move does not let victory slip but, if Black plays accurately, White has to return to the starting position. 1... Kh7! (1...Kg8 2.Kg6 Kh8 3.Kf7 Kh7 4.g6+ Kh8 5.g7+ +-) 2.g6+?? (this move does miss the victory, as we have seen in Position 1.8. 2. Kf7! is the correct move, returning to the starting position) 2... Kh8! Now the pawn cannot be stopped.\n1... Kg8 2. Kh6 Kh8 3.g6\nWith the king at this side of the pawn, promotion runs smoothly, as shown in Position 1.4.\n3...Kg8 4.g7 Kf7 5. Kh7 1-0"
         },
         {
           "type": "position",
@@ -374,7 +374,7 @@
         },
         {
           "type": "text",
-          "content": "In the diagram position Black threatens 1...Kb2, securing the pawn's path to promotion. But it is White's turn:\n1.Kc1!\nPreventing 1...Kb2 and threatening 2.Rb1.\n1...Ka2\n\nThe only way to prevent the white king from getting in the pawn's way. However,\nafter this move the black king loses his mobility and will not be able to let his pawn advance. 1...a4 2.Rb1 a3 3.Ka1 leads to a well known drawn position.\n2. Kc2!\nNow White will not allow the king out of the corner. The rest is quite easy.\n2... a4 (2... Ka3 3. Kb1=) 3. Kc1 a3 4. Kc2 Ka1 5. Kc1\nNothing can be done. The king cannot get out and, if Black pushes the pawn, his king is stalemated.\nThis is so clear that we could add many doubled rook's pawns to the diagram and still Black could not win."
+          "content": "In the diagram position Black threatens 1...Kb2, securing the pawn's path to promotion. But it is White's turn:\n1.Kc1!\nPreventing 1...Kb2 and threatening 2.Kb1.\n1...Ka2\n\nThe only way to prevent the white king from getting in the pawn's way. However,\nafter this move the black king loses his mobility and will not be able to let his pawn advance. 1...a4 2.Kb1 a3 3.Ka1 leads to a well known drawn position.\n2. Kc2!\nNow White will not allow the king out of the corner. The rest is quite easy.\n2... a4 (2... Ka3 3. Kb1=) 3. Kc1 a3 4. Kc2 Ka1 5. Kc1\nNothing can be done. The king cannot get out and, if Black pushes the pawn, his king is stalemated.\nThis is so clear that we could add many doubled rook's pawns to the diagram and still Black could not win."
         },
         {
           "type": "panel",
@@ -431,7 +431,7 @@
         },
         {
           "type": "text",
-          "content": "The black king stands in the corner, while the bishop is ready to interpose on g8\nin case of a check. Then White would have to let the bishop move to avoid stalemate, and the position would be repeated. There are no serious winning chances.\n1.Ra8+ Bg8\nNow either the rook or the king must release the pressure on the enemy pieces to avoid stalemate.\n2.Ra7\n2.Kg5 Kg7 3.Ra7+ Kh8 4.Kg6 Bc4 5.Ra3 Bd5 6.Rh3+ Kg8 7.Re3 Kh8 is similar.\n2... Kb3 3. Kg6\n3.Rh7+ Kg8 4.Rb7 Bd5. The bishop always has enough squares at its disposal along the a2-g8 diagonal.\n3... Kc4\n\nThe only concern for the defender is that his bishop has enough distance to check the enemy king from the b1-h7 diagonal if necessary. Thus 3. Ke6?? would be bad due to 4. Rh7+ Kg8 5.Re7 winning. The position is safe once this danger is averted.\n4.Rh7+ Kg8 5.Rc7 Bd3+ 6.Kh6 Be4="
+          "content": "The black king stands in the corner, while the bishop is ready to interpose on g8\nin case of a check. Then White would have to let the bishop move to avoid stalemate, and the position would be repeated. There are no serious winning chances.\n1.Ra8+ Bg8\nNow either the rook or the king must release the pressure on the enemy pieces to avoid stalemate.\n2.Ra7\n2.Kg5 Kg7 3.Ra7+ Kh8 4.Kg6 Bc4 5.Ra3 Bd5 6.Rh3+ Kg8 7.Re3 Kh8 is similar.\n2... Bb3 3. Kg6\n3.Rh7+ Kg8 4.Rb7 Bd5. The bishop always has enough squares at its disposal along the a2-g8 diagonal.\n3... Bc4\n\nThe only concern for the defender is that his bishop has enough distance to check the enemy king from the b1-h7 diagonal if necessary. Thus 3...Be6?? would be bad due to 4. Rh7+ Kg8 5.Re7 winning. The position is safe once this danger is averted.\n4.Rh7+ Kg8 5.Rc7 Bd3+ 6.Kh6 Be4="
         },
         {
           "type": "ending",
@@ -453,7 +453,7 @@
         },
         {
           "type": "text",
-          "content": "No problems for White, though both the king and the knight have been driven to the edge of the board. Not so when they are in the corner. Moreover, this position has great theoretical importance, as it usually occurs as a result of a Rook vs. Pawn endgame, as we will see in the corresponding section.\nWhen the knight and the king are together on the edge, moves are usually forced,\nbut then there is a lower risk of blundering. The knight should not be separated from the king in any circumstances, though this does not necessarily imply an automatic defeat. The first move is clearly forced.\n1. Nf2+ Ke3\nThe next move is also forced, following the rule of keeping together knight and king, although the check on g4 does not lose here.\n2. Nd1+ Kf3\nNow White has two options that may lead to the same position some moves later.\n3. Nc3\n3. Kf1 Ke2 4.Nc3, and either the king or the knight will return on the next move.\nThis is the only case when the king and the knight are separated for a moment.\n3...Rc2 4. Nd1\nLet's see what would happen if the knight preferred to ride in the open field.\n4.Nd5??"
+          "content": "No problems for White, though both the king and the knight have been driven to the edge of the board. Not so when they are in the corner. Moreover, this position has great theoretical importance, as it usually occurs as a result of a Rook vs. Pawn endgame, as we will see in the corresponding section.\nWhen the knight and the king are together on the edge, moves are usually forced,\nbut then there is a lower risk of blundering. The knight should not be separated from the king in any circumstances, though this does not necessarily imply an automatic defeat. The first move is clearly forced.\n1. Nf2+ Ke3\nThe next move is also forced, following the rule of keeping together knight and king, although the check on g4 does not lose here.\n2. Nd1+ Kf3\nNow White has two options that may lead to the same position some moves later.\n3. Nc3\n3. Kf1 Re2 4.Nc3, and either the king or the knight will return on the next move.\nThis is the only case when the king and the knight are separated for a moment.\n3...Rc2 4. Nd1\nLet's see what would happen if the knight preferred to ride in the open field.\n4.Nd5??"
         },
         {
           "type": "position",
@@ -522,12 +522,13 @@
           "type": "position",
           "content": {
             "number": "1.24",
-            "fen": "8/8/8/8/8/5K2/7R/4nk2 w - - 0 1"
+            "fen": "8/8/8/8/8/5K2/7R/4nk2 w - - 0 1",
+            "caption": "Kamsky - Bacrot, Sofia 2006"
           }
         },
         {
           "type": "text",
-          "content": "Kamsky - Bacrot\nSofia 2006\nBacrot had reached this position after an accurate defence of first a Rook + Pawn vs.\nRook + Pawn, and then a Rook + Pawn vs. Rook ending (see Question 28 in the Final Test). He has just promoted to a knight, which, as we shall see in Ending 23, is the standard way of saving these positions. Now he has a supposedly well known drawn ending. I assumed that at this point he relaxed, and he was probably in time trouble.\n\nNevertheless, there is a special circumstance, which is interesting for us from a theoretical point of view: the knight is 'within range' of its dumb square (g2) and the king is placed on the knight's side next to that square. Defending this ending is somewhat difficult.\n1.Kg3 Nd3 2.Rd2 Ne1 3.Rf2+ Kg1 4.Rf8 Ng2\nSo far everything has been forced. Now Black's troubles start. The knight must go to the dumb square or move away from the king. Intuitively the natural option is\n4...Nd3?, which loses due to 5. Kf3 Ne1+ 6. Ke2+-. On the contrary, 4...Nc2\nleads to a draw, which I consider the easiest way, but over the board one tends to avoid taking the knight so far away: 5. Kf3 Kf1= with no real problems for Black.\nThus, some logical doubts arise: may it be that, if we promote on that square and have the king on that side of the board, the knight is forced to go to the dumb square, thus losing? Well, it is not so, but it is worth noting the difficulties.\n5. Kf3 Kf1?\nActually, this is the losing move. That should not be surprising: with the knight on the g2-square, the defender is very likely to lose. The correct defence, not easy to find, was 5...Nh4+ 6.Ke3 Kg2 7.Rg8+ Kh3 8. Kf2 Kh2= and in practice Black has managed to return to the starting position.\n6. Kg3+?\nKamsky misses his first chance to win: 6.Rf7!\n6... Kg1 7. Kf3 Kf1? 8. Rf7!\nAn amazing zugzwang position.\n8... Ne1+ 9. Ke3+ Kg1 (9... Kg2 10. Ke2+-) 10. Ke2 Ng2 11. Rh7"
+          "content": "Bacrot had reached this position after an accurate defence of first a Rook + Pawn vs.\nRook + Pawn, and then a Rook + Pawn vs. Rook ending (see Question 28 in the Final Test). He has just promoted to a knight, which, as we shall see in Ending 23, is the standard way of saving these positions. Now he has a supposedly well known drawn ending. I assumed that at this point he relaxed, and he was probably in time trouble.\n\nNevertheless, there is a special circumstance, which is interesting for us from a theoretical point of view: the knight is 'within range' of its dumb square (g2) and the king is placed on the knight's side next to that square. Defending this ending is somewhat difficult.\n1.Kg3 Nd3 2.Rd2 Ne1 3.Rf2+ Kg1 4.Rf8 Ng2\nSo far everything has been forced. Now Black's troubles start. The knight must go to the dumb square or move away from the king. Intuitively the natural option is\n4...Nd3?, which loses due to 5. Kf3 Ne1+ 6. Ke2+-. On the contrary, 4...Nc2\nleads to a draw, which I consider the easiest way, but over the board one tends to avoid taking the knight so far away: 5. Kf3 Kf1= with no real problems for Black.\nThus, some logical doubts arise: may it be that, if we promote on that square and have the king on that side of the board, the knight is forced to go to the dumb square, thus losing? Well, it is not so, but it is worth noting the difficulties.\n5. Kf3 Kf1?\nActually, this is the losing move. That should not be surprising: with the knight on the g2-square, the defender is very likely to lose. The correct defence, not easy to find, was 5...Nh4+ 6.Ke3 Kg2 7.Rg8+ Kh3 8. Kf2 Kh2= and in practice Black has managed to return to the starting position.\n6. Kg3+?\nKamsky misses his first chance to win: 6.Rf7!\n6... Kg1 7. Kf3 Kf1? 8. Rf7!\nAn amazing zugzwang position.\n8... Ne1+ 9. Ke3+ Kg1 (9... Kg2 10. Ke2+-) 10. Ke2 Ng2 11. Rh7"
         },
         {
           "type": "position",
@@ -701,7 +702,7 @@
             "number": "2.17",
             "prompt": "White to move. Can he draw?",
             "fen": "7K/8/8/8/8/2p4N/8/2k5 w - - 0 1",
-            "solution": "Yes, by finding the right circuit for the knight. 1. Nf4! ( 1. Nf2?? c2\n2. Nd3+ Kd2 3.Nc5 Kc3 4. Ne4+\nKb4 5. Nf2 Kc4-+)...c2 2.Ne2+!\nKd2 (2... Kd1 3. Nc3+ Kd2 4.Na2)\n3. Nd4=."
+            "solution": "Yes, by finding the right circuit for the knight. 1. Nf4! (1. Nf2?? c2\n2. Nd3+ Kd2 3.Nc5 Kc3 4. Ne4+\nKb4 5. Nf2 Kc4-+) 1...c2 2.Ne2+!\nKd2 (2... Kd1 3. Nc3+ Kd2 4.Na2)\n3. Nd4=."
           }
         },
         {
@@ -755,7 +756,7 @@
             "number": "2.23",
             "prompt": "Suppose you have already spent 30 of your 50 moves to get here. It is time to be accurate. What would you do?",
             "fen": "8/2k4B/4K3/4N3/8/8/8/8 w - - 0 1",
-            "solution": "1.Nd7! Also winning in less than\n20 moves are the moves Bc2 and Kd5;\nbut the text move is pure tactics.\n1... Kc6 (1... Kb7 2.Bd3) 2.Bd3 closing the way out 2... Kc7 3.i.b5! Kd8\n4. Nf6 Kc7 5. Nd5+ building the cage.\n5...Kd8 6. Kd6 Kc8 7. Ke7 Kb7\n8. Kd7 Kb8 9.Ba6 Ka7 10.Bc8 Kb8\n11. Nb4 Ka7 12.Kc7 Ka8 13.Bb7+\nKa7 14.Nc6 mate. See Ending 93."
+            "solution": "1.Nd7! Also winning in less than\n20 moves are the moves Bc2 and Kd5;\nbut the text move is pure tactics.\n1... Kc6 (1... Kb7 2.Bd3) 2.Bd3 closing the way out 2... Kc7 3.Bb5! Kd8\n4. Nf6 Kc7 5. Nd5+ building the cage.\n5...Kd8 6. Kd6 Kc8 7. Ke7 Kb7\n8. Kd7 Kb8 9.Ba6 Ka7 10.Bc8 Kb8\n11. Nb4 Ka7 12.Kc7 Ka8 13.Bb7+\nKa7 14.Nc6 mate. See Ending 93."
           }
         },
         {
@@ -835,7 +836,7 @@
         },
         {
           "type": "text",
-          "content": "As shown by analysis, if we can choose we must control the pawn from the rank, or,\nto provide a graphic idea, to control the pawn from the side rather than from the rear.\nIn the diagram position, the knight must be transferred to the second rank, so that it can enter two circuits: one to stop the pawn and the other to capture the pawn. In this case, e2-c3-a2 or e2-d4-b3-c1.\n1. Ne2+!\nThe right move. As we said, the knight is transferred to a side of the pawn. The alternative was losing: 1. Nd3+?? Kd2! and the knight is driven off the right circuit,\nafter which the pawn promotes. The last try is 2. Nc5!?, a typical calculation mistake in this ending. We may have thought that this move is enough to draw, but this is an illusion. 2... Kc3! Avoiding the trick, threatening to promote the pawn and controlling both 'good' squares for the knight (d3 and b3). 3. Ne4+ Kd3. Any legal move would win now, but this is the shortest way to put an end to the knight's kicking. 4. Nc5+ Kc4 and the pawn promotes.\n1...Kd2. This allows a draw straight away, but in case of 1. Kd1, the knight could get to its ideal square to control the pawn from the other side (here, the a2-square):\n2. Nc3+! Kd2 3. Na2=; other king moves pose no problems for White.\n2. Nd4! c1=Q 3. Nb3+="
+          "content": "As shown by analysis, if we can choose we must control the pawn from the rank, or,\nto provide a graphic idea, to control the pawn from the side rather than from the rear.\nIn the diagram position, the knight must be transferred to the second rank, so that it can enter two circuits: one to stop the pawn and the other to capture the pawn. In this case, e2-c3-a2 or e2-d4-b3-c1.\n1. Ne2+!\nThe right move. As we said, the knight is transferred to a side of the pawn. The alternative was losing: 1. Nd3+?? Kd2! and the knight is driven off the right circuit,\nafter which the pawn promotes. The last try is 2. Nc5!?, a typical calculation mistake in this ending. We may have thought that this move is enough to draw, but this is an illusion. 2... Kc3! Avoiding the trick, threatening to promote the pawn and controlling both 'good' squares for the knight (d3 and b3). 3. Ne4+ Kd3. Any legal move would win now, but this is the shortest way to put an end to the knight's kicking. 4. Nc5+ Kc4 and the pawn promotes.\n1...Kd2. This allows a draw straight away, but in case of 1...Kd1, the knight could get to its ideal square to control the pawn from the other side (here, the a2-square):\n2. Nc3+! Kd2 3. Na2=; other king moves pose no problems for White.\n2. Nd4! c1=Q 3. Nb3+="
         },
         {
           "type": "panel",
@@ -977,7 +978,11 @@
         },
         {
           "type": "text",
-          "content": "The black king seems very close to the pawn, but things are not that easy when he tries to come closer. The knight has set up a barrier (the marked squares). To cross the barrier, the black king must give up the pawn. To go round it, there are two possible routes: d4-e5-f4 or c2-d1-e1-f2. Both allow the white king to come closer.\nIt is interesting to note that the essential (and solid) part of the barrier is the d2-e2-e3-e4-squares, which form an L-shape.\n2... Kd4. The alternative way is also very long. 2... Kc2 3. Kc6 Kd1 4. Kd5 Ke1 5. Ke4 Kf2\n6. Kf4=.\n3. Kc6 Ke5 4. Kc5 ( 4. Nh1 Ke4 5. Kc5=) 4... Kf4 5. Nh1 Kf3 6. Kd4 Kg2 7. Ke3!\nJust in time! The white king can occupy the f2-square.\n7... Kxh1 8. Kf2=\nThe other barrier"
+          "content": "The black king seems very close to the pawn, but things are not that easy when he tries to come closer. The knight has set up a barrier (the marked squares). To cross the barrier, the black king must give up the pawn. To go round it, there are two possible routes: d4-e5-f4 or c2-d1-e1-f2. Both allow the white king to come closer.\nIt is interesting to note that the essential (and solid) part of the barrier is the d2-e2-e3-e4-squares, which form an L-shape.\n2... Kd4. The alternative way is also very long. 2... Kc2 3. Kc6 Kd1 4. Kd5 Ke1 5. Ke4 Kf2\n6. Kf4=.\n3. Kc6 Ke5 4. Kc5 ( 4. Nh1 Ke4 5. Kc5=) 4... Kf4 5. Nh1 Kf3 6. Kd4 Kg2 7. Ke3!\nJust in time! The white king can occupy the f2-square.\n7... Kxh1 8. Kf2="
+        },
+        {
+          "type": "heading",
+          "content": "The other barrier"
         },
         {
           "type": "position",
@@ -988,7 +993,7 @@
         },
         {
           "type": "text",
-          "content": "This position belongs to the final part of one of Grigoriev's studies, but can easily arise in a game.\nStarting from the e4-square the knight can stop the pawn, and set up barriers from the f2-square as well as from the g3-square. Depending on the position of the enemy king, the knight will choose the most suitable location.\n1...Kc2. The king anticipates the barrier and gets ready to go round it, but here that is not enough, because the white king will be able to defend the knight from the f4-square.\n1...Kd3?! 2.Ng3!= (and here is the barrier position we have just seen) 2...Kc2 3.Kd6 Kd1 4.Ke5 Ke1 5.Kf4=.\n1.Kd4?! 2.Nf2!"
+          "content": "This position belongs to the final part of one of Grigoriev's studies, but can easily arise in a game.\nStarting from the e4-square the knight can stop the pawn, and set up barriers from the f2-square as well as from the g3-square. Depending on the position of the enemy king, the knight will choose the most suitable location.\n1...Kc2. The king anticipates the barrier and gets ready to go round it, but here that is not enough, because the white king will be able to defend the knight from the f4-square.\n1...Kd3?! 2.Ng3!= (and here is the barrier position we have just seen) 2...Kc2 3.Kd6 Kd1 4.Ke5 Ke1 5.Kf4=.\n1...Kd4?! 2.Nf2!"
         },
         {
           "type": "position",
@@ -1184,7 +1189,7 @@
         },
         {
           "type": "text",
-          "content": "We have chosen this position because the black king occupies a square that allows\nBlack to win with any of the two following standard procedures:\n1. Qd7+ 2. Kg6 Qe6+ 3. Kg7 Qe7+.\nSetting up one of the winning manoeuvres. This is the alternative way, and you should study it as well, since if the king were on another square (say d6) it would be the only way: 3... Kf6+ 4. Kg8 Ke6!-+ The king stands a step away from the key square f7. To avoid being checkmated on the next move, White must promote to a knight. We see in this variation that the f7-square is the key to checkmate\nWhite.\n4. Qg8 ( 4. Kg6 Qf8-+) 4... Kf6!\nIn this line the king approaches the second key square, g6, which he must occupy immediately after White promotes.\n5.h8=Q+ Kg6-+\nAn important position to know."
+          "content": "We have chosen this position because the black king occupies a square that allows\nBlack to win with any of the two following standard procedures:\n1... Qd7+ 2. Kg6 Qe6+ 3. Kg7 Qe7+.\nSetting up one of the winning manoeuvres. This is the alternative way, and you should study it as well, since if the king were on another square (say d6) it would be the only way: 3... Qf6+ 4. Kg8 Ke6!-+ The king stands a step away from the key square f7. To avoid being checkmated on the next move, White must promote to a knight. We see in this variation that the f7-square is the key to checkmate\nWhite.\n4. Qg8 ( 4. Kg6 Qf8-+) 4... Kf6!\nIn this line the king approaches the second key square, g6, which he must occupy immediately after White promotes.\n5.h8=Q+ Kg6-+\nAn important position to know."
         },
         {
           "type": "position",
@@ -1225,7 +1230,7 @@
         },
         {
           "type": "text",
-          "content": "1. Ke7!\nThe king secures promotion. It is worth noting that promoting straight away is not always a good idea: 1.f8=Q?? Qa3+-+.\n1... Ke5+\nThe queen starts approaching the pawn in the fashion we know.\n2. Kd7 Kf6 3. Ke8 Ke6+ 4. Kf8\nThis allows the black king to come a step nearer.\n\n4... Kc4 5. Kg7!\nBut now the white king has made it to the other side of the pawn, which, as we will see, is the right one. White cannot win tempi to bring his king nearer anymore.\n5... Qe7 6. Kg8 Qg5+ 7. Kh8 Qf6+ 8. Kg8 Qg6+ 9. Kh8!\nThe point: White threatens to promote and 9... Qxf7 is a stalemate."
+          "content": "1. Ke7!\nThe king secures promotion. It is worth noting that promoting straight away is not always a good idea: 1.f8=Q?? Qa3+-+.\n1... Qe5+\nThe queen starts approaching the pawn in the fashion we know.\n2. Kd7 Qf6 3. Ke8 Qe6+ 4. Kf8\nThis allows the black king to come a step nearer.\n\n4... Kc4 5. Kg7!\nBut now the white king has made it to the other side of the pawn, which, as we will see, is the right one. White cannot win tempi to bring his king nearer anymore.\n5... Qe7 6. Kg8 Qg5+ 7. Kh8 Qf6+ 8. Kg8 Qg6+ 9. Kh8!\nThe point: White threatens to promote and 9... Qxf7 is a stalemate."
         },
         {
           "type": "panel",
@@ -1298,7 +1303,7 @@
         },
         {
           "type": "text",
-          "content": "Against a 7th-rank bishop's pawn, when the defending king is on the wrong side of the pawn, the winning zone is much larger, even larger than it was against a rook's pawn. As we will see, there are two mating patterns. One involves the king defending the queen from the d2-square and the other involves forcing the defending king to the other side and reaching the position we have already seen with the strong king on g6. Here is the winning procedure bringing the king to g6.\nThe first phase is easy to understand: we must force the enemy king to the other side.\n1... Ka7+ 2. Ke8 Kb8+ 3. Ke7 Ke5+ 4. Kd7 Kf6 5. Ke8 Ke6+ 6. Kf8 Kg5!\nBlack has gained a tempo and the king uses it to make it to g6.\n7. Kg7 Ke7!\n7... Qd7?! 8. Kh8!? and Black must try again, since his king cannot move further now.\n8. Kg8 Kg6-+ and after promotion comes checkmate.\nLet us see what happens if the stronger side's king is on the other side of the board."
+          "content": "Against a 7th-rank bishop's pawn, when the defending king is on the wrong side of the pawn, the winning zone is much larger, even larger than it was against a rook's pawn. As we will see, there are two mating patterns. One involves the king defending the queen from the d2-square and the other involves forcing the defending king to the other side and reaching the position we have already seen with the strong king on g6. Here is the winning procedure bringing the king to g6.\nThe first phase is easy to understand: we must force the enemy king to the other side.\n1... Ka7+ 2. Ke8 Kb8+ 3. Ke7 Qe5+ 4. Kd7 Qf6 5. Ke8 Qe6+ 6. Kf8 Kg5!\nBlack has gained a tempo and the king uses it to make it to g6.\n7. Kg7 Qe7!\n7... Qd7?! 8. Kh8!? and Black must try again, since his king cannot move further now.\n8. Kg8 Kg6-+ and after promotion comes checkmate.\nLet us see what happens if the stronger side's king is on the other side of the board."
         },
         {
           "type": "position",
@@ -1322,7 +1327,7 @@
         },
         {
           "type": "text",
-          "content": "When the king is inside the winning zone, but two steps away from d7, we must play carefully to prevent the enemy king from reaching the right side without losing tempi.\n1... Qa3+!\n\nActually other checks are also winning, but then accuracy is needed on the next move. For instance: 1...Qa7+ 2. Kf8 (2. Kf6 Qd4+!) and now only 2... Qg1 works.\n2. Ke8\n2. Kf6 Qf8-+ is just too easy.\n2... Qa8+ 3. Ke7 Qe4+! 4. Kf8\nTrying to make it to the other side. 4. Kf6 Kd4+ 5. Ke7 Qg7 6. Ke8 Kc6-+.\n4... Qh7!\nThough the enemy king is in front of the pawn, we must not hurry to bring our king closer. Now our goal is to hinder the enemy king's route to the 'right side'.\n4... Kc6? 5. Kg7 and it is easy to see that, since the black king is more than one step away from e7 or g6, the position is drawn.\n5. Ke8\nThe white king is on the fatal square and the black queen can reach d7 in one move;\ntherefore, it is time to bring the king closer.\n5... Kc6! 6.f8Q Qd7 mate"
+          "content": "When the king is inside the winning zone, but two steps away from d7, we must play carefully to prevent the enemy king from reaching the right side without losing tempi.\n1... Qa3+!\n\nActually other checks are also winning, but then accuracy is needed on the next move. For instance: 1...Qa7+ 2. Kf8 (2. Kf6 Qd4+!) and now only 2... Qg1 works.\n2. Ke8\n2. Kf6 Qf8-+ is just too easy.\n2... Qa8+ 3. Ke7 Qe4+! 4. Kf8\nTrying to make it to the other side. 4. Kf6 Qd4+ 5. Ke7 Qg7 6. Ke8 Kc6-+.\n4... Qh7!\nThough the enemy king is in front of the pawn, we must not hurry to bring our king closer. Now our goal is to hinder the enemy king's route to the 'right side'.\n4... Kc6? 5. Kg7 and it is easy to see that, since the black king is more than one step away from e7 or g6, the position is drawn.\n5. Ke8\nThe white king is on the fatal square and the black queen can reach d7 in one move;\ntherefore, it is time to bring the king closer.\n5... Kc6! 6.f8Q Qd7 mate"
         },
         {
           "type": "panel",
@@ -1357,7 +1362,7 @@
           "type": "position",
           "content": {
             "number": "4.11",
-            "fen": "8/8/8/3K4/8/4Q3/1kp5/8 b - - 0 4",
+            "fen": "8/8/8/3K4/8/8/1kp1Q3/8 b - - 0 4",
             "caption": "Analysis diagram 4.11"
           }
         },

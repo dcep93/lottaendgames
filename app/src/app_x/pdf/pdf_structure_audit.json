@@ -1188,6 +1188,10 @@
     },
     {
       "chapter": "3",
+      "text": "The other barrier"
+    },
+    {
+      "chapter": "3",
       "text": "Exceptional positions"
     },
     {
@@ -1447,7 +1451,7 @@
       "subtitles": 7
     },
     "3": {
-      "headings": 3,
+      "headings": 4,
       "panels": 4,
       "positions": 10,
       "subtitles": 0
