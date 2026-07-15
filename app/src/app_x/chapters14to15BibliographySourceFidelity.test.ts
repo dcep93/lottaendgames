@@ -22,6 +22,8 @@ type FidelityLedger = {
     units: Array<{
       appSectionIndex?: number
       boardNumber?: string
+      deviationId?: string
+      evidence?: string
       id: string
       kind: 'board' | 'page-copy'
       partId: string
@@ -63,6 +65,22 @@ assert.deepEqual(release.partIds, ['14', '15', 'bibliography'])
 assert.equal(new Set(release.units.map(({ id }) => id)).size, release.units.length)
 assert.equal(release.units.filter(({ kind }) => kind === 'page-copy').length, 20)
 assert.equal(release.units.filter(({ kind }) => kind === 'board').length, 56)
+const acceptedDeviation = release.units.find(
+  ({ id }) => id === '14-board-14.29',
+)
+assert.ok(acceptedDeviation, 'Expected the Final Test 14.29 deviation record')
+assert.equal(acceptedDeviation.status, 'accepted-deviation')
+assert.equal(
+  acceptedDeviation.deviationId,
+  'final-test-14.29-side-to-move',
+)
+assert.match(acceptedDeviation.evidence ?? '', /published solution.*White's move 69/)
+assert.equal(
+  release.units.filter(
+    ({ id, status }) => id !== '14-board-14.29' && status !== 'matched',
+  ).length,
+  0,
+)
 assert.deepEqual(
   release.units
     .filter(({ kind }) => kind === 'page-copy')
@@ -156,7 +174,7 @@ assert.equal(
 )
 assert.equal(
   getBoard('14', '14.29').prompt,
-  "White to move. Can he draw? The PDF incorrectly prints 'Black to move.'",
+  'White to move. Can he draw?',
 )
 assert.equal(
   getBoard('14', '14.13').prompt,

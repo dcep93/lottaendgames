@@ -4,7 +4,7 @@
 
 Make the Book module open on intentional digital front matter that credits the
 book and explains the project, gives readers a linkable contents view, and
-discloses the two known source corrections. Improve position interaction with
+discloses the known source inconsistency. Improve position interaction with
 explicit playback controls, a dedicated Lichess action, fullscreen boards,
 coordinates, and PDF-matched orientation.
 
@@ -77,12 +77,9 @@ Display:
 - `www.newinchess.com`
 - `All photos: New In Chess Archives`
 
-Reproduce the edition's rights notice:
-
-> All rights reserved. No part of this book may be reproduced, stored in a
-> retrieval system or transmitted in any form or by any means, electronic,
-> mechanical, photocopying, recording or otherwise, without the prior written
-> permission from the publisher.
+The edition's rights-reservation paragraph is intentionally not displayed, per
+the later approved About-page rights-notice design. The copyright, publisher
+link, and photo credit remain visible.
 
 The front matter describes Lotta Endgames as an unofficial interactive
 companion; it must not imply endorsement or permission from the author or
@@ -120,17 +117,12 @@ List the reader's actual features:
 - revealable test solutions;
 - a linkable table of contents.
 
-### Edition deviations
+### Edition deviation
 
-Explain both known corrections only on the front matter, per the approved
-choice. Do not add inline erratum badges inside the chapters.
-
-- Chapter 13, Ending 95: the printed continuation says `38.Kd7+ Kf6`.
-  Because the white king is on e4, `38.Kd7+` is impossible. The app uses the
-  intended legal move `38.Rd7+ Kf6` for text and playback.
-- Final Test 14.29: the printed prompt says `Black to move. Can he draw?`, but
-  the solution begins with White's 69th move. The app uses `White to move` and
-  a White-to-move FEN.
+Explain the known Final Test 14.29 inconsistency only on the front matter, per
+the approved choice. Do not add inline erratum badges inside the chapters. The
+printed prompt says `Black to move. Can he draw?`, but the solution analyzes
+White's 69th move. The app uses `White to move` and a White-to-move FEN.
 
 The existing corrected chapter content remains unchanged.
 
@@ -279,5 +271,5 @@ Do not change:
 - P1.7 screen-reader position descriptions;
 - P1.8 typography or overall visual direction;
 - P1.9 payload splitting or lazy rendering;
-- the current corrected Chapter 13 and Final Test 14.29 text;
+- the printed Chapter 13 text and corrected Final Test 14.29 prompt;
 - the visible Mate module or any other audit item not requested in this change.

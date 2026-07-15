@@ -13,7 +13,7 @@
 > **Correction notice:** The original audit overstated the completeness of its
 > source-fidelity review. The corrective audit has now completed the missing
 > page-by-page, diagram-by-diagram reconciliation for the full 249-page PDF.
-> The defects it exposed are repaired and protected by a 576-unit matched
+> The defects it exposed are repaired and protected by a 576-unit resolved
 > source ledger. This closes the content audit; it does not waive the five P1
 > product areas the user explicitly instructed this pass to leave untouched.
 
@@ -37,7 +37,7 @@ All P0 source and front-matter items are closed. Whether to proceed with the aut
 
 All commands passed. The runtime contains 100 endings and 337 positions/diagrams/problems. The most recent link audit checked 6,826 generated Lichess links. Browser console inspection found no warnings or errors during the representative interaction pass.
 
-Passing tests alone do **not** establish PDF fidelity. Here they preserve a completed human PDF comparison: 239 page-copy units and all 337 board/problem/diagram units are recorded as matched, with release-specific regression tests for the exact defects found. In two disclosed places, the tests deliberately require the app to differ from the PDF.
+Passing tests alone do **not** establish PDF fidelity. Here they preserve a completed human PDF comparison: 239 page-copy units and 336 board/problem/diagram units are recorded as matched; Final Test 14.29 is recorded as an accepted deviation. Release-specific regression tests protect the exact defects found.
 
 ## Chapter 13 correction release — resolved
 
@@ -162,25 +162,25 @@ and the complete Bibliography hierarchy.
 
 ### P0.1 — Resolved to the approved digital-edition policy
 
-There are at least two confirmed, intentional differences between the printed book and the app:
+There is one confirmed, intentional difference between the printed book and the app:
 
 | Location | Printed PDF | App | Chess assessment |
 |---|---|---|---|
-| Chapter 13, Ending 95, printed p. 216 / PDF page 217 | `38.Kd7+ Kf6` | `38.Rd7+ Kf6` | The printed king move is impossible from e4. `Rd7+` is the logical correction. |
-| Final Test 14.29, printed p. 233 / PDF page 234 | “Black to move. Can he draw?” | “White to move. Can he draw? The PDF incorrectly prints ‘Black to move.’” | The solution starts with White’s 69th move, so the app’s side to move is almost certainly the intended one. |
+| Final Test 14.29, printed p. 233 / PDF page 234 | “Black to move. Can he draw?” | “White to move. Can he draw?” | The published solution analyzes White's 69th move, so the reader follows the solution while neutrally disclosing the inconsistency. |
 
-Both deliberate deviations are now disclosed before the Introduction under
-“Notes on this digital edition.” The corrected legal values continue to drive
-the app and playback. This is the user-approved presentation behavior; any
+The deliberate deviation is disclosed before the Introduction under “Note on
+this digital edition.” The corrected legal value continues to drive the app
+and playback. This is the user-approved presentation behavior; any
 future edition-specific deviation must be added to the same visible register
 and protected by a regression test.
 
 ### P0.2 — Resolved
 
 `/` and `/book` now open an About/front-matter page before the Introduction. It
-shows the author, edition, ISBN, copyright, publisher, rights language, project
-purpose, reader features, visible deviations, thanks, contact address, and a
-linkable table of contents.
+shows the author, edition, ISBN, copyright, publisher link, photo credit, project
+purpose, reader features, visible deviation, thanks, contact address, and a
+linkable table of contents. The full rights-reservation paragraph is
+intentionally hidden; the copyright, publisher link, and photo credit remain.
 
 ### P0.3 — Explicit presentation exception
 
@@ -263,7 +263,8 @@ The new source-fidelity ledger is the presentation release authority; the
 legacy OCR extraction report is retained as extraction history rather than
 treated as proof of correctness. The completed releases contain all 239
 page-copy records and all 337 board/problem/diagram records from the
-Introduction through the Bibliography, with zero unresolved units.
+Introduction through the Bibliography: 336 matched board units and one accepted
+deviation, with zero unresolved units.
 
 ## Source-fidelity and editorial issues (P1/P2)
 
@@ -321,8 +322,8 @@ These strengths mean this is a refinement and editorial-governance project, not 
 The app should not be shown to the author until all of the following are true:
 
 - [x] Every source-to-app difference is enumerated; there are zero unexplained prose, move, prompt, caption, numbering, or diagram differences in the completed PDF-first ledger.
-- [x] The two approved printed-edition deviations are visibly enumerated before the Introduction and drive legal playback.
-- [x] Jesús de la Villa, the edition/publisher, copyright/permission wording, and approved book identity are present.
+- [x] The approved printed-edition deviation is visibly explained before the Introduction and drives legal playback.
+- [x] Jesús de la Villa, the edition/publisher, copyright, and approved book identity are present; the full rights-reservation paragraph is intentionally hidden.
 - [x] The Mate entry is retained as an explicit user-approved presentation exception.
 - [ ] Long analysis uses normal page scrolling; no lesson can be silently skipped inside an internal scroller.
 - [ ] Mobile boards are comfortably readable and can be enlarged.

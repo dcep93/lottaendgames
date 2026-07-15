@@ -143,8 +143,10 @@ corrected move or prompt appears in the reading flow, printed text and project
 commentary must remain distinguishable so that commentary is never presented
 as the author's voice.
 
-The known Chapter 13 Ending 95 and Final Test 14.29 deviations are migrated to
-this register. Newly discovered apparent source errors follow the same process.
+The known Final Test 14.29 deviation is migrated to this register. Newly
+discovered apparent source errors follow the same process. Chapter 13 Ending 95
+is not a deviation: visual inspection confirms that the PDF prints
+`38.Rd7+ Kf6`.
 
 ## Chapter 13 Required Repairs
 

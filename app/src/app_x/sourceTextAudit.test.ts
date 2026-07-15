@@ -166,10 +166,7 @@ assertChapterIncludes(
   '14',
   'Find mistakes in the following moves: 90...Kh7 91.Qe4+ Kh8',
 )
-assertChapterIncludes(
-  '14',
-  "The PDF incorrectly prints 'Black to move.'",
-)
+assertChapterExcludes('14', "The PDF incorrectly prints 'Black to move.'")
 assertChapterExcludes('13', '38.Kd7+ Kf6')
 assertChapterExcludes('14', '100.Kc5 Ke4')
 assertChapterIncludes('introduction', 'The relative importance of the endgame')

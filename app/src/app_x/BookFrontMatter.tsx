@@ -1,5 +1,9 @@
 import type { MouseEvent, ReactNode } from 'react'
-import { bookEndingAnchorId, bookPathForChapterId } from '../routing'
+import {
+  bookEndingAnchorId,
+  bookPathForChapterId,
+  bookPositionAnchorId,
+} from '../routing'
 import type { RuntimeChapterDefinition } from './chapterRuntime'
 import type { EndingSection } from './chapterTypes'
 
@@ -36,11 +40,6 @@ export default function BookFrontMatter({
         </dl>
         <p className="leg-frontmatter-fine-print">
           <a href="https://www.newinchess.com/">www.newinchess.com</a>
-          <br />
-          All rights reserved. No part of this book may be reproduced, stored in
-          a retrieval system or transmitted in any form or by any means,
-          electronic, mechanical, photocopying, recording or otherwise, without
-          the prior written permission from the publisher.
           <br />
           All photos: New In Chess Archives.
         </p>
@@ -79,24 +78,19 @@ export default function BookFrontMatter({
         </ul>
       </FrontMatterSection>
 
-      <FrontMatterSection title="Notes on this digital edition">
+      <FrontMatterSection title="Note on this digital edition">
         <p>
-          This reader makes two deliberate corrections to apparent errors in the
-          printed edition:
+          <BookLink
+            href={`${bookPathForChapterId('14')}#${bookPositionAnchorId('14.29')}`}
+            onNavigate={onNavigate}
+          >
+            Final Test 14.29
+          </BookLink>{' '}
+          (print page 233; PDF page 234) is labeled “Black to move. Can he
+          draw?”, while the published solution analyzes White&apos;s 69th move.
+          This reader follows the solution and presents the position with White
+          to move.
         </p>
-        <ol className="leg-deviation-list">
-          <li>
-            In Chapter 13, Ending 95, the printed continuation says{' '}
-            <code>38.Kd7+ Kf6</code>. Because the white king is on e4,{' '}
-            <code>38.Kd7+</code> is impossible. The app uses the intended legal
-            move <code>38.Rd7+ Kf6</code> in the text and playback.
-          </li>
-          <li>
-            Final Test 14.29 is printed as “Black to move. Can he draw?”, but the
-            solution begins with White&apos;s 69th move. The app treats the position
-            as White to move.
-          </li>
-        </ol>
       </FrontMatterSection>
 
       <FrontMatterSection title="With thanks">
