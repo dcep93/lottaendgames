@@ -1,6 +1,11 @@
+import type { BoardOrientation } from './chapterTypes'
+
 const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 
-export function getSquareIndex(square: string) {
+export function getSquareIndex(
+  square: string,
+  orientation: BoardOrientation = 'white',
+) {
   const file = square[0]?.toLowerCase()
   const rank = Number(square[1])
   const fileIndex = files.indexOf(file)
@@ -10,7 +15,7 @@ export function getSquareIndex(square: string) {
   }
 
   return {
-    column: fileIndex + 1,
-    row: 9 - rank,
+    column: orientation === 'white' ? fileIndex + 1 : 8 - fileIndex,
+    row: orientation === 'white' ? 9 - rank : rank,
   }
 }

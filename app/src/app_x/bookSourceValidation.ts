@@ -73,10 +73,13 @@ function validateSection(
   switch (value.type) {
     case 'diagram':
       validateBoardId(content.number, location, boardIds)
+      validateOrientation(content.orientation, location)
       assertNonEmptyString(content.label, `${location} label`)
       assertNonEmptyString(content.fen, `${location} fen`)
       validatePlacement(content.fen, `${location} fen`)
+      validateOptionalStrings(content, location, ['subtitle'])
       validateMarkers(content.markers, location)
+      validateRoutes(content.routes, location)
       return
     case 'ending':
       assertNonEmptyString(content.number, `${location} number`)
@@ -90,6 +93,7 @@ function validateSection(
       return
     case 'position':
       validateBoardId(content.number, location, boardIds)
+      validateOrientation(content.orientation, location)
       assertNonEmptyString(content.fen, `${location} fen`)
       validateLegalFen(content.fen, `${location} fen`)
       validateOptionalStrings(content, location, [
@@ -98,6 +102,7 @@ function validateSection(
         'subtitle',
       ])
       validateMarkers(content.markers, location)
+      validateRoutes(content.routes, location)
       if (content.alternateFens !== undefined) {
         assert(
           Array.isArray(content.alternateFens),
@@ -111,6 +116,7 @@ function validateSection(
       return
     case 'problem':
       validateBoardId(content.number, location, boardIds)
+      validateOrientation(content.orientation, location)
       assertNonEmptyString(content.fen, `${location} fen`)
       assertNonEmptyString(content.prompt, `${location} prompt`)
       assertNonEmptyString(content.solution, `${location} solution`)
@@ -136,6 +142,13 @@ function validateSection(
       })
       return
   }
+}
+
+function validateOrientation(value: unknown, location: string) {
+  assert(
+    value === 'white' || value === 'black',
+    `${location} orientation must be white or black`,
+  )
 }
 
 function validateBoardId(
@@ -164,9 +177,41 @@ function validateMarkers(value: unknown, location: string) {
     assert(
       marker.variant === undefined ||
         marker.variant === 'badge' ||
+        marker.variant === 'emphasis' ||
         marker.variant === 'label',
       `${markerLocation} has invalid variant`,
     )
+  })
+}
+
+function validateRoutes(value: unknown, location: string) {
+  if (value === undefined) {
+    return
+  }
+
+  assert(Array.isArray(value), `${location} routes must be an array`)
+  value.forEach((route, index) => {
+    const routeLocation = `${location} route ${index + 1}`
+    assertRecord(route, routeLocation)
+    assertNonEmptyString(route.meaning, `${routeLocation} meaning`)
+    assert(
+      route.style === undefined ||
+        route.style === 'arrow' ||
+        route.style === 'line' ||
+        route.style === 'outline',
+      `${routeLocation} has invalid style`,
+    )
+    assert(
+      Array.isArray(route.squares) && route.squares.length >= 2,
+      `${routeLocation} squares must contain at least two squares`,
+    )
+    route.squares.forEach((square, squareIndex) => {
+      assertNonEmptyString(square, `${routeLocation} square ${squareIndex + 1}`)
+      assert(
+        /^[a-h][1-8]$/.test(square),
+        `${routeLocation} has invalid square: ${square}`,
+      )
+    })
   })
 }
 

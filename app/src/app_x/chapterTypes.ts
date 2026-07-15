@@ -22,6 +22,8 @@ export type BookPartSource = {
   sections: RawChapterSection[]
 }
 
+export type BoardOrientation = 'black' | 'white'
+
 export type RawChapterSection = {
   content: unknown
   type: string
@@ -38,6 +40,9 @@ export type DiagramSection = {
     label: string
     markers?: PositionMarker[]
     number: string
+    orientation: BoardOrientation
+    routes?: PositionRoute[]
+    subtitle?: string
   }
   type: 'diagram'
 }
@@ -67,7 +72,13 @@ export type PositionMarker = {
   meaning: string
   square: string
   symbol: string
-  variant?: 'badge' | 'label'
+  variant?: 'badge' | 'emphasis' | 'label'
+}
+
+export type PositionRoute = {
+  meaning: string
+  squares: string[]
+  style?: 'arrow' | 'line' | 'outline'
 }
 
 export type PositionSection = {
@@ -78,6 +89,8 @@ export type PositionSection = {
     fen: string
     markers?: PositionMarker[]
     number: string
+    orientation: BoardOrientation
+    routes?: PositionRoute[]
     subtitle?: string
   }
   type: 'position'
@@ -88,6 +101,7 @@ export type ProblemSection = {
     fen: string
     markers?: PositionMarker[]
     number: string
+    orientation: BoardOrientation
     prompt: string
     solution: string
     solutionFen?: string

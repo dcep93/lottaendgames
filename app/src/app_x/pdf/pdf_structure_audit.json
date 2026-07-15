@@ -657,8 +657,8 @@
       "chapter": "13",
       "ending": "94",
       "page": 209,
-      "targetStartsWith": "Winning chances necessarily (apart from blunders, of course) involve pushing the",
-      "targetType": "text"
+      "targetStartsWith": "Philidor Position",
+      "targetType": "heading"
     },
     {
       "chapter": "13",
@@ -1030,9 +1030,29 @@
       "text": "The same trick, on the other side"
     },
     {
+      "chapter": "6",
+      "position": "6.6",
+      "text": "Lariño - Picazo"
+    },
+    {
+      "chapter": "7",
+      "position": "7.5",
+      "text": "Kurajica - Markland"
+    },
+    {
+      "chapter": "8",
+      "position": "8.5",
+      "text": "Stein - Dorfman"
+    },
+    {
       "chapter": "8",
       "position": "8.7a",
       "text": "Zugzwang, stalemate or perpetual check"
+    },
+    {
+      "chapter": "9",
+      "position": "9.12",
+      "text": "Berger - Kotlerman"
     },
     {
       "chapter": "10",
@@ -1053,6 +1073,16 @@
       "chapter": "11",
       "position": "11.1",
       "text": "First scenario"
+    },
+    {
+      "chapter": "11",
+      "position": "11.3",
+      "text": "Kolesnikov - Bocharov"
+    },
+    {
+      "chapter": "11",
+      "position": "11.6",
+      "text": "Gligoric - Smyslov"
     },
     {
       "chapter": "11",
@@ -1077,7 +1107,12 @@
     {
       "chapter": "12",
       "position": "12.12",
-      "text": "Reti's study"
+      "text": "Réti's study"
+    },
+    {
+      "chapter": "12",
+      "position": "12.13",
+      "text": "Ljubojevic - Browne"
     },
     {
       "chapter": "12",
@@ -1116,23 +1151,18 @@
     },
     {
       "chapter": "13",
-      "position": "13.7",
-      "text": "Philidor Position"
+      "position": "13.5",
+      "text": "(Knight's route)"
     },
     {
       "chapter": "13",
-      "position": "13.8",
-      "text": "Same position shifted one file to the left (Lolli)"
+      "position": "13.12",
+      "text": "Budnikov - Novik"
     },
     {
       "chapter": "13",
-      "position": "13.9",
-      "text": "Same position, knight's file (Lolli)"
-    },
-    {
-      "chapter": "13",
-      "position": "13.11",
-      "text": "Same position, rook's file"
+      "position": "13.16",
+      "text": "García González - Balashov"
     }
   ],
   "standaloneHeadings": [
@@ -1470,6 +1500,22 @@
     },
     {
       "chapter": "13",
+      "text": "Philidor Position"
+    },
+    {
+      "chapter": "13",
+      "text": "Same position shifted one file to the left (Lolli)"
+    },
+    {
+      "chapter": "13",
+      "text": "Same position, knight's file (Lolli)"
+    },
+    {
+      "chapter": "13",
+      "text": "Same position, rook's file"
+    },
+    {
+      "chapter": "13",
       "text": "Pawn on the 6th rank"
     },
     {
@@ -1534,25 +1580,25 @@
       "headings": 7,
       "panels": 1,
       "positions": 10,
-      "subtitles": 0
+      "subtitles": 1
     },
     "7": {
       "headings": 2,
       "panels": 4,
       "positions": 6,
-      "subtitles": 0
+      "subtitles": 1
     },
     "8": {
       "headings": 4,
       "panels": 3,
       "positions": 11,
-      "subtitles": 1
+      "subtitles": 2
     },
     "9": {
       "headings": 14,
       "panels": 10,
       "positions": 20,
-      "subtitles": 0
+      "subtitles": 1
     },
     "10": {
       "headings": 18,
@@ -1564,19 +1610,37 @@
       "headings": 11,
       "panels": 5,
       "positions": 23,
-      "subtitles": 3
+      "subtitles": 5
     },
     "12": {
       "headings": 19,
       "panels": 5,
       "positions": 42,
-      "subtitles": 10
+      "subtitles": 11
     },
     "13": {
-      "headings": 7,
+      "headings": 11,
       "panels": 5,
       "positions": 27,
-      "subtitles": 4
+      "subtitles": 3
+    },
+    "14": {
+      "headings": 0,
+      "panels": 0,
+      "positions": 0,
+      "subtitles": 0
+    },
+    "15": {
+      "headings": 6,
+      "panels": 0,
+      "positions": 19,
+      "subtitles": 0
+    },
+    "bibliography": {
+      "headings": 9,
+      "panels": 0,
+      "positions": 0,
+      "subtitles": 0
     }
   }
 }

@@ -60,6 +60,7 @@ export default function App() {
       anchorId={route.anchorId}
       chapterId={route.chapterId}
       moduleSelector={moduleSelector}
+      onBookNavigate={navigate}
       onAnchorSelect={(anchorId) =>
         navigate(`${bookPathForChapterId(route.chapterId)}#${anchorId}`)
       }

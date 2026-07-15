@@ -161,12 +161,13 @@ each position card.
 
 For a playable position, show:
 
-- Previous
-- Next
-- Reset
-- current state (`Start position` or the displayed move)
-- a compact Left/Right Arrow keyboard hint
 - Lichess
+- Previous as an arrow-only control (`←`)
+- Reset
+- Next as an arrow-only control (`→`)
+
+The arrow-only controls retain descriptive Previous/Next labels for assistive
+technology and tooltips.
 
 Previous and Next use the existing branch-aware navigation graph and the same
 preferred-continuation behavior as keyboard navigation. Previous is disabled at
@@ -174,9 +175,9 @@ the initial position. Next is disabled at the selected line's leaf. Reset return
 to the source starting FEN, clears the selected continuation for that board, and
 keeps the existing position anchor behavior.
 
-For a board without playback, omit Previous, Next, Reset, and the move status;
-show only the applicable Lichess/editor action. Instructional diagrams use a
-Lichess editor link constructed from their displayed FEN.
+For a board without playback, omit Previous, Next, and Reset; show only the
+applicable Lichess/editor action. Instructional diagrams use a Lichess editor
+link constructed from their displayed FEN.
 
 For a test problem whose solution is hidden, the controls and Lichess URL expose
 only the problem's starting position. Revealing the solution enables its
@@ -186,22 +187,21 @@ restores the starting-position-only state.
 The Lichess action is a normal external link with new-tab behavior. The current
 line-selection and URL-length safeguards remain unchanged.
 
-## Board Fullscreen Behavior
+## Board Expansion Behavior
 
 The chessboard is no longer wrapped in a Lichess link. Render it as a dedicated
-button-like fullscreen toggle:
+button-like expansion toggle:
 
-- clicking the board requests native fullscreen for its board wrapper;
-- clicking the fullscreen board exits fullscreen;
-- Escape uses the browser's normal fullscreen exit behavior;
-- the wrapper's `:fullscreen` styling centers the board and sizes it to the
+- clicking the board expands its wrapper over the application viewport;
+- clicking the expanded board restores its normal card layout;
+- Escape also restores an expanded board;
+- the expanded wrapper styling centers the board and sizes it to the
   available viewport without distorting its square aspect ratio;
 - coordinates, markers, current FEN, and move animation remain visible;
-- a pointer cursor, title, and control label communicate the fullscreen action.
+- a pointer cursor, title, and control label communicate the expansion action.
 
-If the Fullscreen API is unavailable or rejects the request, the reader remains
-in its normal state without breaking playback. This scope does not add a custom
-modal fallback.
+The implementation does not use the browser Fullscreen API. While a board is
+expanded, background scrolling is locked and the browser chrome remains visible.
 
 ## Coordinates and PDF Orientation
 
@@ -246,11 +246,11 @@ Add or update focused tests for:
 - front-matter identity, purpose, deviations, thanks/contact, and copyright;
 - all chapter and ending contents links;
 - `Endings X-Y` plus board counts and the complete absence of section counts;
-- Previous, Next, Reset, current-move status, keyboard hint, and Lichess markup;
+- Lichess, arrow-only Previous, Reset, and arrow-only Next markup in that order;
 - disabled navigation states and branch-aware button navigation;
 - hidden/revealed test-solution control behavior;
-- board fullscreen request/exit behavior where testable without coupling to a
-  specific browser implementation;
+- board expansion and Escape-restoration behavior where testable without
+  coupling to a specific browser implementation;
 - visible coordinates and source-driven orientation;
 - validation that all 333 source board objects contain a valid orientation.
 

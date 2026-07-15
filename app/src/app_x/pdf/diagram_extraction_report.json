@@ -121,7 +121,7 @@
   },
   {
     "chapter": 1,
-    "fen": "8/8/8/8/p7/k7/2K5/8 w - - 0 1",
+    "fen": "8/8/8/p7/8/1k6/3K4/8 w - - 0 1",
     "issues": [],
     "label": "Position 1.16",
     "number": "1.16",
@@ -361,7 +361,7 @@
   },
   {
     "chapter": 4,
-    "fen": "8/8/8/3K4/8/4Q3/1kp5/8 b - - 0 4",
+    "fen": "8/8/8/3K4/8/8/1kp1Q3/8 b - - 0 4",
     "issues": [],
     "label": "Analysis diagram 4.11",
     "number": "4.11",
@@ -417,6 +417,15 @@
   },
   {
     "chapter": 10,
+    "fen": "1k6/7R/8/KP6/8/8/8/2r5 w - - 0 1",
+    "issues": [],
+    "label": "Position 10.5",
+    "number": "10.5",
+    "reason": "manually verified against the PDF after no board was paired automatically",
+    "status": "promoted-with-warnings"
+  },
+  {
+    "chapter": 10,
     "fen": "4k3/7R/8/3KPr2/8/8/8/8 b - - 0 1",
     "issues": [],
     "label": "Position 10.6",
@@ -457,7 +466,7 @@
   },
   {
     "chapter": 10,
-    "fen": "1R6/R3K1k1/4P3/8/8/8/8/8 w - - 0 1",
+    "fen": "1r6/R3K1k1/4P3/8/8/8/8/8 w - - 0 1",
     "issues": [],
     "label": "Position 10.11",
     "number": "10.11",
@@ -559,6 +568,15 @@
     "label": "Position 10.21",
     "number": "10.21",
     "status": "promoted"
+  },
+  {
+    "chapter": 10,
+    "fen": "R7/P4k2/8/8/8/8/6K1/r7 b - - 0 1",
+    "issues": [],
+    "label": "Position 10.22",
+    "number": "10.22",
+    "reason": "manually verified against the PDF after no board was paired automatically",
+    "status": "promoted-with-warnings"
   },
   {
     "chapter": 10,
@@ -748,10 +766,10 @@
   },
   {
     "chapter": 11,
-    "fen": "6k1/1R6/5P1P/6K1/8/8/8/R7 w - - 0 1",
+    "fen": "6k1/1R6/5P1P/6K1/8/8/8/r7 b - - 0 1",
     "issues": [
       {
-        "piece": "R",
+        "piece": "r",
         "square": "a1",
         "distance": 0.219,
         "nextDistance": 0.225
@@ -826,6 +844,15 @@
   },
   {
     "chapter": 11,
+    "fen": "8/4r3/8/5K2/2Pk4/3P3R/8/8 w - - 0 1",
+    "issues": [],
+    "label": "Position 11.12",
+    "number": "11.12",
+    "reason": "manually verified against the PDF after no board was paired automatically",
+    "status": "promoted-with-warnings"
+  },
+  {
+    "chapter": 11,
     "fen": "R7/P5k1/8/8/8/6P1/6K1/r7 w - - 0 1",
     "issues": [
       {
@@ -836,7 +863,16 @@
       }
     ],
     "label": "Position 11.12",
-    "number": "11.12",
+    "number": "11.13",
+    "status": "promoted-with-warnings"
+  },
+  {
+    "chapter": 11,
+    "fen": "R7/6k1/8/8/P6P/6K1/8/4r3 b - - 0 1",
+    "issues": [],
+    "label": "Position 11.14",
+    "number": "11.14",
+    "reason": "manually verified against the PDF after no board was paired automatically",
     "status": "promoted-with-warnings"
   },
   {
@@ -1037,6 +1073,15 @@
     "label": "Position 12.12",
     "number": "12.12",
     "status": "promoted"
+  },
+  {
+    "chapter": 12,
+    "fen": "7K/8/2P5/8/8/8/8/8",
+    "issues": [],
+    "label": "King's multiple routes",
+    "number": "12.12-route-counts",
+    "reason": "manually reconstructed from the printed instructional diagram",
+    "status": "promoted-with-warnings"
   },
   {
     "chapter": 12,
@@ -1283,7 +1328,7 @@
   },
   {
     "chapter": 12,
-    "fen": "8/8/8/1p2kPp1/6P1/4K3/8/8 w - - 0 1",
+    "fen": "8/8/8/1p2kPp1/6P1/4K3/8/8 b - - 0 1",
     "issues": [],
     "label": "Position 12.35",
     "number": "12.35",
@@ -1343,6 +1388,33 @@
     "issues": [],
     "label": "Position 12.42",
     "number": "12.42",
+    "status": "promoted"
+  },
+  {
+    "chapter": 13,
+    "fen": "8/8/8/8/8/1B1N4/8/8",
+    "issues": [],
+    "label": "Position 13.1",
+    "number": "13.1",
+    "reason": "manually reconstructed from the schematic diagram on PDF page 206",
+    "status": "promoted"
+  },
+  {
+    "chapter": 13,
+    "fen": "8/4N3/5k2/8/8/4B3/8/8",
+    "issues": [],
+    "label": "Position 13.2",
+    "number": "13.2",
+    "reason": "manually reconstructed from the schematic diagram on PDF page 206",
+    "status": "promoted"
+  },
+  {
+    "chapter": 13,
+    "fen": "3k4/8/8/1B1N4/8/8/8/8",
+    "issues": [],
+    "label": "Position 13.3",
+    "number": "13.3",
+    "reason": "manually reconstructed from the schematic diagram on PDF page 206",
     "status": "promoted"
   },
   {
@@ -1475,7 +1547,7 @@
   },
   {
     "chapter": 13,
-    "fen": "5k2/1R6/4pP2/3b2K1/2p5/1p6/p7/8 w - - 0 1",
+    "fen": "5k2/1R6/5P2/3b2K1/8/8/8/8 w - - 0 4",
     "issues": [],
     "label": "Analysis diagram 13.20",
     "number": "13.20",
@@ -1559,6 +1631,456 @@
     "issues": [],
     "label": "Analysis diagram 13.30",
     "number": "13.30",
+    "status": "promoted"
+  },
+  {
+    "chapter": 14,
+    "fen": "8/K7/1P6/8/6n1/7k/8/8 w - - 0 1",
+    "issues": [],
+    "label": "Final Test 14.01",
+    "number": "14.01",
+    "status": "promoted"
+  },
+  {
+    "chapter": 14,
+    "fen": "8/8/6R1/8/p7/4k3/6K1/r7 w - - 0 1",
+    "issues": [],
+    "label": "Final Test 14.02",
+    "number": "14.02",
+    "status": "promoted"
+  },
+  {
+    "chapter": 14,
+    "fen": "8/4kPK1/8/8/4B3/8/8/8 w - - 0 1",
+    "issues": [],
+    "label": "Final Test 14.03",
+    "number": "14.03",
+    "status": "promoted"
+  },
+  {
+    "chapter": 14,
+    "fen": "8/4k3/8/8/r5P1/5R1K/8/8 b - - 0 1",
+    "issues": [],
+    "label": "Final Test 14.04",
+    "number": "14.04",
+    "status": "promoted"
+  },
+  {
+    "chapter": 14,
+    "fen": "8/8/P7/3k4/1P6/1K5R/8/r7 b - - 0 43",
+    "issues": [],
+    "label": "Final Test 14.05",
+    "number": "14.05",
+    "status": "promoted"
+  },
+  {
+    "chapter": 14,
+    "fen": "8/7p/5k2/8/5K2/7P/6P1/8 w - - 0 1",
+    "issues": [],
+    "label": "Final Test 14.06",
+    "number": "14.06",
+    "status": "promoted"
+  },
+  {
+    "chapter": 14,
+    "fen": "3b4/8/8/NK6/P7/1k6/8/8 b - - 0 1",
+    "issues": [],
+    "label": "Final Test 14.07",
+    "number": "14.07",
+    "status": "promoted"
+  },
+  {
+    "chapter": 14,
+    "fen": "3kB3/1K1P4/1P6/8/3b4/8/8/8 w - - 0 1",
+    "issues": [],
+    "label": "Final Test 14.08",
+    "number": "14.08",
+    "status": "promoted"
+  },
+  {
+    "chapter": 14,
+    "fen": "7K/8/8/8/7N/7p/8/7k w - - 0 1",
+    "issues": [],
+    "label": "Final Test 14.09",
+    "number": "14.09",
+    "status": "promoted"
+  },
+  {
+    "chapter": 14,
+    "fen": "8/8/8/6Kp/kPp5/2P5/8/8 w - - 0 53",
+    "issues": [],
+    "label": "Final Test 14.10",
+    "number": "14.10",
+    "status": "promoted"
+  },
+  {
+    "chapter": 14,
+    "fen": "r7/7R/8/8/8/1P2k3/1K6/8 w - - 0 1",
+    "issues": [],
+    "label": "Final Test 14.11",
+    "number": "14.11",
+    "status": "promoted"
+  },
+  {
+    "chapter": 14,
+    "fen": "8/8/8/5p2/1P5k/3K4/8/8 b - - 0 1",
+    "issues": [],
+    "label": "Final Test 14.12",
+    "number": "14.12",
+    "status": "promoted"
+  },
+  {
+    "chapter": 14,
+    "fen": "8/8/1k6/8/P2P4/8/8/8 b - - 0 1",
+    "issues": [],
+    "label": "Final Test 14.13",
+    "number": "14.13",
+    "status": "promoted"
+  },
+  {
+    "chapter": 14,
+    "fen": "6r1/8/8/8/R3k1PK/8/8/8 b - - 0 1",
+    "issues": [],
+    "label": "Final Test 14.14",
+    "number": "14.14",
+    "status": "promoted"
+  },
+  {
+    "chapter": 14,
+    "fen": "K7/6k1/8/6p1/8/8/7R/8 w - - 0 1",
+    "issues": [],
+    "label": "Final Test 14.15",
+    "number": "14.15",
+    "status": "promoted"
+  },
+  {
+    "chapter": 14,
+    "fen": "8/8/8/r5KP/8/4k3/8/8 w - - 0 1",
+    "issues": [],
+    "label": "Final Test 14.16",
+    "number": "14.16",
+    "status": "promoted"
+  },
+  {
+    "chapter": 14,
+    "fen": "8/8/3B4/5k2/6p1/1r3PK1/8/8 b - - 0 99",
+    "issues": [],
+    "label": "Final Test 14.17",
+    "number": "14.17",
+    "status": "promoted"
+  },
+  {
+    "chapter": 14,
+    "fen": "6KR/8/pk6/8/8/8/8/8 b - - 0 1",
+    "issues": [],
+    "label": "Final Test 14.18",
+    "number": "14.18",
+    "status": "promoted"
+  },
+  {
+    "chapter": 14,
+    "fen": "4k3/7R/8/3rP3/5K2/8/8/8 w - - 0 3",
+    "issues": [],
+    "label": "Final Test 14.19",
+    "number": "14.19",
+    "status": "promoted"
+  },
+  {
+    "chapter": 14,
+    "fen": "8/8/2p5/8/2P5/8/6K1/3k4 w - - 0 1",
+    "issues": [],
+    "label": "Final Test 14.20",
+    "number": "14.20",
+    "status": "promoted"
+  },
+  {
+    "chapter": 14,
+    "fen": "8/3r4/8/3K4/4P3/8/2k5/8 w - - 0 1",
+    "issues": [],
+    "label": "Final Test 14.21",
+    "number": "14.21",
+    "status": "promoted"
+  },
+  {
+    "chapter": 14,
+    "fen": "8/7p/8/6K1/3k2PP/8/2b5/8 b - - 0 54",
+    "issues": [],
+    "label": "Final Test 14.22",
+    "number": "14.22",
+    "status": "promoted"
+  },
+  {
+    "chapter": 14,
+    "fen": "8/6KP/4k3/8/5B2/7r/2p5/8 b - - 0 55",
+    "issues": [],
+    "label": "Final Test 14.23",
+    "number": "14.23",
+    "status": "promoted"
+  },
+  {
+    "chapter": 14,
+    "fen": "b7/P1k5/6N1/8/5PK1/8/8/8 b - - 0 1",
+    "issues": [],
+    "label": "Final Test 14.24",
+    "number": "14.24",
+    "status": "promoted"
+  },
+  {
+    "chapter": 14,
+    "fen": "8/5K1k/8/5p2/3b1P2/3B2P1/8/8 w - - 0 1",
+    "issues": [],
+    "label": "Final Test 14.25",
+    "number": "14.25",
+    "status": "promoted"
+  },
+  {
+    "chapter": 14,
+    "fen": "6rk/8/5K1p/8/2Q5/8/8/8 b - - 0 90",
+    "issues": [],
+    "label": "Final Test 14.26",
+    "number": "14.26",
+    "status": "promoted"
+  },
+  {
+    "chapter": 14,
+    "fen": "3b4/6k1/6P1/8/1BK5/1P6/8/8 w - - 0 81",
+    "issues": [],
+    "label": "Final Test 14.27",
+    "number": "14.27",
+    "status": "promoted"
+  },
+  {
+    "chapter": 14,
+    "fen": "8/7P/7K/3kp2R/8/8/8/6r1 b - - 0 63",
+    "issues": [],
+    "label": "Final Test 14.28",
+    "number": "14.28",
+    "status": "promoted"
+  },
+  {
+    "chapter": 14,
+    "fen": "8/8/2pr4/R7/8/1k6/4K3/8 w - - 0 69",
+    "issues": [
+      "Printed side-to-move corrected and disclosed in front matter"
+    ],
+    "label": "Final Test 14.29",
+    "number": "14.29",
+    "status": "promoted"
+  },
+  {
+    "chapter": 14,
+    "fen": "8/8/2k5/2P5/5KB1/6P1/8/3b4 b - - 0 89",
+    "issues": [],
+    "label": "Final Test 14.30",
+    "number": "14.30",
+    "status": "promoted"
+  },
+  {
+    "chapter": 14,
+    "fen": "8/1n2k3/3n4/P7/7K/8/8/8 w - - 0 1",
+    "issues": [],
+    "label": "Final Test 14.31",
+    "number": "14.31",
+    "status": "promoted"
+  },
+  {
+    "chapter": 14,
+    "fen": "8/5p2/4k1p1/1Kp2pP1/2P2P2/8/8/8 b - - 0 50",
+    "issues": [],
+    "label": "Final Test 14.32",
+    "number": "14.32",
+    "status": "promoted"
+  },
+  {
+    "chapter": 14,
+    "fen": "4R3/8/8/5p2/6P1/5k2/r7/6K1 b - - 0 1",
+    "issues": [],
+    "label": "Final Test 14.33",
+    "number": "14.33",
+    "status": "promoted"
+  },
+  {
+    "chapter": 14,
+    "fen": "1K6/1p6/pp6/B7/8/8/1P6/k7 w - - 0 1",
+    "issues": [],
+    "label": "Final Test 14.34",
+    "number": "14.34",
+    "status": "promoted"
+  },
+  {
+    "chapter": 14,
+    "fen": "8/8/8/p4p2/P5k1/5p2/5KP1/8 w - - 0 1",
+    "issues": [],
+    "label": "Final Test 14.35",
+    "number": "14.35",
+    "status": "promoted"
+  },
+  {
+    "chapter": 14,
+    "fen": "8/8/p2R4/K2P1k2/2r5/P7/8/8 w - - 0 64",
+    "issues": [],
+    "label": "Final Test 14.36",
+    "number": "14.36",
+    "status": "promoted"
+  },
+  {
+    "chapter": 15,
+    "fen": "8/8/8/4k3/3qN3/8/6B1/7K w - - 0 1",
+    "issues": [],
+    "label": "F1",
+    "number": "F1",
+    "status": "promoted"
+  },
+  {
+    "chapter": 15,
+    "fen": "8/8/5k2/8/8/4qBB1/6K1/8 w - - 0 1",
+    "issues": [],
+    "label": "F2",
+    "number": "F2",
+    "status": "promoted"
+  },
+  {
+    "chapter": 15,
+    "fen": "8/8/4nn2/4k3/8/Q4K2/8/8 w - - 0 1",
+    "issues": [],
+    "label": "F3",
+    "number": "F3",
+    "status": "promoted"
+  },
+  {
+    "chapter": 15,
+    "fen": "8/8/8/6k1/2q3p1/4R3/5PK1/8 w - - 0 1",
+    "issues": [],
+    "label": "F4",
+    "number": "F4",
+    "status": "promoted"
+  },
+  {
+    "chapter": 15,
+    "fen": "8/2pk4/1r6/3P4/2K1Q3/8/8/8 w - - 0 1",
+    "issues": [],
+    "label": "F5",
+    "number": "F5",
+    "status": "promoted"
+  },
+  {
+    "chapter": 15,
+    "fen": "8/8/8/6k1/3q3p/4R3/5PK1/8 w - - 0 1",
+    "issues": [],
+    "label": "F6",
+    "number": "F6",
+    "status": "promoted"
+  },
+  {
+    "chapter": 15,
+    "fen": "8/k7/p7/Pr6/K1Q5/8/8/8 w - - 0 1",
+    "issues": [],
+    "label": "F7",
+    "number": "F7",
+    "status": "promoted"
+  },
+  {
+    "chapter": 15,
+    "fen": "8/8/2B5/8/5kp1/8/r4P2/6K1 w - - 0 1",
+    "issues": [],
+    "label": "F8",
+    "number": "F8",
+    "status": "promoted"
+  },
+  {
+    "chapter": 15,
+    "fen": "8/8/8/8/3k2p1/6P1/r5B1/6K1 w - - 0 1",
+    "issues": [],
+    "label": "F9",
+    "number": "F9",
+    "status": "promoted"
+  },
+  {
+    "chapter": 15,
+    "fen": "k7/p4R2/P7/1K6/8/6b1/8/8 w - - 0 1",
+    "issues": [],
+    "label": "F10",
+    "number": "F10",
+    "status": "promoted"
+  },
+  {
+    "chapter": 15,
+    "fen": "8/5k2/8/4r3/5p2/5B2/5PK1/8 w - - 0 1",
+    "issues": [],
+    "label": "F11",
+    "number": "F11",
+    "status": "promoted"
+  },
+  {
+    "chapter": 15,
+    "fen": "8/8/8/8/5pk1/8/r4BP1/5K2 w - - 0 1",
+    "issues": [],
+    "label": "F12",
+    "number": "F12",
+    "status": "promoted"
+  },
+  {
+    "chapter": 15,
+    "fen": "8/8/8/8/5k1p/8/r5BP/6K1 w - - 0 1",
+    "issues": [],
+    "label": "F13",
+    "number": "F13",
+    "status": "promoted"
+  },
+  {
+    "chapter": 15,
+    "fen": "8/6pp/8/8/7P/4k1P1/r5B1/6K1 w - - 0 1",
+    "issues": [],
+    "label": "F14",
+    "number": "F14",
+    "status": "promoted"
+  },
+  {
+    "chapter": 15,
+    "fen": "8/8/2B5/7p/6p1/4k1P1/3r3P/6K1 w - - 0 1",
+    "issues": [],
+    "label": "F15",
+    "number": "F15",
+    "status": "promoted"
+  },
+  {
+    "chapter": 15,
+    "fen": "6k1/R7/4K1pp/6b1/6P1/7P/8/8 w - - 0 1",
+    "issues": [],
+    "label": "F16",
+    "number": "F16",
+    "status": "promoted"
+  },
+  {
+    "chapter": 15,
+    "fen": "8/2B4p/6p1/8/4k1P1/1r5P/6K1/8 w - - 0 1",
+    "issues": [],
+    "label": "F17",
+    "number": "F17",
+    "status": "promoted"
+  },
+  {
+    "chapter": 15,
+    "fen": "6k1/7p/5K1P/8/8/7P/6P1/8 w - - 0 1",
+    "issues": [],
+    "label": "F18",
+    "number": "F18",
+    "status": "promoted"
+  },
+  {
+    "chapter": 15,
+    "fen": "6k1/6Pp/7P/8/3BK3/8/8/8 w - - 0 1",
+    "issues": [],
+    "label": "F19",
+    "number": "F19",
+    "status": "promoted"
+  },
+  {
+    "chapter": 15,
+    "fen": "8/8/8/8/8/8/8/8",
+    "issues": [],
+    "label": "Troitsky's Line",
+    "number": "troitsky-line",
     "status": "promoted"
   }
 ]

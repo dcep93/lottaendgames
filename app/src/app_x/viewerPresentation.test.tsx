@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
 import { renderToStaticMarkup } from 'react-dom/server'
+import BookFrontMatter from './BookFrontMatter'
 import {
   ChapterSelector,
   EndingBlock,
@@ -10,6 +12,7 @@ import {
   ReaderMeta,
 } from './ChapterViewer'
 import ModuleSelector from '../ModuleSelector'
+import { chapterPayloadPath } from './chapterPayloadManifest'
 import InstructionalDiagram from './InstructionalDiagram'
 import TableBlock from './TableBlock'
 import type {
@@ -19,18 +22,44 @@ import type {
   RawChapterSection,
 } from './chapterTypes'
 import type { TextPlaybackToken } from './moveParser'
+import type { RuntimeChapterPayload } from './chapterRuntime'
 
 const activeBoards = {}
 const onMoveClick = () => undefined
 const onAnchorSelect = () => undefined
+const onPositionStep = () => undefined
 
 const moduleSelectorMarkup = renderToStaticMarkup(
   <ModuleSelector activeModule="book" onNavigate={() => undefined} />,
 )
 assert.match(moduleSelectorMarkup, /aria-label="Modules"/)
-assert.match(moduleSelectorMarkup, /href="\/book\/intro"/)
+assert.match(moduleSelectorMarkup, /href="\/book\/about"/)
 assert.match(moduleSelectorMarkup, /href="\/mate"/)
 assert.match(moduleSelectorMarkup, /aria-current="page"[^>]*>Book</)
+
+const runtimePayload = JSON.parse(
+  readFileSync(
+    new URL(`../../public/${chapterPayloadPath}`, import.meta.url),
+    'utf8',
+  ),
+) as RuntimeChapterPayload
+const frontMatterMarkup = renderToStaticMarkup(
+  <BookFrontMatter
+    chapters={runtimePayload.chapters}
+    onNavigate={() => undefined}
+  />,
+)
+assert.match(frontMatterMarkup, /Jesús de la Villa/)
+assert.match(frontMatterMarkup, /New In Chess, 2008/)
+assert.match(frontMatterMarkup, /© 2008 New In Chess/)
+assert.match(frontMatterMarkup, /href="mailto:dcep93@gmail.com"/)
+assert.match(frontMatterMarkup, /38\.Kd7\+/)
+assert.match(frontMatterMarkup, /38\.Rd7\+/)
+assert.match(frontMatterMarkup, /Black to move\. Can he draw\?/)
+assert.match(frontMatterMarkup, /href="\/book\/intro"/)
+assert.match(frontMatterMarkup, /href="\/book\/chapter1#e1"/)
+assert.match(frontMatterMarkup, /href="\/book\/bibliography"/)
+assert.equal((frontMatterMarkup.match(/>Ending \d+</g) ?? []).length, 100)
 
 const diagramMarkup = renderToStaticMarkup(
   <InstructionalDiagram
@@ -39,14 +68,37 @@ const diagramMarkup = renderToStaticMarkup(
       content: {
         number: 'intro-rook-mobility',
         label: 'The rook',
+        subtitle: 'Printed route',
         fen: '8/8/8/3R4/8/8/8/8',
+        orientation: 'white',
+        routes: [
+          {
+            meaning: 'Printed route',
+            squares: ['d5', 'e7'],
+          },
+        ],
       },
     }}
   />,
 )
 assert.match(diagramMarkup, />The rook</)
-assert.doesNotMatch(diagramMarkup, /href=/)
+assert.match(diagramMarkup, />Printed route</)
+assert.match(diagramMarkup, /class="leg-board-route-layer"/)
+assert.match(diagramMarkup, /points="43.75,43.75 56.25,18.75"/)
+assert.match(diagramMarkup, /href="https:\/\/lichess\.org\/editor\//)
 assert.match(diagramMarkup, /The rook instructional chess diagram/)
+assert.match(diagramMarkup, /aria-label="Position controls"/)
+assert.match(diagramMarkup, /Expand position intro-rook-mobility/)
+assert.match(diagramMarkup, /data-expanded="false"/)
+assert.doesNotMatch(diagramMarkup, /fullscreen/i)
+const chessBoardSource = readFileSync(
+  new URL('./ChessBoard.tsx', import.meta.url),
+  'utf8',
+)
+assert.doesNotMatch(
+  chessBoardSource,
+  /requestFullscreen|exitFullscreen|fullscreenElement/,
+)
 
 const tableMarkup = renderToStaticMarkup(
   <TableBlock
@@ -65,12 +117,18 @@ assert.match(tableMarkup, /<th scope="col">Type of ending<\/th>/)
 assert.match(tableMarkup, /<th scope="row">Rooks<\/th>/)
 
 const bibliographyMetaMarkup = renderToStaticMarkup(
-  <ReaderMeta endingCount={0} positionCount={0} sectionCount={20} />,
+  <ReaderMeta endingRange={null} positionCount={0} />,
 )
-assert.match(bibliographyMetaMarkup, />20 sections</)
-assert.doesNotMatch(bibliographyMetaMarkup, /endings|boards/)
+assert.equal(bibliographyMetaMarkup, '')
+const chapterMetaMarkup = renderToStaticMarkup(
+  <ReaderMeta endingRange="1-9" positionCount={25} />,
+)
+assert.match(chapterMetaMarkup, />Endings 1-9</)
+assert.match(chapterMetaMarkup, />25 boards</)
+assert.doesNotMatch(chapterMetaMarkup, /sections/)
 
 const chapterChoices = [
+  { id: 'about', label: 'About', name: 'About this edition' },
   { id: 'introduction', label: 'Introduction', name: 'Introduction' },
   { id: '1', label: 'Chapter 1', name: 'Basic endings' },
   { id: '2', label: 'Chapter 2', name: 'Basic Test' },
@@ -85,6 +143,10 @@ const contentsMarkup = renderToStaticMarkup(
   />,
 )
 assert.match(contentsMarkup, /leg-chapter-picker/)
+assert.match(
+  contentsMarkup,
+  /<option value="about">About - About this edition<\/option>/,
+)
 assert.match(
   contentsMarkup,
   /<select[^>]*aria-label="Top chapter selector"[^>]*>/,
@@ -119,6 +181,7 @@ const positionSection: PositionSection = {
   content: {
     fen: '6k1/8/8/8/8/8/P7/7K w - - 0 1',
     number: '1.1',
+    orientation: 'white',
     subtitle: 'A sample position',
   },
   type: 'position',
@@ -132,6 +195,7 @@ const positionStudyMarkup = renderToStaticMarkup(
     onAnchorSelect={onAnchorSelect}
     onMoveClick={onMoveClick}
     onPositionReset={() => undefined}
+    onPositionStep={onPositionStep}
     playback={{ playablePositions: new Set(), tokensBySectionIndex: new Map() }}
     sections={[
       positionSection,
@@ -156,6 +220,7 @@ const comparisonPositionMarkup = renderToStaticMarkup(
     onAnchorSelect={onAnchorSelect}
     onMoveClick={onMoveClick}
     onPositionReset={() => undefined}
+    onPositionStep={onPositionStep}
     playback={{ playablePositions: new Set(), tokensBySectionIndex: new Map() }}
     sections={[
       {
@@ -163,6 +228,7 @@ const comparisonPositionMarkup = renderToStaticMarkup(
           displayLabel: 'Draw',
           fen: '6k1/8/8/8/8/8/P7/7K w - - 0 1',
           number: 'comparison.1',
+          orientation: 'white',
         },
         type: 'position',
       },
@@ -262,6 +328,7 @@ const problemSection: ProblemSection = {
   content: {
     fen: '6k1/8/8/8/8/8/P7/7K w - - 0 1',
     number: '2.01',
+    orientation: 'white',
     prompt: 'White to move. Is it a draw?',
     solution: 'Play 1.a4!',
   },
@@ -274,6 +341,7 @@ const problemProps = {
   navigationByPosition: new Map(),
   onMoveClick,
   onPositionReset: () => undefined,
+  onPositionStep,
   onToggleSolution: () => undefined,
   playback: {
     playablePositions: new Set(['2.01']),
@@ -290,6 +358,8 @@ assert.match(hiddenProblemMarkup, /id="p2\.01"/)
 assert.match(hiddenProblemMarkup, /aria-expanded="false"/)
 assert.match(hiddenProblemMarkup, />Show solution<\/button>/)
 assert.match(hiddenProblemMarkup, /data-playable="false"/)
+assert.match(hiddenProblemMarkup, />Lichess ↗<\/a>/)
+assert.doesNotMatch(hiddenProblemMarkup, /aria-label="Previous move"/)
 assert.doesNotMatch(hiddenProblemMarkup, /leg-move-token/)
 assert.doesNotMatch(hiddenProblemMarkup, /Play 1\.a4/)
 
@@ -299,6 +369,33 @@ const revealedProblemMarkup = renderToStaticMarkup(
 assert.match(revealedProblemMarkup, /aria-expanded="true"/)
 assert.match(revealedProblemMarkup, />Hide solution<\/button>/)
 assert.match(revealedProblemMarkup, /data-playable="true"/)
+assert.match(
+  revealedProblemMarkup,
+  /<button[^>]*aria-label="Previous move"[^>]*>←<\/button>/,
+)
+assert.match(revealedProblemMarkup, />Reset<\/button>/)
+assert.match(
+  revealedProblemMarkup,
+  /<button[^>]*aria-label="Next move"[^>]*>→<\/button>/,
+)
+assert.doesNotMatch(revealedProblemMarkup, /Start position/)
+assert.doesNotMatch(revealedProblemMarkup, /Keys: ← →/)
+assert.doesNotMatch(revealedProblemMarkup, /leg-position-status/)
+assert.doesNotMatch(revealedProblemMarkup, /leg-position-key-hint/)
+assert.match(revealedProblemMarkup, />Lichess ↗<\/a>/)
+const lichessControlIndex = revealedProblemMarkup.indexOf('>Lichess ↗</a>')
+const previousControlIndex = revealedProblemMarkup.indexOf(
+  'aria-label="Previous move"',
+)
+const resetControlIndex = revealedProblemMarkup.indexOf('>Reset</button>')
+const nextControlIndex = revealedProblemMarkup.indexOf('aria-label="Next move"')
+assert.ok(lichessControlIndex < previousControlIndex)
+assert.ok(previousControlIndex < resetControlIndex)
+assert.ok(resetControlIndex < nextControlIndex)
+assert.ok(
+  revealedProblemMarkup.indexOf('leg-position-controls') <
+    revealedProblemMarkup.indexOf('<figcaption>'),
+)
 assert.match(revealedProblemMarkup, /leg-move-token/)
 assert.match(revealedProblemMarkup, /Play /)
 

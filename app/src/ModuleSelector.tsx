@@ -2,7 +2,7 @@ import type { MouseEvent } from 'react'
 import type { AppModule } from './routing'
 
 const modules: Array<{ href: string; id: AppModule; label: string }> = [
-  { href: '/book/intro', id: 'book', label: 'Book' },
+  { href: '/book/about', id: 'book', label: 'Book' },
   { href: '/mate', id: 'mate', label: 'Mate' },
 ]
 

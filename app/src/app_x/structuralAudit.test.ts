@@ -197,6 +197,52 @@ assert.deepEqual(
 )
 
 const positionThirteenTwenty = getPosition('13', '13.20')
+assert.deepEqual(
+  getChapter('13').sections
+    .filter(
+      (section) =>
+        (section.type === 'diagram' || section.type === 'position') &&
+        isRecord(section.content),
+    )
+    .map((section) => (section.content as Record<string, unknown>).number),
+  Array.from({ length: 30 }, (_, index) => `13.${index + 1}`),
+)
+assert.deepEqual(
+  ['13.1', '13.2', '13.3'].map((number) => getBoard('13', number).type),
+  ['diagram', 'diagram', 'diagram'],
+)
+assert.deepEqual(
+  (getBoard('13', '13.1').content.markers as Array<{ square: string }>).map(
+    ({ square }) => square,
+  ),
+  ['g8', 'f7', 'e6', 'c5', 'd5', 'e5', 'a4', 'b4', 'c4'],
+)
+assert.deepEqual(
+  (getBoard('13', '13.2').content.markers as Array<{ square: string }>).map(
+    ({ square }) => square,
+  ),
+  ['g6', 'h6', 'f5', 'g5'],
+)
+assert.deepEqual(
+  (getBoard('13', '13.3').content.markers as Array<{ square: string }>).map(
+    ({ square }) => square,
+  ),
+  ['e8', 'c7', 'd7', 'e7', 'a6', 'b6', 'c6'],
+)
+assert.deepEqual(getPosition('13', '13.5').content.routes, [
+  {
+    squares: ['c7', 'd5', 'e7', 'f5', 'g7'],
+    meaning: "Knight's V/W route as printed",
+  },
+])
+assert.equal(getPosition('13', '13.5').content.subtitle, "(Knight's route)")
+assert.equal(getPosition('13', '13.12').content.subtitle, 'Budnikov - Novik')
+assert.equal(getPosition('13', '13.12').content.caption, 'Moscow 1991')
+assert.equal(
+  getPosition('13', '13.16').content.subtitle,
+  'García González - Balashov',
+)
+assert.equal(getPosition('13', '13.16').content.caption, 'Leningrad 1977')
 assert.equal(
   positionThirteenTwenty.content.fen,
   '5k2/1R6/5P2/3b2K1/8/8/8/8 w - - 0 4',
@@ -205,7 +251,7 @@ assert.deepEqual(
   (positionThirteenTwenty.content.markers as Array<{ square: string }>).map(
     ({ square }) => square,
   ),
-  ['b1', 'b2', 'c3', 'e4'],
+  ['a2', 'b3', 'c4', 'e6'],
 )
 
 assert.equal(
@@ -351,6 +397,20 @@ function getPosition(chapterId: string, positionNumber: string) {
       candidate.content.number === positionNumber,
   )
   assert.ok(section, `Expected position ${positionNumber}`)
+  assert.equal(isRecord(section.content), true)
+  return section as RawChapterSection & {
+    content: Record<string, unknown>
+  }
+}
+
+function getBoard(chapterId: string, boardNumber: string) {
+  const section = getChapter(chapterId).sections.find(
+    (candidate) =>
+      (candidate.type === 'diagram' || candidate.type === 'position') &&
+      isRecord(candidate.content) &&
+      candidate.content.number === boardNumber,
+  )
+  assert.ok(section, `Expected board ${boardNumber}`)
   assert.equal(isRecord(section.content), true)
   return section as RawChapterSection & {
     content: Record<string, unknown>

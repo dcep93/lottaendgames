@@ -1,0 +1,3097 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "file": "100-endgames-you-must-know-2008.pdf",
+    "pageCount": 249
+  },
+  "releases": [
+    {
+      "id": "chapter-13",
+      "chapterId": "13",
+      "status": "matched",
+      "verifiedOn": "2026-07-15",
+      "pdfPages": {
+        "first": 205,
+        "last": 229
+      },
+      "printPages": {
+        "first": 204,
+        "last": 228
+      },
+      "units": [
+        {"id":"ch13-p205-copy","kind":"page-copy","pdfPage":205,"printPage":204,"appSectionIndexes":[0,1,2,3],"checks":["text","order","hierarchy"],"status":"matched"},
+        {"id":"ch13-p206-copy","kind":"page-copy","pdfPage":206,"printPage":205,"appSectionIndexes":[4,5,6,7,8],"checks":["text","order","captions"],"status":"matched"},
+        {"id":"ch13-p207-copy","kind":"page-copy","pdfPage":207,"printPage":206,"appSectionIndexes":[9],"checks":["text","moves","order"],"status":"matched"},
+        {"id":"ch13-p208-copy","kind":"page-copy","pdfPage":208,"printPage":207,"appSectionIndexes":[9,10,11],"checks":["text","moves","caption","overlay"],"status":"matched"},
+        {"id":"ch13-p209-copy","kind":"page-copy","pdfPage":209,"printPage":208,"appSectionIndexes":[11,12,13,14,15],"checks":["text","moves","order","heading"],"status":"matched"},
+        {"id":"ch13-p210-copy","kind":"page-copy","pdfPage":210,"printPage":209,"appSectionIndexes":[16,17,18,19,20,21],"checks":["text","moves","order","heading","ending"],"status":"matched"},
+        {"id":"ch13-p211-copy","kind":"page-copy","pdfPage":211,"printPage":210,"appSectionIndexes":[21,22,23],"checks":["text","moves","order"],"status":"matched"},
+        {"id":"ch13-p212-copy","kind":"page-copy","pdfPage":212,"printPage":211,"appSectionIndexes":[23,24,25,26],"checks":["text","moves","panel","heading"],"status":"matched"},
+        {"id":"ch13-p213-copy","kind":"page-copy","pdfPage":213,"printPage":212,"appSectionIndexes":[27,28,29,30,31],"checks":["text","moves","order","heading"],"status":"matched"},
+        {"id":"ch13-p214-copy","kind":"page-copy","pdfPage":214,"printPage":213,"appSectionIndexes":[32,33,34,35,36,37],"checks":["text","moves","order","heading","ending"],"status":"matched"},
+        {"id":"ch13-p215-copy","kind":"page-copy","pdfPage":215,"printPage":214,"appSectionIndexes":[37,38,39],"checks":["text","moves","caption","markers"],"status":"matched"},
+        {"id":"ch13-p216-copy","kind":"page-copy","pdfPage":216,"printPage":215,"appSectionIndexes":[40,41,42,43],"checks":["text","moves","captions"],"status":"matched"},
+        {"id":"ch13-p217-copy","kind":"page-copy","pdfPage":217,"printPage":216,"appSectionIndexes":[43,44,45],"checks":["text","moves","caption"],"status":"matched"},
+        {"id":"ch13-p218-copy","kind":"page-copy","pdfPage":218,"printPage":217,"appSectionIndexes":[46,47,48,49,50,51],"checks":["text","moves","ending","panel","caption"],"status":"matched"},
+        {"id":"ch13-p219-copy","kind":"page-copy","pdfPage":219,"printPage":218,"appSectionIndexes":[52,53],"checks":["text","moves","caption"],"status":"matched"},
+        {"id":"ch13-p220-copy","kind":"page-copy","pdfPage":220,"printPage":219,"appSectionIndexes":[54,55,56,57],"checks":["text","moves","caption","ending"],"status":"matched"},
+        {"id":"ch13-p221-copy","kind":"page-copy","pdfPage":221,"printPage":220,"appSectionIndexes":[58,59,60,61],"checks":["text","moves","captions","markers"],"status":"matched"},
+        {"id":"ch13-p222-copy","kind":"page-copy","pdfPage":222,"printPage":221,"appSectionIndexes":[62,63,64,65,66,67,68,69,70],"checks":["text","moves","ending","headings","panel"],"status":"matched"},
+        {"id":"ch13-p223-copy","kind":"page-copy","pdfPage":223,"printPage":222,"appSectionIndexes":[71,72,73],"checks":["text","moves","captions","markers"],"status":"matched"},
+        {"id":"ch13-p224-copy","kind":"page-copy","pdfPage":224,"printPage":223,"appSectionIndexes":[74,75,76,77],"checks":["text","moves","heading"],"status":"matched"},
+        {"id":"ch13-p225-copy","kind":"page-copy","pdfPage":225,"printPage":224,"appSectionIndexes":[78,79,80,81,82],"checks":["text","moves","ending","heading","proper-names"],"status":"matched"},
+        {"id":"ch13-p226-copy","kind":"page-copy","pdfPage":226,"printPage":225,"appSectionIndexes":[83,84,85,86],"checks":["text","moves","captions"],"status":"matched"},
+        {"id":"ch13-p227-copy","kind":"page-copy","pdfPage":227,"printPage":226,"appSectionIndexes":[86,87,88,89,90,91,92],"checks":["text","moves","headings"],"status":"matched"},
+        {"id":"ch13-p228-copy","kind":"page-copy","pdfPage":228,"printPage":227,"appSectionIndexes":[93,94,95,96,97],"checks":["text","moves","panel","ending"],"status":"matched"},
+        {"id":"ch13-p229-copy","kind":"page-copy","pdfPage":229,"printPage":228,"appSectionIndexes":[97,98,99,100],"checks":["text","moves","caption","panel"],"status":"matched"},
+        {"id":"ch13-board-13.1","kind":"board","pdfPage":206,"printPage":205,"appSectionIndex":4,"boardNumber":"13.1","checks":["pieces","markers","caption","orientation"],"status":"matched"},
+        {"id":"ch13-board-13.2","kind":"board","pdfPage":206,"printPage":205,"appSectionIndex":5,"boardNumber":"13.2","checks":["pieces","markers","caption","orientation"],"status":"matched"},
+        {"id":"ch13-board-13.3","kind":"board","pdfPage":206,"printPage":205,"appSectionIndex":6,"boardNumber":"13.3","checks":["pieces","markers","caption","orientation"],"status":"matched"},
+        {"id":"ch13-board-13.4","kind":"board","pdfPage":206,"printPage":205,"appSectionIndex":8,"boardNumber":"13.4","checks":["pieces","side-to-move","orientation"],"status":"matched"},
+        {"id":"ch13-board-13.5","kind":"board","pdfPage":208,"printPage":207,"appSectionIndex":10,"boardNumber":"13.5","checks":["pieces","side-to-move","caption","overlay","orientation"],"status":"matched"},
+        {"id":"ch13-board-13.6","kind":"board","pdfPage":209,"printPage":208,"appSectionIndex":12,"boardNumber":"13.6","checks":["pieces","markers","caption","orientation"],"status":"matched"},
+        {"id":"ch13-board-13.7","kind":"board","pdfPage":210,"printPage":209,"appSectionIndex":20,"boardNumber":"13.7","checks":["pieces","markers","orientation"],"status":"matched"},
+        {"id":"ch13-board-13.8","kind":"board","pdfPage":211,"printPage":210,"appSectionIndex":22,"boardNumber":"13.8","checks":["pieces","side-to-move","orientation"],"status":"matched"},
+        {"id":"ch13-board-13.9","kind":"board","pdfPage":213,"printPage":212,"appSectionIndex":27,"boardNumber":"13.9","checks":["pieces","side-to-move","orientation"],"status":"matched"},
+        {"id":"ch13-board-13.10","kind":"board","pdfPage":213,"printPage":212,"appSectionIndex":30,"boardNumber":"13.10","checks":["pieces","side-to-move","orientation"],"status":"matched"},
+        {"id":"ch13-board-13.11","kind":"board","pdfPage":214,"printPage":213,"appSectionIndex":34,"boardNumber":"13.11","checks":["pieces","side-to-move","orientation"],"status":"matched"},
+        {"id":"ch13-board-13.12","kind":"board","pdfPage":215,"printPage":214,"appSectionIndex":38,"boardNumber":"13.12","checks":["pieces","markers","game-caption","orientation"],"status":"matched"},
+        {"id":"ch13-board-13.13","kind":"board","pdfPage":216,"printPage":215,"appSectionIndex":40,"boardNumber":"13.13","checks":["pieces","side-to-move","caption","orientation"],"status":"matched"},
+        {"id":"ch13-board-13.14","kind":"board","pdfPage":216,"printPage":215,"appSectionIndex":42,"boardNumber":"13.14","checks":["pieces","side-to-move","caption","orientation"],"status":"matched"},
+        {"id":"ch13-board-13.15","kind":"board","pdfPage":217,"printPage":216,"appSectionIndex":44,"boardNumber":"13.15","checks":["pieces","side-to-move","caption","orientation"],"status":"matched"},
+        {"id":"ch13-board-13.16","kind":"board","pdfPage":218,"printPage":217,"appSectionIndex":50,"boardNumber":"13.16","checks":["pieces","side-to-move","game-caption","proper-names","orientation"],"status":"matched"},
+        {"id":"ch13-board-13.17","kind":"board","pdfPage":219,"printPage":218,"appSectionIndex":52,"boardNumber":"13.17","checks":["pieces","side-to-move","caption","orientation"],"status":"matched"},
+        {"id":"ch13-board-13.18","kind":"board","pdfPage":220,"printPage":219,"appSectionIndex":54,"boardNumber":"13.18","checks":["pieces","side-to-move","caption","orientation"],"status":"matched"},
+        {"id":"ch13-board-13.19","kind":"board","pdfPage":221,"printPage":220,"appSectionIndex":58,"boardNumber":"13.19","checks":["pieces","side-to-move","orientation"],"status":"matched"},
+        {"id":"ch13-board-13.20","kind":"board","pdfPage":221,"printPage":220,"appSectionIndex":60,"boardNumber":"13.20","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"ch13-board-13.21","kind":"board","pdfPage":222,"printPage":221,"appSectionIndex":66,"boardNumber":"13.21","checks":["pieces","side-to-move","markers","orientation"],"status":"matched"},
+        {"id":"ch13-board-13.22","kind":"board","pdfPage":223,"printPage":222,"appSectionIndex":71,"boardNumber":"13.22","checks":["pieces","side-to-move","markers","orientation"],"status":"matched"},
+        {"id":"ch13-board-13.23","kind":"board","pdfPage":223,"printPage":222,"appSectionIndex":73,"boardNumber":"13.23","checks":["pieces","side-to-move","caption","orientation"],"status":"matched"},
+        {"id":"ch13-board-13.24","kind":"board","pdfPage":224,"printPage":223,"appSectionIndex":76,"boardNumber":"13.24","checks":["pieces","side-to-move","orientation"],"status":"matched"},
+        {"id":"ch13-board-13.25","kind":"board","pdfPage":225,"printPage":224,"appSectionIndex":81,"boardNumber":"13.25","checks":["pieces","side-to-move","orientation"],"status":"matched"},
+        {"id":"ch13-board-13.26","kind":"board","pdfPage":226,"printPage":225,"appSectionIndex":83,"boardNumber":"13.26","checks":["pieces","side-to-move","orientation"],"status":"matched"},
+        {"id":"ch13-board-13.27","kind":"board","pdfPage":226,"printPage":225,"appSectionIndex":85,"boardNumber":"13.27","checks":["pieces","side-to-move","caption","orientation"],"status":"matched"},
+        {"id":"ch13-board-13.28","kind":"board","pdfPage":227,"printPage":226,"appSectionIndex":89,"boardNumber":"13.28","checks":["pieces","side-to-move","orientation"],"status":"matched"},
+        {"id":"ch13-board-13.29","kind":"board","pdfPage":228,"printPage":227,"appSectionIndex":96,"boardNumber":"13.29","checks":["pieces","side-to-move","orientation"],"status":"matched"},
+        {"id":"ch13-board-13.30","kind":"board","pdfPage":229,"printPage":228,"appSectionIndex":98,"boardNumber":"13.30","checks":["pieces","side-to-move","caption","orientation"],"status":"matched"}
+      ]
+    },
+    {
+      "id": "introduction-chapters-1-4",
+      "partIds": [
+        "introduction",
+        "1",
+        "2",
+        "3",
+        "4"
+      ],
+      "status": "matched",
+      "verifiedOn": "2026-07-15",
+      "pdfPageRanges": [
+        {
+          "first": 10,
+          "last": 26
+        },
+        {
+          "first": 28,
+          "last": 68
+        }
+      ],
+      "printPageRanges": [
+        {
+          "first": 9,
+          "last": 25
+        },
+        {
+          "first": 27,
+          "last": 67
+        }
+      ],
+      "units": [
+        {
+          "id": "1-p28-copy",
+          "kind": "page-copy",
+          "partId": "1",
+          "pdfPage": 28,
+          "printPage": 27,
+          "appSectionIndexes": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "1-p29-copy",
+          "kind": "page-copy",
+          "partId": "1",
+          "pdfPage": 29,
+          "printPage": 28,
+          "appSectionIndexes": [
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "1-p30-copy",
+          "kind": "page-copy",
+          "partId": "1",
+          "pdfPage": 30,
+          "printPage": 29,
+          "appSectionIndexes": [
+            12,
+            13,
+            14,
+            15,
+            16,
+            17
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "1-p31-copy",
+          "kind": "page-copy",
+          "partId": "1",
+          "pdfPage": 31,
+          "printPage": 30,
+          "appSectionIndexes": [
+            18,
+            19,
+            20
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "1-p32-copy",
+          "kind": "page-copy",
+          "partId": "1",
+          "pdfPage": 32,
+          "printPage": 31,
+          "appSectionIndexes": [
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "1-p33-copy",
+          "kind": "page-copy",
+          "partId": "1",
+          "pdfPage": 33,
+          "printPage": 32,
+          "appSectionIndexes": [
+            27,
+            28,
+            29,
+            30
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "1-p34-copy",
+          "kind": "page-copy",
+          "partId": "1",
+          "pdfPage": 34,
+          "printPage": 33,
+          "appSectionIndexes": [
+            30,
+            31,
+            32,
+            33,
+            34,
+            35
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "1-p35-copy",
+          "kind": "page-copy",
+          "partId": "1",
+          "pdfPage": 35,
+          "printPage": 34,
+          "appSectionIndexes": [
+            35,
+            36,
+            37
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "1-p36-copy",
+          "kind": "page-copy",
+          "partId": "1",
+          "pdfPage": 36,
+          "printPage": 35,
+          "appSectionIndexes": [
+            38,
+            39,
+            40,
+            41,
+            42
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "1-p37-copy",
+          "kind": "page-copy",
+          "partId": "1",
+          "pdfPage": 37,
+          "printPage": 36,
+          "appSectionIndexes": [
+            42,
+            43,
+            44
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "1-p38-copy",
+          "kind": "page-copy",
+          "partId": "1",
+          "pdfPage": 38,
+          "printPage": 37,
+          "appSectionIndexes": [
+            44,
+            45,
+            46,
+            47
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "1-p39-copy",
+          "kind": "page-copy",
+          "partId": "1",
+          "pdfPage": 39,
+          "printPage": 38,
+          "appSectionIndexes": [
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "1-p40-copy",
+          "kind": "page-copy",
+          "partId": "1",
+          "pdfPage": 40,
+          "printPage": 39,
+          "appSectionIndexes": [
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "1-p41-copy",
+          "kind": "page-copy",
+          "partId": "1",
+          "pdfPage": 41,
+          "printPage": 40,
+          "appSectionIndexes": [
+            60,
+            61,
+            62,
+            63,
+            64
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "1-p42-copy",
+          "kind": "page-copy",
+          "partId": "1",
+          "pdfPage": 42,
+          "printPage": 41,
+          "appSectionIndexes": [
+            64,
+            65,
+            66,
+            67,
+            68
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "1-p43-copy",
+          "kind": "page-copy",
+          "partId": "1",
+          "pdfPage": 43,
+          "printPage": 42,
+          "appSectionIndexes": [
+            68,
+            69,
+            70,
+            71,
+            72
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "1-p44-copy",
+          "kind": "page-copy",
+          "partId": "1",
+          "pdfPage": 44,
+          "printPage": 43,
+          "appSectionIndexes": [
+            72,
+            73,
+            74,
+            75,
+            76,
+            77,
+            78,
+            79,
+            80
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "1-p45-copy",
+          "kind": "page-copy",
+          "partId": "1",
+          "pdfPage": 45,
+          "printPage": 44,
+          "appSectionIndexes": [
+            80,
+            81,
+            82,
+            83
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "2-p46-copy",
+          "kind": "page-copy",
+          "partId": "2",
+          "pdfPage": 46,
+          "printPage": 45,
+          "appSectionIndexes": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "2-p47-copy",
+          "kind": "page-copy",
+          "partId": "2",
+          "pdfPage": 47,
+          "printPage": 46,
+          "appSectionIndexes": [
+            7,
+            8,
+            9,
+            10,
+            11,
+            12
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "2-p48-copy",
+          "kind": "page-copy",
+          "partId": "2",
+          "pdfPage": 48,
+          "printPage": 47,
+          "appSectionIndexes": [
+            13,
+            14,
+            15,
+            16,
+            17,
+            18
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "2-p49-copy",
+          "kind": "page-copy",
+          "partId": "2",
+          "pdfPage": 49,
+          "printPage": 48,
+          "appSectionIndexes": [
+            19,
+            20,
+            21,
+            22,
+            23,
+            24
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "2-p50-copy",
+          "kind": "page-copy",
+          "partId": "2",
+          "pdfPage": 50,
+          "printPage": 49,
+          "appSectionIndexes": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            25,
+            26
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "2-p51-copy",
+          "kind": "page-copy",
+          "partId": "2",
+          "pdfPage": 51,
+          "printPage": 50,
+          "appSectionIndexes": [
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "3-p52-copy",
+          "kind": "page-copy",
+          "partId": "3",
+          "pdfPage": 52,
+          "printPage": 51,
+          "appSectionIndexes": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "3-p53-copy",
+          "kind": "page-copy",
+          "partId": "3",
+          "pdfPage": 53,
+          "printPage": 52,
+          "appSectionIndexes": [
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "3-p54-copy",
+          "kind": "page-copy",
+          "partId": "3",
+          "pdfPage": 54,
+          "printPage": 53,
+          "appSectionIndexes": [
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "3-p55-copy",
+          "kind": "page-copy",
+          "partId": "3",
+          "pdfPage": 55,
+          "printPage": 54,
+          "appSectionIndexes": [
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "3-p56-copy",
+          "kind": "page-copy",
+          "partId": "3",
+          "pdfPage": 56,
+          "printPage": 55,
+          "appSectionIndexes": [
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "3-p57-copy",
+          "kind": "page-copy",
+          "partId": "3",
+          "pdfPage": 57,
+          "printPage": 56,
+          "appSectionIndexes": [
+            25,
+            26,
+            27,
+            28,
+            29
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "3-p58-copy",
+          "kind": "page-copy",
+          "partId": "3",
+          "pdfPage": 58,
+          "printPage": 57,
+          "appSectionIndexes": [
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "3-p59-copy",
+          "kind": "page-copy",
+          "partId": "3",
+          "pdfPage": 59,
+          "printPage": 58,
+          "appSectionIndexes": [
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "4-p60-copy",
+          "kind": "page-copy",
+          "partId": "4",
+          "pdfPage": 60,
+          "printPage": 59,
+          "appSectionIndexes": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "4-p61-copy",
+          "kind": "page-copy",
+          "partId": "4",
+          "pdfPage": 61,
+          "printPage": 60,
+          "appSectionIndexes": [
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "4-p62-copy",
+          "kind": "page-copy",
+          "partId": "4",
+          "pdfPage": 62,
+          "printPage": 61,
+          "appSectionIndexes": [
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "4-p63-copy",
+          "kind": "page-copy",
+          "partId": "4",
+          "pdfPage": 63,
+          "printPage": 62,
+          "appSectionIndexes": [
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "4-p64-copy",
+          "kind": "page-copy",
+          "partId": "4",
+          "pdfPage": 64,
+          "printPage": 63,
+          "appSectionIndexes": [
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "4-p65-copy",
+          "kind": "page-copy",
+          "partId": "4",
+          "pdfPage": 65,
+          "printPage": 64,
+          "appSectionIndexes": [
+            28,
+            29,
+            30,
+            31,
+            32
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "4-p66-copy",
+          "kind": "page-copy",
+          "partId": "4",
+          "pdfPage": 66,
+          "printPage": 65,
+          "appSectionIndexes": [
+            32,
+            33,
+            34,
+            35,
+            36,
+            37
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "4-p67-copy",
+          "kind": "page-copy",
+          "partId": "4",
+          "pdfPage": 67,
+          "printPage": 66,
+          "appSectionIndexes": [
+            37,
+            38,
+            39,
+            40,
+            41
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "4-p68-copy",
+          "kind": "page-copy",
+          "partId": "4",
+          "pdfPage": 68,
+          "printPage": 67,
+          "appSectionIndexes": [
+            42,
+            43,
+            44
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "introduction-p10-copy",
+          "kind": "page-copy",
+          "partId": "introduction",
+          "pdfPage": 10,
+          "printPage": 9,
+          "appSectionIndexes": [
+            0,
+            1,
+            2
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "introduction-p11-copy",
+          "kind": "page-copy",
+          "partId": "introduction",
+          "pdfPage": 11,
+          "printPage": 10,
+          "appSectionIndexes": [
+            2,
+            3,
+            4
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "introduction-p12-copy",
+          "kind": "page-copy",
+          "partId": "introduction",
+          "pdfPage": 12,
+          "printPage": 11,
+          "appSectionIndexes": [
+            4
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "introduction-p13-copy",
+          "kind": "page-copy",
+          "partId": "introduction",
+          "pdfPage": 13,
+          "printPage": 12,
+          "appSectionIndexes": [
+            5,
+            6,
+            7,
+            8
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "introduction-p14-copy",
+          "kind": "page-copy",
+          "partId": "introduction",
+          "pdfPage": 14,
+          "printPage": 13,
+          "appSectionIndexes": [
+            8
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "introduction-p15-copy",
+          "kind": "page-copy",
+          "partId": "introduction",
+          "pdfPage": 15,
+          "printPage": 14,
+          "appSectionIndexes": [
+            8,
+            9,
+            10
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "introduction-p16-copy",
+          "kind": "page-copy",
+          "partId": "introduction",
+          "pdfPage": 16,
+          "printPage": 15,
+          "appSectionIndexes": [
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "introduction-p17-copy",
+          "kind": "page-copy",
+          "partId": "introduction",
+          "pdfPage": 17,
+          "printPage": 16,
+          "appSectionIndexes": [
+            16,
+            17,
+            18
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "introduction-p18-copy",
+          "kind": "page-copy",
+          "partId": "introduction",
+          "pdfPage": 18,
+          "printPage": 17,
+          "appSectionIndexes": [
+            19,
+            20,
+            21,
+            22,
+            23,
+            24
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "introduction-p19-copy",
+          "kind": "page-copy",
+          "partId": "introduction",
+          "pdfPage": 19,
+          "printPage": 18,
+          "appSectionIndexes": [
+            25
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "introduction-p20-copy",
+          "kind": "page-copy",
+          "partId": "introduction",
+          "pdfPage": 20,
+          "printPage": 19,
+          "appSectionIndexes": [
+            26,
+            27,
+            28
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "introduction-p21-copy",
+          "kind": "page-copy",
+          "partId": "introduction",
+          "pdfPage": 21,
+          "printPage": 20,
+          "appSectionIndexes": [
+            28,
+            29,
+            30,
+            31
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "introduction-p22-copy",
+          "kind": "page-copy",
+          "partId": "introduction",
+          "pdfPage": 22,
+          "printPage": 21,
+          "appSectionIndexes": [
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "introduction-p23-copy",
+          "kind": "page-copy",
+          "partId": "introduction",
+          "pdfPage": 23,
+          "printPage": 22,
+          "appSectionIndexes": [
+            38,
+            39,
+            40,
+            41,
+            42,
+            43
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "introduction-p24-copy",
+          "kind": "page-copy",
+          "partId": "introduction",
+          "pdfPage": 24,
+          "printPage": 23,
+          "appSectionIndexes": [
+            44,
+            45,
+            46,
+            47,
+            48,
+            49
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "introduction-p25-copy",
+          "kind": "page-copy",
+          "partId": "introduction",
+          "pdfPage": 25,
+          "printPage": 24,
+          "appSectionIndexes": [
+            48,
+            49,
+            50,
+            51,
+            52,
+            53
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "introduction-p26-copy",
+          "kind": "page-copy",
+          "partId": "introduction",
+          "pdfPage": 26,
+          "printPage": 25,
+          "appSectionIndexes": [
+            54,
+            55,
+            56,
+            57,
+            58,
+            59
+          ],
+          "checks": [
+            "text",
+            "moves",
+            "order",
+            "hierarchy",
+            "captions"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "1-board-1.1",
+          "kind": "board",
+          "partId": "1",
+          "pdfPage": 28,
+          "printPage": 27,
+          "appSectionIndex": 3,
+          "boardNumber": "1.1",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "1-board-1.2",
+          "kind": "board",
+          "partId": "1",
+          "pdfPage": 29,
+          "printPage": 28,
+          "appSectionIndex": 5,
+          "boardNumber": "1.2",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "1-board-1.3",
+          "kind": "board",
+          "partId": "1",
+          "pdfPage": 30,
+          "printPage": 29,
+          "appSectionIndex": 12,
+          "boardNumber": "1.3",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "1-board-1.4",
+          "kind": "board",
+          "partId": "1",
+          "pdfPage": 30,
+          "printPage": 29,
+          "appSectionIndex": 17,
+          "boardNumber": "1.4",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "1-board-1.5",
+          "kind": "board",
+          "partId": "1",
+          "pdfPage": 31,
+          "printPage": 30,
+          "appSectionIndex": 19,
+          "boardNumber": "1.5",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "1-board-1.6",
+          "kind": "board",
+          "partId": "1",
+          "pdfPage": 32,
+          "printPage": 31,
+          "appSectionIndex": 25,
+          "boardNumber": "1.6",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "1-board-1.7",
+          "kind": "board",
+          "partId": "1",
+          "pdfPage": 33,
+          "printPage": 32,
+          "appSectionIndex": 27,
+          "boardNumber": "1.7",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "1-board-1.8",
+          "kind": "board",
+          "partId": "1",
+          "pdfPage": 33,
+          "printPage": 32,
+          "appSectionIndex": 29,
+          "boardNumber": "1.8",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "1-board-1.9",
+          "kind": "board",
+          "partId": "1",
+          "pdfPage": 34,
+          "printPage": 33,
+          "appSectionIndex": 32,
+          "boardNumber": "1.9",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "1-board-1.10",
+          "kind": "board",
+          "partId": "1",
+          "pdfPage": 35,
+          "printPage": 34,
+          "appSectionIndex": 36,
+          "boardNumber": "1.10",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "1-board-1.11",
+          "kind": "board",
+          "partId": "1",
+          "pdfPage": 36,
+          "printPage": 35,
+          "appSectionIndex": 38,
+          "boardNumber": "1.11",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "1-board-1.12",
+          "kind": "board",
+          "partId": "1",
+          "pdfPage": 36,
+          "printPage": 35,
+          "appSectionIndex": 41,
+          "boardNumber": "1.12",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "1-board-1.13",
+          "kind": "board",
+          "partId": "1",
+          "pdfPage": 37,
+          "printPage": 36,
+          "appSectionIndex": 43,
+          "boardNumber": "1.13",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "1-board-1.14",
+          "kind": "board",
+          "partId": "1",
+          "pdfPage": 38,
+          "printPage": 37,
+          "appSectionIndex": 46,
+          "boardNumber": "1.14",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "1-board-1.15",
+          "kind": "board",
+          "partId": "1",
+          "pdfPage": 39,
+          "printPage": 38,
+          "appSectionIndex": 49,
+          "boardNumber": "1.15",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "1-board-1.16",
+          "kind": "board",
+          "partId": "1",
+          "pdfPage": 39,
+          "printPage": 38,
+          "appSectionIndex": 53,
+          "boardNumber": "1.16",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "1-board-1.17",
+          "kind": "board",
+          "partId": "1",
+          "pdfPage": 40,
+          "printPage": 39,
+          "appSectionIndex": 59,
+          "boardNumber": "1.17",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "1-board-1.18",
+          "kind": "board",
+          "partId": "1",
+          "pdfPage": 41,
+          "printPage": 40,
+          "appSectionIndex": 63,
+          "boardNumber": "1.18",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "1-board-1.19",
+          "kind": "board",
+          "partId": "1",
+          "pdfPage": 42,
+          "printPage": 41,
+          "appSectionIndex": 67,
+          "boardNumber": "1.19",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "1-board-1.20",
+          "kind": "board",
+          "partId": "1",
+          "pdfPage": 43,
+          "printPage": 42,
+          "appSectionIndex": 69,
+          "boardNumber": "1.20",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "1-board-1.21",
+          "kind": "board",
+          "partId": "1",
+          "pdfPage": 44,
+          "printPage": 43,
+          "appSectionIndex": 73,
+          "boardNumber": "1.21",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "1-board-1.22",
+          "kind": "board",
+          "partId": "1",
+          "pdfPage": 44,
+          "printPage": 43,
+          "appSectionIndex": 74,
+          "boardNumber": "1.22",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "1-board-1.23",
+          "kind": "board",
+          "partId": "1",
+          "pdfPage": 44,
+          "printPage": 43,
+          "appSectionIndex": 75,
+          "boardNumber": "1.23",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "1-board-1.24",
+          "kind": "board",
+          "partId": "1",
+          "pdfPage": 44,
+          "printPage": 43,
+          "appSectionIndex": 80,
+          "boardNumber": "1.24",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "1-board-1.25",
+          "kind": "board",
+          "partId": "1",
+          "pdfPage": 45,
+          "printPage": 44,
+          "appSectionIndex": 82,
+          "boardNumber": "1.25",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "2-board-2.01",
+          "kind": "board",
+          "partId": "2",
+          "pdfPage": 46,
+          "printPage": 45,
+          "appSectionIndex": 1,
+          "boardNumber": "2.01",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "prompt",
+            "solution",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "2-board-2.02",
+          "kind": "board",
+          "partId": "2",
+          "pdfPage": 46,
+          "printPage": 45,
+          "appSectionIndex": 2,
+          "boardNumber": "2.02",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "prompt",
+            "solution",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "2-board-2.03",
+          "kind": "board",
+          "partId": "2",
+          "pdfPage": 46,
+          "printPage": 45,
+          "appSectionIndex": 3,
+          "boardNumber": "2.03",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "prompt",
+            "solution",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "2-board-2.04",
+          "kind": "board",
+          "partId": "2",
+          "pdfPage": 46,
+          "printPage": 45,
+          "appSectionIndex": 4,
+          "boardNumber": "2.04",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "prompt",
+            "solution",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "2-board-2.05",
+          "kind": "board",
+          "partId": "2",
+          "pdfPage": 46,
+          "printPage": 45,
+          "appSectionIndex": 5,
+          "boardNumber": "2.05",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "prompt",
+            "solution",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "2-board-2.06",
+          "kind": "board",
+          "partId": "2",
+          "pdfPage": 46,
+          "printPage": 45,
+          "appSectionIndex": 6,
+          "boardNumber": "2.06",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "prompt",
+            "solution",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "2-board-2.07",
+          "kind": "board",
+          "partId": "2",
+          "pdfPage": 47,
+          "printPage": 46,
+          "appSectionIndex": 7,
+          "boardNumber": "2.07",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "prompt",
+            "solution",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "2-board-2.08",
+          "kind": "board",
+          "partId": "2",
+          "pdfPage": 47,
+          "printPage": 46,
+          "appSectionIndex": 8,
+          "boardNumber": "2.08",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "prompt",
+            "solution",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "2-board-2.09",
+          "kind": "board",
+          "partId": "2",
+          "pdfPage": 47,
+          "printPage": 46,
+          "appSectionIndex": 9,
+          "boardNumber": "2.09",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "prompt",
+            "solution",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "2-board-2.10",
+          "kind": "board",
+          "partId": "2",
+          "pdfPage": 47,
+          "printPage": 46,
+          "appSectionIndex": 10,
+          "boardNumber": "2.10",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "prompt",
+            "solution",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "2-board-2.11",
+          "kind": "board",
+          "partId": "2",
+          "pdfPage": 47,
+          "printPage": 46,
+          "appSectionIndex": 11,
+          "boardNumber": "2.11",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "prompt",
+            "solution",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "2-board-2.12",
+          "kind": "board",
+          "partId": "2",
+          "pdfPage": 47,
+          "printPage": 46,
+          "appSectionIndex": 12,
+          "boardNumber": "2.12",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "prompt",
+            "solution",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "2-board-2.13",
+          "kind": "board",
+          "partId": "2",
+          "pdfPage": 48,
+          "printPage": 47,
+          "appSectionIndex": 13,
+          "boardNumber": "2.13",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "prompt",
+            "solution",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "2-board-2.14",
+          "kind": "board",
+          "partId": "2",
+          "pdfPage": 48,
+          "printPage": 47,
+          "appSectionIndex": 14,
+          "boardNumber": "2.14",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "prompt",
+            "solution",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "2-board-2.15",
+          "kind": "board",
+          "partId": "2",
+          "pdfPage": 48,
+          "printPage": 47,
+          "appSectionIndex": 15,
+          "boardNumber": "2.15",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "prompt",
+            "solution",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "2-board-2.16",
+          "kind": "board",
+          "partId": "2",
+          "pdfPage": 48,
+          "printPage": 47,
+          "appSectionIndex": 16,
+          "boardNumber": "2.16",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "prompt",
+            "solution",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "2-board-2.17",
+          "kind": "board",
+          "partId": "2",
+          "pdfPage": 48,
+          "printPage": 47,
+          "appSectionIndex": 17,
+          "boardNumber": "2.17",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "prompt",
+            "solution",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "2-board-2.18",
+          "kind": "board",
+          "partId": "2",
+          "pdfPage": 48,
+          "printPage": 47,
+          "appSectionIndex": 18,
+          "boardNumber": "2.18",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "prompt",
+            "solution",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "2-board-2.19",
+          "kind": "board",
+          "partId": "2",
+          "pdfPage": 49,
+          "printPage": 48,
+          "appSectionIndex": 19,
+          "boardNumber": "2.19",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "prompt",
+            "solution",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "2-board-2.20",
+          "kind": "board",
+          "partId": "2",
+          "pdfPage": 49,
+          "printPage": 48,
+          "appSectionIndex": 20,
+          "boardNumber": "2.20",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "prompt",
+            "solution",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "2-board-2.21",
+          "kind": "board",
+          "partId": "2",
+          "pdfPage": 49,
+          "printPage": 48,
+          "appSectionIndex": 21,
+          "boardNumber": "2.21",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "prompt",
+            "solution",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "2-board-2.22",
+          "kind": "board",
+          "partId": "2",
+          "pdfPage": 49,
+          "printPage": 48,
+          "appSectionIndex": 22,
+          "boardNumber": "2.22",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "prompt",
+            "solution",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "2-board-2.23",
+          "kind": "board",
+          "partId": "2",
+          "pdfPage": 49,
+          "printPage": 48,
+          "appSectionIndex": 23,
+          "boardNumber": "2.23",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "prompt",
+            "solution",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "2-board-2.24",
+          "kind": "board",
+          "partId": "2",
+          "pdfPage": 49,
+          "printPage": 48,
+          "appSectionIndex": 24,
+          "boardNumber": "2.24",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "prompt",
+            "solution",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "2-board-2.25",
+          "kind": "board",
+          "partId": "2",
+          "pdfPage": 50,
+          "printPage": 49,
+          "appSectionIndex": 25,
+          "boardNumber": "2.25",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "prompt",
+            "solution",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "2-board-2.26",
+          "kind": "board",
+          "partId": "2",
+          "pdfPage": 50,
+          "printPage": 49,
+          "appSectionIndex": 26,
+          "boardNumber": "2.26",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "prompt",
+            "solution",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "3-board-3.1",
+          "kind": "board",
+          "partId": "3",
+          "pdfPage": 52,
+          "printPage": 51,
+          "appSectionIndex": 3,
+          "boardNumber": "3.1",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "3-board-3.2",
+          "kind": "board",
+          "partId": "3",
+          "pdfPage": 53,
+          "printPage": 52,
+          "appSectionIndex": 7,
+          "boardNumber": "3.2",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "3-board-3.3",
+          "kind": "board",
+          "partId": "3",
+          "pdfPage": 54,
+          "printPage": 53,
+          "appSectionIndex": 12,
+          "boardNumber": "3.3",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "3-board-3.4",
+          "kind": "board",
+          "partId": "3",
+          "pdfPage": 55,
+          "printPage": 54,
+          "appSectionIndex": 17,
+          "boardNumber": "3.4",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "3-board-3.5",
+          "kind": "board",
+          "partId": "3",
+          "pdfPage": 56,
+          "printPage": 55,
+          "appSectionIndex": 23,
+          "boardNumber": "3.5",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "3-board-3.6",
+          "kind": "board",
+          "partId": "3",
+          "pdfPage": 57,
+          "printPage": 56,
+          "appSectionIndex": 25,
+          "boardNumber": "3.6",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "3-board-3.7",
+          "kind": "board",
+          "partId": "3",
+          "pdfPage": 57,
+          "printPage": 56,
+          "appSectionIndex": 28,
+          "boardNumber": "3.7",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "3-board-3.8",
+          "kind": "board",
+          "partId": "3",
+          "pdfPage": 58,
+          "printPage": 57,
+          "appSectionIndex": 30,
+          "boardNumber": "3.8",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "3-board-3.9",
+          "kind": "board",
+          "partId": "3",
+          "pdfPage": 59,
+          "printPage": 58,
+          "appSectionIndex": 37,
+          "boardNumber": "3.9",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "3-board-3.10",
+          "kind": "board",
+          "partId": "3",
+          "pdfPage": 59,
+          "printPage": 58,
+          "appSectionIndex": 41,
+          "boardNumber": "3.10",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "4-board-4.1",
+          "kind": "board",
+          "partId": "4",
+          "pdfPage": 60,
+          "printPage": 59,
+          "appSectionIndex": 3,
+          "boardNumber": "4.1",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "4-board-4.2",
+          "kind": "board",
+          "partId": "4",
+          "pdfPage": 61,
+          "printPage": 60,
+          "appSectionIndex": 5,
+          "boardNumber": "4.2",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "4-board-4.3",
+          "kind": "board",
+          "partId": "4",
+          "pdfPage": 61,
+          "printPage": 60,
+          "appSectionIndex": 9,
+          "boardNumber": "4.3",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "4-board-4.4",
+          "kind": "board",
+          "partId": "4",
+          "pdfPage": 62,
+          "printPage": 61,
+          "appSectionIndex": 13,
+          "boardNumber": "4.4",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "4-board-4.5",
+          "kind": "board",
+          "partId": "4",
+          "pdfPage": 63,
+          "printPage": 62,
+          "appSectionIndex": 15,
+          "boardNumber": "4.5",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "4-board-4.6",
+          "kind": "board",
+          "partId": "4",
+          "pdfPage": 63,
+          "printPage": 62,
+          "appSectionIndex": 20,
+          "boardNumber": "4.6",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "4-board-4.7",
+          "kind": "board",
+          "partId": "4",
+          "pdfPage": 64,
+          "printPage": 63,
+          "appSectionIndex": 26,
+          "boardNumber": "4.7",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "4-board-4.8",
+          "kind": "board",
+          "partId": "4",
+          "pdfPage": 65,
+          "printPage": 64,
+          "appSectionIndex": 29,
+          "boardNumber": "4.8",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "4-board-4.9",
+          "kind": "board",
+          "partId": "4",
+          "pdfPage": 65,
+          "printPage": 64,
+          "appSectionIndex": 31,
+          "boardNumber": "4.9",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "4-board-4.10",
+          "kind": "board",
+          "partId": "4",
+          "pdfPage": 66,
+          "printPage": 65,
+          "appSectionIndex": 36,
+          "boardNumber": "4.10",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "4-board-4.11",
+          "kind": "board",
+          "partId": "4",
+          "pdfPage": 67,
+          "printPage": 66,
+          "appSectionIndex": 38,
+          "boardNumber": "4.11",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "4-board-4.12",
+          "kind": "board",
+          "partId": "4",
+          "pdfPage": 67,
+          "printPage": 66,
+          "appSectionIndex": 40,
+          "boardNumber": "4.12",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "4-board-4.13",
+          "kind": "board",
+          "partId": "4",
+          "pdfPage": 68,
+          "printPage": 67,
+          "appSectionIndex": 43,
+          "boardNumber": "4.13",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "introduction-board-intro-rook-mobility",
+          "kind": "board",
+          "partId": "introduction",
+          "pdfPage": 21,
+          "printPage": 20,
+          "appSectionIndex": 29,
+          "boardNumber": "intro-rook-mobility",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "introduction-board-intro-bishop-mobility",
+          "kind": "board",
+          "partId": "introduction",
+          "pdfPage": 21,
+          "printPage": 20,
+          "appSectionIndex": 30,
+          "boardNumber": "intro-bishop-mobility",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "introduction-board-intro-queen-mobility",
+          "kind": "board",
+          "partId": "introduction",
+          "pdfPage": 21,
+          "printPage": 20,
+          "appSectionIndex": 31,
+          "boardNumber": "intro-queen-mobility",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "introduction-board-intro-knight-mobility",
+          "kind": "board",
+          "partId": "introduction",
+          "pdfPage": 22,
+          "printPage": 21,
+          "appSectionIndex": 32,
+          "boardNumber": "intro-knight-mobility",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "introduction-board-intro-knight-routes",
+          "kind": "board",
+          "partId": "introduction",
+          "pdfPage": 22,
+          "printPage": 21,
+          "appSectionIndex": 37,
+          "boardNumber": "intro-knight-routes",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "introduction-board-intro-king-routes",
+          "kind": "board",
+          "partId": "introduction",
+          "pdfPage": 23,
+          "printPage": 22,
+          "appSectionIndex": 40,
+          "boardNumber": "intro-king-routes",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "introduction-board-intro-knight-domination",
+          "kind": "board",
+          "partId": "introduction",
+          "pdfPage": 24,
+          "printPage": 23,
+          "appSectionIndex": 44,
+          "boardNumber": "intro-knight-domination",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "introduction-board-I.1",
+          "kind": "board",
+          "partId": "introduction",
+          "pdfPage": 25,
+          "printPage": 24,
+          "appSectionIndex": 48,
+          "boardNumber": "I.1",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "introduction-board-I.2",
+          "kind": "board",
+          "partId": "introduction",
+          "pdfPage": 25,
+          "printPage": 24,
+          "appSectionIndex": 50,
+          "boardNumber": "I.2",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "introduction-board-I.3",
+          "kind": "board",
+          "partId": "introduction",
+          "pdfPage": 25,
+          "printPage": 24,
+          "appSectionIndex": 52,
+          "boardNumber": "I.3",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "introduction-board-I.4",
+          "kind": "board",
+          "partId": "introduction",
+          "pdfPage": 26,
+          "printPage": 25,
+          "appSectionIndex": 54,
+          "boardNumber": "I.4",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "introduction-board-I.5",
+          "kind": "board",
+          "partId": "introduction",
+          "pdfPage": 26,
+          "printPage": 25,
+          "appSectionIndex": 56,
+          "boardNumber": "I.5",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        },
+        {
+          "id": "introduction-board-I.6",
+          "kind": "board",
+          "partId": "introduction",
+          "pdfPage": 26,
+          "printPage": 25,
+          "appSectionIndex": 58,
+          "boardNumber": "I.6",
+          "checks": [
+            "pieces",
+            "side-to-move",
+            "markers",
+            "caption",
+            "overlay",
+            "orientation"
+          ],
+          "status": "matched"
+        }
+      ]
+    },
+    {
+      "id": "chapters-5-9",
+      "partIds": ["5", "6", "7", "8", "9"],
+      "status": "matched",
+      "verifiedOn": "2026-07-15",
+      "pdfPageRanges": [{"first":69,"last":123}],
+      "printPageRanges": [{"first":68,"last":122}],
+      "units": [
+        {"id":"5-p69-copy","kind":"page-copy","partId":"5","pdfPage":69,"printPage":68,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"5-p70-copy","kind":"page-copy","partId":"5","pdfPage":70,"printPage":69,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"5-p71-copy","kind":"page-copy","partId":"5","pdfPage":71,"printPage":70,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"5-p72-copy","kind":"page-copy","partId":"5","pdfPage":72,"printPage":71,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"5-p73-copy","kind":"page-copy","partId":"5","pdfPage":73,"printPage":72,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"5-p74-copy","kind":"page-copy","partId":"5","pdfPage":74,"printPage":73,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"5-p75-copy","kind":"page-copy","partId":"5","pdfPage":75,"printPage":74,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"5-p76-copy","kind":"page-copy","partId":"5","pdfPage":76,"printPage":75,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"5-p77-copy","kind":"page-copy","partId":"5","pdfPage":77,"printPage":76,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"5-p78-copy","kind":"page-copy","partId":"5","pdfPage":78,"printPage":77,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"5-p79-copy","kind":"page-copy","partId":"5","pdfPage":79,"printPage":78,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"5-p80-copy","kind":"page-copy","partId":"5","pdfPage":80,"printPage":79,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"5-p81-copy","kind":"page-copy","partId":"5","pdfPage":81,"printPage":80,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"5-p82-copy","kind":"page-copy","partId":"5","pdfPage":82,"printPage":81,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"5-p83-copy","kind":"page-copy","partId":"5","pdfPage":83,"printPage":82,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"6-p84-copy","kind":"page-copy","partId":"6","pdfPage":84,"printPage":83,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"6-p85-copy","kind":"page-copy","partId":"6","pdfPage":85,"printPage":84,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"6-p86-copy","kind":"page-copy","partId":"6","pdfPage":86,"printPage":85,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"6-p87-copy","kind":"page-copy","partId":"6","pdfPage":87,"printPage":86,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"6-p88-copy","kind":"page-copy","partId":"6","pdfPage":88,"printPage":87,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"6-p89-copy","kind":"page-copy","partId":"6","pdfPage":89,"printPage":88,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"7-p90-copy","kind":"page-copy","partId":"7","pdfPage":90,"printPage":89,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"7-p91-copy","kind":"page-copy","partId":"7","pdfPage":91,"printPage":90,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"7-p92-copy","kind":"page-copy","partId":"7","pdfPage":92,"printPage":91,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"7-p93-copy","kind":"page-copy","partId":"7","pdfPage":93,"printPage":92,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"7-p94-copy","kind":"page-copy","partId":"7","pdfPage":94,"printPage":93,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"7-p95-copy","kind":"page-copy","partId":"7","pdfPage":95,"printPage":94,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"7-p96-copy","kind":"page-copy","partId":"7","pdfPage":96,"printPage":95,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"8-p97-copy","kind":"page-copy","partId":"8","pdfPage":97,"printPage":96,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"8-p98-copy","kind":"page-copy","partId":"8","pdfPage":98,"printPage":97,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"8-p99-copy","kind":"page-copy","partId":"8","pdfPage":99,"printPage":98,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"8-p100-copy","kind":"page-copy","partId":"8","pdfPage":100,"printPage":99,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"8-p101-copy","kind":"page-copy","partId":"8","pdfPage":101,"printPage":100,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"8-p102-copy","kind":"page-copy","partId":"8","pdfPage":102,"printPage":101,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"8-p103-copy","kind":"page-copy","partId":"8","pdfPage":103,"printPage":102,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"8-p104-copy","kind":"page-copy","partId":"8","pdfPage":104,"printPage":103,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"9-p105-copy","kind":"page-copy","partId":"9","pdfPage":105,"printPage":104,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"9-p106-copy","kind":"page-copy","partId":"9","pdfPage":106,"printPage":105,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"9-p107-copy","kind":"page-copy","partId":"9","pdfPage":107,"printPage":106,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"9-p108-copy","kind":"page-copy","partId":"9","pdfPage":108,"printPage":107,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"9-p109-copy","kind":"page-copy","partId":"9","pdfPage":109,"printPage":108,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"9-p110-copy","kind":"page-copy","partId":"9","pdfPage":110,"printPage":109,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"9-p111-copy","kind":"page-copy","partId":"9","pdfPage":111,"printPage":110,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"9-p112-copy","kind":"page-copy","partId":"9","pdfPage":112,"printPage":111,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"9-p113-copy","kind":"page-copy","partId":"9","pdfPage":113,"printPage":112,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"9-p114-copy","kind":"page-copy","partId":"9","pdfPage":114,"printPage":113,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"9-p115-copy","kind":"page-copy","partId":"9","pdfPage":115,"printPage":114,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"9-p116-copy","kind":"page-copy","partId":"9","pdfPage":116,"printPage":115,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"9-p117-copy","kind":"page-copy","partId":"9","pdfPage":117,"printPage":116,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"9-p118-copy","kind":"page-copy","partId":"9","pdfPage":118,"printPage":117,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"9-p119-copy","kind":"page-copy","partId":"9","pdfPage":119,"printPage":118,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"9-p120-copy","kind":"page-copy","partId":"9","pdfPage":120,"printPage":119,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"9-p121-copy","kind":"page-copy","partId":"9","pdfPage":121,"printPage":120,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"9-p122-copy","kind":"page-copy","partId":"9","pdfPage":122,"printPage":121,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"9-p123-copy","kind":"page-copy","partId":"9","pdfPage":123,"printPage":122,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},
+        {"id":"5-board-5.1","kind":"board","partId":"5","pdfPage":69,"printPage":68,"appSectionIndex":4,"boardNumber":"5.1","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"5-board-5.2","kind":"board","partId":"5","pdfPage":70,"printPage":69,"appSectionIndex":8,"boardNumber":"5.2","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"5-board-5.3","kind":"board","partId":"5","pdfPage":71,"printPage":70,"appSectionIndex":13,"boardNumber":"5.3","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"5-board-cutting-off-series-1","kind":"board","partId":"5","pdfPage":72,"printPage":71,"appSectionIndex":18,"boardNumber":"cutting-off-series-1","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"5-board-cutting-off-series-2","kind":"board","partId":"5","pdfPage":72,"printPage":71,"appSectionIndex":19,"boardNumber":"cutting-off-series-2","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"5-board-cutting-off-series-3","kind":"board","partId":"5","pdfPage":72,"printPage":71,"appSectionIndex":20,"boardNumber":"cutting-off-series-3","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"5-board-5.4","kind":"board","partId":"5","pdfPage":72,"printPage":71,"appSectionIndex":25,"boardNumber":"5.4","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"5-board-5.5","kind":"board","partId":"5","pdfPage":73,"printPage":72,"appSectionIndex":31,"boardNumber":"5.5","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"5-board-kings-opposed-at-rear-1","kind":"board","partId":"5","pdfPage":74,"printPage":73,"appSectionIndex":37,"boardNumber":"kings-opposed-at-rear-1","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"5-board-kings-opposed-at-rear-2","kind":"board","partId":"5","pdfPage":74,"printPage":73,"appSectionIndex":38,"boardNumber":"kings-opposed-at-rear-2","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"5-board-kings-opposed-at-rear-3","kind":"board","partId":"5","pdfPage":74,"printPage":73,"appSectionIndex":39,"boardNumber":"kings-opposed-at-rear-3","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"5-board-5.6","kind":"board","partId":"5","pdfPage":75,"printPage":74,"appSectionIndex":43,"boardNumber":"5.6","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"5-board-5.7","kind":"board","partId":"5","pdfPage":76,"printPage":75,"appSectionIndex":48,"boardNumber":"5.7","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"5-board-5.8","kind":"board","partId":"5","pdfPage":76,"printPage":75,"appSectionIndex":52,"boardNumber":"5.8","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"5-board-5.9","kind":"board","partId":"5","pdfPage":77,"printPage":76,"appSectionIndex":59,"boardNumber":"5.9","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"5-board-5.10","kind":"board","partId":"5","pdfPage":78,"printPage":77,"appSectionIndex":62,"boardNumber":"5.10","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"5-board-5.11","kind":"board","partId":"5","pdfPage":79,"printPage":78,"appSectionIndex":67,"boardNumber":"5.11","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"5-board-5.12","kind":"board","partId":"5","pdfPage":80,"printPage":79,"appSectionIndex":73,"boardNumber":"5.12","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"5-board-5.13","kind":"board","partId":"5","pdfPage":81,"printPage":80,"appSectionIndex":79,"boardNumber":"5.13","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"5-board-5.14","kind":"board","partId":"5","pdfPage":81,"printPage":80,"appSectionIndex":84,"boardNumber":"5.14","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"5-board-lateral-push-1","kind":"board","partId":"5","pdfPage":82,"printPage":81,"appSectionIndex":89,"boardNumber":"lateral-push-1","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"5-board-lateral-push-2","kind":"board","partId":"5","pdfPage":82,"printPage":81,"appSectionIndex":90,"boardNumber":"lateral-push-2","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"5-board-lateral-push-3","kind":"board","partId":"5","pdfPage":82,"printPage":81,"appSectionIndex":91,"boardNumber":"lateral-push-3","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"5-board-5.15","kind":"board","partId":"5","pdfPage":83,"printPage":82,"appSectionIndex":95,"boardNumber":"5.15","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"6-board-6.1","kind":"board","partId":"6","pdfPage":84,"printPage":83,"appSectionIndex":5,"boardNumber":"6.1","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"6-board-6.2","kind":"board","partId":"6","pdfPage":85,"printPage":84,"appSectionIndex":14,"boardNumber":"6.2","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"6-board-6.3","kind":"board","partId":"6","pdfPage":86,"printPage":85,"appSectionIndex":19,"boardNumber":"6.3","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"6-board-rook-vs-2-pawns-series-1","kind":"board","partId":"6","pdfPage":86,"printPage":85,"appSectionIndex":24,"boardNumber":"rook-vs-2-pawns-series-1","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"6-board-rook-vs-2-pawns-series-2","kind":"board","partId":"6","pdfPage":86,"printPage":85,"appSectionIndex":25,"boardNumber":"rook-vs-2-pawns-series-2","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"6-board-rook-vs-2-pawns-series-3","kind":"board","partId":"6","pdfPage":86,"printPage":85,"appSectionIndex":26,"boardNumber":"rook-vs-2-pawns-series-3","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"6-board-6.4","kind":"board","partId":"6","pdfPage":87,"printPage":86,"appSectionIndex":30,"boardNumber":"6.4","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"6-board-6.5","kind":"board","partId":"6","pdfPage":88,"printPage":87,"appSectionIndex":33,"boardNumber":"6.5","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"6-board-6.6","kind":"board","partId":"6","pdfPage":88,"printPage":87,"appSectionIndex":36,"boardNumber":"6.6","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"6-board-6.7","kind":"board","partId":"6","pdfPage":89,"printPage":88,"appSectionIndex":40,"boardNumber":"6.7","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"7-board-7.1","kind":"board","partId":"7","pdfPage":90,"printPage":89,"appSectionIndex":3,"boardNumber":"7.1","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"7-board-7.2","kind":"board","partId":"7","pdfPage":91,"printPage":90,"appSectionIndex":9,"boardNumber":"7.2","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"7-board-7.3","kind":"board","partId":"7","pdfPage":92,"printPage":91,"appSectionIndex":15,"boardNumber":"7.3","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"7-board-7.4","kind":"board","partId":"7","pdfPage":93,"printPage":92,"appSectionIndex":21,"boardNumber":"7.4","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"7-board-7.5","kind":"board","partId":"7","pdfPage":94,"printPage":93,"appSectionIndex":26,"boardNumber":"7.5","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"7-board-7.6","kind":"board","partId":"7","pdfPage":95,"printPage":94,"appSectionIndex":30,"boardNumber":"7.6","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"8-board-8.1","kind":"board","partId":"8","pdfPage":97,"printPage":96,"appSectionIndex":5,"boardNumber":"8.1","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"8-board-8.2","kind":"board","partId":"8","pdfPage":98,"printPage":97,"appSectionIndex":8,"boardNumber":"8.2","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"8-board-8.3","kind":"board","partId":"8","pdfPage":99,"printPage":98,"appSectionIndex":12,"boardNumber":"8.3","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"8-board-8.4","kind":"board","partId":"8","pdfPage":100,"printPage":99,"appSectionIndex":15,"boardNumber":"8.4","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"8-board-8.5","kind":"board","partId":"8","pdfPage":100,"printPage":99,"appSectionIndex":19,"boardNumber":"8.5","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"8-board-8.6","kind":"board","partId":"8","pdfPage":101,"printPage":100,"appSectionIndex":22,"boardNumber":"8.6","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"8-board-8.7a","kind":"board","partId":"8","pdfPage":102,"printPage":101,"appSectionIndex":28,"boardNumber":"8.7a","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"8-board-knight-blockades-series-1","kind":"board","partId":"8","pdfPage":103,"printPage":102,"appSectionIndex":33,"boardNumber":"knight-blockades-series-1","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"8-board-knight-blockades-series-2","kind":"board","partId":"8","pdfPage":103,"printPage":102,"appSectionIndex":34,"boardNumber":"knight-blockades-series-2","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"8-board-knight-blockades-series-3","kind":"board","partId":"8","pdfPage":103,"printPage":102,"appSectionIndex":35,"boardNumber":"knight-blockades-series-3","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"8-board-8.7b","kind":"board","partId":"8","pdfPage":104,"printPage":103,"appSectionIndex":39,"boardNumber":"8.7b","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"9-board-9.1","kind":"board","partId":"9","pdfPage":106,"printPage":105,"appSectionIndex":5,"boardNumber":"9.1","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"9-board-9.2","kind":"board","partId":"9","pdfPage":106,"printPage":105,"appSectionIndex":9,"boardNumber":"9.2","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"9-board-9.3","kind":"board","partId":"9","pdfPage":107,"printPage":106,"appSectionIndex":13,"boardNumber":"9.3","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"9-board-9.4","kind":"board","partId":"9","pdfPage":108,"printPage":107,"appSectionIndex":19,"boardNumber":"9.4","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"9-board-9.5","kind":"board","partId":"9","pdfPage":108,"printPage":107,"appSectionIndex":23,"boardNumber":"9.5","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"9-board-9.6","kind":"board","partId":"9","pdfPage":109,"printPage":108,"appSectionIndex":27,"boardNumber":"9.6","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"9-board-9.7","kind":"board","partId":"9","pdfPage":110,"printPage":109,"appSectionIndex":32,"boardNumber":"9.7","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"9-board-9.8","kind":"board","partId":"9","pdfPage":111,"printPage":110,"appSectionIndex":34,"boardNumber":"9.8","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"9-board-9.9","kind":"board","partId":"9","pdfPage":112,"printPage":111,"appSectionIndex":39,"boardNumber":"9.9","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"9-board-9.10","kind":"board","partId":"9","pdfPage":113,"printPage":112,"appSectionIndex":44,"boardNumber":"9.10","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"9-board-9.11","kind":"board","partId":"9","pdfPage":114,"printPage":113,"appSectionIndex":51,"boardNumber":"9.11","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"9-board-9.12","kind":"board","partId":"9","pdfPage":115,"printPage":114,"appSectionIndex":56,"boardNumber":"9.12","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"9-board-9.13","kind":"board","partId":"9","pdfPage":116,"printPage":115,"appSectionIndex":58,"boardNumber":"9.13","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"9-board-9.14","kind":"board","partId":"9","pdfPage":116,"printPage":115,"appSectionIndex":60,"boardNumber":"9.14","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"9-board-9.15","kind":"board","partId":"9","pdfPage":117,"printPage":116,"appSectionIndex":65,"boardNumber":"9.15","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"9-board-9.16","kind":"board","partId":"9","pdfPage":118,"printPage":117,"appSectionIndex":69,"boardNumber":"9.16","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"9-board-9.17","kind":"board","partId":"9","pdfPage":119,"printPage":118,"appSectionIndex":77,"boardNumber":"9.17","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"9-board-9.18","kind":"board","partId":"9","pdfPage":120,"printPage":119,"appSectionIndex":81,"boardNumber":"9.18","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"9-board-9.19","kind":"board","partId":"9","pdfPage":120,"printPage":119,"appSectionIndex":85,"boardNumber":"9.19","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},
+        {"id":"9-board-9.20","kind":"board","partId":"9","pdfPage":121,"printPage":120,"appSectionIndex":89,"boardNumber":"9.20","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"}
+      ]
+    },
+    {"id":"chapters-10-12","partIds":["10","11","12"],"status":"matched","verifiedOn":"2026-07-15","pdfPageRanges":[{"first":124,"last":204}],"printPageRanges":[{"first":123,"last":203}],"units":[{"id":"10-p124-copy","kind":"page-copy","partId":"10","pdfPage":124,"printPage":123,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"10-p125-copy","kind":"page-copy","partId":"10","pdfPage":125,"printPage":124,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"10-p126-copy","kind":"page-copy","partId":"10","pdfPage":126,"printPage":125,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"10-p127-copy","kind":"page-copy","partId":"10","pdfPage":127,"printPage":126,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"10-p128-copy","kind":"page-copy","partId":"10","pdfPage":128,"printPage":127,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"10-p129-copy","kind":"page-copy","partId":"10","pdfPage":129,"printPage":128,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"10-p130-copy","kind":"page-copy","partId":"10","pdfPage":130,"printPage":129,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"10-p131-copy","kind":"page-copy","partId":"10","pdfPage":131,"printPage":130,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"10-p132-copy","kind":"page-copy","partId":"10","pdfPage":132,"printPage":131,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"10-p133-copy","kind":"page-copy","partId":"10","pdfPage":133,"printPage":132,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"10-p134-copy","kind":"page-copy","partId":"10","pdfPage":134,"printPage":133,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"10-p135-copy","kind":"page-copy","partId":"10","pdfPage":135,"printPage":134,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"10-p136-copy","kind":"page-copy","partId":"10","pdfPage":136,"printPage":135,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"10-p137-copy","kind":"page-copy","partId":"10","pdfPage":137,"printPage":136,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"10-p138-copy","kind":"page-copy","partId":"10","pdfPage":138,"printPage":137,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"10-p139-copy","kind":"page-copy","partId":"10","pdfPage":139,"printPage":138,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"10-p140-copy","kind":"page-copy","partId":"10","pdfPage":140,"printPage":139,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"10-p141-copy","kind":"page-copy","partId":"10","pdfPage":141,"printPage":140,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"10-p142-copy","kind":"page-copy","partId":"10","pdfPage":142,"printPage":141,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"10-p143-copy","kind":"page-copy","partId":"10","pdfPage":143,"printPage":142,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"10-p144-copy","kind":"page-copy","partId":"10","pdfPage":144,"printPage":143,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"10-p145-copy","kind":"page-copy","partId":"10","pdfPage":145,"printPage":144,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"10-p146-copy","kind":"page-copy","partId":"10","pdfPage":146,"printPage":145,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"10-p147-copy","kind":"page-copy","partId":"10","pdfPage":147,"printPage":146,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"10-p148-copy","kind":"page-copy","partId":"10","pdfPage":148,"printPage":147,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"10-p149-copy","kind":"page-copy","partId":"10","pdfPage":149,"printPage":148,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"10-p150-copy","kind":"page-copy","partId":"10","pdfPage":150,"printPage":149,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"10-p151-copy","kind":"page-copy","partId":"10","pdfPage":151,"printPage":150,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"10-p152-copy","kind":"page-copy","partId":"10","pdfPage":152,"printPage":151,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"10-p153-copy","kind":"page-copy","partId":"10","pdfPage":153,"printPage":152,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"10-board-10.1","kind":"board","partId":"10","pdfPage":125,"printPage":124,"appSectionIndex":11,"boardNumber":"10.1","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"10-board-10.2","kind":"board","partId":"10","pdfPage":127,"printPage":126,"appSectionIndex":20,"boardNumber":"10.2","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"10-board-10.3","kind":"board","partId":"10","pdfPage":127,"printPage":126,"appSectionIndex":22,"boardNumber":"10.3","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"10-board-10.4","kind":"board","partId":"10","pdfPage":129,"printPage":128,"appSectionIndex":29,"boardNumber":"10.4","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"10-board-10.5","kind":"board","partId":"10","pdfPage":129,"printPage":128,"appSectionIndex":32,"boardNumber":"10.5","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"10-board-10.6","kind":"board","partId":"10","pdfPage":130,"printPage":129,"appSectionIndex":38,"boardNumber":"10.6","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"10-board-10.7","kind":"board","partId":"10","pdfPage":131,"printPage":130,"appSectionIndex":40,"boardNumber":"10.7","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"10-board-10.8","kind":"board","partId":"10","pdfPage":132,"printPage":131,"appSectionIndex":42,"boardNumber":"10.8","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"10-board-10.9","kind":"board","partId":"10","pdfPage":133,"printPage":132,"appSectionIndex":48,"boardNumber":"10.9","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"10-board-10.10","kind":"board","partId":"10","pdfPage":134,"printPage":133,"appSectionIndex":50,"boardNumber":"10.10","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"10-board-10.11","kind":"board","partId":"10","pdfPage":135,"printPage":134,"appSectionIndex":54,"boardNumber":"10.11","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"10-board-10.12","kind":"board","partId":"10","pdfPage":136,"printPage":135,"appSectionIndex":56,"boardNumber":"10.12","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"10-board-10.13","kind":"board","partId":"10","pdfPage":138,"printPage":137,"appSectionIndex":64,"boardNumber":"10.13","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"10-board-10.14","kind":"board","partId":"10","pdfPage":138,"printPage":137,"appSectionIndex":66,"boardNumber":"10.14","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"10-board-10.15","kind":"board","partId":"10","pdfPage":140,"printPage":139,"appSectionIndex":71,"boardNumber":"10.15","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"10-board-10.16","kind":"board","partId":"10","pdfPage":141,"printPage":140,"appSectionIndex":75,"boardNumber":"10.16","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"10-board-10.17","kind":"board","partId":"10","pdfPage":142,"printPage":141,"appSectionIndex":84,"boardNumber":"10.17","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"10-board-10.18","kind":"board","partId":"10","pdfPage":143,"printPage":142,"appSectionIndex":86,"boardNumber":"10.18","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"10-board-10.19","kind":"board","partId":"10","pdfPage":144,"printPage":143,"appSectionIndex":89,"boardNumber":"10.19","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"10-board-10.20","kind":"board","partId":"10","pdfPage":144,"printPage":143,"appSectionIndex":92,"boardNumber":"10.20","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"10-board-10.21","kind":"board","partId":"10","pdfPage":145,"printPage":144,"appSectionIndex":96,"boardNumber":"10.21","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"10-board-10.22","kind":"board","partId":"10","pdfPage":146,"printPage":145,"appSectionIndex":105,"boardNumber":"10.22","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"10-board-10.23","kind":"board","partId":"10","pdfPage":147,"printPage":146,"appSectionIndex":110,"boardNumber":"10.23","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"10-board-10.24","kind":"board","partId":"10","pdfPage":149,"printPage":148,"appSectionIndex":112,"boardNumber":"10.24","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"10-board-10.25","kind":"board","partId":"10","pdfPage":150,"printPage":149,"appSectionIndex":114,"boardNumber":"10.25","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"10-board-10.26","kind":"board","partId":"10","pdfPage":151,"printPage":150,"appSectionIndex":120,"boardNumber":"10.26","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"10-board-10.27","kind":"board","partId":"10","pdfPage":153,"printPage":152,"appSectionIndex":125,"boardNumber":"10.27","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"11-p154-copy","kind":"page-copy","partId":"11","pdfPage":154,"printPage":153,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"11-p155-copy","kind":"page-copy","partId":"11","pdfPage":155,"printPage":154,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"11-p156-copy","kind":"page-copy","partId":"11","pdfPage":156,"printPage":155,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"11-p157-copy","kind":"page-copy","partId":"11","pdfPage":157,"printPage":156,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"11-p158-copy","kind":"page-copy","partId":"11","pdfPage":158,"printPage":157,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"11-p159-copy","kind":"page-copy","partId":"11","pdfPage":159,"printPage":158,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"11-p160-copy","kind":"page-copy","partId":"11","pdfPage":160,"printPage":159,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"11-p161-copy","kind":"page-copy","partId":"11","pdfPage":161,"printPage":160,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"11-p162-copy","kind":"page-copy","partId":"11","pdfPage":162,"printPage":161,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"11-p163-copy","kind":"page-copy","partId":"11","pdfPage":163,"printPage":162,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"11-p164-copy","kind":"page-copy","partId":"11","pdfPage":164,"printPage":163,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"11-p165-copy","kind":"page-copy","partId":"11","pdfPage":165,"printPage":164,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"11-p166-copy","kind":"page-copy","partId":"11","pdfPage":166,"printPage":165,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"11-p167-copy","kind":"page-copy","partId":"11","pdfPage":167,"printPage":166,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"11-p168-copy","kind":"page-copy","partId":"11","pdfPage":168,"printPage":167,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"11-p169-copy","kind":"page-copy","partId":"11","pdfPage":169,"printPage":168,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"11-board-11.1","kind":"board","partId":"11","pdfPage":154,"printPage":153,"appSectionIndex":4,"boardNumber":"11.1","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"11-board-11.2","kind":"board","partId":"11","pdfPage":155,"printPage":154,"appSectionIndex":7,"boardNumber":"11.2","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"11-board-11.3","kind":"board","partId":"11","pdfPage":156,"printPage":155,"appSectionIndex":13,"boardNumber":"11.3","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"11-board-11.4","kind":"board","partId":"11","pdfPage":158,"printPage":157,"appSectionIndex":20,"boardNumber":"11.4","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"11-board-11.5","kind":"board","partId":"11","pdfPage":159,"printPage":158,"appSectionIndex":23,"boardNumber":"11.5","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"11-board-11.series.6.1","kind":"board","partId":"11","pdfPage":160,"printPage":159,"appSectionIndex":27,"boardNumber":"11.series.6.1","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"11-board-11.series.6.2","kind":"board","partId":"11","pdfPage":160,"printPage":159,"appSectionIndex":28,"boardNumber":"11.series.6.2","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"11-board-11.series.6.3","kind":"board","partId":"11","pdfPage":160,"printPage":159,"appSectionIndex":29,"boardNumber":"11.series.6.3","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"11-board-11.series.5.1","kind":"board","partId":"11","pdfPage":160,"printPage":159,"appSectionIndex":33,"boardNumber":"11.series.5.1","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"11-board-11.series.5.2","kind":"board","partId":"11","pdfPage":160,"printPage":159,"appSectionIndex":34,"boardNumber":"11.series.5.2","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"11-board-11.series.5.3","kind":"board","partId":"11","pdfPage":160,"printPage":159,"appSectionIndex":35,"boardNumber":"11.series.5.3","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"11-board-11.series.4.1","kind":"board","partId":"11","pdfPage":161,"printPage":160,"appSectionIndex":39,"boardNumber":"11.series.4.1","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"11-board-11.series.4.2","kind":"board","partId":"11","pdfPage":161,"printPage":160,"appSectionIndex":40,"boardNumber":"11.series.4.2","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"11-board-11.series.4.3","kind":"board","partId":"11","pdfPage":161,"printPage":160,"appSectionIndex":41,"boardNumber":"11.series.4.3","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"11-board-11.6","kind":"board","partId":"11","pdfPage":162,"printPage":161,"appSectionIndex":45,"boardNumber":"11.6","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"11-board-11.7","kind":"board","partId":"11","pdfPage":162,"printPage":161,"appSectionIndex":47,"boardNumber":"11.7","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"11-board-11.8","kind":"board","partId":"11","pdfPage":163,"printPage":162,"appSectionIndex":49,"boardNumber":"11.8","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"11-board-11.9","kind":"board","partId":"11","pdfPage":164,"printPage":163,"appSectionIndex":51,"boardNumber":"11.9","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"11-board-11.10","kind":"board","partId":"11","pdfPage":166,"printPage":165,"appSectionIndex":57,"boardNumber":"11.10","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"11-board-11.11","kind":"board","partId":"11","pdfPage":167,"printPage":166,"appSectionIndex":59,"boardNumber":"11.11","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"11-board-11.12","kind":"board","partId":"11","pdfPage":167,"printPage":166,"appSectionIndex":63,"boardNumber":"11.12","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"11-board-11.13","kind":"board","partId":"11","pdfPage":168,"printPage":167,"appSectionIndex":68,"boardNumber":"11.13","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"11-board-11.14","kind":"board","partId":"11","pdfPage":169,"printPage":168,"appSectionIndex":74,"boardNumber":"11.14","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"12-p170-copy","kind":"page-copy","partId":"12","pdfPage":170,"printPage":169,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"12-p171-copy","kind":"page-copy","partId":"12","pdfPage":171,"printPage":170,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"12-p172-copy","kind":"page-copy","partId":"12","pdfPage":172,"printPage":171,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"12-p173-copy","kind":"page-copy","partId":"12","pdfPage":173,"printPage":172,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"12-p174-copy","kind":"page-copy","partId":"12","pdfPage":174,"printPage":173,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"12-p175-copy","kind":"page-copy","partId":"12","pdfPage":175,"printPage":174,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"12-p176-copy","kind":"page-copy","partId":"12","pdfPage":176,"printPage":175,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"12-p177-copy","kind":"page-copy","partId":"12","pdfPage":177,"printPage":176,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"12-p178-copy","kind":"page-copy","partId":"12","pdfPage":178,"printPage":177,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"12-p179-copy","kind":"page-copy","partId":"12","pdfPage":179,"printPage":178,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"12-p180-copy","kind":"page-copy","partId":"12","pdfPage":180,"printPage":179,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"12-p181-copy","kind":"page-copy","partId":"12","pdfPage":181,"printPage":180,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"12-p182-copy","kind":"page-copy","partId":"12","pdfPage":182,"printPage":181,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"12-p183-copy","kind":"page-copy","partId":"12","pdfPage":183,"printPage":182,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"12-p184-copy","kind":"page-copy","partId":"12","pdfPage":184,"printPage":183,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"12-p185-copy","kind":"page-copy","partId":"12","pdfPage":185,"printPage":184,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"12-p186-copy","kind":"page-copy","partId":"12","pdfPage":186,"printPage":185,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"12-p187-copy","kind":"page-copy","partId":"12","pdfPage":187,"printPage":186,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"12-p188-copy","kind":"page-copy","partId":"12","pdfPage":188,"printPage":187,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"12-p189-copy","kind":"page-copy","partId":"12","pdfPage":189,"printPage":188,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"12-p190-copy","kind":"page-copy","partId":"12","pdfPage":190,"printPage":189,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"12-p191-copy","kind":"page-copy","partId":"12","pdfPage":191,"printPage":190,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"12-p192-copy","kind":"page-copy","partId":"12","pdfPage":192,"printPage":191,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"12-p193-copy","kind":"page-copy","partId":"12","pdfPage":193,"printPage":192,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"12-p194-copy","kind":"page-copy","partId":"12","pdfPage":194,"printPage":193,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"12-p195-copy","kind":"page-copy","partId":"12","pdfPage":195,"printPage":194,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"12-p196-copy","kind":"page-copy","partId":"12","pdfPage":196,"printPage":195,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"12-p197-copy","kind":"page-copy","partId":"12","pdfPage":197,"printPage":196,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"12-p198-copy","kind":"page-copy","partId":"12","pdfPage":198,"printPage":197,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"12-p199-copy","kind":"page-copy","partId":"12","pdfPage":199,"printPage":198,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"12-p200-copy","kind":"page-copy","partId":"12","pdfPage":200,"printPage":199,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"12-p201-copy","kind":"page-copy","partId":"12","pdfPage":201,"printPage":200,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"12-p202-copy","kind":"page-copy","partId":"12","pdfPage":202,"printPage":201,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"12-p203-copy","kind":"page-copy","partId":"12","pdfPage":203,"printPage":202,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"12-p204-copy","kind":"page-copy","partId":"12","pdfPage":204,"printPage":203,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"12-board-12.1","kind":"board","partId":"12","pdfPage":170,"printPage":169,"appSectionIndex":5,"boardNumber":"12.1","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"12-board-12.2","kind":"board","partId":"12","pdfPage":172,"printPage":171,"appSectionIndex":9,"boardNumber":"12.2","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"12-board-12.3","kind":"board","partId":"12","pdfPage":172,"printPage":171,"appSectionIndex":13,"boardNumber":"12.3","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"12-board-12.4","kind":"board","partId":"12","pdfPage":173,"printPage":172,"appSectionIndex":18,"boardNumber":"12.4","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"12-board-12.5","kind":"board","partId":"12","pdfPage":174,"printPage":173,"appSectionIndex":22,"boardNumber":"12.5","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"12-board-12.6","kind":"board","partId":"12","pdfPage":174,"printPage":173,"appSectionIndex":26,"boardNumber":"12.6","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"12-board-12.7","kind":"board","partId":"12","pdfPage":175,"printPage":174,"appSectionIndex":30,"boardNumber":"12.7","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"12-board-12.8","kind":"board","partId":"12","pdfPage":176,"printPage":175,"appSectionIndex":34,"boardNumber":"12.8","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"12-board-12.9","kind":"board","partId":"12","pdfPage":177,"printPage":176,"appSectionIndex":36,"boardNumber":"12.9","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"12-board-12.10","kind":"board","partId":"12","pdfPage":178,"printPage":177,"appSectionIndex":39,"boardNumber":"12.10","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"12-board-12.11","kind":"board","partId":"12","pdfPage":179,"printPage":178,"appSectionIndex":43,"boardNumber":"12.11","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"12-board-12.12","kind":"board","partId":"12","pdfPage":180,"printPage":179,"appSectionIndex":45,"boardNumber":"12.12","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"12-board-12.12-route-counts","kind":"board","partId":"12","pdfPage":180,"printPage":179,"appSectionIndex":47,"boardNumber":"12.12-route-counts","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"12-board-12.13","kind":"board","partId":"12","pdfPage":181,"printPage":180,"appSectionIndex":51,"boardNumber":"12.13","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"12-board-12.14","kind":"board","partId":"12","pdfPage":181,"printPage":180,"appSectionIndex":53,"boardNumber":"12.14","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"12-board-12.15","kind":"board","partId":"12","pdfPage":183,"printPage":182,"appSectionIndex":59,"boardNumber":"12.15","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"12-board-12.16","kind":"board","partId":"12","pdfPage":183,"printPage":182,"appSectionIndex":61,"boardNumber":"12.16","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"12-board-12.17","kind":"board","partId":"12","pdfPage":184,"printPage":183,"appSectionIndex":63,"boardNumber":"12.17","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"12-board-12.18","kind":"board","partId":"12","pdfPage":185,"printPage":184,"appSectionIndex":67,"boardNumber":"12.18","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"12-board-12.19","kind":"board","partId":"12","pdfPage":186,"printPage":185,"appSectionIndex":71,"boardNumber":"12.19","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"12-board-12.20","kind":"board","partId":"12","pdfPage":186,"printPage":185,"appSectionIndex":73,"boardNumber":"12.20","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"12-board-12.21","kind":"board","partId":"12","pdfPage":187,"printPage":186,"appSectionIndex":75,"boardNumber":"12.21","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"12-board-12.22","kind":"board","partId":"12","pdfPage":187,"printPage":186,"appSectionIndex":77,"boardNumber":"12.22","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"12-board-12.23","kind":"board","partId":"12","pdfPage":188,"printPage":187,"appSectionIndex":82,"boardNumber":"12.23","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"12-board-12.24","kind":"board","partId":"12","pdfPage":189,"printPage":188,"appSectionIndex":87,"boardNumber":"12.24","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"12-board-12.25","kind":"board","partId":"12","pdfPage":191,"printPage":190,"appSectionIndex":93,"boardNumber":"12.25","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"12-board-12.26","kind":"board","partId":"12","pdfPage":192,"printPage":191,"appSectionIndex":95,"boardNumber":"12.26","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"12-board-12.27","kind":"board","partId":"12","pdfPage":192,"printPage":191,"appSectionIndex":97,"boardNumber":"12.27","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"12-board-12.28","kind":"board","partId":"12","pdfPage":193,"printPage":192,"appSectionIndex":99,"boardNumber":"12.28","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"12-board-12.29","kind":"board","partId":"12","pdfPage":194,"printPage":193,"appSectionIndex":103,"boardNumber":"12.29","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"12-board-12.30","kind":"board","partId":"12","pdfPage":195,"printPage":194,"appSectionIndex":107,"boardNumber":"12.30","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"12-board-12.31","kind":"board","partId":"12","pdfPage":196,"printPage":195,"appSectionIndex":111,"boardNumber":"12.31","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"12-board-12.32","kind":"board","partId":"12","pdfPage":197,"printPage":196,"appSectionIndex":119,"boardNumber":"12.32","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"12-board-12.33","kind":"board","partId":"12","pdfPage":198,"printPage":197,"appSectionIndex":122,"boardNumber":"12.33","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"12-board-12.34","kind":"board","partId":"12","pdfPage":199,"printPage":198,"appSectionIndex":126,"boardNumber":"12.34","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"12-board-12.35","kind":"board","partId":"12","pdfPage":199,"printPage":198,"appSectionIndex":130,"boardNumber":"12.35","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"12-board-12.36","kind":"board","partId":"12","pdfPage":200,"printPage":199,"appSectionIndex":133,"boardNumber":"12.36","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"12-board-12.37","kind":"board","partId":"12","pdfPage":200,"printPage":199,"appSectionIndex":135,"boardNumber":"12.37","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"12-board-12.38","kind":"board","partId":"12","pdfPage":201,"printPage":200,"appSectionIndex":139,"boardNumber":"12.38","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"12-board-12.39","kind":"board","partId":"12","pdfPage":202,"printPage":201,"appSectionIndex":144,"boardNumber":"12.39","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"12-board-12.40","kind":"board","partId":"12","pdfPage":203,"printPage":202,"appSectionIndex":148,"boardNumber":"12.40","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"12-board-12.41","kind":"board","partId":"12","pdfPage":203,"printPage":202,"appSectionIndex":152,"boardNumber":"12.41","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"},{"id":"12-board-12.42","kind":"board","partId":"12","pdfPage":204,"printPage":203,"appSectionIndex":154,"boardNumber":"12.42","checks":["pieces","side-to-move","markers","routes","caption","orientation"],"status":"matched"}]}
+  ,{"id":"chapters-14-15-bibliography","partIds":["14","15","bibliography"],"status":"matched","verifiedOn":"2026-07-15","pdfPages":{"first":230,"last":249},"printPages":{"first":229,"last":248},"units":[{"id":"14-p230-copy","kind":"page-copy","partId":"14","pdfPage":230,"printPage":229,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"14-p231-copy","kind":"page-copy","partId":"14","pdfPage":231,"printPage":230,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"14-p232-copy","kind":"page-copy","partId":"14","pdfPage":232,"printPage":231,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"14-p233-copy","kind":"page-copy","partId":"14","pdfPage":233,"printPage":232,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"14-p234-copy","kind":"page-copy","partId":"14","pdfPage":234,"printPage":233,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"14-p235-copy","kind":"page-copy","partId":"14","pdfPage":235,"printPage":234,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"14-p236-copy","kind":"page-copy","partId":"14","pdfPage":236,"printPage":235,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"14-p237-copy","kind":"page-copy","partId":"14","pdfPage":237,"printPage":236,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"14-p238-copy","kind":"page-copy","partId":"14","pdfPage":238,"printPage":237,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"14-p239-copy","kind":"page-copy","partId":"14","pdfPage":239,"printPage":238,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"14-p240-copy","kind":"page-copy","partId":"14","pdfPage":240,"printPage":239,"checks":["text","moves","order","hierarchy","captions"],"status":"matched"},{"id":"15-p241-copy","kind":"page-copy","partId":"15","pdfPage":241,"printPage":240,"checks":["text","order","hierarchy","captions","markers"],"status":"matched"},{"id":"15-p242-copy","kind":"page-copy","partId":"15","pdfPage":242,"printPage":241,"checks":["text","order","hierarchy","captions","markers"],"status":"matched"},{"id":"15-p243-copy","kind":"page-copy","partId":"15","pdfPage":243,"printPage":242,"checks":["text","order","hierarchy","captions","markers"],"status":"matched"},{"id":"15-p244-copy","kind":"page-copy","partId":"15","pdfPage":244,"printPage":243,"checks":["text","order","hierarchy","captions","markers"],"status":"matched"},{"id":"15-p245-copy","kind":"page-copy","partId":"15","pdfPage":245,"printPage":244,"checks":["text","order","hierarchy","captions","markers"],"status":"matched"},{"id":"15-p246-copy","kind":"page-copy","partId":"15","pdfPage":246,"printPage":245,"checks":["text","order","hierarchy","captions","markers"],"status":"matched"},{"id":"15-p247-copy","kind":"page-copy","partId":"15","pdfPage":247,"printPage":246,"checks":["text","order","hierarchy","captions","markers"],"status":"matched"},{"id":"bibliography-p248-copy","kind":"page-copy","partId":"bibliography","pdfPage":248,"printPage":247,"checks":["text","order","hierarchy","proper-names"],"status":"matched"},{"id":"bibliography-p249-copy","kind":"page-copy","partId":"bibliography","pdfPage":249,"printPage":248,"checks":["text","order","hierarchy","proper-names"],"status":"matched"},{"id":"14-board-14.01","kind":"board","partId":"14","pdfPage":230,"printPage":229,"appSectionIndex":1,"boardNumber":"14.01","checks":["pieces","side-to-move","prompt","solution","orientation"],"status":"matched"},{"id":"14-board-14.02","kind":"board","partId":"14","pdfPage":230,"printPage":229,"appSectionIndex":2,"boardNumber":"14.02","checks":["pieces","side-to-move","prompt","solution","orientation"],"status":"matched"},{"id":"14-board-14.03","kind":"board","partId":"14","pdfPage":230,"printPage":229,"appSectionIndex":3,"boardNumber":"14.03","checks":["pieces","side-to-move","prompt","solution","orientation"],"status":"matched"},{"id":"14-board-14.04","kind":"board","partId":"14","pdfPage":230,"printPage":229,"appSectionIndex":4,"boardNumber":"14.04","checks":["pieces","side-to-move","prompt","solution","orientation"],"status":"matched"},{"id":"14-board-14.05","kind":"board","partId":"14","pdfPage":230,"printPage":229,"appSectionIndex":5,"boardNumber":"14.05","checks":["pieces","side-to-move","prompt","solution","orientation"],"status":"matched"},{"id":"14-board-14.06","kind":"board","partId":"14","pdfPage":230,"printPage":229,"appSectionIndex":6,"boardNumber":"14.06","checks":["pieces","side-to-move","prompt","solution","orientation"],"status":"matched"},{"id":"14-board-14.07","kind":"board","partId":"14","pdfPage":231,"printPage":230,"appSectionIndex":7,"boardNumber":"14.07","checks":["pieces","side-to-move","prompt","solution","orientation"],"status":"matched"},{"id":"14-board-14.08","kind":"board","partId":"14","pdfPage":231,"printPage":230,"appSectionIndex":8,"boardNumber":"14.08","checks":["pieces","side-to-move","prompt","solution","orientation"],"status":"matched"},{"id":"14-board-14.09","kind":"board","partId":"14","pdfPage":231,"printPage":230,"appSectionIndex":9,"boardNumber":"14.09","checks":["pieces","side-to-move","prompt","solution","orientation"],"status":"matched"},{"id":"14-board-14.10","kind":"board","partId":"14","pdfPage":231,"printPage":230,"appSectionIndex":10,"boardNumber":"14.10","checks":["pieces","side-to-move","prompt","solution","orientation"],"status":"matched"},{"id":"14-board-14.11","kind":"board","partId":"14","pdfPage":231,"printPage":230,"appSectionIndex":11,"boardNumber":"14.11","checks":["pieces","side-to-move","prompt","solution","orientation"],"status":"matched"},{"id":"14-board-14.12","kind":"board","partId":"14","pdfPage":231,"printPage":230,"appSectionIndex":12,"boardNumber":"14.12","checks":["pieces","side-to-move","prompt","solution","orientation"],"status":"matched"},{"id":"14-board-14.13","kind":"board","partId":"14","pdfPage":232,"printPage":231,"appSectionIndex":13,"boardNumber":"14.13","checks":["pieces","side-to-move","prompt","solution","orientation"],"status":"matched"},{"id":"14-board-14.14","kind":"board","partId":"14","pdfPage":232,"printPage":231,"appSectionIndex":14,"boardNumber":"14.14","checks":["pieces","side-to-move","prompt","solution","orientation"],"status":"matched"},{"id":"14-board-14.15","kind":"board","partId":"14","pdfPage":232,"printPage":231,"appSectionIndex":15,"boardNumber":"14.15","checks":["pieces","side-to-move","prompt","solution","orientation"],"status":"matched"},{"id":"14-board-14.16","kind":"board","partId":"14","pdfPage":232,"printPage":231,"appSectionIndex":16,"boardNumber":"14.16","checks":["pieces","side-to-move","prompt","solution","orientation"],"status":"matched"},{"id":"14-board-14.17","kind":"board","partId":"14","pdfPage":232,"printPage":231,"appSectionIndex":17,"boardNumber":"14.17","checks":["pieces","side-to-move","prompt","solution","orientation"],"status":"matched"},{"id":"14-board-14.18","kind":"board","partId":"14","pdfPage":232,"printPage":231,"appSectionIndex":18,"boardNumber":"14.18","checks":["pieces","side-to-move","prompt","solution","orientation"],"status":"matched"},{"id":"14-board-14.19","kind":"board","partId":"14","pdfPage":233,"printPage":232,"appSectionIndex":19,"boardNumber":"14.19","checks":["pieces","side-to-move","prompt","solution","orientation"],"status":"matched"},{"id":"14-board-14.20","kind":"board","partId":"14","pdfPage":233,"printPage":232,"appSectionIndex":20,"boardNumber":"14.20","checks":["pieces","side-to-move","prompt","solution","orientation"],"status":"matched"},{"id":"14-board-14.21","kind":"board","partId":"14","pdfPage":233,"printPage":232,"appSectionIndex":21,"boardNumber":"14.21","checks":["pieces","side-to-move","prompt","solution","orientation"],"status":"matched"},{"id":"14-board-14.22","kind":"board","partId":"14","pdfPage":233,"printPage":232,"appSectionIndex":22,"boardNumber":"14.22","checks":["pieces","side-to-move","prompt","solution","orientation"],"status":"matched"},{"id":"14-board-14.23","kind":"board","partId":"14","pdfPage":233,"printPage":232,"appSectionIndex":23,"boardNumber":"14.23","checks":["pieces","side-to-move","prompt","solution","orientation"],"status":"matched"},{"id":"14-board-14.24","kind":"board","partId":"14","pdfPage":233,"printPage":232,"appSectionIndex":24,"boardNumber":"14.24","checks":["pieces","side-to-move","prompt","solution","orientation"],"status":"matched"},{"id":"14-board-14.25","kind":"board","partId":"14","pdfPage":234,"printPage":233,"appSectionIndex":25,"boardNumber":"14.25","checks":["pieces","side-to-move","prompt","solution","orientation"],"status":"matched"},{"id":"14-board-14.26","kind":"board","partId":"14","pdfPage":234,"printPage":233,"appSectionIndex":26,"boardNumber":"14.26","checks":["pieces","side-to-move","prompt","solution","orientation"],"status":"matched"},{"id":"14-board-14.27","kind":"board","partId":"14","pdfPage":234,"printPage":233,"appSectionIndex":27,"boardNumber":"14.27","checks":["pieces","side-to-move","prompt","solution","orientation"],"status":"matched"},{"id":"14-board-14.28","kind":"board","partId":"14","pdfPage":234,"printPage":233,"appSectionIndex":28,"boardNumber":"14.28","checks":["pieces","side-to-move","prompt","solution","orientation"],"status":"matched"},{"id":"14-board-14.29","kind":"board","partId":"14","pdfPage":234,"printPage":233,"appSectionIndex":29,"boardNumber":"14.29","checks":["pieces","side-to-move","prompt","solution","orientation"],"status":"matched"},{"id":"14-board-14.30","kind":"board","partId":"14","pdfPage":234,"printPage":233,"appSectionIndex":30,"boardNumber":"14.30","checks":["pieces","side-to-move","prompt","solution","orientation"],"status":"matched"},{"id":"14-board-14.31","kind":"board","partId":"14","pdfPage":235,"printPage":234,"appSectionIndex":31,"boardNumber":"14.31","checks":["pieces","side-to-move","prompt","solution","orientation"],"status":"matched"},{"id":"14-board-14.32","kind":"board","partId":"14","pdfPage":235,"printPage":234,"appSectionIndex":32,"boardNumber":"14.32","checks":["pieces","side-to-move","prompt","solution","orientation"],"status":"matched"},{"id":"14-board-14.33","kind":"board","partId":"14","pdfPage":235,"printPage":234,"appSectionIndex":33,"boardNumber":"14.33","checks":["pieces","side-to-move","prompt","solution","orientation"],"status":"matched"},{"id":"14-board-14.34","kind":"board","partId":"14","pdfPage":235,"printPage":234,"appSectionIndex":34,"boardNumber":"14.34","checks":["pieces","side-to-move","prompt","solution","orientation"],"status":"matched"},{"id":"14-board-14.35","kind":"board","partId":"14","pdfPage":235,"printPage":234,"appSectionIndex":35,"boardNumber":"14.35","checks":["pieces","side-to-move","prompt","solution","orientation"],"status":"matched"},{"id":"14-board-14.36","kind":"board","partId":"14","pdfPage":235,"printPage":234,"appSectionIndex":36,"boardNumber":"14.36","checks":["pieces","side-to-move","prompt","solution","orientation"],"status":"matched"},{"id":"15-board-F1","kind":"board","partId":"15","pdfPage":241,"printPage":240,"appSectionIndex":4,"boardNumber":"F1","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},{"id":"15-board-F2","kind":"board","partId":"15","pdfPage":241,"printPage":240,"appSectionIndex":6,"boardNumber":"F2","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},{"id":"15-board-F3","kind":"board","partId":"15","pdfPage":242,"printPage":241,"appSectionIndex":8,"boardNumber":"F3","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},{"id":"15-board-F4","kind":"board","partId":"15","pdfPage":242,"printPage":241,"appSectionIndex":12,"boardNumber":"F4","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},{"id":"15-board-F5","kind":"board","partId":"15","pdfPage":242,"printPage":241,"appSectionIndex":14,"boardNumber":"F5","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},{"id":"15-board-F6","kind":"board","partId":"15","pdfPage":243,"printPage":242,"appSectionIndex":16,"boardNumber":"F6","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},{"id":"15-board-F7","kind":"board","partId":"15","pdfPage":243,"printPage":242,"appSectionIndex":18,"boardNumber":"F7","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},{"id":"15-board-F8","kind":"board","partId":"15","pdfPage":243,"printPage":242,"appSectionIndex":22,"boardNumber":"F8","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},{"id":"15-board-F9","kind":"board","partId":"15","pdfPage":244,"printPage":243,"appSectionIndex":24,"boardNumber":"F9","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},{"id":"15-board-F10","kind":"board","partId":"15","pdfPage":244,"printPage":243,"appSectionIndex":26,"boardNumber":"F10","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},{"id":"15-board-F11","kind":"board","partId":"15","pdfPage":244,"printPage":243,"appSectionIndex":28,"boardNumber":"F11","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},{"id":"15-board-F12","kind":"board","partId":"15","pdfPage":244,"printPage":243,"appSectionIndex":30,"boardNumber":"F12","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},{"id":"15-board-F13","kind":"board","partId":"15","pdfPage":245,"printPage":244,"appSectionIndex":32,"boardNumber":"F13","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},{"id":"15-board-F14","kind":"board","partId":"15","pdfPage":245,"printPage":244,"appSectionIndex":34,"boardNumber":"F14","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},{"id":"15-board-F15","kind":"board","partId":"15","pdfPage":245,"printPage":244,"appSectionIndex":36,"boardNumber":"F15","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},{"id":"15-board-F16","kind":"board","partId":"15","pdfPage":245,"printPage":244,"appSectionIndex":38,"boardNumber":"F16","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},{"id":"15-board-F17","kind":"board","partId":"15","pdfPage":246,"printPage":245,"appSectionIndex":40,"boardNumber":"F17","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},{"id":"15-board-F18","kind":"board","partId":"15","pdfPage":246,"printPage":245,"appSectionIndex":42,"boardNumber":"F18","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},{"id":"15-board-F19","kind":"board","partId":"15","pdfPage":246,"printPage":245,"appSectionIndex":44,"boardNumber":"F19","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"},{"id":"15-board-troitsky-line","kind":"board","partId":"15","pdfPage":247,"printPage":246,"appSectionIndex":48,"boardNumber":"troitsky-line","checks":["pieces","side-to-move","markers","caption","orientation"],"status":"matched"}]}
+  ]
+}

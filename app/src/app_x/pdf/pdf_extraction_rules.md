@@ -74,6 +74,11 @@ with that board until one of those boundaries appears.
 
 ## Positions And Problems
 
+Every `position`, `problem`, and `diagram` contains an `orientation` read from the
+rendered PDF. The current edition prints every audited board with White at the
+bottom, so every current value is `white`; do not infer orientation from the
+side-to-move FEN field.
+
 Every `position` contains a globally unique `number` and a complete legal FEN.
 Infer the active colour from nearby analysis when possible; otherwise use `w`.
 Use `- - 0 1` for unknown castling, en-passant, and move counters.
@@ -85,6 +90,7 @@ Optional position fields:
 - `displayLabel`: printed label used instead of the internal number.
 - `alternateFens`: verified alternate initial states.
 - `markers`: printed non-piece annotations layered over the board.
+- `routes`: printed paths through ordered board squares, with a source meaning.
 
 Each marker has `square`, `symbol`, and `meaning`. Optional `variant` is `badge`
 or `label`. Markers remain present when sharing a square with a piece, so printed
@@ -126,7 +132,8 @@ position:
 Diagram FEN is placement-only and may omit kings. Diagrams have no playback,
 active-board state, pointer cursor, or Lichess link. Legal fortress examples use
 `position`; route, mobility, domination, and Troitsky boundary charts use
-`diagram`.
+`diagram`. A diagram may use `subtitle` for the printed second caption line and
+`routes` for a printed path that must remain visible above the board.
 
 ## Tables
 
@@ -160,6 +167,6 @@ npm run build
 ```
 
 Expected SAN failures and misses are zero. The source audit protects the 100 ending
-numbers, complete part order, text anchors, section semantics, 333 board visuals,
-and the byte-stable Chapters 1-14 content hashes. Keep browser checks targeted to
+numbers, complete part order, text anchors, section semantics, 337 board visuals,
+and the byte-stable complete-book content hashes. Keep browser checks targeted to
 the changed surface; this project does not use full visual end-to-end passes.

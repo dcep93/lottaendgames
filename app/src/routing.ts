@@ -15,6 +15,7 @@ export type RouteResolution = {
   route: AppRoute
 }
 
+const aboutPath = '/book/about'
 const introductionPath = '/book/intro'
 
 export function resolveAppRoute(
@@ -26,9 +27,9 @@ export function resolveAppRoute(
   }
 
   const chapterId = getBookChapterId(pathname)
-  const resolvedChapterId = chapterId ?? 'introduction'
-  const path = chapterId ? bookPathForChapterId(chapterId) : introductionPath
-  const anchorId = chapterId ? parseBookAnchor(hash) : null
+  const resolvedChapterId = chapterId ?? 'about'
+  const path = chapterId ? bookPathForChapterId(chapterId) : aboutPath
+  const anchorId = chapterId && chapterId !== 'about' ? parseBookAnchor(hash) : null
 
   return {
     href: `${path}${anchorId ? `#${anchorId}` : ''}`,
@@ -41,6 +42,10 @@ export function resolveAppRoute(
 }
 
 export function bookPathForChapterId(chapterId: string) {
+  if (chapterId === 'about') {
+    return aboutPath
+  }
+
   if (chapterId === 'introduction') {
     return introductionPath
   }
@@ -53,7 +58,7 @@ export function bookPathForChapterId(chapterId: string) {
     return `/book/chapter${chapterId}`
   }
 
-  return introductionPath
+  return aboutPath
 }
 
 export function bookEndingAnchorId(number: string) {
@@ -65,6 +70,10 @@ export function bookPositionAnchorId(number: string) {
 }
 
 function getBookChapterId(pathname: string) {
+  if (pathname === aboutPath) {
+    return 'about'
+  }
+
   if (pathname === introductionPath) {
     return 'introduction'
   }

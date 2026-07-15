@@ -29,6 +29,7 @@ import InstructionalDiagram from './InstructionalDiagram'
 import TableBlock from './TableBlock'
 import { buildLichessAnalysisUrl, buildLichessEditorUrl } from './lichess'
 import type { TextPlaybackToken } from './moveParser'
+import BookFrontMatter from './BookFrontMatter'
 import {
   getNextNavigationNode,
   getParentFenForNavigationNode,
@@ -37,8 +38,14 @@ import {
   type PositionNavigation,
 } from './playbackNavigation'
 import { isOneMoveFenTransition } from './playbackPaths'
+import PositionControls from './PositionControls'
 
 const emptyChapterSections: RawChapterSection[] = []
+const aboutChapter = {
+  id: 'about',
+  label: 'About',
+  name: 'About this edition',
+}
 const emptyPreparedChapter = hydrateRuntimeChapter({
   endingCount: 0,
   id: '',
@@ -63,26 +70,34 @@ type ActiveBoardState = {
   preferredNextByCursor: Record<string, string>
 }
 
+type PlaybackDirection = 'next' | 'previous'
+
 export default function ChapterViewer({
   anchorId,
   chapterId: activeChapterId,
   moduleSelector,
+  onBookNavigate,
   onAnchorSelect,
   onChapterSelect,
 }: {
   anchorId: string | null
   chapterId: string
   moduleSelector: ReactNode
+  onBookNavigate: (href: string) => void
   onAnchorSelect: (anchorId: string) => void
   onChapterSelect: (chapterId: string) => void
 }) {
   const [chapterPayload, setChapterPayload] =
     useState<RuntimeChapterPayload | null>(null)
   const [chapterLoadError, setChapterLoadError] = useState<string | null>(null)
+  const isAbout = activeChapterId === 'about'
   const activeChapter =
     chapterPayload?.chapters.find((chapter) => chapter.id === activeChapterId) ??
     null
-  const chapterTabs = chapterPayload?.chapters ?? []
+  const chapterTabs = useMemo(
+    () => [aboutChapter, ...(chapterPayload?.chapters ?? [])],
+    [chapterPayload],
+  )
   const preparedChapter = useMemo(
     () =>
       activeChapter ? hydrateRuntimeChapter(activeChapter) : emptyPreparedChapter,
@@ -114,7 +129,10 @@ export default function ChapterViewer({
   const moveAnimationFrameRef = useRef<number | null>(null)
   const anchorAnimationFrameRef = useRef<number | null>(null)
   const positionCount = preparedChapter.positionCount
-  const endingCount = preparedChapter.endingCount
+  const endingRange = useMemo(
+    () => getEndingRange(chapterSections),
+    [chapterSections],
+  )
 
   function handleChapterSelect(chapterId: string) {
     if (chapterId === activeChapterId) {
@@ -171,7 +189,7 @@ export default function ChapterViewer({
   }, [activeChapterId])
 
   useEffect(() => {
-    if (!activeChapter) {
+    if (!activeChapter && !isAbout) {
       return
     }
 
@@ -193,7 +211,7 @@ export default function ChapterViewer({
     return () => {
       cancelAnimationFrameRef(anchorAnimationFrameRef)
     }
-  }, [activeChapter, anchorId])
+  }, [activeChapter, anchorId, isAbout])
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
@@ -367,6 +385,62 @@ export default function ChapterViewer({
     })
   }
 
+  function handlePositionStep(
+    positionNumber: string,
+    direction: PlaybackDirection,
+  ) {
+    const navigation = navigationByPosition.get(positionNumber)
+
+    if (!navigation) {
+      return
+    }
+
+    setActivePositionNumber(positionNumber)
+    cancelAnimationFrameRef(moveAnimationFrameRef)
+    setActiveBoards((currentBoards) => {
+      const currentBoard =
+        currentBoards[positionNumber] ??
+        createInitialBoardState(initialPositionFens[positionNumber])
+
+      if (direction === 'next') {
+        const nextNode = getNextNavigationNode(
+          navigation,
+          currentBoard.cursorId,
+          currentBoard.preferredNextByCursor,
+        )
+
+        if (!nextNode) {
+          return currentBoards
+        }
+
+        return {
+          ...currentBoards,
+          [positionNumber]: createMoveBoardState(currentBoard, nextNode),
+        }
+      }
+
+      const previousNode = getPreviousNavigationNode(
+        navigation,
+        currentBoard.cursorId,
+      )
+
+      if (previousNode === undefined) {
+        return currentBoards
+      }
+
+      return {
+        ...currentBoards,
+        [positionNumber]:
+          previousNode === null
+            ? createInitialBoardState(
+                initialPositionFens[positionNumber],
+                currentBoard.preferredNextByCursor,
+              )
+            : createMoveBoardState(currentBoard, previousNode),
+      }
+    })
+  }
+
   function handleSolutionToggle(problem: ProblemSection) {
     const number = problem.content.number
     const willReveal = !revealedSolutions[number]
@@ -401,20 +475,21 @@ export default function ChapterViewer({
         <header className="leg-reader-header">
           <p className="leg-kicker">Lotta Endgames</p>
           <h1>100 Endgames You Must Know</h1>
-          {activeChapter ? (
+          {isAbout || activeChapter ? (
             <>
               <ChapterSelector
-                activeChapterId={activeChapter.id}
+                activeChapterId={activeChapterId}
                 chapters={chapterTabs}
                 label="Top chapter selector"
                 onSelect={handleChapterSelect}
                 variant="select"
               />
-              <ReaderMeta
-                endingCount={endingCount}
-                positionCount={positionCount}
-                sectionCount={chapterSections.length}
-              />
+              {activeChapter ? (
+                <ReaderMeta
+                  endingRange={endingRange}
+                  positionCount={positionCount}
+                />
+              ) : null}
             </>
           ) : null}
         </header>
@@ -422,6 +497,11 @@ export default function ChapterViewer({
           <aside className="leg-load-state" role="alert">
             {chapterLoadError}
           </aside>
+        ) : isAbout ? (
+          <BookFrontMatter
+            chapters={chapterPayload?.chapters ?? []}
+            onNavigate={onBookNavigate}
+          />
         ) : activeChapter ? (
           <article className="leg-chapter">
             {chapterRenderItems.map((item) =>
@@ -435,6 +515,7 @@ export default function ChapterViewer({
                   onAnchorSelect={onAnchorSelect}
                   onMoveClick={handleMoveClick}
                   onPositionReset={handlePositionReset}
+                  onPositionStep={handlePositionStep}
                   playback={playback}
                   sections={chapterSections}
                 />
@@ -447,6 +528,7 @@ export default function ChapterViewer({
                   navigationByPosition={navigationByPosition}
                   onMoveClick={handleMoveClick}
                   onPositionReset={handlePositionReset}
+                  onPositionStep={handlePositionStep}
                   onToggleSolution={handleSolutionToggle}
                   playback={playback}
                   revealed={Boolean(
@@ -467,6 +549,7 @@ export default function ChapterViewer({
                   onAnchorSelect={onAnchorSelect}
                   onMoveClick={handleMoveClick}
                   onPositionReset={handlePositionReset}
+                  onPositionStep={handlePositionStep}
                   playback={playback}
                   section={chapterSections[item.index]}
                 />
@@ -474,9 +557,9 @@ export default function ChapterViewer({
             )}
           </article>
         ) : null}
-        {activeChapter ? (
+        {isAbout || activeChapter ? (
           <ChapterSelector
-            activeChapterId={activeChapter.id}
+            activeChapterId={activeChapterId}
             chapters={chapterTabs}
             label="Bottom chapter selector"
             onSelect={handleChapterSelect}
@@ -489,21 +572,37 @@ export default function ChapterViewer({
 }
 
 export function ReaderMeta({
-  endingCount,
+  endingRange,
   positionCount,
-  sectionCount,
 }: {
-  endingCount: number
+  endingRange: string | null
   positionCount: number
-  sectionCount: number
 }) {
+  if (!endingRange && positionCount === 0) {
+    return null
+  }
+
   return (
     <div className="leg-reader-meta" aria-label="Part summary">
-      <span>{sectionCount} sections</span>
-      {endingCount > 0 ? <span>{endingCount} endings</span> : null}
+      {endingRange ? <span>Endings {endingRange}</span> : null}
       {positionCount > 0 ? <span>{positionCount} boards</span> : null}
     </div>
   )
+}
+
+function getEndingRange(sections: RawChapterSection[]) {
+  const endingNumbers = sections
+    .filter((section): section is EndingSection => section.type === 'ending')
+    .map((section) => section.content.number)
+
+  if (endingNumbers.length === 0) {
+    return null
+  }
+
+  const first = endingNumbers[0]
+  const last = endingNumbers.at(-1)
+
+  return first === last ? first : `${first}-${last}`
 }
 
 export function ProblemStudyGroup({
@@ -513,6 +612,7 @@ export function ProblemStudyGroup({
   navigationByPosition,
   onMoveClick,
   onPositionReset,
+  onPositionStep,
   onToggleSolution,
   playback,
   revealed,
@@ -524,16 +624,21 @@ export function ProblemStudyGroup({
   navigationByPosition: HydratedChapter['navigationByPosition']
   onMoveClick: (token: Extract<TextPlaybackToken, { type: 'move' }>) => void
   onPositionReset: (positionNumber: string) => void
+  onPositionStep: (
+    positionNumber: string,
+    direction: PlaybackDirection,
+  ) => void
   onToggleSolution: (problem: ProblemSection) => void
   playback: HydratedChapter['playback']
   revealed: boolean
   section: ProblemSection
 }) {
-  const { fen, markers, number, prompt, solutionFen } = section.content
+  const { fen, markers, number, orientation, prompt, solutionFen } =
+    section.content
   const tokens = playback.tokensBySectionIndex.get(index)
   const positionSection: PositionSection = {
     type: 'position',
-    content: { fen, markers, number, subtitle: prompt },
+    content: { fen, markers, number, orientation, subtitle: prompt },
   }
 
   return (
@@ -552,6 +657,7 @@ export function ProblemStudyGroup({
           lichessInitialFen={revealed ? solutionFen ?? fen : fen}
           navigation={revealed ? navigationByPosition.get(number) : undefined}
           onReset={onPositionReset}
+          onStep={onPositionStep}
           section={positionSection}
         />
       </div>
@@ -596,6 +702,7 @@ export function PositionStudyGroup({
   onAnchorSelect,
   onMoveClick,
   onPositionReset,
+  onPositionStep,
   playback,
   sections,
 }: {
@@ -606,6 +713,10 @@ export function PositionStudyGroup({
   onAnchorSelect: (anchorId: string) => void
   onMoveClick: (token: Extract<TextPlaybackToken, { type: 'move' }>) => void
   onPositionReset: (positionNumber: string) => void
+  onPositionStep: (
+    positionNumber: string,
+    direction: PlaybackDirection,
+  ) => void
   playback: HydratedChapter['playback']
   sections: RawChapterSection[]
 }) {
@@ -630,6 +741,7 @@ export function PositionStudyGroup({
           headingId={`position-${positionNumber}-heading`}
           navigation={navigationByPosition.get(positionNumber)}
           onReset={onPositionReset}
+          onStep={onPositionStep}
           section={positionSection}
         />
       </div>
@@ -648,6 +760,7 @@ export function PositionStudyGroup({
               onAnchorSelect={onAnchorSelect}
               onMoveClick={onMoveClick}
               onPositionReset={onPositionReset}
+              onPositionStep={onPositionStep}
               playback={playback}
               section={sections[index]}
             />
@@ -752,6 +865,7 @@ function SectionRenderer({
   onAnchorSelect,
   onMoveClick,
   onPositionReset,
+  onPositionStep,
   playback,
   section,
 }: {
@@ -762,6 +876,10 @@ function SectionRenderer({
   onAnchorSelect: (anchorId: string) => void
   onMoveClick: (token: Extract<TextPlaybackToken, { type: 'move' }>) => void
   onPositionReset: (positionNumber: string) => void
+  onPositionStep: (
+    positionNumber: string,
+    direction: PlaybackDirection,
+  ) => void
   playback: HydratedChapter['playback']
   section: RawChapterSection
 }) {
@@ -812,6 +930,7 @@ function SectionRenderer({
             (section as PositionSection).content.number,
           )}
           onReset={onPositionReset}
+          onStep={onPositionStep}
           section={section as PositionSection}
         />
       )
@@ -872,6 +991,7 @@ function PositionCard({
   lichessInitialFen,
   navigation,
   onReset,
+  onStep,
   section,
 }: {
   activeBoard?: ActiveBoardState
@@ -882,11 +1002,33 @@ function PositionCard({
   lichessInitialFen?: string
   navigation?: PositionNavigation
   onReset: (positionNumber: string) => void
+  onStep: (positionNumber: string, direction: PlaybackDirection) => void
   section: PositionSection
 }) {
-  const { caption, displayLabel, fen, markers, number, subtitle } =
-    section.content
+  const {
+    caption,
+    displayLabel,
+    fen,
+    markers,
+    number,
+    orientation,
+    routes,
+    subtitle,
+  } = section.content
   const isActive = activePositionNumber === number
+  const canGoPrevious = Boolean(
+    navigation &&
+      getPreviousNavigationNode(navigation, activeBoard?.cursorId ?? null) !==
+        undefined,
+  )
+  const canGoNext = Boolean(
+    navigation &&
+      getNextNavigationNode(
+        navigation,
+        activeBoard?.cursorId ?? null,
+        activeBoard?.preferredNextByCursor ?? {},
+      ),
+  )
   const lichessUrl = useMemo(
     () => {
       const initialFen = lichessInitialFen ?? fen
@@ -918,6 +1060,15 @@ function PositionCard({
       data-position-number={number}
     >
       <div className="leg-position-copy">
+        <PositionControls
+          canGoNext={canGoNext}
+          canGoPrevious={canGoPrevious}
+          hasPlayback={hasPlayback}
+          lichessUrl={lichessUrl}
+          onNext={() => onStep(number, 'next')}
+          onPrevious={() => onStep(number, 'previous')}
+          onReset={() => onReset(number)}
+        />
         <figcaption>
           {displayLabel ? null : <span>{headingLabel}</span>}
           {hasPlayback ? (
@@ -944,9 +1095,10 @@ function PositionCard({
       <ChessBoard
         animateNextMove={activeBoard?.animateNextMove}
         fen={activeBoard?.fen ?? fen}
-        lichessUrl={lichessUrl}
         markers={markers}
         number={number}
+        orientation={orientation}
+        routes={routes}
       />
     </figure>
   )

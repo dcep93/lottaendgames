@@ -68,6 +68,8 @@ const chapterTenSections = getChapterSections('10')
 const chapterElevenSections = getChapterSections('11')
 const chapterTwelveSections = getChapterSections('12')
 const chapterThirteenSections = getChapterSections('13')
+const chapterFourteenSections = getChapterSections('14')
+const chapterFifteenSections = getChapterSections('15')
 const playback = buildChapterPlayback(chapterSections)
 const chapterSixPlayback = buildChapterPlayback(chapterSixSections)
 const chapterSevenPlayback = buildChapterPlayback(chapterSevenSections)
@@ -703,6 +705,19 @@ function getPositionNumbers(sections: RawChapterSection[]) {
   )
 }
 
+function getBoardNumbers(sections: RawChapterSection[]) {
+  return new Set(
+    sections
+      .filter(
+        (section) =>
+          section.type === 'diagram' ||
+          section.type === 'position' ||
+          section.type === 'problem',
+      )
+      .map((section) => (section.content as { number: string }).number),
+  )
+}
+
 function getEndingNumbers(sections: RawChapterSection[]) {
   return sections
     .filter((section) => section.type === 'ending')
@@ -726,15 +741,19 @@ function assertDiagramExtractionReport() {
     ['11', chapterElevenSections],
     ['12', chapterTwelveSections],
     ['13', chapterThirteenSections],
+    ['14', chapterFourteenSections],
+    ['15', chapterFifteenSections],
   ])
-  const positionNumbersByChapter = new Map<string, Set<string>>([
-    ['1', chapterOnePositionNumbers],
-    ['3', getPositionNumbers(chapterThreeSections)],
-    ['4', getPositionNumbers(chapterFourSections)],
-    ['10', chapterTenPositionNumbers],
-    ['11', chapterElevenPositionNumbers],
-    ['12', chapterTwelvePositionNumbers],
-    ['13', chapterThirteenPositionNumbers],
+  const boardNumbersByChapter = new Map<string, Set<string>>([
+    ['1', getBoardNumbers(chapterOneSections)],
+    ['3', getBoardNumbers(chapterThreeSections)],
+    ['4', getBoardNumbers(chapterFourSections)],
+    ['10', getBoardNumbers(chapterTenSections)],
+    ['11', getBoardNumbers(chapterElevenSections)],
+    ['12', getBoardNumbers(chapterTwelveSections)],
+    ['13', getBoardNumbers(chapterThirteenSections)],
+    ['14', getBoardNumbers(chapterFourteenSections)],
+    ['15', getBoardNumbers(chapterFifteenSections)],
   ])
   const captionsByChapter = new Map<string, Set<string>>([
     ['1', getCaptions(chapterOneSections)],
@@ -744,6 +763,8 @@ function assertDiagramExtractionReport() {
     ['11', chapterElevenCaptions],
     ['12', chapterTwelveCaptions],
     ['13', chapterThirteenCaptions],
+    ['14', getCaptions(chapterFourteenSections)],
+    ['15', getCaptions(chapterFifteenSections)],
   ])
   const promotedRows = diagramExtractionReport.filter(
     ({ status }) => status === 'promoted' || status === 'promoted-with-warnings',
@@ -763,14 +784,14 @@ function assertDiagramExtractionReport() {
 
   for (const row of promotedRows) {
     const chapterId = String(row.chapter)
-    const positionNumbers = positionNumbersByChapter.get(chapterId)
+    const boardNumbers = boardNumbersByChapter.get(chapterId)
 
-    assert.ok(positionNumbers, `Unexpected extracted chapter ${chapterId}.`)
+    assert.ok(boardNumbers, `Unexpected extracted chapter ${chapterId}.`)
     assert.ok(row.fen, `${row.label} should include an extracted FEN.`)
     assert.equal(
-      positionNumbers.has(row.number),
+      boardNumbers.has(row.number),
       true,
-      `${row.label} should be promoted to a position section.`,
+      `${row.label} should be promoted to a board section.`,
     )
   }
 

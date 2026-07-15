@@ -11,20 +11,23 @@ type BookSource = {
 }
 
 const expectedSectionHashes: Record<string, string> = {
-  '1': 'e9937142968f01369ae9e25397849c8cbbaa6db275573e95724af9063bbfdab2',
-  '2': '6e11ef1f22592c83726ea49cd7077237aceb9064c759d01a178b2d76726b87df',
-  '3': 'eb5c27d8a600692640e4aa9ce7a7a0c507ce8ddb2114a8019ffc08566fa40133',
-  '4': 'a85c5647d426a9af50c8d70b510342c2cbb693200efb5f3ee4a1dceea43077c1',
-  '5': '2d69ae40c921ebaaf2909d5f89f6d8f1967c42e6cd78f32d28075aef7264352b',
-  '6': '047c9cf44ae417fd18284d01ec53b8ff1617a21f0fe810f7941795316964a17d',
-  '7': '0e9f5266db5044b7f32e14d29da88a127eb3c5c43f71bd1c5d5c40783d80fb8e',
-  '8': '2787ab4b39c981919e3e423aa5fda866baaf6903ac5dd2011b56808a2cd27bb2',
-  '9': '8776f5e9d612fc5b7a17535b8c1643526229bb84d1b7ab5844b7cf091532118b',
-  '10': 'c2310087b2e96a8e6714f0da31c2156966d4512b1ac25ee9261542ccd17cbd19',
-  '11': 'fb8215558ef43c4a1cb97d327b932acc1722a5548df0d3b68d536aff91870d89',
-  '12': 'b1d8b319bbd15c42d9d49d71d08a6272d8561ff1416ff9f7896cfcdca35942ee',
-  '13': '314bc3a34a4e7c48b56f091c691429ffc8a6788b92229684a2980cdae0cd02f4',
-  '14': 'c1d891a295b33c9513a85c5f83a16bdef08fa1adec2ad8a8d97ecdb73370911c',
+  introduction: '4ed05a9fa8cc3d0701e5b1a9028c85722e2a1426eb00a957742cb685e38123e7',
+  '1': 'd62d94d36eefbd0c0c9e87bc2b22c319b66dc3748c5dfa1f817cc0f8716c2b62',
+  '2': '45c2fac58e41a7e1b2f97bf59f59a49a0a1483db19acbd9073e6e29a5d9d9729',
+  '3': '56b1685e3a78bad895f175731843abcdfb464a9e9c11f6f5d5be58bd20d38730',
+  '4': 'bb807ea9c44db5435a270f2b60c6b871e35500c573c3ff20a764a49c079c8739',
+  '5': '465695147eef8dafa691c7ab6a2668c973eaad146f9072446063263af9aab84e',
+  '6': 'f872e6c5974a73138f46901fd1afbc44084c5524f45e5f46543e44cf3b325ad4',
+  '7': 'cfa82b94307c20a7bdcb423acb3c1b9d879a8eec1d12608e8ee8792dc23cd61f',
+  '8': '10f190592ef3d72af4305b56f9a142cb61f4b9b3a87fca6f6b959f384a52bb90',
+  '9': 'aa7e76921cea011a00030286a581ea4f1408a353aab8a7dd22e1af2d5bbd90e7',
+  '10': '132b7aa83729ca0b18625383c57a2f52714a3f01d53a27de27a74cab990e094e',
+  '11': '52bf99f07550e2d77ec52ad3fb937811dbd40a4e64f1803267a5d7704eb83b43',
+  '12': 'bbc1feeaba68b4ef573a21679067ae903f2c4c387c79116c9b087bec5f43d93f',
+  '13': '6573fa6ac13b5ea8bb593a39f4a365508fa37c51e87131661852257f1834fd14',
+  '14': 'fda6db05e594021a897d40d5163b3eca804c64088d564deb5d5a5f7d58677b8d',
+  '15': 'b160b207f06c70025a0f35340c7279e2aa3e5206d1862c7e7e77f87ab7fe125f',
+  bibliography: '3cc5d5cdbb85829c0a7c97a8a4d92efffe7921696f86d8f0ca6c61ad24965372',
 }
 
 const book = JSON.parse(
@@ -123,6 +126,28 @@ assert.deepEqual(
     'bibliography',
   ],
 )
+assert.deepEqual(
+  book.parts
+    .filter(({ id }) => /^\d+$/.test(id))
+    .map(({ sections }) => sections[0]?.content),
+  [
+    '1. Basic endings',
+    '2. Basic Test',
+    '3. Knight vs. Pawn',
+    '4. Queen vs. Pawn',
+    '5. Rook vs. Pawn',
+    '6. Rook vs. 2 Pawns',
+    '7. Same-coloured bishops: Bishop + Pawn vs. Bishop',
+    '8. Bishop vs. Knight: one pawn on the board',
+    '9. Opposite-coloured bishops: Bishop + 2 pawns vs. Bishop',
+    '10. Rook + Pawn vs. Rook',
+    '11. Rook + two Pawns vs. Rook',
+    '12. Pawn endings',
+    '13. Other material relations',
+    '14. Final Test',
+    '15. Appendix',
+  ],
+)
 
 const appendix = book.parts.find(({ id }) => id === '15')
 assert.ok(appendix, 'Expected Chapter 15 - Appendix')
@@ -131,7 +156,7 @@ assert.deepEqual(
     .filter(({ type }) => type === 'heading')
     .map(({ content }) => content),
   [
-    'Fortresses',
+    '1. Fortresses',
     'Queen vs. 2 Minor Pieces',
     'Queen vs. Rook (and pawns)',
     'Rook vs. Bishop',
@@ -178,7 +203,21 @@ assert.equal(
     ({ type }) =>
       type === 'diagram' || type === 'position' || type === 'problem',
   ).length,
-  333,
+  337,
+)
+assert.equal(
+  book.parts
+    .flatMap(({ sections }) => sections)
+    .filter(
+      ({ type }) =>
+        type === 'diagram' || type === 'position' || type === 'problem',
+    )
+    .every(
+      ({ content }) =>
+        (content as { orientation?: string }).orientation === 'white',
+    ),
+  true,
+  'Every PDF board must preserve the verified white-side orientation',
 )
 
 console.log('book source audit passed')

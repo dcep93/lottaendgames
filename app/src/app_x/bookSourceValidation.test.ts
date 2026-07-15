@@ -16,6 +16,7 @@ const validBook = {
           type: 'position',
           content: {
             number: 'I.1',
+            orientation: 'white',
             fen: '8/8/8/8/8/2k5/8/2K5 w - - 0 1',
           },
         },
@@ -24,7 +25,15 @@ const validBook = {
           content: {
             number: 'intro-rook',
             label: 'The rook',
+            subtitle: 'Route',
+            orientation: 'white',
             fen: '8/8/8/3R4/8/8/8/8',
+            routes: [
+              {
+                meaning: 'Printed route',
+                squares: ['d5', 'd8'],
+              },
+            ],
           },
         },
         {
@@ -41,6 +50,15 @@ const validBook = {
 } satisfies BookSource
 
 assert.deepEqual(validateBookSource(validBook), validBook)
+assert.throws(
+  () =>
+    validateBookSource(
+      withMutation((book) => {
+        delete book.parts[0].sections[1].content.orientation
+      }),
+    ),
+  /orientation must be white or black/,
+)
 assert.throws(
   () => validateBookSource(withMutation((book) => book.parts.push(book.parts[0]))),
   /Duplicate part id/,
@@ -91,6 +109,15 @@ assert.throws(
       }),
     ),
   /invalid piece|expands to/,
+)
+assert.throws(
+  () =>
+    validateBookSource(
+      withMutation((book) => {
+        book.parts[0].sections[2].content.routes[0].squares = ['d5', 'i9']
+      }),
+    ),
+  /invalid square/,
 )
 assert.throws(
   () =>
