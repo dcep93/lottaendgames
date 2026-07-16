@@ -1,6 +1,13 @@
 import type { ReactNode } from 'react'
+import type { MateRouteSelection } from './types'
 
-export default function Mate({ moduleSelector }: { moduleSelector: ReactNode }) {
+type MateProps = {
+  moduleSelector: ReactNode
+  onNavigate: (href: string) => void
+  route: MateRouteSelection & { module: 'mate' }
+}
+
+export default function Mate({ moduleSelector }: MateProps) {
   return (
     <main className="leg-page">
       <div className="leg-reader-shell">

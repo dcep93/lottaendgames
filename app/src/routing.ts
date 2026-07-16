@@ -1,3 +1,6 @@
+import { MATE_CATALOG } from './mate/catalog'
+import type { MateId, MateMode, MateRouteSelection } from './mate/types'
+
 export type AppModule = 'book' | 'mate'
 
 export type AppRoute =
@@ -8,7 +11,7 @@ export type AppRoute =
     }
   | {
       module: 'mate'
-    }
+    } & MateRouteSelection
 
 export type RouteResolution = {
   href: string
@@ -22,8 +25,8 @@ export function resolveAppRoute(
   pathname: string,
   hash = '',
 ): RouteResolution {
-  if (pathname === '/mate') {
-    return { href: '/mate', route: { module: 'mate' } }
+  if (pathname === '/mate' || pathname.startsWith('/mate/')) {
+    return resolveMateRoute(pathname)
   }
 
   const chapterId = getBookChapterId(pathname)
@@ -39,6 +42,10 @@ export function resolveAppRoute(
       module: 'book',
     },
   }
+}
+
+export function matePath(id: MateId, mode: MateMode) {
+  return `/mate/${id}${mode === 'train' ? '/train' : ''}`
 }
 
 export function bookPathForChapterId(chapterId: string) {
@@ -101,6 +108,44 @@ function parseBookAnchor(hash: string) {
   }
 
   return null
+}
+
+function resolveMateRoute(pathname: string): RouteResolution {
+  if (pathname === '/mate') {
+    return emptyMateResolution()
+  }
+
+  const match = pathname.match(/^\/mate\/([^/]+)(\/train)?$/)
+  const catalogRecord = MATE_CATALOG.find(({ id }) => id === match?.[1])
+
+  if (!catalogRecord) {
+    return emptyMateResolution()
+  }
+
+  const mateMode = match?.[2] ? 'train' : 'standard'
+  const href = matePath(catalogRecord.id, mateMode)
+
+  return {
+    href,
+    route: {
+      module: 'mate',
+      mateId: catalogRecord.id,
+      mateMode,
+      sharedFen: null,
+    },
+  }
+}
+
+function emptyMateResolution(): RouteResolution {
+  return {
+    href: '/mate',
+    route: {
+      module: 'mate',
+      mateId: null,
+      mateMode: null,
+      sharedFen: null,
+    },
+  }
 }
 
 function safeDecodeHash(hash: string) {

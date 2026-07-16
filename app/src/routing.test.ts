@@ -3,6 +3,7 @@ import {
   bookEndingAnchorId,
   bookPathForChapterId,
   bookPositionAnchorId,
+  matePath,
   resolveAppRoute,
 } from './routing'
 
@@ -55,7 +56,57 @@ assert.deepEqual(resolveAppRoute('/book/bibliography', ''), {
 })
 assert.deepEqual(resolveAppRoute('/mate', '#ignored'), {
   href: '/mate',
-  route: { module: 'mate' },
+  route: {
+    module: 'mate',
+    mateId: null,
+    mateMode: null,
+    sharedFen: null,
+  },
+})
+assert.deepEqual(resolveAppRoute('/mate/rook/train'), {
+  href: '/mate/rook/train',
+  route: {
+    module: 'mate',
+    mateId: 'rook',
+    mateMode: 'train',
+    sharedFen: null,
+  },
+})
+assert.deepEqual(resolveAppRoute('/mate/rook/close'), {
+  href: '/mate',
+  route: {
+    module: 'mate',
+    mateId: null,
+    mateMode: null,
+    sharedFen: null,
+  },
+})
+assert.deepEqual(resolveAppRoute('/mate/queen', '#not-supported-yet'), {
+  href: '/mate/queen',
+  route: {
+    module: 'mate',
+    mateId: 'queen',
+    mateMode: 'standard',
+    sharedFen: null,
+  },
+})
+assert.deepEqual(resolveAppRoute('/mate/not-a-mating-set'), {
+  href: '/mate',
+  route: {
+    module: 'mate',
+    mateId: null,
+    mateMode: null,
+    sharedFen: null,
+  },
+})
+assert.deepEqual(resolveAppRoute('/mate/rook/train/extra'), {
+  href: '/mate',
+  route: {
+    module: 'mate',
+    mateId: null,
+    mateMode: null,
+    sharedFen: null,
+  },
 })
 assert.deepEqual(resolveAppRoute('/book/chapter16', '#e1'), {
   href: '/book/about',
@@ -74,5 +125,34 @@ assert.equal(bookPathForChapterId('bibliography'), '/book/bibliography')
 assert.equal(bookPathForChapterId('16'), '/book/about')
 assert.equal(bookEndingAnchorId('1'), 'e1')
 assert.equal(bookPositionAnchorId('1.4'), 'p1.4')
+assert.equal(matePath('bishop-knight', 'standard'), '/mate/bishop-knight')
+assert.equal(matePath('bishop-knight', 'train'), '/mate/bishop-knight/train')
+
+for (const mateId of [
+  'queen',
+  'rook',
+  'two-bishops',
+  'bishop-knight',
+  'two-knights-pawn',
+] as const) {
+  assert.deepEqual(resolveAppRoute(matePath(mateId, 'standard')), {
+    href: `/mate/${mateId}`,
+    route: {
+      module: 'mate',
+      mateId,
+      mateMode: 'standard',
+      sharedFen: null,
+    },
+  })
+  assert.deepEqual(resolveAppRoute(matePath(mateId, 'train')), {
+    href: `/mate/${mateId}/train`,
+    route: {
+      module: 'mate',
+      mateId,
+      mateMode: 'train',
+      sharedFen: null,
+    },
+  })
+}
 
 console.log('routing tests passed')

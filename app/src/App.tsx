@@ -52,7 +52,9 @@ export default function App() {
   )
 
   if (route.module === 'mate') {
-    return <Mate moduleSelector={moduleSelector} />
+    return (
+      <Mate moduleSelector={moduleSelector} route={route} onNavigate={navigate} />
+    )
   }
 
   return (
