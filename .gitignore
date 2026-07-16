@@ -9,4 +9,5 @@ app/.firebaserc
 __pycache__/
 *.pyc
 .superpowers/
+.worktrees/
 tmp/
