@@ -1,4 +1,5 @@
 import type { MateId } from '../types'
+import { bishopKnightRuleSet } from './bishopKnight'
 import { queenRuleSet, rookRuleSet } from './majorPieces'
 import { twoBishopsRuleSet } from './twoBishops'
 import type {
@@ -39,6 +40,38 @@ export type {
   RookBlackMoveScore,
   RookWhiteMoveScore,
 } from './majorPieces'
+
+export {
+  bishopKnightRuleSet,
+  compareKnightAndBishopBlackScores,
+  compareKnightAndBishopWhiteScores,
+  getIdealKnightAndBishopWhiteMoves,
+  getKnightAndBishopEstablishedZoneXKnightRouteTarget,
+  getKnightAndBishopKeySquarePatternScore,
+  getKnightAndBishopLookupEntryResultFen,
+  getKnightAndBishopLookupWhiteMoves,
+  getKnightAndBishopOpponentCandidates,
+  getKnightAndBishopPhaseLabel,
+  getKnightAndBishopZone5,
+  getKnightAndBishopZoneXKnightDriftTarget,
+  getKnightAndBishopZoneXSetup,
+  isKnightAndBishopLookupPhasePosition,
+  isKnightAndBishopMatingNetWhiteTurnPosition,
+  isKnightAndBishopWManeuverPosition,
+  knightAndBishopBlackHasLookupReply,
+  knightAndBishopWhiteMoveForcesZone5,
+  knightAndBishopWhiteMoveReachesLookupPath,
+  knightAndBishopWhiteRules,
+  scoreKnightAndBishopOpponentPosition,
+  scoreKnightAndBishopWhiteMove,
+  wManeuverSetupDistance,
+} from './bishopKnight'
+export type {
+  KnightAndBishopBlackMoveScore,
+  KnightAndBishopWhiteMoveScore,
+  KnightAndBishopZone5,
+  KnightAndBishopZoneXSetup,
+} from './bishopKnight'
 
 export {
   compareTwoBishopsBlackScores,
@@ -327,25 +360,43 @@ function createRegisteredMateRuleSet<Score>(
         id: orderedRule.id,
         shortLabel: orderedRule.shortLabel,
         helpText: orderedRule.helpText,
+        guideOrder: orderedRule.guideOrder,
         applies: orderedRule.applies,
         stopWhenBest: orderedRule.stopWhenBest,
         compare: orderedRule.compare,
       }),
     ),
   )
+  const descriptionsById = new Map<string, RuleDescription>()
+  const descriptionOrderById = new Map<string, number>()
   const ruleEntries = Object.freeze(
-    whiteRules.map((orderedRule) => ({
-      orderedRule,
-      description: Object.freeze({
-        id: orderedRule.id,
-        shortLabel: orderedRule.shortLabel,
-        helpText: orderedRule.helpText,
-      }),
-    })),
+    whiteRules.map((orderedRule, index) => {
+      const existingDescription = descriptionsById.get(orderedRule.id)
+      const description =
+        existingDescription ??
+        Object.freeze({
+          id: orderedRule.id,
+          shortLabel: orderedRule.shortLabel,
+          helpText: orderedRule.helpText,
+        })
+      descriptionsById.set(orderedRule.id, description)
+      descriptionOrderById.set(
+        orderedRule.id,
+        Math.min(
+          descriptionOrderById.get(orderedRule.id) ?? Number.POSITIVE_INFINITY,
+          orderedRule.guideOrder ?? index,
+        ),
+      )
+      return { orderedRule, description }
+    }),
   )
-  const whiteRuleDescriptions = Object.freeze(
-    ruleEntries.map(({ description }) => description),
-  )
+  const whiteRuleDescriptions = Object.freeze([
+    ...descriptionsById.values(),
+  ].sort(
+    (first, second) =>
+      (descriptionOrderById.get(first.id) ?? 0) -
+      (descriptionOrderById.get(second.id) ?? 0),
+  ))
   const scoredWhiteMoves = (fen: string): readonly ScoredMove<Score>[] => {
     const moves = whiteMoves(fen)
     return scoreWhiteCandidates
@@ -417,3 +468,4 @@ export function getMateRuleSet(id: MateId): RegisteredMateRuleSet {
 registerBuiltInMateRuleSet(queenRuleSet)
 registerBuiltInMateRuleSet(rookRuleSet)
 registerBuiltInMateRuleSet(twoBishopsRuleSet)
+registerBuiltInMateRuleSet(bishopKnightRuleSet)

@@ -9,6 +9,8 @@ export type OrderedRule<Score> = {
   readonly id: string
   readonly shortLabel: string
   readonly helpText: string
+  /** Places a deduplicated rule in the visible guide without reordering its evaluator stage. */
+  readonly guideOrder?: number
   /**
    * Limits this priority to the scores for which its comparison is meaningful.
    * A non-applicable candidate remains untouched while applicable candidates
