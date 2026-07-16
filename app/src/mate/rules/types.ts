@@ -9,7 +9,18 @@ export type OrderedRule<Score> = {
   readonly id: string
   readonly shortLabel: string
   readonly helpText: string
+  /**
+   * Defines a deterministic total preorder for this priority. A negative finite
+   * result prefers left, zero ties them, and a positive finite result prefers
+   * right. Implementations must never return NaN or an infinite value.
+   */
   readonly compare: (left: Score, right: Score) => number
+}
+
+export type RuleDescription = {
+  readonly id: string
+  readonly shortLabel: string
+  readonly helpText: string
 }
 
 export type OpponentCandidates = {
@@ -67,6 +78,24 @@ export type RuleHelp = {
   readonly blackPriorities: readonly string[]
   readonly notes: readonly string[]
   readonly noteBoards: readonly RuleNoteBoard[]
+}
+
+export type RegisteredMateRuleSet = {
+  readonly id: MateId
+  readonly phase: (fen: string) => string
+  readonly whiteMoves: (fen: string) => readonly string[]
+  readonly blackCandidates: (
+    fen: string,
+    previousTurnFen?: string,
+  ) => OpponentCandidates
+  readonly help: RuleHelp
+  readonly whiteRuleDescriptions: readonly RuleDescription[]
+  readonly idealWhiteMoves: (fen: string) => readonly string[]
+  readonly explainWhiteMove: (
+    fen: string,
+    san?: string,
+  ) => RuleDescription | undefined
+  readonly currentWhiteHint: (fen: string) => RuleDescription | undefined
 }
 
 export type MateRuleSet<Score> = {

@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import {
+  compareScoresByRules,
   currentHint,
   explainMove,
   findCandidateBySan,
@@ -13,6 +14,7 @@ import {
 import type {
   MateRuleSet,
   OrderedRule,
+  RegisteredMateRuleSet,
   RuleHelp,
   ScoredMove,
 } from './types'
@@ -75,15 +77,36 @@ const help: RuleHelp = {
 const rookRuleSet: MateRuleSet<TestScore> = {
   id: 'rook',
   phase: () => 'box',
-  scoreWhite: (_fen, san) =>
-    san === 'Kh1' ? { safe: 1, closer: 0 } : { safe: 0, closer: 1 },
+  scoreWhite: (_fen, san) => {
+    if (san === 'Kh1') {
+      return { safe: 1, closer: 0 }
+    }
+    if (san === 'Kc2') {
+      return { safe: 0, closer: 2 }
+    }
+    return { safe: 0, closer: 1 }
+  },
   whiteRules: rules,
-  whiteMoves: () => ['Ka2', 'Kb2'],
+  whiteMoves: () => candidates.map(({ san }) => san),
   blackCandidates: () => ({
     moves: ['Kh7', 'Kg7'],
     idealMoves: ['Kh7'],
   }),
   help,
+}
+
+function permutations<Value>(values: readonly Value[]): readonly Value[][] {
+  if (values.length <= 1) {
+    return [[...values]]
+  }
+
+  return values.flatMap((value, index) => {
+    const remaining = [...values.slice(0, index), ...values.slice(index + 1)]
+    return permutations(remaining).map((permutation) => [
+      value,
+      ...permutation,
+    ])
+  })
 }
 
 test('ordered rules filter candidates lexicographically', () => {
@@ -100,6 +123,46 @@ test('multiple ideal moves retain their input order', () => {
   assert.deepEqual(selectIdealMoves(reversedTies, rules), ['Kb2', 'Ka2'])
 })
 
+test('full score comparison applies rules in lexicographic order', () => {
+  assert.equal(
+    compareScoresByRules(candidates[0]!.score, candidates[2]!.score, rules),
+    -1,
+  )
+  assert.equal(
+    compareScoresByRules(candidates[0]!.score, candidates[3]!.score, rules),
+    -1,
+  )
+  assert.equal(
+    compareScoresByRules(candidates[0]!.score, candidates[1]!.score, rules),
+    0,
+  )
+  assert.equal(
+    compareScoresByRules(candidates[2]!.score, candidates[0]!.score, []),
+    0,
+  )
+})
+
+test('candidate permutations preserve tie order and explanation rules', () => {
+  for (const permutation of permutations(candidates)) {
+    const expectedIdealMoves = permutation
+      .filter(({ san }) => san === 'Ka2' || san === 'Kb2')
+      .map(({ san }) => san)
+    const context = permutation.map(({ san }) => san).join(', ')
+
+    assert.deepEqual(
+      selectIdealMoves(permutation, rules),
+      expectedIdealMoves,
+      context,
+    )
+    assert.equal(currentHint(permutation, rules), closerRule, context)
+    for (const san of expectedIdealMoves) {
+      assert.equal(explainMove(permutation, rules, san), closerRule, context)
+    }
+    assert.equal(explainMove(permutation, rules, 'Kh1'), safeRule, context)
+    assert.equal(explainMove(permutation, rules, 'Kc2'), closerRule, context)
+  }
+})
+
 test('an incorrect played move uses its first differing rule', () => {
   assert.equal(explainMove(candidates, rules, 'Kh1'), safeRule)
   assert.equal(
@@ -108,7 +171,7 @@ test('an incorrect played move uses its first differing rule', () => {
   )
 })
 
-test('a correct played move explains the first non-ideal candidate', () => {
+test('a correct played move explains the closest non-ideal candidate', () => {
   assert.equal(explainMove(candidates, rules, 'Kb2'), closerRule)
   assert.equal(currentHint(candidates, rules), closerRule)
 })
@@ -169,24 +232,65 @@ test('rule sets integrate ordered rules with presentation-only help', () => {
   ])
 })
 
-test('registration cleanup removes only its own registry entry', () => {
+test('registered rule operations capture concrete scores without exposing them', () => {
   const unregisterFirst = registerMateRuleSet(rookRuleSet)
-  const unregisterReplacement = registerMateRuleSet(rookRuleSet)
 
   try {
-    unregisterFirst()
-    assert.equal(getMateRuleSet('rook'), rookRuleSet)
+    const unregisterReplacement = registerMateRuleSet(rookRuleSet)
+
+    try {
+      unregisterFirst()
+      const registered = getMateRuleSet('rook')
+      const exposesScoreWhite: 'scoreWhite' extends keyof RegisteredMateRuleSet
+        ? true
+        : false = false
+      const exposesWhiteRules: 'whiteRules' extends keyof RegisteredMateRuleSet
+        ? true
+        : false = false
+      const descriptionsExposeCompare: 'compare' extends keyof RegisteredMateRuleSet['whiteRuleDescriptions'][number]
+        ? true
+        : false = false
+
+      assert.equal(exposesScoreWhite, false)
+      assert.equal(exposesWhiteRules, false)
+      assert.equal(descriptionsExposeCompare, false)
+      assert.equal('scoreWhite' in registered, false)
+      assert.equal('whiteRules' in registered, false)
+      assert.deepEqual(registered.whiteRuleDescriptions, [
+        {
+          id: 'safe',
+          shortLabel: 'Keep it safe',
+          helpText: 'Keep the piece safe.',
+        },
+        {
+          id: 'closer',
+          shortLabel: 'King closer',
+          helpText: 'Bring the king closer.',
+        },
+      ])
+      assert.deepEqual(registered.idealWhiteMoves('test-fen'), ['Ka2', 'Kb2'])
+      assert.deepEqual(registered.explainWhiteMove('test-fen', 'Kh1'), {
+        id: 'safe',
+        shortLabel: 'Keep it safe',
+        helpText: 'Keep the piece safe.',
+      })
+      assert.deepEqual(registered.explainWhiteMove('test-fen', 'Kb2'), {
+        id: 'closer',
+        shortLabel: 'King closer',
+        helpText: 'Bring the king closer.',
+      })
+      assert.deepEqual(registered.currentWhiteHint('test-fen'), {
+        id: 'closer',
+        shortLabel: 'King closer',
+        helpText: 'Bring the king closer.',
+      })
+    } finally {
+      unregisterReplacement()
+    }
   } finally {
-    unregisterReplacement()
+    unregisterFirst()
   }
 
-  assert.throws(
-    () => getMateRuleSet('rook'),
-    new Error('Mate rules not registered: rook'),
-  )
-})
-
-test('registry cleanup leaves subsequent tests isolated', () => {
   assert.throws(
     () => getMateRuleSet('rook'),
     new Error('Mate rules not registered: rook'),

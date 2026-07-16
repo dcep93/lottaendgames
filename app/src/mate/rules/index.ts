@@ -1,10 +1,18 @@
 import type { MateId } from '../types'
-import type { MateRuleSet, OrderedRule, ScoredMove } from './types'
+import type {
+  MateRuleSet,
+  OrderedRule,
+  RegisteredMateRuleSet,
+  RuleDescription,
+  ScoredMove,
+} from './types'
 
 export type {
   MateRuleSet,
   OpponentCandidates,
   OrderedRule,
+  RegisteredMateRuleSet,
+  RuleDescription,
   RuleHelp,
   RuleNoteBoard,
   RuleNoteBoardArrow,
@@ -50,6 +58,21 @@ export function selectIdealMoves<Score>(
   rules: readonly OrderedRule<Score>[],
 ): readonly string[] {
   return selectIdealCandidates(candidates, rules).map(({ san }) => san)
+}
+
+export function compareScoresByRules<Score>(
+  leftScore: Score,
+  rightScore: Score,
+  rules: readonly OrderedRule<Score>[],
+): number {
+  for (const orderedRule of rules) {
+    const comparison = orderedRule.compare(leftScore, rightScore)
+    if (comparison !== 0) {
+      return comparison
+    }
+  }
+
+  return 0
 }
 
 export function firstDifferingRule<Score>(
@@ -102,14 +125,23 @@ export function explainMove<Score>(
     }
   }
 
-  const firstNonIdeal = candidates.find(
+  const nonIdealCandidates = candidates.filter(
     (candidate) => !idealCandidates.includes(candidate),
   )
-  if (!firstNonIdeal) {
+  let closestNonIdeal = nonIdealCandidates[0]
+  if (!closestNonIdeal) {
     return undefined
   }
 
-  return firstDifferingRule(best.score, firstNonIdeal.score, rules)
+  for (const candidate of nonIdealCandidates.slice(1)) {
+    if (
+      compareScoresByRules(candidate.score, closestNonIdeal.score, rules) < 0
+    ) {
+      closestNonIdeal = candidate
+    }
+  }
+
+  return firstDifferingRule(best.score, closestNonIdeal.score, rules)
 }
 
 export function currentHint<Score>(
@@ -120,19 +152,56 @@ export function currentHint<Score>(
 }
 
 type MateRuleSetRegistration = {
-  readonly ruleSet: MateRuleSet<unknown>
+  readonly registeredRuleSet: RegisteredMateRuleSet
 }
 
 const mateRuleSets = new Map<MateId, MateRuleSetRegistration>()
 
+function createRegisteredMateRuleSet<Score>(
+  ruleSet: MateRuleSet<Score>,
+): RegisteredMateRuleSet {
+  const ruleEntries = ruleSet.whiteRules.map((orderedRule) => ({
+    orderedRule,
+    description: {
+      id: orderedRule.id,
+      shortLabel: orderedRule.shortLabel,
+      helpText: orderedRule.helpText,
+    },
+  }))
+  const whiteRuleDescriptions = ruleEntries.map(({ description }) => description)
+  const scoredWhiteMoves = (fen: string): readonly ScoredMove<Score>[] =>
+    ruleSet.whiteMoves(fen).map((san) => ({
+      san,
+      score: ruleSet.scoreWhite(fen, san),
+    }))
+  const describeRule = (
+    orderedRule: OrderedRule<Score> | undefined,
+  ): RuleDescription | undefined =>
+    ruleEntries.find((entry) => entry.orderedRule === orderedRule)?.description
+
+  return {
+    id: ruleSet.id,
+    phase: (fen) => ruleSet.phase(fen),
+    whiteMoves: (fen) => ruleSet.whiteMoves(fen),
+    blackCandidates: (fen, previousTurnFen) =>
+      ruleSet.blackCandidates(fen, previousTurnFen),
+    help: ruleSet.help,
+    whiteRuleDescriptions,
+    idealWhiteMoves: (fen) =>
+      selectIdealMoves(scoredWhiteMoves(fen), ruleSet.whiteRules),
+    explainWhiteMove: (fen, san) =>
+      describeRule(explainMove(scoredWhiteMoves(fen), ruleSet.whiteRules, san)),
+    currentWhiteHint: (fen) =>
+      describeRule(currentHint(scoredWhiteMoves(fen), ruleSet.whiteRules)),
+  }
+}
+
 export function registerMateRuleSet<Score>(
   ruleSet: MateRuleSet<Score>,
 ): () => void {
-  // This is the registry's only type-erasure boundary. A score producer and its
-  // matching rules remain bundled in the same rule-set contract at runtime.
   const id = ruleSet.id
   const registration = {
-    ruleSet: ruleSet as unknown as MateRuleSet<unknown>,
+    registeredRuleSet: createRegisteredMateRuleSet(ruleSet),
   }
   mateRuleSets.set(id, registration)
 
@@ -143,10 +212,10 @@ export function registerMateRuleSet<Score>(
   }
 }
 
-export function getMateRuleSet(id: MateId): MateRuleSet<unknown> {
+export function getMateRuleSet(id: MateId): RegisteredMateRuleSet {
   const registration = mateRuleSets.get(id)
   if (!registration) {
     throw new Error(`Mate rules not registered: ${id}`)
   }
-  return registration.ruleSet
+  return registration.registeredRuleSet
 }
