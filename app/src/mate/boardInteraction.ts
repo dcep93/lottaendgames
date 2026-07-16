@@ -16,6 +16,13 @@ type TryMateBoardMoveOptions = {
   readonly onMove: (san: string) => void
 }
 
+type ResolveMateBoardMoveOptions = Omit<TryMateBoardMoveOptions, 'onMove'>
+
+export type ResolvedMateBoardMove = {
+  readonly fen: string
+  readonly san: string
+}
+
 const SQUARE_PATTERN = /^[a-h][1-8]$/
 
 export function tryMateBoardMove({
@@ -25,6 +32,23 @@ export function tryMateBoardMove({
   disabled,
   onMove,
 }: TryMateBoardMoveOptions): boolean {
+  const move = resolveMateBoardMove({
+    disabled,
+    fen,
+    sourceSquare,
+    targetSquare,
+  })
+  if (move === null) return false
+  onMove(move.san)
+  return true
+}
+
+export function resolveMateBoardMove({
+  fen,
+  sourceSquare,
+  targetSquare,
+  disabled,
+}: ResolveMateBoardMoveOptions): ResolvedMateBoardMove | null {
   if (
     disabled ||
     targetSquare === null ||
@@ -32,25 +56,22 @@ export function tryMateBoardMove({
     !SQUARE_PATTERN.test(sourceSquare) ||
     !SQUARE_PATTERN.test(targetSquare)
   ) {
-    return false
+    return null
   }
 
-  let san: string
   try {
     const chess = getChess(fen)
     const source = sourceSquare as Square
     const target = targetSquare as Square
     if (chess.turn() !== 'w' || chess.get(source)?.color !== 'w') {
-      return false
+      return null
     }
     const move = chess.move({ from: source, to: target })
-    if (move === null) return false
-    san = move.san
+    if (move === null) return null
+    return { fen: chess.fen(), san: move.san }
   } catch {
-    return false
+    return null
   }
-  onMove(san)
-  return true
 }
 
 export function getMateBoardSquareStyles(

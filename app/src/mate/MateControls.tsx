@@ -103,15 +103,14 @@ export default function MateControls({
         >
           {showTimer ? 'Hide timer' : 'Show timer'}
         </button>
-        {showTimer ? (
-          <output
-            aria-label="Elapsed time"
-            className="leg-mate-timer"
-            id={timerId}
-          >
-            {formatMateElapsed(elapsedMs)}
-          </output>
-        ) : null}
+        <output
+          aria-label="Elapsed time"
+          className="leg-mate-timer"
+          hidden={!showTimer}
+          id={timerId}
+        >
+          {formatMateElapsed(elapsedMs)}
+        </output>
         {terminalLabel === undefined ? null : (
           <>
             <span
@@ -127,11 +126,14 @@ export default function MateControls({
             </button>
           </>
         )}
-        {shareStatus ? (
-          <span aria-live="polite" className="leg-mate-share-status">
-            {shareStatus}
-          </span>
-        ) : null}
+        <span
+          aria-label="Share status"
+          aria-live="polite"
+          className="leg-mate-share-status"
+          role="status"
+        >
+          {shareStatus ?? ''}
+        </span>
       </div>
     </div>
   )

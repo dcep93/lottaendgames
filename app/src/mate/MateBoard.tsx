@@ -5,13 +5,18 @@ import {
   useState,
 } from 'react'
 import type { Square } from 'chess.js'
-import { Chessboard } from 'react-chessboard'
+import {
+  Chessboard,
+  defaultPieces,
+  type ChessboardOptions,
+  type PieceRenderObject,
+} from 'react-chessboard'
 import {
   MATE_REPLY_ANIMATION_MS,
   canSelectWhitePiece,
   getLegalTargets,
   getMateBoardSquareStyles,
-  tryMateBoardMove,
+  resolveMateBoardMove,
 } from './boardInteraction'
 
 export type MateBoardProps = {
@@ -22,19 +27,92 @@ export type MateBoardProps = {
   readonly onMove: (san: string) => void
 }
 
-export default function MateBoard({
+type BoardRenderer = React.ComponentType<{ readonly options?: ChessboardOptions }>
+
+type MateBoardSurfaceProps = MateBoardProps & {
+  readonly boardRenderer?: BoardRenderer
+}
+
+type OptimisticMove = {
+  readonly id: number
+  readonly san: string
+  readonly sourceFen: string
+  readonly stage: 'pending' | 'notified' | 'settled'
+  readonly whiteFen: string
+}
+
+const PIECE_NAMES: Readonly<Record<string, string>> = {
+  P: 'pawn',
+  R: 'rook',
+  N: 'knight',
+  B: 'bishop',
+  Q: 'queen',
+  K: 'king',
+}
+
+const VISUALLY_HIDDEN_STYLE = Object.freeze({
+  border: 0,
+  clipPath: 'inset(50%)',
+  height: '0.0625rem',
+  margin: '-0.0625rem',
+  overflow: 'hidden',
+  padding: 0,
+  position: 'absolute',
+  whiteSpace: 'nowrap',
+  width: '0.0625rem',
+} satisfies React.CSSProperties)
+
+const ACCESSIBLE_PIECES = Object.fromEntries(
+  Object.entries(defaultPieces).map(([pieceType, renderPiece]) => [
+    pieceType,
+    (props) => (
+      <>
+        <span aria-hidden="true" style={{ display: 'contents' }}>
+          {renderPiece(props)}
+        </span>
+        <span style={VISUALLY_HIDDEN_STYLE}>
+          {pieceLabel(pieceType, props?.square)}
+        </span>
+      </>
+    ),
+  ]),
+) as PieceRenderObject
+
+export default function MateBoard(props: MateBoardProps) {
+  return <MateBoardSurface {...props} />
+}
+
+export function MateBoardSurface({
   fen,
   phase,
   lastMove,
   disabled,
   onMove,
-}: MateBoardProps) {
+  boardRenderer: BoardRenderer = Chessboard,
+}: MateBoardSurfaceProps) {
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null)
+  const [optimisticMove, setOptimisticMove] = useState<OptimisticMove | null>(
+    null,
+  )
+  const moveId = React.useRef(0)
   const phaseId = React.useId()
 
   useEffect(() => {
     setSelectedSquare(null)
   }, [disabled, fen])
+  useEffect(() => {
+    if (optimisticMove === null || optimisticMove.stage === 'settled') return
+    if (disabled || fen !== optimisticMove.sourceFen) {
+      setOptimisticMove({ ...optimisticMove, stage: 'settled' })
+      return
+    }
+    if (optimisticMove.stage === 'pending') {
+      setOptimisticMove({ ...optimisticMove, stage: 'notified' })
+      onMove(optimisticMove.san)
+      return
+    }
+    setOptimisticMove({ ...optimisticMove, stage: 'settled' })
+  }, [disabled, fen, onMove, optimisticMove])
 
   const legalTargets = useMemo(
     () => getLegalTargets(fen, selectedSquare, disabled),
@@ -48,22 +126,38 @@ export default function MateBoard({
   const lastMoveLabel = lastMove === null
     ? 'none'
     : `${lastMove[0]}-${lastMove[1]}`
+  const isOptimistic =
+    !disabled &&
+    optimisticMove?.stage !== 'settled' &&
+    optimisticMove?.sourceFen === fen
+  const displayedFen = isOptimistic ? optimisticMove.whiteFen : fen
 
   const canSelect = (square: string | null) =>
-    square !== null && canSelectWhitePiece(fen, square, disabled)
+    !isOptimistic &&
+    square !== null &&
+    canSelectWhitePiece(fen, square, disabled)
   const selectSquare = (square: string | null) => {
     setSelectedSquare(canSelect(square) ? square as Square : null)
   }
   const moveFromTo = (sourceSquare: string, targetSquare: string | null) => {
-    const didMove = tryMateBoardMove({
-      disabled,
+    const move = resolveMateBoardMove({
+      disabled: disabled || isOptimistic,
       fen,
-      onMove,
       sourceSquare,
       targetSquare,
     })
-    if (didMove) setSelectedSquare(null)
-    return didMove
+    if (move === null) return false
+
+    moveId.current += 1
+    setSelectedSquare(null)
+    setOptimisticMove({
+      id: moveId.current,
+      san: move.san,
+      sourceFen: fen,
+      stage: 'pending',
+      whiteFen: move.fen,
+    })
+    return true
   }
 
   return (
@@ -82,16 +176,20 @@ export default function MateBoard({
         data-last-move={lastMoveLabel}
         data-orientation="white"
         data-phase={phase}
+        data-position-state={isOptimistic ? 'optimistic' : 'controlled'}
         data-reply-animation-ms={MATE_REPLY_ANIMATION_MS}
         role="group"
       >
-        <Chessboard
+        <BoardRenderer
+          key={`mate-board-move-${optimisticMove?.id ?? 0}`}
           options={{
             id: 'leg-mate-board',
             allowDragOffBoard: false,
-            allowDragging: !disabled,
+            allowDragging: !disabled && !isOptimistic,
             allowDrawingArrows: false,
-            animationDurationInMs: MATE_REPLY_ANIMATION_MS,
+            animationDurationInMs: isOptimistic
+              ? 0
+              : MATE_REPLY_ANIMATION_MS,
             boardOrientation: 'white',
             boardStyle: {
               borderRadius: '0.35rem',
@@ -118,8 +216,9 @@ export default function MateBoard({
                 selectSquare(square)
               }
             },
-            position: fen,
-            showAnimations: true,
+            pieces: ACCESSIBLE_PIECES,
+            position: displayedFen,
+            showAnimations: !isOptimistic,
             showNotation: true,
             squareStyles,
           }}
@@ -127,4 +226,12 @@ export default function MateBoard({
       </div>
     </div>
   )
+}
+
+function pieceLabel(pieceType: string, square: string | undefined): string {
+  const color = pieceType[0] === 'w' ? 'White' : 'Black'
+  const piece = PIECE_NAMES[pieceType[1] ?? ''] ?? 'piece'
+  return square === undefined
+    ? `${color} ${piece}`
+    : `${color} ${piece} on ${square}`
 }
