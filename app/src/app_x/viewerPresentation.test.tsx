@@ -49,6 +49,25 @@ const frontMatterMarkup = renderToStaticMarkup(
     onNavigate={() => undefined}
   />,
 )
+const frontMatterSectionOrder = [
+  'With thanks',
+  'About this project',
+  'About this edition',
+  'Reader features',
+  'Note on this digital edition',
+  'Publisher&#x27;s description',
+  'Table of contents',
+]
+const frontMatterSectionIndexes = frontMatterSectionOrder.map((heading) => {
+  const index = frontMatterMarkup.indexOf(heading)
+  assert.notEqual(index, -1, `missing About-page heading: ${heading}`)
+  return index
+})
+assert.deepEqual(
+  [...frontMatterSectionIndexes].sort((left, right) => left - right),
+  frontMatterSectionIndexes,
+  'About-page sections must remain in the requested DOM order',
+)
 assert.match(frontMatterMarkup, /Jesús de la Villa/)
 assert.match(frontMatterMarkup, /Vital Lessons for Every Chess Player/)
 assert.match(frontMatterMarkup, /New In Chess, 2008/)

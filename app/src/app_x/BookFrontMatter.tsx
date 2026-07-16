@@ -16,6 +16,37 @@ export default function BookFrontMatter({
 }) {
   return (
     <article className="leg-frontmatter">
+      <FrontMatterSection title="With thanks">
+        <p>
+          Thank you to Jesús de la Villa for creating this book and making
+          essential endgame knowledge approachable, memorable, and practical.
+        </p>
+        <p>
+          If anything here needs correction, clarification, permission review,
+          or removal, please contact{' '}
+          <a href="mailto:dcep93@gmail.com">dcep93@gmail.com</a>.
+        </p>
+      </FrontMatterSection>
+
+      <FrontMatterSection title="About this project">
+        <p>
+          Lotta Endgames is an unofficial interactive companion to Jesús de la
+          Villa&apos;s <em>100 Endgames You Must Know</em>.
+        </p>
+        <p>
+          It is probably better to study the book in its original form. Following
+          the notation, visualizing the moves, and moving between text and
+          diagrams takes more work, and that extra effort can lead to stronger
+          retention.
+        </p>
+        <p>
+          For lazier readers - or anyone who does not want to keep flipping
+          between pages or visualizing every move from notation alone - this app
+          offers a lower-friction way to follow the same material with
+          synchronized boards and direct navigation.
+        </p>
+      </FrontMatterSection>
+
       <header className="leg-frontmatter-identity">
         <p className="leg-kicker">About this edition</p>
         <h2>100 Endgames You Must Know</h2>
@@ -72,6 +103,37 @@ export default function BookFrontMatter({
         </p>
       </header>
 
+      <FrontMatterSection title="Reader features">
+        <ul className="leg-feature-list">
+          <li>Clickable move notation with synchronized boards</li>
+          <li>Lichess, Previous, Reset, and Next controls</li>
+          <li>Left and Right Arrow keyboard navigation</li>
+          <li>Visible coordinates and book-matched board orientation</li>
+          <li>Click-to-expand boards</li>
+          <li>Lichess analysis and editor links</li>
+          <li>Direct links to chapters, endings, and positions</li>
+          <li>Revealable test solutions</li>
+          <li>A linkable table of contents</li>
+        </ul>
+      </FrontMatterSection>
+
+      <FrontMatterSection title="Note on this digital edition">
+        <ul className="leg-deviation-list">
+          <li>
+            <BookLink
+              href={`${bookPathForChapterId('14')}#${bookPositionAnchorId('14.29')}`}
+              onNavigate={onNavigate}
+            >
+              Final Test 14.29
+            </BookLink>{' '}
+            has the prompt “Black to move. Can he draw?” (print page 233; PDF
+            page 234), while its solution begins with White&apos;s 69th move (print
+            page 238; PDF page 239). This digital edition presents the prompt as
+            “White to move. Can he draw?” so that it agrees with the solution.
+          </li>
+        </ul>
+      </FrontMatterSection>
+
       <FrontMatterSection title="Publisher's description">
         <p>The good news about chess endgames is:</p>
         <ul>
@@ -120,68 +182,6 @@ export default function BookFrontMatter({
           chess coach. He has won the Spanish Championship twice.
         </p>
         <p>Printed cover price: Games / Chess $24.95 · €21.95.</p>
-      </FrontMatterSection>
-
-      <FrontMatterSection title="About this project">
-        <p>
-          Lotta Endgames is an unofficial interactive companion to Jesús de la
-          Villa&apos;s <em>100 Endgames You Must Know</em>.
-        </p>
-        <p>
-          It is probably better to study the book in its original form. Following
-          the notation, visualizing the moves, and moving between text and
-          diagrams takes more work, and that extra effort can lead to stronger
-          retention.
-        </p>
-        <p>
-          For lazier readers - or anyone who does not want to keep flipping
-          between pages or visualizing every move from notation alone - this app
-          offers a lower-friction way to follow the same material with
-          synchronized boards and direct navigation.
-        </p>
-      </FrontMatterSection>
-
-      <FrontMatterSection title="Reader features">
-        <ul className="leg-feature-list">
-          <li>Clickable move notation with synchronized boards</li>
-          <li>Lichess, Previous, Reset, and Next controls</li>
-          <li>Left and Right Arrow keyboard navigation</li>
-          <li>Visible coordinates and book-matched board orientation</li>
-          <li>Click-to-expand boards</li>
-          <li>Lichess analysis and editor links</li>
-          <li>Direct links to chapters, endings, and positions</li>
-          <li>Revealable test solutions</li>
-          <li>A linkable table of contents</li>
-        </ul>
-      </FrontMatterSection>
-
-      <FrontMatterSection title="Note on this digital edition">
-        <ul className="leg-deviation-list">
-          <li>
-            <BookLink
-              href={`${bookPathForChapterId('14')}#${bookPositionAnchorId('14.29')}`}
-              onNavigate={onNavigate}
-            >
-              Final Test 14.29
-            </BookLink>{' '}
-            has the prompt “Black to move. Can he draw?” (print page 233; PDF
-            page 234), while its solution begins with White&apos;s 69th move (print
-            page 238; PDF page 239). This digital edition presents the prompt as
-            “White to move. Can he draw?” so that it agrees with the solution.
-          </li>
-        </ul>
-      </FrontMatterSection>
-
-      <FrontMatterSection title="With thanks">
-        <p>
-          Thank you to Jesús de la Villa for creating this book and making
-          essential endgame knowledge approachable, memorable, and practical.
-        </p>
-        <p>
-          If anything here needs correction, clarification, permission review,
-          or removal, please contact{' '}
-          <a href="mailto:dcep93@gmail.com">dcep93@gmail.com</a>.
-        </p>
       </FrontMatterSection>
 
       <nav aria-labelledby="book-contents-heading" className="leg-book-contents">
