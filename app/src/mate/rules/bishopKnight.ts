@@ -345,7 +345,6 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
   {
     id: 'knight closer center',
     shortLabel: 'knight closer center',
-    guideOrder: 9,
     helpText: KNIGHT_CLOSER_CENTER_HELP,
     compare: (first, second) =>
       first.bishopOppositionLoopScore - second.bishopOppositionLoopScore ||
@@ -354,7 +353,6 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
   {
     id: 'bishop front',
     shortLabel: 'bishop front',
-    guideOrder: 8,
     helpText: "Establish, maintain, or prepare the bishop on the square in front of White's king, between the kings.",
     compare: (first, second) =>
       first.bishopInFrontScore - second.bishopInFrontScore ||
@@ -365,7 +363,6 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
   {
     id: 'knight closer center',
     shortLabel: 'knight closer center',
-    guideOrder: 9,
     helpText: KNIGHT_CLOSER_CENTER_HELP,
     subpriorities: [
       {

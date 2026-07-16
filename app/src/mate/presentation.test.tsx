@@ -18,7 +18,10 @@ import MateControls from './MateControls'
 import MateLog, {
   MatePriorityGuideDialog,
 } from './MateLog'
-import { getMateRuleSet } from './rules'
+import {
+  getMateRuleSet,
+  knightAndBishopWhiteRules,
+} from './rules'
 import type { MateLogEntry } from './session'
 
 const ROOK_START = '7k/8/8/8/8/8/R7/K7 w - - 0 1'
@@ -595,6 +598,66 @@ test('Mate log cycle controls report their historical log index', async () => {
   await act(async () => renderer.unmount())
 })
 
+test('cycling a log entry preserves its row, control instance, and focus', async () => {
+  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
+    .IS_REACT_ACT_ENVIRONMENT = true
+  function Harness() {
+    const [logs, setLogs] = React.useState(ROOK_LOGS)
+    return (
+      <MateLog
+        fen={ROOK_START}
+        logs={logs}
+        onCycleIdealBlack={() => undefined}
+        onCycleIdealWhite={(logIndex) =>
+          setLogs((current) =>
+            current.map((log, index) =>
+              index === logIndex
+                ? { ...log, san: 'Rh2', opponentSan: 'Kh7' }
+                : log,
+            ),
+          )
+        }
+        onCycleLegalBlack={() => undefined}
+        ruleSet={getMateRuleSet('rook')}
+      />
+    )
+  }
+
+  let renderer!: ReactTestRenderer
+  await act(async () => {
+    renderer = TestRenderer.create(<Harness />)
+  })
+  const label = 'Cycle ideal White move for move 1; 2 correct choices'
+  const focusedButton = renderer.root.findByProps({ 'aria-label': label })
+  const focusedRow = focusedButton.parent?.parent
+  assert.equal(focusedRow?.type, 'tr')
+  // A browser keeps focus when React reuses the same host button. Model that
+  // active element here and prove both the button and keyed row are retained.
+  const focusState = { activeElement: focusedButton }
+
+  await act(async () => focusedButton.props.onClick())
+
+  const updatedButton = renderer.root.findByProps({ 'aria-label': label })
+  const updatedRow = updatedButton.parent?.parent
+  assert.equal(updatedRow?.type, 'tr')
+  assert.ok(
+    updatedButton === focusedButton,
+    'the focused cycle button remounted after its SAN changed',
+  )
+  assert.ok(
+    updatedRow === focusedRow,
+    'the historical row remounted after its SAN changed',
+  )
+  assert.ok(
+    focusState.activeElement === updatedButton,
+    'the retained button should remain the active focus target',
+  )
+  assert.equal(reactNodeText(updatedRow).includes('Rh2'), true)
+  assert.equal(reactNodeText(updatedRow).includes('Kh7'), true)
+
+  await act(async () => renderer.unmount())
+})
+
 test('reason hint is opt-in and reveals only the current rule label', async () => {
   ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
     .IS_REACT_ACT_ENVIRONMENT = true
@@ -639,8 +702,108 @@ test('reason hint is opt-in and reveals only the current rule label', async () =
   await act(async () => renderer.unmount())
 })
 
+test('current hint scoring is lazy and memoized by its exact inputs', async () => {
+  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
+    .IS_REACT_ACT_ENVIRONMENT = true
+  const baseRuleSet = getMateRuleSet('rook')
+  let hintCalls = 0
+  let whiteMovePreflightCalls = 0
+  const makeRuleSetSpy = () => ({
+    ...baseRuleSet,
+    whiteMoves: (fen: string) => {
+      whiteMovePreflightCalls += 1
+      return baseRuleSet.whiteMoves(fen)
+    },
+    currentWhiteHint: (fen: string) => {
+      hintCalls += 1
+      return baseRuleSet.currentWhiteHint(fen)
+    },
+  })
+  const firstRuleSet = makeRuleSetSpy()
+  const secondRuleSet = makeRuleSetSpy()
+  let bumpUnrelated!: () => void
+  let replaceFen!: (fen: string) => void
+  let replaceRuleSet!: (ruleSet: typeof firstRuleSet) => void
+
+  function Harness() {
+    const [fen, setFen] = React.useState(ROOK_START)
+    const [ruleSet, setRuleSet] = React.useState(firstRuleSet)
+    const [unrelatedTick, setUnrelatedTick] = React.useState(0)
+    bumpUnrelated = () => setUnrelatedTick((tick) => tick + 1)
+    replaceFen = setFen
+    replaceRuleSet = setRuleSet
+    return (
+      <>
+        <MateLog
+          fen={fen}
+          logs={[]}
+          onCycleIdealBlack={() => undefined}
+          onCycleIdealWhite={() => undefined}
+          onCycleLegalBlack={() => undefined}
+          ruleSet={ruleSet}
+        />
+        <output data-unrelated-tick={unrelatedTick}>{unrelatedTick}</output>
+      </>
+    )
+  }
+
+  let renderer!: ReactTestRenderer
+  await act(async () => {
+    renderer = TestRenderer.create(<Harness />)
+  })
+  assert.equal(hintCalls, 0)
+  assert.equal(whiteMovePreflightCalls, 0)
+
+  await act(async () => bumpUnrelated())
+  assert.equal(hintCalls, 0)
+
+  await act(async () => {
+    renderer.root
+      .findByProps({ 'aria-label': 'Show reason hints' })
+      .props.onChange({ currentTarget: { checked: true } })
+  })
+  assert.equal(hintCalls, 1)
+
+  await act(async () => bumpUnrelated())
+  assert.equal(hintCalls, 1)
+
+  await act(async () => replaceFen(EXTERNAL_START))
+  assert.equal(hintCalls, 2)
+
+  await act(async () => replaceRuleSet(secondRuleSet))
+  assert.equal(hintCalls, 3)
+
+  await act(async () => {
+    renderer.root
+      .findByProps({ 'aria-label': 'Show reason hints' })
+      .props.onChange({ currentTarget: { checked: false } })
+  })
+  assert.equal(hintCalls, 3)
+  await act(async () => replaceFen(ROOK_START))
+  assert.equal(hintCalls, 3)
+  await act(async () => bumpUnrelated())
+  assert.equal(hintCalls, 3)
+
+  await act(async () => {
+    renderer.root
+      .findByProps({ 'aria-label': 'Show reason hints' })
+      .props.onChange({ currentTarget: { checked: true } })
+  })
+  assert.equal(hintCalls, 4)
+  assert.equal(whiteMovePreflightCalls, 0)
+
+  await act(async () => renderer.unmount())
+})
+
 test('priority guide follows registered facade order and renders typed diagrams', () => {
   const ruleSet = getMateRuleSet('bishop-knight')
+  const expectedWhiteIds = knightAndBishopWhiteRules
+    .map(({ id }) => id)
+    .filter((id, index, ids) => ids.indexOf(id) === index)
+  assert.deepEqual(
+    ruleSet.whiteRuleDescriptions.map(({ id }) => id),
+    expectedWhiteIds,
+  )
   const markup = renderToStaticMarkup(
     <MatePriorityGuideDialog
       onClose={() => undefined}
@@ -658,7 +821,11 @@ test('priority guide follows registered facade order and renders typed diagrams'
   assert.match(markup, />Black resistance</)
 
   let cursor = -1
-  for (const rule of ruleSet.whiteRuleDescriptions) {
+  for (const id of expectedWhiteIds) {
+    const rule = ruleSet.whiteRuleDescriptions.find(
+      (description) => description.id === id,
+    )
+    assert.ok(rule)
     const next = decodedMarkup.indexOf(`>${rule.shortLabel}<`, cursor + 1)
     assert.ok(next > cursor, `White priority out of order: ${rule.shortLabel}`)
     cursor = next
@@ -682,18 +849,22 @@ test('priority guide follows registered facade order and renders typed diagrams'
   assert.doesNotMatch(markup, /<img\b|https?:\/\//)
 })
 
-test('priority guide focuses on open, closes with Escape, and restores focus', async () => {
+test('priority guide traps Tab, closes with Escape, and restores focus', async () => {
   ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
     .IS_REACT_ACT_ENVIRONMENT = true
   type FakeNode = {
     readonly label: string
+    readonly disabled: boolean
+    readonly hidden: boolean
+    readonly tabIndex: number
     focusCalls: number
     focus: () => void
+    getAttribute: (name: string) => string | null
+    hasAttribute: (name: string) => boolean
   }
-  const fakeNodes: FakeNode[] = []
   let keydown: ((event: KeyboardEvent) => void) | undefined
   const originalDocument = globalThis.document
-  const fakeDocument: {
+  let fakeDocument!: {
     activeElement: FakeNode | null
     addEventListener: (
       type: string,
@@ -703,7 +874,51 @@ test('priority guide focuses on open, closes with Escape, and restores focus', a
       type: string,
       listener: EventListenerOrEventListenerObject,
     ) => void
-  } = {
+  }
+  const makeNode = (
+    label: string,
+    options: {
+      readonly disabled?: boolean
+      readonly hidden?: boolean
+      readonly tabIndex?: number
+    } = {},
+  ): FakeNode => {
+    const node: FakeNode = {
+      label,
+      disabled: options.disabled ?? false,
+      hidden: options.hidden ?? false,
+      tabIndex: options.tabIndex ?? 0,
+      focusCalls: 0,
+      focus() {
+        node.focusCalls += 1
+        fakeDocument.activeElement = node
+      },
+      getAttribute(name) {
+        return name === 'aria-hidden' && node.hidden ? 'true' : null
+      },
+      hasAttribute(name) {
+        return name === 'disabled' && node.disabled
+      },
+    }
+    return node
+  }
+  const disabledNode = makeNode('Disabled action', { disabled: true })
+  const hiddenNode = makeNode('Hidden action', { hidden: true })
+  const closeNode = makeNode('Close priority guide')
+  const lastNode = makeNode('Last guide action')
+  const outsideNode = makeNode('Outside dialog')
+  let queriedNodes: FakeNode[] = [
+    disabledNode,
+    hiddenNode,
+    closeNode,
+    lastNode,
+  ]
+  const dialogNode = {
+    contains: (node: FakeNode | null) =>
+      node !== null && queriedNodes.includes(node),
+    querySelectorAll: () => queriedNodes,
+  }
+  fakeDocument = {
     activeElement: null,
     addEventListener: (
       type: string,
@@ -725,6 +940,23 @@ test('priority guide focuses on open, closes with Escape, and restores focus', a
     value: fakeDocument,
   })
 
+  const keyEvent = (key: string, shiftKey = false) => {
+    const calls = { preventDefault: 0, stopPropagation: 0 }
+    return {
+      calls,
+      event: {
+        key,
+        shiftKey,
+        preventDefault: () => {
+          calls.preventDefault += 1
+        },
+        stopPropagation: () => {
+          calls.stopPropagation += 1
+        },
+      } as KeyboardEvent,
+    }
+  }
+
   let renderer: ReactTestRenderer | undefined
   try {
     await act(async () => {
@@ -740,19 +972,11 @@ test('priority guide focuses on open, closes with Escape, and restores focus', a
         {
           createNodeMock: (element) => {
             const props = element.props as Record<string, unknown>
-            const label = String(
-              props['aria-label'] ?? props.children ?? '',
-            )
-            const node: FakeNode = {
-              label,
-              focusCalls: 0,
-              focus() {
-                node.focusCalls += 1
-                fakeDocument.activeElement = node
-              },
+            if (props.role === 'dialog') return dialogNode
+            if (props['aria-label'] === 'Close priority guide') {
+              return closeNode
             }
-            fakeNodes.push(node)
-            return node
+            return makeNode(String(props['aria-label'] ?? 'Host node'))
           },
         },
       )
@@ -762,14 +986,7 @@ test('priority guide focuses on open, closes with Escape, and restores focus', a
     const openButton = mountedRenderer.root.findByProps({
       'aria-label': 'Open Mate priority guide',
     })
-    const openerNode: FakeNode = {
-      label: 'Open Mate priority guide',
-      focusCalls: 0,
-      focus() {
-        openerNode.focusCalls += 1
-        fakeDocument.activeElement = openerNode
-      },
-    }
+    const openerNode = makeNode('Open Mate priority guide')
     await act(async () => {
       openButton.props.onClick({ currentTarget: openerNode })
     })
@@ -777,25 +994,65 @@ test('priority guide focuses on open, closes with Escape, and restores focus', a
       mountedRenderer.root.findAllByProps({ role: 'dialog' }).length,
       1,
     )
-    const closeNode = fakeNodes.find(
-      (node) => node.label === 'Close priority guide',
-    )
-    assert.ok(closeNode)
     assert.equal(closeNode.focusCalls, 1)
+    assert.equal(fakeDocument.activeElement, closeNode)
     assert.ok(keydown)
 
+    fakeDocument.activeElement = lastNode
+    const forwardWrap = keyEvent('Tab')
+    await act(async () => keydown?.(forwardWrap.event))
+    assert.equal(forwardWrap.calls.preventDefault, 1)
+    assert.equal(fakeDocument.activeElement, closeNode)
+    assert.equal(disabledNode.focusCalls, 0)
+    assert.equal(hiddenNode.focusCalls, 0)
+
+    fakeDocument.activeElement = closeNode
+    const backwardWrap = keyEvent('Tab', true)
+    await act(async () => keydown?.(backwardWrap.event))
+    assert.equal(backwardWrap.calls.preventDefault, 1)
+    assert.equal(fakeDocument.activeElement, lastNode)
+
+    fakeDocument.activeElement = outsideNode
+    const focusFromOutside = keyEvent('Tab')
+    await act(async () => keydown?.(focusFromOutside.event))
+    assert.equal(focusFromOutside.calls.preventDefault, 1)
+    assert.equal(fakeDocument.activeElement, closeNode)
+
+    queriedNodes = [disabledNode, hiddenNode]
+    fakeDocument.activeElement = outsideNode
+    const noFocusableNodes = keyEvent('Tab')
+    await act(async () => keydown?.(noFocusableNodes.event))
+    assert.equal(noFocusableNodes.calls.preventDefault, 1)
+    assert.equal(fakeDocument.activeElement, closeNode)
+
+    queriedNodes = [disabledNode, hiddenNode, closeNode, lastNode]
+    const escape = keyEvent('Escape')
     await act(async () => {
-      keydown?.({
-        key: 'Escape',
-        preventDefault: () => undefined,
-        stopPropagation: () => undefined,
-      } as KeyboardEvent)
+      keydown?.(escape.event)
     })
+    assert.equal(escape.calls.preventDefault, 1)
+    assert.equal(escape.calls.stopPropagation, 1)
     assert.equal(
       mountedRenderer.root.findAllByProps({ role: 'dialog' }).length,
       0,
     )
     assert.equal(openerNode.focusCalls, 1)
+    assert.equal(keydown, undefined)
+
+    await act(async () => {
+      mountedRenderer.root
+        .findByProps({ 'aria-label': 'Open Mate priority guide' })
+        .props.onClick({ currentTarget: openerNode })
+    })
+    assert.equal(
+      mountedRenderer.root.findAllByProps({ role: 'dialog' }).length,
+      1,
+    )
+    assert.ok(keydown)
+    await act(async () => mountedRenderer.unmount())
+    renderer = undefined
+    assert.equal(openerNode.focusCalls, 2)
+    assert.equal(keydown, undefined)
   } finally {
     if (renderer) await act(async () => renderer?.unmount())
     if (originalDocument === undefined) {

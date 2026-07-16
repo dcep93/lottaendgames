@@ -37,7 +37,6 @@ function currentRuleHint(
   fen: string,
 ) {
   try {
-    if (ruleSet.whiteMoves(fen).length === 0) return undefined
     return ruleSet.currentWhiteHint(fen)
   } catch {
     return undefined
@@ -65,7 +64,11 @@ export default function MateLog({
       ),
     [ruleSet],
   )
-  const hint = showReasonHints ? currentRuleHint(ruleSet, fen) : undefined
+  const hint = React.useMemo(
+    () =>
+      showReasonHints ? currentRuleHint(ruleSet, fen) : undefined,
+    [fen, ruleSet, showReasonHints],
+  )
   const displayedLogs = logs
     .map((log, index) => ({ index, log }))
     .reverse()
@@ -162,7 +165,7 @@ export default function MateLog({
               )
 
               return (
-                <tr key={`${index}-${log.fen}-${log.san}-${log.opponentSan ?? ''}`}>
+                <tr key={`${index}-${log.fen}`}>
                   <th scope="row">{moveNumber}.</th>
                   <td>{log.phase}</td>
                   <td>{log.san}</td>

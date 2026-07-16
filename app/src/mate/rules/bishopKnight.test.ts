@@ -162,16 +162,16 @@ test('bishop-and-knight rules are registered', () => {
           "Keep White's king in the middle 16 squares while bringing it closer to Black's king and staying on the color opposite the bishop; when outside the middle 16, walk toward it first. The color rule can also yield when the two kings are two diagonal squares apart and the adjacent bishop is a knight move from Black's king. Do not increase the distance between the kings.",
       },
       {
-        id: 'bishop front',
-        shortLabel: 'bishop front',
-        helpText:
-          "Establish, maintain, or prepare the bishop on the square in front of White's king, between the kings.",
-      },
-      {
         id: 'knight closer center',
         shortLabel: 'knight closer center',
         helpText:
           "Avoid the bishop-opposition loop and keep the knight behind White's king relative to Black's king. At the final placement step, compare two knight moves first by how close the knight is to White's king, then compare the resulting knight square by center distance and, finally, prefer it farther from Black's king. Keep moves that do not lose a head-to-head comparison; if those comparisons cycle, use center distance and then distance from Black's king to break the cycle.",
+      },
+      {
+        id: 'bishop front',
+        shortLabel: 'bishop front',
+        helpText:
+          "Establish, maintain, or prepare the bishop on the square in front of White's king, between the kings.",
       },
     ],
   )
@@ -226,6 +226,13 @@ test('bishop-and-knight rules are registered', () => {
       'bishop front',
       'knight closer center',
     ],
+  )
+  const firstEvaluatorIds = knightAndBishopWhiteRules
+    .map(({ id }) => id)
+    .filter((id, index, ids) => ids.indexOf(id) === index)
+  assert.deepEqual(
+    ruleSet.whiteRuleDescriptions.map(({ id }) => id),
+    firstEvaluatorIds,
   )
   assert.equal(knightAndBishopWhiteRules.length, 13)
   const driftGate = knightAndBishopWhiteRules[7]?.stopWhenBest
