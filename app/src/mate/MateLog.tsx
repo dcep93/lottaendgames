@@ -108,9 +108,14 @@ export default function MateLog({
         )}
       </div>
 
-      <div className="leg-mate-log-scroll">
-        <table className="leg-mate-log-table">
-          <caption className="leg-visually-hidden">Mate move log</caption>
+      <div
+        aria-label="Mate move log table"
+        className="leg-mate-log-scroll"
+        role="region"
+        tabIndex={0}
+      >
+        <table aria-label="Mate move log" className="leg-mate-log-table">
+          <caption className="leg-mate-visually-hidden">Mate move log</caption>
           <thead>
             <tr>
               <th scope="col">#</th>

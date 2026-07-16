@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
 import test from 'node:test'
 import type { Square } from 'chess.js'
 import React from 'react'
@@ -1233,6 +1234,58 @@ test('Mate composes a selected reducer-backed training workspace', () => {
   assert.match(markup, /Starting FEN/)
   assert.match(markup, new RegExp(ROOK_START.replaceAll('/', '\\/')))
   assert.doesNotMatch(markup, /Coming soon/)
+})
+
+test('Mate exposes stable desktop and narrow-layout structure', () => {
+  const markup = renderToStaticMarkup(
+    <Mate
+      moduleSelector={<nav aria-label="Modules" />}
+      onNavigate={() => undefined}
+      route={{
+        module: 'mate',
+        mateId: 'rook',
+        mateMode: 'standard',
+        sharedFen: ROOK_START,
+      }}
+    />,
+  )
+
+  for (const className of [
+    'leg-mate-page',
+    'leg-mate-layout',
+    'leg-mate-sidebar',
+    'leg-mate-collapsed-selector',
+    'leg-mate-workspace',
+    'leg-mate-board-card',
+    'leg-mate-controls',
+    'leg-mate-log-scroll',
+  ]) {
+    assert.match(markup, new RegExp(`class="[^"]*${className}`), className)
+  }
+  assert.match(
+    markup,
+    /class="leg-mate-sidebar-label"[^>]*>Mate training</,
+  )
+  assert.match(
+    markup,
+    /aria-label="Mate move log table"[^>]*class="leg-mate-log-scroll"[^>]*role="region"[^>]*tabindex="0"/,
+  )
+  assert.match(markup, /<table[^>]*aria-label="Mate move log"/)
+
+  const css = readFileSync(new URL('./styles.css', import.meta.url), 'utf8')
+  assert.match(css, /\.leg-mate-layout\s*\{[^}]*grid-template-columns:/s)
+  assert.match(css, /\.leg-mate-sidebar\s*\{[^}]*position:\s*sticky/s)
+  assert.match(css, /\.leg-mate-collapsed-selector\s*\{[^}]*display:\s*none/s)
+  assert.match(css, /\.leg-mate-log-scroll\s*\{[^}]*overflow-x:\s*auto/s)
+  assert.match(css, /@media\s*\(max-width:\s*48rem\)/)
+  assert.match(
+    css,
+    /@media\s*\(max-width:\s*48rem\)[\s\S]*\.leg-mate-sidebar\s*\{[^}]*display:\s*none[\s\S]*\.leg-mate-collapsed-selector\s*\{[^}]*display:\s*grid/,
+  )
+  assert.match(
+    css,
+    /@media\s*\(max-width:\s*32rem\)[\s\S]*\.leg-mate-controls-actions[^}]*flex-wrap:\s*wrap/,
+  )
 })
 
 test('Mate recreates its drill synchronously for exact route changes', async () => {

@@ -31,7 +31,7 @@ export default function Mate({
       : null
 
   return (
-    <main className="leg-page">
+    <main className="leg-page leg-mate-page">
       <div className="leg-reader-shell leg-mate-shell">
         {moduleSelector}
         <header className="leg-reader-header leg-mate-header">

@@ -1,4 +1,4 @@
-import React, { type MouseEvent } from 'react'
+import type { MouseEvent } from 'react'
 import { MATE_CATALOG } from './catalog'
 import type { MateId, MateMode } from './types'
 
@@ -14,10 +14,14 @@ export default function MateSidebar({
   onNavigate,
 }: MateSidebarProps) {
   const selectedSet = MATE_CATALOG.find(({ id }) => id === mateId)
+  const selectedHref = selectedSet === undefined || mateMode === null
+    ? ''
+    : `${selectedSet.path}${mateMode === 'train' ? '/train' : ''}`
 
   return (
-    <React.Fragment>
+    <>
       <aside aria-label="Mate training" className="leg-mate-sidebar">
+        <p className="leg-mate-sidebar-label">Mate training</p>
         <nav aria-label="Mating sets" className="leg-mate-set-links">
           {MATE_CATALOG.map((entry) => {
             const isSelected = entry.id === mateId
@@ -61,7 +65,30 @@ export default function MateSidebar({
           </nav>
         )}
       </aside>
-    </React.Fragment>
+
+      <label className="leg-mate-collapsed-selector">
+        <span>Mate training</span>
+        <select
+          aria-label="Choose mating set and mode"
+          onChange={(event) => {
+            if (event.currentTarget.value !== '') {
+              onNavigate(event.currentTarget.value)
+            }
+          }}
+          value={selectedHref}
+        >
+          <option value="">Choose a mating set</option>
+          {MATE_CATALOG.map((entry) => (
+            <optgroup key={entry.id} label={entry.label}>
+              <option value={entry.path}>{entry.label} — Standard</option>
+              <option value={`${entry.path}/train`}>
+                {entry.label} — Train
+              </option>
+            </optgroup>
+          ))}
+        </select>
+      </label>
+    </>
   )
 }
 

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import AppX from './app_x'
 import Mate from './mate'
+import './mate/styles.css'
 import ModuleSelector from './ModuleSelector'
 import {
   bookPathForChapterId,
