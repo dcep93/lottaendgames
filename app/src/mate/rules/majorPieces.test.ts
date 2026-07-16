@@ -1,11 +1,14 @@
 import assert from 'node:assert/strict'
+import { createHash } from 'node:crypto'
 import test from 'node:test'
-import { getChess, positionKey } from '../chess'
+import { getChess, materialMatchesMate, positionKey } from '../chess'
+import { generateMatePosition } from '../positions'
 import {
   compareQueenBlackScores,
   compareQueenWhiteScores,
   compareRookBlackScores,
   compareRookWhiteScores,
+  getEndgameReturnToPositionMoves,
   getMateRuleSet,
   getQueenCageKingApproachDistance,
   getQueenTwoSquareCage,
@@ -238,6 +241,257 @@ const ROOK_BLACK_FIXTURES = [
   },
 ] as const
 
+const QUEEN_ENDGAME_LINE_FIXTURES = [
+  {
+    startingFen: '8/5k2/8/4Q3/8/8/8/7K w - - 0 1',
+    seed: 73888,
+    expectedLine: [
+      ['Kg2'],
+      ['Kg6'],
+      ['Qf4'],
+      ['Kg7'],
+      ['Qf5'],
+      ['Kg8', 'Kh8', 'Kh6'],
+      ['Qg5'],
+      ['Kh7'],
+      ['Kf3'],
+      ['Kh8'],
+      ['Kf4'],
+      ['Kh7'],
+      ['Kf5'],
+      ['Kh8'],
+      ['Kf6'],
+      ['Kh7'],
+      ['Qg7#'],
+    ],
+  },
+  {
+    startingFen: '8/4Q3/8/3K4/8/8/3k4/8 w - - 0 1',
+    seed: 73926,
+    expectedLine: [
+      ['Qe4'],
+      ['Kc3'],
+      ['Kc5'],
+      ['Kd2', 'Kb2', 'Kb3'],
+      ['Qf3'],
+      ['Kc2'],
+      ['Qe3'],
+      ['Kb2'],
+      ['Qd3'],
+      ['Kc1', 'Ka1', 'Ka2'],
+      ['Qd2'],
+      ['Kb1'],
+      ['Kb4'],
+      ['Ka1'],
+      ['Kb3'],
+      ['Kb1'],
+      ['Qb2#'],
+    ],
+  },
+  {
+    startingFen: '1K6/5k2/8/8/8/8/8/6Q1 w - - 0 1',
+    seed: 73964,
+    expectedLine: [
+      ['Qg5'],
+      ['Ke6'],
+      ['Kc7'],
+      ['Kf7'],
+      ['Qe5'],
+      ['Kg6'],
+      ['Qf4'],
+      ['Kg7'],
+      ['Qf5'],
+      ['Kg8', 'Kh8', 'Kh6'],
+      ['Qg4'],
+      ['Kh7'],
+      ['Qg5'],
+      ['Kh8'],
+      ['Kd7'],
+      ['Kh7'],
+      ['Ke7'],
+      ['Kh8'],
+      ['Kf7'],
+      ['Kh7'],
+      ['Qg7#'],
+    ],
+  },
+  {
+    startingFen: '8/8/1Q6/6K1/4k3/8/8/8 w - - 0 1',
+    seed: 74002,
+    expectedLine: [
+      ['Qd6', 'Qc5'],
+      ['Kf3', 'Kd3'],
+      ['Qe5'],
+      ['Kc4'],
+      ['Qd6'],
+      ['Kc3'],
+      ['Qd5'],
+      ['Kb4', 'Kc2', 'Kb2'],
+      ['Qd3', 'Qc4'],
+      ['Kc1', 'Ka1', 'Ka2'],
+      ['Qc3'],
+      ['Kb1'],
+      ['Qd2'],
+      ['Ka1'],
+      ['Kf4'],
+      ['Kb1'],
+      ['Ke3'],
+      ['Ka1'],
+      ['Kd3'],
+      ['Kb1'],
+      ['Kc3'],
+      ['Ka1'],
+      ['Qb2#'],
+    ],
+  },
+  {
+    startingFen: '8/3K4/7Q/4k3/8/8/8/8 w - - 0 1',
+    seed: 74040,
+    expectedLine: [
+      ['Qc6'],
+      ['Kd4'],
+      ['Qe6'],
+      ['Kc5', 'Kd3', 'Kc3'],
+      ['Qe5'],
+      ['Kc4'],
+      ['Qd6'],
+      ['Kc3'],
+      ['Qd5'],
+      ['Kb4', 'Kc2', 'Kb2'],
+      ['Qc6'],
+      ['Kb3'],
+      ['Qc5'],
+      ['Kb2'],
+      ['Qc4'],
+      ['Ka3', 'Kb1', 'Ka1'],
+      ['Qb5'],
+      ['Ka2'],
+      ['Qb4'],
+      ['Ka1'],
+      ['Kc6'],
+      ['Ka2'],
+      ['Kc5'],
+      ['Ka1'],
+      ['Kc4'],
+      ['Ka2'],
+      ['Kc3'],
+      ['Ka1'],
+      ['Qb2#'],
+    ],
+  },
+  {
+    startingFen: '8/5k2/8/8/2K5/8/Q7/8 w - - 0 1',
+    seed: 74078,
+    expectedLine: [
+      ['Qe2'],
+      ['Kf6'],
+      ['Qe4'],
+      ['Kf7', 'Kg7', 'Kg5'],
+      ['Qf3'],
+      ['Kg6'],
+      ['Qf4'],
+      ['Kg7'],
+      ['Qf5'],
+      ['Kg8', 'Kh8', 'Kh6'],
+      ['Qf6'],
+      ['Kh7'],
+      ['Qg5'],
+      ['Kh8'],
+      ['Kd5'],
+      ['Kh7'],
+      ['Ke6'],
+      ['Kh8'],
+      ['Kf7'],
+      ['Kh7'],
+      ['Qg7#'],
+    ],
+  },
+  {
+    startingFen: 'Q6K/5k2/8/8/8/8/8/8 w - - 0 1',
+    seed: 74116,
+    expectedLine: [
+      ['Qc6'],
+      ['Ke7'],
+      ['Kg7'],
+      ['Kd8'],
+      ['Qb7'],
+      ['Ke8'],
+      ['Qf7+'],
+      ['Kd8'],
+      ['Kf6'],
+      ['Kc8'],
+      ['Qe7'],
+      ['Kb8'],
+      ['Qd7'],
+      ['Ka8'],
+      ['Ke6'],
+      ['Kb8'],
+      ['Kd6'],
+      ['Ka8'],
+      ['Kc6'],
+      ['Kb8'],
+      ['Qb7#'],
+    ],
+  },
+  {
+    startingFen: '8/5k2/1Q6/8/8/5K2/8/8 w - - 0 1',
+    seed: 74154,
+    expectedLine: [
+      ['Qd6'],
+      ['Kg7'],
+      ['Qe6'],
+      ['Kf8', 'Kh8', 'Kh7'],
+      ['Qe7'],
+      ['Kg8'],
+      ['Kg4'],
+      ['Kh8'],
+      ['Kg5'],
+      ['Kg8'],
+      ['Kg6'],
+      ['Kh8'],
+      ['Qg7#'],
+    ],
+  },
+] as const
+
+function seededRandom(seed: number): () => number {
+  let state = seed >>> 0
+  return () => {
+    state = (state * 1664525 + 1013904223) >>> 0
+    return state / 2 ** 32
+  }
+}
+
+function consumeSourceShuffle(
+  random: () => number,
+  moveCount: number,
+): void {
+  // chess420 shuffled candidates before scoring. The port is deterministic,
+  // so parity replay consumes those historical RNG draws only in this test.
+  for (let index = moveCount - 1; index > 0; index -= 1) {
+    random()
+  }
+}
+
+function boardTurnKey(fen: string): string {
+  return fen.split(' ').slice(0, 2).join(' ')
+}
+
+function getRookReplayOutcome(
+  chess: ReturnType<typeof getChess>,
+): 'lostPiece' | 'mate' | 'stalemate' | null {
+  if (!materialMatchesMate('rook', chess.fen())) {
+    return 'lostPiece'
+  }
+  if (chess.isCheckmate()) {
+    return 'mate'
+  }
+  if (chess.isStalemate()) {
+    return 'stalemate'
+  }
+  return null
+}
+
 const WHITE_INTRO =
   "White's best moves are the moves that survive these priorities in order. If several moves are still tied after a priority, they all remain best moves."
 
@@ -433,6 +687,23 @@ test('queen white score fields and compound comparisons match literals', () => {
   assert.equal(compareQueenWhiteScores(smallerBox, largerBox), -4)
 })
 
+test('shorter queen move compares only scores from queen moves', () => {
+  const queenScore = scoreQueenWhiteMove(
+    '8/8/8/8/4k3/8/8/3QK3 w - - 0 1',
+    'Qd6',
+  )
+  const kingScore = { ...queenScore, queenMoveDistance: null }
+  const shorterQueenScore = { ...queenScore, queenMoveDistance: 2 }
+  const shorterMoveRule = queenWhiteRules.find(
+    ({ id }) => id === 'shorter queen move',
+  )
+
+  assert.equal(shorterMoveRule?.applies?.(kingScore), false)
+  assert.equal(shorterMoveRule?.applies?.(queenScore), true)
+  assert.equal(compareQueenWhiteScores(kingScore, queenScore), 0)
+  assert.equal(compareQueenWhiteScores(shorterQueenScore, queenScore), -3)
+})
+
 test('queen cage, safety, stalemate, and exact finishing line match literals', () => {
   assert.deepEqual(
     getQueenTwoSquareCage(
@@ -498,6 +769,35 @@ test('queen cage, safety, stalemate, and exact finishing line match literals', (
   assert.deepEqual(getMateRuleSet('queen').idealWhiteMoves(chess.fen()), ['Qb2#'])
   chess.move('Qb2#')
   assert.equal(chess.isCheckmate(), true)
+})
+
+test('queen replays all eight chess420 golden mating lines', () => {
+  const queen = getMateRuleSet('queen')
+  let totalPlies = 0
+
+  for (const fixture of QUEEN_ENDGAME_LINE_FIXTURES) {
+    const chess = getChess(fixture.startingFen)
+    const random = seededRandom(fixture.seed)
+
+    for (const [ply, expectedMoves] of fixture.expectedLine.entries()) {
+      assert.equal(chess.isCheckmate(), false, fixture.startingFen)
+      const actualMoves =
+        chess.turn() === 'w'
+          ? queen.idealWhiteMoves(chess.fen())
+          : queen.blackCandidates(chess.fen()).idealMoves
+      const context = `${fixture.startingFen}; ply ${ply + 1}`
+
+      assert.deepEqual(actualMoves, expectedMoves, context)
+      const chosen =
+        expectedMoves[Math.floor(random() * expectedMoves.length)]!
+      assert.ok(chess.move(chosen), context)
+      totalPlies += 1
+    }
+
+    assert.equal(chess.isCheckmate(), true, fixture.startingFen)
+  }
+
+  assert.equal(totalPlies, 162)
 })
 
 test('queen black scoring and literal defensive choices retain legal order', () => {
@@ -628,6 +928,101 @@ test('rook black scoring and literal defensive choices retain legal order', () =
       idealMoves: fixture.idealMoves,
     })
   }
+})
+
+test('rook mates all 50 source-seeded Standard starts within 220 plies', () => {
+  const random = seededRandom(42050)
+  const rook = getMateRuleSet('rook')
+  const starts: string[] = []
+  const lines: string[] = []
+  let totalPlies = 0
+  let maxPlies = 0
+
+  for (let game = 0; game < 50; game += 1) {
+    const startingFen = generateMatePosition('rook', 'standard', random)
+    const chess = getChess(startingFen)
+    const seen = new Set([boardTurnKey(chess.fen())])
+    const moves: string[] = []
+    let lastWhiteTurnFen: string | undefined
+    let blackReturnTargetFen: string | undefined
+    let outcome: 'lostPiece' | 'mate' | 'stalemate' | 'loop' | 'noMove' | 'limit' =
+      'limit'
+    starts.push(startingFen)
+
+    for (let ply = 0; ply < 220; ply += 1) {
+      const terminalBeforeMove = getRookReplayOutcome(chess)
+      if (terminalBeforeMove !== null) {
+        outcome = terminalBeforeMove
+        break
+      }
+
+      let choices: readonly string[]
+      if (chess.turn() === 'w') {
+        consumeSourceShuffle(random, rook.whiteMoves(chess.fen()).length)
+        choices = rook.idealWhiteMoves(chess.fen())
+      } else {
+        const candidates = rook.blackCandidates(
+          chess.fen(),
+          blackReturnTargetFen,
+        )
+        const returnMoves = getEndgameReturnToPositionMoves(
+          chess.fen(),
+          blackReturnTargetFen,
+          candidates.moves,
+        )
+        if (returnMoves.length === 0) {
+          consumeSourceShuffle(random, candidates.moves.length)
+        }
+        choices = candidates.idealMoves
+      }
+
+      const san = choices[Math.floor(random() * choices.length)]
+      if (san === undefined) {
+        outcome = 'noMove'
+        break
+      }
+      if (chess.turn() === 'w') {
+        blackReturnTargetFen = lastWhiteTurnFen
+        lastWhiteTurnFen = chess.fen()
+      } else {
+        blackReturnTargetFen = undefined
+      }
+      moves.push(san)
+      assert.ok(
+        chess.move(san),
+        `game ${game + 1}; start ${startingFen}; moves ${moves.join(' ')}`,
+      )
+
+      const terminalAfterMove = getRookReplayOutcome(chess)
+      if (terminalAfterMove !== null) {
+        outcome = terminalAfterMove
+        break
+      }
+      const key = boardTurnKey(chess.fen())
+      if (seen.has(key)) {
+        outcome = 'loop'
+        break
+      }
+      seen.add(key)
+    }
+
+    const context =
+      `game ${game + 1}; outcome ${outcome}; start ${startingFen}; ` +
+      `final ${chess.fen()}; moves ${moves.join(' ')}`
+    assert.equal(outcome, 'mate', context)
+    lines.push(moves.join(' '))
+    totalPlies += moves.length
+    maxPlies = Math.max(maxPlies, moves.length)
+  }
+
+  assert.equal(totalPlies, 2456)
+  assert.equal(maxPlies, 101)
+  assert.equal(
+    createHash('sha256')
+      .update(JSON.stringify({ starts, lines }))
+      .digest('hex'),
+    'afba5f9397c04180d36c68800a6b5751be3b9ac4e7362055f5c47b14cb125444',
+  )
 })
 
 test('major phases are visible only on White turns', () => {

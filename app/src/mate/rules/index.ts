@@ -5,6 +5,7 @@ import type {
   OrderedRule,
   RegisteredMateRuleSet,
   RuleDescription,
+  RuleHelp,
   ScoredMove,
 } from './types'
 
@@ -53,22 +54,40 @@ export type {
   ScoredMove,
 } from './types'
 
-function selectIdealCandidates<Score>(
+type CandidateSelection<Score> = {
+  readonly idealCandidates: readonly ScoredMove<Score>[]
+  readonly eliminatedBy: ReadonlyMap<ScoredMove<Score>, OrderedRule<Score>>
+  readonly lastEliminatingRule: OrderedRule<Score> | undefined
+}
+
+function ruleApplies<Score>(
+  orderedRule: OrderedRule<Score>,
+  score: Score,
+): boolean {
+  return orderedRule.applies?.(score) ?? true
+}
+
+function selectCandidatesByRules<Score>(
   candidates: readonly ScoredMove<Score>[],
   rules: readonly OrderedRule<Score>[],
-): readonly ScoredMove<Score>[] {
+): CandidateSelection<Score> {
   let remaining = [...candidates]
+  const eliminatedBy = new Map<ScoredMove<Score>, OrderedRule<Score>>()
+  let lastEliminatingRule: OrderedRule<Score> | undefined
 
   for (const orderedRule of rules) {
-    const first = remaining[0]
+    const applicable = remaining.filter((candidate) =>
+      ruleApplies(orderedRule, candidate.score),
+    )
+    const first = applicable[0]
     if (!first) {
-      break
+      continue
     }
 
     let best = first
     let tiedBest = [best]
 
-    for (const candidate of remaining.slice(1)) {
+    for (const candidate of applicable.slice(1)) {
       const comparison = orderedRule.compare(candidate.score, best.score)
       if (comparison < 0) {
         best = candidate
@@ -78,10 +97,31 @@ function selectIdealCandidates<Score>(
       }
     }
 
-    remaining = tiedBest
+    const applicableSet = new Set(applicable)
+    const tiedBestSet = new Set(tiedBest)
+    remaining = remaining.filter((candidate) => {
+      if (!applicableSet.has(candidate) || tiedBestSet.has(candidate)) {
+        return true
+      }
+
+      eliminatedBy.set(candidate, orderedRule)
+      lastEliminatingRule = orderedRule
+      return false
+    })
   }
 
-  return remaining
+  return {
+    idealCandidates: remaining,
+    eliminatedBy,
+    lastEliminatingRule,
+  }
+}
+
+function selectIdealCandidates<Score>(
+  candidates: readonly ScoredMove<Score>[],
+  rules: readonly OrderedRule<Score>[],
+): readonly ScoredMove<Score>[] {
+  return selectCandidatesByRules(candidates, rules).idealCandidates
 }
 
 export function selectIdealMoves<Score>(
@@ -97,6 +137,12 @@ export function compareScoresByRules<Score>(
   rules: readonly OrderedRule<Score>[],
 ): number {
   for (const orderedRule of rules) {
+    if (
+      !ruleApplies(orderedRule, leftScore) ||
+      !ruleApplies(orderedRule, rightScore)
+    ) {
+      continue
+    }
     const comparison = orderedRule.compare(leftScore, rightScore)
     if (comparison !== 0) {
       return comparison
@@ -112,7 +158,10 @@ export function firstDifferingRule<Score>(
   rules: readonly OrderedRule<Score>[],
 ): OrderedRule<Score> | undefined {
   return rules.find(
-    (orderedRule) => orderedRule.compare(leftScore, rightScore) !== 0,
+    (orderedRule) =>
+      ruleApplies(orderedRule, leftScore) &&
+      ruleApplies(orderedRule, rightScore) &&
+      orderedRule.compare(leftScore, rightScore) !== 0,
   )
 }
 
@@ -140,9 +189,8 @@ export function explainMove<Score>(
   rules: readonly OrderedRule<Score>[],
   san?: string,
 ): OrderedRule<Score> | undefined {
-  const idealCandidates = selectIdealCandidates(candidates, rules)
-  const best = idealCandidates[0]
-  if (!best) {
+  const selection = selectCandidatesByRules(candidates, rules)
+  if (selection.idealCandidates.length === 0) {
     return undefined
   }
 
@@ -151,28 +199,12 @@ export function explainMove<Score>(
     if (!played) {
       return undefined
     }
-    if (!idealCandidates.includes(played)) {
-      return firstDifferingRule(best.score, played.score, rules)
+    if (!selection.idealCandidates.includes(played)) {
+      return selection.eliminatedBy.get(played)
     }
   }
 
-  const nonIdealCandidates = candidates.filter(
-    (candidate) => !idealCandidates.includes(candidate),
-  )
-  let closestNonIdeal = nonIdealCandidates[0]
-  if (!closestNonIdeal) {
-    return undefined
-  }
-
-  for (const candidate of nonIdealCandidates.slice(1)) {
-    if (
-      compareScoresByRules(candidate.score, closestNonIdeal.score, rules) < 0
-    ) {
-      closestNonIdeal = candidate
-    }
-  }
-
-  return firstDifferingRule(best.score, closestNonIdeal.score, rules)
+  return selection.lastEliminatingRule
 }
 
 export function currentHint<Score>(
@@ -189,6 +221,45 @@ type MateRuleSetRegistration = {
 const mateRuleSets = new Map<MateId, MateRuleSetRegistration>()
 const builtInMateRuleSets = new Map<MateId, MateRuleSetRegistration>()
 
+function snapshotRuleHelp(help: RuleHelp): RuleHelp {
+  const noteBoards = Object.freeze(
+    help.noteBoards.map((board) =>
+      Object.freeze({
+        id: board.id,
+        title: board.title,
+        caption: board.caption,
+        ...(board.layout === undefined
+          ? {}
+          : { layout: Object.freeze({ ...board.layout }) }),
+        pieces: Object.freeze(
+          board.pieces.map((piece) => Object.freeze({ ...piece })),
+        ),
+        highlights: Object.freeze(
+          board.highlights.map((highlight) =>
+            Object.freeze({ ...highlight }),
+          ),
+        ),
+        ...(board.arrows === undefined
+          ? {}
+          : {
+              arrows: Object.freeze(
+                board.arrows.map((arrow) => Object.freeze({ ...arrow })),
+              ),
+            }),
+      }),
+    ),
+  )
+
+  return Object.freeze({
+    title: help.title,
+    whiteIntro: help.whiteIntro,
+    blackIntro: help.blackIntro,
+    blackPriorities: Object.freeze([...help.blackPriorities]),
+    notes: Object.freeze([...help.notes]),
+    noteBoards,
+  })
+}
+
 function createRegisteredMateRuleSet<Score>(
   ruleSet: MateRuleSet<Score>,
 ): RegisteredMateRuleSet {
@@ -199,6 +270,7 @@ function createRegisteredMateRuleSet<Score>(
         id: orderedRule.id,
         shortLabel: orderedRule.shortLabel,
         helpText: orderedRule.helpText,
+        applies: orderedRule.applies,
         compare: orderedRule.compare,
       }),
     ),
@@ -226,13 +298,12 @@ function createRegisteredMateRuleSet<Score>(
   ): RuleDescription | undefined =>
     ruleEntries.find((entry) => entry.orderedRule === orderedRule)?.description
 
-  return {
+  return Object.freeze({
     id,
-    phase: (fen) => phase(fen),
-    whiteMoves: (fen) => whiteMoves(fen),
-    blackCandidates: (fen, previousTurnFen) =>
-      blackCandidates(fen, previousTurnFen),
-    help,
+    phase,
+    whiteMoves,
+    blackCandidates,
+    help: snapshotRuleHelp(help),
     whiteRuleDescriptions,
     idealWhiteMoves: (fen) =>
       selectIdealMoves(scoredWhiteMoves(fen), whiteRules),
@@ -240,7 +311,7 @@ function createRegisteredMateRuleSet<Score>(
       describeRule(explainMove(scoredWhiteMoves(fen), whiteRules, san)),
     currentWhiteHint: (fen) =>
       describeRule(currentHint(scoredWhiteMoves(fen), whiteRules)),
-  }
+  })
 }
 
 export function registerMateRuleSet<Score>(

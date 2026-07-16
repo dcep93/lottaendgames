@@ -47,6 +47,40 @@ const candidates: readonly ScoredMove<TestScore>[] = [
   { san: 'Kh1', score: { safe: 1, closer: 0 } },
 ]
 
+type OptionalDistanceScore = {
+  readonly safe: number
+  readonly distance: number | null
+}
+
+const optionalSafeRule: OrderedRule<OptionalDistanceScore> = {
+  id: 'optional-safe',
+  shortLabel: 'Keep it safe',
+  helpText: 'Keep the piece safe.',
+  compare: (left, right) => left.safe - right.safe,
+}
+
+const optionalDistanceRule: OrderedRule<OptionalDistanceScore> = {
+  id: 'optional-distance',
+  shortLabel: 'Prefer shorter moves',
+  helpText: 'Prefer the shorter applicable move.',
+  applies: (score) => score.distance !== null,
+  compare: (left, right) => {
+    if (left.distance === null || right.distance === null) {
+      throw new Error('distance comparison escaped its applicable domain')
+    }
+    return left.distance - right.distance
+  },
+}
+
+const optionalRules = [optionalSafeRule, optionalDistanceRule] as const
+
+const optionalCandidates: readonly ScoredMove<OptionalDistanceScore>[] = [
+  { san: 'Ka1', score: { safe: 0, distance: null } },
+  { san: 'Qb1', score: { safe: 0, distance: 5 } },
+  { san: 'Qc1', score: { safe: 0, distance: 2 } },
+  { san: 'Qd1', score: { safe: 1, distance: 1 } },
+]
+
 const help: RuleHelp = {
   title: 'How best moves are chosen',
   whiteIntro: 'Apply each White priority in order.',
@@ -139,6 +173,70 @@ test('full score comparison applies rules in lexicographic order', () => {
   assert.equal(
     compareScoresByRules(candidates[2]!.score, candidates[0]!.score, []),
     0,
+  )
+})
+
+test('ordered rules leave non-applicable candidates untouched', () => {
+  assert.deepEqual(selectIdealMoves(optionalCandidates, optionalRules), [
+    'Ka1',
+    'Qc1',
+  ])
+})
+
+test('applicability preserves survivor order and explanation semantics', () => {
+  for (const permutation of permutations(optionalCandidates)) {
+    const expectedIdealMoves = permutation
+      .filter(({ san }) => san === 'Ka1' || san === 'Qc1')
+      .map(({ san }) => san)
+    const context = permutation.map(({ san }) => san).join(', ')
+
+    assert.deepEqual(
+      selectIdealMoves(permutation, optionalRules),
+      expectedIdealMoves,
+      context,
+    )
+    assert.equal(
+      currentHint(permutation, optionalRules),
+      optionalDistanceRule,
+      context,
+    )
+    for (const san of expectedIdealMoves) {
+      assert.equal(
+        explainMove(permutation, optionalRules, san),
+        optionalDistanceRule,
+        context,
+      )
+    }
+    assert.equal(
+      explainMove(permutation, optionalRules, 'Qb1'),
+      optionalDistanceRule,
+      context,
+    )
+    assert.equal(
+      explainMove(permutation, optionalRules, 'Qd1'),
+      optionalSafeRule,
+      context,
+    )
+  }
+})
+
+test('pair comparisons skip priorities outside either score domain', () => {
+  const nonApplicable = optionalCandidates[0]!.score
+  const longer = optionalCandidates[1]!.score
+  const shorter = optionalCandidates[2]!.score
+
+  assert.equal(
+    compareScoresByRules(nonApplicable, longer, optionalRules),
+    0,
+  )
+  assert.equal(compareScoresByRules(longer, shorter, optionalRules), 3)
+  assert.equal(
+    firstDifferingRule(nonApplicable, longer, optionalRules),
+    undefined,
+  )
+  assert.equal(
+    firstDifferingRule(longer, shorter, optionalRules),
+    optionalDistanceRule,
   )
 })
 
@@ -347,6 +445,145 @@ test('registered rule operations snapshot the source rule array', () => {
       shortLabel: 'King closer',
       helpText: 'Bring the king closer.',
     })
+  } finally {
+    unregister()
+  }
+})
+
+test('registered rule operations snapshot rule applicability functions', () => {
+  const mutableRule = {
+    ...safeRule,
+    applies: () => false,
+  }
+  const mutableRuleSet: MateRuleSet<TestScore> = {
+    ...rookRuleSet,
+    id: 'two-knights-pawn',
+    whiteRules: [mutableRule, closerRule],
+  }
+  const unregister = registerMateRuleSet(mutableRuleSet)
+
+  try {
+    mutableRule.applies = () => true
+
+    const registered = getMateRuleSet('two-knights-pawn')
+    assert.deepEqual(registered.idealWhiteMoves('test-fen'), ['Kh1'])
+    assert.deepEqual(registered.currentWhiteHint('test-fen'), {
+      id: 'closer',
+      shortLabel: 'King closer',
+      helpText: 'Bring the king closer.',
+    })
+  } finally {
+    unregister()
+  }
+})
+
+test('registered rule operations deeply snapshot and freeze help', () => {
+  const mutableHelp: {
+    title: string
+    whiteIntro: string
+    blackIntro: string
+    blackPriorities: string[]
+    notes: string[]
+    noteBoards: Array<{
+      id: string
+      title: string
+      caption: string
+      layout: { files: number; ranks: number; fileOffset: number }
+      pieces: Array<{ square: string; piece: 'K' | 'k' }>
+      highlights: Array<{ square: string; kind: 'zone' | 'escape' }>
+      arrows: Array<{ from: string; to: string }>
+    }>
+  } = {
+    title: 'Original title',
+    whiteIntro: 'Original White introduction.',
+    blackIntro: 'Original Black introduction.',
+    blackPriorities: ['Original Black priority.'],
+    notes: ['Original note.'],
+    noteBoards: [
+      {
+        id: 'original-board',
+        title: 'Original board title',
+        caption: 'Original board caption.',
+        layout: { files: 8, ranks: 8, fileOffset: 0 },
+        pieces: [{ square: 'a1', piece: 'K' }],
+        highlights: [{ square: 'b2', kind: 'zone' }],
+        arrows: [{ from: 'a1', to: 'b2' }],
+      },
+    ],
+  }
+  const mutableRuleSet: MateRuleSet<TestScore> = {
+    ...rookRuleSet,
+    id: 'two-bishops',
+    help: mutableHelp,
+  }
+  const unregister = registerMateRuleSet(mutableRuleSet)
+
+  try {
+    const registered = getMateRuleSet('two-bishops')
+
+    mutableHelp.title = 'Mutated title'
+    mutableHelp.whiteIntro = 'Mutated White introduction.'
+    mutableHelp.blackIntro = 'Mutated Black introduction.'
+    mutableHelp.blackPriorities[0] = 'Mutated Black priority.'
+    mutableHelp.blackPriorities.push('Another Black priority.')
+    mutableHelp.notes[0] = 'Mutated note.'
+    mutableHelp.notes.push('Another note.')
+    const sourceBoard = mutableHelp.noteBoards[0]!
+    sourceBoard.id = 'mutated-board'
+    sourceBoard.title = 'Mutated board title'
+    sourceBoard.caption = 'Mutated board caption.'
+    sourceBoard.layout.files = 4
+    sourceBoard.pieces[0]!.square = 'h8'
+    sourceBoard.pieces.push({ square: 'h7', piece: 'k' })
+    sourceBoard.highlights[0]!.kind = 'escape'
+    sourceBoard.highlights.push({ square: 'g7', kind: 'escape' })
+    sourceBoard.arrows[0]!.to = 'h8'
+    sourceBoard.arrows.push({ from: 'h7', to: 'h8' })
+    mutableHelp.noteBoards.push({
+      id: 'extra-board',
+      title: 'Extra board',
+      caption: 'Extra board caption.',
+      layout: { files: 1, ranks: 1, fileOffset: 7 },
+      pieces: [],
+      highlights: [],
+      arrows: [],
+    })
+
+    assert.deepEqual(registered.help, {
+      title: 'Original title',
+      whiteIntro: 'Original White introduction.',
+      blackIntro: 'Original Black introduction.',
+      blackPriorities: ['Original Black priority.'],
+      notes: ['Original note.'],
+      noteBoards: [
+        {
+          id: 'original-board',
+          title: 'Original board title',
+          caption: 'Original board caption.',
+          layout: { files: 8, ranks: 8, fileOffset: 0 },
+          pieces: [{ square: 'a1', piece: 'K' }],
+          highlights: [{ square: 'b2', kind: 'zone' }],
+          arrows: [{ from: 'a1', to: 'b2' }],
+        },
+      ],
+    })
+    assert.equal(registered.phase, mutableRuleSet.phase)
+    assert.equal(registered.whiteMoves, mutableRuleSet.whiteMoves)
+    assert.equal(registered.blackCandidates, mutableRuleSet.blackCandidates)
+    assert.equal(Object.isFrozen(registered), true)
+    assert.equal(Object.isFrozen(registered.help), true)
+    assert.equal(Object.isFrozen(registered.help.blackPriorities), true)
+    assert.equal(Object.isFrozen(registered.help.notes), true)
+    assert.equal(Object.isFrozen(registered.help.noteBoards), true)
+    const registeredBoard = registered.help.noteBoards[0]!
+    assert.equal(Object.isFrozen(registeredBoard), true)
+    assert.equal(Object.isFrozen(registeredBoard.layout), true)
+    assert.equal(Object.isFrozen(registeredBoard.pieces), true)
+    assert.equal(Object.isFrozen(registeredBoard.pieces[0]), true)
+    assert.equal(Object.isFrozen(registeredBoard.highlights), true)
+    assert.equal(Object.isFrozen(registeredBoard.highlights[0]), true)
+    assert.equal(Object.isFrozen(registeredBoard.arrows), true)
+    assert.equal(Object.isFrozen(registeredBoard.arrows?.[0]), true)
   } finally {
     unregister()
   }

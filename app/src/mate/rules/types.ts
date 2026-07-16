@@ -10,9 +10,15 @@ export type OrderedRule<Score> = {
   readonly shortLabel: string
   readonly helpText: string
   /**
-   * Defines a deterministic total preorder for this priority. A negative finite
-   * result prefers left, zero ties them, and a positive finite result prefers
-   * right. Implementations must never return NaN or an infinite value.
+   * Limits this priority to the scores for which its comparison is meaningful.
+   * A non-applicable candidate remains untouched while applicable candidates
+   * are filtered. Omitting this function makes the rule apply to every score.
+   */
+  readonly applies?: (score: Score) => boolean
+  /**
+   * Defines a deterministic finite total preorder within the applicable domain.
+   * A negative finite result prefers left, zero ties them, and a positive finite
+   * result prefers right. Implementations must never return NaN or infinity.
    */
   readonly compare: (left: Score, right: Score) => number
 }
