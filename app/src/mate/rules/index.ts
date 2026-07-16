@@ -7,6 +7,7 @@ import {
   selectIdealMoves,
 } from './selection'
 import { twoBishopsRuleSet } from './twoBishops'
+import { twoKnightsPawnRuleSet } from './twoKnightsPawn'
 import type {
   MateRuleSet,
   OrderedRule,
@@ -105,6 +106,25 @@ export {
   twoBishopsRuleSet,
   twoBishopsWhiteRules,
 } from './twoBishops'
+
+export {
+  compareTwoKnightsPawnBlackScores,
+  compareTwoKnightsPawnWhiteScores,
+  getIdealTwoKnightsPawnBlackMoves,
+  getIdealTwoKnightsPawnWhiteMoves,
+  getTwoKnightsPawnBlackKingRegion,
+  getTwoKnightsPawnTerminalOutcome,
+  scoreTwoKnightsPawnBlackMove,
+  scoreTwoKnightsPawnWhiteCandidates,
+  scoreTwoKnightsPawnWhiteMove,
+  twoKnightsPawnRuleSet,
+  twoKnightsPawnWhiteRules,
+} from './twoKnightsPawn'
+export type {
+  TwoKnightsPawnBlackMoveScore,
+  TwoKnightsPawnTerminalOutcome,
+  TwoKnightsPawnWhiteMoveScore,
+} from './twoKnightsPawn'
 export type {
   TwoBishopsBlackMoveScore,
   TwoBishopsWhiteMoveScore,
@@ -464,3 +484,4 @@ registerBuiltInMateRuleSet(queenRuleSet)
 registerBuiltInMateRuleSet(rookRuleSet)
 registerBuiltInMateRuleSet(twoBishopsRuleSet)
 registerBuiltInMateRuleSet(bishopKnightRuleSet)
+registerBuiltInMateRuleSet(twoKnightsPawnRuleSet)

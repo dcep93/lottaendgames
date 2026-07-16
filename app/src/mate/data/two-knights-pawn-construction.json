@@ -1,0 +1,212 @@
+{
+  "metadata": {
+    "generator": "scripts/generate_two_knights_pawn_construction.mts",
+    "algorithm": "bounded-adversarial-witness-replay-v1",
+    "discovery": "deterministic-offline-beam-search",
+    "whiteEdgeAuditProvider": "Lichess tablebase API",
+    "whiteEdgeAuditVerifiedOn": "2026-07-16",
+    "whiteEdgeRequiredWdl": 2,
+    "beamWidth": 10000,
+    "maximumWhiteMoves": 95,
+    "maximumPlies": 200,
+    "policySha256": "da5f501265694930614958521f693a1d9e683b216f716f937ca2dcb443a6100d"
+  },
+  "routes": [
+    {
+      "mode": "standard",
+      "sourceIndex": 0,
+      "transformName": "identity",
+      "plies": [
+        {
+          "san": "Nc3"
+        },
+        {
+          "san": "Kd7"
+        },
+        {
+          "san": "Nge2"
+        },
+        {
+          "san": "Kd6"
+        },
+        {
+          "san": "Kd2"
+        },
+        {
+          "san": "Ke5"
+        },
+        {
+          "san": "Ke3"
+        },
+        {
+          "san": "a5"
+        },
+        {
+          "san": "Na4"
+        },
+        {
+          "san": "Kd5"
+        },
+        {
+          "san": "Kd3"
+        },
+        {
+          "san": "Kc6"
+        },
+        {
+          "san": "Kc4"
+        },
+        {
+          "san": "Kd6"
+        },
+        {
+          "san": "Nd4"
+        },
+        {
+          "san": "Kd7"
+        },
+        {
+          "san": "Kd5"
+        },
+        {
+          "san": "Kc7"
+        },
+        {
+          "san": "Ke6"
+        },
+        {
+          "san": "Kb7"
+        },
+        {
+          "san": "Kd5"
+        },
+        {
+          "san": "Ka6"
+        },
+        {
+          "san": "Kc6"
+        },
+        {
+          "san": "Ka7"
+        },
+        {
+          "san": "Nb5+"
+        },
+        {
+          "san": "Ka6"
+        },
+        {
+          "san": "Nc5#"
+        }
+      ]
+    },
+    {
+      "mode": "standard",
+      "sourceIndex": 0,
+      "transformName": "mirrorFile",
+      "plies": [
+        {
+          "san": "Nf3"
+        },
+        {
+          "san": "Ke7"
+        },
+        {
+          "san": "Nbd2"
+        },
+        {
+          "san": "Ke6"
+        },
+        {
+          "san": "Ke2"
+        },
+        {
+          "san": "Kd5"
+        },
+        {
+          "san": "Kd3"
+        },
+        {
+          "san": "h5"
+        },
+        {
+          "san": "Nh4"
+        },
+        {
+          "san": "Ke5"
+        },
+        {
+          "san": "Ke3"
+        },
+        {
+          "san": "Kf6"
+        },
+        {
+          "san": "Kf4"
+        },
+        {
+          "san": "Ke6"
+        },
+        {
+          "san": "Ne4"
+        },
+        {
+          "san": "Ke7"
+        },
+        {
+          "san": "Ke5"
+        },
+        {
+          "san": "Kf7"
+        },
+        {
+          "san": "Kd6"
+        },
+        {
+          "san": "Kg7"
+        },
+        {
+          "san": "Ke5"
+        },
+        {
+          "san": "Kh6"
+        },
+        {
+          "san": "Kf6"
+        },
+        {
+          "san": "Kh7"
+        },
+        {
+          "san": "Ng5+"
+        },
+        {
+          "san": "Kh6"
+        },
+        {
+          "san": "Nf5#"
+        }
+      ]
+    },
+    {
+      "mode": "train",
+      "sourceIndex": 0,
+      "transformName": "identity",
+      "plies": [
+        {
+          "san": "Nf7#"
+        }
+      ]
+    },
+    {
+      "mode": "train",
+      "sourceIndex": 0,
+      "transformName": "mirrorFile",
+      "plies": [
+        {
+          "san": "Nc7#"
+        }
+      ]
+    }
+  ]
+}

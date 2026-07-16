@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict'
-import { MATE_CATALOG } from './catalog'
+import twoKnightsPawnPositions from './data/two-knights-pawn-positions.json'
+import { MATE_CATALOG, TWO_KNIGHTS_PAWN_POSITIONS } from './catalog'
+import { parseTwoKnightsPawnManifest } from './twoKnightsPawnData'
 
 type Assert<T extends true> = T
 
@@ -64,6 +66,67 @@ assert.equal(new Set(paths).size, MATE_CATALOG.length)
 for (const record of MATE_CATALOG) {
   assert.ok(record.standardFallbackFen)
   assert.ok(record.trainSeeds.length > 0)
+}
+
+assert.deepEqual(TWO_KNIGHTS_PAWN_POSITIONS, twoKnightsPawnPositions)
+assert.equal(Object.isFrozen(TWO_KNIGHTS_PAWN_POSITIONS), true)
+assert.equal(Object.isFrozen(TWO_KNIGHTS_PAWN_POSITIONS.standard), true)
+assert.equal(Object.isFrozen(TWO_KNIGHTS_PAWN_POSITIONS.provenance), true)
+assert.equal(Object.isFrozen(TWO_KNIGHTS_PAWN_POSITIONS.standard[0]), true)
+assert.equal(
+  Object.isFrozen(TWO_KNIGHTS_PAWN_POSITIONS.standard[0]?.transformNames),
+  true,
+)
+
+const validManifest = structuredClone(twoKnightsPawnPositions) as Record<
+  string,
+  unknown
+>
+
+for (const [label, mutate, expected] of [
+  [
+    'bad provenance',
+    (manifest: any) => { manifest.provenance.provider = 'unknown' },
+    /provenance.provider must be Lichess tablebase API/,
+  ],
+  [
+    'empty standard',
+    (manifest: any) => { manifest.standard = [] },
+    /standard must be a non-empty array/,
+  ],
+  [
+    'empty train',
+    (manifest: any) => { manifest.train = [] },
+    /train must be a non-empty array/,
+  ],
+  [
+    'cursed win',
+    (manifest: any) => { manifest.syzygy.requiredProbe = 1 },
+    /unconditional win value 2/,
+  ],
+  [
+    'undeclared transform',
+    (manifest: any) => {
+      manifest.standard[0].transformNames = ['identity', 'rotate90']
+    },
+    /not an allowed pawn-preserving transform/,
+  ],
+  [
+    'duplicate transform',
+    (manifest: any) => {
+      manifest.standard[0].transformNames = ['identity', 'identity']
+    },
+    /must not contain duplicates/,
+  ],
+  [
+    'extra metadata',
+    (manifest: any) => { manifest.syzygy.url = 'https://example.test' },
+    /syzygy must contain exactly/,
+  ],
+] as const) {
+  const manifest = structuredClone(validManifest)
+  mutate(manifest)
+  assert.throws(() => parseTwoKnightsPawnManifest(manifest), expected, label)
 }
 
 console.log('mate catalog tests passed')

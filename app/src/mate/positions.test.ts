@@ -1,7 +1,10 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import type { Square } from 'chess.js'
-import { MATE_CATALOG } from './catalog'
+import {
+  MATE_CATALOG,
+  TWO_KNIGHTS_PAWN_POSITIONS,
+} from './catalog'
 import {
   SQUARE_TRANSFORMS,
   allSquares,
@@ -28,6 +31,11 @@ import {
   type EndgamePiecePlacement,
 } from './chess'
 import { generateMatePosition } from './positions'
+import {
+  assertTwoKnightsPawnPositionManifest,
+  isSupportedTwoKnightsPawnStart,
+} from './positions'
+import { parseTwoKnightsPawnManifest } from './twoKnightsPawnData'
 
 function sequenceRandom(values: readonly number[]): () => number {
   let index = 0
@@ -451,13 +459,123 @@ test('Train generation allows repeated FENs', () => {
   assert.equal(second, first)
 })
 
-test('Two Knights vs Pawn generation remains unregistered', () => {
+test('Two Knights vs Pawn generation selects audited Standard and Train starts', () => {
+  assert.equal(
+    generateMatePosition(
+      'two-knights-pawn',
+      'standard',
+      sequenceRandom([0, 0]),
+    ),
+    TWO_KNIGHTS_PAWN_POSITIONS.standard[0]?.fen,
+  )
+  assert.equal(
+    generateMatePosition(
+      'two-knights-pawn',
+      'train',
+      sequenceRandom([0, 0.99]),
+    ),
+    transformFen(
+      TWO_KNIGHTS_PAWN_POSITIONS.train[0]!.fen,
+      getSquareTransform('mirrorFile'),
+    ),
+  )
+})
+
+test('Two Knights vs Pawn generation covers exactly the declared source-transform union', () => {
+  for (const [mode, sources] of [
+    ['standard', TWO_KNIGHTS_PAWN_POSITIONS.standard],
+    ['train', TWO_KNIGHTS_PAWN_POSITIONS.train],
+  ] as const) {
+    const generated = new Set<string>()
+    const declared = new Set<string>()
+    for (const [sourceIndex, source] of sources.entries()) {
+      for (const [transformIndex, name] of source.transformNames.entries()) {
+        generated.add(
+          generateMatePosition(
+            'two-knights-pawn',
+            mode,
+            sequenceRandom([
+              (sourceIndex + 0.5) / sources.length,
+              (transformIndex + 0.5) / source.transformNames.length,
+            ]),
+          ),
+        )
+        declared.add(transformFen(source.fen, getSquareTransform(name)))
+      }
+    }
+    assert.deepEqual([...generated].sort(), [...declared].sort(), mode)
+  }
+})
+
+test('Two Knights vs Pawn manifest validates source material and transformed starts', () => {
+  assert.doesNotThrow(() =>
+    assertTwoKnightsPawnPositionManifest(TWO_KNIGHTS_PAWN_POSITIONS),
+  )
+  for (const [mode, sources] of [
+    ['standard', TWO_KNIGHTS_PAWN_POSITIONS.standard],
+    ['train', TWO_KNIGHTS_PAWN_POSITIONS.train],
+  ] as const) {
+    for (const source of sources) {
+      for (const transformName of source.transformNames) {
+        const fen = transformFen(
+          source.fen,
+          getSquareTransform(transformName),
+        )
+        assert.equal(isSupportedTwoKnightsPawnStart(fen, mode), true)
+      }
+    }
+  }
+  assert.equal(
+    isSupportedTwoKnightsPawnStart(
+      TWO_KNIGHTS_PAWN_POSITIONS.standard[0]!.fen,
+      'train',
+    ),
+    false,
+  )
+})
+
+test('Two Knights vs Pawn manifest rejects bad material, edge pawns, illegal checks, and duplicates', () => {
+  const manifestWithFen = (fen: string) =>
+    parseTwoKnightsPawnManifest({
+      ...structuredClone(TWO_KNIGHTS_PAWN_POSITIONS),
+      standard: [
+        {
+          ...structuredClone(TWO_KNIGHTS_PAWN_POSITIONS.standard[0]),
+          fen,
+          transformNames: ['identity'],
+        },
+      ],
+    })
+
   assert.throws(
-    () => generateMatePosition('two-knights-pawn', 'standard', () => 0),
-    new Error('Two Knights vs Pawn generation is not registered'),
+    () =>
+      assertTwoKnightsPawnPositionManifest(
+        manifestWithFen('4k3/p7/8/8/8/8/8/1B2K1N1 w - - 0 1'),
+      ),
+    /Material does not match two-knights-pawn/,
   )
   assert.throws(
-    () => generateMatePosition('two-knights-pawn', 'train', () => 0),
-    new Error('Two Knights vs Pawn generation is not registered'),
+    () =>
+      assertTwoKnightsPawnPositionManifest(
+        manifestWithFen('4k3/8/8/8/8/8/8/pN2K1N1 w - - 0 1'),
+      ),
+    /Pawns cannot be placed on ranks 1 or 8/,
+  )
+  assert.throws(
+    () =>
+      assertTwoKnightsPawnPositionManifest(
+        manifestWithFen('4k3/p7/5N2/8/8/8/8/1N2K3 w - - 0 1'),
+      ),
+    /legal non-terminal endgame start/,
+  )
+
+  const duplicatedSource = structuredClone(TWO_KNIGHTS_PAWN_POSITIONS.standard[0])
+  const duplicateManifest = parseTwoKnightsPawnManifest({
+    ...structuredClone(TWO_KNIGHTS_PAWN_POSITIONS),
+    standard: [duplicatedSource, duplicatedSource],
+  })
+  assert.throws(
+    () => assertTwoKnightsPawnPositionManifest(duplicateManifest),
+    /duplicate transformed position/,
   )
 })

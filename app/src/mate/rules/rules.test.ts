@@ -839,10 +839,22 @@ test('candidate lookup and correctness use exact SAN', () => {
   assert.equal(explainMove(candidates, rules, 'Missing'), undefined)
 })
 
-test('the registry reports an exact error for an unregistered mate set', () => {
-  assert.throws(
-    () => getMateRuleSet('two-knights-pawn'),
-    new Error('Mate rules not registered: two-knights-pawn'),
+test('all five built-in mate sets are registered', () => {
+  assert.deepEqual(
+    [
+      'queen',
+      'rook',
+      'two-bishops',
+      'bishop-knight',
+      'two-knights-pawn',
+    ].map((id) => getMateRuleSet(id as MateRuleSet<TestScore>['id']).id),
+    [
+      'queen',
+      'rook',
+      'two-bishops',
+      'bishop-knight',
+      'two-knights-pawn',
+    ],
   )
 })
 

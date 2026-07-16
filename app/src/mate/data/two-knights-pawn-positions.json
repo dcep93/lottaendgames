@@ -2,8 +2,16 @@
   "syzygy": {
     "format": "five-piece",
     "classification": "win",
-    "requiredProbe": 2,
-    "verifiedAt": "https://tablebase.lichess.org/standard"
+    "requiredProbe": 2
+  },
+  "provenance": {
+    "provider": "Lichess tablebase API",
+    "endpoint": "https://tablebase.lichess.ovh/standard",
+    "verifiedOn": "2026-07-16",
+    "wdlMetric": "Syzygy WDL",
+    "dtzMetric": "Syzygy DTZ",
+    "dtmMetric": "Lichess DTM record (not exposed by Syzygy)",
+    "constructionMaximumPlies": 200
   },
   "standard": [{
     "fen": "4k3/p7/8/8/8/8/8/1N2K1N1 w - - 0 1",

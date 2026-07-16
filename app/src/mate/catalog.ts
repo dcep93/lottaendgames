@@ -1,5 +1,9 @@
 import twoKnightsPawnPositions from './data/two-knights-pawn-positions.json'
+import { parseTwoKnightsPawnManifest } from './twoKnightsPawnData'
 import type { MateId } from './types'
+
+export const TWO_KNIGHTS_PAWN_POSITIONS =
+  parseTwoKnightsPawnManifest(twoKnightsPawnPositions)
 
 export type MateCatalogEntry = {
   readonly id: MateId
@@ -51,7 +55,9 @@ export const MATE_CATALOG: readonly MateCatalogEntry[] = [
     label: 'Two Knights vs Pawn',
     materialSignature: 'KNNvKP',
     path: '/mate/two-knights-pawn',
-    standardFallbackFen: twoKnightsPawnPositions.standard[0].fen,
-    trainSeeds: twoKnightsPawnPositions.train.map(({ fen }) => fen),
+    standardFallbackFen: TWO_KNIGHTS_PAWN_POSITIONS.standard[0]!.fen,
+    trainSeeds: Object.freeze(
+      TWO_KNIGHTS_PAWN_POSITIONS.train.map(({ fen }) => fen),
+    ),
   },
 ]
