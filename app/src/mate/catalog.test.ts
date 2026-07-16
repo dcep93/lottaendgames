@@ -1,6 +1,12 @@
 import assert from 'node:assert/strict'
 import { MATE_CATALOG } from './catalog'
 
+type Assert<T extends true> = T
+
+export type KNNTrainSeedsAreReadonly = Assert<
+  'push' extends keyof (typeof MATE_CATALOG)[4]['trainSeeds'] ? false : true
+>
+
 const expectedCatalog = [
   {
     id: 'queen',

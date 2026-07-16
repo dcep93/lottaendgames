@@ -1,16 +1,16 @@
 import twoKnightsPawnPositions from './data/two-knights-pawn-positions.json'
 import type { MateId } from './types'
 
-export type MateCatalogRecord = {
-  id: MateId
-  label: string
-  materialSignature: string
-  path: `/mate/${MateId}`
-  standardFallbackFen: string
-  trainSeeds: readonly string[]
+export type MateCatalogEntry = {
+  readonly id: MateId
+  readonly label: string
+  readonly materialSignature: string
+  readonly path: `/mate/${MateId}`
+  readonly standardFallbackFen: string
+  readonly trainSeeds: readonly string[]
 }
 
-export const MATE_CATALOG = [
+export const MATE_CATALOG: readonly MateCatalogEntry[] = [
   {
     id: 'queen',
     label: 'Queen',
@@ -54,4 +54,4 @@ export const MATE_CATALOG = [
     standardFallbackFen: twoKnightsPawnPositions.standard[0].fen,
     trainSeeds: twoKnightsPawnPositions.train.map(({ fen }) => fen),
   },
-] as const satisfies readonly MateCatalogRecord[]
+]

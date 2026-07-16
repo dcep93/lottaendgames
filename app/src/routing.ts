@@ -26,7 +26,7 @@ export function resolveAppRoute(
   hash = '',
 ): RouteResolution {
   if (pathname === '/mate' || pathname.startsWith('/mate/')) {
-    return resolveMateRoute(pathname)
+    return resolveMateRoute(pathname, hash)
   }
 
   const chapterId = getBookChapterId(pathname)
@@ -110,8 +110,8 @@ function parseBookAnchor(hash: string) {
   return null
 }
 
-function resolveMateRoute(pathname: string): RouteResolution {
-  if (pathname === '/mate') {
+function resolveMateRoute(pathname: string, hash: string): RouteResolution {
+  if (hash || pathname === '/mate') {
     return emptyMateResolution()
   }
 

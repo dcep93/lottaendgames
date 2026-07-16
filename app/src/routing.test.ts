@@ -82,11 +82,20 @@ assert.deepEqual(resolveAppRoute('/mate/rook/close'), {
   },
 })
 assert.deepEqual(resolveAppRoute('/mate/queen', '#not-supported-yet'), {
-  href: '/mate/queen',
+  href: '/mate',
   route: {
     module: 'mate',
-    mateId: 'queen',
-    mateMode: 'standard',
+    mateId: null,
+    mateMode: null,
+    sharedFen: null,
+  },
+})
+assert.deepEqual(resolveAppRoute('/mate/rook/train', '#not-supported-yet'), {
+  href: '/mate',
+  route: {
+    module: 'mate',
+    mateId: null,
+    mateMode: null,
     sharedFen: null,
   },
 })
