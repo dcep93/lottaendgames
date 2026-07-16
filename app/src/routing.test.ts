@@ -6,6 +6,16 @@ import {
   matePath,
   resolveAppRoute,
 } from './routing'
+import { encodeMateFen } from './mate/share'
+
+const sharedRookFen =
+  '4k3/8/8/8/8/8/8/4K2R w K - 7 12'
+const sharedRookTrainFen =
+  '8/8/8/8/3k4/8/1R6/3K4 w - - 0 1'
+const sharedKnnStandardFen =
+  '4k3/p7/8/8/8/8/8/1N2K1N1 w - - 0 1'
+const sharedKnnTrainFen =
+  '7k/8/5NKN/8/8/8/p7/8 w - - 0 1'
 
 assert.deepEqual(resolveAppRoute('/', ''), {
   href: '/book/about',
@@ -99,6 +109,79 @@ assert.deepEqual(resolveAppRoute('/mate/rook/train', '#not-supported-yet'), {
     sharedFen: null,
   },
 })
+assert.deepEqual(
+  resolveAppRoute('/mate/rook', encodeMateFen(sharedRookFen)),
+  {
+    href: `/mate/rook${encodeMateFen(sharedRookFen)}`,
+    route: {
+      module: 'mate',
+      mateId: 'rook',
+      mateMode: 'standard',
+      sharedFen: sharedRookFen,
+    },
+  },
+)
+assert.deepEqual(
+  resolveAppRoute(
+    '/mate/rook/train',
+    encodeMateFen(sharedRookTrainFen),
+  ),
+  {
+    href: `/mate/rook/train${encodeMateFen(sharedRookTrainFen)}`,
+    route: {
+      module: 'mate',
+      mateId: 'rook',
+      mateMode: 'train',
+      sharedFen: sharedRookTrainFen,
+    },
+  },
+)
+assert.deepEqual(
+  resolveAppRoute(
+    '/mate/two-knights-pawn',
+    encodeMateFen(sharedKnnStandardFen),
+  ),
+  {
+    href: `/mate/two-knights-pawn${encodeMateFen(sharedKnnStandardFen)}`,
+    route: {
+      module: 'mate',
+      mateId: 'two-knights-pawn',
+      mateMode: 'standard',
+      sharedFen: sharedKnnStandardFen,
+    },
+  },
+)
+assert.deepEqual(
+  resolveAppRoute(
+    '/mate/two-knights-pawn/train',
+    encodeMateFen(sharedKnnTrainFen),
+  ),
+  {
+    href: `/mate/two-knights-pawn/train${encodeMateFen(sharedKnnTrainFen)}`,
+    route: {
+      module: 'mate',
+      mateId: 'two-knights-pawn',
+      mateMode: 'train',
+      sharedFen: sharedKnnTrainFen,
+    },
+  },
+)
+for (const [pathname, hash] of [
+  ['/mate/rook/train', encodeMateFen(sharedRookFen)],
+  ['/mate/two-knights-pawn/train', encodeMateFen(sharedKnnStandardFen)],
+  ['/mate/two-knights-pawn', encodeMateFen(sharedKnnTrainFen)],
+  ['/mate/rook', '#fen=%E0%A4%A'],
+] as const) {
+  assert.deepEqual(resolveAppRoute(pathname, hash), {
+    href: '/mate',
+    route: {
+      module: 'mate',
+      mateId: null,
+      mateMode: null,
+      sharedFen: null,
+    },
+  })
+}
 assert.deepEqual(resolveAppRoute('/mate/not-a-mating-set'), {
   href: '/mate',
   route: {

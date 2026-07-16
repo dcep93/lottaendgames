@@ -1,4 +1,5 @@
 import { MATE_CATALOG } from './mate/catalog'
+import { decodeMateFen, encodeMateFen } from './mate/share'
 import type { MateId, MateMode, MateRouteSelection } from './mate/types'
 
 export type AppModule = 'book' | 'mate'
@@ -111,7 +112,7 @@ function parseBookAnchor(hash: string) {
 }
 
 function resolveMateRoute(pathname: string, hash: string): RouteResolution {
-  if (hash || pathname === '/mate') {
+  if (pathname === '/mate') {
     return emptyMateResolution()
   }
 
@@ -124,6 +125,20 @@ function resolveMateRoute(pathname: string, hash: string): RouteResolution {
 
   const mateMode = match?.[2] ? 'train' : 'standard'
   const href = matePath(catalogRecord.id, mateMode)
+
+  if (hash) {
+    const decoded = decodeMateFen(hash, catalogRecord.id, mateMode)
+    if (!decoded.ok) return emptyMateResolution()
+    return {
+      href: `${href}${encodeMateFen(decoded.fen)}`,
+      route: {
+        module: 'mate',
+        mateId: catalogRecord.id,
+        mateMode,
+        sharedFen: decoded.fen,
+      },
+    }
+  }
 
   return {
     href,
