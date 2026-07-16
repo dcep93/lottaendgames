@@ -16,6 +16,11 @@ export type OrderedRule<Score> = {
    */
   readonly applies?: (score: Score) => boolean
   /**
+   * Stops later priorities from breaking a best-score tie when every survivor
+   * satisfies this predicate. Use this for a decisive result such as mate.
+   */
+  readonly stopWhenBest?: (score: Score) => boolean
+  /**
    * Defines a deterministic finite total preorder within the applicable domain.
    * A negative finite result prefers left, zero ties them, and a positive finite
    * result prefers right. Implementations must never return NaN or infinity.
@@ -108,6 +113,14 @@ export type MateRuleSet<Score> = {
   readonly id: MateId
   readonly phase: (fen: string) => string
   readonly scoreWhite: (fen: string, san: string) => Score
+  /**
+   * Optionally prepares and scores the full legal-move batch. This keeps
+   * expensive, position-only context pure while avoiding repeated work.
+   */
+  readonly scoreWhiteCandidates?: (
+    fen: string,
+    moves: readonly string[],
+  ) => readonly ScoredMove<Score>[]
   readonly whiteRules: readonly OrderedRule<Score>[]
   readonly whiteMoves: (fen: string) => readonly string[]
   readonly blackCandidates: (

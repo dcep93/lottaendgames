@@ -1,5 +1,6 @@
 import type { MateId } from '../types'
 import { queenRuleSet, rookRuleSet } from './majorPieces'
+import { twoBishopsRuleSet } from './twoBishops'
 import type {
   MateRuleSet,
   OrderedRule,
@@ -38,6 +39,26 @@ export type {
   RookBlackMoveScore,
   RookWhiteMoveScore,
 } from './majorPieces'
+
+export {
+  compareTwoBishopsBlackScores,
+  compareTwoBishopsWhiteScores,
+  getBlackKingFrontSquares,
+  getIdealTwoBishopsBlackMoves,
+  getIdealTwoBishopsWhiteMoves,
+  getPhaseTwoControlledOppositionEdgeSquares,
+  getTwoBishopsCornerWaitingMoves,
+  getTwoBishopsPhaseTwoWaitingMoveTargets,
+  isTwoBishopsPhaseTwoPosition,
+  scoreTwoBishopsBlackMove,
+  scoreTwoBishopsWhiteMove,
+  twoBishopsRuleSet,
+  twoBishopsWhiteRules,
+} from './twoBishops'
+export type {
+  TwoBishopsBlackMoveScore,
+  TwoBishopsWhiteMoveScore,
+} from './twoBishops'
 
 export type {
   MateRuleSet,
@@ -108,6 +129,16 @@ function selectCandidatesByRules<Score>(
       lastEliminatingRule = orderedRule
       return false
     })
+
+    const stopWhenBest = orderedRule.stopWhenBest
+    if (
+      stopWhenBest &&
+      remaining.length > 0 &&
+      remaining.every((candidate) => stopWhenBest(candidate.score))
+    ) {
+      lastEliminatingRule = orderedRule
+      break
+    }
   }
 
   return {
@@ -147,6 +178,12 @@ export function compareScoresByRules<Score>(
     if (comparison !== 0) {
       return comparison
     }
+    if (
+      orderedRule.stopWhenBest?.(leftScore) &&
+      orderedRule.stopWhenBest(rightScore)
+    ) {
+      return 0
+    }
   }
 
   return 0
@@ -157,12 +194,24 @@ export function firstDifferingRule<Score>(
   rightScore: Score,
   rules: readonly OrderedRule<Score>[],
 ): OrderedRule<Score> | undefined {
-  return rules.find(
-    (orderedRule) =>
-      ruleApplies(orderedRule, leftScore) &&
-      ruleApplies(orderedRule, rightScore) &&
-      orderedRule.compare(leftScore, rightScore) !== 0,
-  )
+  for (const orderedRule of rules) {
+    if (
+      !ruleApplies(orderedRule, leftScore) ||
+      !ruleApplies(orderedRule, rightScore)
+    ) {
+      continue
+    }
+    if (orderedRule.compare(leftScore, rightScore) !== 0) {
+      return orderedRule
+    }
+    if (
+      orderedRule.stopWhenBest?.(leftScore) &&
+      orderedRule.stopWhenBest(rightScore)
+    ) {
+      return undefined
+    }
+  }
+  return undefined
 }
 
 export function findCandidateBySan<Score>(
@@ -263,7 +312,15 @@ function snapshotRuleHelp(help: RuleHelp): RuleHelp {
 function createRegisteredMateRuleSet<Score>(
   ruleSet: MateRuleSet<Score>,
 ): RegisteredMateRuleSet {
-  const { id, phase, scoreWhite, whiteMoves, blackCandidates, help } = ruleSet
+  const {
+    id,
+    phase,
+    scoreWhite,
+    scoreWhiteCandidates,
+    whiteMoves,
+    blackCandidates,
+    help,
+  } = ruleSet
   const whiteRules = Object.freeze(
     ruleSet.whiteRules.map((orderedRule) =>
       Object.freeze({
@@ -271,6 +328,7 @@ function createRegisteredMateRuleSet<Score>(
         shortLabel: orderedRule.shortLabel,
         helpText: orderedRule.helpText,
         applies: orderedRule.applies,
+        stopWhenBest: orderedRule.stopWhenBest,
         compare: orderedRule.compare,
       }),
     ),
@@ -288,11 +346,18 @@ function createRegisteredMateRuleSet<Score>(
   const whiteRuleDescriptions = Object.freeze(
     ruleEntries.map(({ description }) => description),
   )
-  const scoredWhiteMoves = (fen: string): readonly ScoredMove<Score>[] =>
-    whiteMoves(fen).map((san) => ({
-      san,
-      score: scoreWhite(fen, san),
-    }))
+  const scoredWhiteMoves = (fen: string): readonly ScoredMove<Score>[] => {
+    const moves = whiteMoves(fen)
+    return scoreWhiteCandidates
+      ? scoreWhiteCandidates(fen, moves).map(({ san, score }) => ({
+          san,
+          score,
+        }))
+      : moves.map((san) => ({
+          san,
+          score: scoreWhite(fen, san),
+        }))
+  }
   const describeRule = (
     orderedRule: OrderedRule<Score> | undefined,
   ): RuleDescription | undefined =>
@@ -351,3 +416,4 @@ export function getMateRuleSet(id: MateId): RegisteredMateRuleSet {
 
 registerBuiltInMateRuleSet(queenRuleSet)
 registerBuiltInMateRuleSet(rookRuleSet)
+registerBuiltInMateRuleSet(twoBishopsRuleSet)

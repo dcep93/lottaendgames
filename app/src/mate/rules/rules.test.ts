@@ -81,6 +81,32 @@ const optionalCandidates: readonly ScoredMove<OptionalDistanceScore>[] = [
   { san: 'Qd1', score: { safe: 1, distance: 1 } },
 ]
 
+type DecisiveScore = {
+  readonly matePenalty: number
+  readonly laterPreference: number
+}
+
+const decisiveRule: OrderedRule<DecisiveScore> = {
+  id: 'decisive-mate',
+  shortLabel: 'Mate now',
+  helpText: 'Checkmate immediately when mate is available.',
+  stopWhenBest: (score) => score.matePenalty === 0,
+  compare: (left, right) => left.matePenalty - right.matePenalty,
+}
+
+const laterRule: OrderedRule<DecisiveScore> = {
+  id: 'later-detail',
+  shortLabel: 'Later detail',
+  helpText: 'Break an otherwise non-decisive tie.',
+  compare: (left, right) => left.laterPreference - right.laterPreference,
+}
+
+const decisiveCandidates: readonly ScoredMove<DecisiveScore>[] = [
+  { san: 'Ba1#', score: { matePenalty: 0, laterPreference: 2 } },
+  { san: 'Bb2#', score: { matePenalty: 0, laterPreference: 1 } },
+  { san: 'Kc2', score: { matePenalty: 1, laterPreference: 0 } },
+]
+
 const help: RuleHelp = {
   title: 'How best moves are chosen',
   whiteIntro: 'Apply each White priority in order.',
@@ -238,6 +264,92 @@ test('pair comparisons skip priorities outside either score domain', () => {
     firstDifferingRule(longer, shorter, optionalRules),
     optionalDistanceRule,
   )
+})
+
+test('a decisive best priority preserves every tied terminal move', () => {
+  const decisiveRules = [decisiveRule, laterRule] as const
+
+  for (const permutation of permutations(decisiveCandidates)) {
+    const expectedMates = permutation
+      .filter(({ score }) => score.matePenalty === 0)
+      .map(({ san }) => san)
+    assert.deepEqual(
+      selectIdealMoves(permutation, decisiveRules),
+      expectedMates,
+    )
+    assert.equal(currentHint(permutation, decisiveRules), decisiveRule)
+    assert.equal(explainMove(permutation, decisiveRules, 'Kc2'), decisiveRule)
+  }
+  assert.equal(
+    compareScoresByRules(
+      decisiveCandidates[0]!.score,
+      decisiveCandidates[1]!.score,
+      decisiveRules,
+    ),
+    0,
+  )
+  assert.equal(
+    firstDifferingRule(
+      decisiveCandidates[0]!.score,
+      decisiveCandidates[1]!.score,
+      decisiveRules,
+    ),
+    undefined,
+  )
+})
+
+test('registered rule operations snapshot decisive stop predicates', () => {
+  const mutableDecisiveRule = { ...decisiveRule }
+  const decisiveRuleSet: MateRuleSet<DecisiveScore> = {
+    id: 'two-knights-pawn',
+    phase: () => 'phase',
+    scoreWhite: (_fen, san) =>
+      decisiveCandidates.find((candidate) => candidate.san === san)!.score,
+    whiteRules: [mutableDecisiveRule, laterRule],
+    whiteMoves: () => decisiveCandidates.map(({ san }) => san),
+    blackCandidates: () => ({ moves: [], idealMoves: [] }),
+    help,
+  }
+  const unregister = registerMateRuleSet(decisiveRuleSet)
+
+  try {
+    mutableDecisiveRule.stopWhenBest = () => false
+    assert.deepEqual(
+      getMateRuleSet('two-knights-pawn').idealWhiteMoves('fen'),
+      ['Ba1#', 'Bb2#'],
+    )
+  } finally {
+    unregister()
+  }
+})
+
+test('registered rule sets may prepare a pure candidate score batch', () => {
+  let batchCalls = 0
+  let individualCalls = 0
+  const batchRuleSet: MateRuleSet<TestScore> = {
+    ...rookRuleSet,
+    id: 'bishop-knight',
+    scoreWhite: (_fen, san) => {
+      individualCalls += 1
+      return candidates.find((candidate) => candidate.san === san)!.score
+    },
+    scoreWhiteCandidates: (_fen, moves) => {
+      batchCalls += 1
+      return moves.map((san) => candidates.find((move) => move.san === san)!)
+    },
+  }
+  const unregister = registerMateRuleSet(batchRuleSet)
+
+  try {
+    assert.deepEqual(getMateRuleSet('bishop-knight').idealWhiteMoves('fen'), [
+      'Ka2',
+      'Kb2',
+    ])
+    assert.equal(batchCalls, 1)
+    assert.equal(individualCalls, 0)
+  } finally {
+    unregister()
+  }
 })
 
 test('candidate permutations preserve tie order and explanation rules', () => {
