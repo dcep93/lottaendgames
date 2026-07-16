@@ -302,58 +302,85 @@
   font-weight: 750;
 }
 
-.leg-book-contents > ol,
+.leg-contents-list,
 .leg-ending-contents {
   display: grid;
-  gap: 0.55rem;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.leg-book-contents > ol > li {
-  border-top: 0.0625rem solid var(--leg-border);
-  padding-top: 0.55rem;
+.leg-contents-list,
+.leg-ending-contents {
+  gap: 0;
 }
 
-.leg-book-contents > ol > li:first-child {
-  border-top: 0;
-  padding-top: 0;
+.leg-contents-chapter,
+.leg-contents-ending {
+  min-width: 0;
 }
 
-.leg-book-contents a {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem 0.65rem;
+.leg-contents-row {
+  display: grid;
+  grid-template-columns: minmax(5.4rem, 7rem) minmax(0, 1fr);
+  gap: 0.55rem;
   align-items: baseline;
-  width: fit-content;
-  text-decoration-color: rgba(216, 179, 138, 0.42);
+  box-sizing: border-box;
+  width: 100%;
+  border-bottom: 0.0625rem solid var(--leg-border);
+  padding: 0.62rem 0.25rem;
+  text-decoration: none;
+  transition:
+    background-color 140ms ease,
+    color 140ms ease;
 }
 
-.leg-book-contents a > span {
+.leg-contents-row:hover,
+.leg-contents-row:focus-visible {
+  color: var(--leg-pink);
+  background: linear-gradient(90deg, rgba(216, 179, 138, 0.08), transparent);
+}
+
+.leg-contents-row:focus-visible {
+  border-radius: 0.25rem;
+  outline: 0.125rem solid rgba(255, 123, 195, 0.72);
+  outline-offset: -0.125rem;
+}
+
+.leg-contents-row > span {
   font-size: 0.78rem;
   font-weight: 850;
   text-transform: uppercase;
 }
 
-.leg-book-contents a > strong {
+.leg-contents-row > span:only-child {
+  grid-column: 1 / -1;
+}
+
+.leg-contents-row > strong {
+  min-width: 0;
   color: var(--leg-text);
   font-size: 1.02rem;
 }
 
-.leg-ending-contents {
-  gap: 0.3rem;
-  margin-top: 0.45rem;
-  padding-left: 1rem;
+.leg-contents-chapter-row > span {
+  color: var(--leg-pink);
 }
 
-.leg-ending-contents a > span {
-  min-width: 5.4rem;
+.leg-ending-contents {
+  padding-left: clamp(0.35rem, 2vw, 0.9rem);
+}
+
+.leg-contents-ending-row {
+  padding-block: 0.65rem;
+}
+
+.leg-contents-ending-row > span {
   color: var(--leg-brown);
   font-size: 0.7rem;
 }
 
-.leg-ending-contents a > strong {
+.leg-contents-ending-row > strong {
   font-size: 0.92rem;
   font-weight: 700;
 }

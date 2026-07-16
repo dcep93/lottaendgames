@@ -160,7 +160,7 @@ assertChapterIncludes('13', 'Pawn on the 6th rank')
 assertChapterIncludes('13', 'The winning manoeuvre')
 assertChapterIncludes(
   '14',
-  '58.Qb4+ Ke2 59.Qe4+ Kd2 60.Qd4+ Kc1 61.Qg3 Kb1',
+  '58.Qb4+ Ke2 59.Qe4+ Kd2 60.Qd4+ Kc1 61.Kg3 Kb1',
 )
 assertChapterIncludes('14', '100.Bc5 Ke4 101.Kf2')
 assertChapterIncludes(

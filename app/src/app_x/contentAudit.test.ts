@@ -86,13 +86,15 @@ function auditChapter({ number, sections }: ChapterFixture) {
     for (const token of tokens) {
       if (token.type === 'move') {
         assertMoveTokenIsEnginePlayable(number, sectionIndex, token)
-      } else {
-        unplayableSanDisplays.push(
-          ...findSanDisplays(token.text).map(
-            (display) => `${number}:${sectionIndex}:${display}`,
-          ),
-        )
       }
+    }
+
+    for (const textRun of contiguousTextRuns(tokens)) {
+      unplayableSanDisplays.push(
+        ...findSanDisplays(textRun).map(
+          (display) => `${number}:${sectionIndex}:${display}`,
+        ),
+      )
     }
   }
 
@@ -101,6 +103,29 @@ function auditChapter({ number, sections }: ChapterFixture) {
     [],
     `Chapter ${number} has SAN-looking text that was not converted to a playable move token.`,
   )
+}
+
+function contiguousTextRuns(tokens: TextPlaybackToken[]) {
+  const runs: string[] = []
+  let current = ''
+
+  for (const token of tokens) {
+    if (token.type === 'move') {
+      if (current) {
+        runs.push(current)
+        current = ''
+      }
+      continue
+    }
+
+    current += token.text
+  }
+
+  if (current) {
+    runs.push(current)
+  }
+
+  return runs
 }
 
 function assertMoveTokenIsEnginePlayable(

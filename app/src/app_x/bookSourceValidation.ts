@@ -219,6 +219,9 @@ function validatePlaybackSegments(value: unknown, location: string) {
     )
     assertNonEmptyString(segment.parentFen, `${segmentLocation} parentFen`)
     validateLegalFen(segment.parentFen, `${segmentLocation} parentFen`)
+    if (segment.pathPrefix !== undefined) {
+      assertStringArray(segment.pathPrefix, `${segmentLocation} pathPrefix`)
+    }
     assert(
       typeof segment.sectionIndex === 'number' &&
         Number.isInteger(segment.sectionIndex) &&

@@ -18,6 +18,15 @@ const validBook = {
             number: 'I.1',
             orientation: 'white',
             fen: '8/8/8/8/8/2k5/8/2K5 w - - 0 1',
+            playbackSegments: [
+              {
+                parentFen: '8/8/8/8/8/2k5/8/2K5 w - - 0 1',
+                pathPrefix: ['Kc2'],
+                positionNumber: 'I.1',
+                sectionIndex: 2,
+                start: '1.Kc2',
+              },
+            ],
           },
         },
         {
@@ -127,6 +136,25 @@ assert.throws(
       }),
     ),
   /unknown type/,
+)
+assert.throws(
+  () =>
+    validateBookSource(
+      withMutation((book) => {
+        book.parts[0].sections[1].content.playbackSegments[0].pathPrefix =
+          'Kc2'
+      }),
+    ),
+  /pathPrefix must be an array/,
+)
+assert.throws(
+  () =>
+    validateBookSource(
+      withMutation((book) => {
+        book.parts[0].sections[1].content.playbackSegments[0].pathPrefix = ['']
+      }),
+    ),
+  /pathPrefix\[0\] must be a non-empty string/,
 )
 
 const source = JSON.parse(

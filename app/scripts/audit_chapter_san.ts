@@ -10,6 +10,7 @@ import {
 import {
   isProseMoveReference,
   isProseMoveReferenceContinuation,
+  isProseSanReference,
   type TextPlaybackToken,
 } from '../src/app_x/moveParser'
 
@@ -279,6 +280,10 @@ function classifySanMiss(
 
 function shouldIgnoreSanDisplay(display: string, text: string, index: number) {
   if (/^\d+$/.test(display)) {
+    return true
+  }
+
+  if (isProseSanReference(text, index, display.length)) {
     return true
   }
 

@@ -80,6 +80,7 @@ export type PlaybackAnchor = {
 
 export type PlaybackSegment = {
   parentFen: string
+  pathPrefix?: string[]
   positionNumber: string
   sectionIndex: number
   start: string

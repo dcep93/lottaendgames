@@ -845,7 +845,7 @@
     {
       "chapter": "10",
       "page": 135,
-      "title": "Summary of section",
+      "title": "Summary of Section 2",
       "textStartsWith": "This section deals with those positions"
     },
     {
@@ -1068,11 +1068,6 @@
       "chapter": "10",
       "position": "10.19",
       "text": "Perfect Cut with a 3rd-rank central pawn"
-    },
-    {
-      "chapter": "11",
-      "position": "11.1",
-      "text": "First scenario"
     },
     {
       "chapter": "11",
@@ -1388,19 +1383,19 @@
     },
     {
       "chapter": "11",
-      "text": "Series about rook and bishop's pawns"
+      "text": "Series about rook and bishop's pawns."
     },
     {
       "chapter": "11",
-      "text": "Defending king cut off on the back rank; bishop's pawn on the 6th rank"
+      "text": "Defending king cut off on the back rank; bishop's pawn on the 6th rank."
     },
     {
       "chapter": "11",
-      "text": "Bishop's pawn on the 5th rank"
+      "text": "Bishop's pawn on the 5th rank."
     },
     {
       "chapter": "11",
-      "text": "Bishop's pawn on the 4th rank"
+      "text": "Bishop's pawn on the 4th rank."
     },
     {
       "chapter": "11",
@@ -1556,7 +1551,7 @@
       "headings": 3,
       "panels": 10,
       "positions": 25,
-      "subtitles": 7
+      "subtitles": 8
     },
     "3": {
       "headings": 4,
@@ -1610,7 +1605,7 @@
       "headings": 11,
       "panels": 5,
       "positions": 23,
-      "subtitles": 5
+      "subtitles": 4
     },
     "12": {
       "headings": 19,

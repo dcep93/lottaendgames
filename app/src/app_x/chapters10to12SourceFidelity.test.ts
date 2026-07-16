@@ -39,6 +39,8 @@ type FidelityLedger = {
     units: Array<{
       appSectionIndex?: number
       boardNumber?: string
+      deviationId?: string
+      evidence?: string
       id: string
       kind: 'board' | 'page-copy'
       partId: string
@@ -123,8 +125,27 @@ for (const [partId, expectedNumbers] of Object.entries(expectedBoards)) {
   )
 }
 
+const acceptedChapterTenToTwelveUnits = new Set([
+  '10-p144-copy',
+  '10-p150-copy',
+  '10-p152-copy',
+  '11-p155-copy',
+  '12-p184-copy',
+  '12-p186-copy',
+  '12-board-12.6',
+  '12-board-12.18',
+])
 for (const unit of release.units) {
-  assert.equal(unit.status, 'matched')
+  assert.equal(
+    unit.status,
+    acceptedChapterTenToTwelveUnits.has(unit.id)
+      ? 'accepted-deviation'
+      : 'matched',
+  )
+  if (unit.status === 'accepted-deviation') {
+    assert.ok(unit.deviationId, `${unit.id} must name its accepted deviation`)
+    assert.ok(unit.evidence, `${unit.id} must record page-level evidence`)
+  }
   if (unit.kind !== 'board') {
     continue
   }
@@ -158,6 +179,11 @@ assert.equal(
   '8/5k2/7P/6R1/5PK1/8/8/1r6 b - - 0 1',
 )
 assert.equal(getBoard('11', '11.13').displayLabel, 'Position 11.12')
+assert.equal(
+  getBoard('12', '12.8').fen,
+  '8/1p6/1P6/8/7K/8/8/1k6 w - - 0 1',
+  'PDF 176 / printed 175 has a key-square star, not a white pawn, on b4.',
+)
 assert.equal(
   getBoard('12', '12.24').fen,
   '2k5/8/p1P5/P2K4/8/8/8/8 w - - 0 1',
@@ -338,6 +364,11 @@ assert.deepEqual(
 )
 
 const chapterTenText = textualContent(getPart('10').sections)
+assert.match(
+  chapterTenText,
+  /8\.Rd4\+−\nEnd of the manoeuvre/,
+  'PDF 128 / printed 127 preserves the printed +− evaluation',
+)
 assertIncludesAll(chapterTenText, [
   'Second method: 3.Ra1. White transfers the rook to c8.',
   '5...Ra1 6.Rd7 Ra2',
@@ -363,6 +394,7 @@ assertIncludesAll(chapterTenText, [
   '4.Rd7? Ra8!=',
   'we are in an extreme position',
   '1...Kf6Z 2.e7',
+  'such as ...Rf2',
   '2.Kd7Z Kg7',
   '3.Ke7Z',
   "Black's disposal..",
@@ -391,6 +423,8 @@ assertIncludesAll(chapterTenText, [
   'manoeuvre Rb7 and a6-a7',
   '7...Ke6 8.Kc4 Kd6',
   '8...Rxb1 9.a8Q+-.',
+  // PDF 152 / printed 151: both black moves are king moves.
+  '14.Ke7 Kb5 15.Ra1\nKb6=',
   'Therefore,\nwe will classify',
 ])
 assertExcludesAll(chapterTenText, [
@@ -406,6 +440,7 @@ assertExcludesAll(chapterTenText, [
   '4.a7 Ra6! =',
   '1...Ra1? Rb7+!',
   '2.Kf7 Ra3+',
+  'such as 1...Rf2',
   '11.Kd4 Rf5',
   '3...Kd8? (a king move is better',
   '4.Rh7+! Ke8',
@@ -425,6 +460,7 @@ assertExcludesAll(chapterTenText, [
   '2...Rd8 3.Rd5 Ra8 4.Kd4 Kf4.',
   '6...Rb7+ 7.Ka7.',
   '8...Rxb1 9.a8=Q+-.',
+  '14.Ke7 Rb5 15.Ra1\nRb6=',
   'Insisting on the defensive strategy White cannot',
   "we're in an extreme position",
   "Black's disposal.\n1...Ra8",
@@ -442,9 +478,16 @@ for (const [sectionIndex, display, positionNumber, parentFen] of [
   [13, '2...Rg1!', '10.1', '4k3/R7/4P1r1/3K4/8/8/8/8 b - - 0 2'],
   [23, '3.Ra1', '10.3', '3K4/3P2k1/8/8/8/8/2r5/5R2 w - - 3 3'],
   [30, '7.Rf8', '10.4', '8/4P3/4r3/2K5/8/8/8/5Rk1 w - - 11 7'],
+  [39, 'Rf2', '10.6', '4k3/7R/8/3KPr2/8/8/8/8 b - - 0 1'],
   [41, '4.Rf7+!', '10.7', '5k2/7R/4K3/4P3/8/8/8/3r4 w - - 0 4'],
+  [41, '4.Rh8+', '10.7', '3k4/7R/4K3/4P3/8/8/8/4r3 w - - 5 4'],
   [41, '4.Kf6', '10.7', '3k4/7R/4K3/4P3/8/8/8/4r3 w - - 5 4'],
   [41, '7...Kd8', '10.7', '4k3/7R/4K3/4P3/8/8/8/4r3 b - - 12 7'],
+  [49, '1...Ra1?', '10.9', 'r2R4/4K1k1/4P3/8/8/8/8/8 b - - 1 1'],
+  [49, '2.Ke8', '10.9', '3R4/4K1k1/4P3/8/8/8/8/r7 w - - 2 2'],
+  [49, '2.Rd7', '10.9', '3R4/r3K1k1/4P3/8/8/8/8/8 w - - 2 2'],
+  [49, '2...Ra8', '10.9', '8/r2RK1k1/4P3/8/8/8/8/8 b - - 3 2'],
+  [49, '3.Rd6!', '10.9', 'r7/3RK1k1/4P3/8/8/8/8/8 w - - 4 3'],
   [51, '3.Rb7', '10.10', 'r7/3RK1k1/4P3/8/8/8/8/8 w - - 4 3'],
   [52, '4.Rd7', '10.10', 'r7/4K3/3RP1k1/8/8/8/8/8 w - - 1 4'],
   [55, '1.Ra1?', '10.11', '1r6/R3K1k1/4P3/8/8/8/8/8 w - - 0 1'],
@@ -459,7 +502,17 @@ for (const [sectionIndex, display, positionNumber, parentFen] of [
   [93, '1...Rc7', '10.20', '2r5/8/1R6/4k3/2P5/2K5/8/8 b - - 1 1'],
   [93, '4.Rd6+', '10.20', '2r5/8/1R6/2Pk4/1K6/8/8/8 w - - 1 4'],
   [111, '6...Rb1+', '10.23', 'R7/6k1/PK6/8/8/8/8/r7 b - - 10 6'],
+  [113, '2.Kf2', '10.23', 'R7/6k1/P7/8/8/8/6K1/r7 w - - 1 2'],
+  [113, '6.Rh7!', '10.24', '8/R7/P4k2/1r6/3K4/8/8/8 w - - 7 6'],
+  [113, '6.Rb7?', '10.24', '8/R7/P4k2/1r6/3K4/8/8/8 w - - 7 6'],
+  [113, '5...Ra5', '10.24', '8/1R6/P5k1/1r6/4K3/8/8/8 b - - 6 5'],
+  [113, 'Kf6!', '10.24', '8/PR6/6k1/r7/4K3/8/8/8 b - - 0 6'],
+  [113, '7.Rh7!?', '10.24', '8/PR6/5k2/r7/4K3/8/8/8 w - - 1 7'],
+  [113, '7.Kd4', '10.24', '8/PR6/5k2/r7/4K3/8/8/8 w - - 1 7'],
+  [121, '7.Kc5+', '10.26', '1R6/P2k4/1K6/8/8/8/8/1r6 w - - 12 7'],
   [121, '14.Ke7', '10.26', 'r7/P4K2/R7/2k5/8/8/8/8 w - - 26 14'],
+  [121, 'Kb5', '10.26', 'r7/P3K3/R7/2k5/8/8/8/8 b - - 27 14'],
+  [121, 'Kb6=', '10.26', 'r7/P3K3/8/1k6/8/8/8/R7 b - - 29 15'],
   [121, '9.a8Q+', '10.26', '3K4/P7/8/2k5/8/8/8/1r6 w - - 0 9'],
   [126, '3.Rb2', '10.27', '8/1K1k4/1R6/P7/8/8/8/2r5 w - - 3 3'],
 ] as const) {
@@ -475,6 +528,29 @@ for (const [sectionIndex, display, positionNumber, parentFen] of [
   )
 }
 
+assert.equal(chapterTenMoves(39).length, 15)
+assert.equal(chapterTenMoves(49).length, 27)
+assert.equal(
+  chapterTenMoves(23).find(({ display }) => display === '8.Rd4+')?.san,
+  'Rd4',
+  'PDF 128 / printed 127 uses +− as an evaluation, not a check marker',
+)
+for (const [sectionIndex, display, parentFen] of [
+  [41, 'Ke7', '7R/2k5/4K3/4P3/8/8/8/4r3 w - - 7 5'],
+  [55, 'Kf6', '1r6/2K3k1/4P3/8/8/8/8/R7 b - - 5 3'],
+  [90, 'Kc3', 'r7/8/8/7R/3P4/6k1/3K4/8 w - - 1 3'],
+  [93, 'Rb6', '1r6/8/7R/4k3/2P5/2K5/8/8 w - - 1 2'],
+  [113, 'Kg6', '8/R5k1/P7/r7/8/5K2/8/8 b - - 2 3'],
+] as const) {
+  assert.equal(
+    chapterTenMoves(sectionIndex).some(
+      (token) => token.display === display && token.parentFen === parentFen,
+    ),
+    false,
+    `Chapter 10 prose reference ${display} must not become playback`,
+  )
+}
+
 // PDF 144 / printed 143 genuinely repeats the rook's occupied h5 square as
 // 3.Rh5. PDF 150 / printed 149 genuinely jumps the king from e4 to c4.
 // Preserve both source inconsistencies as prose instead of inventing legal moves.
@@ -487,11 +563,29 @@ assert.equal(
   ),
   false,
 )
+// PDF 152 / printed 151 also prints 8.Rb5? Rh8+ even though Rb5 checks
+// the black king. Keep the impossible continuation visible but non-playable.
+assert.equal(
+  chapterTenMoves(121).some(
+    ({ display, parentFen }) =>
+      display === 'Rh8+' &&
+      parentFen === '3K4/P7/8/1Rk5/8/8/8/7r b - - 15 8',
+  ),
+  false,
+)
+assert.equal(
+  chapterTenMoves(121).some(
+    ({ display, parentFen }) =>
+      display === '9.Kc7' &&
+      parentFen === '3K4/P7/1R6/2k5/8/8/8/7r w - - 14 9',
+  ),
+  false,
+)
 
 const chapterElevenText = textualContent(getPart('11').sections)
 assertIncludesAll(chapterElevenText, [
   '3...Rc8! holds',
-  '4.Kd6 Kc8 5.Kc6',
+  '4.Kd6 Kc8 5.Rc6+ Kd8',
   '3.Rh6 (intending Kd6)',
   "Series about rook and bishop's pawns.",
   "bishop's pawn on the 6th rank.",
@@ -535,9 +629,23 @@ assertIncludesAll(chapterElevenText, [
   // PDF 169 / printed 168: ...Rf4 completes Vancura and ...Kh7 starts the main continuation.
   '9.Kc5 Rf4 - Vancura',
   '6...Kh7 7.Ke5 Rb6',
+  // High-resolution glyph regressions, PDF 156–159 and 163 / printed 155–158 and 162.
+  '4.Rh7+ Kd8=',
+  '1.Rb7? White captures the pawn',
+  '3.Rxg7 Kg3',
+  '6.Rg7+ Kh8 7.f7',
+  '8.Rb8! Kxh7 9.Ke7',
+  '6...Ra1 7.f6 Ra6+ 8.Kf5 Ra5+ 9.Re5 Ra8 10.f7+-',
+  '3.Rg7+ Kf8',
+  '7.f6 Rg2 8.Rg7 Rf2',
+  '(7.Rg6+ Kf7=)',
+  // PDF 163 / printed 162: both king moves capture the h5-pawn.
+  '8.Re7 (8.Kf6 Kxh5=)',
+  '9.Re8 (9.Kf6 Kxh5=)',
 ])
 assertExcludesAll(chapterElevenText, [
   '3...Kc8! holds',
+  '4.Kd6 Kc8 5.Kc6',
   '4.Kd6 4...Kc8',
   '3.Kc6 (intending Kd6)',
   '3...Kg5?? loses on the spot',
@@ -565,7 +673,50 @@ assertExcludesAll(chapterElevenText, [
   '22.f5 Re2+ 23.Ke6 Ra2',
   '9.Kc5 Rg4 - Vancura',
   '6...Rh7 7.Ke5 Rb6',
+  '4.Rb7+ Kd8=',
+  '1...Rb7? White captures the pawn',
+  '3.Rg7 Kg3',
+  '6.Kg7+ Kh8 7.f7',
+  '8.Rb8! Rxh7 9.Ke7',
+  '6...Ra1 7.f6 Ra6+ 8.Kf5 Ra8+ 9.Re5 Ra8 10.f7+-',
+  '3.Kg7+ Kf8',
+  '7.f6 Rg2 8.Kg7 Rf2',
+  '(7.Kg6+ Kf7=)',
+  '8.Re7 (8.Kf6 Kh5=)',
+  '9.Re8 (9.Kf6 Kh5=)',
 ])
+
+const chapterElevenPlayback = buildChapterPlayback(getPart('11').sections)
+assert.equal(chapterElevenMoves(8).length, 48)
+for (const [sectionIndex, display, positionNumber, parentFen] of [
+  [8, '4...Rg1!', '11.2', 'R7/2k3r1/8/2KP4/3P4/8/8/8 b - - 0 4'],
+  [8, '5.Rc6+', '11.1', '2k5/8/1R1K4/3P4/3r4/8/8/8 w - - 2 5'],
+  [9, '4.Rh7+', '11.1', '8/3k4/7R/2KP4/3P2r1/8/8/8 w - - 6 4'],
+  [14, '1.Rb7?', '11.3', '8/6p1/8/8/1R4pk/r7/6K1/8 w - - 0 1'],
+  [14, '3.Rxg7', '11.3', '8/1R4p1/8/8/6p1/7k/r7/6K1 w - - 4 3'],
+  [21, '6.Rg7+', '11.4', '6k1/1R6/5P1P/8/8/2K5/8/5r2 w - - 9 6'],
+  [21, '8.Rb8!', '11.4', '3K3k/1R5P/5P2/8/8/8/8/5r2 w - - 1 8'],
+  [21, 'Kxh7', '11.4', '1R1K3k/7P/5P2/8/8/8/8/5r2 b - - 2 8'],
+  [24, '3.Rg7+', '11.5', '6k1/1R6/5K1P/5P2/8/8/8/7r w - - 3 3'],
+  [24, 'Ra5+', '11.5', '4R3/7k/r4P1P/5K2/8/8/8/8 b - - 2 8'],
+  [24, '8.Rg7', '11.5', '5k2/R6K/5P1P/8/8/8/6r1/8 w - - 1 8'],
+  [48, '7.Rg6+', '11.7', '8/6k1/2R5/5K1P/5P2/8/8/6r1 w - - 8 7'],
+  [48, '12.Rd4', '11.7', '8/6k1/8/3R1K1P/5P2/8/8/5r2 w - - 18 12'],
+  [58, '4.Kf4', '11.10', '3R4/1r6/6kP/4K1P1/8/8/8/8 w - - 6 4'],
+  [58, '6.Kf4', '11.10', '4R3/1r6/6kP/4K1P1/8/8/8/8 w - - 10 6'],
+  [42, '1...Rg1+', '11.series.4.1', '6k1/1R6/7P/6K1/5P2/8/8/r7 b - - 0 1'],
+] as const) {
+  assert.equal(
+    chapterElevenMoves(sectionIndex).some(
+      (token) =>
+        token.display === display &&
+        token.positionNumber === positionNumber &&
+        token.parentFen === parentFen,
+    ),
+    true,
+    `Missing Chapter 11 playback token ${display} in section ${sectionIndex}`,
+  )
+}
 
 const chapterTwelveText = textualContent(getPart('12').sections)
 assertIncludesAll(chapterTwelveText, [
@@ -591,6 +742,7 @@ assertIncludesAll(chapterTwelveText, [
   '3.Kd3! Kxa4',
   '1...h6 is also a draw',
   '3.Kb4+- d4 4.Kxa4',
+  '4.Kxe5 Kxh6 5.Kd5+- Kg6',
   '1...axb6 (1...cxb6',
 ])
 assertExcludesAll(chapterTwelveText, [
@@ -611,8 +763,37 @@ assertExcludesAll(chapterTwelveText, [
   '3.Kd3! Ka4',
   'Here 1.h6 is also a draw',
   '3.Kb4+- 3...d4 4.Ka4',
+  '4.Ke5 Kh6 5.Kd5+- Kg6',
   '1.axb6 (1.cxb6',
 ])
+
+const chapterTwelvePlayback = buildChapterPlayback(getPart('12').sections)
+for (const [sectionIndex, display, parentFen, san] of [
+  [35, '6.Kb4', '8/1p6/1k6/8/8/2K5/8/8 w - - 0 6', 'Kb4'],
+  [62, '2.Ke5', '8/8/8/7p/1k1K3P/1P6/8/8 w - - 2 2', 'Ke5'],
+  [62, '6.Kg6!', '8/8/4k3/7K/7P/8/8/8 w - - 1 6', 'Kg6'],
+  [98, '4...Kh6', '8/7p/8/5K1k/8/6P1/7P/8 b - - 0 4', 'Kh6'],
+  [98, '6.Kg7', '8/7p/5K2/7k/8/6P1/7P/8 w - - 3 6', 'Kg7'],
+  [104, '1...Kg6', '8/7p/5k2/8/5K2/7P/6P1/8 b - - 0 1', 'Kg6'],
+  [104, '2.Kg4', '8/7p/6k1/8/5K2/7P/6P1/8 w - - 1 2', 'Kg4'],
+  [104, '2.Kg4+', '8/7p/6k1/8/5K1P/8/6P1/8 w - - 1 2', 'Kg4'],
+  [120, '3.Kb4+', '8/8/6Pk/3p3P/p7/2K5/8/8 w - - 2 3', 'Kb4'],
+  [120, '4.Kxa4', '8/8/6Pk/7P/pK1p4/8/8/8 w - - 0 4', 'Kxa4'],
+  [140, '4.Kxe5', '8/8/6kP/1p2p3/1P2K3/8/8/8 w - - 1 4', 'Kxe5'],
+  [140, 'Kxh6', '8/8/6kP/1p2K3/1P6/8/8/8 b - - 0 4', 'Kxh6'],
+  [140, '6.Kc5', '8/8/6k1/1p1K4/1P6/8/8/8 w - - 2 6', 'Kc5'],
+] as const) {
+  assert.equal(
+    chapterTwelveMoves(sectionIndex).some(
+      (token) =>
+        token.display === display &&
+        token.parentFen === parentFen &&
+        token.san === san,
+    ),
+    true,
+    `Missing Chapter 12 playback token ${display} in section ${sectionIndex}`,
+  )
+}
 
 replay(getBoard('10', '10.1').fen, [
   'Rg1',
@@ -889,6 +1070,19 @@ replay(getBoard('12', '12.1').fen, [
   'Kxb7',
   'Kb5',
 ])
+replay(getBoard('12', '12.8').fen, [
+  'Kg3',
+  'Kc2',
+  'Kf2',
+  'Kd3',
+  'Ke1',
+  'Kc4',
+  'Kd2',
+  'Kb5',
+  'Kc3',
+  'Kxb6',
+  'Kb4',
+])
 replay(getBoard('12', '12.24').fen, [
   'Kd4',
   'Kd8',
@@ -898,13 +1092,52 @@ replay(getBoard('12', '12.24').fen, [
   'Kc7',
   'Kc5',
 ])
-replay(getBoard('12', '12.29').fen, ['h3'])
-replay(getBoard('12', '12.29').fen, ['h4', 'Kg6'])
+replay(getBoard('12', '12.29').fen, [
+  'h3',
+  'Kg6',
+  'Kg4',
+  'Kh6',
+  'Kf5',
+  'Kh5',
+  'g3',
+  'Kh6',
+  'Kf6',
+  'Kh5',
+  'Kg7',
+  'h6',
+  'h4',
+])
+replay(getBoard('12', '12.29').fen, ['h4', 'Kg6', 'Kg4'])
 replay(getBoard('12', '12.29').fen, ['g3'])
-// The PDF then prints 2.Kg4, although g4 is occupied by White's pawn after
-// 1.g4?; preserve and disclose that source inconsistency rather than inventing
-// a legal continuation.
-replay(getBoard('12', '12.29').fen, ['g4', 'Kg6'])
+replay(getBoard('12', '12.29').fen, ['g4'])
+assert.equal(
+  chapterTwelveMoves(104).some(
+    ({ display, parentFen, path }) =>
+      display === '2.Kg4' &&
+      parentFen === '8/7p/6k1/8/5K1P/8/6P1/8 w - - 1 2' &&
+      path.join(' ') === 'h4 Kg6 Kg4',
+  ),
+  false,
+  'Position 12.29 must not attach the later 2.Kg4 to the short 1.h4 variation.',
+)
+assert.equal(
+  chapterTwelveMoves(104).some(
+    ({ display, parentFen }) =>
+      display === '1...Kg6' &&
+      parentFen === '8/7p/5k2/8/5KP1/8/7P/8 b - - 0 1',
+  ),
+  false,
+  'Position 12.29 must not attach the later 1...Kg6 to the 1.g4? alternative.',
+)
+assert.deepEqual(
+  chapterTwelveMoves(104).find(
+    ({ display, parentFen }) =>
+      display === '2.Kg4' &&
+      parentFen === '8/7p/6k1/8/5K2/7P/6P1/8 w - - 1 2',
+  )?.path,
+  ['h3', 'Kg6', 'Kg4'],
+  'Position 12.29 later 1...Kg6 2.Kg4 must retain the 1.h3 main-line ancestry.',
+)
 replay(getBoard('12', '12.32').fen, [
   'a4',
   'Kc3',
@@ -967,6 +1200,23 @@ replay(getBoard('12', '12.37').fen, [
   'Kc5',
   'Kd7',
   'f7',
+])
+replay(getBoard('12', '12.38').fen, [
+  'h4',
+  'Ke6',
+  'h5',
+  'Kf6',
+  'h6',
+  'Kg6',
+  'Kxe5',
+  'Kxh6',
+  'Kd5',
+  'Kg6',
+  'Kc5',
+  'Kf6',
+  'Kxb5',
+  'Ke7',
+  'Kc6',
 ])
 
 console.log('Chapters 10–12 source fidelity audit passed')
@@ -1034,6 +1284,24 @@ function assertExcludesAll(text: string, forbidden: string[]) {
 
 function chapterTenMoves(sectionIndex: number) {
   return (chapterTenPlayback.tokensBySectionIndex.get(sectionIndex) ?? []).filter(
+    (token): token is Extract<TextPlaybackToken, { type: 'move' }> =>
+      token.type === 'move',
+  )
+}
+
+function chapterElevenMoves(sectionIndex: number) {
+  return (
+    chapterElevenPlayback.tokensBySectionIndex.get(sectionIndex) ?? []
+  ).filter(
+    (token): token is Extract<TextPlaybackToken, { type: 'move' }> =>
+      token.type === 'move',
+  )
+}
+
+function chapterTwelveMoves(sectionIndex: number) {
+  return (
+    chapterTwelvePlayback.tokensBySectionIndex.get(sectionIndex) ?? []
+  ).filter(
     (token): token is Extract<TextPlaybackToken, { type: 'move' }> =>
       token.type === 'move',
   )

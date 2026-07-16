@@ -161,6 +161,37 @@ const chapterTwelveCaptions = getCaptions(chapterTwelveSections)
 const chapterThirteenCaptions = getCaptions(chapterThirteenSections)
 const chapterTenPlayback = buildChapterPlayback(chapterTenSections)
 const chapterElevenPlayback = buildChapterPlayback(chapterElevenSections)
+const chapterThirteenPlayback = buildChapterPlayback(chapterThirteenSections)
+const chapterTwelvePlayback = buildChapterPlayback(chapterTwelveSections)
+const prefixedSegmentPlayback = buildChapterPlayback([
+  {
+    type: 'position',
+    content: {
+      fen: '8/7p/5k2/8/5K2/8/6PP/8 w - - 0 1',
+      number: 'segment-prefix',
+      orientation: 'white',
+      playbackSegments: [
+        {
+          parentFen: '8/7p/5k2/8/5K2/8/6PP/8 w - - 0 1',
+          positionNumber: 'segment-prefix',
+          sectionIndex: 1,
+          start: '1.h3',
+        },
+        {
+          parentFen: '8/7p/5k2/8/5K2/7P/6P1/8 b - - 0 1',
+          pathPrefix: ['h3'],
+          positionNumber: 'segment-prefix',
+          sectionIndex: 1,
+          start: '1...Kg6',
+        },
+      ],
+    },
+  },
+  {
+    type: 'text',
+    content: '1.h3 1...Kg6 2.Kg4',
+  },
+])
 const chapterTenPhilidorTokens = getChapterMoveTokens(
   chapterTenPlayback,
   chapterTenSections.findIndex(
@@ -231,10 +262,164 @@ assert.deepEqual(scanUnclickableSan('1', chapterOneSections), [])
 assert.deepEqual(scanUnclickableSan('2', chapterTwoSections), [])
 assert.deepEqual(scanUnclickableSan('3', chapterThreeSections), [])
 assert.deepEqual(scanUnclickableSan('4', chapterFourSections), [])
-assert.deepEqual(scanUnclickableSan('10', chapterTenSections), [])
-assert.deepEqual(scanUnclickableSan('11', chapterElevenSections), [])
-assert.deepEqual(scanUnclickableSan('12', chapterTwelveSections), [])
+assert.deepEqual(scanUnclickableSan('10', chapterTenSections), [
+  // Retrospective or prospective prose references, not played variations.
+  '10:41:2.Ke6',
+  '10:41:Kf8!',
+  '10:52:3.Rb7',
+  '10:85:Ka4',
+  // PDF 144 / printed 143: the null move 3.Rh5 is preserved verbatim.
+  '10:90:3.Rh5',
+  // PDF 150 / printed 149: 8.Kc4 and its continuation are illegal in print.
+  '10:113:8.Kc4',
+  '10:113:Kd6',
+  '10:113:9.Kb4',
+  '10:113:Kc6=',
+  // PDF 152 / printed 151: the response to checking 8.Rb5? is illegal.
+  '10:121:Rh8+',
+  '10:121:9.Kc7',
+  '10:121:Rh7+',
+])
+assert.deepEqual(scanUnclickableSan('11', chapterElevenSections), [
+  // PDF 155 / printed 154: the rook cannot move from g1 to c8.
+  '11:6:3...Rc8!',
+  // Prose route and retrospective position references, not played variations.
+  '11:12:Rf1',
+  '11:52:3.h6',
+])
+assert.deepEqual(scanUnclickableSan('12', chapterTwelveSections), [
+  // PDF 184 / printed 183: b4 is empty, so the printed capture is illegal.
+  '12:62:1...Kxb4',
+  // Retrospective prose references, not played variations.
+  '12:66:1.b4?',
+  // PDF 186 / printed 185: the black king cannot jump from d4 to b5.
+  '12:72:4...Kb5',
+])
 assert.deepEqual(scanUnclickableSan('13', chapterThirteenSections), [])
+for (const regression of [
+  {
+    display: '10...Ka6',
+    page: 'PDF 207 / printed 206',
+    parentFen: '8/1k6/3K4/2B2N2/8/8/8/8 b - - 19 10',
+    sectionIndex: 9,
+  },
+  {
+    display: 'Kb4',
+    page: 'PDF 207 / printed 206',
+    parentFen: '8/8/2K5/k4N2/3B4/8/8/8 b - - 23 12',
+    sectionIndex: 9,
+  },
+  {
+    display: '3...Re3',
+    page: 'PDF 211 / printed 210',
+    parentFen: '3k4/7R/3K4/3B4/8/8/4r3/8 b - - 5 3',
+    sectionIndex: 21,
+  },
+  {
+    display: '8.Rg4',
+    page: 'PDF 211 / printed 210',
+    parentFen: '4k3/8/3K4/3B4/5R2/3r4/8/8 w - - 14 8',
+    sectionIndex: 21,
+  },
+  {
+    display: '6.Rf7!',
+    page: 'PDF 211 / printed 210',
+    parentFen: '2k5/R7/3K4/3B4/8/8/8/1r6 w - - 10 6',
+    sectionIndex: 23,
+  },
+  {
+    display: '7.Rf8+',
+    page: 'PDF 211 / printed 210',
+    parentFen: '1k6/5R2/3K4/3B4/8/8/8/1r6 w - - 12 7',
+    sectionIndex: 23,
+  },
+  {
+    display: '9.Bd5!?',
+    page: 'PDF 215 / printed 214',
+    parentFen: '8/4k3/6R1/r7/3KB3/8/8/8 w - - 15 9',
+    sectionIndex: 39,
+  },
+  {
+    display: '2.Bf4',
+    page: 'PDF 218 / printed 217',
+    parentFen: '8/6R1/7B/3K4/8/7k/4r3/8 w - - 1 2',
+    sectionIndex: 51,
+  },
+  {
+    display: '7.Bg5',
+    page: 'PDF 219 / printed 218',
+    parentFen: '8/6R1/8/8/5B2/4K2k/6r1/8 w - - 5 7',
+    sectionIndex: 53,
+  },
+  {
+    display: '9.Bf4+',
+    page: 'PDF 219 / printed 218',
+    parentFen: '6R1/8/8/6B1/8/4K1k1/6r1/8 w - - 9 9',
+    sectionIndex: 53,
+  },
+  {
+    display: '8...Kg7=',
+    page: 'PDF 221 / printed 220',
+    parentFen: '5k2/2R2P2/8/6K1/8/8/8/1b6 b - - 4 8',
+    sectionIndex: 59,
+  },
+  {
+    display: 'Rd6',
+    page: 'PDF 227 / printed 226',
+    parentFen: 'Q7/3kp3/5r2/2K5/8/8/8/8 b - - 9 5',
+    sectionIndex: 90,
+  },
+  {
+    display: '13.Qd7+',
+    page: 'PDF 229 / printed 228',
+    parentFen: '2K5/k7/p2Q4/1r6/8/8/8/8 w - - 5 13',
+    sectionIndex: 99,
+  },
+] as const) {
+  assert.equal(
+    findMove(
+      getChapterMoveTokens(
+        chapterThirteenPlayback,
+        regression.sectionIndex,
+      ),
+      regression.display,
+    ).parentFen,
+    regression.parentFen,
+    `${regression.page} ${regression.display} must stay on its printed branch.`,
+  )
+}
+const chapterThirteenSecondRankTokens = getChapterMoveTokens(
+  chapterThirteenPlayback,
+  51,
+)
+assert.equal(
+  chapterThirteenSecondRankTokens.filter(({ display }) => display === 'Rg2')
+    .length,
+  1,
+  'PDF 218 / printed 217: prose “The idea is ...Rg2” must not become a second move token.',
+)
+assert.equal(
+  getChapterMoveTokens(chapterThirteenPlayback, 59).some(
+    ({ display }) => display === 'Bf7=',
+  ),
+  false,
+  'PDF 221 / printed 220: prospective “followed by Bf7=” must remain prose.',
+)
+for (const [sectionIndex, proseDisplay] of [
+  [9, 'Bd6'],
+  [21, 'Ra8'],
+  [23, 'Bd7'],
+  [23, '3...Re3'],
+  [28, 'Ka4'],
+] as const) {
+  assert.equal(
+    getChapterMoveTokens(chapterThirteenPlayback, sectionIndex).some(
+      ({ display }) => display === proseDisplay,
+    ),
+    false,
+    `Chapter 13 section ${sectionIndex} prose reference ${proseDisplay} must stay non-playable.`,
+  )
+}
 assert.equal(panelSections.length, 5)
 const summaryPanels = panelSections.filter(
   (section) =>
@@ -360,6 +545,13 @@ const exactBranchParentExpectations = [
     chapterId: '8',
     display: '5...Nc5!',
     parentFen: '8/8/8/8/n7/8/p7/B1k1K3 b - - 8 5',
+    positionNumber: '8.5',
+    sectionIndex: 21,
+  },
+  {
+    chapterId: '8',
+    display: '7.Bg7',
+    parentFen: '8/8/8/2n5/8/8/p3K3/Bk6 w - - 10 7',
     positionNumber: '8.5',
     sectionIndex: 21,
   },
@@ -663,8 +855,13 @@ const sourceMovesExpectedToBePlayable = [
   ['11', 75, '11.14', ['Rf4', '6...Kh7']],
   ['12', 35, '12.8', ['6.Kb4']],
   ['12', 54, '12.14', ['4...Kc6!']],
-  ['12', 62, '12.16', ['1...Kxb4', '2.Ke5', 'Kxb3', '4.Kg5', '5.Kxh5']],
-  ['12', 72, '12.19', ['4...Kb5', '5...Kd6']],
+  [
+    '12',
+    62,
+    '12.16',
+    ['2.Ke5', 'Kxb3', '3.Kf5', 'Kc4', '4.Kg5', 'Kd5', '5.Kxh5', 'Ke6', '6.Kg6!'],
+  ],
+  ['12', 72, '12.19', ['5...Kd6']],
   ['12', 94, '12.25', ['1...h6', '7.Kd4', 'Kd6=']],
   [
     '12',
@@ -693,6 +890,7 @@ const sourceMovesExpectedToBePlayable = [
   ['12', 140, '12.38', ['6.Kc5', '7.Kb5', '8.Kc6']],
   ['13', 9, '13.4', ['12...Kb8', '13.Nb5', '14.Nc7+']],
   ['13', 13, '13.5', ['19...Kg7']],
+  ['13', 21, '13.7', ['3...Re3', '7...Rd3', '8.Rg4']],
   [
     '13',
     23,
@@ -702,14 +900,14 @@ const sourceMovesExpectedToBePlayable = [
       '6...Kb8',
       '7.Rf8+',
       '8.Ra8+',
-      '8.Ka4!',
+      '8.Ba4!',
       '6...Rd3+',
       '11...Rd3',
-      '12.Kc4!',
+      '12.Bc4!',
     ],
   ],
-  ['13', 32, '13.10', ['14.Ke6', '16.Kd6', '17.Bd5', 'Rh6+=']],
-  ['13', 39, '13.12', ['9.Kd5!?']],
+  ['13', 32, '13.10', ['14.Be6', '16.Kd6', '17.Bd5', 'Rh6+=']],
+  ['13', 39, '13.12', ['9.Bd5!?']],
   [
     '13',
     45,
@@ -718,7 +916,7 @@ const sourceMovesExpectedToBePlayable = [
       '35.Bf5',
       '38.Rd7+',
       '39.Rd6+',
-      '40.Be6+',
+      '40.Re6+',
       '41.Ra6',
       '42.Kd5',
       '43.Be4',
@@ -732,14 +930,14 @@ const sourceMovesExpectedToBePlayable = [
       '50.Bf5',
     ],
   ],
-  ['13', 51, '13.16', ['2.Kf4', '3.Rh7+', '4.Ke4']],
-  ['13', 53, '13.17', ['7.Kg5', '9.Kf4+', '10.Rh8+', '16.Ke4']],
+  ['13', 51, '13.16', ['2.Bf4', '3.Rh7+', '4.Ke4']],
+  ['13', 53, '13.17', ['7.Bg5', '9.Bf4+', '10.Rh8+', '16.Ke4']],
   [
     '13',
     55,
     '13.18',
     [
-      '22.Rxe4',
+      '22.Re4',
       '23.Bd6',
       '24.Bb4',
       '26.Ba5',
@@ -750,7 +948,7 @@ const sourceMovesExpectedToBePlayable = [
       '31.Re2+',
     ],
   ],
-  ['13', 59, '13.19', ['Bf7=', '8...Kg7=']],
+  ['13', 59, '13.19', ['8...Kg7=']],
   [
     '13',
     74,
@@ -768,6 +966,7 @@ const sourceMovesExpectedToBePlayable = [
   ],
   ['13', 90, '13.28', ['6.Qb7+']],
   ['13', 99, '13.29', ['6.Kc6+', '7.Qe8+', '8.Qe3+', '9.Qd4', '11.Qc8']],
+  ['13', 99, '13.30', ['13.Qd7+']],
   [
     '14',
     10,
@@ -844,6 +1043,47 @@ assert.deepEqual(
     unplayableSourceMoves: [],
   },
   'Every source move must be playable from the board governing its variation.',
+)
+
+const prefixedSegmentTokens = getChapterMoveTokens(prefixedSegmentPlayback, 1)
+assert.deepEqual(findMove(prefixedSegmentTokens, '1.h3').path, ['h3'])
+assert.deepEqual(findMove(prefixedSegmentTokens, '1...Kg6').path, [
+  'h3',
+  'Kg6',
+])
+assert.deepEqual(findMove(prefixedSegmentTokens, '2.Kg4').path, [
+  'h3',
+  'Kg6',
+  'Kg4',
+])
+const prefixedSegmentNavigation = buildPlaybackNavigation(
+  prefixedSegmentPlayback,
+).get('segment-prefix')
+assert.ok(prefixedSegmentNavigation)
+assert.equal(
+  getPreviousNavigationNode(
+    prefixedSegmentNavigation,
+    findMove(prefixedSegmentTokens, '1...Kg6').id,
+  )?.id,
+  findMove(prefixedSegmentTokens, '1.h3').id,
+)
+assert.equal(
+  getPreviousNavigationNode(
+    prefixedSegmentNavigation,
+    findMove(prefixedSegmentTokens, '2.Kg4').id,
+  )?.id,
+  findMove(prefixedSegmentTokens, '1...Kg6').id,
+)
+
+const chapterTwelveEvaluationToken = findMove(
+  getChapterMoveTokens(chapterTwelvePlayback, 120),
+  '3.Kb4+',
+)
+assert.equal(chapterTwelveEvaluationToken.san, 'Kb4')
+assert.equal(
+  chapterTwelveEvaluationToken.parentFen,
+  '8/8/6Pk/3p3P/p7/2K5/8/8 w - - 2 3',
+  'PDF 198 / printed 197 uses +− as an evaluation; the following d4 must remain a move, not make Kb4 a check or a prose range.',
 )
 
 assert.deepEqual(findMove(moveTokens, '1.Kg5!').path, ['Kg5'])
@@ -1590,18 +1830,39 @@ function scanUnclickableSan(
       continue
     }
 
-    for (const token of tokens) {
-      if (token.type === 'text') {
-        misses.push(
-          ...findSanDisplays(token.text).map(
-            (display) => `${chapterNumber}:${sectionIndex}:${display}`,
-          ),
-        )
-      }
+    for (const textRun of contiguousTextRuns(tokens)) {
+      misses.push(
+        ...findSanDisplays(textRun).map(
+          (display) => `${chapterNumber}:${sectionIndex}:${display}`,
+        ),
+      )
     }
   }
 
   return misses
+}
+
+function contiguousTextRuns(tokens: TextPlaybackToken[]) {
+  const runs: string[] = []
+  let current = ''
+
+  for (const token of tokens) {
+    if (token.type === 'move') {
+      if (current) {
+        runs.push(current)
+        current = ''
+      }
+      continue
+    }
+
+    current += token.text
+  }
+
+  if (current) {
+    runs.push(current)
+  }
+
+  return runs
 }
 
 function getSectionText(section: RawChapterSection) {

@@ -210,15 +210,36 @@ function buildSegmentedPlaybackTokens(
       located.segment.positionNumber,
       located.segment.parentFen,
     )
-    const segmentTokens = resolveAdjacentTextMoveTokens(
-      segmentContext.parse(segmentText, sectionIndex),
-      located.segment.positionNumber,
-      sectionIndex,
+    const segmentTokens = prependPlaybackPathPrefix(
+      resolveAdjacentTextMoveTokens(
+        segmentContext.parse(segmentText, sectionIndex),
+        located.segment.positionNumber,
+        sectionIndex,
+      ),
+      located.segment.pathPrefix,
     )
     tokens.push(...segmentTokens)
   }
 
   return tokens
+}
+
+function prependPlaybackPathPrefix(
+  tokens: TextPlaybackToken[],
+  pathPrefix: string[] | undefined,
+) {
+  if (!pathPrefix?.length) {
+    return tokens
+  }
+
+  return tokens.map((token) =>
+    token.type === 'move'
+      ? {
+          ...token,
+          path: [...pathPrefix, ...token.path],
+        }
+      : token,
+  )
 }
 
 function getEligibleContexts(
@@ -1027,7 +1048,12 @@ function tokenizeMoveText(content: string): ParseToken[] {
     const index = match.index ?? 0
     const display = match[0]
     const prefix = match[1] ? display.slice(0, display.length - match[4].length) : ''
-    const san = normalizeSan(match[4])
+    const rawSan =
+      match[4].endsWith('+') &&
+      /^[-−](?!\+)/.test(content.slice(index + display.length))
+        ? match[4].slice(0, -1)
+        : match[4]
+    const san = normalizeSan(rawSan)
 
     if (
       !shouldTokenizeMoveCandidate(
@@ -1086,6 +1112,18 @@ function shouldTokenizeMoveCandidate(
   followingText: string,
   tokens: ParseToken[],
 ) {
+  const previousParseToken = tokens.at(-1)
+  const previousText =
+    previousParseToken?.type === 'text' ? previousParseToken.text : ''
+
+  if (
+    !match[2] &&
+    (isProsePlanReference(`${previousText}${precedingText}`) ||
+      /\band\s*$/i.test(precedingText))
+  ) {
+    return false
+  }
+
   if (isProseMoveReference(precedingText)) {
     return false
   }
@@ -1094,7 +1132,10 @@ function shouldTokenizeMoveCandidate(
     return false
   }
 
-  if (/^\s*-\s*(?:[KQRBN])?[a-h][1-8]/.test(followingText)) {
+  if (
+    !match[4].endsWith('+') &&
+    /^\s*-\s*(?:[KQRBN])?[a-h][1-8]/.test(followingText)
+  ) {
     return false
   }
 
@@ -1118,14 +1159,22 @@ function shouldTokenizeMoveCandidate(
   )
 }
 
+function isProsePlanReference(text: string) {
+  const normalized = text.replace(/\.\.\./g, '')
+
+  return /\b(?:with\s+(?:the\s+)?idea|(?:the\s+)?idea\s+is|cannot\s+move|intending|attempting|threatened|soundest\s+being)\b[^.!?;\n]*$/i.test(
+    normalized,
+  )
+}
+
 export function isProseMoveReference(text: string) {
-  return /(?:\b(?:allows?|allowed|answer|as|blow|by means of|dominates?|followed by|for example|forcing|i\.e\.|in case|intending|manoeuvre|play first|prefers?|prevented by|preventing|such as|the threat (?:is|was)|threat|threatens|threatened|threatening|which would allow|would allow|would play|would prefer)\s*(?:\.\.\.)?\s*)$/i.test(
+  return /(?:\b(?:against|allows?|allowed|answer|as|blow|by means of|dominates?|followed by|for example|forcing|i\.e\.|in case|intending|manoeuvre|play first|prefers?|prevented by|preventing|starting with|such as|the threat (?:is|was)|threat|threatens|threatened|threatening|which would allow|would allow|would play|would prefer)\s*(?:\.\.\.)?\s*)$/i.test(
     text,
   )
 }
 
 export function isProseMoveReferenceContinuation(text: string) {
-  return /^\s*(?:dominates?\b|is impossible\b|(?:is|was|would be|will be)\s+(?:a\s+)?(?:threat|idea|manoeuvre|resource|possibility)\b|would\s+(?:allow|hinder|prevent)\b)/i.test(
+  return /^\s*(?:dominates?\b|is impossible\b|line\b|(?:is|was|would be|will be)\s+(?:a\s+)?(?:threat|idea|manoeuvre|resource|possibility)\b|would\s+(?:allow|hinder|prevent)\b)/i.test(
     text,
   )
 }
@@ -1139,11 +1188,19 @@ export function isProseSanReference(
   const followingText = text.slice(index + displayLength)
 
   return (
+    isProsePlanReference(precedingText) ||
     isProseMoveReference(precedingText) ||
     isProseMoveReferenceContinuation(followingText) ||
     /\b(?:by means of|followed by|plan|route|path)\b[^.!?;\n]*$/i.test(
       precedingText,
     ) ||
+    /\b(?:avoided|hindered|prevented)\b[^.!?;\n]*\bwith\s*$/i.test(
+      precedingText,
+    ) ||
+    /\banswer\b[^.!?;\n]*\bwith\s*$/i.test(
+      precedingText.replace(/\.\.\./g, ''),
+    ) ||
+    /\b(?:threatens|threatening)\b[^.!?;\n]*-\s*$/i.test(precedingText) ||
     /\band\s*(?:\.\.\.)?$/i.test(precedingText) ||
     /,\s*(?:\.\.\.)?$/.test(precedingText) ||
     /^\s*-\s*(?:[KQRBN])?[a-h][1-8]/.test(followingText)
@@ -1173,7 +1230,7 @@ function isMoveContinuationText(text: string) {
     return true
   }
 
-  return /^(?:(?:or|and|then|if|A|B)\b|[(),;:+=!?-]|\s)+$/i.test(
+  return /^(?:(?:or|and|then|if|ep|A|B)\b|[(),;:+=!?-]|\s)+$/i.test(
     normalized,
   )
 }
@@ -1325,7 +1382,7 @@ function normalizePlaybackToken(token: string) {
 function normalizeSan(rawMove: string) {
   const stripped = rawMove
     .replace(/[!?]+$/g, '')
-    .replace(/(?<![QRBN])=$/g, '')
+    .replace(/=$/g, '')
     .replace(/^0-0-0/, 'O-O-O')
     .replace(/^0-0/, 'O-O')
 

@@ -158,51 +158,16 @@ export default function BookFrontMatter({
       <FrontMatterSection title="Note on this digital edition">
         <ul className="leg-deviation-list">
           <li>
-          <BookLink
-            href={`${bookPathForChapterId('14')}#${bookPositionAnchorId('14.29')}`}
-            onNavigate={onNavigate}
-          >
-            Final Test 14.29
-          </BookLink>{' '}
-          (print page 233; PDF page 234) is labeled “Black to move. Can he
-          draw?”, while the published solution analyzes White&apos;s 69th move.
-          This reader follows the solution and presents the position with White
-          to move.
-          </li>
-          <li>
             <BookLink
-              href={`${bookPathForChapterId('12')}#${bookPositionAnchorId('12.18')}`}
+              href={`${bookPathForChapterId('14')}#${bookPositionAnchorId('14.29')}`}
               onNavigate={onNavigate}
             >
-              Position 12.18
+              Final Test 14.29
             </BookLink>{' '}
-            (print page 184; PDF page 185) is introduced as the position after
-            1.b4?, which leaves Black to move, while the published continuation
-            begins 1.Kb3. This reader preserves the printed diagram state and
-            stages the continuation from White&apos;s move without attributing an
-            error to the author.
-          </li>
-          <li>
-            <BookLink
-              href={`${bookPathForChapterId('12')}#${bookPositionAnchorId('12.6')}`}
-              onNavigate={onNavigate}
-            >
-              Position 12.6
-            </BookLink>{' '}
-            (print page 173; PDF page 174) gives no single side to move and
-            explicitly discusses both turns. The reader uses White to move as a
-            neutral analysis-board default.
-          </li>
-          <li>
-            <BookLink
-              href={`${bookPathForChapterId('12')}#${bookPositionAnchorId('12.29')}`}
-              onNavigate={onNavigate}
-            >
-              Position 12.29
-            </BookLink>{' '}
-            (print page 193; PDF page 194) prints the branch 1.g4? Kg6
-            2.Kg4 even though White&apos;s pawn occupies g4. The reader preserves
-            the published notation and does not invent a legal replacement.
+            has the prompt “Black to move. Can he draw?” (print page 233; PDF
+            page 234), while its solution begins with White&apos;s 69th move (print
+            page 238; PDF page 239). This digital edition presents the prompt as
+            “White to move. Can he draw?” so that it agrees with the solution.
           </li>
         </ul>
       </FrontMatterSection>
@@ -221,7 +186,7 @@ export default function BookFrontMatter({
 
       <nav aria-labelledby="book-contents-heading" className="leg-book-contents">
         <h2 id="book-contents-heading">Table of contents</h2>
-        <ol>
+        <ol className="leg-contents-list">
           {chapters.map((chapter) => (
             <ContentsPart
               chapter={chapter}
@@ -263,8 +228,12 @@ function ContentsPart({
   )
 
   return (
-    <li>
-      <BookLink href={chapterHref} onNavigate={onNavigate}>
+    <li className="leg-contents-chapter">
+      <BookLink
+        className="leg-contents-row leg-contents-chapter-row"
+        href={chapterHref}
+        onNavigate={onNavigate}
+      >
         <span>{chapter.label}</span>
         {chapter.label === chapter.name ? null : <strong>{chapter.name}</strong>}
       </BookLink>
@@ -276,8 +245,12 @@ function ContentsPart({
             )}`
 
             return (
-              <li key={ending.content.number}>
-                <BookLink href={href} onNavigate={onNavigate}>
+              <li className="leg-contents-ending" key={ending.content.number}>
+                <BookLink
+                  className="leg-contents-row leg-contents-ending-row"
+                  href={href}
+                  onNavigate={onNavigate}
+                >
                   <span>Ending {ending.content.number}</span>
                   <strong>{ending.content.text}</strong>
                 </BookLink>
@@ -292,15 +265,18 @@ function ContentsPart({
 
 function BookLink({
   children,
+  className,
   href,
   onNavigate,
 }: {
   children: ReactNode
+  className?: string
   href: string
   onNavigate: (href: string) => void
 }) {
   return (
     <a
+      className={className}
       href={href}
       onClick={(event) => handleNavigation(event, href, onNavigate)}
     >

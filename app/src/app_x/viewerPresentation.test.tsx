@@ -71,14 +71,53 @@ assert.doesNotMatch(frontMatterMarkup, /38\.Kd7\+/)
 assert.match(frontMatterMarkup, /Note on this digital edition/)
 assert.match(frontMatterMarkup, /Black to move\. Can he draw\?/)
 assert.match(frontMatterMarkup, /print page 233; PDF page 234/)
+assert.match(frontMatterMarkup, /print page 238; PDF page 239/)
 assert.match(frontMatterMarkup, /href="\/book\/chapter14#p14\.29"/)
-assert.match(frontMatterMarkup, /href="\/book\/chapter12#p12\.18"/)
-assert.match(frontMatterMarkup, /href="\/book\/chapter12#p12\.6"/)
-assert.match(frontMatterMarkup, /href="\/book\/chapter12#p12\.29"/)
+const deviationListMatch = frontMatterMarkup.match(
+  /<ul class="leg-deviation-list">([\s\S]*?)<\/ul>/,
+)
+assert.ok(deviationListMatch)
+const deviationListMarkup = deviationListMatch[1]
+assert.equal((deviationListMarkup.match(/<a /g) ?? []).length, 1)
+assert.doesNotMatch(deviationListMarkup, /href="\/book\/chapter12#/)
+assert.match(
+  deviationListMarkup,
+  /This digital edition presents the prompt as “White to move\. Can he draw\?” so that it agrees with the solution\./,
+)
+assert.doesNotMatch(deviationListMarkup, /author error|mistake|incorrect/i)
+assert.doesNotMatch(frontMatterMarkup, /href="\/book\/chapter12#p12\.18"/)
+assert.doesNotMatch(frontMatterMarkup, /href="\/book\/chapter12#p12\.6"/)
+assert.doesNotMatch(frontMatterMarkup, /href="\/book\/chapter12#p12\.29"/)
 assert.match(frontMatterMarkup, /href="\/book\/intro"/)
 assert.match(frontMatterMarkup, /href="\/book\/chapter1#e1"/)
 assert.match(frontMatterMarkup, /href="\/book\/bibliography"/)
 assert.equal((frontMatterMarkup.match(/>Ending \d+</g) ?? []).length, 100)
+assert.match(frontMatterMarkup, /<ol class="leg-contents-list">/)
+assert.equal(
+  (frontMatterMarkup.match(/class="leg-contents-chapter"/g) ?? []).length,
+  17,
+)
+assert.equal(
+  (
+    frontMatterMarkup.match(
+      /class="leg-contents-row leg-contents-chapter-row"/g,
+    ) ?? []
+  ).length,
+  17,
+)
+assert.equal(
+  (frontMatterMarkup.match(/class="leg-contents-ending"/g) ?? []).length,
+  100,
+)
+assert.equal(
+  (
+    frontMatterMarkup.match(
+      /class="leg-contents-row leg-contents-ending-row"/g,
+    ) ?? []
+  ).length,
+  100,
+)
+assert.doesNotMatch(frontMatterMarkup, /<(?:details|summary)\b/)
 
 const diagramMarkup = renderToStaticMarkup(
   <InstructionalDiagram

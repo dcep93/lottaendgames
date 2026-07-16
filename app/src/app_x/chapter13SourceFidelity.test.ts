@@ -45,7 +45,7 @@ const fidelityLedger = JSON.parse(
 const chapter = book.parts.find(({ id }) => id === '13')
 
 assert.ok(chapter, 'Expected Chapter 13 source')
-assert.equal(fidelityLedger.schemaVersion, 1)
+assert.equal(fidelityLedger.schemaVersion, 2)
 
 const fidelityRelease = fidelityLedger.releases.find(
   ({ chapterId }) => chapterId === '13',
@@ -179,6 +179,54 @@ assert.equal(
   'PDF 220 / printed 219 prints 22.Re4 without a capture.',
 )
 assert.equal(sourceText.includes('22.Rxe4 Rc2'), false)
+assert.equal(
+  sourceText.includes('For instance: 3...Re3 4.Rd7+'),
+  true,
+  'PDF 211 / printed 210 prints a rook move, 3...Re3.',
+)
+assert.equal(sourceText.includes('For instance: 3...Ke3 4.Rd7+'), false)
+assert.equal(
+  sourceText.includes('7...Kd8 (7...Rd3 8.Rg4) 8.Be4!'),
+  true,
+  'PDF 211 / printed 210 prints the rook move 8.Rg4.',
+)
+assert.equal(sourceText.includes('(7...Rd3 8.Kg4)'), false)
+assert.equal(
+  sourceText.includes('5.Ra7 Rb1 6.Rf7!'),
+  true,
+  'PDF 211 / printed 210 prints 6.Rf7!, not 6.Rh7!.',
+)
+assert.equal(sourceText.includes('5.Ra7 Rb1 6.Rh7!'), false)
+assert.equal(
+  sourceText.includes('8.Rg6 Ra5 9.Bd5!?'),
+  true,
+  'PDF 215 / printed 214 prints the bishop move 9.Bd5!?.',
+)
+assert.equal(sourceText.includes('8.Rg6 Ra5 9.Kd5!?'), false)
+assert.equal(
+  sourceText.includes('The idea is...Rg2. 2.Bf4 Rg2'),
+  true,
+  'PDF 218 / printed 217 prints the bishop move 2.Bf4.',
+)
+assert.equal(sourceText.includes('The idea is...Rg2. 2.Kf4 Rg2'), false)
+assert.equal(
+  sourceText.includes('6.Rg7+ Kh3\n7.Bg5 Kg4 8.Rg8 Kg3 9.Bf4+'),
+  true,
+  'PDF 219 / printed 218 prints bishop moves 7.Bg5 and 9.Bf4+.',
+)
+assert.equal(sourceText.includes('7.Kg5 Kg4 8.Rg8 Kg3 9.Kf4+'), false)
+assert.equal(
+  sourceText.includes('5.Qa8 Rd6 6.Qb7+ Kd8='),
+  true,
+  'PDF 227 / printed 226 prints the rook move 5...Rd6.',
+)
+assert.equal(sourceText.includes('5.Qa8 Kd6 6.Qb7+'), false)
+assert.equal(
+  sourceText.includes('11.Kc7 Rb7+ 12.Kc8 Rb5 13.Qd7+'),
+  true,
+  'PDF 229 / printed 228 prints 12...Rb5, keeping 13.Qd7+ legal.',
+)
+assert.equal(sourceText.includes('11.Kc7 Rb7+ 12.Kc8 Rb8 13.Qd7+'), false)
 
 assert.deepEqual(
   chapter.sections
@@ -213,6 +261,11 @@ assert.deepEqual(boardContent(getBoard('13.5')).routes, [
 assert.equal(
   boardContent(getBoard('13.4')).fen,
   '8/8/8/8/4k3/8/6K1/6BN w - - 0 1',
+)
+assert.equal(
+  boardContent(getBoard('13.23')).fen,
+  '6k1/6R1/7K/7P/8/3b4/8/8 b - - 0 1',
+  'PDF 223 / printed 222 follows 3.Rg7+; therefore Black is visibly next to move.',
 )
 replay(boardContent(getBoard('13.4')).fen, [
   'Kg3',
