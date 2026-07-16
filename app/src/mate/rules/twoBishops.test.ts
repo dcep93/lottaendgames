@@ -5,6 +5,7 @@ import {
   compareTwoBishopsBlackScores,
   getMateRuleSet,
   scoreTwoBishopsBlackMove,
+  scoreTwoBishopsWhiteMove,
 } from './index'
 
 const SOURCE_COMMIT = '70704ecf25d6ee9e5c76a18f49e2a6fce409b728'
@@ -206,6 +207,32 @@ test('Two Bishops phase is White-turn-only and reports lost material', () => {
   assert.equal(
     ruleSet.phase('8/8/8/8/2K5/2B5/k7/8 w - - 0 1'),
     '0/2',
+  )
+})
+
+test('Two Bishops phase two counts one-edge-step opposition pressure', () => {
+  const fen = '8/8/8/B7/B7/8/2K5/k7 w - - 0 1'
+  const ruleSet = getMateRuleSet('two-bishops')
+  const forceOpposition = scoreTwoBishopsWhiteMove(fen, 'Kb3')
+  const forceCorner = scoreTwoBishopsWhiteMove(fen, 'Kc3')
+
+  assert.equal(ruleSet.phase(fen), '2/2')
+  assert.equal(
+    forceOpposition.phaseTwoWaitingMovePenalty,
+    forceCorner.phaseTwoWaitingMovePenalty,
+  )
+  assert.equal(
+    forceOpposition.phaseTwoTakeDirectOppositionPenalty,
+    forceCorner.phaseTwoTakeDirectOppositionPenalty,
+  )
+  assert.equal(forceOpposition.phaseTwoForceOpponentOppositionPenalty, 0)
+  assert.equal(forceCorner.phaseTwoForceOpponentOppositionPenalty, 0)
+  assert.equal(forceOpposition.phaseTwoForceOpponentCornerPenalty, 1)
+  assert.equal(forceCorner.phaseTwoForceOpponentCornerPenalty, 1)
+  assert.equal(
+    forceOpposition.kingBishopScreeningPenalty >
+      forceCorner.kingBishopScreeningPenalty,
+    true,
   )
 })
 
