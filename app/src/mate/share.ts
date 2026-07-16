@@ -1,3 +1,4 @@
+import type { Chess } from 'chess.js'
 import { MATE_CATALOG } from './catalog'
 import {
   getChess,
@@ -33,6 +34,27 @@ const OUTCOME_LABELS: Readonly<Record<MateTerminalOutcome, string>> = {
 
 const trainStartsByMateId = new Map<MateId, ReadonlySet<string>>()
 
+const CASTLING_REQUIREMENTS = {
+  K: [
+    { square: 'e1', color: 'w', type: 'k' },
+    { square: 'h1', color: 'w', type: 'r' },
+  ],
+  Q: [
+    { square: 'e1', color: 'w', type: 'k' },
+    { square: 'a1', color: 'w', type: 'r' },
+  ],
+  k: [
+    { square: 'e8', color: 'b', type: 'k' },
+    { square: 'h8', color: 'b', type: 'r' },
+  ],
+  q: [
+    { square: 'e8', color: 'b', type: 'k' },
+    { square: 'a8', color: 'b', type: 'r' },
+  ],
+} as const
+
+type CastlingRight = keyof typeof CASTLING_REQUIREMENTS
+
 export function encodeMateFen(fen: string): string {
   return `#fen=${encodeURIComponent(fen)}`
 }
@@ -54,18 +76,24 @@ export function decodeMateFen(
     return INVALID_MATE_FEN
   }
   const fields = decodedFen.trim().split(/\s+/)
-  if (
-    fields.length !== 6 ||
-    !/^(?:0|[1-9]\d*)$/.test(fields[4] ?? '') ||
-    !/^[1-9]\d*$/.test(fields[5] ?? '')
-  ) {
+  if (fields.length !== 6) {
     return INVALID_MATE_FEN
   }
+  const halfmove = canonicalFenCounter(fields[4] ?? '', 0)
+  const fullmove = canonicalFenCounter(fields[5] ?? '', 1)
+  if (halfmove === null || fullmove === null) return INVALID_MATE_FEN
+  fields[4] = halfmove
+  fields[5] = fullmove
 
+  let chess: Chess
   let fen: string
   try {
-    fen = getChess(fields.join(' ')).fen()
+    chess = getChess(fields.join(' '))
+    fen = chess.fen()
   } catch {
+    return INVALID_MATE_FEN
+  }
+  if (!castlingRightsMatchPosition(chess, fields[2] ?? '')) {
     return INVALID_MATE_FEN
   }
 
@@ -97,6 +125,35 @@ function isSupportedExactMateStart(
   }
   if (mode === 'standard') return true
   return getTrainStarts(mateId).has(fen)
+}
+
+function canonicalFenCounter(value: string, minimum: number): string | null {
+  if (!/^\d+$/.test(value)) return null
+  const parsed = Number(value)
+  return Number.isSafeInteger(parsed) && parsed >= minimum
+    ? String(parsed)
+    : null
+}
+
+function castlingRightsMatchPosition(
+  chess: Chess,
+  castling: string,
+): boolean {
+  if (
+    castling === '' ||
+    !/^(?:-|K?Q?k?q?)$/.test(castling)
+  ) {
+    return false
+  }
+  if (castling === '-') return true
+
+  return Array.from(castling).every((right) => {
+    const requirements = CASTLING_REQUIREMENTS[right as CastlingRight]
+    return requirements?.every(({ square, color, type }) => {
+      const piece = chess.get(square)
+      return piece?.color === color && piece.type === type
+    }) === true
+  })
 }
 
 function getTrainStarts(mateId: MateId): ReadonlySet<string> {

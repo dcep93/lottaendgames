@@ -8,6 +8,8 @@ import {
 
 const ROOK_STANDARD_FEN =
   '4k3/8/8/8/8/8/8/4K2R w K - 7 12'
+const ROOK_QUEENSIDE_CASTLING_FEN =
+  '4k3/8/8/8/8/8/8/R3K3 w Q - 7 12'
 const ROOK_TRAIN_FEN =
   '8/8/8/8/3k4/8/1R6/3K4 w - - 0 1'
 const ROTATED_ROOK_TRAIN_FEN =
@@ -39,6 +41,91 @@ test('normalizes a valid decoded FEN through chess.js', () => {
     decodeMateFen(encodeMateFen(unnormalized), 'rook', 'standard'),
     { ok: true, fen: ROOK_STANDARD_FEN },
   )
+})
+
+test('canonicalizes safe decimal counters and then round-trips idempotently', () => {
+  const paddedCounters = ROOK_STANDARD_FEN.replace(' 7 12', ' 0007 00012')
+  const decoded = decodeMateFen(
+    encodeMateFen(paddedCounters),
+    'rook',
+    'standard',
+  )
+
+  assert.deepEqual(decoded, { ok: true, fen: ROOK_STANDARD_FEN })
+  assert.equal(encodeMateFen(decoded.fen), encodeMateFen(ROOK_STANDARD_FEN))
+  assert.deepEqual(
+    decodeMateFen(encodeMateFen(decoded.fen), 'rook', 'standard'),
+    decoded,
+  )
+
+  const largestSafeFullmove = ROOK_STANDARD_FEN.replace(
+    ' 7 12',
+    ` 7 ${Number.MAX_SAFE_INTEGER}`,
+  )
+  assert.deepEqual(
+    decodeMateFen(
+      encodeMateFen(largestSafeFullmove),
+      'rook',
+      'standard',
+    ),
+    { ok: true, fen: largestSafeFullmove },
+  )
+})
+
+test('rejects counters that are not safe decimal integers', () => {
+  for (const fen of [
+    ROOK_STANDARD_FEN.replace(' 7 12', ' 9007199254740992 12'),
+    ROOK_STANDARD_FEN.replace(' 7 12', ' 7 9007199254740992'),
+    ROOK_STANDARD_FEN.replace(' 7 12', ' 7.0 12'),
+    ROOK_STANDARD_FEN.replace(' 7 12', ' 7 1e2'),
+  ]) {
+    assert.deepEqual(
+      decodeMateFen(encodeMateFen(fen), 'rook', 'standard'),
+      { ok: false },
+    )
+  }
+})
+
+test('accepts real Rook castling rights and rejects ghost rights', () => {
+  for (const fen of [ROOK_STANDARD_FEN, ROOK_QUEENSIDE_CASTLING_FEN]) {
+    assert.deepEqual(
+      decodeMateFen(encodeMateFen(fen), 'rook', 'standard'),
+      { ok: true, fen },
+    )
+  }
+
+  const ghostRights = [
+    {
+      mateId: 'rook',
+      fen: ROOK_STANDARD_FEN.replace(' w K ', ' w Q '),
+    },
+    {
+      mateId: 'rook',
+      fen: ROOK_QUEENSIDE_CASTLING_FEN.replace(' w Q ', ' w K '),
+    },
+    {
+      mateId: 'rook',
+      fen: '4k3/8/8/8/8/8/8/3K3R w K - 7 12',
+    },
+    {
+      mateId: 'rook',
+      fen: ROOK_STANDARD_FEN.replace(' w K ', ' w Kk '),
+    },
+    {
+      mateId: 'queen',
+      fen: QUEEN_STANDARD_FEN.replace(' w - ', ' w K '),
+    },
+    {
+      mateId: 'queen',
+      fen: QUEEN_STANDARD_FEN.replace(' w - ', ' w q '),
+    },
+  ] as const
+  for (const { fen, mateId } of ghostRights) {
+    assert.deepEqual(
+      decodeMateFen(encodeMateFen(fen), mateId, 'standard'),
+      { ok: false },
+    )
+  }
 })
 
 test('rejects malformed hashes and illegal FEN without throwing', () => {

@@ -10,6 +10,8 @@ import { encodeMateFen } from './mate/share'
 
 const sharedRookFen =
   '4k3/8/8/8/8/8/8/4K2R w K - 7 12'
+const sharedQueensideRookFen =
+  '4k3/8/8/8/8/8/8/R3K3 w Q - 7 12'
 const sharedRookTrainFen =
   '8/8/8/8/3k4/8/1R6/3K4 w - - 0 1'
 const sharedKnnStandardFen =
@@ -122,6 +124,33 @@ assert.deepEqual(
   },
 )
 assert.deepEqual(
+  resolveAppRoute('/mate/rook', encodeMateFen(sharedQueensideRookFen)),
+  {
+    href: `/mate/rook${encodeMateFen(sharedQueensideRookFen)}`,
+    route: {
+      module: 'mate',
+      mateId: 'rook',
+      mateMode: 'standard',
+      sharedFen: sharedQueensideRookFen,
+    },
+  },
+)
+assert.deepEqual(
+  resolveAppRoute(
+    '/mate/rook',
+    encodeMateFen(sharedRookFen.replace(' 7 12', ' 0007 00012')),
+  ),
+  {
+    href: `/mate/rook${encodeMateFen(sharedRookFen)}`,
+    route: {
+      module: 'mate',
+      mateId: 'rook',
+      mateMode: 'standard',
+      sharedFen: sharedRookFen,
+    },
+  },
+)
+assert.deepEqual(
   resolveAppRoute(
     '/mate/rook/train',
     encodeMateFen(sharedRookTrainFen),
@@ -171,6 +200,22 @@ for (const [pathname, hash] of [
   ['/mate/two-knights-pawn/train', encodeMateFen(sharedKnnStandardFen)],
   ['/mate/two-knights-pawn', encodeMateFen(sharedKnnTrainFen)],
   ['/mate/rook', '#fen=%E0%A4%A'],
+  [
+    '/mate/rook',
+    encodeMateFen(sharedRookFen.replace(' w K ', ' w Kk ')),
+  ],
+  [
+    '/mate/queen',
+    encodeMateFen(
+      '8/8/8/8/4k3/8/8/3QK3 w K - 38 20',
+    ),
+  ],
+  [
+    '/mate/rook',
+    encodeMateFen(
+      sharedRookFen.replace(' 7 12', ' 9007199254740992 12'),
+    ),
+  ],
 ] as const) {
   assert.deepEqual(resolveAppRoute(pathname, hash), {
     href: '/mate',
