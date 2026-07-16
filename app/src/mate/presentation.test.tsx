@@ -18,6 +18,8 @@ import MateControls from './MateControls'
 import MateLog, {
   MatePriorityGuideDialog,
 } from './MateLog'
+import MateSidebar from './MateSidebar'
+import Mate from './index'
 import {
   getMateRuleSet,
   knightAndBishopWhiteRules,
@@ -28,6 +30,10 @@ const ROOK_START = '7k/8/8/8/8/8/R7/K7 w - - 0 1'
 const ROOK_AFTER_WHITE = 'R6k/8/8/8/8/8/8/K7 b - - 1 1'
 const ROOK_AFTER_REPLY = 'R7/6k1/8/8/8/8/8/K7 w - - 2 2'
 const EXTERNAL_START = '6k1/8/8/8/8/3K4/8/R7 w - - 0 1'
+const MULTI_WHITE_START = '7R/2K3k1/8/8/8/8/8/8 w - - 0 1'
+const MULTI_BLACK_START = '8/8/8/8/2k5/8/2K5/2R5 w - - 0 1'
+const ROOK_MATE_START = '7k/8/6K1/8/8/8/8/R7 w - - 0 1'
+const QUEEN_START = '8/8/8/8/4k3/8/8/3QK3 w - - 0 1'
 
 const ROOK_LOGS: readonly MateLogEntry[] = [
   {
@@ -1081,4 +1087,610 @@ function currentOptions(renderer: ReactTestRenderer): ChessboardOptions {
       (node.props as BoardRendererProps).options?.id === 'leg-mate-board',
   )
   return (probe.props as BoardRendererProps).options ?? {}
+}
+
+test('Mate sidebar exposes native set and mode links with route state', () => {
+  const markup = renderToStaticMarkup(
+    <MateSidebar
+      mateId="rook"
+      mateMode="train"
+      onNavigate={() => undefined}
+    />,
+  )
+
+  for (const [label, href] of [
+    ['Queen', '/mate/queen'],
+    ['Rook', '/mate/rook'],
+    ['Two Bishops', '/mate/two-bishops'],
+    ['Bishop and Knight', '/mate/bishop-knight'],
+    ['Two Knights vs Pawn', '/mate/two-knights-pawn'],
+    ['Standard', '/mate/rook'],
+    ['Train', '/mate/rook/train'],
+  ]) {
+    assert.match(
+      markup,
+      new RegExp(`href="${href}"[^>]*>${label}</a>`),
+      label,
+    )
+  }
+  assert.match(
+    markup,
+    /aria-current="location"[^>]*href="\/mate\/rook"/,
+  )
+  assert.match(
+    markup,
+    /aria-current="page"[^>]*href="\/mate\/rook\/train"/,
+  )
+  assert.doesNotMatch(markup, /\/standard/)
+})
+
+test('Mate sidebar intercepts only unmodified primary link clicks', async () => {
+  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
+    .IS_REACT_ACT_ENVIRONMENT = true
+  const navigations: string[] = []
+  let renderer!: ReactTestRenderer
+  await act(async () => {
+    renderer = TestRenderer.create(
+      <MateSidebar
+        mateId="rook"
+        mateMode="standard"
+        onNavigate={(href) => navigations.push(href)}
+      />,
+    )
+  })
+  const queenLink = renderer.root.findByProps({ href: '/mate/queen' })
+
+  for (const overrides of [
+    { button: 1 },
+    { button: 2 },
+    { button: 0, metaKey: true },
+    { button: 0, ctrlKey: true },
+    { button: 0, shiftKey: true },
+    { button: 0, altKey: true },
+    { button: 0, defaultPrevented: true },
+  ]) {
+    let prevented = 0
+    const clickEvent = {
+      altKey: false,
+      button: 0,
+      ctrlKey: false,
+      defaultPrevented: false,
+      metaKey: false,
+      preventDefault: () => {
+        prevented += 1
+      },
+      shiftKey: false,
+    }
+    Object.assign(clickEvent, overrides)
+    await act(async () => {
+      queenLink.props.onClick(clickEvent)
+    })
+    assert.equal(prevented, 0, JSON.stringify(overrides))
+  }
+  assert.deepEqual(navigations, [])
+
+  let prevented = 0
+  await act(async () => {
+    queenLink.props.onClick({
+      altKey: false,
+      button: 0,
+      ctrlKey: false,
+      defaultPrevented: false,
+      metaKey: false,
+      preventDefault: () => {
+        prevented += 1
+      },
+      shiftKey: false,
+    })
+  })
+  assert.equal(prevented, 1)
+  assert.deepEqual(navigations, ['/mate/queen'])
+
+  await act(async () => renderer.unmount())
+})
+
+test('Mate landing keeps the catalog visible without mounting a drill', () => {
+  const markup = renderToStaticMarkup(
+    <Mate
+      moduleSelector={<nav aria-label="Modules" />}
+      onNavigate={() => undefined}
+      route={{
+        module: 'mate',
+        mateId: null,
+        mateMode: null,
+        sharedFen: null,
+      }}
+    />,
+  )
+
+  assert.match(markup, /Choose a mating set/)
+  assert.match(markup, /href="\/mate\/queen"/)
+  assert.doesNotMatch(markup, /leg-mate-workspace/)
+  assert.doesNotMatch(markup, /aria-label="Mate board, White orientation"/)
+  assert.doesNotMatch(markup, /aria-current=/)
+  assert.doesNotMatch(markup, /Coming soon/)
+})
+
+test('Mate composes a selected reducer-backed training workspace', () => {
+  const markup = renderToStaticMarkup(
+    <Mate
+      moduleSelector={<nav aria-label="Modules" />}
+      onNavigate={() => undefined}
+      route={{
+        module: 'mate',
+        mateId: 'rook',
+        mateMode: 'standard',
+        sharedFen: ROOK_START,
+      }}
+    />,
+  )
+
+  assert.match(markup, /class="leg-mate-workspace"/)
+  assert.match(markup, /aria-label="Mate board, White orientation"/)
+  assert.match(markup, /aria-label="Mate controls"/)
+  assert.match(markup, /aria-label="Mate move log"/)
+  assert.match(markup, /Starting FEN/)
+  assert.match(markup, new RegExp(ROOK_START.replaceAll('/', '\\/')))
+  assert.doesNotMatch(markup, /Coming soon/)
+})
+
+test('Mate recreates its drill synchronously for exact route changes', async () => {
+  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
+    .IS_REACT_ACT_ENVIRONMENT = true
+  const originalRandom = Math.random
+  Math.random = () => 0
+  let renderer: ReactTestRenderer | undefined
+
+  try {
+    await act(async () => {
+      renderer = TestRenderer.create(
+        matePage('rook', 'standard', MULTI_WHITE_START),
+      )
+    })
+    const mountedRenderer = renderer as ReactTestRenderer
+    await act(async () => {
+      mountedRenderer.root.findByType(MateBoardProbe).props.onMove('Rh5')
+    })
+    assert.equal(mountedRenderer.root.findByType(MateLog).props.logs.length, 1)
+
+    await act(async () => {
+      mountedRenderer.update(
+        matePage('rook', 'standard', MULTI_BLACK_START),
+      )
+    })
+    assert.equal(mountedRenderer.root.findByType(MateLog).props.logs.length, 0)
+    assert.equal(
+      mountedRenderer.root.findByType(MateBoardProbe).props.fen,
+      MULTI_BLACK_START,
+    )
+
+    await act(async () => {
+      mountedRenderer.update(matePage('queen', 'standard', QUEEN_START))
+    })
+    assert.equal(mountedRenderer.root.findByType(MateLog).props.logs.length, 0)
+    assert.equal(
+      mountedRenderer.root.findByType(MateBoardProbe).props.fen,
+      QUEEN_START,
+    )
+    assert.equal(
+      mountedRenderer.root
+        .findAllByProps({ href: '/mate/queen' })
+        .find((link) => link.props['aria-current'] === 'location')
+        ?.props['aria-current'],
+      'location',
+    )
+  } finally {
+    if (renderer) await act(async () => renderer?.unmount())
+    Math.random = originalRandom
+  }
+})
+
+test('Mate wires board, history, timer, and every log replacement action', async () => {
+  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
+    .IS_REACT_ACT_ENVIRONMENT = true
+  const originalRandom = Math.random
+  Math.random = () => 0
+  let renderer: ReactTestRenderer | undefined
+
+  try {
+    await act(async () => {
+      renderer = TestRenderer.create(
+        matePage('rook', 'standard', MULTI_BLACK_START),
+      )
+    })
+    const mountedRenderer = renderer as ReactTestRenderer
+
+    assert.equal(mountedRenderer.root.findByType(MateControls).props.showTimer, true)
+    await act(async () => {
+      mountedRenderer.root.findByType(MateControls).props.onToggleTimer()
+    })
+    assert.equal(
+      mountedRenderer.root.findByType(MateControls).props.showTimer,
+      false,
+    )
+
+    await act(async () => {
+      mountedRenderer.root.findByType(MateBoardProbe).props.onMove('Rd1')
+    })
+    assert.equal(mountedRenderer.root.findByType(MateLog).props.logs.length, 1)
+    assert.equal(
+      mountedRenderer.root.findByType(MateLog).props.logs[0].opponentSan,
+      'Kc5',
+    )
+    assert.deepEqual(
+      mountedRenderer.root.findByType(MateBoardProbe).props.lastMove,
+      ['c4', 'c5'],
+    )
+
+    await act(async () => {
+      mountedRenderer.root.findByType(MateControls).props.onUndo()
+    })
+    assert.equal(mountedRenderer.root.findByType(MateLog).props.logs.length, 0)
+    assert.equal(
+      mountedRenderer.root.findByType(MateBoardProbe).props.lastMove,
+      null,
+    )
+    await act(async () => {
+      mountedRenderer.root.findByType(MateControls).props.onRedo()
+    })
+    assert.equal(mountedRenderer.root.findByType(MateLog).props.logs.length, 1)
+
+    await act(async () => {
+      mountedRenderer.root.findByType(MateLog).props.onCycleIdealBlack(0)
+    })
+    assert.equal(
+      mountedRenderer.root.findByType(MateLog).props.logs[0].opponentSan,
+      'Kb4',
+    )
+    await act(async () => {
+      mountedRenderer.root.findByType(MateLog).props.onCycleLegalBlack(0)
+    })
+    assert.equal(
+      mountedRenderer.root.findByType(MateLog).props.logs[0].opponentSan,
+      'Kb5',
+    )
+
+    await act(async () => {
+      mountedRenderer.update(
+        matePage('rook', 'standard', MULTI_WHITE_START),
+      )
+    })
+    await act(async () => {
+      mountedRenderer.root.findByType(MateBoardProbe).props.onMove('Rh5')
+    })
+    assert.equal(
+      mountedRenderer.root.findByType(MateLog).props.logs[0].san,
+      'Rh5',
+    )
+    await act(async () => {
+      mountedRenderer.root.findByType(MateLog).props.onCycleIdealWhite(0)
+    })
+    assert.equal(
+      mountedRenderer.root.findByType(MateLog).props.logs[0].san,
+      'Re8',
+    )
+
+    await act(async () => {
+      mountedRenderer.root.findByType(MateControls).props.onStartOver()
+    })
+    assert.equal(mountedRenderer.root.findByType(MateLog).props.logs.length, 0)
+    assert.notEqual(
+      mountedRenderer.root.findByType(MateBoardProbe).props.fen,
+      MULTI_WHITE_START,
+    )
+    assert.doesNotMatch(reactNodeText(mountedRenderer.root), /reset count/i)
+  } finally {
+    if (renderer) await act(async () => renderer?.unmount())
+    Math.random = originalRandom
+  }
+})
+
+test('Mate keyboard shortcuts execute only from the training surface', async () => {
+  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
+    .IS_REACT_ACT_ENVIRONMENT = true
+  const originalDocument = globalThis.document
+  const originalRandom = Math.random
+  const keydownListeners = new Set<(event: KeyboardEvent) => void>()
+  const fakeDocument = {
+    addEventListener: (
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+    ) => {
+      if (type === 'keydown') {
+        keydownListeners.add(listener as (event: KeyboardEvent) => void)
+      }
+    },
+    removeEventListener: (
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+    ) => {
+      if (type === 'keydown') {
+        keydownListeners.delete(listener as (event: KeyboardEvent) => void)
+      }
+    },
+  }
+  Object.defineProperty(globalThis, 'document', {
+    configurable: true,
+    value: fakeDocument,
+  })
+  Math.random = () => 0
+  let renderer: ReactTestRenderer | undefined
+
+  const dispatch = (
+    key: string,
+    target: object | null = {
+      closest: () => null,
+      tagName: 'DIV',
+    },
+    modifiers: Partial<
+      Pick<KeyboardEvent, 'altKey' | 'ctrlKey' | 'metaKey' | 'shiftKey'>
+    > = {},
+  ) => {
+    let prevented = 0
+    const event = {
+      altKey: false,
+      ctrlKey: false,
+      defaultPrevented: false,
+      key,
+      metaKey: false,
+      preventDefault: () => {
+        prevented += 1
+      },
+      shiftKey: false,
+      target,
+      ...modifiers,
+    } as unknown as KeyboardEvent
+    for (const listener of [...keydownListeners]) listener(event)
+    return prevented
+  }
+
+  try {
+    await act(async () => {
+      renderer = TestRenderer.create(
+        matePage('rook', 'standard', MULTI_WHITE_START),
+      )
+    })
+    const mountedRenderer = renderer as ReactTestRenderer
+    assert.equal(keydownListeners.size, 1)
+
+    assert.equal(dispatch('ArrowLeft'), 0)
+    assert.equal(dispatch('ArrowRight'), 0)
+    assert.equal(dispatch('ArrowDown'), 0)
+    assert.equal(dispatch('Escape'), 0)
+    assert.equal(dispatch('w'), 0)
+    assert.equal(dispatch('a'), 0)
+    assert.equal(dispatch('h'), 0)
+    assert.equal(mountedRenderer.root.findByType(MateLog).props.logs.length, 0)
+
+    for (const tagName of [
+      'INPUT',
+      'SELECT',
+      'TEXTAREA',
+      'BUTTON',
+      'A',
+    ]) {
+      assert.equal(
+        dispatch('ArrowUp', { closest: () => null, tagName }),
+        0,
+        tagName,
+      )
+    }
+    assert.equal(
+      dispatch('ArrowUp', {
+        closest: () => null,
+        isContentEditable: true,
+        tagName: 'DIV',
+      }),
+      0,
+    )
+    assert.equal(
+      dispatch('ArrowUp', {
+        closest: () => ({ role: 'dialog' }),
+        tagName: 'SPAN',
+      }),
+      0,
+    )
+    assert.equal(dispatch('ArrowUp', null, { ctrlKey: true }), 0)
+    assert.equal(mountedRenderer.root.findByType(MateLog).props.logs.length, 0)
+
+    await act(async () => assert.equal(dispatch('ArrowUp'), 1))
+    assert.equal(mountedRenderer.root.findByType(MateLog).props.logs.length, 1)
+    await act(async () => assert.equal(dispatch('ArrowLeft'), 1))
+    assert.equal(mountedRenderer.root.findByType(MateLog).props.logs.length, 0)
+    assert.equal(dispatch('ArrowLeft'), 0)
+    await act(async () => assert.equal(dispatch('ArrowRight'), 1))
+    assert.equal(mountedRenderer.root.findByType(MateLog).props.logs.length, 1)
+    assert.equal(dispatch('ArrowRight'), 0)
+    await act(async () => assert.equal(dispatch('Enter'), 1))
+    assert.equal(mountedRenderer.root.findByType(MateLog).props.logs.length, 0)
+
+    await act(async () => mountedRenderer.unmount())
+    renderer = undefined
+    assert.equal(keydownListeners.size, 0)
+  } finally {
+    if (renderer) await act(async () => renderer?.unmount())
+    Math.random = originalRandom
+    if (originalDocument === undefined) {
+      delete (globalThis as { document?: Document }).document
+    } else {
+      Object.defineProperty(globalThis, 'document', {
+        configurable: true,
+        value: originalDocument,
+      })
+    }
+  }
+})
+
+test('Mate terminal sharing copies the exact starting position with status', async () => {
+  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
+    .IS_REACT_ACT_ENVIRONMENT = true
+  const navigatorDescriptor = Object.getOwnPropertyDescriptor(
+    globalThis,
+    'navigator',
+  )
+  const copied: string[] = []
+  let shouldReject = false
+  Object.defineProperty(globalThis, 'navigator', {
+    configurable: true,
+    value: {
+      clipboard: {
+        writeText: async (text: string) => {
+          if (shouldReject) throw new Error('clipboard unavailable')
+          copied.push(text)
+        },
+      },
+    },
+  })
+  let renderer: ReactTestRenderer | undefined
+
+  try {
+    await act(async () => {
+      renderer = TestRenderer.create(
+        matePage('rook', 'standard', ROOK_MATE_START),
+      )
+    })
+    const mountedRenderer = renderer as ReactTestRenderer
+    await act(async () => {
+      mountedRenderer.root.findByType(MateBoardProbe).props.onMove('Ra8#')
+    })
+    assert.equal(
+      mountedRenderer.root.findByType(MateControls).props.outcome,
+      'checkmate',
+    )
+
+    await act(async () => {
+      mountedRenderer.root.findByType(MateControls).props.onShare()
+      await Promise.resolve()
+      await Promise.resolve()
+    })
+    assert.equal(copied.length, 1)
+    assert.match(copied[0] ?? '', /^checkmate in \d{2}:\d{2}\.\d{2}\n/)
+    assert.ok(
+      copied[0]?.includes(
+        `/mate/rook#fen=${encodeURIComponent(ROOK_MATE_START)}`,
+      ),
+    )
+    assert.equal(
+      mountedRenderer.root.findByType(MateControls).props.shareStatus,
+      'Copied',
+    )
+
+    shouldReject = true
+    await act(async () => {
+      mountedRenderer.root.findByType(MateControls).props.onShare()
+      await Promise.resolve()
+      await Promise.resolve()
+    })
+    assert.equal(
+      mountedRenderer.root.findByType(MateControls).props.shareStatus,
+      'Copy unavailable',
+    )
+  } finally {
+    if (renderer) await act(async () => renderer?.unmount())
+    if (navigatorDescriptor === undefined) {
+      delete (globalThis as { navigator?: Navigator }).navigator
+    } else {
+      Object.defineProperty(globalThis, 'navigator', navigatorDescriptor)
+    }
+  }
+})
+
+test('Mate timers clean up across exact-route replacement and landing', async () => {
+  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
+    .IS_REACT_ACT_ENVIRONMENT = true
+  const originalSetInterval = globalThis.setInterval
+  const originalClearInterval = globalThis.clearInterval
+  let nextTimerId = 0
+  const activeTimers = new Set<number>()
+  globalThis.setInterval = ((
+    _handler: TimerHandler,
+    _timeout?: number,
+    ..._arguments: unknown[]
+  ) => {
+    nextTimerId += 1
+    activeTimers.add(nextTimerId)
+    return nextTimerId
+  }) as typeof setInterval
+  globalThis.clearInterval = ((timerId: number | undefined) => {
+    if (timerId !== undefined) activeTimers.delete(Number(timerId))
+  }) as typeof clearInterval
+  let renderer: ReactTestRenderer | undefined
+
+  try {
+    await act(async () => {
+      renderer = TestRenderer.create(
+        matePage('rook', 'standard', MULTI_WHITE_START),
+      )
+    })
+    const mountedRenderer = renderer as ReactTestRenderer
+    assert.equal(activeTimers.size, 1)
+
+    await act(async () => {
+      mountedRenderer.update(
+        matePage('rook', 'standard', MULTI_BLACK_START),
+      )
+    })
+    assert.equal(activeTimers.size, 1)
+    assert.equal(nextTimerId, 2)
+
+    await act(async () => {
+      mountedRenderer.update(mateLandingPage())
+    })
+    assert.equal(activeTimers.size, 0)
+
+    await act(async () => mountedRenderer.unmount())
+    renderer = undefined
+    assert.equal(activeTimers.size, 0)
+  } finally {
+    if (renderer) await act(async () => renderer?.unmount())
+    globalThis.setInterval = originalSetInterval
+    globalThis.clearInterval = originalClearInterval
+  }
+})
+
+function matePage(
+  mateId: 'queen' | 'rook',
+  mateMode: 'standard' | 'train',
+  sharedFen: string | null,
+) {
+  return (
+    <Mate
+      boardComponent={MateBoardProbe}
+      moduleSelector={<nav aria-label="Modules" />}
+      onNavigate={() => undefined}
+      route={{
+        module: 'mate',
+        mateId,
+        mateMode,
+        sharedFen,
+      }}
+    />
+  )
+}
+
+function mateLandingPage() {
+  return (
+    <Mate
+      boardComponent={MateBoardProbe}
+      moduleSelector={<nav aria-label="Modules" />}
+      onNavigate={() => undefined}
+      route={{
+        module: 'mate',
+        mateId: null,
+        mateMode: null,
+        sharedFen: null,
+      }}
+    />
+  )
+}
+
+function MateBoardProbe(props: React.ComponentProps<typeof MateBoard>) {
+  return (
+    <div
+      aria-disabled={props.disabled}
+      aria-label="Mate board probe"
+      data-fen={props.fen}
+      data-phase={props.phase}
+    />
+  )
 }
