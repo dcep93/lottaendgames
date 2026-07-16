@@ -160,19 +160,34 @@ const mateRuleSets = new Map<MateId, MateRuleSetRegistration>()
 function createRegisteredMateRuleSet<Score>(
   ruleSet: MateRuleSet<Score>,
 ): RegisteredMateRuleSet {
-  const ruleEntries = ruleSet.whiteRules.map((orderedRule) => ({
-    orderedRule,
-    description: {
-      id: orderedRule.id,
-      shortLabel: orderedRule.shortLabel,
-      helpText: orderedRule.helpText,
-    },
-  }))
-  const whiteRuleDescriptions = ruleEntries.map(({ description }) => description)
+  const { id, phase, scoreWhite, whiteMoves, blackCandidates, help } = ruleSet
+  const whiteRules = Object.freeze(
+    ruleSet.whiteRules.map((orderedRule) =>
+      Object.freeze({
+        id: orderedRule.id,
+        shortLabel: orderedRule.shortLabel,
+        helpText: orderedRule.helpText,
+        compare: orderedRule.compare,
+      }),
+    ),
+  )
+  const ruleEntries = Object.freeze(
+    whiteRules.map((orderedRule) => ({
+      orderedRule,
+      description: Object.freeze({
+        id: orderedRule.id,
+        shortLabel: orderedRule.shortLabel,
+        helpText: orderedRule.helpText,
+      }),
+    })),
+  )
+  const whiteRuleDescriptions = Object.freeze(
+    ruleEntries.map(({ description }) => description),
+  )
   const scoredWhiteMoves = (fen: string): readonly ScoredMove<Score>[] =>
-    ruleSet.whiteMoves(fen).map((san) => ({
+    whiteMoves(fen).map((san) => ({
       san,
-      score: ruleSet.scoreWhite(fen, san),
+      score: scoreWhite(fen, san),
     }))
   const describeRule = (
     orderedRule: OrderedRule<Score> | undefined,
@@ -180,28 +195,29 @@ function createRegisteredMateRuleSet<Score>(
     ruleEntries.find((entry) => entry.orderedRule === orderedRule)?.description
 
   return {
-    id: ruleSet.id,
-    phase: (fen) => ruleSet.phase(fen),
-    whiteMoves: (fen) => ruleSet.whiteMoves(fen),
+    id,
+    phase: (fen) => phase(fen),
+    whiteMoves: (fen) => whiteMoves(fen),
     blackCandidates: (fen, previousTurnFen) =>
-      ruleSet.blackCandidates(fen, previousTurnFen),
-    help: ruleSet.help,
+      blackCandidates(fen, previousTurnFen),
+    help,
     whiteRuleDescriptions,
     idealWhiteMoves: (fen) =>
-      selectIdealMoves(scoredWhiteMoves(fen), ruleSet.whiteRules),
+      selectIdealMoves(scoredWhiteMoves(fen), whiteRules),
     explainWhiteMove: (fen, san) =>
-      describeRule(explainMove(scoredWhiteMoves(fen), ruleSet.whiteRules, san)),
+      describeRule(explainMove(scoredWhiteMoves(fen), whiteRules, san)),
     currentWhiteHint: (fen) =>
-      describeRule(currentHint(scoredWhiteMoves(fen), ruleSet.whiteRules)),
+      describeRule(currentHint(scoredWhiteMoves(fen), whiteRules)),
   }
 }
 
 export function registerMateRuleSet<Score>(
   ruleSet: MateRuleSet<Score>,
 ): () => void {
-  const id = ruleSet.id
+  const registeredRuleSet = createRegisteredMateRuleSet(ruleSet)
+  const id = registeredRuleSet.id
   const registration = {
-    registeredRuleSet: createRegisteredMateRuleSet(ruleSet),
+    registeredRuleSet,
   }
   mateRuleSets.set(id, registration)
 

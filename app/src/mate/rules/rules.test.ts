@@ -296,3 +296,53 @@ test('registered rule operations capture concrete scores without exposing them',
     new Error('Mate rules not registered: rook'),
   )
 })
+
+test('registered rule operations snapshot the source rule array', () => {
+  const mutableSafeRule = { ...safeRule }
+  const mutableRules: OrderedRule<TestScore>[] = [mutableSafeRule, closerRule]
+  const mutableRuleSet: MateRuleSet<TestScore> = {
+    ...rookRuleSet,
+    id: 'bishop-knight',
+    whiteRules: mutableRules,
+  }
+  const unregister = registerMateRuleSet(mutableRuleSet)
+
+  try {
+    const registered = getMateRuleSet('bishop-knight')
+    mutableRules[0] = {
+      id: 'prefer-unsafe',
+      shortLabel: 'Prefer unsafe',
+      helpText: 'Prefer an unsafe move.',
+      compare: (left, right) => right.safe - left.safe,
+    }
+    mutableRules.push({
+      id: 'prefer-farther',
+      shortLabel: 'King farther',
+      helpText: 'Move the king farther away.',
+      compare: (left, right) => right.closer - left.closer,
+    })
+    mutableSafeRule.helpText = 'The source description changed.'
+    mutableSafeRule.compare = (left, right) => right.safe - left.safe
+
+    assert.deepEqual(registered.whiteRuleDescriptions, [
+      {
+        id: 'safe',
+        shortLabel: 'Keep it safe',
+        helpText: 'Keep the piece safe.',
+      },
+      {
+        id: 'closer',
+        shortLabel: 'King closer',
+        helpText: 'Bring the king closer.',
+      },
+    ])
+    assert.deepEqual(registered.idealWhiteMoves('test-fen'), ['Ka2', 'Kb2'])
+    assert.deepEqual(registered.currentWhiteHint('test-fen'), {
+      id: 'closer',
+      shortLabel: 'King closer',
+      helpText: 'Bring the king closer.',
+    })
+  } finally {
+    unregister()
+  }
+})
