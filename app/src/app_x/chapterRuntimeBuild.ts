@@ -75,6 +75,14 @@ function buildRuntimePlayback(sections: RawChapterSection[]): ChapterPlayback {
           fen: problem.content.solutionFen ?? problem.content.fen,
           number: problem.content.number,
           orientation: problem.content.orientation,
+          playbackAnchors: problem.content.playbackAnchors?.map((anchor) => ({
+            ...anchor,
+            sectionIndex: 1,
+          })),
+          playbackSegments: problem.content.playbackSegments?.map((segment) => ({
+            ...segment,
+            sectionIndex: 1,
+          })),
         },
       },
       { type: 'text', content: problem.content.solution },

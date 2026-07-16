@@ -96,7 +96,7 @@ function parseBookAnchor(hash: string) {
     return decodedHash
   }
 
-  if (/^p[A-Za-z0-9]+(?:\.[A-Za-z0-9]+)*$/.test(decodedHash)) {
+  if (/^p[A-Za-z0-9]+(?:[.-][A-Za-z0-9]+)*$/.test(decodedHash)) {
     return decodedHash
   }
 

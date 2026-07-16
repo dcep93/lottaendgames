@@ -62,6 +62,21 @@ function validateSection(
   assertNonEmptyString(value.type, `${location} type`)
   assert(sectionTypes.has(value.type), `${location} has unknown type: ${value.type}`)
 
+  if (value.playbackPositionNumbers !== undefined) {
+    assert(
+      value.type === 'text' || value.type === 'panel',
+      `${location} playbackPositionNumbers is only valid on text and panel sections`,
+    )
+    assertStringArray(
+      value.playbackPositionNumbers,
+      `${location} playbackPositionNumbers`,
+    )
+    assert(
+      value.playbackPositionNumbers.length > 0,
+      `${location} playbackPositionNumbers must not be empty`,
+    )
+  }
+
   if (['caption', 'heading', 'text', 'title'].includes(value.type)) {
     assertNonEmptyString(value.content, `${location} content`)
     return
@@ -103,6 +118,18 @@ function validateSection(
       ])
       validateMarkers(content.markers, location)
       validateRoutes(content.routes, location)
+      validatePlaybackAnchors(content.playbackAnchors, location)
+      validatePlaybackSegments(content.playbackSegments, location)
+      if (content.relatedPositionNumbers !== undefined) {
+        assertStringArray(
+          content.relatedPositionNumbers,
+          `${location} relatedPositionNumbers`,
+        )
+        assert(
+          content.relatedPositionNumbers.length > 0,
+          `${location} relatedPositionNumbers must not be empty`,
+        )
+      }
       if (content.alternateFens !== undefined) {
         assert(
           Array.isArray(content.alternateFens),
@@ -126,9 +153,13 @@ function validateSection(
       }
       validateProblemFen(content.fen, content.solutionFen, `${location} fen`)
       validateMarkers(content.markers, location)
+      validatePlaybackAnchors(content.playbackAnchors, location)
+      validatePlaybackSegments(content.playbackSegments, location)
       return
     case 'table':
-      assertNonEmptyString(content.caption, `${location} caption`)
+      if (content.caption !== undefined) {
+        assertNonEmptyString(content.caption, `${location} caption`)
+      }
       assertStringArray(content.columns, `${location} columns`)
       const columns = content.columns
       assert(columns.length > 0, `${location} columns must not be empty`)
@@ -142,6 +173,59 @@ function validateSection(
       })
       return
   }
+}
+
+function validatePlaybackAnchors(value: unknown, location: string) {
+  if (value === undefined) {
+    return
+  }
+
+  assert(Array.isArray(value), `${location} playbackAnchors must be an array`)
+  value.forEach((anchor, index) => {
+    const anchorLocation = `${location} playback anchor ${index + 1}`
+    assertRecord(anchor, anchorLocation)
+    assertNonEmptyString(anchor.token, `${anchorLocation} token`)
+    assertNonEmptyString(anchor.parentFen, `${anchorLocation} parentFen`)
+    validateLegalFen(anchor.parentFen, `${anchorLocation} parentFen`)
+    assert(
+      typeof anchor.sectionIndex === 'number' &&
+        Number.isInteger(anchor.sectionIndex) &&
+        anchor.sectionIndex >= 0,
+      `${anchorLocation} sectionIndex must be a non-negative integer`,
+    )
+    assert(
+      anchor.occurrence === undefined ||
+        (typeof anchor.occurrence === 'number' &&
+          Number.isInteger(anchor.occurrence) &&
+          anchor.occurrence >= 0),
+      `${anchorLocation} occurrence must be a non-negative integer`,
+    )
+  })
+}
+
+function validatePlaybackSegments(value: unknown, location: string) {
+  if (value === undefined) {
+    return
+  }
+
+  assert(Array.isArray(value), `${location} playbackSegments must be an array`)
+  value.forEach((segment, index) => {
+    const segmentLocation = `${location} playback segment ${index + 1}`
+    assertRecord(segment, segmentLocation)
+    assertNonEmptyString(segment.start, `${segmentLocation} start`)
+    assertNonEmptyString(
+      segment.positionNumber,
+      `${segmentLocation} positionNumber`,
+    )
+    assertNonEmptyString(segment.parentFen, `${segmentLocation} parentFen`)
+    validateLegalFen(segment.parentFen, `${segmentLocation} parentFen`)
+    assert(
+      typeof segment.sectionIndex === 'number' &&
+        Number.isInteger(segment.sectionIndex) &&
+        segment.sectionIndex >= 0,
+      `${segmentLocation} sectionIndex must be a non-negative integer`,
+    )
+  })
 }
 
 function validateOrientation(value: unknown, location: string) {

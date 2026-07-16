@@ -1,5 +1,10 @@
 import { Chess } from 'chess.js'
-import type { PositionSection, RawChapterSection } from './chapterTypes'
+import type {
+  PlaybackAnchor,
+  PlaybackSegment,
+  PositionSection,
+  RawChapterSection,
+} from './chapterTypes'
 
 export type TextPlaybackToken =
   | {
@@ -73,6 +78,9 @@ export function buildChapterPlayback(
         position.content.number,
         position.content.fen,
         position.content.alternateFens,
+        position.content.relatedPositionNumbers,
+        position.content.playbackAnchors,
+        position.content.playbackSegments,
       )
       contexts.push(context)
       hasParsedPlayableSincePosition = false
@@ -84,27 +92,53 @@ export function buildChapterPlayback(
     }
 
     const content = getPlayableText(section)
-    context = chooseContextForContent(
-      contexts,
-      context,
+    const playbackSegments = contexts.flatMap((candidateContext) =>
+      candidateContext.getPlaybackSegments(sectionIndex),
+    )
+
+    if (playbackSegments.length) {
+      const tokens = assignMoveTokenIds(
+        buildSegmentedPlaybackTokens(content, playbackSegments, sectionIndex),
+        sectionIndex,
+      )
+      const positionNumbers = new Set(
+        tokens
+          .filter((token) => token.type === 'move')
+          .map((token) => token.positionNumber),
+      )
+
+      for (const positionNumber of positionNumbers) {
+        playablePositions.add(positionNumber)
+      }
+      if (positionNumbers.size) {
+        tokensBySectionIndex.set(sectionIndex, tokens)
+      }
+      return
+    }
+
+    const eligibleContexts = getEligibleContexts(section, contexts, context)
+    const selectedPreferredContext = eligibleContexts.includes(context)
+      ? context
+      : eligibleContexts.at(-1) ?? context
+    let selectedContext = chooseContextForContent(
+      eligibleContexts,
+      selectedPreferredContext,
       content,
       hasNumberedMoveText(content) && !hasParsedPlayableSincePosition,
       sectionIndex,
     )
-    const parsedTokens = context.parse(content, sectionIndex)
-    let selectedContext = context
+    const parsedTokens = selectedContext.parse(content, sectionIndex)
     let tokens = resolveUnresolvedTextTokens(
       parsedTokens,
-      contexts,
-      context,
+      eligibleContexts,
+      selectedContext,
       sectionIndex,
     )
 
     if (!tokens.some((token) => token.type === 'move')) {
-      const upcomingPositionContext = createUpcomingPositionContext(
-        sections,
-        sectionIndex,
-      )
+      const upcomingPositionContext = section.playbackPositionNumbers
+        ? null
+        : createUpcomingPositionContext(sections, sectionIndex)
 
       if (upcomingPositionContext) {
         const upcomingTokens = resolveUnresolvedTextTokens(
@@ -144,6 +178,67 @@ export function buildChapterPlayback(
   }
 }
 
+function buildSegmentedPlaybackTokens(
+  content: string,
+  segments: PlaybackSegment[],
+  sectionIndex: number,
+) {
+  const locatedSegments = segments
+    .map((segment) => ({
+      index: content.indexOf(segment.start),
+      segment,
+    }))
+    .filter(({ index }) => index >= 0)
+    .sort((left, right) => left.index - right.index)
+  const tokens: TextPlaybackToken[] = []
+
+  if (!locatedSegments.length) {
+    return [{ text: content, type: 'text' as const }]
+  }
+
+  if (locatedSegments[0].index > 0) {
+    tokens.push({
+      text: content.slice(0, locatedSegments[0].index),
+      type: 'text',
+    })
+  }
+
+  for (const [index, located] of locatedSegments.entries()) {
+    const end = locatedSegments[index + 1]?.index ?? content.length
+    const segmentText = content.slice(located.index, end)
+    const segmentContext = new PositionContext(
+      located.segment.positionNumber,
+      located.segment.parentFen,
+    )
+    const segmentTokens = resolveAdjacentTextMoveTokens(
+      segmentContext.parse(segmentText, sectionIndex),
+      located.segment.positionNumber,
+      sectionIndex,
+    )
+    tokens.push(...segmentTokens)
+  }
+
+  return tokens
+}
+
+function getEligibleContexts(
+  section: RawChapterSection,
+  contexts: PositionContext[],
+  currentContext: PositionContext,
+) {
+  const allowed = new Set(
+    section.playbackPositionNumbers ?? [
+      currentContext.positionNumber,
+      ...currentContext.relatedPositionNumbers,
+    ],
+  )
+  const eligible = contexts.filter((candidate) =>
+    allowed.has(candidate.positionNumber),
+  )
+
+  return eligible.length ? eligible : [currentContext]
+}
+
 function assignMoveTokenIds(
   tokens: TextPlaybackToken[],
   sectionIndex: number,
@@ -173,6 +268,9 @@ function createUpcomingPositionContext(
     position.content.number,
     position.content.fen,
     position.content.alternateFens,
+    position.content.relatedPositionNumbers,
+    position.content.playbackAnchors,
+    position.content.playbackSegments,
   )
 }
 
@@ -550,14 +648,23 @@ class PositionContext {
   private readonly initialFen: string
   private readonly branchStack: Branch[] = []
   private readonly variationReturnStack: Branch[] = []
+  private readonly playbackAnchors: PlaybackAnchor[]
+  private readonly playbackSegments: PlaybackSegment[]
   readonly positionNumber: string
+  readonly relatedPositionNumbers: string[]
 
   constructor(
     positionNumber: string,
     initialFen: string,
     alternateFens: string[] = [],
+    relatedPositionNumbers: string[] = [],
+    playbackAnchors: PlaybackAnchor[] = [],
+    playbackSegments: PlaybackSegment[] = [],
   ) {
     this.positionNumber = positionNumber
+    this.relatedPositionNumbers = relatedPositionNumbers
+    this.playbackAnchors = playbackAnchors
+    this.playbackSegments = playbackSegments
     this.initialFen = initialFen
     this.baseWhiteFen = withTurn(initialFen, 'w')
     this.baseBlackFen = withTurn(initialFen, 'b')
@@ -575,8 +682,21 @@ class PositionContext {
     }
   }
 
+  getPlaybackSegments(sectionIndex: number) {
+    return this.playbackSegments.filter(
+      (segment) => segment.sectionIndex === sectionIndex,
+    )
+  }
+
   clone() {
-    const context = new PositionContext(this.positionNumber, this.initialFen)
+    const context = new PositionContext(
+      this.positionNumber,
+      this.initialFen,
+      [],
+      this.relatedPositionNumbers,
+      this.playbackAnchors,
+      this.playbackSegments,
+    )
     context.branch = { ...this.branch, path: [...this.branch.path] }
     context.branchHistory.length = 0
     context.branchHistory.push(
@@ -638,6 +758,7 @@ class PositionContext {
 
   parse(content: string, sectionIndex: number): TextPlaybackToken[] {
     const parseTokens = tokenizeMoveText(content)
+    const tokenOccurrences = new Map<string, number>()
 
     return parseTokens.map((token, tokenIndex) => {
       if (token.type === 'text') {
@@ -648,7 +769,18 @@ class PositionContext {
         return token
       }
 
-      const candidate = this.resolveCandidate(token, parseTokens, tokenIndex)
+      const tokenKey = normalizePlaybackToken(token.display)
+      const occurrence = tokenOccurrences.get(tokenKey) ?? 0
+      tokenOccurrences.set(tokenKey, occurrence + 1)
+      const anchor = this.playbackAnchors.find(
+        (candidateAnchor) =>
+          candidateAnchor.sectionIndex === sectionIndex &&
+          normalizePlaybackToken(candidateAnchor.token) === tokenKey &&
+          (candidateAnchor.occurrence ?? 0) === occurrence,
+      )
+      const candidate = anchor
+        ? this.resolvePlaybackAnchor(token, anchor, occurrence)
+        : this.resolveCandidate(token, parseTokens, tokenIndex)
 
       if (!candidate) {
         return {
@@ -678,6 +810,33 @@ class PositionContext {
         type: 'move',
       }
     })
+  }
+
+  private resolvePlaybackAnchor(
+    token: CandidateToken,
+    anchor: PlaybackAnchor,
+    occurrence: number,
+  ): BranchCandidate | null {
+    const parent: Branch = {
+      fen: anchor.parentFen,
+      path: [
+        `@${anchor.sectionIndex}:${normalizePlaybackToken(anchor.token)}:${occurrence}`,
+      ],
+    }
+    const branch = applyMove(parent, token.san)
+
+    if (!branch) {
+      return null
+    }
+
+    return {
+      branch,
+      exactMoveNumber: true,
+      fromCurrent: branchesMatch(parent, this.branch),
+      parentFen: parent.fen,
+      score: Number.MAX_SAFE_INTEGER,
+      sourceIndex: Number.MAX_SAFE_INTEGER,
+    }
   }
 
   parseLooseCandidate(
@@ -960,13 +1119,13 @@ function shouldTokenizeMoveCandidate(
 }
 
 export function isProseMoveReference(text: string) {
-  return /(?:\b(?:allows?|allowed|answer|as|blow|by means of|followed by|for example|forcing|i\.e\.|in case|intending|manoeuvre|play first|prevented by|such as|the threat (?:is|was)|threat|threatens|threatened|threatening|which would allow|would allow)\s*(?:\.\.\.)?\s*)$/i.test(
+  return /(?:\b(?:allows?|allowed|answer|as|blow|by means of|dominates?|followed by|for example|forcing|i\.e\.|in case|intending|manoeuvre|play first|prefers?|prevented by|preventing|such as|the threat (?:is|was)|threat|threatens|threatened|threatening|which would allow|would allow|would play|would prefer)\s*(?:\.\.\.)?\s*)$/i.test(
     text,
   )
 }
 
 export function isProseMoveReferenceContinuation(text: string) {
-  return /^\s*(?:(?:is|was|would be|will be)\s+(?:a\s+)?(?:threat|idea|manoeuvre|resource|possibility)\b|would\s+(?:allow|hinder|prevent)\b)/i.test(
+  return /^\s*(?:dominates?\b|is impossible\b|(?:is|was|would be|will be)\s+(?:a\s+)?(?:threat|idea|manoeuvre|resource|possibility)\b|would\s+(?:allow|hinder|prevent)\b)/i.test(
     text,
   )
 }
@@ -986,6 +1145,7 @@ export function isProseSanReference(
       precedingText,
     ) ||
     /\band\s*(?:\.\.\.)?$/i.test(precedingText) ||
+    /,\s*(?:\.\.\.)?$/.test(precedingText) ||
     /^\s*-\s*(?:[KQRBN])?[a-h][1-8]/.test(followingText)
   )
 }
@@ -1005,6 +1165,7 @@ function isVariationIntroContinuation(text: string) {
 function isMoveContinuationText(text: string) {
   const normalized = text
     .replace(/\.\.\./g, '')
+    .replace(/[□Z]/g, '')
     .replace(/\s+/g, ' ')
     .trim()
 
@@ -1155,6 +1316,10 @@ function applyMove(branch: Branch, san: string): Branch | null {
   } catch {
     return null
   }
+}
+
+function normalizePlaybackToken(token: string) {
+  return token.replace(/\s+/g, '')
 }
 
 function normalizeSan(rawMove: string) {

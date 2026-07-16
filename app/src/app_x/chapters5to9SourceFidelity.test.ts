@@ -143,6 +143,17 @@ for (const unit of release.units) {
   )
 }
 
+for (const boardNumber of [
+  'cutting-off-series-1',
+  'cutting-off-series-2',
+  'cutting-off-series-3',
+]) {
+  const unit: FidelityUnit | undefined = release.units.find((candidate) =>
+    candidate.boardNumber === boardNumber
+  )
+  assert.equal(unit?.pdfPage, 71)
+}
+
 assert.equal(
   getBoard('8', 'knight-blockades-series-1').fen,
   '5nK1/4kP2/8/5B2/8/8/8/8 w - - 0 1',
@@ -150,6 +161,10 @@ assert.equal(
 assert.equal(
   getBoard('8', 'knight-blockades-series-2').fen,
   '4Kn2/5Pk1/8/5B2/8/8/8/8 w - - 0 1',
+)
+assert.equal(
+  getBoard('8', '8.4').fen,
+  '8/8/8/8/7n/7p/8/4K1kB b - - 0 3',
 )
 assert.equal(
   getBoard('9', '9.18').fen,
@@ -192,6 +207,68 @@ for (const [partId, number, subtitle, caption] of [
 const chapterSevenText = textualContent(getPart('7').sections)
 assert.equal(chapterSevenText.includes('arise with reasonably frequency.'), true)
 assert.equal(chapterSevenText.includes('arise with reasonable frequency.'), false)
+assertIncludesAll(chapterSevenText, [
+  "concept of the 'bad bishop'",
+  '3...Ke8!= Now the king reaches a black square',
+  'has reached rear opposition.\n\nFrom his position',
+  'an essential manoeuvre: Now the stronger side',
+  'without obstructing the pawn!',
+  'the other diagonal (a4-e8)',
+  'Third Case. The defending king',
+  'Now we can draw some important conclusions.',
+  'It think it is better to remember why things happen.',
+  'make sure that is impossible to win that way',
+])
+assertExcludesAll(chapterSevenText, [
+  'concept of the bad bishop',
+  '3...Ke8! Now the king reaches a black square',
+  'the other diagonal, a4-e8',
+  'Third Case.The defending king',
+  'I think it is better to remember why things happen.',
+  'make sure that it is impossible to win that way',
+])
+
+const chapterEightText = textualContent(getPart('8').sections)
+assertIncludesAll(chapterEightText, [
+  'Bishop vs. Knight (see statistics).',
+  'easily solved (most positions) or',
+  'Bishop + Pawn vs. Bishop: 47% wins; here just 25%',
+  'shorter diagonal (4 squares long)',
+  'which was tactically prevented (...Nd5, ...Ne3)',
+  '4.Kd7 (the king is too late) 4...Kf1',
+  'White dominates all 4 squares on the stopping diagonal',
+  'The first point! If the knight retreats',
+  'The second point! The knight is ill-placed',
+  '2.Ba1□ Nb2',
+  'they are very similar... but different',
+  '5.Kd3□ Nc5+',
+  '4.Kd2Z and, as shown',
+  'the white king would prefer Kd1',
+  '6...Nb2Z - see main line',
+  '(unless there is a chance of a knight fork)',
+  'ousted by - sometimes complicated - tactics',
+  '5.Ba4+ 5...Kc5',
+  '10.Be4Z+-',
+  '6.Be4Z+- another zugzwang',
+  'Zugzwang!',
+  'only with White to move!',
+  'Recommended Exercise: look carefully',
+  'drawing resources:\n1) Perpetual check with the knight\n2) Stalemate',
+  'square in front of the pawn (the opposite colour to the bishop)',
+])
+assertExcludesAll(chapterEightText, [
+  'easily solved, in most positions, or',
+  'shorter diagonal, was losing',
+  'which was tactically prevented by ...Nd5 and ...Ne3',
+  '3...Kb1? 4.Kd2 and, as shown',
+  'blockading position, unless there is a chance',
+  'ousted by sometimes complicated tactics',
+  '6.Be4+- another zugzwang',
+  'only with White to move.',
+  'Recommended Exercise: Look carefully',
+  'resources: 1) perpetual check with the knight, and 2) stalemate',
+  'square in front of the pawn, the opposite colour to the bishop',
+])
 
 const chapterNineText = textualContent(getPart('9').sections)
 assert.equal(
@@ -204,6 +281,52 @@ assert.equal(
   chapterNineText.includes('the right position for the defending bishop is given.'),
   false,
 )
+assertIncludesAll(chapterNineText, [
+  'There is one exception:',
+  '5.Kc3Z followed by Kb4',
+  'enemy bishop (avoiding blockade)',
+  'This pawn structure always wins',
+  '5.Bb3Z (5.f5??',
+  '9.Bc4Z',
+  'André Cheron',
+  'as we will see in the next examples',
+  '3.Be3Z',
+  '8.e6+!+-',
+  '18.Bd2! (similar to the previous note) 18...Kc6',
+  'With a- and d- pawns (or h- and e-)',
+  '4.Bc8Z The first zugzwang',
+  '8.Be6Z The second zugzwang',
+  '9.Be5Z Bb7',
+  '6.Bb7Z Kg5',
+  '11.Bb7Z',
+  '15.Bd5Z',
+  'From c8 (or d7) the bishop attacks',
+  'defensive set-up against the pawns on 4th rank',
+  'not 3.Kd2? Bb5!',
+  '5.Ke3 Be8!',
+  'Here the defensive procedure is simple too:',
+  "Two bishop's pawns (c- and f-files) win",
+  'left hand side of the pawn',
+  '2.Bh7? Kb2 3.Kd1',
+  "with a rook's pawn (not a wrong rook's pawn)",
+])
+assertExcludesAll(chapterNineText, [
+  'There is one exception.',
+  'This pawn structure allows wins',
+  'Andre Cheron',
+  'but here there are some exceptions.',
+  '2...Bc4 3.Be3\n',
+  'With a- and d-pawns, or h- and e-pawns',
+  'From c8 or d7 the bishop attacks',
+  'defensive set-up against the pawns on the 4th rank',
+  'not 3.Bd2? Bb5!',
+  '5.Be3 Be8!',
+  'Here the defensive procedure is simple too.',
+  "Two bishop's pawns, c- and f-files, win",
+  'left-hand side of the pawn',
+  '2.Bh7? Kb2 3.Bd1',
+  "with a rook's pawn, not a wrong rook's pawn",
+])
 
 replay(getBoard('9', '9.18').fen, [
   'Bb7',
@@ -223,6 +346,16 @@ replay(getBoard('9', '9.18').fen, [
   'Kf5',
   'Kc5',
   'Ke6',
+])
+replay(getBoard('8', '8.4').fen, [
+  'Kxh1',
+  'Kf2',
+  'Nf3',
+  'Kf1',
+  'Nd2+',
+  'Kf2',
+  'Ne4+',
+  'Kf1',
 ])
 replay(getBoard('9', '9.20').fen, [
   'Kd3',
@@ -275,9 +408,30 @@ function boardContent(content: unknown) {
 
 function textualContent(sections: RawChapterSection[]) {
   return sections
-    .filter(({ content }) => typeof content === 'string')
-    .map(({ content }) => content as string)
+    .flatMap(({ content }) => {
+      if (typeof content === 'string') {
+        return [content]
+      }
+      if (content && typeof content === 'object' && !Array.isArray(content)) {
+        return Object.values(content).filter(
+          (value): value is string => typeof value === 'string',
+        )
+      }
+      return []
+    })
     .join('\n')
+}
+
+function assertIncludesAll(text: string, expected: string[]) {
+  for (const fragment of expected) {
+    assert.equal(text.includes(fragment), true, `Missing source fragment: ${fragment}`)
+  }
+}
+
+function assertExcludesAll(text: string, forbidden: string[]) {
+  for (const fragment of forbidden) {
+    assert.equal(text.includes(fragment), false, `Stale source fragment: ${fragment}`)
+  }
 }
 
 function replay(fen: string, sans: string[]) {

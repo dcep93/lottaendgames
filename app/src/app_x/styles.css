@@ -217,6 +217,13 @@
   font-weight: 850;
 }
 
+.leg-frontmatter-subtitle {
+  margin: 0;
+  color: var(--leg-soft);
+  font-size: 1.05rem;
+  font-style: italic;
+}
+
 .leg-publication-details {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));

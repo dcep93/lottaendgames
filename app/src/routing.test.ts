@@ -38,6 +38,17 @@ assert.deepEqual(resolveAppRoute('/book/chapter2', '#p2.01'), {
   href: '/book/chapter2#p2.01',
   route: { anchorId: 'p2.01', chapterId: '2', module: 'book' },
 })
+assert.deepEqual(
+  resolveAppRoute('/book/chapter5', '#pcutting-off-series-1'),
+  {
+    href: '/book/chapter5#pcutting-off-series-1',
+    route: {
+      anchorId: 'pcutting-off-series-1',
+      chapterId: '5',
+      module: 'book',
+    },
+  },
+)
 assert.deepEqual(resolveAppRoute('/book/bibliography', ''), {
   href: '/book/bibliography',
   route: { anchorId: null, chapterId: 'bibliography', module: 'book' },

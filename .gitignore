@@ -9,3 +9,4 @@ app/.firebaserc
 __pycache__/
 *.pyc
 .superpowers/
+tmp/

@@ -26,6 +26,7 @@ export type BoardOrientation = 'black' | 'white'
 
 export type RawChapterSection = {
   content: unknown
+  playbackPositionNumbers?: string[]
   type: string
 }
 
@@ -41,6 +42,7 @@ export type DiagramSection = {
     markers?: PositionMarker[]
     number: string
     orientation: BoardOrientation
+    relatedPositionNumbers?: string[]
     routes?: PositionRoute[]
     subtitle?: string
   }
@@ -65,7 +67,22 @@ export type PanelSection = {
     text: string
     title?: string
   }
+  playbackPositionNumbers?: string[]
   type: 'panel'
+}
+
+export type PlaybackAnchor = {
+  occurrence?: number
+  parentFen: string
+  sectionIndex: number
+  token: string
+}
+
+export type PlaybackSegment = {
+  parentFen: string
+  positionNumber: string
+  sectionIndex: number
+  start: string
 }
 
 export type PositionMarker = {
@@ -90,6 +107,9 @@ export type PositionSection = {
     markers?: PositionMarker[]
     number: string
     orientation: BoardOrientation
+    playbackAnchors?: PlaybackAnchor[]
+    playbackSegments?: PlaybackSegment[]
+    relatedPositionNumbers?: string[]
     routes?: PositionRoute[]
     subtitle?: string
   }
@@ -102,6 +122,8 @@ export type ProblemSection = {
     markers?: PositionMarker[]
     number: string
     orientation: BoardOrientation
+    playbackAnchors?: PlaybackAnchor[]
+    playbackSegments?: PlaybackSegment[]
     prompt: string
     solution: string
     solutionFen?: string
@@ -111,7 +133,7 @@ export type ProblemSection = {
 
 export type TableSection = {
   content: {
-    caption: string
+    caption?: string
     columns: string[]
     rows: string[][]
   }
@@ -120,6 +142,7 @@ export type TableSection = {
 
 export type TextSection = {
   content: string
+  playbackPositionNumbers?: string[]
   type: 'text'
 }
 

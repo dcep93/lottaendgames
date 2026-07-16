@@ -6,7 +6,7 @@ export default function TableBlock({ section }: { section: TableSection }) {
   return (
     <div className="leg-table-wrap">
       <table className="leg-table">
-        <caption>{caption}</caption>
+        {caption ? <caption>{caption}</caption> : null}
         <thead>
           <tr>
             {columns.map((column) => (

@@ -19,6 +19,9 @@ export default function BookFrontMatter({
       <header className="leg-frontmatter-identity">
         <p className="leg-kicker">About this edition</p>
         <h2>100 Endgames You Must Know</h2>
+        <p className="leg-frontmatter-subtitle">
+          Vital Lessons for Every Chess Player
+        </p>
         <p className="leg-frontmatter-author">Jesús de la Villa</p>
         <dl className="leg-publication-details">
           <div>
@@ -37,6 +40,30 @@ export default function BookFrontMatter({
             <dt>Publisher</dt>
             <dd>New In Chess, Alkmaar, The Netherlands</dd>
           </div>
+          <div>
+            <dt>Cover design</dt>
+            <dd>Steven Boland</dd>
+          </div>
+          <div>
+            <dt>Translation</dt>
+            <dd>Patricia Llaneza Vega</dd>
+          </div>
+          <div>
+            <dt>Correction</dt>
+            <dd>Steve Giddins</dd>
+          </div>
+          <div>
+            <dt>Supervisor</dt>
+            <dd>Peter Boel</dd>
+          </div>
+          <div>
+            <dt>Proofreading</dt>
+            <dd>René Olthof</dd>
+          </div>
+          <div>
+            <dt>Production</dt>
+            <dd>Anton Schermer</dd>
+          </div>
         </dl>
         <p className="leg-frontmatter-fine-print">
           <a href="https://www.newinchess.com/">www.newinchess.com</a>
@@ -44,6 +71,56 @@ export default function BookFrontMatter({
           All photos: New In Chess Archives.
         </p>
       </header>
+
+      <FrontMatterSection title="Publisher's description">
+        <p>The good news about chess endgames is:</p>
+        <ul>
+          <li>there are relatively few endings you should really know by heart</li>
+          <li>
+            once you know these endings, that&apos;s it. Your knowledge never goes
+            out of date!
+          </li>
+        </ul>
+        <p>
+          The bad news is that, all the same, the endgame technique of most
+          players is deficient.
+        </p>
+        <p>
+          Since you are reading this, your endgame knowledge may be inadequate
+          as well, with predictable consequences for your results. To make
+          matters worse, modern time-controls prevent you from compensating for
+          your lack of knowledge by delving deeply into the subtleties of an
+          ending during a game.
+        </p>
+        <p>
+          This book is a great help for players such as you. The author debunks
+          the myth that endgame theory is complex and teaches you to steer the
+          game into a position you are familiar with.
+        </p>
+        <p>
+          Jesus de la Villa has only selected those endgames that show up most
+          frequently, are easy to learn and contain ideas that are also useful
+          in more difficult positions.
+        </p>
+        <p>Your performance will improve dramatically because this book brings you:</p>
+        <ul>
+          <li>simple rules</li>
+          <li>detailed and lively explanations</li>
+          <li>many diagrams</li>
+          <li>clear summaries of the most important themes</li>
+        </ul>
+        <p>
+          <em>100 Endgames You Must Know</em> is not an encyclopedia, but a
+          practical tool to improve your knowledge of the most common
+          theoretical endings.
+        </p>
+        <p>
+          <strong>Jesus de la Villa</strong> (1958) is an International
+          Grandmaster born in Spain. He is a successful author and a well-known
+          chess coach. He has won the Spanish Championship twice.
+        </p>
+        <p>Printed cover price: Games / Chess $24.95 · €21.95.</p>
+      </FrontMatterSection>
 
       <FrontMatterSection title="About this project">
         <p>
@@ -79,7 +156,8 @@ export default function BookFrontMatter({
       </FrontMatterSection>
 
       <FrontMatterSection title="Note on this digital edition">
-        <p>
+        <ul className="leg-deviation-list">
+          <li>
           <BookLink
             href={`${bookPathForChapterId('14')}#${bookPositionAnchorId('14.29')}`}
             onNavigate={onNavigate}
@@ -90,7 +168,43 @@ export default function BookFrontMatter({
           draw?”, while the published solution analyzes White&apos;s 69th move.
           This reader follows the solution and presents the position with White
           to move.
-        </p>
+          </li>
+          <li>
+            <BookLink
+              href={`${bookPathForChapterId('12')}#${bookPositionAnchorId('12.18')}`}
+              onNavigate={onNavigate}
+            >
+              Position 12.18
+            </BookLink>{' '}
+            (print page 184; PDF page 185) is introduced as the position after
+            1.b4?, which leaves Black to move, while the published continuation
+            begins 1.Kb3. This reader preserves the printed diagram state and
+            stages the continuation from White&apos;s move without attributing an
+            error to the author.
+          </li>
+          <li>
+            <BookLink
+              href={`${bookPathForChapterId('12')}#${bookPositionAnchorId('12.6')}`}
+              onNavigate={onNavigate}
+            >
+              Position 12.6
+            </BookLink>{' '}
+            (print page 173; PDF page 174) gives no single side to move and
+            explicitly discusses both turns. The reader uses White to move as a
+            neutral analysis-board default.
+          </li>
+          <li>
+            <BookLink
+              href={`${bookPathForChapterId('12')}#${bookPositionAnchorId('12.29')}`}
+              onNavigate={onNavigate}
+            >
+              Position 12.29
+            </BookLink>{' '}
+            (print page 193; PDF page 194) prints the branch 1.g4? Kg6
+            2.Kg4 even though White&apos;s pawn occupies g4. The reader preserves
+            the published notation and does not invent a legal replacement.
+          </li>
+        </ul>
       </FrontMatterSection>
 
       <FrontMatterSection title="With thanks">

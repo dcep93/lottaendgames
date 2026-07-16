@@ -147,6 +147,48 @@ assert.deepEqual(kingRoutes.routes, [
   },
 ])
 
+assert.equal(
+  boardContent(getBoard('3', '3.2')).fen,
+  '8/8/8/8/5N2/7K/2p5/2k5 w - - 0 1',
+  'PDF 53 / print 52 places the black pawn and king on c2 and c1',
+)
+assert.equal(
+  boardContent(getBoard('3', '3.10')).fen,
+  '3k4/1n6/8/P7/8/8/7K/8 w - - 0 1',
+  'PDF 59 / print 58 places the black king on d8',
+)
+
+const introductionText = getPart('introduction').sections
+  .map(textualContent)
+  .join('\n')
+assert.equal(introductionText.includes('Centurini, Chéron, Euwe'), true)
+assert.equal(introductionText.includes('Centurini, Cheron, Euwe'), false)
+
+const positionOneTwo = boardContent(getBoard('1', '1.2'))
+assert.deepEqual(positionOneTwo.routes, [
+  {
+    meaning: 'Square of the pawn boundary as printed',
+    squares: ['a4', 'a8', 'e8', 'e4', 'a4'],
+    style: 'outline',
+  },
+])
+
+const positionOneTwentyFour = boardContent(getBoard('1', '1.24'))
+assert.equal(positionOneTwentyFour.subtitle, 'Kamsky - Bacrot')
+assert.equal(positionOneTwentyFour.caption, 'Sofía 2006')
+assert.equal(
+  release.units.find(({ boardNumber }) => boardNumber === '1.21')?.pdfPage,
+  43,
+)
+assert.equal(
+  release.units.find(({ boardNumber }) => boardNumber === '1.22')?.pdfPage,
+  43,
+)
+assert.equal(
+  release.units.find(({ boardNumber }) => boardNumber === '1.23')?.pdfPage,
+  43,
+)
+
 const positionOneSixteen = boardContent(getBoard('1', '1.16'))
 assert.equal(positionOneSixteen.fen, '8/8/8/p7/8/1k6/3K4/8 w - - 0 1')
 assert.deepEqual(markerSquares(positionOneSixteen), ['c2', 'c1'])
@@ -168,6 +210,26 @@ assert.equal(
   '1r6/8/8/8/1P1k4/K7/8/7R w - - 0 1',
 )
 replay(problemTwoTwenty.fen, ['Rh5'])
+
+const problemTwoTwentySix = boardContent(getBoard('2', '2.26'))
+assert.equal(
+  problemTwoTwentySix.fen,
+  '8/8/3Q1p2/1q1P4/3k4/3p4/8/2K5 b - - 0 1',
+)
+replay(problemTwoTwentySix.fen, [
+  'Qc5+',
+  'Qxc5+',
+  'Kxc5',
+  'Kd2',
+  'Kd6',
+  'Ke3',
+  'Ke5',
+  'Kd2',
+  'Kd6',
+  'Ke3',
+  'Kxd5',
+  'Kxd3',
+])
 
 const chapterThreeText = getPart('3').sections
   .map(textualContent)
@@ -230,10 +292,16 @@ function boardContent(section: RawChapterSection) {
       !Array.isArray(section.content),
   )
   return section.content as {
+    caption?: string
     fen: string
     markers?: Array<{ square: string }>
     number: string
-    routes?: Array<{ meaning: string; squares: string[] }>
+    routes?: Array<{
+      meaning: string
+      squares: string[]
+      style?: 'arrow' | 'line' | 'outline'
+    }>
+    subtitle?: string
   }
 }
 

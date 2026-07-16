@@ -50,11 +50,21 @@ const frontMatterMarkup = renderToStaticMarkup(
   />,
 )
 assert.match(frontMatterMarkup, /Jesús de la Villa/)
+assert.match(frontMatterMarkup, /Vital Lessons for Every Chess Player/)
 assert.match(frontMatterMarkup, /New In Chess, 2008/)
 assert.match(frontMatterMarkup, /© 2008 New In Chess/)
 assert.match(frontMatterMarkup, /New In Chess, Alkmaar, The Netherlands/)
 assert.match(frontMatterMarkup, /href="https:\/\/www\.newinchess\.com\/"/)
 assert.match(frontMatterMarkup, /All photos: New In Chess Archives\./)
+assert.match(frontMatterMarkup, /Steven Boland/)
+assert.match(frontMatterMarkup, /Patricia Llaneza Vega/)
+assert.match(frontMatterMarkup, /Steve Giddins/)
+assert.match(frontMatterMarkup, /Peter Boel/)
+assert.match(frontMatterMarkup, /René Olthof/)
+assert.match(frontMatterMarkup, /Anton Schermer/)
+assert.match(frontMatterMarkup, /Publisher&#x27;s description/)
+assert.match(frontMatterMarkup, /The good news about chess endgames is:/)
+assert.match(frontMatterMarkup, /Printed cover price: Games \/ Chess \$24\.95/)
 assert.doesNotMatch(frontMatterMarkup, /All rights reserved/)
 assert.match(frontMatterMarkup, /href="mailto:dcep93@gmail.com"/)
 assert.doesNotMatch(frontMatterMarkup, /38\.Kd7\+/)
@@ -62,6 +72,9 @@ assert.match(frontMatterMarkup, /Note on this digital edition/)
 assert.match(frontMatterMarkup, /Black to move\. Can he draw\?/)
 assert.match(frontMatterMarkup, /print page 233; PDF page 234/)
 assert.match(frontMatterMarkup, /href="\/book\/chapter14#p14\.29"/)
+assert.match(frontMatterMarkup, /href="\/book\/chapter12#p12\.18"/)
+assert.match(frontMatterMarkup, /href="\/book\/chapter12#p12\.6"/)
+assert.match(frontMatterMarkup, /href="\/book\/chapter12#p12\.29"/)
 assert.match(frontMatterMarkup, /href="\/book\/intro"/)
 assert.match(frontMatterMarkup, /href="\/book\/chapter1#e1"/)
 assert.match(frontMatterMarkup, /href="\/book\/bibliography"/)
@@ -121,6 +134,18 @@ const tableMarkup = renderToStaticMarkup(
 assert.match(tableMarkup, /<caption>Endgame statistics<\/caption>/)
 assert.match(tableMarkup, /<th scope="col">Type of ending<\/th>/)
 assert.match(tableMarkup, /<th scope="row">Rooks<\/th>/)
+const uncaptionedTableMarkup = renderToStaticMarkup(
+  <TableBlock
+    section={{
+      type: 'table',
+      content: {
+        columns: ['Type of ending', 'Games', '%'],
+        rows: [['Rooks', '320,548', '8.01']],
+      },
+    }}
+  />,
+)
+assert.doesNotMatch(uncaptionedTableMarkup, /<caption>/)
 
 const bibliographyMetaMarkup = renderToStaticMarkup(
   <ReaderMeta endingRange={null} positionCount={0} />,
