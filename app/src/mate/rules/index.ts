@@ -119,18 +119,34 @@ export function currentHint<Score>(
   return explainMove(candidates, rules)
 }
 
-const mateRuleSets = new Map<MateId, MateRuleSet<unknown>>()
+type MateRuleSetRegistration = {
+  readonly ruleSet: MateRuleSet<unknown>
+}
 
-export function registerMateRuleSet<Score>(ruleSet: MateRuleSet<Score>): void {
+const mateRuleSets = new Map<MateId, MateRuleSetRegistration>()
+
+export function registerMateRuleSet<Score>(
+  ruleSet: MateRuleSet<Score>,
+): () => void {
   // This is the registry's only type-erasure boundary. A score producer and its
   // matching rules remain bundled in the same rule-set contract at runtime.
-  mateRuleSets.set(ruleSet.id, ruleSet as unknown as MateRuleSet<unknown>)
+  const id = ruleSet.id
+  const registration = {
+    ruleSet: ruleSet as unknown as MateRuleSet<unknown>,
+  }
+  mateRuleSets.set(id, registration)
+
+  return () => {
+    if (mateRuleSets.get(id) === registration) {
+      mateRuleSets.delete(id)
+    }
+  }
 }
 
 export function getMateRuleSet(id: MateId): MateRuleSet<unknown> {
-  const ruleSet = mateRuleSets.get(id)
-  if (!ruleSet) {
+  const registration = mateRuleSets.get(id)
+  if (!registration) {
     throw new Error(`Mate rules not registered: ${id}`)
   }
-  return ruleSet
+  return registration.ruleSet
 }

@@ -167,7 +167,28 @@ test('rule sets integrate ordered rules with presentation-only help', () => {
     { square: 'e6', piece: 'B' },
     { square: 'c6', piece: 'N' },
   ])
+})
 
-  registerMateRuleSet(rookRuleSet)
-  assert.equal(getMateRuleSet('rook'), rookRuleSet)
+test('registration cleanup removes only its own registry entry', () => {
+  const unregisterFirst = registerMateRuleSet(rookRuleSet)
+  const unregisterReplacement = registerMateRuleSet(rookRuleSet)
+
+  try {
+    unregisterFirst()
+    assert.equal(getMateRuleSet('rook'), rookRuleSet)
+  } finally {
+    unregisterReplacement()
+  }
+
+  assert.throws(
+    () => getMateRuleSet('rook'),
+    new Error('Mate rules not registered: rook'),
+  )
+})
+
+test('registry cleanup leaves subsequent tests isolated', () => {
+  assert.throws(
+    () => getMateRuleSet('rook'),
+    new Error('Mate rules not registered: rook'),
+  )
 })
