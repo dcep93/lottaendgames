@@ -230,6 +230,28 @@ test('undo and redo operate on complete turns and new play truncates redo', () =
   assert.notEqual(replacementLine.fen, played.fen)
 })
 
+test('current logs and stored snapshots do not share mutable log objects', () => {
+  const deps = createDeps({
+    times: [1_000, 1_100],
+    randoms: [0],
+  })
+  const played = playWhiteMove(
+    createMateSession(
+      { mateId: 'rook', mode: 'standard' },
+      deps,
+    ),
+    'Ra8+',
+    deps,
+  )
+  const currentSnapshot = played.history[played.historyIndex]!
+
+  played.logs[0]!.reasonId = 'session-only mutation'
+  assert.equal(currentSnapshot.logs[0]?.reasonId, 'finish-net')
+
+  currentSnapshot.logs[0]!.reasonId = 'snapshot-only mutation'
+  assert.equal(played.logs[0]?.reasonId, 'session-only mutation')
+})
+
 test('Start Over ignores an exact-start override, generates anew, and has no reset counter', () => {
   const deps = createDeps({
     fens: [SECOND_START_FEN],
