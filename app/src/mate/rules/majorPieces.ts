@@ -30,6 +30,7 @@ import {
   getRookOneDimensionalBoxSize,
   isMajorPieceBetweenKings,
 } from './majorPieceGeometry'
+import { compareScoresByRules, selectIdealMoves } from './selection'
 import type {
   MateRuleSet,
   OpponentCandidates,
@@ -118,26 +119,6 @@ const rookHelp: RuleHelp = {
   noteBoards: [],
 }
 
-function compareByRules<Score>(
-  first: Score,
-  second: Score,
-  rules: readonly OrderedRule<Score>[],
-): number {
-  for (const rule of rules) {
-    if (
-      (rule.applies && !rule.applies(first)) ||
-      (rule.applies && !rule.applies(second))
-    ) {
-      continue
-    }
-    const comparison = rule.compare(first, second)
-    if (comparison !== 0) {
-      return comparison
-    }
-  }
-  return 0
-}
-
 function selectBestMoves<Score>(
   moves: readonly string[],
   scoreMove: (san: string) => Score,
@@ -157,45 +138,6 @@ function selectBestMoves<Score>(
   return scoredMoves
     .filter((candidate) => compareScores(candidate.score, bestScore) === 0)
     .map(({ san }) => san)
-}
-
-function selectBestMovesByRules<Score>(
-  moves: readonly string[],
-  scoreMove: (san: string) => Score,
-  rules: readonly OrderedRule<Score>[],
-): string[] {
-  let remaining = moves.map((san) => ({ san, score: scoreMove(san) }))
-
-  for (const rule of rules) {
-    const applicable = remaining.filter(
-      ({ score }) => rule.applies?.(score) ?? true,
-    )
-    const first = applicable[0]
-    if (!first) {
-      continue
-    }
-
-    let best = first
-    let tiedBest = [first]
-    for (const candidate of applicable.slice(1)) {
-      const comparison = rule.compare(candidate.score, best.score)
-      if (comparison < 0) {
-        best = candidate
-        tiedBest = [candidate]
-      } else if (comparison === 0) {
-        tiedBest.push(candidate)
-      }
-    }
-
-    const applicableSet = new Set(applicable)
-    const tiedBestSet = new Set(tiedBest)
-    remaining = remaining.filter(
-      (candidate) =>
-        !applicableSet.has(candidate) || tiedBestSet.has(candidate),
-    )
-  }
-
-  return remaining.map(({ san }) => san)
 }
 
 export function scoreQueenWhiteMove(
@@ -346,7 +288,7 @@ export function compareQueenWhiteScores(
   first: QueenWhiteMoveScore,
   second: QueenWhiteMoveScore,
 ): number {
-  return compareByRules(first, second, queenWhiteRules)
+  return compareScoresByRules(first, second, queenWhiteRules)
 }
 
 export function getIdealQueenWhiteMoves(fen: string): string[] {
@@ -355,11 +297,10 @@ export function getIdealQueenWhiteMoves(fen: string): string[] {
   if (chess.turn() !== 'w' || moves.length === 0) {
     return moves
   }
-  return selectBestMovesByRules(
-    moves,
-    (san) => scoreQueenWhiteMove(fen, san),
+  return [...selectIdealMoves(
+    moves.map((san) => ({ san, score: scoreQueenWhiteMove(fen, san) })),
     queenWhiteRules,
-  )
+  )]
 }
 
 export function scoreRookWhiteMove(
@@ -545,7 +486,7 @@ export function compareRookWhiteScores(
   first: RookWhiteMoveScore,
   second: RookWhiteMoveScore,
 ): number {
-  return compareByRules(first, second, rookWhiteRules)
+  return compareScoresByRules(first, second, rookWhiteRules)
 }
 
 export function getIdealRookWhiteMoves(fen: string): string[] {
@@ -554,11 +495,10 @@ export function getIdealRookWhiteMoves(fen: string): string[] {
   if (chess.turn() !== 'w' || moves.length === 0) {
     return moves
   }
-  return selectBestMovesByRules(
-    moves,
-    (san) => scoreRookWhiteMove(fen, san),
+  return [...selectIdealMoves(
+    moves.map((san) => ({ san, score: scoreRookWhiteMove(fen, san) })),
     rookWhiteRules,
-  )
+  )]
 }
 
 export function scoreQueenBlackMove(

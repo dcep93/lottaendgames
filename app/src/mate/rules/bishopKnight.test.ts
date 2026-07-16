@@ -9,7 +9,9 @@ import {
   transformSquare,
 } from '../chess'
 import {
+  compareScoresByRules,
   getIdealKnightAndBishopWhiteMoves,
+  getKnightAndBishopEstablishedZoneXKnightRouteTarget,
   getKnightAndBishopOpponentCandidates,
   getKnightAndBishopPhaseLabel,
   getKnightAndBishopLookupEntryResultFen,
@@ -25,12 +27,16 @@ import {
   knightAndBishopWhiteMoveReachesLookupPath,
   knightAndBishopWhiteRules,
   scoreKnightAndBishopWhiteMove,
+  selectIdealMoves,
   wManeuverSetupDistance,
 } from './index'
 import {
   BISHOP_KNIGHT_LOOKUP_ENTRIES,
   BISHOP_KNIGHT_PREPARE_STARTS,
 } from './bishopKnightData'
+import { sameSquareColor } from './bishopKnightGeometry'
+import { isKnightAndBishopBishopOppositionLoopShape } from './bishopKnightStrategy'
+import { knightAndBishopAllBlackRepliesPreserveZoneXSetup } from './bishopKnightZoneX'
 
 test('bishop-and-knight source data is an exact immutable snapshot', () => {
   assert.equal(BISHOP_KNIGHT_LOOKUP_ENTRIES.length, 119)
@@ -98,18 +104,64 @@ test('bishop-and-knight rules are registered', () => {
   const ruleSet = getMateRuleSet('bishop-knight')
   assert.equal(ruleSet.id, 'bishop-knight')
   assert.deepEqual(
-    ruleSet.whiteRuleDescriptions.map(({ id }) => id),
+    ruleSet.whiteRuleDescriptions,
     [
-      'mate',
-      'no stalemate',
-      'minors safe',
-      'enter mating net',
-      'key square pattern',
-      'prepare zone x',
-      'force zone x',
-      'bring king closer',
-      'bishop front',
-      'knight closer center',
+      {
+        id: 'mate',
+        shortLabel: 'mate',
+        helpText: 'Checkmate immediately when mate is available.',
+      },
+      {
+        id: 'no stalemate',
+        shortLabel: 'no stalemate',
+        helpText: 'Avoid stalemate.',
+      },
+      {
+        id: 'minors safe',
+        shortLabel: 'minors safe',
+        helpText: 'Keep pieces safe from capture.',
+      },
+      {
+        id: 'enter mating net',
+        shortLabel: 'enter mating net',
+        helpText:
+          '[mate] Follow the known knight-and-bishop mating net when it is available.',
+      },
+      {
+        id: 'key square pattern',
+        shortLabel: 'key square pattern',
+        helpText:
+          "[prepare] Reach the knight's key-square pattern when available.",
+      },
+      {
+        id: 'prepare zone x',
+        shortLabel: 'prepare zone x',
+        helpText:
+          "Prepare the knight's route into an established Zone X cage. Establish the bishop and knight geometry that prepares Zone X, preferring the setup with the closest pieces. Once the bishop and Zone X setup are established, move White's king toward Black's king; otherwise move the knight by the shortest path to its stable Zone X square.",
+      },
+      {
+        id: 'force zone x',
+        shortLabel: 'force zone x',
+        helpText: '[prepare] Force Black into Zone X when it is available.',
+      },
+      {
+        id: 'bring king closer',
+        shortLabel: 'bring king closer',
+        helpText:
+          "Keep White's king in the middle 16 squares while bringing it closer to Black's king and staying on the color opposite the bishop; when outside the middle 16, walk toward it first. The color rule can also yield when the two kings are two diagonal squares apart and the adjacent bishop is a knight move from Black's king. Do not increase the distance between the kings.",
+      },
+      {
+        id: 'bishop front',
+        shortLabel: 'bishop front',
+        helpText:
+          "Establish, maintain, or prepare the bishop on the square in front of White's king, between the kings.",
+      },
+      {
+        id: 'knight closer center',
+        shortLabel: 'knight closer center',
+        helpText:
+          "Avoid the bishop-opposition loop and keep the knight behind White's king relative to Black's king, then closer to White's king, then closer to the center, preferring squares farther from Black's king.",
+      },
     ],
   )
   assert.deepEqual(
@@ -150,7 +202,6 @@ test('bishop-and-knight rules are registered', () => {
     knightAndBishopWhiteRules.map(({ id }) => id),
     [
       'mate',
-      'enter mating net',
       'no stalemate',
       'minors safe',
       'enter mating net',
@@ -163,16 +214,78 @@ test('bishop-and-knight rules are registered', () => {
       'knight closer center',
       'bishop front',
       'knight closer center',
-      'knight closer center',
     ],
   )
-  const driftGate = knightAndBishopWhiteRules[8]?.stopWhenBest
+  assert.equal(knightAndBishopWhiteRules.length, 13)
+  const driftGate = knightAndBishopWhiteRules[7]?.stopWhenBest
   const driftScore = scoreKnightAndBishopWhiteMove(
     '8/8/8/3N4/8/1BK5/8/1k6 w - - 6 4',
     'Nb4',
   )
   assert.equal(driftGate?.(driftScore), true)
   assert.equal(driftGate?.({ ...driftScore, zoneXDriftScore: 99 }), false)
+})
+
+test('direct lookup is decisive while immediate mate keeps precedence', () => {
+  const ruleSet = getMateRuleSet('bishop-knight')
+  const lookupFen = '8/8/5KNk/5B2/8/8/8/8 w - - 34 18'
+  assert.deepEqual(getKnightAndBishopLookupWhiteMoves(lookupFen), ['Bg4'])
+  assert.deepEqual(ruleSet.idealWhiteMoves(lookupFen), ['Bg4'])
+  assert.equal(ruleSet.currentWhiteHint(lookupFen)?.id, 'enter mating net')
+  assert.equal(ruleSet.explainWhiteMove(lookupFen, 'Ke7')?.id, 'enter mating net')
+
+  const mateFen = 'k7/8/NK6/5B2/8/8/8/8 w - - 0 1'
+  assert.deepEqual(getKnightAndBishopLookupWhiteMoves(mateFen), ['Be4#'])
+  assert.deepEqual(ruleSet.idealWhiteMoves(mateFen), ['Be4#'])
+  assert.equal(ruleSet.currentWhiteHint(mateFen)?.id, 'mate')
+  assert.equal(ruleSet.explainWhiteMove(mateFen, 'Nb8')?.id, 'mate')
+})
+
+test('final grouped priority preserves source pair semantics without permutation sensitivity', () => {
+  const fen = '6K1/3N4/3k4/8/8/8/8/3B4 w - - 0 1'
+  const candidates = getChess(fen).moves().map((san) => ({
+    san,
+    score: scoreKnightAndBishopWhiteMove(fen, san),
+  }))
+  const finalRule = knightAndBishopWhiteRules.at(-1)!
+
+  for (const left of candidates) {
+    for (const right of candidates) {
+      const sourcePairComparison =
+        (left.score.movedPiece === 'n' && right.score.movedPiece === 'n'
+          ? left.score.knightWhiteKingDistance -
+            right.score.knightWhiteKingDistance
+          : 0) ||
+        left.score.knightCentralDistance - right.score.knightCentralDistance ||
+        right.score.knightBlackKingDistance -
+          left.score.knightBlackKingDistance
+      assert.equal(
+        compareScoresByRules(left.score, right.score, [finalRule]),
+        sourcePairComparison,
+        `${left.san} vs ${right.san}`,
+      )
+    }
+  }
+
+  const permutations = [
+    candidates,
+    [...candidates].reverse(),
+    ...candidates.map((_, index) => [
+      ...candidates.slice(index),
+      ...candidates.slice(0, index),
+    ]),
+  ]
+  for (const permutation of permutations) {
+    assert.deepEqual(
+      selectIdealMoves(permutation, knightAndBishopWhiteRules),
+      ['Nf6'],
+    )
+  }
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), ['Nf6'])
+  assert.equal(
+    getMateRuleSet('bishop-knight').explainWhiteMove(fen, 'Ba4')?.id,
+    'knight closer center',
+  )
 })
 
 test('all lookup moves survive every symmetry without transformed collisions', () => {
@@ -272,6 +385,46 @@ test('phase handoff requires a forced lookup path on the white turn', () => {
   ])
 })
 
+test('literal source key-square negatives preserve color and edge boundaries', () => {
+  const ruleSet = getMateRuleSet('bishop-knight')
+  const fixtures = [
+    {
+      fen: '8/8/4B3/7k/4NK2/8/8/8 w - - 22 12',
+      san: 'Kf5',
+      keySquarePatternScore: 2,
+      ideals: ['Bf5'],
+      hint: 'prepare zone x',
+      explanation: 'prepare zone x',
+    },
+    {
+      fen: '8/8/8/8/B7/1K6/N7/1k6 w - - 6 4',
+      san: 'Ka3',
+      keySquarePatternScore: 2,
+      ideals: ['Nb4'],
+      hint: 'knight closer center',
+      explanation: 'bring king closer',
+    },
+  ] as const
+
+  assert.equal(sameSquareColor('g4', 'e6'), true)
+  assert.equal(sameSquareColor('g5', 'e6'), false)
+  for (const fixture of fixtures) {
+    assert.equal(
+      scoreKnightAndBishopWhiteMove(fixture.fen, fixture.san)
+        .keySquarePatternScore,
+      fixture.keySquarePatternScore,
+      fixture.fen,
+    )
+    assert.deepEqual(ruleSet.idealWhiteMoves(fixture.fen), fixture.ideals)
+    assert.equal(getKnightAndBishopPhaseLabel(fixture.fen), '1/2')
+    assert.equal(ruleSet.currentWhiteHint(fixture.fen)?.id, fixture.hint)
+    assert.equal(
+      ruleSet.explainWhiteMove(fixture.fen, fixture.san)?.id,
+      fixture.explanation,
+    )
+  }
+})
+
 test('Zone X geometry, establishment, drift, and forcing match source fixtures', () => {
   assert.deepEqual(
     getKnightAndBishopZone5(
@@ -328,6 +481,114 @@ test('Zone X geometry, establishment, drift, and forcing match source fixtures',
   assert.deepEqual(getIdealKnightAndBishopWhiteMoves(forceFen), ['Kd5'])
 })
 
+test('literal Zone X preparation and preservation corpus keeps positive and negative branches', () => {
+  const ruleSet = getMateRuleSet('bishop-knight')
+  const establishFen = '8/8/4B3/7k/4NK2/8/8/8 w - - 22 12'
+  const established = getChess(establishFen)
+  established.move('Bf5')
+  const setup = {
+    bishopSquare: 'f5',
+    blackAnchorSquares: ['g5', 'h4', 'h5', 'h6'],
+    stableKnightSquares: ['f3', 'f7'],
+  } as const
+  assert.deepEqual(getKnightAndBishopZoneXSetup(established.fen()), setup)
+  assert.equal(
+    knightAndBishopAllBlackRepliesPreserveZoneXSetup(established.fen(), setup),
+    true,
+  )
+  assert.deepEqual(ruleSet.idealWhiteMoves(establishFen), ['Bf5'])
+  assert.equal(ruleSet.currentWhiteHint(establishFen)?.id, 'prepare zone x')
+  assert.equal(ruleSet.explainWhiteMove(establishFen, 'Bf5')?.id, 'prepare zone x')
+  assert.equal(
+    scoreKnightAndBishopWhiteMove(establishFen, 'Bf5').zoneXPrepareScore,
+    0,
+  )
+  assert.equal(
+    scoreKnightAndBishopWhiteMove(establishFen, 'Bg4+').zoneXPrepareScore,
+    99,
+  )
+  assert.equal(
+    ruleSet.explainWhiteMove(establishFen, 'Bg4+')?.id,
+    'prepare zone x',
+  )
+
+  const escapingFen = '8/8/8/6k1/3KB3/4N3/8/8 w - - 20 11'
+  const escaping = getChess(escapingFen)
+  escaping.move('Bf5')
+  assert.deepEqual(getKnightAndBishopZoneXSetup(escaping.fen()), setup)
+  assert.equal(
+    knightAndBishopAllBlackRepliesPreserveZoneXSetup(escaping.fen(), setup),
+    false,
+  )
+  assert.equal(
+    scoreKnightAndBishopWhiteMove(escapingFen, 'Bf5').zoneXPrepareScore,
+    99,
+  )
+  assert.deepEqual(ruleSet.idealWhiteMoves(escapingFen), ['Ke5'])
+  assert.equal(ruleSet.currentWhiteHint(escapingFen)?.id, 'bring king closer')
+
+  const routeFixtures = [
+    {
+      fen: '8/8/8/8/2N5/2K5/k1B5/8 w - - 14 8',
+      target: 'b3',
+      san: 'Nd2',
+      routeScore: 1,
+      ideals: ['Nd2'],
+    },
+    {
+      fen: '8/8/8/8/8/2K5/2BN4/k7 w - - 20 11',
+      target: 'b3',
+      san: 'Nb3+',
+      routeScore: 0,
+      ideals: ['Nb3+'],
+    },
+    {
+      fen: '8/8/8/8/5N2/5K2/5B1k/8 w - - 14 8',
+      target: 'g3',
+      san: 'Ne2',
+      routeScore: 1,
+      ideals: ['Ne2'],
+    },
+  ] as const
+  for (const fixture of routeFixtures) {
+    assert.equal(
+      getKnightAndBishopEstablishedZoneXKnightRouteTarget(fixture.fen),
+      fixture.target,
+    )
+    assert.equal(
+      scoreKnightAndBishopWhiteMove(fixture.fen, fixture.san)
+        .zoneXEstablishedKnightRouteScore,
+      fixture.routeScore,
+    )
+    assert.deepEqual(ruleSet.idealWhiteMoves(fixture.fen), fixture.ideals)
+    assert.equal(getKnightAndBishopPhaseLabel(fixture.fen), '1/2')
+    assert.equal(ruleSet.currentWhiteHint(fixture.fen)?.id, 'prepare zone x')
+    assert.equal(
+      ruleSet.explainWhiteMove(fixture.fen, fixture.san)?.id,
+      'prepare zone x',
+    )
+  }
+
+  const routeNegativeFen = '8/8/8/8/2N5/2K5/k1B5/8 w - - 14 8'
+  assert.equal(
+    scoreKnightAndBishopWhiteMove(routeNegativeFen, 'Na5')
+      .zoneXEstablishedKnightRouteScore,
+    99,
+  )
+  assert.equal(
+    scoreKnightAndBishopWhiteMove(routeNegativeFen, 'Kd2').zoneXEntryScore,
+    0,
+  )
+
+  const prepareStarFen = '8/4k3/4B3/4K3/8/2N5/8/8 w - - 0 1'
+  assert.equal(
+    scoreKnightAndBishopWhiteMove(prepareStarFen, 'Nd5+').zoneXPrepareScore,
+    2,
+  )
+  assert.deepEqual(ruleSet.idealWhiteMoves(prepareStarFen), ['Nd5+'])
+  assert.equal(ruleSet.currentWhiteHint(prepareStarFen)?.id, 'prepare zone x')
+})
+
 test('king, bishop-front, and knight priorities retain literal source scores', () => {
   const kingFen = '8/8/8/3NK3/2k5/2B5/8/8 w - - 72 37'
   assert.equal(
@@ -374,6 +635,210 @@ test('king, bishop-front, and knight priorities retain literal source scores', (
   )
 })
 
+test('literal later-priority corpus pins scores, ideals, phases, and reasons', () => {
+  const ruleSet = getMateRuleSet('bishop-knight')
+  const positions = [
+    {
+      fen: '8/8/8/B7/3k1N2/5K2/8/8 w - - 36 19',
+      ideals: ['Ng2'],
+      hint: 'knight closer center',
+    },
+    {
+      fen: '8/8/8/2N1B3/4K3/8/3k4/8 w - - 12 7',
+      ideals: ['Ne6'],
+      hint: 'knight closer center',
+    },
+    {
+      fen: '8/8/8/3KB3/1k6/4N3/8/8 w - - 32 17',
+      ideals: ['Nf5'],
+      hint: 'knight closer center',
+    },
+    {
+      fen: '8/4k3/8/8/4K3/2B5/N7/8 w - - 0 1',
+      ideals: ['Kd5', 'Kf5'],
+      hint: 'bring king closer',
+    },
+    {
+      fen: '8/8/8/2N1B3/4K3/8/2k5/8 w - - 18 10',
+      ideals: ['Ne6'],
+      hint: 'knight closer center',
+    },
+    {
+      fen: '8/8/2K5/2B5/N3k3/8/8/8 w - - 46 24',
+      ideals: ['Kd6'],
+      hint: 'bring king closer',
+    },
+    {
+      fen: '8/8/8/1k1N4/3BK3/8/8/8 w - - 14 8',
+      ideals: ['Kd3'],
+      hint: 'bring king closer',
+    },
+    {
+      fen: '8/8/5k2/8/5BK1/8/3N4/8 w - - 24 13',
+      ideals: ['Kf3'],
+      hint: 'key square pattern',
+    },
+    {
+      fen: '8/8/4B3/1k6/2N5/2K5/8/8 w - - 2 2',
+      ideals: ['Nd2'],
+      hint: 'knight closer center',
+    },
+  ] as const
+  for (const position of positions) {
+    assert.deepEqual(ruleSet.idealWhiteMoves(position.fen), position.ideals)
+    assert.equal(getKnightAndBishopPhaseLabel(position.fen), '1/2')
+    assert.equal(ruleSet.currentWhiteHint(position.fen)?.id, position.hint)
+    for (const ideal of position.ideals) {
+      assert.equal(
+        ruleSet.explainWhiteMove(position.fen, ideal)?.id,
+        position.hint,
+      )
+    }
+  }
+
+  const preparationFen = positions[0].fen
+  assert.equal(
+    scoreKnightAndBishopWhiteMove(preparationFen, 'Bb6+')
+      .bishopFrontPreparationScore,
+    0,
+  )
+  assert.equal(
+    scoreKnightAndBishopWhiteMove(preparationFen, 'Ne6+')
+      .bishopFrontPreparationScore,
+    99,
+  )
+  assert.equal(
+    ruleSet.explainWhiteMove(preparationFen, 'Bb6+')?.id,
+    'knight closer center',
+  )
+
+  const frontSquareFen = positions[1].fen
+  assert.equal(
+    scoreKnightAndBishopWhiteMove(frontSquareFen, 'Bd4')
+      .bishopFrontPreparationScore,
+    0,
+  )
+  assert.equal(
+    scoreKnightAndBishopWhiteMove(frontSquareFen, 'Bf4+')
+      .bishopFrontPreparationScore,
+    0,
+  )
+  assert.equal(
+    scoreKnightAndBishopWhiteMove(frontSquareFen, 'Ne6')
+      .bishopFrontPreparationScore,
+    99,
+  )
+
+  const bishopDistanceFen = positions[2].fen
+  assert.equal(
+    scoreKnightAndBishopWhiteMove(bishopDistanceFen, 'Bd6+')
+      .bishopBlackKingDistance,
+    4,
+  )
+  assert.equal(
+    scoreKnightAndBishopWhiteMove(bishopDistanceFen, 'Bd4')
+      .bishopBlackKingDistance,
+    2,
+  )
+
+  const bishopFrontFen = positions[3].fen
+  assert.equal(
+    scoreKnightAndBishopWhiteMove(bishopFrontFen, 'Be5').bishopInFrontScore,
+    0,
+  )
+  assert.equal(
+    scoreKnightAndBishopWhiteMove(bishopFrontFen, 'Kd5').bishopInFrontScore,
+    1,
+  )
+
+  const regressionFen = positions[4].fen
+  assert.equal(
+    scoreKnightAndBishopWhiteMove(regressionFen, 'Bd4')
+      .kingDistanceRegressionScore,
+    0,
+  )
+  assert.equal(
+    scoreKnightAndBishopWhiteMove(regressionFen, 'Kf5')
+      .kingDistanceRegressionScore,
+    10,
+  )
+  assert.equal(
+    ruleSet.explainWhiteMove(regressionFen, 'Kf5')?.id,
+    'bring king closer',
+  )
+
+  const diagonalFen = positions[5].fen
+  assert.equal(
+    scoreKnightAndBishopWhiteMove(diagonalFen, 'Kd6')
+      .kingCloserOppositeBishopScore,
+    5,
+  )
+
+  const maintainFrontFen = positions[6].fen
+  assert.equal(
+    scoreKnightAndBishopWhiteMove(maintainFrontFen, 'Ne3').bishopInFrontScore,
+    0,
+  )
+
+  const oppositionFen = positions[7].fen
+  assert.equal(isKnightAndBishopBishopOppositionLoopShape(oppositionFen), true)
+  const bishopLoop = scoreKnightAndBishopWhiteMove(oppositionFen, 'Bg5+')
+  assert.equal(bishopLoop.bishopOppositionLoopScore, 1)
+  assert.equal(bishopLoop.bishopInFrontScore, 1)
+  assert.equal(
+    scoreKnightAndBishopWhiteMove(oppositionFen, 'Nf3')
+      .bishopOppositionLoopScore,
+    0,
+  )
+
+  const knightOrderingFen = '8/8/8/8/1B1k4/N4K2/8/8 w - - 12 7'
+  assert.equal(
+    scoreKnightAndBishopWhiteMove(knightOrderingFen, 'Nc2+')
+      .knightWhiteKingDistance,
+    3,
+  )
+  assert.equal(
+    scoreKnightAndBishopWhiteMove(knightOrderingFen, 'Nb5+')
+      .knightWhiteKingDistance,
+    4,
+  )
+  assert.equal(
+    scoreKnightAndBishopWhiteMove(knightOrderingFen, 'Nb1')
+      .knightCentralDistance,
+    5,
+  )
+
+  const knightTieFen = '8/8/8/8/8/B7/5K2/1N5k w - - 0 1'
+  const nc3 = scoreKnightAndBishopWhiteMove(knightTieFen, 'Nc3')
+  const nd2 = scoreKnightAndBishopWhiteMove(knightTieFen, 'Nd2')
+  assert.equal(nc3.knightCentralDistance, 2)
+  assert.equal(nd2.knightCentralDistance, 2)
+  assert.equal(nc3.knightBlackKingDistance, 7)
+  assert.equal(nd2.knightBlackKingDistance, 5)
+
+  const behindFen = '8/8/8/3k4/4N3/5K2/8/B7 w - - 14 8'
+  assert.equal(
+    scoreKnightAndBishopWhiteMove(behindFen, 'Nc5')
+      .knightBehindWhiteKingScore,
+    1,
+  )
+  assert.equal(
+    scoreKnightAndBishopWhiteMove(behindFen, 'Bc3')
+      .knightBehindWhiteKingScore,
+    1,
+  )
+  assert.equal(
+    scoreKnightAndBishopWhiteMove(behindFen, 'Ng3')
+      .knightBehindWhiteKingScore,
+    0,
+  )
+  assert.equal(
+    scoreKnightAndBishopWhiteMove(behindFen, 'Nf2')
+      .knightBehindWhiteKingScore,
+    0,
+  )
+})
+
 test('wrong moves explain the first rule that prefers a better move', () => {
   const fen = '8/4k3/4B3/4K3/1N6/8/8/8 w - - 0 1'
   const ruleSet = getMateRuleSet('bishop-knight')
@@ -409,6 +874,118 @@ test('forced lookup re-entry holes remain in the mating net', () => {
     const candidates = getKnightAndBishopOpponentCandidates(chess.fen())
     assert.deepEqual(candidates.idealMoves, candidates.moves, chess.fen())
   }
+})
+
+test('literal lookup collision and re-entry branches preserve source choices and phases', () => {
+  const ruleSet = getMateRuleSet('bishop-knight')
+  const collisionFen = 'k7/1N3B2/1K6/8/8/8/8/8 w - - 0 1'
+  assert.deepEqual(getKnightAndBishopLookupWhiteMoves(collisionFen), ['Be6'])
+  assert.deepEqual(ruleSet.idealWhiteMoves(collisionFen), ['Be6'])
+  assert.equal(getKnightAndBishopPhaseLabel(collisionFen), '2/2')
+  assert.equal(ruleSet.currentWhiteHint(collisionFen)?.id, 'enter mating net')
+  const collision = getChess(collisionFen)
+  collision.move('Be6')
+  assert.deepEqual(
+    getKnightAndBishopOpponentCandidates(collision.fen()).idealMoves,
+    ['Kb8'],
+  )
+
+  const branches = [
+    {
+      fen: '2k5/3N3B/3K4/8/8/8/8/8 w - - 0 1',
+      line: [
+        'Nc5',
+        'Kb8',
+        'Kc6',
+        'Kc8',
+        'Nb7',
+        'Kb8',
+        'Kb6',
+        'Kc8',
+        'Bf5+',
+        'Kb8',
+        'Nc5',
+        'Ka8',
+        'Be6',
+        'Kb8',
+        'Na6+',
+        'Ka8',
+        'Bd5#',
+      ],
+    },
+    {
+      fen: '2k5/8/3K2B1/2N5/8/8/8/8 w - - 60 31',
+      line: [
+        'Bf7',
+        'Kb8',
+        'Be6',
+        'Ka7',
+        'Kc7',
+        'Ka8',
+        'Kb6',
+        'Kb8',
+        'Na6+',
+        'Ka8',
+        'Bd5#',
+      ],
+    },
+    {
+      fen: '8/1k1N4/4K3/8/8/3B4/8/8 w - - 56 29',
+      line: ['Kd6', 'Kc8', 'Be4', 'Kd8', 'Bg6', 'Kc8'],
+    },
+    {
+      fen: '8/3N4/2k1K3/8/8/3B4/8/8 w - - 56 29',
+      line: ['Bc4', 'Kb7', 'Kd6', 'Ka8'],
+    },
+    {
+      fen: '8/k2N4/4K3/8/8/3B4/8/8 w - - 56 29',
+      line: ['Kd6', 'Ka8', 'Kc6', 'Ka7', 'Bc4', 'Ka8'],
+    },
+  ] as const
+
+  let assertedWhitePlies = 0
+  let assertedBlackPlies = 0
+  for (const branch of branches) {
+    const chess = getChess(branch.fen)
+    for (const san of branch.line) {
+      const fen = chess.fen()
+      if (chess.turn() === 'w') {
+        const after = getChess(fen)
+        after.move(san)
+        const mate = after.isCheckmate()
+        if (!mate) {
+          assert.deepEqual(
+            getKnightAndBishopLookupWhiteMoves(fen),
+            [san],
+            fen,
+          )
+        }
+        assert.deepEqual(ruleSet.idealWhiteMoves(fen), [san], fen)
+        assert.equal(getKnightAndBishopPhaseLabel(fen), '2/2', fen)
+        assert.equal(
+          ruleSet.currentWhiteHint(fen)?.id,
+          mate ? 'mate' : 'enter mating net',
+          fen,
+        )
+        assert.equal(
+          ruleSet.explainWhiteMove(fen, san)?.id,
+          mate ? 'mate' : 'enter mating net',
+          fen,
+        )
+        assertedWhitePlies += 1
+      } else {
+        assert.ok(
+          getKnightAndBishopOpponentCandidates(fen).idealMoves.includes(san),
+          `${san} from ${fen}`,
+        )
+        assert.equal(getKnightAndBishopPhaseLabel(fen), '1/2', fen)
+        assertedBlackPlies += 1
+      }
+      chess.move(san)
+    }
+  }
+  assert.equal(assertedWhitePlies, 23)
+  assert.equal(assertedBlackPlies, 21)
 })
 
 test('canonical Train lookup line preserves White choices and Black resistance', () => {

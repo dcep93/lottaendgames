@@ -36,12 +36,14 @@ import {
   getKnightAndBishopZoneXEntryScore,
   getKnightAndBishopZoneXPrepareScore,
 } from './bishopKnightZoneX'
+import { compareScoresByRules, selectIdealMoves } from './selection'
 import type {
   MateRuleSet,
   OpponentCandidates,
   OrderedRule,
   RuleHelp,
   ScoredMove,
+  WhiteMoveOverride,
 } from './types'
 
 export type KnightAndBishopWhiteMoveScore = {
@@ -49,7 +51,6 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly stalemateScore: number
   readonly pieceSafetyScore: number
   readonly phaseTwoEntryScore: number
-  readonly lookupOverride: boolean
   readonly keySquarePatternScore: number
   readonly zoneXEstablishedKnightRouteScore: number
   readonly zoneXEntryScore: number
@@ -135,10 +136,9 @@ function distanceToNearestUnprotectedKnightOrBishop(fen: string): number {
     : 99
 }
 
-function scoreKnightAndBishopWhiteMoveWithLookup(
+function scoreKnightAndBishopWhiteMoveCore(
   fen: string,
   san: string,
-  lookupMoves: readonly string[],
 ): KnightAndBishopWhiteMoveScore {
   const chess = getChess(fen)
   const move = chess.move(san)
@@ -152,7 +152,6 @@ function scoreKnightAndBishopWhiteMoveWithLookup(
     phaseTwoEntryScore: knightAndBishopWhiteMoveReachesLookupPath(fen, san)
       ? 0
       : 1,
-    lookupOverride: lookupMoves.includes(san),
     keySquarePatternScore: knightAndBishopKingApproachesMiddle16(
       fen,
       resultFen,
@@ -213,11 +212,34 @@ export function scoreKnightAndBishopWhiteMove(
   fen: string,
   san: string,
 ): KnightAndBishopWhiteMoveScore {
-  return scoreKnightAndBishopWhiteMoveWithLookup(
-    fen,
-    san,
-    getKnightAndBishopLookupWhiteMoves(fen),
-  )
+  return scoreKnightAndBishopWhiteMoveCore(fen, san)
+}
+
+const ENTER_MATING_NET_HELP =
+  '[mate] Follow the known knight-and-bishop mating net when it is available.'
+const PREPARE_ZONE_X_HELP =
+  "Prepare the knight's route into an established Zone X cage. Establish the bishop and knight geometry that prepares Zone X, preferring the setup with the closest pieces. Once the bishop and Zone X setup are established, move White's king toward Black's king; otherwise move the knight by the shortest path to its stable Zone X square."
+const BRING_KING_CLOSER_HELP =
+  "Keep White's king in the middle 16 squares while bringing it closer to Black's king and staying on the color opposite the bishop; when outside the middle 16, walk toward it first. The color rule can also yield when the two kings are two diagonal squares apart and the adjacent bishop is a knight move from Black's king. Do not increase the distance between the kings."
+const KNIGHT_CLOSER_CENTER_HELP =
+  "Avoid the bishop-opposition loop and keep the knight behind White's king relative to Black's king, then closer to White's king, then closer to the center, preferring squares farther from Black's king."
+
+const bishopKnightWhiteMoveOverride: WhiteMoveOverride = {
+  description: {
+    id: 'enter mating net',
+    shortLabel: 'enter mating net',
+    helpText: ENTER_MATING_NET_HELP,
+  },
+  guideOrder: 3,
+  select: (fen, legalMoves) => {
+    if (getImmediateMateMoves(fen, [...legalMoves]).length > 0) {
+      return { active: false }
+    }
+    const lookupMoves = getKnightAndBishopLookupWhiteMoves(fen)
+    return lookupMoves.length > 0
+      ? { active: true, moves: lookupMoves }
+      : { active: false }
+  },
 }
 
 export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhiteMoveScore>[] = [
@@ -228,15 +250,6 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     helpText: 'Checkmate immediately when mate is available.',
     stopWhenBest: (score) => score.mateScore === 0,
     compare: (first, second) => first.mateScore - second.mateScore,
-  },
-  {
-    id: 'enter mating net',
-    shortLabel: 'enter mating net',
-    guideOrder: 3,
-    helpText: '[mate] Follow the known knight-and-bishop mating net when it is available.',
-    stopWhenBest: (score) => score.lookupOverride,
-    compare: (first, second) =>
-      Number(second.lookupOverride) - Number(first.lookupOverride),
   },
   {
     id: 'no stalemate',
@@ -256,7 +269,7 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     id: 'enter mating net',
     shortLabel: 'enter mating net',
     guideOrder: 3,
-    helpText: '[mate] Follow the known knight-and-bishop mating net when it is available.',
+    helpText: ENTER_MATING_NET_HELP,
     compare: (first, second) =>
       first.phaseTwoEntryScore - second.phaseTwoEntryScore,
   },
@@ -273,7 +286,7 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     id: 'prepare zone x',
     shortLabel: 'prepare zone x',
     guideOrder: 5,
-    helpText: "Prepare the knight's route into an established Zone X cage.",
+    helpText: PREPARE_ZONE_X_HELP,
     compare: (first, second) =>
       first.zoneXEstablishedKnightRouteScore -
       second.zoneXEstablishedKnightRouteScore,
@@ -289,7 +302,7 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
   {
     id: 'prepare zone x',
     shortLabel: 'prepare zone x',
-    helpText: 'Establish the bishop and knight geometry that prepares Zone X.',
+    helpText: PREPARE_ZONE_X_HELP,
     compare: (first, second) =>
       first.zoneXPrepareScore - second.zoneXPrepareScore ||
       first.zoneXPreparePieceProximity - second.zoneXPreparePieceProximity,
@@ -299,8 +312,7 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     id: 'bring king closer',
     shortLabel: 'bring king closer',
     guideOrder: 7,
-    helpText:
-      "Keep White's king in the middle 16 squares while bringing it closer to Black's king and staying on the color opposite the bishop; when outside the middle 16, walk toward it first. The color rule can also yield when the two kings are two diagonal squares apart and the adjacent bishop is a knight move from Black's king.",
+    helpText: BRING_KING_CLOSER_HELP,
     compare: (first, second) =>
       first.kingCloserOppositeBishopScore -
       second.kingCloserOppositeBishopScore,
@@ -308,7 +320,7 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
   {
     id: 'bring king closer',
     shortLabel: 'bring king closer',
-    helpText: "Do not increase the distance between White's king and Black's king.",
+    helpText: BRING_KING_CLOSER_HELP,
     compare: (first, second) =>
       first.kingDistanceRegressionScore -
       second.kingDistanceRegressionScore,
@@ -317,7 +329,7 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     id: 'knight closer center',
     shortLabel: 'knight closer center',
     guideOrder: 9,
-    helpText: "Keep the knight behind White's king relative to Black's king.",
+    helpText: KNIGHT_CLOSER_CENTER_HELP,
     compare: (first, second) =>
       first.bishopOppositionLoopScore - second.bishopOppositionLoopScore ||
       first.knightBehindWhiteKingScore - second.knightBehindWhiteKingScore,
@@ -337,19 +349,20 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     id: 'knight closer center',
     shortLabel: 'knight closer center',
     guideOrder: 9,
-    helpText: "Keep the knight closer to White's king, then the center, while preferring squares farther from Black's king.",
-    applies: (score) => score.movedPiece === 'n',
-    compare: (first, second) =>
-      first.knightWhiteKingDistance - second.knightWhiteKingDistance,
-  },
-  {
-    id: 'knight closer center',
-    shortLabel: 'knight closer center',
-    guideOrder: 9,
-    helpText: "Keep the knight closer to White's king, then the center, while preferring squares farther from Black's king.",
-    compare: (first, second) =>
-      first.knightCentralDistance - second.knightCentralDistance ||
-      second.knightBlackKingDistance - first.knightBlackKingDistance,
+    helpText: KNIGHT_CLOSER_CENTER_HELP,
+    subpriorities: [
+      {
+        when: (scores) =>
+          scores.every(({ movedPiece }) => movedPiece === 'n'),
+        compare: (first, second) =>
+          first.knightWhiteKingDistance - second.knightWhiteKingDistance,
+      },
+      {
+        compare: (first, second) =>
+          first.knightCentralDistance - second.knightCentralDistance ||
+          second.knightBlackKingDistance - first.knightBlackKingDistance,
+      },
+    ],
   },
 ]
 
@@ -357,102 +370,17 @@ export function compareKnightAndBishopWhiteScores(
   first: KnightAndBishopWhiteMoveScore,
   second: KnightAndBishopWhiteMoveScore,
 ): number {
-  for (const rule of knightAndBishopWhiteRules) {
-    if (
-      (rule.applies && !rule.applies(first)) ||
-      (rule.applies && !rule.applies(second))
-    ) {
-      continue
-    }
-    const comparison = rule.compare(first, second)
-    if (comparison !== 0) return comparison
-    if (rule.stopWhenBest?.(first) && rule.stopWhenBest(second)) return 0
-  }
-  return 0
+  return compareScoresByRules(first, second, knightAndBishopWhiteRules)
 }
 
 function scoreWhiteCandidates(
   fen: string,
   moves: readonly string[],
 ): readonly ScoredMove<KnightAndBishopWhiteMoveScore>[] {
-  const mateMoves = getImmediateMateMoves(fen, [...moves])
-  const lookupMoves =
-    mateMoves.length > 0 ? [] : getKnightAndBishopLookupWhiteMoves(fen)
-  if (mateMoves.length > 0 || lookupMoves.length > 0) {
-    return moves.map((san) => {
-      const chess = getChess(fen)
-      chess.move(san)
-      const mateScore = chess.isCheckmate() ? 0 : 1
-      return {
-        san,
-        score: {
-          mateScore,
-          stalemateScore: 0,
-          pieceSafetyScore: 0,
-          phaseTwoEntryScore: 0,
-          lookupOverride: lookupMoves.includes(san),
-          keySquarePatternScore: 0,
-          zoneXEstablishedKnightRouteScore: 0,
-          zoneXEntryScore: 0,
-          zoneXPrepareScore: 0,
-          zoneXPreparePieceProximity: 0,
-          zoneXDriftScore: 99,
-          kingCloserOppositeBishopScore: 0,
-          kingDistanceRegressionScore: 0,
-          bishopOppositionLoopScore: 0,
-          knightBehindWhiteKingScore: 0,
-          bishopInFrontScore: 0,
-          bishopFrontPreparationScore: 0,
-          bishopBlackKingDistance: 0,
-          movedPiece: undefined,
-          knightWhiteKingDistance: 0,
-          knightCentralDistance: 0,
-          knightBlackKingDistance: 0,
-        },
-      }
-    })
-  }
   return moves.map((san) => ({
     san,
-    score: scoreKnightAndBishopWhiteMoveWithLookup(fen, san, lookupMoves),
+    score: scoreKnightAndBishopWhiteMoveCore(fen, san),
   }))
-}
-
-function selectIdealWhiteCandidates(
-  candidates: readonly ScoredMove<KnightAndBishopWhiteMoveScore>[],
-): readonly ScoredMove<KnightAndBishopWhiteMoveScore>[] {
-  let remaining = [...candidates]
-  for (const rule of knightAndBishopWhiteRules) {
-    const applicable = remaining.filter(
-      ({ score }) => rule.applies?.(score) ?? true,
-    )
-    const first = applicable[0]
-    if (!first) continue
-    let best = first
-    let tiedBest = [first]
-    for (const candidate of applicable.slice(1)) {
-      const comparison = rule.compare(candidate.score, best.score)
-      if (comparison < 0) {
-        best = candidate
-        tiedBest = [candidate]
-      } else if (comparison === 0) {
-        tiedBest.push(candidate)
-      }
-    }
-    const applicableSet = new Set(applicable)
-    const tied = new Set(tiedBest)
-    remaining = remaining.filter(
-      (candidate) => !applicableSet.has(candidate) || tied.has(candidate),
-    )
-    if (
-      rule.stopWhenBest &&
-      remaining.length > 0 &&
-      remaining.every(({ score }) => rule.stopWhenBest?.(score))
-    ) {
-      break
-    }
-  }
-  return remaining
 }
 
 export function getIdealKnightAndBishopWhiteMoves(fen: string): string[] {
@@ -462,9 +390,10 @@ export function getIdealKnightAndBishopWhiteMoves(fen: string): string[] {
   if (mateMoves.length > 0) return mateMoves
   const lookupMoves = getKnightAndBishopLookupWhiteMoves(fen)
   if (lookupMoves.length > 0) return lookupMoves
-  return selectIdealWhiteCandidates(scoreWhiteCandidates(fen, moves)).map(
-    ({ san }) => san,
-  )
+  return [...selectIdealMoves(
+    scoreWhiteCandidates(fen, moves),
+    knightAndBishopWhiteRules,
+  )]
 }
 
 export function scoreKnightAndBishopOpponentPosition(
@@ -631,6 +560,7 @@ export const bishopKnightRuleSet: MateRuleSet<KnightAndBishopWhiteMoveScore> = {
   phase: getKnightAndBishopPhaseLabel,
   scoreWhite: scoreKnightAndBishopWhiteMove,
   scoreWhiteCandidates,
+  whiteMoveOverride: bishopKnightWhiteMoveOverride,
   whiteRules: knightAndBishopWhiteRules,
   whiteMoves: whiteLegalMoves,
   blackCandidates: getKnightAndBishopOpponentCandidates,

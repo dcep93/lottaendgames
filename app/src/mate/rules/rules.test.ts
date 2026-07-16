@@ -17,6 +17,7 @@ import type {
   RegisteredMateRuleSet,
   RuleHelp,
   ScoredMove,
+  WhiteMoveOverride,
 } from './types'
 
 type TestScore = {
@@ -350,6 +351,266 @@ test('registered rule sets may prepare a pure candidate score batch', () => {
   } finally {
     unregister()
   }
+})
+
+test('a decisive move override preserves its ordered legal subset and explains every rejected move', () => {
+  let batchCalls = 0
+  const lookupDescription = {
+    id: 'enter mating net',
+    shortLabel: 'enter mating net',
+    helpText: 'Follow the known mating net.',
+  }
+  const lookupOverride: WhiteMoveOverride = {
+    description: lookupDescription,
+    guideOrder: 1,
+    select: (_fen, legalMoves) => {
+      assert.equal(Object.isFrozen(legalMoves), true)
+      return {
+        active: true,
+        moves: [legalMoves[1]!, legalMoves[0]!],
+      }
+    },
+  }
+  const overrideRuleSet: MateRuleSet<TestScore> = {
+    ...rookRuleSet,
+    id: 'bishop-knight',
+    whiteMoveOverride: lookupOverride,
+    scoreWhiteCandidates: () => {
+      batchCalls += 1
+      return candidates
+    },
+  }
+  const unregister = registerMateRuleSet(overrideRuleSet)
+
+  try {
+    const registered = getMateRuleSet('bishop-knight')
+    assert.deepEqual(registered.idealWhiteMoves('fen'), ['Kb2', 'Ka2'])
+    assert.equal(batchCalls, 0)
+    assert.deepEqual(registered.currentWhiteHint('fen'), lookupDescription)
+    assert.deepEqual(
+      registered.explainWhiteMove('fen', 'Kb2'),
+      lookupDescription,
+    )
+    assert.deepEqual(
+      registered.explainWhiteMove('fen', 'Kh1'),
+      lookupDescription,
+    )
+    assert.equal(registered.explainWhiteMove('fen', 'illegal'), undefined)
+    assert.deepEqual(registered.whiteRuleDescriptions, [
+      {
+        id: 'safe',
+        shortLabel: 'Keep it safe',
+        helpText: 'Keep the piece safe.',
+      },
+      lookupDescription,
+      {
+        id: 'closer',
+        shortLabel: 'King closer',
+        helpText: 'Bring the king closer.',
+      },
+    ])
+  } finally {
+    unregister()
+  }
+})
+
+test('registered move overrides snapshot descriptions and selector functions', () => {
+  const mutableDescription = {
+    id: 'enter mating net',
+    shortLabel: 'enter mating net',
+    helpText: 'Original mating-net help.',
+  }
+  const mutableOverride = {
+    description: mutableDescription,
+    select: () => ({ active: true, moves: ['Kb2'] }),
+  } satisfies WhiteMoveOverride
+  const overrideRuleSet: MateRuleSet<TestScore> = {
+    ...rookRuleSet,
+    id: 'bishop-knight',
+    whiteMoveOverride: mutableOverride,
+  }
+  const unregister = registerMateRuleSet(overrideRuleSet)
+
+  try {
+    mutableDescription.helpText = 'Mutated mating-net help.'
+    mutableOverride.select = () => ({ active: true, moves: ['Kh1'] })
+
+    const registered = getMateRuleSet('bishop-knight')
+    assert.deepEqual(registered.idealWhiteMoves('fen'), ['Kb2'])
+    assert.deepEqual(registered.currentWhiteHint('fen'), {
+      id: 'enter mating net',
+      shortLabel: 'enter mating net',
+      helpText: 'Original mating-net help.',
+    })
+  } finally {
+    unregister()
+  }
+})
+
+test('decisive move overrides explicitly distinguish inactive and invalid active selections', () => {
+  const description = {
+    id: 'override',
+    shortLabel: 'Override',
+    helpText: 'Choose the decisive batch.',
+  }
+  const scenarios: Array<{
+    readonly name: string
+    readonly result: ReturnType<WhiteMoveOverride['select']>
+    readonly expected: readonly string[] | RegExp
+  }> = [
+    {
+      name: 'inactive',
+      result: { active: false },
+      expected: ['Ka2', 'Kb2'],
+    },
+    {
+      name: 'empty',
+      result: { active: true, moves: [] },
+      expected: /active move override must select at least one legal move/,
+    },
+    {
+      name: 'duplicate',
+      result: { active: true, moves: ['Ka2', 'Ka2'] },
+      expected: /move override selected duplicate SAN: Ka2/,
+    },
+    {
+      name: 'illegal',
+      result: { active: true, moves: ['missing'] },
+      expected: /move override selected illegal SAN: missing/,
+    },
+  ]
+
+  for (const scenario of scenarios) {
+    const ruleSet: MateRuleSet<TestScore> = {
+      ...rookRuleSet,
+      id: 'bishop-knight',
+      whiteMoveOverride: {
+        description,
+        select: () => scenario.result,
+      },
+    }
+    const unregister = registerMateRuleSet(ruleSet)
+    try {
+      const evaluate = () => getMateRuleSet('bishop-knight').idealWhiteMoves('fen')
+      if (scenario.expected instanceof RegExp) {
+        assert.throws(evaluate, scenario.expected, scenario.name)
+      } else {
+        assert.deepEqual(evaluate(), scenario.expected, scenario.name)
+      }
+    } finally {
+      unregister()
+    }
+  }
+})
+
+test('grouped subpriorities evaluate immutable survivor groups once and remain permutation invariant', () => {
+  type GroupScore = {
+    readonly movedPiece: 'n' | 'other'
+    readonly knightDistance: number
+    readonly centerDistance: number
+  }
+  let groupPredicateCalls = 0
+  const groupedRule: OrderedRule<GroupScore> = {
+    id: 'grouped',
+    shortLabel: 'Grouped priority',
+    helpText: 'Use conditional and general comparisons as one priority.',
+    subpriorities: [
+      {
+        when: (scores) => {
+          groupPredicateCalls += 1
+          assert.equal(Object.isFrozen(scores), true)
+          return scores.every(({ movedPiece }) => movedPiece === 'n')
+        },
+        compare: (left, right) =>
+          left.knightDistance - right.knightDistance,
+      },
+      {
+        compare: (left, right) =>
+          left.centerDistance - right.centerDistance,
+      },
+    ],
+  }
+  const groupedCandidates: readonly ScoredMove<GroupScore>[] = [
+    {
+      san: 'Na1',
+      score: { movedPiece: 'n', knightDistance: 0, centerDistance: 2 },
+    },
+    {
+      san: 'Nc3',
+      score: { movedPiece: 'n', knightDistance: 1, centerDistance: 0 },
+    },
+    {
+      san: 'Ba2',
+      score: { movedPiece: 'other', knightDistance: 99, centerDistance: 1 },
+    },
+  ]
+
+  for (const permutation of permutations(groupedCandidates)) {
+    groupPredicateCalls = 0
+    assert.deepEqual(selectIdealMoves(permutation, [groupedRule]), ['Nc3'])
+    assert.equal(groupPredicateCalls, 1)
+    assert.equal(currentHint(permutation, [groupedRule]), groupedRule)
+    assert.equal(explainMove(permutation, [groupedRule], 'Na1'), groupedRule)
+    assert.equal(explainMove(permutation, [groupedRule], 'Ba2'), groupedRule)
+  }
+
+  assert.deepEqual(
+    selectIdealMoves(groupedCandidates.slice(0, 2), [groupedRule]),
+    ['Na1'],
+  )
+  assert.equal(
+    explainMove(groupedCandidates.slice(0, 2), [groupedRule], 'Nc3'),
+    groupedRule,
+  )
+})
+
+test('grouped comparator results must remain finite', () => {
+  const invalidRule: OrderedRule<TestScore> = {
+    id: 'invalid',
+    shortLabel: 'Invalid',
+    helpText: 'Invalid comparator.',
+    subpriorities: [{ compare: () => Number.NaN }],
+  }
+  assert.throws(
+    () => selectIdealMoves(candidates, [invalidRule]),
+    /rule invalid comparator returned non-finite result/,
+  )
+})
+
+test('duplicate visible rule IDs require one canonical description', () => {
+  const canonicalDuplicate: OrderedRule<TestScore> = {
+    ...safeRule,
+    compare: (left, right) => left.closer - right.closer,
+  }
+  const accepted = registerMateRuleSet({
+    ...rookRuleSet,
+    id: 'bishop-knight',
+    whiteRules: [safeRule, canonicalDuplicate],
+  })
+  try {
+    assert.deepEqual(getMateRuleSet('bishop-knight').whiteRuleDescriptions, [
+      {
+        id: 'safe',
+        shortLabel: 'Keep it safe',
+        helpText: 'Keep the piece safe.',
+      },
+    ])
+  } finally {
+    accepted()
+  }
+
+  assert.throws(
+    () =>
+      registerMateRuleSet({
+        ...rookRuleSet,
+        id: 'bishop-knight',
+        whiteRules: [
+          safeRule,
+          { ...canonicalDuplicate, helpText: 'Conflicting help.' },
+        ],
+      }),
+    /conflicting rule description for id safe/,
+  )
 })
 
 test('candidate permutations preserve tie order and explanation rules', () => {

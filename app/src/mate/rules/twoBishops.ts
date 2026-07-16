@@ -1,5 +1,6 @@
 import { edgeDistance, findPiece, getChess } from '../chess'
 import { getEndgameReturnToPositionMoves } from './majorPieces'
+import { compareScoresByRules, selectIdealMoves } from './selection'
 import {
   blackCanTakeWhiteBishops,
   blackCanWalkUpToWhiteBishop,
@@ -257,29 +258,11 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
   },
 ]
 
-function compareByWhiteRules(
-  first: TwoBishopsWhiteMoveScore,
-  second: TwoBishopsWhiteMoveScore,
-): number {
-  for (const rule of twoBishopsWhiteRules) {
-    if (
-      (rule.applies && !rule.applies(first)) ||
-      (rule.applies && !rule.applies(second))
-    ) {
-      continue
-    }
-    const comparison = rule.compare(first, second)
-    if (comparison !== 0) return comparison
-    if (rule.stopWhenBest?.(first) && rule.stopWhenBest(second)) return 0
-  }
-  return 0
-}
-
 export function compareTwoBishopsWhiteScores(
   first: TwoBishopsWhiteMoveScore,
   second: TwoBishopsWhiteMoveScore,
 ): number {
-  return compareByWhiteRules(first, second)
+  return compareScoresByRules(first, second, twoBishopsWhiteRules)
 }
 
 function scoreWhiteCandidates(
@@ -293,51 +276,13 @@ function scoreWhiteCandidates(
   }))
 }
 
-function selectIdealWhiteCandidates(
-  candidates: readonly ScoredMove<TwoBishopsWhiteMoveScore>[],
-): readonly ScoredMove<TwoBishopsWhiteMoveScore>[] {
-  let remaining = [...candidates]
-  for (const rule of twoBishopsWhiteRules) {
-    const applicable = remaining.filter(
-      ({ score }) => rule.applies?.(score) ?? true,
-    )
-    const first = applicable[0]
-    if (!first) continue
-    let best = first
-    let tiedBest = [first]
-    for (const candidate of applicable.slice(1)) {
-      const comparison = rule.compare(candidate.score, best.score)
-      if (comparison < 0) {
-        best = candidate
-        tiedBest = [candidate]
-      } else if (comparison === 0) {
-        tiedBest.push(candidate)
-      }
-    }
-    const applicableSet = new Set(applicable)
-    const tiedBestSet = new Set(tiedBest)
-    remaining = remaining.filter(
-      (candidate) =>
-        !applicableSet.has(candidate) || tiedBestSet.has(candidate),
-    )
-    const stopWhenBest = rule.stopWhenBest
-    if (
-      stopWhenBest &&
-      remaining.length > 0 &&
-      remaining.every(({ score }) => stopWhenBest(score))
-    ) {
-      break
-    }
-  }
-  return remaining
-}
-
 export function getIdealTwoBishopsWhiteMoves(fen: string): string[] {
   const chess = getChess(fen)
   const moves = chess.turn() === 'w' ? chess.moves() : []
-  return selectIdealWhiteCandidates(scoreWhiteCandidates(fen, moves)).map(
-    ({ san }) => san,
-  )
+  return [...selectIdealMoves(
+    scoreWhiteCandidates(fen, moves),
+    twoBishopsWhiteRules,
+  )]
 }
 
 export function scoreTwoBishopsBlackMove(

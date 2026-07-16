@@ -1,6 +1,11 @@
 import type { MateId } from '../types'
 import { bishopKnightRuleSet } from './bishopKnight'
 import { queenRuleSet, rookRuleSet } from './majorPieces'
+import {
+  currentHint,
+  explainMove,
+  selectIdealMoves,
+} from './selection'
 import { twoBishopsRuleSet } from './twoBishops'
 import type {
   MateRuleSet,
@@ -9,7 +14,18 @@ import type {
   RuleDescription,
   RuleHelp,
   ScoredMove,
+  WhiteMoveOverride,
 } from './types'
+
+export {
+  compareScoresByRules,
+  currentHint,
+  explainMove,
+  findCandidateBySan,
+  firstDifferingRule,
+  isMoveIdeal,
+  selectIdealMoves,
+} from './selection'
 
 export {
   compareQueenBlackScores,
@@ -105,196 +121,11 @@ export type {
   RuleNoteBoardHighlight,
   RuleNoteBoardLayout,
   RuleNoteBoardPiece,
+  RuleSubpriority,
   ScoredMove,
+  WhiteMoveOverride,
+  WhiteMoveOverrideSelection,
 } from './types'
-
-type CandidateSelection<Score> = {
-  readonly idealCandidates: readonly ScoredMove<Score>[]
-  readonly eliminatedBy: ReadonlyMap<ScoredMove<Score>, OrderedRule<Score>>
-  readonly lastEliminatingRule: OrderedRule<Score> | undefined
-}
-
-function ruleApplies<Score>(
-  orderedRule: OrderedRule<Score>,
-  score: Score,
-): boolean {
-  return orderedRule.applies?.(score) ?? true
-}
-
-function selectCandidatesByRules<Score>(
-  candidates: readonly ScoredMove<Score>[],
-  rules: readonly OrderedRule<Score>[],
-): CandidateSelection<Score> {
-  let remaining = [...candidates]
-  const eliminatedBy = new Map<ScoredMove<Score>, OrderedRule<Score>>()
-  let lastEliminatingRule: OrderedRule<Score> | undefined
-
-  for (const orderedRule of rules) {
-    const applicable = remaining.filter((candidate) =>
-      ruleApplies(orderedRule, candidate.score),
-    )
-    const first = applicable[0]
-    if (!first) {
-      continue
-    }
-
-    let best = first
-    let tiedBest = [best]
-
-    for (const candidate of applicable.slice(1)) {
-      const comparison = orderedRule.compare(candidate.score, best.score)
-      if (comparison < 0) {
-        best = candidate
-        tiedBest = [candidate]
-      } else if (comparison === 0) {
-        tiedBest.push(candidate)
-      }
-    }
-
-    const applicableSet = new Set(applicable)
-    const tiedBestSet = new Set(tiedBest)
-    remaining = remaining.filter((candidate) => {
-      if (!applicableSet.has(candidate) || tiedBestSet.has(candidate)) {
-        return true
-      }
-
-      eliminatedBy.set(candidate, orderedRule)
-      lastEliminatingRule = orderedRule
-      return false
-    })
-
-    const stopWhenBest = orderedRule.stopWhenBest
-    if (
-      stopWhenBest &&
-      remaining.length > 0 &&
-      remaining.every((candidate) => stopWhenBest(candidate.score))
-    ) {
-      lastEliminatingRule = orderedRule
-      break
-    }
-  }
-
-  return {
-    idealCandidates: remaining,
-    eliminatedBy,
-    lastEliminatingRule,
-  }
-}
-
-function selectIdealCandidates<Score>(
-  candidates: readonly ScoredMove<Score>[],
-  rules: readonly OrderedRule<Score>[],
-): readonly ScoredMove<Score>[] {
-  return selectCandidatesByRules(candidates, rules).idealCandidates
-}
-
-export function selectIdealMoves<Score>(
-  candidates: readonly ScoredMove<Score>[],
-  rules: readonly OrderedRule<Score>[],
-): readonly string[] {
-  return selectIdealCandidates(candidates, rules).map(({ san }) => san)
-}
-
-export function compareScoresByRules<Score>(
-  leftScore: Score,
-  rightScore: Score,
-  rules: readonly OrderedRule<Score>[],
-): number {
-  for (const orderedRule of rules) {
-    if (
-      !ruleApplies(orderedRule, leftScore) ||
-      !ruleApplies(orderedRule, rightScore)
-    ) {
-      continue
-    }
-    const comparison = orderedRule.compare(leftScore, rightScore)
-    if (comparison !== 0) {
-      return comparison
-    }
-    if (
-      orderedRule.stopWhenBest?.(leftScore) &&
-      orderedRule.stopWhenBest(rightScore)
-    ) {
-      return 0
-    }
-  }
-
-  return 0
-}
-
-export function firstDifferingRule<Score>(
-  leftScore: Score,
-  rightScore: Score,
-  rules: readonly OrderedRule<Score>[],
-): OrderedRule<Score> | undefined {
-  for (const orderedRule of rules) {
-    if (
-      !ruleApplies(orderedRule, leftScore) ||
-      !ruleApplies(orderedRule, rightScore)
-    ) {
-      continue
-    }
-    if (orderedRule.compare(leftScore, rightScore) !== 0) {
-      return orderedRule
-    }
-    if (
-      orderedRule.stopWhenBest?.(leftScore) &&
-      orderedRule.stopWhenBest(rightScore)
-    ) {
-      return undefined
-    }
-  }
-  return undefined
-}
-
-export function findCandidateBySan<Score>(
-  candidates: readonly ScoredMove<Score>[],
-  san: string,
-): ScoredMove<Score> | undefined {
-  return candidates.find((candidate) => candidate.san === san)
-}
-
-export function isMoveIdeal<Score>(
-  candidates: readonly ScoredMove<Score>[],
-  rules: readonly OrderedRule<Score>[],
-  san: string,
-): boolean {
-  if (!findCandidateBySan(candidates, san)) {
-    return false
-  }
-
-  return selectIdealMoves(candidates, rules).includes(san)
-}
-
-export function explainMove<Score>(
-  candidates: readonly ScoredMove<Score>[],
-  rules: readonly OrderedRule<Score>[],
-  san?: string,
-): OrderedRule<Score> | undefined {
-  const selection = selectCandidatesByRules(candidates, rules)
-  if (selection.idealCandidates.length === 0) {
-    return undefined
-  }
-
-  if (san !== undefined) {
-    const played = findCandidateBySan(candidates, san)
-    if (!played) {
-      return undefined
-    }
-    if (!selection.idealCandidates.includes(played)) {
-      return selection.eliminatedBy.get(played)
-    }
-  }
-
-  return selection.lastEliminatingRule
-}
-
-export function currentHint<Score>(
-  candidates: readonly ScoredMove<Score>[],
-  rules: readonly OrderedRule<Score>[],
-): OrderedRule<Score> | undefined {
-  return explainMove(candidates, rules)
-}
 
 type MateRuleSetRegistration = {
   readonly registeredRuleSet: RegisteredMateRuleSet
@@ -342,6 +173,90 @@ function snapshotRuleHelp(help: RuleHelp): RuleHelp {
   })
 }
 
+function snapshotOrderedRule<Score>(
+  orderedRule: OrderedRule<Score>,
+): OrderedRule<Score> {
+  if (orderedRule.compare && orderedRule.subpriorities) {
+    throw new Error(
+      `rule ${orderedRule.id} must define compare or subpriorities, not both`,
+    )
+  }
+  if (!orderedRule.compare && !orderedRule.subpriorities) {
+    throw new Error(
+      `rule ${orderedRule.id} must define compare or subpriorities`,
+    )
+  }
+  if (orderedRule.subpriorities?.length === 0) {
+    throw new Error(`rule ${orderedRule.id} subpriorities must not be empty`)
+  }
+  const compare = orderedRule.compare
+  const applies = orderedRule.applies
+  const stopWhenBest = orderedRule.stopWhenBest
+  const subpriorities = orderedRule.subpriorities
+    ? Object.freeze(
+        orderedRule.subpriorities.map((subpriority) => {
+          const subpriorityCompare = subpriority.compare
+          const when = subpriority.when
+          return Object.freeze({
+            ...(when
+              ? {
+                  when: Object.freeze((scores: readonly Score[]) =>
+                    when(scores),
+                  ),
+                }
+              : {}),
+            compare: Object.freeze((left: Score, right: Score) =>
+              subpriorityCompare(left, right),
+            ),
+          })
+        }),
+      )
+    : undefined
+
+  return Object.freeze({
+    id: orderedRule.id,
+    shortLabel: orderedRule.shortLabel,
+    helpText: orderedRule.helpText,
+    guideOrder: orderedRule.guideOrder,
+    ...(applies
+      ? { applies: Object.freeze((score: Score) => applies(score)) }
+      : {}),
+    ...(stopWhenBest
+      ? {
+          stopWhenBest: Object.freeze((score: Score) => stopWhenBest(score)),
+        }
+      : {}),
+    ...(compare
+      ? {
+          compare: Object.freeze((left: Score, right: Score) =>
+            compare(left, right),
+          ),
+        }
+      : {}),
+    ...(subpriorities ? { subpriorities } : {}),
+  })
+}
+
+type SnapshottedWhiteMoveOverride = {
+  readonly description: RuleDescription
+  readonly guideOrder: number | undefined
+  readonly select: WhiteMoveOverride['select']
+}
+
+function snapshotWhiteMoveOverride(
+  override: WhiteMoveOverride | undefined,
+): SnapshottedWhiteMoveOverride | undefined {
+  if (!override) return undefined
+  const sourceSelect = override.select
+  return Object.freeze({
+    description: Object.freeze({ ...override.description }),
+    guideOrder: override.guideOrder,
+    select: Object.freeze((fen: string, legalMoves: readonly string[]) =>
+      sourceSelect(fen, legalMoves),
+    ),
+  })
+}
+
 function createRegisteredMateRuleSet<Score>(
   ruleSet: MateRuleSet<Score>,
 ): RegisteredMateRuleSet {
@@ -355,37 +270,56 @@ function createRegisteredMateRuleSet<Score>(
     help,
   } = ruleSet
   const whiteRules = Object.freeze(
-    ruleSet.whiteRules.map((orderedRule) =>
-      Object.freeze({
-        id: orderedRule.id,
-        shortLabel: orderedRule.shortLabel,
-        helpText: orderedRule.helpText,
-        guideOrder: orderedRule.guideOrder,
-        applies: orderedRule.applies,
-        stopWhenBest: orderedRule.stopWhenBest,
-        compare: orderedRule.compare,
-      }),
-    ),
+    ruleSet.whiteRules.map(snapshotOrderedRule),
+  )
+  const whiteMoveOverride = snapshotWhiteMoveOverride(
+    ruleSet.whiteMoveOverride,
   )
   const descriptionsById = new Map<string, RuleDescription>()
   const descriptionOrderById = new Map<string, number>()
+  const registerDescription = (
+    source: RuleDescription,
+    guideOrder?: number,
+    fallbackOrder = 0,
+  ): RuleDescription => {
+    const existing = descriptionsById.get(source.id)
+    if (
+      existing &&
+      (existing.shortLabel !== source.shortLabel ||
+        existing.helpText !== source.helpText)
+    ) {
+      throw new Error(`conflicting rule description for id ${source.id}`)
+    }
+    const description =
+      existing ??
+      Object.freeze({
+        id: source.id,
+        shortLabel: source.shortLabel,
+        helpText: source.helpText,
+      })
+    descriptionsById.set(source.id, description)
+    descriptionOrderById.set(
+      source.id,
+      Math.min(
+        descriptionOrderById.get(source.id) ?? Number.POSITIVE_INFINITY,
+        guideOrder ?? fallbackOrder,
+      ),
+    )
+    return description
+  }
+  const overrideDescription = whiteMoveOverride
+    ? registerDescription(
+        whiteMoveOverride.description,
+        whiteMoveOverride.guideOrder,
+        whiteRules.length,
+      )
+    : undefined
   const ruleEntries = Object.freeze(
     whiteRules.map((orderedRule, index) => {
-      const existingDescription = descriptionsById.get(orderedRule.id)
-      const description =
-        existingDescription ??
-        Object.freeze({
-          id: orderedRule.id,
-          shortLabel: orderedRule.shortLabel,
-          helpText: orderedRule.helpText,
-        })
-      descriptionsById.set(orderedRule.id, description)
-      descriptionOrderById.set(
-        orderedRule.id,
-        Math.min(
-          descriptionOrderById.get(orderedRule.id) ?? Number.POSITIVE_INFINITY,
-          orderedRule.guideOrder ?? index,
-        ),
+      const description = registerDescription(
+        orderedRule,
+        orderedRule.guideOrder,
+        index,
       )
       return { orderedRule, description }
     }),
@@ -397,8 +331,35 @@ function createRegisteredMateRuleSet<Score>(
       (descriptionOrderById.get(first.id) ?? 0) -
       (descriptionOrderById.get(second.id) ?? 0),
   ))
-  const scoredWhiteMoves = (fen: string): readonly ScoredMove<Score>[] => {
-    const moves = whiteMoves(fen)
+  const getLegalWhiteMoves = (fen: string): readonly string[] =>
+    Object.freeze([...whiteMoves(fen)])
+  const selectedOverrideMoves = (
+    fen: string,
+    moves: readonly string[],
+  ): readonly string[] | undefined => {
+    if (!whiteMoveOverride) return undefined
+    const selection = whiteMoveOverride.select(fen, moves)
+    if (!selection.active) return undefined
+    if (selection.moves.length === 0) {
+      throw new Error('active move override must select at least one legal move')
+    }
+    const legalMoves = new Set(moves)
+    const selected = new Set<string>()
+    for (const san of selection.moves) {
+      if (selected.has(san)) {
+        throw new Error(`move override selected duplicate SAN: ${san}`)
+      }
+      if (!legalMoves.has(san)) {
+        throw new Error(`move override selected illegal SAN: ${san}`)
+      }
+      selected.add(san)
+    }
+    return Object.freeze([...selection.moves])
+  }
+  const scoredWhiteMoves = (
+    fen: string,
+    moves: readonly string[],
+  ): readonly ScoredMove<Score>[] => {
     return scoreWhiteCandidates
       ? scoreWhiteCandidates(fen, moves).map(({ san, score }) => ({
           san,
@@ -421,12 +382,26 @@ function createRegisteredMateRuleSet<Score>(
     blackCandidates,
     help: snapshotRuleHelp(help),
     whiteRuleDescriptions,
-    idealWhiteMoves: (fen) =>
-      selectIdealMoves(scoredWhiteMoves(fen), whiteRules),
-    explainWhiteMove: (fen, san) =>
-      describeRule(explainMove(scoredWhiteMoves(fen), whiteRules, san)),
-    currentWhiteHint: (fen) =>
-      describeRule(currentHint(scoredWhiteMoves(fen), whiteRules)),
+    idealWhiteMoves: (fen) => {
+      const moves = getLegalWhiteMoves(fen)
+      return (
+        selectedOverrideMoves(fen, moves) ??
+        selectIdealMoves(scoredWhiteMoves(fen, moves), whiteRules)
+      )
+    },
+    explainWhiteMove: (fen, san) => {
+      const moves = getLegalWhiteMoves(fen)
+      if (san !== undefined && !moves.includes(san)) return undefined
+      if (selectedOverrideMoves(fen, moves)) return overrideDescription
+      return describeRule(
+        explainMove(scoredWhiteMoves(fen, moves), whiteRules, san),
+      )
+    },
+    currentWhiteHint: (fen) => {
+      const moves = getLegalWhiteMoves(fen)
+      if (selectedOverrideMoves(fen, moves)) return overrideDescription
+      return describeRule(currentHint(scoredWhiteMoves(fen, moves), whiteRules))
+    },
   })
 }
 

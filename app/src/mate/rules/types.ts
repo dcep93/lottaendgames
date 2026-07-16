@@ -5,6 +5,16 @@ export type ScoredMove<Score> = {
   readonly score: Score
 }
 
+export type RuleSubpriority<Score> = {
+  /**
+   * Enables this comparison once for the current immutable survivor group.
+   * The predicate must depend only on the group members, not their order.
+   */
+  readonly when?: (scores: readonly Score[]) => boolean
+  /** Defines a deterministic finite total preorder for an active subpriority. */
+  readonly compare: (left: Score, right: Score) => number
+}
+
 export type OrderedRule<Score> = {
   readonly id: string
   readonly shortLabel: string
@@ -27,13 +37,35 @@ export type OrderedRule<Score> = {
    * A negative finite result prefers left, zero ties them, and a positive finite
    * result prefers right. Implementations must never return NaN or infinity.
    */
-  readonly compare: (left: Score, right: Score) => number
+  readonly compare?: (left: Score, right: Score) => number
+  /**
+   * Keeps conditional comparisons inside one visible evaluator priority.
+   * Exactly one of `compare` or a non-empty `subpriorities` array is required.
+   */
+  readonly subpriorities?: readonly RuleSubpriority<Score>[]
 }
 
 export type RuleDescription = {
   readonly id: string
   readonly shortLabel: string
   readonly helpText: string
+}
+
+export type WhiteMoveOverrideSelection =
+  | { readonly active: false }
+  | { readonly active: true; readonly moves: readonly string[] }
+
+export type WhiteMoveOverride = {
+  readonly description: RuleDescription
+  readonly guideOrder?: number
+  /**
+   * Selects a decisive ordered subset of the supplied legal SANs. An active
+   * selection must be non-empty, unique, and contain only supplied moves.
+   */
+  readonly select: (
+    fen: string,
+    legalMoves: readonly string[],
+  ) => WhiteMoveOverrideSelection
 }
 
 export type OpponentCandidates = {
@@ -123,6 +155,7 @@ export type MateRuleSet<Score> = {
     fen: string,
     moves: readonly string[],
   ) => readonly ScoredMove<Score>[]
+  readonly whiteMoveOverride?: WhiteMoveOverride
   readonly whiteRules: readonly OrderedRule<Score>[]
   readonly whiteMoves: (fen: string) => readonly string[]
   readonly blackCandidates: (
