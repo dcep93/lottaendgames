@@ -69,23 +69,21 @@ export default function MateWorkspace({
   )
   const sessionRef = React.useRef(session)
   const mountedRef = React.useRef(false)
-  const [clockNow, setClockNow] = React.useState(session.startedAtMs)
+  const shareRequestRef = React.useRef(0)
   const [showTimer, setShowTimer] = React.useState(true)
   const [shareStatus, setShareStatus] = React.useState('')
-  sessionRef.current = session
+
+  React.useLayoutEffect(() => {
+    sessionRef.current = session
+  }, [session])
 
   React.useEffect(() => {
     mountedRef.current = true
     return () => {
       mountedRef.current = false
+      shareRequestRef.current += 1
     }
   }, [])
-
-  React.useEffect(() => {
-    if (session.finishedAtMs !== undefined) return
-    const timer = setInterval(() => setClockNow(deps.now()), 100)
-    return () => clearInterval(timer)
-  }, [deps, session.finishedAtMs, session.startedAtMs])
 
   const commit = React.useCallback(
     (transition: (current: MateSession) => MateSession) => {
@@ -98,13 +96,13 @@ export default function MateWorkspace({
       }
       if (next === current) return false
 
+      shareRequestRef.current += 1
       sessionRef.current = next
       setSession(next)
-      setClockNow(deps.now())
       setShareStatus('')
       return true
     },
-    [deps],
+    [],
   )
 
   const startOver = React.useCallback(
@@ -222,6 +220,8 @@ export default function MateWorkspace({
   const share = React.useCallback(async () => {
     const current = sessionRef.current
     if (current.outcome === undefined) return
+    const request = shareRequestRef.current + 1
+    shareRequestRef.current = request
 
     const text = formatMateShareText({
       outcome: current.outcome,
@@ -233,7 +233,11 @@ export default function MateWorkspace({
       ),
     })
     const copied = await copyMateShareText(text)
-    if (mountedRef.current) {
+    if (
+      mountedRef.current &&
+      shareRequestRef.current === request &&
+      sessionRef.current === current
+    ) {
       setShareStatus(copied ? 'Copied' : 'Copy unavailable')
     }
   }, [deps])
@@ -260,7 +264,7 @@ export default function MateWorkspace({
           canPlayBest={canPlayBest}
           canRedo={session.historyIndex < session.history.length - 1}
           canUndo={session.historyIndex > 0}
-          elapsedMs={getMateElapsedMs(session, clockNow)}
+          finishedAtMs={session.finishedAtMs}
           onPlayBest={playBest}
           onRedo={redo}
           onShare={() => void share()}
@@ -270,6 +274,8 @@ export default function MateWorkspace({
           outcome={session.outcome}
           shareStatus={shareStatus}
           showTimer={showTimer}
+          startedAtMs={session.startedAtMs}
+          timerNow={deps.now}
         />
         <aside className="leg-mate-starting-position">
           <h3>Starting FEN</h3>

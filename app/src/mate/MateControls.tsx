@@ -5,10 +5,12 @@ export type MateControlsProps = {
   readonly canUndo: boolean
   readonly canRedo: boolean
   readonly canPlayBest: boolean
-  readonly elapsedMs: number
+  readonly startedAtMs: number
+  readonly finishedAtMs?: number
   readonly showTimer: boolean
   readonly outcome?: MateTerminalOutcome
   readonly shareStatus?: string
+  readonly timerNow?: () => number
   readonly onStartOver: () => void
   readonly onUndo: () => void
   readonly onRedo: () => void
@@ -27,6 +29,8 @@ const OUTCOME_LABELS: Readonly<Record<MateTerminalOutcome, string>> = {
   unsupported: 'The position left the supported winning construction',
 }
 
+const readCurrentTime = () => Date.now()
+
 function formatMateElapsed(elapsedMs: number): string {
   const safeMs = Number.isFinite(elapsedMs)
     ? Math.max(0, Math.floor(elapsedMs))
@@ -42,10 +46,12 @@ export default function MateControls({
   canUndo,
   canRedo,
   canPlayBest,
-  elapsedMs,
+  startedAtMs,
+  finishedAtMs,
   showTimer,
   outcome,
   shareStatus,
+  timerNow = readCurrentTime,
   onStartOver,
   onUndo,
   onRedo,
@@ -109,7 +115,12 @@ export default function MateControls({
           hidden={!showTimer}
           id={timerId}
         >
-          {formatMateElapsed(elapsedMs)}
+          <MateElapsedTimer
+            finishedAtMs={finishedAtMs}
+            now={timerNow}
+            showTimer={showTimer}
+            startedAtMs={startedAtMs}
+          />
         </output>
         {terminalLabel === undefined ? null : (
           <>
@@ -138,3 +149,38 @@ export default function MateControls({
     </div>
   )
 }
+
+const MateElapsedTimer = React.memo(function MateElapsedTimer({
+  finishedAtMs,
+  now,
+  showTimer,
+  startedAtMs,
+}: {
+  readonly finishedAtMs?: number
+  readonly now: () => number
+  readonly showTimer: boolean
+  readonly startedAtMs: number
+}) {
+  const [clockNow, setClockNow] = React.useState(
+    finishedAtMs ?? startedAtMs,
+  )
+
+  React.useEffect(() => {
+    if (!showTimer) return
+
+    if (finishedAtMs !== undefined) {
+      setClockNow(finishedAtMs)
+      return
+    }
+
+    setClockNow(now())
+    const timer = setInterval(() => setClockNow(now()), 100)
+    return () => clearInterval(timer)
+  }, [finishedAtMs, now, showTimer, startedAtMs])
+
+  const elapsedMs = Math.max(
+    0,
+    (finishedAtMs ?? clockNow) - startedAtMs,
+  )
+  return formatMateElapsed(elapsedMs)
+})

@@ -429,7 +429,7 @@ test('Mate controls expose preserved actions and their disabled states', () => {
       canPlayBest
       canRedo={true}
       canUndo={false}
-      elapsedMs={83_459}
+      finishedAtMs={84_459}
       onPlayBest={() => undefined}
       onRedo={() => undefined}
       onShare={() => undefined}
@@ -439,6 +439,7 @@ test('Mate controls expose preserved actions and their disabled states', () => {
       outcome="checkmate"
       shareStatus="Copied"
       showTimer
+      startedAtMs={1_000}
     />,
   )
 
@@ -459,7 +460,6 @@ test('active controls hide timer and withhold terminal-only sharing', () => {
       canPlayBest
       canRedo={false}
       canUndo
-      elapsedMs={0}
       onPlayBest={() => undefined}
       onRedo={() => undefined}
       onShare={() => undefined}
@@ -467,6 +467,7 @@ test('active controls hide timer and withhold terminal-only sharing', () => {
       onToggleTimer={() => undefined}
       onUndo={() => undefined}
       showTimer={false}
+      startedAtMs={0}
     />,
   )
 
@@ -1490,6 +1491,28 @@ test('Mate keyboard shortcuts execute only from the training surface', async () 
       }),
       0,
     )
+    assert.equal(
+      dispatch('ArrowUp', {
+        closest: (selector: string) =>
+          selector.includes('[role="button"]')
+            ? { role: 'button' }
+            : null,
+        tagName: 'DIV',
+      }),
+      0,
+      'react-chessboard role=button target',
+    )
+    assert.equal(
+      dispatch('ArrowUp', {
+        closest: (selector: string) =>
+          selector.includes('.leg-mate-board-shell')
+            ? { className: 'leg-mate-board-shell' }
+            : null,
+        tagName: 'SVG',
+      }),
+      0,
+      'Mate board descendant',
+    )
     assert.equal(dispatch('ArrowUp', null, { ctrlKey: true }), 0)
     assert.equal(mountedRenderer.root.findByType(MateLog).props.logs.length, 0)
 
@@ -1595,43 +1618,187 @@ test('Mate terminal sharing copies the exact starting position with status', asy
   }
 })
 
+test('Mate sharing ignores stale clipboard requests and session results', async () => {
+  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
+    .IS_REACT_ACT_ENVIRONMENT = true
+  const navigatorDescriptor = Object.getOwnPropertyDescriptor(
+    globalThis,
+    'navigator',
+  )
+  const pendingCopies: Array<{
+    readonly reject: (reason?: unknown) => void
+    readonly resolve: () => void
+  }> = []
+  Object.defineProperty(globalThis, 'navigator', {
+    configurable: true,
+    value: {
+      clipboard: {
+        writeText: () => new Promise<void>((resolve, reject) => {
+          pendingCopies.push({ resolve, reject })
+        }),
+      },
+    },
+  })
+  let renderer: ReactTestRenderer | undefined
+
+  try {
+    await act(async () => {
+      renderer = TestRenderer.create(
+        matePage('rook', 'standard', ROOK_MATE_START),
+      )
+    })
+    const mountedRenderer = renderer as ReactTestRenderer
+    await act(async () => {
+      mountedRenderer.root.findByType(MateBoardProbe).props.onMove('Ra8#')
+    })
+
+    await act(async () => {
+      mountedRenderer.root.findByType(MateControls).props.onShare()
+      mountedRenderer.root.findByType(MateControls).props.onShare()
+      await Promise.resolve()
+    })
+    assert.equal(pendingCopies.length, 2)
+
+    await act(async () => {
+      pendingCopies[1]?.resolve()
+      await Promise.resolve()
+      await Promise.resolve()
+    })
+    assert.equal(
+      mountedRenderer.root.findByType(MateControls).props.shareStatus,
+      'Copied',
+    )
+
+    await act(async () => {
+      pendingCopies[0]?.reject(new Error('older copy failed'))
+      await Promise.resolve()
+      await Promise.resolve()
+    })
+    assert.equal(
+      mountedRenderer.root.findByType(MateControls).props.shareStatus,
+      'Copied',
+      'an older request must not overwrite the latest result',
+    )
+
+    await act(async () => {
+      mountedRenderer.root.findByType(MateControls).props.onShare()
+      await Promise.resolve()
+    })
+    assert.equal(pendingCopies.length, 3)
+    await act(async () => {
+      mountedRenderer.root.findByType(MateControls).props.onUndo()
+    })
+    assert.equal(
+      mountedRenderer.root.findByType(MateControls).props.shareStatus,
+      '',
+    )
+
+    await act(async () => {
+      pendingCopies[2]?.resolve()
+      await Promise.resolve()
+      await Promise.resolve()
+    })
+    assert.equal(
+      mountedRenderer.root.findByType(MateControls).props.shareStatus,
+      '',
+      'a result from the previous session state must stay invalidated',
+    )
+  } finally {
+    if (renderer) await act(async () => renderer?.unmount())
+    if (navigatorDescriptor === undefined) {
+      delete (globalThis as { navigator?: Navigator }).navigator
+    } else {
+      Object.defineProperty(globalThis, 'navigator', navigatorDescriptor)
+    }
+  }
+})
+
 test('Mate timers clean up across exact-route replacement and landing', async () => {
   ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
     .IS_REACT_ACT_ENVIRONMENT = true
   const originalSetInterval = globalThis.setInterval
   const originalClearInterval = globalThis.clearInterval
   let nextTimerId = 0
-  const activeTimers = new Set<number>()
+  const activeTimers = new Map<number, TimerHandler>()
   globalThis.setInterval = ((
-    _handler: TimerHandler,
+    handler: TimerHandler,
     _timeout?: number,
     ..._arguments: unknown[]
   ) => {
     nextTimerId += 1
-    activeTimers.add(nextTimerId)
+    activeTimers.set(nextTimerId, handler)
     return nextTimerId
   }) as typeof setInterval
   globalThis.clearInterval = ((timerId: number | undefined) => {
     if (timerId !== undefined) activeTimers.delete(Number(timerId))
   }) as typeof clearInterval
   let renderer: ReactTestRenderer | undefined
+  let boardRenders = 0
+
+  function CountingBoardProbe(
+    props: React.ComponentProps<typeof MateBoard>,
+  ) {
+    boardRenders += 1
+    return <MateBoardProbe {...props} />
+  }
 
   try {
     await act(async () => {
       renderer = TestRenderer.create(
-        matePage('rook', 'standard', MULTI_WHITE_START),
+        <Mate
+          boardComponent={CountingBoardProbe}
+          moduleSelector={<nav aria-label="Modules" />}
+          onNavigate={() => undefined}
+          route={{
+            module: 'mate',
+            mateId: 'rook',
+            mateMode: 'standard',
+            sharedFen: MULTI_WHITE_START,
+          }}
+        />,
       )
     })
     const mountedRenderer = renderer as ReactTestRenderer
     assert.equal(activeTimers.size, 1)
 
+    const rendersBeforeTick = boardRenders
+    const activeHandler = [...activeTimers.values()][0]
+    assert.equal(typeof activeHandler, 'function')
+    await act(async () => {
+      if (typeof activeHandler === 'function') activeHandler()
+    })
+    assert.equal(
+      boardRenders,
+      rendersBeforeTick,
+      'elapsed ticks must not rerender the workspace board',
+    )
+
+    await act(async () => {
+      mountedRenderer.root.findByType(MateControls).props.onToggleTimer()
+    })
+    assert.equal(activeTimers.size, 0, 'a hidden timer must stop ticking')
+    await act(async () => {
+      mountedRenderer.root.findByType(MateControls).props.onToggleTimer()
+    })
+    assert.equal(activeTimers.size, 1)
+
     await act(async () => {
       mountedRenderer.update(
-        matePage('rook', 'standard', MULTI_BLACK_START),
+        <Mate
+          boardComponent={CountingBoardProbe}
+          moduleSelector={<nav aria-label="Modules" />}
+          onNavigate={() => undefined}
+          route={{
+            module: 'mate',
+            mateId: 'rook',
+            mateMode: 'standard',
+            sharedFen: MULTI_BLACK_START,
+          }}
+        />,
       )
     })
     assert.equal(activeTimers.size, 1)
-    assert.equal(nextTimerId, 2)
+    assert.equal(nextTimerId, 3)
 
     await act(async () => {
       mountedRenderer.update(mateLandingPage())
