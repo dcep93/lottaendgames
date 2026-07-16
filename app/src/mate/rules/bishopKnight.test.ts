@@ -38,6 +38,17 @@ import { sameSquareColor } from './bishopKnightGeometry'
 import { isKnightAndBishopBishopOppositionLoopShape } from './bishopKnightStrategy'
 import { knightAndBishopAllBlackRepliesPreserveZoneXSetup } from './bishopKnightZoneX'
 
+function permutations<Value>(values: readonly Value[]): readonly Value[][] {
+  if (values.length <= 1) return [[...values]]
+  return values.flatMap((value, index) => {
+    const remaining = [...values.slice(0, index), ...values.slice(index + 1)]
+    return permutations(remaining).map((permutation) => [
+      value,
+      ...permutation,
+    ])
+  })
+}
+
 test('bishop-and-knight source data is an exact immutable snapshot', () => {
   assert.equal(BISHOP_KNIGHT_LOOKUP_ENTRIES.length, 119)
   assert.equal(
@@ -160,7 +171,7 @@ test('bishop-and-knight rules are registered', () => {
         id: 'knight closer center',
         shortLabel: 'knight closer center',
         helpText:
-          "Avoid the bishop-opposition loop and keep the knight behind White's king relative to Black's king, then closer to White's king, then closer to the center, preferring squares farther from Black's king.",
+          "Avoid the bishop-opposition loop and keep the knight behind White's king relative to Black's king. At the final placement step, compare two knight moves first by how close the knight is to White's king, then compare the resulting knight square by center distance and, finally, prefer it farther from Black's king. Keep moves that do not lose a head-to-head comparison; if those comparisons cycle, use center distance and then distance from Black's king to break the cycle.",
       },
     ],
   )
@@ -241,51 +252,112 @@ test('direct lookup is decisive while immediate mate keeps precedence', () => {
   assert.equal(ruleSet.explainWhiteMove(mateFen, 'Nb8')?.id, 'mate')
 })
 
-test('final grouped priority preserves source pair semantics without permutation sensitivity', () => {
-  const fen = '6K1/3N4/3k4/8/8/8/8/3B4 w - - 0 1'
-  const candidates = getChess(fen).moves().map((san) => ({
-    san,
-    score: scoreKnightAndBishopWhiteMove(fen, san),
-  }))
+test('final grouped priority preserves the sign of every source pair comparison', () => {
   const finalRule = knightAndBishopWhiteRules.at(-1)!
+  const fens = [
+    '7N/8/8/3K4/1k1B4/8/8/8 w - - 14 8',
+    '6K1/3N4/3k4/8/8/8/8/3B4 w - - 0 1',
+  ] as const
 
-  for (const left of candidates) {
-    for (const right of candidates) {
-      const sourcePairComparison =
-        (left.score.movedPiece === 'n' && right.score.movedPiece === 'n'
-          ? left.score.knightWhiteKingDistance -
-            right.score.knightWhiteKingDistance
-          : 0) ||
-        left.score.knightCentralDistance - right.score.knightCentralDistance ||
-        right.score.knightBlackKingDistance -
-          left.score.knightBlackKingDistance
+  for (const fen of fens) {
+    const candidates = getChess(fen).moves().map((san) => ({
+      san,
+      score: scoreKnightAndBishopWhiteMove(fen, san),
+    }))
+    for (const left of candidates) {
+      for (const right of candidates) {
+        const sourcePairComparison =
+          (left.score.movedPiece === 'n' && right.score.movedPiece === 'n'
+            ? left.score.knightWhiteKingDistance -
+              right.score.knightWhiteKingDistance
+            : 0) ||
+          left.score.knightCentralDistance -
+            right.score.knightCentralDistance ||
+          right.score.knightBlackKingDistance -
+            left.score.knightBlackKingDistance
+        assert.equal(
+          Math.sign(
+            compareScoresByRules(left.score, right.score, [finalRule]),
+          ),
+          Math.sign(sourcePairComparison),
+          `${fen}: ${left.san} vs ${right.san}`,
+        )
+      }
+    }
+  }
+})
+
+test('final grouped priority resolves an undefeated winner and a source cycle across every survivor order', () => {
+  const cases = [
+    {
+      fen: '7N/8/8/3K4/1k1B4/8/8/8 w - - 14 8',
+      survivors: ['Ng6', 'Nf7', 'Kc6'],
+      ideal: 'Nf7',
+      rejected: ['Ng6', 'Kc6'],
+      permutationCount: 6,
+    },
+    {
+      fen: '6K1/3N4/3k4/8/8/8/8/3B4 w - - 0 1',
+      survivors: ['Nb8', 'Nf8', 'Nf6', 'Nb6', 'Ba4', 'Bg4'],
+      ideal: 'Nf6',
+      rejected: ['Ba4', 'Bg4'],
+      permutationCount: 720,
+    },
+  ] as const
+  const rulesBeforeFinal = knightAndBishopWhiteRules.slice(0, -1)
+  const finalRule = knightAndBishopWhiteRules.at(-1)!
+  const ruleSet = getMateRuleSet('bishop-knight')
+
+  for (const scenario of cases) {
+    const candidates = getChess(scenario.fen).moves().map((san) => ({
+      san,
+      score: scoreKnightAndBishopWhiteMove(scenario.fen, san),
+    }))
+    assert.deepEqual(
+      selectIdealMoves(candidates, rulesBeforeFinal),
+      scenario.survivors,
+      scenario.fen,
+    )
+    const survivorSet = new Set<string>(scenario.survivors)
+    const survivors = candidates.filter(({ san }) => survivorSet.has(san))
+    const survivorPermutations = permutations(survivors)
+    assert.equal(survivorPermutations.length, scenario.permutationCount)
+
+    for (const permutation of survivorPermutations) {
+      const context = `${scenario.fen}: ${permutation
+        .map(({ san }) => san)
+        .join(', ')}`
+      assert.deepEqual(
+        selectIdealMoves(permutation, [finalRule]),
+        [scenario.ideal],
+        context,
+      )
+      assert.deepEqual(
+        selectIdealMoves(permutation, knightAndBishopWhiteRules),
+        [scenario.ideal],
+        context,
+      )
+    }
+
+    assert.deepEqual(
+      getIdealKnightAndBishopWhiteMoves(scenario.fen),
+      [scenario.ideal],
+    )
+    assert.equal(
+      ruleSet.currentWhiteHint(scenario.fen)?.id,
+      'knight closer center',
+    )
+    assert.equal(
+      ruleSet.explainWhiteMove(scenario.fen, scenario.ideal)?.id,
+      'knight closer center',
+    )
+    for (const san of scenario.rejected) {
       assert.equal(
-        compareScoresByRules(left.score, right.score, [finalRule]),
-        sourcePairComparison,
-        `${left.san} vs ${right.san}`,
+        ruleSet.explainWhiteMove(scenario.fen, san)?.id,
+        'knight closer center',
       )
     }
   }
-
-  const permutations = [
-    candidates,
-    [...candidates].reverse(),
-    ...candidates.map((_, index) => [
-      ...candidates.slice(index),
-      ...candidates.slice(0, index),
-    ]),
-  ]
-  for (const permutation of permutations) {
-    assert.deepEqual(
-      selectIdealMoves(permutation, knightAndBishopWhiteRules),
-      ['Nf6'],
-    )
-  }
-  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), ['Nf6'])
-  assert.equal(
-    getMateRuleSet('bishop-knight').explainWhiteMove(fen, 'Ba4')?.id,
-    'knight closer center',
-  )
 })
 
 test('all lookup moves survive every symmetry without transformed collisions', () => {

@@ -5,15 +5,30 @@ export type ScoredMove<Score> = {
   readonly score: Score
 }
 
-export type RuleSubpriority<Score> = {
+type RuleSubpriorityBase<Score> = {
   /**
-   * Enables this comparison once for the current immutable survivor group.
+   * Enables this subpriority once for the current immutable survivor group.
    * The predicate must depend only on the group members, not their order.
    */
   readonly when?: (scores: readonly Score[]) => boolean
-  /** Defines a deterministic finite total preorder for an active subpriority. */
-  readonly compare: (left: Score, right: Score) => number
 }
+
+export type RuleSubpriority<Score> = RuleSubpriorityBase<Score> &
+  (
+    | {
+        /** Defines a deterministic finite total preorder. */
+        readonly compare: (left: Score, right: Score) => number
+        readonly rank?: never
+      }
+    | {
+        readonly compare?: never
+        /**
+         * Assigns one finite rank per score in the same order. The lowest rank
+         * survives. This pure callback is evaluated once per survivor group.
+         */
+        readonly rank: (scores: readonly Score[]) => readonly number[]
+      }
+  )
 
 export type OrderedRule<Score> = {
   readonly id: string

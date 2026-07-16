@@ -24,6 +24,7 @@ export {
   findCandidateBySan,
   firstDifferingRule,
   isMoveIdeal,
+  rankUndefeatedScores,
   selectIdealMoves,
 } from './selection'
 
@@ -196,7 +197,18 @@ function snapshotOrderedRule<Score>(
     ? Object.freeze(
         orderedRule.subpriorities.map((subpriority) => {
           const subpriorityCompare = subpriority.compare
+          const subpriorityRank = subpriority.rank
           const when = subpriority.when
+          if (subpriorityCompare && subpriorityRank) {
+            throw new Error(
+              `rule ${orderedRule.id} subpriority must define compare or rank, not both`,
+            )
+          }
+          if (!subpriorityCompare && !subpriorityRank) {
+            throw new Error(
+              `rule ${orderedRule.id} subpriority must define compare or rank`,
+            )
+          }
           return Object.freeze({
             ...(when
               ? {
@@ -205,9 +217,17 @@ function snapshotOrderedRule<Score>(
                   ),
                 }
               : {}),
-            compare: Object.freeze((left: Score, right: Score) =>
-              subpriorityCompare(left, right),
-            ),
+            ...(subpriorityCompare
+              ? {
+                  compare: Object.freeze((left: Score, right: Score) =>
+                    subpriorityCompare(left, right),
+                  ),
+                }
+              : {
+                  rank: Object.freeze((scores: readonly Score[]) =>
+                    subpriorityRank!(scores),
+                  ),
+                }),
           })
         }),
       )

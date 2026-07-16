@@ -26,6 +26,20 @@ function ruleSubpriorities<Score>(
     if (subpriorities.length === 0) {
       throw new Error(`rule ${orderedRule.id} subpriorities must not be empty`)
     }
+    for (const subpriority of subpriorities) {
+      const hasCompare = typeof subpriority.compare === 'function'
+      const hasRank = typeof subpriority.rank === 'function'
+      if (hasCompare && hasRank) {
+        throw new Error(
+          `rule ${orderedRule.id} subpriority must define compare or rank, not both`,
+        )
+      }
+      if (!hasCompare && !hasRank) {
+        throw new Error(
+          `rule ${orderedRule.id} subpriority must define compare or rank`,
+        )
+      }
+    }
     return subpriorities
   }
   if (!compare) {
@@ -36,17 +50,92 @@ function ruleSubpriorities<Score>(
 
 function finiteComparison<Score>(
   orderedRule: OrderedRule<Score>,
-  subpriority: RuleSubpriority<Score>,
+  compare: (left: Score, right: Score) => number,
   left: Score,
   right: Score,
 ): number {
-  const result = subpriority.compare(left, right)
+  const result = compare(left, right)
   if (!Number.isFinite(result)) {
     throw new Error(
       `rule ${orderedRule.id} comparator returned non-finite result`,
     )
   }
   return result
+}
+
+function finiteRanks<Score>(
+  orderedRule: OrderedRule<Score>,
+  rank: (scores: readonly Score[]) => readonly number[],
+  scores: readonly Score[],
+): readonly number[] {
+  const result = rank(scores)
+  if (!Array.isArray(result)) {
+    throw new Error(`rule ${orderedRule.id} rank must return an array`)
+  }
+  if (result.length !== scores.length) {
+    throw new Error(
+      `rule ${orderedRule.id} rank returned ${result.length} values for ${scores.length} scores`,
+    )
+  }
+  const ranks = result.map((value, index) => {
+    if (!Number.isFinite(value)) {
+      throw new Error(
+        `rule ${orderedRule.id} rank returned non-finite result at index ${index}`,
+      )
+    }
+    return value
+  })
+  return Object.freeze(ranks)
+}
+
+function compareFiniteRanks(left: number, right: number): number {
+  return left < right ? -1 : left > right ? 1 : 0
+}
+
+function subpriorityPairComparison<Score>(
+  orderedRule: OrderedRule<Score>,
+  subpriority: RuleSubpriority<Score>,
+  scores: readonly Score[],
+): number {
+  const rank = subpriority.rank
+  if (rank) {
+    const ranks = finiteRanks(orderedRule, rank, scores)
+    return compareFiniteRanks(ranks[0]!, ranks[1]!)
+  }
+  return finiteComparison(
+    orderedRule,
+    subpriority.compare,
+    scores[0]!,
+    scores[1]!,
+  )
+}
+
+/**
+ * Ranks every score with no incoming strict loss ahead of defeated scores.
+ * If a comparison cycle leaves no undefeated score, every score ties so a
+ * later deterministic subpriority can resolve the group.
+ */
+export function rankUndefeatedScores<Score>(
+  scores: readonly Score[],
+  compare: (left: Score, right: Score) => number,
+): readonly number[] {
+  const defeated = scores.map(() => false)
+  for (const [challengerIndex, challenger] of scores.entries()) {
+    for (const [candidateIndex, candidate] of scores.entries()) {
+      if (challengerIndex === candidateIndex) continue
+      const comparison = compare(challenger, candidate)
+      if (!Number.isFinite(comparison)) {
+        throw new Error('undefeated comparator returned non-finite result')
+      }
+      if (comparison < 0) defeated[candidateIndex] = true
+    }
+  }
+  const hasUndefeatedScore = defeated.some((isDefeated) => !isDefeated)
+  return Object.freeze(
+    defeated.map((isDefeated) =>
+      hasUndefeatedScore && isDefeated ? 1 : 0,
+    ),
+  )
 }
 
 function immutableScores<Score>(
@@ -74,21 +163,30 @@ function selectCandidatesByRules<Score>(
       const scores = immutableScores(applicable)
       if (subpriority.when && !subpriority.when(scores)) continue
 
-      let best = first
-      let tiedBest = [best]
-      for (const candidate of applicable.slice(1)) {
-        const comparison = finiteComparison(
-          orderedRule,
-          subpriority,
-          candidate.score,
-          best.score,
-        )
-        if (comparison < 0) {
-          best = candidate
-          tiedBest = [candidate]
-        } else if (comparison === 0) {
-          tiedBest.push(candidate)
+      let tiedBest: readonly ScoredMove<Score>[]
+      const rank = subpriority.rank
+      if (rank) {
+        const ranks = finiteRanks(orderedRule, rank, scores)
+        const bestRank = Math.min(...ranks)
+        tiedBest = applicable.filter((_, index) => ranks[index] === bestRank)
+      } else {
+        let best = first
+        const tied: ScoredMove<Score>[] = [best]
+        for (const candidate of applicable.slice(1)) {
+          const comparison = finiteComparison(
+            orderedRule,
+            subpriority.compare,
+            candidate.score,
+            best.score,
+          )
+          if (comparison < 0) {
+            best = candidate
+            tied.splice(0, tied.length, candidate)
+          } else if (comparison === 0) {
+            tied.push(candidate)
+          }
         }
+        tiedBest = tied
       }
 
       const applicableSet = new Set(applicable)
@@ -145,11 +243,10 @@ export function compareScoresByRules<Score>(
     for (const subpriority of ruleSubpriorities(orderedRule)) {
       const scores = Object.freeze([leftScore, rightScore])
       if (subpriority.when && !subpriority.when(scores)) continue
-      const comparison = finiteComparison(
+      const comparison = subpriorityPairComparison(
         orderedRule,
         subpriority,
-        leftScore,
-        rightScore,
+        scores,
       )
       if (comparison !== 0) return comparison
     }
@@ -178,14 +275,7 @@ export function firstDifferingRule<Score>(
     for (const subpriority of ruleSubpriorities(orderedRule)) {
       const scores = Object.freeze([leftScore, rightScore])
       if (subpriority.when && !subpriority.when(scores)) continue
-      if (
-        finiteComparison(
-          orderedRule,
-          subpriority,
-          leftScore,
-          rightScore,
-        ) !== 0
-      ) {
+      if (subpriorityPairComparison(orderedRule, subpriority, scores) !== 0) {
         return orderedRule
       }
     }

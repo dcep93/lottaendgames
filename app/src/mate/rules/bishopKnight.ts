@@ -36,7 +36,11 @@ import {
   getKnightAndBishopZoneXEntryScore,
   getKnightAndBishopZoneXPrepareScore,
 } from './bishopKnightZoneX'
-import { compareScoresByRules, selectIdealMoves } from './selection'
+import {
+  compareScoresByRules,
+  rankUndefeatedScores,
+  selectIdealMoves,
+} from './selection'
 import type {
   MateRuleSet,
   OpponentCandidates,
@@ -222,7 +226,20 @@ const PREPARE_ZONE_X_HELP =
 const BRING_KING_CLOSER_HELP =
   "Keep White's king in the middle 16 squares while bringing it closer to Black's king and staying on the color opposite the bishop; when outside the middle 16, walk toward it first. The color rule can also yield when the two kings are two diagonal squares apart and the adjacent bishop is a knight move from Black's king. Do not increase the distance between the kings."
 const KNIGHT_CLOSER_CENTER_HELP =
-  "Avoid the bishop-opposition loop and keep the knight behind White's king relative to Black's king, then closer to White's king, then closer to the center, preferring squares farther from Black's king."
+  "Avoid the bishop-opposition loop and keep the knight behind White's king relative to Black's king. At the final placement step, compare two knight moves first by how close the knight is to White's king, then compare the resulting knight square by center distance and, finally, prefer it farther from Black's king. Keep moves that do not lose a head-to-head comparison; if those comparisons cycle, use center distance and then distance from Black's king to break the cycle."
+
+function compareKnightAndBishopFinalSourcePriority(
+  first: KnightAndBishopWhiteMoveScore,
+  second: KnightAndBishopWhiteMoveScore,
+): number {
+  return (
+    (first.movedPiece === 'n' && second.movedPiece === 'n'
+      ? first.knightWhiteKingDistance - second.knightWhiteKingDistance
+      : 0) ||
+    first.knightCentralDistance - second.knightCentralDistance ||
+    second.knightBlackKingDistance - first.knightBlackKingDistance
+  )
+}
 
 const bishopKnightWhiteMoveOverride: WhiteMoveOverride = {
   description: {
@@ -351,6 +368,17 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     guideOrder: 9,
     helpText: KNIGHT_CLOSER_CENTER_HELP,
     subpriorities: [
+      {
+        // The source pair ordering is not transitive for every mixed-piece
+        // group. Preserve an undefeated source winner when one exists; when
+        // every survivor has a loss, tie the cycle and let the stable stages
+        // below choose independently of candidate enumeration order.
+        rank: (scores) =>
+          rankUndefeatedScores(
+            scores,
+            compareKnightAndBishopFinalSourcePriority,
+          ),
+      },
       {
         when: (scores) =>
           scores.every(({ movedPiece }) => movedPiece === 'n'),

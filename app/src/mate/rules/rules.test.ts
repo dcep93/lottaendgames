@@ -8,6 +8,7 @@ import {
   firstDifferingRule,
   getMateRuleSet,
   isMoveIdeal,
+  rankUndefeatedScores,
   registerMateRuleSet,
   selectIdealMoves,
 } from './index'
@@ -16,6 +17,7 @@ import type {
   OrderedRule,
   RegisteredMateRuleSet,
   RuleHelp,
+  RuleSubpriority,
   ScoredMove,
   WhiteMoveOverride,
 } from './types'
@@ -562,6 +564,160 @@ test('grouped subpriorities evaluate immutable survivor groups once and remain p
     explainMove(groupedCandidates.slice(0, 2), [groupedRule], 'Nc3'),
     groupedRule,
   )
+})
+
+test('undefeated group ranks handle winners, ties, and cycles without order sensitivity', () => {
+  type TournamentScore = {
+    readonly id: 'a' | 'b' | 'c'
+    readonly tier: number
+    readonly fallback: number
+  }
+  const tournamentCandidates: readonly ScoredMove<TournamentScore>[] = [
+    { san: 'A', score: { id: 'a', tier: 0, fallback: 2 } },
+    { san: 'B', score: { id: 'b', tier: 0, fallback: 0 } },
+    { san: 'C', score: { id: 'c', tier: 1, fallback: 1 } },
+  ]
+  let groupRankCalls = 0
+  const rankedRule = (
+    compare: (left: TournamentScore, right: TournamentScore) => number,
+    withFallback = false,
+  ): OrderedRule<TournamentScore> => ({
+    id: 'ranked',
+    shortLabel: 'Ranked group',
+    helpText: 'Prefer undefeated candidates, then use a stable fallback.',
+    subpriorities: [
+      {
+        rank: (scores) => {
+          groupRankCalls += 1
+          assert.equal(Object.isFrozen(scores), true)
+          return rankUndefeatedScores(scores, compare)
+        },
+      },
+      ...(withFallback
+        ? [
+            {
+              compare: (
+                left: TournamentScore,
+                right: TournamentScore,
+              ) => left.fallback - right.fallback,
+            },
+          ]
+        : []),
+    ],
+  })
+
+  const oneWinner = rankedRule(
+    (left, right) => left.fallback - right.fallback,
+  )
+  const multipleWinners = rankedRule(
+    (left, right) => left.tier - right.tier,
+  )
+  const allTied = rankedRule(() => 0)
+  const cycle = rankedRule((left, right) => {
+    if (left.id === right.id) return 0
+    const defeatedBy = { a: 'c', b: 'a', c: 'b' } as const
+    return defeatedBy[right.id] === left.id ? -1 : 1
+  }, true)
+
+  const candidatePermutations = permutations(tournamentCandidates)
+  for (const permutation of candidatePermutations) {
+    assert.deepEqual(selectIdealMoves(permutation, [oneWinner]), ['B'])
+    assert.deepEqual(
+      selectIdealMoves(permutation, [multipleWinners]),
+      permutation
+        .filter(({ score }) => score.tier === 0)
+        .map(({ san }) => san),
+    )
+    assert.deepEqual(
+      selectIdealMoves(permutation, [allTied]),
+      permutation.map(({ san }) => san),
+    )
+    assert.deepEqual(selectIdealMoves(permutation, [cycle]), ['B'])
+  }
+  assert.equal(groupRankCalls, candidatePermutations.length * 4)
+})
+
+test('group rank callbacks must return exactly one finite rank per survivor', () => {
+  const invalidRanks = [
+    {
+      name: 'non-array',
+      rank: () => null as unknown as readonly number[],
+      expected: /rule invalid rank must return an array/,
+    },
+    {
+      name: 'too few',
+      rank: (scores: readonly TestScore[]) => scores.slice(1).map(() => 0),
+      expected: /rule invalid rank returned 3 values for 4 scores/,
+    },
+    {
+      name: 'too many',
+      rank: (scores: readonly TestScore[]) => [...scores.map(() => 0), 0],
+      expected: /rule invalid rank returned 5 values for 4 scores/,
+    },
+    {
+      name: 'NaN',
+      rank: (scores: readonly TestScore[]) =>
+        scores.map((_, index) => (index === 1 ? Number.NaN : 0)),
+      expected: /rule invalid rank returned non-finite result at index 1/,
+    },
+    {
+      name: 'infinity',
+      rank: (scores: readonly TestScore[]) =>
+        scores.map((_, index) =>
+          index === 2 ? Number.POSITIVE_INFINITY : 0,
+        ),
+      expected: /rule invalid rank returned non-finite result at index 2/,
+    },
+  ] as const
+
+  for (const scenario of invalidRanks) {
+    const invalidRule: OrderedRule<TestScore> = {
+      id: 'invalid',
+      shortLabel: 'Invalid',
+      helpText: 'Invalid group rank.',
+      subpriorities: [{ rank: scenario.rank }],
+    }
+    assert.throws(
+      () => selectIdealMoves(candidates, [invalidRule]),
+      scenario.expected,
+      scenario.name,
+    )
+  }
+})
+
+test('registered rule operations snapshot grouped rank callbacks', () => {
+  const mutableRank = {
+    rank: (scores: readonly TestScore[]) => scores.map(({ safe }) => safe),
+  }
+  const mutableSubpriorities: RuleSubpriority<TestScore>[] = [
+    mutableRank,
+    { compare: (left, right) => left.closer - right.closer },
+  ]
+  const mutableRule: OrderedRule<TestScore> = {
+    id: 'ranked-safe',
+    shortLabel: 'Ranked safe',
+    helpText: 'Prefer safe moves through a grouped rank.',
+    subpriorities: mutableSubpriorities,
+  }
+  const unregister = registerMateRuleSet({
+    ...rookRuleSet,
+    id: 'two-knights-pawn',
+    whiteRules: [mutableRule],
+  })
+
+  try {
+    mutableRank.rank = (scores) => scores.map(({ safe }) => -safe)
+    mutableSubpriorities.splice(0, mutableSubpriorities.length, {
+      compare: (left, right) => right.closer - left.closer,
+    })
+
+    assert.deepEqual(
+      getMateRuleSet('two-knights-pawn').idealWhiteMoves('test-fen'),
+      ['Ka2', 'Kb2'],
+    )
+  } finally {
+    unregister()
+  }
 })
 
 test('grouped comparator results must remain finite', () => {
