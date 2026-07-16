@@ -131,6 +131,16 @@ export function getEndgamePiecePlacements(
   return placements
 }
 
+export function findPiece(
+  fen: string,
+  color: Color,
+  type: PieceSymbol,
+): EndgamePiecePlacement | undefined {
+  return getEndgamePiecePlacements(fen).find(
+    (piece) => piece.color === color && piece.type === type,
+  )
+}
+
 export function boardFenFromPlacements(
   placements: readonly EndgamePiecePlacement[],
 ): string {
@@ -288,6 +298,117 @@ export function manhattanDistance(first: Square, second: Square): number {
   const a = squareCoordinates(first)
   const b = squareCoordinates(second)
   return Math.abs(a.file - b.file) + Math.abs(a.rank - b.rank)
+}
+
+export function isKnightMove(first: Square, second: Square): boolean {
+  const a = squareCoordinates(first)
+  const b = squareCoordinates(second)
+  const fileDistance = Math.abs(a.file - b.file)
+  const rankDistance = Math.abs(a.rank - b.rank)
+  return (
+    (fileDistance === 1 && rankDistance === 2) ||
+    (fileDistance === 2 && rankDistance === 1)
+  )
+}
+
+export function isDiagonalKingMove(first: Square, second: Square): boolean {
+  const a = squareCoordinates(first)
+  const b = squareCoordinates(second)
+  return (
+    Math.abs(a.file - b.file) === 1 && Math.abs(a.rank - b.rank) === 1
+  )
+}
+
+export function sharesRankOrFile(first: Square, second: Square): boolean {
+  const a = squareCoordinates(first)
+  const b = squareCoordinates(second)
+  return a.file === b.file || a.rank === b.rank
+}
+
+export function hasDirectKingOpposition(
+  first: Square,
+  second: Square,
+): boolean {
+  const a = squareCoordinates(first)
+  const b = squareCoordinates(second)
+  return (
+    (a.rank === b.rank && Math.abs(a.file - b.file) === 2) ||
+    (a.file === b.file && Math.abs(a.rank - b.rank) === 2)
+  )
+}
+
+export function isStrictlyBetween(
+  value: number,
+  first: number,
+  second: number,
+): boolean {
+  return value > Math.min(first, second) && value < Math.max(first, second)
+}
+
+export function edgeDistance(square: Square): number {
+  const { file, rank } = squareCoordinates(square)
+  return Math.min(file, 7 - file, rank, 7 - rank)
+}
+
+export function distanceToRange(
+  value: number,
+  minimum: number,
+  maximum: number,
+): number {
+  if (value < minimum) return minimum - value
+  if (value > maximum) return value - maximum
+  return 0
+}
+
+export function middle2x2Distance(square: Square): number {
+  const { file, rank } = squareCoordinates(square)
+  return distanceToRange(file, 3, 4) + distanceToRange(rank, 3, 4)
+}
+
+export function kingWalkCenterDistance(square: Square): number {
+  return Math.min(
+    ...(['d4', 'e4', 'd5', 'e5'] as const).map((centerSquare) =>
+      kingDistance(square, centerSquare),
+    ),
+  )
+}
+
+export function withFenTurn(fen: string, turn: Color): string {
+  const fields = fen.split(' ')
+  fields[1] = turn
+  return fields.join(' ')
+}
+
+export function legalMoveCount(fen: string): number {
+  return getChess(fen).moves().length
+}
+
+export function positionKey(fen: string): string {
+  return fen.split(' ').slice(0, 4).join(' ')
+}
+
+export function sideToMoveCanCapturePiece(
+  fen: string,
+  color: Color,
+  type: PieceSymbol,
+): boolean {
+  const currentCount = getEndgamePiecePlacements(fen).filter(
+    (piece) => piece.color === color && piece.type === type,
+  ).length
+  if (currentCount === 0) {
+    return true
+  }
+
+  return getChess(fen)
+    .moves()
+    .some((san) => {
+      const nextChess = getChess(fen)
+      nextChess.move(san)
+      const nextCount = getEndgamePiecePlacements(nextChess.fen()).filter(
+        (piece) => piece.color === color && piece.type === type,
+      ).length
+      return nextCount < currentCount
+    })
 }
 
 export function squaredEuclideanDistance(

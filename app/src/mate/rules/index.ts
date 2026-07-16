@@ -1,4 +1,5 @@
 import type { MateId } from '../types'
+import { queenRuleSet, rookRuleSet } from './majorPieces'
 import type {
   MateRuleSet,
   OrderedRule,
@@ -6,6 +7,36 @@ import type {
   RuleDescription,
   ScoredMove,
 } from './types'
+
+export {
+  compareQueenBlackScores,
+  compareQueenWhiteScores,
+  compareRookBlackScores,
+  compareRookWhiteScores,
+  getEndgameReturnToPositionMoves,
+  getIdealQueenBlackMoves,
+  getIdealQueenWhiteMoves,
+  getIdealRookBlackMoves,
+  getIdealRookWhiteMoves,
+  getMajorEndgamePhase,
+  getQueenCageKingApproachDistance,
+  getQueenCageKingApproachManhattanDistance,
+  getQueenTwoSquareCage,
+  queenRuleSet,
+  queenWhiteRules,
+  rookRuleSet,
+  rookWhiteRules,
+  scoreQueenBlackMove,
+  scoreQueenWhiteMove,
+  scoreRookBlackMove,
+  scoreRookWhiteMove,
+} from './majorPieces'
+export type {
+  QueenBlackMoveScore,
+  QueenWhiteMoveScore,
+  RookBlackMoveScore,
+  RookWhiteMoveScore,
+} from './majorPieces'
 
 export type {
   MateRuleSet,
@@ -156,6 +187,7 @@ type MateRuleSetRegistration = {
 }
 
 const mateRuleSets = new Map<MateId, MateRuleSetRegistration>()
+const builtInMateRuleSets = new Map<MateId, MateRuleSetRegistration>()
 
 function createRegisteredMateRuleSet<Score>(
   ruleSet: MateRuleSet<Score>,
@@ -228,10 +260,23 @@ export function registerMateRuleSet<Score>(
   }
 }
 
+function registerBuiltInMateRuleSet<Score>(
+  ruleSet: MateRuleSet<Score>,
+): void {
+  const registeredRuleSet = createRegisteredMateRuleSet(ruleSet)
+  if (builtInMateRuleSets.has(registeredRuleSet.id)) {
+    throw new Error(`Mate rules already registered as built-in: ${registeredRuleSet.id}`)
+  }
+  builtInMateRuleSets.set(registeredRuleSet.id, { registeredRuleSet })
+}
+
 export function getMateRuleSet(id: MateId): RegisteredMateRuleSet {
-  const registration = mateRuleSets.get(id)
+  const registration = mateRuleSets.get(id) ?? builtInMateRuleSets.get(id)
   if (!registration) {
     throw new Error(`Mate rules not registered: ${id}`)
   }
   return registration.registeredRuleSet
 }
+
+registerBuiltInMateRuleSet(queenRuleSet)
+registerBuiltInMateRuleSet(rookRuleSet)

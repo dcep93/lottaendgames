@@ -214,9 +214,15 @@ test('candidate lookup and correctness use exact SAN', () => {
 
 test('the registry reports an exact error for an unregistered mate set', () => {
   assert.throws(
-    () => getMateRuleSet('queen'),
-    new Error('Mate rules not registered: queen'),
+    () => getMateRuleSet('two-knights-pawn'),
+    new Error('Mate rules not registered: two-knights-pawn'),
   )
+})
+
+test('built-in registration is not exposed as a mutable public API', async () => {
+  const ruleExports = await import('./index')
+
+  assert.equal('registerBuiltInMateRuleSet' in ruleExports, false)
 })
 
 test('rule sets integrate ordered rules with presentation-only help', () => {
@@ -291,10 +297,9 @@ test('registered rule operations capture concrete scores without exposing them',
     unregisterFirst()
   }
 
-  assert.throws(
-    () => getMateRuleSet('rook'),
-    new Error('Mate rules not registered: rook'),
-  )
+  const restoredBuiltIn = getMateRuleSet('rook')
+  assert.equal(restoredBuiltIn.id, 'rook')
+  assert.equal(restoredBuiltIn.whiteRuleDescriptions[0]?.id, 'mate')
 })
 
 test('registered rule operations snapshot the source rule array', () => {
