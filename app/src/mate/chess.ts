@@ -237,8 +237,26 @@ export function randomTransformFen(
   fen: string,
   random: () => number = Math.random,
 ): string {
-  const index = randomArrayIndex(SQUARE_TRANSFORMS.length, random)
+  const index = collectionIndex(SQUARE_TRANSFORMS.length, random())
   return transformFen(fen, SQUARE_TRANSFORMS[index])
+}
+
+export function collectionIndex(length: number, randomValue: number): number {
+  if (!Number.isInteger(length) || length <= 0) {
+    throw new RangeError(
+      `Collection length must be a positive integer; received ${String(length)}`,
+    )
+  }
+  if (
+    !Number.isFinite(randomValue) ||
+    randomValue < 0 ||
+    randomValue >= 1
+  ) {
+    throw new RangeError(
+      `Random value must be finite and within [0, 1); received ${String(randomValue)}`,
+    )
+  }
+  return Math.floor(randomValue * length)
 }
 
 export function allSquares(): Square[] {
@@ -309,6 +327,7 @@ export function isLegalEndgameStart(fen: string): boolean {
 
     const fields = fen.trim().split(/\s+/)
     fields[1] = 'b'
+    fields[3] = '-'
     const blackToMove = getChess(fields.join(' '))
     return (
       !blackToMove.isCheck() &&
@@ -406,11 +425,6 @@ function getCatalogEntry(mateId: MateId) {
     throw new Error(`Unknown mate set: ${mateId}`)
   }
   return entry
-}
-
-function randomArrayIndex(length: number, random: () => number): number {
-  const value = Math.floor(random() * length)
-  return Math.max(0, Math.min(length - 1, value))
 }
 
 function fenHasPawnOnEdgeRank(fen: string): boolean {

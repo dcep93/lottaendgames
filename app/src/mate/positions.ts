@@ -2,6 +2,7 @@ import { MATE_CATALOG, type MateCatalogEntry } from './catalog'
 import {
   allSquares,
   boardFenFromPlacements,
+  collectionIndex,
   getEndgamePieces,
   randomTransformFen,
   validateMatePosition,
@@ -24,7 +25,8 @@ export function generateMatePosition(
 
   const entry = getCatalogEntry(mateId)
   if (mode === 'train') {
-    const seed = entry.trainSeeds[randomArrayIndex(entry.trainSeeds.length, random)]
+    const seed =
+      entry.trainSeeds[collectionIndex(entry.trainSeeds.length, random())]
     return randomTransformFen(seed, random)
   }
 
@@ -49,7 +51,7 @@ function generateStandardAttempt(
       (square) => !piece.isPawn || (square[1] !== '1' && square[1] !== '8'),
     )
     if (candidates.length === 0) return null
-    const square = candidates[randomArrayIndex(candidates.length, random)]
+    const square = candidates[collectionIndex(candidates.length, random())]
     availableSquares.splice(availableSquares.indexOf(square), 1)
     placements.push({ ...piece, square })
   }
@@ -71,9 +73,4 @@ function getCatalogEntry(mateId: MateId): MateCatalogEntry {
     throw new Error(`Unknown mate set: ${mateId}`)
   }
   return entry
-}
-
-function randomArrayIndex(length: number, random: () => number): number {
-  const value = Math.floor(random() * length)
-  return Math.max(0, Math.min(length - 1, value))
 }

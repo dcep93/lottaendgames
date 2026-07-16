@@ -6,6 +6,7 @@ import {
   SQUARE_TRANSFORMS,
   allSquares,
   boardFenFromPlacements,
+  collectionIndex,
   getChess,
   getEndgamePiecePlacements,
   getEndgamePieces,
@@ -45,6 +46,13 @@ function seededRandom(seed: number): () => number {
     return state / 2 ** 32
   }
 }
+
+const IMPLEMENTED_MATES = [
+  { id: 'queen', signature: 'w:k,w:q,b:k' },
+  { id: 'rook', signature: 'w:k,w:r,b:k' },
+  { id: 'two-bishops', signature: 'w:k,w:b,w:b,b:k' },
+  { id: 'bishop-knight', signature: 'w:k,w:b,w:n,b:k' },
+] as const
 
 test('all eight square transforms expose their inverse and exact mapping', () => {
   assert.deepEqual(
@@ -195,6 +203,49 @@ test('transformFen transforms only the board and preserves all other fields', ()
   )
 })
 
+test('random selection callers surface the shared RNG contract error', () => {
+  const rookSeed = '8/8/8/8/3k4/8/1R6/3K4 w - - 0 1'
+  const nanError = new RangeError(
+    'Random value must be finite and within [0, 1); received NaN',
+  )
+  const upperBoundError = new RangeError(
+    'Random value must be finite and within [0, 1); received 1',
+  )
+  const negativeError = new RangeError(
+    'Random value must be finite and within [0, 1); received -0.01',
+  )
+  const infiniteError = new RangeError(
+    'Random value must be finite and within [0, 1); received Infinity',
+  )
+
+  assert.throws(() => randomTransformFen(rookSeed, () => Number.NaN), nanError)
+  assert.throws(
+    () => randomTransformFen(rookSeed, () => Number.POSITIVE_INFINITY),
+    infiniteError,
+  )
+  assert.throws(
+    () => generateMatePosition('rook', 'standard', () => Number.NaN),
+    nanError,
+  )
+  assert.throws(
+    () => generateMatePosition('rook', 'train', () => 1),
+    upperBoundError,
+  )
+  assert.throws(
+    () => generateMatePosition('rook', 'train', () => -0.01),
+    negativeError,
+  )
+})
+
+test('collection index selection maps the RNG interval to valid indices', () => {
+  assert.equal(collectionIndex(8, 0), 0)
+  assert.equal(collectionIndex(8, 0.999_999), 7)
+  assert.throws(
+    () => collectionIndex(0, 0.5),
+    new RangeError('Collection length must be a positive integer; received 0'),
+  )
+})
+
 test('opposite-colored bishop detection requires exactly two white bishops', () => {
   const placement = (square: Square): EndgamePiecePlacement => ({
     color: 'w',
@@ -232,6 +283,13 @@ test('legal starts are white to move, quiet, non-terminal positions', () => {
     false,
   )
   assert.equal(isLegalEndgameStart('not a FEN'), false)
+})
+
+test('legal start validation ignores en passant when checking the opposite turn', () => {
+  const fen = '4k3/8/8/4p3/8/8/8/1N2K1N1 w - e6 0 2'
+
+  assert.equal(isLegalEndgameStart(fen), true)
+  assert.deepEqual(validateMatePosition('two-knights-pawn', fen), { ok: true })
 })
 
 test('all five mate validators accept their catalog positions', () => {
@@ -295,13 +353,45 @@ test('mate validation rejects wrong material, bad bishops, edge pawns, and termi
   )
 })
 
-test('every transformed rook Train seed remains valid with rook material', () => {
-  const rookSeed = '8/8/8/8/3k4/8/1R6/3K4 w - - 0 1'
-  for (const transform of SQUARE_TRANSFORMS) {
-    const fen = transformFen(rookSeed, transform)
-    assert.doesNotThrow(() => getChess(fen), transform.name)
-    assert.equal(pieceSignature(fen), 'w:k,w:r,b:k', transform.name)
-    assert.deepEqual(validateMatePosition('rook', fen), { ok: true })
+test('every implemented Train seed remains valid under every transform', () => {
+  for (const mate of IMPLEMENTED_MATES) {
+    const catalogEntry = MATE_CATALOG.find((entry) => entry.id === mate.id)
+    assert.ok(catalogEntry)
+    for (const seed of catalogEntry.trainSeeds) {
+      for (const transform of SQUARE_TRANSFORMS) {
+        const fen = transformFen(seed, transform)
+        const context = `${mate.id}: ${seed} via ${transform.name}`
+        assert.doesNotThrow(() => getChess(fen), context)
+        assert.equal(pieceSignature(fen), mate.signature, context)
+        assert.deepEqual(
+          validateMatePosition(mate.id, fen),
+          { ok: true },
+          context,
+        )
+      }
+    }
+  }
+})
+
+test('Standard and Train generation stay legal across all implemented sets', () => {
+  for (const [mateIndex, mate] of IMPLEMENTED_MATES.entries()) {
+    for (const [modeIndex, mode] of (
+      ['standard', 'train'] as const
+    ).entries()) {
+      const seed = 1000 + mateIndex * 10 + modeIndex
+      const first = generateMatePosition(mate.id, mode, seededRandom(seed))
+      const second = generateMatePosition(mate.id, mode, seededRandom(seed))
+      const context = `${mate.id} ${mode}`
+
+      assert.equal(first, second, `${context} deterministic`)
+      assert.equal(pieceSignature(first), mate.signature, `${context} material`)
+      assert.equal(isLegalEndgameStart(first), true, `${context} legal start`)
+      assert.deepEqual(
+        validateMatePosition(mate.id, first),
+        { ok: true },
+        `${context} structural validation`,
+      )
+    }
   }
 })
 
