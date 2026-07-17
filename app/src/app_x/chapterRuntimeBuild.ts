@@ -3,6 +3,10 @@ import type {
   ProblemSection,
   RawChapterSection,
 } from './chapterTypes'
+import {
+  buildChapterReferences,
+  type BookReferenceIndex,
+} from './bookReferences'
 import type {
   RuntimeChapterDefinition,
   RuntimeChapterRenderItem,
@@ -22,6 +26,7 @@ type SourceChapterDefinition = {
 
 export function buildRuntimeChapter(
   chapter: SourceChapterDefinition,
+  referenceIndex: BookReferenceIndex,
 ): RuntimeChapterDefinition {
   const playback = buildRuntimePlayback(chapter.sections)
   const initialPositionFens = chapter.sections.reduce<Record<string, string>>(
@@ -55,6 +60,7 @@ export function buildRuntimeChapter(
         section.type === 'position' ||
         section.type === 'problem',
     ).length,
+    referencesBySectionIndex: buildChapterReferences(chapter, referenceIndex),
     renderItems: buildChapterRenderItems(chapter.sections),
   }
 }

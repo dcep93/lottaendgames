@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { Chess } from 'chess.js'
 import { buildRuntimeChapter } from './chapterRuntimeBuild'
+import { buildBookReferenceIndex } from './bookReferences'
 import type { BookSource, RawChapterSection } from './chapterTypes'
 
 type BoardContent = {
@@ -102,7 +103,10 @@ assert.deepEqual(
 const finalTest = getPart('14')
 const appendix = getPart('15')
 const bibliography = getPart('bibliography')
-const finalTestRuntime = buildRuntimeChapter(finalTest)
+const finalTestRuntime = buildRuntimeChapter(
+  finalTest,
+  buildBookReferenceIndex(book.parts),
+)
 const finalTestMoves = (sectionIndex: number) =>
   (
     finalTestRuntime.playback.tokensBySectionIndex.find(

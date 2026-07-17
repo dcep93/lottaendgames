@@ -9,6 +9,7 @@ import {
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { buildRuntimeChapter } from '../app/src/app_x/chapterRuntimeBuild'
+import { buildBookReferenceIndex } from '../app/src/app_x/bookReferences'
 import { validateBookSource } from '../app/src/app_x/bookSourceValidation'
 import type { RuntimeChapterPayload } from '../app/src/app_x/chapterRuntime'
 
@@ -25,10 +26,13 @@ const bookSource = validateBookSource(
 )
 const sourceChapters = bookSource.parts
 const sourceContentHash = getContentHash(sourceChapters)
-const runtimeChapters = sourceChapters.map(buildRuntimeChapter)
+const referenceIndex = buildBookReferenceIndex(sourceChapters)
+const runtimeChapters = sourceChapters.map((chapter) =>
+  buildRuntimeChapter(chapter, referenceIndex),
+)
 const runtimeContentHash = getContentHash(runtimeChapters)
 const runtimePayload: RuntimeChapterPayload = {
-  schemaVersion: 2,
+  schemaVersion: 3,
   sourceContentHash: `sha256:${sourceContentHash}`,
   contentHash: `sha256:${runtimeContentHash}`,
   chapters: runtimeChapters,

@@ -29,6 +29,8 @@ import InstructionalDiagram from './InstructionalDiagram'
 import TableBlock from './TableBlock'
 import { buildLichessAnalysisUrl, buildLichessEditorUrl } from './lichess'
 import type { TextPlaybackToken } from './moveParser'
+import type { BookReferenceSpan } from './bookReferences'
+import { shouldHandleBookReferenceClick } from './bookReferenceNavigation'
 import BookFrontMatter from './BookFrontMatter'
 import {
   getNextNavigationNode,
@@ -57,6 +59,7 @@ const emptyPreparedChapter = hydrateRuntimeChapter({
     tokensBySectionIndex: [],
   },
   positionCount: 0,
+  referencesBySectionIndex: [],
   renderItems: [],
   sections: emptyChapterSections,
 })
@@ -106,6 +109,7 @@ export default function ChapterViewer({
   const chapterSections = preparedChapter.sections
   const chapterRenderItems = preparedChapter.renderItems
   const playback = preparedChapter.playback
+  const referencesBySectionIndex = preparedChapter.referencesBySectionIndex
   const navigationByPosition = preparedChapter.navigationByPosition
   const initialPositionFens = preparedChapter.initialPositionFens
   const [activeBoards, setActiveBoards] = useState<
@@ -513,10 +517,12 @@ export default function ChapterViewer({
                   key={`position-group-${item.index}`}
                   navigationByPosition={navigationByPosition}
                   onAnchorSelect={onAnchorSelect}
+                  onBookNavigate={onBookNavigate}
                   onMoveClick={handleMoveClick}
                   onPositionReset={handlePositionReset}
                   onPositionStep={handlePositionStep}
                   playback={playback}
+                  referencesBySectionIndex={referencesBySectionIndex}
                   sections={chapterSections}
                 />
               ) : chapterSections[item.index].type === 'problem' ? (
@@ -526,11 +532,13 @@ export default function ChapterViewer({
                   index={item.index}
                   key={`problem-${item.index}`}
                   navigationByPosition={navigationByPosition}
+                  onBookNavigate={onBookNavigate}
                   onMoveClick={handleMoveClick}
                   onPositionReset={handlePositionReset}
                   onPositionStep={handlePositionStep}
                   onToggleSolution={handleSolutionToggle}
                   playback={playback}
+                  referenceSpans={referencesBySectionIndex.get(item.index)}
                   revealed={Boolean(
                     revealedSolutions[
                       (chapterSections[item.index] as ProblemSection).content
@@ -547,10 +555,12 @@ export default function ChapterViewer({
                   activePositionNumber={activePositionNumber}
                   navigationByPosition={navigationByPosition}
                   onAnchorSelect={onAnchorSelect}
+                  onBookNavigate={onBookNavigate}
                   onMoveClick={handleMoveClick}
                   onPositionReset={handlePositionReset}
                   onPositionStep={handlePositionStep}
                   playback={playback}
+                  referenceSpans={referencesBySectionIndex.get(item.index)}
                   section={chapterSections[item.index]}
                 />
               ),
@@ -610,11 +620,13 @@ export function ProblemStudyGroup({
   activePositionNumber,
   index,
   navigationByPosition,
+  onBookNavigate,
   onMoveClick,
   onPositionReset,
   onPositionStep,
   onToggleSolution,
   playback,
+  referenceSpans,
   revealed,
   section,
 }: {
@@ -622,6 +634,7 @@ export function ProblemStudyGroup({
   activePositionNumber: string | null
   index: number
   navigationByPosition: HydratedChapter['navigationByPosition']
+  onBookNavigate: (href: string) => void
   onMoveClick: (token: Extract<TextPlaybackToken, { type: 'move' }>) => void
   onPositionReset: (positionNumber: string) => void
   onPositionStep: (
@@ -630,6 +643,7 @@ export function ProblemStudyGroup({
   ) => void
   onToggleSolution: (problem: ProblemSection) => void
   playback: HydratedChapter['playback']
+  referenceSpans?: BookReferenceSpan[]
   revealed: boolean
   section: ProblemSection
 }) {
@@ -684,7 +698,9 @@ export function ProblemStudyGroup({
               activeBoards={activeBoards}
               activePositionNumber={activePositionNumber}
               content={section.content.solution}
+              onBookNavigate={onBookNavigate}
               onMoveClick={onMoveClick}
+              referenceSpans={referenceSpans}
               tokens={tokens}
             />
           </div>
@@ -700,10 +716,12 @@ export function PositionStudyGroup({
   group,
   navigationByPosition,
   onAnchorSelect,
+  onBookNavigate,
   onMoveClick,
   onPositionReset,
   onPositionStep,
   playback,
+  referencesBySectionIndex,
   sections,
 }: {
   activeBoards: Record<string, ActiveBoardState>
@@ -711,6 +729,7 @@ export function PositionStudyGroup({
   group: Extract<RuntimeChapterRenderItem, { type: 'positionGroup' }>
   navigationByPosition: HydratedChapter['navigationByPosition']
   onAnchorSelect: (anchorId: string) => void
+  onBookNavigate: (href: string) => void
   onMoveClick: (token: Extract<TextPlaybackToken, { type: 'move' }>) => void
   onPositionReset: (positionNumber: string) => void
   onPositionStep: (
@@ -718,6 +737,7 @@ export function PositionStudyGroup({
     direction: PlaybackDirection,
   ) => void
   playback: HydratedChapter['playback']
+  referencesBySectionIndex: HydratedChapter['referencesBySectionIndex']
   sections: RawChapterSection[]
 }) {
   const positionSection = sections[group.index] as PositionSection
@@ -758,10 +778,12 @@ export function PositionStudyGroup({
               key={`${sections[index].type}-${index}`}
               navigationByPosition={navigationByPosition}
               onAnchorSelect={onAnchorSelect}
+              onBookNavigate={onBookNavigate}
               onMoveClick={onMoveClick}
               onPositionReset={onPositionReset}
               onPositionStep={onPositionStep}
               playback={playback}
+              referenceSpans={referencesBySectionIndex.get(index)}
               section={sections[index]}
             />
           ))}
@@ -863,10 +885,12 @@ function SectionRenderer({
   index,
   navigationByPosition,
   onAnchorSelect,
+  onBookNavigate,
   onMoveClick,
   onPositionReset,
   onPositionStep,
   playback,
+  referenceSpans,
   section,
 }: {
   activeBoards: Record<string, ActiveBoardState>
@@ -874,6 +898,7 @@ function SectionRenderer({
   index: number
   navigationByPosition: HydratedChapter['navigationByPosition']
   onAnchorSelect: (anchorId: string) => void
+  onBookNavigate: (href: string) => void
   onMoveClick: (token: Extract<TextPlaybackToken, { type: 'move' }>) => void
   onPositionReset: (positionNumber: string) => void
   onPositionStep: (
@@ -881,6 +906,7 @@ function SectionRenderer({
     direction: PlaybackDirection,
   ) => void
   playback: HydratedChapter['playback']
+  referenceSpans?: BookReferenceSpan[]
   section: RawChapterSection
 }) {
   const playbackTokens = playback.tokensBySectionIndex.get(index)
@@ -912,7 +938,9 @@ function SectionRenderer({
         <PanelBlock
           activeBoards={activeBoards}
           activePositionNumber={activePositionNumber}
+          onBookNavigate={onBookNavigate}
           onMoveClick={onMoveClick}
+          referenceSpans={referenceSpans}
           section={panelSection}
           tokens={playbackTokens}
         />
@@ -945,7 +973,9 @@ function SectionRenderer({
           activeBoards={activeBoards}
           activePositionNumber={activePositionNumber}
           content={textSection.content}
+          onBookNavigate={onBookNavigate}
           onMoveClick={onMoveClick}
+          referenceSpans={referenceSpans}
           tokens={playbackTokens}
         />
       )
@@ -1107,13 +1137,17 @@ function PositionCard({
 export function PanelBlock({
   activeBoards,
   activePositionNumber,
+  onBookNavigate,
   onMoveClick,
+  referenceSpans,
   section,
   tokens,
 }: {
   activeBoards: Record<string, ActiveBoardState>
   activePositionNumber: string | null
+  onBookNavigate: (href: string) => void
   onMoveClick: (token: Extract<TextPlaybackToken, { type: 'move' }>) => void
+  referenceSpans?: BookReferenceSpan[]
   section: PanelSection
   tokens?: TextPlaybackToken[]
 }) {
@@ -1125,11 +1159,18 @@ export function PanelBlock({
           <InlinePlayback
             activeBoards={activeBoards}
             activePositionNumber={activePositionNumber}
+            content={section.content.text}
+            onBookNavigate={onBookNavigate}
             onMoveClick={onMoveClick}
+            referenceSpans={referenceSpans}
             tokens={tokens}
           />
         ) : (
-          section.content.text
+          <InlineBookReferences
+            content={section.content.text}
+            onBookNavigate={onBookNavigate}
+            spans={referenceSpans}
+          />
         )}
       </p>
     </aside>
@@ -1140,13 +1181,17 @@ export function ProseBlock({
   activeBoards,
   activePositionNumber,
   content,
+  onBookNavigate,
   onMoveClick,
+  referenceSpans,
   tokens,
 }: {
   activeBoards: Record<string, ActiveBoardState>
   activePositionNumber: string | null
   content: string
+  onBookNavigate: (href: string) => void
   onMoveClick: (token: Extract<TextPlaybackToken, { type: 'move' }>) => void
+  referenceSpans?: BookReferenceSpan[]
   tokens?: TextPlaybackToken[]
 }) {
   if (tokens) {
@@ -1156,7 +1201,10 @@ export function ProseBlock({
           <InlinePlayback
             activeBoards={activeBoards}
             activePositionNumber={activePositionNumber}
+            content={content}
+            onBookNavigate={onBookNavigate}
             onMoveClick={onMoveClick}
+            referenceSpans={referenceSpans}
             tokens={tokens}
           />
         </p>
@@ -1166,8 +1214,15 @@ export function ProseBlock({
 
   return (
     <div className="leg-prose">
-      {content.split(/\n+/).map((paragraph, index) => (
-        <p key={`${paragraph.slice(0, 16)}-${index}`}>{paragraph}</p>
+      {splitParagraphs(content).map(({ start, text }, index) => (
+        <p key={`${text.slice(0, 16)}-${index}`}>
+          <InlineBookReferences
+            baseOffset={start}
+            content={text}
+            onBookNavigate={onBookNavigate}
+            spans={referenceSpans}
+          />
+        </p>
       ))}
     </div>
   )
@@ -1176,17 +1231,43 @@ export function ProseBlock({
 function InlinePlayback({
   activeBoards,
   activePositionNumber,
+  content,
+  onBookNavigate,
   onMoveClick,
+  referenceSpans,
   tokens,
 }: {
   activeBoards: Record<string, ActiveBoardState>
   activePositionNumber: string | null
+  content: string
+  onBookNavigate: (href: string) => void
   onMoveClick: (token: Extract<TextPlaybackToken, { type: 'move' }>) => void
+  referenceSpans?: BookReferenceSpan[]
   tokens: TextPlaybackToken[]
 }) {
+  const reconstructedContent = tokens
+    .map((token) => (token.type === 'text' ? token.text : token.display))
+    .join('')
+  const alignedReferenceSpans =
+    reconstructedContent === content ? referenceSpans : undefined
+  let sourceOffset = 0
+
   return tokens.map((token, index) => {
+    const tokenText = token.type === 'text' ? token.text : token.display
+    const tokenOffset = sourceOffset
+    sourceOffset += tokenText.length
+
     if (token.type === 'text') {
-      return <span key={`${token.text.slice(0, 12)}-${index}`}>{token.text}</span>
+      return (
+        <span key={`${token.text.slice(0, 12)}-${index}`}>
+          <InlineBookReferences
+            baseOffset={tokenOffset}
+            content={token.text}
+            onBookNavigate={onBookNavigate}
+            spans={alignedReferenceSpans}
+          />
+        </span>
+      )
     }
 
     const isActive =
@@ -1206,6 +1287,91 @@ function InlinePlayback({
       </button>
     )
   })
+}
+
+function InlineBookReferences({
+  baseOffset = 0,
+  content,
+  onBookNavigate,
+  spans = [],
+}: {
+  baseOffset?: number
+  content: string
+  onBookNavigate: (href: string) => void
+  spans?: BookReferenceSpan[]
+}) {
+  const contentEnd = baseOffset + content.length
+  const alignedSpans = spans.filter(
+    (span) =>
+      span.start >= baseOffset &&
+      span.end <= contentEnd &&
+      content.slice(span.start - baseOffset, span.end - baseOffset) ===
+        span.number,
+  )
+
+  if (alignedSpans.length === 0) {
+    return content
+  }
+
+  const output: ReactNode[] = []
+  let cursor = 0
+
+  for (const span of alignedSpans) {
+    const start = span.start - baseOffset
+    const end = span.end - baseOffset
+
+    if (start < cursor) {
+      continue
+    }
+
+    if (start > cursor) {
+      output.push(content.slice(cursor, start))
+    }
+
+    output.push(
+      <a
+        className="leg-book-reference"
+        href={span.href}
+        key={`${span.start}-${span.href}`}
+        onClick={(event) =>
+          handleBookReferenceClick(event, span.href, onBookNavigate)
+        }
+        title={`Go to ${span.kind === 'ending' ? 'Ending' : 'Position'} ${span.number}`}
+      >
+        {content.slice(start, end)}
+      </a>,
+    )
+    cursor = end
+  }
+
+  if (cursor < content.length) {
+    output.push(content.slice(cursor))
+  }
+
+  return output
+}
+
+function splitParagraphs(content: string) {
+  let searchOffset = 0
+
+  return content.split(/\n+/).map((text) => {
+    const start = content.indexOf(text, searchOffset)
+    searchOffset = start + text.length
+    return { start, text }
+  })
+}
+
+function handleBookReferenceClick(
+  event: MouseEvent<HTMLAnchorElement>,
+  href: string,
+  onBookNavigate: (href: string) => void,
+) {
+  if (!shouldHandleBookReferenceClick(event)) {
+    return
+  }
+
+  event.preventDefault()
+  onBookNavigate(href)
 }
 
 function createInitialBoardState(

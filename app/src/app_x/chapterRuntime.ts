@@ -1,4 +1,8 @@
 import type { RawChapterSection } from './chapterTypes'
+import type {
+  BookReferenceSpan,
+  SerializedChapterReferences,
+} from './bookReferences'
 import type { TextPlaybackToken } from './moveParser'
 import {
   buildPlaybackNavigation,
@@ -29,6 +33,7 @@ export type RuntimeChapterDefinition = {
   name: string
   playback: SerializedChapterPlayback
   positionCount: number
+  referencesBySectionIndex: SerializedChapterReferences
   renderItems: RuntimeChapterRenderItem[]
   sections: RawChapterSection[]
 }
@@ -42,13 +47,14 @@ export type RuntimeChapterPayload = {
 
 export type HydratedChapter = Omit<
   RuntimeChapterDefinition,
-  'navigationByPosition' | 'playback'
+  'navigationByPosition' | 'playback' | 'referencesBySectionIndex'
 > & {
   navigationByPosition: Map<string, PositionNavigation>
   playback: {
     playablePositions: Set<string>
     tokensBySectionIndex: Map<number, TextPlaybackToken[]>
   }
+  referencesBySectionIndex: Map<number, BookReferenceSpan[]>
 }
 
 export function hydrateRuntimeChapter(
@@ -63,5 +69,6 @@ export function hydrateRuntimeChapter(
     ...chapter,
     navigationByPosition: buildPlaybackNavigation(playback),
     playback,
+    referencesBySectionIndex: new Map(chapter.referencesBySectionIndex),
   }
 }

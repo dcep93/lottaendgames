@@ -11,6 +11,7 @@ import {
   ProseBlock,
   ReaderMeta,
 } from './ChapterViewer'
+import { shouldHandleBookReferenceClick } from './bookReferenceNavigation'
 import ModuleSelector from '../ModuleSelector'
 import { chapterPayloadPath } from './chapterPayloadManifest'
 import InstructionalDiagram from './InstructionalDiagram'
@@ -22,12 +23,35 @@ import type {
   RawChapterSection,
 } from './chapterTypes'
 import type { TextPlaybackToken } from './moveParser'
+import type { BookReferenceSpan } from './bookReferences'
 import type { RuntimeChapterPayload } from './chapterRuntime'
 
 const activeBoards = {}
 const onMoveClick = () => undefined
 const onAnchorSelect = () => undefined
+const onBookNavigate = () => undefined
 const onPositionStep = () => undefined
+
+assert.equal(
+  shouldHandleBookReferenceClick({
+    altKey: false,
+    button: 0,
+    ctrlKey: false,
+    metaKey: false,
+    shiftKey: false,
+  }),
+  true,
+)
+assert.equal(
+  shouldHandleBookReferenceClick({
+    altKey: false,
+    button: 0,
+    ctrlKey: false,
+    metaKey: true,
+    shiftKey: false,
+  }),
+  false,
+)
 
 const moduleSelectorMarkup = renderToStaticMarkup(
   <ModuleSelector activeModule="book" onNavigate={() => undefined} />,
@@ -43,6 +67,43 @@ const runtimePayload = JSON.parse(
     'utf8',
   ),
 ) as RuntimeChapterPayload
+assert.equal(runtimePayload.schemaVersion, 3)
+
+let runtimeReferenceSpanCount = 0
+
+for (const chapter of runtimePayload.chapters) {
+  const playbackTokens = new Map(chapter.playback.tokensBySectionIndex)
+
+  for (const [sectionIndex, spans] of chapter.referencesBySectionIndex) {
+    const section = chapter.sections[sectionIndex]
+    const content = section.content as
+      | string
+      | { solution?: string; text?: string }
+    const source =
+      spans[0].field === 'content'
+        ? (content as string)
+        : ((content as { solution?: string; text?: string })[spans[0].field] ??
+          '')
+
+    for (const span of spans) {
+      assert.equal(source.slice(span.start, span.end), span.number)
+      runtimeReferenceSpanCount += 1
+    }
+
+    const tokens = playbackTokens.get(sectionIndex)
+
+    if (tokens) {
+      assert.equal(
+        tokens
+          .map((token) => (token.type === 'text' ? token.text : token.display))
+          .join(''),
+        source,
+      )
+    }
+  }
+}
+
+assert.equal(runtimeReferenceSpanCount, 95)
 const frontMatterMarkup = renderToStaticMarkup(
   <BookFrontMatter
     chapters={runtimePayload.chapters}
@@ -282,10 +343,12 @@ const positionStudyMarkup = renderToStaticMarkup(
     group={{ contentIndexes: [1], index: 0, type: 'positionGroup' }}
     navigationByPosition={new Map()}
     onAnchorSelect={onAnchorSelect}
+    onBookNavigate={onBookNavigate}
     onMoveClick={onMoveClick}
     onPositionReset={() => undefined}
     onPositionStep={onPositionStep}
     playback={{ playablePositions: new Set(), tokensBySectionIndex: new Map() }}
+    referencesBySectionIndex={new Map()}
     sections={[
       positionSection,
       { content: 'Associated prose.', type: 'text' },
@@ -307,10 +370,12 @@ const comparisonPositionMarkup = renderToStaticMarkup(
     group={{ contentIndexes: [], index: 0, type: 'positionGroup' }}
     navigationByPosition={new Map()}
     onAnchorSelect={onAnchorSelect}
+    onBookNavigate={onBookNavigate}
     onMoveClick={onMoveClick}
     onPositionReset={() => undefined}
     onPositionStep={onPositionStep}
     playback={{ playablePositions: new Set(), tokensBySectionIndex: new Map() }}
+    referencesBySectionIndex={new Map()}
     sections={[
       {
         content: {
@@ -345,6 +410,7 @@ const proseMarkup = renderToStaticMarkup(
     activeBoards={activeBoards}
     activePositionNumber={null}
     content={'First paragraph.\nSecond paragraph.'}
+    onBookNavigate={onBookNavigate}
     onMoveClick={onMoveClick}
   />,
 )
@@ -352,6 +418,68 @@ assert.equal(
   proseMarkup,
   '<div class="leg-prose"><p>First paragraph.</p><p>Second paragraph.</p></div>',
 )
+
+const referencedProse = 'See Ending 56 and Position 10.2.'
+const referencedProseSpans: BookReferenceSpan[] = [
+  {
+    end: referencedProse.indexOf('56') + 2,
+    field: 'content',
+    href: '/book/chapter10#e56',
+    kind: 'ending',
+    number: '56',
+    start: referencedProse.indexOf('56'),
+  },
+  {
+    end: referencedProse.indexOf('10.2') + 4,
+    field: 'content',
+    href: '/book/chapter10#p10.2',
+    kind: 'board',
+    number: '10.2',
+    start: referencedProse.indexOf('10.2'),
+  },
+]
+const referencedProseMarkup = renderToStaticMarkup(
+  <ProseBlock
+    activeBoards={activeBoards}
+    activePositionNumber={null}
+    content={referencedProse}
+    onBookNavigate={onBookNavigate}
+    onMoveClick={onMoveClick}
+    referenceSpans={referencedProseSpans}
+  />,
+)
+assert.match(
+  referencedProseMarkup,
+  /class="leg-book-reference" href="\/book\/chapter10#e56"/,
+)
+assert.match(
+  referencedProseMarkup,
+  /class="leg-book-reference" href="\/book\/chapter10#p10\.2"/,
+)
+assert.match(referencedProseMarkup, />56<\/a>/)
+assert.match(referencedProseMarkup, />10\.2<\/a>/)
+
+const misalignedReferenceMarkup = renderToStaticMarkup(
+  <ProseBlock
+    activeBoards={activeBoards}
+    activePositionNumber={null}
+    content="Ending 56 remains readable."
+    onBookNavigate={onBookNavigate}
+    onMoveClick={onMoveClick}
+    referenceSpans={[
+      {
+        end: 8,
+        field: 'content',
+        href: '/book/chapter10#e56',
+        kind: 'ending',
+        number: '56',
+        start: 6,
+      },
+    ]}
+  />,
+)
+assert.doesNotMatch(misalignedReferenceMarkup, /leg-book-reference/)
+assert.match(misalignedReferenceMarkup, /Ending 56 remains readable\./)
 
 const moveTokens: TextPlaybackToken[] = [
   { text: 'Play ', type: 'text' },
@@ -371,6 +499,7 @@ const playableProseMarkup = renderToStaticMarkup(
     activeBoards={activeBoards}
     activePositionNumber={null}
     content="Play 1.a4!"
+    onBookNavigate={onBookNavigate}
     onMoveClick={onMoveClick}
     tokens={moveTokens}
   />,
@@ -378,6 +507,34 @@ const playableProseMarkup = renderToStaticMarkup(
 assert.match(playableProseMarkup, /^<div class="leg-prose"><p>/)
 assert.match(playableProseMarkup, /<button[^>]*class="leg-move-token"/)
 assert.match(playableProseMarkup, />1\.a4!<\/button>/)
+
+const referencedPlayableContent = 'See Ending 1. Play 1.a4!'
+const referencedMoveTokens: TextPlaybackToken[] = [
+  { text: 'See Ending 1. Play ', type: 'text' },
+  moveTokens[1],
+]
+const referencedPlayableMarkup = renderToStaticMarkup(
+  <ProseBlock
+    activeBoards={activeBoards}
+    activePositionNumber={null}
+    content={referencedPlayableContent}
+    onBookNavigate={onBookNavigate}
+    onMoveClick={onMoveClick}
+    referenceSpans={[
+      {
+        end: 12,
+        field: 'content',
+        href: '/book/chapter1#e1',
+        kind: 'ending',
+        number: '1',
+        start: 11,
+      },
+    ]}
+    tokens={referencedMoveTokens}
+  />,
+)
+assert.match(referencedPlayableMarkup, /href="\/book\/chapter1#e1"/)
+assert.match(referencedPlayableMarkup, /<button[^>]*class="leg-move-token"/)
 
 const titledPanel: PanelSection = {
   content: {
@@ -390,6 +547,7 @@ const titledPanelMarkup = renderToStaticMarkup(
   <PanelBlock
     activeBoards={activeBoards}
     activePositionNumber={null}
+    onBookNavigate={onBookNavigate}
     onMoveClick={onMoveClick}
     section={titledPanel}
   />,
@@ -404,6 +562,7 @@ const untitledPanelMarkup = renderToStaticMarkup(
   <PanelBlock
     activeBoards={activeBoards}
     activePositionNumber={null}
+    onBookNavigate={onBookNavigate}
     onMoveClick={onMoveClick}
     section={{ content: { text: 'An untitled callout.' }, type: 'panel' }}
   />,
@@ -413,13 +572,35 @@ assert.equal(
   '<aside class="leg-panel-callout"><p>An untitled callout.</p></aside>',
 )
 
+const referencedPanelText = 'Review Ending 84.'
+const referencedPanelMarkup = renderToStaticMarkup(
+  <PanelBlock
+    activeBoards={activeBoards}
+    activePositionNumber={null}
+    onBookNavigate={onBookNavigate}
+    onMoveClick={onMoveClick}
+    referenceSpans={[
+      {
+        end: referencedPanelText.indexOf('84') + 2,
+        field: 'text',
+        href: '/book/chapter12#e84',
+        kind: 'ending',
+        number: '84',
+        start: referencedPanelText.indexOf('84'),
+      },
+    ]}
+    section={{ content: { text: referencedPanelText }, type: 'panel' }}
+  />,
+)
+assert.match(referencedPanelMarkup, /href="\/book\/chapter12#e84"/)
+
 const problemSection: ProblemSection = {
   content: {
     fen: '6k1/8/8/8/8/8/P7/7K w - - 0 1',
     number: '2.01',
     orientation: 'white',
     prompt: 'White to move. Is it a draw?',
-    solution: 'Play 1.a4!',
+    solution: 'See Ending 1. Play 1.a4!',
   },
   type: 'problem',
 }
@@ -428,14 +609,25 @@ const problemProps = {
   activePositionNumber: null,
   index: 1,
   navigationByPosition: new Map(),
+  onBookNavigate,
   onMoveClick,
   onPositionReset: () => undefined,
   onPositionStep,
   onToggleSolution: () => undefined,
   playback: {
     playablePositions: new Set(['2.01']),
-    tokensBySectionIndex: new Map([[1, moveTokens]]),
+    tokensBySectionIndex: new Map([[1, referencedMoveTokens]]),
   },
+  referenceSpans: [
+    {
+      end: 12,
+      field: 'solution',
+      href: '/book/chapter1#e1',
+      kind: 'ending',
+      number: '1',
+      start: 11,
+    },
+  ] as BookReferenceSpan[],
   section: problemSection,
 }
 const hiddenProblemMarkup = renderToStaticMarkup(
@@ -463,6 +655,7 @@ assert.match(
   /<button[^>]*aria-label="Previous move"[^>]*>←<\/button>/,
 )
 assert.match(revealedProblemMarkup, />Reset<\/button>/)
+assert.match(revealedProblemMarkup, /href="\/book\/chapter1#e1"/)
 assert.match(
   revealedProblemMarkup,
   /<button[^>]*aria-label="Next move"[^>]*>→<\/button>/,

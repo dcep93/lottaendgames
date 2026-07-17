@@ -214,7 +214,7 @@ const sanScanPattern =
 assert.equal(positionFiveOneIndex, 4)
 assert.equal(isProseMoveReference('which was tactically prevented by ...'), true)
 assert.equal(isProseMoveReference('prevented the lethal blow ...'), true)
-assert.equal(chapterPayload.schemaVersion, 2)
+assert.equal(chapterPayload.schemaVersion, 3)
 assert.match(chapterPayload.contentHash, /^sha256:[a-f0-9]{64}$/)
 assert.equal(chapterPayload.contentHash, getPayloadContentHash(chapterPayload))
 assert.equal(chapterPayload.contentHash, chapterPayloadContentHash)
