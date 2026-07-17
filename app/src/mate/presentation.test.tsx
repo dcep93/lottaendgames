@@ -1268,6 +1268,10 @@ test('Mate exposes stable desktop and narrow-layout structure', () => {
   )
   assert.match(
     markup,
+    /aria-label="Mate training: choose mating set and mode"/,
+  )
+  assert.match(
+    markup,
     /aria-label="Mate move log table"[^>]*class="leg-mate-log-scroll"[^>]*role="region"[^>]*tabindex="0"/,
   )
   assert.match(markup, /<table[^>]*aria-label="Mate move log"/)

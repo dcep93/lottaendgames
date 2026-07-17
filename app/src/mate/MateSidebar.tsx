@@ -1,4 +1,4 @@
-import type { MouseEvent } from 'react'
+import React, { type MouseEvent } from 'react'
 import { MATE_CATALOG } from './catalog'
 import type { MateId, MateMode } from './types'
 
@@ -19,7 +19,7 @@ export default function MateSidebar({
     : `${selectedSet.path}${mateMode === 'train' ? '/train' : ''}`
 
   return (
-    <>
+    <React.Fragment>
       <aside aria-label="Mate training" className="leg-mate-sidebar">
         <p className="leg-mate-sidebar-label">Mate training</p>
         <nav aria-label="Mating sets" className="leg-mate-set-links">
@@ -69,7 +69,7 @@ export default function MateSidebar({
       <label className="leg-mate-collapsed-selector">
         <span>Mate training</span>
         <select
-          aria-label="Choose mating set and mode"
+          aria-label="Mate training: choose mating set and mode"
           onChange={(event) => {
             if (event.currentTarget.value !== '') {
               onNavigate(event.currentTarget.value)
@@ -88,7 +88,7 @@ export default function MateSidebar({
           ))}
         </select>
       </label>
-    </>
+    </React.Fragment>
   )
 }
 
