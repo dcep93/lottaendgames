@@ -15,31 +15,38 @@ use the same board-anchor namespace as ordinary positions.
 
 ## Approved approach
 
-Parse references at render time with a small, dedicated book-reference module.
-The chapter payload already contains every chapter and target needed to build a
-global reference index, and reference matching is inexpensive compared with
-chess playback parsing. This avoids changing the curated source format or the
-derived runtime-payload schema.
+Parse and validate references at build time. The chapter-payload builder first
+constructs a global destination index from every source chapter, then emits
+precomputed reference spans alongside each runtime chapter. Browsers apply
+those spans while rendering but do not scan prose or decide whether a phrase is
+a reference.
+
+This keeps recognition deterministic, makes unresolved references a payload
+build failure, and follows the project’s existing pattern of moving authored
+content analysis out of the browser. The runtime payload schema advances from
+version 2 to version 3 and remains cache-busted by its content hash.
 
 The rejected alternatives are:
 
-- precomputing reference tokens in the derived runtime payload, which would add
-  schema and cache-building work without a meaningful performance benefit;
+- parsing references at render time, which would make each browser repeat
+  content recognition and defer broken-reference detection until runtime;
 - manually annotating all affected prose in `book.json`, which would make the
   source harder to curate and require repeated editorial maintenance.
 
 ## Reference index and parser
 
-Add a focused module that:
+Add a focused build-time module that:
 
-1. Scans the loaded chapter definitions once and indexes all ending, position,
-   diagram, and problem destinations.
+1. Scans all validated source chapter definitions once and indexes all ending,
+   position, diagram, and problem destinations.
 2. Maps endings to `bookEndingAnchorId(number)` and boards to
    `bookPositionAnchorId(number)` in their owning chapter route.
-3. Scans rendered authored text only for explicit, case-insensitive labels:
+3. Scans text-section content, panel text, and problem solutions for explicit,
+   case-insensitive labels:
    `Ending`, `Endings`, `Position`, `Positions`, `Diagram`, and `Diagrams`,
    followed by their supported number or list syntax.
-4. Preserves the source text exactly while emitting text and reference tokens.
+4. Preserves the source text exactly while emitting offset-based reference
+   spans for the relevant section field.
 
 Every printed target number becomes its own link. Thus `Endings 34 and 35`
 links both `34` and `35`; in a printed range such as `positions 13.1-13.3`, the
@@ -51,23 +58,51 @@ other prose numbers are not promoted accidentally. A reference to the board or
 ending that owns the current prose remains plain text instead of becoming a
 self-link.
 
-The parser returns unresolved-reference information for validation. Production
-rendering leaves an unresolved target as unchanged text; automated source
-audits must fail if the curated book contains one.
+Each serialized span identifies the source field, start and end offsets of the
+printed target number, canonical destination href, target kind, and target
+number. Offsets refer to the untouched source string and use JavaScript string
+index semantics at both build and render time.
+
+The parser returns unresolved-reference information for diagnostics, and the
+payload build fails if any explicit target or any intermediate member of a
+printed range is missing. No unresolved reference is serialized for production
+rendering.
+
+## Payload generation and schema
+
+The payload script builds the global index before mapping source chapters
+through `buildRuntimeChapter`. Each chapter build receives that read-only index
+and serializes a `referencesBySectionIndex` collection. Entries exist only for
+sections with at least one linkable reference and identify whether offsets
+belong to text content, panel text, or a problem solution.
+
+Reference data is separate from SAN playback data. It does not change
+`TextPlaybackToken`, move-tree construction, playable-position detection, or
+navigation. Runtime hydration converts the serialized section collection to a
+map just as it already does for playback tokens.
+
+Adding the collection advances the runtime payload schema to version 3. The
+normal payload build writes a new cache-busted runtime JSON file, removes the
+old generated payload, and updates `chapterPayloadManifest.ts`. No generated
+reference data is written back to `book.json`.
 
 ## Rendering and navigation
 
-Build the global destination index from the loaded runtime chapter payload and
-derive the current board/ending context for each section. Pass those inputs to
-the existing prose, panel, and problem-solution rendering paths.
+The browser receives only precomputed reference spans. Pass the hydrated spans
+for the current section to the existing prose, panel, and problem-solution
+rendering paths.
 
-Reference rendering composes with move playback instead of replacing it:
+Reference rendering applies spans and composes with move playback instead of
+replacing it:
 
-- plain prose is tokenized directly;
-- for playable prose and panels, only existing playback `text` tokens are
-  subdivided into text/reference tokens;
+- plain prose is divided at the precomputed offsets;
+- for playable prose and panels, a source-offset cursor aligns the precomputed
+  spans with existing playback `text` tokens, which are then subdivided into
+  text/reference output;
 - existing move tokens remain buttons with unchanged behavior and identity;
-- paragraph boundaries and all visible source wording remain unchanged.
+- paragraph boundaries and all visible source wording remain unchanged;
+- a development assertion reports a span that does not align with the expected
+  source substring, while production safely leaves that substring as text.
 
 Each generated anchor has a canonical `bookPathForChapterId(...)#anchor`
 destination. An unmodified primary click uses the existing client-side book
@@ -93,25 +128,29 @@ role or keyboard handler is needed because the element remains a native link.
 
 ## Verification
 
-Add focused unit coverage for:
+Add focused build-time unit coverage for:
 
 - singular and plural ending references;
 - position and diagram aliases targeting the board namespace;
 - comma, `and`, `or`, and printed-range syntax;
 - source-text preservation and keyword anchoring;
 - current-target self-reference suppression;
-- unresolved-target reporting and full-book zero-unresolved validation;
+- unresolved-target build failure and full-book zero-unresolved validation;
 - same-chapter and cross-chapter href construction.
+
+Add runtime coverage showing that rendering consumes supplied spans without
+performing keyword recognition, including safe behavior for a malformed or
+misaligned span.
 
 Extend presentation coverage for plain prose, panel prose, problem solutions,
 and prose containing existing move buttons. Verify that each reference link and
 move button retains the correct destination or action, and that modifier clicks
 are not intercepted.
 
-Run the repository’s required content gates because the work touches book
-rendering and playback composition: rebuild the derived payload only if a
-source or playback file ultimately changes, then run `npm test`,
-`npm run test:content`, `npm run test:audit-san`, and
+Run the repository’s required content gates because the work changes the
+derived runtime payload and composes with playback rendering: rebuild the
+derived payload with `python3 scripts/build_chapter_payload.py`, then run
+`npm test`, `npm run test:content`, `npm run test:audit-san`, and
 `npm run test:audit-san:advisory -- --all` from `app/`. Also run lint, the
 production build, and `git diff --check`. A narrow browser check should confirm
 one same-chapter link, one cross-chapter link, back navigation, focus styling,
@@ -125,5 +164,6 @@ and coexistence with a clickable move token.
   a link unless it includes an explicit numbered reference.
 - Do not change board playback, chapter selection, destination anchor IDs, or
   route syntax.
-- Do not introduce a new runtime-payload schema or manually authored link
-  markup.
+- Do not perform reference recognition or target lookup in the browser.
+- Do not merge reference spans into SAN playback tokens.
+- Do not introduce manually authored link markup.
