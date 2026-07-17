@@ -3,6 +3,7 @@ import type { MouseEvent, MutableRefObject, ReactNode } from 'react'
 import {
   bookEndingAnchorId,
   bookPositionAnchorId,
+  bookProblemSolutionAnchorId,
 } from '../routing'
 import { chapterPayloadPath } from './chapterPayloadManifest'
 import {
@@ -36,6 +37,7 @@ import {
   getNextNavigationNode,
   getParentFenForNavigationNode,
   getPreferredNextUpdates,
+  getPreviousNavigationFen,
   getPreviousNavigationNode,
   type PositionNavigation,
 } from './playbackNavigation'
@@ -427,6 +429,11 @@ export default function ChapterViewer({
         navigation,
         currentBoard.cursorId,
       )
+      const previousFen = getPreviousNavigationFen(
+        navigation,
+        currentBoard.cursorId,
+        initialPositionFens[positionNumber],
+      )
 
       if (previousNode === undefined) {
         return currentBoards
@@ -437,7 +444,7 @@ export default function ChapterViewer({
         [positionNumber]:
           previousNode === null
             ? createInitialBoardState(
-                initialPositionFens[positionNumber],
+                previousFen ?? initialPositionFens[positionNumber],
                 currentBoard.preferredNextByCursor,
               )
             : createMoveBoardState(currentBoard, previousNode),
@@ -682,6 +689,7 @@ export function ProblemStudyGroup({
             ? 'leg-position-study-content leg-test-solution is-revealed'
             : 'leg-position-study-content leg-test-solution'
         }
+        id={bookProblemSolutionAnchorId(number)}
       >
         <button
           aria-controls={`problem-${number}-solution`}
@@ -741,7 +749,8 @@ export function PositionStudyGroup({
   sections: RawChapterSection[]
 }) {
   const positionSection = sections[group.index] as PositionSection
-  const positionNumber = positionSection.content.number
+  const { caption, hideVisualLabel, number: positionNumber } =
+    positionSection.content
 
   return (
     <section
@@ -750,7 +759,10 @@ export function PositionStudyGroup({
           ? 'leg-position-study'
           : 'leg-position-study is-board-only'
       }
-      aria-labelledby={`position-${positionNumber}-heading`}
+      aria-label={hideVisualLabel ? caption : undefined}
+      aria-labelledby={
+        hideVisualLabel ? undefined : `position-${positionNumber}-heading`
+      }
       id={bookPositionAnchorId(positionNumber)}
     >
       <div className="leg-position-study-header">
@@ -1036,9 +1048,11 @@ function PositionCard({
   section: PositionSection
 }) {
   const {
+    boundaryPaths,
     caption,
     displayLabel,
     fen,
+    hideVisualLabel,
     markers,
     number,
     orientation,
@@ -1083,6 +1097,7 @@ function PositionCard({
 
   return (
     <figure
+      aria-label={hideVisualLabel ? caption : undefined}
       className={
         isActive ? 'leg-position-card is-active-position' : 'leg-position-card'
       }
@@ -1099,31 +1114,35 @@ function PositionCard({
           onPrevious={() => onStep(number, 'previous')}
           onReset={() => onReset(number)}
         />
-        <figcaption>
-          {displayLabel ? null : <span>{headingLabel}</span>}
-          {hasPlayback ? (
-            <button
-              aria-label={
-                displayLabel
-                  ? `Reset ${displayLabel} board`
-                  : `Reset position ${number}`
-              }
-              className="leg-position-reset"
-              id={headingId}
-              onClick={() => onReset(number)}
-              type="button"
-            >
-              {displayLabel ?? number}
-            </button>
-          ) : (
-            <strong id={headingId}>{displayLabel ?? number}</strong>
-          )}
-        </figcaption>
+        {hideVisualLabel ? null : (
+          <figcaption>
+            {displayLabel ? null : <span>{headingLabel}</span>}
+            {hasPlayback ? (
+              <button
+                aria-label={
+                  displayLabel
+                    ? `Reset ${displayLabel} board`
+                    : `Reset position ${number}`
+                }
+                className="leg-position-reset"
+                id={headingId}
+                onClick={() => onReset(number)}
+                type="button"
+              >
+                {displayLabel ?? number}
+              </button>
+            ) : (
+              <strong id={headingId}>{displayLabel ?? number}</strong>
+            )}
+          </figcaption>
+        )}
         {subtitle ? <p className="leg-position-subtitle">{subtitle}</p> : null}
         {caption ? <p className="leg-position-caption">{caption}</p> : null}
       </div>
       <ChessBoard
         animateNextMove={activeBoard?.animateNextMove}
+        ariaLabel={hideVisualLabel ? caption : undefined}
+        boundaryPaths={boundaryPaths}
         fen={activeBoard?.fen ?? fen}
         markers={markers}
         number={number}
@@ -1245,14 +1264,17 @@ function InlinePlayback({
   referenceSpans?: BookReferenceSpan[]
   tokens: TextPlaybackToken[]
 }) {
-  const reconstructedContent = tokens
+  const visibleTokens = tokens.filter(
+    (token) => token.type !== 'move' || !token.hidden,
+  )
+  const reconstructedContent = visibleTokens
     .map((token) => (token.type === 'text' ? token.text : token.display))
     .join('')
   const alignedReferenceSpans =
     reconstructedContent === content ? referenceSpans : undefined
   let sourceOffset = 0
 
-  return tokens.map((token, index) => {
+  return visibleTokens.map((token, index) => {
     const tokenText = token.type === 'text' ? token.text : token.display
     const tokenOffset = sourceOffset
     sourceOffset += tokenText.length
@@ -1396,7 +1418,7 @@ function createMoveBoardState(
   forceAnimate = false,
 ): ActiveBoardState {
   return {
-    activeMoveId: token.id,
+    activeMoveId: token.sourceId ?? token.id,
     animateNextMove:
       forceAnimate || isOneMoveFenTransition(currentFen, token.fen),
     cursorId: token.id,

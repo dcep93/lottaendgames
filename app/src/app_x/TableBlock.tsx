@@ -9,8 +9,8 @@ export default function TableBlock({ section }: { section: TableSection }) {
         {caption ? <caption>{caption}</caption> : null}
         <thead>
           <tr>
-            {columns.map((column) => (
-              <th key={column} scope="col">
+            {columns.map((column, columnIndex) => (
+              <th key={`${column}-${columnIndex}`} scope="col">
                 {column}
               </th>
             ))}

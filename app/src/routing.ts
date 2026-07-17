@@ -77,6 +77,10 @@ export function bookPositionAnchorId(number: string) {
   return `p${number}`
 }
 
+export function bookProblemSolutionAnchorId(number: string) {
+  return `${bookPositionAnchorId(number)}-solution`
+}
+
 function getBookChapterId(pathname: string) {
   if (pathname === aboutPath) {
     return 'about'

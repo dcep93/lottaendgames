@@ -139,6 +139,10 @@ const fullBookSpanCount = fullBookReferences.reduce(
   0,
 )
 
-assert.equal(fullBookSpanCount, 95)
+// The governed Chapter 10 correction changes the old cross-reference to
+// Position 10.19 into a self-reference to the owning Position 10.20. The
+// renderer deliberately does not link a board to itself, so the closed book has
+// one fewer navigable reference span than the pre-correction source.
+assert.equal(fullBookSpanCount, 94)
 
 console.log('book reference tests passed')

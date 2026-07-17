@@ -1,6 +1,8 @@
 import { Chess } from 'chess.js'
 import type {
   PlaybackAnchor,
+  PlaybackCanonicalAlias,
+  PlaybackContinuationAlias,
   PlaybackSegment,
   PositionSection,
   RawChapterSection,
@@ -14,11 +16,13 @@ export type TextPlaybackToken =
   | {
       display: string
       fen: string
+      hidden?: true
       id: string
       parentFen: string
       path: string[]
       positionNumber: string
       san: string
+      sourceId?: string
       type: 'move'
     }
 
@@ -59,6 +63,33 @@ type BranchCandidate = {
 
 type FallbackParseMode = 'current' | 'pending-return'
 
+type PositionedPlaybackContinuationAlias = PlaybackContinuationAlias & {
+  positionNumber: string
+}
+
+type CanonicalPlaybackDefinition = {
+  aliases: PlaybackCanonicalAlias[]
+  alternateFens: string[]
+  initialFen: string
+  paths: string[]
+  positionNumber: string
+  sourcePositionNumbers: string[]
+}
+
+type CanonicalPlaybackNode = {
+  fen: string
+  parentFen: string
+  path: string[]
+  positionNumber: string
+  san: string
+}
+
+type LocatedPlaybackMove = {
+  sectionIndex: number
+  token: Extract<TextPlaybackToken, { type: 'move' }>
+  tokenIndex: number
+}
+
 const movePattern =
   /(?<![A-Za-z0-9])((\d+)\s*(\.\.\.|\.)\s*)?((?:O-O-O|O-O|0-0-0|0-0|[KQRBN]?[a-h]?[1-8]?x?[a-h][1-8](?:=?[QRBN])?|[a-h]x[a-h][1-8](?:=?[QRBN])?|[a-h][1-8](?:=?[QRBN])?)(?:[+#])?(?:[!?]+|=)?)/g
 
@@ -70,6 +101,8 @@ export function buildChapterPlayback(
   let context: PositionContext | null = null
   let hasParsedPlayableSincePosition = false
   const contexts: PositionContext[] = []
+  const continuationAliases: PositionedPlaybackContinuationAlias[] = []
+  const canonicalDefinitions: CanonicalPlaybackDefinition[] = []
 
   sections.forEach((section, sectionIndex) => {
     if (section.type === 'position') {
@@ -83,6 +116,25 @@ export function buildChapterPlayback(
         position.content.playbackSegments,
       )
       contexts.push(context)
+      continuationAliases.push(
+        ...(position.content.playbackContinuationAliases ?? []).map(
+          (alias) => ({
+            ...alias,
+            positionNumber: position.content.number,
+          }),
+        ),
+      )
+      if (position.content.playbackCanonicalPaths?.length) {
+        canonicalDefinitions.push({
+          aliases: position.content.playbackCanonicalAliases ?? [],
+          alternateFens: position.content.alternateFens ?? [],
+          initialFen: position.content.fen,
+          paths: position.content.playbackCanonicalPaths,
+          positionNumber: position.content.number,
+          sourcePositionNumbers:
+            position.content.playbackCanonicalSourcePositionNumbers ?? [],
+        })
+      }
       hasParsedPlayableSincePosition = false
       return
     }
@@ -119,7 +171,7 @@ export function buildChapterPlayback(
     const eligibleContexts = getEligibleContexts(section, contexts, context)
     const selectedPreferredContext = eligibleContexts.includes(context)
       ? context
-      : eligibleContexts.at(-1) ?? context
+      : (eligibleContexts.at(-1) ?? context)
     let selectedContext = chooseContextForContent(
       eligibleContexts,
       selectedPreferredContext,
@@ -171,6 +223,12 @@ export function buildChapterPlayback(
       tokensBySectionIndex.set(sectionIndex, tokens)
     }
   })
+
+  materializePlaybackContinuationAliases(
+    tokensBySectionIndex,
+    continuationAliases,
+  )
+  materializeCanonicalPlaybackPaths(tokensBySectionIndex, canonicalDefinitions)
 
   return {
     playablePositions,
@@ -260,10 +318,7 @@ function getEligibleContexts(
   return eligible.length ? eligible : [currentContext]
 }
 
-function assignMoveTokenIds(
-  tokens: TextPlaybackToken[],
-  sectionIndex: number,
-) {
+function assignMoveTokenIds(tokens: TextPlaybackToken[], sectionIndex: number) {
   return tokens.map((token, tokenIndex) =>
     token.type === 'move'
       ? {
@@ -271,6 +326,450 @@ function assignMoveTokenIds(
           id: `${token.positionNumber}-${sectionIndex}-${tokenIndex}`,
         }
       : token,
+  )
+}
+
+function materializePlaybackContinuationAliases(
+  tokensBySectionIndex: Map<number, TextPlaybackToken[]>,
+  aliases: PositionedPlaybackContinuationAlias[],
+) {
+  for (const [aliasIndex, alias] of aliases.entries()) {
+    const sourceTokens = tokensBySectionIndex.get(alias.sectionIndex)
+
+    if (!sourceTokens) {
+      continue
+    }
+
+    const alternate = findPlaybackMoveOccurrence(
+      sourceTokens,
+      alias.positionNumber,
+      alias.alternateToken,
+      alias.alternateOccurrence ?? 0,
+    )
+    const continuation = findPlaybackMoveOccurrence(
+      sourceTokens,
+      alias.positionNumber,
+      alias.continuationToken,
+      alias.continuationOccurrence ?? 0,
+    )
+
+    if (!alternate || !continuation) {
+      continue
+    }
+
+    const continuationIndex = sourceTokens.indexOf(continuation)
+    const canonicalParentPath = continuation.path.slice(0, -1)
+    const aliasedBranches = new Map<string, Branch>([
+      [
+        getPlaybackPathKey(canonicalParentPath),
+        { fen: alternate.fen, path: alternate.path },
+      ],
+    ])
+    const aliasTokens: TextPlaybackToken[] = []
+
+    for (const token of sourceTokens.slice(continuationIndex)) {
+      if (
+        token.type !== 'move' ||
+        token.hidden ||
+        token.positionNumber !== alias.positionNumber ||
+        !pathStartsWith(token.path, canonicalParentPath)
+      ) {
+        continue
+      }
+
+      const canonicalTokenParentPath = token.path.slice(0, -1)
+      const aliasedParent = aliasedBranches.get(
+        getPlaybackPathKey(canonicalTokenParentPath),
+      )
+
+      if (!aliasedParent) {
+        continue
+      }
+
+      const aliasedBranch = applyMove(aliasedParent, token.san)
+
+      if (!aliasedBranch) {
+        continue
+      }
+
+      aliasedBranches.set(getPlaybackPathKey(token.path), aliasedBranch)
+      aliasTokens.push({
+        ...token,
+        fen: aliasedBranch.fen,
+        hidden: true,
+        id: `${token.id}-continuation-alias-${aliasIndex}`,
+        parentFen: aliasedParent.fen,
+        path: aliasedBranch.path,
+        sourceId: token.id,
+      })
+    }
+
+    if (aliasTokens.length) {
+      tokensBySectionIndex.set(alias.sectionIndex, [
+        ...sourceTokens,
+        ...aliasTokens,
+      ])
+    }
+  }
+}
+
+function materializeCanonicalPlaybackPaths(
+  tokensBySectionIndex: Map<number, TextPlaybackToken[]>,
+  definitions: CanonicalPlaybackDefinition[],
+) {
+  for (const definition of definitions) {
+    const canonicalNodes = buildCanonicalPlaybackNodes(definition)
+    const canonicalByTransition = groupCanonicalNodesByTransition(
+      canonicalNodes.values(),
+    )
+    const locatedMoves = getLocatedPlaybackMoves(
+      tokensBySectionIndex,
+      definition.positionNumber,
+    )
+    const movesByTransition = groupLocatedMovesByTransition(locatedMoves)
+    const assignedPaths = new Set<string>()
+
+    for (const [transition, moves] of movesByTransition) {
+      const candidates = canonicalByTransition.get(transition)
+
+      if (!candidates?.length) {
+        throw new Error(
+          `Canonical playback for ${definition.positionNumber} cannot match ${moves[0].token.display}`,
+        )
+      }
+      if (moves.length > candidates.length) {
+        throw new Error(
+          `Canonical playback for ${definition.positionNumber} has ${moves.length} printed tokens for ${candidates.length} source transitions`,
+        )
+      }
+
+      for (const [move, node] of matchCanonicalPlaybackMoves(
+        moves,
+        candidates,
+      )) {
+        const replacement = {
+          ...move.token,
+          fen: node.fen,
+          parentFen: node.parentFen,
+          path: node.path,
+          san: node.san,
+        }
+        const sectionTokens = tokensBySectionIndex.get(move.sectionIndex)
+
+        if (!sectionTokens) {
+          throw new Error(
+            `Canonical playback section ${move.sectionIndex} disappeared`,
+          )
+        }
+        sectionTokens[move.tokenIndex] = replacement
+        move.token = replacement
+        assignedPaths.add(getPlaybackPathKey(node.path))
+      }
+    }
+
+    const aliasesByPath = new Map(
+      definition.aliases.map((alias) => [
+        getPlaybackPathKey(alias.path),
+        alias,
+      ]),
+    )
+    const canonicalSourceMoves = definition.sourcePositionNumbers.flatMap(
+      (positionNumber) =>
+        getLocatedPlaybackMoves(tokensBySectionIndex, positionNumber),
+    )
+
+    for (const node of canonicalNodes.values()) {
+      const nodePathKey = getPlaybackPathKey(node.path)
+
+      if (assignedPaths.has(nodePathKey)) {
+        continue
+      }
+
+      const alias = aliasesByPath.get(nodePathKey)
+      const automaticSource = alias
+        ? undefined
+        : canonicalSourceMoves.find(
+            ({ token }) =>
+              getPositionIndependentCanonicalTransitionKey(token) ===
+              getPositionIndependentCanonicalTransitionKey(node),
+          )
+
+      if (!alias && !automaticSource) {
+        throw new Error(
+          `Canonical playback for ${definition.positionNumber} is missing printed source for ${node.path.join(' ')}`,
+        )
+      }
+
+      const sourceSectionIndex =
+        alias?.sourceSectionIndex ?? automaticSource!.sectionIndex
+      const sourceTokens = tokensBySectionIndex.get(sourceSectionIndex)
+      const source = alias
+        ? sourceTokens
+          ? findPlaybackMoveOccurrence(
+              sourceTokens,
+              alias.sourcePositionNumber,
+              alias.sourceToken,
+              alias.sourceOccurrence ?? 0,
+            )
+          : undefined
+        : automaticSource!.token
+
+      if (!source || !sourceTokens) {
+        throw new Error(
+          `Canonical playback alias for ${definition.positionNumber} cannot find ${alias?.sourceToken ?? node.san}`,
+        )
+      }
+
+      const hiddenAlias: Extract<TextPlaybackToken, { type: 'move' }> = {
+        ...source,
+        fen: node.fen,
+        hidden: true,
+        id: `${source.id}-canonical-alias-${definition.positionNumber}-${assignedPaths.size}`,
+        parentFen: node.parentFen,
+        path: node.path,
+        positionNumber: definition.positionNumber,
+        san: node.san,
+        sourceId: source.id,
+      }
+      const childIndex = sourceTokens.findIndex(
+        (token) =>
+          token.type === 'move' &&
+          token.positionNumber === definition.positionNumber &&
+          pathStartsWith(token.path, node.path),
+      )
+
+      sourceTokens.splice(
+        childIndex < 0 ? sourceTokens.length : childIndex,
+        0,
+        hiddenAlias,
+      )
+      assignedPaths.add(nodePathKey)
+    }
+
+    if (assignedPaths.size !== canonicalNodes.size) {
+      throw new Error(
+        `Canonical playback for ${definition.positionNumber} assigned ${assignedPaths.size} of ${canonicalNodes.size} source paths`,
+      )
+    }
+  }
+}
+
+function buildCanonicalPlaybackNodes(definition: CanonicalPlaybackDefinition) {
+  const nodes = new Map<string, CanonicalPlaybackNode>()
+
+  for (const [lineIndex, line] of definition.paths.entries()) {
+    const rawMoves = line.trim().split(/\s+/).filter(Boolean)
+    let acceptedNodes: CanonicalPlaybackNode[] | undefined
+    let lastFailure:
+      { error: unknown; parentFen: string; rawSan: string } | undefined
+
+    for (const rootFen of [
+      definition.initialFen,
+      ...definition.alternateFens,
+    ]) {
+      const chess = new Chess(rootFen)
+      const path: string[] = []
+      const candidateNodes: CanonicalPlaybackNode[] = []
+
+      try {
+        for (const rawSan of rawMoves) {
+          const parentFen = chess.fen()
+
+          try {
+            const move = chess.move(normalizeSan(rawSan), { strict: false })
+            path.push(move.san)
+          } catch (error) {
+            lastFailure = { error, parentFen, rawSan }
+            throw error
+          }
+
+          candidateNodes.push({
+            fen: chess.fen(),
+            parentFen,
+            path: [...path],
+            positionNumber: definition.positionNumber,
+            san: path.at(-1)!,
+          })
+        }
+        acceptedNodes = candidateNodes
+        break
+      } catch {
+        // A canonical line must replay from one root in full. Try the next root.
+      }
+    }
+
+    if (!acceptedNodes) {
+      const failure = lastFailure
+      throw new Error(
+        `Canonical playback for ${definition.positionNumber}, line ${lineIndex + 1}, cannot play ${failure?.rawSan ?? line} from ${failure?.parentFen ?? definition.initialFen}`,
+        { cause: failure?.error },
+      )
+    }
+
+    for (const node of acceptedNodes) {
+      nodes.set(getPlaybackPathKey(node.path), node)
+    }
+  }
+
+  return nodes
+}
+
+function getLocatedPlaybackMoves(
+  tokensBySectionIndex: Map<number, TextPlaybackToken[]>,
+  positionNumber: string,
+) {
+  const moves: LocatedPlaybackMove[] = []
+
+  for (const [sectionIndex, tokens] of tokensBySectionIndex) {
+    tokens.forEach((token, tokenIndex) => {
+      if (
+        token.type === 'move' &&
+        !token.hidden &&
+        token.positionNumber === positionNumber
+      ) {
+        moves.push({ sectionIndex, token, tokenIndex })
+      }
+    })
+  }
+
+  return moves
+}
+
+function groupCanonicalNodesByTransition(
+  nodes: Iterable<CanonicalPlaybackNode>,
+) {
+  const groups = new Map<string, CanonicalPlaybackNode[]>()
+
+  for (const node of nodes) {
+    const key = getCanonicalTransitionKey(node)
+    groups.set(key, [...(groups.get(key) ?? []), node])
+  }
+
+  return groups
+}
+
+function groupLocatedMovesByTransition(moves: LocatedPlaybackMove[]) {
+  const groups = new Map<string, LocatedPlaybackMove[]>()
+
+  for (const move of moves) {
+    const key = getCanonicalTransitionKey(move.token)
+    groups.set(key, [...(groups.get(key) ?? []), move])
+  }
+
+  return groups
+}
+
+function getCanonicalTransitionKey({
+  fen,
+  parentFen,
+  positionNumber,
+  san,
+}: Pick<
+  CanonicalPlaybackNode,
+  'fen' | 'parentFen' | 'positionNumber' | 'san'
+>) {
+  return [
+    positionNumber,
+    getCanonicalFenState(parentFen),
+    san,
+    getCanonicalFenState(fen),
+  ].join('\u001e')
+}
+
+function getPositionIndependentCanonicalTransitionKey({
+  fen,
+  parentFen,
+  san,
+}: Pick<CanonicalPlaybackNode, 'fen' | 'parentFen' | 'san'>) {
+  return [getCanonicalFenState(parentFen), san, getCanonicalFenState(fen)].join(
+    '\u001e',
+  )
+}
+
+function getCanonicalFenState(fen: string) {
+  return fen.split(/\s+/).slice(0, 4).join(' ')
+}
+
+function matchCanonicalPlaybackMoves(
+  moves: LocatedPlaybackMove[],
+  candidates: CanonicalPlaybackNode[],
+) {
+  const pairings = moves
+    .flatMap((move, moveIndex) =>
+      candidates.map((candidate, candidateIndex) => ({
+        candidate,
+        candidateIndex,
+        move,
+        moveIndex,
+        suffixLength: getCommonPathSuffixLength(
+          move.token.path,
+          candidate.path,
+        ),
+      })),
+    )
+    .sort(
+      (left, right) =>
+        right.suffixLength - left.suffixLength ||
+        left.moveIndex - right.moveIndex ||
+        left.candidateIndex - right.candidateIndex,
+    )
+  const assignedMoves = new Set<LocatedPlaybackMove>()
+  const assignedCandidates = new Set<CanonicalPlaybackNode>()
+  const matches: Array<[LocatedPlaybackMove, CanonicalPlaybackNode]> = []
+
+  for (const { candidate, move } of pairings) {
+    if (assignedMoves.has(move) || assignedCandidates.has(candidate)) {
+      continue
+    }
+    assignedMoves.add(move)
+    assignedCandidates.add(candidate)
+    matches.push([move, candidate])
+  }
+
+  if (matches.length !== moves.length) {
+    throw new Error('Canonical playback could not assign every printed token')
+  }
+
+  return matches
+}
+
+function getCommonPathSuffixLength(left: string[], right: string[]) {
+  let length = 0
+
+  while (
+    length < left.length &&
+    length < right.length &&
+    left[left.length - 1 - length] === right[right.length - 1 - length]
+  ) {
+    length += 1
+  }
+
+  return length
+}
+
+function findPlaybackMoveOccurrence(
+  tokens: TextPlaybackToken[],
+  positionNumber: string,
+  display: string,
+  occurrence: number,
+) {
+  return tokens.filter(
+    (token): token is Extract<TextPlaybackToken, { type: 'move' }> =>
+      token.type === 'move' &&
+      !token.hidden &&
+      token.positionNumber === positionNumber &&
+      normalizePlaybackToken(token.display) === normalizePlaybackToken(display),
+  )[occurrence]
+}
+
+function getPlaybackPathKey(path: string[]) {
+  return path.join('\u001f')
+}
+
+function pathStartsWith(path: string[], prefix: string[]) {
+  return (
+    path.length > prefix.length &&
+    prefix.every((move, index) => path[index] === move)
   )
 }
 
@@ -302,7 +801,11 @@ function chooseContextForContent(
   preferCurrentContext: boolean,
   sectionIndex: number,
 ) {
-  const preferredScore = scoreContextParse(preferredContext, content, sectionIndex)
+  const preferredScore = scoreContextParse(
+    preferredContext,
+    content,
+    sectionIndex,
+  )
 
   if (
     preferredScore.unresolvedSanCount === 0 ||
@@ -378,7 +881,8 @@ function resolveUnresolvedTextTokens(
 
     while (tokens[index + 1]?.type === 'text') {
       index += 1
-      text += (tokens[index] as Extract<TextPlaybackToken, { type: 'text' }>).text
+      text += (tokens[index] as Extract<TextPlaybackToken, { type: 'text' }>)
+        .text
     }
 
     resolvedTokens.push(
@@ -404,7 +908,9 @@ function resolveUnresolvedTextToken(
     return [{ text, type: 'text' }]
   }
 
-  const originalUnresolvedSanCount = countUnresolvedSan([{ text, type: 'text' }])
+  const originalUnresolvedSanCount = countUnresolvedSan([
+    { text, type: 'text' },
+  ])
 
   if (!originalUnresolvedSanCount) {
     return [{ text, type: 'text' }]
@@ -424,7 +930,7 @@ function resolveUnresolvedTextToken(
           mode: preview.mode,
           moveCount: preview.tokens.filter((token) => token.type === 'move')
             .length,
-            unresolvedSanCount: countUnresolvedSan(preview.tokens),
+          unresolvedSanCount: countUnresolvedSan(preview.tokens),
         }))
     })
     .filter((candidate) => candidate.moveCount > 0)
@@ -584,7 +1090,7 @@ function resolveTextMovesFromBranch(
       parentFen: applied.parentFen,
       path: applied.branch.path,
       positionNumber,
-      san: token.san,
+      san: applied.branch.path.at(-1)!,
       type: 'move',
     })
   }
@@ -593,10 +1099,9 @@ function resolveTextMovesFromBranch(
 }
 
 function applyAdjacentTokenMove(branch: Branch, token: CandidateToken) {
-  const normalizedBranch =
-    token.moveNumber
-      ? withFullmove(branch, token.moveNumber)
-      : branch
+  const normalizedBranch = token.moveNumber
+    ? withFullmove(branch, token.moveNumber)
+    : branch
   const nextBranch = applyMove(normalizedBranch, token.san)
 
   if (!nextBranch) {
@@ -827,7 +1332,7 @@ class PositionContext {
         parentFen: candidate.parentFen,
         path: candidate.branch.path,
         positionNumber: this.positionNumber,
-        san: token.san,
+        san: candidate.branch.path.at(-1)!,
         type: 'move',
       }
     })
@@ -840,7 +1345,7 @@ class PositionContext {
   ): BranchCandidate | null {
     const parent: Branch = {
       fen: anchor.parentFen,
-      path: [
+      path: anchor.pathPrefix ?? [
         `@${anchor.sectionIndex}:${normalizePlaybackToken(anchor.token)}:${occurrence}`,
       ],
     }
@@ -888,7 +1393,7 @@ class PositionContext {
       parentFen: candidate.parentFen,
       path: candidate.branch.path,
       positionNumber: this.positionNumber,
-      san: token.san,
+      san: candidate.branch.path.at(-1)!,
       type: 'move',
     }
   }
@@ -904,11 +1409,11 @@ class PositionContext {
       const continued = applyTokenMove(this.branch, token)
 
       if (continued) {
-          candidates.push({
-            branch: continued.branch,
-            exactMoveNumber: continued.exactMoveNumber,
-            fromCurrent: true,
-            parentFen: continued.parentFen,
+        candidates.push({
+          branch: continued.branch,
+          exactMoveNumber: continued.exactMoveNumber,
+          fromCurrent: true,
+          parentFen: continued.parentFen,
           sourceIndex: this.branchHistory.length,
         })
       }
@@ -941,7 +1446,10 @@ class PositionContext {
     }
 
     if (token.moveNumber === 1) {
-      const restart = applyMove(this.createRestartBranch(token.prefix), token.san)
+      const restart = applyMove(
+        this.createRestartBranch(token.prefix),
+        token.san,
+      )
 
       if (restart) {
         const restartParent = this.createRestartBranch(token.prefix)
@@ -1046,13 +1554,17 @@ function tokenizeMoveText(content: string): ParseToken[] {
 
   for (const match of content.matchAll(movePattern)) {
     const index = match.index ?? 0
-    const display = match[0]
-    const prefix = match[1] ? display.slice(0, display.length - match[4].length) : ''
-    const rawSan =
+    const matchedDisplay = match[0]
+    const hasEvaluationSuffix =
       match[4].endsWith('+') &&
-      /^[-−](?!\+)/.test(content.slice(index + display.length))
-        ? match[4].slice(0, -1)
-        : match[4]
+      /^[-−](?!\+)/.test(content.slice(index + matchedDisplay.length))
+    const rawSan = hasEvaluationSuffix ? match[4].slice(0, -1) : match[4]
+    const display = hasEvaluationSuffix
+      ? matchedDisplay.slice(0, -1)
+      : matchedDisplay
+    const prefix = match[1]
+      ? display.slice(0, display.length - rawSan.length)
+      : ''
     const san = normalizeSan(rawSan)
 
     if (
@@ -1124,7 +1636,7 @@ function shouldTokenizeMoveCandidate(
     return false
   }
 
-  if (isProseMoveReference(precedingText)) {
+  if (isProseMoveReference(`${previousText}${precedingText}`)) {
     return false
   }
 
@@ -1168,8 +1680,16 @@ function isProsePlanReference(text: string) {
 }
 
 export function isProseMoveReference(text: string) {
-  return /(?:\b(?:against|allows?|allowed|answer|as|blow|by means of|dominates?|followed by|for example|forcing|i\.e\.|in case|intending|manoeuvre|play first|prefers?|prevented by|preventing|starting with|such as|the threat (?:is|was)|threat|threatens|threatened|threatening|which would allow|would allow|would play|would prefer)\s*(?:\.\.\.)?\s*)$/i.test(
-    text,
+  return (
+    /\bwould\s+(?:immediately\s+)?draw\s+after\b[^!?;\n]*$/i.test(text) ||
+    /\b(?:white|black)\s+moves\s*$/i.test(text) ||
+    /(?:\b(?:against|allows?|allowed|answer|as|avoid(?:ed|ing|s)?|blow|by means of|compared to|dominates?|followed by|for example|forcing|i\.e\.|in case|intending|manoeuvre|play first|prefers?|prevented by|preventing|starting with|such as|the next (?:white|black) move will be|the threat (?:is|was)|threat|threatens|threatened|threatening|which would allow|with simply|would allow|would play|would prefer)\s*(?:\.\.\.)?\s*)$/i.test(
+      text,
+    ) ||
+    /(?:tactically\s+)?prevented\s*\(\s*(?:\.\.\.)?\s*$/i.test(text) ||
+    /\bwould play\s+\.\.\.[KQRBN]?[a-h][1-8](?:[+#])?\s+and,\s+if\s*$/i.test(
+      text,
+    )
   )
 }
 
@@ -1230,9 +1750,7 @@ function isMoveContinuationText(text: string) {
     return true
   }
 
-  return /^(?:(?:or|and|then|if|ep|A|B)\b|[(),;:+=!?-]|\s)+$/i.test(
-    normalized,
-  )
+  return /^(?:(?:or|and|then|if|ep|A|B)\b|[(),;:+=!?-]|\s)+$/i.test(normalized)
 }
 
 function scoreContinuation(
@@ -1287,9 +1805,7 @@ function compareCandidates(left: BranchCandidate, right: BranchCandidate) {
   return right.sourceIndex - left.sourceIndex
 }
 
-function dedupeCandidates(
-  candidates: Array<Omit<BranchCandidate, 'score'>>,
-) {
+function dedupeCandidates(candidates: Array<Omit<BranchCandidate, 'score'>>) {
   const seen = new Set<string>()
 
   return candidates.filter((candidate) => {
@@ -1325,10 +1841,9 @@ function applyTokenMove(branch: Branch, token: CandidateToken) {
     return null
   }
 
-  const normalizedBranch =
-    token.moveNumber
-      ? withFullmove(branch, token.moveNumber)
-      : branch
+  const normalizedBranch = token.moveNumber
+    ? withFullmove(branch, token.moveNumber)
+    : branch
   const nextBranch = applyMove(normalizedBranch, token.san)
 
   if (!nextBranch) {
@@ -1338,7 +1853,8 @@ function applyTokenMove(branch: Branch, token: CandidateToken) {
   return {
     branch: nextBranch,
     exactMoveNumber:
-      !token.moveNumber || Number(branch.fen.split(' ')[5]) === token.moveNumber,
+      !token.moveNumber ||
+      Number(branch.fen.split(' ')[5]) === token.moveNumber,
     parentFen: normalizedBranch.fen,
   }
 }
@@ -1386,10 +1902,7 @@ function normalizeSan(rawMove: string) {
     .replace(/^0-0-0/, 'O-O-O')
     .replace(/^0-0/, 'O-O')
 
-  return stripped.replace(
-    /^([a-h](?:x[a-h])?[18])([QRBN])([+#]?)$/,
-    '$1=$2$3',
-  )
+  return stripped.replace(/^([a-h](?:x[a-h])?[18])([QRBN])([+#]?)$/, '$1=$2$3')
 }
 
 function withTurn(fen: string, turn: 'b' | 'w') {

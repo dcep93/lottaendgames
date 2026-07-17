@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Chessboard } from 'react-chessboard'
 import type {
   BoardOrientation,
+  PositionBoundaryPath,
   PositionMarker,
   PositionRoute,
 } from './chapterTypes'
@@ -10,20 +11,24 @@ import { getSquareIndex } from './fen'
 type ChessBoardProps = {
   animateNextMove?: boolean
   ariaLabel?: string
+  boundaryPaths?: PositionBoundaryPath[]
   fen: string
   markers?: PositionMarker[]
   number: string
   orientation: BoardOrientation
+  quadrantDividers?: boolean
   routes?: PositionRoute[]
 }
 
 export default function ChessBoard({
   animateNextMove = false,
   ariaLabel,
+  boundaryPaths = [],
   fen,
   markers = [],
   number,
   orientation,
+  quadrantDividers = false,
   routes = [],
 }: ChessBoardProps) {
   const [isExpanded, setIsExpanded] = useState(false)
@@ -80,6 +85,48 @@ export default function ChessBoard({
         }}
       />
       <div className="leg-board-marker-layer">
+        {boundaryPaths.length > 0 ? (
+          <svg
+            aria-hidden="true"
+            className="leg-board-boundary-layer"
+            preserveAspectRatio="none"
+            viewBox="0 0 100 100"
+          >
+            {boundaryPaths.map((boundaryPath, boundaryPathIndex) => (
+              <polyline
+                className="leg-board-boundary-path"
+                key={`${boundaryPath.meaning}-${boundaryPathIndex}`}
+                points={getBoundaryPoints(boundaryPath, orientation)}
+                vectorEffect="non-scaling-stroke"
+              />
+            ))}
+          </svg>
+        ) : null}
+        {quadrantDividers ? (
+          <svg
+            aria-hidden="true"
+            className="leg-board-quadrant-divider-layer"
+            preserveAspectRatio="none"
+            viewBox="0 0 100 100"
+          >
+            <line
+              className="leg-board-quadrant-divider"
+              vectorEffect="non-scaling-stroke"
+              x1="50"
+              x2="50"
+              y1="0"
+              y2="100"
+            />
+            <line
+              className="leg-board-quadrant-divider"
+              vectorEffect="non-scaling-stroke"
+              x1="0"
+              x2="100"
+              y1="50"
+              y2="50"
+            />
+          </svg>
+        ) : null}
         {routes.length > 0 ? (
           <svg
             aria-hidden="true"
@@ -135,7 +182,7 @@ export default function ChessBoard({
       data-expanded={isExpanded ? 'true' : 'false'}
     >
       <div
-        aria-label={`${expansionAction} position ${number}`}
+        aria-label={`${expansionAction} ${ariaLabel ?? `position ${number}`}`}
         aria-pressed={isExpanded}
         className="leg-board-expand-toggle"
         onClick={toggleExpanded}
@@ -171,6 +218,17 @@ function getRoutePoints(
     .join(' ')
 }
 
+function getBoundaryPoints(
+  boundaryPath: PositionBoundaryPath,
+  orientation: BoardOrientation,
+) {
+  return boundaryPath.points
+    .map(({ x, y }) =>
+      orientation === 'black' ? `${100 - x},${100 - y}` : `${x},${y}`,
+    )
+    .join(' ')
+}
+
 function BoardMarker({
   marker,
   orientation,
@@ -184,17 +242,20 @@ function BoardMarker({
     return null
   }
 
+  const accessibleSymbol = marker.symbol === '★' ? 'star' : marker.symbol
   const markerClass = marker.symbol === 'outlined square'
     ? 'leg-board-marker leg-board-marker--outline'
     : marker.variant === 'emphasis'
       ? 'leg-board-marker leg-board-marker--emphasis'
-    : marker.variant === 'label'
-      ? 'leg-board-marker leg-board-marker--label'
-      : 'leg-board-marker leg-board-marker--badge'
+      : marker.variant === 'label-italic'
+        ? 'leg-board-marker leg-board-marker--label-italic'
+        : marker.variant === 'label'
+          ? 'leg-board-marker leg-board-marker--label'
+          : 'leg-board-marker leg-board-marker--badge'
 
   return (
     <span
-      aria-label={`${marker.symbol} marker on ${marker.square}: ${marker.meaning}`}
+      aria-label={`${accessibleSymbol} marker on ${marker.square}: ${marker.meaning}`}
       className={markerClass}
       style={{
         gridColumn: squareIndex.column,

@@ -49,7 +49,11 @@ function validatePart(
   assert(Array.isArray(value.sections), `${location} sections must be an array`)
 
   value.sections.forEach((section, sectionIndex) => {
-    validateSection(section, `${location}, section ${sectionIndex + 1}`, boardIds)
+    validateSection(
+      section,
+      `${location}, section ${sectionIndex + 1}`,
+      boardIds,
+    )
   })
 }
 
@@ -60,7 +64,10 @@ function validateSection(
 ): asserts value is RawChapterSection {
   assertRecord(value, location)
   assertNonEmptyString(value.type, `${location} type`)
-  assert(sectionTypes.has(value.type), `${location} has unknown type: ${value.type}`)
+  assert(
+    sectionTypes.has(value.type),
+    `${location} has unknown type: ${value.type}`,
+  )
 
   if (value.playbackPositionNumbers !== undefined) {
     assert(
@@ -93,6 +100,17 @@ function validateSection(
       assertNonEmptyString(content.fen, `${location} fen`)
       validatePlacement(content.fen, `${location} fen`)
       validateOptionalStrings(content, location, ['subtitle'])
+      assert(
+        content.hideVisualLabel === undefined ||
+          typeof content.hideVisualLabel === 'boolean',
+        `${location} hideVisualLabel must be a boolean`,
+      )
+      assert(
+        content.quadrantDividers === undefined ||
+          typeof content.quadrantDividers === 'boolean',
+        `${location} quadrantDividers must be a boolean`,
+      )
+      validateBoundaryPaths(content.boundaryPaths, location)
       validateMarkers(content.markers, location)
       validateRoutes(content.routes, location)
       return
@@ -116,9 +134,54 @@ function validateSection(
         'displayLabel',
         'subtitle',
       ])
+      assert(
+        content.hideVisualLabel === undefined ||
+          typeof content.hideVisualLabel === 'boolean',
+        `${location} hideVisualLabel must be a boolean`,
+      )
+      if (content.hideVisualLabel) {
+        assertNonEmptyString(
+          content.caption,
+          `${location} caption required when hideVisualLabel is true`,
+        )
+      }
+      validateBoundaryPaths(content.boundaryPaths, location)
       validateMarkers(content.markers, location)
       validateRoutes(content.routes, location)
       validatePlaybackAnchors(content.playbackAnchors, location)
+      if (content.alternateFens !== undefined) {
+        assert(
+          Array.isArray(content.alternateFens),
+          `${location} alternateFens must be an array`,
+        )
+        content.alternateFens.forEach((fen, index) => {
+          assertNonEmptyString(fen, `${location} alternateFens[${index}]`)
+          validateLegalFen(fen, `${location} alternateFens[${index}]`)
+        })
+      }
+      validatePlaybackCanonicalPaths(
+        content.playbackCanonicalPaths,
+        [content.fen, ...(content.alternateFens ?? [])],
+        location,
+      )
+      validatePlaybackCanonicalAliases(
+        content.playbackCanonicalAliases,
+        location,
+      )
+      if (content.playbackCanonicalSourcePositionNumbers !== undefined) {
+        assertStringArray(
+          content.playbackCanonicalSourcePositionNumbers,
+          `${location} playbackCanonicalSourcePositionNumbers`,
+        )
+        assert(
+          content.playbackCanonicalSourcePositionNumbers.length > 0,
+          `${location} playbackCanonicalSourcePositionNumbers must not be empty`,
+        )
+      }
+      validatePlaybackContinuationAliases(
+        content.playbackContinuationAliases,
+        location,
+      )
       validatePlaybackSegments(content.playbackSegments, location)
       if (content.relatedPositionNumbers !== undefined) {
         assertStringArray(
@@ -129,16 +192,6 @@ function validateSection(
           content.relatedPositionNumbers.length > 0,
           `${location} relatedPositionNumbers must not be empty`,
         )
-      }
-      if (content.alternateFens !== undefined) {
-        assert(
-          Array.isArray(content.alternateFens),
-          `${location} alternateFens must be an array`,
-        )
-        content.alternateFens.forEach((fen, index) => {
-          assertNonEmptyString(fen, `${location} alternateFens[${index}]`)
-          validateLegalFen(fen, `${location} alternateFens[${index}]`)
-        })
       }
       return
     case 'problem':
@@ -154,6 +207,10 @@ function validateSection(
       validateProblemFen(content.fen, content.solutionFen, `${location} fen`)
       validateMarkers(content.markers, location)
       validatePlaybackAnchors(content.playbackAnchors, location)
+      validatePlaybackContinuationAliases(
+        content.playbackContinuationAliases,
+        location,
+      )
       validatePlaybackSegments(content.playbackSegments, location)
       return
     case 'table':
@@ -200,6 +257,130 @@ function validatePlaybackAnchors(value: unknown, location: string) {
           anchor.occurrence >= 0),
       `${anchorLocation} occurrence must be a non-negative integer`,
     )
+    if (anchor.pathPrefix !== undefined) {
+      assertStringArray(anchor.pathPrefix, `${anchorLocation} pathPrefix`)
+    }
+  })
+}
+
+function validatePlaybackCanonicalPaths(
+  value: unknown,
+  rootFens: string[],
+  location: string,
+) {
+  if (value === undefined) {
+    return
+  }
+
+  assert(
+    Array.isArray(value),
+    `${location} playbackCanonicalPaths must be an array`,
+  )
+  assert(
+    value.length > 0,
+    `${location} playbackCanonicalPaths must not be empty`,
+  )
+  value.forEach((line, index) => {
+    const pathLocation = `${location} playback canonical path ${index + 1}`
+    assertNonEmptyString(line, pathLocation)
+    let lastFailure: { fen: string; san: string } | undefined
+    const hasLegalRoot = rootFens.some((rootFen) => {
+      const chess = new Chess(rootFen)
+
+      for (const san of line.trim().split(/\s+/)) {
+        try {
+          chess.move(san, { strict: false })
+        } catch {
+          lastFailure = { fen: chess.fen(), san }
+          return false
+        }
+      }
+
+      return true
+    })
+
+    if (!hasLegalRoot) {
+      throw new Error(
+        `${pathLocation} has illegal move ${lastFailure?.san ?? line} from ${lastFailure?.fen ?? rootFens[0]}`,
+      )
+    }
+  })
+}
+
+function validatePlaybackCanonicalAliases(value: unknown, location: string) {
+  if (value === undefined) {
+    return
+  }
+
+  assert(
+    Array.isArray(value),
+    `${location} playbackCanonicalAliases must be an array`,
+  )
+  value.forEach((alias, index) => {
+    const aliasLocation = `${location} playback canonical alias ${index + 1}`
+    assertRecord(alias, aliasLocation)
+    assertStringArray(alias.path, `${aliasLocation} path`)
+    assert(alias.path.length > 0, `${aliasLocation} path must not be empty`)
+    assertNonEmptyString(
+      alias.sourcePositionNumber,
+      `${aliasLocation} sourcePositionNumber`,
+    )
+    assertNonEmptyString(alias.sourceToken, `${aliasLocation} sourceToken`)
+    assert(
+      typeof alias.sourceSectionIndex === 'number' &&
+        Number.isInteger(alias.sourceSectionIndex) &&
+        alias.sourceSectionIndex >= 0,
+      `${aliasLocation} sourceSectionIndex must be a non-negative integer`,
+    )
+    assert(
+      alias.sourceOccurrence === undefined ||
+        (typeof alias.sourceOccurrence === 'number' &&
+          Number.isInteger(alias.sourceOccurrence) &&
+          alias.sourceOccurrence >= 0),
+      `${aliasLocation} sourceOccurrence must be a non-negative integer`,
+    )
+  })
+}
+
+function validatePlaybackContinuationAliases(value: unknown, location: string) {
+  if (value === undefined) {
+    return
+  }
+
+  assert(
+    Array.isArray(value),
+    `${location} playbackContinuationAliases must be an array`,
+  )
+  value.forEach((alias, index) => {
+    const aliasLocation = `${location} playback continuation alias ${index + 1}`
+    assertRecord(alias, aliasLocation)
+    assertNonEmptyString(
+      alias.alternateToken,
+      `${aliasLocation} alternateToken`,
+    )
+    assertNonEmptyString(
+      alias.continuationToken,
+      `${aliasLocation} continuationToken`,
+    )
+    assert(
+      typeof alias.sectionIndex === 'number' &&
+        Number.isInteger(alias.sectionIndex) &&
+        alias.sectionIndex >= 0,
+      `${aliasLocation} sectionIndex must be a non-negative integer`,
+    )
+    for (const occurrenceName of [
+      'alternateOccurrence',
+      'continuationOccurrence',
+    ] as const) {
+      const occurrence = alias[occurrenceName]
+      assert(
+        occurrence === undefined ||
+          (typeof occurrence === 'number' &&
+            Number.isInteger(occurrence) &&
+            occurrence >= 0),
+        `${aliasLocation} ${occurrenceName} must be a non-negative integer`,
+      )
+    }
   })
 }
 
@@ -258,16 +439,50 @@ function validateMarkers(value: unknown, location: string) {
     const markerLocation = `${location} marker ${index + 1}`
     assertRecord(marker, markerLocation)
     assertNonEmptyString(marker.square, `${markerLocation} square`)
-    assert(/^[a-h][1-8]$/.test(marker.square), `${markerLocation} has invalid square`)
+    assert(
+      /^[a-h][1-8]$/.test(marker.square),
+      `${markerLocation} has invalid square`,
+    )
     assertNonEmptyString(marker.symbol, `${markerLocation} symbol`)
     assertNonEmptyString(marker.meaning, `${markerLocation} meaning`)
     assert(
       marker.variant === undefined ||
         marker.variant === 'badge' ||
         marker.variant === 'emphasis' ||
-        marker.variant === 'label',
+        marker.variant === 'label' ||
+        marker.variant === 'label-italic',
       `${markerLocation} has invalid variant`,
     )
+  })
+}
+
+function validateBoundaryPaths(value: unknown, location: string) {
+  if (value === undefined) {
+    return
+  }
+
+  assert(Array.isArray(value), `${location} boundaryPaths must be an array`)
+  value.forEach((path, pathIndex) => {
+    const pathLocation = `${location} boundary path ${pathIndex + 1}`
+    assertRecord(path, pathLocation)
+    assertNonEmptyString(path.meaning, `${pathLocation} meaning`)
+    assert(
+      Array.isArray(path.points) && path.points.length >= 2,
+      `${pathLocation} points must contain at least two points`,
+    )
+    path.points.forEach((point, pointIndex) => {
+      const pointLocation = `${pathLocation} point ${pointIndex + 1}`
+      assertRecord(point, pointLocation)
+      for (const coordinate of ['x', 'y'] as const) {
+        assert(
+          typeof point[coordinate] === 'number' &&
+            Number.isFinite(point[coordinate]) &&
+            point[coordinate] >= 0 &&
+            point[coordinate] <= 100,
+          `${pointLocation} ${coordinate} must be between 0 and 100`,
+        )
+      }
+    })
   })
 }
 
@@ -391,7 +606,10 @@ function assertNonEmptyString(
   value: unknown,
   location: string,
 ): asserts value is string {
-  assert(typeof value === 'string' && value.trim() !== '', `${location} must be a non-empty string`)
+  assert(
+    typeof value === 'string' && value.trim() !== '',
+    `${location} must be a non-empty string`,
+  )
 }
 
 function assert(condition: unknown, message: string): asserts condition {

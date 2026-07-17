@@ -14,6 +14,7 @@ import {
 import { shouldHandleBookReferenceClick } from './bookReferenceNavigation'
 import ModuleSelector from '../ModuleSelector'
 import { chapterPayloadPath } from './chapterPayloadManifest'
+import ChessBoard from './ChessBoard'
 import InstructionalDiagram from './InstructionalDiagram'
 import TableBlock from './TableBlock'
 import type {
@@ -95,6 +96,7 @@ for (const chapter of runtimePayload.chapters) {
     if (tokens) {
       assert.equal(
         tokens
+          .filter((token) => token.type !== 'move' || !token.hidden)
           .map((token) => (token.type === 'text' ? token.text : token.display))
           .join(''),
         source,
@@ -103,7 +105,7 @@ for (const chapter of runtimePayload.chapters) {
   }
 }
 
-assert.equal(runtimeReferenceSpanCount, 95)
+assert.equal(runtimeReferenceSpanCount, 94)
 const frontMatterMarkup = renderToStaticMarkup(
   <BookFrontMatter
     chapters={runtimePayload.chapters}
@@ -153,24 +155,112 @@ assert.match(frontMatterMarkup, /Black to move\. Can he draw\?/)
 assert.match(frontMatterMarkup, /print page 233; PDF page 234/)
 assert.match(frontMatterMarkup, /print page 238; PDF page 239/)
 assert.match(frontMatterMarkup, /href="\/book\/chapter14#p14\.29"/)
+assert.match(frontMatterMarkup, /href="\/book\/chapter12#p12\.19"/)
+assert.match(frontMatterMarkup, /Position 12\.19/)
+assert.match(frontMatterMarkup, /print page 185; PDF page 186/)
+assert.match(
+  frontMatterMarkup,
+  /legal immediate counterattack after 4\.Kd2 is 4\.\.\.Kc5/,
+)
+assert.match(frontMatterMarkup, /href="\/book\/chapter11#p11\.1"/)
+assert.match(frontMatterMarkup, /Position 11\.1/)
+assert.match(frontMatterMarkup, /print page 154; PDF page 155/)
+assert.match(frontMatterMarkup, /black rook on g1 cannot move to c8/)
+assert.match(frontMatterMarkup, /intended move is uncertain/)
+assert.match(frontMatterMarkup, /href="\/book\/chapter1#p1\.7"/)
+assert.match(frontMatterMarkup, /href="\/book\/chapter1#p1\.10"/)
+assert.match(frontMatterMarkup, /href="\/book\/chapter1#p1\.14"/)
+assert.match(frontMatterMarkup, /href="\/book\/chapter1#p1\.16"/)
+assert.match(
+  frontMatterMarkup,
+  /Most mistakes made in King \+ Pawn vs\. Pawn endings occur in this position\./,
+)
+assert.match(frontMatterMarkup, /print page 32; PDF page 33/)
+assert.match(frontMatterMarkup, /King \+ Pawn vs\. King endings/)
+assert.match(frontMatterMarkup, /Now the pawn cannot be stopped\./)
+assert.match(frontMatterMarkup, /print page 34; PDF page 35/)
+assert.match(frontMatterMarkup, /Now the pawn can be stopped\./)
+assert.match(frontMatterMarkup, /there is a\.stalemate\./)
+assert.match(frontMatterMarkup, /print page 37; PDF page 38/)
+assert.match(frontMatterMarkup, /there is a stalemate\./)
+assert.match(frontMatterMarkup, /the stronger side’s king\.\./)
+assert.match(frontMatterMarkup, /print page 38; PDF page 39/)
+assert.match(frontMatterMarkup, /the stronger side’s king\./)
+assert.match(frontMatterMarkup, /href="\/book\/chapter4#p4\.6"/)
+assert.match(frontMatterMarkup, /href="\/book\/chapter4#p4\.11"/)
+assert.match(
+  frontMatterMarkup,
+  /White cannot win tempi to bring his king nearer anymore\./,
+)
+assert.match(frontMatterMarkup, /print page 63; PDF page 64/)
+assert.match(
+  frontMatterMarkup,
+  /Black cannot win tempi to bring his king nearer anymore\./,
+)
+assert.match(
+  frontMatterMarkup,
+  /Only move, but not enough to draw\./,
+)
+assert.match(frontMatterMarkup, /print page 66; PDF page 67/)
+assert.match(frontMatterMarkup, /Only move, but enough to draw\./)
 const deviationListMatch = frontMatterMarkup.match(
   /<ul class="leg-deviation-list">([\s\S]*?)<\/ul>/,
 )
 assert.ok(deviationListMatch)
 const deviationListMarkup = deviationListMatch[1]
-assert.equal((deviationListMarkup.match(/<a /g) ?? []).length, 1)
-assert.doesNotMatch(deviationListMarkup, /href="\/book\/chapter12#/)
+assert.equal((deviationListMarkup.match(/<a /g) ?? []).length, 30)
 assert.match(
   deviationListMarkup,
   /This digital edition presents the prompt as “White to move\. Can he draw\?” so that it agrees with the solution\./,
 )
-assert.doesNotMatch(deviationListMarkup, /author error|mistake|incorrect/i)
+assert.doesNotMatch(
+  deviationListMarkup,
+  /author (?:error|mistake)|book (?:error|mistake)|publisher (?:error|mistake)|incorrect/i,
+)
 assert.doesNotMatch(frontMatterMarkup, /href="\/book\/chapter12#p12\.18"/)
 assert.doesNotMatch(frontMatterMarkup, /href="\/book\/chapter12#p12\.6"/)
 assert.doesNotMatch(frontMatterMarkup, /href="\/book\/chapter12#p12\.29"/)
 assert.match(frontMatterMarkup, /href="\/book\/intro"/)
 assert.match(frontMatterMarkup, /href="\/book\/chapter1#e1"/)
 assert.match(frontMatterMarkup, /href="\/book\/bibliography"/)
+const contentsMarkupMatch = frontMatterMarkup.match(
+  /<nav aria-labelledby="book-contents-heading"[\s\S]*?<\/nav>/,
+)
+assert.ok(contentsMarkupMatch)
+const bookContentsMarkup = contentsMarkupMatch[0]
+assert.equal(
+  (bookContentsMarkup.match(/class="leg-contents-supplement"/g) ?? []).length,
+  2,
+)
+assert.equal(
+  (
+    bookContentsMarkup.match(
+      /class="leg-contents-row leg-contents-supplement-row"/g,
+    ) ?? []
+  ).length,
+  2,
+)
+assert.match(bookContentsMarkup, /href="\/book\/chapter2#p2\.01-solution">/)
+assert.match(bookContentsMarkup, /href="\/book\/chapter14#p14\.01-solution">/)
+assert.equal((bookContentsMarkup.match(/>Solutions<\/span>/g) ?? []).length, 2)
+for (const [chapterHref, solutionHref, nextChapterHref] of [
+  [
+    'href="/book/chapter2"',
+    'href="/book/chapter2#p2.01-solution"',
+    'href="/book/chapter3"',
+  ],
+  [
+    'href="/book/chapter14"',
+    'href="/book/chapter14#p14.01-solution"',
+    'href="/book/chapter15"',
+  ],
+] as const) {
+  const chapterIndex = bookContentsMarkup.indexOf(chapterHref)
+  const solutionIndex = bookContentsMarkup.indexOf(solutionHref)
+  const nextChapterIndex = bookContentsMarkup.indexOf(nextChapterHref)
+  assert.ok(chapterIndex < solutionIndex)
+  assert.ok(solutionIndex < nextChapterIndex)
+}
 assert.equal((frontMatterMarkup.match(/>Ending \d+</g) ?? []).length, 100)
 assert.match(frontMatterMarkup, /<ol class="leg-contents-list">/)
 assert.equal(
@@ -226,9 +316,51 @@ assert.match(diagramMarkup, /points="43.75,43.75 56.25,18.75"/)
 assert.match(diagramMarkup, /href="https:\/\/lichess\.org\/editor\//)
 assert.match(diagramMarkup, /The rook instructional chess diagram/)
 assert.match(diagramMarkup, /aria-label="Position controls"/)
-assert.match(diagramMarkup, /Expand position intro-rook-mobility/)
+assert.match(diagramMarkup, /Expand The rook instructional chess diagram/)
+assert.doesNotMatch(diagramMarkup, /Expand position intro-rook-mobility/)
 assert.match(diagramMarkup, /data-expanded="false"/)
 assert.doesNotMatch(diagramMarkup, /fullscreen/i)
+const chapterOneDiagramMarkup = renderToStaticMarkup(
+  <ChessBoard
+    boundaryPaths={[
+      {
+        meaning: 'Square of the pawn boundary as printed',
+        points: [
+          { x: 0, y: 62.5 },
+          { x: 0, y: 0 },
+          { x: 62.5, y: 0 },
+          { x: 62.5, y: 62.5 },
+          { x: 0, y: 62.5 },
+        ],
+      },
+    ]}
+    fen="6k1/8/8/8/P7/8/8/7K b - - 0 1"
+    markers={[
+      { meaning: 'key square', square: 'e6', symbol: '★' },
+      { meaning: 'key square', square: 'f6', symbol: '★' },
+      { meaning: 'key square', square: 'g6', symbol: '★' },
+    ]}
+    number="1.2"
+    orientation="white"
+  />,
+)
+assert.match(chapterOneDiagramMarkup, /class="leg-board-boundary-layer"/)
+assert.match(
+  chapterOneDiagramMarkup,
+  /points="0,62\.5 0,0 62\.5,0 62\.5,62\.5 0,62\.5"/,
+)
+assert.doesNotMatch(chapterOneDiagramMarkup, /class="leg-board-route-layer"/)
+assert.equal(
+  (chapterOneDiagramMarkup.match(
+    /class="leg-board-marker-glyph">★<\/span>/g,
+  ) ?? []).length,
+  3,
+)
+assert.match(
+  chapterOneDiagramMarkup,
+  /aria-label="star marker on e6: key square"/,
+)
+assert.doesNotMatch(chapterOneDiagramMarkup, /aria-label="★ marker/)
 const chessBoardSource = readFileSync(
   new URL('./ChessBoard.tsx', import.meta.url),
   'utf8',
@@ -265,6 +397,26 @@ const uncaptionedTableMarkup = renderToStaticMarkup(
   />,
 )
 assert.doesNotMatch(uncaptionedTableMarkup, /<caption>/)
+
+const originalConsoleError = console.error
+const duplicateHeaderErrors: unknown[][] = []
+console.error = (...args: unknown[]) => duplicateHeaderErrors.push(args)
+try {
+  renderToStaticMarkup(
+    <TableBlock
+      section={{
+        type: 'table',
+        content: {
+          columns: ['Type of ending', 'Games', '%', 'Drawn games', '%'],
+          rows: [['Rooks', '320,548', '8.01', '120,610', '37.63']],
+        },
+      }}
+    />,
+  )
+} finally {
+  console.error = originalConsoleError
+}
+assert.deepEqual(duplicateHeaderErrors, [])
 
 const bibliographyMetaMarkup = renderToStaticMarkup(
   <ReaderMeta endingRange={null} positionCount={0} />,
@@ -329,6 +481,18 @@ assert.doesNotMatch(compactSelectorMarkup, /Basic endings/)
 
 const positionSection: PositionSection = {
   content: {
+    boundaryPaths: [
+      {
+        meaning: 'Printed stepped boundary',
+        points: [
+          { x: 37.5, y: 0 },
+          { x: 37.5, y: 50 },
+          { x: 50, y: 50 },
+          { x: 50, y: 62.5 },
+          { x: 100, y: 62.5 },
+        ],
+      },
+    ],
     fen: '6k1/8/8/8/8/8/P7/7K w - - 0 1',
     number: '1.1',
     orientation: 'white',
@@ -358,6 +522,11 @@ const positionStudyMarkup = renderToStaticMarkup(
 assert.match(positionStudyMarkup, /leg-position-study-header/)
 assert.match(positionStudyMarkup, /leg-position-study-content/)
 assert.match(positionStudyMarkup, /id="p1\.1"/)
+assert.match(positionStudyMarkup, /class="leg-board-boundary-layer"/)
+assert.match(
+  positionStudyMarkup,
+  /points="37\.5,0 37\.5,50 50,50 50,62\.5 100,62\.5"/,
+)
 assert.ok(
   positionStudyMarkup.indexOf('leg-position-study-header') <
     positionStudyMarkup.indexOf('leg-position-study-content'),
@@ -493,6 +662,17 @@ const moveTokens: TextPlaybackToken[] = [
     san: 'a4',
     type: 'move',
   },
+  {
+    display: '2...Kg6',
+    fen: '6k1/8/6K1/8/P7/8/8/8 w - - 1 2',
+    hidden: true,
+    id: 'test-navigation-alias',
+    parentFen: '6k1/8/8/8/P7/8/6K1/8 b - - 0 1',
+    path: ['a4', 'Kg6'],
+    positionNumber: '1.1',
+    san: 'Kg6',
+    type: 'move',
+  },
 ]
 const playableProseMarkup = renderToStaticMarkup(
   <ProseBlock
@@ -507,6 +687,7 @@ const playableProseMarkup = renderToStaticMarkup(
 assert.match(playableProseMarkup, /^<div class="leg-prose"><p>/)
 assert.match(playableProseMarkup, /<button[^>]*class="leg-move-token"/)
 assert.match(playableProseMarkup, />1\.a4!<\/button>/)
+assert.doesNotMatch(playableProseMarkup, /2\.\.\.Kg6/)
 
 const referencedPlayableContent = 'See Ending 1. Play 1.a4!'
 const referencedMoveTokens: TextPlaybackToken[] = [
@@ -636,6 +817,7 @@ const hiddenProblemMarkup = renderToStaticMarkup(
 assert.match(hiddenProblemMarkup, /leg-position-study-header/)
 assert.match(hiddenProblemMarkup, /leg-position-study-content/)
 assert.match(hiddenProblemMarkup, /id="p2\.01"/)
+assert.match(hiddenProblemMarkup, /id="p2\.01-solution"/)
 assert.match(hiddenProblemMarkup, /aria-expanded="false"/)
 assert.match(hiddenProblemMarkup, />Show solution<\/button>/)
 assert.match(hiddenProblemMarkup, /data-playable="false"/)
@@ -643,11 +825,14 @@ assert.match(hiddenProblemMarkup, />Lichess ↗<\/a>/)
 assert.doesNotMatch(hiddenProblemMarkup, /aria-label="Previous move"/)
 assert.doesNotMatch(hiddenProblemMarkup, /leg-move-token/)
 assert.doesNotMatch(hiddenProblemMarkup, /Play 1\.a4/)
+assert.doesNotMatch(hiddenProblemMarkup, /id="problem-2\.01-solution"/)
 
 const revealedProblemMarkup = renderToStaticMarkup(
   <ProblemStudyGroup {...problemProps} revealed />,
 )
 assert.match(revealedProblemMarkup, /aria-expanded="true"/)
+assert.match(revealedProblemMarkup, /id="p2\.01-solution"/)
+assert.match(revealedProblemMarkup, /id="problem-2\.01-solution"/)
 assert.match(revealedProblemMarkup, />Hide solution<\/button>/)
 assert.match(revealedProblemMarkup, /data-playable="true"/)
 assert.match(

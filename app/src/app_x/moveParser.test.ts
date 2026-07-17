@@ -133,7 +133,9 @@ const zugzwangContinuationTokens = getMoveTokens(
 )
 const kopaevTokens = getMoveTokens(positionFiveElevenMoveSectionIndex)
 const rookInFrontTokens = getChapterSixMoveTokens(rookInFrontMoveSectionIndex)
-const seriesOfChecksTokens = getChapterSixMoveTokens(positionSixSixMoveSectionIndex)
+const seriesOfChecksTokens = getChapterSixMoveTokens(
+  positionSixSixMoveSectionIndex,
+)
 const positionFiveOneNavigation = navigationByPosition.get('5.1')
 const positionFiveOneInitialFen = '4R3/8/7K/8/1kp5/8/8/8 w - - 0 1'
 const panelSections = chapterSections.filter(
@@ -154,7 +156,9 @@ const chapterNinePositionNumbers = getPositionNumbers(chapterNineSections)
 const chapterTenPositionNumbers = getPositionNumbers(chapterTenSections)
 const chapterElevenPositionNumbers = getPositionNumbers(chapterElevenSections)
 const chapterTwelvePositionNumbers = getPositionNumbers(chapterTwelveSections)
-const chapterThirteenPositionNumbers = getPositionNumbers(chapterThirteenSections)
+const chapterThirteenPositionNumbers = getPositionNumbers(
+  chapterThirteenSections,
+)
 const chapterTenCaptions = getCaptions(chapterTenSections)
 const chapterElevenCaptions = getCaptions(chapterElevenSections)
 const chapterTwelveCaptions = getCaptions(chapterTwelveSections)
@@ -192,6 +196,36 @@ const prefixedSegmentPlayback = buildChapterPlayback([
     content: '1.h3 1...Kg6 2.Kg4',
   },
 ])
+const alternateRootCanonicalPlayback = buildChapterPlayback([
+  {
+    type: 'position',
+    content: {
+      alternateFens: [
+        '7k/8/8/8/8/8/8/K7 w - - 7 42',
+        '7k/8/8/8/8/8/8/K7 b - - 0 1',
+      ],
+      fen: '7k/8/8/8/8/8/8/K7 w - - 0 1',
+      number: 'canonical-alternate-root',
+      orientation: 'white',
+      playbackCanonicalPaths: ['Kb1', 'Kg8'],
+      playbackSegments: [
+        {
+          parentFen: '7k/8/8/8/8/8/8/K7 w - - 0 1',
+          positionNumber: 'canonical-alternate-root',
+          sectionIndex: 1,
+          start: '1.Kb1',
+        },
+        {
+          parentFen: '7k/8/8/8/8/8/8/K7 b - - 0 1',
+          positionNumber: 'canonical-alternate-root',
+          sectionIndex: 1,
+          start: '1...Kg8',
+        },
+      ],
+    },
+  },
+  { type: 'text', content: '1.Kb1 1...Kg8' },
+])
 const chapterTenPhilidorTokens = getChapterMoveTokens(
   chapterTenPlayback,
   chapterTenSections.findIndex(
@@ -212,8 +246,27 @@ const sanScanPattern =
   /(?<![A-Za-z0-9])((\d+)\s*(\.\.\.|\.)\s*)?((?:O-O-O|O-O|0-0-0|0-0|[KQRBN]?[a-h]?[1-8]?x?[a-h][1-8](?:=?[QRBN])?|[a-h]x[a-h][1-8](?:=?[QRBN])?|[a-h][1-8](?:=?[QRBN])?)(?:[+#])?(?:[!?]+|=)?)/g
 
 assert.equal(positionFiveOneIndex, 4)
-assert.equal(isProseMoveReference('which was tactically prevented by ...'), true)
+assert.equal(
+  isProseMoveReference('which was tactically prevented by ...'),
+  true,
+)
 assert.equal(isProseMoveReference('prevented the lethal blow ...'), true)
+assert.equal(isProseMoveReference('The next white move will be '), true)
+assert.equal(
+  isProseMoveReference('he would immediately draw after 1.Kg3 and '),
+  true,
+)
+assert.equal(
+  isProseMoveReference('opposite-coloured squares when White moves '),
+  true,
+)
+assert.equal(isProseMoveReference('which was tactically prevented (...'), true)
+assert.equal(isProseMoveReference('Black would play ...Kc6 and, if '), true)
+assert.equal(
+  isProseMoveReference('White wins if he has the move (with simply '),
+  true,
+)
+assert.equal(isProseMoveReference('looks nonsensical compared to '), true)
 assert.equal(chapterPayload.schemaVersion, 3)
 assert.match(chapterPayload.contentHash, /^sha256:[a-f0-9]{64}$/)
 assert.equal(chapterPayload.contentHash, getPayloadContentHash(chapterPayload))
@@ -264,38 +317,31 @@ assert.deepEqual(scanUnclickableSan('3', chapterThreeSections), [])
 assert.deepEqual(scanUnclickableSan('4', chapterFourSections), [])
 assert.deepEqual(scanUnclickableSan('10', chapterTenSections), [
   // Retrospective or prospective prose references, not played variations.
+  '10:30:7.Rf8',
   '10:41:2.Ke6',
   '10:41:Kf8!',
   '10:52:3.Rb7',
+  '10:76:2...Ka6',
   '10:85:Ka4',
-  // PDF 144 / printed 143: the null move 3.Rh5 is preserved verbatim.
-  '10:90:3.Rh5',
-  // PDF 150 / printed 149: 8.Kc4 and its continuation are illegal in print.
-  '10:113:8.Kc4',
-  '10:113:Kd6',
-  '10:113:9.Kb4',
-  '10:113:Kc6=',
-  // PDF 152 / printed 151: the response to checking 8.Rb5? is illegal.
-  '10:121:Rh8+',
-  '10:121:9.Kc7',
-  '10:121:Rh7+',
+  '10:113:2.Kf2',
 ])
 assert.deepEqual(scanUnclickableSan('11', chapterElevenSections), [
   // PDF 155 / printed 154: the rook cannot move from g1 to c8.
   '11:6:3...Rc8!',
   // Prose route and retrospective position references, not played variations.
   '11:12:Rf1',
-  '11:52:3.h6',
 ])
 assert.deepEqual(scanUnclickableSan('12', chapterTwelveSections), [
-  // PDF 184 / printed 183: b4 is empty, so the printed capture is illegal.
-  '12:62:1...Kxb4',
   // Retrospective prose references, not played variations.
   '12:66:1.b4?',
-  // PDF 186 / printed 185: the black king cannot jump from d4 to b5.
-  '12:72:4...Kb5',
 ])
-assert.deepEqual(scanUnclickableSan('13', chapterThirteenSections), [])
+assert.deepEqual(scanUnclickableSan('13', chapterThirteenSections), [
+  // Prose repetitions and a cross-reference, not played variations.
+  '13:21:4.Bb3',
+  '13:21:Re2!',
+  '13:72:2...Bc4',
+  '13:97:1.Kc4',
+])
 for (const regression of [
   {
     display: '10...Ka6',
@@ -348,13 +394,13 @@ for (const regression of [
   {
     display: '7.Bg5',
     page: 'PDF 219 / printed 218',
-    parentFen: '8/6R1/8/8/5B2/4K2k/6r1/8 w - - 5 7',
+    parentFen: '8/6R1/8/8/4K3/4B2k/6r1/8 w - - 5 7',
     sectionIndex: 53,
   },
   {
     display: '9.Bf4+',
     page: 'PDF 219 / printed 218',
-    parentFen: '6R1/8/8/6B1/8/4K1k1/6r1/8 w - - 9 9',
+    parentFen: '6R1/8/8/6B1/4K3/6k1/6r1/8 w - - 9 9',
     sectionIndex: 53,
   },
   {
@@ -378,10 +424,7 @@ for (const regression of [
 ] as const) {
   assert.equal(
     findMove(
-      getChapterMoveTokens(
-        chapterThirteenPlayback,
-        regression.sectionIndex,
-      ),
+      getChapterMoveTokens(chapterThirteenPlayback, regression.sectionIndex),
       regression.display,
     ).parentFen,
     regression.parentFen,
@@ -442,8 +485,7 @@ for (const section of summaryPanels) {
   assert.equal(panelText.includes('Summary of interesting ideas:'), false)
 }
 const chapterFiveConclusion = panelSections.find(
-  (section) =>
-    (section.content as { title?: unknown }).title === 'Conclusion',
+  (section) => (section.content as { title?: unknown }).title === 'Conclusion',
 )
 assert.ok(chapterFiveConclusion)
 assert.equal(
@@ -491,9 +533,11 @@ assert.equal(chapterSevenPositionNumbers.has('7.6'), true)
 assert.equal(chapterSevenPlayback.playablePositions.has('7.1'), true)
 assert.equal(chapterSevenPlayback.playablePositions.has('7.6'), true)
 assert.equal(chapterEightPositionNumbers.has('8.1'), true)
-assert.equal(chapterEightPositionNumbers.has('8.7b'), true)
+assert.equal(chapterEightPositionNumbers.has('8.7'), true)
+assert.equal(chapterEightPositionNumbers.has('8.8'), true)
 assert.equal(chapterEightPlayback.playablePositions.has('8.1'), true)
-assert.equal(chapterEightPlayback.playablePositions.has('8.7b'), true)
+assert.equal(chapterEightPlayback.playablePositions.has('8.7'), true)
+assert.equal(chapterEightPlayback.playablePositions.has('8.8'), true)
 assert.equal(chapterNinePositionNumbers.has('9.1'), true)
 assert.equal(chapterNinePositionNumbers.has('9.20'), true)
 assert.equal(chapterNinePlayback.playablePositions.has('9.1'), true)
@@ -508,7 +552,7 @@ const exactBranchParentExpectations = [
   {
     chapterId: '7',
     display: 'Kf5',
-    parentFen: '6K1/5P2/3b1k1B/8/8/8/8/8 b - - 1 1',
+    parentFen: '4K3/5P2/3b1k1B/8/8/8/8/8 b - - 1 1',
     positionNumber: '7.4',
     sectionIndex: 23,
   },
@@ -551,7 +595,7 @@ const exactBranchParentExpectations = [
   {
     chapterId: '8',
     display: '7.Bg7',
-    parentFen: '8/8/8/2n5/8/8/p3K3/Bk6 w - - 10 7',
+    parentFen: '8/8/8/2n5/8/8/p3K3/Bk6 w - - 11 7',
     positionNumber: '8.5',
     sectionIndex: 21,
   },
@@ -559,15 +603,15 @@ const exactBranchParentExpectations = [
     chapterId: '8',
     display: '1...Nd8',
     parentFen: '8/2KPkn2/8/8/8/5B2/8/8 b - - 1 1',
-    positionNumber: '8.7a',
-    sectionIndex: 30,
+    positionNumber: '8.7',
+    sectionIndex: 31,
   },
   {
     chapterId: '8',
-    display: '2.Bd5+',
+    display: '2.Bd5',
     parentFen: '3n4/2KPk3/8/8/8/5B2/8/8 w - - 2 2',
-    positionNumber: '8.7a',
-    sectionIndex: 30,
+    positionNumber: '8.7',
+    sectionIndex: 31,
   },
   {
     chapterId: '9',
@@ -671,7 +715,10 @@ const exactBranchParentExpectations = [
 
 for (const expectation of exactBranchParentExpectations) {
   const sourcePlayback = chaptersSevenToNinePlayback.get(expectation.chapterId)
-  assert.ok(sourcePlayback, `Expected Chapter ${expectation.chapterId} playback`)
+  assert.ok(
+    sourcePlayback,
+    `Expected Chapter ${expectation.chapterId} playback`,
+  )
   const sourceMove = findMove(
     getChapterMoveTokens(sourcePlayback, expectation.sectionIndex),
     expectation.display,
@@ -757,7 +804,10 @@ assert.equal(
   findMove(chapterElevenAnalysisTokens, '4...Rg1!').positionNumber,
   '11.2',
 )
-assert.equal(findMove(chapterElevenAnalysisTokens, '3.d6').positionNumber, '11.1')
+assert.equal(
+  findMove(chapterElevenAnalysisTokens, '3.d6').positionNumber,
+  '11.1',
+)
 
 const chapterElevenParentFenExpectations = [
   // PDF 162 / printed 161.
@@ -765,17 +815,17 @@ const chapterElevenParentFenExpectations = [
   [46, '6.Rg8', 0, '11.6', '8/6R1/5k1K/5P1P/8/8/8/5r2 w - - 7 6'],
   [46, '2...Rb1!', 0, '11.6', '8/5k2/8/1r4RP/5PK1/8/8/8 b - - 3 2'],
   // PDF 163 / printed 162.
-  [48, '6...Kg7?', 0, '11.7', '8/5k2/2R5/5K1P/5P2/8/8/6r1 b - - 7 6'],
-  [48, '7.Rg6+', 0, '11.7', '8/6k1/2R5/5K1P/5P2/8/8/6r1 w - - 8 7'],
-  [48, '9...Ra1', 0, '11.7', '4R3/8/7k/5K1P/5P2/8/8/1r6 b - - 13 9'],
+  [48, '6...Kg7?', 0, '11.7', '8/5k2/2R5/5K1P/5P2/8/8/6r1 b - - 7 4'],
+  [48, '7.Rg6+', 0, '11.7', '8/6k1/2R5/5K1P/5P2/8/8/6r1 w - - 8 5'],
+  [48, '9...Ra1', 0, '11.7', '4R3/8/7k/5K1P/5P2/8/8/1r6 b - - 13 7'],
   // PDF 164 / printed 163; the two 23.Re6 moves belong to different branches.
-  [50, '23.Re6', 0, '11.8', '8/4K1k1/3R4/5P2/8/8/4r3/8 w - - 1 23'],
-  [50, '23.Re6', 1, '11.8', '8/4K2k/3R4/5P2/8/8/4r3/8 w - - 1 23'],
-  [50, '25...Rb8', 0, '11.8', 'r7/5K1k/4RP2/8/8/8/8/8 b - - 2 25'],
-  [50, '26.Re1', 0, '11.8', 'r7/5K2/4RP1k/8/8/8/8/8 w - - 3 26'],
+  [50, '23.Re6', 0, '11.8', '8/4K1k1/3R4/5P2/8/8/4r3/8 w - - 1 7'],
+  [50, '23.Re6', 1, '11.8', '8/4K2k/3R4/5P2/8/8/4r3/8 w - - 1 7'],
+  [50, '25...Rb8', 0, '11.8', 'r7/5K1k/4RP2/8/8/8/8/8 b - - 2 9'],
+  [50, '26.Re1', 0, '11.8', 'r7/5K2/4RP1k/8/8/8/8/8 w - - 3 10'],
   // PDF 165 / printed 164.
-  [52, '8.Ke4', 0, '11.9', '8/2R4P/6k1/8/5P2/5K2/8/7r w - - 3 8'],
-  [52, '19.Kg8+', 0, '11.9', '5K2/4R2P/6k1/8/5P2/8/8/7r w - - 25 19'],
+  [52, '8.Ke4', 0, '11.9', '8/2R4P/6k1/8/5P2/5K2/8/7r w - - 3 6'],
+  [52, '19.Kg8', 0, '11.9', '5K2/4R2P/6k1/8/5P2/8/8/7r w - - 25 17'],
   // PDF 167 / printed 166.
   [60, '2.Re6+!', 0, '11.11', '8/8/1r3kP1/5P2/4RK2/8/8/8 w - - 2 2'],
   // PDF 169 / printed 168.
@@ -783,7 +833,13 @@ const chapterElevenParentFenExpectations = [
   [75, '6...Kh7', 0, '11.14', 'R7/6k1/P1r5/8/5K1P/8/8/8 b - - 2 6'],
 ] as const
 
-for (const [sectionIndex, display, occurrence, positionNumber, parentFen] of chapterElevenParentFenExpectations) {
+for (const [
+  sectionIndex,
+  display,
+  occurrence,
+  positionNumber,
+  parentFen,
+] of chapterElevenParentFenExpectations) {
   const token = findMove(
     getChapterMoveTokens(chapterElevenPlayback, sectionIndex),
     display,
@@ -797,12 +853,11 @@ const chapterElevenPositionElevenNineTokens = getChapterMoveTokens(
   chapterElevenPlayback,
   52,
 )
-assert.equal(chapterElevenPositionElevenNineTokens.length, 120)
+assert.equal(chapterElevenPositionElevenNineTokens.length, 121)
 assert.equal(
   chapterElevenPositionElevenNineTokens.some(
     ({ display, parentFen }) =>
-      display === 'Kg5' &&
-      parentFen === '8/7k/5K1P/5P2/8/4R3/r7/8 w - - 11 11',
+      display === 'Kg5' && parentFen === '8/7k/5K1P/5P2/8/4R3/r7/8 w - - 11 11',
   ),
   false,
   'PDF 165 / printed 164 prose “Threatening Rc6 and Kg5” must not become a move on a stale branch.',
@@ -847,10 +902,13 @@ const sourceBoardAssociationMismatches = sourceBoardAssociationRanges.flatMap(
   },
 )
 const sourceMovesExpectedToBePlayable = [
+  ['11', 24, '11.5', ['7...Re1+']],
+  ['11', 42, '11.series.4.2', ['2.f5']],
   ['11', 46, '11.6', ['5.Rg7+', '6.Rg8', '2...Rb1!']],
   ['11', 48, '11.7', ['6...Kg7?', '7.Rg6+', '9...Ra1']],
   ['11', 50, '11.8', ['23.Re6', '25...Rb8', '26.Re1']],
-  ['11', 52, '11.9', ['8.Ke4', '10.Kd5', '19.Kg8+']],
+  ['11', 52, '11.7', ['3.h6']],
+  ['11', 52, '11.9', ['8.Ke4', '10.Kd5', '19.Kg8']],
   ['11', 60, '11.11', ['2.Re6+!']],
   ['11', 75, '11.14', ['Rf4', '6...Kh7']],
   ['12', 35, '12.8', ['6.Kb4']],
@@ -859,9 +917,20 @@ const sourceMovesExpectedToBePlayable = [
     '12',
     62,
     '12.16',
-    ['2.Ke5', 'Kxb3', '3.Kf5', 'Kc4', '4.Kg5', 'Kd5', '5.Kxh5', 'Ke6', '6.Kg6!'],
+    [
+      '1...Kb4',
+      '2.Ke5',
+      'Kxb3',
+      '3.Kf5',
+      'Kc4',
+      '4.Kg5',
+      'Kd5',
+      '5.Kxh5',
+      'Ke6',
+      '6.Kg6!',
+    ],
   ],
-  ['12', 72, '12.19', ['5...Kd6']],
+  ['12', 72, '12.19', ['4...Kb5', '5...Kd6']],
   ['12', 94, '12.25', ['1...h6', '7.Kd4', 'Kd6=']],
   [
     '12',
@@ -886,7 +955,7 @@ const sourceMovesExpectedToBePlayable = [
       '5.Kh6',
     ],
   ],
-  ['12', 120, '12.32', ['3.Kb4+', 'd4', '4.Kxa4']],
+  ['12', 120, '12.32', ['3.Kb4', 'd4', '4.Kxa4']],
   ['12', 140, '12.38', ['6.Kc5', '7.Kb5', '8.Kc6']],
   ['13', 9, '13.4', ['12...Kb8', '13.Nb5', '14.Nc7+']],
   ['13', 13, '13.5', ['19...Kg7']],
@@ -1047,10 +1116,7 @@ assert.deepEqual(
 
 const prefixedSegmentTokens = getChapterMoveTokens(prefixedSegmentPlayback, 1)
 assert.deepEqual(findMove(prefixedSegmentTokens, '1.h3').path, ['h3'])
-assert.deepEqual(findMove(prefixedSegmentTokens, '1...Kg6').path, [
-  'h3',
-  'Kg6',
-])
+assert.deepEqual(findMove(prefixedSegmentTokens, '1...Kg6').path, ['h3', 'Kg6'])
 assert.deepEqual(findMove(prefixedSegmentTokens, '2.Kg4').path, [
   'h3',
   'Kg6',
@@ -1075,9 +1141,41 @@ assert.equal(
   findMove(prefixedSegmentTokens, '1...Kg6').id,
 )
 
+const alternateRootCanonicalTokens = getChapterMoveTokens(
+  alternateRootCanonicalPlayback,
+  1,
+)
+assert.equal(
+  findMove(alternateRootCanonicalTokens, '1.Kb1').parentFen,
+  '7k/8/8/8/8/8/8/K7 w - - 0 1',
+  'Canonical replay must deterministically prefer initialFen when a full line is legal from multiple roots.',
+)
+assert.equal(
+  findMove(alternateRootCanonicalTokens, '1...Kg8').parentFen,
+  '7k/8/8/8/8/8/8/K7 b - - 0 1',
+  'Canonical replay must accept a complete line from an existing alternateFen.',
+)
+assert.throws(
+  () =>
+    buildChapterPlayback([
+      {
+        type: 'position',
+        content: {
+          alternateFens: ['6k1/8/8/8/8/8/8/K7 b - - 0 1'],
+          fen: '7k/8/8/8/8/8/8/K7 w - - 0 1',
+          number: 'canonical-no-root-switching',
+          orientation: 'white',
+          playbackCanonicalPaths: ['Kb1 Kf8'],
+        },
+      },
+    ]),
+  /Canonical playback for canonical-no-root-switching, line 1, cannot play/,
+  'A canonical line must be legal from one root in full; it cannot switch roots between plies.',
+)
+
 const chapterTwelveEvaluationToken = findMove(
   getChapterMoveTokens(chapterTwelvePlayback, 120),
-  '3.Kb4+',
+  '3.Kb4',
 )
 assert.equal(chapterTwelveEvaluationToken.san, 'Kb4')
 assert.equal(
@@ -1110,14 +1208,8 @@ assert.deepEqual(findMove(moveTokens, '5.Kd2').path, [
 
 assert.deepEqual(findMove(proseTokens, '1.Rc8?').path, ['Rc8'])
 assert.deepEqual(findMove(proseTokens, '1...Kc3!').path, ['Rc8', 'Kc3'])
-assert.deepEqual(findMove(cuttingOffTokens, '1...Kb5').path, [
-  'Rg8',
-  'Kb5',
-])
-assert.deepEqual(findMove(cuttingOffTokens, '1...a4?').path, [
-  'Rg8',
-  'a4',
-])
+assert.deepEqual(findMove(cuttingOffTokens, '1...Kb5').path, ['Rg8', 'Kb5'])
+assert.deepEqual(findMove(cuttingOffTokens, '1...a4?').path, ['Rg8', 'a4'])
 assert.deepEqual(findMove(cuttingOffTokens, '2.Kg7', 0).path, [
   'Rg8',
   'Kc5',
@@ -1136,7 +1228,7 @@ assert.deepEqual(findMove(cuttingOffTokens, '3.Rg3!').path, [
   'a3',
   'Rg3',
 ])
-assert.deepEqual(findMove(cuttingOffTokens, '4.Ra3+').path, [
+assert.deepEqual(findMove(cuttingOffTokens, '4.Ra3').path, [
   'Rg5',
   'a4',
   'Kg7',
@@ -1160,29 +1252,28 @@ assert.deepEqual(findMove(zugzwangTokens, '3.Ke6', 1).path, [
   'Kf4',
   'Ke6',
 ])
-assert.deepEqual(findMove(zugzwangTokens, '3.Kd7').path, [
-  'Ke7',
-  'Ke5',
-  'Kd7',
-])
+assert.deepEqual(findMove(zugzwangTokens, '3.Kd7').path, ['Ke7', 'Ke5', 'Kd7'])
 assert.deepEqual(findMove(zugzwangTokens, 'Kd5!').path, [
   'Ke7',
   'Ke5',
   'Kd7',
   'Kd5',
 ])
-assert.equal(findMove(zugzwangContinuationTokens, '1...e4').positionNumber, '5.9')
+assert.equal(
+  findMove(zugzwangContinuationTokens, '1...e4').positionNumber,
+  '5.9',
+)
 assert.deepEqual(findMove(zugzwangContinuationTokens, '1...e4').path, [
-  'Re3',
+  'Re2',
   'e4',
 ])
 assert.deepEqual(findMove(zugzwangContinuationTokens, '2.Re1!').path, [
-  'Re3',
+  'Re2',
   'e4',
   'Re1',
 ])
-assert.deepEqual(findMove(zugzwangContinuationTokens, '6.Kd4+').path, [
-  'Re3',
+assert.deepEqual(findMove(zugzwangContinuationTokens, '6.Kd4').path, [
+  'Re2',
   'e4',
   'Re1',
   'Ke5',
@@ -1200,11 +1291,7 @@ assert.equal(
   '6r1/8/P7/1P5k/8/8/7K/8 b - - 0 1',
 )
 assert.deepEqual(findMove(rookInFrontTokens, 'Ra8').path, ['Ra8'])
-assert.deepEqual(findMove(kopaevTokens, '2.Kd7').path, [
-  'Rc7+',
-  'Kb3',
-  'Kd7',
-])
+assert.deepEqual(findMove(kopaevTokens, '2.Kd7').path, ['Rc7+', 'Kb3', 'Kd7'])
 assert.deepEqual(findMove(kopaevTokens, '3.Kd6!').path, [
   'Rc7+',
   'Kb3',
@@ -1217,20 +1304,20 @@ assert.deepEqual(findMove(kopaevTokens, '4.Kd5').path, [
   'Kb3',
   'Kd7',
   'b4',
-  'Kc6',
+  'Kd6',
   'Ka2',
   'Kd5',
 ])
-assert.deepEqual(findMove(kopaevTokens, '10.Ka2+').path, [
+assert.deepEqual(findMove(kopaevTokens, '10.Ka2').path, [
   'Rc7+',
   'Kb3',
   'Kd7',
   'b4',
-  'Kc6',
+  'Kd6',
   'Ka2',
   'Kc5',
   'b3',
-  'Kc4',
+  'Kb4',
   'b2',
   'Ra7+',
   'Kb1',
@@ -1315,7 +1402,10 @@ assert.equal(
 const firstMove = getNextNavigationNode(positionFiveOneNavigation, null, {})
 assert.ok(firstMove, 'Expected a main first move for position 5.1')
 assert.equal(firstMove?.id, findMove(moveTokens, '1.Kg5!').id)
-assert.equal(getPreviousNavigationNode(positionFiveOneNavigation, firstMove.id), null)
+assert.equal(
+  getPreviousNavigationNode(positionFiveOneNavigation, firstMove.id),
+  null,
+)
 
 const branchPreference = getPreferredNextUpdates(
   positionFiveOneNavigation,
@@ -1417,7 +1507,9 @@ function getChapterSixMoveTokens(sectionIndex: number) {
   const tokens = chapterSixPlayback.tokensBySectionIndex.get(sectionIndex)
 
   if (!tokens) {
-    assert.fail(`Expected chapter 6 playback tokens for section ${sectionIndex}`)
+    assert.fail(
+      `Expected chapter 6 playback tokens for section ${sectionIndex}`,
+    )
   }
 
   return tokens.filter(isMoveToken)
@@ -1466,7 +1558,8 @@ function getRuntimeMoveRange({
   )
   const startIndex = moves.findIndex(
     ({ display }) =>
-      normalizeSourceMoveText(display) === normalizeSourceMoveText(startDisplay),
+      normalizeSourceMoveText(display) ===
+      normalizeSourceMoveText(startDisplay),
   )
   const endIndex = moves.findIndex(
     ({ display }, index) =>
@@ -1562,7 +1655,8 @@ function assertDiagramExtractionReport() {
     ['15', getCaptions(chapterFifteenSections)],
   ])
   const promotedRows = diagramExtractionReport.filter(
-    ({ status }) => status === 'promoted' || status === 'promoted-with-warnings',
+    ({ status }) =>
+      status === 'promoted' || status === 'promoted-with-warnings',
   )
   const keptRows = diagramExtractionReport.filter(
     ({ status }) => status === 'kept-caption',
@@ -1889,7 +1983,9 @@ function findSanDisplays(text: string) {
       display: match[0],
       index: match.index ?? 0,
     }))
-    .filter(({ display, index }) => !shouldIgnoreSanDisplay(display, text, index))
+    .filter(
+      ({ display, index }) => !shouldIgnoreSanDisplay(display, text, index),
+    )
     .map(({ display }) => display)
 }
 

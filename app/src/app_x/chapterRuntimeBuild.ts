@@ -85,6 +85,11 @@ function buildRuntimePlayback(sections: RawChapterSection[]): ChapterPlayback {
             ...anchor,
             sectionIndex: 1,
           })),
+          playbackContinuationAliases:
+            problem.content.playbackContinuationAliases?.map((alias) => ({
+              ...alias,
+              sectionIndex: 1,
+            })),
           playbackSegments: problem.content.playbackSegments?.map((segment) => ({
             ...segment,
             sectionIndex: 1,

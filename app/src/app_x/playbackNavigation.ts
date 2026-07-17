@@ -51,6 +51,27 @@ export function buildPlaybackNavigation(playback: ChapterPlayback) {
     }
   }
 
+  for (const navigation of navigationByPosition.values()) {
+    for (const node of navigation.nodesById.values()) {
+      if (node.previousId || node.path.length <= 1) {
+        continue
+      }
+
+      node.previousId =
+        lastNodeIdByPath.get(
+          getPathKey(node.positionNumber, node.path.slice(0, -1)),
+        ) ?? null
+    }
+
+    navigation.defaultNextByCursor.clear()
+    for (const node of navigation.nodesById.values()) {
+      const cursorKey = getCursorKey(node.previousId)
+      if (!navigation.defaultNextByCursor.has(cursorKey)) {
+        navigation.defaultNextByCursor.set(cursorKey, node.id)
+      }
+    }
+  }
+
   return navigationByPosition
 }
 
@@ -87,6 +108,21 @@ export function getPreviousNavigationNode(
   return currentNode.previousId
     ? getNavigationNode(navigation, currentNode.previousId) ?? undefined
     : null
+}
+
+export function getPreviousNavigationFen(
+  navigation: PositionNavigation,
+  cursorId: string | null,
+  initialFen: string,
+) {
+  const currentNode = getNavigationNode(navigation, cursorId)
+  const previousNode = getPreviousNavigationNode(navigation, cursorId)
+
+  if (previousNode === undefined) {
+    return undefined
+  }
+
+  return previousNode?.fen ?? currentNode?.parentFen ?? initialFen
 }
 
 export function getParentFenForNavigationNode(

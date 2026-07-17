@@ -15,9 +15,38 @@ const validBook = {
         {
           type: 'position',
           content: {
+            boundaryPaths: [
+              {
+                meaning: 'Printed boundary',
+                points: [
+                  { x: 37.5, y: 0 },
+                  { x: 37.5, y: 50 },
+                ],
+              },
+            ],
+            caption: 'Hidden source caption',
             number: 'I.1',
             orientation: 'white',
             fen: '8/8/8/8/8/2k5/8/2K5 w - - 0 1',
+            alternateFens: ['8/8/8/8/8/2k5/8/2K5 b - - 0 1'],
+            hideVisualLabel: true,
+            playbackAnchors: [
+              {
+                parentFen: '8/8/8/8/8/2k5/8/2K5 w - - 0 1',
+                pathPrefix: ['Kc2'],
+                sectionIndex: 2,
+                token: '1.Kc2',
+              },
+            ],
+            playbackCanonicalPaths: ['Kb1 Kd3', 'Kd3'],
+            playbackCanonicalSourcePositionNumbers: ['I.2'],
+            playbackContinuationAliases: [
+              {
+                alternateToken: '2.Kg8',
+                continuationToken: '2...Kg6',
+                sectionIndex: 2,
+              },
+            ],
             playbackSegments: [
               {
                 parentFen: '8/8/8/8/8/2k5/8/2K5 w - - 0 1',
@@ -69,7 +98,8 @@ assert.throws(
   /orientation must be white or black/,
 )
 assert.throws(
-  () => validateBookSource(withMutation((book) => book.parts.push(book.parts[0]))),
+  () =>
+    validateBookSource(withMutation((book) => book.parts.push(book.parts[0]))),
   /Duplicate part id/,
 )
 assert.throws(
@@ -141,8 +171,51 @@ assert.throws(
   () =>
     validateBookSource(
       withMutation((book) => {
-        book.parts[0].sections[1].content.playbackSegments[0].pathPrefix =
-          'Kc2'
+        book.parts[0].sections[1].content.playbackCanonicalSourcePositionNumbers =
+          []
+      }),
+    ),
+  /playbackCanonicalSourcePositionNumbers must not be empty/,
+)
+assert.throws(
+  () =>
+    validateBookSource(
+      withMutation((book) => {
+        book.parts[0].sections[1].content.playbackCanonicalPaths[0] = 'Kb1 Kb1'
+      }),
+    ),
+  /illegal move Kb1/,
+)
+assert.throws(
+  () =>
+    validateBookSource(
+      withMutation((book) => {
+        book.parts[0].sections[1].content.fen = '7k/8/8/8/8/8/8/K7 w - - 0 1'
+        book.parts[0].sections[1].content.alternateFens = [
+          '6k1/8/8/8/8/8/8/K7 b - - 0 1',
+        ]
+        book.parts[0].sections[1].content.playbackCanonicalPaths = ['Kb1 Kf8']
+      }),
+    ),
+  /playback canonical path 1 has illegal move/,
+  'Validation must not allow a canonical line to switch roots between plies.',
+)
+assert.throws(
+  () =>
+    validateBookSource(
+      withMutation((book) => {
+        book.parts[0].sections[1].content.alternateFens = [
+          '8/8/8/8/8/8/8/8 w - - 0 1',
+        ]
+      }),
+    ),
+  /alternateFens\[0\].*not a legal FEN/,
+)
+assert.throws(
+  () =>
+    validateBookSource(
+      withMutation((book) => {
+        book.parts[0].sections[1].content.playbackSegments[0].pathPrefix = 'Kc2'
       }),
     ),
   /pathPrefix must be an array/,
@@ -155,6 +228,43 @@ assert.throws(
       }),
     ),
   /pathPrefix\[0\] must be a non-empty string/,
+)
+assert.throws(
+  () =>
+    validateBookSource(
+      withMutation((book) => {
+        book.parts[0].sections[1].content.playbackAnchors[0].pathPrefix = 'Kc2'
+      }),
+    ),
+  /playback anchor 1 pathPrefix must be an array/,
+)
+assert.throws(
+  () =>
+    validateBookSource(
+      withMutation((book) => {
+        delete book.parts[0].sections[1].content.caption
+      }),
+    ),
+  /caption required when hideVisualLabel is true/,
+)
+assert.throws(
+  () =>
+    validateBookSource(
+      withMutation((book) => {
+        book.parts[0].sections[1].content.boundaryPaths[0].points[0].x = 101
+      }),
+    ),
+  /x must be between 0 and 100/,
+)
+assert.throws(
+  () =>
+    validateBookSource(
+      withMutation((book) => {
+        book.parts[0].sections[1].content.playbackContinuationAliases[0].alternateOccurrence =
+          -1
+      }),
+    ),
+  /alternateOccurrence must be a non-negative integer/,
 )
 
 const source = JSON.parse(

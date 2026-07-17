@@ -3,6 +3,7 @@ import {
   bookEndingAnchorId,
   bookPathForChapterId,
   bookPositionAnchorId,
+  bookProblemSolutionAnchorId,
   matePath,
   resolveAppRoute,
 } from './routing'
@@ -50,6 +51,14 @@ assert.deepEqual(resolveAppRoute('/book/chapter15', '#pI.1'), {
 assert.deepEqual(resolveAppRoute('/book/chapter2', '#p2.01'), {
   href: '/book/chapter2#p2.01',
   route: { anchorId: 'p2.01', chapterId: '2', module: 'book' },
+})
+assert.deepEqual(resolveAppRoute('/book/chapter2', '#p2.01-solution'), {
+  href: '/book/chapter2#p2.01-solution',
+  route: { anchorId: 'p2.01-solution', chapterId: '2', module: 'book' },
+})
+assert.deepEqual(resolveAppRoute('/book/chapter14', '#p14.01-solution'), {
+  href: '/book/chapter14#p14.01-solution',
+  route: { anchorId: 'p14.01-solution', chapterId: '14', module: 'book' },
 })
 assert.deepEqual(
   resolveAppRoute('/book/chapter5', '#pcutting-off-series-1'),
@@ -262,6 +271,8 @@ assert.equal(bookPathForChapterId('bibliography'), '/book/bibliography')
 assert.equal(bookPathForChapterId('16'), '/book/about')
 assert.equal(bookEndingAnchorId('1'), 'e1')
 assert.equal(bookPositionAnchorId('1.4'), 'p1.4')
+assert.equal(bookProblemSolutionAnchorId('2.01'), 'p2.01-solution')
+assert.equal(bookProblemSolutionAnchorId('14.01'), 'p14.01-solution')
 assert.equal(matePath('bishop-knight', 'standard'), '/mate/bishop-knight')
 assert.equal(matePath('bishop-knight', 'train'), '/mate/bishop-knight/train')
 

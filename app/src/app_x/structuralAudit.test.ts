@@ -184,8 +184,8 @@ assert.deepEqual(
     (section) => (section.content as Record<string, unknown>).displayLabel,
   ),
   [
-    'Draw',
     'White wins',
+    'Draw',
     'Draw',
     'White wins',
     'White wins',
@@ -245,7 +245,7 @@ assert.equal(
 assert.equal(getPosition('13', '13.16').content.caption, 'Leningrad 1977')
 assert.equal(
   positionThirteenTwenty.content.fen,
-  '5k2/1R6/5P2/3b2K1/8/8/8/8 w - - 0 4',
+  '5k2/1R6/5P2/3b2K1/8/8/8/8 w - - 4 4',
 )
 assert.deepEqual(
   (positionThirteenTwenty.content.markers as Array<{ square: string }>).map(
@@ -256,7 +256,7 @@ assert.deepEqual(
 
 assert.equal(
   getProblem('14', '14.22').content.fen,
-  '8/7p/8/6K1/3k2PP/8/2b5/8 b - - 0 54',
+  '8/7p/8/3k2K1/6PP/8/2b5/8 b - - 0 54',
 )
 assert.equal(
   getProblem('14', '14.29').content.fen,

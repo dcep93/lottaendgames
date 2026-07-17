@@ -1,371 +1,948 @@
 #!/usr/bin/env node
 
 import { createHash } from 'node:crypto'
-import { readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, readFileSync, writeFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+const scriptPath = fileURLToPath(import.meta.url)
 const root = fileURLToPath(new URL('..', import.meta.url))
-const ledgerPath = `${root}/app/src/app_x/pdf/source_fidelity_ledger.json`
-const bookPath = `${root}/app/src/app_x/pdf/book.json`
-const pdfPath = `${root}/app/src/app_x/pdf/100-endgames-you-must-know-2008.pdf`
-
-const previous = JSON.parse(readFileSync(ledgerPath, 'utf8'))
-const book = JSON.parse(readFileSync(bookPath, 'utf8'))
-const pdfSha256 = createHash('sha256').update(readFileSync(pdfPath)).digest('hex')
-const boardByNumber = new Map()
-
-for (const part of book.parts) {
-  part.sections.forEach((section, sectionIndex) => {
-    if (
-      ['diagram', 'position', 'problem'].includes(section.type) &&
-      section.content?.number
-    ) {
-      boardByNumber.set(`${part.id}:${section.content.number}`, {
-        content: section.content,
-        sectionIndex,
-      })
-    }
-  })
-}
-
-const accepted = new Map([
-  [
-    '10-p144-copy',
-    {
-      deviationId: 'source-null-move-pdf-144',
-      evidence:
-        'Rendered PDF 144 / printed 143 visibly repeats 3.Rh5 while the white rook already occupies h5. The exact text remains visible; the null move is non-playable and the following line resumes from the unchanged board.',
-    },
-  ],
-  [
-    '10-p150-copy',
-    {
-      deviationId: 'source-illegal-king-jump-pdf-150',
-      evidence:
-        'Rendered PDF 150 / printed 149 visibly prints 7...Ke6 8.Kc4 although the white king is on e4. The exact line is retained and the impossible jump is not presented as a legal playback move.',
-    },
-  ],
-  [
-    '10-p152-copy',
-    {
-      deviationId: 'source-illegal-check-response-pdf-152',
-      evidence:
-        'Rendered PDF 152 / printed 151 visibly prints 8.Rb5? Rh8+ even though Rb5 checks the black king. The exact line is retained; the impossible continuation is deliberately non-playable.',
-    },
-  ],
-  [
-    '11-p155-copy',
-    {
-      deviationId: 'source-illegal-rook-path-pdf-155',
-      evidence:
-        'Rendered PDF 155 / printed 154 visibly prints 3...Rc8! after 2...Rg1?! 3.Kc6, when the black rook is on g1 and cannot reach c8. The exact text is retained and the move is deliberately non-playable.',
-    },
-  ],
-  [
-    '12-board-12.6',
-    {
-      deviationId: 'position-12.6-neutral-turn',
-      evidence:
-        'Rendered PDF 174 / printed 173 gives no single side to move and analyzes both turns. The board squares and orientation match; White to move is used as a neutral analysis default.',
-    },
-  ],
-  [
-    '12-p184-copy',
-    {
-      deviationId: 'source-illegal-capture-pdf-184',
-      evidence:
-        'Rendered PDF 184 / printed 183 visibly prints 1...Kxb4 from Position 12.16 although b4 is empty (the black king moves from b5 and the white pawn is on b3). The exact notation is retained and deliberately non-playable; the legal downstream sequence is staged from the resulting b4 king placement without silently changing the printed move.',
-    },
-  ],
-  [
-    '12-p186-copy',
-    {
-      deviationId: 'source-illegal-king-jump-pdf-186',
-      evidence:
-        'Rendered PDF 186 / printed 185 visibly prints the prospective 4...Kb5 in Position 12.19 although the black king is on d4 and cannot jump to b5. The exact notation is retained and deliberately non-playable.',
-    },
-  ],
-  [
-    '12-board-12.18',
-    {
-      deviationId: 'position-12.18-continuation-turn',
-      evidence:
-        'Rendered PDF 185 / printed 184 shows the position after 1.b4?, leaving Black to move, while the published continuation begins 1.Kb3. The diagram state is preserved and the White continuation is staged separately.',
-    },
-  ],
-  [
-    '14-p234-copy',
-    {
-      deviationId: 'final-test-14.29-side-to-move',
-      evidence:
-        'Rendered PDF 234 / printed 233 prints “Black to move. Can he draw?”, while the published solution analyzes White’s move 69. The reader prompt says “White to move. Can he draw?” and About gives both page references and a deep link.',
-    },
-  ],
-  [
-    '14-board-14.29',
-    {
-      deviationId: 'final-test-14.29-side-to-move',
-      evidence:
-        'Rendered PDF 234 / printed 233 prints Black to move, but the published solution starts with White’s move 69. The FEN uses White to move, the prompt is neutrally corrected, and About discloses the inconsistency with a deep link.',
-    },
-  ],
-])
-
-const matched = new Map([
-  [
-    '12-board-12.29',
-    {
-      evidence:
-        'Rendered PDF 194 / printed 193 gives 1.h3 as the main move, with 1.h4, 1.g3, and 1.g4? as separate first-move alternatives. The later 1...Kg6 2.Kg4 resumes the 1.h3 main line; the app preserves that association, the separate 1.h4 variation, the diagram square map, turn, orientation, caption, and all displayed notation.',
-    },
-  ],
-])
-
-const frontMatterUnits = [
-  ['frontmatter-p1-cover', 1, 'cover', 'Front cover artwork, title, author, subtitle, publisher mark, and cover callouts were visually inventoried. The reader preserves the identity text in a semantic About header; the photographic cover composition is not reproduced.'],
-  ['frontmatter-p2-back-cover', 2, 'back-cover', 'Back-cover description, author biography, ISBN, and printed prices were visually compared with About. The prose and prices are present; the barcode and photographic layout are omitted.'],
-  ['frontmatter-p3-half-title', 3, 'half-title', 'The half-title “100 Endgames You Must Know” is represented by the reader’s About identity heading; print spacing and page isolation are presentation-only differences.'],
-  ['frontmatter-p4-title-page', 4, 'title-page', 'Author, title, publisher, and 2008 edition were visually compared with the About identity metadata and match semantically.'],
-  ['frontmatter-p5-publication', 5, 'publication-metadata', 'Copyright, publisher, publisher URL, photo credit, production credits, and ISBN were visually checked against About. The full “All rights reserved…” paragraph is intentionally hidden as directed.'],
-  ['frontmatter-p6-contents', 6, 'contents-1', 'Rendered contents page was visually compared entry-by-entry with the linked table of contents. Printed dot leaders and page numbers are replaced by semantic deep links.'],
-  ['frontmatter-p7-contents', 7, 'contents-2', 'Rendered contents page was visually compared entry-by-entry with the linked table of contents. Printed dot leaders and page numbers are replaced by semantic deep links.'],
-  ['frontmatter-p8-contents', 8, 'contents-3', 'Rendered contents page was visually compared entry-by-entry with the linked table of contents. Printed dot leaders and page numbers are replaced by semantic deep links.'],
-  ['frontmatter-p9-contents', 9, 'contents-4', 'Rendered contents page was visually compared entry-by-entry with the linked table of contents. Printed dot leaders and page numbers are replaced by semantic deep links.'],
-].map(([id, pdfPage, sourceIdentifier, evidence]) => ({
-  id,
-  kind: 'front-matter',
-  pdfPage,
-  chapter: 'front-matter',
-  sourceIdentifier,
-  appRoute: '/book/about',
-  fieldsChecked: [
-    'rendered-layout',
-    'headings',
-    'copy',
-    'publication-metadata',
-    'navigation-association',
-  ],
-  status: 'accepted-deviation',
-  deviationId:
-    pdfPage === 5
-      ? 'rights-paragraph-intentionally-hidden'
-      : pdfPage <= 4
-        ? 'frontmatter-semantic-presentation'
-        : 'contents-deep-link-presentation',
-  evidence,
-}))
-
-const blankUnit = {
-  id: 'blank-p27',
-  kind: 'blank',
-  pdfPage: 27,
-  printPage: 26,
-  chapter: 'interstitial',
-  sourceIdentifier: 'blank-verso-before-chapter-1',
-  appRoute: '/book/chapter1',
-  fieldsChecked: ['rendered-page', 'blank-state', 'source-order'],
-  status: 'accepted-deviation',
-  deviationId: 'blank-verso-omitted',
-  evidence:
-    'Rendered PDF 27 / printed 26 is blank. The digital reader omits the empty interstitial page and proceeds directly from the Introduction to Chapter 1.',
-}
-
-const oldReleases = previous.releases.filter(
-  ({ id }) => id !== 'front-matter-and-blank',
+const evidencePath = resolve(
+  root,
+  'app/src/app_x/pdf/source_fidelity_evidence.json',
 )
-const normalizedReleases = oldReleases.map((release) => ({
-  ...release,
-  verifiedOn: '2026-07-15',
-  units: release.units.map((unit) => normalizeUnit(unit, release)),
-}))
+const ledgerPath = resolve(root, 'app/src/app_x/pdf/source_fidelity_ledger.json')
+const bookPath = resolve(root, 'app/src/app_x/pdf/book.json')
+const pdfPath = resolve(
+  root,
+  'app/src/app_x/pdf/100-endgames-you-must-know-2008.pdf',
+)
+const manifestPath = resolve(root, 'app/src/app_x/chapterPayloadManifest.ts')
+const publicPath = resolve(root, 'app/public')
 
-const releases = [
-  {
-    id: 'front-matter-and-blank',
-    status: 'accepted-deviation',
-    verifiedOn: '2026-07-15',
-    pdfPages: { first: 1, last: 9 },
-    additionalPdfPages: [27],
-    units: [...frontMatterUnits, blankUnit],
-  },
-  ...sortReleases(normalizedReleases),
+const auditStates = new Set(['blocked', 'complete', 'in-progress'])
+const batchStates = new Set(['closed', 'open'])
+const chessLegalityStatuses = new Set([
+  'blocked',
+  'illegal',
+  'legal',
+  'mixed',
+  'not-applicable',
+])
+const classifications = [
+  'matched',
+  'app-defect',
+  'book-error',
+  'accepted-presentation-deviation',
+  'blocked',
 ]
+const classificationSet = new Set(classifications)
+const classificationPriorities = new Map([
+  ['matched', 0],
+  ['accepted-presentation-deviation', 1],
+  ['book-error', 2],
+  ['app-defect', 3],
+  ['blocked', 4],
+])
+const compatibleDispositionStatuses = new Map([
+  ['matched', new Set(['no-change'])],
+  ['accepted-presentation-deviation', new Set(['accepted'])],
+  ['book-error', new Set(['preserved-print', 'repaired'])],
+  ['app-defect', new Set(['repaired'])],
+  ['blocked', new Set(['blocked'])],
+])
+const correctionCertainties = new Set([
+  'blocked',
+  'certain',
+  'not-applicable',
+  'uncertain',
+])
+const dispositionStatuses = new Set([
+  'accepted',
+  'blocked',
+  'no-change',
+  'preserved-print',
+  'repaired',
+])
+const findingOrigins = new Set(['app', 'book', 'presentation', 'unknown'])
+const kinds = ['blank', 'board', 'front-matter', 'page-copy']
+const kindSet = new Set(kinds)
+const locationKinds = new Set([
+  'app-source',
+  'book-section',
+  'not-applicable',
+])
+const severities = new Set(['critical', 'high', 'low', 'medium', 'none'])
+const transcriptionStatuses = new Set([
+  'blocked',
+  'different',
+  'matched',
+  'not-applicable',
+])
 
-const deviations = [
-  {
-    id: 'frontmatter-semantic-presentation',
-    unitIds: frontMatterUnits.slice(0, 4).map(({ id }) => id),
-    justification:
-      'Navigation and presentation may improve on print. Identity and marketing copy are preserved semantically; photographic cover composition, barcode graphics, and isolated title-page spacing are not reproduced.',
-  },
-  {
-    id: 'rights-paragraph-intentionally-hidden',
-    unitIds: ['frontmatter-p5-publication'],
-    justification:
-      'Explicitly accepted requirement: hide the full rights-reservation paragraph while retaining author, edition, publisher, copyright, publisher link, photo credit, production credits, and ISBN.',
-  },
-  {
-    id: 'contents-deep-link-presentation',
-    unitIds: frontMatterUnits.slice(5).map(({ id }) => id),
-    justification:
-      'The four printed contents pages are represented as one linked semantic table of contents; entries remain in source order while dot leaders and printed page numbers become routes and anchors.',
-  },
-  {
-    id: 'blank-verso-omitted',
-    unitIds: ['blank-p27'],
-    justification:
-      'The source page is visually blank and has no content to reconstruct; omitting it is a digital-presentation change only.',
-  },
-  ...Array.from(accepted.entries()).map(([unitId, details]) => ({
-    id: details.deviationId,
-    unitIds: [unitId],
-    justification: details.evidence,
-  })),
-]
-
-const ledger = {
-  schemaVersion: 2,
-  source: {
-    file: '100-endgames-you-must-know-2008.pdf',
-    pageCount: 249,
-    sha256: pdfSha256,
-    authority:
-      'Only plausible supplied edition; rendered PDF pages are the audit source of truth.',
-  },
-  method: {
-    order: 'PDF pages 1 through 249, visually inspected in source order',
-    rendering:
-      'Full book rendered at 150 dpi; ambiguous chess glyphs and corrected items reinspected at 300–600 dpi.',
-    boardVerification:
-      'Every diagram was reconstructed square-by-square and compared with FEN, side to move, orientation, coordinates, overlays, prompt/caption, and associated playback.',
-    automatedEvidenceRole:
-      'Automated validation supports but does not replace the visual page comparison.',
-  },
-  inventory: {
-    pageCopyUnits: 239,
-    boardProblemDiagramUnits: 337,
-    frontMatterUnits: 9,
-    blankUnits: 1,
-    totalUnits: 586,
-    projectExpectation: {
-      pageCopyUnits: 239,
-      boardProblemDiagramUnits: 337,
-      comparison:
-        'The independent body-copy and board totals agree exactly. The complete source inventory is 586 because the project expectation did not count PDF pages 1–9 as front matter or blank PDF page 27.',
-    },
-  },
-  outOfScope: [
-    'P1.1',
-    'P1.2',
-    'P1.7',
-    'P1.8',
-    'P1.9',
-  ],
-  deviations: dedupeDeviations(deviations),
-  releases,
+if (process.argv[1] && resolve(process.argv[1]) === scriptPath) {
+  main()
 }
 
-const allUnits = releases.flatMap(({ units }) => units)
-if (allUnits.length !== 586) {
-  throw new Error(`Expected 586 ledger units, found ${allUnits.length}`)
-}
-if (new Set(allUnits.map(({ id }) => id)).size !== allUnits.length) {
-  throw new Error('Fidelity ledger unit ids must be globally unique')
-}
-if (allUnits.some(({ evidence }) => !evidence)) {
-  throw new Error('Every fidelity unit must contain concise evidence')
-}
-
-writeFileSync(ledgerPath, `${JSON.stringify(ledger, null, 2)}\n`)
-
-function normalizeUnit(unit, release) {
-  const partId = unit.partId ?? release.chapterId
-  const appRoute = routeForPart(partId)
-  const board = unit.boardNumber
-    ? boardByNumber.get(`${partId}:${unit.boardNumber}`)
-    : undefined
-  const appSectionIndex = unit.appSectionIndex ?? board?.sectionIndex
-  const acceptedDetails = accepted.get(unit.id)
-  const matchedDetails = matched.get(unit.id)
-  const fieldsChecked = Array.from(
-    new Set([
-      ...(unit.checks ?? []),
-      ...(unit.kind === 'board'
-        ? [
-            'fen-square-map',
-            'side-to-move',
-            'orientation',
-            'coordinates-and-overlays',
-            'associated-moves-and-solution',
-          ]
-        : ['rendered-copy', 'source-order', 'notation-and-glyphs']),
-    ]),
+function main() {
+  const args = process.argv.slice(2)
+  assert(
+    args.every((argument) => argument === '--check'),
+    `Unknown argument: ${args.find((argument) => argument !== '--check')}`,
   )
-  const location = `${appRoute}${unit.boardNumber ? `#p${unit.boardNumber}` : ''}`
-  const defaultEvidence =
-    unit.kind === 'board'
-      ? `Rendered PDF ${unit.pdfPage}${unit.printPage ? ` / printed ${unit.printPage}` : ''} diagram ${unit.boardNumber} was reconstructed square-by-square and compared with ${location}; FEN ${board?.content.fen ?? 'recorded in source'}, turn, orientation, overlays, caption/prompt, and associated playback matched.`
-      : `Rendered PDF ${unit.pdfPage}${unit.printPage ? ` / printed ${unit.printPage}` : ''} was visually compared in source order with ${location}${formatSectionIndexes(unit)}; headings, prose, punctuation, chess glyphs, move notation, captions, and hierarchy matched.`
+  assert(
+    args.filter((argument) => argument === '--check').length <= 1,
+    '--check may be specified only once',
+  )
+
+  const evidence = readJson(evidencePath)
+  const book = readJson(bookPath)
+  const candidate = inspectCandidate(evidence, book)
+  const ledger = buildLedger(evidence, candidate, book)
+  const serialized = `${JSON.stringify(ledger, null, 2)}\n`
+
+  if (args.includes('--check')) {
+    const current = existsSync(ledgerPath) ? readFileSync(ledgerPath, 'utf8') : ''
+    if (current !== serialized) {
+      console.error(
+        'source_fidelity_ledger.json is stale; run node scripts/rebuild_fidelity_ledger.mjs',
+      )
+      process.exitCode = 1
+      return
+    }
+
+    console.log('source fidelity ledger is fresh')
+    return
+  }
+
+  writeFileSync(ledgerPath, serialized)
+  console.log(
+    `rebuilt source fidelity ledger: ${ledger.inventory.totalUnits} units, ${ledger.findings.length} findings`,
+  )
+}
+
+function inspectCandidate(evidence, book) {
+  assertRecord(evidence, 'Evidence record')
+  assert(evidence.schemaVersion === 1, 'Evidence schemaVersion must be 1')
+  assertNonEmptyString(evidence.auditRunId, 'Evidence auditRunId')
+  assert(
+    auditStates.has(evidence.auditState),
+    `Evidence auditState must be one of: ${Array.from(auditStates).join(', ')}`,
+  )
+  assertRecord(evidence.candidate, 'Evidence candidate')
+  assertRecord(evidence.candidate.pdf, 'Evidence candidate PDF')
+  assertRecord(evidence.candidate.book, 'Evidence candidate book')
+  assertRecord(evidence.candidate.runtime, 'Evidence candidate runtime')
+
+  assertRecord(book, 'Book source')
+  assert(book.schemaVersion === 1, 'Book schemaVersion must be 1')
+  assert(Array.isArray(book.parts), 'Book parts must be an array')
+
+  const manifest = parseManifest(readFileSync(manifestPath, 'utf8'))
+  const runtimePath = resolve(publicPath, manifest.runtimePath)
+  assert(
+    runtimePath.startsWith(`${publicPath}/`),
+    'Runtime payload path must stay under app/public',
+  )
+  const runtime = readJson(runtimePath)
+  assertRecord(runtime, 'Runtime payload')
+  assert(runtime.schemaVersion === 3, 'Runtime schemaVersion must be 3')
+  assert(Array.isArray(runtime.chapters), 'Runtime chapters must be an array')
+
+  const bookSourceContentHash = `sha256:${getContentHash(book.parts)}`
+  const runtimeContentHash = `sha256:${getContentHash(runtime.chapters)}`
+  const pdfSha256 = createHash('sha256')
+    .update(readFileSync(pdfPath))
+    .digest('hex')
+
+  assert(
+    runtime.sourceContentHash === bookSourceContentHash,
+    'Runtime sourceContentHash does not match book.json',
+  )
+  assert(
+    runtime.contentHash === runtimeContentHash,
+    'Runtime contentHash does not match its chapters',
+  )
+  assert(
+    manifest.contentHash === runtimeContentHash,
+    'Chapter payload manifest content hash does not match runtime payload',
+  )
+  assertRuntimeSectionsMatchBook(runtime.chapters, book.parts)
+
+  const actual = {
+    pdf: {
+      file: '100-endgames-you-must-know-2008.pdf',
+      pageCount: evidence.candidate.pdf.pageCount,
+      sha256: pdfSha256,
+    },
+    book: {
+      file: 'book.json',
+      sourceContentHash: bookSourceContentHash,
+    },
+    runtime: {
+      path: manifest.runtimePath,
+      schemaVersion: runtime.schemaVersion,
+      sourceContentHash: runtime.sourceContentHash,
+      contentHash: runtime.contentHash,
+    },
+  }
+
+  assertPositiveInteger(actual.pdf.pageCount, 'Evidence candidate PDF pageCount')
+  assertDeepEqual(
+    evidence.candidate,
+    actual,
+    'Evidence candidate metadata is stale',
+  )
+
+  return actual
+}
+
+function buildLedger(evidence, candidate, book) {
+  assert(Array.isArray(evidence.batches), 'Evidence batches must be an array')
+  assert(Array.isArray(evidence.units), 'Evidence units must be an array')
+  assert(Array.isArray(evidence.findings), 'Evidence findings must be an array')
+
+  const partById = new Map(book.parts.map((part) => [part.id, part]))
+  const unitById = validateUnits(evidence.units, candidate, partById)
+  const findingById = validateFindings(evidence.findings, unitById)
+  validateUnitFindingLinks(evidence.units, findingById)
+  const batches = validateAndBuildBatches(evidence.batches, unitById)
+
+  if (evidence.auditState === 'complete') {
+    assert(
+      batches.every(({ status }) => status === 'closed'),
+      'A complete audit may not contain open batches',
+    )
+  }
 
   return {
-    ...unit,
-    partId,
-    chapter: partId,
-    sourceIdentifier: unit.boardNumber ?? unit.id,
-    appRoute,
-    ...(unit.boardNumber ? { appAnchor: `p${unit.boardNumber}` } : {}),
-    ...(appSectionIndex === undefined ? {} : { appSectionIndex }),
-    fieldsChecked,
-    status: acceptedDetails
-      ? 'accepted-deviation'
-      : matchedDetails
-        ? 'matched'
-        : unit.status,
-    ...(acceptedDetails ?? {}),
-    ...(matchedDetails ? { deviationId: undefined } : {}),
-    evidence:
-      matchedDetails?.evidence ??
-      acceptedDetails?.evidence ??
-      unit.evidence ??
-      defaultEvidence,
+    schemaVersion: 3,
+    generatedFrom: 'source_fidelity_evidence.json',
+    auditRunId: evidence.auditRunId,
+    auditState: evidence.auditState,
+    candidate,
+    inventory: buildInventory(evidence.units),
+    batches,
+    units: evidence.units,
+    findings: evidence.findings,
   }
+}
+
+function validateUnits(units, candidate, partById) {
+  const unitById = new Map()
+  const sourceItemIds = new Set()
+
+  for (const [unitIndex, unit] of units.entries()) {
+    const location = `Evidence unit ${unitIndex + 1}`
+    assertRecord(unit, location)
+    assertNonEmptyString(unit.id, `${location} id`)
+    assert(!unitById.has(unit.id), `Duplicate evidence unit id: ${unit.id}`)
+    unitById.set(unit.id, unit)
+
+    assert(kindSet.has(unit.kind), `${location} has invalid kind: ${unit.kind}`)
+    assertNonEmptyString(unit.unitType, `${location} unitType`)
+    assertPositiveInteger(unit.pdfPage, `${location} pdfPage`)
+    assert(
+      unit.pdfPage <= candidate.pdf.pageCount,
+      `${location} pdfPage exceeds the candidate PDF page count`,
+    )
+    validatePrintPageReference(unit, location)
+    assertNonEmptyString(unit.chapter, `${location} chapter`)
+    assertNonEmptyString(unit.sourceIdentifier, `${location} sourceIdentifier`)
+    assertNonEmptyString(unit.appRoute, `${location} appRoute`)
+    assert(
+      unit.appRoute.startsWith('/book/'),
+      `${location} appRoute must start with /book/`,
+    )
+    assert(
+      Object.hasOwn(unit, 'appAnchor'),
+      `${location} must record appAnchor, using null when not applicable`,
+    )
+    assert(
+      unit.appAnchor === null || isNonEmptyString(unit.appAnchor),
+      `${location} appAnchor must be null or a non-empty string`,
+    )
+    assertStringArray(unit.fieldsChecked, `${location} fieldsChecked`, false)
+    assertNonEmptyString(
+      unit.renderedPageEvidence,
+      `${location} renderedPageEvidence`,
+    )
+    assert(
+      classificationSet.has(unit.classification),
+      `${location} has invalid classification: ${unit.classification}`,
+    )
+    assert(
+      severities.has(unit.severity),
+      `${location} has invalid severity: ${unit.severity}`,
+    )
+    assertStringArray(
+      unit.regressionCoverage,
+      `${location} regressionCoverage`,
+      false,
+    )
+
+    validateComparisonResult(
+      unit.transcriptionFidelity,
+      transcriptionStatuses,
+      `${location} transcriptionFidelity`,
+    )
+    validateComparisonResult(
+      unit.chessLegality,
+      chessLegalityStatuses,
+      `${location} chessLegality`,
+    )
+    validatePostFixVerification(unit.postFixVerification, location)
+    validateDispositionForClassification(
+      unit.disposition,
+      unit.classification,
+      `${location} disposition`,
+    )
+
+    assert(
+      Array.isArray(unit.curatedSourceLocations) &&
+        unit.curatedSourceLocations.length > 0,
+      `${location} curatedSourceLocations must not be empty`,
+    )
+    unit.curatedSourceLocations.forEach((sourceLocation, sourceLocationIndex) =>
+      validateCuratedSourceLocation(
+        sourceLocation,
+        `${location} curatedSourceLocations[${sourceLocationIndex}]`,
+        partById,
+      ),
+    )
+
+    assert(
+      Array.isArray(unit.sourceItems) && unit.sourceItems.length > 0,
+      `${location} sourceItems must not be empty`,
+    )
+    for (const [sourceItemIndex, sourceItem] of unit.sourceItems.entries()) {
+      const itemLocation = `${location} sourceItems[${sourceItemIndex}]`
+      assertRecord(sourceItem, itemLocation)
+      assertNonEmptyString(sourceItem.id, `${itemLocation} id`)
+      assert(
+        !sourceItemIds.has(sourceItem.id),
+        `Duplicate source item id: ${sourceItem.id}`,
+      )
+      sourceItemIds.add(sourceItem.id)
+      assertNonEmptyString(sourceItem.type, `${itemLocation} type`)
+      assertStringArray(
+        sourceItem.fieldsChecked,
+        `${itemLocation} fieldsChecked`,
+        false,
+      )
+      assertNonEmptyString(
+        sourceItem.renderedPageEvidence,
+        `${itemLocation} renderedPageEvidence`,
+      )
+      validateCuratedSourceLocation(
+        sourceItem.curatedSourceLocation,
+        `${itemLocation} curatedSourceLocation`,
+        partById,
+      )
+    }
+
+    validateDifferences(unit, location)
+    validateUnitBookMapping(unit, location, partById)
+    validateDiagramEvidence(unit, location, partById)
+
+    assert(
+      unit.findingId === undefined,
+      `${location} must use findingIds instead of findingId`,
+    )
+    assertStringArray(unit.findingIds, `${location} findingIds`, true)
+    assert(
+      new Set(unit.findingIds).size === unit.findingIds.length,
+      `${location} contains duplicate findingIds`,
+    )
+
+    if (unit.classification === 'matched') {
+      assert(
+        unit.findingIds.length === 0,
+        `${location} matched units must not link findings`,
+      )
+      assert(
+        unit.severity === 'none',
+        `${location} matched units must use severity none`,
+      )
+      assert(
+        unit.disposition.status === 'no-change',
+        `${location} matched units must use a no-change disposition`,
+      )
+    } else {
+      assert(
+        unit.findingIds.length > 0,
+        `${location} non-matched units must link at least one finding`,
+      )
+    }
+  }
+
+  return unitById
+}
+
+function validatePrintPageReference(unit, location) {
+  const hasPrintPage = Object.hasOwn(unit, 'printPage')
+  const hasPrintPageLabel = Object.hasOwn(unit, 'printPageLabel')
+
+  assert(
+    hasPrintPage !== hasPrintPageLabel,
+    `${location} must record exactly one of printPage or printPageLabel`,
+  )
+
+  if (hasPrintPage) {
+    assertPositiveInteger(unit.printPage, `${location} printPage`)
+    return
+  }
+
+  assert(
+    unit.printPageLabel === 'unnumbered',
+    `${location} printPageLabel must be unnumbered`,
+  )
+}
+
+function validateComparisonResult(value, allowedStatuses, location) {
+  assertRecord(value, location)
+  assert(
+    allowedStatuses.has(value.status),
+    `${location} has invalid status: ${value.status}`,
+  )
+  assertNonEmptyString(value.evidence, `${location} evidence`)
+}
+
+function validatePostFixVerification(value, location) {
+  assertRecord(value, `${location} postFixVerification`)
+  assertNonEmptyString(value.pdf, `${location} postFixVerification pdf`)
+  assertNonEmptyString(
+    value.runningApp,
+    `${location} postFixVerification runningApp`,
+  )
+}
+
+function validateDisposition(value, location) {
+  assertRecord(value, location)
+  assert(
+    dispositionStatuses.has(value.status),
+    `${location} has invalid status: ${value.status}`,
+  )
+  assertNonEmptyString(value.summary, `${location} summary`)
+}
+
+function validateDispositionForClassification(value, classification, location) {
+  validateDisposition(value, location)
+  const compatibleStatuses = compatibleDispositionStatuses.get(classification)
+  assert(
+    compatibleStatuses?.has(value.status),
+    `${location} status ${value.status} is incompatible with classification ${classification}`,
+  )
+}
+
+function validateDifferences(unit, location) {
+  validateDifferenceRecords(unit.differences, `${location} differences`, true)
+
+  if (unit.classification === 'matched') {
+    assert(
+      unit.differences.length === 0,
+      `${location} matched units must not record differences`,
+    )
+  }
+}
+
+function validateDifferenceRecords(differences, location, allowEmpty) {
+  assert(Array.isArray(differences), `${location} must be an array`)
+  assert(allowEmpty || differences.length > 0, `${location} must not be empty`)
+  const serializedDifferences = new Set()
+
+  for (const [differenceIndex, difference] of differences.entries()) {
+    const differenceLocation = `${location}[${differenceIndex}]`
+    assertRecord(difference, differenceLocation)
+    assertNonEmptyString(difference.field, `${differenceLocation} field`)
+    assert(
+      Object.hasOwn(difference, 'printedValue'),
+      `${differenceLocation} must record printedValue`,
+    )
+    assert(
+      Object.hasOwn(difference, 'appValue'),
+      `${differenceLocation} must record appValue`,
+    )
+    const serialized = canonicalStringify(difference)
+    assert(
+      !serializedDifferences.has(serialized),
+      `${location} contains duplicate difference records`,
+    )
+    serializedDifferences.add(serialized)
+  }
+}
+
+function validateCuratedSourceLocation(value, location, partById) {
+  assertRecord(value, location)
+  assert(
+    locationKinds.has(value.kind),
+    `${location} has invalid kind: ${value.kind}`,
+  )
+
+  if (value.kind === 'book-section') {
+    assertNonEmptyString(value.partId, `${location} partId`)
+    assertNonNegativeInteger(value.sectionIndex, `${location} sectionIndex`)
+    assertNonEmptyString(value.field, `${location} field`)
+    const part = partById.get(value.partId)
+    assert(part, `${location} points to missing book part ${value.partId}`)
+    assert(
+      part.sections[value.sectionIndex],
+      `${location} points to missing section ${value.sectionIndex}`,
+    )
+    return
+  }
+
+  if (value.kind === 'app-source') {
+    assertNonEmptyString(value.file, `${location} file`)
+    assertNonEmptyString(value.symbol, `${location} symbol`)
+    return
+  }
+
+  assertNonEmptyString(value.reason, `${location} reason`)
+}
+
+function validateUnitBookMapping(unit, location, partById) {
+  if (unit.kind !== 'board' && unit.kind !== 'page-copy') {
+    return
+  }
+
+  assertNonEmptyString(unit.partId, `${location} partId`)
+  const part = partById.get(unit.partId)
+  assert(part, `${location} points to missing book part ${unit.partId}`)
+  assert(
+    unit.appRoute === routeForPart(unit.partId),
+    `${location} appRoute does not match part ${unit.partId}`,
+  )
+
+  if (unit.kind !== 'board') {
+    return
+  }
+
+  assertNonEmptyString(unit.boardNumber, `${location} boardNumber`)
+  assert(
+    unit.appAnchor === `p${unit.boardNumber}`,
+    `${location} appAnchor does not match boardNumber`,
+  )
+  const boardLocations = unit.curatedSourceLocations.filter(
+    (sourceLocation) => sourceLocation.kind === 'book-section',
+  )
+  assert(
+    boardLocations.length === 1,
+    `${location} board units must point to exactly one book section`,
+  )
+  const boardSection = part.sections[boardLocations[0].sectionIndex]
+  assert(
+    ['diagram', 'position', 'problem'].includes(boardSection.type),
+    `${location} points to a non-board section`,
+  )
+  assert(
+    boardSection.content?.number === unit.boardNumber,
+    `${location} points to the wrong board section`,
+  )
+  assert(
+    unit.unitType === boardSection.type,
+    `${location} unitType does not match book section type`,
+  )
+}
+
+function validateDiagramEvidence(unit, location, partById) {
+  if (unit.kind !== 'board') {
+    assert(
+      unit.diagramEvidence === undefined,
+      `${location} non-board units must not record diagramEvidence`,
+    )
+    return
+  }
+
+  assertRecord(unit.diagramEvidence, `${location} diagramEvidence`)
+  for (const field of [
+    'appFen',
+    'associationEvidence',
+    'orientationEvidence',
+    'overlayEvidence',
+    'sideToMoveEvidence',
+    'sourceFen',
+    'squareMapEvidence',
+  ]) {
+    assertNonEmptyString(
+      unit.diagramEvidence[field],
+      `${location} diagramEvidence ${field}`,
+    )
+  }
+
+  const bookLocation = unit.curatedSourceLocations.find(
+    (sourceLocation) => sourceLocation.kind === 'book-section',
+  )
+  const board = partById.get(bookLocation.partId).sections[bookLocation.sectionIndex]
+  assert(
+    board.content.fen === unit.diagramEvidence.appFen,
+    `${location} diagramEvidence appFen is stale relative to book.json`,
+  )
+}
+
+function validateFindings(findings, unitById) {
+  const findingById = new Map()
+
+  for (const [findingIndex, finding] of findings.entries()) {
+    const location = `Evidence finding ${findingIndex + 1}`
+    assertRecord(finding, location)
+    assertNonEmptyString(finding.id, `${location} id`)
+    assert(!findingById.has(finding.id), `Duplicate finding id: ${finding.id}`)
+    findingById.set(finding.id, finding)
+    assert(
+      classificationSet.has(finding.classification) &&
+        finding.classification !== 'matched',
+      `${location} must use a non-matched classification`,
+    )
+    assert(
+      findingOrigins.has(finding.origin),
+      `${location} has invalid origin: ${finding.origin}`,
+    )
+    assert(
+      correctionCertainties.has(finding.correctionCertainty),
+      `${location} has invalid correctionCertainty: ${finding.correctionCertainty}`,
+    )
+    assert(
+      severities.has(finding.severity),
+      `${location} has invalid severity: ${finding.severity}`,
+    )
+    assertNonEmptyString(finding.evidence, `${location} evidence`)
+    validateDifferenceRecords(
+      finding.differences,
+      `${location} differences`,
+      false,
+    )
+    assertNonEmptyString(finding.repair, `${location} repair`)
+    assertStringArray(
+      finding.regressionCoverage,
+      `${location} regressionCoverage`,
+      false,
+    )
+    validatePostFixVerification(finding.postFixVerification, location)
+    assertStringArray(finding.unitIds, `${location} unitIds`, false)
+    assert(
+      new Set(finding.unitIds).size === finding.unitIds.length,
+      `${location} contains duplicate unitIds`,
+    )
+    for (const unitId of finding.unitIds) {
+      const unit = unitById.get(unitId)
+      assert(unit, `${location} points to missing unit ${unitId}`)
+    }
+    validateDispositionForClassification(
+      finding.disposition,
+      finding.classification,
+      `${location} disposition`,
+    )
+    validateFindingOrigin(finding, location)
+  }
+
+  return findingById
+}
+
+function validateFindingOrigin(finding, location) {
+  const expectedOrigins = {
+    'accepted-presentation-deviation': 'presentation',
+    'app-defect': 'app',
+    'book-error': 'book',
+  }
+  const expectedOrigin = expectedOrigins[finding.classification]
+  if (expectedOrigin) {
+    assert(
+      finding.origin === expectedOrigin,
+      `${location} classification ${finding.classification} requires origin ${expectedOrigin}`,
+    )
+  }
+
+  if (finding.classification === 'book-error') {
+    assert(
+      finding.correctionCertainty === 'certain' ||
+        finding.correctionCertainty === 'uncertain',
+      `${location} book errors require certain or uncertain correction certainty`,
+    )
+  }
+}
+
+function validateUnitFindingLinks(units, findingById) {
+  const unitById = new Map(units.map((unit) => [unit.id, unit]))
+
+  for (const unit of units) {
+    const linkedFindings = unit.findingIds.map((findingId) => {
+      const finding = findingById.get(findingId)
+      assert(finding, `${unit.id} points to missing finding ${findingId}`)
+      assert(
+        finding.unitIds.includes(unit.id),
+        `${unit.id} is not linked back from finding ${findingId}`,
+      )
+      return finding
+    })
+    const primaryClassification = getPrimaryClassification(linkedFindings)
+    assert(
+      unit.classification === primaryClassification,
+      `${unit.id} classification ${unit.classification} does not match primary linked classification ${primaryClassification}`,
+    )
+    const linkedDifferenceRecords = Array.from(
+      new Map(
+        linkedFindings
+          .flatMap(({ differences }) => differences)
+          .map((difference) => [canonicalStringify(difference), difference]),
+      ).values(),
+    )
+    assertDeepEqual(
+      unit.differences
+        .map((difference) => canonicalStringify(difference))
+        .sort(),
+      linkedDifferenceRecords
+        .map((difference) => canonicalStringify(difference))
+        .sort(),
+      `${unit.id} differences must equal its linked findings' exact differences`,
+    )
+  }
+
+  for (const finding of findingById.values()) {
+    for (const unitId of finding.unitIds) {
+      const unit = unitById.get(unitId)
+      assert(
+        unit.findingIds.includes(finding.id),
+        `${finding.id} is not linked back from unit ${unitId}`,
+      )
+    }
+  }
+}
+
+function getPrimaryClassification(findings) {
+  return findings.reduce(
+    (primary, finding) =>
+      classificationPriorities.get(finding.classification) >
+      classificationPriorities.get(primary)
+        ? finding.classification
+        : primary,
+    'matched',
+  )
+}
+
+function validateAndBuildBatches(batches, unitById) {
+  const batchIds = new Set()
+  const assignedUnitIds = new Set()
+
+  const normalized = batches.map((batch, batchIndex) => {
+    const location = `Evidence batch ${batchIndex + 1}`
+    assertRecord(batch, location)
+    assertNonEmptyString(batch.id, `${location} id`)
+    assert(!batchIds.has(batch.id), `Duplicate batch id: ${batch.id}`)
+    batchIds.add(batch.id)
+    assertNonEmptyString(batch.label, `${location} label`)
+    assert(
+      batchStates.has(batch.status),
+      `${location} has invalid status: ${batch.status}`,
+    )
+    assertStringArray(batch.unitIds, `${location} unitIds`, true)
+    assert(
+      new Set(batch.unitIds).size === batch.unitIds.length,
+      `${location} contains duplicate unitIds`,
+    )
+
+    const units = batch.unitIds.map((unitId) => {
+      const unit = unitById.get(unitId)
+      assert(unit, `${location} points to missing unit ${unitId}`)
+      assert(
+        !assignedUnitIds.has(unitId),
+        `Evidence unit ${unitId} belongs to more than one batch`,
+      )
+      assignedUnitIds.add(unitId)
+      return unit
+    })
+
+    return {
+      ...batch,
+      pdfPageRanges: toRanges(units.map(({ pdfPage }) => pdfPage)),
+      unitCount: units.length,
+      classificationCounts: countByValues(
+        units.map(({ classification }) => classification),
+        classifications,
+      ),
+    }
+  })
+
+  for (const unitId of unitById.keys()) {
+    assert(assignedUnitIds.has(unitId), `Evidence unit ${unitId} has no batch`)
+  }
+
+  return normalized
+}
+
+function buildInventory(units) {
+  return {
+    totalUnits: units.length,
+    pageCopyUnits: units.filter(({ kind }) => kind === 'page-copy').length,
+    boardProblemDiagramUnits: units.filter(({ kind }) => kind === 'board').length,
+    frontMatterUnits: units.filter(({ kind }) => kind === 'front-matter').length,
+    blankUnits: units.filter(({ kind }) => kind === 'blank').length,
+    coveredPdfPages: new Set(units.map(({ pdfPage }) => pdfPage)).size,
+    pdfPageRanges: toRanges(units.map(({ pdfPage }) => pdfPage)),
+    byKind: countByValues(
+      units.map(({ kind }) => kind),
+      kinds,
+    ),
+    byUnitType: countBy(units.map(({ unitType }) => unitType)),
+    classifications: countByValues(
+      units.map(({ classification }) => classification),
+      classifications,
+    ),
+  }
+}
+
+function countBy(values) {
+  return Object.fromEntries(
+    Array.from(new Set(values))
+      .sort((left, right) => left.localeCompare(right))
+      .map((value) => [value, values.filter((candidate) => candidate === value).length]),
+  )
+}
+
+function countByValues(values, allowedValues) {
+  return Object.fromEntries(
+    allowedValues.map((value) => [
+      value,
+      values.filter((candidate) => candidate === value).length,
+    ]),
+  )
+}
+
+function toRanges(values) {
+  const pages = Array.from(new Set(values)).sort((left, right) => left - right)
+  const ranges = []
+
+  for (const page of pages) {
+    const last = ranges.at(-1)
+    if (last && page === last.last + 1) {
+      last.last = page
+    } else {
+      ranges.push({ first: page, last: page })
+    }
+  }
+
+  return ranges
 }
 
 function routeForPart(partId) {
   if (partId === 'introduction') return '/book/intro'
   if (partId === 'bibliography') return '/book/bibliography'
-  if (/^\d+$/.test(partId)) return `/book/chapter${partId}`
+  if (/^(?:[1-9]|1[0-5])$/.test(partId)) return `/book/chapter${partId}`
   return '/book/about'
 }
 
-function formatSectionIndexes(unit) {
-  const indexes = unit.appSectionIndexes ??
-    (unit.appSectionIndex === undefined ? [] : [unit.appSectionIndex])
-  return indexes.length ? ` section index${indexes.length === 1 ? '' : 'es'} ${indexes.join(', ')}` : ''
+function assertRuntimeSectionsMatchBook(runtimeChapters, bookParts) {
+  assert(
+    runtimeChapters.length === bookParts.length,
+    'Runtime chapter count does not match book parts',
+  )
+
+  for (const [partIndex, part] of bookParts.entries()) {
+    const runtimeChapter = runtimeChapters[partIndex]
+    assert(
+      runtimeChapter?.id === part.id,
+      `Runtime chapter ${partIndex + 1} does not match book part ${part.id}`,
+    )
+    assertDeepEqual(
+      runtimeChapter.sections,
+      part.sections,
+      `Runtime sections are stale for book part ${part.id}`,
+    )
+  }
 }
 
-function sortReleases(releasesToSort) {
-  const order = [
-    'introduction-chapters-1-4',
-    'chapters-5-9',
-    'chapters-10-12',
-    'chapter-13',
-    'chapters-14-15-bibliography',
-  ]
-  return [...releasesToSort].sort(
-    (left, right) => order.indexOf(left.id) - order.indexOf(right.id),
+function parseManifest(value) {
+  const contentHash = value.match(
+    /chapterPayloadContentHash = '(sha256:[a-f0-9]{64})'/,
+  )?.[1]
+  const runtimePath = value.match(
+    /chapterPayloadPath = '(app_x\/chapter-runtime\.[a-f0-9]{16}\.json)'/,
+  )?.[1]
+  assert(contentHash, 'Chapter payload manifest has no valid content hash')
+  assert(runtimePath, 'Chapter payload manifest has no valid runtime path')
+  return { contentHash, runtimePath }
+}
+
+function getContentHash(value) {
+  return createHash('sha256').update(canonicalStringify(value)).digest('hex')
+}
+
+function canonicalStringify(value) {
+  if (Array.isArray(value)) {
+    return `[${value.map(canonicalStringify).join(',')}]`
+  }
+
+  if (value && typeof value === 'object') {
+    return `{${Object.entries(value)
+      .sort(([leftKey], [rightKey]) => leftKey.localeCompare(rightKey))
+      .map(
+        ([key, entryValue]) =>
+          `${JSON.stringify(key)}:${canonicalStringify(entryValue)}`,
+      )
+      .join(',')}}`
+  }
+
+  return JSON.stringify(value)
+}
+
+function readJson(path) {
+  try {
+    return JSON.parse(readFileSync(path, 'utf8'))
+  } catch (error) {
+    throw new Error(`Could not read ${path}: ${error.message}`)
+  }
+}
+
+function assertRecord(value, location) {
+  assert(
+    value !== null && typeof value === 'object' && !Array.isArray(value),
+    `${location} must be an object`,
   )
 }
 
-function dedupeDeviations(items) {
-  const byId = new Map()
-  for (const item of items) {
-    const existing = byId.get(item.id)
-    if (!existing) {
-      byId.set(item.id, item)
-      continue
-    }
-    existing.unitIds = Array.from(new Set([...existing.unitIds, ...item.unitIds]))
+function assertStringArray(value, location, allowEmpty) {
+  assert(Array.isArray(value), `${location} must be an array`)
+  assert(allowEmpty || value.length > 0, `${location} must not be empty`)
+  value.forEach((entry, index) =>
+    assertNonEmptyString(entry, `${location}[${index}]`),
+  )
+}
+
+function assertNonEmptyString(value, location) {
+  assert(isNonEmptyString(value), `${location} must be a non-empty string`)
+}
+
+function isNonEmptyString(value) {
+  return typeof value === 'string' && value.trim().length > 0
+}
+
+function assertPositiveInteger(value, location) {
+  assert(
+    typeof value === 'number' && Number.isInteger(value) && value > 0,
+    `${location} must be a positive integer`,
+  )
+}
+
+function assertNonNegativeInteger(value, location) {
+  assert(
+    typeof value === 'number' && Number.isInteger(value) && value >= 0,
+    `${location} must be a non-negative integer`,
+  )
+}
+
+function assertDeepEqual(actual, expected, message) {
+  assert(canonicalStringify(actual) === canonicalStringify(expected), message)
+}
+
+function assert(condition, message) {
+  if (!condition) {
+    throw new Error(message)
   }
-  return Array.from(byId.values())
+}
+
+export {
+  getPrimaryClassification,
+  validateDispositionForClassification,
+  validatePrintPageReference,
+  validateUnitFindingLinks,
 }

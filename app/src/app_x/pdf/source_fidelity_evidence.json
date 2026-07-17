@@ -1,6 +1,5 @@
 {
-  "schemaVersion": 3,
-  "generatedFrom": "source_fidelity_evidence.json",
+  "schemaVersion": 1,
   "auditRunId": "2026-07-17-independent-release-audit",
   "auditState": "in-progress",
   "candidate": {
@@ -18,44 +17,6 @@
       "schemaVersion": 3,
       "sourceContentHash": "sha256:0bb74e777ae507caeef6d10ca86be7af0925bf47810e10c8188ca3a2c38a545a",
       "contentHash": "sha256:2cd26b918d32cc7e2a8d46ee0586c6deb2b87e6d9b5431a593a355e7ccb8c90d"
-    }
-  },
-  "inventory": {
-    "totalUnits": 586,
-    "pageCopyUnits": 239,
-    "boardProblemDiagramUnits": 337,
-    "frontMatterUnits": 9,
-    "blankUnits": 1,
-    "coveredPdfPages": 249,
-    "pdfPageRanges": [
-      {
-        "first": 1,
-        "last": 249
-      }
-    ],
-    "byKind": {
-      "blank": 1,
-      "board": 337,
-      "front-matter": 9,
-      "page-copy": 239
-    },
-    "byUnitType": {
-      "bibliography-page-copy": 2,
-      "blank-page": 1,
-      "chapter-page-copy": 220,
-      "diagram": 12,
-      "front-matter-page": 9,
-      "introduction-page-copy": 16,
-      "position": 263,
-      "problem": 62,
-      "statistics-table-page": 1
-    },
-    "classifications": {
-      "matched": 364,
-      "app-defect": 178,
-      "book-error": 29,
-      "accepted-presentation-deviation": 15,
-      "blocked": 0
     }
   },
   "batches": [
@@ -104,21 +65,7 @@
         "b01-p026-board-i.5",
         "b01-p026-board-i.6",
         "b01-p027-blank"
-      ],
-      "pdfPageRanges": [
-        {
-          "first": 1,
-          "last": 27
-        }
-      ],
-      "unitCount": 40,
-      "classificationCounts": {
-        "matched": 22,
-        "app-defect": 9,
-        "book-error": 0,
-        "accepted-presentation-deviation": 9,
-        "blocked": 0
-      }
+      ]
     },
     {
       "id": "batch-02a-pdf-028-045",
@@ -176,20 +123,6 @@
           "app/src/app_x/introChapters1to4SourceFidelity.test.ts",
           "app/src/app_x/introDiagramFidelity.test.tsx"
         ]
-      },
-      "pdfPageRanges": [
-        {
-          "first": 28,
-          "last": 45
-        }
-      ],
-      "unitCount": 43,
-      "classificationCounts": {
-        "matched": 29,
-        "app-defect": 10,
-        "book-error": 4,
-        "accepted-presentation-deviation": 0,
-        "blocked": 0
       }
     },
     {
@@ -236,20 +169,6 @@
         "regressionCoverage": [
           "app/src/app_x/chapter2SourceFidelity.test.tsx"
         ]
-      },
-      "pdfPageRanges": [
-        {
-          "first": 46,
-          "last": 51
-        }
-      ],
-      "unitCount": 32,
-      "classificationCounts": {
-        "matched": 21,
-        "app-defect": 5,
-        "book-error": 0,
-        "accepted-presentation-deviation": 6,
-        "blocked": 0
       }
     },
     {
@@ -304,20 +223,6 @@
         "regressionCoverage": [
           "app/src/app_x/introChapters1to4SourceFidelity.test.ts"
         ]
-      },
-      "pdfPageRanges": [
-        {
-          "first": 52,
-          "last": 68
-        }
-      ],
-      "unitCount": 40,
-      "classificationCounts": {
-        "matched": 22,
-        "app-defect": 16,
-        "book-error": 2,
-        "accepted-presentation-deviation": 0,
-        "blocked": 0
       }
     },
     {
@@ -371,20 +276,6 @@
         "regressionCoverage": [
           "app/src/app_x/chapter5SourceFidelity.test.tsx"
         ]
-      },
-      "pdfPageRanges": [
-        {
-          "first": 69,
-          "last": 83
-        }
-      ],
-      "unitCount": 39,
-      "classificationCounts": {
-        "matched": 19,
-        "app-defect": 20,
-        "book-error": 0,
-        "accepted-presentation-deviation": 0,
-        "blocked": 0
       }
     },
     {
@@ -428,20 +319,6 @@
         "regressionCoverage": [
           "app/src/app_x/chapters6to7SourceFidelity.test.tsx"
         ]
-      },
-      "pdfPageRanges": [
-        {
-          "first": 84,
-          "last": 96
-        }
-      ],
-      "unitCount": 29,
-      "classificationCounts": {
-        "matched": 14,
-        "app-defect": 11,
-        "book-error": 4,
-        "accepted-presentation-deviation": 0,
-        "blocked": 0
       }
     },
     {
@@ -514,20 +391,6 @@
         "regressionCoverage": [
           "app/src/app_x/chapters8to9SourceFidelity.test.tsx"
         ]
-      },
-      "pdfPageRanges": [
-        {
-          "first": 97,
-          "last": 123
-        }
-      ],
-      "unitCount": 58,
-      "classificationCounts": {
-        "matched": 27,
-        "app-defect": 26,
-        "book-error": 5,
-        "accepted-presentation-deviation": 0,
-        "blocked": 0
       }
     },
     {
@@ -599,20 +462,6 @@
         "regressionCoverage": [
           "app/src/app_x/chapter10SourceFidelity.test.tsx"
         ]
-      },
-      "pdfPageRanges": [
-        {
-          "first": 124,
-          "last": 153
-        }
-      ],
-      "unitCount": 57,
-      "classificationCounts": {
-        "matched": 45,
-        "app-defect": 10,
-        "book-error": 2,
-        "accepted-presentation-deviation": 0,
-        "blocked": 0
       }
     },
     {
@@ -666,20 +515,6 @@
         "regressionCoverage": [
           "app/src/app_x/chapter11SourceFidelity.test.tsx"
         ]
-      },
-      "pdfPageRanges": [
-        {
-          "first": 154,
-          "last": 169
-        }
-      ],
-      "unitCount": 39,
-      "classificationCounts": {
-        "matched": 25,
-        "app-defect": 10,
-        "book-error": 4,
-        "accepted-presentation-deviation": 0,
-        "blocked": 0
       }
     },
     {
@@ -773,20 +608,6 @@
           "app/src/app_x/chapter12SourceFidelity.test.tsx",
           "app/src/app_x/chapter12SourcePaths.json"
         ]
-      },
-      "pdfPageRanges": [
-        {
-          "first": 170,
-          "last": 204
-        }
-      ],
-      "unitCount": 78,
-      "classificationCounts": {
-        "matched": 52,
-        "app-defect": 23,
-        "book-error": 3,
-        "accepted-presentation-deviation": 0,
-        "blocked": 0
       }
     },
     {
@@ -857,20 +678,6 @@
           "app/src/app_x/chapter13SourceFidelity.test.tsx",
           "app/src/app_x/chapter13SourcePaths.json"
         ]
-      },
-      "pdfPageRanges": [
-        {
-          "first": 205,
-          "last": 229
-        }
-      ],
-      "unitCount": 55,
-      "classificationCounts": {
-        "matched": 28,
-        "app-defect": 25,
-        "book-error": 2,
-        "accepted-presentation-deviation": 0,
-        "blocked": 0
       }
     },
     {
@@ -933,20 +740,6 @@
           "app/src/app_x/chapter14SourceFidelity.test.tsx",
           "app/src/app_x/chapter14SourcePaths.json"
         ]
-      },
-      "pdfPageRanges": [
-        {
-          "first": 230,
-          "last": 240
-        }
-      ],
-      "unitCount": 47,
-      "classificationCounts": {
-        "matched": 33,
-        "app-defect": 12,
-        "book-error": 2,
-        "accepted-presentation-deviation": 0,
-        "blocked": 0
       }
     },
     {
@@ -990,20 +783,6 @@
         "regressionCoverage": [
           "app/src/app_x/chapter15BibliographySourceFidelity.test.tsx"
         ]
-      },
-      "pdfPageRanges": [
-        {
-          "first": 241,
-          "last": 249
-        }
-      ],
-      "unitCount": 29,
-      "classificationCounts": {
-        "matched": 27,
-        "app-defect": 1,
-        "book-error": 1,
-        "accepted-presentation-deviation": 0,
-        "blocked": 0
       }
     }
   ],

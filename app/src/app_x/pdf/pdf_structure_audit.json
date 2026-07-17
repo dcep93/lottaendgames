@@ -272,14 +272,14 @@
       "chapter": "8",
       "ending": "39",
       "page": 101,
-      "targetStartsWith": "Position 8.7a",
-      "targetType": "position"
+      "targetStartsWith": "Zugzwang, stalemate or perpetual check",
+      "targetType": "heading"
     },
     {
       "chapter": "8",
       "ending": "40",
       "page": 103,
-      "targetStartsWith": "Position 8.7b",
+      "targetStartsWith": "Position 8.8",
       "targetType": "position"
     },
     {
@@ -1045,11 +1045,6 @@
       "text": "Stein - Dorfman"
     },
     {
-      "chapter": "8",
-      "position": "8.7a",
-      "text": "Zugzwang, stalemate or perpetual check"
-    },
-    {
       "chapter": "9",
       "position": "9.12",
       "text": "Berger - Kotlerman"
@@ -1244,6 +1239,10 @@
     {
       "chapter": "8",
       "text": "When the defending king is further away"
+    },
+    {
+      "chapter": "8",
+      "text": "Zugzwang, stalemate or perpetual check"
     },
     {
       "chapter": "9",
@@ -1584,10 +1583,10 @@
       "subtitles": 1
     },
     "8": {
-      "headings": 4,
+      "headings": 5,
       "panels": 3,
       "positions": 11,
-      "subtitles": 2
+      "subtitles": 1
     },
     "9": {
       "headings": 14,
