@@ -111,7 +111,11 @@ assertChapterIncludes(
   '12',
   '12.Kg6 Kf4 13.Kxh6 Kf5 14.Kg7+- and the pawn promotes.',
 )
+assertChapterIncludes('12', 'Immediate counterattack by 3...Kb5 draws easily')
+assertChapterExcludes('12', 'Immediate counterattack by 4...Kc5 draws easily')
 assertChapterIncludes('1', '2...Ke7 3.f6+ Ke6 4.f7 1-0')
+assertChapterIncludes('1', 'there is a stalemate.')
+assertChapterExcludes('1', 'there is a.stalemate.')
 assertChapterIncludes('1', '1... Kg8 2. Kh6 Kh8 3.g6')
 assertChapterIncludes('1', '3...Kg8 4.g7 Kf7 5. Kh7 1-0')
 assertChapterIncludes('1', 'Preventing 1...Kb2 and threatening 2.Kb1.')
@@ -187,6 +191,14 @@ assertChapterIncludes(
 )
 assertChapterIncludes('15', 'Draw. One of the most surprising fortresses.')
 assertChapterIncludes('15', 'A false fortress. Black can force one of the pawns')
+assertChapterIncludes(
+  '15',
+  'A false fortress. Black can force one of the pawns’ advance to h3 and then win.',
+)
+assertChapterExcludes(
+  '15',
+  'A false fortress. Black can force one of the pawns to advance to h3 and then win.',
+)
 assertChapterIncludes('15', "A rook's pawn on the second rank works wonders.")
 assertChapterIncludes('15', 'The knights can win thanks to the enemy pawn')
 assertChapterIncludes('15', '2 Bishops vs. Knight. Won.')

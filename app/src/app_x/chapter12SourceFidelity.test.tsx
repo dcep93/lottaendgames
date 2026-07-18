@@ -202,7 +202,7 @@ const pageCopyUnits: PageCopyExpectation[] = [
     printPage: 185,
     includes: [
       'Blocked pawn on the 6th rank',
-      'Immediate counterattack by 4...Kc5',
+      'Immediate counterattack by 3...Kb5',
     ],
   },
   {
@@ -354,6 +354,7 @@ for (const unit of pageCopyUnits) {
 for (const staleText of [
   'reach c7 on that moment',
   'Immediate counterattack by 4...Kb5',
+  'Immediate counterattack by 4...Kc5',
   'When it comes the right moment',
 ]) {
   assert.equal(visibleChapterText.includes(staleText), false)
@@ -368,7 +369,7 @@ assert.equal(
       ),
     )
     .digest('hex'),
-  'b0257e7dec2870f5bfce9246ecedd5607234b98b0d9f73b42100a451b5e06ebc',
+  '0c9fdd5600d41a9ee11b1999709c10ada1b72766ce82b6ad633ca38015c5c3bb',
   'Chapter 12 copy and hierarchy must remain source-authoritative',
 )
 
@@ -411,7 +412,7 @@ assert.equal(
   createHash('sha256')
     .update(JSON.stringify(boardSections.map(({ section }) => section.content)))
     .digest('hex'),
-  'c52c6edc55d76694dc9969350671eeed33ac793ad2e21a05eb6df05d04a1339c',
+  'cc5659f68b2ceab426147a94af36f050f63e7010474b11555e89f16ab4fbdfdf',
   'Chapter 12 board semantics must remain source-authoritative',
 )
 
@@ -576,7 +577,7 @@ assert.equal(
         .join('\n'),
     )
     .digest('hex'),
-  '93fb989d026bda64ab0f8a6f736bc3d0f27f566616ce4b2fbb37b8c781a8e6e1',
+  'fa8b3ea591a24bb6be06eb00f0a30dfd7b1ad654022c7e45b148619089584903',
   'Chapter 12 source fixture digest',
 )
 
@@ -763,7 +764,7 @@ for (const source of sourcePaths) {
 }
 
 assert.equal(verifiedPaths, 119)
-assert.equal(verifiedPlies, 1104)
+assert.equal(verifiedPlies, 1102)
 assert.equal(sourceGlobalTransitions.size, 774)
 assert.equal(sourcePositionTransitions.size, 858)
 assert.equal(sourcePrefixKeys.size, 861)
@@ -864,16 +865,16 @@ const frontMatterMarkup = renderToStaticMarkup(
 const frontMatterText = markupToText(frontMatterMarkup)
 for (const expectedText of [
   'Position 12.19',
-  'prints “4...Kb5” as an immediate counterattack',
-  'print page 185; PDF page 186',
-  'legal immediate counterattack after 4.Kd2 is 4...Kc5',
+  'prints “4...Kb5”',
+  'print page 185',
+  '3...Kb5',
   'Position 12.9',
   'reach c7 “on that moment”',
-  'print page 176; PDF page 177',
+  'print page 176',
   'corrects the phrase to “at that moment.”',
   'Position 12.39',
   'says “When it comes the right moment”',
-  'print page 201; PDF page 202',
+  'print page 201',
   'corrects the phrase to “When the right moment comes.”',
 ]) {
   assert.equal(
@@ -892,7 +893,7 @@ for (const number of ['12.9', '12.19', '12.39']) {
 }
 
 console.log(
-  'Chapter 12 source fidelity passed (35 page units, 43 diagrams, 78 total units; 119 replay paths / 1,104 plies / 774 global and 858 position-scoped transitions; 3 governed corrections)',
+  'Chapter 12 source fidelity passed (35 page units, 43 diagrams, 78 total units; 119 replay paths / 1,102 plies / 774 global and 858 position-scoped transitions; 3 governed corrections)',
 )
 
 function boardContent(section: BoardSection) {

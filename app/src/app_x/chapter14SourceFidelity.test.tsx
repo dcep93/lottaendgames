@@ -583,13 +583,13 @@ const frontMatterText = markupToText(frontMatterMarkup)
 for (const expectedText of [
   'Final Test 14.17',
   'prints “the black king is driven off his blockade position”',
-  'print page 236; PDF page 237',
+  'print page 236',
   'corrects “black king” to “white king.”',
   'Final Test 14.29',
   'has the prompt “Black to move. Can he draw?”',
-  'print page 233; PDF page 234',
+  'print page 233',
   "solution begins with White's 69th move",
-  'print page 238; PDF page 239',
+  'print page 238',
   'presents the prompt as “White to move. Can he draw?”',
 ]) {
   assert.equal(

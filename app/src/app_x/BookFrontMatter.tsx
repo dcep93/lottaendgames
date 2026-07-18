@@ -123,29 +123,8 @@ export default function BookFrontMatter({
       <FrontMatterSection title="Note on this digital edition">
         <ul className="leg-deviation-list">
           <li>
-            <BookLink
-              href={`${bookPathForChapterId('14')}#${bookPositionAnchorId('14.17')}`}
-              onNavigate={onNavigate}
-            >
-              Final Test 14.17
-            </BookLink>{' '}
-            prints “the black king is driven off his blockade position” in its
-            solution (print page 236; PDF page 237). The line is Black&apos;s
-            winning method for driving White&apos;s king away from the blockade,
-            so this digital edition corrects “black king” to “white king.”
-          </li>
-          <li>
-            <BookLink
-              href={`${bookPathForChapterId('14')}#${bookPositionAnchorId('14.29')}`}
-              onNavigate={onNavigate}
-            >
-              Final Test 14.29
-            </BookLink>{' '}
-            has the prompt “Black to move. Can he draw?” (print page 233; PDF
-            page 234), while its solution begins with White&apos;s 69th move
-            (print page 238; PDF page 239). This digital edition presents the
-            prompt as “White to move. Can he draw?” so that it agrees with the
-            solution.
+            The author of this digital app consulted only the 2008 edition. The
+            issues listed below were likely corrected in later editions.
           </li>
           <li>
             <BookLink
@@ -155,7 +134,7 @@ export default function BookFrontMatter({
               Position 1.7
             </BookLink>{' '}
             prints “Most mistakes made in King + Pawn vs. Pawn endings occur in
-            this position.” (print page 32; PDF page 33). This digital edition
+            this position.” (print page 32). This digital edition
             corrects the second material description to “King + Pawn vs. King
             endings,” which agrees with the diagram and section.
           </li>
@@ -167,20 +146,9 @@ export default function BookFrontMatter({
               Position 1.10
             </BookLink>{' '}
             prints “Now the pawn cannot be stopped.” after 2.g6+?? Kh8! (print
-            page 34; PDF page 35). The line is drawn and the surrounding text
+            page 34). The line is drawn and the surrounding text
             says the move misses the win, so this digital edition reads “Now the
             pawn can be stopped.”
-          </li>
-          <li>
-            <BookLink
-              href={`${bookPathForChapterId('1')}#${bookPositionAnchorId('1.14')}`}
-              onNavigate={onNavigate}
-            >
-              Position 1.14
-            </BookLink>{' '}
-            prints “there is a.stalemate.” (print page 37; PDF page 38). This
-            digital edition restores the missing space and reads “there is a
-            stalemate.”
           </li>
           <li>
             <BookLink
@@ -189,7 +157,7 @@ export default function BookFrontMatter({
             >
               Ending 5 / Position 1.16
             </BookLink>{' '}
-            prints “the stronger side’s king..” (print page 38; PDF page 39).
+            prints “the stronger side’s king..” (print page 38).
             This digital edition removes the duplicated final period and reads
             “the stronger side’s king.”
           </li>
@@ -201,7 +169,7 @@ export default function BookFrontMatter({
               Position 4.6
             </BookLink>{' '}
             prints “White cannot win tempi to bring his king nearer anymore.”
-            (print page 63; PDF page 64). The passage describes Black&apos;s
+            (print page 63). The passage describes Black&apos;s
             king trying to approach while White&apos;s king uses the defensive
             tempo, so this digital edition reads “Black cannot win tempi to
             bring his king nearer anymore.”
@@ -214,7 +182,7 @@ export default function BookFrontMatter({
               Analysis diagram 4.11
             </BookLink>{' '}
             prints “Only move, but not enough to draw.” after 6...Qb1+ (print
-            page 66; PDF page 67). The resulting position is a tablebase draw,
+            page 66). The resulting position is a tablebase draw,
             so this digital edition reads “Only move, but enough to draw.”
           </li>
           <li>
@@ -222,7 +190,7 @@ export default function BookFrontMatter({
               Chapter 7 introduction
             </BookLink>{' '}
             prints “Endings with same-coloured bishops arise with reasonably
-            frequency.” (print page 89; PDF page 90). This digital edition reads
+            frequency.” (print page 89). This digital edition reads
             “reasonable frequency,” using the adjective required to modify the
             noun “frequency.”
           </li>
@@ -233,7 +201,7 @@ export default function BookFrontMatter({
             >
               Position 7.3
             </BookLink>{' '}
-            prints “Third Case.The defending king” (print page 91; PDF page 92).
+            prints “Third Case.The defending king” (print page 91).
             This digital edition inserts the missing space and reads “Third
             Case. The defending king.”
           </li>
@@ -245,7 +213,7 @@ export default function BookFrontMatter({
               Position 7.4 vicinity
             </BookLink>{' '}
             prints “It think it is better to remember why things happen.” (print
-            page 92; PDF page 93). This digital edition corrects the pronoun and
+            page 92). This digital edition corrects the pronoun and
             reads “I think it is better to remember why things happen.”
           </li>
           <li>
@@ -257,7 +225,7 @@ export default function BookFrontMatter({
             </BookLink>{' '}
             prints “victory comes easily, since White cannot offer the bishop
             exchange without obstructing his pawn” after 4.Bh6!+- (print page
-            94; PDF page 95). The printed negation contradicts the stated win
+            94). The printed negation contradicts the stated win
             and both supplied winning lines, so this digital edition reads
             “White can offer the bishop exchange without obstructing his pawn.”
           </li>
@@ -269,7 +237,7 @@ export default function BookFrontMatter({
               Position 8.1
             </BookLink>{' '}
             prints “White dominates all 4 squares on the stopping diagonal.”
-            (print page 97; PDF page 98). The sentence describes the black king
+            (print page 97). The sentence describes the black king
             and knight controlling the bishop&apos;s stopping diagonal, so this
             digital edition reads “Black dominates all 4 squares on the stopping
             diagonal.”
@@ -281,8 +249,8 @@ export default function BookFrontMatter({
             >
               Position 8.8
             </BookLink>{' '}
-            is printed as a second “Position 8.7” (print page 103; PDF page
-            104). Because it follows Position 8.7 in the sequence, this digital
+            is printed as a second “Position 8.7” (print page 103). Because it
+            follows Position 8.7 in the sequence, this digital
             edition numbers it Position 8.8.
           </li>
           <li>
@@ -293,7 +261,7 @@ export default function BookFrontMatter({
               Position 9.5
             </BookLink>{' '}
             prints “the right positional for the defending bishop” (print page
-            107; PDF page 108). The sentence requires the noun “position,” so
+            107). The sentence requires the noun “position,” so
             this digital edition reads “the right position for the defending
             bishop.”
           </li>
@@ -304,7 +272,7 @@ export default function BookFrontMatter({
             >
               Position 9.10
             </BookLink>{' '}
-            is printed as “Position 9.1” (print page 112; PDF page 113). The
+            is printed as “Position 9.1” (print page 112). The
             next page explicitly calls it Position 9.10 and the following
             diagram is Position 9.11, so this digital edition uses Position
             9.10.
@@ -316,7 +284,7 @@ export default function BookFrontMatter({
             >
               Position 9.20
             </BookLink>{' '}
-            is printed as “Position 9.2” (print page 120; PDF page 121). It
+            is printed as “Position 9.2” (print page 120). It
             follows Position 9.19 and is the chapter&apos;s twentieth position,
             so this digital edition uses Position 9.20.
           </li>
@@ -328,7 +296,7 @@ export default function BookFrontMatter({
               Chapter 10, Section 5
             </BookLink>{' '}
             is introduced as “Section 6” in the chapter&apos;s technical
-            overview (print page 123; PDF page 124). Chapter 10 has five
+            overview (print page 123). Chapter 10 has five
             sections, and the rook&apos;s-pawn material begins under “Section 5.
             The rook&apos;s pawn,” so this digital edition corrects the forward
             reference to “Section 5.”
@@ -340,10 +308,22 @@ export default function BookFrontMatter({
             >
               Position 10.20
             </BookLink>{' '}
-            is described as “as in Position 10.19” (print page 144; PDF page
-            145). The sentence describes the imperfect cut shown in Position
+            is described as “as in Position 10.19” (print page 144). The
+            sentence describes the imperfect cut shown in Position
             10.20, so this digital edition corrects the cross-reference to
             “Position 10.20.”
+          </li>
+          <li>
+            <BookLink
+              href={`${bookPathForChapterId('11')}#${bookPositionAnchorId('11.1')}`}
+              onNavigate={onNavigate}
+            >
+              Position 11.1
+            </BookLink>{' '}
+            prints “3...Rc8!” after “2...Rg1?! 3.Kc6” (print page 154), although
+            the black rook on g1 cannot move to c8. The intended move is
+            uncertain, so this digital edition preserves the source text
+            without making that move playable.
           </li>
           <li>
             <BookLink
@@ -352,7 +332,7 @@ export default function BookFrontMatter({
             >
               Chapter 11, sixth-rank series, first diagram
             </BookLink>{' '}
-            is captioned “Draw” (print page 159; PDF page 160). It repeats the
+            is captioned “Draw” (print page 159). It repeats the
             Position 11.4 placement, whose analysis proves that White wins, so
             this digital edition captions it “White wins.”
           </li>
@@ -363,7 +343,7 @@ export default function BookFrontMatter({
             >
               Chapter 11, sixth-rank series, second diagram
             </BookLink>{' '}
-            is captioned “White wins” (print page 159; PDF page 160). The text
+            is captioned “White wins” (print page 159). The text
             immediately following the series identifies the second and third
             diagrams as draws, so this digital edition captions it “Draw.”
           </li>
@@ -374,20 +354,9 @@ export default function BookFrontMatter({
             >
               Position 11.13
             </BookLink>{' '}
-            is printed as a second “Position 11.12” (print page 167; PDF page
-            168). It follows Position 11.12 and precedes Position 11.14, so this
+            is printed as a second “Position 11.12” (print page 167). It follows
+            Position 11.12 and precedes Position 11.14, so this
             digital edition numbers it Position 11.13.
-          </li>
-          <li>
-            <BookLink
-              href={`${bookPathForChapterId('12')}#${bookPositionAnchorId('12.19')}`}
-              onNavigate={onNavigate}
-            >
-              Position 12.19
-            </BookLink>{' '}
-            prints “4...Kb5” as an immediate counterattack (print page 185; PDF
-            page 186). From the position after 3.d3+, the legal immediate
-            counterattack after 4.Kd2 is 4...Kc5.
           </li>
           <li>
             <BookLink
@@ -397,8 +366,18 @@ export default function BookFrontMatter({
               Position 12.9
             </BookLink>{' '}
             says the defending king must reach c7 “on that moment” (print page
-            176; PDF page 177). This digital edition corrects the phrase to “at
-            that moment.”
+            176). This digital edition corrects the phrase to “at that moment.”
+          </li>
+          <li>
+            <BookLink
+              href={`${bookPathForChapterId('12')}#${bookPositionAnchorId('12.19')}`}
+              onNavigate={onNavigate}
+            >
+              Position 12.19
+            </BookLink>{' '}
+            prints “4...Kb5” as an immediate counterattack (print page 185).
+            Immediately after 3.d3+, 3...Kb5 is legal and draws, so this digital
+            edition corrects the move number from 4...Kb5 to 3...Kb5.
           </li>
           <li>
             <BookLink
@@ -407,8 +386,8 @@ export default function BookFrontMatter({
             >
               Position 12.39
             </BookLink>{' '}
-            says “When it comes the right moment” (print page 201; PDF page
-            202). This digital edition corrects the phrase to “When the right
+            says “When it comes the right moment” (print page 201). This digital
+            edition corrects the phrase to “When the right
             moment comes.”
           </li>
           <li>
@@ -419,7 +398,7 @@ export default function BookFrontMatter({
               Position 13.1–13.3 discussion
             </BookLink>{' '}
             prints “that, is” in the phrase about cornering the enemy king
-            (print page 205; PDF page 206). This digital edition removes the
+            (print page 205). This digital edition removes the
             misplaced comma and reads “that is.”
           </li>
           <li>
@@ -429,8 +408,8 @@ export default function BookFrontMatter({
             >
               Position 13.4
             </BookLink>{' '}
-            prints “Remember this procedure by the moment.” (print page 207; PDF
-            page 208). This digital edition reads “Remember this procedure for
+            prints “Remember this procedure by the moment.” (print page 207).
+            This digital edition reads “Remember this procedure for
             the moment.”
           </li>
           <li>
@@ -440,32 +419,32 @@ export default function BookFrontMatter({
             >
               Position 13.14
             </BookLink>{' '}
-            prints “get his king out of the edge.” (print page 216; PDF page
-            217). This digital edition reads “get his king off the edge.”
+            prints “get his king out of the edge.” (print page 216). This digital
+            edition reads “get his king off the edge.”
           </li>
           <li>
             <BookLink
-              href={`${bookPathForChapterId('11')}#${bookPositionAnchorId('11.1')}`}
+              href={`${bookPathForChapterId('14')}#${bookPositionAnchorId('14.29')}`}
               onNavigate={onNavigate}
             >
-              Position 11.1
+              Final Test 14.29
             </BookLink>{' '}
-            prints “3...Rc8!” after “2...Rg1?! 3.Kc6” (print page 154; PDF page
-            155), although the black rook on g1 cannot move to c8. The intended
-            move is uncertain, so this digital edition preserves the source text
-            without making that move playable.
+            has the prompt “Black to move. Can he draw?” (print page 233), while
+            its solution begins with White&apos;s 69th move (print page 238).
+            This digital edition presents the prompt as “White to move. Can he
+            draw?” so that it agrees with the solution.
           </li>
           <li>
             <BookLink
-              href={`${bookPathForChapterId('15')}#${bookPositionAnchorId('F13')}`}
+              href={`${bookPathForChapterId('14')}#${bookPositionAnchorId('14.17')}`}
               onNavigate={onNavigate}
             >
-              Appendix F13
+              Final Test 14.17
             </BookLink>{' '}
-            prints “Black can force one of the pawns’ advance to h3 and then
-            win.” (print page 244; PDF page 245). The intended action is
-            grammatically certain, so this digital edition reads “Black can
-            force one of the pawns to advance to h3 and then win.”
+            prints “the black king is driven off his blockade position” in its
+            solution (print page 236). The line is Black&apos;s winning method for
+            driving White&apos;s king away from the blockade, so this digital
+            edition corrects “black king” to “white king.”
           </li>
         </ul>
       </FrontMatterSection>

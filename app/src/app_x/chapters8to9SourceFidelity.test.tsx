@@ -1305,20 +1305,20 @@ const frontMatterMarkup = renderToStaticMarkup(
 const frontMatterText = markupToText(frontMatterMarkup)
 for (const expectedText of [
   'White dominates all 4 squares on the stopping diagonal.',
-  'print page 97; PDF page 98',
+  'print page 97',
   'Black dominates all 4 squares on the stopping diagonal.',
   'black king and knight controlling the bishop\'s stopping diagonal',
   'a second “Position 8.7”',
-  'print page 103; PDF page 104',
+  'print page 103',
   'numbers it Position 8.8',
   'the right positional for the defending bishop',
-  'print page 107; PDF page 108',
+  'print page 107',
   'requires the noun “position,”',
   'is printed as “Position 9.1”',
-  'print page 112; PDF page 113',
+  'print page 112',
   'following diagram is Position 9.11',
   'is printed as “Position 9.2”',
-  'print page 120; PDF page 121',
+  'print page 120',
   'follows Position 9.19',
 ]) {
   assert.equal(

@@ -7,10 +7,8 @@ import {
   bookPositionAnchorId,
   resolveAppRoute,
 } from '../routing'
-import BookFrontMatter from './BookFrontMatter'
 import { PositionStudyGroup } from './ChapterViewer'
 import InstructionalDiagram from './InstructionalDiagram'
-import type { RuntimeChapterDefinition } from './chapterRuntime'
 import type {
   BookPartSource,
   BookSource,
@@ -134,7 +132,7 @@ const expectedAppendixStrings = new Map<
     33,
     {
       content:
-        'A false fortress. Black can force one of the pawns to advance to h3 and then win.',
+        'A false fortress. Black can force one of the pawns’ advance to h3 and then win.',
       type: 'text',
     },
   ],
@@ -240,10 +238,10 @@ for (const [sectionIndex, expected] of expectedAppendixStrings) {
 }
 assert.equal(
   JSON.stringify(appendix.sections).includes(
-    "Black can force one of the pawns' advance to h3 and then win.",
+    'Black can force one of the pawns to advance to h3 and then win.',
   ),
   false,
-  'The malformed printed F13 wording must not survive in reader data',
+  'The unapproved F13 editorial rewrite must not survive in reader data',
 )
 
 const positions = appendix.sections.filter(
@@ -461,34 +459,8 @@ const bibliographyRoute = resolveAppRoute(bookPathForChapterId('bibliography'))
 assert.equal(bibliographyRoute.href, '/book/bibliography')
 assert.equal(bibliographyRoute.route.module, 'book')
 
-const frontMatterMarkup = renderToStaticMarkup(
-  <BookFrontMatter
-    chapters={
-      book.parts.filter(({ id }) => /^\d+$/.test(id)) as unknown as RuntimeChapterDefinition[]
-    }
-    onNavigate={() => undefined}
-  />,
-)
-const frontMatterText = markupToText(frontMatterMarkup)
-for (const text of [
-  'Appendix F13',
-  'Black can force one of the pawns’ advance to h3 and then win.',
-  'print page 244; PDF page 245',
-  'The intended action is grammatically certain',
-  'Black can force one of the pawns to advance to h3 and then win.',
-]) {
-  assert.equal(frontMatterText.includes(text), true, `About must disclose: ${text}`)
-}
-assert.equal(
-  frontMatterMarkup.includes(
-    `href="${bookPathForChapterId('15')}#${bookPositionAnchorId('F13')}"`,
-  ),
-  true,
-  'The neutral correction disclosure must deep-link to Appendix F13',
-)
-
 console.log(
-  'Chapter 15 and bibliography source fidelity passed (9 page-copy units, 20 diagrams, 0 replay paths, 1 governed book correction)',
+  'Chapter 15 and bibliography source fidelity passed (9 page-copy units, 20 diagrams, 0 replay paths, exact source wording)',
 )
 
 function getPart(partId: string): BookPartSource {

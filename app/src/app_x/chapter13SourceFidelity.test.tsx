@@ -522,15 +522,15 @@ const frontMatterText = markupToText(frontMatterMarkup)
 for (const expected of [
   'Position 13.1–13.3 discussion',
   'prints “that, is”',
-  'print page 205; PDF page 206',
+  'print page 205',
   'reads “that is.”',
   'Position 13.4',
   'Remember this procedure by the moment.',
-  'print page 207; PDF page 208',
+  'print page 207',
   'Remember this procedure for the moment.',
   'Position 13.14',
   'get his king out of the edge.',
-  'print page 216; PDF page 217',
+  'print page 216',
   'get his king off the edge.',
 ]) {
   assert.equal(frontMatterText.includes(expected), true, expected)

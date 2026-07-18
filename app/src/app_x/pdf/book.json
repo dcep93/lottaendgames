@@ -10250,7 +10250,7 @@
               "Kc1 Kd4 Kc2 Kc4 d3+ Kd4 Kd2 Kd5 Kc3 Kc5 d4+ Kd5 Kd3 Kd6 Kc4 Kc6 d5+ Kd6 Kd4 Kd7 Kc5 Kc7 d6+ Kd7 Kd5 Kd8 Kc6 Kc8 d7+ Kd8",
               "Kc1 Kd4 Kc2 Kc4 d3+ Kd4 Kd2 Kd5 Kc3 Kc6 Kc4 Kb6 Kd5 Kxa6 Kc6",
               "Kc1 Kd4 Kc2 Kc4 d3+ Kd4 Kd2 Kd5 Kc3 Kd6 Kd4",
-              "Kc1 Kd4 Kc2 Kc4 d3+ Kd4 Kd2 Kc5"
+              "Kc1 Kd4 Kc2 Kc4 d3+ Kb5"
             ],
             "playbackSegments": [
               {
@@ -10261,17 +10261,15 @@
               },
               {
                 "sectionIndex": 72,
-                "start": "4...Kc5",
+                "start": "3...Kb5",
                 "positionNumber": "12.19",
-                "parentFen": "8/p7/P7/8/3k4/3P4/3K4/8 b - - 2 4",
+                "parentFen": "8/p7/P7/8/2k5/3P4/2K5/8 b - - 0 3",
                 "pathPrefix": [
                   "Kc1",
                   "Kd4",
                   "Kc2",
                   "Kc4",
-                  "d3+",
-                  "Kd4",
-                  "Kd2"
+                  "d3+"
                 ]
               },
               {
@@ -10345,7 +10343,7 @@
         },
         {
           "type": "text",
-          "content": "Let us start with a position where the blocked pawn is well advanced. In contrast with the previous ending, this is less favourable to the stronger side.\n1.Kc1 Kd4 2.Kc2 Kc4 3.d3+ Kd4\nImmediate counterattack by 4...Kc5 draws easily, but we will follow this line to check that the result is the same, no matter how advanced the passed pawn is.\n4.Kd2 Kd5 5.Kc3 Kc5!\nThe only instance when the counterattack does not work and Black must keep the white king away from the key squares. 5...Kc6 6.Kc4! Kb6 7.Kd5! Kxa6 8.Kc6 trapping the black king and winning. We will study this in detail in the following positions. Other moves are losing, such as 5...Kd6 6.Kd4 and the d-pawn promotes.\n6.d4+ Kd5 7.Kd3 Kd6 8.Kc4 Kc6 9.d5+ Kd6 10.Kd4 Kd7 11.Kc5 Kc7\n12.d6+ Kd7 13.Kd5 Kd8 14.Kc6 Kc8\nThis is the position we wanted to see. When the pawns are blocked on the 6th rank,\nthe stronger side's king has no room to attack the enemy pawn and it is a draw.\n15.d7+ Kd8="
+          "content": "Let us start with a position where the blocked pawn is well advanced. In contrast with the previous ending, this is less favourable to the stronger side.\n1.Kc1 Kd4 2.Kc2 Kc4 3.d3+ Kd4\nImmediate counterattack by 3...Kb5 draws easily, but we will follow this line to check that the result is the same, no matter how advanced the passed pawn is.\n4.Kd2 Kd5 5.Kc3 Kc5!\nThe only instance when the counterattack does not work and Black must keep the white king away from the key squares. 5...Kc6 6.Kc4! Kb6 7.Kd5! Kxa6 8.Kc6 trapping the black king and winning. We will study this in detail in the following positions. Other moves are losing, such as 5...Kd6 6.Kd4 and the d-pawn promotes.\n6.d4+ Kd5 7.Kd3 Kd6 8.Kc4 Kc6 9.d5+ Kd6 10.Kd4 Kd7 11.Kc5 Kc7\n12.d6+ Kd7 13.Kd5 Kd8 14.Kc6 Kc8\nThis is the position we wanted to see. When the pawns are blocked on the 6th rank,\nthe stronger side's king has no room to attack the enemy pawn and it is a draw.\n15.d7+ Kd8="
         },
         {
           "type": "position",
@@ -13725,7 +13723,7 @@
         },
         {
           "type": "text",
-          "content": "A false fortress. Black can force one of the pawns to advance to h3 and then win."
+          "content": "A false fortress. Black can force one of the pawns’ advance to h3 and then win."
         },
         {
           "type": "position",

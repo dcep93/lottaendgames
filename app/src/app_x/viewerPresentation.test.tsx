@@ -151,64 +151,87 @@ assert.doesNotMatch(frontMatterMarkup, /All rights reserved/)
 assert.match(frontMatterMarkup, /href="mailto:dcep93@gmail.com"/)
 assert.doesNotMatch(frontMatterMarkup, /38\.Kd7\+/)
 assert.match(frontMatterMarkup, /Note on this digital edition/)
-assert.match(frontMatterMarkup, /Black to move\. Can he draw\?/)
-assert.match(frontMatterMarkup, /print page 233; PDF page 234/)
-assert.match(frontMatterMarkup, /print page 238; PDF page 239/)
-assert.match(frontMatterMarkup, /href="\/book\/chapter14#p14\.29"/)
-assert.match(frontMatterMarkup, /href="\/book\/chapter12#p12\.19"/)
-assert.match(frontMatterMarkup, /Position 12\.19/)
-assert.match(frontMatterMarkup, /print page 185; PDF page 186/)
-assert.match(
-  frontMatterMarkup,
-  /legal immediate counterattack after 4\.Kd2 is 4\.\.\.Kc5/,
-)
-assert.match(frontMatterMarkup, /href="\/book\/chapter11#p11\.1"/)
-assert.match(frontMatterMarkup, /Position 11\.1/)
-assert.match(frontMatterMarkup, /print page 154; PDF page 155/)
-assert.match(frontMatterMarkup, /black rook on g1 cannot move to c8/)
-assert.match(frontMatterMarkup, /intended move is uncertain/)
-assert.match(frontMatterMarkup, /href="\/book\/chapter1#p1\.7"/)
-assert.match(frontMatterMarkup, /href="\/book\/chapter1#p1\.10"/)
-assert.match(frontMatterMarkup, /href="\/book\/chapter1#p1\.14"/)
-assert.match(frontMatterMarkup, /href="\/book\/chapter1#p1\.16"/)
-assert.match(
-  frontMatterMarkup,
-  /Most mistakes made in King \+ Pawn vs\. Pawn endings occur in this position\./,
-)
-assert.match(frontMatterMarkup, /print page 32; PDF page 33/)
-assert.match(frontMatterMarkup, /King \+ Pawn vs\. King endings/)
-assert.match(frontMatterMarkup, /Now the pawn cannot be stopped\./)
-assert.match(frontMatterMarkup, /print page 34; PDF page 35/)
-assert.match(frontMatterMarkup, /Now the pawn can be stopped\./)
-assert.match(frontMatterMarkup, /there is a\.stalemate\./)
-assert.match(frontMatterMarkup, /print page 37; PDF page 38/)
-assert.match(frontMatterMarkup, /there is a stalemate\./)
-assert.match(frontMatterMarkup, /the stronger side’s king\.\./)
-assert.match(frontMatterMarkup, /print page 38; PDF page 39/)
-assert.match(frontMatterMarkup, /the stronger side’s king\./)
-assert.match(frontMatterMarkup, /href="\/book\/chapter4#p4\.6"/)
-assert.match(frontMatterMarkup, /href="\/book\/chapter4#p4\.11"/)
-assert.match(
-  frontMatterMarkup,
-  /White cannot win tempi to bring his king nearer anymore\./,
-)
-assert.match(frontMatterMarkup, /print page 63; PDF page 64/)
-assert.match(
-  frontMatterMarkup,
-  /Black cannot win tempi to bring his king nearer anymore\./,
-)
-assert.match(
-  frontMatterMarkup,
-  /Only move, but not enough to draw\./,
-)
-assert.match(frontMatterMarkup, /print page 66; PDF page 67/)
-assert.match(frontMatterMarkup, /Only move, but enough to draw\./)
 const deviationListMatch = frontMatterMarkup.match(
   /<ul class="leg-deviation-list">([\s\S]*?)<\/ul>/,
 )
 assert.ok(deviationListMatch)
 const deviationListMarkup = deviationListMatch[1]
-assert.equal((deviationListMarkup.match(/<a /g) ?? []).length, 30)
+const deviationListItems = Array.from(
+  deviationListMarkup.matchAll(/<li>([\s\S]*?)<\/li>/g),
+  (match) => match[1],
+)
+assert.match(
+  deviationListItems[0],
+  /The author of this digital app consulted only the 2008 edition\. The issues listed below were likely corrected in later editions\./,
+)
+assert.doesNotMatch(deviationListItems[0], /<a /)
+assert.equal((deviationListMarkup.match(/<a /g) ?? []).length, 28)
+assert.doesNotMatch(deviationListMarkup, /PDF page/)
+assert.doesNotMatch(deviationListMarkup, /Position 1\.14/)
+assert.doesNotMatch(deviationListMarkup, /href="\/book\/chapter1#p1\.14"/)
+assert.doesNotMatch(deviationListMarkup, /Appendix F13/)
+assert.doesNotMatch(deviationListMarkup, /href="\/book\/chapter15#pF13"/)
+const correctionPrintPages = deviationListItems.slice(1).map((item, index) => {
+  const printPageMatch = item.match(/print page (\d+)/)
+  assert.ok(
+    printPageMatch,
+    `Note correction entry ${index + 1} must include a print page`,
+  )
+  return Number(printPageMatch[1])
+})
+assert.deepEqual(
+  correctionPrintPages,
+  [...correctionPrintPages].sort((left, right) => left - right),
+  'Note correction entries must be ordered by their earliest print page',
+)
+assert.match(deviationListMarkup, /Black to move\. Can he draw\?/)
+assert.match(deviationListMarkup, /print page 233/)
+assert.match(deviationListMarkup, /print page 238/)
+assert.match(deviationListMarkup, /href="\/book\/chapter14#p14\.29"/)
+assert.match(deviationListMarkup, /href="\/book\/chapter12#p12\.19"/)
+assert.match(deviationListMarkup, /Position 12\.19/)
+assert.match(deviationListMarkup, /print page 185/)
+assert.match(
+  deviationListMarkup,
+  /Immediately after 3\.d3\+, 3\.\.\.Kb5 is legal and draws, so this digital edition corrects the move number from 4\.\.\.Kb5 to 3\.\.\.Kb5\./,
+)
+assert.match(deviationListMarkup, /href="\/book\/chapter11#p11\.1"/)
+assert.match(deviationListMarkup, /Position 11\.1/)
+assert.match(deviationListMarkup, /print page 154/)
+assert.match(deviationListMarkup, /black rook on g1 cannot move to c8/)
+assert.match(deviationListMarkup, /intended move is uncertain/)
+assert.match(deviationListMarkup, /href="\/book\/chapter1#p1\.7"/)
+assert.match(deviationListMarkup, /href="\/book\/chapter1#p1\.10"/)
+assert.match(deviationListMarkup, /href="\/book\/chapter1#p1\.16"/)
+assert.match(
+  deviationListMarkup,
+  /Most mistakes made in King \+ Pawn vs\. Pawn endings occur in this position\./,
+)
+assert.match(deviationListMarkup, /print page 32/)
+assert.match(deviationListMarkup, /King \+ Pawn vs\. King endings/)
+assert.match(deviationListMarkup, /Now the pawn cannot be stopped\./)
+assert.match(deviationListMarkup, /print page 34/)
+assert.match(deviationListMarkup, /Now the pawn can be stopped\./)
+assert.match(deviationListMarkup, /the stronger side’s king\.\./)
+assert.match(deviationListMarkup, /print page 38/)
+assert.match(deviationListMarkup, /the stronger side’s king\./)
+assert.match(deviationListMarkup, /href="\/book\/chapter4#p4\.6"/)
+assert.match(deviationListMarkup, /href="\/book\/chapter4#p4\.11"/)
+assert.match(
+  deviationListMarkup,
+  /White cannot win tempi to bring his king nearer anymore\./,
+)
+assert.match(deviationListMarkup, /print page 63/)
+assert.match(
+  deviationListMarkup,
+  /Black cannot win tempi to bring his king nearer anymore\./,
+)
+assert.match(
+  deviationListMarkup,
+  /Only move, but not enough to draw\./,
+)
+assert.match(deviationListMarkup, /print page 66/)
+assert.match(deviationListMarkup, /Only move, but enough to draw\./)
 assert.match(
   deviationListMarkup,
   /This digital edition presents the prompt as “White to move\. Can he draw\?” so that it agrees with the solution\./,

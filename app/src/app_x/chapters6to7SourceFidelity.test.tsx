@@ -971,16 +971,16 @@ const frontMatterText = markupToText(frontMatterMarkup)
 
 for (const expectedText of [
   'Endings with same-coloured bishops arise with reasonably frequency.',
-  'print page 89; PDF page 90',
+  'print page 89',
   'reasonable frequency',
   'Third Case.The defending king',
-  'print page 91; PDF page 92',
+  'print page 91',
   'inserts the missing space',
   'It think it is better to remember why things happen.',
-  'print page 92; PDF page 93',
+  'print page 92',
   'corrects the pronoun',
   'White cannot offer the bishop exchange without obstructing his pawn',
-  'print page 94; PDF page 95',
+  'print page 94',
   'printed negation contradicts the stated win and both supplied winning lines',
   'White can offer the bishop exchange without obstructing his pawn.',
 ]) {

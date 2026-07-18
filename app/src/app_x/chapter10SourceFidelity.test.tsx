@@ -959,11 +959,11 @@ const frontMatterMarkup = renderToStaticMarkup(
 const frontMatterText = markupToText(frontMatterMarkup)
 for (const expectedText of [
   'Chapter 10, Section 5',
-  'print page 123; PDF page 124',
+  'print page 123',
   'Section 6',
   'corrects the forward reference to “Section 5.”',
   'Position 10.20',
-  'print page 144; PDF page 145',
+  'print page 144',
   'as in Position 10.19',
   'corrects the cross-reference to “Position 10.20.”',
 ]) {

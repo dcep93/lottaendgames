@@ -784,16 +784,16 @@ const frontMatterText = markupToText(frontMatterMarkup)
 for (const expectedText of [
   'sixth-rank series, first diagram',
   'is captioned “Draw”',
-  'print page 159; PDF page 160',
+  'print page 159',
   'this digital edition captions it “White wins.”',
   'sixth-rank series, second diagram',
   'is captioned “White wins”',
   'this digital edition captions it “Draw.”',
   'is printed as a second “Position 11.12”',
-  'print page 167; PDF page 168',
+  'print page 167',
   'numbers it Position 11.13',
   'prints “3...Rc8!” after “2...Rg1?! 3.Kc6”',
-  'print page 154; PDF page 155',
+  'print page 154',
   'preserves the source text without making that move playable',
 ]) {
   assert.equal(
