@@ -17,7 +17,10 @@ The first content inside the dialog is a responsive two-column grid:
 At desktop widths, the grid uses `minmax(0, 3fr) minmax(0, 2fr)`, giving the
 White column approximately 60% and the Black column approximately 40% of the
 available track width. White best moves and Black resistance share that grid's
-row. A separate sibling grid uses two equal
+row. The priorities grid uses `align-items: start`, so both sections keep their
+natural content height and pack their content at the top instead of stretching
+internal rows across the height of the taller section. A separate sibling grid
+uses two equal
 `minmax(0, 1fr)` tracks for Keyboard shortcuts and Starting position. This
 makes the two supporting sections start at the same vertical position and gives
 each half of the available width. On narrow viewports both grids become one
@@ -107,7 +110,7 @@ and move-legality checks remain unchanged.
 
 ## Tests and Verification
 
-Tests cover the 60/40 adjacent priority grid, White and Black sharing its row,
+Tests cover the top-aligned 60/40 priority grid, White and Black sharing its row,
 the separate 50/50 supporting grid for Keyboard shortcuts and Starting position, the
 universal first-three group, selected endgame headings, exact shortcut glyphs,
 removal of headings and priority-intro copy, narrow-layout stacking, readable
