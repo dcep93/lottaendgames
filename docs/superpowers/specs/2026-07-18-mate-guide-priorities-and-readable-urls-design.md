@@ -16,11 +16,11 @@ The first content inside the dialog is a responsive two-column grid:
 
 At desktop widths, the grid uses `minmax(0, 3fr) minmax(0, 2fr)`, giving the
 White column approximately 60% and the Black column approximately 40% of the
-available track width. The White track contains White best moves followed by
-Keyboard shortcuts. The Black track contains Black resistance followed by the
-Starting position and its copy control. Both columns retain their registered
-production order. On narrow viewports the two tracks stack, preserving those
-groupings and placing the White track first.
+available track width. It has two shared rows: White best moves and Black
+resistance occupy the first row; Keyboard shortcuts and Starting position
+occupy the second. The shared second row makes the two supporting sections
+start at the same vertical position. On narrow viewports the grid becomes one
+column in row-major order: White, Black, Keyboard shortcuts, Starting position.
 
 The desktop dialog width is `69.6rem`, exactly 20% wider than its former
 `58rem` width. It remains capped at 100% of the available container and keeps
@@ -93,9 +93,9 @@ and move-legality checks remain unchanged.
 
 ## Tests and Verification
 
-Tests cover the 60/40 adjacent grid structure, shortcuts grouped below White,
-the starting position grouped below Black, the universal first-three group,
-selected endgame headings, exact shortcut glyphs, removal of headings and
-priority-intro copy, narrow-layout stacking, readable FEN and replay encoding,
-legacy-link decoding and canonical routing, malformed input, interactive dialog
-inspection, full tests, lint, and production build.
+Tests cover the 60/40 adjacent grid structure, White and Black sharing the first
+row, Keyboard shortcuts and Starting position sharing the second row, the
+universal first-three group, selected endgame headings, exact shortcut glyphs,
+removal of headings and priority-intro copy, narrow-layout stacking, readable
+FEN and replay encoding, legacy-link decoding and canonical routing, malformed
+input, interactive dialog inspection, full tests, lint, and production build.
