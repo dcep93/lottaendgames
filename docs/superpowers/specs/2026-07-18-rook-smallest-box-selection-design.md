@@ -16,6 +16,10 @@ established cut, advance that cut on its existing axis before switching axes.
 This prevents the evaluator from shuttling between perpendicular cuts as Black
 steps between two squares.
 
+Do not require box preservation when the rook begins the move under attack.
+White must first escape to a safe square, and the existing distance tiebreak may
+then move the rook away from Black instead of confining it to a chaseable line.
+
 ## Scoring Change
 
 Keep the existing ordered rule and its public ID, label, and help text unchanged.
@@ -45,6 +49,11 @@ These checks remain within the final `maximize black distance` priority, after
 all earlier safety, mating, and king-approach priorities. They therefore do not
 force premature rook moves ahead of more important technique rules.
 
+The preservation penalty and preserved-box-size comparison apply only when the
+rook is safe in the starting position. When it begins under attack, both fields
+are neutral for every safe candidate. The earlier `rook safe` priority still
+rejects every destination where Black can capture the rook.
+
 For `8/8/8/3K4/8/k7/8/2R5 w - - 34 18`:
 
 - `Rc4` establishes a rank cut with box size 3.
@@ -64,6 +73,10 @@ For the cycle beginning at `8/8/8/7k/5R2/4K3/8/8 w - - 0 1`, Black's
 White must advance that rank cut with `Ra5` instead of switching to the file cut
 with `Rf4`; this breaks the `Ra4 Kg6 Rf4 Kh5` cycle.
 
+For `7K/8/8/2R5/1k6/8/8/8 w - - 0 1`, Black attacks the rook on `c5`.
+Preservation must not confine the rook to the c-file; `Rg5` is the safe,
+far-distance choice and breaks the `Rc7 Ka5 Rc6 Ka4 Rc5 Kb4` cycle.
+
 The evaluator rule order, Black response logic, and all user-facing tooltip and
 guide copy remain unchanged.
 
@@ -73,6 +86,7 @@ Add focused regression tests for both exact positions, the relevant candidate
 scores, each sole ideal move, and each rejected move's explanation. Update any
 existing score fixture whose box-size fields become meaningful under the
 corrected definition. Add a regression for the perpendicular-cut cycle and its
-same-axis continuation. Assert that the existing tooltip copy is unchanged. Run
-Rook parity/self-play tests, the exhaustive Rook verifier, the full Mate suite,
-lint, and the production build.
+same-axis continuation, plus a regression for escaping an attacked-rook chase.
+Assert that the existing tooltip copy is unchanged. Run Rook parity/self-play
+tests, the exhaustive Rook verifier, the full Mate suite, lint, and the
+production build.
