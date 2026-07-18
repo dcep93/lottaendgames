@@ -16,11 +16,12 @@ The first content inside the dialog is a responsive two-column grid:
 
 At desktop widths, the grid uses `minmax(0, 3fr) minmax(0, 2fr)`, giving the
 White column approximately 60% and the Black column approximately 40% of the
-available track width. It has two shared rows: White best moves and Black
-resistance occupy the first row; Keyboard shortcuts and Starting position
-occupy the second. The shared second row makes the two supporting sections
-start at the same vertical position. On narrow viewports the grid becomes one
-column in row-major order: White, Black, Keyboard shortcuts, Starting position.
+available track width. White best moves and Black resistance share that grid's
+row. A separate sibling grid uses two equal
+`minmax(0, 1fr)` tracks for Keyboard shortcuts and Starting position. This
+makes the two supporting sections start at the same vertical position and gives
+each half of the available width. On narrow viewports both grids become one
+column, producing White, Black, Keyboard shortcuts, Starting position.
 
 The desktop dialog width is `69.6rem`, exactly 20% wider than its former
 `58rem` width. It remains capped at 100% of the available container and keeps
@@ -93,8 +94,8 @@ and move-legality checks remain unchanged.
 
 ## Tests and Verification
 
-Tests cover the 60/40 adjacent grid structure, White and Black sharing the first
-row, Keyboard shortcuts and Starting position sharing the second row, the
+Tests cover the 60/40 adjacent priority grid, White and Black sharing its row,
+the separate 50/50 supporting grid for Keyboard shortcuts and Starting position, the
 universal first-three group, selected endgame headings, exact shortcut glyphs,
 removal of headings and priority-intro copy, narrow-layout stacking, readable
 FEN and replay encoding, legacy-link decoding and canonical routing, malformed
