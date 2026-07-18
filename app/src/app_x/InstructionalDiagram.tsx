@@ -1,8 +1,6 @@
 import ChessBoard from './ChessBoard'
 import { bookPositionAnchorId } from '../routing'
 import type { DiagramSection } from './chapterTypes'
-import { buildLichessEditorUrl } from './lichess'
-import PositionControls from './PositionControls'
 
 export default function InstructionalDiagram({
   section,
@@ -29,10 +27,6 @@ export default function InstructionalDiagram({
       className="leg-instructional-diagram"
       id={bookPositionAnchorId(number)}
     >
-      <PositionControls
-        hasPlayback={false}
-        lichessUrl={buildLichessEditorUrl(displayFen)}
-      />
       {hideVisualLabel ? null : (
         <figcaption>
           <span>{label}</span>

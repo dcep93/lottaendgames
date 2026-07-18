@@ -51,8 +51,8 @@
       "statistics-table-page": 1
     },
     "classifications": {
-      "matched": 365,
-      "app-defect": 178,
+      "matched": 360,
+      "app-defect": 183,
       "book-error": 27,
       "accepted-presentation-deviation": 16,
       "blocked": 0
@@ -782,8 +782,8 @@
       ],
       "unitCount": 78,
       "classificationCounts": {
-        "matched": 52,
-        "app-defect": 23,
+        "matched": 51,
+        "app-defect": 24,
         "book-error": 3,
         "accepted-presentation-deviation": 0,
         "blocked": 0
@@ -866,8 +866,8 @@
       ],
       "unitCount": 55,
       "classificationCounts": {
-        "matched": 28,
-        "app-defect": 25,
+        "matched": 25,
+        "app-defect": 28,
         "book-error": 2,
         "accepted-presentation-deviation": 0,
         "blocked": 0
@@ -942,8 +942,8 @@
       ],
       "unitCount": 47,
       "classificationCounts": {
-        "matched": 33,
-        "app-defect": 12,
+        "matched": 32,
+        "app-defect": 13,
         "book-error": 2,
         "accepted-presentation-deviation": 0,
         "blocked": 0
@@ -7060,12 +7060,18 @@
       "severity": "medium",
       "differences": [
         {
+          "field": "Lichess export for a non-playable source state",
+          "printedValue": "Instructional schematics and the incomplete Problem 14.13 prompt do not define legal playable positions",
+          "appValue": "Before repair, the app exposed Lichess editor links for all instructional diagrams and the incomplete hidden Problem 14.13 state"
+        },
+        {
           "field": "instructional-diagram DOM deep-link target",
           "printedValue": "Seven distinct labeled source diagrams, each mapped to its own stable app identifier",
           "appValue": "Before repair, the seven generated #p… links had no corresponding InstructionalDiagram figure id"
         }
       ],
       "findingIds": [
+        "cross-f-invalid-lichess-links",
         "b01-f-instructional-diagram-anchors"
       ],
       "disposition": {
@@ -7171,12 +7177,18 @@
       "severity": "medium",
       "differences": [
         {
+          "field": "Lichess export for a non-playable source state",
+          "printedValue": "Instructional schematics and the incomplete Problem 14.13 prompt do not define legal playable positions",
+          "appValue": "Before repair, the app exposed Lichess editor links for all instructional diagrams and the incomplete hidden Problem 14.13 state"
+        },
+        {
           "field": "instructional-diagram DOM deep-link target",
           "printedValue": "Seven distinct labeled source diagrams, each mapped to its own stable app identifier",
           "appValue": "Before repair, the seven generated #p… links had no corresponding InstructionalDiagram figure id"
         }
       ],
       "findingIds": [
+        "cross-f-invalid-lichess-links",
         "b01-f-instructional-diagram-anchors"
       ],
       "disposition": {
@@ -7282,12 +7294,18 @@
       "severity": "medium",
       "differences": [
         {
+          "field": "Lichess export for a non-playable source state",
+          "printedValue": "Instructional schematics and the incomplete Problem 14.13 prompt do not define legal playable positions",
+          "appValue": "Before repair, the app exposed Lichess editor links for all instructional diagrams and the incomplete hidden Problem 14.13 state"
+        },
+        {
           "field": "instructional-diagram DOM deep-link target",
           "printedValue": "Seven distinct labeled source diagrams, each mapped to its own stable app identifier",
           "appValue": "Before repair, the seven generated #p… links had no corresponding InstructionalDiagram figure id"
         }
       ],
       "findingIds": [
+        "cross-f-invalid-lichess-links",
         "b01-f-instructional-diagram-anchors"
       ],
       "disposition": {
@@ -7591,12 +7609,18 @@
       "severity": "medium",
       "differences": [
         {
+          "field": "Lichess export for a non-playable source state",
+          "printedValue": "Instructional schematics and the incomplete Problem 14.13 prompt do not define legal playable positions",
+          "appValue": "Before repair, the app exposed Lichess editor links for all instructional diagrams and the incomplete hidden Problem 14.13 state"
+        },
+        {
           "field": "instructional-diagram DOM deep-link target",
           "printedValue": "Seven distinct labeled source diagrams, each mapped to its own stable app identifier",
           "appValue": "Before repair, the seven generated #p… links had no corresponding InstructionalDiagram figure id"
         }
       ],
       "findingIds": [
+        "cross-f-invalid-lichess-links",
         "b01-f-instructional-diagram-anchors"
       ],
       "disposition": {
@@ -7738,6 +7762,11 @@
       "severity": "medium",
       "differences": [
         {
+          "field": "Lichess export for a non-playable source state",
+          "printedValue": "Instructional schematics and the incomplete Problem 14.13 prompt do not define legal playable positions",
+          "appValue": "Before repair, the app exposed Lichess editor links for all instructional diagrams and the incomplete hidden Problem 14.13 state"
+        },
+        {
           "field": "instructional-diagram DOM deep-link target",
           "printedValue": "Seven distinct labeled source diagrams, each mapped to its own stable app identifier",
           "appValue": "Before repair, the seven generated #p… links had no corresponding InstructionalDiagram figure id"
@@ -7754,6 +7783,7 @@
         }
       ],
       "findingIds": [
+        "cross-f-invalid-lichess-links",
         "b01-f-instructional-diagram-anchors",
         "b01-f-knight-route-origins"
       ],
@@ -8111,6 +8141,11 @@
       "severity": "medium",
       "differences": [
         {
+          "field": "Lichess export for a non-playable source state",
+          "printedValue": "Instructional schematics and the incomplete Problem 14.13 prompt do not define legal playable positions",
+          "appValue": "Before repair, the app exposed Lichess editor links for all instructional diagrams and the incomplete hidden Problem 14.13 state"
+        },
+        {
           "field": "instructional-diagram DOM deep-link target",
           "printedValue": "Seven distinct labeled source diagrams, each mapped to its own stable app identifier",
           "appValue": "Before repair, the seven generated #p… links had no corresponding InstructionalDiagram figure id"
@@ -8122,6 +8157,7 @@
         }
       ],
       "findingIds": [
+        "cross-f-invalid-lichess-links",
         "b01-f-instructional-diagram-anchors",
         "b01-f-accepted-king-route-lines"
       ],
@@ -8535,6 +8571,11 @@
       "severity": "medium",
       "differences": [
         {
+          "field": "Lichess export for a non-playable source state",
+          "printedValue": "Instructional schematics and the incomplete Problem 14.13 prompt do not define legal playable positions",
+          "appValue": "Before repair, the app exposed Lichess editor links for all instructional diagrams and the incomplete hidden Problem 14.13 state"
+        },
+        {
           "field": "instructional-diagram DOM deep-link target",
           "printedValue": "Seven distinct labeled source diagrams, each mapped to its own stable app identifier",
           "appValue": "Before repair, the seven generated #p… links had no corresponding InstructionalDiagram figure id"
@@ -8546,6 +8587,7 @@
         }
       ],
       "findingIds": [
+        "cross-f-invalid-lichess-links",
         "b01-f-instructional-diagram-anchors",
         "b01-f-domination-dividers"
       ],
@@ -42055,18 +42097,28 @@
         "status": "not-applicable",
         "evidence": "The source presents this as a schematic, comparison, or turn-unspecified teaching diagram; no unsupported playable-turn claim is inferred."
       },
-      "classification": "matched",
-      "severity": "none",
-      "differences": [],
-      "findingIds": [],
+      "classification": "app-defect",
+      "severity": "medium",
+      "differences": [
+        {
+          "field": "Lichess export for a non-playable source state",
+          "printedValue": "Instructional schematics and the incomplete Problem 14.13 prompt do not define legal playable positions",
+          "appValue": "Before repair, the app exposed Lichess editor links for all instructional diagrams and the incomplete hidden Problem 14.13 state"
+        }
+      ],
+      "findingIds": [
+        "cross-f-invalid-lichess-links"
+      ],
       "disposition": {
-        "status": "no-change",
-        "summary": "Current board unit matches the fresh source reconstruction."
+        "status": "repaired",
+        "summary": "Removed the Lichess control from this non-playable instructional schematic."
       },
       "regressionCoverage": [
         "app/src/app_x/chapter12SourceFidelity.test.tsx",
         "app/src/app_x/chapter12SourcePaths.json",
-        "app/src/app_x/bookSourceValidation.test.ts"
+        "app/src/app_x/bookSourceValidation.test.ts",
+        "app/src/app_x/lichess.test.ts",
+        "app/src/app_x/viewerPresentation.test.tsx"
       ],
       "postFixVerification": {
         "pdf": "Fresh board reconstruction and source association are recorded at tmp/pdfs/lotta-release-audit/batch-08-source.md for PDF page 180.",
@@ -47175,18 +47227,28 @@
         "status": "not-applicable",
         "evidence": "The source presents this as a schematic, comparison, or turn-unspecified teaching diagram; no unsupported playable-turn claim is inferred."
       },
-      "classification": "matched",
-      "severity": "none",
-      "differences": [],
-      "findingIds": [],
+      "classification": "app-defect",
+      "severity": "medium",
+      "differences": [
+        {
+          "field": "Lichess export for a non-playable source state",
+          "printedValue": "Instructional schematics and the incomplete Problem 14.13 prompt do not define legal playable positions",
+          "appValue": "Before repair, the app exposed Lichess editor links for all instructional diagrams and the incomplete hidden Problem 14.13 state"
+        }
+      ],
+      "findingIds": [
+        "cross-f-invalid-lichess-links"
+      ],
       "disposition": {
-        "status": "no-change",
-        "summary": "Current board unit matches the fresh source reconstruction."
+        "status": "repaired",
+        "summary": "Removed the Lichess control from this non-playable instructional schematic."
       },
       "regressionCoverage": [
         "app/src/app_x/chapter13SourceFidelity.test.tsx",
         "app/src/app_x/chapter13SourcePaths.json",
-        "app/src/app_x/bookSourceValidation.test.ts"
+        "app/src/app_x/bookSourceValidation.test.ts",
+        "app/src/app_x/lichess.test.ts",
+        "app/src/app_x/viewerPresentation.test.tsx"
       ],
       "postFixVerification": {
         "pdf": "Fresh board reconstruction and source association are recorded at tmp/pdfs/lotta-release-audit/batch-09-source.md for PDF page 206.",
@@ -47269,18 +47331,28 @@
         "status": "not-applicable",
         "evidence": "The source presents this as a schematic, comparison, or turn-unspecified teaching diagram; no unsupported playable-turn claim is inferred."
       },
-      "classification": "matched",
-      "severity": "none",
-      "differences": [],
-      "findingIds": [],
+      "classification": "app-defect",
+      "severity": "medium",
+      "differences": [
+        {
+          "field": "Lichess export for a non-playable source state",
+          "printedValue": "Instructional schematics and the incomplete Problem 14.13 prompt do not define legal playable positions",
+          "appValue": "Before repair, the app exposed Lichess editor links for all instructional diagrams and the incomplete hidden Problem 14.13 state"
+        }
+      ],
+      "findingIds": [
+        "cross-f-invalid-lichess-links"
+      ],
       "disposition": {
-        "status": "no-change",
-        "summary": "Current board unit matches the fresh source reconstruction."
+        "status": "repaired",
+        "summary": "Removed the Lichess control from this non-playable instructional schematic."
       },
       "regressionCoverage": [
         "app/src/app_x/chapter13SourceFidelity.test.tsx",
         "app/src/app_x/chapter13SourcePaths.json",
-        "app/src/app_x/bookSourceValidation.test.ts"
+        "app/src/app_x/bookSourceValidation.test.ts",
+        "app/src/app_x/lichess.test.ts",
+        "app/src/app_x/viewerPresentation.test.tsx"
       ],
       "postFixVerification": {
         "pdf": "Fresh board reconstruction and source association are recorded at tmp/pdfs/lotta-release-audit/batch-09-source.md for PDF page 206.",
@@ -47363,18 +47435,28 @@
         "status": "not-applicable",
         "evidence": "The source presents this as a schematic, comparison, or turn-unspecified teaching diagram; no unsupported playable-turn claim is inferred."
       },
-      "classification": "matched",
-      "severity": "none",
-      "differences": [],
-      "findingIds": [],
+      "classification": "app-defect",
+      "severity": "medium",
+      "differences": [
+        {
+          "field": "Lichess export for a non-playable source state",
+          "printedValue": "Instructional schematics and the incomplete Problem 14.13 prompt do not define legal playable positions",
+          "appValue": "Before repair, the app exposed Lichess editor links for all instructional diagrams and the incomplete hidden Problem 14.13 state"
+        }
+      ],
+      "findingIds": [
+        "cross-f-invalid-lichess-links"
+      ],
       "disposition": {
-        "status": "no-change",
-        "summary": "Current board unit matches the fresh source reconstruction."
+        "status": "repaired",
+        "summary": "Removed the Lichess control from this non-playable instructional schematic."
       },
       "regressionCoverage": [
         "app/src/app_x/chapter13SourceFidelity.test.tsx",
         "app/src/app_x/chapter13SourcePaths.json",
-        "app/src/app_x/bookSourceValidation.test.ts"
+        "app/src/app_x/bookSourceValidation.test.ts",
+        "app/src/app_x/lichess.test.ts",
+        "app/src/app_x/viewerPresentation.test.tsx"
       ],
       "postFixVerification": {
         "pdf": "Fresh board reconstruction and source association are recorded at tmp/pdfs/lotta-release-audit/batch-09-source.md for PDF page 206.",
@@ -53412,21 +53494,31 @@
         "evidence": "Fresh inventory and dedicated regression find no substantive source difference."
       },
       "chessLegality": {
-        "status": "legal",
-        "evidence": "The dedicated batch fixture replays every printed playable path from its exact source parent and verifies stored result positions."
+        "status": "mixed",
+        "evidence": "The hidden prompt intentionally omits the white king and is not a legal FEN; the revealed solution supplies White's king on a1 and is legal."
       },
-      "classification": "matched",
-      "severity": "none",
-      "differences": [],
-      "findingIds": [],
+      "classification": "app-defect",
+      "severity": "medium",
+      "differences": [
+        {
+          "field": "Lichess export for a non-playable source state",
+          "printedValue": "Instructional schematics and the incomplete Problem 14.13 prompt do not define legal playable positions",
+          "appValue": "Before repair, the app exposed Lichess editor links for all instructional diagrams and the incomplete hidden Problem 14.13 state"
+        }
+      ],
+      "findingIds": [
+        "cross-f-invalid-lichess-links"
+      ],
       "disposition": {
-        "status": "no-change",
-        "summary": "Current board unit matches the fresh source reconstruction."
+        "status": "repaired",
+        "summary": "Removed the Lichess control from the incomplete hidden state while preserving it for the legal revealed solution."
       },
       "regressionCoverage": [
         "app/src/app_x/chapter14SourceFidelity.test.tsx",
         "app/src/app_x/chapter14SourcePaths.json",
-        "app/src/app_x/bookSourceValidation.test.ts"
+        "app/src/app_x/bookSourceValidation.test.ts",
+        "app/src/app_x/lichess.test.ts",
+        "app/src/app_x/viewerPresentation.test.tsx"
       ],
       "postFixVerification": {
         "pdf": "Fresh board reconstruction and source association are recorded at tmp/pdfs/lotta-release-audit/batch-10-source.md for PDF page 232.",
@@ -58708,12 +58800,18 @@
       "severity": "high",
       "differences": [
         {
+          "field": "Lichess export for a non-playable source state",
+          "printedValue": "Instructional schematics and the incomplete Problem 14.13 prompt do not define legal playable positions",
+          "appValue": "Before repair, the app exposed Lichess editor links for all instructional diagrams and the incomplete hidden Problem 14.13 state"
+        },
+        {
           "field": "Batch 11 source-fidelity obligations on the linked units",
           "printedValue": "Exact page copy, board state/semantics, and source-parented playback/navigation recorded by the independent source inventory.",
           "appValue": "Before repair, each linked unit failed one or more independently frozen obligations: the Troitsky schematic used asterisks rather than source-star glyphs/accessibility and duplicated the visible title before repair"
         }
       ],
       "findingIds": [
+        "cross-f-invalid-lichess-links",
         "b11-f-repaired-app-fidelity"
       ],
       "disposition": {
@@ -60822,6 +60920,49 @@
       "disposition": {
         "status": "repaired",
         "summary": "Repaired the linked curated-source, presentation, and playback defects and froze them in the dedicated batch regression."
+      }
+    },
+    {
+      "id": "cross-f-invalid-lichess-links",
+      "classification": "app-defect",
+      "origin": "app",
+      "correctionCertainty": "not-applicable",
+      "severity": "medium",
+      "evidence": "The app treated all diagram placements and the intentionally incomplete hidden state of Problem 14.13 as exportable editor positions, despite the extraction policy defining diagrams as non-playable schematics and chess.js rejecting the incomplete FENs.",
+      "differences": [
+        {
+          "field": "Lichess export for a non-playable source state",
+          "printedValue": "Instructional schematics and the incomplete Problem 14.13 prompt do not define legal playable positions",
+          "appValue": "Before repair, the app exposed Lichess editor links for all instructional diagrams and the incomplete hidden Problem 14.13 state"
+        }
+      ],
+      "repair": "Removed Lichess controls from every InstructionalDiagram and made editor URL generation fail closed when chess.js rejects the supplied FEN. Problem 14.13 now remains unlinked while hidden and restores legal Lichess/playback controls after its solution is revealed.",
+      "regressionCoverage": [
+        "app/src/app_x/lichess.test.ts",
+        "app/src/app_x/viewerPresentation.test.tsx"
+      ],
+      "postFixVerification": {
+        "pdf": "The source inventory records all 12 diagram units as instructional schematics and Problem 14.13 as an incomplete prompt completed by its solution.",
+        "runningApp": "Focused generated-link and presentation regressions pass; final desktop/mobile browser verification is recorded in the release report."
+      },
+      "unitIds": [
+        "b01-p021-board-intro-rook-mobility",
+        "b01-p021-board-intro-bishop-mobility",
+        "b01-p021-board-intro-queen-mobility",
+        "b01-p022-board-intro-knight-mobility",
+        "b01-p022-board-intro-knight-routes",
+        "b01-p023-board-intro-king-routes",
+        "b01-p024-board-intro-knight-domination",
+        "b08-p180-board-12.12-route-counts",
+        "b09-p206-board-13.1",
+        "b09-p206-board-13.2",
+        "b09-p206-board-13.3",
+        "b10-p232-board-14.13",
+        "b11-p247-board-troitsky-line"
+      ],
+      "disposition": {
+        "status": "repaired",
+        "summary": "Non-playable diagrams and invalid hidden states no longer offer Lichess links; legal position and revealed-solution links remain available."
       }
     }
   ]

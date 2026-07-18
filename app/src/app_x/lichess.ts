@@ -54,12 +54,15 @@ export function buildLichessAnalysisUrl(
 }
 
 export function buildLichessEditorUrl(fen: string) {
-  const fields = fen.trim().split(/\s+/)
+  const normalizedFen = fen.trim()
 
-  if (fields.length < 4 || !fields[0].includes('/')) {
+  try {
+    new Chess(normalizedFen)
+  } catch {
     return null
   }
 
+  const fields = normalizedFen.split(/\s+/)
   return `https://lichess.org/editor/${fields.slice(0, 4).join('_')}`
 }
 

@@ -1,6 +1,6 @@
 # Lotta Endgames independent release audit
 
-Audit closed: 2026-07-18. Candidate baseline: `d6fe9be` on `main`; no commit or push was performed.
+Audit closed: 2026-07-18. Candidate baseline: `d695f5b` on `main`; no commit or push was performed.
 
 The earlier **goal blocked** status was administrative: the audit had repeatedly reached the Codex usage-credit limit and could not continue. It was not a product or fidelity verdict. After credits resumed, the pending audit, repair, browser verification, and release gates were completed.
 
@@ -51,7 +51,7 @@ Unit types:
 | problem | 62 |
 | statistics-table-page | 1 |
 
-Final unit classifications: 365 matched; 178 app-defect units; 27 book-error units; 16 accepted-presentation-deviation units; 0 blocked. Every unit has exactly one disposition.
+Final unit classifications: 360 matched; 183 app-defect units; 27 book-error units; 16 accepted-presentation-deviation units; 0 blocked. Every unit has exactly one disposition.
 
 ## 3. Batch-by-batch coverage
 
@@ -68,14 +68,14 @@ Each batch has source-first rendered-page records, comparison/repair records, re
 | Batch 05 — PDF pages 97–123 | 58 | 27 | 26 | 5 | 0 | 0 | closed |
 | Batch 06 — PDF pages 124–153 | 57 | 45 | 10 | 2 | 0 | 0 | closed |
 | Batch 07 — PDF pages 154–169 | 39 | 25 | 10 | 4 | 0 | 0 | closed |
-| Batch 08 — PDF pages 170–204 | 78 | 52 | 23 | 3 | 0 | 0 | closed |
-| Batch 09 — PDF pages 205–229 | 55 | 28 | 25 | 2 | 0 | 0 | closed |
-| Batch 10 — PDF pages 230–240 | 47 | 33 | 12 | 2 | 0 | 0 | closed |
+| Batch 08 — PDF pages 170–204 | 78 | 51 | 24 | 3 | 0 | 0 | closed |
+| Batch 09 — PDF pages 205–229 | 55 | 25 | 28 | 2 | 0 | 0 | closed |
+| Batch 10 — PDF pages 230–240 | 47 | 32 | 13 | 2 | 0 | 0 | closed |
 | Batch 11 — PDF pages 241–249 | 29 | 28 | 1 | 0 | 0 | 0 | closed |
 
 ## 4. App defects found and repaired
 
-The audit recorded **18 app-defect findings affecting 178 units**. Every affected unit, exact field comparison, FEN/legality record, disposition, and post-fix evidence remains individually enumerated in the canonical ledger. The table below includes every finding; none is omitted.
+The audit recorded **19 app-defect findings affecting 183 units**. Every affected unit, exact field comparison, FEN/legality record, disposition, and post-fix evidence remains individually enumerated in the canonical ledger. The table below includes every finding; none is omitted.
 
 | Finding | Severity | PDF pages | App locations | Evidence | Repair | Regression | Final |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -97,6 +97,7 @@ The audit recorded **18 app-defect findings affecting 178 units**. Every affecte
 | b09-f-repaired-app-fidelity | high | 206, 210, 211, 213, 215, 216, 217, 218, 219, 220, 221, 223, 225, 226, 228, 229 | /book/chapter13<br>/book/chapter13#p13.4<br>/book/chapter13#p13.7<br>/book/chapter13#p13.9<br>/book/chapter13#p13.10<br>/book/chapter13#p13.12<br>/book/chapter13#p13.16<br>/book/chapter13#p13.19<br>/book/chapter13#p13.22<br>/book/chapter13#p13.25<br>/book/chapter13#p13.29<br>/book/chapter13#p13.8<br>/book/chapter13#p13.13<br>/book/chapter13#p13.14<br>/book/chapter13#p13.15<br>/book/chapter13#p13.17<br>/book/chapter13#p13.18<br>/book/chapter13#p13.20<br>/book/chapter13#p13.23<br>/book/chapter13#p13.26<br>/book/chapter13#p13.27<br>/book/chapter13#p13.30 | The pre-repair comparison and adversarial repair report identify the linked units and preserve before/after measurements. four move transcriptions, 13 checkpoint clocks, canonical continuation joins, alternate roots, false prose transitions, and exact Next/Previous path closure | Repaired the linked curated-source, presentation, and playback defects and froze them in the dedicated batch regression. | app/src/app_x/chapter13SourceFidelity.test.tsx<br>app/src/app_x/chapter13SourcePaths.json<br>app/src/app_x/bookSourceValidation.test.ts | Repaired; PDF/app reinspection and final gates pass |
 | b10-f-repaired-app-fidelity | high | 231, 233, 234, 235 | /book/chapter14#p14.09<br>/book/chapter14#p14.11<br>/book/chapter14#p14.12<br>/book/chapter14#p14.19<br>/book/chapter14#p14.21<br>/book/chapter14#p14.22<br>/book/chapter14#p14.25<br>/book/chapter14#p14.26<br>/book/chapter14#p14.28<br>/book/chapter14#p14.32<br>/book/chapter14#p14.33<br>/book/chapter14#p14.34 | The pre-repair comparison and adversarial repair report identify the linked units and preserve before/after measurements. four diagram FENs, one move transcription, and eight problem trees with disconnected exact source hierarchy | Repaired the linked curated-source, presentation, and playback defects and froze them in the dedicated batch regression. | app/src/app_x/chapter14SourceFidelity.test.tsx<br>app/src/app_x/chapter14SourcePaths.json<br>app/src/app_x/bookSourceValidation.test.ts | Repaired; PDF/app reinspection and final gates pass |
 | b11-f-repaired-app-fidelity | high | 247 | /book/chapter15#ptroitsky-line | The pre-repair comparison and adversarial repair report identify the linked units and preserve before/after measurements. the Troitsky schematic used asterisks rather than source-star glyphs/accessibility and duplicated the visible title before repair | Repaired the linked curated-source, presentation, and playback defects and froze them in the dedicated batch regression. | app/src/app_x/chapter15BibliographySourceFidelity.test.tsx<br>app/src/app_x/bookSourceValidation.test.ts | Repaired; PDF/app reinspection and final gates pass |
+| cross-f-invalid-lichess-links | medium | 21, 22, 23, 24, 180, 206, 232, 247 | /book/intro instructional diagrams<br>/book/chapter12#p12.12-route-counts<br>/book/chapter13#p13.1<br>/book/chapter13#p13.2<br>/book/chapter13#p13.3<br>/book/chapter14#p14.13<br>/book/chapter15#ptroitsky-line | The app exposed Lichess editor links for all 12 non-playable instructional schematics and for Problem 14.13's intentionally incomplete hidden board state. | Removed Lichess controls from every InstructionalDiagram and made editor-link generation fail closed when chess.js rejects the supplied FEN; the legal revealed 14.13 solution still links. | app/src/app_x/lichess.test.ts<br>app/src/app_x/viewerPresentation.test.tsx | Repaired; focused, full-suite, desktop/mobile browser, console, and overflow checks pass |
 
 ## 5. Confirmed printed-book errors
 
@@ -174,6 +175,7 @@ The sole uncertain printed anomaly is Position 11.1’s `2...Rg1?! 3.Kc6 Rc8!`; 
 - All 336 governed live DOM anchors across the 16 anchored book routes existed exactly once; no governed anchors were missing or duplicated.
 - No route showed horizontal overflow. Browser console audit found zero warnings or errors.
 - Note deep links and browser back/forward, chapter selector navigation, Chapter 2 solution reveal/hide, board reset/Previous/Next, keyboard Left/Right, expansion/restore, coordinates, and Lichess links passed.
+- All 12 instructional schematics now omit Lichess links and empty control rows, including the syntactically legal king-routes placement. Problem 14.13 omits the link/control row while its intentionally incomplete prompt is hidden and restores the legal Lichess/playback controls when the solution is revealed. Normal legal positions retain their links.
 - Position 12.19’s `3...Kb5` branch played from the exact post-`3.d3+` parent. Expanded visual inspection showed the black king on b5; Previous/Next and keyboard traversal returned to the correct parent/child states.
 - Strict SAN audit covered 337 positions and 7,252 move tokens with zero strict failures and zero misses. Advisory all-token audit also had zero misses.
 - Chapter 12 source replay closed 119/119 complete, forward, and previous paths over 1,102 plies and 862 unique transitions, with zero failures, wrong parents/results, missing transitions, or extra leaves. Two source paths are valid prefixes of longer app paths rather than terminal leaves; both replay completely.
@@ -184,11 +186,11 @@ Historical regression challenges were rechecked: 10.19 matched the source h4/h5 
 
 ## 9. Files and generated artifacts changed
 
-- Reader/policy/source: `app/src/app_x/BookFrontMatter.tsx`, `app/src/app_x/pdf/book.json`, `app/src/app_x/chapter12SourcePaths.json`.
+- Reader/policy/source: `app/src/app_x/BookFrontMatter.tsx`, `app/src/app_x/InstructionalDiagram.tsx`, `app/src/app_x/lichess.ts`, `app/src/app_x/pdf/book.json`, `app/src/app_x/chapter12SourcePaths.json`.
 - Generated runtime: added `app/public/app_x/chapter-runtime.0aaad1daefd3eb5b.json`; deleted stale `chapter-runtime.2cd26b918d32cc7e.json`; updated `app/src/app_x/chapterPayloadManifest.ts`.
 - Evidence: `app/src/app_x/pdf/source_fidelity_evidence.json`, `app/src/app_x/pdf/source_fidelity_ledger.json`.
-- Regression coverage: `bookSourceAudit.test.ts`, `chapter10SourceFidelity.test.tsx`, `chapter11SourceFidelity.test.tsx`, `chapter12SourceFidelity.test.tsx`, `chapter13SourceFidelity.test.tsx`, `chapter14SourceFidelity.test.tsx`, `chapter15BibliographySourceFidelity.test.tsx`, `chapters6to7SourceFidelity.test.tsx`, `chapters8to9SourceFidelity.test.tsx`, `moveParser.test.ts`, `sourceTextAudit.test.ts`, and `viewerPresentation.test.tsx` under `app/src/app_x/`.
-- Audit design/report: `docs/superpowers/specs/2026-07-18-digital-edition-note-policy-design.md` and this report.
+- Regression coverage: `bookSourceAudit.test.ts`, `chapter10SourceFidelity.test.tsx`, `chapter11SourceFidelity.test.tsx`, `chapter12SourceFidelity.test.tsx`, `chapter13SourceFidelity.test.tsx`, `chapter14SourceFidelity.test.tsx`, `chapter15BibliographySourceFidelity.test.tsx`, `chapters6to7SourceFidelity.test.tsx`, `chapters8to9SourceFidelity.test.tsx`, `lichess.test.ts`, `moveParser.test.ts`, `sourceTextAudit.test.ts`, and `viewerPresentation.test.tsx` under `app/src/app_x/`.
+- Audit design/report: `docs/superpowers/specs/2026-07-18-digital-edition-note-policy-design.md`, `docs/superpowers/specs/2026-07-18-invalid-lichess-link-suppression-design.md`, and this report.
 - Runtime semantic content hash: `sha256:0aaad1daefd3eb5b5d8c9640afd010ea978772c3d4b64622e85584f82516525d`; curated-source semantic hash: `sha256:38122a0e5fda619b12c49b1d5a9e2162e1a546eb7cb842654052ec461275df9f`.
 - No commit or push was performed.
 
@@ -197,21 +199,21 @@ Historical regression challenges were rechecked: 10.19 matched the source h4/h5 
 | Command / check | Exact result |
 | --- | --- |
 | `python3 scripts/build_chapter_payload.py` | Exit 0; runtime/manifest rebuilt to semantic hash `0aaad1da…`; 17 book parts in payload. |
-| `node scripts/rebuild_fidelity_ledger.mjs` | Exit 0; `rebuilt source fidelity ledger: 586 units, 56 findings`. |
+| `node scripts/rebuild_fidelity_ledger.mjs` | Exit 0; `rebuilt source fidelity ledger: 586 units, 57 findings`. |
 | `node scripts/rebuild_fidelity_ledger.mjs --check` | Exit 0; `source fidelity ledger is fresh`. |
 | `cd app && npm test` (final run) | Exit 0; 165 Mate tests passed, then routing, source, ledger, all chapter-fidelity, parser, 7,577-link, structural, text, and presentation suites passed. |
 | `cd app && npm run test:content` | Exit 0; `content audit passed`. |
 | `cd app && npm run test:audit-san` | Exit 0; 337 positions / 7,252 move tokens; 0 strict SAN failures; 0 misses. |
 | `cd app && npm run test:audit-san:advisory -- --all` | Exit 0; 337 positions / 7,252 move tokens; 0 misses. |
 | `cd app && npm run lint` | Exit 0; oxlint reported no findings. |
-| `cd app && npm run build` | Exit 0; TypeScript and Vite build passed; 71 modules; JS 459.43 kB (139.08 kB gzip), CSS 32.43 kB (6.48 kB gzip). |
+| `cd app && npm run build` | Exit 0; TypeScript and Vite build passed; 71 modules; JS 459.36 kB (139.04 kB gzip), CSS 32.43 kB (6.48 kB gzip). |
 | `app/node_modules/.bin/tsx tmp/pdfs/lotta-release-audit/compare12.ts` | Exit 0; 119 paths / 1,102 plies; 119 complete, forward, previous; 862 transitions; 0 failures. |
 | Focused chapter/source tests | Exit 0; Chapters 6–7, 8–9, 10, 11, 12, 13, 14, 15/Bibliography, source text, viewer presentation, book source audit/validation, parser, and ledger freshness all passed. |
 | `python3 -m py_compile` on batch replay/tablebase scripts | Exit 0. |
 | `jq empty` on book, evidence, ledger, Chapter 12 paths, and runtime JSON | Exit 0. |
 | `shasum -a 256` / `pdfinfo` on authoritative PDF | Exit 0; 249 pages, 14,360,268 bytes, SHA-256 `7610f6c…`. |
 | Stale-policy searches | Exit 0; no public `PDF page`, Position 1.14, or F13 erratum; no reader `4...Kc5` rewrite or F13 editorial rewrite; expected `3...Kb5` and printed F13 wording present. |
-| Browser route/anchor/interaction audit | 19 routes at desktop and mobile; 336 governed anchors; 0 missing/duplicate anchors, overflow, warnings, or errors; all targeted interactions passed. |
+| Browser route/anchor/interaction audit | 19 routes at desktop and mobile; 336 governed anchors; 0 missing/duplicate anchors, overflow, warnings, or errors; all prior interactions passed. Follow-up 1280×900 and 390×844 checks confirmed zero schematic links/controls, hidden/revealed 14.13 behavior, retained legal-position links, and exact viewport-width layout. |
 | `git diff --check` | Exit 0; no whitespace errors. |
 
 Transparent diagnostic corrections:
@@ -220,6 +222,7 @@ Transparent diagnostic corrections:
 - The first full `npm test` run exposed a stale Chapter 12 part hash; the second exposed stale public `PDF page` expectations. Both guards were updated to the approved final source/policy, focused tests passed, and the final full suite exited 0.
 - One `rg app/src/app_x` invocation was issued while already inside `app/` and reported a missing path; the corrected `rg src/app_x` search found only the intentional negative `/PDF page/` assertion.
 - The in-app browser does not implement `networkidle`; the audit used supported `domcontentloaded` plus explicit DOM readiness. Two initial keyboard targets rerendered or were non-regions; the same Left/Right behavior passed against the stable scoped Reset control.
+- The follow-up responsive check first tried unsupported tab-level viewport setters, then used the browser's supported viewport capability. One route-transition evaluation reached its short selector deadline; explicit diagram readiness was awaited and the same mobile checks passed.
 
 ## 11. Final diff review
 
@@ -227,7 +230,8 @@ Transparent diagnostic corrections:
 - The Note has 29 list items: one unlinked disclaimer plus 28 linked book entries, ordered by earliest print page. It contains no PDF-page labels and no Position 1.14 or F13 entry.
 - Position 12.19 now uses a connected `Kc1 Kd4 Kc2 Kc4 d3+ Kb5` branch from exact parent FEN `8/p7/P7/8/2k5/3P4/2K5/8 b - - 0 3`.
 - F13 exactly preserves `Black can force one of the pawns’ advance to h3 and then win.`
-- Evidence and generated ledger both say `auditState: complete`, contain 586 units / 56 findings, and contain zero pending or blocked records.
+- Instructional diagrams have no Lichess/control row. Editor URL construction validates with chess.js, hidden Problem 14.13 fails closed, its legal revealed solution links, and ordinary legal position links remain unchanged.
+- Evidence and generated ledger both say `auditState: complete`, contain 586 units / 57 findings, and contain zero pending or blocked records.
 - Only the current hashed runtime exists in `app/public/app_x`; manifest, runtime, source hash, and ledger candidate metadata agree.
 - No collateral source rewrite, unsupported correction, duplicate disclosure, stale runtime, whitespace defect, commit, or push remains.
 

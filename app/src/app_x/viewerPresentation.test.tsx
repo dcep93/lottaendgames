@@ -336,13 +336,28 @@ assert.match(diagramMarkup, />The rook</)
 assert.match(diagramMarkup, />Printed route</)
 assert.match(diagramMarkup, /class="leg-board-route-layer"/)
 assert.match(diagramMarkup, /points="43.75,43.75 56.25,18.75"/)
-assert.match(diagramMarkup, /href="https:\/\/lichess\.org\/editor\//)
+assert.doesNotMatch(diagramMarkup, /href="https:\/\/lichess\.org\//)
 assert.match(diagramMarkup, /The rook instructional chess diagram/)
-assert.match(diagramMarkup, /aria-label="Position controls"/)
+assert.doesNotMatch(diagramMarkup, /aria-label="Position controls"/)
 assert.match(diagramMarkup, /Expand The rook instructional chess diagram/)
 assert.doesNotMatch(diagramMarkup, /Expand position intro-rook-mobility/)
 assert.match(diagramMarkup, /data-expanded="false"/)
 assert.doesNotMatch(diagramMarkup, /fullscreen/i)
+const legalDiagramMarkup = renderToStaticMarkup(
+  <InstructionalDiagram
+    section={{
+      type: 'diagram',
+      content: {
+        number: 'intro-king-routes',
+        label: "The king's routes",
+        fen: '7k/8/8/8/8/8/8/K7',
+        orientation: 'white',
+      },
+    }}
+  />,
+)
+assert.doesNotMatch(legalDiagramMarkup, /href="https:\/\/lichess\.org\//)
+assert.doesNotMatch(legalDiagramMarkup, /aria-label="Position controls"/)
 const chapterOneDiagramMarkup = renderToStaticMarkup(
   <ChessBoard
     boundaryPaths={[
@@ -888,5 +903,41 @@ assert.ok(
 )
 assert.match(revealedProblemMarkup, /leg-move-token/)
 assert.match(revealedProblemMarkup, /Play /)
+
+const problem1413Section: ProblemSection = {
+  content: {
+    fen: '8/8/1k6/8/P2P4/8/8/8 b - - 0 1',
+    number: '14.13',
+    orientation: 'white',
+    prompt:
+      'Is there any square on the board for the white king such that Black can draw?',
+    solution: 'The white king must be on a1.',
+    solutionFen: '8/8/1k6/8/P2P4/8/8/K7 b - - 0 1',
+  },
+  type: 'problem',
+}
+const problem1413Props = {
+  ...problemProps,
+  playback: {
+    playablePositions: new Set(['14.13']),
+    tokensBySectionIndex: new Map(),
+  },
+  section: problem1413Section,
+}
+const hiddenProblem1413Markup = renderToStaticMarkup(
+  <ProblemStudyGroup {...problem1413Props} revealed={false} />,
+)
+assert.doesNotMatch(hiddenProblem1413Markup, />Lichess ↗<\/a>/)
+assert.doesNotMatch(
+  hiddenProblem1413Markup,
+  /aria-label="Position controls"/,
+)
+
+const revealedProblem1413Markup = renderToStaticMarkup(
+  <ProblemStudyGroup {...problem1413Props} revealed />,
+)
+assert.match(revealedProblem1413Markup, />Lichess ↗<\/a>/)
+assert.match(revealedProblem1413Markup, /aria-label="Position controls"/)
+assert.match(revealedProblem1413Markup, /aria-label="Previous move"/)
 
 console.log('viewer presentation tests passed')

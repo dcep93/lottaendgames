@@ -95,9 +95,18 @@ assert.equal(
 )
 
 assert.equal(
-  buildLichessEditorUrl('8/8/1k6/8/P2P4/8/8/8 b - - 0 1'),
-  'https://lichess.org/editor/8/8/1k6/8/P2P4/8/8/8_b_-_-',
+  buildLichessEditorUrl('8/8/1k6/8/P2P4/8/8/K7 b - - 0 1'),
+  'https://lichess.org/editor/8/8/1k6/8/P2P4/8/8/K7_b_-_-',
 )
+assert.equal(
+  buildLichessEditorUrl('8/8/1k6/8/P2P4/8/8/8 b - - 0 1'),
+  null,
+)
+assert.equal(
+  buildLichessEditorUrl('8/8/8/8/P2P4/8/8/K7 b - - 0 1'),
+  null,
+)
+assert.equal(buildLichessEditorUrl('8/8/8/8/8/8/8/8 w - - 0 1'), null)
 assert.equal(buildLichessEditorUrl('not a fen'), null)
 assert.equal(
   buildLichessAnalysisUrl(
