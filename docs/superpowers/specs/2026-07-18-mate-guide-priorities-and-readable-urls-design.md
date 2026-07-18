@@ -45,8 +45,8 @@ Keyboard shortcuts use compact key/action pairs:
 
 - `Enter`: Start over
 - `←`: Undo
-- `→`: Redo
 - `↑`: Play best move
+- `→`: Redo
 
 The arrow glyphs are literal Unicode arrows rendered in keyboard-key elements.
 
