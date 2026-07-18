@@ -14,8 +14,10 @@ The first content inside the dialog is a responsive two-column grid:
 - **White best moves** appears on the left.
 - **Black resistance** appears on the right.
 
-Both columns retain their registered production order. On narrow viewports the
-columns stack with White first.
+At desktop widths, the grid uses `minmax(0, 3fr) minmax(0, 2fr)`, giving the
+White column approximately 60% and the Black column approximately 40% of the
+available track width. Both columns retain their registered production order.
+On narrow viewports the columns stack with White first.
 
 The desktop dialog width is `69.6rem`, exactly 20% wider than its former
 `58rem` width. It remains capped at 100% of the available container and keeps
@@ -88,8 +90,8 @@ and move-legality checks remain unchanged.
 
 ## Tests and Verification
 
-Tests cover priorities appearing before all supporting sections, adjacent grid
-structure, the universal first-three group, selected endgame headings, exact
+Tests cover priorities appearing before all supporting sections, the 60/40
+adjacent grid structure, the universal first-three group, selected endgame headings, exact
 shortcut glyphs and removal of both headings and priority-intro copy,
 narrow-layout stacking, readable FEN and
 replay encoding, legacy-link decoding and canonical routing, malformed input,
