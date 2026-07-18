@@ -13,8 +13,8 @@ layouts.
 groups in the existing DOM and keyboard order:
 
 1. Start Over, Undo, Redo, and Play Best;
-2. the timer toggle, elapsed timer, terminal status, Share button, and share
-   feedback.
+2. the terminal status, Share button, share feedback, timer toggle, and elapsed
+   timer.
 
 The outer controls panel becomes a wrapping horizontal flex toolbar. On desktop
 and other widths where both groups fit, they share one row. The action group is
@@ -24,6 +24,12 @@ the right edge.
 The summary group loses its current top border, top padding, and separate-row
 treatment. Its controls remain vertically centered and may wrap internally only
 when their own content requires it.
+
+Within the right-aligned summary group, terminal sharing precedes timer control:
+the terminal label appears first, followed by Share and its feedback, then the
+timer visibility toggle and elapsed timer. During an active session, the absent
+terminal-only controls leave the timer controls as the visible right-aligned
+content.
 
 At the existing narrow breakpoint, the action group keeps its current two-by-two
 button layout. The action group occupies the full first line, while the complete
@@ -40,8 +46,9 @@ Mate stylesheet. No props, callbacks, state ownership, or timer logic change.
 - Checkmate or another terminal label and Share remain terminal-only.
 - Share feedback retains its polite live-region behavior.
 - Busy and disabled behavior remains unchanged.
-- DOM order remains action group first and summary group second, preserving
-  keyboard navigation order.
+- DOM order remains action group first and summary group second. Within the
+  summary group, keyboard navigation follows terminal Share before the timer
+  visibility toggle when terminal controls are present.
 
 ## Responsive and accessibility requirements
 
@@ -62,6 +69,8 @@ Mate stylesheet. No props, callbacks, state ownership, or timer logic change.
 Presentation and stylesheet tests must prove:
 
 - the action group precedes the summary group in the control panel;
+- terminal status, Share, and share feedback precede the timer toggle and timer
+  in the summary group;
 - the controls panel is a wrapping flex container;
 - the summary group uses automatic leading margin and has no top divider;
 - the narrow breakpoint gives the action group a full line while preserving its
