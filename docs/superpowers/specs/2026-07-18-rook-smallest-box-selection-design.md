@@ -11,6 +11,11 @@ may preserve or shrink that box, but may not expand or lose it merely to move
 the rook farther from Black. In the minimal loop position after `1.Re7 Kf8`,
 this must choose `Ra7` instead of `Re1`.
 
+When Black steps away from a closest cut but the rook still maintains an
+established cut, advance that cut on its existing axis before switching axes.
+This prevents the evaluator from shuttling between perpendicular cuts as Black
+steps between two squares.
+
 ## Scoring Change
 
 Keep the existing ordered rule and its public ID, label, and help text unchanged.
@@ -22,6 +27,12 @@ size along that actual established axis. Lower size remains better under the
 existing `establish box` comparison. Candidates that do not establish a closest
 axis retain the existing establishment penalty and do not need a meaningful box
 size.
+
+If the starting position has an established but non-closest cut, candidates
+that make that same axis closest survive before candidates that switch to the
+perpendicular axis. Resulting box size breaks ties only after this axis-
+continuity preference. If there is no established cut, either axis remains
+eligible and the smallest resulting box wins as before.
 
 When the starting position already has a closest box, record its size and the
 candidate's resulting closest-box size. The existing preservation penalty must
@@ -48,6 +59,11 @@ For `5k2/4R3/3K4/8/8/8/8/8 w - - 2 2`:
 - `Ra7` is the sole ideal White move, and `Re1` is rejected by
   `maximize black distance`.
 
+For the cycle beginning at `8/8/8/7k/5R2/4K3/8/8 w - - 0 1`, Black's
+`...Kg6` leaves White's rook with an established but non-closest rank cut.
+White must advance that rank cut with `Ra5` instead of switching to the file cut
+with `Rf4`; this breaks the `Ra4 Kg6 Rf4 Kh5` cycle.
+
 The evaluator rule order, Black response logic, and all user-facing tooltip and
 guide copy remain unchanged.
 
@@ -56,6 +72,7 @@ guide copy remain unchanged.
 Add focused regression tests for both exact positions, the relevant candidate
 scores, each sole ideal move, and each rejected move's explanation. Update any
 existing score fixture whose box-size fields become meaningful under the
-corrected definition. Assert that the existing tooltip copy is unchanged. Run
-Rook parity/self-play tests, the exhaustive verifier against the loop root, the
-full Mate suite, lint, and the production build.
+corrected definition. Add a regression for the perpendicular-cut cycle and its
+same-axis continuation. Assert that the existing tooltip copy is unchanged. Run
+Rook parity/self-play tests, the exhaustive Rook verifier, the full Mate suite,
+lint, and the production build.
