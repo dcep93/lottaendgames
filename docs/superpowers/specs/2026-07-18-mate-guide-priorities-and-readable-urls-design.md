@@ -26,20 +26,24 @@ under **Technique priorities** and keep their exact evaluator order.
 ## Selected Endgame Identity
 
 The dialog heading uses the selected catalog label followed by “endgames,” such
-as **Rook endgames** or **Bishop and Knight endgames**. “How best moves are
-chosen” remains as supporting header text rather than the only title.
+as **Rook endgames** or **Bishop and Knight endgames**. It has no subtitle.
 
 ## Supporting Information
 
-After the two priority columns, the dialog presents any rule notes, training
-information, and the starting position.
+After the two priority columns, the dialog presents any rule notes, keyboard
+shortcuts, and the starting position. It does not contain a “How training
+works” section or descriptions of the two modes. Remove:
 
-Training information continues to explain Standard and Train because this is
-useful reference material, but it does not announce the current mode. Remove:
-
+- “How best moves are chosen.”
+- “How training works.”
+- the Standard and Train explanatory bullets.
 - “Move White; Black replies automatically.”
 - “Play Best makes one recommended White move.”
 - the sentence explaining reason hints and the guide.
+
+The user-facing name of the `train` mode is **Training Wheels** in the sidebar
+and accessible workspace label. The internal mode value and `/train` route stay
+unchanged for compatibility.
 
 Keyboard shortcuts use compact key/action pairs:
 
