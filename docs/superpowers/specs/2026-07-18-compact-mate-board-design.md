@@ -1,54 +1,98 @@
-# Compact Mate board
+# Streamlined Mate header and smaller board
 
 ## Goal
 
-Reduce the Mate exercise board's visual dominance while giving the controls and
-move log more room. The board's desktop maximum width decreases from roughly
-`32rem` to `16rem`.
+Remove redundant visible page and drill identity text, move the mating controls
+directly beneath the module tabs, and reduce the exercise board's width and
+height by 20% at every viewport.
 
-## Confirmed layout
+## Confirmed header layout
 
-The desktop workspace uses a board column capped at `16rem` and a flexible log
-column that receives the reclaimed width. The board card, chessboard, and the
-guidance/position-details group all remain inside the compact board column.
+The Mate page begins with the existing `Book | Mate` module selector. The
+material-icon selector and horizontal Standard/Train controls follow directly
+beneath it.
 
-At narrower workspace breakpoints, the board column remains capped at `16rem`
-and is centered rather than expanding to the viewport width. This avoids the
-unusable result of applying a strict 50% viewport width on phones while keeping
-the board materially smaller than its current mobile presentation.
+The following visible identity text is removed:
 
-The two information disclosures stack naturally when the compact column cannot
-support them side by side. The controls and log retain their current full-width
-stack below the board column at narrow widths.
+- the `Lotta Endgames` kicker;
+- the large `Mate` page title;
+- the selected set heading, such as `Queen`;
+- the selected-mode badge, such as `Standard`.
+
+Standard and Train remain visible in the selector because they are interactive
+mode controls, not a duplicate selected-state heading.
+
+A visually hidden level-one heading preserves a useful page heading for
+assistive technology. The selected workspace keeps its existing descriptive
+region label, so the current material and mode remain available to screen
+readers without occupying visual space.
+
+## Confirmed board sizing
+
+The board is 80% of its former linear size. Its desktop maximum decreases from
+roughly `32rem` to `25.6rem`, and the workspace board column shrinks with it so
+the controls and move log receive the reclaimed width.
+
+At narrower workspace breakpoints, the board column uses 80% of the available
+content width, up to the same `25.6rem` maximum, and is centered. The board
+remains square. Guidance and Position Details stay beneath the board and stack
+naturally when the narrower column cannot support them side by side.
+
+The controls and move log retain their current full-width stack after the board
+when the workspace switches to one column.
 
 ## Boundaries and behavior
 
-This is a CSS layout change. It does not alter the chessboard position,
-orientation, notation, piece interaction, animation duration, session state,
-routes, controls, log contents, selector, or mating logic.
+This is a composition and CSS layout change. It does not alter:
 
-Sizing follows the repository's `rem` convention. The board remains square,
-keyboard-operable, and free of page-level horizontal overflow.
+- selector routes or active states;
+- chessboard position, orientation, notation, or piece interaction;
+- the sequential 100 millisecond Play Best animations;
+- session state, controls, log contents, sharing, or mating logic.
+
+Sizing follows the repository's `rem` convention. The board remains
+keyboard-operable and the page must not develop horizontal overflow.
+
+## Component boundaries
+
+- `Mate` removes the visible reader header, keeps a visually hidden page
+  heading, and places `MateSidebar` immediately after the module selector.
+- `MateWorkspace` removes only its visible set/mode header. Its descriptive
+  region label, board/information column, and controls/log column remain.
+- Mate CSS owns the 80% board sizing, centered responsive alignment, and the
+  reclaimed desktop grid width.
+
+No routing, catalog, rule, session, or persistence change is added.
 
 ## Verification
 
-- Existing Mate presentation and interaction tests remain green.
+- Presentation tests confirm the visible kicker, page title, selected-set
+  heading, and selected-mode badge are absent while the hidden level-one heading
+  and labelled workspace remain.
+- Selector links and Standard/Train controls retain their existing accessible
+  names and active states.
+- Existing Mate interaction and animation tests remain green.
 - The production build and lint pass.
-- A targeted desktop check confirms a board width near `16rem` and a wider log
-  column.
-- A targeted narrow-width check confirms the board stays centered, does not
-  exceed `16rem`, and introduces no horizontal overflow.
+- A targeted desktop check confirms a board width near `25.6rem`, a wider log
+  column, and the selector directly below `Book | Mate`.
+- A targeted narrow-width check confirms an 80%-width centered board and no
+  horizontal overflow.
 
 ## Alternatives rejected
 
-- **Strict 50% width at every viewport:** makes the board too small on phones.
-- **Reduce board area by 50%:** produces only a modest linear-size reduction and
-  does not satisfy the requested visual change.
+- **Keep compact identity text beside the module tabs:** still repeats context
+  already conveyed by the active module, selector, and labelled workspace.
+- **Fixed desktop-only board cap:** leaves the mobile board at its former size
+  and does not fulfill a consistent 20% reduction.
+- **Reduce board area by 20%:** produces only a small linear-size change and is
+  visually too subtle.
 - **Shrink only the chessboard inside the existing wide column:** leaves unused
   space and does not return width to the controls and log.
 
 ## Constraints
 
 - Preserve unrelated and in-progress user changes.
-- Keep the patch limited to Mate workspace sizing and responsive alignment.
+- Supersede the discarded 50% board design completely.
+- Keep the patch limited to Mate composition, presentation coverage, sizing,
+  and responsive alignment.
 - Do not perform a broader visual pass.
