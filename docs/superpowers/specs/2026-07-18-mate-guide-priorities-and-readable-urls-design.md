@@ -31,8 +31,19 @@ The desktop dialog width is `69.6rem`, exactly 20% wider than its former
 the existing narrow-viewport padding and stacking behavior.
 
 White's first three registered priorities are visually grouped without a label
-or explanatory sentence. Remaining White priorities follow without a subsection
-label and keep their exact evaluator order. The White column starts directly
+or explanatory sentence. Every built-in material presents those priorities in
+this exact universal order and with no help-text suffix:
+
+1. `mate`
+2. `pieces safe`
+3. `no stalemate`
+
+The registered descriptions also supply these concise labels to current hints
+and move-log reasons. Material-specific stable rule IDs remain unchanged.
+Where an evaluator applies safety and stalemate in a different order, explicit
+guide ordering changes presentation only; scoring and move selection retain
+their production order. Remaining White priorities follow without a subsection
+label and keep their registered guide order. The White column starts directly
 with the numbered priorities; it does not render the rule set's White-intro
 paragraph.
 
@@ -111,8 +122,9 @@ and move-legality checks remain unchanged.
 ## Tests and Verification
 
 Tests cover the top-aligned 60/40 priority grid, White and Black sharing its row,
-the separate 50/50 supporting grid for Keyboard shortcuts and Starting position, the
-universal first-three group, selected endgame headings, exact shortcut glyphs,
+the separate 50/50 supporting grid for Keyboard shortcuts and Starting position,
+the exact universal first-three labels and order across every material, selected
+endgame headings, exact shortcut glyphs,
 removal of headings and priority-intro copy, narrow-layout stacking, readable
 FEN and replay encoding, legacy-link decoding and canonical routing, malformed
 input, clicked-reason highlighting and generic-opener clearing, interactive
