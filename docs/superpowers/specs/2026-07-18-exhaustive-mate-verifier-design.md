@@ -87,7 +87,8 @@ Use a tri-color depth-first graph search with memoized completed nodes:
 - entering a node marks it active;
 - reaching an active structural node proves a cycle;
 - a node is proven only after every child branch is proven;
-- parent edges retain enough information to reconstruct the prefix and cycle.
+- parent edges retain enough information to reconstruct a failure path and the
+  exact boundary of a cycle.
 
 The verifier has no success horizon. Optional node or time limits are diagnostic
 only and return `incomplete` with exit code `2`.
@@ -115,14 +116,21 @@ A successful result reports, per mate set:
 - elapsed time;
 - exact verification status.
 
-A failure reports:
+A non-cycle failure reports:
 
 - mate set and failure classification;
 - starting FEN;
 - ordered SAN path;
 - final FEN;
-- cycle-start ply for loops;
 - relevant optimal/legal choice sets at a rule gap or illegal move.
+
+A cycle failure is normalized to the minimal directly replayable witness. Its
+`startingFen` is the encountered state at the first active occurrence, its move
+list contains only the cycle, and `cycleStartPly` is `0`. The original root
+prefix is omitted, while the root source label remains for provenance. The
+final FEN remains the repeated state in the encountered orientation; under
+symmetry reduction it may be proof-equivalent rather than textually identical
+to the minimal starting FEN.
 
 The witness must be directly replayable with `chess.js`. Output ordering and
 position enumeration are deterministic so failures reproduce across runs.
@@ -152,7 +160,7 @@ Fast verifier tests use small injected graphs and focused real positions to pin:
 - all optimal White choices are explored;
 - all legal Black responses are explored;
 - a non-preferred Black response can expose a failure;
-- self-loops and longer cycles produce correct witnesses;
+- self-loops and longer cycles produce minimal witnesses without root prefixes;
 - stalemate, material loss, promotion, rule gaps, and fifty-move draws fail;
 - checkmate-only DAGs pass;
 - resource limits return incomplete rather than success;
@@ -162,4 +170,3 @@ These focused tests join the normal Mate test command. The full exhaustive proof
 is intentionally an explicit developer command because its runtime is much
 larger. Each mating-rule change should be followed by the relevant filtered
 exhaustive command before release.
-
