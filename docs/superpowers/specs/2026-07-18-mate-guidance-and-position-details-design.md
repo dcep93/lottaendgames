@@ -1,5 +1,9 @@
 # Mate guidance and position details
 
+> Superseded for training guidance and position-details placement by
+> `2026-07-18-mate-training-info-dialog-design.md`. Terminal badge and Rook help
+> requirements in this document remain applicable.
+
 ## Goal
 
 Resolve four quality-audit findings in the Mate workspace without changing the
