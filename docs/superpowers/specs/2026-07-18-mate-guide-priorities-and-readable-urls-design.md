@@ -16,8 +16,11 @@ The first content inside the dialog is a responsive two-column grid:
 
 At desktop widths, the grid uses `minmax(0, 3fr) minmax(0, 2fr)`, giving the
 White column approximately 60% and the Black column approximately 40% of the
-available track width. Both columns retain their registered production order.
-On narrow viewports the columns stack with White first.
+available track width. The White track contains White best moves followed by
+Keyboard shortcuts. The Black track contains Black resistance followed by the
+Starting position and its copy control. Both columns retain their registered
+production order. On narrow viewports the two tracks stack, preserving those
+groupings and placing the White track first.
 
 The desktop dialog width is `69.6rem`, exactly 20% wider than its former
 `58rem` width. It remains capped at 100% of the available container and keeps
@@ -36,9 +39,9 @@ as **Rook endgames** or **Bishop and Knight endgames**. It has no subtitle.
 
 ## Supporting Information
 
-After the two priority columns, the dialog presents any rule notes, keyboard
-shortcuts, and the starting position. It does not contain a “How training
-works” section or descriptions of the two modes. Remove:
+After the two-column area, the dialog presents any rule notes at full width.
+It does not contain a “How training works” section or descriptions of the two
+modes. Remove:
 
 - “How best moves are chosen.”
 - “How training works.”
@@ -90,9 +93,9 @@ and move-legality checks remain unchanged.
 
 ## Tests and Verification
 
-Tests cover priorities appearing before all supporting sections, the 60/40
-adjacent grid structure, the universal first-three group, selected endgame headings, exact
-shortcut glyphs and removal of both headings and priority-intro copy,
-narrow-layout stacking, readable FEN and
-replay encoding, legacy-link decoding and canonical routing, malformed input,
-interactive dialog inspection, full tests, lint, and production build.
+Tests cover the 60/40 adjacent grid structure, shortcuts grouped below White,
+the starting position grouped below Black, the universal first-three group,
+selected endgame headings, exact shortcut glyphs, removal of headings and
+priority-intro copy, narrow-layout stacking, readable FEN and replay encoding,
+legacy-link decoding and canonical routing, malformed input, interactive dialog
+inspection, full tests, lint, and production build.
