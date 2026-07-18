@@ -1,4 +1,4 @@
-# Rook Smallest-Box Selection
+# Rook Smallest-Box Establishment and Preservation
 
 ## Goal
 
@@ -6,18 +6,33 @@ Make the Rook `establish box` evaluator choose the closest legal cut that gives
 Black the smallest resulting box. In the known loop position on White move 18,
 this must reject `Rc4` in favor of `Rb1`.
 
+Once White has established a closest box, make its size monotonic: a candidate
+may preserve or shrink that box, but may not expand or lose it merely to move
+the rook farther from Black. In the minimal loop position after `1.Re7 Kf8`,
+this must choose `Ra7` instead of `Re1`.
+
 ## Scoring Change
 
 Keep the existing ordered rule and its public ID, label, and help text unchanged.
-The change is limited to `rookBoxSize` inside Rook White-move scoring.
+The change is limited to Rook White-move scoring and comparison.
 
 When the starting position does not already have a closest rook-box axis and a
 candidate move establishes one, calculate the resulting one-dimensional box
 size along that actual established axis. Lower size remains better under the
 existing `establish box` comparison. Candidates that do not establish a closest
 axis retain the existing establishment penalty and do not need a meaningful box
-size. Once a closest box already exists, this rule continues to leave later
-box-preservation priorities in control.
+size.
+
+When the starting position already has a closest box, record its size and the
+candidate's resulting closest-box size. The existing preservation penalty must
+reject a candidate if it loses the closest box or makes it larger. Among the
+remaining candidates, prefer the smaller resulting box before using rook
+distance as the final tiebreak. An axis change remains valid when it preserves
+or shrinks the box; the geometry, not the axis name, controls the result.
+
+These checks remain within the final `maximize black distance` priority, after
+all earlier safety, mating, and king-approach priorities. They therefore do not
+force premature rook moves ahead of more important technique rules.
 
 For `8/8/8/3K4/8/k7/8/2R5 w - - 34 18`:
 
@@ -25,13 +40,22 @@ For `8/8/8/3K4/8/k7/8/2R5 w - - 34 18`:
 - `Rb1` establishes a file cut with box size 1.
 - `Rb1` is the sole ideal White move, and `Rc4` is explained by `establish box`.
 
+For `5k2/4R3/3K4/8/8/8/8/8 w - - 2 2`:
+
+- `Re1` changes to a file cut and expands Black's box from size 1 to size 3.
+- `Ra7` and `Rb7` preserve the rank cut and its size 1.
+- `Ra7` is preferred to `Rb7` by the existing rook-distance tiebreak.
+- `Ra7` is the sole ideal White move, and `Re1` is rejected by
+  `maximize black distance`.
+
 The evaluator rule order, Black response logic, and all user-facing tooltip and
 guide copy remain unchanged.
 
 ## Verification
 
-Add a focused regression test for the exact move-18 position, both candidate
-scores, the sole ideal move, and the rejected move's explanation. Update any
-existing score fixture whose box-size field becomes meaningful under the
-corrected definition. Run Rook parity/self-play tests, the full Mate suite,
-lint, and the production build.
+Add focused regression tests for both exact positions, the relevant candidate
+scores, each sole ideal move, and each rejected move's explanation. Update any
+existing score fixture whose box-size fields become meaningful under the
+corrected definition. Assert that the existing tooltip copy is unchanged. Run
+Rook parity/self-play tests, the exhaustive verifier against the loop root, the
+full Mate suite, lint, and the production build.
