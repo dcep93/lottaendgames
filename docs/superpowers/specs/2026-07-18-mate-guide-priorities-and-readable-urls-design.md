@@ -22,8 +22,8 @@ The desktop dialog width is `69.6rem`, exactly 20% wider than its former
 the existing narrow-viewport padding and stacking behavior.
 
 White's first three registered priorities are visually grouped without a label
-or explanatory sentence. Remaining White priorities appear under **Technique
-priorities** and keep their exact evaluator order.
+or explanatory sentence. Remaining White priorities follow without a subsection
+label and keep their exact evaluator order.
 
 ## Selected Endgame Identity
 
