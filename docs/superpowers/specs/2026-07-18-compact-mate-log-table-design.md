@@ -13,8 +13,8 @@ Use these eight columns, in order:
 2. `Phase`
 3. `White`
 4. `Black`
-5. `Black replies`
-6. `Correctness`
+5. `Correctness`
+6. `Black replies`
 7. `Duration`
 8. `Reason`
 
@@ -53,9 +53,9 @@ Update presentation tests to verify:
 
 - The shortened `White` and `Black` headers.
 - One `Black replies` header and no legacy reply headers.
+- `Correctness` precedes `Black replies` in both the header and every data row.
 - `ideal / legal` values render in one table cell and both controls retain their
   callbacks and labels.
 - Correctness renders as `👍 /N` or `👎 /N` without visible descriptive labels.
 - The reduced CSS minimum width remains responsive with horizontal overflow as a
   fallback.
-
