@@ -49,8 +49,9 @@ paragraph.
 
 ## Selected Endgame Identity
 
-The dialog heading uses the selected catalog label followed by “endgames,” such
-as **Rook endgames** or **Bishop and Knight endgames**. It has no subtitle.
+The dialog heading uses the selected catalog label followed by “: checkmate,”
+such as **Rook: checkmate** or **Bishop and Knight: checkmate**. It has no
+subtitle.
 
 ## Supporting Information
 
