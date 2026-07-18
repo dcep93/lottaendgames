@@ -66,6 +66,19 @@ Keyboard shortcuts use compact key/action pairs:
 
 The arrow glyphs are literal Unicode arrows rendered in keyboard-key elements.
 
+## Reason-Linked Highlighting
+
+Opening the guide from a current reason hint or a move-log reason carries that
+rule's stable ID into the dialog. The matching White priority receives a
+high-contrast highlight and `aria-current="true"`, making the clicked reason
+easy to locate visually and identifiable to assistive technology.
+
+Opening the guide from the generic Training info button or Reason column header
+does not highlight a priority. A missing or unregistered reason ID also leaves
+the guide unhighlighted. Closing and reopening from a generic opener clears any
+previous selection. The highlight changes presentation only; rule ordering,
+evaluation, and log data remain unchanged.
+
 ## Readable Mate Hashes
 
 Canonical FEN-only links use:
@@ -99,4 +112,5 @@ the separate 50/50 supporting grid for Keyboard shortcuts and Starting position,
 universal first-three group, selected endgame headings, exact shortcut glyphs,
 removal of headings and priority-intro copy, narrow-layout stacking, readable
 FEN and replay encoding, legacy-link decoding and canonical routing, malformed
-input, interactive dialog inspection, full tests, lint, and production build.
+input, clicked-reason highlighting and generic-opener clearing, interactive
+dialog inspection, full tests, lint, and production build.
