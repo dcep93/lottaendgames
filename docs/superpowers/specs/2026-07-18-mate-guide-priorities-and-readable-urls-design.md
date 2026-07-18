@@ -23,7 +23,9 @@ the existing narrow-viewport padding and stacking behavior.
 
 White's first three registered priorities are visually grouped without a label
 or explanatory sentence. Remaining White priorities follow without a subsection
-label and keep their exact evaluator order.
+label and keep their exact evaluator order. The White column starts directly
+with the numbered priorities; it does not render the rule set's White-intro
+paragraph.
 
 ## Selected Endgame Identity
 
@@ -42,6 +44,8 @@ works” section or descriptions of the two modes. Remove:
 - “Move White; Black replies automatically.”
 - “Play Best makes one recommended White move.”
 - the sentence explaining reason hints and the guide.
+- the explanatory paragraph about best moves surviving priorities and tied moves
+  remaining best moves.
 
 The user-facing name of the `train` mode is **Training Wheels** in the sidebar
 and accessible workspace label. The internal mode value and `/train` route stay
@@ -86,6 +90,7 @@ and move-legality checks remain unchanged.
 
 Tests cover priorities appearing before all supporting sections, adjacent grid
 structure, the universal first-three group, selected endgame headings, exact
-shortcut glyphs and copy removal, narrow-layout stacking, readable FEN and
+shortcut glyphs and removal of both headings and priority-intro copy,
+narrow-layout stacking, readable FEN and
 replay encoding, legacy-link decoding and canonical routing, malformed input,
 interactive dialog inspection, full tests, lint, and production build.
