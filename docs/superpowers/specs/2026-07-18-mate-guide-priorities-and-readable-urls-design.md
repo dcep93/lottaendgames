@@ -17,6 +17,10 @@ The first content inside the dialog is a responsive two-column grid:
 Both columns retain their registered production order. On narrow viewports the
 columns stack with White first.
 
+The desktop dialog width is `69.6rem`, exactly 20% wider than its former
+`58rem` width. It remains capped at 100% of the available container and keeps
+the existing narrow-viewport padding and stacking behavior.
+
 White's first three registered priorities are visually grouped under
 **Universal priorities** with a short statement that they apply in every
 position for the selected mating material. These are the universal mate,
