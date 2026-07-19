@@ -16,12 +16,15 @@ because the rendered rule will state it explicitly.
 
 ## Selected Approach
 
-Use two layers:
+Use three cooperating layers:
 
 1. A clean geometric evaluator supplies the human training priorities.
-2. A generated exact three-piece policy rank restricts White to moves that
-   provably advance the documented training policy. Human priorities break ties
-   only inside that safe set.
+2. A generated exact three-piece distance-to-mate table supports the Rook's
+   explicitly rendered **exact mate progress** stage. It is not a blanket
+   fastest-mate policy, because that would reject sound teaching detours.
+3. Verifier-only whole-policy ranks certify the final selected Queen and Rook
+   policies, including every tied White move and every legal Black response.
+   These ranks are proof output, not runtime move-selection data.
 
 Position-specific patches are forbidden. A heuristic-only rewrite is insufficient
 because the current Rook witness is acyclic yet reaches the fifty-move draw.
@@ -80,8 +83,12 @@ different calculations under one visible rule.
 
 After the three universal priorities, render and evaluate:
 
-1. **make mating progress** — Keep every legal Black response inside a strictly
-   lower certified policy rank.
+1. **exact mate progress** — Use exact King-and-Rook mate distance whenever no
+   Rook box exists, whenever the kings are at most two king moves apart, or when
+   the kings are three king moves apart and the Rook is within three king moves
+   of White's King. Keep only moves that reduce the exact distance, then prefer
+   the shortest remaining finish. Two rendered, geometry-based farther-tempo
+   alignments remain outside this stage.
 2. **rook waiting move** — When the king geometry requires a tempo, make a quiet
    Rook move that preserves the strongest box. The unusual 2-by-1, 3-by-1, and
    3-by-2 king geometries may remain internal edge detection; box size may not.
@@ -101,31 +108,32 @@ strongest box. Remove all `boxSize === 2` gates, the compact establishment clamp
 and the size-specific king-line waiver. Box preservation itself decides whether
 a king move may enter a Rook line; there is no separate size-dependent exception.
 
-Preserve the previously approved exact Rook choices wherever they satisfy the
-certified progress rule, including `Rb1`, `Ra7`, `Rb7`, `Kf6`, `Kf3`, `Rc1`,
-`Kd6`, `Ra6`, `Ra5`, and both `Ke2` regressions. If an approved move does
-not decrease the exact rank, the design must stop and document that mathematical
-conflict instead of silently adding a FEN override.
+Preserve previously approved Rook choices wherever they remain compatible with
+symmetry and the exhaustive proof, including `Rb1`, `Rb7`, `Kf6`, `Rc1`, `Kd6`,
+`Ra6`, `Rf2`, and both `Ke2` regressions. If an approved move is symmetry-
+equivalent to an edge in a proven loop, the newer exhaustive no-loop requirement
+supersedes it. This is why the earlier `Ra5` expectation becomes `Kg5`: its
+rotated/reflected counterpart was an edge of the same cycle. Never hide such a
+conflict behind a FEN override.
 
 ## Queen Geometry, Distances, and English
 
 Keep the existing Queen strategy but make each rendered statement exact:
 
-1. **make mating progress** — same certified policy-rank gate as Rook.
-2. **stable two-square corner cage** — Build or preserve a corner-plus-adjacent
+1. **stable two-square corner cage** — Build or preserve a corner-plus-adjacent
    edge cage from which every legal Black reply remains in those two squares.
-3. **White king toward cage support** — With that stable cage, move White's king
+2. **White king toward cage support** — With that stable cage, move White's king
    toward a mating-support square a knight's move from both the Queen and corner.
    Compare king-move distance first and row-plus-file distance second.
-4. **white pieces off edge** — Minimize White King and Queen edge occupancy.
-5. **Queen a knight move from Black** — Keep or place the Queen a knight's move
+3. **white pieces off edge** — Minimize White King and Queen edge occupancy.
+4. **Queen a knight move from Black** — Keep or place the Queen a knight's move
    from Black's king.
-6. **Queen box size** — Minimize the board-edge rectangle bounded by the Queen's
+5. **Queen box size** — Minimize the board-edge rectangle bounded by the Queen's
    rank/file on Black's side.
-7. **White king closer** — Reduce king-move distance without entering the Queen's
-   rank/file channel between Queen and Black; use row-plus-file distance as a
-   tie-break.
-8. **shorter Queen move** — Among otherwise tied Queen moves, prefer fewer squares
+6. **White king closer** — Minimize resulting king-move distance without entering
+   the Queen's rank/file channel between Queen and Black; use resulting
+   row-plus-file distance as a tie-break.
+7. **shorter Queen move** — Among otherwise tied Queen moves, prefer fewer squares
    traversed. King moves do not participate in this tiebreak.
 
 Remove the unused Queen middle-distance score. Replace numeric packing such as
@@ -137,7 +145,7 @@ Queen's displayed phase must use the same documented rank/file-channel geometry
 as its King-line rule. No user-facing description may call a projection a literal
 collinear segment.
 
-## Certified Mate-Progress Rank
+## Exact Mate Data and Whole-Policy Rank
 
 Add a deterministic generator under `scripts/mate-verifier/` for every legal KQK
 and KRK state. Its first layer performs exact retrograde minimax over side to
@@ -150,45 +158,43 @@ move:
   winning;
 - capture, stalemate, unsupported material, and other draws are not winning.
 
-The distance-to-mate table is a legality and winning-state foundation, not the
-runtime training policy. Exact fastest-mate descent conflicts with the approved
-teaching moves: `Rb1`, `Ra7`, `Kf6`, `Rc1`, `Kd6`, `Ra6`, and `Ra5` all make a
-sound pedagogical detour while increasing fastest-mate distance. Rejecting those
-moves would contradict the already approved Rook behavior.
+The distance-to-mate table is both a legality foundation and the source for the
+Rook's visible exact-progress comparisons. It is deliberately scoped. Blanket
+fastest-mate descent conflicts with approved teaching moves such as `Rb1`, `Kf6`,
+`Rc1`, `Kd6`, and `Ra6`, all of which make sound geometric detours while
+temporarily increasing fastest-mate distance.
 
-The second layer therefore derives an exact policy graph from the documented
-geometric evaluator with the progress rule omitted. White edges are its tied best
-moves; Black edges include every legal response. If that graph is acyclic and its
-longest fresh-clock line is below 100 plies, its exact longest-path distance is
-the certified policy rank. If a cycle or overlong path remains, repair it by a
-generic graph operation: remove unsafe White edges inside cyclic strongly
-connected components or over-budget branches, then admit the next-best geometric
-preference tier that stays in the exact winning set. Repeat to a fixed point. The
-generator may not contain a FEN list, named-square exception, or manual approved-
-move override.
+The Rook exact-progress scope is position-independent and rendered in full:
 
-For every Black state, policy rank is one plus the maximum rank of every legal
-reply. For every White state, it is one plus the maximum rank of the certified
-White edges. A runtime White move may pass **make mating progress** only when its
-resulting Black state has a strictly lower policy rank. Allowing an additional
-edge that also descends the rank is safe: the finite rank still falls on every
-ply. This forbids structural cycles, and a maximum root rank below 100 forbids the
-Rook fifty-move draw from a fresh training position.
+- every boxless position;
+- kings at most two king moves apart;
+- kings three king moves apart with the Rook within three king moves of White's
+  King;
+- except for two precisely rendered, symmetric farther-tempo alignments that
+  preserve an active box.
 
-Generate compact, immutable, symmetry-canonical lookup artifacts. Runtime lookup
-must be synchronous and pure. Missing or malformed entries fail closed in tests
-and verifier builds; production may leave the progress rule neutral only for a
-position outside the supported three-piece material contract. The artifacts are
-reproducible: a check command regenerates them in memory and byte-compares the
-result. Hand-editing generated data is unsupported.
+The Queen remains purely geometric. Its final policy, and the Rook's combined
+exact/geometric policy, are certified after selection. A complete graph
+diagnostic collects every selected White edge and every legal Black edge and
+reports every cyclic strongly connected component rather than stopping at the
+first witness. Once that graph is acyclic, a separate longest-path derivation
+assigns exact whole-policy ranks. For every selected after-White Black state the
+rank covers the maximum of every legal reply; for every White state it covers
+the maximum of every tied selected move. A finite rank proves no structural
+loop. A Rook maximum below 100 plies proves no fresh-clock fifty-move draw.
+
+Only the distance-to-mate artifact ships at runtime. It is compact, immutable,
+symmetry-canonical, synchronous, pure, and reproducible: the check command
+regenerates it in memory, validates every recurrence, and byte-compares the
+complete artifact. Whole-policy ranks and SCCs are recomputed by verifier scripts
+and do not become a second source of runtime move truth.
 
 ## Error Handling and Boundaries
 
 - Geometry helpers return empty cuts rather than inventing an axis.
 - Scoring never relies on sentinels to compare an applicable rule; rule
   applicability is explicit.
-- The distance and policy lookups validate material, turn, and legal square
-  occupancy.
+- The distance lookup validates material, turn, and legal square occupancy.
 - Immediate mate, piece safety, and stalemate remain ahead of progress.
 - Black response policy remains pedagogical, but proofs quantify every legal
   Black response, not only the rendered resistance choice.
@@ -205,8 +211,11 @@ Add focused unit tests for:
 - absence of production Rook box-size literals;
 - exact Queen cage, distance, channel, box-area, and move-length semantics;
 - rendered Queen/Rook priority IDs, order, labels, and full help text;
-- generated distance/policy lookup integrity and every returned White move's
-  strict policy descent.
+- generated exact-distance lookup integrity and every scoped Rook move's strict
+  exact-distance descent;
+- complete SCC collection across every selected White move and legal Black
+  response;
+- verifier-only whole-policy rank derivation.
 
 Run both symmetry-reduced and identity-key exhaustive verification. The identity
 result is the certificate. For Queen and Rook separately, verify every enumerated
