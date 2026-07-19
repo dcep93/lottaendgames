@@ -78,8 +78,10 @@ alignment penalty, and therefore must not displace the approved `Ra7` rook move.
 
 For `1k6/8/2R5/2K5/8/8/8/8 w - - 0 1`, `Kd6` reduces king distance but changes
 the rook's cut from the sixth rank to the c-file. It must retain the alignment
-penalty. `Kd5` preserves the established rank cut, is the sole ideal White move,
-and prevents the exact `Kd6 Ka7 Kc5 Kb8` cycle.
+penalty. This is also a compact 3-by-1 waiting position, so the farthest rook
+wait `Rh6` is the sole ideal White move. It prevents the exact
+`Kd6 Ka7 Kc5 Kb8` cycle, and every legal Black reply after `Rh6` must remain
+provably mating.
 
 Add a second phase-two waiting pattern for the edge geometry in which the
 starting cut is closest, its box size is 2, and the kings' file/rank deltas are
