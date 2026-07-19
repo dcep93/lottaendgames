@@ -76,11 +76,18 @@ rook's established cut with a different one.
 `Ke6` after `1.Re7 Kf8` only ties the existing king-move distance, retains the
 alignment penalty, and therefore must not displace the approved `Ra7` rook move.
 
-Limit that alignment exception to an approaching king move that finishes within
-two king moves of Black. Entering the rook's rank or file while still farther
-away is premature and must retain the alignment penalty. This keeps the approved
-`Kf3` exception, which finishes two king moves away, while rejecting more distant
-alignment moves.
+Limit that alignment exception to an approaching king move with useful box
+geometry. Waive the penalty when the move does at least one of the following:
+
+- finishes within two king moves of Black;
+- changes the active cut to a closest box that is strictly smaller than the
+  prior active box; or
+- preserves an already-closest box of size 2.
+
+Entering the rook's rank or file while still farther away without one of those
+box benefits is premature and must retain the alignment penalty. This keeps the
+approved `Kf3` exception, which finishes two king moves away, while rejecting
+the distant `Ke1` alignment that retains a size-6 box.
 
 For `1k6/8/2R5/2K5/8/8/8/8 w - - 0 1`, `Kd6` reduces king distance but changes
 the rook's cut from the sixth rank to the c-file. It must retain the alignment
@@ -122,7 +129,16 @@ is still three king moves from Black and must retain the alignment penalty.
 `Re8` changes away from the closest rank cut without earning shrink credit.
 `Ra2` retains the rank box and places the rook farthest from Black, so it must be
 the sole ideal White move. Every legal Black reply after `Ra2` must remain
-provably mating.
+structurally loop-free. The separately reported fifty-move witness remains a
+distinct bounded-mate issue until a later evaluator correction removes it.
+
+For `8/8/8/6k1/8/8/5R2/3K4 w - - 4 3`, `Ke2` brings White closer and changes
+the active cut from the size-6 rank box to the closest size-2 file box. It must
+be the sole ideal move instead of `Ke1`.
+
+For `8/8/6k1/8/8/8/5R2/4K3 w - - 6 4`, the closest file box already has size
+2. `Ke2` brings White closer while preserving that compact box and must be the
+sole ideal move instead of `Rf3`.
 
 Add a compact straight-waiting pattern when an active box exists, the rook is
 adjacent to White's king, and the kings' file/rank deltas are 3 and 1. Prefer a
@@ -209,8 +225,9 @@ sizes, and exhaustively check every legal reply after `Ra6`. Assert that the
 existing tooltip copy and visible order are unchanged. Add the exact `Ra5`
 versus `Ke4` size-3 compact-waiting regression and exhaustively check every legal
 reply after `Ra5`. Add the exact `Ra2` versus `Ke1` and `Re8` regression, preserve
-the approved `Kf3` alignment exception, and exhaustively check every legal reply
-after `Ra2`. Run Rook parity/self-play tests, the exhaustive Rook verifier, the
-full Mate suite, lint, and the production build. If another literal loop remains,
-encode one minimal exact-position witness as a replay URL with explicit moves
-for Undo/Redo.
+the approved `Kf3` alignment exception, and exhaustively check structural
+loop-freedom after `Ra2`. Add both exact `Ke2` king-proximity regressions and retain the `Ke1`
+size-6 negative. Run Rook parity/self-play tests, the exhaustive Rook verifier,
+the full Mate suite, lint, and the production build. If another literal loop
+remains, encode one minimal exact-position witness as a replay URL with explicit
+moves for Undo/Redo.
