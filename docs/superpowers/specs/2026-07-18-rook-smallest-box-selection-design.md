@@ -115,6 +115,13 @@ tempo. The waiting move may retain a larger box than an axis-changing king move
 would create because the waiting priority is deliberate in this exact geometry;
 ordinary establishment positions continue to prefer the smaller box.
 
+Because `establish box` precedes `rook waiting move`, clamp a candidate's
+establishment size to at least the current active-box size while this compact
+pattern is active. A smaller cut on another axis therefore ties the current box
+on size and loses the existing-axis tiebreak; a larger cut remains worse. This
+allows the later waiting-distance priority to select the farthest quiet rook
+move without reordering or renaming any visible evaluator priority.
+
 For `5k2/8/4R3/4K3/8/8/8/8 w - - 2 2`, `Ra6` retains the size-2 rank box while
 `Kd5` creates a larger size-3 file box. Establishment must prefer `Ra6` over
 `Kd5`, and the compact straight-waiting pattern must prefer it over `Kf5`.
