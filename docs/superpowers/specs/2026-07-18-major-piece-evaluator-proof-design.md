@@ -61,8 +61,9 @@ Box preservation compares the strongest size before and after a move:
 This classifies the important positions without a size exception:
 
 - At `8/8/8/8/8/7k/4R3/3K4 w - - 6 4`, the initial file cut is stronger than
-  the rank cut. `Ke1` loses that stronger file cut and enlarges the box; `Ra2`
-  retains a strongest cut and remains preferred.
+  the rank cut. Both `Ke1` and `Ra2` lose that stronger file cut and enlarge the
+  box. `Rf2` retains the file cut and shrinks it from three files to two, so it
+  is the sole preferred move.
 - At `8/8/8/6k1/8/8/5R2/3K4 w - - 4 3`, `Ke2` retains the strongest file cut
   while improving king proximity and is the sole preferred move.
 - At `8/8/6k1/8/8/8/5R2/4K3 w - - 6 4`, `Ke2` again retains the strongest file
@@ -101,7 +102,7 @@ a king move may enter a Rook line; there is no separate size-dependent exception
 
 Preserve the previously approved exact Rook choices wherever they satisfy the
 certified progress rule, including `Rb1`, `Ra7`, `Rb7`, `Kf6`, `Kf3`, `Rc1`,
-`Kd6`, `Ra6`, `Ra5`, `Ra2`, and both `Ke2` regressions. If an approved move does
+`Kd6`, `Ra6`, `Ra5`, and both `Ke2` regressions. If an approved move does
 not decrease the exact rank, the design must stop and document that mathematical
 conflict instead of silently adding a FEN override.
 
@@ -180,7 +181,8 @@ Add focused unit tests for:
 
 - dual-axis cut enumeration, strongest-cut selection, symmetry, preservation,
   shrink, enlargement, and loss;
-- the bad `Ke1`, both correct `Ke2` moves, and every prior approved Rook regression;
+- the bad `Ke1` and `Ra2`, the correct `Rf2`, both correct `Ke2` moves, and every
+  prior approved Rook regression;
 - absence of production Rook box-size literals;
 - exact Queen cage, distance, channel, box-area, and move-length semantics;
 - rendered Queen/Rook priority IDs, order, labels, and full help text;
@@ -196,4 +198,3 @@ results:
 - no Queen or Rook rule gap or terminal failure;
 - Rook maximum forced line below 100 plies from a fresh clock;
 - generated artifact check, full Mate tests, lint, and production build all pass.
-
