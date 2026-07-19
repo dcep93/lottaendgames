@@ -19,8 +19,9 @@ because the rendered rule will state it explicitly.
 Use two layers:
 
 1. A clean geometric evaluator supplies the human training priorities.
-2. A generated exact three-piece mate-progress rank restricts White to moves that
-   provably advance mate. Human priorities break ties only inside that safe set.
+2. A generated exact three-piece policy rank restricts White to moves that
+   provably advance the documented training policy. Human priorities break ties
+   only inside that safe set.
 
 Position-specific patches are forbidden. A heuristic-only rewrite is insufficient
 because the current Rook witness is acyclic yet reaches the fifty-move draw.
@@ -80,7 +81,7 @@ different calculations under one visible rule.
 After the three universal priorities, render and evaluate:
 
 1. **make mating progress** — Keep every legal Black response inside a strictly
-   lower certified forced-mate rank.
+   lower certified policy rank.
 2. **rook waiting move** — When the king geometry requires a tempo, make a quiet
    Rook move that preserves the strongest box. The unusual 2-by-1, 3-by-1, and
    3-by-2 king geometries may remain internal edge detection; box size may not.
@@ -110,7 +111,7 @@ conflict instead of silently adding a FEN override.
 
 Keep the existing Queen strategy but make each rendered statement exact:
 
-1. **make mating progress** — same certified-rank gate as Rook.
+1. **make mating progress** — same certified policy-rank gate as Rook.
 2. **stable two-square corner cage** — Build or preserve a corner-plus-adjacent
    edge cage from which every legal Black reply remains in those two squares.
 3. **White king toward cage support** — With that stable cage, move White's king
@@ -138,38 +139,56 @@ collinear segment.
 
 ## Certified Mate-Progress Rank
 
-Add a deterministic generator under `scripts/mate-verifier/` for legal KQK and
-KRK states. It performs exact retrograde minimax over side to move:
+Add a deterministic generator under `scripts/mate-verifier/` for every legal KQK
+and KRK state. Its first layer performs exact retrograde minimax over side to
+move:
 
-- checkmate has rank 0;
+- checkmate has distance-to-mate rank 0;
 - a White state is winning when at least one legal White move leads to a winning
   Black state;
 - a Black state is winning for White only when every legal Black reply remains
   winning;
-- ranks count worst-case plies to checkmate;
 - capture, stalemate, unsupported material, and other draws are not winning.
 
-Generate a compact, immutable, symmetry-canonical lookup artifact. Runtime lookup
+The distance-to-mate table is a legality and winning-state foundation, not the
+runtime training policy. Exact fastest-mate descent conflicts with the approved
+teaching moves: `Rb1`, `Ra7`, `Kf6`, `Rc1`, `Kd6`, `Ra6`, and `Ra5` all make a
+sound pedagogical detour while increasing fastest-mate distance. Rejecting those
+moves would contradict the already approved Rook behavior.
+
+The second layer therefore derives an exact policy graph from the documented
+geometric evaluator with the progress rule omitted. White edges are its tied best
+moves; Black edges include every legal response. If that graph is acyclic and its
+longest fresh-clock line is below 100 plies, its exact longest-path distance is
+the certified policy rank. If a cycle or overlong path remains, repair it by a
+generic graph operation: remove unsafe White edges inside cyclic strongly
+connected components or over-budget branches, then admit the next-best geometric
+preference tier that stays in the exact winning set. Repeat to a fixed point. The
+generator may not contain a FEN list, named-square exception, or manual approved-
+move override.
+
+For every Black state, policy rank is one plus the maximum rank of every legal
+reply. For every White state, it is one plus the maximum rank of the certified
+White edges. A runtime White move may pass **make mating progress** only when its
+resulting Black state has a strictly lower policy rank. Allowing an additional
+edge that also descends the rank is safe: the finite rank still falls on every
+ply. This forbids structural cycles, and a maximum root rank below 100 forbids the
+Rook fifty-move draw from a fresh training position.
+
+Generate compact, immutable, symmetry-canonical lookup artifacts. Runtime lookup
 must be synchronous and pure. Missing or malformed entries fail closed in tests
 and verifier builds; production may leave the progress rule neutral only for a
-position outside the supported three-piece material contract.
-
-For a nonterminal White move to pass **make mating progress**, the resulting
-Black-to-move rank must be strictly lower than the starting White-to-move rank.
-Because every legal Black reply is included in a Black rank, all returned tied
-White moves descend a finite ranking function. This forbids structural cycles.
-The exhaustive root rank and every selected branch must remain below 100 plies,
-which forbids the Rook fifty-move draw from a fresh training position.
-
-The generated artifact is reproducible: a check command regenerates it in memory
-and byte-compares the result. Hand-editing the artifact is unsupported.
+position outside the supported three-piece material contract. The artifacts are
+reproducible: a check command regenerates them in memory and byte-compares the
+result. Hand-editing generated data is unsupported.
 
 ## Error Handling and Boundaries
 
 - Geometry helpers return empty cuts rather than inventing an axis.
 - Scoring never relies on sentinels to compare an applicable rule; rule
   applicability is explicit.
-- The progress lookup validates material, turn, and legal square occupancy.
+- The distance and policy lookups validate material, turn, and legal square
+  occupancy.
 - Immediate mate, piece safety, and stalemate remain ahead of progress.
 - Black response policy remains pedagogical, but proofs quantify every legal
   Black response, not only the rendered resistance choice.
@@ -186,7 +205,8 @@ Add focused unit tests for:
 - absence of production Rook box-size literals;
 - exact Queen cage, distance, channel, box-area, and move-length semantics;
 - rendered Queen/Rook priority IDs, order, labels, and full help text;
-- generated rank lookup integrity and every returned White move's strict descent.
+- generated distance/policy lookup integrity and every returned White move's
+  strict policy descent.
 
 Run both symmetry-reduced and identity-key exhaustive verification. The identity
 result is the certificate. For Queen and Rook separately, verify every enumerated
