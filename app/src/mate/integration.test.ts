@@ -32,16 +32,21 @@ test('App navigation pushes Mate routes and restores them from browser history',
   )
 })
 
-test('Mate production code has no progress storage or excluded chess420 runtime', () => {
+test('Mate production code confines storage to the timer preference', () => {
   const productionFiles = collectProductionSources(mateRoot)
   const excludedRuntime =
-    /\b(?:localStorage|sessionStorage|indexedDB|bootstrap|novelty|speedrun|traps|traverse)\b|loop finder/i
+    /\b(?:sessionStorage|indexedDB|bootstrap|novelty|speedrun|traps|traverse)\b|loop finder/i
+  const localStorageRuntime = /\blocalStorage\b/
   const networkRuntime = /\b(?:fetch|WebSocket|EventSource)\s*\(/
+  const timerPreferenceFile = join(mateRoot, 'timerPreference.ts')
 
   for (const file of productionFiles) {
     const source = readFileSync(file, 'utf8')
     assert.doesNotMatch(source, excludedRuntime, file)
     assert.doesNotMatch(source, networkRuntime, file)
+    if (file !== timerPreferenceFile) {
+      assert.doesNotMatch(source, localStorageRuntime, file)
+    }
   }
 })
 

@@ -20,12 +20,15 @@ import MateLog, {
   MatePriorityGuideDialog,
 } from './MateLog'
 import MateSidebar from './MateSidebar'
+import { MATE_SHARE_NOTIFICATION_MS } from './MateWorkspace'
 import Mate from './index'
 import {
   getMateRuleSet,
   knightAndBishopWhiteRules,
 } from './rules'
-import type { MateLogEntry } from './session'
+import type { MateLogEntry, MateTerminalOutcome } from './session'
+import { encodeMateFen } from './share'
+import { MATE_TIMER_PREFERENCE_KEY } from './timerPreference'
 
 const ROOK_START = '7k/8/8/8/8/8/R7/K7 w - - 0 1'
 const ROOK_AFTER_WHITE = 'R6k/8/8/8/8/8/8/K7 b - - 1 1'
@@ -35,6 +38,13 @@ const MULTI_WHITE_START = '7R/2K3k1/8/8/8/8/8/8 w - - 0 1'
 const MULTI_BLACK_START = '8/8/8/8/2k5/8/2K5/2R5 w - - 0 1'
 const ROOK_MATE_START = '7k/8/6K1/8/8/8/8/R7 w - - 0 1'
 const QUEEN_START = '8/8/8/8/4k3/8/8/3QK3 w - - 0 1'
+
+const MATE_TRAINING_INFO_PROPS = {
+  copyStartingUrlStatus: '',
+  mateMode: 'standard' as const,
+  onCopyStartingUrl: () => undefined,
+  startingFen: ROOK_START,
+}
 
 const ROOK_LOGS: readonly MateLogEntry[] = [
   {
@@ -138,6 +148,23 @@ test('accessible piece names follow their controlled squares', () => {
   assert.match(markup, /Black king on g7/)
   assert.doesNotMatch(markup, /White rook on a2|Black king on h8/)
   assert.equal((markup.match(/<svg\b/g) ?? []).length, 4)
+})
+
+test('Mate board replaces its terminal phase badge without changing phase data', () => {
+  const markup = renderToStaticMarkup(
+    <MateBoard
+      complete
+      disabled
+      fen={ROOK_AFTER_WHITE}
+      lastMove={['a2', 'a8']}
+      onMove={() => undefined}
+      phase="2/2"
+    />,
+  )
+
+  assert.match(markup, /class="leg-mate-board-phase"[^>]*>Complete</)
+  assert.doesNotMatch(markup, />Phase 2\/2</)
+  assert.match(markup, /data-phase="2\/2"/)
 })
 
 test('click and drag render White optimistically, then animate only the reply', async () => {
@@ -453,6 +480,23 @@ test('Mate controls expose preserved actions and their disabled states', () => {
   assert.match(markup, /aria-label="Elapsed time"[^>]*>01:23\.45</)
   assert.match(markup, /role="status"[^>]*>Checkmate</)
   assert.match(markup, /aria-live="polite"[^>]*>Copied</)
+  assert.match(
+    markup,
+    /class="leg-mate-controls-actions"[\s\S]*class="leg-mate-controls-summary"/,
+  )
+  const summaryOrder = [
+    markup.indexOf('>Checkmate</span>'),
+    markup.indexOf('>Share</button>'),
+    markup.indexOf('>Hide timer</button>'),
+    markup.indexOf('aria-label="Elapsed time"'),
+  ]
+  assert.ok(summaryOrder.every((index) => index >= 0))
+  assert.deepEqual(summaryOrder, [...summaryOrder].sort((left, right) => left - right))
+  const summaryEnd = markup.indexOf(
+    '</div>',
+    markup.indexOf('class="leg-mate-controls-summary"'),
+  )
+  assert.ok(markup.indexOf('aria-label="Share status"') > summaryEnd)
 })
 
 test('active controls hide timer and withhold terminal-only sharing', () => {
@@ -491,12 +535,46 @@ test('active controls hide timer and withhold terminal-only sharing', () => {
   )
 })
 
+test('Mate controls use concise terminal outcome labels', () => {
+  const outcomes: ReadonlyArray<readonly [MateTerminalOutcome, string]> = [
+    ['checkmate', 'Checkmate'],
+    ['stalemate', 'Stalemate'],
+    ['lost-material', 'Defeated'],
+    ['lost-knight', 'Defeated'],
+    ['pawn-promoted', 'Defeated'],
+    ['fifty-move', 'Draw'],
+    ['unsupported', 'Defeated'],
+  ]
+
+  for (const [outcome, label] of outcomes) {
+    const markup = renderToStaticMarkup(
+      <MateControls
+        canPlayBest={false}
+        canRedo={false}
+        canUndo={false}
+        onPlayBest={() => undefined}
+        onRedo={() => undefined}
+        onShare={() => undefined}
+        onStartOver={() => undefined}
+        onToggleTimer={() => undefined}
+        onUndo={() => undefined}
+        outcome={outcome}
+        showTimer={false}
+        startedAtMs={0}
+      />,
+    )
+
+    assert.match(markup, new RegExp(`role="status"[^>]*>${label}<`))
+  }
+})
+
 test('Mate log exposes every training field and semantic cycle controls', () => {
   const idealWhiteIndexes: number[] = []
   const idealBlackIndexes: number[] = []
   const legalBlackIndexes: number[] = []
   const markup = renderToStaticMarkup(
     <MateLog
+      {...MATE_TRAINING_INFO_PROPS}
       fen={ROOK_START}
       logs={ROOK_LOGS}
       onCycleIdealBlack={(index) => idealBlackIndexes.push(index)}
@@ -506,25 +584,64 @@ test('Mate log exposes every training field and semantic cycle controls', () => 
     />,
   )
 
+  let headerCursor = -1
   for (const header of [
     '#',
     'Phase',
-    'White move',
-    'Black move',
-    'Ideal Black replies',
-    'Legal Black replies',
+    'White',
+    'Black',
     'Correctness',
+    'Black replies',
     'Duration',
     'Reason',
   ]) {
-    assert.ok(markup.includes(`>${header}<`) || markup.includes(`>${header}`), header)
+    const next = markup.indexOf(`>${header}`, headerCursor + 1)
+    assert.ok(next > headerCursor, `Header out of order: ${header}`)
+    headerCursor = next
   }
   assert.match(markup, />Rg2</)
   assert.match(markup, />Kg7</)
-  assert.match(markup, />Correct</)
-  assert.match(markup, />Incorrect</)
-  assert.match(markup, /2 correct choices/)
-  assert.match(markup, /1 correct choice/)
+  assert.equal((markup.match(/<th scope="col"/g) ?? []).length, 8)
+  assert.equal(
+    (markup.match(/<col class="leg-mate-log-number-column"/g) ?? []).length,
+    1,
+  )
+  assert.equal(
+    (markup.match(/<col class="leg-mate-log-intrinsic-column"/g) ?? [])
+      .length,
+    6,
+  )
+  assert.equal(
+    (markup.match(/<col class="leg-mate-log-flexible-column"/g) ?? [])
+      .length,
+    1,
+  )
+  assert.match(
+    markup,
+    /<col class="leg-mate-log-number-column"\/>(?:<col class="leg-mate-log-intrinsic-column"\/>){6}<col class="leg-mate-log-flexible-column"\/>/,
+  )
+  assert.doesNotMatch(
+    markup,
+    />White move<|>Black move<|>Ideal Black replies<|>Legal Black replies</,
+  )
+  assert.match(
+    markup,
+    /class="leg-mate-log-replies"[\s\S]*?>2<\/button><span aria-hidden="true">\/<\/span>[\s\S]*?>3<\/button><\/td>/,
+  )
+  assert.ok(
+    markup.indexOf('class="leg-mate-log-correctness"') <
+      markup.indexOf('class="leg-mate-log-replies"'),
+    'Correctness cell should precede Black replies',
+  )
+  assert.match(
+    markup,
+    /aria-label="Correct"[^>]*role="img"[^>]*>👍<\/span><button[^>]*aria-label="Cycle ideal White move for move 1; 2 correct choices"[^>]*>\/2<\/button>/,
+  )
+  assert.match(
+    markup,
+    /aria-label="Incorrect"[^>]*role="img"[^>]*>👎<\/span><button[^>]*aria-label="Cycle ideal White move for move 2; 1 correct choice"[^>]*>\/1<\/button>/,
+  )
+  assert.doesNotMatch(markup, />Correct<|>Incorrect<|>\d+ correct choices?<\/button>/)
   assert.match(markup, />0:01\.234</)
   assert.match(markup, />1:01\.007</)
   assert.match(markup, />White king closer</)
@@ -574,6 +691,7 @@ test('Mate log cycle controls report their historical log index', async () => {
   await act(async () => {
     renderer = TestRenderer.create(
       <MateLog
+        {...MATE_TRAINING_INFO_PROPS}
         fen={ROOK_START}
         logs={ROOK_LOGS}
         onCycleIdealBlack={(index) => calls.push(`ideal-black-${index}`)}
@@ -613,6 +731,7 @@ test('cycling a log entry preserves its row, control instance, and focus', async
     const [logs, setLogs] = React.useState(ROOK_LOGS)
     return (
       <MateLog
+        {...MATE_TRAINING_INFO_PROPS}
         fen={ROOK_START}
         logs={logs}
         onCycleIdealBlack={() => undefined}
@@ -637,7 +756,7 @@ test('cycling a log entry preserves its row, control instance, and focus', async
   })
   const label = 'Cycle ideal White move for move 1; 2 correct choices'
   const focusedButton = renderer.root.findByProps({ 'aria-label': label })
-  const focusedRow = focusedButton.parent?.parent
+  const focusedRow = focusedButton.parent?.parent?.parent
   assert.equal(focusedRow?.type, 'tr')
   // A browser keeps focus when React reuses the same host button. Model that
   // active element here and prove both the button and keyed row are retained.
@@ -646,7 +765,7 @@ test('cycling a log entry preserves its row, control instance, and focus', async
   await act(async () => focusedButton.props.onClick())
 
   const updatedButton = renderer.root.findByProps({ 'aria-label': label })
-  const updatedRow = updatedButton.parent?.parent
+  const updatedRow = updatedButton.parent?.parent?.parent
   assert.equal(updatedRow?.type, 'tr')
   assert.ok(
     updatedButton === focusedButton,
@@ -674,6 +793,7 @@ test('reason hint is opt-in and reveals only the current rule label', async () =
   await act(async () => {
     renderer = TestRenderer.create(
       <MateLog
+        {...MATE_TRAINING_INFO_PROPS}
         fen={ROOK_START}
         logs={[]}
         onCycleIdealBlack={() => undefined}
@@ -703,9 +823,102 @@ test('reason hint is opt-in and reveals only the current rule label', async () =
     'data-mate-current-hint': true,
   })
   const hintText = reactNodeText(hint)
-  assert.equal(hintText, 'White king closer')
+  assert.equal(hintText, 'establish box')
   assert.doesNotMatch(hintText, /Rg2|a2|g2|bring White's king/i)
   assert.equal(hint.props.type, 'button')
+
+  await act(async () => renderer.unmount())
+})
+
+test('clicking a reason highlights its guide priority until a generic reopen', async () => {
+  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
+    .IS_REACT_ACT_ENVIRONMENT = true
+  let renderer!: ReactTestRenderer
+  await act(async () => {
+    renderer = TestRenderer.create(
+      <MateLog
+        {...MATE_TRAINING_INFO_PROPS}
+        fen={ROOK_START}
+        logs={ROOK_LOGS}
+        onCycleIdealBlack={() => undefined}
+        onCycleIdealWhite={() => undefined}
+        onCycleLegalBlack={() => undefined}
+        ruleSet={getMateRuleSet('rook')}
+      />,
+    )
+  })
+
+  await act(async () => {
+    renderer.root
+      .findByProps({
+        'aria-label': 'establish box. Open priority guide',
+      })
+      .props.onClick({ currentTarget: null })
+  })
+  const highlighted = renderer.root.findAllByProps({
+    'aria-current': 'true',
+  })
+  assert.equal(highlighted.length, 1)
+  assert.match(reactNodeText(highlighted[0]), /^establish box/)
+
+  await act(async () => {
+    renderer.root
+      .findByProps({ 'aria-label': 'Close priority guide' })
+      .props.onClick()
+    renderer.root
+      .findByProps({
+        'aria-label': 'Open training info and priority guide',
+      })
+      .props.onClick({ currentTarget: null })
+  })
+  assert.equal(
+    renderer.root.findAllByProps({ 'aria-current': 'true' }).length,
+    0,
+  )
+
+  await act(async () => renderer.unmount())
+})
+
+test('pointer-opened guides release the opener while keyboard-opened guides restore it', async () => {
+  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
+    .IS_REACT_ACT_ENVIRONMENT = true
+  let renderer!: ReactTestRenderer
+  await act(async () => {
+    renderer = TestRenderer.create(
+      <MateLog
+        {...MATE_TRAINING_INFO_PROPS}
+        fen={ROOK_START}
+        logs={[]}
+        onCycleIdealBlack={() => undefined}
+        onCycleIdealWhite={() => undefined}
+        onCycleLegalBlack={() => undefined}
+        ruleSet={getMateRuleSet('rook')}
+      />,
+    )
+  })
+  const opener = { focus: () => undefined }
+  const openButton = renderer.root.findByProps({
+    'aria-label': 'Open training info and priority guide',
+  })
+
+  await act(async () => {
+    openButton.props.onClick({ currentTarget: opener, detail: 1 })
+  })
+  assert.equal(
+    renderer.root.findByType(MatePriorityGuideDialog).props.returnFocusTo,
+    null,
+  )
+  await act(async () => {
+    renderer.root.findByType(MatePriorityGuideDialog).props.onClose()
+  })
+
+  await act(async () => {
+    openButton.props.onClick({ currentTarget: opener, detail: 0 })
+  })
+  assert.equal(
+    renderer.root.findByType(MatePriorityGuideDialog).props.returnFocusTo,
+    opener,
+  )
 
   await act(async () => renderer.unmount())
 })
@@ -743,6 +956,7 @@ test('current hint scoring is lazy and memoized by its exact inputs', async () =
     return (
       <>
         <MateLog
+          {...MATE_TRAINING_INFO_PROPS}
           fen={fen}
           logs={[]}
           onCycleIdealBlack={() => undefined}
@@ -805,15 +1019,22 @@ test('current hint scoring is lazy and memoized by its exact inputs', async () =
 
 test('priority guide follows registered facade order and renders typed diagrams', () => {
   const ruleSet = getMateRuleSet('bishop-knight')
-  const expectedWhiteIds = knightAndBishopWhiteRules
+  const evaluatorWhiteIds = knightAndBishopWhiteRules
     .map(({ id }) => id)
     .filter((id, index, ids) => ids.indexOf(id) === index)
+  const expectedWhiteIds = [
+    evaluatorWhiteIds[0],
+    evaluatorWhiteIds[2],
+    evaluatorWhiteIds[1],
+    ...evaluatorWhiteIds.slice(3),
+  ]
   assert.deepEqual(
     ruleSet.whiteRuleDescriptions.map(({ id }) => id),
     expectedWhiteIds,
   )
   const markup = renderToStaticMarkup(
     <MatePriorityGuideDialog
+      {...MATE_TRAINING_INFO_PROPS}
       onClose={() => undefined}
       ruleSet={ruleSet}
     />,
@@ -825,8 +1046,52 @@ test('priority guide follows registered facade order and renders typed diagrams'
 
   assert.match(markup, /role="dialog"/)
   assert.match(markup, /aria-modal="true"/)
+  assert.match(markup, />Bishop and Knight: checkmate</)
+  assert.doesNotMatch(markup, />How best moves are chosen</)
+  assert.match(markup, /class="leg-mate-guide-priorities"/)
+  assert.doesNotMatch(markup, />Universal priorities</)
+  assert.doesNotMatch(markup, /first three priorities stay consistent/)
+  assert.doesNotMatch(markup, />Technique priorities</)
+  assert.doesNotMatch(markup, />How training works</)
+  assert.doesNotMatch(markup, /Current mode:/)
+  assert.doesNotMatch(markup, /new legal starting position/)
+  assert.doesNotMatch(markup, /curated position/)
+  assert.doesNotMatch(markup, /Move White; Black replies automatically/)
+  assert.doesNotMatch(markup, /Play Best makes one recommended White move/)
+  assert.doesNotMatch(markup, /Reason hints and this priority guide explain/)
+  assert.match(markup, />Keyboard shortcuts</)
+  assert.match(markup, /<kbd>Enter<\/kbd>[\s\S]*Start over/)
+  assert.match(markup, /<kbd>←<\/kbd>[\s\S]*Undo/)
+  assert.match(markup, /<kbd>↑<\/kbd>[\s\S]*Play best move/)
+  assert.match(markup, /<kbd>→<\/kbd>[\s\S]*Redo/)
+  let shortcutCursor = -1
+  for (const key of ['Enter', '←', '↑', '→']) {
+    const next = markup.indexOf(`<kbd>${key}</kbd>`, shortcutCursor + 1)
+    assert.ok(next > shortcutCursor, `Shortcut out of order: ${key}`)
+    shortcutCursor = next
+  }
+  assert.match(markup, />Starting position</)
+  assert.match(markup, new RegExp(ROOK_START.replaceAll('/', '\\/')))
+  assert.match(markup, />Copy game URL</)
+  assert.match(markup, /aria-label="Game URL copy status"/)
   assert.match(markup, />White best moves</)
   assert.match(markup, />Black resistance</)
+  assert.match(markup, /class="leg-mate-guide-supporting"/)
+  const sectionOrder = [
+    '>White best moves<',
+    '>Black resistance<',
+    '>Keyboard shortcuts<',
+    '>Starting position<',
+  ]
+  let sectionCursor = -1
+  for (const heading of sectionOrder) {
+    const next = markup.indexOf(heading, sectionCursor + 1)
+    assert.ok(next > sectionCursor, `Guide section out of order: ${heading}`)
+    sectionCursor = next
+  }
+  const prioritiesAt = markup.indexOf('leg-mate-guide-priorities')
+  assert.ok(prioritiesAt < markup.indexOf('>Keyboard shortcuts<'))
+  assert.ok(prioritiesAt < markup.indexOf('>Starting position<'))
 
   let cursor = -1
   for (const id of expectedWhiteIds) {
@@ -855,6 +1120,28 @@ test('priority guide follows registered facade order and renders typed diagrams'
   assert.match(markup, /data-highlight-kind="key"/)
   assert.match(markup, /data-arrow="e5-f6"/)
   assert.doesNotMatch(markup, /<img\b|https?:\/\//)
+})
+
+test('every Mate rule set exposes the same concise universal priorities', () => {
+  for (const mateId of [
+    'queen',
+    'rook',
+    'two-bishops',
+    'bishop-knight',
+    'two-knights-pawn',
+  ] as const) {
+    assert.deepEqual(
+      getMateRuleSet(mateId).whiteRuleDescriptions
+        .slice(0, 3)
+        .map(({ shortLabel, helpText }) => ({ shortLabel, helpText })),
+      [
+        { shortLabel: 'mate', helpText: '' },
+        { shortLabel: 'pieces safe', helpText: '' },
+        { shortLabel: 'no stalemate', helpText: '' },
+      ],
+      mateId,
+    )
+  }
 })
 
 test('priority guide traps Tab, closes with Escape, and restores focus', async () => {
@@ -970,6 +1257,7 @@ test('priority guide traps Tab, closes with Escape, and restores focus', async (
     await act(async () => {
       renderer = TestRenderer.create(
         <MateLog
+          {...MATE_TRAINING_INFO_PROPS}
           fen={ROOK_START}
           logs={ROOK_LOGS}
           onCycleIdealBlack={() => undefined}
@@ -992,9 +1280,9 @@ test('priority guide traps Tab, closes with Escape, and restores focus', async (
     const mountedRenderer = renderer as ReactTestRenderer
 
     const openButton = mountedRenderer.root.findByProps({
-      'aria-label': 'Open Mate priority guide',
+      'aria-label': 'Open training info and priority guide',
     })
-    const openerNode = makeNode('Open Mate priority guide')
+    const openerNode = makeNode('Open training info and priority guide')
     await act(async () => {
       openButton.props.onClick({ currentTarget: openerNode })
     })
@@ -1049,7 +1337,9 @@ test('priority guide traps Tab, closes with Escape, and restores focus', async (
 
     await act(async () => {
       mountedRenderer.root
-        .findByProps({ 'aria-label': 'Open Mate priority guide' })
+        .findByProps({
+          'aria-label': 'Open training info and priority guide',
+        })
         .props.onClick({ currentTarget: openerNode })
     })
     assert.equal(
@@ -1091,7 +1381,7 @@ function currentOptions(renderer: ReactTestRenderer): ChessboardOptions {
   return (probe.props as BoardRendererProps).options ?? {}
 }
 
-test('Mate sidebar exposes native set and mode links with route state', () => {
+test('Mate selector exposes material icons and horizontal mode links', () => {
   const markup = renderToStaticMarkup(
     <MateSidebar
       mateId="rook"
@@ -1106,15 +1396,24 @@ test('Mate sidebar exposes native set and mode links with route state', () => {
     ['Two Bishops', '/mate/two-bishops'],
     ['Bishop and Knight', '/mate/bishop-knight'],
     ['Two Knights vs Pawn', '/mate/two-knights-pawn'],
-    ['Standard', '/mate/rook'],
-    ['Train', '/mate/rook/train'],
   ]) {
     assert.match(
       markup,
-      new RegExp(`href="${href}"[^>]*>${label}</a>`),
+      new RegExp(
+        `<a[^>]*aria-label="${label}"[^>]*href="${href}"[^>]*title="${label}"`,
+      ),
       label,
     )
+    assert.doesNotMatch(markup, new RegExp(`>${label}</a>`))
   }
+  for (const [label, href] of [
+    ['Standard', '/mate/rook'],
+    ['Training Wheels', '/mate/rook/train'],
+  ]) {
+    assert.match(markup, new RegExp(`href="${href}"[^>]*>${label}</a>`))
+  }
+  assert.equal((markup.match(/<svg\b/g) ?? []).length, 9)
+  assert.doesNotMatch(markup, /leg-mate-sidebar-label|<select\b/)
   assert.match(
     markup,
     /aria-current="location"[^>]*href="\/mate\/rook"/,
@@ -1231,9 +1530,35 @@ test('Mate composes a selected reducer-backed training workspace', () => {
   assert.match(markup, /aria-label="Mate board, White orientation"/)
   assert.match(markup, /aria-label="Mate controls"/)
   assert.match(markup, /aria-label="Mate move log"/)
-  assert.match(markup, /Starting FEN/)
-  assert.match(markup, new RegExp(ROOK_START.replaceAll('/', '\\/')))
+  assert.match(
+    markup,
+    /aria-label="Open training info and priority guide"[^>]*>Training info<\/button>/,
+  )
+  assert.match(markup, /Show reason hints[\s\S]*Training info/)
+  assert.doesNotMatch(markup, /How training works|Position details|Copy FEN/)
+  assert.doesNotMatch(markup, /<details\b/)
   assert.doesNotMatch(markup, /Coming soon/)
+})
+
+test('Mate guide omits mode explanations and the evaluator subtitle', () => {
+  const markup = renderToStaticMarkup(
+    <MatePriorityGuideDialog
+      {...MATE_TRAINING_INFO_PROPS}
+      mateMode="train"
+      onClose={() => undefined}
+      ruleSet={getMateRuleSet('rook')}
+    />,
+  )
+
+  assert.match(markup, />Rook: checkmate</)
+  assert.doesNotMatch(markup, /How best moves are chosen/)
+  assert.doesNotMatch(
+    markup,
+    /White's best moves are the moves that survive these priorities in order/,
+  )
+  assert.doesNotMatch(markup, /How training works/)
+  assert.doesNotMatch(markup, /Current mode:/)
+  assert.doesNotMatch(markup, /new legal starting position|curated position/)
 })
 
 test('Mate exposes stable desktop and narrow-layout structure', () => {
@@ -1254,22 +1579,39 @@ test('Mate exposes stable desktop and narrow-layout structure', () => {
     'leg-mate-page',
     'leg-mate-layout',
     'leg-mate-sidebar',
-    'leg-mate-collapsed-selector',
     'leg-mate-workspace',
     'leg-mate-board-card',
     'leg-mate-controls',
+    'leg-mate-log-column',
     'leg-mate-log-scroll',
   ]) {
     assert.match(markup, new RegExp(`class="[^"]*${className}`), className)
   }
   assert.match(
     markup,
-    /class="leg-mate-sidebar-label"[^>]*>Mate training</,
+    /<nav aria-label="Modules"><\/nav><h1 class="leg-mate-visually-hidden">Mate<\/h1><aside aria-label="Mate training"/,
   )
   assert.match(
     markup,
-    /aria-label="Mate training: choose mating set and mode"/,
+    /<\/aside><div class="leg-mate-layout"><section[^>]*class="leg-mate-workspace"/,
   )
+  assert.doesNotMatch(
+    markup,
+    /leg-reader-header|leg-mate-header|leg-mate-workspace-header/,
+  )
+  assert.match(
+    markup,
+    /class="leg-mate-board-column"><div class="leg-mate-board-card"/,
+  )
+  assert.doesNotMatch(
+    markup,
+    /leg-mate-information|leg-mate-training-guide|leg-mate-position-details/,
+  )
+  assert.match(
+    markup,
+    /class="leg-mate-log-column"><div aria-busy="false" aria-label="Mate controls"[\s\S]*?<section aria-label="Mate move log"/,
+  )
+  assert.doesNotMatch(markup, /leg-mate-sidebar-label|<select\b/)
   assert.match(
     markup,
     /aria-label="Mate move log table"[^>]*class="leg-mate-log-scroll"[^>]*role="region"[^>]*tabindex="0"/,
@@ -1277,18 +1619,102 @@ test('Mate exposes stable desktop and narrow-layout structure', () => {
   assert.match(markup, /<table[^>]*aria-label="Mate move log"/)
 
   const css = readFileSync(new URL('./styles.css', import.meta.url), 'utf8')
-  assert.match(css, /\.leg-mate-layout\s*\{[^}]*grid-template-columns:/s)
-  assert.match(css, /\.leg-mate-sidebar\s*\{[^}]*position:\s*sticky/s)
-  assert.match(css, /\.leg-mate-collapsed-selector\s*\{[^}]*display:\s*none/s)
-  assert.match(css, /\.leg-mate-log-scroll\s*\{[^}]*overflow-x:\s*auto/s)
-  assert.match(css, /@media\s*\(max-width:\s*48rem\)/)
+  assert.doesNotMatch(css, /\.leg-mate-masthead|\.leg-mate-workspace-header/)
   assert.match(
     css,
-    /@media\s*\(max-width:\s*48rem\)[\s\S]*\.leg-mate-sidebar\s*\{[^}]*display:\s*none[\s\S]*\.leg-mate-collapsed-selector\s*\{[^}]*display:\s*grid/,
+    /\.leg-mate-workspace\s*\{[^}]*grid-template-columns:\s*minmax\(16rem, 25\.6rem\) minmax\(0, 1fr\)/s,
   )
   assert.match(
     css,
-    /@media\s*\(max-width:\s*32rem\)[\s\S]*\.leg-mate-controls-actions[^}]*flex-wrap:\s*wrap/,
+    /\.leg-mate-board-shell\s*\{[^}]*max-width:\s*25\.6rem/s,
+  )
+  assert.match(
+    css,
+    /\.leg-mate-layout\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\)/s,
+  )
+  assert.doesNotMatch(css, /\.leg-mate-sidebar\s*\{[^}]*position:\s*sticky/s)
+  assert.match(
+    css,
+    /\.leg-mate-mode-links\s*\{[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/s,
+  )
+  assert.match(
+    css,
+    /\.leg-mate-controls\s*\{[^}]*display:\s*flex;[^}]*flex-wrap:\s*wrap/s,
+  )
+  assert.match(
+    css,
+    /\.leg-mate-controls-summary\s*\{[^}]*margin-left:\s*auto;[^}]*justify-content:\s*flex-end/s,
+  )
+  assert.doesNotMatch(
+    css,
+    /\.leg-mate-controls-summary\s*\{[^}]*(?:border-top|padding-top)/s,
+  )
+  assert.match(
+    css,
+    /\.leg-mate-share-status,\s*\.leg-mate-guide-copy-status\s*\{[^}]*position:\s*fixed;[^}]*right:\s*1rem;[^}]*bottom:\s*1rem/s,
+  )
+  assert.match(
+    css,
+    /\.leg-mate-share-status:empty,\s*\.leg-mate-guide-copy-status:empty\s*\{[^}]*display:\s*none/s,
+  )
+  assert.doesNotMatch(
+    css,
+    /\.leg-mate-information|\.leg-mate-training-guide|\.leg-mate-position-details/,
+  )
+  assert.match(css, /\.leg-mate-log-scroll\s*\{[^}]*overflow-x:\s*auto/s)
+  assert.match(
+    css,
+    /\.leg-mate-log-table\s*\{[^}]*min-width:\s*44rem/s,
+  )
+  assert.match(
+    css,
+    /\.leg-mate-log-number-column\s*\{[^}]*width:\s*3rem/s,
+  )
+  assert.match(
+    css,
+    /\.leg-mate-log-intrinsic-column\s*\{[^}]*width:\s*1%/s,
+  )
+  assert.match(
+    css,
+    /\.leg-mate-log-flexible-column\s*\{[^}]*width:\s*auto/s,
+  )
+  assert.doesNotMatch(css, /\.leg-mate-log-table\s*\{[^}]*min-width:\s*(?:58|62)rem/s)
+  assert.match(css, /@media\s*\(max-width:\s*48rem\)/)
+  assert.match(
+    css,
+    /@media\s*\(max-width:\s*68rem\)[\s\S]*\.leg-mate-board-column\s*\{[^}]*width:\s*min\(25\.6rem, 80%\)[^}]*margin-inline:\s*auto/s,
+  )
+  assert.match(
+    css,
+    /@media\s*\(max-width:\s*48rem\)[\s\S]*\.leg-mate-sidebar\s*\{[^}]*grid-template-areas:[^}]*'sets'[^}]*'modes'/,
+  )
+  assert.match(
+    css,
+    /\.leg-mate-guide-priorities\s*\{[^}]*align-items:\s*start[^}]*grid-template-columns:\s*minmax\(0, 3fr\) minmax\(0, 2fr\)/s,
+  )
+  assert.match(
+    css,
+    /\.leg-mate-guide-supporting\s*\{[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/s,
+  )
+  assert.match(
+    css,
+    /\.leg-mate-guide\s*\{[^}]*width:\s*min\(69\.6rem, 100%\)/s,
+  )
+  assert.match(
+    css,
+    /@media\s*\(max-width:\s*48rem\)[\s\S]*\.leg-mate-guide-priorities,[\s\S]*\.leg-mate-guide-supporting,[\s\S]*grid-template-columns:\s*minmax\(0, 1fr\)/,
+  )
+  assert.match(
+    css,
+    /@media\s*\(max-width:\s*32rem\)[\s\S]*\.leg-mate-controls-actions\s*\{[^}]*flex:\s*1 1 100%/,
+  )
+  assert.match(
+    css,
+    /@media\s*\(max-width:\s*32rem\)[\s\S]*\.leg-mate-controls-actions button\s*\{[^}]*flex:\s*1 1 calc\(50% - 0\.4em\)/,
+  )
+  assert.match(
+    css,
+    /@media\s*\(max-width:\s*32rem\)[\s\S]*\.leg-mate-controls-summary\s*\{[^}]*justify-content:\s*flex-end/,
   )
 })
 
@@ -1340,6 +1766,167 @@ test('Mate recreates its drill synchronously for exact route changes', async () 
   } finally {
     if (renderer) await act(async () => renderer?.unmount())
     Math.random = originalRandom
+  }
+})
+
+test('Mate loads replay history at its final position for Undo and Redo', async () => {
+  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
+    .IS_REACT_ACT_ENVIRONMENT = true
+  let renderer: ReactTestRenderer | undefined
+
+  try {
+    await act(async () => {
+      renderer = TestRenderer.create(
+        matePage('rook', 'standard', ROOK_START, ['Ra8+', 'Kg7']),
+      )
+    })
+    const mountedRenderer = renderer as ReactTestRenderer
+    assert.equal(
+      mountedRenderer.root.findByType(MateBoardProbe).props.fen,
+      ROOK_AFTER_REPLY,
+    )
+    assert.equal(mountedRenderer.root.findByType(MateLog).props.logs.length, 1)
+    assert.equal(mountedRenderer.root.findByType(MateControls).props.canUndo, true)
+
+    await act(async () => {
+      mountedRenderer.root.findByType(MateControls).props.onUndo()
+    })
+    assert.equal(
+      mountedRenderer.root.findByType(MateBoardProbe).props.fen,
+      ROOK_START,
+    )
+    assert.equal(mountedRenderer.root.findByType(MateControls).props.canRedo, true)
+
+    await act(async () => {
+      mountedRenderer.root.findByType(MateControls).props.onRedo()
+    })
+    assert.equal(
+      mountedRenderer.root.findByType(MateBoardProbe).props.fen,
+      ROOK_AFTER_REPLY,
+    )
+  } finally {
+    if (renderer) await act(async () => renderer?.unmount())
+  }
+})
+
+test('Mate Play Best stages White before committing Black and cancels on route change', async () => {
+  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
+    .IS_REACT_ACT_ENVIRONMENT = true
+  const originalRandom = Math.random
+  Math.random = () => 0
+  let renderer: ReactTestRenderer | undefined
+
+  try {
+    await act(async () => {
+      renderer = TestRenderer.create(
+        matePage('rook', 'standard', MULTI_BLACK_START),
+      )
+    })
+    const mountedRenderer = renderer as ReactTestRenderer
+    await act(async () => {
+      assert.equal(
+        mountedRenderer.root.findByType(MateControls).props.onPlayBest(),
+        true,
+      )
+    })
+
+    const whiteFen = mountedRenderer.root.findByType(MateBoardProbe).props.fen
+    assert.notEqual(whiteFen, MULTI_BLACK_START)
+    assert.equal(mountedRenderer.root.findByType(MateBoardProbe).props.disabled, true)
+    assert.equal(mountedRenderer.root.findByType(MateControls).props.busy, true)
+    assert.equal(mountedRenderer.root.findByType(MateLog).props.busy, true)
+    assert.equal(mountedRenderer.root.findByType(MateLog).props.logs.length, 0)
+    assert.equal(
+      mountedRenderer.root.findByType(MateControls).props.onStartOver(),
+      false,
+    )
+
+    await act(async () => {
+      await new Promise((resolve) =>
+        setTimeout(resolve, MATE_REPLY_ANIMATION_MS + 20),
+      )
+    })
+    assert.equal(mountedRenderer.root.findByType(MateLog).props.logs.length, 1)
+    assert.notEqual(
+      mountedRenderer.root.findByType(MateBoardProbe).props.fen,
+      whiteFen,
+    )
+    assert.equal(mountedRenderer.root.findByType(MateControls).props.busy, false)
+
+    await act(async () => {
+      mountedRenderer.update(matePage('queen', 'standard', QUEEN_START))
+    })
+    await act(async () => {
+      mountedRenderer.update(
+        matePage('rook', 'standard', MULTI_BLACK_START),
+      )
+    })
+    await act(async () => {
+      mountedRenderer.root.findByType(MateControls).props.onPlayBest()
+    })
+    await act(async () => {
+      mountedRenderer.update(matePage('queen', 'standard', QUEEN_START))
+      await new Promise((resolve) =>
+        setTimeout(resolve, MATE_REPLY_ANIMATION_MS + 20),
+      )
+    })
+    assert.equal(mountedRenderer.root.findByType(MateBoardProbe).props.fen, QUEEN_START)
+    assert.equal(mountedRenderer.root.findByType(MateLog).props.logs.length, 0)
+  } finally {
+    if (renderer) await act(async () => renderer?.unmount())
+    Math.random = originalRandom
+  }
+})
+
+test('Mate restores and writes the timer visibility preference', async () => {
+  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
+    .IS_REACT_ACT_ENVIRONMENT = true
+  const originalWindowDescriptor = Object.getOwnPropertyDescriptor(
+    globalThis,
+    'window',
+  )
+  const storedValues = new Map([[MATE_TIMER_PREFERENCE_KEY, 'false']])
+  let renderer: ReactTestRenderer | undefined
+
+  Object.defineProperty(globalThis, 'window', {
+    configurable: true,
+    value: {
+      localStorage: {
+        getItem: (key: string) => storedValues.get(key) ?? null,
+        setItem: (key: string, value: string) => {
+          storedValues.set(key, value)
+        },
+      },
+    },
+  })
+
+  try {
+    await act(async () => {
+      renderer = TestRenderer.create(
+        matePage('rook', 'standard', MULTI_BLACK_START),
+      )
+    })
+    const mountedRenderer = renderer as ReactTestRenderer
+
+    assert.equal(
+      mountedRenderer.root.findByType(MateControls).props.showTimer,
+      false,
+    )
+    await act(async () => {
+      mountedRenderer.root.findByType(MateControls).props.onToggleTimer()
+    })
+    assert.equal(
+      mountedRenderer.root.findByType(MateControls).props.showTimer,
+      true,
+    )
+    assert.equal(storedValues.get(MATE_TIMER_PREFERENCE_KEY), 'true')
+  } finally {
+    if (renderer) await act(async () => renderer?.unmount())
+    if (originalWindowDescriptor === undefined) {
+      Reflect.deleteProperty(globalThis, 'window')
+    } else {
+      Object.defineProperty(globalThis, 'window', originalWindowDescriptor)
+    }
   }
 })
 
@@ -1425,7 +2012,7 @@ test('Mate wires board, history, timer, and every log replacement action', async
     })
     assert.equal(
       mountedRenderer.root.findByType(MateLog).props.logs[0].san,
-      'Re8',
+      'Rh1',
     )
 
     await act(async () => {
@@ -1510,6 +2097,20 @@ test('Mate keyboard shortcuts execute only from the training surface', async () 
     })
     const mountedRenderer = renderer as ReactTestRenderer
     assert.equal(keydownListeners.size, 1)
+    const workspace = mountedRenderer.root.find(
+      (node) => node.props.className === 'leg-mate-workspace',
+    )
+    let pointerButtonBlurs = 0
+    workspace.props.onClick({
+      detail: 1,
+      target: {
+        blur: () => {
+          pointerButtonBlurs += 1
+        },
+        tagName: 'BUTTON',
+      },
+    })
+    assert.equal(pointerButtonBlurs, 1)
 
     assert.equal(dispatch('ArrowLeft'), 0)
     assert.equal(dispatch('ArrowRight'), 0)
@@ -1574,6 +2175,13 @@ test('Mate keyboard shortcuts execute only from the training surface', async () 
     assert.equal(mountedRenderer.root.findByType(MateLog).props.logs.length, 0)
 
     await act(async () => assert.equal(dispatch('ArrowUp'), 1))
+    assert.equal(mountedRenderer.root.findByType(MateLog).props.logs.length, 0)
+    assert.equal(dispatch('ArrowLeft'), 0)
+    await act(async () => {
+      await new Promise((resolve) =>
+        setTimeout(resolve, MATE_REPLY_ANIMATION_MS + 20),
+      )
+    })
     assert.equal(mountedRenderer.root.findByType(MateLog).props.logs.length, 1)
     await act(async () => assert.equal(dispatch('ArrowLeft'), 1))
     assert.equal(mountedRenderer.root.findByType(MateLog).props.logs.length, 0)
@@ -1608,6 +2216,38 @@ test('Mate terminal sharing copies the exact starting position with status', asy
     globalThis,
     'navigator',
   )
+  const originalSetTimeout = globalThis.setTimeout
+  const originalClearTimeout = globalThis.clearTimeout
+  let nextNotificationTimerId = 0
+  const notificationTimers = new Map<number, () => void>()
+  globalThis.setTimeout = ((
+    handler: TimerHandler,
+    timeout?: number,
+    ...args: unknown[]
+  ) => {
+    if (
+      timeout === MATE_SHARE_NOTIFICATION_MS &&
+      typeof handler === 'function'
+    ) {
+      nextNotificationTimerId += 1
+      const timerId = nextNotificationTimerId
+      notificationTimers.set(timerId, () => {
+        notificationTimers.delete(timerId)
+        handler(...args)
+      })
+      return timerId
+    }
+    return originalSetTimeout(handler, timeout, ...args)
+  }) as typeof setTimeout
+  globalThis.clearTimeout = ((timerId: number | undefined) => {
+    if (
+      timerId !== undefined &&
+      notificationTimers.delete(Number(timerId))
+    ) {
+      return
+    }
+    originalClearTimeout(timerId)
+  }) as typeof clearTimeout
   const copied: string[] = []
   let shouldReject = false
   Object.defineProperty(globalThis, 'navigator', {
@@ -1637,6 +2277,10 @@ test('Mate terminal sharing copies the exact starting position with status', asy
       mountedRenderer.root.findByType(MateControls).props.outcome,
       'checkmate',
     )
+    assert.equal(
+      mountedRenderer.root.findByType(MateBoardProbe).props.complete,
+      true,
+    )
 
     await act(async () => {
       mountedRenderer.root.findByType(MateControls).props.onShare()
@@ -1647,13 +2291,34 @@ test('Mate terminal sharing copies the exact starting position with status', asy
     assert.match(copied[0] ?? '', /^checkmate in \d{2}:\d{2}\.\d{2}\n/)
     assert.ok(
       copied[0]?.includes(
-        `/mate/rook#fen=${encodeURIComponent(ROOK_MATE_START)}`,
+        `/mate/rook${encodeMateFen(ROOK_MATE_START)}`,
       ),
     )
     assert.equal(
       mountedRenderer.root.findByType(MateControls).props.shareStatus,
       'Copied',
     )
+    assert.equal(notificationTimers.size, 1)
+
+    const notificationTimer = [...notificationTimers.values()][0]
+    assert.equal(typeof notificationTimer, 'function')
+    await act(async () => notificationTimer?.())
+    assert.equal(
+      mountedRenderer.root.findByType(MateControls).props.shareStatus,
+      '',
+    )
+    assert.equal(notificationTimers.size, 0)
+
+    await act(async () => {
+      mountedRenderer.root.findByType(MateControls).props.onShare()
+      await Promise.resolve()
+      await Promise.resolve()
+    })
+    assert.equal(
+      mountedRenderer.root.findByType(MateControls).props.shareStatus,
+      'Copied',
+    )
+    assert.equal(notificationTimers.size, 1)
 
     shouldReject = true
     await act(async () => {
@@ -1664,6 +2329,148 @@ test('Mate terminal sharing copies the exact starting position with status', asy
     assert.equal(
       mountedRenderer.root.findByType(MateControls).props.shareStatus,
       'Copy unavailable',
+    )
+    assert.equal(notificationTimers.size, 1)
+
+    await act(async () => {
+      mountedRenderer.root.findByType(MateControls).props.onUndo()
+    })
+    assert.equal(
+      mountedRenderer.root.findByType(MateControls).props.shareStatus,
+      '',
+    )
+    assert.equal(notificationTimers.size, 0)
+  } finally {
+    if (renderer) await act(async () => renderer?.unmount())
+    globalThis.setTimeout = originalSetTimeout
+    globalThis.clearTimeout = originalClearTimeout
+    if (navigatorDescriptor === undefined) {
+      delete (globalThis as { navigator?: Navigator }).navigator
+    } else {
+      Object.defineProperty(globalThis, 'navigator', navigatorDescriptor)
+    }
+  }
+})
+
+test('Mate training dialog copies the exact starting-position URL', async () => {
+  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
+    .IS_REACT_ACT_ENVIRONMENT = true
+  const navigatorDescriptor = Object.getOwnPropertyDescriptor(
+    globalThis,
+    'navigator',
+  )
+  const copied: string[] = []
+  let shouldReject = false
+  Object.defineProperty(globalThis, 'navigator', {
+    configurable: true,
+    value: {
+      clipboard: {
+        writeText: async (text: string) => {
+          if (shouldReject) throw new Error('clipboard unavailable')
+          copied.push(text)
+        },
+      },
+    },
+  })
+  let renderer: ReactTestRenderer | undefined
+
+  try {
+    await act(async () => {
+      renderer = TestRenderer.create(
+        matePage('rook', 'standard', ROOK_START),
+      )
+    })
+    const mountedRenderer = renderer as ReactTestRenderer
+    await act(async () => {
+      mountedRenderer.root.findByProps({
+        'aria-label': 'Open training info and priority guide',
+      }).props.onClick({ currentTarget: null })
+    })
+    const copyButton = mountedRenderer.root.findByProps({
+      'aria-label': 'Copy game URL',
+    })
+    const copyStatus = () => mountedRenderer.root.findByProps({
+      'aria-label': 'Game URL copy status',
+    }).props.children
+
+    await act(async () => {
+      copyButton.props.onClick()
+      await Promise.resolve()
+      await Promise.resolve()
+    })
+    assert.deepEqual(copied, [
+      `/mate/rook${encodeMateFen(ROOK_START)}`,
+    ])
+    assert.equal(copyStatus(), 'Copied')
+
+    shouldReject = true
+    await act(async () => {
+      copyButton.props.onClick()
+      await Promise.resolve()
+      await Promise.resolve()
+    })
+    assert.equal(copyStatus(), 'Copy unavailable')
+  } finally {
+    if (renderer) await act(async () => renderer?.unmount())
+    if (navigatorDescriptor === undefined) {
+      delete (globalThis as { navigator?: Navigator }).navigator
+    } else {
+      Object.defineProperty(globalThis, 'navigator', navigatorDescriptor)
+    }
+  }
+})
+
+test('Mate training dialog ignores a stale copy result after Start Over', async () => {
+  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
+    .IS_REACT_ACT_ENVIRONMENT = true
+  const navigatorDescriptor = Object.getOwnPropertyDescriptor(
+    globalThis,
+    'navigator',
+  )
+  let resolveCopy: (() => void) | undefined
+  Object.defineProperty(globalThis, 'navigator', {
+    configurable: true,
+    value: {
+      clipboard: {
+        writeText: () => new Promise<void>((resolve) => {
+          resolveCopy = resolve
+        }),
+      },
+    },
+  })
+  let renderer: ReactTestRenderer | undefined
+
+  try {
+    await act(async () => {
+      renderer = TestRenderer.create(
+        matePage('rook', 'standard', ROOK_START),
+      )
+    })
+    const mountedRenderer = renderer as ReactTestRenderer
+    await act(async () => {
+      mountedRenderer.root.findByProps({
+        'aria-label': 'Open training info and priority guide',
+      }).props.onClick({ currentTarget: null })
+    })
+    await act(async () => {
+      mountedRenderer.root.findByProps({
+        'aria-label': 'Copy game URL',
+      }).props.onClick()
+      await Promise.resolve()
+    })
+    await act(async () => {
+      mountedRenderer.root.findByType(MateControls).props.onStartOver()
+    })
+    await act(async () => {
+      resolveCopy?.()
+      await Promise.resolve()
+      await Promise.resolve()
+    })
+    assert.equal(
+      mountedRenderer.root.findByProps({
+        'aria-label': 'Game URL copy status',
+      }).props.children,
+      '',
     )
   } finally {
     if (renderer) await act(async () => renderer?.unmount())
@@ -1876,6 +2683,7 @@ function matePage(
   mateId: 'queen' | 'rook',
   mateMode: 'standard' | 'train',
   sharedFen: string | null,
+  sharedMoves: readonly string[] | null = null,
 ) {
   return (
     <Mate
@@ -1887,6 +2695,7 @@ function matePage(
         mateId,
         mateMode,
         sharedFen,
+        ...(sharedMoves === null ? {} : { sharedMoves }),
       }}
     />
   )

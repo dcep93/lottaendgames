@@ -12,7 +12,7 @@ import {
   type PieceRenderObject,
 } from 'react-chessboard'
 import {
-  MATE_REPLY_ANIMATION_MS,
+  MATE_MOVE_ANIMATION_MS,
   canSelectWhitePiece,
   getLegalTargets,
   getMateBoardSquareStyles,
@@ -22,6 +22,7 @@ import {
 export type MateBoardProps = {
   readonly fen: string
   readonly phase: string
+  readonly complete?: boolean
   readonly lastMove: readonly [Square, Square] | null
   readonly disabled: boolean
   readonly onMove: (san: string) => void
@@ -85,6 +86,7 @@ export default function MateBoard(props: MateBoardProps) {
 export function MateBoardSurface({
   fen,
   phase,
+  complete = false,
   lastMove,
   disabled,
   onMove,
@@ -163,7 +165,7 @@ export function MateBoardSurface({
   return (
     <div className="leg-mate-board-card">
       <p className="leg-mate-board-phase" id={phaseId}>
-        Phase {phase}
+        {complete ? 'Complete' : `Phase ${phase}`}
       </p>
       <div
         aria-describedby={phaseId}
@@ -177,7 +179,7 @@ export function MateBoardSurface({
         data-orientation="white"
         data-phase={phase}
         data-position-state={isOptimistic ? 'optimistic' : 'controlled'}
-        data-reply-animation-ms={MATE_REPLY_ANIMATION_MS}
+        data-reply-animation-ms={MATE_MOVE_ANIMATION_MS}
         role="group"
       >
         <BoardRenderer
@@ -189,7 +191,7 @@ export function MateBoardSurface({
             allowDrawingArrows: false,
             animationDurationInMs: isOptimistic
               ? 0
-              : MATE_REPLY_ANIMATION_MS,
+              : MATE_MOVE_ANIMATION_MS,
             boardOrientation: 'white',
             boardStyle: {
               borderRadius: '0.35rem',

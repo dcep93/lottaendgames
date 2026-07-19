@@ -63,11 +63,13 @@ export type RookWhiteMoveScore = {
   readonly rookCapturePenalty: number
   readonly stalematePenalty: number
   readonly rookBoxEstablishedPenalty: number
+  readonly rookBoxAxisSwitchPenalty: number
   readonly rookBoxSize: number
   readonly forcingCheckPenalty: number
   readonly rookPhaseTwoWaitingPenalty: number
   readonly rookPhaseTwoWaitingDistanceScore: number
   readonly rookBoxPreservedPenalty: number
+  readonly rookPreservedBoxSize: number
   readonly rookBlackDistanceScore: number
   readonly kingRookLinePenalty: number
   readonly kingDistance: number
@@ -213,20 +215,20 @@ export const queenWhiteRules: readonly OrderedRule<QueenWhiteMoveScore>[] = [
   {
     id: 'mate',
     shortLabel: 'mate',
-    helpText: 'Checkmate immediately when mate is available.',
+    helpText: '',
     compare: (first, second) => first.matePenalty - second.matePenalty,
   },
   {
     id: 'queen safe',
-    shortLabel: 'queen safe',
-    helpText: 'Keep pieces safe from capture.',
+    shortLabel: 'pieces safe',
+    helpText: '',
     compare: (first, second) =>
       first.queenCapturePenalty - second.queenCapturePenalty,
   },
   {
     id: 'no stalemate',
     shortLabel: 'no stalemate',
-    helpText: 'Avoid stalemate.',
+    helpText: '',
     compare: (first, second) =>
       first.stalematePenalty - second.stalematePenalty,
   },
@@ -315,6 +317,14 @@ export function scoreRookWhiteMove(
     beforeRook && beforeWhiteKing && beforeBlackKing
       ? getClosestRookBoxAxis(beforeRook, beforeWhiteKing, beforeBlackKing)
       : null
+  const beforeClosestRookBoxSize =
+    beforeRook && beforeBlackKing && beforeClosestRookBoxAxis !== null
+      ? getRookOneDimensionalBoxSize(
+          beforeRook.square,
+          beforeBlackKing.square,
+          beforeClosestRookBoxAxis,
+        )
+      : null
   const needsPhaseTwoWaitingMove = Boolean(
     beforeRook &&
       beforeWhiteKing &&
@@ -338,6 +348,14 @@ export function scoreRookWhiteMove(
   const closestRookBoxAxis =
     whiteRook && whiteKing && blackKing
       ? getClosestRookBoxAxis(whiteRook, whiteKing, blackKing)
+      : null
+  const closestRookBoxSize =
+    whiteRook && blackKing && closestRookBoxAxis !== null
+      ? getRookOneDimensionalBoxSize(
+          whiteRook.square,
+          blackKing.square,
+          closestRookBoxAxis,
+        )
       : null
   const rookPhaseTwoWaitingMove = Boolean(
     needsPhaseTwoWaitingMove &&
@@ -363,9 +381,17 @@ export function scoreRookWhiteMove(
           ? 0
           : 1
         : 0,
+    rookBoxAxisSwitchPenalty:
+      beforeClosestRookBoxAxis === null &&
+      beforeRookBoxAxis !== null &&
+      closestRookBoxAxis !== null &&
+      closestRookBoxAxis !== beforeRookBoxAxis
+        ? 1
+        : 0,
     rookBoxSize:
-      beforeRookBoxAxis === null && whiteRook && blackKing
-        ? getRookOneDimensionalBoxSize(whiteRook.square, blackKing.square)
+      beforeClosestRookBoxAxis === null &&
+      closestRookBoxSize !== null
+        ? closestRookBoxSize
         : 0,
     forcingCheckPenalty:
       chess.isCheck() &&
@@ -386,13 +412,18 @@ export function scoreRookWhiteMove(
         ? -kingDistance(whiteRook.square, beforeBlackKing.square)
         : 0,
     rookBoxPreservedPenalty:
-      beforeClosestRookBoxAxis !== null
-        ? closestRookBoxAxis === null
+      beforeClosestRookBoxSize !== null
+        ? closestRookBoxSize === null ||
+          closestRookBoxSize > beforeClosestRookBoxSize
           ? 1
           : 0
         : beforeRookBoxAxis !== null && rookBoxAxis === null
           ? 1
           : 0,
+    rookPreservedBoxSize:
+      beforeClosestRookBoxSize !== null && closestRookBoxSize !== null
+        ? closestRookBoxSize
+        : 0,
     rookBlackDistanceScore:
       move.piece === 'r' && whiteRook && blackKing
         ? -manhattanDistance(whiteRook.square, blackKing.square)
@@ -412,20 +443,20 @@ export const rookWhiteRules: readonly OrderedRule<RookWhiteMoveScore>[] = [
   {
     id: 'mate',
     shortLabel: 'mate',
-    helpText: 'Checkmate immediately when mate is available.',
+    helpText: '',
     compare: (first, second) => first.matePenalty - second.matePenalty,
   },
   {
     id: 'rook safe',
-    shortLabel: 'rook safe',
-    helpText: 'Keep pieces safe from capture.',
+    shortLabel: 'pieces safe',
+    helpText: '',
     compare: (first, second) =>
       first.rookCapturePenalty - second.rookCapturePenalty,
   },
   {
     id: 'no stalemate',
     shortLabel: 'no stalemate',
-    helpText: 'Avoid stalemate.',
+    helpText: '',
     compare: (first, second) =>
       first.stalematePenalty - second.stalematePenalty,
   },
@@ -436,6 +467,7 @@ export const rookWhiteRules: readonly OrderedRule<RookWhiteMoveScore>[] = [
       "Put the rook on the row or file between the kings and closest to Black's king when not already.",
     compare: (first, second) =>
       first.rookBoxEstablishedPenalty - second.rookBoxEstablishedPenalty ||
+      first.rookBoxAxisSwitchPenalty - second.rookBoxAxisSwitchPenalty ||
       first.rookBoxSize - second.rookBoxSize,
   },
   {
@@ -457,7 +489,8 @@ export const rookWhiteRules: readonly OrderedRule<RookWhiteMoveScore>[] = [
   {
     id: 'rook waiting distance',
     shortLabel: 'rook waiting distance',
-    helpText: '',
+    helpText:
+      "When a rook waiting move is required and the earlier priorities tie, place the rook as far as possible from Black's king.",
     compare: (first, second) =>
       first.rookPhaseTwoWaitingDistanceScore -
       second.rookPhaseTwoWaitingDistanceScore,
@@ -478,6 +511,7 @@ export const rookWhiteRules: readonly OrderedRule<RookWhiteMoveScore>[] = [
       "Move the rook as far as possible from Black's king while preserving the box.",
     compare: (first, second) =>
       first.rookBoxPreservedPenalty - second.rookBoxPreservedPenalty ||
+      first.rookPreservedBoxSize - second.rookPreservedBoxSize ||
       first.rookBlackDistanceScore - second.rookBlackDistanceScore,
   },
 ]

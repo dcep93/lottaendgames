@@ -331,21 +331,24 @@ export const twoKnightsPawnWhiteRules: readonly OrderedRule<TwoKnightsPawnWhiteM
   {
     id: 'mate',
     shortLabel: 'mate',
-    helpText: 'Checkmate immediately when mate is available.',
+    guideOrder: 0,
+    helpText: '',
     stopWhenBest: (score) => score.matePenalty === 0,
     compare: (first, second) => first.matePenalty - second.matePenalty,
   },
   {
     id: 'no stalemate',
     shortLabel: 'no stalemate',
-    helpText: 'Avoid stalemate.',
+    guideOrder: 2,
+    helpText: '',
     compare: (first, second) =>
       first.stalematePenalty - second.stalematePenalty,
   },
   {
     id: 'knights safe',
-    shortLabel: 'knights safe',
-    helpText: 'Keep both knights safe from immediate capture.',
+    shortLabel: 'pieces safe',
+    guideOrder: 1,
+    helpText: '',
     compare: (first, second) =>
       first.knightSafetyPenalty - second.knightSafetyPenalty,
   },
@@ -386,7 +389,7 @@ export const twoKnightsPawnWhiteRules: readonly OrderedRule<TwoKnightsPawnWhiteM
     id: 'follow verified construction',
     shortLabel: 'follow verified construction',
     helpText:
-      'On an exact audited route position, stay on the legal 27-ply Standard identity or file-mirror construction (or the one-ply Train finish) that preserves the unconditional win, establishes and maintains the pawn blockade, and completes the mating cage. This priority is inactive off the committed route, where the human geometric priorities apply instead.',
+      'On an exact audited route position, stay on the legal 27-ply Standard identity or file-mirror construction (or the one-ply Training Wheels finish) that preserves the unconditional win, establishes and maintains the pawn blockade, and completes the mating cage. This priority is inactive off the committed route, where the human geometric priorities apply instead.',
     applies: (score) => score.hasVerifiedConstruction,
     compare: (first, second) =>
       first.verifiedConstructionPenalty - second.verifiedConstructionPenalty,

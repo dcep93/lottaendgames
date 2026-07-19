@@ -40,7 +40,12 @@ test('Two Knights vs Pawn exposes the exact explicit ordered priorities', () => 
   )
   assert.deepEqual(
     ruleSet.whiteRuleDescriptions.map(({ id }) => id),
-    WHITE_RULE_IDS,
+    [
+      WHITE_RULE_IDS[0],
+      WHITE_RULE_IDS[2],
+      WHITE_RULE_IDS[1],
+      ...WHITE_RULE_IDS.slice(3),
+    ],
   )
   assert.deepEqual(
     ruleSet.help.blackPriorities,

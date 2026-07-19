@@ -1,4 +1,5 @@
 import React, { type MouseEvent } from 'react'
+import { defaultPieces } from 'react-chessboard'
 import { MATE_CATALOG } from './catalog'
 import type { MateId, MateMode } from './types'
 
@@ -8,26 +9,38 @@ export type MateSidebarProps = {
   readonly onNavigate: (href: string) => void
 }
 
+const MATE_MATERIAL_PIECES: Readonly<Record<MateId, readonly string[]>> = {
+  queen: ['wQ'],
+  rook: ['wR'],
+  'two-bishops': ['wB', 'wB'],
+  'bishop-knight': ['wB', 'wN'],
+  'two-knights-pawn': ['wN', 'wN', 'bP'],
+}
+
 export default function MateSidebar({
   mateId,
   mateMode,
   onNavigate,
 }: MateSidebarProps) {
   const selectedSet = MATE_CATALOG.find(({ id }) => id === mateId)
-  const selectedHref = selectedSet === undefined || mateMode === null
-    ? ''
-    : `${selectedSet.path}${mateMode === 'train' ? '/train' : ''}`
-
+  const hasSelectedMode = selectedSet !== undefined && mateMode !== null
   return (
     <React.Fragment>
-      <aside aria-label="Mate training" className="leg-mate-sidebar">
-        <p className="leg-mate-sidebar-label">Mate training</p>
+      <aside
+        aria-label="Mate training"
+        className={
+          hasSelectedMode
+            ? 'leg-mate-sidebar'
+            : 'leg-mate-sidebar leg-mate-sidebar--sets-only'
+        }
+      >
         <nav aria-label="Mating sets" className="leg-mate-set-links">
           {MATE_CATALOG.map((entry) => {
             const isSelected = entry.id === mateId
             return (
               <a
                 aria-current={isSelected ? 'location' : undefined}
+                aria-label={entry.label}
                 className={
                   isSelected
                     ? 'leg-mate-set-link is-active'
@@ -38,14 +51,15 @@ export default function MateSidebar({
                 onClick={(event) =>
                   handleMateNavigation(event, entry.path, onNavigate)
                 }
+                title={entry.label}
               >
-                {entry.label}
+                <MateMaterialIcon mateId={entry.id} />
               </a>
             )
           })}
         </nav>
 
-        {selectedSet === undefined || mateMode === null ? null : (
+        {!hasSelectedMode ? null : (
           <nav
             aria-label={`${selectedSet.label} mode`}
             className="leg-mate-mode-links"
@@ -59,36 +73,42 @@ export default function MateSidebar({
             <MateModeLink
               active={mateMode === 'train'}
               href={`${selectedSet.path}/train`}
-              label="Train"
+              label="Training Wheels"
               onNavigate={onNavigate}
             />
           </nav>
         )}
       </aside>
-
-      <label className="leg-mate-collapsed-selector">
-        <span>Mate training</span>
-        <select
-          aria-label="Mate training: choose mating set and mode"
-          onChange={(event) => {
-            if (event.currentTarget.value !== '') {
-              onNavigate(event.currentTarget.value)
-            }
-          }}
-          value={selectedHref}
-        >
-          <option value="">Choose a mating set</option>
-          {MATE_CATALOG.map((entry) => (
-            <optgroup key={entry.id} label={entry.label}>
-              <option value={entry.path}>{entry.label} — Standard</option>
-              <option value={`${entry.path}/train`}>
-                {entry.label} — Train
-              </option>
-            </optgroup>
-          ))}
-        </select>
-      </label>
     </React.Fragment>
+  )
+}
+
+function MateMaterialIcon({ mateId }: { readonly mateId: MateId }) {
+  const pieces = MATE_MATERIAL_PIECES[mateId]
+
+  return (
+    <span
+      aria-hidden="true"
+      className={`leg-mate-material-icon leg-mate-material-icon--${pieces.length}`}
+    >
+      {pieces.map((pieceType, index) => {
+        const renderPiece = defaultPieces[pieceType]
+        return renderPiece === undefined ? null : (
+          <span
+            className="leg-mate-material-piece"
+            key={`${pieceType}-${index}`}
+          >
+            {renderPiece({
+              svgStyle: {
+                display: 'block',
+                height: '100%',
+                width: '100%',
+              },
+            })}
+          </span>
+        )
+      })}
+    </span>
   )
 }
 

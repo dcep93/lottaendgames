@@ -6,6 +6,7 @@ import {
   getMateRuleSet,
   scoreTwoBishopsBlackMove,
   scoreTwoBishopsWhiteMove,
+  twoBishopsWhiteRules,
 } from './index'
 
 const SOURCE_COMMIT = '70704ecf25d6ee9e5c76a18f49e2a6fce409b728'
@@ -158,8 +159,17 @@ test('Two Bishops exposes the literal ordered chess420 priorities', () => {
   const ruleSet = getMateRuleSet('two-bishops')
 
   assert.deepEqual(
-    ruleSet.whiteRuleDescriptions.map(({ id }) => id),
+    twoBishopsWhiteRules.map(({ id }) => id),
     WHITE_RULE_IDS,
+  )
+  assert.deepEqual(
+    ruleSet.whiteRuleDescriptions.map(({ id }) => id),
+    [
+      WHITE_RULE_IDS[0],
+      WHITE_RULE_IDS[2],
+      WHITE_RULE_IDS[1],
+      ...WHITE_RULE_IDS.slice(3),
+    ],
   )
 })
 

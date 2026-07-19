@@ -134,21 +134,24 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
   {
     id: 'mate',
     shortLabel: 'mate',
-    helpText: 'Checkmate immediately when mate is available.',
+    guideOrder: 0,
+    helpText: '',
     stopWhenBest: (score) => score.matePenalty === 0,
     compare: (first, second) => first.matePenalty - second.matePenalty,
   },
   {
     id: 'no stalemate',
     shortLabel: 'no stalemate',
-    helpText: 'Avoid stalemate.',
+    guideOrder: 2,
+    helpText: '',
     compare: (first, second) =>
       first.stalematePenalty - second.stalematePenalty,
   },
   {
     id: 'bishops safe',
-    shortLabel: 'bishops safe',
-    helpText: 'Keep pieces safe from capture.',
+    shortLabel: 'pieces safe',
+    guideOrder: 1,
+    helpText: '',
     compare: (first, second) =>
       first.bishopSafetyPenalty - second.bishopSafetyPenalty,
   },

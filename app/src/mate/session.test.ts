@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import { MATE_CATALOG } from './catalog'
-import { getChess } from './chess'
+import { getChess, positionKey } from './chess'
 import {
   getMateRuleSet,
   type RegisteredMateRuleSet,
@@ -9,6 +9,7 @@ import {
 } from './rules'
 import {
   createMateSession,
+  createMateReplaySession,
   getMateElapsedMs,
   getMateTerminalOutcome,
   playBestMateMove,
@@ -23,6 +24,16 @@ import {
 
 const START_FEN = '7k/8/8/8/8/8/R7/K7 w - - 0 1'
 const SECOND_START_FEN = '6k1/8/8/8/8/3K4/8/R7 w - - 0 1'
+const ROOK_LOOP_START = '8/8/8/8/3k4/8/1R6/3K4 w - - 0 1'
+const ROOK_LOOP_MOVES = `
+  Rb3 Kc5 Kc2 Kc6 Rh3 Kb7 Rh6 Kc7 Kc3 Kd7 Kd4 Ke7
+  Ke5 Kd7 Ra6 Kc8 Rd6 Kc7 Rd1 Kc8 Ke6 Kc7 Rd2 Kb8
+  Rc2 Kb7 Kd7 Kb6 Rc1 Kb5 Kd6 Kb4 Kd5 Ka3
+  Rc4 Kb3 Rh4 Kc3 Rg4 Kd3 Rg3+ Ke2 Ke4 Kf1 Kf4 Ke2
+  Ra3 Kd2 Ke4 Kc1 Rd3 Kc2 Rd8 Kc3 Rd7 Kb4 Rc7 Kb5
+  Kd5 Ka6 Kd6 Kb6 Rc1 Kb5 Rc2 Kb4 Kd5 Kb3 Rc8 Kb4
+  Rc1 Ka3
+`.trim().split(/\s+/)
 
 const finishRule: RuleDescription = {
   id: 'finish-net',
@@ -141,6 +152,64 @@ test('initializes a fresh dependency-injected session', () => {
   assert.equal(session.finishedAtMs, undefined)
   assert.equal(session.outcome, undefined)
   assertCurrentSnapshot(session)
+})
+
+test('reconstructs the former exact Rook loop as undoable ordinary history', () => {
+  const deps: MateSessionDeps = {
+    now: () => 1_000,
+    random: () => 0,
+    generatePosition: () => ROOK_LOOP_START,
+    getRuleSet: getMateRuleSet,
+  }
+  const replay = createMateReplaySession(
+    {
+      mateId: 'rook',
+      mode: 'standard',
+      moves: ROOK_LOOP_MOVES,
+      startingFen: ROOK_LOOP_START,
+    },
+    deps,
+  )
+
+  assert.equal(replay.logs.length, 36)
+  assert.equal(replay.history.length, 37)
+  assert.equal(replay.historyIndex, 36)
+  assert.equal(
+    replay.fen,
+    '8/8/8/3K4/8/k7/8/2R5 w - - 72 37',
+  )
+  assert.deepEqual(
+    replay.logs.flatMap((log, index) =>
+      log.isCorrect
+        ? []
+        : [{ move: index + 1, reasonId: log.reasonId, san: log.san }],
+    ),
+    [
+      { move: 9, reasonId: 'establish box', san: 'Rd6' },
+      { move: 10, reasonId: 'maximize black distance', san: 'Rd1' },
+      { move: 18, reasonId: 'establish box', san: 'Rc4' },
+      { move: 19, reasonId: 'maximize black distance', san: 'Rh4' },
+      { move: 26, reasonId: 'establish box', san: 'Rd3' },
+      { move: 27, reasonId: 'maximize black distance', san: 'Rd8' },
+    ],
+  )
+
+  let priorLoopPosition = replay
+  for (let turn = 0; turn < 19; turn += 1) {
+    priorLoopPosition = undoMateMove(priorLoopPosition)
+  }
+  assert.equal(priorLoopPosition.historyIndex, 17)
+  assert.equal(positionKey(priorLoopPosition.fen), positionKey(replay.fen))
+
+  let beginning = priorLoopPosition
+  while (beginning.historyIndex > 0) beginning = undoMateMove(beginning)
+  assert.equal(beginning.fen, ROOK_LOOP_START)
+
+  let restored = beginning
+  while (restored.historyIndex < restored.history.length - 1) {
+    restored = redoMateMove(restored)
+  }
+  assert.equal(restored.fen, replay.fen)
 })
 
 test('records a correct White move and one tied automatic Black reply as one history step', () => {

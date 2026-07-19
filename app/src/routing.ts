@@ -1,5 +1,9 @@
 import { MATE_CATALOG } from './mate/catalog'
-import { decodeMateFen, encodeMateFen } from './mate/share'
+import {
+  decodeMateReplay,
+  encodeMateFen,
+  encodeMateReplay,
+} from './mate/share'
 import type { MateId, MateMode, MateRouteSelection } from './mate/types'
 
 export type AppModule = 'book' | 'mate'
@@ -131,15 +135,20 @@ function resolveMateRoute(pathname: string, hash: string): RouteResolution {
   const href = matePath(catalogRecord.id, mateMode)
 
   if (hash) {
-    const decoded = decodeMateFen(hash, catalogRecord.id, mateMode)
+    const decoded = decodeMateReplay(hash, catalogRecord.id, mateMode)
     if (!decoded.ok) return emptyMateResolution()
+    const canonicalHash =
+      decoded.moves === null
+        ? encodeMateFen(decoded.fen)
+        : encodeMateReplay(decoded.fen, decoded.moves)
     return {
-      href: `${href}${encodeMateFen(decoded.fen)}`,
+      href: `${href}${canonicalHash}`,
       route: {
         module: 'mate',
         mateId: catalogRecord.id,
         mateMode,
         sharedFen: decoded.fen,
+        ...(decoded.moves === null ? {} : { sharedMoves: decoded.moves }),
       },
     }
   }

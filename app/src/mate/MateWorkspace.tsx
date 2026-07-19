@@ -2,7 +2,9 @@ import React from 'react'
 import type { MateBoardProps } from './MateBoard'
 import MateControls from './MateControls'
 import MateLog from './MateLog'
+import { MATE_MOVE_ANIMATION_MS } from './boardInteraction'
 import { MATE_CATALOG } from './catalog'
+import { getChess } from './chess'
 import { generateMatePosition } from './positions'
 import {
   getMateRuleSet,
@@ -10,6 +12,7 @@ import {
 } from './rules'
 import {
   createMateSession,
+  createMateReplaySession,
   getMateElapsedMs,
   playBestMateMove,
   playWhiteMove,
@@ -22,6 +25,10 @@ import {
   type MateSessionDeps,
 } from './session'
 import { formatMateShareText } from './share'
+import {
+  readMateTimerPreference,
+  writeMateTimerPreference,
+} from './timerPreference'
 import type { MateId, MateMode } from './types'
 import {
   canAcceptWhiteMove,
@@ -32,6 +39,7 @@ import {
   getLastMateMove,
   hasPreferredWhiteMove,
   nextCycledMove,
+  releasePointerButtonFocus,
   shouldIgnoreMateShortcut,
 } from './workspaceSupport'
 
@@ -40,6 +48,13 @@ export type MateWorkspaceProps = {
   readonly mateId: MateId
   readonly mateMode: MateMode
   readonly sharedFen: string | null
+  readonly sharedMoves: readonly string[] | null
+}
+
+type PlayBestAnimation = {
+  readonly nextSession: MateSession
+  readonly sourceSession: MateSession
+  readonly whiteFen: string
 }
 
 const PRODUCTION_MATE_DEPS: MateSessionDeps = Object.freeze({
@@ -49,29 +64,56 @@ const PRODUCTION_MATE_DEPS: MateSessionDeps = Object.freeze({
   getRuleSet: getMateRuleSet,
 })
 
+export const MATE_SHARE_NOTIFICATION_MS = 2_000
+
 export default function MateWorkspace({
   BoardComponent,
   mateId,
   mateMode,
   sharedFen,
+  sharedMoves,
 }: MateWorkspaceProps) {
   const deps = PRODUCTION_MATE_DEPS
   const ruleSet = React.useMemo(() => deps.getRuleSet(mateId), [deps, mateId])
-  const [session, setSession] = React.useState(() =>
-    createMateSession(
+  const [session, setSession] = React.useState(() => {
+    if (sharedFen !== null && sharedMoves !== null) {
+      try {
+        return createMateReplaySession(
+          {
+            mateId,
+            mode: mateMode,
+            moves: sharedMoves,
+            startingFen: sharedFen,
+          },
+          deps,
+        )
+      } catch {
+        // A route-level replay was already validated. Preserve the exact start
+        // if production evaluator invariants nevertheless reject reconstruction.
+      }
+    }
+    return createMateSession(
       {
         mateId,
         mode: mateMode,
         ...(sharedFen === null ? {} : { startingFen: sharedFen }),
       },
       deps,
-    ),
-  )
+    )
+  })
   const sessionRef = React.useRef(session)
+  const playBestAnimationRef = React.useRef<PlayBestAnimation | null>(null)
+  const playBestTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  )
   const mountedRef = React.useRef(false)
   const shareRequestRef = React.useRef(0)
-  const [showTimer, setShowTimer] = React.useState(true)
+  const fenCopyRequestRef = React.useRef(0)
+  const [showTimer, setShowTimer] = React.useState(readMateTimerPreference)
   const [shareStatus, setShareStatus] = React.useState('')
+  const [fenCopyStatus, setFenCopyStatus] = React.useState('')
+  const [playBestAnimation, setPlayBestAnimation] =
+    React.useState<PlayBestAnimation | null>(null)
 
   React.useLayoutEffect(() => {
     sessionRef.current = session
@@ -82,11 +124,51 @@ export default function MateWorkspace({
     return () => {
       mountedRef.current = false
       shareRequestRef.current += 1
+      fenCopyRequestRef.current += 1
+      playBestAnimationRef.current = null
+      if (playBestTimerRef.current !== null) {
+        clearTimeout(playBestTimerRef.current)
+        playBestTimerRef.current = null
+      }
     }
   }, [])
 
+  React.useEffect(() => {
+    if (shareStatus === '') return
+    const timer = setTimeout(
+      () => setShareStatus(''),
+      MATE_SHARE_NOTIFICATION_MS,
+    )
+    return () => clearTimeout(timer)
+  }, [shareStatus])
+
+  React.useEffect(() => {
+    if (fenCopyStatus === '') return
+    const timer = setTimeout(
+      () => setFenCopyStatus(''),
+      MATE_SHARE_NOTIFICATION_MS,
+    )
+    return () => clearTimeout(timer)
+  }, [fenCopyStatus])
+
+  const commitSession = React.useCallback(
+    (current: MateSession, next: MateSession) => {
+      if (next === current) return false
+
+      shareRequestRef.current += 1
+      fenCopyRequestRef.current += 1
+      sessionRef.current = next
+      setSession(next)
+      setShareStatus('')
+      setFenCopyStatus('')
+      return true
+    },
+    [],
+  )
+
   const commit = React.useCallback(
     (transition: (current: MateSession) => MateSession) => {
+      if (playBestAnimationRef.current !== null) return false
       const current = sessionRef.current
       let next: MateSession
       try {
@@ -94,15 +176,9 @@ export default function MateWorkspace({
       } catch {
         return false
       }
-      if (next === current) return false
-
-      shareRequestRef.current += 1
-      sessionRef.current = next
-      setSession(next)
-      setShareStatus('')
-      return true
+      return commitSession(current, next)
     },
-    [],
+    [commitSession],
   )
 
   const startOver = React.useCallback(
@@ -118,8 +194,43 @@ export default function MateWorkspace({
     [commit],
   )
   const playBest = React.useCallback(
-    () => commit((current) => playBestMateMove(current, deps)),
-    [commit, deps],
+    () => {
+      if (playBestAnimationRef.current !== null) return false
+      const current = sessionRef.current
+      let next: MateSession
+      try {
+        next = playBestMateMove(current, deps)
+      } catch {
+        return false
+      }
+      if (next === current) return false
+
+      const whiteFen = playBestWhiteFen(current, next)
+      if (whiteFen === null) return commitSession(current, next)
+
+      const animation = {
+        nextSession: next,
+        sourceSession: current,
+        whiteFen,
+      }
+      playBestAnimationRef.current = animation
+      setPlayBestAnimation(animation)
+      playBestTimerRef.current = setTimeout(() => {
+        playBestTimerRef.current = null
+        if (
+          !mountedRef.current ||
+          playBestAnimationRef.current !== animation ||
+          sessionRef.current !== animation.sourceSession
+        ) {
+          return
+        }
+        playBestAnimationRef.current = null
+        setPlayBestAnimation(null)
+        commitSession(animation.sourceSession, animation.nextSession)
+      }, MATE_MOVE_ANIMATION_MS)
+      return true
+    },
+    [commitSession, deps],
   )
   const playMove = React.useCallback(
     (san: string) =>
@@ -206,8 +317,8 @@ export default function MateWorkspace({
     [ruleSet, session],
   )
   const boardDisabled = React.useMemo(
-    () => !canAcceptWhiteMove(session),
-    [session],
+    () => playBestAnimation !== null || !canAcceptWhiteMove(session),
+    [playBestAnimation, session],
   )
   const canPlayBest = React.useMemo(
     () =>
@@ -215,13 +326,15 @@ export default function MateWorkspace({
     [boardDisabled, ruleSet, session.fen],
   )
   const catalogEntry = MATE_CATALOG.find(({ id }) => id === mateId)
-  const modeLabel = mateMode === 'train' ? 'Train' : 'Standard'
+  const modeLabel = mateMode === 'train' ? 'Training Wheels' : 'Standard'
 
   const share = React.useCallback(async () => {
     const current = sessionRef.current
     if (current.outcome === undefined) return
     const request = shareRequestRef.current + 1
     shareRequestRef.current = request
+    setShareStatus('')
+    setFenCopyStatus('')
 
     const text = formatMateShareText({
       outcome: current.outcome,
@@ -242,25 +355,55 @@ export default function MateWorkspace({
     }
   }, [deps])
 
+  const copyStartingUrl = React.useCallback(async () => {
+    const current = sessionRef.current
+    const request = fenCopyRequestRef.current + 1
+    fenCopyRequestRef.current = request
+    setFenCopyStatus('')
+    setShareStatus('')
+    const copied = await copyMateShareText(
+      exactMateHref(
+        current.mateId,
+        current.mode,
+        current.startingFen,
+      ),
+    )
+    if (
+      mountedRef.current &&
+      fenCopyRequestRef.current === request &&
+      sessionRef.current === current
+    ) {
+      setFenCopyStatus(copied ? 'Copied' : 'Copy unavailable')
+    }
+  }, [])
+  const toggleTimer = React.useCallback(() => {
+    const nextShowTimer = !showTimer
+    setShowTimer(nextShowTimer)
+    writeMateTimerPreference(nextShowTimer)
+  }, [showTimer])
+
   return (
     <section
       aria-label={`${catalogEntry?.label ?? mateId} ${modeLabel} training`}
       className="leg-mate-workspace"
+      onClick={(event) =>
+        releasePointerButtonFocus(event.detail, event.target)
+      }
     >
-      <header className="leg-mate-workspace-header">
-        <h2>{catalogEntry?.label ?? mateId}</h2>
-        <p>{modeLabel}</p>
-      </header>
-
       <div className="leg-mate-board-column">
         <BoardComponent
+          complete={session.outcome !== undefined}
           disabled={boardDisabled}
-          fen={session.fen}
+          fen={playBestAnimation?.whiteFen ?? session.fen}
           lastMove={lastMove}
           onMove={playMove}
           phase={phase}
         />
+      </div>
+
+      <div className="leg-mate-log-column">
         <MateControls
+          busy={playBestAnimation !== null}
           canPlayBest={canPlayBest}
           canRedo={session.historyIndex < session.history.length - 1}
           canUndo={session.historyIndex > 0}
@@ -269,7 +412,7 @@ export default function MateWorkspace({
           onRedo={redo}
           onShare={() => void share()}
           onStartOver={startOver}
-          onToggleTimer={() => setShowTimer((visible) => !visible)}
+          onToggleTimer={toggleTimer}
           onUndo={undo}
           outcome={session.outcome}
           shareStatus={shareStatus}
@@ -277,22 +420,37 @@ export default function MateWorkspace({
           startedAtMs={session.startedAtMs}
           timerNow={deps.now}
         />
-        <aside className="leg-mate-starting-position">
-          <h3>Starting FEN</h3>
-          <code>{session.startingFen}</code>
-        </aside>
+        <MateLog
+          busy={playBestAnimation !== null}
+          copyStartingUrlStatus={fenCopyStatus}
+          fen={session.fen}
+          logs={session.logs}
+          mateMode={mateMode}
+          onCycleIdealBlack={cycleIdealBlack}
+          onCycleIdealWhite={cycleIdealWhite}
+          onCycleLegalBlack={cycleLegalBlack}
+          onCopyStartingUrl={() => void copyStartingUrl()}
+          ruleSet={ruleSet}
+          startingFen={session.startingFen}
+        />
       </div>
-
-      <MateLog
-        fen={session.fen}
-        logs={session.logs}
-        onCycleIdealBlack={cycleIdealBlack}
-        onCycleIdealWhite={cycleIdealWhite}
-        onCycleLegalBlack={cycleLegalBlack}
-        ruleSet={ruleSet}
-      />
     </section>
   )
+}
+
+function playBestWhiteFen(
+  current: MateSession,
+  next: MateSession,
+): string | null {
+  const log = next.logs[current.logs.length]
+  if (log === undefined || log.fen !== current.fen) return null
+
+  try {
+    const chess = getChess(current.fen)
+    return chess.move(log.san) === null ? null : chess.fen()
+  } catch {
+    return null
+  }
 }
 
 function cycleBlackReply(

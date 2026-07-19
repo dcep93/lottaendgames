@@ -2,13 +2,19 @@ import React from 'react'
 import MatePriorityGuideDialog from './MatePriorityGuide'
 import type { RegisteredMateRuleSet } from './rules'
 import type { MateLogEntry } from './session'
+import type { MateMode } from './types'
 
 export { default as MatePriorityGuideDialog } from './MatePriorityGuide'
 
 export type MateLogProps = {
+  readonly busy?: boolean
+  readonly copyStartingUrlStatus: string
   readonly fen: string
   readonly logs: readonly MateLogEntry[]
+  readonly mateMode: MateMode
+  readonly onCopyStartingUrl: () => void
   readonly ruleSet: RegisteredMateRuleSet
+  readonly startingFen: string
   readonly onCycleIdealWhite: (logIndex: number) => void
   readonly onCycleIdealBlack: (logIndex: number) => void
   readonly onCycleLegalBlack: (logIndex: number) => void
@@ -44,9 +50,14 @@ function currentRuleHint(
 }
 
 export default function MateLog({
+  busy = false,
+  copyStartingUrlStatus,
   fen,
   logs,
+  mateMode,
+  onCopyStartingUrl,
   ruleSet,
+  startingFen,
   onCycleIdealWhite,
   onCycleIdealBlack,
   onCycleLegalBlack,
@@ -54,6 +65,9 @@ export default function MateLog({
   const [showReasonHints, setShowReasonHints] = React.useState(false)
   const [guideOpen, setGuideOpen] = React.useState(false)
   const [guideOpener, setGuideOpener] = React.useState<GuideOpener>(null)
+  const [highlightedReasonId, setHighlightedReasonId] = React.useState<
+    string | null
+  >(null)
   const descriptionsById = React.useMemo(
     () =>
       new Map(
@@ -73,8 +87,12 @@ export default function MateLog({
     .map((log, index) => ({ index, log }))
     .reverse()
   const openGuide = React.useCallback(
-    (event: React.MouseEvent<HTMLElement>) => {
-      setGuideOpener(event.currentTarget)
+    (
+      event: React.MouseEvent<HTMLElement>,
+      reasonId: string | null = null,
+    ) => {
+      setGuideOpener(event.detail > 0 ? null : event.currentTarget)
+      setHighlightedReasonId(reasonId)
       setGuideOpen(true)
     },
     [],
@@ -84,23 +102,33 @@ export default function MateLog({
   return (
     <section aria-label="Mate move log" className="leg-mate-log">
       <div className="leg-mate-log-tools">
-        <label className="leg-mate-hint-toggle">
-          <input
-            aria-label="Show reason hints"
-            checked={showReasonHints}
-            onChange={(event) =>
-              setShowReasonHints(event.currentTarget.checked)
-            }
-            type="checkbox"
-          />
-          <span>Show reason hints</span>
-        </label>
+        <div className="leg-mate-log-primary-tools">
+          <label className="leg-mate-hint-toggle">
+            <input
+              aria-label="Show reason hints"
+              checked={showReasonHints}
+              onChange={(event) =>
+                setShowReasonHints(event.currentTarget.checked)
+              }
+              type="checkbox"
+            />
+            <span>Show reason hints</span>
+          </label>
+          <button
+            aria-label="Open training info and priority guide"
+            className="leg-mate-training-info-button"
+            onClick={openGuide}
+            type="button"
+          >
+            Training info
+          </button>
+        </div>
         {hint === undefined ? null : (
           <button
             aria-label={`Current rule hint: ${hint.shortLabel}. Open priority guide`}
             className="leg-mate-current-hint"
             data-mate-current-hint={true}
-            onClick={openGuide}
+            onClick={(event) => openGuide(event, hint.id)}
             type="button"
           >
             {hint.shortLabel}
@@ -116,15 +144,24 @@ export default function MateLog({
       >
         <table aria-label="Mate move log" className="leg-mate-log-table">
           <caption className="leg-mate-visually-hidden">Mate move log</caption>
+          <colgroup>
+            <col className="leg-mate-log-number-column" />
+            <col className="leg-mate-log-intrinsic-column" />
+            <col className="leg-mate-log-intrinsic-column" />
+            <col className="leg-mate-log-intrinsic-column" />
+            <col className="leg-mate-log-intrinsic-column" />
+            <col className="leg-mate-log-intrinsic-column" />
+            <col className="leg-mate-log-intrinsic-column" />
+            <col className="leg-mate-log-flexible-column" />
+          </colgroup>
           <thead>
             <tr>
               <th scope="col">#</th>
               <th scope="col">Phase</th>
-              <th scope="col">White move</th>
-              <th scope="col">Black move</th>
-              <th scope="col">Ideal Black replies</th>
-              <th scope="col">Legal Black replies</th>
+              <th scope="col">White</th>
+              <th scope="col">Black</th>
               <th scope="col">Correctness</th>
+              <th scope="col">Black replies</th>
               <th scope="col">Duration</th>
               <th scope="col">
                 <button
@@ -176,45 +213,48 @@ export default function MateLog({
                   <td>{log.san}</td>
                   <td>{log.opponentSan ?? ''}</td>
                   <td>
+                    <span className="leg-mate-log-correctness">
+                      <span
+                        aria-label={log.isCorrect ? 'Correct' : 'Incorrect'}
+                        className="leg-mate-log-emoji"
+                        role="img"
+                      >
+                        {log.isCorrect ? '👍' : '👎'}
+                      </span>
+                      {correctChoices === 0 ? null : (
+                        <button
+                          aria-label={`Cycle ideal White move for move ${moveNumber}; ${correctChoiceText}`}
+                          className="leg-mate-log-choice-button"
+                          disabled={
+                            busy || (log.isCorrect && correctChoices === 1)
+                          }
+                          onClick={() => onCycleIdealWhite(index)}
+                          type="button"
+                        >
+                          /{correctChoices}
+                        </button>
+                      )}
+                    </span>
+                  </td>
+                  <td className="leg-mate-log-replies">
                     <button
                       aria-label={`Cycle ideal Black reply for move ${moveNumber}; ${idealBlackChoiceText}`}
                       className="leg-mate-log-choice-button"
-                      disabled={idealBlackChoices === 0}
+                      disabled={busy || idealBlackChoices === 0}
                       onClick={() => onCycleIdealBlack(index)}
                       type="button"
                     >
                       {idealBlackChoices}
                     </button>
-                  </td>
-                  <td>
+                    <span aria-hidden="true">/</span>
                     <button
                       aria-label={`Cycle any legal Black reply for move ${moveNumber}; ${legalBlackChoiceText}`}
                       className="leg-mate-log-choice-button"
-                      disabled={legalBlackChoices <= 1}
+                      disabled={busy || legalBlackChoices <= 1}
                       onClick={() => onCycleLegalBlack(index)}
                       type="button"
                     >
                       {legalBlackChoices}
-                    </button>
-                  </td>
-                  <td>
-                    <span className="leg-mate-log-correctness">
-                      <span aria-hidden="true">
-                        {log.isCorrect ? '✓' : '✗'}
-                      </span>{' '}
-                      <span>{log.isCorrect ? 'Correct' : 'Incorrect'}</span>
-                    </span>{' '}
-                    <button
-                      aria-label={`Cycle ideal White move for move ${moveNumber}; ${correctChoiceText}`}
-                      className="leg-mate-log-choice-button"
-                      disabled={
-                        correctChoices === 0 ||
-                        (log.isCorrect && correctChoices === 1)
-                      }
-                      onClick={() => onCycleIdealWhite(index)}
-                      type="button"
-                    >
-                      {correctChoiceText}
                     </button>
                   </td>
                   <td>{formatMateMoveDuration(log.durationMs)}</td>
@@ -222,7 +262,7 @@ export default function MateLog({
                     <button
                       aria-label={`${reasonLabel}. Open priority guide`}
                       className="leg-mate-log-reason-button"
-                      onClick={openGuide}
+                      onClick={(event) => openGuide(event, reason?.id ?? null)}
                       type="button"
                     >
                       {reasonLabel}
@@ -237,9 +277,14 @@ export default function MateLog({
 
       {guideOpen ? (
         <MatePriorityGuideDialog
+          copyStartingUrlStatus={copyStartingUrlStatus}
+          highlightedReasonId={highlightedReasonId}
+          mateMode={mateMode}
           onClose={closeGuide}
+          onCopyStartingUrl={onCopyStartingUrl}
           returnFocusTo={guideOpener}
           ruleSet={ruleSet}
+          startingFen={startingFen}
         />
       ) : null}
     </section>

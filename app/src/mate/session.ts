@@ -60,6 +60,11 @@ export type MateSessionSelection = {
   startingFen?: string
 }
 
+export type MateReplaySessionSelection = MateSessionSelection & {
+  readonly moves: readonly string[]
+  readonly startingFen: string
+}
+
 export type MateSessionDeps = {
   now: () => number
   random: () => number
@@ -327,6 +332,50 @@ export function createMateSession(
     finishedAtMs,
     outcome,
   }
+}
+
+export function createMateReplaySession(
+  selection: MateReplaySessionSelection,
+  deps: MateSessionDeps,
+): MateSession {
+  if (selection.moves.length === 0 || selection.moves.length % 2 !== 0) {
+    throw new Error('Mate replay requires complete White/Black turns')
+  }
+
+  let session = createMateSession(selection, deps)
+  for (let index = 0; index < selection.moves.length; index += 2) {
+    if (session.outcome !== undefined) {
+      throw new Error('Mate replay continues after a terminal position')
+    }
+    const whiteSan = selection.moves[index]
+    const blackSan = selection.moves[index + 1]
+    if (whiteSan === undefined || blackSan === undefined) {
+      throw new Error('Mate replay has an incomplete turn')
+    }
+    const completed = completeWhiteTurn({
+      mateId: session.mateId,
+      preMoveFen: session.fen,
+      san: whiteSan,
+      prefixLogs: session.logs,
+      durationMs: 0,
+      preferredOpponentSan: blackSan,
+      deps,
+    })
+    if (
+      completed === undefined ||
+      completed.log.opponentSan !== blackSan
+    ) {
+      throw new Error(`Mate replay rejected turn ${index / 2 + 1}`)
+    }
+    session = commitSnapshot(
+      session,
+      completed.fen,
+      [...session.logs, completed.log],
+      session.startedAtMs,
+      completed.outcome,
+    )
+  }
+  return session
 }
 
 export function playWhiteMove(

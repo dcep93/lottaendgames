@@ -120,17 +120,17 @@ test('bishop-and-knight rules are registered', () => {
       {
         id: 'mate',
         shortLabel: 'mate',
-        helpText: 'Checkmate immediately when mate is available.',
+        helpText: '',
+      },
+      {
+        id: 'minors safe',
+        shortLabel: 'pieces safe',
+        helpText: '',
       },
       {
         id: 'no stalemate',
         shortLabel: 'no stalemate',
-        helpText: 'Avoid stalemate.',
-      },
-      {
-        id: 'minors safe',
-        shortLabel: 'minors safe',
-        helpText: 'Keep pieces safe from capture.',
+        helpText: '',
       },
       {
         id: 'enter mating net',
@@ -232,7 +232,12 @@ test('bishop-and-knight rules are registered', () => {
     .filter((id, index, ids) => ids.indexOf(id) === index)
   assert.deepEqual(
     ruleSet.whiteRuleDescriptions.map(({ id }) => id),
-    firstEvaluatorIds,
+    [
+      firstEvaluatorIds[0],
+      firstEvaluatorIds[2],
+      firstEvaluatorIds[1],
+      ...firstEvaluatorIds.slice(3),
+    ],
   )
   assert.equal(knightAndBishopWhiteRules.length, 13)
   const driftGate = knightAndBishopWhiteRules[7]?.stopWhenBest

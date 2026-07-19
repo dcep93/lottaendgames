@@ -161,8 +161,8 @@ const ROOK_WHITE_FIXTURES: readonly WhiteFixture[] = [
   },
   {
     fen: '6k1/8/8/8/8/2R5/8/2K5 w - - 0 1',
-    idealMoves: ['Rf3'],
-    hint: 'king closer',
+    idealMoves: ['Rc7'],
+    hint: 'establish box',
     phase: '2/2',
   },
   {
@@ -173,8 +173,8 @@ const ROOK_WHITE_FIXTURES: readonly WhiteFixture[] = [
   },
   {
     fen: '8/8/8/8/R7/K7/8/k7 w - - 0 1',
-    idealMoves: ['Rc4'],
-    hint: 'establish box',
+    idealMoves: ['Rh4'],
+    hint: 'maximize black distance',
     phase: '1/2',
   },
   {
@@ -498,7 +498,7 @@ const WHITE_INTRO =
 const BLACK_INTRO =
   'Black uses its own priorities to put up the strongest resistance. Black is not trying to help the mate; it looks for the most stubborn legal reply.'
 
-test('queen and rook preserve chess420 white rule order, labels, and help', () => {
+test('queen and rook preserve evaluator order with universal priority labels', () => {
   assert.deepEqual(
     queenWhiteRules.map(({ id }) => id),
     [
@@ -532,7 +532,7 @@ test('queen and rook preserve chess420 white rule order, labels, and help', () =
     queenWhiteRules.map(({ shortLabel }) => shortLabel),
     [
       'mate',
-      'queen safe',
+      'pieces safe',
       'no stalemate',
       'corner cage',
       'White king toward cage',
@@ -547,7 +547,7 @@ test('queen and rook preserve chess420 white rule order, labels, and help', () =
     rookWhiteRules.map(({ shortLabel }) => shortLabel),
     [
       'mate',
-      'rook safe',
+      'pieces safe',
       'no stalemate',
       'establish box',
       'forcing check',
@@ -568,7 +568,11 @@ test('queen and rook preserve chess420 white rule order, labels, and help', () =
   assert.equal(
     rookWhiteRules.find(({ id }) => id === 'rook waiting distance')
       ?.helpText,
-    '',
+    "When a rook waiting move is required and the earlier priorities tie, place the rook as far as possible from Black's king.",
+  )
+  assert.equal(
+    rookWhiteRules.find(({ id }) => id === 'establish box')?.helpText,
+    "Put the rook on the row or file between the kings and closest to Black's king when not already.",
   )
   assert.equal(queenRuleSet.help.title, 'How best moves are chosen')
   assert.equal(queenRuleSet.help.whiteIntro, WHITE_INTRO)
@@ -836,11 +840,13 @@ test('rook white score fields preserve establish-box and post-box priorities', (
     rookCapturePenalty: 0,
     stalematePenalty: 0,
     rookBoxEstablishedPenalty: 0,
-    rookBoxSize: 0,
+    rookBoxAxisSwitchPenalty: 0,
+    rookBoxSize: 2,
     forcingCheckPenalty: 1,
     rookPhaseTwoWaitingPenalty: 0,
     rookPhaseTwoWaitingDistanceScore: 0,
     rookBoxPreservedPenalty: 0,
+    rookPreservedBoxSize: 0,
     rookBlackDistanceScore: -6,
     kingRookLinePenalty: 0,
     kingDistance: 5,
@@ -850,11 +856,13 @@ test('rook white score fields preserve establish-box and post-box priorities', (
     rookCapturePenalty: 0,
     stalematePenalty: 0,
     rookBoxEstablishedPenalty: 1,
+    rookBoxAxisSwitchPenalty: 0,
     rookBoxSize: 0,
     forcingCheckPenalty: 1,
     rookPhaseTwoWaitingPenalty: 0,
     rookPhaseTwoWaitingDistanceScore: 0,
     rookBoxPreservedPenalty: 0,
+    rookPreservedBoxSize: 0,
     rookBlackDistanceScore: -7,
     kingRookLinePenalty: 0,
     kingDistance: 5,
@@ -869,17 +877,64 @@ test('rook white score fields preserve establish-box and post-box priorities', (
     rookCapturePenalty: 0,
     stalematePenalty: 0,
     rookBoxEstablishedPenalty: 0,
+    rookBoxAxisSwitchPenalty: 0,
     rookBoxSize: 0,
     forcingCheckPenalty: 1,
     rookPhaseTwoWaitingPenalty: 0,
     rookPhaseTwoWaitingDistanceScore: -3,
     rookBoxPreservedPenalty: 0,
+    rookPreservedBoxSize: 2,
     rookBlackDistanceScore: -4,
     kingRookLinePenalty: 0,
     kingDistance: 3,
   })
   assert.deepEqual(far, near)
   assert.equal(compareRookWhiteScores(near, far), 0)
+
+  const loopMove18Fen = '8/8/8/3K4/8/k7/8/2R5 w - - 34 18'
+  const loopRc4 = scoreRookWhiteMove(loopMove18Fen, 'Rc4')
+  const loopRb1 = scoreRookWhiteMove(loopMove18Fen, 'Rb1')
+  assert.equal(loopRc4.rookBoxSize, 3)
+  assert.equal(loopRb1.rookBoxSize, 1)
+  assert.ok(compareRookWhiteScores(loopRb1, loopRc4) < 0)
+  const rook = getMateRuleSet('rook')
+  assert.deepEqual(rook.idealWhiteMoves(loopMove18Fen), ['Rb1'])
+  assert.equal(
+    rook.explainWhiteMove(loopMove18Fen, 'Rc4')?.id,
+    'establish box',
+  )
+
+  const minimalLoopFen = '5k2/4R3/3K4/8/8/8/8/8 w - - 2 2'
+  const minimalLoopRe1 = scoreRookWhiteMove(minimalLoopFen, 'Re1')
+  const minimalLoopRa7 = scoreRookWhiteMove(minimalLoopFen, 'Ra7')
+  const minimalLoopRb7 = scoreRookWhiteMove(minimalLoopFen, 'Rb7')
+  assert.equal(minimalLoopRe1.rookBoxPreservedPenalty, 1)
+  assert.equal(minimalLoopRe1.rookPreservedBoxSize, 3)
+  assert.equal(minimalLoopRa7.rookBoxPreservedPenalty, 0)
+  assert.equal(minimalLoopRa7.rookPreservedBoxSize, 1)
+  assert.equal(minimalLoopRb7.rookBoxPreservedPenalty, 0)
+  assert.equal(minimalLoopRb7.rookPreservedBoxSize, 1)
+  assert.ok(compareRookWhiteScores(minimalLoopRa7, minimalLoopRe1) < 0)
+  assert.ok(compareRookWhiteScores(minimalLoopRa7, minimalLoopRb7) < 0)
+  assert.deepEqual(rook.idealWhiteMoves(minimalLoopFen), ['Ra7'])
+  assert.equal(
+    rook.explainWhiteMove(minimalLoopFen, 'Re1')?.id,
+    'maximize black distance',
+  )
+
+  const perpendicularCycleFen = '8/8/6k1/8/R7/4K3/8/8 w - - 2 2'
+  const perpendicularRa5 = scoreRookWhiteMove(perpendicularCycleFen, 'Ra5')
+  const perpendicularRf4 = scoreRookWhiteMove(perpendicularCycleFen, 'Rf4')
+  assert.equal(perpendicularRa5.rookBoxAxisSwitchPenalty, 0)
+  assert.equal(perpendicularRa5.rookBoxSize, 3)
+  assert.equal(perpendicularRf4.rookBoxAxisSwitchPenalty, 1)
+  assert.equal(perpendicularRf4.rookBoxSize, 2)
+  assert.ok(compareRookWhiteScores(perpendicularRa5, perpendicularRf4) < 0)
+  assert.deepEqual(rook.idealWhiteMoves(perpendicularCycleFen), ['Ra5'])
+  assert.equal(
+    rook.explainWhiteMove(perpendicularCycleFen, 'Rf4')?.id,
+    'establish box',
+  )
 })
 
 test('rook avoids unsafe material and stalemate in literal source positions', () => {
@@ -1015,13 +1070,13 @@ test('rook mates all 50 source-seeded Standard starts within 220 plies', () => {
     maxPlies = Math.max(maxPlies, moves.length)
   }
 
-  assert.equal(totalPlies, 2456)
-  assert.equal(maxPlies, 101)
+  assert.equal(totalPlies, 2020)
+  assert.equal(maxPlies, 115)
   assert.equal(
     createHash('sha256')
       .update(JSON.stringify({ starts, lines }))
       .digest('hex'),
-    'afba5f9397c04180d36c68800a6b5751be3b9ac4e7362055f5c47b14cb125444',
+    '24ac7bf124636ee5725b4ce9a854c983cc9df7b49d0eefff18fd090e206a6472',
   )
 })
 

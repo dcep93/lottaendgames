@@ -2,7 +2,8 @@ import type { CSSProperties } from 'react'
 import type { Square } from 'chess.js'
 import { getChess } from './chess'
 
-export const MATE_REPLY_ANIMATION_MS = 90
+export const MATE_MOVE_ANIMATION_MS = 100
+export const MATE_REPLY_ANIMATION_MS = MATE_MOVE_ANIMATION_MS
 
 export type LegalTarget = {
   readonly isCapture: boolean

@@ -34,17 +34,14 @@ export default function Mate({
     <main className="leg-page leg-mate-page">
       <div className="leg-reader-shell leg-mate-shell">
         {moduleSelector}
-        <header className="leg-reader-header leg-mate-header">
-          <p className="leg-kicker">Lotta Endgames</p>
-          <h1>Mate</h1>
-        </header>
+        <h1 className="leg-mate-visually-hidden">Mate</h1>
+        <MateSidebar
+          mateId={route.mateId}
+          mateMode={route.mateMode}
+          onNavigate={onNavigate}
+        />
 
         <div className="leg-mate-layout">
-          <MateSidebar
-            mateId={route.mateId}
-            mateMode={route.mateMode}
-            onNavigate={onNavigate}
-          />
           {selectedDrill ? (
             <MateWorkspace
               BoardComponent={BoardComponent}
@@ -52,10 +49,12 @@ export default function Mate({
                 selectedDrill.set.id,
                 selectedDrill.mode,
                 route.sharedFen,
+                route.sharedMoves ?? null,
               )}
               mateId={selectedDrill.set.id}
               mateMode={selectedDrill.mode}
               sharedFen={route.sharedFen}
+              sharedMoves={route.sharedMoves ?? null}
             />
           ) : (
             <section className="leg-mate-empty-state">
@@ -75,6 +74,7 @@ function drillKey(
   mateId: MateId,
   mateMode: MateMode,
   sharedFen: string | null,
+  sharedMoves: readonly string[] | null,
 ): string {
-  return `${mateId}:${mateMode}:${sharedFen ?? ''}`
+  return `${mateId}:${mateMode}:${sharedFen ?? ''}:${sharedMoves?.join(' ') ?? ''}`
 }

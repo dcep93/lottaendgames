@@ -2,8 +2,11 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import {
   decodeMateFen,
+  decodeMateReplay,
   encodeMateFen,
+  encodeMateReplay,
   formatMateShareText,
+  MATE_REPLAY_MAX_PLIES,
 } from './share'
 
 const ROOK_STANDARD_FEN =
@@ -20,18 +23,84 @@ const KNN_STANDARD_FEN =
   '4k3/p7/8/8/8/8/8/1N2K1N1 w - - 0 1'
 const KNN_TRAIN_FEN =
   '7k/8/5NKN/8/8/8/p7/8 w - - 0 1'
+const ROOK_LOOP_START =
+  '8/8/8/8/3k4/8/1R6/3K4 w - - 0 1'
 
 test('encodes and round-trips one documented hash with all six FEN fields', () => {
   const hash = encodeMateFen(ROOK_STANDARD_FEN)
 
   assert.equal(
     hash,
-    `#fen=${encodeURIComponent(ROOK_STANDARD_FEN)}`,
+    `#fen=${ROOK_STANDARD_FEN.replaceAll(' ', '_')}`,
   )
   assert.deepEqual(decodeMateFen(hash, 'rook', 'standard'), {
     ok: true,
     fen: ROOK_STANDARD_FEN,
   })
+})
+
+test('accepts legacy escaped FEN hashes for canonical routing', () => {
+  assert.deepEqual(
+    decodeMateFen(
+      `#fen=${encodeURIComponent(ROOK_STANDARD_FEN)}`,
+      'rook',
+      'standard',
+    ),
+    { ok: true, fen: ROOK_STANDARD_FEN },
+  )
+})
+
+test('encodes and canonicalizes a complete legal replay line', () => {
+  const hash = encodeMateReplay(ROOK_LOOP_START, ['Rb3', 'Kc5'])
+  assert.equal(
+    hash,
+    `${encodeMateFen(ROOK_LOOP_START)}&moves=Rb3,Kc5`,
+  )
+  assert.deepEqual(decodeMateReplay(hash, 'rook', 'standard'), {
+    ok: true,
+    fen: ROOK_LOOP_START,
+    moves: ['Rb3', 'Kc5'],
+  })
+  assert.deepEqual(
+    decodeMateReplay(encodeMateFen(ROOK_LOOP_START), 'rook', 'standard'),
+    { ok: true, fen: ROOK_LOOP_START, moves: null },
+  )
+  assert.deepEqual(
+    decodeMateReplay(
+      `#fen=${encodeURIComponent(ROOK_LOOP_START)}&moves=${encodeURIComponent('Rb3 Kc5')}`,
+      'rook',
+      'standard',
+    ),
+    { ok: true, fen: ROOK_LOOP_START, moves: ['Rb3', 'Kc5'] },
+  )
+})
+
+test('rejects malformed, incomplete, terminal, and oversized replays', () => {
+  const mateStart = '7k/8/6K1/8/8/8/8/R7 w - - 0 1'
+  const invalidHashes = [
+    `${encodeMateFen(ROOK_LOOP_START)}&moves=`,
+    `${encodeMateFen(ROOK_LOOP_START)}&moves=Rb3`,
+    `${encodeMateFen(ROOK_LOOP_START)}&moves=${encodeURIComponent('Rb3 nope')}`,
+    `${encodeMateFen(ROOK_LOOP_START)}&moves=${encodeURIComponent(' Rb3 Kc5')}`,
+    `${encodeMateFen(ROOK_LOOP_START)}&moves=${encodeURIComponent('Rb3 Kc5')}&extra=true`,
+    `${encodeMateFen(mateStart)}&moves=${encodeURIComponent('Ra8# Kh7')}`,
+    `${encodeMateFen(ROOK_LOOP_START)}&moves=${encodeURIComponent(
+      Array.from({ length: MATE_REPLAY_MAX_PLIES + 2 }, () => 'x').join(' '),
+    )}`,
+  ]
+  for (const hash of invalidHashes) {
+    assert.deepEqual(decodeMateReplay(hash, 'rook', 'standard'), {
+      ok: false,
+    })
+  }
+  assert.throws(
+    () =>
+      encodeMateReplay(
+        ROOK_LOOP_START,
+        Array.from({ length: MATE_REPLAY_MAX_PLIES + 1 }, () => 'x'),
+      ),
+    RangeError,
+  )
 })
 
 test('normalizes a valid decoded FEN through chess.js', () => {

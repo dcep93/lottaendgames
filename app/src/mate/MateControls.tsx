@@ -2,6 +2,7 @@ import React from 'react'
 import type { MateTerminalOutcome } from './session'
 
 export type MateControlsProps = {
+  readonly busy?: boolean
   readonly canUndo: boolean
   readonly canRedo: boolean
   readonly canPlayBest: boolean
@@ -22,11 +23,11 @@ export type MateControlsProps = {
 const OUTCOME_LABELS: Readonly<Record<MateTerminalOutcome, string>> = {
   checkmate: 'Checkmate',
   stalemate: 'Stalemate',
-  'lost-material': 'Required mating material was lost',
-  'lost-knight': 'A required knight was lost',
-  'pawn-promoted': 'The pawn promoted',
-  'fifty-move': 'Draw by the fifty-move rule',
-  unsupported: 'The position left the supported winning construction',
+  'lost-material': 'Defeated',
+  'lost-knight': 'Defeated',
+  'pawn-promoted': 'Defeated',
+  'fifty-move': 'Draw',
+  unsupported: 'Defeated',
 }
 
 const readCurrentTime = () => Date.now()
@@ -43,6 +44,7 @@ function formatMateElapsed(elapsedMs: number): string {
 }
 
 export default function MateControls({
+  busy = false,
   canUndo,
   canRedo,
   canPlayBest,
@@ -65,10 +67,16 @@ export default function MateControls({
     : OUTCOME_LABELS[outcome]
 
   return (
-    <div aria-label="Mate controls" className="leg-mate-controls" role="group">
+    <div
+      aria-busy={busy}
+      aria-label="Mate controls"
+      className="leg-mate-controls"
+      role="group"
+    >
       <div className="leg-mate-controls-actions">
         <button
           aria-keyshortcuts="Enter"
+          disabled={busy}
           onClick={onStartOver}
           type="button"
         >
@@ -76,7 +84,7 @@ export default function MateControls({
         </button>
         <button
           aria-keyshortcuts="ArrowLeft"
-          disabled={!canUndo}
+          disabled={busy || !canUndo}
           onClick={onUndo}
           type="button"
         >
@@ -84,7 +92,7 @@ export default function MateControls({
         </button>
         <button
           aria-keyshortcuts="ArrowRight"
-          disabled={!canRedo}
+          disabled={busy || !canRedo}
           onClick={onRedo}
           type="button"
         >
@@ -92,7 +100,7 @@ export default function MateControls({
         </button>
         <button
           aria-keyshortcuts="ArrowUp"
-          disabled={!canPlayBest || outcome !== undefined}
+          disabled={busy || !canPlayBest || outcome !== undefined}
           onClick={onPlayBest}
           type="button"
         >
@@ -101,6 +109,21 @@ export default function MateControls({
       </div>
 
       <div className="leg-mate-controls-summary">
+        {terminalLabel === undefined ? null : (
+          <>
+            <span
+              aria-atomic="true"
+              aria-live="polite"
+              className="leg-mate-terminal-status"
+              role="status"
+            >
+              {terminalLabel}
+            </span>
+            <button onClick={onShare} type="button">
+              Share
+            </button>
+          </>
+        )}
         <button
           aria-controls={timerId}
           aria-pressed={showTimer}
@@ -122,30 +145,16 @@ export default function MateControls({
             startedAtMs={startedAtMs}
           />
         </output>
-        {terminalLabel === undefined ? null : (
-          <>
-            <span
-              aria-atomic="true"
-              aria-live="polite"
-              className="leg-mate-terminal-status"
-              role="status"
-            >
-              {terminalLabel}
-            </span>
-            <button onClick={onShare} type="button">
-              Share
-            </button>
-          </>
-        )}
-        <span
-          aria-label="Share status"
-          aria-live="polite"
-          className="leg-mate-share-status"
-          role="status"
-        >
-          {shareStatus ?? ''}
-        </span>
       </div>
+      <span
+        aria-atomic="true"
+        aria-label="Share status"
+        aria-live="polite"
+        className="leg-mate-share-status"
+        role="status"
+      >
+        {shareStatus ?? ''}
+      </span>
     </div>
   )
 }

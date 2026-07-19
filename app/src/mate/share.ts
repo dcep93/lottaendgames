@@ -7,11 +7,22 @@ import {
   validateMatePosition,
 } from './chess'
 import { isSupportedTwoKnightsPawnStart } from './positions'
-import type { MateTerminalOutcome } from './session'
+import {
+  getMateTerminalOutcome,
+  type MateTerminalOutcome,
+} from './session'
 import type { MateId, MateMode } from './types'
 
 export type MateFenDecodeResult =
   | { readonly ok: true; readonly fen: string }
+  | { readonly ok: false }
+
+export type MateReplayDecodeResult =
+  | {
+      readonly ok: true
+      readonly fen: string
+      readonly moves: readonly string[] | null
+    }
   | { readonly ok: false }
 
 export type MateShareTextInput = {
@@ -21,6 +32,9 @@ export type MateShareTextInput = {
 }
 
 const INVALID_MATE_FEN = Object.freeze({ ok: false } as const)
+const INVALID_MATE_REPLAY = Object.freeze({ ok: false } as const)
+
+export const MATE_REPLAY_MAX_PLIES = 512
 
 const OUTCOME_LABELS: Readonly<Record<MateTerminalOutcome, string>> = {
   checkmate: 'checkmate',
@@ -56,7 +70,85 @@ const CASTLING_REQUIREMENTS = {
 type CastlingRight = keyof typeof CASTLING_REQUIREMENTS
 
 export function encodeMateFen(fen: string): string {
-  return `#fen=${encodeURIComponent(fen)}`
+  return `#fen=${fen.trim().replace(/\s+/g, '_')}`
+}
+
+export function encodeMateReplay(
+  fen: string,
+  moves: readonly string[],
+): string {
+  if (moves.length === 0 || moves.length > MATE_REPLAY_MAX_PLIES) {
+    throw new RangeError(
+      `Mate replay requires 1-${MATE_REPLAY_MAX_PLIES} plies`,
+    )
+  }
+  return `${encodeMateFen(fen)}&moves=${moves.map(encodeURIComponent).join(',')}`
+}
+
+export function decodeMateReplay(
+  hash: string,
+  mateId: MateId,
+  mode: MateMode = 'standard',
+): MateReplayDecodeResult {
+  if (!hash.startsWith('#fen=')) return INVALID_MATE_REPLAY
+  const parts = hash.slice(1).split('&')
+  if (parts.length > 2 || parts[0]?.startsWith('fen=') !== true) {
+    return INVALID_MATE_REPLAY
+  }
+  const fenResult = decodeMateFen(`#${parts[0]}`, mateId, mode)
+  if (!fenResult.ok) return INVALID_MATE_REPLAY
+  if (parts.length === 1) {
+    return { ok: true, fen: fenResult.fen, moves: null }
+  }
+
+  const movesField = parts[1]
+  if (movesField?.startsWith('moves=') !== true) {
+    return INVALID_MATE_REPLAY
+  }
+  const encodedMoves = movesField.slice('moves='.length)
+  if (encodedMoves === '') return INVALID_MATE_REPLAY
+
+  let decodedMoves: string
+  try {
+    decodedMoves = decodeURIComponent(encodedMoves)
+  } catch {
+    return INVALID_MATE_REPLAY
+  }
+  const moves = decodedMoves.includes(',')
+    ? decodedMoves.split(',')
+    : decodedMoves.trim() === decodedMoves
+      ? decodedMoves.split(/\s+/)
+      : []
+  if (
+    moves.length === 0 ||
+    moves.some((move) => move === '' || /\s/.test(move)) ||
+    moves.length > MATE_REPLAY_MAX_PLIES ||
+    moves.length % 2 !== 0
+  ) {
+    return INVALID_MATE_REPLAY
+  }
+
+  const chess = getChess(fenResult.fen)
+  const canonicalMoves: string[] = []
+  for (const san of moves) {
+    if (getMateTerminalOutcome(mateId, chess.fen()) !== undefined) {
+      return INVALID_MATE_REPLAY
+    }
+    try {
+      const move = chess.move(san)
+      if (move === null) return INVALID_MATE_REPLAY
+      canonicalMoves.push(move.san)
+    } catch {
+      return INVALID_MATE_REPLAY
+    }
+  }
+  if (chess.turn() !== 'w') return INVALID_MATE_REPLAY
+
+  return {
+    ok: true,
+    fen: fenResult.fen,
+    moves: Object.freeze(canonicalMoves),
+  }
 }
 
 export function decodeMateFen(
@@ -75,6 +167,7 @@ export function decodeMateFen(
   } catch {
     return INVALID_MATE_FEN
   }
+  if (!/\s/.test(decodedFen)) decodedFen = decodedFen.replaceAll('_', ' ')
   const fields = decodedFen.trim().split(/\s+/)
   if (fields.length !== 6) {
     return INVALID_MATE_FEN

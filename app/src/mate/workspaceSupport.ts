@@ -159,6 +159,34 @@ export function shouldIgnoreMateShortcut(target: EventTarget | null): boolean {
   }
 }
 
+export function releasePointerButtonFocus(
+  detail: number,
+  target: EventTarget | null,
+): void {
+  if (detail <= 0 || target === null || typeof target !== 'object') return
+  const candidate = target as {
+    blur?: () => void
+    closest?: (selector: string) => unknown
+    readonly tagName?: string
+  }
+  try {
+    const button =
+      candidate.tagName?.toLowerCase() === 'button'
+        ? candidate
+        : candidate.closest?.('button')
+    if (
+      button !== null &&
+      typeof button === 'object' &&
+      typeof (button as { blur?: unknown }).blur === 'function'
+    ) {
+      const blurrableButton = button as { blur: () => void }
+      blurrableButton.blur()
+    }
+  } catch {
+    // A non-DOM or detached event target cannot retain actionable focus here.
+  }
+}
+
 export function exactMateHref(
   mateId: MateId,
   mode: MateMode,
