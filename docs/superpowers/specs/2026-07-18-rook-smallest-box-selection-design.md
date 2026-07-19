@@ -25,18 +25,17 @@ separating cut and does not block it, so it must not prevent a closer king move.
 Keep the existing ordered rule and its public ID, label, and help text unchanged.
 The change is limited to Rook White-move scoring and comparison.
 
-When the starting position does not already have a closest rook-box axis and a
-candidate move establishes one, calculate the resulting one-dimensional box
-size along that actual established axis. Lower size remains better under the
-existing `establish box` comparison. Candidates that do not establish a closest
-axis retain the existing establishment penalty and do not need a meaningful box
-size.
+When the starting position does not already have a closest rook-box axis,
+calculate the resulting one-dimensional box size along every candidate's active
+cut axis. Lower size remains better under the existing `establish box`
+comparison. A candidate is penalized only if it establishes no active cut; the
+closest-cut label must not make a larger box beat a smaller retained cut.
 
 If the starting position has an established but non-closest cut, compare every
-candidate that establishes a closest cut by resulting box size first. Lower is
-always better. If sizes tie, prefer the candidate that retains the existing
-axis. If there is no established cut, either axis remains eligible and the
-smallest resulting box wins as before.
+candidate with an active cut by resulting box size first. Lower is always
+better. If sizes tie, prefer the candidate that retains the existing axis. If
+there is no established cut, either axis remains eligible and the smallest
+resulting active box wins as before.
 
 When the starting position already has a closest box, record its size and the
 candidate's resulting active-cut box size. The existing preservation penalty
@@ -101,6 +100,18 @@ inactive. `Kd6` is the sole ideal move through `king closer`; `Rc6` must not
 switch the box axis back and recreate the four-ply cycle. Every legal Black
 reply after `Kd6` must remain provably mating.
 
+Add a compact straight-waiting pattern when the active box has size 2, the rook
+is adjacent to White's king, and the kings' file/rank deltas are 3 and 1. Prefer
+a quiet rook move that stays on the current cut line and preserves the active
+box, then use the existing waiting-distance ranking. This is distinct from the
+3-by-2 equal-box axis-switch pattern.
+
+For `5k2/8/4R3/4K3/8/8/8/8 w - - 2 2`, `Ra6` retains the size-2 rank box while
+`Kd5` creates a larger size-3 file box. Establishment must prefer `Ra6` over
+`Kd5`, and the compact straight-waiting pattern must prefer it over `Kf5`.
+`Ra6` is the sole ideal move. Every legal Black reply after `Ra6` must remain
+provably mating.
+
 For `8/8/8/3K4/8/k7/8/2R5 w - - 34 18`:
 
 - `Rc4` establishes a rank cut with box size 3.
@@ -153,7 +164,9 @@ king-approach continuation, the exact `Rb7` versus `Rc6` comparison, and the
 edge-box waiting regression, including equal active-box sizes and an exhaustive
 check of every legal reply after `Rc1`. Add the exact `Kd6` versus `Rc6`
 post-waiting regression and exhaustively check every legal reply after `Kd6`.
-Assert that the existing tooltip copy and visible order are unchanged. Run Rook
-parity/self-play tests, the exhaustive Rook verifier, the full Mate suite, lint,
-and the production build. If another literal loop remains, encode one minimal
-exact-position witness as a replay URL with explicit moves for Undo/Redo.
+Add the exact `Ra6` versus `Kd5` and `Kf5` regression, including active box
+sizes, and exhaustively check every legal reply after `Ra6`. Assert that the
+existing tooltip copy and visible order are unchanged. Run Rook parity/self-play
+tests, the exhaustive Rook verifier, the full Mate suite, lint, and the
+production build. If another literal loop remains, encode one minimal exact-
+position witness as a replay URL with explicit moves for Undo/Redo.
