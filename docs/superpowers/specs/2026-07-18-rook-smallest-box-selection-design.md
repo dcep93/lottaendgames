@@ -81,16 +81,25 @@ and prevents the exact `Kd6 Ka7 Kc5 Kb8` cycle.
 
 Add a second phase-two waiting pattern for the edge geometry in which the
 starting cut is closest, its box size is 2, and the kings' file/rank deltas are
-3 and 2. In that pattern, prefer a quiet rook move that switches the active cut
-axis without enlarging the box. Rank qualifying moves by Manhattan distance
-from Black so the rook waits as far away as possible. Keep the existing
-knight-distance waiting pattern and its distance ranking unchanged.
+3 and 2. Require the rook to begin adjacent to White's king: this is the compact
+position that needs a rook tempo. In that pattern, prefer a quiet rook move that
+switches the active cut axis without enlarging the box. Rank qualifying moves by
+Manhattan distance from Black so the rook waits as far away as possible. Once
+the rook has moved far away, do not trigger the same axis-switch waiting pattern
+again; resume king approach. Keep the existing knight-distance waiting pattern
+and its distance ranking unchanged.
 
 For `8/k7/2R5/3K4/8/8/8/8 w - - 0 1`, the rank cut and the file cut produced by
 `Rc1` both have size 2. `Rc1` is therefore preservation, not box loss. It is the
 farthest qualifying equal-box axis-switch waiting move and must be the sole
 ideal move instead of `Kc5`. After `Rc1`, every legal Black reply must remain
 provably mating under the evaluator.
+
+After `1.Rc1 Kb8`, at `1k6/8/8/3K4/8/8/8/2R5 w - - 2 2`, the rook is no longer
+adjacent to White's king. The edge-box waiting pattern must therefore be
+inactive. `Kd6` is the sole ideal move through `king closer`; `Rc6` must not
+switch the box axis back and recreate the four-ply cycle. Every legal Black
+reply after `Kd6` must remain provably mating.
 
 For `8/8/8/3K4/8/k7/8/2R5 w - - 34 18`:
 
@@ -142,8 +151,9 @@ corrected definition. Add a regression for the perpendicular-cut cycle and its
 king-approach continuation, the exact `Rb7` versus `Rc6` comparison, and the
 `Kd5` versus `Kd6` cut-axis comparison. Add the exact `Rc1` versus `Kc5`
 edge-box waiting regression, including equal active-box sizes and an exhaustive
-check of every legal reply after `Rc1`. Assert that the existing tooltip copy
-and visible order are unchanged. Run Rook parity/self-play tests, the exhaustive
-Rook verifier, the full Mate suite, lint, and the production build. If another
-literal loop remains, encode one minimal exact-position witness as a hosted
-replay URL with explicit moves for Undo/Redo.
+check of every legal reply after `Rc1`. Add the exact `Kd6` versus `Rc6`
+post-waiting regression and exhaustively check every legal reply after `Kd6`.
+Assert that the existing tooltip copy and visible order are unchanged. Run Rook
+parity/self-play tests, the exhaustive Rook verifier, the full Mate suite, lint,
+and the production build. If another literal loop remains, encode one minimal
+exact-position witness as a replay URL with explicit moves for Undo/Redo.
