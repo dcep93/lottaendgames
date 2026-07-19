@@ -55,6 +55,11 @@ When a cut remains established, any king-rook alignment is perpendicular to the
 separating axis and does not obstruct it. This lets king progress beat an
 unnecessary rook waiting move.
 
+Measure Rook king approach by actual king-move distance (Chebyshev distance),
+not Manhattan distance. `Kf3` in the shuttle root genuinely reduces that
+distance, while `Ke6` after `1.Re7 Kf8` only ties the existing distance and must
+not displace the approved `Ra7` rook move.
+
 For `8/8/8/3K4/8/k7/8/2R5 w - - 34 18`:
 
 - `Rc4` establishes a rank cut with box size 3.
