@@ -12,6 +12,11 @@ test('App navigation pushes Mate routes and restores them from browser history',
   assert.match(appSource, /window\.history\.pushState\(null, '', href\)/)
   assert.match(
     appSource,
+    /function replaceCurrentHref\(href: string\)[\s\S]*window\.history\.replaceState\(null, '', href\)/,
+  )
+  assert.match(appSource, /onReplaceHref=\{replaceCurrentHref\}/)
+  assert.match(
+    appSource,
     /window\.addEventListener\('popstate', handleHistoryChange\)/,
   )
   assert.match(

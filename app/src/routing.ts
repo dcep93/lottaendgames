@@ -2,6 +2,8 @@ import { MATE_CATALOG } from './mate/catalog'
 import {
   decodeMateReplay,
   encodeMateFen,
+  decodeMateLiveFen,
+  encodeMateLiveFen,
   encodeMateReplay,
 } from './mate/share'
 import type { MateId, MateMode, MateRouteSelection } from './mate/types'
@@ -135,6 +137,19 @@ function resolveMateRoute(pathname: string, hash: string): RouteResolution {
   const href = matePath(catalogRecord.id, mateMode)
 
   if (hash) {
+    if (hash.startsWith('#live=')) {
+      const decoded = decodeMateLiveFen(hash, catalogRecord.id)
+      if (!decoded.ok) return emptyMateResolution()
+      return {
+        href: `${href}${encodeMateLiveFen(decoded.fen)}`,
+        route: {
+          module: 'mate',
+          mateId: catalogRecord.id,
+          mateMode,
+          sharedFen: decoded.fen,
+        },
+      }
+    }
     const decoded = decodeMateReplay(hash, catalogRecord.id, mateMode)
     if (!decoded.ok) return emptyMateResolution()
     const canonicalHash =

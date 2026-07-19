@@ -1,7 +1,9 @@
 import type { Chess } from 'chess.js'
 import { MATE_CATALOG } from './catalog'
 import {
+  getEndgamePiecePlacements,
   getChess,
+  materialMatchesMate,
   SQUARE_TRANSFORMS,
   transformFen,
   validateMatePosition,
@@ -71,6 +73,10 @@ type CastlingRight = keyof typeof CASTLING_REQUIREMENTS
 
 export function encodeMateFen(fen: string): string {
   return `#fen=${fen.trim().replace(/\s+/g, '_')}`
+}
+
+export function encodeMateLiveFen(fen: string): string {
+  return `#live=${fen.trim().replace(/\s+/g, '_')}`
 }
 
 export function encodeMateReplay(
@@ -156,39 +162,8 @@ export function decodeMateFen(
   mateId: MateId,
   mode: MateMode = 'standard',
 ): MateFenDecodeResult {
-  if (!hash.startsWith('#fen=')) return INVALID_MATE_FEN
-
-  const encodedFen = hash.slice('#fen='.length)
-  if (encodedFen === '') return INVALID_MATE_FEN
-
-  let decodedFen: string
-  try {
-    decodedFen = decodeURIComponent(encodedFen)
-  } catch {
-    return INVALID_MATE_FEN
-  }
-  if (!/\s/.test(decodedFen)) decodedFen = decodedFen.replaceAll('_', ' ')
-  const fields = decodedFen.trim().split(/\s+/)
-  if (fields.length !== 6) {
-    return INVALID_MATE_FEN
-  }
-  const halfmove = canonicalFenCounter(fields[4] ?? '', 0)
-  const fullmove = canonicalFenCounter(fields[5] ?? '', 1)
-  if (halfmove === null || fullmove === null) return INVALID_MATE_FEN
-  fields[4] = halfmove
-  fields[5] = fullmove
-
-  let chess: Chess
-  let fen: string
-  try {
-    chess = getChess(fields.join(' '))
-    fen = chess.fen()
-  } catch {
-    return INVALID_MATE_FEN
-  }
-  if (!castlingRightsMatchPosition(chess, fields[2] ?? '')) {
-    return INVALID_MATE_FEN
-  }
+  const fen = decodeCanonicalFen(hash, '#fen=')
+  if (fen === null) return INVALID_MATE_FEN
 
   if (!validateMatePosition(mateId, fen).ok) {
     return INVALID_MATE_FEN
@@ -198,6 +173,109 @@ export function decodeMateFen(
   }
 
   return { ok: true, fen }
+}
+
+export function decodeMateLiveFen(
+  hash: string,
+  mateId: MateId,
+): MateFenDecodeResult {
+  const fen = decodeCanonicalFen(hash, '#live=')
+  if (fen === null) return INVALID_MATE_FEN
+
+  if (validateMatePosition(mateId, fen).ok) {
+    return { ok: true, fen }
+  }
+  try {
+    const outcome = getMateTerminalOutcome(mateId, fen)
+    return outcome !== undefined && isPlausibleLiveMaterial(mateId, fen)
+      ? { ok: true, fen }
+      : INVALID_MATE_FEN
+  } catch {
+    return INVALID_MATE_FEN
+  }
+}
+
+function isPlausibleLiveMaterial(mateId: MateId, fen: string): boolean {
+  if (materialMatchesMate(mateId, fen)) return true
+
+  const entry = MATE_CATALOG.find(({ id }) => id === mateId)
+  if (entry === undefined) return false
+  const expected = pieceCounts(entry.standardFallbackFen)
+  const actual = pieceCounts(fen)
+  if (
+    actual.get('w:k') !== 1 ||
+    actual.get('b:k') !== 1
+  ) {
+    return false
+  }
+  const onlyExpectedCaptures = [...actual].every(
+    ([piece, count]) => count <= (expected.get(piece) ?? 0),
+  )
+  if (onlyExpectedCaptures) return true
+  if (mateId !== 'two-knights-pawn') return false
+
+  const placements = getEndgamePiecePlacements(fen)
+  const promotedBlackPieces = placements.filter(
+    ({ color, type }) =>
+      color === 'b' && type !== 'k' && type !== 'p',
+  )
+  return (
+    promotedBlackPieces.length === 1 &&
+    placements.every(({ color, type }) =>
+      color === 'w'
+        ? type === 'k' || type === 'n'
+        : type === 'k' || type === promotedBlackPieces[0]?.type,
+    )
+  )
+}
+
+function pieceCounts(fen: string): Map<string, number> {
+  const counts = new Map<string, number>()
+  for (const { color, type } of getEndgamePiecePlacements(fen)) {
+    const key = `${color}:${type}`
+    counts.set(key, (counts.get(key) ?? 0) + 1)
+  }
+  return counts
+}
+
+function decodeCanonicalFen(
+  hash: string,
+  prefix: '#fen=' | '#live=',
+): string | null {
+  if (!hash.startsWith(prefix)) return null
+
+  const encodedFen = hash.slice(prefix.length)
+  if (encodedFen === '') return null
+
+  let decodedFen: string
+  try {
+    decodedFen = decodeURIComponent(encodedFen)
+  } catch {
+    return null
+  }
+  if (!/\s/.test(decodedFen)) decodedFen = decodedFen.replaceAll('_', ' ')
+  const fields = decodedFen.trim().split(/\s+/)
+  if (fields.length !== 6) {
+    return null
+  }
+  const halfmove = canonicalFenCounter(fields[4] ?? '', 0)
+  const fullmove = canonicalFenCounter(fields[5] ?? '', 1)
+  if (halfmove === null || fullmove === null) return null
+  fields[4] = halfmove
+  fields[5] = fullmove
+
+  let chess: Chess
+  let fen: string
+  try {
+    chess = getChess(fields.join(' '))
+    fen = chess.fen()
+  } catch {
+    return null
+  }
+  if (!castlingRightsMatchPosition(chess, fields[2] ?? '')) {
+    return null
+  }
+  return fen
 }
 
 export function formatMateShareText({

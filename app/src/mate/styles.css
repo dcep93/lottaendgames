@@ -40,11 +40,6 @@
   margin-bottom: 1rem;
 }
 
-.leg-mate-sidebar--sets-only {
-  grid-template-areas: 'sets';
-  grid-template-columns: minmax(0, 1fr);
-}
-
 .leg-mate-set-links,
 .leg-mate-mode-links {
   display: grid;
@@ -151,6 +146,18 @@
   border-color: var(--leg-pink);
   color: #140d12;
   background: var(--leg-pink);
+}
+
+.leg-mate-mode-link.is-disabled {
+  color: var(--leg-muted);
+  cursor: default;
+  opacity: 0.58;
+}
+
+.leg-mate-mode-link.is-disabled:hover {
+  border-color: transparent;
+  color: var(--leg-muted);
+  outline: none;
 }
 
 .leg-mate-empty-state {

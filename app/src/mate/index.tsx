@@ -13,6 +13,7 @@ type MateProps = {
   readonly boardComponent?: React.ComponentType<MateBoardProps>
   readonly moduleSelector: ReactNode
   readonly onNavigate: (href: string) => void
+  readonly onReplaceHref?: (href: string) => void
   readonly route: MateRouteSelection & { readonly module: 'mate' }
 }
 
@@ -20,6 +21,7 @@ export default function Mate({
   boardComponent: BoardComponent = MateBoard,
   moduleSelector,
   onNavigate,
+  onReplaceHref,
   route,
 }: MateProps) {
   const selectedSet = MATE_CATALOG.find(
@@ -53,6 +55,7 @@ export default function Mate({
               )}
               mateId={selectedDrill.set.id}
               mateMode={selectedDrill.mode}
+              onReplaceHref={onReplaceHref}
               sharedFen={route.sharedFen}
               sharedMoves={route.sharedMoves ?? null}
             />

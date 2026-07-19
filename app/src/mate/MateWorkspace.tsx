@@ -38,6 +38,7 @@ import {
   getCurrentPhase,
   getLastMateMove,
   hasPreferredWhiteMove,
+  liveMateHref,
   nextCycledMove,
   releasePointerButtonFocus,
   shouldIgnoreMateShortcut,
@@ -49,6 +50,7 @@ export type MateWorkspaceProps = {
   readonly mateMode: MateMode
   readonly sharedFen: string | null
   readonly sharedMoves: readonly string[] | null
+  readonly onReplaceHref?: (href: string) => void
 }
 
 type PlayBestAnimation = {
@@ -70,6 +72,7 @@ export default function MateWorkspace({
   BoardComponent,
   mateId,
   mateMode,
+  onReplaceHref,
   sharedFen,
   sharedMoves,
 }: MateWorkspaceProps) {
@@ -118,6 +121,12 @@ export default function MateWorkspace({
   React.useLayoutEffect(() => {
     sessionRef.current = session
   }, [session])
+
+  React.useEffect(() => {
+    onReplaceHref?.(
+      liveMateHref(session.mateId, session.mode, session.fen),
+    )
+  }, [onReplaceHref, session])
 
   React.useEffect(() => {
     mountedRef.current = true

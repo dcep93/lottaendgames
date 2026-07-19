@@ -48,6 +48,11 @@ export type QueenTwoSquareCage = {
   readonly pair: readonly [Square, Square]
 }
 
+export type QueenBoxDimensions = {
+  readonly shorterSide: number
+  readonly longerSide: number
+}
+
 export function isMajorPieceBetweenKings(
   majorPiece: PieceSquare,
   whiteKing: PieceSquare,
@@ -112,10 +117,10 @@ export function blackCanTakeWhiteMajorPiece(
   return sideToMoveCanCapturePiece(fen, 'w', pieceType)
 }
 
-export function getQueenBoxArea(
+export function getQueenBoxDimensions(
   whiteQueenSquare: Square,
   blackKingSquare: Square,
-): number {
+): QueenBoxDimensions {
   const queen = squareCoordinates(whiteQueenSquare)
   const black = squareCoordinates(blackKingSquare)
   const width =
@@ -130,7 +135,10 @@ export function getQueenBoxArea(
       : black.rank > queen.rank
         ? 7 - queen.rank
         : queen.rank
-  return width * height
+  return Object.freeze({
+    shorterSide: Math.min(width, height),
+    longerSide: Math.max(width, height),
+  })
 }
 
 export function getQueenMoveDistance(

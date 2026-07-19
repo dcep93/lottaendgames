@@ -17,7 +17,7 @@ import {
   getAxisDistance,
   getMajorEndgamePhase,
   getMajorEndgamePhaseLabel,
-  getQueenBoxArea,
+  getQueenBoxDimensions,
   getQueenCageKingApproachDistance,
   getQueenCageKingApproachManhattanDistance,
   getQueenMoveDistance,
@@ -42,7 +42,8 @@ export type QueenWhiteMoveScore = {
   readonly cagePenalty: number
   readonly whitePieceEdgePenalty: number
   readonly queenKnightMovePenalty: number
-  readonly queenBoxArea: number
+  readonly queenBoxShorterSide: number
+  readonly queenBoxLongerSide: number
   readonly cageKingApproachPriority: 0 | 1 | 2
   readonly cageKingApproachDistance: number | null
   readonly cageKingApproachManhattanDistance: number | null
@@ -168,6 +169,10 @@ export function scoreQueenWhiteMove(
   const whiteKing = findPiece(resultFen, 'w', 'k')
   const blackKing = findPiece(resultFen, 'b', 'k')
   const resultCage = getQueenTwoSquareCage(resultFen)
+  const queenBox =
+    whiteQueen && blackKing
+      ? getQueenBoxDimensions(whiteQueen.square, blackKing.square)
+      : null
   const cageKingApproachDistance =
     shouldWalkCageKing && resultCage && move.piece === 'k' && whiteKing && whiteQueen
       ? getQueenCageKingApproachDistance(
@@ -198,10 +203,8 @@ export function scoreQueenWhiteMove(
       isKnightMove(whiteQueen.square, blackKing.square)
         ? 0
         : 1,
-    queenBoxArea:
-      whiteQueen && blackKing
-        ? getQueenBoxArea(whiteQueen.square, blackKing.square)
-        : 99,
+    queenBoxShorterSide: queenBox?.shorterSide ?? 99,
+    queenBoxLongerSide: queenBox?.longerSide ?? 99,
     cageKingApproachPriority:
       shouldWalkCageKing && resultCage
         ? move.piece !== 'k'
@@ -266,9 +269,9 @@ export const queenWhiteRules: readonly OrderedRule<QueenWhiteMoveScore>[] = [
   },
   {
     id: 'king to cage',
-    shortLabel: 'White king toward cage support',
+    shortLabel: 'white king toward cage support',
     helpText:
-      "With a stable two-square corner cage, move White's king toward a mating-support square a knight's move from both the Queen and corner. Compare king-move distance first and row-plus-file distance second.",
+      "With a stable two-square corner cage, move White's king toward a mating-support square a knight's move from both the Queen and corner.",
     compare: (first, second) =>
       first.cageKingApproachPriority - second.cageKingApproachPriority ||
       compareOptionalDistances(
@@ -283,30 +286,31 @@ export const queenWhiteRules: readonly OrderedRule<QueenWhiteMoveScore>[] = [
   {
     id: 'white pieces off edge',
     shortLabel: 'white pieces off edge',
-    helpText:
-      "Minimize the number of White pieces—King and Queen—on edge squares.",
+    helpText: 'Minimize the number of White pieces on edge squares.',
     compare: (first, second) =>
       first.whitePieceEdgePenalty - second.whitePieceEdgePenalty,
   },
   {
     id: 'queen knight move',
-    shortLabel: 'Queen a knight move from Black',
+    shortLabel: 'queen a knight move from black',
     helpText: "Keep or place the Queen a knight's move from Black's king.",
     compare: (first, second) =>
       first.queenKnightMovePenalty - second.queenKnightMovePenalty,
   },
   {
     id: 'queen box size',
-    shortLabel: 'Queen box size',
+    shortLabel: 'queen box size',
     helpText:
-      "Minimize the board-edge rectangle bounded by the Queen's rank and file on Black's side.",
-    compare: (first, second) => first.queenBoxArea - second.queenBoxArea,
+      "Minimize the shorter side of the board-edge rectangle bounded by the Queen's rank and file containing Black's king, then minimize its longer side.",
+    compare: (first, second) =>
+      first.queenBoxShorterSide - second.queenBoxShorterSide ||
+      first.queenBoxLongerSide - second.queenBoxLongerSide,
   },
   {
     id: 'king closer',
-    shortLabel: 'White king closer',
+    shortLabel: 'white king closer',
     helpText:
-      "Minimize the resulting king-move distance to Black without entering the Queen's rank/file channel between the Queen and Black's king; use resulting row-plus-file distance as a tie-break.",
+      "Minimize the resulting king-move distance to Black without entering the Queen's rank/file channel between the Queen and Black's king.",
     applies: (score) =>
       score.kingDistance !== null && score.kingManhattanDistance !== null,
     compare: (first, second) =>
@@ -317,9 +321,9 @@ export const queenWhiteRules: readonly OrderedRule<QueenWhiteMoveScore>[] = [
   },
   {
     id: 'shorter queen move',
-    shortLabel: 'shorter Queen move',
+    shortLabel: 'shorter queen move',
     helpText:
-      'Among otherwise tied Queen moves, prefer fewer squares traversed. King moves do not participate in this tie-break.',
+      'Among otherwise tied Queen moves, prefer fewer squares traversed.',
     applies: (score) => score.queenMoveDistance !== null,
     compare: (first, second) =>
       first.queenMoveDistance! - second.queenMoveDistance!,
@@ -665,9 +669,8 @@ export const rookWhiteRules: readonly OrderedRule<RookWhiteMoveScore>[] = [
   },
   {
     id: 'king closer',
-    shortLabel: 'White king closer',
-    helpText:
-      "Minimize White's resulting king-move distance to Black; use resulting row-plus-file distance as a tie-break.",
+    shortLabel: 'white king closer',
+    helpText: "Minimize White's resulting king-move distance to Black.",
     applies: (score) =>
       score.kingDistance !== null && score.kingManhattanDistance !== null,
     compare: (first, second) =>
@@ -676,7 +679,7 @@ export const rookWhiteRules: readonly OrderedRule<RookWhiteMoveScore>[] = [
   },
   {
     id: 'maximize black distance',
-    shortLabel: 'keep Black far from Rook',
+    shortLabel: 'keep black far from rook',
     helpText:
       "When earlier priorities tie, maximize the Rook's row-plus-file distance from Black's king.",
     applies: (score) => score.rookBlackDistanceScore !== null,

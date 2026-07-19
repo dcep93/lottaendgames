@@ -1,6 +1,28 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { releasePointerButtonFocus } from './workspaceSupport'
+import {
+  liveMateHref,
+  releasePointerButtonFocus,
+} from './workspaceSupport'
+
+test('live Mate href stores only the current FEN', () => {
+  assert.equal(
+    liveMateHref(
+      'rook',
+      'standard',
+      '8/8/8/8/3k4/8/1R6/3K4 w - - 0 1',
+    ),
+    '/mate/rook#live=8/8/8/8/3k4/8/1R6/3K4_w_-_-_0_1',
+  )
+  assert.equal(
+    liveMateHref(
+      'queen',
+      'train',
+      '8/8/8/8/4k3/8/8/3QK3 w - - 4 3',
+    ),
+    '/mate/queen/train#live=8/8/8/8/4k3/8/8/3QK3_w_-_-_4_3',
+  )
+})
 
 test('pointer-clicked Mate buttons release focus without affecting keyboard activation', () => {
   let directBlurs = 0

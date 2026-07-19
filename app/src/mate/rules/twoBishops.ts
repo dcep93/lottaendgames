@@ -247,14 +247,14 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
   },
   {
     id: 'force black to edge',
-    shortLabel: 'force Black to edge',
+    shortLabel: 'force black to edge',
     helpText: 'Force Black to the edge.',
     compare: (first, second) =>
       first.blackKingEdgeDistance - second.blackKingEdgeDistance,
   },
   {
     id: 'bishops closer',
-    shortLabel: 'bishops closer to Black king',
+    shortLabel: 'bishops closer to black king',
     helpText: "Bring the bishops closer to Black's king.",
     compare: (first, second) =>
       first.bishopBlackKingDistance - second.bishopBlackKingDistance,

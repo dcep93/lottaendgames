@@ -29,6 +29,7 @@ import {
 import type { MateLogEntry, MateTerminalOutcome } from './session'
 import { encodeMateFen } from './share'
 import { MATE_TIMER_PREFERENCE_KEY } from './timerPreference'
+import { liveMateHref } from './workspaceSupport'
 
 const ROOK_START = '7k/8/8/8/8/8/R7/K7 w - - 0 1'
 const ROOK_AFTER_WHITE = 'R6k/8/8/8/8/8/8/K7 b - - 1 1'
@@ -644,7 +645,7 @@ test('Mate log exposes every training field and semantic cycle controls', () => 
   assert.doesNotMatch(markup, />Correct<|>Incorrect<|>\d+ correct choices?<\/button>/)
   assert.match(markup, />0:01\.234</)
   assert.match(markup, />1:01\.007</)
-  assert.match(markup, />White king closer</)
+  assert.match(markup, />white king closer</)
   assert.match(markup, />establish and preserve box</)
   assert.match(
     markup,
@@ -823,7 +824,7 @@ test('reason hint is opt-in and reveals only the current rule label', async () =
     'data-mate-current-hint': true,
   })
   const hintText = reactNodeText(hint)
-  assert.equal(hintText, 'keep Black far from Rook')
+  assert.equal(hintText, 'keep black far from rook')
   assert.doesNotMatch(hintText, /Rg2|a2|g2|bring White's king/i)
   assert.equal(hint.props.type, 'button')
 
@@ -1076,6 +1077,15 @@ test('priority guide follows registered facade order and renders typed diagrams'
   assert.match(markup, /aria-label="Game URL copy status"/)
   assert.match(markup, />White best moves</)
   assert.match(markup, />Black resistance</)
+  assert.match(markup, />Notes</)
+  const correctnessNote =
+    'Correctness: 👍 means White chose a best move; 👎 means White did not. /N is the number of best White moves.'
+  const blackRepliesNote =
+    'Black replies: X / Y means X best-resistance replies out of Y legal replies.'
+  const correctnessNoteAt = decodedMarkup.indexOf(correctnessNote)
+  const blackRepliesNoteAt = decodedMarkup.indexOf(blackRepliesNote)
+  assert.ok(correctnessNoteAt >= 0)
+  assert.ok(blackRepliesNoteAt > correctnessNoteAt)
   assert.match(markup, /class="leg-mate-guide-supporting"/)
   const sectionOrder = [
     '>White best moves<',
@@ -1111,6 +1121,7 @@ test('priority guide follows registered facade order and renders typed diagrams'
   }
   for (const note of ruleSet.help.notes) {
     assert.ok(decodedMarkup.includes(note))
+    assert.ok(decodedMarkup.indexOf(note) > blackRepliesNoteAt)
   }
   assert.match(markup, />Zone X</)
   assert.match(markup, />Key Square</)
@@ -1141,6 +1152,10 @@ test('every Mate rule set exposes the same concise universal priorities', () => 
       ],
       mateId,
     )
+    for (const { shortLabel } of getMateRuleSet(mateId)
+      .whiteRuleDescriptions) {
+      assert.equal(shortLabel, shortLabel.toLowerCase(), mateId)
+    }
   }
 })
 
@@ -1425,6 +1440,28 @@ test('Mate selector exposes material icons and horizontal mode links', () => {
   assert.doesNotMatch(markup, /\/standard/)
 })
 
+test('Mate selector keeps disabled mode labels on the landing path', () => {
+  const markup = renderToStaticMarkup(
+    <MateSidebar
+      mateId={null}
+      mateMode={null}
+      onNavigate={() => undefined}
+    />,
+  )
+
+  assert.match(markup, /aria-label="Mate mode"/)
+  assert.match(
+    markup,
+    /<span aria-disabled="true" class="leg-mate-mode-link is-disabled">Standard<\/span>/,
+  )
+  assert.match(
+    markup,
+    /<span aria-disabled="true" class="leg-mate-mode-link is-disabled">Training Wheels<\/span>/,
+  )
+  assert.doesNotMatch(markup, /leg-mate-sidebar--sets-only/)
+  assert.doesNotMatch(markup, /aria-current=/)
+})
+
 test('Mate sidebar intercepts only unmodified primary link clicks', async () => {
   ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
     .IS_REACT_ACT_ENVIRONMENT = true
@@ -1506,6 +1543,8 @@ test('Mate landing keeps the catalog visible without mounting a drill', () => {
 
   assert.match(markup, /Choose a mating set/)
   assert.match(markup, /href="\/mate\/queen"/)
+  assert.match(markup, />Standard<\/span>/)
+  assert.match(markup, />Training Wheels<\/span>/)
   assert.doesNotMatch(markup, /leg-mate-workspace/)
   assert.doesNotMatch(markup, /aria-label="Mate board, White orientation"/)
   assert.doesNotMatch(markup, /aria-current=/)
@@ -1806,6 +1845,65 @@ test('Mate loads replay history at its final position for Undo and Redo', async 
     )
   } finally {
     if (renderer) await act(async () => renderer?.unmount())
+  }
+})
+
+test('Mate syncs the current live FEN after session transitions', async () => {
+  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
+    .IS_REACT_ACT_ENVIRONMENT = true
+  const originalRandom = Math.random
+  Math.random = () => 0
+  const hrefs: string[] = []
+  let renderer: ReactTestRenderer | undefined
+
+  try {
+    await act(async () => {
+      renderer = TestRenderer.create(
+        matePage(
+          'rook',
+          'standard',
+          MULTI_BLACK_START,
+          null,
+          (href) => hrefs.push(href),
+        ),
+      )
+    })
+    const mountedRenderer = renderer as ReactTestRenderer
+    const currentFen = () =>
+      mountedRenderer.root.findByType(MateBoardProbe).props.fen as string
+    const assertLatestHref = () =>
+      assert.equal(
+        hrefs.at(-1),
+        liveMateHref('rook', 'standard', currentFen()),
+      )
+
+    assertLatestHref()
+    await act(async () => {
+      mountedRenderer.root.findByType(MateBoardProbe).props.onMove('Rd1')
+    })
+    const playedFen = currentFen()
+    assertLatestHref()
+
+    await act(async () => {
+      mountedRenderer.root.findByType(MateControls).props.onUndo()
+    })
+    assert.equal(currentFen(), MULTI_BLACK_START)
+    assertLatestHref()
+
+    await act(async () => {
+      mountedRenderer.root.findByType(MateControls).props.onRedo()
+    })
+    assert.equal(currentFen(), playedFen)
+    assertLatestHref()
+
+    await act(async () => {
+      mountedRenderer.root.findByType(MateControls).props.onStartOver()
+    })
+    assert.notEqual(currentFen(), playedFen)
+    assertLatestHref()
+  } finally {
+    if (renderer) await act(async () => renderer?.unmount())
+    Math.random = originalRandom
   }
 })
 
@@ -2684,12 +2782,14 @@ function matePage(
   mateMode: 'standard' | 'train',
   sharedFen: string | null,
   sharedMoves: readonly string[] | null = null,
+  onReplaceHref: (href: string) => void = () => undefined,
 ) {
   return (
     <Mate
       boardComponent={MateBoardProbe}
       moduleSelector={<nav aria-label="Modules" />}
       onNavigate={() => undefined}
+      onReplaceHref={onReplaceHref}
       route={{
         module: 'mate',
         mateId,

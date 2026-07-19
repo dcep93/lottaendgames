@@ -2,8 +2,10 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import {
   decodeMateFen,
+  decodeMateLiveFen,
   decodeMateReplay,
   encodeMateFen,
+  encodeMateLiveFen,
   encodeMateReplay,
   formatMateShareText,
   MATE_REPLAY_MAX_PLIES,
@@ -25,6 +27,10 @@ const KNN_TRAIN_FEN =
   '7k/8/5NKN/8/8/8/p7/8 w - - 0 1'
 const ROOK_LOOP_START =
   '8/8/8/8/3k4/8/1R6/3K4 w - - 0 1'
+const ROOK_LIVE_FEN =
+  'R7/6k1/8/8/8/8/8/K7 w - - 2 2'
+const ROOK_MATE_FEN =
+  'R6k/8/6K1/8/8/8/8/8 b - - 1 1'
 
 test('encodes and round-trips one documented hash with all six FEN fields', () => {
   const hash = encodeMateFen(ROOK_STANDARD_FEN)
@@ -48,6 +54,28 @@ test('accepts legacy escaped FEN hashes for canonical routing', () => {
     ),
     { ok: true, fen: ROOK_STANDARD_FEN },
   )
+})
+
+test('encodes and decodes resumable live and terminal FENs', () => {
+  assert.equal(
+    encodeMateLiveFen(ROOK_LIVE_FEN),
+    `#live=${ROOK_LIVE_FEN.replaceAll(' ', '_')}`,
+  )
+  assert.deepEqual(
+    decodeMateLiveFen(encodeMateLiveFen(ROOK_LIVE_FEN), 'rook'),
+    { ok: true, fen: ROOK_LIVE_FEN },
+  )
+  assert.deepEqual(
+    decodeMateLiveFen(encodeMateLiveFen(ROOK_MATE_FEN), 'rook'),
+    { ok: true, fen: ROOK_MATE_FEN },
+  )
+  assert.deepEqual(
+    decodeMateLiveFen(encodeMateLiveFen(QUEEN_STANDARD_FEN), 'rook'),
+    { ok: false },
+  )
+  assert.deepEqual(decodeMateLiveFen('#live=not-a-fen', 'rook'), {
+    ok: false,
+  })
 })
 
 test('encodes and canonicalizes a complete legal replay line', () => {

@@ -48,13 +48,23 @@ export default function App() {
     setResolution(readCurrentRoute())
   }
 
+  function replaceCurrentHref(href: string) {
+    if (href === currentHref()) return
+    window.history.replaceState(null, '', href)
+  }
+
   const moduleSelector = (
     <ModuleSelector activeModule={route.module} onNavigate={navigate} />
   )
 
   if (route.module === 'mate') {
     return (
-      <Mate moduleSelector={moduleSelector} route={route} onNavigate={navigate} />
+      <Mate
+        moduleSelector={moduleSelector}
+        onNavigate={navigate}
+        onReplaceHref={replaceCurrentHref}
+        route={route}
+      />
     )
   }
 

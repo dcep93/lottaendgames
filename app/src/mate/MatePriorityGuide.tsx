@@ -15,6 +15,11 @@ export type MatePriorityGuideDialogProps = {
   readonly returnFocusTo?: HTMLElement | null
 }
 
+const MOVE_LOG_COLUMN_NOTES = Object.freeze([
+  'Correctness: 👍 means White chose a best move; 👎 means White did not. /N is the number of best White moves.',
+  'Black replies: X / Y means X best-resistance replies out of Y legal replies.',
+])
+
 function isFocusable(element: HTMLElement): boolean {
   return (
     !element.hasAttribute('disabled') &&
@@ -39,6 +44,7 @@ export default function MatePriorityGuideDialog({
     MATE_CATALOG.find(({ id }) => id === ruleSet.id)?.label ?? ruleSet.id
   const universalWhitePriorities = ruleSet.whiteRuleDescriptions.slice(0, 3)
   const techniqueWhitePriorities = ruleSet.whiteRuleDescriptions.slice(3)
+  const notes = [...MOVE_LOG_COLUMN_NOTES, ...ruleSet.help.notes]
 
   React.useEffect(() => {
     closeButtonRef.current?.focus()
@@ -196,26 +202,21 @@ export default function MatePriorityGuideDialog({
             </section>
           </div>
 
-          {ruleSet.help.notes.length === 0 &&
-          ruleSet.help.noteBoards.length === 0 ? null : (
-            <section className="leg-mate-guide-section">
-              <h3>Notes</h3>
-              {ruleSet.help.notes.length === 0 ? null : (
-                <ul>
-                  {ruleSet.help.notes.map((note, index) => (
-                    <li key={`${index}-${note}`}>{note}</li>
-                  ))}
-                </ul>
-              )}
-              {ruleSet.help.noteBoards.length === 0 ? null : (
-                <div className="leg-mate-guide-note-boards">
-                  {ruleSet.help.noteBoards.map((board) => (
-                    <MateRuleNoteBoard board={board} key={board.id} />
-                  ))}
-                </div>
-              )}
-            </section>
-          )}
+          <section className="leg-mate-guide-section">
+            <h3>Notes</h3>
+            <ul>
+              {notes.map((note, index) => (
+                <li key={`${index}-${note}`}>{note}</li>
+              ))}
+            </ul>
+            {ruleSet.help.noteBoards.length === 0 ? null : (
+              <div className="leg-mate-guide-note-boards">
+                {ruleSet.help.noteBoards.map((board) => (
+                  <MateRuleNoteBoard board={board} key={board.id} />
+                ))}
+              </div>
+            )}
+          </section>
         </div>
       </section>
     </div>

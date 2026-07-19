@@ -1,7 +1,11 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import { getChess, SQUARE_TRANSFORMS, transformFen } from '../chess'
-import { getRookBoxFromFen, type RookAxis } from './majorPieceGeometry'
+import {
+  getQueenBoxDimensions,
+  getRookBoxFromFen,
+  type RookAxis,
+} from './majorPieceGeometry'
 
 const MATURE_DUAL_AXIS_FEN =
   '8/8/8/8/8/7k/4R3/3K4 w - - 6 4'
@@ -11,6 +15,36 @@ function movedFen(fen: string, san: string): string {
   assert.ok(chess.move(san), `${san} must be legal in ${fen}`)
   return chess.fen()
 }
+
+test('queen box dimensions sort the rectangle sides', () => {
+  const dimensions = getQueenBoxDimensions('g4', 'e3')
+
+  assert.deepEqual(dimensions, { shorterSide: 3, longerSide: 6 })
+  assert.equal(Object.isFrozen(dimensions), true)
+})
+
+test('queen box dimensions are symmetric across board transforms', () => {
+  const fen = '8/8/3K4/5Q2/8/4k3/8/8 w - - 14 8'
+  const base = getQueenBoxDimensions('f5', 'e3')
+
+  for (const transform of SQUARE_TRANSFORMS) {
+    const transformedFen = transformFen(fen, transform)
+    const chess = getChess(transformedFen)
+    const queen = chess.board().flat().find((piece) => piece?.type === 'q')
+    const blackKing = chess
+      .board()
+      .flat()
+      .find((piece) => piece?.type === 'k' && piece.color === 'b')
+
+    assert.ok(queen)
+    assert.ok(blackKing)
+    assert.deepEqual(
+      getQueenBoxDimensions(queen.square, blackKing.square),
+      base,
+      transform.name,
+    )
+  }
+})
 
 test('rook box enumerates every cut and freezes the full description', () => {
   const box = getRookBoxFromFen(MATURE_DUAL_AXIS_FEN)

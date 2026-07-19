@@ -396,7 +396,7 @@ export const twoKnightsPawnWhiteRules: readonly OrderedRule<TwoKnightsPawnWhiteM
   },
   {
     id: 'confine black king',
-    shortLabel: 'confine Black king',
+    shortLabel: 'confine black king',
     helpText:
       "After the pawn is securely blockaded, follow the verified construction: coordinate White's king and free knight to shrink Black's reachable region and drive the king into the mating cage.",
     applies: (score) => score.confinementReady,
@@ -413,7 +413,7 @@ export const twoKnightsPawnWhiteRules: readonly OrderedRule<TwoKnightsPawnWhiteM
   },
   {
     id: 'reduce black mobility',
-    shortLabel: 'reduce Black mobility',
+    shortLabel: 'reduce black mobility',
     helpText: 'Reduce the number of legal replies available to Black.',
     applies: (score) => score.confinementReady,
     compare: (first, second) =>
@@ -421,7 +421,7 @@ export const twoKnightsPawnWhiteRules: readonly OrderedRule<TwoKnightsPawnWhiteM
   },
   {
     id: 'bring white king closer',
-    shortLabel: 'bring White king closer',
+    shortLabel: 'bring white king closer',
     helpText: "Bring White's king closer to Black's king.",
     compare: (first, second) =>
       first.whiteKingDistance - second.whiteKingDistance,

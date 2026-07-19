@@ -5,7 +5,7 @@ import type {
   MateLogEntry,
   MateSession,
 } from './session'
-import { encodeMateFen } from './share'
+import { encodeMateFen, encodeMateLiveFen } from './share'
 import type { MateId, MateMode } from './types'
 
 const SHORTCUT_EXCLUSION_SELECTOR = [
@@ -202,6 +202,15 @@ export function exactMateHref(
   } catch {
     return relativeHref
   }
+}
+
+export function liveMateHref(
+  mateId: MateId,
+  mode: MateMode,
+  fen: string,
+): string {
+  const path = `/mate/${mateId}${mode === 'train' ? '/train' : ''}`
+  return `${path}${encodeMateLiveFen(fen)}`
 }
 
 export async function copyMateShareText(text: string): Promise<boolean> {

@@ -23,16 +23,11 @@ export default function MateSidebar({
   onNavigate,
 }: MateSidebarProps) {
   const selectedSet = MATE_CATALOG.find(({ id }) => id === mateId)
-  const hasSelectedMode = selectedSet !== undefined && mateMode !== null
   return (
     <React.Fragment>
       <aside
         aria-label="Mate training"
-        className={
-          hasSelectedMode
-            ? 'leg-mate-sidebar'
-            : 'leg-mate-sidebar leg-mate-sidebar--sets-only'
-        }
+        className="leg-mate-sidebar"
       >
         <nav aria-label="Mating sets" className="leg-mate-set-links">
           {MATE_CATALOG.map((entry) => {
@@ -59,11 +54,17 @@ export default function MateSidebar({
           })}
         </nav>
 
-        {!hasSelectedMode ? null : (
-          <nav
-            aria-label={`${selectedSet.label} mode`}
-            className="leg-mate-mode-links"
-          >
+        <nav
+          aria-label={`${selectedSet?.label ?? 'Mate'} mode`}
+          className="leg-mate-mode-links"
+        >
+          {selectedSet === undefined ? (
+            <React.Fragment>
+              <MateDisabledModeLabel label="Standard" />
+              <MateDisabledModeLabel label="Training Wheels" />
+            </React.Fragment>
+          ) : (
+            <React.Fragment>
             <MateModeLink
               active={mateMode === 'standard'}
               href={selectedSet.path}
@@ -76,10 +77,22 @@ export default function MateSidebar({
               label="Training Wheels"
               onNavigate={onNavigate}
             />
-          </nav>
-        )}
+            </React.Fragment>
+          )}
+        </nav>
       </aside>
     </React.Fragment>
+  )
+}
+
+function MateDisabledModeLabel({ label }: { readonly label: string }) {
+  return (
+    <span
+      aria-disabled="true"
+      className="leg-mate-mode-link is-disabled"
+    >
+      {label}
+    </span>
   )
 }
 

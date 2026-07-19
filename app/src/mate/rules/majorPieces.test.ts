@@ -81,6 +81,12 @@ const QUEEN_WHITE_FIXTURES: readonly WhiteFixture[] = [
     phase: '1/2',
   },
   {
+    fen: '8/8/3K4/5Q2/8/4k3/8/8 w - - 14 8',
+    idealMoves: ['Qg4'],
+    hint: 'queen box size',
+    phase: '2/2',
+  },
+  {
     fen: '8/8/5k2/3Q4/6K1/8/8/8 w - - 6 4',
     idealMoves: ['Kf4'],
     hint: 'king closer',
@@ -323,25 +329,27 @@ const QUEEN_ENDGAME_LINE_FIXTURES = [
     expectedLine: [
       ['Qc5'],
       ['Kf3', 'Kd3'],
-      ['Qe5'],
-      ['Kc4'],
-      ['Qd6'],
-      ['Kc3'],
-      ['Qd5'],
-      ['Kb4', 'Kc2', 'Kb2'],
-      ['Qc4'],
-      ['Ka3', 'Kb1', 'Ka1'],
       ['Qb4'],
-      ['Ka2'],
-      ['Kf4'],
-      ['Ka1'],
       ['Ke3'],
-      ['Ka2'],
-      ['Kd2'],
-      ['Ka1'],
-      ['Kc2'],
-      ['Ka2'],
-      ['Qb2#'],
+      ['Qc4'],
+      ['Kf3'],
+      ['Qd4'],
+      ['Kg3', 'Kg2', 'Ke2'],
+      ['Qc3'],
+      ['Kf2'],
+      ['Qd3'],
+      ['Kg2'],
+      ['Qe3'],
+      ['Kh2', 'Kh1', 'Kf1'],
+      ['Qf3'],
+      ['Kg1'],
+      ['Qe2'],
+      ['Kh1'],
+      ['Kg4'],
+      ['Kg1'],
+      ['Kg3'],
+      ['Kh1'],
+      ['Qg2#'],
     ],
   },
   {
@@ -535,12 +543,12 @@ test('queen and rook preserve evaluator order with universal priority labels', (
       'pieces safe',
       'no stalemate',
       'stable two-square corner cage',
-      'White king toward cage support',
+      'white king toward cage support',
       'white pieces off edge',
-      'Queen a knight move from Black',
-      'Queen box size',
-      'White king closer',
-      'shorter Queen move',
+      'queen a knight move from black',
+      'queen box size',
+      'white king closer',
+      'shorter queen move',
     ],
   )
   assert.deepEqual(
@@ -553,17 +561,55 @@ test('queen and rook preserve evaluator order with universal priority labels', (
       'rook waiting move',
       'establish and preserve box',
       'forcing check',
-      'White king closer',
-      'keep Black far from Rook',
+      'white king closer',
+      'keep black far from rook',
+    ],
+  )
+  assert.deepEqual(
+    queenWhiteRules.slice(3).map(({ id, helpText }) => ({ id, helpText })),
+    [
+      {
+        id: 'corner cage',
+        helpText:
+          'Build or preserve a corner-plus-adjacent-edge cage from which every legal Black reply remains in those two squares.',
+      },
+      {
+        id: 'king to cage',
+        helpText:
+          "With a stable two-square corner cage, move White's king toward a mating-support square a knight's move from both the Queen and corner.",
+      },
+      {
+        id: 'white pieces off edge',
+        helpText: 'Minimize the number of White pieces on edge squares.',
+      },
+      {
+        id: 'queen knight move',
+        helpText: "Keep or place the Queen a knight's move from Black's king.",
+      },
+      {
+        id: 'queen box size',
+        helpText:
+          "Minimize the shorter side of the board-edge rectangle bounded by the Queen's rank and file containing Black's king, then minimize its longer side.",
+      },
+      {
+        id: 'king closer',
+        helpText:
+          "Minimize the resulting king-move distance to Black without entering the Queen's rank/file channel between the Queen and Black's king.",
+      },
+      {
+        id: 'shorter queen move',
+        helpText:
+          'Among otherwise tied Queen moves, prefer fewer squares traversed.',
+      },
     ],
   )
   assert.equal(
     queenWhiteRules.find(({ id }) => id === 'king closer')?.helpText,
-    "Minimize the resulting king-move distance to Black without entering the Queen's rank/file channel between the Queen and Black's king; use resulting row-plus-file distance as a tie-break.",
+    "Minimize the resulting king-move distance to Black without entering the Queen's rank/file channel between the Queen and Black's king.",
   )
   assert.equal(
     rookWhiteRules.find(({ id }) => id === 'king closer')?.helpText,
-    "Minimize White's resulting king-move distance to Black; use resulting row-plus-file distance as a tie-break.",
+    "Minimize White's resulting king-move distance to Black.",
   )
   assert.equal(
     rookWhiteRules.find(
@@ -653,7 +699,8 @@ test('queen white score fields and compound comparisons match literals', () => {
     cagePenalty: 1,
     whitePieceEdgePenalty: 0,
     queenKnightMovePenalty: 1,
-    queenBoxArea: 32,
+    queenBoxShorterSide: 4,
+    queenBoxLongerSide: 8,
     cageKingApproachPriority: 0,
     cageKingApproachDistance: null,
     cageKingApproachManhattanDistance: null,
@@ -669,7 +716,8 @@ test('queen white score fields and compound comparisons match literals', () => {
     cagePenalty: 1,
     whitePieceEdgePenalty: 1,
     queenKnightMovePenalty: 0,
-    queenBoxArea: 35,
+    queenBoxShorterSide: 5,
+    queenBoxLongerSide: 7,
     cageKingApproachPriority: 0,
     cageKingApproachDistance: null,
     cageKingApproachManhattanDistance: null,
@@ -690,7 +738,8 @@ test('queen white score fields and compound comparisons match literals', () => {
     cagePenalty: 1,
     whitePieceEdgePenalty: 1,
     queenKnightMovePenalty: 0,
-    queenBoxArea: 20,
+    queenBoxShorterSide: 4,
+    queenBoxLongerSide: 5,
     cageKingApproachPriority: 0,
     cageKingApproachDistance: null,
     cageKingApproachManhattanDistance: null,
@@ -706,7 +755,8 @@ test('queen white score fields and compound comparisons match literals', () => {
     cagePenalty: 1,
     whitePieceEdgePenalty: 1,
     queenKnightMovePenalty: 0,
-    queenBoxArea: 24,
+    queenBoxShorterSide: 4,
+    queenBoxLongerSide: 6,
     cageKingApproachPriority: 0,
     cageKingApproachDistance: null,
     cageKingApproachManhattanDistance: null,
@@ -715,7 +765,7 @@ test('queen white score fields and compound comparisons match literals', () => {
     kingManhattanDistance: 3,
     queenMoveDistance: 1,
   })
-  assert.equal(compareQueenWhiteScores(smallerBox, largerBox), -4)
+  assert.equal(compareQueenWhiteScores(smallerBox, largerBox), -1)
 })
 
 test('shorter queen move compares only scores from queen moves', () => {
@@ -848,7 +898,7 @@ test('queen cage, safety, stalemate, and exact finishing line match literals', (
   assert.equal(chess.isCheckmate(), true)
 })
 
-test('queen replays all eight chess420 golden mating lines', () => {
+test('queen replays all eight curated golden mating lines', () => {
   const queen = getMateRuleSet('queen')
   let totalPlies = 0
 
@@ -874,7 +924,7 @@ test('queen replays all eight chess420 golden mating lines', () => {
     assert.equal(chess.isCheckmate(), true, fixture.startingFen)
   }
 
-  assert.equal(totalPlies, 160)
+  assert.equal(totalPlies, 162)
 })
 
 test('queen black scoring and literal defensive choices retain legal order', () => {

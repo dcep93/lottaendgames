@@ -7,7 +7,11 @@ import {
   matePath,
   resolveAppRoute,
 } from './routing'
-import { encodeMateFen, encodeMateReplay } from './mate/share'
+import {
+  encodeMateFen,
+  encodeMateLiveFen,
+  encodeMateReplay,
+} from './mate/share'
 
 const sharedRookFen =
   '4k3/8/8/8/8/8/8/4K2R w K - 7 12'
@@ -20,6 +24,10 @@ const sharedKnnStandardFen =
 const sharedKnnTrainFen =
   '7k/8/5NKN/8/8/8/p7/8 w - - 0 1'
 const rookReplayMoves = ['Rb3', 'Kc5'] as const
+const sharedRookLiveFen =
+  'R7/6k1/8/8/8/8/8/K7 w - - 2 2'
+const sharedRookMateFen =
+  'R6k/8/6K1/8/8/8/8/8 b - - 1 1'
 
 assert.deepEqual(resolveAppRoute('/', ''), {
   href: '/book/about',
@@ -130,6 +138,33 @@ assert.deepEqual(
       mateId: 'rook',
       mateMode: 'standard',
       sharedFen: sharedRookFen,
+    },
+  },
+)
+assert.deepEqual(
+  resolveAppRoute(
+    '/mate/rook/train',
+    encodeMateLiveFen(sharedRookLiveFen),
+  ),
+  {
+    href: `/mate/rook/train${encodeMateLiveFen(sharedRookLiveFen)}`,
+    route: {
+      module: 'mate',
+      mateId: 'rook',
+      mateMode: 'train',
+      sharedFen: sharedRookLiveFen,
+    },
+  },
+)
+assert.deepEqual(
+  resolveAppRoute('/mate/rook', encodeMateLiveFen(sharedRookMateFen)),
+  {
+    href: `/mate/rook${encodeMateLiveFen(sharedRookMateFen)}`,
+    route: {
+      module: 'mate',
+      mateId: 'rook',
+      mateMode: 'standard',
+      sharedFen: sharedRookMateFen,
     },
   },
 )
