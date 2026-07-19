@@ -11,10 +11,14 @@ may preserve or shrink that box, but may not expand or lose it merely to move
 the rook farther from Black. In the minimal loop position after `1.Re7 Kf8`,
 this must choose `Ra7` instead of `Re1`.
 
-When Black steps away from a closest cut but the rook still maintains an
-established cut, advance that cut on its existing axis before switching axes.
-This prevents the evaluator from shuttling between perpendicular cuts as Black
-steps between two squares.
+When more than one candidate establishes a closest cut, the smaller resulting
+box must win regardless of whether that candidate changes axes. Preserve the
+existing axis only as a tiebreak between equal-size boxes.
+
+Fix the earlier perpendicular shuttle at its actual source: the king-approach
+score currently rejects every king-rook rank or file alignment even when the
+rook retains an active cut. Such an alignment is perpendicular to the
+separating cut and does not block it, so it must not prevent a closer king move.
 
 ## Scoring Change
 
@@ -28,11 +32,11 @@ existing `establish box` comparison. Candidates that do not establish a closest
 axis retain the existing establishment penalty and do not need a meaningful box
 size.
 
-If the starting position has an established but non-closest cut, candidates
-that make that same axis closest survive before candidates that switch to the
-perpendicular axis. Resulting box size breaks ties only after this axis-
-continuity preference. If there is no established cut, either axis remains
-eligible and the smallest resulting box wins as before.
+If the starting position has an established but non-closest cut, compare every
+candidate that establishes a closest cut by resulting box size first. Lower is
+always better. If sizes tie, prefer the candidate that retains the existing
+axis. If there is no established cut, either axis remains eligible and the
+smallest resulting box wins as before.
 
 When the starting position already has a closest box, record its size and the
 candidate's resulting closest-box size. The existing preservation penalty must
@@ -44,6 +48,12 @@ or shrinks the box; the geometry, not the axis name, controls the result.
 These checks remain within the final `maximize black distance` priority, after
 all earlier safety, mating, and king-approach priorities. They therefore do not
 force premature rook moves ahead of more important technique rules.
+
+For `king closer`, retain the line penalty only when White's king shares the
+rook's rank or file and the resulting rook position has no established cut.
+When a cut remains established, any king-rook alignment is perpendicular to the
+separating axis and does not obstruct it. This lets king progress beat an
+unnecessary rook waiting move.
 
 For `8/8/8/3K4/8/k7/8/2R5 w - - 34 18`:
 
@@ -59,10 +69,19 @@ For `5k2/4R3/3K4/8/8/8/8/8 w - - 2 2`:
 - `Ra7` is the sole ideal White move, and `Re1` is rejected by
   `maximize black distance`.
 
-For the cycle beginning at `8/8/8/7k/5R2/4K3/8/8 w - - 0 1`, Black's
-`...Kg6` leaves White's rook with an established but non-closest rank cut.
-White must advance that rank cut with `Ra5` instead of switching to the file cut
-with `Rf4`; this breaks the `Ra4 Kg6 Rf4 Kh5` cycle.
+For `7K/2R5/8/k7/8/8/8/8 w - - 2 2`:
+
+- `Rc6` retains the rank axis but creates a box of size 5.
+- `Rb7` changes to the file axis and creates a box of size 1.
+- `Rb7` is the sole ideal White move, and `Rc6` is rejected by `establish box`.
+
+For the earlier cycle beginning at
+`8/8/8/7k/5R2/4K3/8/8 w - - 0 1`, `Kf3` keeps the rank cut while bringing
+White's king closer. It must not receive the broad king-rook alignment penalty,
+and it must beat the unnecessary `Ra4`. If the later position after
+`Ra4 Kg6` is evaluated independently, the smaller file box from `Rf4` correctly
+beats the larger rank box from `Ra5`; play still cannot cycle because the
+revisited starting position now continues with `Kf3`.
 
 The evaluator rule order, Black response logic, and all user-facing tooltip and
 guide copy remain unchanged.
@@ -73,6 +92,7 @@ Add focused regression tests for both exact positions, the relevant candidate
 scores, each sole ideal move, and each rejected move's explanation. Update any
 existing score fixture whose box-size fields become meaningful under the
 corrected definition. Add a regression for the perpendicular-cut cycle and its
-same-axis continuation. Assert that the existing tooltip copy is unchanged. Run
-Rook parity/self-play tests, the exhaustive Rook verifier, the full Mate suite,
-lint, and the production build.
+king-approach continuation, plus the exact `Rb7` versus `Rc6` comparison. Assert
+that the existing tooltip copy is unchanged. Run Rook parity/self-play tests,
+the exhaustive Rook verifier, the full Mate suite, lint, and the production
+build.
