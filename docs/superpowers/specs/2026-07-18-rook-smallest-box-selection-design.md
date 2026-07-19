@@ -76,6 +76,12 @@ rook's established cut with a different one.
 `Ke6` after `1.Re7 Kf8` only ties the existing king-move distance, retains the
 alignment penalty, and therefore must not displace the approved `Ra7` rook move.
 
+Limit that alignment exception to an approaching king move that finishes within
+two king moves of Black. Entering the rook's rank or file while still farther
+away is premature and must retain the alignment penalty. This keeps the approved
+`Kf3` exception, which finishes two king moves away, while rejecting more distant
+alignment moves.
+
 For `1k6/8/2R5/2K5/8/8/8/8 w - - 0 1`, `Kd6` reduces king distance but changes
 the rook's cut from the sixth rank to the c-file. It must retain the alignment
 penalty. This is also a compact 3-by-1 waiting position, so the farthest rook
@@ -104,6 +110,19 @@ adjacent to White's king. The edge-box waiting pattern must therefore be
 inactive. `Kd6` is the sole ideal move through `king closer`; `Rc6` must not
 switch the box axis back and recreate the four-ply cycle. Every legal Black
 reply after `Kd6` must remain provably mating.
+
+When White already has a closest box and a candidate switches to a non-closest
+axis without earning shrink credit, prefer retaining the current cut axis at the
+same effective preserved-box size. Exempt the explicit edge-box axis-switch
+waiting pattern, whose purpose is to change axes. This is a preservation
+tiebreak only: a genuinely smaller closest box continues to win.
+
+For `8/8/8/8/8/7k/4R3/3K4 w - - 6 4`, `Ke1` enters the rook's file while White
+is still three king moves from Black and must retain the alignment penalty.
+`Re8` changes away from the closest rank cut without earning shrink credit.
+`Ra2` retains the rank box and places the rook farthest from Black, so it must be
+the sole ideal White move. Every legal Black reply after `Ra2` must remain
+provably mating.
 
 Add a compact straight-waiting pattern when an active box exists, the rook is
 adjacent to White's king, and the kings' file/rank deltas are 3 and 1. Prefer a
@@ -189,7 +208,9 @@ Add the exact `Ra6` versus `Kd5` and `Kf5` regression, including active box
 sizes, and exhaustively check every legal reply after `Ra6`. Assert that the
 existing tooltip copy and visible order are unchanged. Add the exact `Ra5`
 versus `Ke4` size-3 compact-waiting regression and exhaustively check every legal
-reply after `Ra5`. Run Rook parity/self-play tests, the exhaustive Rook verifier,
-the full Mate suite, lint, and the production build. If another literal loop
-remains, encode one minimal exact-position witness as a replay URL with explicit
-moves for Undo/Redo.
+reply after `Ra5`. Add the exact `Ra2` versus `Ke1` and `Re8` regression, preserve
+the approved `Kf3` alignment exception, and exhaustively check every legal reply
+after `Ra2`. Run Rook parity/self-play tests, the exhaustive Rook verifier, the
+full Mate suite, lint, and the production build. If another literal loop remains,
+encode one minimal exact-position witness as a replay URL with explicit moves
+for Undo/Redo.
