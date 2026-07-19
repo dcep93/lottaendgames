@@ -41,10 +41,7 @@ const ROOK_MATE_START = '7k/8/6K1/8/8/8/8/R7 w - - 0 1'
 const QUEEN_START = '8/8/8/8/4k3/8/8/3QK3 w - - 0 1'
 
 const MATE_TRAINING_INFO_PROPS = {
-  copyStartingUrlStatus: '',
   mateMode: 'standard' as const,
-  onCopyStartingUrl: () => undefined,
-  startingFen: ROOK_START,
 }
 
 const ROOK_LOGS: readonly MateLogEntry[] = [
@@ -645,8 +642,8 @@ test('Mate log exposes every training field and semantic cycle controls', () => 
   assert.doesNotMatch(markup, />Correct<|>Incorrect<|>\d+ correct choices?<\/button>/)
   assert.match(markup, />0:01\.234</)
   assert.match(markup, />1:01\.007</)
-  assert.match(markup, />white king closer</)
-  assert.match(markup, />establish and preserve box</)
+  assert.match(markup, />king closer</)
+  assert.match(markup, />smaller box</)
   assert.match(
     markup,
     /aria-label="Cycle ideal White move for move 1; 2 correct choices"/,
@@ -824,7 +821,7 @@ test('reason hint is opt-in and reveals only the current rule label', async () =
     'data-mate-current-hint': true,
   })
   const hintText = reactNodeText(hint)
-  assert.equal(hintText, 'keep black far from rook')
+  assert.equal(hintText, 'rook farther')
   assert.doesNotMatch(hintText, /Rg2|a2|g2|bring White's king/i)
   assert.equal(hint.props.type, 'button')
 
@@ -852,7 +849,7 @@ test('clicking a reason highlights its guide priority until a generic reopen', a
   await act(async () => {
     renderer.root
       .findByProps({
-        'aria-label': 'establish and preserve box. Open priority guide',
+        'aria-label': 'smaller box. Open priority guide',
       })
       .props.onClick({ currentTarget: null })
   })
@@ -860,7 +857,7 @@ test('clicking a reason highlights its guide priority until a generic reopen', a
     'aria-current': 'true',
   })
   assert.equal(highlighted.length, 1)
-  assert.match(reactNodeText(highlighted[0]), /^establish and preserve box/)
+  assert.match(reactNodeText(highlighted[0]), /^smaller box/)
 
   await act(async () => {
     renderer.root
@@ -1071,10 +1068,9 @@ test('priority guide follows registered facade order and renders typed diagrams'
     assert.ok(next > shortcutCursor, `Shortcut out of order: ${key}`)
     shortcutCursor = next
   }
-  assert.match(markup, />Starting position</)
-  assert.match(markup, new RegExp(ROOK_START.replaceAll('/', '\\/')))
-  assert.match(markup, />Copy game URL</)
-  assert.match(markup, /aria-label="Game URL copy status"/)
+  assert.doesNotMatch(markup, />Starting position</)
+  assert.doesNotMatch(markup, />Copy game URL</)
+  assert.doesNotMatch(markup, /aria-label="Game URL copy status"/)
   assert.match(markup, />White best moves</)
   assert.match(markup, />Black resistance</)
   assert.match(markup, />Notes</)
@@ -1086,12 +1082,12 @@ test('priority guide follows registered facade order and renders typed diagrams'
   const blackRepliesNoteAt = decodedMarkup.indexOf(blackRepliesNote)
   assert.ok(correctnessNoteAt >= 0)
   assert.ok(blackRepliesNoteAt > correctnessNoteAt)
-  assert.match(markup, /class="leg-mate-guide-supporting"/)
+  assert.doesNotMatch(markup, /class="leg-mate-guide-supporting"/)
   const sectionOrder = [
     '>White best moves<',
     '>Black resistance<',
     '>Keyboard shortcuts<',
-    '>Starting position<',
+    '>Notes<',
   ]
   let sectionCursor = -1
   for (const heading of sectionOrder) {
@@ -1101,7 +1097,7 @@ test('priority guide follows registered facade order and renders typed diagrams'
   }
   const prioritiesAt = markup.indexOf('leg-mate-guide-priorities')
   assert.ok(prioritiesAt < markup.indexOf('>Keyboard shortcuts<'))
-  assert.ok(prioritiesAt < markup.indexOf('>Starting position<'))
+  assert.ok(prioritiesAt < markup.indexOf('>Notes<'))
 
   let cursor = -1
   for (const id of expectedWhiteIds) {
@@ -1690,11 +1686,15 @@ test('Mate exposes stable desktop and narrow-layout structure', () => {
   )
   assert.match(
     css,
-    /\.leg-mate-share-status,\s*\.leg-mate-guide-copy-status\s*\{[^}]*position:\s*fixed;[^}]*right:\s*1rem;[^}]*bottom:\s*1rem/s,
+    /\.leg-mate-share-status\s*\{[^}]*position:\s*fixed;[^}]*right:\s*1rem;[^}]*bottom:\s*1rem/s,
   )
   assert.match(
     css,
-    /\.leg-mate-share-status:empty,\s*\.leg-mate-guide-copy-status:empty\s*\{[^}]*display:\s*none/s,
+    /\.leg-mate-share-status:empty\s*\{[^}]*display:\s*none/s,
+  )
+  assert.doesNotMatch(
+    css,
+    /\.leg-mate-guide-(?:supporting|fen|copy-row|copy-status)/,
   )
   assert.doesNotMatch(
     css,
@@ -1733,15 +1733,11 @@ test('Mate exposes stable desktop and narrow-layout structure', () => {
   )
   assert.match(
     css,
-    /\.leg-mate-guide-supporting\s*\{[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/s,
-  )
-  assert.match(
-    css,
     /\.leg-mate-guide\s*\{[^}]*width:\s*min\(69\.6rem, 100%\)/s,
   )
   assert.match(
     css,
-    /@media\s*\(max-width:\s*48rem\)[\s\S]*\.leg-mate-guide-priorities,[\s\S]*\.leg-mate-guide-supporting,[\s\S]*grid-template-columns:\s*minmax\(0, 1fr\)/,
+    /@media\s*\(max-width:\s*48rem\)[\s\S]*\.leg-mate-guide-priorities,[\s\S]*\.leg-mate-guide-shortcuts\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\)/,
   )
   assert.match(
     css,
@@ -2442,136 +2438,6 @@ test('Mate terminal sharing copies the exact starting position with status', asy
     if (renderer) await act(async () => renderer?.unmount())
     globalThis.setTimeout = originalSetTimeout
     globalThis.clearTimeout = originalClearTimeout
-    if (navigatorDescriptor === undefined) {
-      delete (globalThis as { navigator?: Navigator }).navigator
-    } else {
-      Object.defineProperty(globalThis, 'navigator', navigatorDescriptor)
-    }
-  }
-})
-
-test('Mate training dialog copies the exact starting-position URL', async () => {
-  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
-    .IS_REACT_ACT_ENVIRONMENT = true
-  const navigatorDescriptor = Object.getOwnPropertyDescriptor(
-    globalThis,
-    'navigator',
-  )
-  const copied: string[] = []
-  let shouldReject = false
-  Object.defineProperty(globalThis, 'navigator', {
-    configurable: true,
-    value: {
-      clipboard: {
-        writeText: async (text: string) => {
-          if (shouldReject) throw new Error('clipboard unavailable')
-          copied.push(text)
-        },
-      },
-    },
-  })
-  let renderer: ReactTestRenderer | undefined
-
-  try {
-    await act(async () => {
-      renderer = TestRenderer.create(
-        matePage('rook', 'standard', ROOK_START),
-      )
-    })
-    const mountedRenderer = renderer as ReactTestRenderer
-    await act(async () => {
-      mountedRenderer.root.findByProps({
-        'aria-label': 'Open training info and priority guide',
-      }).props.onClick({ currentTarget: null })
-    })
-    const copyButton = mountedRenderer.root.findByProps({
-      'aria-label': 'Copy game URL',
-    })
-    const copyStatus = () => mountedRenderer.root.findByProps({
-      'aria-label': 'Game URL copy status',
-    }).props.children
-
-    await act(async () => {
-      copyButton.props.onClick()
-      await Promise.resolve()
-      await Promise.resolve()
-    })
-    assert.deepEqual(copied, [
-      `/mate/rook${encodeMateFen(ROOK_START)}`,
-    ])
-    assert.equal(copyStatus(), 'Copied')
-
-    shouldReject = true
-    await act(async () => {
-      copyButton.props.onClick()
-      await Promise.resolve()
-      await Promise.resolve()
-    })
-    assert.equal(copyStatus(), 'Copy unavailable')
-  } finally {
-    if (renderer) await act(async () => renderer?.unmount())
-    if (navigatorDescriptor === undefined) {
-      delete (globalThis as { navigator?: Navigator }).navigator
-    } else {
-      Object.defineProperty(globalThis, 'navigator', navigatorDescriptor)
-    }
-  }
-})
-
-test('Mate training dialog ignores a stale copy result after Start Over', async () => {
-  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
-    .IS_REACT_ACT_ENVIRONMENT = true
-  const navigatorDescriptor = Object.getOwnPropertyDescriptor(
-    globalThis,
-    'navigator',
-  )
-  let resolveCopy: (() => void) | undefined
-  Object.defineProperty(globalThis, 'navigator', {
-    configurable: true,
-    value: {
-      clipboard: {
-        writeText: () => new Promise<void>((resolve) => {
-          resolveCopy = resolve
-        }),
-      },
-    },
-  })
-  let renderer: ReactTestRenderer | undefined
-
-  try {
-    await act(async () => {
-      renderer = TestRenderer.create(
-        matePage('rook', 'standard', ROOK_START),
-      )
-    })
-    const mountedRenderer = renderer as ReactTestRenderer
-    await act(async () => {
-      mountedRenderer.root.findByProps({
-        'aria-label': 'Open training info and priority guide',
-      }).props.onClick({ currentTarget: null })
-    })
-    await act(async () => {
-      mountedRenderer.root.findByProps({
-        'aria-label': 'Copy game URL',
-      }).props.onClick()
-      await Promise.resolve()
-    })
-    await act(async () => {
-      mountedRenderer.root.findByType(MateControls).props.onStartOver()
-    })
-    await act(async () => {
-      resolveCopy?.()
-      await Promise.resolve()
-      await Promise.resolve()
-    })
-    assert.equal(
-      mountedRenderer.root.findByProps({
-        'aria-label': 'Game URL copy status',
-      }).props.children,
-      '',
-    )
-  } finally {
-    if (renderer) await act(async () => renderer?.unmount())
     if (navigatorDescriptor === undefined) {
       delete (globalThis as { navigator?: Navigator }).navigator
     } else {

@@ -111,10 +111,8 @@ export default function MateWorkspace({
   )
   const mountedRef = React.useRef(false)
   const shareRequestRef = React.useRef(0)
-  const fenCopyRequestRef = React.useRef(0)
   const [showTimer, setShowTimer] = React.useState(readMateTimerPreference)
   const [shareStatus, setShareStatus] = React.useState('')
-  const [fenCopyStatus, setFenCopyStatus] = React.useState('')
   const [playBestAnimation, setPlayBestAnimation] =
     React.useState<PlayBestAnimation | null>(null)
 
@@ -133,7 +131,6 @@ export default function MateWorkspace({
     return () => {
       mountedRef.current = false
       shareRequestRef.current += 1
-      fenCopyRequestRef.current += 1
       playBestAnimationRef.current = null
       if (playBestTimerRef.current !== null) {
         clearTimeout(playBestTimerRef.current)
@@ -151,25 +148,14 @@ export default function MateWorkspace({
     return () => clearTimeout(timer)
   }, [shareStatus])
 
-  React.useEffect(() => {
-    if (fenCopyStatus === '') return
-    const timer = setTimeout(
-      () => setFenCopyStatus(''),
-      MATE_SHARE_NOTIFICATION_MS,
-    )
-    return () => clearTimeout(timer)
-  }, [fenCopyStatus])
-
   const commitSession = React.useCallback(
     (current: MateSession, next: MateSession) => {
       if (next === current) return false
 
       shareRequestRef.current += 1
-      fenCopyRequestRef.current += 1
       sessionRef.current = next
       setSession(next)
       setShareStatus('')
-      setFenCopyStatus('')
       return true
     },
     [],
@@ -343,7 +329,6 @@ export default function MateWorkspace({
     const request = shareRequestRef.current + 1
     shareRequestRef.current = request
     setShareStatus('')
-    setFenCopyStatus('')
 
     const text = formatMateShareText({
       outcome: current.outcome,
@@ -364,27 +349,6 @@ export default function MateWorkspace({
     }
   }, [deps])
 
-  const copyStartingUrl = React.useCallback(async () => {
-    const current = sessionRef.current
-    const request = fenCopyRequestRef.current + 1
-    fenCopyRequestRef.current = request
-    setFenCopyStatus('')
-    setShareStatus('')
-    const copied = await copyMateShareText(
-      exactMateHref(
-        current.mateId,
-        current.mode,
-        current.startingFen,
-      ),
-    )
-    if (
-      mountedRef.current &&
-      fenCopyRequestRef.current === request &&
-      sessionRef.current === current
-    ) {
-      setFenCopyStatus(copied ? 'Copied' : 'Copy unavailable')
-    }
-  }, [])
   const toggleTimer = React.useCallback(() => {
     const nextShowTimer = !showTimer
     setShowTimer(nextShowTimer)
@@ -431,16 +395,13 @@ export default function MateWorkspace({
         />
         <MateLog
           busy={playBestAnimation !== null}
-          copyStartingUrlStatus={fenCopyStatus}
           fen={session.fen}
           logs={session.logs}
           mateMode={mateMode}
           onCycleIdealBlack={cycleIdealBlack}
           onCycleIdealWhite={cycleIdealWhite}
           onCycleLegalBlack={cycleLegalBlack}
-          onCopyStartingUrl={() => void copyStartingUrl()}
           ruleSet={ruleSet}
-          startingFen={session.startingFen}
         />
       </div>
     </section>

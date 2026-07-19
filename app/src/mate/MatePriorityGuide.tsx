@@ -5,12 +5,9 @@ import MateRuleNoteBoard from './MateRuleNoteBoard'
 import type { MateMode } from './types'
 
 export type MatePriorityGuideDialogProps = {
-  readonly copyStartingUrlStatus: string
   readonly highlightedReasonId?: string | null
   readonly mateMode: MateMode
-  readonly onCopyStartingUrl: () => void
   readonly ruleSet: RegisteredMateRuleSet
-  readonly startingFen: string
   readonly onClose: () => void
   readonly returnFocusTo?: HTMLElement | null
 }
@@ -29,11 +26,8 @@ function isFocusable(element: HTMLElement): boolean {
 }
 
 export default function MatePriorityGuideDialog({
-  copyStartingUrlStatus,
   highlightedReasonId = null,
-  onCopyStartingUrl,
   ruleSet,
-  startingFen,
   onClose,
   returnFocusTo,
 }: MatePriorityGuideDialogProps) {
@@ -155,52 +149,27 @@ export default function MatePriorityGuideDialog({
             </section>
           </div>
 
-          <div className="leg-mate-guide-supporting">
-            <section className="leg-mate-guide-section">
-              <h3>Keyboard shortcuts</h3>
-              <dl className="leg-mate-guide-shortcuts">
-                <div>
-                  <dt><kbd>Enter</kbd></dt>
-                  <dd>Start over</dd>
-                </div>
-                <div>
-                  <dt><kbd>←</kbd></dt>
-                  <dd>Undo</dd>
-                </div>
-                <div>
-                  <dt><kbd>↑</kbd></dt>
-                  <dd>Play best move</dd>
-                </div>
-                <div>
-                  <dt><kbd>→</kbd></dt>
-                  <dd>Redo</dd>
-                </div>
-              </dl>
-            </section>
-
-            <section className="leg-mate-guide-section">
-              <h3>Starting position</h3>
-              <code className="leg-mate-guide-fen">{startingFen}</code>
-              <div className="leg-mate-guide-copy-row">
-                <button
-                  aria-label="Copy game URL"
-                  onClick={onCopyStartingUrl}
-                  type="button"
-                >
-                  Copy game URL
-                </button>
+          <section className="leg-mate-guide-section">
+            <h3>Keyboard shortcuts</h3>
+            <dl className="leg-mate-guide-shortcuts">
+              <div>
+                <dt><kbd>Enter</kbd></dt>
+                <dd>Start over</dd>
               </div>
-              <span
-                aria-atomic="true"
-                aria-label="Game URL copy status"
-                aria-live="polite"
-                className="leg-mate-guide-copy-status"
-                role="status"
-              >
-                {copyStartingUrlStatus}
-              </span>
-            </section>
-          </div>
+              <div>
+                <dt><kbd>←</kbd></dt>
+                <dd>Undo</dd>
+              </div>
+              <div>
+                <dt><kbd>↑</kbd></dt>
+                <dd>Play best move</dd>
+              </div>
+              <div>
+                <dt><kbd>→</kbd></dt>
+                <dd>Redo</dd>
+              </div>
+            </dl>
+          </section>
 
           <section className="leg-mate-guide-section">
             <h3>Notes</h3>

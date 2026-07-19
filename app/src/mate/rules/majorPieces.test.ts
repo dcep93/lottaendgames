@@ -191,6 +191,12 @@ const ROOK_WHITE_FIXTURES: readonly WhiteFixture[] = [
     hint: 'rook waiting move',
     phase: '2/2',
   },
+  {
+    fen: '8/8/8/8/8/5K1k/6R1/8 w - - 10 6',
+    idealMoves: ['Rg4'],
+    hint: 'rook waiting move',
+    phase: '2/2',
+  },
 ]
 
 const QUEEN_BLACK_FIXTURES = [
@@ -557,12 +563,12 @@ test('queen and rook preserve evaluator order with universal priority labels', (
       'mate',
       'pieces safe',
       'no stalemate',
-      'exact mate progress',
-      'rook waiting move',
-      'establish and preserve box',
-      'forcing check',
-      'white king closer',
-      'keep black far from rook',
+      'shortest mate',
+      'waiting move',
+      'smaller box',
+      'push with check',
+      'king closer',
+      'rook farther',
     ],
   )
   assert.deepEqual(
@@ -607,46 +613,61 @@ test('queen and rook preserve evaluator order with universal priority labels', (
     queenWhiteRules.find(({ id }) => id === 'king closer')?.helpText,
     "Minimize the resulting king-move distance to Black without entering the Queen's rank/file channel between the Queen and Black's king.",
   )
-  assert.equal(
-    rookWhiteRules.find(({ id }) => id === 'king closer')?.helpText,
-    "Minimize White's resulting king-move distance to Black.",
-  )
-  assert.equal(
-    rookWhiteRules.find(
-      ({ id }) => id === 'exact mate progress',
-    )?.helpText,
-    "Use the exact King-and-Rook mate distance whenever no Rook box is active, whenever the kings are at most two king moves apart, or when they are three king moves apart and the Rook is within three king moves of White's King. There are two farther-tempo exceptions. At three king moves and four row-plus-file steps, an orthogonally protected Rook with a current strongest cut not closest to Black keeps its farther tempo only when Black is on an edge exactly two king steps from the nearest corner and the three-step king separation runs inward from that edge. At three king moves and five row-plus-file steps with two current strongest cuts, the farther tempo remains only while Black is on an edge. Keep only moves that reduce the mate distance, then choose the shortest remaining finish.",
-  )
-  assert.equal(
-    rookWhiteRules.find(({ id }) => id === 'rook waiting move')?.helpText,
-    "When the kings directly oppose each other and the Rook is not yet beside White's king, or when the kings are a knight's move apart with the Rook already beside White's king, make a quiet, safe Rook tempo beside White's king while preserving or shrinking a current strongest boundary. When Black is already on the board edge in direct opposition and the Rook is beside White's king, the finishing tempo may release that boundary. Among accepted protected tempos, maximize the Rook's distance from the board edge, then its row-plus-file distance from Black. A knight's-move alignment with a farther Rook, plus a few farther king alignments, uses the same boundary-preserving tempo but lets the Rook stay away from White's king.",
-  )
-  assert.equal(
-    rookWhiteRules.find(({ id }) => id === 'establish box')?.helpText,
-    'Establish the smallest available box around Black. Once a box exists, preserve it or make the resulting strongest cut smaller; for an equal-size box, retain one of the current strongest cut directions and do not move the Rook closer to Black.',
+  assert.deepEqual(
+    rookWhiteRules.slice(3).map(({ id, helpText }) => ({ id, helpText })),
+    [
+      {
+        id: 'exact mate progress',
+        helpText: 'When active, follow the shortest forced mate.',
+      },
+      {
+        id: 'rook waiting move',
+        helpText:
+          'When the kings are set, play a safe Rook waiting move that keeps the box.',
+      },
+      {
+        id: 'establish box',
+        helpText:
+          "Make Black's box smaller. If it cannot shrink, keep the same wall and keep the Rook back.",
+      },
+      {
+        id: 'forcing check',
+        helpText:
+          'Check only when every reply pushes Black farther from your King.',
+      },
+      {
+        id: 'king closer',
+        helpText: 'Bring your King closer to Black.',
+      },
+      {
+        id: 'maximize black distance',
+        helpText: 'Keep your Rook farther from Black.',
+      },
+    ],
   )
   assert.equal(queenRuleSet.help.title, 'How best moves are chosen')
   assert.equal(queenRuleSet.help.whiteIntro, WHITE_INTRO)
   assert.equal(queenRuleSet.help.blackIntro, BLACK_INTRO)
+  assert.equal(rookRuleSet.help.blackIntro, 'Black chooses the toughest reply.')
   assert.deepEqual(queenRuleSet.help.blackPriorities, [
     'Return to the previous board position when a legal reply can recreate it.',
     "Take a piece if White isn't looking.",
     'Head toward the center, where Black has the most room to resist.',
   ])
   assert.deepEqual(rookRuleSet.help.blackPriorities, [
-    'Return to the previous board position when a legal reply can recreate it.',
-    "Take a piece if White isn't looking.",
-    'When a box exists, move toward the nearest of its strongest Rook cut lines.',
-    "When White's King and Rook are diagonally adjacent, get as close to the Rook as possible by row-plus-file distance.",
-    "Unless the kings already oppose each other or White's King and Rook are diagonally adjacent, avoid creating direct opposition.",
-    'Get as close to the Rook as possible by row-plus-file distance.',
+    'Repeat the position.',
+    'Take a loose Rook.',
+    'Move toward the nearest box wall.',
+    "If the Rook is diagonally beside White's King, chase it.",
+    'Avoid creating opposition.',
+    'Move toward the Rook.',
   ])
   assert.deepEqual(queenRuleSet.help.notes, [
     "Phase 2 means the Queen's rank or file is strictly between the two kings on that axis. It is shown only on White's turn.",
   ])
   assert.deepEqual(queenRuleSet.help.noteBoards, [])
   assert.deepEqual(rookRuleSet.help.notes, [
-    "Phase 2 means the Rook's rank or file is strictly between the two kings on that axis. It is shown only on White's turn.",
+    "Phase 2: the Rook cuts between the kings. Shown only on White's turn.",
   ])
   assert.deepEqual(rookRuleSet.help.noteBoards, [])
 
@@ -1056,12 +1077,12 @@ test('rook uses a protected tempo instead of oscillating around direct oppositio
   assert.deepEqual(rook.idealWhiteMoves(afterTempo), ['Rg6'])
 
   for (const [fen, finish] of [
-    ['8/8/8/8/6R1/5K1k/8/8 w - - 18 10', 'Re4'],
-    ['5k2/6R1/5K2/8/8/8/8/8 w - - 4 3', 'Rg5'],
+    ['8/8/8/8/6R1/5K1k/8/8 w - - 18 10', 'Rg2'],
+    ['5k2/6R1/5K2/8/8/8/8/8 w - - 4 3', 'Re7'],
   ] as const) {
     const finishScore = scoreRookWhiteMove(fen, finish)
     assert.equal(finishScore.rookWaitingPenalty, 0)
-    assert.equal(finishScore.rookBoxLossPenalty, 1)
+    assert.equal(finishScore.rookBoxLossPenalty, 0)
     assert.deepEqual(rook.idealWhiteMoves(fen), [finish])
   }
 })

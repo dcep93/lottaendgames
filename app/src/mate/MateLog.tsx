@@ -8,13 +8,10 @@ export { default as MatePriorityGuideDialog } from './MatePriorityGuide'
 
 export type MateLogProps = {
   readonly busy?: boolean
-  readonly copyStartingUrlStatus: string
   readonly fen: string
   readonly logs: readonly MateLogEntry[]
   readonly mateMode: MateMode
-  readonly onCopyStartingUrl: () => void
   readonly ruleSet: RegisteredMateRuleSet
-  readonly startingFen: string
   readonly onCycleIdealWhite: (logIndex: number) => void
   readonly onCycleIdealBlack: (logIndex: number) => void
   readonly onCycleLegalBlack: (logIndex: number) => void
@@ -51,13 +48,10 @@ function currentRuleHint(
 
 export default function MateLog({
   busy = false,
-  copyStartingUrlStatus,
   fen,
   logs,
   mateMode,
-  onCopyStartingUrl,
   ruleSet,
-  startingFen,
   onCycleIdealWhite,
   onCycleIdealBlack,
   onCycleLegalBlack,
@@ -277,14 +271,11 @@ export default function MateLog({
 
       {guideOpen ? (
         <MatePriorityGuideDialog
-          copyStartingUrlStatus={copyStartingUrlStatus}
           highlightedReasonId={highlightedReasonId}
           mateMode={mateMode}
           onClose={closeGuide}
-          onCopyStartingUrl={onCopyStartingUrl}
           returnFocusTo={guideOpener}
           ruleSet={ruleSet}
-          startingFen={startingFen}
         />
       ) : null}
     </section>

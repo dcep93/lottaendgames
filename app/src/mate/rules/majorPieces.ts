@@ -112,17 +112,17 @@ const queenHelp: RuleHelp = {
 const rookHelp: RuleHelp = {
   title: 'How best moves are chosen',
   whiteIntro: WHITE_INTRO,
-  blackIntro: BLACK_INTRO,
+  blackIntro: 'Black chooses the toughest reply.',
   blackPriorities: [
-    RETURN_POSITION_PRIORITY,
-    "Take a piece if White isn't looking.",
-    'When a box exists, move toward the nearest of its strongest Rook cut lines.',
-    "When White's King and Rook are diagonally adjacent, get as close to the Rook as possible by row-plus-file distance.",
-    "Unless the kings already oppose each other or White's King and Rook are diagonally adjacent, avoid creating direct opposition.",
-    'Get as close to the Rook as possible by row-plus-file distance.',
+    'Repeat the position.',
+    'Take a loose Rook.',
+    'Move toward the nearest box wall.',
+    "If the Rook is diagonally beside White's King, chase it.",
+    'Avoid creating opposition.',
+    'Move toward the Rook.',
   ],
   notes: [
-    "Phase 2 means the Rook's rank or file is strictly between the two kings on that axis. It is shown only on White's turn.",
+    "Phase 2: the Rook cuts between the kings. Shown only on White's turn.",
   ],
   noteBoards: [],
 }
@@ -425,6 +425,8 @@ export function scoreRookWhiteMove(
       !rookIsAdjacentToWhiteKing) ||
     needsDualCutDistantRookWaitingMove ||
     needsOrthogonalDistantRookWaitingMove
+  const needsRookWaitingMove =
+    needsProtectedRookWaitingMove || needsDistantRookWaitingMove
   const blackEdgeDistance = beforeBlackKing
     ? edgeDistance(beforeBlackKing.square)
     : null
@@ -460,6 +462,8 @@ export function scoreRookWhiteMove(
     orthogonalAlignmentRunsInwardFromEdge
   const keepsDualCutFarTempo =
     needsDualCutDistantRookWaitingMove && blackEdgeDistance === 0
+  const needsEdgeFinishBoundaryWaitingMove =
+    needsEdgeFinishRookWaitingMove && blackAlongEdgeCornerDistance === 2
   const hasCloseKingFinishGeometry = Boolean(
     kingMoveDistance !== null &&
       rookWhiteKingDistance !== null &&
@@ -472,13 +476,11 @@ export function scoreRookWhiteMove(
     !keepsOrthogonalFarTempo &&
     !keepsDualCutFarTempo
   const usesExactMateProgress =
-    usesExactClosePiecesProgress ||
-    usesExactBoxlessProgress
+    !needsEdgeFinishBoundaryWaitingMove &&
+    (usesExactClosePiecesProgress || usesExactBoxlessProgress)
   const beforeExactMateProgress = usesExactMateProgress
     ? lookupMajorPieceMateProgress('rook', fen)
     : null
-  const needsRookWaitingMove =
-    needsProtectedRookWaitingMove || needsDistantRookWaitingMove
   const chess = getChess(fen)
   const move = chess.move(san)
   const resultFen = chess.fen()
@@ -537,7 +539,8 @@ export function scoreRookWhiteMove(
       !chess.isCheck() &&
       rookIsSafe &&
       whiteRook &&
-      (needsEdgeFinishRookWaitingMove ||
+      ((!needsEdgeFinishBoundaryWaitingMove &&
+        needsEdgeFinishRookWaitingMove) ||
         (preservesOrShrinksBox && retainsStrongestBoundary)) &&
       (!needsProtectedRookWaitingMove || rookEndsAdjacentToWhiteKing),
   )
@@ -622,9 +625,8 @@ export const rookWhiteRules: readonly OrderedRule<RookWhiteMoveScore>[] = [
   },
   {
     id: 'exact mate progress',
-    shortLabel: 'exact mate progress',
-    helpText:
-      "Use the exact King-and-Rook mate distance whenever no Rook box is active, whenever the kings are at most two king moves apart, or when they are three king moves apart and the Rook is within three king moves of White's King. There are two farther-tempo exceptions. At three king moves and four row-plus-file steps, an orthogonally protected Rook with a current strongest cut not closest to Black keeps its farther tempo only when Black is on an edge exactly two king steps from the nearest corner and the three-step king separation runs inward from that edge. At three king moves and five row-plus-file steps with two current strongest cuts, the farther tempo remains only while Black is on an edge. Keep only moves that reduce the mate distance, then choose the shortest remaining finish.",
+    shortLabel: 'shortest mate',
+    helpText: 'When active, follow the shortest forced mate.',
     compare: (first, second) =>
       first.rookExactMateProgressPenalty -
         second.rookExactMateProgressPenalty ||
@@ -632,9 +634,9 @@ export const rookWhiteRules: readonly OrderedRule<RookWhiteMoveScore>[] = [
   },
   {
     id: 'rook waiting move',
-    shortLabel: 'rook waiting move',
+    shortLabel: 'waiting move',
     helpText:
-      "When the kings directly oppose each other and the Rook is not yet beside White's king, or when the kings are a knight's move apart with the Rook already beside White's king, make a quiet, safe Rook tempo beside White's king while preserving or shrinking a current strongest boundary. When Black is already on the board edge in direct opposition and the Rook is beside White's king, the finishing tempo may release that boundary. Among accepted protected tempos, maximize the Rook's distance from the board edge, then its row-plus-file distance from Black. A knight's-move alignment with a farther Rook, plus a few farther king alignments, uses the same boundary-preserving tempo but lets the Rook stay away from White's king.",
+      'When the kings are set, play a safe Rook waiting move that keeps the box.',
     compare: (first, second) =>
       first.rookWaitingPenalty - second.rookWaitingPenalty ||
       compareNullableAscending(
@@ -648,9 +650,9 @@ export const rookWhiteRules: readonly OrderedRule<RookWhiteMoveScore>[] = [
   },
   {
     id: 'establish box',
-    shortLabel: 'establish and preserve box',
+    shortLabel: 'smaller box',
     helpText:
-      "Establish the smallest available box around Black. Once a box exists, preserve it or make the resulting strongest cut smaller; for an equal-size box, retain one of the current strongest cut directions and do not move the Rook closer to Black.",
+      "Make Black's box smaller. If it cannot shrink, keep the same wall and keep the Rook back.",
     compare: (first, second) =>
       first.rookBoxLossPenalty - second.rookBoxLossPenalty ||
       compareNullableAscending(first.rookBoxSize, second.rookBoxSize) ||
@@ -661,16 +663,16 @@ export const rookWhiteRules: readonly OrderedRule<RookWhiteMoveScore>[] = [
   },
   {
     id: 'forcing check',
-    shortLabel: 'forcing check',
+    shortLabel: 'push with check',
     helpText:
-      "Prefer a check only when every legal Black reply increases Black's king-move distance from White's king.",
+      'Check only when every reply pushes Black farther from your King.',
     compare: (first, second) =>
       first.forcingCheckPenalty - second.forcingCheckPenalty,
   },
   {
     id: 'king closer',
-    shortLabel: 'white king closer',
-    helpText: "Minimize White's resulting king-move distance to Black.",
+    shortLabel: 'king closer',
+    helpText: 'Bring your King closer to Black.',
     applies: (score) =>
       score.kingDistance !== null && score.kingManhattanDistance !== null,
     compare: (first, second) =>
@@ -679,9 +681,8 @@ export const rookWhiteRules: readonly OrderedRule<RookWhiteMoveScore>[] = [
   },
   {
     id: 'maximize black distance',
-    shortLabel: 'keep black far from rook',
-    helpText:
-      "When earlier priorities tie, maximize the Rook's row-plus-file distance from Black's king.",
+    shortLabel: 'rook farther',
+    helpText: 'Keep your Rook farther from Black.',
     applies: (score) => score.rookBlackDistanceScore !== null,
     compare: (first, second) =>
       first.rookBlackDistanceScore! - second.rookBlackDistanceScore!,
