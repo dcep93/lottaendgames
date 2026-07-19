@@ -59,15 +59,21 @@ king approach. It also preserves the existing explanation ID for moves that
 lose or enlarge the box.
 
 For `king closer`, retain the existing rank-or-file alignment penalty by
-default. Waive it only for a White king move that strictly reduces actual
-king-move distance (Chebyshev distance) to Black. Continue using the existing
-Manhattan distance to rank ordinary king approach after that gate. This lets a
-genuinely closer king move beat an unnecessary rook waiting move without making
-every perpendicular alignment preferable.
+default. Waive it only for a White king move that both strictly reduces actual
+king-move distance (Chebyshev distance) to Black and preserves the rook's
+existing cut axis. Continue using the existing Manhattan distance to rank
+ordinary king approach after that gate. This lets a genuinely closer king move
+beat an unnecessary rook waiting move without allowing the king to replace the
+rook's established cut with a different one.
 
 `Kf3` in the shuttle root reduces king-move distance and receives the exception.
 `Ke6` after `1.Re7 Kf8` only ties the existing king-move distance, retains the
 alignment penalty, and therefore must not displace the approved `Ra7` rook move.
+
+For `1k6/8/2R5/2K5/8/8/8/8 w - - 0 1`, `Kd6` reduces king distance but changes
+the rook's cut from the sixth rank to the c-file. It must retain the alignment
+penalty. `Kd5` preserves the established rank cut, is the sole ideal White move,
+and prevents the exact `Kd6 Ka7 Kc5 Kb8` cycle.
 
 For `8/8/8/3K4/8/k7/8/2R5 w - - 34 18`:
 
@@ -116,8 +122,9 @@ exact `Kf6` versus `Kf7` preservation regression and assert that the duplicated
 internal stage produces only one unchanged visible rule description. Update any
 existing score fixture whose box-size fields become meaningful under the
 corrected definition. Add a regression for the perpendicular-cut cycle and its
-king-approach continuation, plus the exact `Rb7` versus `Rc6` comparison. Assert
-that the existing tooltip copy and visible order are unchanged. Run Rook
-parity/self-play tests, the exhaustive Rook verifier, the full Mate suite, lint,
-and the production build. If another literal loop remains, encode one minimal
-exact-position witness as a hosted replay URL with explicit moves for Undo/Redo.
+king-approach continuation, the exact `Rb7` versus `Rc6` comparison, and the
+`Kd5` versus `Kd6` cut-axis comparison. Assert that the existing tooltip copy and
+visible order are unchanged. Run Rook parity/self-play tests, the exhaustive
+Rook verifier, the full Mate suite, lint, and the production build. If another
+literal loop remains, encode one minimal exact-position witness as a hosted
+replay URL with explicit moves for Undo/Redo.
