@@ -105,17 +105,26 @@ inactive. `Kd6` is the sole ideal move through `king closer`; `Rc6` must not
 switch the box axis back and recreate the four-ply cycle. Every legal Black
 reply after `Kd6` must remain provably mating.
 
-Add a compact straight-waiting pattern when the active box has size 2, the rook
-is adjacent to White's king, and the kings' file/rank deltas are 3 and 1. Prefer
-a quiet rook move that stays on the current cut line and preserves the active
-box, then use the existing waiting-distance ranking. This is distinct from the
-3-by-2 equal-box axis-switch pattern.
+Add a compact straight-waiting pattern when an active box exists, the rook is
+adjacent to White's king, and the kings' file/rank deltas are 3 and 1. Prefer a
+quiet rook move that stays on the current cut line and preserves the active box,
+then use the existing waiting-distance ranking. This is distinct from the 3-by-2
+equal-box axis-switch pattern. The 3-by-1 king geometry and adjacent rook, rather
+than the active-box size or distance from the board edge, identify the required
+tempo. The waiting move may retain a larger box than an axis-changing king move
+would create because the waiting priority is deliberate in this exact geometry;
+ordinary establishment positions continue to prefer the smaller box.
 
 For `5k2/8/4R3/4K3/8/8/8/8 w - - 2 2`, `Ra6` retains the size-2 rank box while
 `Kd5` creates a larger size-3 file box. Establishment must prefer `Ra6` over
 `Kd5`, and the compact straight-waiting pattern must prefer it over `Kf5`.
 `Ra6` is the sole ideal move. Every legal Black reply after `Ra6` must remain
 provably mating.
+
+For `8/6k1/8/5R2/5K2/8/8/8 w - - 2 2`, the same compact straight-waiting
+geometry occurs with a size-3 rank box. `Ra5` is the farthest quiet rook move on
+the current cut line and must be the sole ideal move instead of `Ke4`. Every
+legal Black reply after `Ra5` must remain provably mating.
 
 For `8/8/8/3K4/8/k7/8/2R5 w - - 34 18`:
 
@@ -171,7 +180,9 @@ check of every legal reply after `Rc1`. Add the exact `Kd6` versus `Rc6`
 post-waiting regression and exhaustively check every legal reply after `Kd6`.
 Add the exact `Ra6` versus `Kd5` and `Kf5` regression, including active box
 sizes, and exhaustively check every legal reply after `Ra6`. Assert that the
-existing tooltip copy and visible order are unchanged. Run Rook parity/self-play
-tests, the exhaustive Rook verifier, the full Mate suite, lint, and the
-production build. If another literal loop remains, encode one minimal exact-
-position witness as a replay URL with explicit moves for Undo/Redo.
+existing tooltip copy and visible order are unchanged. Add the exact `Ra5`
+versus `Ke4` size-3 compact-waiting regression and exhaustively check every legal
+reply after `Ra5`. Run Rook parity/self-play tests, the exhaustive Rook verifier,
+the full Mate suite, lint, and the production build. If another literal loop
+remains, encode one minimal exact-position witness as a replay URL with explicit
+moves for Undo/Redo.
