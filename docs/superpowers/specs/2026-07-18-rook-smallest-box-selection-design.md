@@ -43,9 +43,11 @@ candidate's resulting active-cut box size. The existing preservation penalty
 must reject a candidate if it loses the active cut or makes its box larger. It
 must not reject an axis change merely because the new cut is not the closest
 possible cut: an equal or smaller active box is preserved. Among the remaining
-candidates, prefer the smaller resulting box before using rook distance as the
-final tiebreak. The geometry, not the axis name or closest-cut label, controls
-the result.
+candidates, grant shrink credit only when the resulting active cut is also a
+closest cut. A non-closest equal-or-smaller cut ties the starting box size for
+ranking; this lets it act as a waiting move without displacing a useful king
+approach merely by claiming an off-center shrink. Then use rook distance as the
+final tiebreak. The geometry, not the axis name, controls preservation.
 
 Split the existing `maximize black distance` priority into two internal
 evaluator stages with the same public ID, label, and help text. The first stage
