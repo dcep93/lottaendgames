@@ -45,9 +45,18 @@ remaining candidates, prefer the smaller resulting box before using rook
 distance as the final tiebreak. An axis change remains valid when it preserves
 or shrinks the box; the geometry, not the axis name, controls the result.
 
-These checks remain within the final `maximize black distance` priority, after
-all earlier safety, mating, and king-approach priorities. They therefore do not
-force premature rook moves ahead of more important technique rules.
+Split the existing `maximize black distance` priority into two internal
+evaluator stages with the same public ID, label, and help text. The first stage
+runs immediately before `king closer` and compares only box preservation and
+preserved box size. The second remains after `king closer` and compares only
+rook distance from Black. The rule registry already deduplicates identical
+public descriptions, so the guide and move explanations continue to expose one
+unchanged `maximize black distance` priority in its existing visible position.
+
+This ordering makes retaining the achieved box more important than walking the
+king closer, while still preventing raw rook distance from overriding a useful
+king approach. It also preserves the existing explanation ID for moves that
+lose or enlarge the box.
 
 For `king closer`, retain the existing rank-or-file alignment penalty by
 default. Waive it only for a White king move that strictly reduces actual
@@ -80,6 +89,13 @@ For `7K/2R5/8/k7/8/8/8/8 w - - 2 2`:
 - `Rb7` changes to the file axis and creates a box of size 1.
 - `Rb7` is the sole ideal White move, and `Rc6` is rejected by `establish box`.
 
+For `7k/R7/4K3/8/8/8/8/8 w - - 6 4`:
+
+- `Kf7` walks White's king closer but loses the established box.
+- `Kf6` preserves the box at size 1.
+- `Kf6` is the sole ideal White move, and `Kf7` is rejected by
+  `maximize black distance` before `king closer` can prefer it.
+
 For the earlier cycle beginning at
 `8/8/8/7k/5R2/4K3/8/8 w - - 0 1`, `Kf3` keeps the rank cut while bringing
 White's king closer. It must not receive the broad king-rook alignment penalty,
@@ -88,16 +104,20 @@ and it must beat the unnecessary `Ra4`. If the later position after
 beats the larger rank box from `Ra5`; play still cannot cycle because the
 revisited starting position now continues with `Kf3`.
 
-The evaluator rule order, Black response logic, and all user-facing tooltip and
-guide copy remain unchanged.
+Black response logic and all user-facing tooltip and guide copy remain
+unchanged. The evaluator gains only the internal early preservation stage; its
+deduplicated visible rule order remains unchanged.
 
 ## Verification
 
 Add focused regression tests for both exact positions, the relevant candidate
-scores, each sole ideal move, and each rejected move's explanation. Update any
+scores, each sole ideal move, and each rejected move's explanation. Include the
+exact `Kf6` versus `Kf7` preservation regression and assert that the duplicated
+internal stage produces only one unchanged visible rule description. Update any
 existing score fixture whose box-size fields become meaningful under the
 corrected definition. Add a regression for the perpendicular-cut cycle and its
 king-approach continuation, plus the exact `Rb7` versus `Rc6` comparison. Assert
-that the existing tooltip copy is unchanged. Run Rook parity/self-play tests,
-the exhaustive Rook verifier, the full Mate suite, lint, and the production
-build.
+that the existing tooltip copy and visible order are unchanged. Run Rook
+parity/self-play tests, the exhaustive Rook verifier, the full Mate suite, lint,
+and the production build. If another literal loop remains, encode one minimal
+exact-position witness as a hosted replay URL with explicit moves for Undo/Redo.
