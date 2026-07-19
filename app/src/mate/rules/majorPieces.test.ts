@@ -524,6 +524,7 @@ test('queen and rook preserve evaluator order with universal priority labels', (
       'forcing check',
       'rook waiting move',
       'rook waiting distance',
+      'maximize black distance',
       'king closer',
       'maximize black distance',
     ],
@@ -553,6 +554,7 @@ test('queen and rook preserve evaluator order with universal priority labels', (
       'forcing check',
       'rook waiting move',
       'rook waiting distance',
+      'keep Black far from rook',
       'White king closer',
       'keep Black far from rook',
     ],
@@ -605,7 +607,23 @@ test('queen and rook preserve evaluator order with universal priority labels', (
   )
   assert.deepEqual(
     registeredRook.whiteRuleDescriptions.map(({ id }) => id),
-    rookWhiteRules.map(({ id }) => id),
+    [
+      'mate',
+      'rook safe',
+      'no stalemate',
+      'establish box',
+      'forcing check',
+      'rook waiting move',
+      'rook waiting distance',
+      'king closer',
+      'maximize black distance',
+    ],
+  )
+  assert.equal(
+    registeredRook.whiteRuleDescriptions.filter(
+      ({ id }) => id === 'maximize black distance',
+    ).length,
+    1,
   )
 })
 
@@ -929,11 +947,76 @@ test('rook white score fields preserve establish-box and post-box priorities', (
   assert.equal(perpendicularRa5.rookBoxSize, 3)
   assert.equal(perpendicularRf4.rookBoxAxisSwitchPenalty, 1)
   assert.equal(perpendicularRf4.rookBoxSize, 2)
-  assert.ok(compareRookWhiteScores(perpendicularRa5, perpendicularRf4) < 0)
-  assert.deepEqual(rook.idealWhiteMoves(perpendicularCycleFen), ['Ra5'])
+  assert.ok(compareRookWhiteScores(perpendicularRf4, perpendicularRa5) < 0)
+  assert.deepEqual(rook.idealWhiteMoves(perpendicularCycleFen), ['Rf4'])
   assert.equal(
-    rook.explainWhiteMove(perpendicularCycleFen, 'Rf4')?.id,
+    rook.explainWhiteMove(perpendicularCycleFen, 'Ra5')?.id,
     'establish box',
+  )
+
+  const loopingReplyFen = '7K/2R5/8/k7/8/8/8/8 w - - 2 2'
+  const loopingReplyRb7 = scoreRookWhiteMove(loopingReplyFen, 'Rb7')
+  const loopingReplyRc6 = scoreRookWhiteMove(loopingReplyFen, 'Rc6')
+  assert.equal(loopingReplyRb7.rookBoxAxisSwitchPenalty, 1)
+  assert.equal(loopingReplyRb7.rookBoxSize, 1)
+  assert.equal(loopingReplyRc6.rookBoxAxisSwitchPenalty, 0)
+  assert.equal(loopingReplyRc6.rookBoxSize, 5)
+  assert.ok(compareRookWhiteScores(loopingReplyRb7, loopingReplyRc6) < 0)
+  assert.deepEqual(rook.idealWhiteMoves(loopingReplyFen), ['Rb7'])
+  assert.equal(
+    rook.explainWhiteMove(loopingReplyFen, 'Rc6')?.id,
+    'establish box',
+  )
+
+  const lostBoxFen = '7k/R7/4K3/8/8/8/8/8 w - - 6 4'
+  const lostBoxKf6 = scoreRookWhiteMove(lostBoxFen, 'Kf6')
+  const lostBoxKf7 = scoreRookWhiteMove(lostBoxFen, 'Kf7')
+  assert.equal(lostBoxKf6.rookBoxPreservedPenalty, 0)
+  assert.equal(lostBoxKf6.rookPreservedBoxSize, 1)
+  assert.equal(lostBoxKf6.kingRookLinePenalty, 0)
+  assert.equal(lostBoxKf7.rookBoxPreservedPenalty, 1)
+  assert.equal(lostBoxKf7.rookPreservedBoxSize, 0)
+  assert.ok(compareRookWhiteScores(lostBoxKf6, lostBoxKf7) < 0)
+  assert.deepEqual(rook.idealWhiteMoves(lostBoxFen), ['Kf6'])
+  assert.equal(
+    rook.explainWhiteMove(lostBoxFen, 'Kf7')?.id,
+    'maximize black distance',
+  )
+
+  const cutSwitchCycleFen = '1k6/8/2R5/2K5/8/8/8/8 w - - 0 1'
+  const cutSwitchKd5 = scoreRookWhiteMove(cutSwitchCycleFen, 'Kd5')
+  const cutSwitchKd6 = scoreRookWhiteMove(cutSwitchCycleFen, 'Kd6')
+  assert.equal(cutSwitchKd5.kingRookLinePenalty, 0)
+  assert.equal(cutSwitchKd5.kingDistance, 5)
+  assert.equal(cutSwitchKd6.kingRookLinePenalty, 1)
+  assert.equal(cutSwitchKd6.kingDistance, 4)
+  assert.ok(compareRookWhiteScores(cutSwitchKd5, cutSwitchKd6) < 0)
+  assert.deepEqual(rook.idealWhiteMoves(cutSwitchCycleFen), ['Kd5'])
+  assert.equal(
+    rook.explainWhiteMove(cutSwitchCycleFen, 'Kd6')?.id,
+    'king closer',
+  )
+
+  const perpendicularCycleStartFen = '8/8/8/7k/5R2/4K3/8/8 w - - 0 1'
+  const perpendicularCycleKf3 = scoreRookWhiteMove(
+    perpendicularCycleStartFen,
+    'Kf3',
+  )
+  const perpendicularCycleRa4 = scoreRookWhiteMove(
+    perpendicularCycleStartFen,
+    'Ra4',
+  )
+  assert.equal(perpendicularCycleKf3.kingRookLinePenalty, 0)
+  assert.equal(perpendicularCycleKf3.kingDistance, 4)
+  assert.equal(perpendicularCycleRa4.kingRookLinePenalty, 0)
+  assert.equal(perpendicularCycleRa4.kingDistance, 5)
+  assert.ok(
+    compareRookWhiteScores(perpendicularCycleKf3, perpendicularCycleRa4) < 0,
+  )
+  assert.deepEqual(rook.idealWhiteMoves(perpendicularCycleStartFen), ['Kf3'])
+  assert.equal(
+    rook.explainWhiteMove(perpendicularCycleStartFen, 'Ra4')?.id,
+    'king closer',
   )
 })
 
@@ -1070,13 +1153,13 @@ test('rook mates all 50 source-seeded Standard starts within 220 plies', () => {
     maxPlies = Math.max(maxPlies, moves.length)
   }
 
-  assert.equal(totalPlies, 2020)
-  assert.equal(maxPlies, 115)
+  assert.equal(totalPlies, 2168)
+  assert.equal(maxPlies, 107)
   assert.equal(
     createHash('sha256')
       .update(JSON.stringify({ starts, lines }))
       .digest('hex'),
-    '24ac7bf124636ee5725b4ce9a854c983cc9df7b49d0eefff18fd090e206a6472',
+    'fa59764af2a9b0bc0883152bb8d04b814c136ef5b58cd7062b6d8172c767343d',
   )
 })
 

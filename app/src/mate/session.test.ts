@@ -187,6 +187,7 @@ test('reconstructs the former exact Rook loop as undoable ordinary history', () 
     [
       { move: 9, reasonId: 'establish box', san: 'Rd6' },
       { move: 10, reasonId: 'maximize black distance', san: 'Rd1' },
+      { move: 13, reasonId: 'establish box', san: 'Rc2' },
       { move: 18, reasonId: 'establish box', san: 'Rc4' },
       { move: 19, reasonId: 'maximize black distance', san: 'Rh4' },
       { move: 26, reasonId: 'establish box', san: 'Rd3' },

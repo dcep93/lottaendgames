@@ -430,7 +430,16 @@ export function scoreRookWhiteMove(
         : 1,
     kingRookLinePenalty:
       whiteKing && whiteRook && sharesRankOrFile(whiteKing.square, whiteRook.square)
-        ? 1
+        ? move.piece === 'k' &&
+          beforeWhiteKing &&
+          beforeBlackKing &&
+          blackKing &&
+          beforeRookBoxAxis !== null &&
+          rookCutAxis === beforeRookBoxAxis &&
+          kingDistance(whiteKing.square, blackKing.square) <
+            kingDistance(beforeWhiteKing.square, beforeBlackKing.square)
+          ? 0
+          : 1
         : 0,
     kingDistance:
       whiteKing && blackKing
@@ -438,6 +447,14 @@ export function scoreRookWhiteMove(
         : 99,
   }
 }
+
+const ROOK_BOX_DISTANCE_RULE_DESCRIPTION = {
+  id: 'maximize black distance',
+  shortLabel: 'keep Black far from rook',
+  helpText:
+    "Move the rook as far as possible from Black's king while preserving the box.",
+  guideOrder: 8,
+} as const
 
 export const rookWhiteRules: readonly OrderedRule<RookWhiteMoveScore>[] = [
   {
@@ -467,8 +484,8 @@ export const rookWhiteRules: readonly OrderedRule<RookWhiteMoveScore>[] = [
       "Put the rook on the row or file between the kings and closest to Black's king when not already.",
     compare: (first, second) =>
       first.rookBoxEstablishedPenalty - second.rookBoxEstablishedPenalty ||
-      first.rookBoxAxisSwitchPenalty - second.rookBoxAxisSwitchPenalty ||
-      first.rookBoxSize - second.rookBoxSize,
+      first.rookBoxSize - second.rookBoxSize ||
+      first.rookBoxAxisSwitchPenalty - second.rookBoxAxisSwitchPenalty,
   },
   {
     id: 'forcing check',
@@ -496,22 +513,24 @@ export const rookWhiteRules: readonly OrderedRule<RookWhiteMoveScore>[] = [
       second.rookPhaseTwoWaitingDistanceScore,
   },
   {
+    ...ROOK_BOX_DISTANCE_RULE_DESCRIPTION,
+    compare: (first, second) =>
+      first.rookBoxPreservedPenalty - second.rookBoxPreservedPenalty ||
+      first.rookPreservedBoxSize - second.rookPreservedBoxSize,
+  },
+  {
     id: 'king closer',
     shortLabel: 'White king closer',
     helpText:
       "Bring White's king closer to Black's king without entering the rook's lines.",
+    guideOrder: 7,
     compare: (first, second) =>
       first.kingRookLinePenalty - second.kingRookLinePenalty ||
       first.kingDistance - second.kingDistance,
   },
   {
-    id: 'maximize black distance',
-    shortLabel: 'keep Black far from rook',
-    helpText:
-      "Move the rook as far as possible from Black's king while preserving the box.",
+    ...ROOK_BOX_DISTANCE_RULE_DESCRIPTION,
     compare: (first, second) =>
-      first.rookBoxPreservedPenalty - second.rookBoxPreservedPenalty ||
-      first.rookPreservedBoxSize - second.rookPreservedBoxSize ||
       first.rookBlackDistanceScore - second.rookBlackDistanceScore,
   },
 ]
