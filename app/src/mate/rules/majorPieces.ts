@@ -8,16 +8,13 @@ import {
   kingDistance,
   kingWalkCenterDistance,
   manhattanDistance,
-  middle2x2Distance,
   positionKey,
-  sharesRankOrFile,
   squareCoordinates,
 } from '../chess'
 import {
   blackCanTakeWhiteMajorPiece,
   blackMustMoveAwayFromWhiteKing,
   getAxisDistance,
-  getClosestRookBoxAxis,
   getMajorEndgamePhase,
   getMajorEndgamePhaseLabel,
   getQueenBoxArea,
@@ -25,11 +22,11 @@ import {
   getQueenCageKingApproachManhattanDistance,
   getQueenMoveDistance,
   getQueenTwoSquareCage,
-  getRookCutAxis,
-  getRookEstablishedBoxAxis,
-  getRookOneDimensionalBoxSize,
-  isMajorPieceBetweenKings,
+  getRookBox,
+  getRookBoxFromFen,
+  isQueenRankOrFileChannelBetween,
 } from './majorPieceGeometry'
+import { lookupMajorPieceMateProgress } from './majorPieceMateProgress'
 import { compareScoresByRules, selectIdealMoves } from './selection'
 import type {
   MateRuleSet,
@@ -46,10 +43,12 @@ export type QueenWhiteMoveScore = {
   readonly whitePieceEdgePenalty: number
   readonly queenKnightMovePenalty: number
   readonly queenBoxArea: number
-  readonly cageKingApproach: number
-  readonly kingMiddleDistance: number
+  readonly cageKingApproachPriority: 0 | 1 | 2
+  readonly cageKingApproachDistance: number | null
+  readonly cageKingApproachManhattanDistance: number | null
   readonly whiteKingBetweenPiecesPenalty: number
-  readonly kingDistance: number
+  readonly kingDistance: number | null
+  readonly kingManhattanDistance: number | null
   readonly queenMoveDistance: number | null
 }
 
@@ -62,17 +61,19 @@ export type RookWhiteMoveScore = {
   readonly matePenalty: number
   readonly rookCapturePenalty: number
   readonly stalematePenalty: number
-  readonly rookBoxEstablishedPenalty: number
-  readonly rookBoxAxisSwitchPenalty: number
-  readonly rookBoxSize: number
+  readonly rookExactMateProgressPenalty: number
+  readonly rookExactMateProgressRank: number
+  readonly rookWaitingPenalty: number
+  readonly rookWaitingEdgeDistanceScore: number | null
+  readonly rookWaitingDistanceScore: number | null
+  readonly rookBoxLossPenalty: number
+  readonly rookBoxSize: number | null
+  readonly rookBoxAxisRetentionPenalty: number
+  readonly rookBoxRookApproachPenalty: number
   readonly forcingCheckPenalty: number
-  readonly rookPhaseTwoWaitingPenalty: number
-  readonly rookPhaseTwoWaitingDistanceScore: number
-  readonly rookBoxPreservedPenalty: number
-  readonly rookPreservedBoxSize: number
-  readonly rookBlackDistanceScore: number
-  readonly kingRookLinePenalty: number
-  readonly kingDistance: number
+  readonly kingDistance: number | null
+  readonly kingManhattanDistance: number | null
+  readonly rookBlackDistanceScore: number | null
 }
 
 export type RookBlackMoveScore = {
@@ -84,13 +85,13 @@ export type RookBlackMoveScore = {
 }
 
 const WHITE_INTRO =
-  "White's best moves are the moves that survive these priorities in order. If several moves are still tied after a priority, they all remain best moves."
+  "White's best moves are the moves that survive these priorities in order. Moves tied at one priority remain candidates for the next priority."
 
 const BLACK_INTRO =
   'Black uses its own priorities to put up the strongest resistance. Black is not trying to help the mate; it looks for the most stubborn legal reply.'
 
 const RETURN_POSITION_PRIORITY =
-  'Return to the previous full position when a legal reply can recreate it.'
+  'Return to the previous board position when a legal reply can recreate it.'
 
 const queenHelp: RuleHelp = {
   title: 'How best moves are chosen',
@@ -101,7 +102,9 @@ const queenHelp: RuleHelp = {
     "Take a piece if White isn't looking.",
     'Head toward the center, where Black has the most room to resist.',
   ],
-  notes: [],
+  notes: [
+    "Phase 2 means the Queen's rank or file is strictly between the two kings on that axis. It is shown only on White's turn.",
+  ],
   noteBoards: [],
 }
 
@@ -112,12 +115,14 @@ const rookHelp: RuleHelp = {
   blackPriorities: [
     RETURN_POSITION_PRIORITY,
     "Take a piece if White isn't looking.",
-    "Move toward the rook's cut line when that weakens White's box.",
-    "Approach a diagonally protected rook when White's king and rook are awkwardly placed.",
-    "Avoid walking into direct opposition when it makes White's job easier.",
-    'Get as close to the rook as possible.',
+    'When a box exists, move toward the nearest of its strongest Rook cut lines.',
+    "When White's King and Rook are diagonally adjacent, get as close to the Rook as possible by row-plus-file distance.",
+    "Unless the kings already oppose each other or White's King and Rook are diagonally adjacent, avoid creating direct opposition.",
+    'Get as close to the Rook as possible by row-plus-file distance.',
   ],
-  notes: [],
+  notes: [
+    "Phase 2 means the Rook's rank or file is strictly between the two kings on that axis. It is shown only on White's turn.",
+  ],
   noteBoards: [],
 }
 
@@ -142,6 +147,13 @@ function selectBestMoves<Score>(
     .map(({ san }) => san)
 }
 
+function compareOptionalDistances(
+  first: number | null,
+  second: number | null,
+): number {
+  return first === null || second === null ? 0 : first - second
+}
+
 export function scoreQueenWhiteMove(
   fen: string,
   san: string,
@@ -156,6 +168,22 @@ export function scoreQueenWhiteMove(
   const whiteKing = findPiece(resultFen, 'w', 'k')
   const blackKing = findPiece(resultFen, 'b', 'k')
   const resultCage = getQueenTwoSquareCage(resultFen)
+  const cageKingApproachDistance =
+    shouldWalkCageKing && resultCage && move.piece === 'k' && whiteKing && whiteQueen
+      ? getQueenCageKingApproachDistance(
+          whiteKing.square,
+          whiteQueen.square,
+          startingCage.corner,
+        )
+      : null
+  const cageKingApproachManhattanDistance =
+    cageKingApproachDistance !== null && whiteKing && whiteQueen
+      ? getQueenCageKingApproachManhattanDistance(
+          whiteKing.square,
+          whiteQueen.square,
+          startingCage!.corner,
+        )
+      : null
   return {
     matePenalty: chess.isCheckmate() ? 0 : 1,
     queenCapturePenalty: blackCanTakeWhiteMajorPiece(resultFen, 'q') ? 1 : 0,
@@ -174,35 +202,32 @@ export function scoreQueenWhiteMove(
       whiteQueen && blackKing
         ? getQueenBoxArea(whiteQueen.square, blackKing.square)
         : 99,
-    cageKingApproach:
-      shouldWalkCageKing && resultCage && whiteKing && whiteQueen
-        ? move.piece === 'k'
-          ? getQueenCageKingApproachDistance(
-              whiteKing.square,
-              whiteQueen.square,
-              startingCage.corner,
-            ) *
-              8 +
-            getQueenCageKingApproachManhattanDistance(
-              whiteKing.square,
-              whiteQueen.square,
-              startingCage.corner,
-            )
-          : 99
+    cageKingApproachPriority:
+      shouldWalkCageKing && resultCage
+        ? move.piece !== 'k'
+          ? 1
+          : cageKingApproachDistance === null
+            ? 2
+            : 0
         : 0,
-    kingMiddleDistance: whiteKing ? middle2x2Distance(whiteKing.square) : 99,
+    cageKingApproachDistance,
+    cageKingApproachManhattanDistance,
     whiteKingBetweenPiecesPenalty:
       move.piece === 'k' &&
       whiteQueen &&
       whiteKing &&
       blackKing &&
-      isMajorPieceBetweenKings(whiteKing, whiteQueen, blackKing)
+      isQueenRankOrFileChannelBetween(whiteKing, whiteQueen, blackKing)
         ? 1
         : 0,
     kingDistance:
       whiteKing && blackKing
+        ? kingDistance(whiteKing.square, blackKing.square)
+        : null,
+    kingManhattanDistance:
+      whiteKing && blackKing
         ? manhattanDistance(whiteKing.square, blackKing.square)
-        : 99,
+        : null,
     queenMoveDistance: getQueenMoveDistance(
       beforeQueen?.square,
       whiteQueen?.square,
@@ -234,52 +259,67 @@ export const queenWhiteRules: readonly OrderedRule<QueenWhiteMoveScore>[] = [
   },
   {
     id: 'corner cage',
-    shortLabel: 'corner cage',
-    helpText: "Build or preserve the queen's corner cage.",
+    shortLabel: 'stable two-square corner cage',
+    helpText:
+      'Build or preserve a corner-plus-adjacent-edge cage from which every legal Black reply remains in those two squares.',
     compare: (first, second) => first.cagePenalty - second.cagePenalty,
   },
   {
     id: 'king to cage',
-    shortLabel: 'White king toward cage',
+    shortLabel: 'White king toward cage support',
     helpText:
-      "When the queen has a two-square corner cage, walk White's king toward that cage.",
+      "With a stable two-square corner cage, move White's king toward a mating-support square a knight's move from both the Queen and corner. Compare king-move distance first and row-plus-file distance second.",
     compare: (first, second) =>
-      first.cageKingApproach - second.cageKingApproach,
+      first.cageKingApproachPriority - second.cageKingApproachPriority ||
+      compareOptionalDistances(
+        first.cageKingApproachDistance,
+        second.cageKingApproachDistance,
+      ) ||
+      compareOptionalDistances(
+        first.cageKingApproachManhattanDistance,
+        second.cageKingApproachManhattanDistance,
+      ),
   },
   {
     id: 'white pieces off edge',
     shortLabel: 'white pieces off edge',
-    helpText: 'Keep white pieces off edge squares.',
+    helpText:
+      "Minimize the number of White pieces—King and Queen—on edge squares.",
     compare: (first, second) =>
       first.whitePieceEdgePenalty - second.whitePieceEdgePenalty,
   },
   {
     id: 'queen knight move',
-    shortLabel: 'queen a knight move from Black king',
-    helpText: "Place the queen a knight move from Black's king.",
+    shortLabel: 'Queen a knight move from Black',
+    helpText: "Keep or place the Queen a knight's move from Black's king.",
     compare: (first, second) =>
       first.queenKnightMovePenalty - second.queenKnightMovePenalty,
   },
   {
     id: 'queen box size',
-    shortLabel: 'queen box size',
-    helpText: "Shrink the queen's box around Black's king.",
+    shortLabel: 'Queen box size',
+    helpText:
+      "Minimize the board-edge rectangle bounded by the Queen's rank and file on Black's side.",
     compare: (first, second) => first.queenBoxArea - second.queenBoxArea,
   },
   {
     id: 'king closer',
     shortLabel: 'White king closer',
     helpText:
-      "Bring White's king closer to Black's king without walking between the queen and Black's king.",
+      "Minimize the resulting king-move distance to Black without entering the Queen's rank/file channel between the Queen and Black's king; use resulting row-plus-file distance as a tie-break.",
+    applies: (score) =>
+      score.kingDistance !== null && score.kingManhattanDistance !== null,
     compare: (first, second) =>
       first.whiteKingBetweenPiecesPenalty -
         second.whiteKingBetweenPiecesPenalty ||
-      first.kingDistance - second.kingDistance,
+      first.kingDistance! - second.kingDistance! ||
+      first.kingManhattanDistance! - second.kingManhattanDistance!,
   },
   {
     id: 'shorter queen move',
-    shortLabel: 'shorter queen move',
-    helpText: 'Prefer the shorter queen move when everything else is tied.',
+    shortLabel: 'shorter Queen move',
+    helpText:
+      'Among otherwise tied Queen moves, prefer fewer squares traversed. King moves do not participate in this tie-break.',
     applies: (score) => score.queenMoveDistance !== null,
     compare: (first, second) =>
       first.queenMoveDistance! - second.queenMoveDistance!,
@@ -305,6 +345,15 @@ export function getIdealQueenWhiteMoves(fen: string): string[] {
   )]
 }
 
+function compareNullableAscending(
+  first: number | null,
+  second: number | null,
+): number {
+  if (first === null) return second === null ? 0 : 1
+  if (second === null) return -1
+  return first - second
+}
+
 export function scoreRookWhiteMove(
   fen: string,
   san: string,
@@ -312,27 +361,120 @@ export function scoreRookWhiteMove(
   const beforeRook = findPiece(fen, 'w', 'r')
   const beforeWhiteKing = findPiece(fen, 'w', 'k')
   const beforeBlackKing = findPiece(fen, 'b', 'k')
-  const beforeRookBoxAxis = getRookEstablishedBoxAxis(fen)
-  const beforeClosestRookBoxAxis =
-    beforeRook && beforeWhiteKing && beforeBlackKing
-      ? getClosestRookBoxAxis(beforeRook, beforeWhiteKing, beforeBlackKing)
-      : null
-  const beforeClosestRookBoxSize =
-    beforeRook && beforeBlackKing && beforeClosestRookBoxAxis !== null
-      ? getRookOneDimensionalBoxSize(
-          beforeRook.square,
-          beforeBlackKing.square,
-          beforeClosestRookBoxAxis,
-        )
-      : null
-  const needsPhaseTwoWaitingMove = Boolean(
-    beforeRook &&
-      beforeWhiteKing &&
+  const beforeBox = getRookBoxFromFen(fen)
+  const kingsAreKnightMoveApart = Boolean(
+    beforeWhiteKing &&
       beforeBlackKing &&
-      beforeRookBoxAxis &&
-      getMajorEndgamePhase(fen, 'r') === 2 &&
       isKnightMove(beforeWhiteKing.square, beforeBlackKing.square),
   )
+  const kingsHaveDirectOpposition = Boolean(
+    beforeWhiteKing &&
+      beforeBlackKing &&
+      hasDirectKingOpposition(
+        beforeWhiteKing.square,
+        beforeBlackKing.square,
+      ),
+  )
+  const rookWhiteKingDistance =
+    beforeRook && beforeWhiteKing
+      ? kingDistance(beforeRook.square, beforeWhiteKing.square)
+      : null
+  const rookIsAdjacentToWhiteKing = rookWhiteKingDistance === 1
+  const kingMoveDistance =
+    beforeWhiteKing && beforeBlackKing
+      ? kingDistance(beforeWhiteKing.square, beforeBlackKing.square)
+      : null
+  const kingRowPlusFileDistance =
+    beforeWhiteKing && beforeBlackKing
+      ? manhattanDistance(beforeWhiteKing.square, beforeBlackKing.square)
+      : null
+  const needsEdgeFinishRookWaitingMove = Boolean(
+    beforeBlackKing &&
+      kingsHaveDirectOpposition &&
+      rookIsAdjacentToWhiteKing &&
+      edgeDistance(beforeBlackKing.square) === 0,
+  )
+  const needsProtectedRookWaitingMove =
+    beforeBox.size !== null &&
+    ((kingsHaveDirectOpposition && !rookIsAdjacentToWhiteKing) ||
+      (kingsAreKnightMoveApart && rookIsAdjacentToWhiteKing) ||
+      needsEdgeFinishRookWaitingMove)
+  const needsDualCutDistantRookWaitingMove =
+    beforeBox.size !== null &&
+    rookIsAdjacentToWhiteKing &&
+    kingMoveDistance === 3 &&
+    kingRowPlusFileDistance === 5 &&
+    beforeBox.strongestCuts.length === 2
+  const needsOrthogonalDistantRookWaitingMove = Boolean(
+    beforeBox.size !== null &&
+      rookIsAdjacentToWhiteKing &&
+      kingMoveDistance === 3 &&
+      kingRowPlusFileDistance === 4 &&
+      beforeRook &&
+      beforeWhiteKing &&
+      !isDiagonalKingMove(beforeRook.square, beforeWhiteKing.square) &&
+      beforeBox.strongestCuts.some((cut) => !cut.closest),
+  )
+  const needsDistantRookWaitingMove =
+    (beforeBox.size !== null &&
+      kingsAreKnightMoveApart &&
+      !rookIsAdjacentToWhiteKing) ||
+    needsDualCutDistantRookWaitingMove ||
+    needsOrthogonalDistantRookWaitingMove
+  const blackEdgeDistance = beforeBlackKing
+    ? edgeDistance(beforeBlackKing.square)
+    : null
+  const blackAlongEdgeCornerDistance =
+    beforeBlackKing && blackEdgeDistance === 0
+      ? (() => {
+          const { file, rank } = squareCoordinates(beforeBlackKing.square)
+          return Math.max(
+            Math.min(file, 7 - file),
+            Math.min(rank, 7 - rank),
+          )
+        })()
+      : null
+  const orthogonalAlignmentRunsInwardFromEdge = Boolean(
+    beforeBlackKing &&
+      beforeWhiteKing &&
+      (() => {
+        const black = squareCoordinates(beforeBlackKing.square)
+        const white = squareCoordinates(beforeWhiteKing.square)
+        const fileDistance = Math.abs(black.file - white.file)
+        const rankDistance = Math.abs(black.rank - white.rank)
+        return (
+          ((black.rank === 0 || black.rank === 7) &&
+            rankDistance > fileDistance) ||
+          ((black.file === 0 || black.file === 7) &&
+            fileDistance > rankDistance)
+        )
+      })(),
+  )
+  const keepsOrthogonalFarTempo =
+    needsOrthogonalDistantRookWaitingMove &&
+    blackAlongEdgeCornerDistance === 2 &&
+    orthogonalAlignmentRunsInwardFromEdge
+  const keepsDualCutFarTempo =
+    needsDualCutDistantRookWaitingMove && blackEdgeDistance === 0
+  const hasCloseKingFinishGeometry = Boolean(
+    kingMoveDistance !== null &&
+      rookWhiteKingDistance !== null &&
+      kingMoveDistance <= 3 &&
+      (kingMoveDistance <= 2 || rookWhiteKingDistance <= 3),
+  )
+  const usesExactBoxlessProgress = beforeBox.size === null
+  const usesExactClosePiecesProgress =
+    hasCloseKingFinishGeometry &&
+    !keepsOrthogonalFarTempo &&
+    !keepsDualCutFarTempo
+  const usesExactMateProgress =
+    usesExactClosePiecesProgress ||
+    usesExactBoxlessProgress
+  const beforeExactMateProgress = usesExactMateProgress
+    ? lookupMajorPieceMateProgress('rook', fen)
+    : null
+  const needsRookWaitingMove =
+    needsProtectedRookWaitingMove || needsDistantRookWaitingMove
   const chess = getChess(fen)
   const move = chess.move(san)
   const resultFen = chess.fen()
@@ -340,58 +482,99 @@ export function scoreRookWhiteMove(
   const whiteKing = findPiece(resultFen, 'w', 'k')
   const blackKing = findPiece(resultFen, 'b', 'k')
   const rookIsSafe = !blackCanTakeWhiteMajorPiece(resultFen, 'r')
-  const rookCutAxis =
-    whiteRook && whiteKing && blackKing
-      ? getRookCutAxis(whiteRook, whiteKing, blackKing)
-      : null
-  const rookBoxAxis = getRookEstablishedBoxAxis(resultFen)
-  const closestRookBoxAxis =
-    whiteRook && whiteKing && blackKing
-      ? getClosestRookBoxAxis(whiteRook, whiteKing, blackKing)
-      : null
-  const closestRookBoxSize =
-    whiteRook && blackKing && closestRookBoxAxis !== null
-      ? getRookOneDimensionalBoxSize(
-          whiteRook.square,
-          blackKing.square,
-          closestRookBoxAxis,
-        )
-      : null
-  const rookPhaseTwoWaitingMove = Boolean(
-    needsPhaseTwoWaitingMove &&
-      move.piece === 'r' &&
-      !chess.isCheck() &&
-      beforeRook &&
-      whiteRook &&
-      beforeRookBoxAxis &&
-      rookCutAxis === beforeRookBoxAxis &&
-      squareCoordinates(whiteRook.square)[beforeRookBoxAxis] ===
-        squareCoordinates(beforeRook.square)[beforeRookBoxAxis],
+  const resultBox = getRookBoxFromFen(resultFen)
+  const preservesOrShrinksBox = Boolean(
+    beforeBox.size !== null &&
+      resultBox.size !== null &&
+      resultBox.size <= beforeBox.size,
   )
+  const retainsStrongestAxis = beforeBox.strongestCuts.some((beforeCut) =>
+    resultBox.strongestCuts.some(
+      (resultCut) => resultCut.axis === beforeCut.axis,
+    ),
+  )
+  const retainsStrongestBoundary = Boolean(
+    beforeRook &&
+      whiteRook &&
+      beforeBox.strongestCuts.some((beforeCut) =>
+        resultBox.cuts.some(
+          (resultCut) =>
+            resultCut.axis === beforeCut.axis &&
+            squareCoordinates(whiteRook.square)[resultCut.axis] ===
+              squareCoordinates(beforeRook.square)[beforeCut.axis],
+        ),
+      ),
+  )
+  const beforeRookBlackDistance =
+    beforeRook && beforeBlackKing
+      ? manhattanDistance(beforeRook.square, beforeBlackKing.square)
+      : null
+  const resultRookBlackDistance =
+    whiteRook && blackKing
+      ? manhattanDistance(whiteRook.square, blackKing.square)
+      : null
+  const resultExactMateProgress = usesExactMateProgress
+    ? lookupMajorPieceMateProgress('rook', resultFen)
+    : null
+  const makesExactMateProgress = Boolean(
+    beforeExactMateProgress?.kind === 'winning' &&
+      resultExactMateProgress?.kind === 'winning' &&
+      resultExactMateProgress.rank < beforeExactMateProgress.rank,
+  )
+  const rookEndsAdjacentToWhiteKing = Boolean(
+    whiteRook &&
+      whiteKing &&
+      kingDistance(whiteRook.square, whiteKing.square) === 1,
+  )
+  const rookWaitingMove = Boolean(
+    needsRookWaitingMove &&
+      move.piece === 'r' &&
+      move.captured === undefined &&
+      !chess.isCheck() &&
+      rookIsSafe &&
+      whiteRook &&
+      (needsEdgeFinishRookWaitingMove ||
+        (preservesOrShrinksBox && retainsStrongestBoundary)) &&
+      (!needsProtectedRookWaitingMove || rookEndsAdjacentToWhiteKing),
+  )
+  const losesOrEnlargesBox =
+    resultBox.size === null ||
+    (beforeBox.size !== null && resultBox.size > beforeBox.size)
   return {
     matePenalty: chess.isCheckmate() ? 0 : 1,
     rookCapturePenalty: rookIsSafe ? 0 : 1,
     stalematePenalty: !chess.isCheckmate() && chess.isStalemate() ? 1 : 0,
-    rookBoxEstablishedPenalty:
-      beforeRook &&
-      beforeWhiteKing &&
-      beforeBlackKing &&
-      beforeClosestRookBoxAxis === null
-        ? closestRookBoxAxis !== null
-          ? 0
-          : 1
+    rookExactMateProgressPenalty:
+      usesExactMateProgress && !makesExactMateProgress ? 1 : 0,
+    rookExactMateProgressRank:
+      makesExactMateProgress && resultExactMateProgress?.kind === 'winning'
+        ? resultExactMateProgress.rank
         : 0,
-    rookBoxAxisSwitchPenalty:
-      beforeClosestRookBoxAxis === null &&
-      beforeRookBoxAxis !== null &&
-      closestRookBoxAxis !== null &&
-      closestRookBoxAxis !== beforeRookBoxAxis
+    rookWaitingPenalty: needsRookWaitingMove && !rookWaitingMove ? 1 : 0,
+    rookWaitingEdgeDistanceScore:
+      rookWaitingMove && needsProtectedRookWaitingMove && whiteRook
+        ? -edgeDistance(whiteRook.square)
+        : null,
+    rookWaitingDistanceScore:
+      rookWaitingMove && whiteRook && blackKing
+        ? -manhattanDistance(whiteRook.square, blackKing.square)
+        : null,
+    rookBoxLossPenalty: losesOrEnlargesBox ? 1 : 0,
+    rookBoxSize: resultBox.size,
+    rookBoxAxisRetentionPenalty:
+      beforeBox.size !== null &&
+      resultBox.size === beforeBox.size &&
+      !retainsStrongestAxis
         ? 1
         : 0,
-    rookBoxSize:
-      beforeClosestRookBoxAxis === null &&
-      closestRookBoxSize !== null
-        ? closestRookBoxSize
+    rookBoxRookApproachPenalty:
+      beforeBox.size !== null &&
+      resultBox.size === beforeBox.size &&
+      move.piece === 'r' &&
+      beforeRookBlackDistance !== null &&
+      resultRookBlackDistance !== null &&
+      resultRookBlackDistance < beforeRookBlackDistance
+        ? 1
         : 0,
     forcingCheckPenalty:
       chess.isCheck() &&
@@ -399,62 +582,18 @@ export function scoreRookWhiteMove(
       blackMustMoveAwayFromWhiteKing(resultFen)
         ? 0
         : 1,
-    rookPhaseTwoWaitingPenalty: needsPhaseTwoWaitingMove
-      ? rookPhaseTwoWaitingMove
-        ? 0
-        : 1
-      : 0,
-    rookPhaseTwoWaitingDistanceScore:
-      needsPhaseTwoWaitingMove &&
-      rookPhaseTwoWaitingMove &&
-      whiteRook &&
-      beforeBlackKing
-        ? -kingDistance(whiteRook.square, beforeBlackKing.square)
-        : 0,
-    rookBoxPreservedPenalty:
-      beforeClosestRookBoxSize !== null
-        ? closestRookBoxSize === null ||
-          closestRookBoxSize > beforeClosestRookBoxSize
-          ? 1
-          : 0
-        : beforeRookBoxAxis !== null && rookBoxAxis === null
-          ? 1
-          : 0,
-    rookPreservedBoxSize:
-      beforeClosestRookBoxSize !== null && closestRookBoxSize !== null
-        ? closestRookBoxSize
-        : 0,
-    rookBlackDistanceScore:
-      move.piece === 'r' && whiteRook && blackKing
-        ? -manhattanDistance(whiteRook.square, blackKing.square)
-        : 1,
-    kingRookLinePenalty:
-      whiteKing && whiteRook && sharesRankOrFile(whiteKing.square, whiteRook.square)
-        ? move.piece === 'k' &&
-          beforeWhiteKing &&
-          beforeBlackKing &&
-          blackKing &&
-          beforeRookBoxAxis !== null &&
-          rookCutAxis === beforeRookBoxAxis &&
-          kingDistance(whiteKing.square, blackKing.square) <
-            kingDistance(beforeWhiteKing.square, beforeBlackKing.square)
-          ? 0
-          : 1
-        : 0,
     kingDistance:
       whiteKing && blackKing
+        ? kingDistance(whiteKing.square, blackKing.square)
+        : null,
+    kingManhattanDistance:
+      whiteKing && blackKing
         ? manhattanDistance(whiteKing.square, blackKing.square)
-        : 99,
+        : null,
+    rookBlackDistanceScore:
+      resultRookBlackDistance === null ? null : -resultRookBlackDistance,
   }
 }
-
-const ROOK_BOX_DISTANCE_RULE_DESCRIPTION = {
-  id: 'maximize black distance',
-  shortLabel: 'keep Black far from rook',
-  helpText:
-    "Move the rook as far as possible from Black's king while preserving the box.",
-  guideOrder: 8,
-} as const
 
 export const rookWhiteRules: readonly OrderedRule<RookWhiteMoveScore>[] = [
   {
@@ -478,60 +617,71 @@ export const rookWhiteRules: readonly OrderedRule<RookWhiteMoveScore>[] = [
       first.stalematePenalty - second.stalematePenalty,
   },
   {
-    id: 'establish box',
-    shortLabel: 'establish box',
+    id: 'exact mate progress',
+    shortLabel: 'exact mate progress',
     helpText:
-      "Put the rook on the row or file between the kings and closest to Black's king when not already.",
+      "Use the exact King-and-Rook mate distance whenever no Rook box is active, whenever the kings are at most two king moves apart, or when they are three king moves apart and the Rook is within three king moves of White's King. There are two farther-tempo exceptions. At three king moves and four row-plus-file steps, an orthogonally protected Rook with a current strongest cut not closest to Black keeps its farther tempo only when Black is on an edge exactly two king steps from the nearest corner and the three-step king separation runs inward from that edge. At three king moves and five row-plus-file steps with two current strongest cuts, the farther tempo remains only while Black is on an edge. Keep only moves that reduce the mate distance, then choose the shortest remaining finish.",
     compare: (first, second) =>
-      first.rookBoxEstablishedPenalty - second.rookBoxEstablishedPenalty ||
-      first.rookBoxSize - second.rookBoxSize ||
-      first.rookBoxAxisSwitchPenalty - second.rookBoxAxisSwitchPenalty,
-  },
-  {
-    id: 'forcing check',
-    shortLabel: 'forcing check',
-    helpText:
-      "Check if it forces Black's king to walk away from White's king.",
-    compare: (first, second) =>
-      first.forcingCheckPenalty - second.forcingCheckPenalty,
+      first.rookExactMateProgressPenalty -
+        second.rookExactMateProgressPenalty ||
+      first.rookExactMateProgressRank - second.rookExactMateProgressRank,
   },
   {
     id: 'rook waiting move',
     shortLabel: 'rook waiting move',
     helpText:
-      'When the kings are a knight move apart and the rook is on the row or file between them, make a rook waiting move as far as possible while staying between the kings.',
+      "When the kings directly oppose each other and the Rook is not yet beside White's king, or when the kings are a knight's move apart with the Rook already beside White's king, make a quiet, safe Rook tempo beside White's king while preserving or shrinking a current strongest boundary. When Black is already on the board edge in direct opposition and the Rook is beside White's king, the finishing tempo may release that boundary. Among accepted protected tempos, maximize the Rook's distance from the board edge, then its row-plus-file distance from Black. A knight's-move alignment with a farther Rook, plus a few farther king alignments, uses the same boundary-preserving tempo but lets the Rook stay away from White's king.",
     compare: (first, second) =>
-      first.rookPhaseTwoWaitingPenalty - second.rookPhaseTwoWaitingPenalty,
+      first.rookWaitingPenalty - second.rookWaitingPenalty ||
+      compareNullableAscending(
+        first.rookWaitingEdgeDistanceScore,
+        second.rookWaitingEdgeDistanceScore,
+      ) ||
+      compareNullableAscending(
+        first.rookWaitingDistanceScore,
+        second.rookWaitingDistanceScore,
+      ),
   },
   {
-    id: 'rook waiting distance',
-    shortLabel: 'rook waiting distance',
+    id: 'establish box',
+    shortLabel: 'establish and preserve box',
     helpText:
-      "When a rook waiting move is required and the earlier priorities tie, place the rook as far as possible from Black's king.",
+      "Establish the smallest available box around Black. Once a box exists, preserve it or make the resulting strongest cut smaller; for an equal-size box, retain one of the current strongest cut directions and do not move the Rook closer to Black.",
     compare: (first, second) =>
-      first.rookPhaseTwoWaitingDistanceScore -
-      second.rookPhaseTwoWaitingDistanceScore,
+      first.rookBoxLossPenalty - second.rookBoxLossPenalty ||
+      compareNullableAscending(first.rookBoxSize, second.rookBoxSize) ||
+      first.rookBoxAxisRetentionPenalty -
+        second.rookBoxAxisRetentionPenalty ||
+      first.rookBoxRookApproachPenalty -
+        second.rookBoxRookApproachPenalty,
   },
   {
-    ...ROOK_BOX_DISTANCE_RULE_DESCRIPTION,
+    id: 'forcing check',
+    shortLabel: 'forcing check',
+    helpText:
+      "Prefer a check only when every legal Black reply increases Black's king-move distance from White's king.",
     compare: (first, second) =>
-      first.rookBoxPreservedPenalty - second.rookBoxPreservedPenalty ||
-      first.rookPreservedBoxSize - second.rookPreservedBoxSize,
+      first.forcingCheckPenalty - second.forcingCheckPenalty,
   },
   {
     id: 'king closer',
     shortLabel: 'White king closer',
     helpText:
-      "Bring White's king closer to Black's king without entering the rook's lines.",
-    guideOrder: 7,
+      "Minimize White's resulting king-move distance to Black; use resulting row-plus-file distance as a tie-break.",
+    applies: (score) =>
+      score.kingDistance !== null && score.kingManhattanDistance !== null,
     compare: (first, second) =>
-      first.kingRookLinePenalty - second.kingRookLinePenalty ||
-      first.kingDistance - second.kingDistance,
+      first.kingDistance! - second.kingDistance! ||
+      first.kingManhattanDistance! - second.kingManhattanDistance!,
   },
   {
-    ...ROOK_BOX_DISTANCE_RULE_DESCRIPTION,
+    id: 'maximize black distance',
+    shortLabel: 'keep Black far from Rook',
+    helpText:
+      "When earlier priorities tie, maximize the Rook's row-plus-file distance from Black's king.",
+    applies: (score) => score.rookBlackDistanceScore !== null,
     compare: (first, second) =>
-      first.rookBlackDistanceScore - second.rookBlackDistanceScore,
+      first.rookBlackDistanceScore! - second.rookBlackDistanceScore!,
   },
 ]
 
@@ -595,9 +745,9 @@ export function scoreRookBlackMove(
   const startingBlackKing = findPiece(fen, 'b', 'k')
   const startingWhiteRook = findPiece(fen, 'w', 'r')
   const startingWhiteKing = findPiece(fen, 'w', 'k')
-  const rookCutAxis =
+  const startingRookBox =
     startingBlackKing && startingWhiteRook && startingWhiteKing
-      ? getRookCutAxis(
+      ? getRookBox(
           startingWhiteRook,
           startingWhiteKing,
           startingBlackKing,
@@ -634,8 +784,19 @@ export function scoreRookBlackMove(
   return {
     captureRookPenalty: move.captured === 'r' ? 0 : 1,
     cutLineDistance:
-      rookCutAxis && whiteRook && blackKing
-        ? getAxisDistance(blackKing.square, whiteRook.square, rookCutAxis)
+      startingRookBox &&
+      startingRookBox.strongestCuts.length > 0 &&
+      startingWhiteRook &&
+      blackKing
+        ? Math.min(
+            ...startingRookBox.strongestCuts.map((cut) =>
+              getAxisDistance(
+                blackKing.square,
+                startingWhiteRook.square,
+                cut.axis,
+              ),
+            ),
+          )
         : 0,
     diagonalAdjacentRookDistance: whiteKingRookDiagonalAdjacent
       ? rookDistance

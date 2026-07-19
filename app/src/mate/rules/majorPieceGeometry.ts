@@ -19,9 +19,29 @@ import {
 export type MajorPieceType = 'q' | 'r'
 export type RookAxis = 'rank' | 'file'
 
+export type RookCut = {
+  readonly axis: RookAxis
+  readonly size: number
+  readonly closest: boolean
+}
+
+export type RookBox = {
+  readonly cuts: readonly RookCut[]
+  readonly strongestCuts: readonly RookCut[]
+  readonly size: number | null
+}
+
 type PieceSquare = {
   readonly square: Square
 }
+
+const ROOK_AXES: readonly RookAxis[] = Object.freeze(['rank', 'file'])
+const EMPTY_ROOK_CUTS: readonly RookCut[] = Object.freeze([])
+const EMPTY_ROOK_BOX: RookBox = Object.freeze({
+  cuts: EMPTY_ROOK_CUTS,
+  strongestCuts: EMPTY_ROOK_CUTS,
+  size: null,
+})
 
 export type QueenTwoSquareCage = {
   readonly corner: Square
@@ -42,6 +62,20 @@ export function isMajorPieceBetweenKings(
   )
 }
 
+export function isQueenRankOrFileChannelBetween(
+  square: PieceSquare,
+  firstBoundary: PieceSquare,
+  secondBoundary: PieceSquare,
+): boolean {
+  const target = squareCoordinates(square.square)
+  const first = squareCoordinates(firstBoundary.square)
+  const second = squareCoordinates(secondBoundary.square)
+  return (
+    isStrictlyBetween(target.rank, first.rank, second.rank) ||
+    isStrictlyBetween(target.file, first.file, second.file)
+  )
+}
+
 export function getMajorEndgamePhase(
   fen: string,
   pieceType: MajorPieceType,
@@ -55,7 +89,11 @@ export function getMajorEndgamePhase(
   if (!whiteKing || !blackKing) {
     return 1
   }
-  return isMajorPieceBetweenKings(majorPiece, whiteKing, blackKing) ? 2 : 1
+  const isPhaseTwo =
+    pieceType === 'q'
+      ? isQueenRankOrFileChannelBetween(majorPiece, whiteKing, blackKing)
+      : isMajorPieceBetweenKings(majorPiece, whiteKing, blackKing)
+  return isPhaseTwo ? 2 : 1
 }
 
 export function getMajorEndgamePhaseLabel(
@@ -101,7 +139,7 @@ export function getQueenMoveDistance(
   piece: PieceSymbol | undefined,
 ): number | null {
   if (piece === 'q' && beforeQueenSquare && afterQueenSquare) {
-    return manhattanDistance(beforeQueenSquare, afterQueenSquare)
+    return kingDistance(beforeQueenSquare, afterQueenSquare)
   }
   return null
 }
@@ -227,104 +265,87 @@ export function getQueenCageKingApproachDistance(
   whiteKingSquare: Square,
   whiteQueenSquare: Square,
   corner: Square,
-): number {
+): number | null {
   const distances = queenCageKingTargetSquares(
     whiteQueenSquare,
     corner,
   ).map((square) => kingDistance(whiteKingSquare, square))
-  return distances.length === 0 ? 99 : Math.min(...distances)
+  return distances.length === 0 ? null : Math.min(...distances)
 }
 
 export function getQueenCageKingApproachManhattanDistance(
   whiteKingSquare: Square,
   whiteQueenSquare: Square,
   corner: Square,
-): number {
+): number | null {
   const distances = queenCageKingTargetSquares(
     whiteQueenSquare,
     corner,
   ).map((square) => manhattanDistance(whiteKingSquare, square))
-  return distances.length === 0 ? 99 : Math.min(...distances)
+  return distances.length === 0 ? null : Math.min(...distances)
 }
 
-export function getRookCutAxis(
+export function getRookCuts(
   whiteRook: PieceSquare,
   whiteKing: PieceSquare,
   blackKing: PieceSquare,
-): RookAxis | null {
+): readonly RookCut[] {
   const rook = squareCoordinates(whiteRook.square)
   const white = squareCoordinates(whiteKing.square)
   const black = squareCoordinates(blackKing.square)
-  if (isStrictlyBetween(rook.rank, white.rank, black.rank)) {
-    return 'rank'
-  }
-  if (isStrictlyBetween(rook.file, white.file, black.file)) {
-    return 'file'
-  }
-  return null
+  return Object.freeze(
+    ROOK_AXES.flatMap((axis) => {
+      if (!isStrictlyBetween(rook[axis], white[axis], black[axis])) {
+        return []
+      }
+      return [
+        Object.freeze({
+          axis,
+          size: getRookOneDimensionalBoxSize(
+            whiteRook.square,
+            blackKing.square,
+            axis,
+          ),
+          closest:
+            rook[axis] ===
+            black[axis] + Math.sign(white[axis] - black[axis]),
+        }),
+      ]
+    }),
+  )
 }
 
-export function getClosestRookBoxAxis(
+export function getRookBox(
   whiteRook: PieceSquare,
   whiteKing: PieceSquare,
   blackKing: PieceSquare,
-): RookAxis | null {
-  const rook = squareCoordinates(whiteRook.square)
-  const white = squareCoordinates(whiteKing.square)
-  const black = squareCoordinates(blackKing.square)
-  const closestBetweenRank = black.rank + Math.sign(white.rank - black.rank)
-  const closestBetweenFile = black.file + Math.sign(white.file - black.file)
-  if (
-    isStrictlyBetween(rook.rank, white.rank, black.rank) &&
-    rook.rank === closestBetweenRank
-  ) {
-    return 'rank'
+): RookBox {
+  const cuts = getRookCuts(whiteRook, whiteKing, blackKing)
+  if (cuts.length === 0) {
+    return EMPTY_ROOK_BOX
   }
-  if (
-    isStrictlyBetween(rook.file, white.file, black.file) &&
-    rook.file === closestBetweenFile
-  ) {
-    return 'file'
-  }
-  return null
+  const size = Math.min(...cuts.map((cut) => cut.size))
+  const strongestCuts = Object.freeze(
+    cuts.filter((cut) => cut.size === size),
+  )
+  return Object.freeze({ cuts, strongestCuts, size })
 }
 
-export function getRookEstablishedBoxAxis(fen: string): RookAxis | null {
+export function getRookBoxFromFen(fen: string): RookBox {
   const whiteRook = findPiece(fen, 'w', 'r')
   const whiteKing = findPiece(fen, 'w', 'k')
   const blackKing = findPiece(fen, 'b', 'k')
   if (!whiteRook || !whiteKing || !blackKing) {
-    return null
+    return EMPTY_ROOK_BOX
   }
-  return getRookCutAxis(whiteRook, whiteKing, blackKing)
+  return getRookBox(whiteRook, whiteKing, blackKing)
 }
 
-export function getRookOneDimensionalBoxSize(
+function getRookOneDimensionalBoxSize(
   whiteRookSquare: Square,
   blackKingSquare: Square,
-  axis?: RookAxis,
+  axis: RookAxis,
 ): number {
-  if (!axis) {
-    const rook = squareCoordinates(whiteRookSquare)
-    const black = squareCoordinates(blackKingSquare)
-    const rankSize =
-      rook.rank === black.rank
-        ? 99
-        : getRookOneDimensionalBoxSize(
-            whiteRookSquare,
-            blackKingSquare,
-            'rank',
-          )
-    const fileSize =
-      rook.file === black.file
-        ? 99
-        : getRookOneDimensionalBoxSize(
-            whiteRookSquare,
-            blackKingSquare,
-            'file',
-          )
-    return Math.min(rankSize, fileSize)
-  }
   const rook = squareCoordinates(whiteRookSquare)
   const black = squareCoordinates(blackKingSquare)
   if (axis === 'rank') {

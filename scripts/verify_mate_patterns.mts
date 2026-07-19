@@ -2,6 +2,7 @@ import type { MateId } from '../app/src/mate/types.ts'
 import {
   createProductionMateAdapter,
   enumerateProductionMateRoots,
+  type ProductionMateStateKeyMode,
 } from './mate-verifier/production.mts'
 import { verifyMateRoots } from './mate-verifier/search.mts'
 
@@ -18,6 +19,7 @@ type CliOptions = {
   readonly maxNodes?: number
   readonly maxRoots?: number
   readonly progressEvery: number
+  readonly stateKeyMode: ProductionMateStateKeyMode
 }
 
 const options = parseOptions(process.argv.slice(2))
@@ -28,7 +30,9 @@ for (const mateId of options.mateIds) {
   console.error(`Verifying ${mateId} exhaustively...`)
   const result = verifyMateRoots(
     enumerateProductionMateRoots(mateId),
-    createProductionMateAdapter(mateId),
+    createProductionMateAdapter(mateId, {
+      stateKeyMode: options.stateKeyMode,
+    }),
     {
       ...(options.maxNodes === undefined
         ? {}
@@ -48,6 +52,7 @@ for (const mateId of options.mateIds) {
   const summary = {
     elapsedMs: Date.now() - startedAt,
     mateId,
+    stateKeyMode: options.stateKeyMode,
     ...result,
   }
   console.log(JSON.stringify(summary))
@@ -71,6 +76,7 @@ function parseOptions(args: readonly string[]): CliOptions {
   let maxNodes: number | undefined
   let maxRoots: number | undefined
   let progressEvery = 10_000
+  let stateKeyMode: ProductionMateStateKeyMode = 'symmetry'
 
   for (let index = 0; index < args.length; index += 1) {
     const arg = args[index]
@@ -96,6 +102,10 @@ function parseOptions(args: readonly string[]): CliOptions {
       index += 1
       continue
     }
+    if (arg === '--identity') {
+      stateKeyMode = 'identity'
+      continue
+    }
     throw new Error(`Unknown argument ${String(arg)}`)
   }
 
@@ -104,6 +114,7 @@ function parseOptions(args: readonly string[]): CliOptions {
     ...(maxNodes === undefined ? {} : { maxNodes }),
     ...(maxRoots === undefined ? {} : { maxRoots }),
     progressEvery,
+    stateKeyMode,
   }
 }
 

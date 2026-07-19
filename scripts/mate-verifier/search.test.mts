@@ -11,6 +11,7 @@ import {
   createProductionMateAdapter,
   canonicalVerifierPositionKey,
   enumerateProductionMateRoots,
+  identityVerifierPositionKey,
   normalizeVerifierState,
 } from './production.mts'
 import { verifyMateRoots } from './search.mts'
@@ -314,6 +315,34 @@ test('all pawnless rotations and reflections share one canonical key', () => {
     canonicalVerifierPositionKey('rook', transformFen(fen, transform)),
   )
   assert.equal(new Set(keys).size, 1)
+})
+
+test('identity keys preserve orientation while excluding move counters', () => {
+  const fen = '7k/8/8/3K4/8/8/1R6/8 w - - 17 23'
+  const rotated = transformFen(fen, getSquareTransform('rotate90'))
+
+  assert.notEqual(
+    identityVerifierPositionKey(fen),
+    identityVerifierPositionKey(rotated),
+  )
+  assert.equal(
+    identityVerifierPositionKey(fen),
+    identityVerifierPositionKey(
+      '7k/8/8/3K4/8/8/1R6/8 w - - 99 58',
+    ),
+  )
+})
+
+test('production adapter identity mode does not merge symmetric states', () => {
+  const fen = '7k/8/8/3K4/8/8/1R6/8 w - - 0 1'
+  const rotated = transformFen(fen, getSquareTransform('rotate90'))
+  const symmetryAdapter = createProductionMateAdapter('rook')
+  const identityAdapter = createProductionMateAdapter('rook', {
+    stateKeyMode: 'identity',
+  })
+
+  assert.equal(symmetryAdapter.key(fen), symmetryAdapter.key(rotated))
+  assert.notEqual(identityAdapter.key(fen), identityAdapter.key(rotated))
 })
 
 test('KNN pawn symmetry preserves files but not pawn direction', () => {

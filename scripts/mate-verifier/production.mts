@@ -31,6 +31,12 @@ import type {
 
 export type ProductionMateVerificationState = string
 
+export type ProductionMateStateKeyMode = 'identity' | 'symmetry'
+
+export type ProductionMateAdapterOptions = {
+  readonly stateKeyMode?: ProductionMateStateKeyMode
+}
+
 const TWO_KNIGHTS_PAWN_TRANSFORMS = Object.freeze([
   getSquareTransform('identity'),
   getSquareTransform('mirrorFile'),
@@ -68,10 +74,15 @@ const STANDARD_PIECES: Readonly<
 
 export function createProductionMateAdapter(
   mateId: MateId,
+  options: ProductionMateAdapterOptions = {},
 ): MateVerificationAdapter<ProductionMateVerificationState> {
   const ruleSet = getMateRuleSet(mateId)
+  const stateKeyMode = options.stateKeyMode ?? 'symmetry'
   return {
-    key: (state) => canonicalVerifierPositionKey(mateId, state),
+    key: (state) =>
+      stateKeyMode === 'identity'
+        ? identityVerifierPositionKey(state)
+        : canonicalVerifierPositionKey(mateId, state),
     render: (state) => state,
     expand: (state) => {
       const white = getChess(normalizeVerifierState(state))
@@ -227,6 +238,10 @@ export function* enumerateProductionMateRoots(
 export function normalizeVerifierState(fen: string): string {
   const canonical = getChess(fen).fen().split(' ')
   return `${canonical.slice(0, 4).join(' ')} 0 1`
+}
+
+export function identityVerifierPositionKey(fen: string): string {
+  return normalizeVerifierState(fen).split(' ').slice(0, 4).join(' ')
 }
 
 export function canonicalVerifierPositionKey(

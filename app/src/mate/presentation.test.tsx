@@ -645,7 +645,7 @@ test('Mate log exposes every training field and semantic cycle controls', () => 
   assert.match(markup, />0:01\.234</)
   assert.match(markup, />1:01\.007</)
   assert.match(markup, />White king closer</)
-  assert.match(markup, />establish box</)
+  assert.match(markup, />establish and preserve box</)
   assert.match(
     markup,
     /aria-label="Cycle ideal White move for move 1; 2 correct choices"/,
@@ -823,7 +823,7 @@ test('reason hint is opt-in and reveals only the current rule label', async () =
     'data-mate-current-hint': true,
   })
   const hintText = reactNodeText(hint)
-  assert.equal(hintText, 'establish box')
+  assert.equal(hintText, 'keep Black far from Rook')
   assert.doesNotMatch(hintText, /Rg2|a2|g2|bring White's king/i)
   assert.equal(hint.props.type, 'button')
 
@@ -851,7 +851,7 @@ test('clicking a reason highlights its guide priority until a generic reopen', a
   await act(async () => {
     renderer.root
       .findByProps({
-        'aria-label': 'establish box. Open priority guide',
+        'aria-label': 'establish and preserve box. Open priority guide',
       })
       .props.onClick({ currentTarget: null })
   })
@@ -859,7 +859,7 @@ test('clicking a reason highlights its guide priority until a generic reopen', a
     'aria-current': 'true',
   })
   assert.equal(highlighted.length, 1)
-  assert.match(reactNodeText(highlighted[0]), /^establish box/)
+  assert.match(reactNodeText(highlighted[0]), /^establish and preserve box/)
 
   await act(async () => {
     renderer.root
@@ -2012,7 +2012,7 @@ test('Mate wires board, history, timer, and every log replacement action', async
     })
     assert.equal(
       mountedRenderer.root.findByType(MateLog).props.logs[0].san,
-      'Rh1',
+      'Rh5',
     )
 
     await act(async () => {

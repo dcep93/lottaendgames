@@ -60,6 +60,14 @@ export type {
 } from './majorPieces'
 
 export {
+  getRookBox,
+  getRookBoxFromFen,
+  getRookCuts,
+  isQueenRankOrFileChannelBetween,
+} from './majorPieceGeometry'
+export type { RookAxis, RookBox, RookCut } from './majorPieceGeometry'
+
+export {
   bishopKnightRuleSet,
   compareKnightAndBishopBlackScores,
   compareKnightAndBishopWhiteScores,
