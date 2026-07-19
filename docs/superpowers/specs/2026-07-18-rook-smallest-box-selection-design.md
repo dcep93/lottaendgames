@@ -27,9 +27,12 @@ The change is limited to Rook White-move scoring and comparison.
 
 When the starting position does not already have a closest rook-box axis,
 calculate the resulting one-dimensional box size along every candidate's active
-cut axis. Lower size remains better under the existing `establish box`
-comparison. A candidate is penalized only if it establishes no active cut; the
-closest-cut label must not make a larger box beat a smaller retained cut.
+cut axis. When a candidate simultaneously provides a closest cut on another
+axis, score that stronger closest cut instead of relying on the active-axis
+helper's rank-first implementation order. Lower size remains better under the
+existing `establish box` comparison. A candidate is penalized only if it
+establishes no cut; the closest-cut label must not make a larger box beat a
+smaller retained cut.
 
 If the starting position has an established but non-closest cut, compare every
 candidate with an active cut by resulting box size first. Lower is always
