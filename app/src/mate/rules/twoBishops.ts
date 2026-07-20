@@ -74,7 +74,7 @@ const twoBishopsHelp: RuleHelp = {
     'Among equally central moves, take an unprotected bishop when possible; otherwise move toward the nearest unprotected bishop.',
   ],
   notes: [
-    "Phase 2 is where Black's king is on an edge and White's king controls at least 2 squares in front of Black's king. Phase 2 also includes positions where White's king is two diagonal king moves from Black's edge king and Black is forced to move along the edge toward White's king. It applies only on White turns. Squares in front are the squares opposite an edge: edge squares have 3 squares in front of them. Corner front squares are the 3 inward squares, such as a2 and b1 and b2 when Black's king is on a1.",
+    "Phase 2 is where Black's king is on an edge and White's king controls at least 2 squares in front of Black's king. Phase 2 also includes positions where White's king is two diagonal king moves from Black's edge king and Black is forced to move along the edge toward White's king. Squares in front are the squares opposite an edge: edge squares have 3 squares in front of them. Corner front squares are the 3 inward squares, such as a2 and b1 and b2 when Black's king is on a1.",
     "The phase 2 waiting move is not any quiet move. It is a bishop move for a boxed-in king: either the line-pattern waiting move that keeps the wall, or the corner waiting move that lets that bishop cover Black's single escape square after Black moves.",
   ],
   noteBoards: [],

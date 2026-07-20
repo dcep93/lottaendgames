@@ -643,7 +643,7 @@ test('Mate log exposes every training field and semantic cycle controls', () => 
   assert.match(markup, />0:01\.234</)
   assert.match(markup, />1:01\.007</)
   assert.match(markup, />king closer</)
-  assert.match(markup, />smaller box</)
+  assert.match(markup, />establish box</)
   assert.match(
     markup,
     /aria-label="Cycle ideal White move for move 1; 2 correct choices"/,
@@ -849,7 +849,7 @@ test('clicking a reason highlights its guide priority until a generic reopen', a
   await act(async () => {
     renderer.root
       .findByProps({
-        'aria-label': 'smaller box. Open priority guide',
+        'aria-label': 'establish box. Open priority guide',
       })
       .props.onClick({ currentTarget: null })
   })
@@ -857,7 +857,7 @@ test('clicking a reason highlights its guide priority until a generic reopen', a
     'aria-current': 'true',
   })
   assert.equal(highlighted.length, 1)
-  assert.match(reactNodeText(highlighted[0]), /^smaller box/)
+  assert.match(reactNodeText(highlighted[0]), /^establish box/)
 
   await act(async () => {
     renderer.root
@@ -1504,12 +1504,19 @@ test('Mate sidebar intercepts only unmodified primary link clicks', async () => 
   assert.deepEqual(navigations, [])
 
   let prevented = 0
+  let pointerBlurs = 0
   await act(async () => {
     queenLink.props.onClick({
       altKey: false,
       button: 0,
       ctrlKey: false,
+      currentTarget: {
+        blur: () => {
+          pointerBlurs += 1
+        },
+      },
       defaultPrevented: false,
+      detail: 1,
       metaKey: false,
       preventDefault: () => {
         prevented += 1
@@ -1518,7 +1525,29 @@ test('Mate sidebar intercepts only unmodified primary link clicks', async () => 
     })
   })
   assert.equal(prevented, 1)
+  assert.equal(pointerBlurs, 1)
   assert.deepEqual(navigations, ['/mate/queen'])
+
+  let keyboardBlurs = 0
+  await act(async () => {
+    queenLink.props.onClick({
+      altKey: false,
+      button: 0,
+      ctrlKey: false,
+      currentTarget: {
+        blur: () => {
+          keyboardBlurs += 1
+        },
+      },
+      defaultPrevented: false,
+      detail: 0,
+      metaKey: false,
+      preventDefault: () => undefined,
+      shiftKey: false,
+    })
+  })
+  assert.equal(keyboardBlurs, 0)
+  assert.deepEqual(navigations, ['/mate/queen', '/mate/queen'])
 
   await act(async () => renderer.unmount())
 })
@@ -1737,7 +1766,15 @@ test('Mate exposes stable desktop and narrow-layout structure', () => {
   )
   assert.match(
     css,
-    /@media\s*\(max-width:\s*48rem\)[\s\S]*\.leg-mate-guide-priorities,[\s\S]*\.leg-mate-guide-shortcuts\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\)/,
+    /@media\s*\(max-width:\s*48rem\)[\s\S]*\.leg-mate-guide-priorities\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\)/,
+  )
+  assert.match(
+    css,
+    /\.leg-mate-guide-shortcuts\s*\{[^}]*display:\s*grid;[^}]*grid-template-columns:\s*max-content max-content;[^}]*gap:\s*0\.45rem 1rem/s,
+  )
+  assert.match(
+    css,
+    /\.leg-mate-guide-shortcuts div\s*\{[^}]*display:\s*inline-flex;[^}]*gap:\s*0\.4rem/s,
   )
   assert.match(
     css,
@@ -2106,7 +2143,7 @@ test('Mate wires board, history, timer, and every log replacement action', async
     })
     assert.equal(
       mountedRenderer.root.findByType(MateLog).props.logs[0].san,
-      'Rh5',
+      'Re8',
     )
 
     await act(async () => {

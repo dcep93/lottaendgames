@@ -156,6 +156,12 @@ const ROOK_WHITE_FIXTURES: readonly WhiteFixture[] = [
     phase: '2/2',
   },
   {
+    fen: '8/8/8/8/8/8/2k4K/7R w - - 0 1',
+    idealMoves: ['Re1'],
+    hint: 'establish box',
+    phase: '1/2',
+  },
+  {
     fen: '1R3K2/8/8/8/8/8/8/7k w - - 0 1',
     idealMoves: ['Kg7'],
     hint: 'exact mate progress',
@@ -548,7 +554,7 @@ test('queen and rook preserve evaluator order with universal priority labels', (
       'mate',
       'pieces safe',
       'no stalemate',
-      'stable two-square corner cage',
+      'two-square corner cage',
       'white king toward cage support',
       'white pieces off edge',
       'queen a knight move from black',
@@ -565,7 +571,7 @@ test('queen and rook preserve evaluator order with universal priority labels', (
       'no stalemate',
       'shortest mate',
       'waiting move',
-      'smaller box',
+      'establish box',
       'push with check',
       'king closer',
       'rook farther',
@@ -582,7 +588,7 @@ test('queen and rook preserve evaluator order with universal priority labels', (
       {
         id: 'king to cage',
         helpText:
-          "With a stable two-square corner cage, move White's king toward a mating-support square a knight's move from both the Queen and corner.",
+          "With a two-square corner cage, move White's king toward a mating-support square a knight's move from both the Queen and corner.",
       },
       {
         id: 'white pieces off edge',
@@ -618,56 +624,57 @@ test('queen and rook preserve evaluator order with universal priority labels', (
     [
       {
         id: 'exact mate progress',
-        helpText: 'When active, follow the shortest forced mate.',
+        helpText:
+          'Finish with the shortest forced mate when the box rule does not apply.',
       },
       {
         id: 'rook waiting move',
         helpText:
-          'When the kings are set, play a safe Rook waiting move that keeps the box.',
+          'When White needs a tempo, move the Rook without losing the box.',
       },
       {
         id: 'establish box',
         helpText:
-          "Make Black's box smaller. If it cannot shrink, keep the same wall and keep the Rook back.",
+          'When the kings line up far apart, establish the smallest safe box; then preserve or shrink it.',
       },
       {
         id: 'forcing check',
         helpText:
-          'Check only when every reply pushes Black farther from your King.',
+          "Check when every reply pushes Black farther from White's king.",
       },
       {
         id: 'king closer',
-        helpText: 'Bring your King closer to Black.',
+        helpText: "Move White's king closer to Black's king.",
       },
       {
         id: 'maximize black distance',
-        helpText: 'Keep your Rook farther from Black.',
+        helpText: "Keep the Rook farther from Black's king.",
       },
     ],
   )
   assert.equal(queenRuleSet.help.title, 'How best moves are chosen')
   assert.equal(queenRuleSet.help.whiteIntro, WHITE_INTRO)
   assert.equal(queenRuleSet.help.blackIntro, BLACK_INTRO)
-  assert.equal(rookRuleSet.help.blackIntro, 'Black chooses the toughest reply.')
+  assert.equal(rookRuleSet.help.blackIntro, BLACK_INTRO)
   assert.deepEqual(queenRuleSet.help.blackPriorities, [
     'Return to the previous board position when a legal reply can recreate it.',
     "Take a piece if White isn't looking.",
     'Head toward the center, where Black has the most room to resist.',
   ])
   assert.deepEqual(rookRuleSet.help.blackPriorities, [
-    'Repeat the position.',
-    'Take a loose Rook.',
+    'Return to the previous board position when a legal reply can recreate it.',
+    "Take a piece if White isn't looking.",
     'Move toward the nearest box wall.',
-    "If the Rook is diagonally beside White's King, chase it.",
-    'Avoid creating opposition.',
+    "If the Rook is diagonally beside White's king, chase it.",
+    'Avoid giving White opposition.',
     'Move toward the Rook.',
   ])
   assert.deepEqual(queenRuleSet.help.notes, [
-    "Phase 2 means the Queen's rank or file is strictly between the two kings on that axis. It is shown only on White's turn.",
+    "Phase 2 means the Queen's rank or file is strictly between the two kings on that axis.",
   ])
   assert.deepEqual(queenRuleSet.help.noteBoards, [])
   assert.deepEqual(rookRuleSet.help.notes, [
-    "Phase 2: the Rook cuts between the kings. Shown only on White's turn.",
+    "Phase 2 means the Rook's rank or file is strictly between the two kings on that axis.",
   ])
   assert.deepEqual(rookRuleSet.help.noteBoards, [])
 
@@ -685,9 +692,9 @@ test('queen and rook preserve evaluator order with universal priority labels', (
       'mate',
       'rook safe',
       'no stalemate',
-      'exact mate progress',
       'rook waiting move',
       'establish box',
+      'exact mate progress',
       'forcing check',
       'king closer',
       'maximize black distance',
@@ -1411,13 +1418,13 @@ test('rook mates all 50 source-seeded Standard starts within 220 plies', () => {
     maxPlies = Math.max(maxPlies, moves.length)
   }
 
-  assert.equal(totalPlies, 808)
+  assert.equal(totalPlies, 822)
   assert.equal(maxPlies, 27)
   assert.equal(
     createHash('sha256')
       .update(JSON.stringify({ starts, lines }))
       .digest('hex'),
-    '964718077f6a8ce3a37793c54026c6a58acdd113acae8de7d9a65dbafe427596',
+    '35cd2ea50f22dc5c8b42e670809f3fa1d6eecd6012768538a11528659952c9b2',
   )
 })
 

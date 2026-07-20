@@ -93,6 +93,7 @@ const BLACK_INTRO =
 
 const RETURN_POSITION_PRIORITY =
   'Return to the previous board position when a legal reply can recreate it.'
+const CAPTURE_LOOSE_PIECE_PRIORITY = "Take a piece if White isn't looking."
 
 const queenHelp: RuleHelp = {
   title: 'How best moves are chosen',
@@ -100,11 +101,11 @@ const queenHelp: RuleHelp = {
   blackIntro: BLACK_INTRO,
   blackPriorities: [
     RETURN_POSITION_PRIORITY,
-    "Take a piece if White isn't looking.",
+    CAPTURE_LOOSE_PIECE_PRIORITY,
     'Head toward the center, where Black has the most room to resist.',
   ],
   notes: [
-    "Phase 2 means the Queen's rank or file is strictly between the two kings on that axis. It is shown only on White's turn.",
+    "Phase 2 means the Queen's rank or file is strictly between the two kings on that axis.",
   ],
   noteBoards: [],
 }
@@ -112,17 +113,17 @@ const queenHelp: RuleHelp = {
 const rookHelp: RuleHelp = {
   title: 'How best moves are chosen',
   whiteIntro: WHITE_INTRO,
-  blackIntro: 'Black chooses the toughest reply.',
+  blackIntro: BLACK_INTRO,
   blackPriorities: [
-    'Repeat the position.',
-    'Take a loose Rook.',
+    RETURN_POSITION_PRIORITY,
+    CAPTURE_LOOSE_PIECE_PRIORITY,
     'Move toward the nearest box wall.',
-    "If the Rook is diagonally beside White's King, chase it.",
-    'Avoid creating opposition.',
+    "If the Rook is diagonally beside White's king, chase it.",
+    'Avoid giving White opposition.',
     'Move toward the Rook.',
   ],
   notes: [
-    "Phase 2: the Rook cuts between the kings. Shown only on White's turn.",
+    "Phase 2 means the Rook's rank or file is strictly between the two kings on that axis.",
   ],
   noteBoards: [],
 }
@@ -262,7 +263,7 @@ export const queenWhiteRules: readonly OrderedRule<QueenWhiteMoveScore>[] = [
   },
   {
     id: 'corner cage',
-    shortLabel: 'stable two-square corner cage',
+    shortLabel: 'two-square corner cage',
     helpText:
       'Build or preserve a corner-plus-adjacent-edge cage from which every legal Black reply remains in those two squares.',
     compare: (first, second) => first.cagePenalty - second.cagePenalty,
@@ -271,7 +272,7 @@ export const queenWhiteRules: readonly OrderedRule<QueenWhiteMoveScore>[] = [
     id: 'king to cage',
     shortLabel: 'white king toward cage support',
     helpText:
-      "With a stable two-square corner cage, move White's king toward a mating-support square a knight's move from both the Queen and corner.",
+      "With a two-square corner cage, move White's king toward a mating-support square a knight's move from both the Queen and corner.",
     compare: (first, second) =>
       first.cageKingApproachPriority - second.cageKingApproachPriority ||
       compareOptionalDistances(
@@ -356,6 +357,20 @@ function compareNullableAscending(
   if (first === null) return second === null ? 0 : 1
   if (second === null) return -1
   return first - second
+}
+
+function hasSafeRookBoxMove(fen: string): boolean {
+  const chess = getChess(fen)
+  if (chess.turn() !== 'w') return false
+  return chess.moves().some((san) => {
+    const candidate = getChess(fen)
+    candidate.move(san)
+    const resultFen = candidate.fen()
+    return (
+      !blackCanTakeWhiteMajorPiece(resultFen, 'r') &&
+      getRookBoxFromFen(resultFen).size !== null
+    )
+  })
 }
 
 export function scoreRookWhiteMove(
@@ -475,9 +490,24 @@ export function scoreRookWhiteMove(
     hasCloseKingFinishGeometry &&
     !keepsOrthogonalFarTempo &&
     !keepsDualCutFarTempo
+  const alignedKingsCanEstablishSafeBox = Boolean(
+    usesExactBoxlessProgress &&
+      !usesExactClosePiecesProgress &&
+      kingMoveDistance !== null &&
+      kingMoveDistance >= 4 &&
+      beforeWhiteKing &&
+      beforeBlackKing &&
+      (() => {
+        const white = squareCoordinates(beforeWhiteKing.square)
+        const black = squareCoordinates(beforeBlackKing.square)
+        return white.file === black.file || white.rank === black.rank
+      })() &&
+      hasSafeRookBoxMove(fen),
+  )
   const usesExactMateProgress =
     !needsEdgeFinishBoundaryWaitingMove &&
-    (usesExactClosePiecesProgress || usesExactBoxlessProgress)
+    (usesExactClosePiecesProgress ||
+      (usesExactBoxlessProgress && !alignedKingsCanEstablishSafeBox))
   const beforeExactMateProgress = usesExactMateProgress
     ? lookupMajorPieceMateProgress('rook', fen)
     : null
@@ -626,7 +656,9 @@ export const rookWhiteRules: readonly OrderedRule<RookWhiteMoveScore>[] = [
   {
     id: 'exact mate progress',
     shortLabel: 'shortest mate',
-    helpText: 'When active, follow the shortest forced mate.',
+    helpText:
+      'Finish with the shortest forced mate when the box rule does not apply.',
+    guideOrder: 5,
     compare: (first, second) =>
       first.rookExactMateProgressPenalty -
         second.rookExactMateProgressPenalty ||
@@ -636,7 +668,8 @@ export const rookWhiteRules: readonly OrderedRule<RookWhiteMoveScore>[] = [
     id: 'rook waiting move',
     shortLabel: 'waiting move',
     helpText:
-      'When the kings are set, play a safe Rook waiting move that keeps the box.',
+      'When White needs a tempo, move the Rook without losing the box.',
+    guideOrder: 3,
     compare: (first, second) =>
       first.rookWaitingPenalty - second.rookWaitingPenalty ||
       compareNullableAscending(
@@ -650,9 +683,10 @@ export const rookWhiteRules: readonly OrderedRule<RookWhiteMoveScore>[] = [
   },
   {
     id: 'establish box',
-    shortLabel: 'smaller box',
+    shortLabel: 'establish box',
     helpText:
-      "Make Black's box smaller. If it cannot shrink, keep the same wall and keep the Rook back.",
+      'When the kings line up far apart, establish the smallest safe box; then preserve or shrink it.',
+    guideOrder: 4,
     compare: (first, second) =>
       first.rookBoxLossPenalty - second.rookBoxLossPenalty ||
       compareNullableAscending(first.rookBoxSize, second.rookBoxSize) ||
@@ -665,14 +699,14 @@ export const rookWhiteRules: readonly OrderedRule<RookWhiteMoveScore>[] = [
     id: 'forcing check',
     shortLabel: 'push with check',
     helpText:
-      'Check only when every reply pushes Black farther from your King.',
+      "Check when every reply pushes Black farther from White's king.",
     compare: (first, second) =>
       first.forcingCheckPenalty - second.forcingCheckPenalty,
   },
   {
     id: 'king closer',
     shortLabel: 'king closer',
-    helpText: 'Bring your King closer to Black.',
+    helpText: "Move White's king closer to Black's king.",
     applies: (score) =>
       score.kingDistance !== null && score.kingManhattanDistance !== null,
     compare: (first, second) =>
@@ -682,7 +716,7 @@ export const rookWhiteRules: readonly OrderedRule<RookWhiteMoveScore>[] = [
   {
     id: 'maximize black distance',
     shortLabel: 'rook farther',
-    helpText: 'Keep your Rook farther from Black.',
+    helpText: "Keep the Rook farther from Black's king.",
     applies: (score) => score.rookBlackDistanceScore !== null,
     compare: (first, second) =>
       first.rookBlackDistanceScore! - second.rookBlackDistanceScore!,

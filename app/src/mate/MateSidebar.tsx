@@ -169,5 +169,6 @@ function handleMateNavigation(
   }
 
   event.preventDefault()
+  if (event.detail > 0) event.currentTarget.blur()
   onNavigate(href)
 }
