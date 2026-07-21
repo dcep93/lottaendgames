@@ -64,7 +64,7 @@ export function resolveMateBoardMove({
     const chess = getChess(fen)
     const source = sourceSquare as Square
     const target = targetSquare as Square
-    if (chess.turn() !== 'w' || chess.get(source)?.color !== 'w') {
+    if (chess.get(source)?.color !== chess.turn()) {
       return null
     }
     const move = chess.move({ from: source, to: target })
@@ -117,7 +117,7 @@ export function getMateBoardSquareStyles(
   return styles
 }
 
-export function canSelectWhitePiece(
+export function canSelectSideToMovePiece(
   fen: string,
   square: string,
   disabled: boolean,
@@ -125,10 +125,7 @@ export function canSelectWhitePiece(
   if (disabled || !SQUARE_PATTERN.test(square)) return false
   try {
     const chess = getChess(fen)
-    return (
-      chess.turn() === 'w' &&
-      chess.get(square as Square)?.color === 'w'
-    )
+    return chess.get(square as Square)?.color === chess.turn()
   } catch {
     return false
   }
@@ -140,7 +137,10 @@ export function getLegalTargets(
   disabled: boolean,
 ): ReadonlyMap<Square, LegalTarget> {
   const targets = new Map<Square, LegalTarget>()
-  if (square === null || !canSelectWhitePiece(fen, square, disabled)) {
+  if (
+    square === null ||
+    !canSelectSideToMovePiece(fen, square, disabled)
+  ) {
     return targets
   }
 

@@ -438,6 +438,25 @@ export function playWhiteMove(
   )
 }
 
+export function playBlackMove(
+  session: MateSession,
+  san: string,
+  deps: MateSessionDeps,
+): MateSession {
+  if (session.outcome !== undefined) return session
+  try {
+    if (getChess(session.fen).turn() !== 'b') return session
+  } catch {
+    return session
+  }
+  const logIndex = session.logs.length - 1
+  const pendingLog = session.logs[logIndex]
+  if (pendingLog === undefined || pendingLog.opponentSan !== undefined) {
+    return session
+  }
+  return replaceHistoricalBlackMove(session, logIndex, san, deps)
+}
+
 export function playBestMateMove(
   session: MateSession,
   deps: MateSessionDeps,

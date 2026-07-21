@@ -12,6 +12,7 @@ import {
   createMateReplaySession,
   getMateElapsedMs,
   getMateTerminalOutcome,
+  playBlackMove,
   playBestMateMove,
   playWhiteMove,
   redoMateMove,
@@ -189,10 +190,11 @@ test('reconstructs the former exact Rook loop as undoable ordinary history', () 
       { move: 8, reasonId: 'rook waiting move', san: 'Ra6' },
       { move: 9, reasonId: 'establish box', san: 'Rd6' },
       { move: 10, reasonId: 'establish box', san: 'Rd1' },
-      { move: 15, reasonId: 'king closer', san: 'Rc1' },
+      { move: 11, reasonId: 'establish box', san: 'Ke6' },
+      { move: 13, reasonId: 'establish box', san: 'Rc2' },
       { move: 18, reasonId: 'establish box', san: 'Rc4' },
       { move: 19, reasonId: 'establish box', san: 'Rh4' },
-      { move: 24, reasonId: 'king closer', san: 'Ra3' },
+      { move: 24, reasonId: 'rook waiting move', san: 'Ra3' },
       { move: 26, reasonId: 'establish box', san: 'Rd3' },
       { move: 27, reasonId: 'establish box', san: 'Rd8' },
       { move: 33, reasonId: 'rook waiting move', san: 'Rc2' },
@@ -313,6 +315,28 @@ test('undo and redo operate on half-moves and new play truncates redo', () => {
   assert.equal(replacementLine.historyIndex, 2)
   assert.equal(replacementLine.history.length, 3)
   assert.notEqual(replacementLine.fen, played.fen)
+})
+
+test('manual Black play completes the pending ply and truncates redo', () => {
+  const deps = createDeps({
+    times: [1_000, 1_100],
+    randoms: [0],
+  })
+  const initial = createMateSession(
+    { mateId: 'rook', mode: 'standard' },
+    deps,
+  )
+  const automaticLine = playWhiteMove(initial, 'Ra8+', deps)
+  const afterWhite = undoMateMove(automaticLine)
+  const manualLine = playBlackMove(afterWhite, 'Kg7', deps)
+
+  assert.equal(manualLine.logs[0]?.opponentSan, 'Kg7')
+  assert.equal(manualLine.fen, 'R7/6k1/8/8/8/8/8/K7 w - - 2 2')
+  assert.equal(manualLine.historyIndex, 2)
+  assert.equal(manualLine.history.length, 3)
+  assert.equal(redoMateMove(manualLine), manualLine)
+  assert.equal(playBlackMove(initial, 'Kh7', deps), initial)
+  assertCurrentSnapshot(manualLine)
 })
 
 test('current logs and stored snapshots do not share mutable log objects', () => {

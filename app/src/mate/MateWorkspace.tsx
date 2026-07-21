@@ -15,6 +15,7 @@ import {
   createMateReplaySession,
   getMateElapsedMs,
   getReloadableMateFen,
+  playBlackMove,
   playBestMateMove,
   playWhiteMove,
   redoMateMove,
@@ -234,7 +235,11 @@ export default function MateWorkspace({
   )
   const playMove = React.useCallback(
     (san: string) =>
-      commit((current) => playWhiteMove(current, san, deps)),
+      commit((current) =>
+        getChess(current.fen).turn() === 'w'
+          ? playWhiteMove(current, san, deps)
+          : playBlackMove(current, san, deps),
+      ),
     [commit, deps],
   )
   const cycleIdealWhite = React.useCallback(
@@ -317,13 +322,15 @@ export default function MateWorkspace({
     [ruleSet, session],
   )
   const boardDisabled = React.useMemo(
-    () => playBestAnimation !== null || !canAcceptWhiteMove(session),
+    () => playBestAnimation !== null || session.outcome !== undefined,
     [playBestAnimation, session],
   )
   const canPlayBest = React.useMemo(
     () =>
-      !boardDisabled && hasPreferredWhiteMove(ruleSet, session.fen),
-    [boardDisabled, ruleSet, session.fen],
+      !boardDisabled &&
+      canAcceptWhiteMove(session) &&
+      hasPreferredWhiteMove(ruleSet, session.fen),
+    [boardDisabled, ruleSet, session],
   )
   const catalogEntry = MATE_CATALOG.find(({ id }) => id === mateId)
   const modeLabel = mateMode === 'train' ? 'Training Wheels' : 'Standard'

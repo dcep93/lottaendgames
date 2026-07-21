@@ -34,6 +34,7 @@ import { liveMateHref } from './workspaceSupport'
 const ROOK_START = '7k/8/8/8/8/8/R7/K7 w - - 0 1'
 const ROOK_AFTER_WHITE = 'R6k/8/8/8/8/8/8/K7 b - - 1 1'
 const ROOK_AFTER_REPLY = 'R7/6k1/8/8/8/8/8/K7 w - - 2 2'
+const ROOK_AFTER_ALT_REPLY = 'R7/7k/8/8/8/8/8/K7 w - - 2 2'
 const EXTERNAL_START = '6k1/8/8/8/8/3K4/8/R7 w - - 0 1'
 const MULTI_WHITE_START = '7R/2K3k1/8/8/8/8/8/8 w - - 0 1'
 const MULTI_BLACK_START = '8/8/8/8/2k5/8/2K5/2R5 w - - 0 1'
@@ -402,7 +403,7 @@ test('a legal drop dispatches canonical SAN exactly once', () => {
   assert.deepEqual(moves, ['Ra8+'])
 })
 
-test('illegal, disabled, malformed, and non-White drops are inert', () => {
+test('legal Black drops dispatch on Black turn and wrong-color drops are inert', () => {
   const moves: string[] = []
   const onMove = (san: string) => moves.push(san)
 
@@ -444,9 +445,19 @@ test('illegal, disabled, malformed, and non-White drops are inert', () => {
       sourceSquare: 'h8',
       targetSquare: 'h7',
     }),
+    true,
+  )
+  assert.equal(
+    tryMateBoardMove({
+      disabled: false,
+      fen: ROOK_START.replace(' w ', ' b '),
+      onMove,
+      sourceSquare: 'a2',
+      targetSquare: 'a8',
+    }),
     false,
   )
-  assert.deepEqual(moves, [])
+  assert.deepEqual(moves, ['Kh7'])
 })
 
 test('Mate controls expose preserved actions and their disabled states', () => {
@@ -1885,6 +1896,56 @@ test('Mate loads replay history at its final position for Undo and Redo', async 
   }
 })
 
+test('Mate accepts a manual Black board move from half-move history', async () => {
+  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
+    .IS_REACT_ACT_ENVIRONMENT = true
+  const hrefs: string[] = []
+  let renderer: ReactTestRenderer | undefined
+
+  try {
+    await act(async () => {
+      renderer = TestRenderer.create(
+        matePage(
+          'rook',
+          'standard',
+          ROOK_START,
+          ['Ra8+', 'Kg7'],
+          (href) => hrefs.push(href),
+        ),
+      )
+    })
+    const mountedRenderer = renderer as ReactTestRenderer
+    await act(async () => {
+      mountedRenderer.root.findByType(MateControls).props.onUndo()
+    })
+
+    assert.equal(mountedRenderer.root.findByType(MateBoardProbe).props.fen, ROOK_AFTER_WHITE)
+    assert.equal(mountedRenderer.root.findByType(MateBoardProbe).props.disabled, false)
+    assert.equal(mountedRenderer.root.findByType(MateControls).props.canPlayBest, false)
+    assert.equal(
+      hrefs.at(-1),
+      liveMateHref('rook', 'standard', ROOK_START),
+    )
+
+    await act(async () => {
+      mountedRenderer.root.findByType(MateBoardProbe).props.onMove('Kh7')
+    })
+
+    assert.equal(mountedRenderer.root.findByType(MateBoardProbe).props.fen, ROOK_AFTER_ALT_REPLY)
+    assert.equal(
+      mountedRenderer.root.findByType(MateLog).props.logs[0]?.opponentSan,
+      'Kh7',
+    )
+    assert.equal(mountedRenderer.root.findByType(MateControls).props.canRedo, false)
+    assert.equal(
+      hrefs.at(-1),
+      liveMateHref('rook', 'standard', ROOK_AFTER_ALT_REPLY),
+    )
+  } finally {
+    if (renderer) await act(async () => renderer?.unmount())
+  }
+})
+
 test('Mate syncs the current live FEN after session transitions', async () => {
   ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
     .IS_REACT_ACT_ENVIRONMENT = true
@@ -2113,10 +2174,14 @@ test('Mate wires board, history, timer, and every log replacement action', async
     await act(async () => {
       mountedRenderer.root.findByType(MateControls).props.onUndo()
     })
-    assert.equal(mountedRenderer.root.findByType(MateLog).props.logs.length, 0)
+    assert.equal(mountedRenderer.root.findByType(MateLog).props.logs.length, 1)
     assert.equal(
+      mountedRenderer.root.findByType(MateLog).props.logs[0].opponentSan,
+      undefined,
+    )
+    assert.deepEqual(
       mountedRenderer.root.findByType(MateBoardProbe).props.lastMove,
-      null,
+      ['c1', 'd1'],
     )
     await act(async () => {
       mountedRenderer.root.findByType(MateControls).props.onRedo()
@@ -2327,10 +2392,26 @@ test('Mate keyboard shortcuts execute only from the training surface', async () 
     })
     assert.equal(mountedRenderer.root.findByType(MateLog).props.logs.length, 1)
     await act(async () => assert.equal(dispatch('ArrowLeft'), 1))
+    assert.equal(mountedRenderer.root.findByType(MateLog).props.logs.length, 1)
+    assert.equal(
+      mountedRenderer.root.findByType(MateLog).props.logs[0].opponentSan,
+      undefined,
+    )
+    await act(async () => assert.equal(dispatch('ArrowLeft'), 1))
     assert.equal(mountedRenderer.root.findByType(MateLog).props.logs.length, 0)
     assert.equal(dispatch('ArrowLeft'), 0)
     await act(async () => assert.equal(dispatch('ArrowRight'), 1))
     assert.equal(mountedRenderer.root.findByType(MateLog).props.logs.length, 1)
+    assert.equal(
+      mountedRenderer.root.findByType(MateLog).props.logs[0].opponentSan,
+      undefined,
+    )
+    await act(async () => assert.equal(dispatch('ArrowRight'), 1))
+    assert.equal(mountedRenderer.root.findByType(MateLog).props.logs.length, 1)
+    assert.notEqual(
+      mountedRenderer.root.findByType(MateLog).props.logs[0].opponentSan,
+      undefined,
+    )
     assert.equal(dispatch('ArrowRight'), 0)
     await act(async () => assert.equal(dispatch('Enter'), 1))
     assert.equal(mountedRenderer.root.findByType(MateLog).props.logs.length, 0)

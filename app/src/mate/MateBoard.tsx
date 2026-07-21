@@ -13,7 +13,7 @@ import {
 } from 'react-chessboard'
 import {
   MATE_MOVE_ANIMATION_MS,
-  canSelectWhitePiece,
+  canSelectSideToMovePiece,
   getLegalTargets,
   getMateBoardSquareStyles,
   resolveMateBoardMove,
@@ -39,7 +39,7 @@ type OptimisticMove = {
   readonly san: string
   readonly sourceFen: string
   readonly stage: 'pending' | 'notified' | 'settled'
-  readonly whiteFen: string
+  readonly moveFen: string
 }
 
 const PIECE_NAMES: Readonly<Record<string, string>> = {
@@ -132,12 +132,12 @@ export function MateBoardSurface({
     !disabled &&
     optimisticMove?.stage !== 'settled' &&
     optimisticMove?.sourceFen === fen
-  const displayedFen = isOptimistic ? optimisticMove.whiteFen : fen
+  const displayedFen = isOptimistic ? optimisticMove.moveFen : fen
 
   const canSelect = (square: string | null) =>
     !isOptimistic &&
     square !== null &&
-    canSelectWhitePiece(fen, square, disabled)
+    canSelectSideToMovePiece(fen, square, disabled)
   const selectSquare = (square: string | null) => {
     setSelectedSquare(canSelect(square) ? square as Square : null)
   }
@@ -157,7 +157,7 @@ export function MateBoardSurface({
       san: move.san,
       sourceFen: fen,
       stage: 'pending',
-      whiteFen: move.fen,
+      moveFen: move.fen,
     })
     return true
   }

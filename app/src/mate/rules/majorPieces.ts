@@ -66,6 +66,7 @@ export type RookWhiteMoveScore = {
   readonly rookEstablishBoxPenalty: number
   readonly rookPhaseTwoBoxSize: number | null
   readonly forcingCheckPenalty: number
+  readonly kingApproachPriority: 0 | 1 | 2
   readonly kingDistance: number | null
   readonly kingManhattanDistance: number | null
   readonly rookBlackDistanceScore: number | null
@@ -361,20 +362,12 @@ export function scoreRookWhiteMove(
   const beforeWhiteKing = findPiece(fen, 'w', 'k')
   const beforeBlackKing = findPiece(fen, 'b', 'k')
   const beforeBox = getRookBoxFromFen(fen)
-  const kingsAreKnightMoveApart = Boolean(
-    beforeWhiteKing &&
+  const needsRookWaitingMove = Boolean(
+    beforeBox.size !== null &&
+      beforeWhiteKing &&
       beforeBlackKing &&
       isKnightMove(beforeWhiteKing.square, beforeBlackKing.square),
   )
-  const rookStartsAdjacentToWhiteKing = Boolean(
-    beforeRook &&
-      beforeWhiteKing &&
-      kingDistance(beforeRook.square, beforeWhiteKing.square) === 1,
-  )
-  const needsRookWaitingMove =
-    beforeBox.size !== null &&
-    kingsAreKnightMoveApart &&
-    !rookStartsAdjacentToWhiteKing
   const chess = getChess(fen)
   const move = chess.move(san)
   const resultFen = chess.fen()
@@ -419,8 +412,16 @@ export function scoreRookWhiteMove(
       whiteRook &&
       whiteKing &&
       blackKing &&
+      !rookEndsAdjacentToWhiteKing &&
       preservesOrShrinksBox &&
-      retainsStrongestBoundary &&
+      retainsStrongestBoundary
+  )
+  const preferredRookWaitingMove = Boolean(
+    rookWaitingMove &&
+      beforeRook &&
+      whiteRook &&
+      whiteKing &&
+      blackKing &&
       waitingWhiteKingBetweenOtherPieces(
         beforeRook.square,
         whiteRook.square,
@@ -428,14 +429,68 @@ export function scoreRookWhiteMove(
         blackKing.square,
       ),
   )
-  const establishesPhaseTwoBox =
-    getMajorEndgamePhase(resultFen, 'r') === 2 &&
-    !(move.piece === 'r' && rookEndsAdjacentToWhiteKing)
+  const establishesPhaseTwoBox = getMajorEndgamePhase(resultFen, 'r') === 2
+  const beforeKingFileDistance =
+    beforeWhiteKing && beforeBlackKing
+      ? getAxisDistance(
+          beforeWhiteKing.square,
+          beforeBlackKing.square,
+          'file',
+        )
+      : null
+  const beforeKingRankDistance =
+    beforeWhiteKing && beforeBlackKing
+      ? getAxisDistance(
+          beforeWhiteKing.square,
+          beforeBlackKing.square,
+          'rank',
+        )
+      : null
+  const resultKingFileDistance =
+    whiteKing && blackKing
+      ? getAxisDistance(whiteKing.square, blackKing.square, 'file')
+      : null
+  const resultKingRankDistance =
+    whiteKing && blackKing
+      ? getAxisDistance(whiteKing.square, blackKing.square, 'rank')
+      : null
+  const resultKingDistance =
+    whiteKing && blackKing
+      ? kingDistance(whiteKing.square, blackKing.square)
+      : null
+  const kingMoveRegressesAxis = Boolean(
+    beforeKingFileDistance !== null &&
+      beforeKingRankDistance !== null &&
+      resultKingFileDistance !== null &&
+      resultKingRankDistance !== null &&
+      (resultKingFileDistance > beforeKingFileDistance ||
+        resultKingRankDistance > beforeKingRankDistance),
+  )
+  const kingMoveImprovesAxis = Boolean(
+    beforeKingFileDistance !== null &&
+      beforeKingRankDistance !== null &&
+      resultKingFileDistance !== null &&
+      resultKingRankDistance !== null &&
+      (resultKingFileDistance < beforeKingFileDistance ||
+        resultKingRankDistance < beforeKingRankDistance),
+  )
+  const kingApproachPriority: 0 | 1 | 2 =
+    move.piece !== 'k'
+      ? 1
+      : kingMoveImprovesAxis && !kingMoveRegressesAxis
+        ? 0
+        : 2
   return {
     matePenalty: chess.isCheckmate() ? 0 : 1,
     rookCapturePenalty: rookIsSafe ? 0 : 1,
     stalematePenalty: !chess.isCheckmate() && chess.isStalemate() ? 1 : 0,
-    rookWaitingPenalty: needsRookWaitingMove && !rookWaitingMove ? 1 : 0,
+    rookWaitingPenalty: !needsRookWaitingMove
+      ? 0
+      : preferredRookWaitingMove
+        ? 0
+        : rookWaitingMove
+          ? 1
+          : 2,
     rookEstablishBoxPenalty: establishesPhaseTwoBox ? 0 : 1,
     rookPhaseTwoBoxSize: establishesPhaseTwoBox ? resultBox.size : null,
     forcingCheckPenalty:
@@ -444,10 +499,8 @@ export function scoreRookWhiteMove(
       blackMustMoveAwayFromWhiteKing(resultFen)
         ? 0
         : 1,
-    kingDistance:
-      whiteKing && blackKing
-        ? kingDistance(whiteKing.square, blackKing.square)
-        : null,
+    kingApproachPriority,
+    kingDistance: resultKingDistance,
     kingManhattanDistance:
       whiteKing && blackKing
         ? manhattanDistance(whiteKing.square, blackKing.square)
@@ -489,8 +542,7 @@ export const rookWhiteRules: readonly OrderedRule<RookWhiteMoveScore>[] = [
   {
     id: 'establish box',
     shortLabel: 'establish box',
-    helpText:
-      'Use the Rook to make the smallest phase 2 box without placing the rook adjacent to the White king.',
+    helpText: 'Use the Rook to make the smallest phase 2 box.',
     compare: (first, second) =>
       first.rookEstablishBoxPenalty - second.rookEstablishBoxPenalty ||
       compareNullableAscending(
@@ -502,7 +554,7 @@ export const rookWhiteRules: readonly OrderedRule<RookWhiteMoveScore>[] = [
     id: 'rook waiting move',
     shortLabel: 'waiting move',
     helpText:
-      "If the kings are a knight's move apart, and the rook is not adjacent to White's king, move the rook, keeping the box, and with white's king between the other pieces.",
+      "If the kings are a knight's move apart, move the rook, keeping the box, ideally with white's king between the other pieces, but the rook should not be adjacent to white's king.",
     compare: (first, second) =>
       first.rookWaitingPenalty - second.rookWaitingPenalty,
   },
@@ -513,6 +565,7 @@ export const rookWhiteRules: readonly OrderedRule<RookWhiteMoveScore>[] = [
     applies: (score) =>
       score.kingDistance !== null && score.kingManhattanDistance !== null,
     compare: (first, second) =>
+      first.kingApproachPriority - second.kingApproachPriority ||
       first.kingDistance! - second.kingDistance! ||
       first.kingManhattanDistance! - second.kingManhattanDistance!,
   },
