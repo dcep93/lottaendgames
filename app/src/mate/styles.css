@@ -184,6 +184,13 @@
   color: var(--leg-muted);
 }
 
+.leg-mate-empty-state .leg-mate-empty-state-intro {
+  max-width: 54rem;
+  color: var(--leg-text);
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
 .leg-mate-workspace {
   display: grid;
   grid-template-areas: 'board log';
@@ -577,6 +584,13 @@
   grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
 }
 
+.leg-mate-guide-footer {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.1rem;
+  align-items: start;
+}
+
 .leg-mate-guide-section {
   display: grid;
   gap: 0.55rem;
@@ -811,6 +825,10 @@
 }
 
 @media (max-width: 48rem) {
+  .leg-mate-guide-footer {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .leg-mate-sidebar {
     display: grid;
     grid-template-areas:

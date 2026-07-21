@@ -1,9 +1,95 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import {
+  getCurrentPhase,
   liveMateHref,
   releasePointerButtonFocus,
 } from './workspaceSupport'
+import type { RegisteredMateRuleSet } from './rules'
+import type { MateLogEntry, MateSession } from './session'
+
+function phaseSession(
+  fen: string,
+  logs: readonly MateLogEntry[] = [],
+): MateSession {
+  return {
+    mateId: 'rook',
+    mode: 'standard',
+    startingFen: fen,
+    fen,
+    logs: [...logs],
+    history: [],
+    historyIndex: 0,
+    startedAtMs: 0,
+  }
+}
+
+function phaseLog(phase: string): MateLogEntry {
+  return {
+    fen: '8/8/8/8/3k4/8/1R6/3K4 w - - 0 1',
+    san: 'Rb4',
+    phase,
+    isCorrect: true,
+    correctChoices: 1,
+    durationMs: 0,
+    reasonId: 'establish box',
+  }
+}
+
+function phaseRuleSet(
+  phase: (fen: string) => string,
+): RegisteredMateRuleSet {
+  return { phase } as RegisteredMateRuleSet
+}
+
+test('Mate phase recalculates only when White is to move', () => {
+  let calls = 0
+  const ruleSet = phaseRuleSet(() => {
+    calls += 1
+    return '2/2'
+  })
+
+  assert.equal(
+    getCurrentPhase(
+      ruleSet,
+      phaseSession(
+        '8/8/8/8/3k4/8/1R6/3K4 w - - 0 1',
+        [phaseLog('1/2')],
+      ),
+    ),
+    '2/2',
+  )
+  assert.equal(calls, 1)
+
+  assert.equal(
+    getCurrentPhase(
+      ruleSet,
+      phaseSession(
+        '8/8/8/8/3k4/8/1R6/3K4 b - - 1 1',
+        [phaseLog('2/2')],
+      ),
+    ),
+    '2/2',
+  )
+  assert.equal(calls, 1)
+})
+
+test('Black-to-move Mate phase is unknown without a preceding White turn', () => {
+  let calls = 0
+  const ruleSet = phaseRuleSet(() => {
+    calls += 1
+    return '1/2'
+  })
+
+  assert.equal(
+    getCurrentPhase(
+      ruleSet,
+      phaseSession('8/8/8/8/3k4/8/1R6/3K4 b - - 1 1'),
+    ),
+    '—',
+  )
+  assert.equal(calls, 0)
+})
 
 test('live Mate href stores only the current FEN', () => {
   assert.equal(

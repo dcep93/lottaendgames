@@ -1,4 +1,4 @@
-import { edgeDistance, findPiece, getChess } from '../chess'
+import { findPiece, getChess, kingDistance } from '../chess'
 import { getEndgameReturnToPositionMoves } from './majorPieces'
 import { compareScoresByRules, selectIdealMoves } from './selection'
 import {
@@ -9,7 +9,6 @@ import {
   getTwoBishopsPhaseLabel,
   getWhiteBishopDistanceToSquare,
   getWhiteKingBishopScreeningPenalty,
-  getWhiteKingDistanceToBishops,
   whiteBishopsAreAdjacent,
 } from './twoBishopsGeometry'
 import {
@@ -48,12 +47,12 @@ export type TwoBishopsWhiteMoveScore = {
   readonly phaseTwoBishopCornerDistance: number
   readonly kingBishopScreeningPenalty: number
   readonly bishopAdjacencyPenalty: number
-  readonly kingBishopDistance: number
-  readonly blackKingEdgeDistance: number
   readonly bishopBlackKingDistance: number
+  readonly whiteBlackKingDistance: number
 }
 
 export type TwoBishopsBlackMoveScore = {
+  readonly bishopCapturePenalty: number
   readonly centerDistance: number
   readonly unprotectedBishopDistance: number
 }
@@ -69,13 +68,14 @@ const twoBishopsHelp: RuleHelp = {
   whiteIntro: WHITE_INTRO,
   blackIntro: BLACK_INTRO,
   blackPriorities: [
-    'Return to the previous full position when a legal reply can recreate it.',
-    'Stay away from edges and corners, preferring the center.',
-    'Among equally central moves, take an unprotected bishop when possible; otherwise move toward the nearest unprotected bishop.',
+    'Return to the previous board position when a legal reply can recreate it.',
+    "Take a piece if White isn't looking.",
+    'Move towards the center.',
+    'Move towards an unprotected bishop.',
   ],
   notes: [
-    "Phase 2 is where Black's king is on an edge and White's king controls at least 2 squares in front of Black's king. Phase 2 also includes positions where White's king is two diagonal king moves from Black's edge king and Black is forced to move along the edge toward White's king. Squares in front are the squares opposite an edge: edge squares have 3 squares in front of them. Corner front squares are the 3 inward squares, such as a2 and b1 and b2 when Black's king is on a1.",
-    "The phase 2 waiting move is not any quiet move. It is a bishop move for a boxed-in king: either the line-pattern waiting move that keeps the wall, or the corner waiting move that lets that bishop cover Black's single escape square after Black moves.",
+    "Phase 2 is where Black's king is on an edge and White's king controls at least 2 squares in front of Black's king. Phase 2 also includes positions where White's king is two diagonal squares from Black's king and Black is forced to move along the edge toward White's king.",
+    "The phase 2 waiting move is a bishop move for a boxed-in king: either the line-pattern waiting move that keeps the wall, or the corner waiting move that lets that bishop cover Black's single escape square after Black moves.",
   ],
   noteBoards: [],
 }
@@ -89,8 +89,8 @@ export function scoreTwoBishopsWhiteMove(
   const chess = getChess(fen)
   const move = chess.move(san)
   const resultFen = chess.fen()
-  const whiteKing = findPiece(resultFen, 'w', 'k')
   const blackKing = findPiece(resultFen, 'b', 'k')
+  const whiteKing = findPiece(resultFen, 'w', 'k')
   return {
     matePenalty: chess.isCheckmate() ? 0 : 1,
     stalematePenalty: !chess.isCheckmate() && chess.isStalemate() ? 1 : 0,
@@ -120,13 +120,13 @@ export function scoreTwoBishopsWhiteMove(
     kingBishopScreeningPenalty:
       getWhiteKingBishopScreeningPenalty(resultFen),
     bishopAdjacencyPenalty: whiteBishopsAreAdjacent(resultFen) ? 0 : 1,
-    kingBishopDistance: whiteKing
-      ? getWhiteKingDistanceToBishops(resultFen, whiteKing.square)
-      : 99,
-    blackKingEdgeDistance: blackKing ? edgeDistance(blackKing.square) : 99,
     bishopBlackKingDistance: blackKing
       ? getWhiteBishopDistanceToSquare(resultFen, blackKing.square)
       : 99,
+    whiteBlackKingDistance:
+      whiteKing && blackKing
+        ? kingDistance(whiteKing.square, blackKing.square)
+        : 99,
   }
 }
 
@@ -156,8 +156,8 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
       first.bishopSafetyPenalty - second.bishopSafetyPenalty,
   },
   {
-    id: 'stay phase two',
-    shortLabel: 'stay phase two',
+    id: 'keep phase two',
+    shortLabel: 'keep phase two',
     helpText: 'Enter or remain in phase 2.',
     compare: (first, second) =>
       first.phaseTwoStayPhaseTwoPenalty -
@@ -224,10 +224,10 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
       first.phaseTwoBishopCornerDistance,
   },
   {
-    id: 'avoid king bishop screening',
-    shortLabel: 'avoid king bishop screening',
+    id: 'avoid bishop screening',
+    shortLabel: 'avoid bishop screening',
     helpText:
-      "Keep White's king and bishops from screening each other from Black's king.",
+      "Keep White's king from screening the bishops from Black's king.",
     compare: (first, second) =>
       first.kingBishopScreeningPenalty - second.kingBishopScreeningPenalty,
   },
@@ -239,25 +239,18 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
       first.bishopAdjacencyPenalty - second.bishopAdjacencyPenalty,
   },
   {
-    id: 'king near bishops',
-    shortLabel: 'king near bishops',
-    helpText: "Keep White's king near the bishops.",
-    compare: (first, second) =>
-      first.kingBishopDistance - second.kingBishopDistance,
-  },
-  {
-    id: 'force black to edge',
-    shortLabel: 'force black to edge',
-    helpText: 'Force Black to the edge.',
-    compare: (first, second) =>
-      first.blackKingEdgeDistance - second.blackKingEdgeDistance,
-  },
-  {
-    id: 'bishops closer',
-    shortLabel: 'bishops closer to black king',
-    helpText: "Bring the bishops closer to Black's king.",
+    id: 'coordinate bishops',
+    shortLabel: 'coordinate bishops',
+    helpText: "Force Black's king away from the bishops.",
     compare: (first, second) =>
       first.bishopBlackKingDistance - second.bishopBlackKingDistance,
+  },
+  {
+    id: 'king closer',
+    shortLabel: 'king closer',
+    helpText: "Minimize distance from White's king to Black's king.",
+    compare: (first, second) =>
+      first.whiteBlackKingDistance - second.whiteBlackKingDistance,
   },
 ]
 
@@ -296,11 +289,11 @@ export function scoreTwoBishopsBlackMove(
   const move = chess.move(san)
   const blackKing = findPiece(chess.fen(), 'b', 'k')
   return {
+    bishopCapturePenalty: move.captured === 'b' ? 0 : 1,
     centerDistance: blackKing ? centerDistance(blackKing.square) : 99,
-    unprotectedBishopDistance:
-      move.captured === 'b'
-        ? 0
-        : distanceToNearestUnprotectedWhiteBishop(chess.fen()),
+    unprotectedBishopDistance: distanceToNearestUnprotectedWhiteBishop(
+      chess.fen(),
+    ),
   }
 }
 
@@ -309,6 +302,7 @@ export function compareTwoBishopsBlackScores(
   second: TwoBishopsBlackMoveScore,
 ): number {
   return (
+    first.bishopCapturePenalty - second.bishopCapturePenalty ||
     first.centerDistance - second.centerDistance ||
     first.unprotectedBishopDistance - second.unprotectedBishopDistance
   )

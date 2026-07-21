@@ -12,7 +12,7 @@ export type MatePriorityGuideDialogProps = {
   readonly returnFocusTo?: HTMLElement | null
 }
 
-const MOVE_LOG_COLUMN_NOTES = Object.freeze([
+const MOVE_LOG_LEGEND = Object.freeze([
   'Correctness: 👍 means White chose a best move; 👎 means White did not. /N is the number of best White moves.',
   'Black replies: X / Y means X best-resistance replies out of Y legal replies.',
 ])
@@ -38,7 +38,6 @@ export default function MatePriorityGuideDialog({
     MATE_CATALOG.find(({ id }) => id === ruleSet.id)?.label ?? ruleSet.id
   const universalWhitePriorities = ruleSet.whiteRuleDescriptions.slice(0, 3)
   const techniqueWhitePriorities = ruleSet.whiteRuleDescriptions.slice(3)
-  const notes = [...MOVE_LOG_COLUMN_NOTES, ...ruleSet.help.notes]
 
   React.useEffect(() => {
     closeButtonRef.current?.focus()
@@ -150,31 +149,9 @@ export default function MatePriorityGuideDialog({
           </div>
 
           <section className="leg-mate-guide-section">
-            <h3>Keyboard shortcuts</h3>
-            <dl className="leg-mate-guide-shortcuts">
-              <div>
-                <dt><kbd>Enter</kbd></dt>
-                <dd>Start over</dd>
-              </div>
-              <div>
-                <dt><kbd>←</kbd></dt>
-                <dd>Undo</dd>
-              </div>
-              <div>
-                <dt><kbd>↑</kbd></dt>
-                <dd>Play best move</dd>
-              </div>
-              <div>
-                <dt><kbd>→</kbd></dt>
-                <dd>Redo</dd>
-              </div>
-            </dl>
-          </section>
-
-          <section className="leg-mate-guide-section">
             <h3>Notes</h3>
             <ul>
-              {notes.map((note, index) => (
+              {ruleSet.help.notes.map((note, index) => (
                 <li key={`${index}-${note}`}>{note}</li>
               ))}
             </ul>
@@ -186,6 +163,39 @@ export default function MatePriorityGuideDialog({
               </div>
             )}
           </section>
+
+          <div className="leg-mate-guide-footer">
+            <section className="leg-mate-guide-section">
+              <h3>Keyboard shortcuts</h3>
+              <dl className="leg-mate-guide-shortcuts">
+                <div>
+                  <dt><kbd>Enter</kbd></dt>
+                  <dd>Start over</dd>
+                </div>
+                <div>
+                  <dt><kbd>←</kbd></dt>
+                  <dd>Undo</dd>
+                </div>
+                <div>
+                  <dt><kbd>↑</kbd></dt>
+                  <dd>Play best move</dd>
+                </div>
+                <div>
+                  <dt><kbd>→</kbd></dt>
+                  <dd>Redo</dd>
+                </div>
+              </dl>
+            </section>
+
+            <section className="leg-mate-guide-section">
+              <h3>Legend</h3>
+              <ul>
+                {MOVE_LOG_LEGEND.map((entry) => (
+                  <li key={entry}>{entry}</li>
+                ))}
+              </ul>
+            </section>
+          </div>
         </div>
       </section>
     </div>

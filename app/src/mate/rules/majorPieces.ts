@@ -345,15 +345,6 @@ export function getIdealQueenWhiteMoves(fen: string): string[] {
   )]
 }
 
-function compareNullableAscending(
-  first: number | null,
-  second: number | null,
-): number {
-  if (first === null) return second === null ? 0 : 1
-  if (second === null) return -1
-  return first - second
-}
-
 export function scoreRookWhiteMove(
   fen: string,
   san: string,
@@ -362,6 +353,7 @@ export function scoreRookWhiteMove(
   const beforeWhiteKing = findPiece(fen, 'w', 'k')
   const beforeBlackKing = findPiece(fen, 'b', 'k')
   const beforeBox = getRookBoxFromFen(fen)
+  const beforeIsPhaseTwo = getMajorEndgamePhase(fen, 'r') === 2
   const needsRookWaitingMove = Boolean(
     beforeBox.size !== null &&
       beforeWhiteKing &&
@@ -429,7 +421,10 @@ export function scoreRookWhiteMove(
         blackKing.square,
       ),
   )
-  const establishesPhaseTwoBox = getMajorEndgamePhase(resultFen, 'r') === 2
+  const establishesPhaseTwoBox = Boolean(
+    getMajorEndgamePhase(resultFen, 'r') === 2 &&
+      (!beforeIsPhaseTwo || preservesOrShrinksBox),
+  )
   const beforeKingFileDistance =
     beforeWhiteKing && beforeBlackKing
       ? getAxisDistance(
@@ -542,13 +537,9 @@ export const rookWhiteRules: readonly OrderedRule<RookWhiteMoveScore>[] = [
   {
     id: 'establish box',
     shortLabel: 'establish box',
-    helpText: 'Use the Rook to make the smallest phase 2 box.',
+    helpText: 'Use the Rook to make a phase 2 box.',
     compare: (first, second) =>
-      first.rookEstablishBoxPenalty - second.rookEstablishBoxPenalty ||
-      compareNullableAscending(
-        first.rookPhaseTwoBoxSize,
-        second.rookPhaseTwoBoxSize,
-      ),
+      first.rookEstablishBoxPenalty - second.rookEstablishBoxPenalty,
   },
   {
     id: 'rook waiting move',

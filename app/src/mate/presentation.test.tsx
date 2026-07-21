@@ -10,6 +10,7 @@ import TestRenderer, {
   type ReactTestRenderer,
 } from 'react-test-renderer'
 import MateBoard, { MateBoardSurface } from './MateBoard'
+import { MATE_CATALOG } from './catalog'
 import {
   MATE_REPLY_ANIMATION_MS,
   getMateBoardSquareStyles,
@@ -1085,6 +1086,8 @@ test('priority guide follows registered facade order and renders typed diagrams'
   assert.match(markup, />White best moves</)
   assert.match(markup, />Black resistance</)
   assert.match(markup, />Notes</)
+  assert.match(markup, />Legend</)
+  assert.match(markup, /class="leg-mate-guide-footer"/)
   const correctnessNote =
     'Correctness: 👍 means White chose a best move; 👎 means White did not. /N is the number of best White moves.'
   const blackRepliesNote =
@@ -1097,8 +1100,9 @@ test('priority guide follows registered facade order and renders typed diagrams'
   const sectionOrder = [
     '>White best moves<',
     '>Black resistance<',
-    '>Keyboard shortcuts<',
     '>Notes<',
+    '>Keyboard shortcuts<',
+    '>Legend<',
   ]
   let sectionCursor = -1
   for (const heading of sectionOrder) {
@@ -1107,8 +1111,12 @@ test('priority guide follows registered facade order and renders typed diagrams'
     sectionCursor = next
   }
   const prioritiesAt = markup.indexOf('leg-mate-guide-priorities')
-  assert.ok(prioritiesAt < markup.indexOf('>Keyboard shortcuts<'))
   assert.ok(prioritiesAt < markup.indexOf('>Notes<'))
+  assert.ok(markup.indexOf('>Notes<') < markup.indexOf('>Keyboard shortcuts<'))
+  assert.ok(
+    markup.indexOf('>Keyboard shortcuts<') < markup.indexOf('>Legend<'),
+  )
+  assert.ok(decodedMarkup.indexOf('>Legend<') < correctnessNoteAt)
 
   let cursor = -1
   for (const id of expectedWhiteIds) {
@@ -1128,7 +1136,7 @@ test('priority guide follows registered facade order and renders typed diagrams'
   }
   for (const note of ruleSet.help.notes) {
     assert.ok(decodedMarkup.includes(note))
-    assert.ok(decodedMarkup.indexOf(note) > blackRepliesNoteAt)
+    assert.ok(decodedMarkup.indexOf(note) < correctnessNoteAt)
   }
   assert.match(markup, />Zone X</)
   assert.match(markup, />Key Square</)
@@ -1138,6 +1146,25 @@ test('priority guide follows registered facade order and renders typed diagrams'
   assert.match(markup, /data-highlight-kind="key"/)
   assert.match(markup, /data-arrow="e5-f6"/)
   assert.doesNotMatch(markup, /<img\b|https?:\/\//)
+})
+
+test('every mate guide puts notes before shortcuts and the shared legend', () => {
+  for (const { id } of MATE_CATALOG) {
+    const markup = renderToStaticMarkup(
+      <MatePriorityGuideDialog
+        {...MATE_TRAINING_INFO_PROPS}
+        onClose={() => undefined}
+        ruleSet={getMateRuleSet(id)}
+      />,
+    )
+    const notesAt = markup.indexOf('>Notes<')
+    const shortcutsAt = markup.indexOf('>Keyboard shortcuts<')
+    const legendAt = markup.indexOf('>Legend<')
+
+    assert.ok(notesAt >= 0, `${id}: Notes missing`)
+    assert.ok(shortcutsAt > notesAt, `${id}: shortcuts must follow Notes`)
+    assert.ok(legendAt > shortcutsAt, `${id}: Legend must follow shortcuts`)
+  }
 })
 
 test('every Mate rule set exposes the same concise universal priorities', () => {
@@ -1412,17 +1439,17 @@ test('Mate selector exposes material icons and horizontal mode links', () => {
     />,
   )
 
-  for (const [label, href] of [
-    ['Queen', '/mate/queen'],
-    ['Rook', '/mate/rook'],
-    ['Two Bishops', '/mate/two-bishops'],
-    ['Bishop and Knight', '/mate/bishop-knight'],
-    ['Two Knights vs Pawn', '/mate/two-knights-pawn'],
+  for (const [label, href, title] of [
+    ['Queen', '/mate/queen', 'Queen'],
+    ['Rook, selected', '/mate', 'Rook'],
+    ['Two Bishops', '/mate/two-bishops', 'Two Bishops'],
+    ['Bishop and Knight', '/mate/bishop-knight', 'Bishop and Knight'],
+    ['Two Knights vs Pawn', '/mate/two-knights-pawn', 'Two Knights vs Pawn'],
   ]) {
     assert.match(
       markup,
       new RegExp(
-        `<a[^>]*aria-label="${label}"[^>]*href="${href}"[^>]*title="${label}"`,
+        `<a[^>]*aria-label="${label}"[^>]*href="${href}"[^>]*title="${title}"`,
       ),
       label,
     )
@@ -1438,7 +1465,7 @@ test('Mate selector exposes material icons and horizontal mode links', () => {
   assert.doesNotMatch(markup, /leg-mate-sidebar-label|<select\b/)
   assert.match(
     markup,
-    /aria-current="location"[^>]*href="\/mate\/rook"/,
+    /aria-label="Rook, selected"[^>]*class="leg-mate-set-link is-active"[^>]*href="\/mate"/,
   )
   assert.match(
     markup,
@@ -1484,6 +1511,10 @@ test('Mate sidebar intercepts only unmodified primary link clicks', async () => 
     )
   })
   const queenLink = renderer.root.findByProps({ href: '/mate/queen' })
+  const activeRookLink = renderer.root.findByProps({
+    'aria-label': 'Rook, selected',
+    href: '/mate',
+  })
 
   for (const overrides of [
     { button: 1 },
@@ -1560,6 +1591,46 @@ test('Mate sidebar intercepts only unmodified primary link clicks', async () => 
   assert.equal(keyboardBlurs, 0)
   assert.deepEqual(navigations, ['/mate/queen', '/mate/queen'])
 
+  let activePointerBlurs = 0
+  await act(async () => {
+    activeRookLink.props.onClick({
+      altKey: false,
+      button: 0,
+      ctrlKey: false,
+      currentTarget: {
+        blur: () => {
+          activePointerBlurs += 1
+        },
+      },
+      defaultPrevented: false,
+      detail: 1,
+      metaKey: false,
+      preventDefault: () => undefined,
+      shiftKey: false,
+    })
+  })
+  assert.equal(activePointerBlurs, 1)
+
+  await act(async () => {
+    activeRookLink.props.onClick({
+      altKey: false,
+      button: 0,
+      ctrlKey: false,
+      currentTarget: { blur: () => undefined },
+      defaultPrevented: false,
+      detail: 0,
+      metaKey: false,
+      preventDefault: () => undefined,
+      shiftKey: false,
+    })
+  })
+  assert.deepEqual(navigations, [
+    '/mate/queen',
+    '/mate/queen',
+    '/mate',
+    '/mate',
+  ])
+
   await act(async () => renderer.unmount())
 })
 
@@ -1577,7 +1648,16 @@ test('Mate landing keeps the catalog visible without mounting a drill', () => {
     />,
   )
 
-  assert.match(markup, /Choose a mating set/)
+  const explanation =
+    'Most mating trainers rely on engine moves or ask you to memorize a fixed line. Lotta Endgames teaches a repeatable plan instead. Every recommended move follows visible, human-readable priorities, while Black chooses stubborn replies so you learn the pattern—not a script. Reason hints show what to look for, the move log explains each decision, and Undo, Redo, and Play Best let you explore alternatives. Standard positions build adaptability; Training Wheels isolates useful patterns. The goal is confidence you can carry into real games.'
+  const slopAlertAt = markup.indexOf('>Slop Alert</h2>')
+  const explanationAt = markup.indexOf(explanation)
+  const chooserAt = markup.indexOf('Choose a mating set')
+  const explanationWordCount = explanation.trim().split(/\s+/).length
+  assert.ok(slopAlertAt >= 0)
+  assert.ok(explanationAt > slopAlertAt)
+  assert.ok(chooserAt > explanationAt)
+  assert.ok(explanationWordCount >= 50 && explanationWordCount <= 100)
   assert.match(markup, /href="\/mate\/queen"/)
   assert.match(markup, />Standard<\/span>/)
   assert.match(markup, />Training Wheels<\/span>/)
@@ -1789,6 +1869,14 @@ test('Mate exposes stable desktop and narrow-layout structure', () => {
   )
   assert.match(
     css,
+    /\.leg-mate-guide-footer\s*\{[^}]*display:\s*grid;[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\);[^}]*gap:\s*1\.1rem/s,
+  )
+  assert.match(
+    css,
+    /@media\s*\(max-width:\s*48rem\)[\s\S]*\.leg-mate-guide-footer\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\)/,
+  )
+  assert.match(
+    css,
     /@media\s*\(max-width:\s*32rem\)[\s\S]*\.leg-mate-controls-actions\s*\{[^}]*flex:\s*1 1 100%/,
   )
   assert.match(
@@ -1841,10 +1929,9 @@ test('Mate recreates its drill synchronously for exact route changes', async () 
     )
     assert.equal(
       mountedRenderer.root
-        .findAllByProps({ href: '/mate/queen' })
-        .find((link) => link.props['aria-current'] === 'location')
-        ?.props['aria-current'],
-      'location',
+        .findByProps({ 'aria-label': 'Queen, selected' })
+        .props.href,
+      '/mate',
     )
   } finally {
     if (renderer) await act(async () => renderer?.unmount())

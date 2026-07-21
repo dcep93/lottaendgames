@@ -729,7 +729,7 @@ test('queen and rook preserve evaluator order with universal priority labels', (
       },
       {
         id: 'establish box',
-        helpText: 'Use the Rook to make the smallest phase 2 box.',
+        helpText: 'Use the Rook to make a phase 2 box.',
       },
       {
         id: 'rook waiting move',

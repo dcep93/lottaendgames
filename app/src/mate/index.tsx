@@ -61,6 +61,19 @@ export default function Mate({
             />
           ) : (
             <section className="leg-mate-empty-state">
+              <h2>Slop Alert</h2>
+              <p className="leg-mate-empty-state-intro">
+                Most mating trainers rely on engine moves or ask you to
+                memorize a fixed line. Lotta Endgames teaches a repeatable
+                plan instead. Every recommended move follows visible,
+                human-readable priorities, while Black chooses stubborn
+                replies so you learn the pattern—not a script. Reason hints
+                show what to look for, the move log explains each decision,
+                and Undo, Redo, and Play Best let you explore alternatives.
+                Standard positions build adaptability; Training Wheels
+                isolates useful patterns. The goal is confidence you can
+                carry into real games.
+              </p>
               <h2>Choose a mating set</h2>
               <p>
                 Pick a material set to practise its explicit mating rules.

@@ -108,6 +108,9 @@ export function getCurrentPhase(
   session: MateSession,
 ): string {
   try {
+    if (getChess(session.fen).turn() === 'b') {
+      return session.logs.at(-1)?.phase ?? '—'
+    }
     return ruleSet.phase(session.fen)
   } catch {
     return session.logs.at(-1)?.phase ?? '—'

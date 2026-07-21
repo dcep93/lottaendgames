@@ -32,19 +32,21 @@ export default function MateSidebar({
         <nav aria-label="Mating sets" className="leg-mate-set-links">
           {MATE_CATALOG.map((entry) => {
             const isSelected = entry.id === mateId
+            const href = isSelected ? '/mate' : entry.path
             return (
               <a
-                aria-current={isSelected ? 'location' : undefined}
-                aria-label={entry.label}
+                aria-label={
+                  isSelected ? `${entry.label}, selected` : entry.label
+                }
                 className={
                   isSelected
                     ? 'leg-mate-set-link is-active'
                     : 'leg-mate-set-link'
                 }
-                href={entry.path}
+                href={href}
                 key={entry.id}
                 onClick={(event) =>
-                  handleMateNavigation(event, entry.path, onNavigate)
+                  handleMateNavigation(event, href, onNavigate)
                 }
                 title={entry.label}
               >

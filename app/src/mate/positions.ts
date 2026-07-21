@@ -11,9 +11,9 @@ import {
   getEndgamePieces,
   getSquareTransform,
   randomTransformFen,
+  squareColor,
   transformFen,
   validateMatePosition,
-  whiteBishopsAreOppositeColored,
   type EndgamePiece,
   type EndgamePiecePlacement,
 } from './chess'
@@ -149,22 +149,38 @@ function generateStandardAttempt(
 ): string | null {
   const availableSquares = allSquares()
   const placements: EndgamePiecePlacement[] = []
+  const whiteBishops = pieces.filter(
+    (piece) => piece.color === 'w' && piece.type === 'b',
+  )
+  const deferredBishop =
+    mateId === 'two-bishops' ? whiteBishops[1] : undefined
+  const orderedPieces =
+    deferredBishop === undefined
+      ? pieces
+      : [
+          ...pieces.filter((piece) => piece !== deferredBishop),
+          deferredBishop,
+        ]
 
-  for (const piece of pieces) {
-    const candidates = availableSquares.filter(
-      (square) => !piece.isPawn || (square[1] !== '1' && square[1] !== '8'),
+  for (const piece of orderedPieces) {
+    const placedBishop = placements.find(
+      (placement) =>
+        placement.color === 'w' && placement.type === 'b',
     )
+    const candidates = availableSquares.filter((square) => {
+      if (piece.isPawn && (square[1] === '1' || square[1] === '8')) {
+        return false
+      }
+      return !(
+        piece === deferredBishop &&
+        placedBishop !== undefined &&
+        squareColor(square) === squareColor(placedBishop.square)
+      )
+    })
     if (candidates.length === 0) return null
     const square = candidates[collectionIndex(candidates.length, random())]
     availableSquares.splice(availableSquares.indexOf(square), 1)
     placements.push({ ...piece, square })
-  }
-
-  if (
-    mateId === 'two-bishops' &&
-    !whiteBishopsAreOppositeColored(placements)
-  ) {
-    return null
   }
 
   const fen = `${boardFenFromPlacements(placements)} w - - 0 1`

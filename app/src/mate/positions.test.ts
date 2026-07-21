@@ -423,9 +423,32 @@ test('Standard generation is deterministic with an injected random source', () =
     'standard',
     seededRandom(123),
   )
-  assert.equal(first, '8/4K2B/k7/8/8/8/5B2/8 w - - 0 1')
-  assert.equal(second, '8/4K2B/k7/8/8/8/5B2/8 w - - 0 1')
+  assert.equal(first, '1B6/8/8/3B4/8/K1k5/8/8 w - - 0 1')
+  assert.equal(second, '1B6/8/8/3B4/8/K1k5/8/8 w - - 0 1')
   assert.deepEqual(validateMatePosition('two-bishops', first), { ok: true })
+})
+
+test('Two Bishops Standard constructively places the second bishop', () => {
+  const fen = generateMatePosition(
+    'two-bishops',
+    'standard',
+    sequenceRandom([
+      35.5 / 64,
+      16.5 / 63,
+      31.5 / 62,
+      19.5 / 31,
+    ]),
+  )
+
+  assert.equal(fen, '8/8/8/8/4k3/8/8/2B1KB2 w - - 0 1')
+  const bishops = getEndgamePiecePlacements(fen).filter(
+    (piece) => piece.color === 'w' && piece.type === 'b',
+  )
+  assert.equal(bishops.length, 2)
+  assert.notEqual(
+    squareColor(bishops[0]!.square),
+    squareColor(bishops[1]!.square),
+  )
 })
 
 test('Standard generation stops after 1000 invalid attempts and uses fallback', () => {

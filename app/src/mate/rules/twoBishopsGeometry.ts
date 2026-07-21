@@ -97,13 +97,6 @@ export function getWhiteKingBishopScreeningPenalty(fen: string): number {
       screening +
       (squareScreensSquareFromSource(
         blackKing.square,
-        bishop,
-        whiteKing.square,
-      )
-        ? 1
-        : 0) +
-      (squareScreensSquareFromSource(
-        blackKing.square,
         whiteKing.square,
         bishop,
       )
@@ -251,21 +244,17 @@ function isDiagonalEdgeWalkPhaseTwo(
   return moves.every((move) => {
     if (move.from !== blackKing || edgeDistance(move.to) !== 0) return false
     const target = squareCoordinates(move.to)
-    if (black.file === 0 || black.file === 7) {
-      return (
-        target.file === black.file &&
-        Math.abs(target.rank - white.rank) <
-          Math.abs(black.rank - white.rank)
-      )
-    }
-    if (black.rank === 0 || black.rank === 7) {
-      return (
-        target.rank === black.rank &&
-        Math.abs(target.file - white.file) <
-          Math.abs(black.file - white.file)
-      )
-    }
-    return false
+    const movesTowardWhiteOnFileEdge =
+      (black.file === 0 || black.file === 7) &&
+      target.file === black.file &&
+      Math.abs(target.rank - white.rank) <
+        Math.abs(black.rank - white.rank)
+    const movesTowardWhiteOnRankEdge =
+      (black.rank === 0 || black.rank === 7) &&
+      target.rank === black.rank &&
+      Math.abs(target.file - white.file) <
+        Math.abs(black.file - white.file)
+    return movesTowardWhiteOnFileEdge || movesTowardWhiteOnRankEdge
   })
 }
 
