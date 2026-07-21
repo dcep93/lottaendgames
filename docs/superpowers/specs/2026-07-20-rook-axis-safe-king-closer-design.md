@@ -16,33 +16,38 @@ Display:
 
 ## Evaluator
 
-For each candidate, compare the absolute horizontal and vertical distances
-between the kings before and after the move. Give the candidate an axis-
-regression penalty when either resulting distance is larger than its starting
-distance.
+For each candidate, compare the king-move distance and the absolute horizontal
+and vertical distances between the kings before and after the move. A
+productive King approach must strictly reduce king-move distance without
+increasing either axis distance.
 
-Inside the existing `king closer` priority, compare in this order:
+Rank candidates inside the existing `king closer` priority:
 
-1. avoid axis regression;
-2. minimize resulting king-move distance; then
-3. minimize resulting row-plus-file distance.
+1. a productive King approach;
+2. a neutral Rook move; then
+3. a King move that regresses an axis or does not strictly reduce king-move
+   distance.
 
-A Rook move leaves both King-axis distances unchanged and therefore has no
-regression penalty. A King move may improve one axis only if it does not worsen
-the other. The rule remains symmetric under every board rotation and
+Within a tier, minimize resulting king-move distance and then resulting
+row-plus-file distance.
+
+A Rook move leaves all King distances unchanged and is neutral. A King move may
+improve one axis only if it does not worsen the other and its king-move distance
+strictly decreases. The rule remains symmetric under every board rotation and
 reflection; neither horizontal nor vertical distance is preferred over the
 other.
 
-In the supplied position, `Kd3` improves vertical distance but worsens
-horizontal distance, so it loses at `king closer` to box-preserving Rook moves.
-The later `rook farther` priority selects `Rh3`.
+In the supplied position, `Kd3` improves king-move distance but worsens
+horizontal distance. `Kb4` improves horizontal distance but does not reduce
+king-move distance. Both lose at `king closer` to box-preserving neutral Rook
+moves. The later `rook farther` priority selects `Rh3`.
 
 ## Verification
 
 - Assert the exact visible rule copy.
 - Pin `Rh3` as the sole best move in the supplied position and assert that
   `Kd3` is rejected by `king closer`.
-- Assert the before/after axis distances and regression score directly.
+- Assert the before/after king and axis distances and approach tier directly.
 - Retain a King move that improves one axis without worsening the other,
   proving valid King approach still wins when appropriate.
 - Verify the supplied position across all D4 rotations and reflections.
