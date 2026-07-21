@@ -172,8 +172,8 @@ test('reconstructs the former exact Rook loop as undoable ordinary history', () 
   )
 
   assert.equal(replay.logs.length, 36)
-  assert.equal(replay.history.length, 37)
-  assert.equal(replay.historyIndex, 36)
+  assert.equal(replay.history.length, 73)
+  assert.equal(replay.historyIndex, 72)
   assert.equal(
     replay.fen,
     '8/8/8/3K4/8/k7/8/2R5 w - - 72 37',
@@ -185,38 +185,26 @@ test('reconstructs the former exact Rook loop as undoable ordinary history', () 
         : [{ move: index + 1, reasonId: log.reasonId, san: log.san }],
     ),
     [
-      { move: 1, reasonId: 'exact mate progress', san: 'Rb3' },
       { move: 3, reasonId: 'establish box', san: 'Rh3' },
+      { move: 8, reasonId: 'rook waiting move', san: 'Ra6' },
       { move: 9, reasonId: 'establish box', san: 'Rd6' },
-      { move: 10, reasonId: 'exact mate progress', san: 'Rd1' },
-      { move: 11, reasonId: 'establish box', san: 'Ke6' },
-      { move: 12, reasonId: 'exact mate progress', san: 'Rd2' },
-      { move: 13, reasonId: 'establish box', san: 'Rc2' },
-      { move: 15, reasonId: 'exact mate progress', san: 'Rc1' },
+      { move: 10, reasonId: 'establish box', san: 'Rd1' },
+      { move: 15, reasonId: 'king closer', san: 'Rc1' },
       { move: 18, reasonId: 'establish box', san: 'Rc4' },
-      { move: 19, reasonId: 'exact mate progress', san: 'Rh4' },
-      { move: 20, reasonId: 'exact mate progress', san: 'Rg4' },
-      { move: 21, reasonId: 'rook waiting move', san: 'Rg3+' },
-      { move: 22, reasonId: 'exact mate progress', san: 'Ke4' },
-      { move: 23, reasonId: 'exact mate progress', san: 'Kf4' },
-      { move: 24, reasonId: 'exact mate progress', san: 'Ra3' },
+      { move: 19, reasonId: 'establish box', san: 'Rh4' },
+      { move: 24, reasonId: 'king closer', san: 'Ra3' },
       { move: 26, reasonId: 'establish box', san: 'Rd3' },
-      { move: 27, reasonId: 'exact mate progress', san: 'Rd8' },
-      { move: 28, reasonId: 'exact mate progress', san: 'Rd7' },
-      { move: 29, reasonId: 'exact mate progress', san: 'Rc7' },
-      { move: 30, reasonId: 'exact mate progress', san: 'Kd5' },
-      { move: 31, reasonId: 'exact mate progress', san: 'Kd6' },
-      { move: 32, reasonId: 'exact mate progress', san: 'Rc1' },
-      { move: 33, reasonId: 'exact mate progress', san: 'Rc2' },
-      { move: 35, reasonId: 'exact mate progress', san: 'Rc8' },
+      { move: 27, reasonId: 'establish box', san: 'Rd8' },
+      { move: 33, reasonId: 'rook waiting move', san: 'Rc2' },
+      { move: 36, reasonId: 'rook waiting move', san: 'Rc1' },
     ],
   )
 
   let priorLoopPosition = replay
-  for (let turn = 0; turn < 19; turn += 1) {
+  for (let ply = 0; ply < 38; ply += 1) {
     priorLoopPosition = undoMateMove(priorLoopPosition)
   }
-  assert.equal(priorLoopPosition.historyIndex, 17)
+  assert.equal(priorLoopPosition.historyIndex, 34)
   assert.equal(positionKey(priorLoopPosition.fen), positionKey(replay.fen))
 
   let beginning = priorLoopPosition
@@ -230,7 +218,7 @@ test('reconstructs the former exact Rook loop as undoable ordinary history', () 
   assert.equal(restored.fen, replay.fen)
 })
 
-test('records a correct White move and one tied automatic Black reply as one history step', () => {
+test('records White and automatic Black moves as separate history steps', () => {
   const deps = createDeps({
     times: [1_000, 1_600],
     randoms: [0.75],
@@ -255,10 +243,12 @@ test('records a correct White move and one tied automatic Black reply as one his
     reasonId: 'finish-net',
   })
   assert.equal(session.fen, 'R7/6k1/8/8/8/8/8/K7 w - - 2 2')
-  assert.equal(session.historyIndex, 1)
-  assert.equal(session.history.length, 2)
+  assert.equal(session.historyIndex, 2)
+  assert.equal(session.history.length, 3)
   assert.equal(session.history[0]?.fen, initial.fen)
-  assert.equal(session.history[1]?.fen, session.fen)
+  assert.equal(session.history[1]?.fen, 'R6k/8/8/8/8/8/8/K7 b - - 1 1')
+  assert.equal(session.history[1]?.logs[0]?.opponentSan, undefined)
+  assert.equal(session.history[2]?.fen, session.fen)
   assert.equal(initial.logs.length, 0)
   assert.equal(getMateElapsedMs(session, 2_100), 1_100)
   assertCurrentSnapshot(session)
@@ -285,10 +275,10 @@ test('an incorrect move is explained and play continues', () => {
   session = playWhiteMove(session, nextSan, deps)
   assert.equal(session.logs.length, 2)
   assert.equal(session.logs[1]?.durationMs, 650)
-  assert.equal(session.history.length, 3)
+  assert.equal(session.history.length, 5)
 })
 
-test('undo and redo operate on complete turns and new play truncates redo', () => {
+test('undo and redo operate on half-moves and new play truncates redo', () => {
   const deps = createDeps({
     times: [1_000, 1_100, 1_300],
     randoms: [0, 0],
@@ -298,22 +288,30 @@ test('undo and redo operate on complete turns and new play truncates redo', () =
     deps,
   )
   const played = playWhiteMove(initial, 'Ra8+', deps)
-  const undone = undoMateMove(played)
+  const afterWhite = undoMateMove(played)
 
+  assert.equal(afterWhite.fen, 'R6k/8/8/8/8/8/8/K7 b - - 1 1')
+  assert.equal(afterWhite.logs.length, 1)
+  assert.equal(afterWhite.logs[0]?.opponentSan, undefined)
+  assert.equal(afterWhite.historyIndex, 1)
+
+  const undone = undoMateMove(afterWhite)
   assert.equal(undone.fen, initial.fen)
   assert.deepEqual(undone.logs, [])
   assert.equal(undone.historyIndex, 0)
   assert.equal(undoMateMove(undone), undone)
 
-  const redone = redoMateMove(undone)
+  const redoneWhite = redoMateMove(undone)
+  assert.equal(redoneWhite.fen, afterWhite.fen)
+  const redone = redoMateMove(redoneWhite)
   assert.equal(redone.fen, played.fen)
   assert.deepEqual(redone.logs, played.logs)
   assert.equal(redoMateMove(redone), redone)
 
   const replacementLine = playWhiteMove(undone, 'Rh2+', deps)
   assert.equal(replacementLine.logs[0]?.san, 'Rh2+')
-  assert.equal(replacementLine.historyIndex, 1)
-  assert.equal(replacementLine.history.length, 2)
+  assert.equal(replacementLine.historyIndex, 2)
+  assert.equal(replacementLine.history.length, 3)
   assert.notEqual(replacementLine.fen, played.fen)
 })
 
@@ -406,11 +404,12 @@ test('historical White replacement truncates the line, preserves timing, and kee
   assert.equal(replaced.logs[0]?.opponentSan, 'Kh7')
   assert.equal(replaced.logs[0]?.durationMs, originalDuration)
   assert.equal(replaced.logs[0]?.isCorrect, true)
-  assert.equal(replaced.historyIndex, 3)
-  assert.equal(replaced.history.length, 4)
-  const restored = undoMateMove(replaced)
-  assert.deepEqual(restored.logs, session.logs)
-  assert.equal(restored.fen, session.fen)
+  assert.equal(replaced.historyIndex, 2)
+  assert.equal(replaced.history.length, 3)
+  const afterReplacementWhite = undoMateMove(replaced)
+  assert.equal(afterReplacementWhite.logs[0]?.san, 'Ra8+')
+  assert.equal(afterReplacementWhite.logs[0]?.opponentSan, undefined)
+  assert.deepEqual(undoMateMove(afterReplacementWhite).logs, [])
   assertCurrentSnapshot(replaced)
 })
 
@@ -462,9 +461,9 @@ test('historical Black replacement accepts any legal reply and truncates later t
   assert.equal(replaced.logs[0]?.durationMs, originalDuration)
   assert.equal(replaced.logs[0]?.idealOpponentChoices, 2)
   assert.equal(replaced.logs[0]?.legalOpponentChoices, 3)
-  assert.equal(replaced.historyIndex, 3)
-  assert.equal(replaced.history.length, 4)
-  assert.deepEqual(undoMateMove(replaced).logs, session.logs)
+  assert.equal(replaced.historyIndex, 2)
+  assert.equal(replaced.history.length, 3)
+  assert.equal(undoMateMove(replaced).logs[0]?.opponentSan, undefined)
   assertCurrentSnapshot(replaced)
 })
 
@@ -667,8 +666,9 @@ test('a terminal historical replacement uses its original move time and remains 
   assert.equal(replaced.outcome, 'checkmate')
   assert.equal(replaced.finishedAtMs, 1_400)
   assert.equal(getMateElapsedMs(replaced, 50_000), 400)
-  assert.deepEqual(undoMateMove(replaced).logs, session.logs)
-  assert.equal(redoMateMove(undoMateMove(replaced)).finishedAtMs, 1_400)
+  const beginning = undoMateMove(replaced)
+  assert.deepEqual(beginning.logs, [])
+  assert.equal(redoMateMove(beginning).finishedAtMs, 1_400)
 })
 
 test('historical White replacement rejects a legal nonideal move without consuming dependencies', () => {

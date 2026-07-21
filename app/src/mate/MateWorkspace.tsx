@@ -14,6 +14,7 @@ import {
   createMateSession,
   createMateReplaySession,
   getMateElapsedMs,
+  getReloadableMateFen,
   playBestMateMove,
   playWhiteMove,
   redoMateMove,
@@ -122,7 +123,11 @@ export default function MateWorkspace({
 
   React.useEffect(() => {
     onReplaceHref?.(
-      liveMateHref(session.mateId, session.mode, session.fen),
+      liveMateHref(
+        session.mateId,
+        session.mode,
+        getReloadableMateFen(session),
+      ),
     )
   }, [onReplaceHref, session])
 

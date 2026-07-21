@@ -1865,7 +1865,11 @@ test('Mate loads replay history at its final position for Undo and Redo', async 
     })
     assert.equal(
       mountedRenderer.root.findByType(MateBoardProbe).props.fen,
-      ROOK_START,
+      ROOK_AFTER_WHITE,
+    )
+    assert.equal(
+      mountedRenderer.root.findByType(MateLog).props.logs[0]?.opponentSan,
+      undefined,
     )
     assert.equal(mountedRenderer.root.findByType(MateControls).props.canRedo, true)
 
@@ -1904,10 +1908,10 @@ test('Mate syncs the current live FEN after session transitions', async () => {
     const mountedRenderer = renderer as ReactTestRenderer
     const currentFen = () =>
       mountedRenderer.root.findByType(MateBoardProbe).props.fen as string
-    const assertLatestHref = () =>
+    const assertLatestHref = (fen = currentFen()) =>
       assert.equal(
         hrefs.at(-1),
-        liveMateHref('rook', 'standard', currentFen()),
+        liveMateHref('rook', 'standard', fen),
       )
 
     assertLatestHref()
@@ -1920,13 +1924,21 @@ test('Mate syncs the current live FEN after session transitions', async () => {
     await act(async () => {
       mountedRenderer.root.findByType(MateControls).props.onUndo()
     })
-    assert.equal(currentFen(), MULTI_BLACK_START)
-    assertLatestHref()
+    assert.notEqual(currentFen(), MULTI_BLACK_START)
+    assert.notEqual(currentFen(), playedFen)
+    assertLatestHref(MULTI_BLACK_START)
 
     await act(async () => {
       mountedRenderer.root.findByType(MateControls).props.onRedo()
     })
     assert.equal(currentFen(), playedFen)
+    assertLatestHref()
+
+    await act(async () => {
+      mountedRenderer.root.findByType(MateControls).props.onUndo()
+      mountedRenderer.root.findByType(MateControls).props.onUndo()
+    })
+    assert.equal(currentFen(), MULTI_BLACK_START)
     assertLatestHref()
 
     await act(async () => {

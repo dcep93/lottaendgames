@@ -77,6 +77,9 @@ export type MateSessionDeps = {
 }
 
 type CompletedTurn = {
+  readonly whiteFen: string
+  readonly whiteLog: MateLogEntry
+  readonly whiteOutcome: MateTerminalOutcome | undefined
   readonly fen: string
   readonly log: MateLogEntry
   readonly outcome: MateTerminalOutcome | undefined
@@ -140,6 +143,30 @@ function commitSnapshot(
     finishedAtMs,
     outcome,
   }
+}
+
+function commitCompletedTurn(
+  session: MateSession,
+  completed: CompletedTurn,
+  prefixLogs: readonly MateLogEntry[],
+  transitionAtMs: number,
+): MateSession {
+  let next = commitSnapshot(
+    session,
+    completed.whiteFen,
+    [...prefixLogs, completed.whiteLog],
+    transitionAtMs,
+    completed.whiteOutcome,
+  )
+  if (completed.log.opponentSan === undefined) return next
+  next = commitSnapshot(
+    next,
+    completed.fen,
+    [...prefixLogs, completed.log],
+    transitionAtMs,
+    completed.outcome,
+  )
+  return next
 }
 
 function tryMove(chess: Chess, san: string) {
@@ -225,7 +252,9 @@ function completeWhiteTurn(options: {
       ? undefined
       : ruleSet.explainWhiteMove(preMoveFen, canonicalSan) ??
         (isCorrect ? ruleSet.currentWhiteHint(preMoveFen) : undefined)
-  let outcome = getMateTerminalOutcome(mateId, chess.fen())
+  const whiteFen = chess.fen()
+  const whiteOutcome = getMateTerminalOutcome(mateId, whiteFen)
+  let outcome = whiteOutcome
   let opponentSan: string | undefined
   let idealOpponentChoices: number | undefined
   let legalOpponentChoices: number | undefined
@@ -267,26 +296,32 @@ function completeWhiteTurn(options: {
     }
   }
 
+  const whiteLog: MateLogEntry = {
+    fen: preMoveFen,
+    san: canonicalSan,
+    phase: ruleSet.phase(preMoveFen),
+    isCorrect,
+    correctChoices: idealWhiteMoves.length,
+    ...(idealOpponentChoices === undefined
+      ? {}
+      : { idealOpponentChoices }),
+    ...(legalOpponentChoices === undefined
+      ? {}
+      : { legalOpponentChoices }),
+    durationMs,
+    // The facade can legitimately have no differentiating rule when every
+    // legal move ties. Keep the required log field stable and empty-safe.
+    reasonId: reason?.id ?? NO_PREFERRED_RULE_ID,
+  }
   return {
+    whiteFen,
+    whiteLog,
+    whiteOutcome,
     fen: chess.fen(),
     outcome,
     log: {
-      fen: preMoveFen,
-      san: canonicalSan,
+      ...whiteLog,
       ...(opponentSan === undefined ? {} : { opponentSan }),
-      phase: ruleSet.phase(preMoveFen),
-      isCorrect,
-      correctChoices: idealWhiteMoves.length,
-      ...(idealOpponentChoices === undefined
-        ? {}
-        : { idealOpponentChoices }),
-      ...(legalOpponentChoices === undefined
-        ? {}
-        : { legalOpponentChoices }),
-      durationMs,
-      // The facade can legitimately have no differentiating rule when every
-      // legal move ties. Keep the required log field stable and empty-safe.
-      reasonId: reason?.id ?? NO_PREFERRED_RULE_ID,
     },
   }
 }
@@ -367,12 +402,11 @@ export function createMateReplaySession(
     ) {
       throw new Error(`Mate replay rejected turn ${index / 2 + 1}`)
     }
-    session = commitSnapshot(
+    session = commitCompletedTurn(
       session,
-      completed.fen,
-      [...session.logs, completed.log],
+      completed,
+      session.logs,
       session.startedAtMs,
-      completed.outcome,
     )
   }
   return session
@@ -396,12 +430,11 @@ export function playWhiteMove(
     deps,
   })
   if (completed === undefined) return session
-  return commitSnapshot(
+  return commitCompletedTurn(
     session,
-    completed.fen,
-    [...session.logs, completed.log],
+    completed,
+    session.logs,
     transitionAtMs,
-    completed.outcome,
   )
 }
 
@@ -430,6 +463,20 @@ export function undoMateMove(session: MateSession): MateSession {
 export function redoMateMove(session: MateSession): MateSession {
   if (session.historyIndex >= session.history.length - 1) return session
   return applySnapshot(session, session.historyIndex + 1)
+}
+
+export function getReloadableMateFen(session: MateSession): string {
+  for (let index = session.historyIndex; index >= 0; index -= 1) {
+    const snapshot = session.history[index]
+    if (snapshot === undefined) continue
+    if (
+      snapshot.outcome !== undefined ||
+      getChess(snapshot.fen).turn() === 'w'
+    ) {
+      return snapshot.fen
+    }
+  }
+  return session.startingFen
 }
 
 export function startOverMateSession(
@@ -469,12 +516,18 @@ export function replaceHistoricalWhiteMove(
     deps,
   })
   if (completed === undefined) return session
-  return commitSnapshot(
-    session,
-    completed.fen,
-    [...prefixLogs, completed.log],
+  const baseIndex = session.history.findIndex(
+    (snapshot, index) =>
+      index <= session.historyIndex &&
+      snapshot.logs.length === logIndex &&
+      getChess(snapshot.fen).turn() === 'w',
+  )
+  if (baseIndex < 0) return session
+  return commitCompletedTurn(
+    applySnapshot(session, baseIndex),
+    completed,
+    prefixLogs,
     historicalWhiteMoveAtMs(session, logIndex),
-    completed.outcome,
   )
 }
 
@@ -510,8 +563,16 @@ export function replaceHistoricalBlackMove(
     idealOpponentChoices: candidates.idealMoves.length,
     legalOpponentChoices: candidates.moves.length,
   }
+  const whiteSnapshotIndex = session.history.findIndex(
+    (snapshot, index) =>
+      index <= session.historyIndex &&
+      snapshot.logs.length === logIndex + 1 &&
+      snapshot.logs[logIndex]?.opponentSan === undefined &&
+      getChess(snapshot.fen).turn() === 'b',
+  )
+  if (whiteSnapshotIndex < 0) return session
   return commitSnapshot(
-    session,
+    applySnapshot(session, whiteSnapshotIndex),
     chess.fen(),
     [...prefixLogs, replacementLog],
     historicalWhiteMoveAtMs(session, logIndex),
