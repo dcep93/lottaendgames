@@ -296,6 +296,98 @@ test('click and drag render White optimistically, then animate only the reply', 
   }
 })
 
+test('pointer board interactions release only board focus', async () => {
+  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
+    .IS_REACT_ACT_ENVIRONMENT = true
+  const originalDocument = globalThis.document
+  let blurs = 0
+  const focusedBoardChild = {
+    blur: () => {
+      blurs += 1
+    },
+  } as unknown as Element
+  const boardNode = {
+    contains: (candidate: Node | null) => candidate === focusedBoardChild,
+  }
+  function BoardProbe({ options }: BoardRendererProps) {
+    return <div data-position={String(options?.position)} />
+  }
+  Object.defineProperty(globalThis, 'document', {
+    configurable: true,
+    value: { activeElement: focusedBoardChild },
+  })
+  let renderer: ReactTestRenderer | undefined
+
+  try {
+    await act(async () => {
+      renderer = TestRenderer.create(
+        <MateBoardSurface
+          boardRenderer={BoardProbe}
+          disabled={false}
+          fen={ROOK_START}
+          lastMove={null}
+          onMove={() => undefined}
+          phase="1/2"
+        />,
+        {
+          createNodeMock: (element) =>
+            (element.props as Record<string, unknown>)['aria-label'] ===
+            'Mate board, White orientation'
+              ? boardNode
+              : {},
+        },
+      )
+    })
+    const mountedRenderer = renderer as ReactTestRenderer
+    const boardShell = mountedRenderer.root.findByProps({
+      'aria-label': 'Mate board, White orientation',
+    })
+
+    await act(async () => {
+      assert.equal(
+        currentOptions(mountedRenderer).onPieceDrop?.({
+          piece: {
+            isSparePiece: false,
+            pieceType: 'wR',
+            position: 'a2',
+          },
+          sourceSquare: 'a2',
+          targetSquare: 'a2',
+        }),
+        false,
+      )
+    })
+    assert.equal(blurs, 0, 'keyboard interaction kept board focus')
+
+    boardShell.props.onPointerDownCapture()
+    boardShell.props.onPointerUpCapture()
+    assert.equal(blurs, 1, 'pointer click released board focus')
+
+    boardShell.props.onPointerDownCapture()
+    await act(async () => {
+      assert.equal(
+        currentOptions(mountedRenderer).onPieceDrop?.({
+          piece: {
+            isSparePiece: false,
+            pieceType: 'wR',
+            position: 'a2',
+          },
+          sourceSquare: 'a2',
+          targetSquare: 'a8',
+        }),
+        true,
+      )
+    })
+    assert.equal(blurs, 2, 'pointer drag released board focus')
+  } finally {
+    if (renderer) await act(async () => renderer?.unmount())
+    Object.defineProperty(globalThis, 'document', {
+      configurable: true,
+      value: originalDocument,
+    })
+  }
+})
+
 test('pending board state rolls back or unmounts safely when the parent declines', async () => {
   ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
     .IS_REACT_ACT_ENVIRONMENT = true

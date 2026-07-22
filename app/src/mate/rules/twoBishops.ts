@@ -12,6 +12,7 @@ import {
   whiteBishopsAreAdjacent,
 } from './twoBishopsGeometry'
 import {
+  getPhaseTwoCornerSupportDistance,
   phaseTwoBishopCornerDistance,
   phaseTwoCheckPenalty,
   phaseTwoForceOpponentCornerPenalty,
@@ -39,6 +40,7 @@ export type TwoBishopsWhiteMoveScore = {
   readonly bishopSafetyPenalty: number
   readonly phaseTwoStayPhaseTwoPenalty: number
   readonly phaseTwoWaitingMovePenalty: number
+  readonly phaseTwoCornerSupportDistance: number | null
   readonly phaseTwoForceOpponentOppositionPenalty: number
   readonly phaseTwoTakeDirectOppositionPenalty: number
   readonly phaseTwoPushFromControlledEdgeSquarePenalty: number
@@ -75,7 +77,7 @@ const twoBishopsHelp: RuleHelp = {
   ],
   notes: [
     "Phase 2 is where Black's king is on an edge and White's king controls at least 2 squares in front of Black's king. Phase 2 also includes positions where White's king is two diagonal squares from Black's king and Black is forced to move along the edge toward White's king.",
-    "The phase 2 waiting move is a bishop move for a boxed-in king: either the line-pattern waiting move that keeps the wall, or the corner waiting move that lets that bishop cover Black's single escape square after Black moves.",
+    'A phase 2 waiting move keeps the mating net while making Black move.',
   ],
   noteBoards: [],
 }
@@ -104,6 +106,10 @@ export function scoreTwoBishopsWhiteMove(
       move.from,
       move.to,
       waitingMoveContext,
+    ),
+    phaseTwoCornerSupportDistance: getPhaseTwoCornerSupportDistance(
+      fen,
+      resultFen,
     ),
     phaseTwoForceOpponentOppositionPenalty:
       phaseTwoForceOpponentOppositionPenalty(fen, resultFen),
@@ -167,9 +173,19 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
     id: 'waiting move',
     shortLabel: 'waiting move',
     helpText:
-      'Phase 2: use the specific bishop waiting move when Black is boxed in.',
+      "When the kings are a knight's move apart and the bishops are together, move a bishop one square toward the center without losing phase 2.",
     compare: (first, second) =>
       first.phaseTwoWaitingMovePenalty - second.phaseTwoWaitingMovePenalty,
+  },
+  {
+    id: 'corner support',
+    shortLabel: 'corner support',
+    helpText:
+      "When Black is in a corner or one edge-square beside it, place White's king a knight's move from that corner.",
+    applies: (score) => score.phaseTwoCornerSupportDistance !== null,
+    compare: (first, second) =>
+      (first.phaseTwoCornerSupportDistance ?? 0) -
+      (second.phaseTwoCornerSupportDistance ?? 0),
   },
   {
     id: 'force opponent to take opposition',
@@ -372,8 +388,11 @@ export {
   getBlackKingFrontSquares,
   isTwoBishopsPhaseTwoPosition,
 } from './twoBishopsGeometry'
-export { getPhaseTwoControlledOppositionEdgeSquares } from './twoBishopsPhaseTwo'
 export {
-  getTwoBishopsCornerWaitingMoves,
+  getPhaseTwoCornerSupportDistance,
+  getPhaseTwoControlledOppositionEdgeSquares,
+} from './twoBishopsPhaseTwo'
+export {
+  getTwoBishopsKnightDistanceWaitingMoves,
   getTwoBishopsPhaseTwoWaitingMoveTargets,
 } from './twoBishopsWaitingMoves'

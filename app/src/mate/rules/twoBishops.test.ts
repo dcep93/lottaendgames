@@ -4,6 +4,8 @@ import { getChess, SQUARE_TRANSFORMS, transformFen } from '../chess'
 import {
   compareTwoBishopsBlackScores,
   getMateRuleSet,
+  getPhaseTwoCornerSupportDistance,
+  getTwoBishopsKnightDistanceWaitingMoves,
   scoreTwoBishopsBlackMove,
   scoreTwoBishopsWhiteMove,
   twoBishopsWhiteRules,
@@ -18,6 +20,7 @@ const WHITE_RULE_IDS = [
   'bishops safe',
   'keep phase two',
   'waiting move',
+  'corner support',
   'force opponent to take opposition',
   'take direct opposition',
   'push from controlled edge square',
@@ -74,14 +77,14 @@ const WHITE_PARITY_FIXTURES: readonly WhiteParityFixture[] = [
     idealBlackReplies: { Bd3: ['Ka3'] },
   },
   {
-    category: 'phase-two corner waiting move',
+    category: 'phase-two knight-distance move by the corner',
     fen: '8/8/2B5/2B5/8/8/2K5/k7 w - - 40 21',
     phase: '2/2',
-    idealMoves: ['Be4'],
+    idealMoves: ['Bd4+'],
     hint: 'waiting move',
-    sampledMove: 'Bf3',
+    sampledMove: 'Be4',
     sampledReason: 'waiting move',
-    idealBlackReplies: { Be4: ['Ka2'] },
+    idealBlackReplies: { 'Bd4+': ['Ka2'] },
   },
   {
     category: 'phase-two entry',
@@ -98,20 +101,20 @@ const WHITE_PARITY_FIXTURES: readonly WhiteParityFixture[] = [
     fen: '8/1B6/8/6B1/8/5K2/7k/8 w - - 0 1',
     phase: '2/2',
     idealMoves: ['Kf2'],
-    hint: 'take direct opposition',
+    hint: 'corner support',
     sampledMove: 'Ba8',
-    sampledReason: 'take direct opposition',
+    sampledReason: 'corner support',
     idealBlackReplies: { Kf2: ['Kh3'] },
   },
   {
-    category: 'direct opposition',
+    category: 'knight-distance waiting before direct opposition',
     fen: '8/7k/5K2/8/6B1/6B1/8/8 w - - 64 33',
     phase: '2/2',
-    idealMoves: ['Kf7'],
-    hint: 'take direct opposition',
-    sampledMove: 'Bf4',
-    sampledReason: 'take direct opposition',
-    idealBlackReplies: { Kf7: ['Kh6'] },
+    idealMoves: ['Bf5+'],
+    hint: 'check king',
+    sampledMove: 'Kf7',
+    sampledReason: 'waiting move',
+    idealBlackReplies: { 'Bf5+': ['Kh6'] },
   },
   {
     category: 'controlled-edge push',
@@ -331,6 +334,90 @@ test('Two Bishops phase two lets a corner continue toward White on either edge',
   }
 })
 
+test('Two Bishops uses a centerward waiting move at knight king distance', () => {
+  const fen = '8/8/8/8/8/2K5/5BB1/1k6 w - - 0 1'
+  const ruleSet = getMateRuleSet('two-bishops')
+
+  assert.deepEqual(getTwoBishopsKnightDistanceWaitingMoves(fen), [
+    { from: 'f2', to: 'e3' },
+    { from: 'g2', to: 'f3' },
+  ])
+  assert.deepEqual(ruleSet.idealWhiteMoves(fen), ['Bf3'])
+  assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'bishops together')
+  assert.equal(ruleSet.explainWhiteMove(fen, 'Kb3')?.id, 'waiting move')
+  assert.equal(ruleSet.explainWhiteMove(fen, 'Be3')?.id, 'bishops together')
+
+  for (const transform of SQUARE_TRANSFORMS) {
+    const transformed = transformFen(fen, transform)
+    assert.equal(
+      getTwoBishopsKnightDistanceWaitingMoves(transformed).length,
+      2,
+      transform.name,
+    )
+    assert.equal(
+      ruleSet.idealWhiteMoves(transformed).length,
+      1,
+      transform.name,
+    )
+  }
+})
+
+test('Two Bishops waiting move falls back when no safe centerward move exists', () => {
+  const fen = '8/8/8/8/8/1K6/5BB1/2k5 w - - 2 2'
+  const ruleSet = getMateRuleSet('two-bishops')
+
+  assert.deepEqual(getTwoBishopsKnightDistanceWaitingMoves(fen), [])
+  assert.deepEqual(ruleSet.idealWhiteMoves(fen), ['Kc3'])
+})
+
+test('Two Bishops corner support is current-position geometry', () => {
+  const cornerFen = '7k/8/3B1K2/3B4/8/8/8/8 w - - 0 1'
+  const adjacentFen = '8/5K1k/3B4/3B4/8/8/8/8 w - - 2 2'
+  const outsideCornerArea = '8/5K2/3B3k/8/4B3/8/8/8 w - - 0 1'
+  const ruleSet = getMateRuleSet('two-bishops')
+
+  assert.deepEqual(ruleSet.idealWhiteMoves(cornerFen), ['Kf7'])
+  assert.equal(
+    scoreTwoBishopsWhiteMove(cornerFen, 'Kf7')
+      .phaseTwoCornerSupportDistance,
+    0,
+  )
+  assert.equal(
+    scoreTwoBishopsWhiteMove(cornerFen, 'Be6')
+      .phaseTwoCornerSupportDistance,
+    1,
+  )
+  assert.equal(ruleSet.explainWhiteMove(cornerFen, 'Be6')?.id, 'corner support')
+  assert.equal(
+    getPhaseTwoCornerSupportDistance(adjacentFen, adjacentFen),
+    0,
+  )
+  assert.equal(
+    getPhaseTwoCornerSupportDistance(outsideCornerArea, outsideCornerArea),
+    null,
+  )
+
+  for (const transform of SQUARE_TRANSFORMS) {
+    const transformed = transformFen(cornerFen, transform)
+    const idealMoves = ruleSet.idealWhiteMoves(transformed)
+    assert.equal(idealMoves.length, 1, transform.name)
+    assert.equal(
+      scoreTwoBishopsWhiteMove(transformed, idealMoves[0]!)
+        .phaseTwoCornerSupportDistance,
+      0,
+      transform.name,
+    )
+  }
+})
+
+test('Two Bishops keeps knight-distance waiting ahead of corner support', () => {
+  const fen = '8/8/8/8/8/2K5/5BB1/1k6 w - - 0 1'
+  const ruleSet = getMateRuleSet('two-bishops')
+
+  assert.deepEqual(ruleSet.idealWhiteMoves(fen), ['Bf3'])
+  assert.equal(ruleSet.explainWhiteMove(fen, 'Kb3')?.id, 'waiting move')
+})
+
 test('Two Bishops phase two counts one-edge-step opposition pressure', () => {
   const fen = '8/8/8/B7/B7/8/2K5/k7 w - - 0 1'
   const ruleSet = getMateRuleSet('two-bishops')
@@ -438,6 +525,6 @@ test('Two Bishops help preserves concrete phase-two guidance', () => {
   ])
   assert.deepEqual(help.notes, [
     "Phase 2 is where Black's king is on an edge and White's king controls at least 2 squares in front of Black's king. Phase 2 also includes positions where White's king is two diagonal squares from Black's king and Black is forced to move along the edge toward White's king.",
-    "The phase 2 waiting move is a bishop move for a boxed-in king: either the line-pattern waiting move that keeps the wall, or the corner waiting move that lets that bishop cover Black's single escape square after Black moves.",
+    'A phase 2 waiting move keeps the mating net while making Black move.',
   ])
 })

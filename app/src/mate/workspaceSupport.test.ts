@@ -3,6 +3,7 @@ import test from 'node:test'
 import {
   getCurrentPhase,
   liveMateHref,
+  releaseFocusWithin,
   releasePointerButtonFocus,
 } from './workspaceSupport'
 import type { RegisteredMateRuleSet } from './rules'
@@ -150,4 +151,46 @@ test('pointer-clicked Mate buttons release focus without affecting keyboard acti
   )
   releasePointerButtonFocus(1, { tagName: 'DIV' } as unknown as EventTarget)
   releasePointerButtonFocus(1, null)
+})
+
+test('Mate board focus release is scoped to focused descendants', () => {
+  let blurs = 0
+  const focusedBoardChild = {
+    blur: () => {
+      blurs += 1
+    },
+  } as unknown as Element
+  const outsideElement = {
+    blur: () => {
+      blurs += 10
+    },
+  } as unknown as Element
+  const board = {
+    contains: (candidate: Node | null) => candidate === focusedBoardChild,
+  } as Pick<HTMLElement, 'contains'>
+
+  releaseFocusWithin(board, focusedBoardChild)
+  assert.equal(blurs, 1)
+
+  releaseFocusWithin(board, outsideElement)
+  releaseFocusWithin(null, focusedBoardChild)
+  releaseFocusWithin(board, null)
+  assert.equal(blurs, 1)
+
+  assert.doesNotThrow(() =>
+    releaseFocusWithin(
+      {
+        contains: () => {
+          throw new Error('detached')
+        },
+      } as unknown as Pick<HTMLElement, 'contains'>,
+      focusedBoardChild,
+    ),
+  )
+  assert.doesNotThrow(() =>
+    releaseFocusWithin(
+      { contains: () => true } as unknown as Pick<HTMLElement, 'contains'>,
+      {} as Element,
+    ),
+  )
 })

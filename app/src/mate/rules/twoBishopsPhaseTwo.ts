@@ -42,6 +42,42 @@ function getDirectOppositionSquares(square: Square): Square[] {
   ].filter((candidate): candidate is Square => candidate !== null)
 }
 
+function getKnightMoveSquares(square: Square): Square[] {
+  const { file, rank } = squareCoordinates(square)
+  return [
+    [-2, -1],
+    [-2, 1],
+    [-1, -2],
+    [-1, 2],
+    [1, -2],
+    [1, 2],
+    [2, -1],
+    [2, 1],
+  ].map(([fileOffset, rankOffset]) =>
+    squareFromCoordinates(file + fileOffset, rank + rankOffset),
+  ).filter((candidate): candidate is Square => candidate !== null)
+}
+
+export function getPhaseTwoCornerSupportDistance(
+  fen: string,
+  resultFen: string,
+): number | null {
+  if (!isTwoBishopsPhaseTwoPosition(fen)) return null
+  const blackKing = findPiece(fen, 'b', 'k')
+  const whiteKing = findPiece(resultFen, 'w', 'k')
+  if (!blackKing || !whiteKing) return null
+  const nearbyCorners = getCurrentEdgeCorners(blackKing.square).filter(
+    (corner) => kingDistance(blackKing.square, corner) <= 1,
+  )
+  if (nearbyCorners.length !== 1) return null
+  const supportSquares = getKnightMoveSquares(nearbyCorners[0])
+  return Math.min(
+    ...supportSquares.map((square) =>
+      kingDistance(whiteKing.square, square),
+    ),
+  )
+}
+
 function isOneEdgeKingMoveFromDirectOpposition(
   whiteKing: Square,
   blackKing: Square,

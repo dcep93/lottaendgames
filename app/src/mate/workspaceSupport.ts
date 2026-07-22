@@ -190,6 +190,24 @@ export function releasePointerButtonFocus(
   }
 }
 
+export function releaseFocusWithin(
+  container: Pick<HTMLElement, 'contains'> | null,
+  activeElement: Element | null =
+    typeof document === 'undefined' ? null : document.activeElement,
+): void {
+  if (container === null || activeElement === null) return
+  try {
+    if (
+      container.contains(activeElement) &&
+      typeof (activeElement as { blur?: unknown }).blur === 'function'
+    ) {
+      ;(activeElement as unknown as { blur: () => void }).blur()
+    }
+  } catch {
+    // Detached or test-only DOM stand-ins are harmless here.
+  }
+}
+
 export function exactMateHref(
   mateId: MateId,
   mode: MateMode,

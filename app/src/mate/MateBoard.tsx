@@ -18,6 +18,7 @@ import {
   getMateBoardSquareStyles,
   resolveMateBoardMove,
 } from './boardInteraction'
+import { releaseFocusWithin } from './workspaceSupport'
 
 export type MateBoardProps = {
   readonly fen: string
@@ -97,6 +98,8 @@ export function MateBoardSurface({
     null,
   )
   const moveId = React.useRef(0)
+  const boardShellRef = React.useRef<HTMLDivElement>(null)
+  const pointerInteractionRef = React.useRef(false)
   const phaseId = React.useId()
 
   useEffect(() => {
@@ -161,6 +164,14 @@ export function MateBoardSurface({
     })
     return true
   }
+  const beginPointerInteraction = () => {
+    pointerInteractionRef.current = true
+  }
+  const releasePointerFocus = () => {
+    if (!pointerInteractionRef.current) return
+    releaseFocusWithin(boardShellRef.current)
+    pointerInteractionRef.current = false
+  }
 
   return (
     <div className="leg-mate-board-card">
@@ -168,6 +179,7 @@ export function MateBoardSurface({
         {complete ? 'Complete' : `Phase ${phase}`}
       </p>
       <div
+        ref={boardShellRef}
         aria-describedby={phaseId}
         aria-disabled={disabled}
         aria-label="Mate board, White orientation"
@@ -180,6 +192,9 @@ export function MateBoardSurface({
         data-phase={phase}
         data-position-state={isOptimistic ? 'optimistic' : 'controlled'}
         data-reply-animation-ms={MATE_MOVE_ANIMATION_MS}
+        onPointerCancelCapture={releasePointerFocus}
+        onPointerDownCapture={beginPointerInteraction}
+        onPointerUpCapture={releasePointerFocus}
         role="group"
       >
         <BoardRenderer
@@ -203,7 +218,9 @@ export function MateBoardSurface({
             onPieceDrag: ({ square }) => selectSquare(square),
             onPieceDrop: ({ sourceSquare, targetSquare }) => {
               setSelectedSquare(null)
-              return moveFromTo(sourceSquare, targetSquare)
+              const moved = moveFromTo(sourceSquare, targetSquare)
+              releasePointerFocus()
+              return moved
             },
             onSquareClick: ({ square }) => {
               if (selectedSquare === null) {

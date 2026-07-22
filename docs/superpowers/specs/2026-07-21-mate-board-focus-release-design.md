@@ -8,15 +8,18 @@ not leave a focused internal chessboard element that intercepts the arrow keys.
 
 ## Interaction
 
-`MateBoardSurface` owns a reference to the board shell. After each piece click,
-square click, and piece drop callback, it checks `document.activeElement`. If the
-focused element is inside that board shell and supports `blur()`, the board
-blurs it. The move and selection behavior remains unchanged.
+`MateBoardSurface` owns a reference to the board shell and tracks whether the
+current interaction began with a pointer. When that pointer is released or
+cancelled, it checks `document.activeElement`. If the focused element is inside
+the board shell and supports `blur()`, the board blurs it. A completed drop also
+performs the check so a release outside the shell is covered. The move and
+selection behavior remains unchanged.
 
-Focus outside the board is untouched. The existing shortcut exclusions for
-buttons, links, and form controls remain unchanged, so keyboard-focused controls
-retain their accessible behavior. Missing browser globals, detached nodes, and
-non-blurrable active elements are harmless no-ops.
+Focus outside the board is untouched. Keyboard-initiated board interactions do
+not set the pointer marker, so their focus is preserved. The existing shortcut
+exclusions for buttons, links, and form controls remain unchanged. Missing
+browser globals, detached nodes, and non-blurrable active elements are harmless
+no-ops.
 
 ## Structure
 
@@ -29,6 +32,6 @@ unit coverage.
 
 Tests cover a focused board descendant, focus outside the board, absent DOM
 state, containment errors, and elements without `blur()`. Presentation tests
-verify that piece clicks, square clicks, and drops all invoke focus release while
-preserving their existing selection and move results. Run the focused Mate board
-tests, lint, and the production build.
+verify pointer release and drag/drop focus release while preserving keyboard
+focus and the existing move result. Run the focused Mate board tests, lint, and
+the production build.

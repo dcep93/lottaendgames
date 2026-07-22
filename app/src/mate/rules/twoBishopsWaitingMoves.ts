@@ -1,6 +1,5 @@
 import type { Square } from 'chess.js'
 import {
-  edgeDistance,
   findPiece,
   getChess,
   kingDistance,
@@ -9,11 +8,8 @@ import {
   squareFromCoordinates,
 } from '../chess'
 import {
-  bishopControlsOrOccupiesSquare,
   centerDistance,
-  getWhiteBishopDistanceToSquare,
   getWhiteBishopSquares,
-  isCorner,
   isTwoBishopsPhaseTwoPosition,
   whiteBishopsAreAdjacent,
 } from './twoBishopsGeometry'
@@ -29,7 +25,7 @@ export type TwoBishopsLineWaitingMoveTargets = {
 }
 
 export type TwoBishopsWaitingMoveContext = {
-  readonly cornerMoves: readonly TwoBishopsWaitingMove[]
+  readonly knightDistanceMoves: readonly TwoBishopsWaitingMove[]
   readonly lineTargets: TwoBishopsLineWaitingMoveTargets | null
 }
 
@@ -67,6 +63,57 @@ function isLegalMove(fen: string, from: Square, to: Square): boolean {
   } catch {
     return false
   }
+}
+
+function kingsAreAKnightMoveApart(fen: string): boolean {
+  const whiteKing = findPiece(fen, 'w', 'k')
+  const blackKing = findPiece(fen, 'b', 'k')
+  if (!whiteKing || !blackKing) return false
+  const white = squareCoordinates(whiteKing.square)
+  const black = squareCoordinates(blackKing.square)
+  const distances = [
+    Math.abs(white.file - black.file),
+    Math.abs(white.rank - black.rank),
+  ].sort((first, second) => first - second)
+  return distances[0] === 1 && distances[1] === 2
+}
+
+function keepsPhaseTwoAfterEveryBlackReply(
+  fen: string,
+  from: Square,
+  to: Square,
+): boolean {
+  const afterWhite = getChess(fen)
+  if (afterWhite.move({ from, to }) === null) return false
+  const blackMoves = afterWhite.moves()
+  if (blackMoves.length === 0) return false
+  return blackMoves.every((san) => {
+    const afterBlack = getChess(afterWhite.fen())
+    afterBlack.move(san)
+    return isTwoBishopsPhaseTwoPosition(afterBlack.fen())
+  })
+}
+
+export function getTwoBishopsKnightDistanceWaitingMoves(
+  fen: string,
+): TwoBishopsWaitingMove[] {
+  if (
+    !isTwoBishopsPhaseTwoPosition(fen) ||
+    !kingsAreAKnightMoveApart(fen) ||
+    !whiteBishopsAreAdjacent(fen)
+  ) {
+    return []
+  }
+  return getChess(fen)
+    .moves({ verbose: true })
+    .filter(
+      (move) =>
+        move.piece === 'b' &&
+        kingDistance(move.from, move.to) === 1 &&
+        centerDistance(move.to) < centerDistance(move.from) &&
+        keepsPhaseTwoAfterEveryBlackReply(fen, move.from, move.to),
+    )
+    .map(({ from, to }) => ({ from, to }))
 }
 
 export function getTwoBishopsPhaseTwoWaitingMoveTargets(
@@ -117,123 +164,11 @@ export function getTwoBishopsPhaseTwoWaitingMoveTargets(
   }
 }
 
-function canBishopMoveToControlSquare(
-  fen: string,
-  bishop: Square,
-  target: Square,
-): boolean {
-  return getChess(fen)
-    .moves({ verbose: true })
-    .filter((move) => move.piece === 'b' && move.from === bishop)
-    .some((move) => {
-      const chess = getChess(fen)
-      chess.move(move.san)
-      return bishopControlsOrOccupiesSquare(chess.fen(), move.to, target)
-    })
-}
-
-function isTwoBishopsCornerWaitingMove(
-  fen: string,
-  from: Square,
-  to: Square,
-): boolean {
-  const chess = getChess(fen)
-  const move = chess.move({ from, to })
-  if (move.piece !== 'b' || chess.isCheckmate() || chess.isStalemate()) {
-    return false
-  }
-  const blackMoves = chess.moves({ verbose: true })
-  if (blackMoves.length !== 1) return false
-  const escapeSquare = blackMoves[0].to
-  if (bishopControlsOrOccupiesSquare(chess.fen(), to, escapeSquare)) {
-    return false
-  }
-  const afterBlack = getChess(chess.fen())
-  afterBlack.move(blackMoves[0].san)
-  return canBishopMoveToControlSquare(afterBlack.fen(), to, escapeSquare)
-}
-
-function isMiddle16Square(square: Square): boolean {
-  const { file, rank } = squareCoordinates(square)
-  return file >= 2 && file <= 5 && rank >= 2 && rank <= 5
-}
-
-function getWhiteBishopMiddle16Penalty(fen: string): number {
-  return getWhiteBishopSquares(fen).filter(
-    (square) => !isMiddle16Square(square),
-  ).length
-}
-
-function compareNumberArrays(
-  first: readonly number[],
-  second: readonly number[],
-): number {
-  for (
-    let index = 0;
-    index < Math.min(first.length, second.length);
-    index += 1
-  ) {
-    const difference = first[index] - second[index]
-    if (difference !== 0) return difference
-  }
-  return first.length - second.length
-}
-
-export function getTwoBishopsCornerWaitingMoves(
-  fen: string,
-): TwoBishopsWaitingMove[] {
-  const blackKing = findPiece(fen, 'b', 'k')
-  if (
-    !blackKing ||
-    !isCorner(blackKing.square) ||
-    !isTwoBishopsPhaseTwoPosition(fen)
-  ) {
-    return []
-  }
-  const moves = getChess(fen)
-    .moves({ verbose: true })
-    .filter((move) => move.piece === 'b')
-    .filter((move) =>
-      isTwoBishopsCornerWaitingMove(fen, move.from, move.to),
-    )
-  if (moves.length === 0) return []
-  const scoredMoves = moves.map((move) => {
-    const chess = getChess(fen)
-    chess.move(move.san)
-    const whiteKing = findPiece(chess.fen(), 'w', 'k')
-    const nextBlackKing = findPiece(chess.fen(), 'b', 'k')
-    return {
-      from: move.from,
-      to: move.to,
-      score: [
-        getWhiteBishopMiddle16Penalty(chess.fen()),
-        whiteBishopsAreAdjacent(chess.fen()) ? 0 : 1,
-        whiteKing && edgeDistance(whiteKing.square) === 0 ? 1 : 0,
-        whiteKing && nextBlackKing
-          ? kingDistance(whiteKing.square, nextBlackKing.square)
-          : 99,
-        nextBlackKing
-          ? getWhiteBishopDistanceToSquare(
-              chess.fen(),
-              nextBlackKing.square,
-            )
-          : 99,
-      ],
-    }
-  })
-  const bestScore = scoredMoves
-    .map(({ score }) => score)
-    .sort(compareNumberArrays)[0]
-  return scoredMoves
-    .filter(({ score }) => compareNumberArrays(score, bestScore) === 0)
-    .map(({ from, to }) => ({ from, to }))
-}
-
 export function getTwoBishopsWaitingMoveContext(
   fen: string,
 ): TwoBishopsWaitingMoveContext {
   return {
-    cornerMoves: getTwoBishopsCornerWaitingMoves(fen),
+    knightDistanceMoves: getTwoBishopsKnightDistanceWaitingMoves(fen),
     lineTargets: getTwoBishopsPhaseTwoWaitingMoveTargets(fen),
   }
 }
@@ -243,14 +178,16 @@ export function twoBishopsPhaseTwoWaitingMovePenalty(
   to: Square,
   context: TwoBishopsWaitingMoveContext,
 ): number {
-  if (context.cornerMoves.length > 0) {
-    return context.cornerMoves.some(
+  const targets = context.lineTargets
+  if (targets) {
+    return targets.from === from && targets.to.includes(to) ? 0 : 1
+  }
+  if (context.knightDistanceMoves.length > 0) {
+    return context.knightDistanceMoves.some(
       (target) => target.from === from && target.to === to,
     )
       ? 0
       : 1
   }
-  const targets = context.lineTargets
-  if (!targets) return 0
-  return targets.from === from && targets.to.includes(to) ? 0 : 1
+  return 0
 }

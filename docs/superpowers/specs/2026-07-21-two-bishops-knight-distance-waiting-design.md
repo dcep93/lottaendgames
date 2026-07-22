@@ -10,11 +10,11 @@ generic draw-avoidance exception.
 
 Replace the narrow phase-two waiting-move explanation with:
 
-**waiting move** — When the kings are a knight's move apart, move a bishop one
-square toward the center without losing phase 2.
+**waiting move** — When the kings are a knight's move apart and the bishops are
+together, move a bishop one square toward the center without losing phase 2.
 
 The rule activates only in phase 2 when the kings' file and rank differences are
-one and two. A qualifying move must:
+one and two and the bishops occupy adjacent squares. A qualifying move must:
 
 - move a bishop exactly one diagonal square;
 - reduce that bishop square's distance from the center; and
