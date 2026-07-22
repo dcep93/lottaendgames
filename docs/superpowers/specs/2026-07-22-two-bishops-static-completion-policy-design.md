@@ -21,7 +21,7 @@ When the kings are a knight's move apart, use these waiting ideas:
 1. Away from a supported corner, if the bishops are together and a safe one-square move toward the center preserves phase 2, make that move.
 2. Otherwise, make a non-checking bishop move that places the bishops as close together as possible. This preserves the bishop wall instead of following Black sideways with White's king.
 
-When Black is one edge-square from a corner, use a bishop move that forces every legal Black reply into that corner. If possible, place the bishop on an edge that meets at the corner to prepare the next check. This corner-forcing move comes before moving White's king toward corner support; if both checking and quiet moves work, the later `check king` priority chooses the check.
+When Black is one edge-square from a corner, use a bishop move that forces every legal Black reply into that corner while keeping the bishops as close together as possible. This corner-forcing move comes before moving White's king toward corner support; if both checking and quiet moves work, the later `check king` priority chooses the check.
 
 For a supported corner, apply these waiting ideas in order:
 
@@ -54,6 +54,8 @@ After each rule change:
 5. If it reports another cycle or 50-move line, reduce it to its minimal cycle, inspect the board geometry, and add the smallest general teaching rule that makes genuine progress.
 
 Completion requires the exhaustive verifier to pass with no cycle and no 50-move failure. The final modal copy and tests must still match the resulting policy.
+
+`pieces safe` treats a Black king approach as dangerous only when the approached bishop is not protected by White's king. A protected bishop may be used in a forcing corner-check pattern.
 
 ## Winning Root Boundary
 
