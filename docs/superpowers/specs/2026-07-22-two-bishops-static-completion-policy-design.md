@@ -21,7 +21,7 @@ When the kings are a knight's move apart, use these waiting ideas:
 1. If the bishops are together and a safe one-square move toward the center preserves phase 2, make that move.
 2. Otherwise, make a non-checking bishop move that places the bishops as close together as possible. This preserves the bishop wall instead of following Black sideways with White's king.
 
-When Black is one edge-square from a corner, use a non-checking bishop wait that forces every legal Black reply into that corner. This corner-forcing tempo comes before moving White's king toward corner support.
+When Black is one edge-square from a corner, use a bishop move that forces every legal Black reply into that corner. This corner-forcing move comes before moving White's king toward corner support; if both checking and quiet moves work, the later `check king` priority chooses the check.
 
 For a supported corner, apply these waiting ideas in order:
 
