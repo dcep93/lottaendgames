@@ -14,7 +14,12 @@ Some legal KBBK positions are already drawn. For example, White may have to choo
 
 ## Strategy
 
-Use a position-based geometric progress ladder. Keep the universal safety rules first, preserve phase 2 once reached, and express each phase-two maneuver as a visible board relationship. Every new exhaustive counterexample must be fixed by generalizing a position class, tested under all eight rotations and reflections, and described in the modal.
+Use a position-based geometric progress ladder. Keep the universal safety rules first and express each phase-two maneuver as a visible board relationship. Special waiting maneuvers come before `keep phase two`, because preserving the mating net can require a bishop-wall move whose Black replies temporarily fall outside the phase label. Every new exhaustive counterexample must be fixed by generalizing a position class, tested under all eight rotations and reflections, and described in the modal.
+
+When the kings are a knight's move apart, use these waiting ideas:
+
+1. If the bishops are together and a safe one-square move toward the center preserves phase 2, make that move.
+2. Otherwise, make a non-checking bishop move that places the bishops as close together as possible. This preserves the bishop wall instead of following Black sideways with White's king.
 
 For a supported corner, apply these waiting ideas in order:
 
