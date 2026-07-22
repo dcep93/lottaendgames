@@ -2,7 +2,9 @@
 
 ## Goal
 
-Make the Two Bishops teaching policy terminate from every supported legal starting position without repetition or a 50-move draw. Every decision must depend only on the current board. The modal must explain the same priorities the evaluator uses.
+Make the Two Bishops teaching policy terminate from every theoretically winning supported starting position without repetition or a 50-move draw. Every decision must depend only on the current board. The modal must explain the same priorities the evaluator uses.
+
+Some legal KBBK positions are already drawn. For example, White may have to choose between moving an attacked bishop and causing immediate stalemate or losing that bishop on Black's next move. No policy can force mate from such a root. Standard generation and exhaustive root enumeration must reject these positions, while the verifier must continue treating the same outcome as a failure if the policy reaches it from a winning root.
 
 ## Rejected Approaches
 
@@ -44,3 +46,7 @@ After each rule change:
 5. If it reports another cycle or 50-move line, reduce it to its minimal cycle, inspect the board geometry, and add the smallest general teaching rule that makes genuine progress.
 
 Completion requires the exhaustive verifier to pass with no cycle and no 50-move failure. The final modal copy and tests must still match the resulting policy.
+
+## Winning Root Boundary
+
+A generated Two Bishops root is eligible only if White has at least one legal first move that checkmates or leaves a non-terminal position where every legal Black reply retains both bishops. This position-only test rejects immediate, unavoidable capture-or-stalemate draws without weakening verification after play begins.
