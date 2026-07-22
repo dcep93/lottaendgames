@@ -18,9 +18,10 @@ Use a position-based geometric progress ladder. Keep the universal safety rules 
 
 For a supported corner, apply these waiting ideas in order:
 
-1. If a bishop occupies the corner edge closest to White's king, move that bishop off the edge or move White's king to the other support square.
-2. If the bishops can be brought together safely without checking, bring them together.
-3. Otherwise, make a non-checking move with the bishop on the same square color as the corner. Place it as far as possible from both edges that meet at the corner: maximize its distance from the nearer edge.
+1. If every nearest corner-support square for White's king is occupied by a bishop, move the blocking bishop out of the way.
+2. If a bishop occupies the corner edge closest to White's king, move that bishop off the edge or move White's king to the other support square.
+3. If the bishops can be brought together safely without checking, bring them together.
+4. Otherwise, make a non-checking move with the bishop on the same square color as the corner. Place it as far as possible from both edges that meet at the corner: maximize its distance from the nearer edge.
 
 The third step changes `1. Bc3+` to `1. Bh6` in `4B3/8/8/8/8/1K6/3B4/k7 w - - 0 1`. It also chooses `Bh6` instead of the edge-hugging `Bh2` in `4B3/8/8/8/5B2/1K6/8/k7 w - - 0 1`.
 
