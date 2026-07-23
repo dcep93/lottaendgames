@@ -17,9 +17,9 @@ White compares legal moves in this order:
 1. `mate` — Checkmate immediately when it is available.
 2. `pieces safe` — Do not leave a bishop available for Black to take.
 3. `no stalemate` — Do not stalemate Black.
-4. `no backtracking` — Every Black reply must shorten the remaining forced
-   mate. One corner waiting move may hold the distance while changing the
-   bishops from close together to separated.
+4. `finish guarantee` — Filter out moves that could loop or draw by the
+   fifty-move rule. One corner waiting move may hold the distance while
+   changing the bishops from close together to separated.
 5. `waiting move` — When White's king holds Black back, move a bishop without
    loosening the net so Black must give ground. Near the corner, use the
    corner-color bishop while the bishops are close; then continue with the king
@@ -42,8 +42,9 @@ must never contradict the displayed action.
 
 ## Position-Only Completion Guard
 
-`no backtracking` is a filter, not a shortest-mate tie-break. Human rules choose
-among every move that passes it.
+`finish guarantee` is a guard, not a shortest-mate tie-break or a technique to
+memorize. Human rules choose among every move that passes it, and correct-move
+hints name a board-visible human priority.
 
 The repository contains a compact White-to-move KBB-v-K distance-to-mate table.
 It is generated offline from the Gaviota four-piece tablebase, reduced by all

@@ -189,7 +189,7 @@ test('reconstructs the former exact Rook loop as undoable ordinary history', () 
   )
   assert.ok(incorrectMoves.length > 0)
   assert.ok(
-    incorrectMoves.some(({ reasonId }) => reasonId === 'no backtracking'),
+    incorrectMoves.some(({ reasonId }) => reasonId === 'finish guarantee'),
   )
   assert.ok(
     incorrectMoves.every(

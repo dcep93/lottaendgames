@@ -16,7 +16,6 @@ const EXPECTED_RULE_PREFIX = [
   'mate',
   'bishops safe',
   'no stalemate',
-  'no backtracking',
 ] as const
 
 /**
@@ -61,12 +60,14 @@ export function verifyTwoBishopsProofCertificate(): MateVerificationResult {
   const rulePrefix = twoBishopsWhiteRules
     .slice(0, EXPECTED_RULE_PREFIX.length)
     .map(({ id }) => id)
+  const proofGuard = twoBishopsWhiteRules[EXPECTED_RULE_PREFIX.length]
   if (
     rulePrefix.length !== EXPECTED_RULE_PREFIX.length ||
-    rulePrefix.some((id, index) => id !== EXPECTED_RULE_PREFIX[index])
+    rulePrefix.some((id, index) => id !== EXPECTED_RULE_PREFIX[index]) ||
+    proofGuard?.presentationRole !== 'guard'
   ) {
     return incomplete(
-      `Two Bishops proof guard must follow ${EXPECTED_RULE_PREFIX.join(', ')}`,
+      `Two Bishops proof guard must immediately follow ${EXPECTED_RULE_PREFIX.join(', ')}`,
     )
   }
 

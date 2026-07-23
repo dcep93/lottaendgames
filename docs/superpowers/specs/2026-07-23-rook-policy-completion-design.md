@@ -26,8 +26,9 @@ Then use the concise geometric rules to choose among all progressing moves.
 This is the selected approach. Unlike the removed `shortest mate` rule, it does
 not prefer the single shortest move or compare exact distances among progressing
 moves. It rejects only moves that allow Black to erase the current progress.
-The modal and reason column expose the gate as `no backtracking`, so it is not a
-hidden engine tiebreak.
+The modal exposes the gate as a `finish guarantee`, so it is not a hidden
+engine tiebreak. The guide separates it from the techniques a learner should
+memorize.
 
 ### 2. Complete the geometry without a proof gate
 
@@ -53,8 +54,8 @@ The universal rules remain first:
 
 The Rook rules then apply in this order:
 
-4. `no backtracking` — Every Black reply must shorten the remaining forced
-   mate.
+4. `finish guarantee` — Filter out moves that could loop or draw by the
+   fifty-move rule.
 5. `push with check` — Check when every reply pushes Black farther from White's
    king.
 6. `establish box` — Use the Rook to make a phase 2 box. When Black is on the
@@ -65,10 +66,12 @@ The Rook rules then apply in this order:
 8. `king closer` — Move White's king closer to Black's king.
 9. `rook farther` — Keep the Rook farther from Black's king.
 
-`no backtracking` compares only whether a move descends the exact KRK
+`finish guarantee` compares only whether a move descends the exact KRK
 forced-mate rank. The rank already includes Black's strongest legal response,
-so passing the gate means every Black reply leaves a shorter forced mate.
-Exact ranks do not break ties after the gate.
+so passing the guard means every Black reply leaves a shorter forced mate.
+Exact ranks do not break ties after the guard. Correct-move hints use a
+board-visible human priority; only a move rejected by the guard is labeled
+`finish guarantee`.
 
 `establish box` remains a non-expansion gate. If phase 2 already exists, leaving
 phase 2 or enlarging the box loses. Preserving and shrinking it otherwise tie,

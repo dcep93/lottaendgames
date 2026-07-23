@@ -158,7 +158,7 @@ const ROOK_WHITE_FIXTURES: readonly WhiteFixture[] = [
   {
     fen: '8/2k5/8/8/7R/3K4/8/8 w - - 2 2',
     idealMoves: ['Rd4'],
-    hint: 'no backtracking',
+    hint: 'establish box',
     phase: '2/2',
   },
   {
@@ -170,13 +170,13 @@ const ROOK_WHITE_FIXTURES: readonly WhiteFixture[] = [
   {
     fen: '1R3K2/8/8/8/8/8/8/7k w - - 0 1',
     idealMoves: ['Kg7'],
-    hint: 'no backtracking',
+    hint: 'king closer',
     phase: '1/2',
   },
   {
     fen: '5R2/8/8/8/8/8/4k1K1/8 w - - 6 4',
     idealMoves: ['Rf3'],
-    hint: 'no backtracking',
+    hint: 'establish box',
     phase: '2/2',
   },
   {
@@ -224,7 +224,7 @@ const ROOK_WHITE_FIXTURES: readonly WhiteFixture[] = [
   {
     fen: '8/8/8/8/2k5/1R6/2K5/8 w - - 4 3',
     idealMoves: ['Rd3'],
-    hint: 'no backtracking',
+    hint: 'establish box',
     phase: '2/2',
   },
   {
@@ -242,25 +242,25 @@ const ROOK_WHITE_FIXTURES: readonly WhiteFixture[] = [
   {
     fen: '8/8/2k5/R7/1K6/8/8/8 w - - 50 26',
     idealMoves: ['Kc4'],
-    hint: 'no backtracking',
+    hint: 'king closer',
     phase: '2/2',
   },
   {
     fen: '8/8/3k4/1K6/8/8/8/2R5 w - - 6 4',
     idealMoves: ['Rc5'],
-    hint: 'no backtracking',
+    hint: 'establish box',
     phase: '2/2',
   },
   {
     fen: '8/8/8/1K6/3k4/8/8/2R5 w - - 6 4',
     idealMoves: ['Re1'],
-    hint: 'no backtracking',
+    hint: 'king closer',
     phase: '2/2',
   },
   {
     fen: '8/1K6/3k4/8/8/8/8/2R5 w - - 10 6',
     idealMoves: ['Re1'],
-    hint: 'no backtracking',
+    hint: 'maximize black distance',
     phase: '2/2',
   },
   {
@@ -278,7 +278,7 @@ const ROOK_WHITE_FIXTURES: readonly WhiteFixture[] = [
   {
     fen: '7k/8/R7/6K1/8/8/8/8 w - - 0 1',
     idealMoves: ['Kg6'],
-    hint: 'no backtracking',
+    hint: 'king closer',
     phase: '2/2',
   },
   {
@@ -290,19 +290,19 @@ const ROOK_WHITE_FIXTURES: readonly WhiteFixture[] = [
   {
     fen: '6k1/8/7R/5K2/8/8/8/8 w - - 0 1',
     idealMoves: ['Kf6'],
-    hint: 'no backtracking',
+    hint: 'king closer',
     phase: '2/2',
   },
   {
     fen: '8/8/8/8/2K5/2R5/8/1k6 w - - 0 1',
     idealMoves: ['Kb3'],
-    hint: 'no backtracking',
+    hint: 'king closer',
     phase: '2/2',
   },
   {
     fen: '7k/R7/5K2/8/8/8/8/8 w - - 2 2',
     idealMoves: ['Kg6'],
-    hint: 'no backtracking',
+    hint: 'king closer',
     phase: '2/2',
   },
 ]
@@ -642,7 +642,7 @@ test('queen and rook preserve evaluator order with universal priority labels', (
       'mate',
       'rook safe',
       'no stalemate',
-      'no backtracking',
+      'finish guarantee',
       'forcing check',
       'establish box',
       'rook waiting move',
@@ -671,7 +671,7 @@ test('queen and rook preserve evaluator order with universal priority labels', (
       'mate',
       'pieces safe',
       'no stalemate',
-      'no backtracking',
+      'finish guarantee',
       'push with check',
       'establish box',
       'waiting move',
@@ -679,6 +679,7 @@ test('queen and rook preserve evaluator order with universal priority labels', (
       'rook farther',
     ],
   )
+  assert.equal(rookWhiteRules[3]?.presentationRole, 'guard')
   assert.deepEqual(
     queenWhiteRules.slice(3).map(({ id, helpText }) => ({ id, helpText })),
     [
@@ -725,9 +726,9 @@ test('queen and rook preserve evaluator order with universal priority labels', (
     rookWhiteRules.slice(3).map(({ id, helpText }) => ({ id, helpText })),
     [
       {
-        id: 'no backtracking',
+        id: 'finish guarantee',
         helpText:
-          'Every Black reply must shorten the remaining forced mate.',
+          'The app filters out moves that could loop or draw by the fifty-move rule. You do not need to calculate this.',
       },
       {
         id: 'forcing check',
@@ -742,7 +743,7 @@ test('queen and rook preserve evaluator order with universal priority labels', (
       {
         id: 'rook waiting move',
         helpText:
-          "If the kings are a knight's move apart, move the rook, keeping the box, ideally with white's king between the other pieces, but the rook should not be adjacent to white's king.",
+          "When the kings are a knight's move apart, keep the box with a Rook move. Prefer White's king between Black's king and the Rook, without placing the Rook beside White's king.",
       },
       {
         id: 'king closer',
@@ -794,13 +795,17 @@ test('queen and rook preserve evaluator order with universal priority labels', (
       'mate',
       'rook safe',
       'no stalemate',
-      'no backtracking',
+      'finish guarantee',
       'forcing check',
       'establish box',
       'rook waiting move',
       'king closer',
       'maximize black distance',
     ],
+  )
+  assert.equal(
+    registeredRook.whiteRuleDescriptions[3]?.presentationRole,
+    'guard',
   )
 })
 
@@ -1100,7 +1105,7 @@ test('rook waiting ranks preferred, fallback, and invalid moves', () => {
   assert.deepEqual(rook.idealWhiteMoves(noBetweenFen), ['Kf5'])
   assert.equal(
     rook.explainWhiteMove(noBetweenFen, 'Ra6')?.id,
-    'no backtracking',
+    'finish guarantee',
   )
 
   const phaseFen = '8/7k/1R6/5K2/8/8/8/8 w - - 4 3'
@@ -1139,7 +1144,7 @@ test('rook establish-box scoring shrinks the box on the finishing edge', () => {
   assert.equal(progressingKing.proofProgressPenalty, 0)
   assert.equal(
     rook.explainWhiteMove(shrinkFen, 'Ra7')?.id,
-    'no backtracking',
+    'finish guarantee',
   )
   assert.deepEqual(rook.idealWhiteMoves(shrinkFen), ['Kg6'])
 
@@ -1150,7 +1155,7 @@ test('rook establish-box scoring shrinks the box on the finishing edge', () => {
   assert.deepEqual(rook.idealWhiteMoves(kingApproachFen), ['Kd5'])
   assert.equal(
     rook.explainWhiteMove(kingApproachFen, 'Rc1')?.id,
-    'no backtracking',
+    'finish guarantee',
   )
 })
 
@@ -1163,7 +1168,7 @@ test('rook waiting does not activate for an unsafe box shrink alone', () => {
   assert.equal(scoreRookWhiteMove(fen, 'Ra6').proofProgressPenalty, 1)
   assert.equal(scoreRookWhiteMove(fen, 'Kf6').proofProgressPenalty, 0)
   assert.deepEqual(rook.idealWhiteMoves(fen), ['Kf6'])
-  assert.equal(rook.explainWhiteMove(fen, 'Ra6')?.id, 'no backtracking')
+  assert.equal(rook.explainWhiteMove(fen, 'Ra6')?.id, 'finish guarantee')
 
   const safeShrinkFen = '7k/8/R7/6K1/8/8/8/8 w - - 0 1'
   assert.equal(scoreRookWhiteMove(safeShrinkFen, 'Ra7').rookCapturePenalty, 0)
@@ -1181,7 +1186,7 @@ test('rook rejects forcing checks that give back forced-mate progress', () => {
     assert.equal(scoreRookWhiteMove(fen, check).proofProgressPenalty, 1)
     assert.equal(scoreRookWhiteMove(fen, tempo).proofProgressPenalty, 0)
     assert.deepEqual(rook.idealWhiteMoves(fen), [tempo])
-    assert.equal(rook.explainWhiteMove(fen, check)?.id, 'no backtracking')
+    assert.equal(rook.explainWhiteMove(fen, check)?.id, 'finish guarantee')
   }
 
   const afterTempo = '8/7k/5R2/6K1/8/8/8/8 w - - 2 2'
@@ -1216,7 +1221,7 @@ test('rook best moves are explained only by registered human rules', () => {
   assert.deepEqual(rook.idealWhiteMoves(rc1Fen), ['Rc5'])
   assert.equal(
     rook.explainWhiteMove(rc1Fen, 'Rc1')?.id,
-    'no backtracking',
+    'finish guarantee',
   )
 })
 
@@ -1243,7 +1248,7 @@ test('rook waiting geometry remains literal behind the proof gate', () => {
     assert.equal(scoreRookWhiteMove(fen, preferred).proofProgressPenalty, 1)
     assert.equal(scoreRookWhiteMove(fen, ideal).proofProgressPenalty, 0)
     assert.deepEqual(rook.idealWhiteMoves(fen), [ideal])
-    assert.equal(rook.explainWhiteMove(fen, preferred)?.id, 'no backtracking')
+    assert.equal(rook.explainWhiteMove(fen, preferred)?.id, 'finish guarantee')
 
     const expected = getChess(fen)
     expected.move(ideal)
@@ -1313,7 +1318,7 @@ test('rook king proximity requires componentwise axis progress', () => {
   assert.equal(productiveKing.proofProgressPenalty, 1)
   assert.equal(progressingKing.proofProgressPenalty, 0)
   assert.deepEqual(rook.idealWhiteMoves(fen), ['Kb3'])
-  assert.equal(rook.explainWhiteMove(fen, 'Kd3')?.id, 'no backtracking')
+  assert.equal(rook.explainWhiteMove(fen, 'Kd3')?.id, 'finish guarantee')
 
   const sourceFen = '7k/R7/5K2/8/8/8/8/8 w - - 2 2'
   assert.equal(scoreRookWhiteMove(sourceFen, 'Kg6').kingApproachPriority, 0)

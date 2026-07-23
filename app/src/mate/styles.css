@@ -599,6 +599,7 @@
 }
 
 .leg-mate-guide-universal-priorities,
+.leg-mate-guide-guards,
 .leg-mate-guide-technique-priorities {
   display: grid;
   gap: 0.45rem;
@@ -609,6 +610,16 @@
   border-radius: 0.55rem;
   padding: 0.7rem 0.75rem;
   background: rgba(216, 179, 138, 0.07);
+}
+
+.leg-mate-guide-guard {
+  border: 0.0625rem solid rgba(229, 138, 138, 0.42);
+  border-radius: 0.55rem;
+  padding: 0.7rem 0.75rem;
+  color: var(--leg-soft);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  background: rgba(229, 138, 138, 0.08);
 }
 
 .leg-mate-guide-body h3,

@@ -37,7 +37,12 @@ export default function MatePriorityGuideDialog({
   const endgameLabel =
     MATE_CATALOG.find(({ id }) => id === ruleSet.id)?.label ?? ruleSet.id
   const universalWhitePriorities = ruleSet.whiteRuleDescriptions.slice(0, 3)
-  const techniqueWhitePriorities = ruleSet.whiteRuleDescriptions.slice(3)
+  const guardWhitePriorities = ruleSet.whiteRuleDescriptions.filter(
+    ({ presentationRole }) => presentationRole === 'guard',
+  )
+  const techniqueWhitePriorities = ruleSet.whiteRuleDescriptions
+    .slice(3)
+    .filter(({ presentationRole }) => presentationRole !== 'guard')
 
   React.useEffect(() => {
     closeButtonRef.current?.focus()
@@ -126,6 +131,29 @@ export default function MatePriorityGuideDialog({
                   priorities={universalWhitePriorities}
                 />
               </div>
+              {guardWhitePriorities.length === 0 ? null : (
+                <div className="leg-mate-guide-guards">
+                  {guardWhitePriorities.map((guard) => {
+                    const highlighted = guard.id === highlightedReasonId
+                    return (
+                      <div
+                        aria-current={highlighted ? 'true' : undefined}
+                        className={
+                          highlighted
+                            ? 'leg-mate-guide-guard leg-mate-guide-priority-highlighted'
+                            : 'leg-mate-guide-guard'
+                        }
+                        key={guard.id}
+                      >
+                        <strong>{guard.shortLabel}</strong>
+                        {guard.helpText === '' ? null : (
+                          <> — {guard.helpText}</>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
               {techniqueWhitePriorities.length === 0 ? null : (
                 <div className="leg-mate-guide-technique-priorities">
                   <PriorityList

@@ -17,7 +17,7 @@ const WHITE_RULE_IDS = [
   'mate',
   'bishops safe',
   'no stalemate',
-  'no backtracking',
+  'finish guarantee',
   'waiting move',
   'corner support',
   'keep phase two',
@@ -161,14 +161,19 @@ test('Black captures before seeking the center or a bishop', () => {
   assert.ok(compareTwoBishopsBlackScores(capture, quiet) < 0)
 })
 
-test('Black resistance and proof notes stay explicit', () => {
-  const help = getMateRuleSet('two-bishops').help
+test('Black resistance and the finish guarantee stay explicit', () => {
+  const ruleSet = getMateRuleSet('two-bishops')
+  const help = ruleSet.help
   assert.deepEqual(help.blackPriorities, [
     'Return to the previous board position when a legal reply can recreate it.',
     "Take a piece if White isn't looking.",
     'Move towards the center.',
     'Move towards an unprotected bishop.',
   ])
-  assert.match(help.notes.join(' '), /current board/)
-  assert.match(help.notes.join(' '), /no move history/)
+  const guard = ruleSet.whiteRuleDescriptions.find(
+    ({ presentationRole }) => presentationRole === 'guard',
+  )
+  assert.equal(guard?.id, 'finish guarantee')
+  assert.match(guard?.helpText ?? '', /loop/)
+  assert.match(guard?.helpText ?? '', /fifty-move rule/)
 })

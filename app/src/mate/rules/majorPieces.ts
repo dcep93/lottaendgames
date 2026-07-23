@@ -543,10 +543,11 @@ export const rookWhiteRules: readonly OrderedRule<RookWhiteMoveScore>[] = [
       first.stalematePenalty - second.stalematePenalty,
   },
   {
-    id: 'no backtracking',
-    shortLabel: 'no backtracking',
+    id: 'finish guarantee',
+    shortLabel: 'finish guarantee',
     helpText:
-      'Every Black reply must shorten the remaining forced mate.',
+      'The app filters out moves that could loop or draw by the fifty-move rule. You do not need to calculate this.',
+    presentationRole: 'guard',
     compare: (first, second) =>
       first.proofProgressPenalty - second.proofProgressPenalty,
   },
@@ -574,7 +575,7 @@ export const rookWhiteRules: readonly OrderedRule<RookWhiteMoveScore>[] = [
     id: 'rook waiting move',
     shortLabel: 'waiting move',
     helpText:
-      "If the kings are a knight's move apart, move the rook, keeping the box, ideally with white's king between the other pieces, but the rook should not be adjacent to white's king.",
+      "When the kings are a knight's move apart, keep the box with a Rook move. Prefer White's king between Black's king and the Rook, without placing the Rook beside White's king.",
     compare: (first, second) =>
       first.rookWaitingPenalty - second.rookWaitingPenalty,
   },

@@ -87,7 +87,6 @@ const twoBishopsHelp: RuleHelp = {
   ],
   notes: [
     "Phase 2 begins when Black's king is on an edge and White's king controls at least two squares in front of it. The diagonal approach that forces Black along the edge also counts.",
-    'No backtracking is checked from the current board against a bundled proof of every legal two-bishop position. It uses no move history, engine, or network request; the human rules choose among the moves that pass.',
   ],
   noteBoards: [],
 }
@@ -218,10 +217,11 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
       first.stalematePenalty - second.stalematePenalty,
   },
   {
-    id: 'no backtracking',
-    shortLabel: 'no backtracking',
+    id: 'finish guarantee',
+    shortLabel: 'finish guarantee',
     helpText:
-      'Every Black reply must shorten the remaining forced mate. Near the corner, one waiting move may hold the distance while it separates the bishops.',
+      'The app filters out moves that could loop or draw by the fifty-move rule. You do not need to calculate this.',
+    presentationRole: 'guard',
     compare: (first, second) =>
       first.proofProgressPenalty - second.proofProgressPenalty,
   },

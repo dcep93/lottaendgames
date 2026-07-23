@@ -3,6 +3,7 @@ import test from 'node:test'
 import {
   compareScoresByRules,
   currentHint,
+  currentTeachingHint,
   explainMove,
   findCandidateBySan,
   firstDifferingRule,
@@ -801,6 +802,56 @@ test('an incorrect played move uses its first differing rule', () => {
 test('a correct played move explains the closest non-ideal candidate', () => {
   assert.equal(explainMove(candidates, rules, 'Kb2'), closerRule)
   assert.equal(currentHint(candidates, rules), closerRule)
+})
+
+test('a correctness guard stays exact while ideal moves receive a teaching hint', () => {
+  const guardRule: OrderedRule<TestScore> = {
+    id: 'finish guarantee',
+    shortLabel: 'finish guarantee',
+    helpText: 'Reject moves that can stall.',
+    presentationRole: 'guard',
+    compare: (left, right) => left.safe - right.safe,
+  }
+  const guardCandidates: readonly ScoredMove<TestScore>[] = [
+    { san: 'Ka2', score: { safe: 0, closer: 0 } },
+    { san: 'Kb2', score: { safe: 1, closer: 2 } },
+    { san: 'Kc2', score: { safe: 1, closer: -1 } },
+  ]
+  const guardRules = [guardRule, closerRule] as const
+
+  assert.deepEqual(selectIdealMoves(guardCandidates, guardRules), ['Ka2'])
+  assert.equal(currentHint(guardCandidates, guardRules), guardRule)
+  assert.equal(
+    currentTeachingHint(guardCandidates, guardRules),
+    closerRule,
+  )
+
+  const guardRuleSet: MateRuleSet<TestScore> = {
+    ...rookRuleSet,
+    id: 'bishop-knight',
+    whiteRules: guardRules,
+    whiteMoves: () => guardCandidates.map(({ san }) => san),
+    scoreWhite: (_fen, san) =>
+      guardCandidates.find((candidate) => candidate.san === san)!.score,
+  }
+  const unregister = registerMateRuleSet(guardRuleSet)
+  try {
+    const registered = getMateRuleSet('bishop-knight')
+    assert.equal(registered.currentWhiteHint('fen')?.id, 'closer')
+    assert.equal(registered.explainWhiteMove('fen', 'Ka2')?.id, 'closer')
+    assert.equal(
+      registered.explainWhiteMove('fen', 'Kb2')?.id,
+      'finish guarantee',
+    )
+    assert.deepEqual(registered.whiteRuleDescriptions[0], {
+      id: 'finish guarantee',
+      shortLabel: 'finish guarantee',
+      helpText: 'Reject moves that can stall.',
+      presentationRole: 'guard',
+    })
+  } finally {
+    unregister()
+  }
 })
 
 test('all-tied candidates have no current hint or move reason', () => {

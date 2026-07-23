@@ -45,9 +45,8 @@ For Rook and Two Bishops, the modal shows:
 
 The guard copy is:
 
-> **finish guarantee** — The app rejects moves that can loop or reach the
-> fifty-move draw. This guarantees the exercise finishes; it is not a technique
-> to calculate or memorize.
+> **finish guarantee** — The app filters out moves that could loop or draw by
+> the fifty-move rule. You do not need to calculate this.
 
 The human priorities retain their evaluator order after the guard.
 

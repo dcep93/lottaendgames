@@ -926,7 +926,7 @@ test('reason hint is opt-in and reveals only the current rule label', async () =
     'data-mate-current-hint': true,
   })
   const hintText = reactNodeText(hint)
-  assert.equal(hintText, 'no backtracking')
+  assert.equal(hintText, 'establish box')
   assert.doesNotMatch(hintText, /Rg2|a2|g2|bring White's king/i)
   assert.equal(hint.props.type, 'button')
 
@@ -1258,6 +1258,48 @@ test('every mate guide puts notes before shortcuts and the shared legend', () =>
     assert.ok(shortcutsAt > notesAt, `${id}: shortcuts must follow Notes`)
     assert.ok(legendAt > shortcutsAt, `${id}: Legend must follow shortcuts`)
   }
+})
+
+test('Rook and Two Bishops separate the finish guarantee from human priorities', () => {
+  for (const mateId of ['rook', 'two-bishops'] as const) {
+    const markup = renderToStaticMarkup(
+      <MatePriorityGuideDialog
+        {...MATE_TRAINING_INFO_PROPS}
+        highlightedReasonId="finish guarantee"
+        onClose={() => undefined}
+        ruleSet={getMateRuleSet(mateId)}
+      />,
+    )
+    assert.match(
+      markup,
+      /class="leg-mate-guide-guards"[\s\S]*class="leg-mate-guide-guard leg-mate-guide-priority-highlighted"/,
+      mateId,
+    )
+    assert.match(
+      markup,
+      />finish guarantee<\/strong>[\s\S]*You do not need to calculate this/,
+      mateId,
+    )
+    assert.equal(
+      (markup.match(/>finish guarantee<\/strong>/g) ?? []).length,
+      1,
+      mateId,
+    )
+    assert.ok(
+      markup.indexOf('leg-mate-guide-guards') <
+        markup.indexOf('leg-mate-guide-technique-priorities'),
+      mateId,
+    )
+  }
+
+  const queenMarkup = renderToStaticMarkup(
+    <MatePriorityGuideDialog
+      {...MATE_TRAINING_INFO_PROPS}
+      onClose={() => undefined}
+      ruleSet={getMateRuleSet('queen')}
+    />,
+  )
+  assert.doesNotMatch(queenMarkup, /leg-mate-guide-guards/)
 })
 
 test('every Mate rule set exposes the same concise universal priorities', () => {

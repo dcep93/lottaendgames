@@ -2,7 +2,7 @@ import type { MateId } from '../types'
 import { bishopKnightRuleSet } from './bishopKnight'
 import { queenRuleSet, rookRuleSet } from './majorPieces'
 import {
-  currentHint,
+  currentTeachingHint,
   explainMove,
   selectIdealMoves,
 } from './selection'
@@ -21,6 +21,7 @@ import type {
 export {
   compareScoresByRules,
   currentHint,
+  currentTeachingHint,
   explainMove,
   findCandidateBySan,
   firstDifferingRule,
@@ -269,6 +270,9 @@ function snapshotOrderedRule<Score>(
     id: orderedRule.id,
     shortLabel: orderedRule.shortLabel,
     helpText: orderedRule.helpText,
+    ...(orderedRule.presentationRole === undefined
+      ? {}
+      : { presentationRole: orderedRule.presentationRole }),
     guideOrder: orderedRule.guideOrder,
     ...(applies
       ? { applies: Object.freeze((score: Score) => applies(score)) }
@@ -338,7 +342,8 @@ function createRegisteredMateRuleSet<Score>(
     if (
       existing &&
       (existing.shortLabel !== source.shortLabel ||
-        existing.helpText !== source.helpText)
+        existing.helpText !== source.helpText ||
+        existing.presentationRole !== source.presentationRole)
     ) {
       throw new Error(`conflicting rule description for id ${source.id}`)
     }
@@ -348,6 +353,9 @@ function createRegisteredMateRuleSet<Score>(
         id: source.id,
         shortLabel: source.shortLabel,
         helpText: source.helpText,
+        ...(source.presentationRole === undefined
+          ? {}
+          : { presentationRole: source.presentationRole }),
       })
     descriptionsById.set(source.id, description)
     descriptionOrderById.set(
@@ -445,14 +453,20 @@ function createRegisteredMateRuleSet<Score>(
       const moves = getLegalWhiteMoves(fen)
       if (san !== undefined && !moves.includes(san)) return undefined
       if (selectedOverrideMoves(fen, moves)) return overrideDescription
-      return describeRule(
-        explainMove(scoredWhiteMoves(fen, moves), whiteRules, san),
-      )
+      const candidates = scoredWhiteMoves(fen, moves)
+      const idealMoves = selectIdealMoves(candidates, whiteRules)
+      const rule =
+        san === undefined || idealMoves.includes(san)
+          ? currentTeachingHint(candidates, whiteRules, san)
+          : explainMove(candidates, whiteRules, san)
+      return describeRule(rule)
     },
     currentWhiteHint: (fen) => {
       const moves = getLegalWhiteMoves(fen)
       if (selectedOverrideMoves(fen, moves)) return overrideDescription
-      return describeRule(currentHint(scoredWhiteMoves(fen, moves), whiteRules))
+      return describeRule(
+        currentTeachingHint(scoredWhiteMoves(fen, moves), whiteRules),
+      )
     },
   })
 }
