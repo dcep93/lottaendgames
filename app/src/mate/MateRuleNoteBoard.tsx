@@ -55,6 +55,9 @@ const HIGHLIGHT_NAMES: Readonly<
   escape: 'escape square',
   key: 'key square',
   red: 'red escape square',
+  box: 'box square',
+  wall: 'bishop wall square',
+  support: 'king support square',
 }
 
 function squareGridPosition(square: string, layout: BoardLayout) {

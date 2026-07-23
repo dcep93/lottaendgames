@@ -105,7 +105,41 @@ const queenHelp: RuleHelp = {
   notes: [
     "Phase 2 means the Queen's rank or file is strictly between the two kings on that axis.",
   ],
-  noteBoards: [],
+  noteBoards: [
+    {
+      id: 'queen-box',
+      title: 'Queen box',
+      caption:
+        "The Queen's rank and file bound a 4 × 5 box containing Black. Minimize 4 before 5.",
+      pieces: [
+        { square: 'a1', piece: 'K' },
+        { square: 'c4', piece: 'Q' },
+        { square: 'g7', piece: 'k' },
+      ],
+      highlights: [
+        'd5',
+        'e5',
+        'f5',
+        'g5',
+        'h5',
+        'd6',
+        'e6',
+        'f6',
+        'g6',
+        'h6',
+        'd7',
+        'e7',
+        'f7',
+        'g7',
+        'h7',
+        'd8',
+        'e8',
+        'f8',
+        'g8',
+        'h8',
+      ].map((square) => ({ square, kind: 'box' as const })),
+    },
+  ],
 }
 
 const rookHelp: RuleHelp = {
@@ -123,7 +157,45 @@ const rookHelp: RuleHelp = {
   notes: [
     "Phase 2 means the Rook's rank or file is strictly between the two kings on that axis.",
   ],
-  noteBoards: [],
+  noteBoards: [
+    {
+      id: 'rook-phase-two-box',
+      title: 'Phase 2 box',
+      caption:
+        "The Rook's file is between the kings, boxing Black onto the highlighted side.",
+      pieces: [
+        { square: 'c3', piece: 'K' },
+        { square: 'e2', piece: 'R' },
+        { square: 'g6', piece: 'k' },
+      ],
+      highlights: [
+        'f1',
+        'g1',
+        'h1',
+        'f2',
+        'g2',
+        'h2',
+        'f3',
+        'g3',
+        'h3',
+        'f4',
+        'g4',
+        'h4',
+        'f5',
+        'g5',
+        'h5',
+        'f6',
+        'g6',
+        'h6',
+        'f7',
+        'g7',
+        'h7',
+        'f8',
+        'g8',
+        'h8',
+      ].map((square) => ({ square, kind: 'box' as const })),
+    },
+  ],
 }
 
 function selectBestMoves<Score>(

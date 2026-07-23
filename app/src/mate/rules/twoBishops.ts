@@ -88,7 +88,48 @@ const twoBishopsHelp: RuleHelp = {
   notes: [
     "Phase 2 begins when Black's king is on an edge and White's king controls at least two squares in front of it. The diagonal approach that forces Black along the edge also counts.",
   ],
-  noteBoards: [],
+  noteBoards: [
+    {
+      id: 'bishop-wall',
+      title: 'Bishop wall',
+      caption:
+        "Keep the bishops beside each other so their diagonals form one wall and shrink Black's room.",
+      pieces: [
+        { square: 'c2', piece: 'K' },
+        { square: 'd3', piece: 'B' },
+        { square: 'e3', piece: 'B' },
+        { square: 'g7', piece: 'k' },
+      ],
+      highlights: [
+        'e4',
+        'f5',
+        'g6',
+        'h7',
+        'f4',
+        'g5',
+        'h6',
+      ].map((square) => ({ square, kind: 'wall' as const })),
+    },
+    {
+      id: 'bishop-corner-finish',
+      title: 'Corner finish',
+      caption:
+        "The king supports from a knight's move away while the bishop wall covers the corner and last escape.",
+      pieces: [
+        { square: 'b3', piece: 'K' },
+        { square: 'd4', piece: 'B' },
+        { square: 'e4', piece: 'B' },
+        { square: 'a1', piece: 'k' },
+      ],
+      highlights: [
+        { square: 'a2', kind: 'support' },
+        { square: 'b2', kind: 'support' },
+        { square: 'b3', kind: 'support' },
+        { square: 'a1', kind: 'wall' },
+        { square: 'b1', kind: 'wall' },
+      ],
+    },
+  ],
 }
 
 function scoreTwoBishopsProofPrefix(

@@ -775,11 +775,17 @@ test('queen and rook preserve evaluator order with universal priority labels', (
   assert.deepEqual(queenRuleSet.help.notes, [
     "Phase 2 means the Queen's rank or file is strictly between the two kings on that axis.",
   ])
-  assert.deepEqual(queenRuleSet.help.noteBoards, [])
+  assert.deepEqual(
+    queenRuleSet.help.noteBoards.map(({ id }) => id),
+    ['queen-box'],
+  )
   assert.deepEqual(rookRuleSet.help.notes, [
     "Phase 2 means the Rook's rank or file is strictly between the two kings on that axis.",
   ])
-  assert.deepEqual(rookRuleSet.help.noteBoards, [])
+  assert.deepEqual(
+    rookRuleSet.help.noteBoards.map(({ id }) => id),
+    ['rook-phase-two-box'],
+  )
 
   const registeredQueen = getMateRuleSet('queen')
   const registeredRook = getMateRuleSet('rook')

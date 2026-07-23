@@ -116,7 +116,14 @@ export type RuleNoteBoardPiece = {
 
 export type RuleNoteBoardHighlight = {
   readonly square: string
-  readonly kind: 'zone' | 'escape' | 'key' | 'red'
+  readonly kind:
+    | 'zone'
+    | 'escape'
+    | 'key'
+    | 'red'
+    | 'box'
+    | 'wall'
+    | 'support'
 }
 
 export type RuleNoteBoardArrow = {

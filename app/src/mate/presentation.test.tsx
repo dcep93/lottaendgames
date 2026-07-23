@@ -1241,6 +1241,104 @@ test('priority guide follows registered facade order and renders typed diagrams'
   assert.doesNotMatch(markup, /<img\b|https?:\/\//)
 })
 
+test('major-piece and two-bishops guides render compact teaching diagrams', () => {
+  const expectedBoards = {
+    queen: ['queen-box'],
+    rook: ['rook-phase-two-box'],
+    'two-bishops': ['bishop-wall', 'bishop-corner-finish'],
+  } as const
+
+  for (const [mateId, boardIds] of Object.entries(expectedBoards)) {
+    const ruleSet = getMateRuleSet(
+      mateId as keyof typeof expectedBoards,
+    )
+    assert.deepEqual(
+      ruleSet.help.noteBoards.map(({ id }) => id),
+      boardIds,
+    )
+    const markup = renderToStaticMarkup(
+      <MatePriorityGuideDialog
+        {...MATE_TRAINING_INFO_PROPS}
+        onClose={() => undefined}
+        ruleSet={ruleSet}
+      />,
+    )
+
+    assert.match(markup, /class="leg-mate-note-board"/)
+    assert.doesNotMatch(markup, /<img\b|https?:\/\//)
+  }
+
+  const queenBoard = getMateRuleSet('queen').help.noteBoards[0]!
+  assert.deepEqual(queenBoard.pieces, [
+    { square: 'a1', piece: 'K' },
+    { square: 'c4', piece: 'Q' },
+    { square: 'g7', piece: 'k' },
+  ])
+  assert.equal(queenBoard.highlights.length, 20)
+  assert.ok(queenBoard.highlights.every(({ kind }) => kind === 'box'))
+
+  const queenMarkup = renderToStaticMarkup(
+    <MatePriorityGuideDialog
+      {...MATE_TRAINING_INFO_PROPS}
+      onClose={() => undefined}
+      ruleSet={getMateRuleSet('queen')}
+    />,
+  )
+  assert.match(queenMarkup, />Queen box</)
+  assert.match(queenMarkup, /bound a 4 × 5 box containing Black/)
+  assert.match(queenMarkup, /data-highlight-kind="box"/)
+  assert.match(
+    queenMarkup,
+    /aria-label="Queen box\. White king on a1\. White queen on c4\. Black king on g7\./,
+  )
+
+  const rookBoard = getMateRuleSet('rook').help.noteBoards[0]!
+  assert.deepEqual(rookBoard.pieces, [
+    { square: 'c3', piece: 'K' },
+    { square: 'e2', piece: 'R' },
+    { square: 'g6', piece: 'k' },
+  ])
+  assert.equal(rookBoard.highlights.length, 24)
+  assert.ok(rookBoard.highlights.every(({ kind }) => kind === 'box'))
+
+  const rookMarkup = renderToStaticMarkup(
+    <MatePriorityGuideDialog
+      {...MATE_TRAINING_INFO_PROPS}
+      onClose={() => undefined}
+      ruleSet={getMateRuleSet('rook')}
+    />,
+  )
+  assert.match(rookMarkup, />Phase 2 box</)
+  assert.match(rookMarkup, /file is between the kings/)
+  assert.match(rookMarkup, /data-highlight-kind="box"/)
+
+  const bishopsRuleSet = getMateRuleSet('two-bishops')
+  const [wallBoard, cornerBoard] = bishopsRuleSet.help.noteBoards
+  assert.ok(wallBoard)
+  assert.ok(cornerBoard)
+  assert.ok(wallBoard.highlights.every(({ kind }) => kind === 'wall'))
+  assert.deepEqual(
+    new Set(cornerBoard.highlights.map(({ kind }) => kind)),
+    new Set(['support', 'wall']),
+  )
+
+  const bishopsMarkup = renderToStaticMarkup(
+    <MatePriorityGuideDialog
+      {...MATE_TRAINING_INFO_PROPS}
+      onClose={() => undefined}
+      ruleSet={bishopsRuleSet}
+    />,
+  )
+  assert.match(bishopsMarkup, />Bishop wall</)
+  assert.match(bishopsMarkup, />Corner finish</)
+  assert.match(bishopsMarkup, /data-highlight-kind="wall"/)
+  assert.match(bishopsMarkup, /data-highlight-kind="support"/)
+  assert.match(
+    bishopsMarkup,
+    /aria-label="Corner finish\. White king on b3\. White bishop on d4\. White bishop on e4\. Black king on a1\./,
+  )
+})
+
 test('every mate guide puts notes before shortcuts and the shared legend', () => {
   for (const { id } of MATE_CATALOG) {
     const markup = renderToStaticMarkup(
@@ -2005,6 +2103,18 @@ test('Mate exposes stable desktop and narrow-layout structure', () => {
   assert.match(
     css,
     /\.leg-mate-guide-footer\s*\{[^}]*display:\s*grid;[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\);[^}]*gap:\s*1\.1rem/s,
+  )
+  assert.match(
+    css,
+    /\.leg-mate-note-board\s*\{[^}]*width:\s*min\(100%, 18rem\)/s,
+  )
+  assert.match(
+    css,
+    /\.leg-mate-guide-note-boards\s*\{[^}]*grid-template-columns:\s*repeat\(auto-fit, minmax\(11rem, 18rem\)\)/s,
+  )
+  assert.match(
+    css,
+    /\.leg-mate-note-board-piece\s*\{[^}]*font-size:\s*clamp\(1\.45rem, 7vw, 2\.25rem\)/s,
   )
   assert.match(
     css,
