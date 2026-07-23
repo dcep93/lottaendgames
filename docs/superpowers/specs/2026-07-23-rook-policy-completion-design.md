@@ -17,21 +17,25 @@ halfmove clock near 100 cannot always be rescued in pawnless KRK.
 
 ## Considered approaches
 
-### 1. Complete the geometric policy and prove the whole policy
+### 1. Require visible forced-mate progress, then apply the geometric policy
 
-Keep the concise teaching rules, add the already-designed **king supports rook**
-priority, and use exhaustive SCC and longest-path verification to find and fix
-every remaining counterexample. This preserves the trainer's purpose: a human
-can reproduce every recommendation from the modal.
+Use the generated KRK proof table for one visible binary gate: every surviving
+White move must reduce the worst-case number of plies remaining before mate.
+Then use the concise geometric rules to choose among all progressing moves.
 
-This is the selected approach.
+This is the selected approach. Unlike the removed `shortest mate` rule, it does
+not prefer the single shortest move or compare exact distances among progressing
+moves. It rejects only moves that allow Black to erase the current progress.
+The modal and reason column expose the gate as `no backtracking`, so it is not a
+hidden engine tiebreak.
 
-### 2. Filter every move through exact distance to mate
+### 2. Complete the geometry without a proof gate
 
-The bundled KRK table could force strict distance-to-mate descent. This would be
-easy to prove but would silently override human strategy with an engine-like
-number. Earlier work deliberately removed `shortest mate`; restoring it would
-make the reason column incomplete or mysterious.
+Keep adding geometric priorities until the exhaustive graph becomes acyclic.
+The attempted `king supports rook` priority disproved this approach: it
+increased the cyclic graph from 25 components and 1,198 states to 46 components
+and 1,338 states. Other local box and king-approach changes moved cycles rather
+than eliminating them.
 
 ### 3. Replace the Rook rules wholesale
 
@@ -49,44 +53,42 @@ The universal rules remain first:
 
 The Rook rules then apply in this order:
 
-4. `push with check` — Check when every reply pushes Black farther from White's
+4. `no backtracking` — Every Black reply must shorten the remaining forced
+   mate.
+5. `push with check` — Check when every reply pushes Black farther from White's
    king.
-5. `establish box` — Use the Rook to make a phase 2 box.
-6. `waiting move` — When the kings are a knight's move apart, make a safe,
+6. `establish box` — Use the Rook to make a phase 2 box. When Black is on the
+   edge, shrink it.
+7. `waiting move` — When the kings are a knight's move apart, make a safe,
    quiet Rook move that keeps the box; prefer White's king between the other
    pieces and avoid finishing beside White's king.
-7. `king supports rook` — When White's king is more than two king moves from
-   the Rook, move it closer to the Rook.
 8. `king closer` — Move White's king closer to Black's king.
 9. `rook farther` — Keep the Rook farther from Black's king.
 
-`establish box` remains a non-expansion gate. If phase 2 already exists,
-preserving and shrinking its strongest box tie; leaving phase 2 or enlarging the
-box loses. This follows the latest approved rule and supersedes older fixtures
-that expected shrinkage to beat every preserving king move.
+`no backtracking` compares only whether a move descends the exact KRK
+forced-mate rank. The rank already includes Black's strongest legal response,
+so passing the gate means every Black reply leaves a shorter forced mate.
+Exact ranks do not break ties after the gate.
 
-`king supports rook` is active only when the starting Chebyshev distance from
-White's king to the Rook exceeds two. A king move that reduces that distance
-wins, a Rook move is neutral, and a king move that fails to reduce it loses.
-This changes the four-ply loop start from `Ke2` to `Kc2` without using history,
-a FEN exception, or a hidden mate-distance score.
+`establish box` remains a non-expansion gate. If phase 2 already exists, leaving
+phase 2 or enlarging the box loses. Preserving and shrinking it otherwise tie,
+except when Black is already on the edge: then the smaller resulting box wins.
 
 ## Counterexample loop
 
-After implementing the visible policy, run the symmetry-reduced exhaustive
-graph diagnostic in one process. For every reported cyclic component or
-fifty-move witness:
+Run the symmetry-reduced exhaustive graph diagnostic in one process. For every
+reported cyclic component or fifty-move witness:
 
 1. reduce it to its minimal repeating or draw-causing segment;
 2. inspect all legal White candidates and every legal Black response;
-3. identify the first visible rule that should distinguish the useful move;
-4. generalize the geometry without square, orientation, or literal box-size
-   exceptions;
+3. identify the first visible rule that distinguishes the useful move;
+4. generalize any necessary geometry without square, orientation, or literal
+   box-size exceptions;
 5. add a focused fixture and all-symmetry assertion;
 6. rerun the diagnostic.
 
-If no existing rule can explain a necessary distinction in plain language, add
-one concise rule and expose it in the modal. Do not add an invisible tiebreak.
+The proof gate is a generated position-only lookup, not history and not a FEN
+exception. Do not add an invisible tiebreak.
 
 ## Verification
 
@@ -98,7 +100,7 @@ tied White recommendation and every legal Black reply.
 - The identity-keyed verifier is the final cross-check if it is practical in a
   single bounded process.
 - The maximum proven line from every fresh-clock Standard root must be below
-  100 plies.
+  100 plies. The expected symmetry-reduced certificate is at most 31 plies.
 - Curated Training Wheels clocks must remain below 100 along their respective
   worst cases.
 - Focused Rook fixtures, the complete Mate suite, lint, build, generated-table

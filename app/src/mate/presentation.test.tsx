@@ -38,6 +38,7 @@ const ROOK_AFTER_REPLY = 'R7/6k1/8/8/8/8/8/K7 w - - 2 2'
 const ROOK_AFTER_ALT_REPLY = 'R7/7k/8/8/8/8/8/K7 w - - 2 2'
 const EXTERNAL_START = '6k1/8/8/8/8/3K4/8/R7 w - - 0 1'
 const MULTI_WHITE_START = '7R/2K3k1/8/8/8/8/8/8 w - - 0 1'
+const CYCLING_WHITE_START = '8/8/8/8/4R3/3k4/8/4K3 w - - 0 1'
 const MULTI_BLACK_START = '8/8/8/8/2k5/8/2K5/2R5 w - - 0 1'
 const ROOK_MATE_START = '7k/8/6K1/8/8/8/8/R7 w - - 0 1'
 const QUEEN_START = '8/8/8/8/4k3/8/8/3QK3 w - - 0 1'
@@ -925,7 +926,7 @@ test('reason hint is opt-in and reveals only the current rule label', async () =
     'data-mate-current-hint': true,
   })
   const hintText = reactNodeText(hint)
-  assert.equal(hintText, 'rook farther')
+  assert.equal(hintText, 'no backtracking')
   assert.doesNotMatch(hintText, /Rg2|a2|g2|bring White's king/i)
   assert.equal(hint.props.type, 'button')
 
@@ -2384,22 +2385,22 @@ test('Mate wires board, history, timer, and every log replacement action', async
 
     await act(async () => {
       mountedRenderer.update(
-        matePage('rook', 'standard', MULTI_WHITE_START),
+        matePage('rook', 'standard', CYCLING_WHITE_START),
       )
     })
     await act(async () => {
-      mountedRenderer.root.findByType(MateBoardProbe).props.onMove('Rh5')
+      mountedRenderer.root.findByType(MateBoardProbe).props.onMove('Rg4')
     })
     assert.equal(
       mountedRenderer.root.findByType(MateLog).props.logs[0].san,
-      'Rh5',
+      'Rg4',
     )
     await act(async () => {
       mountedRenderer.root.findByType(MateLog).props.onCycleIdealWhite(0)
     })
     assert.equal(
       mountedRenderer.root.findByType(MateLog).props.logs[0].san,
-      'Re8',
+      'Ra4',
     )
 
     await act(async () => {
@@ -2408,7 +2409,7 @@ test('Mate wires board, history, timer, and every log replacement action', async
     assert.equal(mountedRenderer.root.findByType(MateLog).props.logs.length, 0)
     assert.notEqual(
       mountedRenderer.root.findByType(MateBoardProbe).props.fen,
-      MULTI_WHITE_START,
+      CYCLING_WHITE_START,
     )
     assert.doesNotMatch(reactNodeText(mountedRenderer.root), /reset count/i)
   } finally {

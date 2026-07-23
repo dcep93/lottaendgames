@@ -27,6 +27,7 @@ import {
   getRookBoxFromFen,
   isQueenRankOrFileChannelBetween,
 } from './majorPieceGeometry'
+import { lookupMajorPieceMateProgress } from './majorPieceMateProgress'
 import { compareScoresByRules, selectIdealMoves } from './selection'
 import type {
   MateRuleSet,
@@ -62,9 +63,11 @@ export type RookWhiteMoveScore = {
   readonly matePenalty: number
   readonly rookCapturePenalty: number
   readonly stalematePenalty: number
+  readonly proofProgressPenalty: number
   readonly rookWaitingPenalty: number
   readonly rookEstablishBoxPenalty: number
   readonly rookPhaseTwoBoxSize: number | null
+  readonly rookFinishBoxSize: number | null
   readonly forcingCheckPenalty: number
   readonly kingApproachPriority: 0 | 1 | 2
   readonly kingDistance: number | null
@@ -349,11 +352,15 @@ export function scoreRookWhiteMove(
   fen: string,
   san: string,
 ): RookWhiteMoveScore {
+  const beforeMateProgress = lookupMajorPieceMateProgress('rook', fen)
   const beforeRook = findPiece(fen, 'w', 'r')
   const beforeWhiteKing = findPiece(fen, 'w', 'k')
   const beforeBlackKing = findPiece(fen, 'b', 'k')
   const beforeBox = getRookBoxFromFen(fen)
   const beforeIsPhaseTwo = getMajorEndgamePhase(fen, 'r') === 2
+  const blackEdgeDistance = beforeBlackKing
+    ? edgeDistance(beforeBlackKing.square)
+    : null
   const needsRookWaitingMove = Boolean(
     beforeBox.size !== null &&
       beforeWhiteKing &&
@@ -421,6 +428,7 @@ export function scoreRookWhiteMove(
         blackKing.square,
       ),
   )
+  const resultMateProgress = lookupMajorPieceMateProgress('rook', resultFen)
   const establishesPhaseTwoBox = Boolean(
     getMajorEndgamePhase(resultFen, 'r') === 2 &&
       (!beforeIsPhaseTwo || preservesOrShrinksBox),
@@ -475,10 +483,19 @@ export function scoreRookWhiteMove(
       : kingMoveImprovesAxis && !kingMoveRegressesAxis
         ? 0
         : 2
+  const forcingCheck =
+    chess.isCheck() &&
+    !chess.isCheckmate() &&
+    blackMustMoveAwayFromWhiteKing(resultFen)
+  const makesMateProgress =
+    beforeMateProgress.kind === 'winning' &&
+    resultMateProgress.kind === 'winning' &&
+    resultMateProgress.rank < beforeMateProgress.rank
   return {
     matePenalty: chess.isCheckmate() ? 0 : 1,
     rookCapturePenalty: rookIsSafe ? 0 : 1,
     stalematePenalty: !chess.isCheckmate() && chess.isStalemate() ? 1 : 0,
+    proofProgressPenalty: makesMateProgress ? 0 : 1,
     rookWaitingPenalty: !needsRookWaitingMove
       ? 0
       : preferredRookWaitingMove
@@ -488,12 +505,11 @@ export function scoreRookWhiteMove(
           : 2,
     rookEstablishBoxPenalty: establishesPhaseTwoBox ? 0 : 1,
     rookPhaseTwoBoxSize: establishesPhaseTwoBox ? resultBox.size : null,
-    forcingCheckPenalty:
-      chess.isCheck() &&
-      !chess.isCheckmate() &&
-      blackMustMoveAwayFromWhiteKing(resultFen)
-        ? 0
-        : 1,
+    rookFinishBoxSize:
+      blackEdgeDistance === 0 && establishesPhaseTwoBox
+        ? resultBox.size
+        : null,
+    forcingCheckPenalty: forcingCheck ? 0 : 1,
     kingApproachPriority,
     kingDistance: resultKingDistance,
     kingManhattanDistance:
@@ -527,6 +543,14 @@ export const rookWhiteRules: readonly OrderedRule<RookWhiteMoveScore>[] = [
       first.stalematePenalty - second.stalematePenalty,
   },
   {
+    id: 'no backtracking',
+    shortLabel: 'no backtracking',
+    helpText:
+      'Every Black reply must shorten the remaining forced mate.',
+    compare: (first, second) =>
+      first.proofProgressPenalty - second.proofProgressPenalty,
+  },
+  {
     id: 'forcing check',
     shortLabel: 'push with check',
     helpText:
@@ -537,9 +561,14 @@ export const rookWhiteRules: readonly OrderedRule<RookWhiteMoveScore>[] = [
   {
     id: 'establish box',
     shortLabel: 'establish box',
-    helpText: 'Use the Rook to make a phase 2 box.',
+    helpText:
+      'Use the Rook to make a phase 2 box. When Black is on the edge, shrink it.',
     compare: (first, second) =>
-      first.rookEstablishBoxPenalty - second.rookEstablishBoxPenalty,
+      first.rookEstablishBoxPenalty - second.rookEstablishBoxPenalty ||
+      compareOptionalDistances(
+        first.rookFinishBoxSize,
+        second.rookFinishBoxSize,
+      ),
   },
   {
     id: 'rook waiting move',
