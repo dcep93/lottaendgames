@@ -33,7 +33,7 @@ function phaseLog(phase: string): MateLogEntry {
     isCorrect: true,
     correctChoices: 1,
     durationMs: 0,
-    reasonId: 'establish box',
+    reasonId: 'build box',
   }
 }
 

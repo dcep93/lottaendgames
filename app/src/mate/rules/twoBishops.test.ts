@@ -19,12 +19,12 @@ const WHITE_RULE_IDS = [
   'no stalemate',
   'finish guarantee',
   'waiting move',
-  'corner support',
-  'keep phase two',
-  'take direct opposition',
-  'avoid bishop screening',
-  'bishops together',
-  'coordinate bishops',
+  'corner finish',
+  'corner finish',
+  'corner finish',
+  'bishop wall',
+  'bishop wall',
+  'bishop wall',
   'king closer',
 ] as const
 
@@ -39,7 +39,20 @@ test('Two Bishops exposes concise position-only teaching rules', () => {
   }
   assert.match(
     twoBishopsWhiteRules.find(({ id }) => id === 'waiting move')!.helpText,
-    /corner-color/,
+    /controls that corner/,
+  )
+  assert.deepEqual(
+    getMateRuleSet('two-bishops').whiteRuleDescriptions.map(({ id }) => id),
+    [
+      'mate',
+      'bishops safe',
+      'no stalemate',
+      'finish guarantee',
+      'waiting move',
+      'corner finish',
+      'bishop wall',
+      'king closer',
+    ],
   )
 })
 
@@ -167,13 +180,13 @@ test('Black resistance and the finish guarantee stay explicit', () => {
   assert.deepEqual(help.blackPriorities, [
     'Return to the previous board position when a legal reply can recreate it.',
     "Take a piece if White isn't looking.",
-    'Move towards the center.',
-    'Move towards an unprotected bishop.',
+    'Move toward the center.',
+    'Move toward an unprotected bishop.',
   ])
   const guard = ruleSet.whiteRuleDescriptions.find(
     ({ presentationRole }) => presentationRole === 'guard',
   )
   assert.equal(guard?.id, 'finish guarantee')
-  assert.match(guard?.helpText ?? '', /loop/)
-  assert.match(guard?.helpText ?? '', /fifty-move rule/)
+  assert.match(guard?.helpText ?? '', /repetition/)
+  assert.match(guard?.helpText ?? '', /fifty-move draw/)
 })

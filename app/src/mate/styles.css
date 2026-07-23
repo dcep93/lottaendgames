@@ -704,7 +704,7 @@
 
 .leg-mate-guide-note-boards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(11rem, 18rem));
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 14rem));
   gap: 0.75rem;
   margin-top: 0.35rem;
 }
@@ -712,7 +712,7 @@
 .leg-mate-note-board {
   display: grid;
   gap: 0.45rem;
-  width: min(100%, 18rem);
+  width: min(100%, 14rem);
   min-width: 0;
   margin: 0;
   border: 0.0625rem solid var(--leg-border);
@@ -778,6 +778,11 @@
 .leg-mate-note-board-square--box {
   background: rgba(255, 123, 195, 0.34);
   box-shadow: inset 0 0 0 0.08rem rgba(255, 221, 239, 0.45);
+}
+
+.leg-mate-note-board-square--cage {
+  background: rgba(255, 123, 195, 0.58);
+  box-shadow: inset 0 0 0 0.14rem rgba(255, 235, 246, 0.82);
 }
 
 .leg-mate-note-board-square--wall {

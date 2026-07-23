@@ -74,6 +74,14 @@ const WHITE_INTRO =
 
 const BLACK_INTRO =
   'Black uses its own priorities to put up the strongest resistance. Black is not trying to help the mate; it looks for the most stubborn legal reply.'
+const FINISH_GUARANTEE_HELP =
+  'Every recommended move keeps mate forced and rules out repetition or a fifty-move draw.'
+const WAITING_MOVE_HELP =
+  "When White's king holds Black back, keep the wall with a quiet bishop move so Black must give ground. Near a corner, move the bishop that controls that corner first."
+const CORNER_FINISH_HELP =
+  "Drive Black to the edge and keep it there. Put White's king a knight's move from the mating corner, then take direct opposition."
+const BISHOP_WALL_HELP =
+  "Keep White's king clear of the bishops' lines. Place the bishops side by side, then shrink Black's room."
 
 const twoBishopsHelp: RuleHelp = {
   title: 'How best moves are chosen',
@@ -82,8 +90,8 @@ const twoBishopsHelp: RuleHelp = {
   blackPriorities: [
     'Return to the previous board position when a legal reply can recreate it.',
     "Take a piece if White isn't looking.",
-    'Move towards the center.',
-    'Move towards an unprotected bishop.',
+    'Move toward the center.',
+    'Move toward an unprotected bishop.',
   ],
   notes: [
     "Phase 2 begins when Black's king is on an edge and White's king controls at least two squares in front of it. The diagonal approach that forces Black along the edge also counts.",
@@ -91,30 +99,30 @@ const twoBishopsHelp: RuleHelp = {
   noteBoards: [
     {
       id: 'bishop-wall',
-      title: 'Bishop wall',
+      title: 'bishop wall',
       caption:
         "Keep the bishops beside each other so their diagonals form one wall and shrink Black's room.",
+      layout: { files: 6, ranks: 6, fileOffset: 0 },
       pieces: [
-        { square: 'c2', piece: 'K' },
-        { square: 'd3', piece: 'B' },
-        { square: 'e3', piece: 'B' },
-        { square: 'g7', piece: 'k' },
+        { square: 'b1', piece: 'K' },
+        { square: 'c2', piece: 'B' },
+        { square: 'd2', piece: 'B' },
+        { square: 'f6', piece: 'k' },
       ],
       highlights: [
+        'd3',
         'e4',
         'f5',
-        'g6',
-        'h7',
+        'e3',
         'f4',
-        'g5',
-        'h6',
       ].map((square) => ({ square, kind: 'wall' as const })),
     },
     {
       id: 'bishop-corner-finish',
-      title: 'Corner finish',
+      title: 'corner finish',
       caption:
         "The king supports from a knight's move away while the bishop wall covers the corner and last escape.",
+      layout: { files: 5, ranks: 5, fileOffset: 0 },
       pieces: [
         { square: 'b3', piece: 'K' },
         { square: 'd4', piece: 'B' },
@@ -260,8 +268,7 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
   {
     id: 'finish guarantee',
     shortLabel: 'finish guarantee',
-    helpText:
-      'The app filters out moves that could loop or draw by the fifty-move rule. You do not need to calculate this.',
+    helpText: FINISH_GUARANTEE_HELP,
     presentationRole: 'guard',
     compare: (first, second) =>
       first.proofProgressPenalty - second.proofProgressPenalty,
@@ -269,16 +276,14 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
   {
     id: 'waiting move',
     shortLabel: 'waiting move',
-    helpText:
-      "When White's king holds Black back, move a bishop without loosening the net so Black must give ground. Near the corner, use the corner-color bishop while the bishops are close; then continue with the king or other bishop.",
+    helpText: WAITING_MOVE_HELP,
     compare: (first, second) =>
       first.phaseTwoWaitingMovePenalty - second.phaseTwoWaitingMovePenalty,
   },
   {
-    id: 'corner support',
-    shortLabel: 'corner support',
-    helpText:
-      "Move White's king toward a square a knight's move from the mating corner, without letting Black leave the edge.",
+    id: 'corner finish',
+    shortLabel: 'corner finish',
+    helpText: CORNER_FINISH_HELP,
     applies: (score) => score.matingSupportDistance !== null,
     compare: (first, second) =>
       (first.matingSupportDistance ?? 0) -
@@ -287,41 +292,39 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
         second.phaseTwoStayPhaseTwoPenalty,
   },
   {
-    id: 'keep phase two',
-    shortLabel: 'keep phase two',
-    helpText: 'Enter or remain in phase 2.',
+    id: 'corner finish',
+    shortLabel: 'corner finish',
+    helpText: CORNER_FINISH_HELP,
     compare: (first, second) =>
       first.phaseTwoStayPhaseTwoPenalty -
       second.phaseTwoStayPhaseTwoPenalty,
   },
   {
-    id: 'take direct opposition',
-    shortLabel: 'take direct opposition',
-    helpText: "Put White's king two squares in front of Black's king.",
+    id: 'corner finish',
+    shortLabel: 'corner finish',
+    helpText: CORNER_FINISH_HELP,
     compare: (first, second) =>
       first.phaseTwoTakeDirectOppositionPenalty -
       second.phaseTwoTakeDirectOppositionPenalty,
   },
   {
-    id: 'avoid bishop screening',
-    shortLabel: 'avoid bishop screening',
-    helpText:
-      "Keep White's king from screening the bishops from Black's king.",
+    id: 'bishop wall',
+    shortLabel: 'bishop wall',
+    helpText: BISHOP_WALL_HELP,
     compare: (first, second) =>
       first.kingBishopScreeningPenalty - second.kingBishopScreeningPenalty,
   },
   {
-    id: 'bishops together',
-    shortLabel: 'bishops together',
-    helpText: 'Keep the bishops beside each other so their diagonals form a wall.',
+    id: 'bishop wall',
+    shortLabel: 'bishop wall',
+    helpText: BISHOP_WALL_HELP,
     compare: (first, second) =>
       first.bishopAdjacencyPenalty - second.bishopAdjacencyPenalty,
   },
   {
-    id: 'coordinate bishops',
-    shortLabel: 'coordinate bishops',
-    helpText:
-      "Use the bishop wall to shrink Black's room.",
+    id: 'bishop wall',
+    shortLabel: 'bishop wall',
+    helpText: BISHOP_WALL_HELP,
     compare: (first, second) =>
       first.blackKingReachableArea - second.blackKingReachableArea,
   },

@@ -58,7 +58,7 @@ const ROOK_LOGS: readonly MateLogEntry[] = [
     idealOpponentChoices: 2,
     legalOpponentChoices: 3,
     durationMs: 1_234,
-    reasonId: 'king closer',
+    reasonId: 'bring king',
   },
   {
     fen: EXTERNAL_START,
@@ -70,7 +70,7 @@ const ROOK_LOGS: readonly MateLogEntry[] = [
     idealOpponentChoices: 1,
     legalOpponentChoices: 4,
     durationMs: 61_007,
-    reasonId: 'establish box',
+    reasonId: 'build box',
   },
   {
     fen: '7k/8/6K1/8/8/8/8/R7 w - - 0 1',
@@ -747,8 +747,8 @@ test('Mate log exposes every training field and semantic cycle controls', () => 
   assert.doesNotMatch(markup, />Correct<|>Incorrect<|>\d+ correct choices?<\/button>/)
   assert.match(markup, />0:01\.234</)
   assert.match(markup, />1:01\.007</)
-  assert.match(markup, />king closer</)
-  assert.match(markup, />establish box</)
+  assert.match(markup, />bring the king</)
+  assert.match(markup, />build the box</)
   assert.match(
     markup,
     /aria-label="Cycle ideal White move for move 1; 2 correct choices"/,
@@ -926,7 +926,7 @@ test('reason hint is opt-in and reveals only the current rule label', async () =
     'data-mate-current-hint': true,
   })
   const hintText = reactNodeText(hint)
-  assert.equal(hintText, 'establish box')
+  assert.equal(hintText, 'build the box')
   assert.doesNotMatch(hintText, /Rg2|a2|g2|bring White's king/i)
   assert.equal(hint.props.type, 'button')
 
@@ -954,7 +954,7 @@ test('clicking a reason highlights its guide priority until a generic reopen', a
   await act(async () => {
     renderer.root
       .findByProps({
-        'aria-label': 'establish box. Open priority guide',
+        'aria-label': 'build the box. Open priority guide',
       })
       .props.onClick({ currentTarget: null })
   })
@@ -962,7 +962,7 @@ test('clicking a reason highlights its guide priority until a generic reopen', a
     'aria-current': 'true',
   })
   assert.equal(highlighted.length, 1)
-  assert.match(reactNodeText(highlighted[0]), /^establish box/)
+  assert.match(reactNodeText(highlighted[0]), /^build the box/)
 
   await act(async () => {
     renderer.root
@@ -1243,7 +1243,7 @@ test('priority guide follows registered facade order and renders typed diagrams'
 
 test('major-piece and two-bishops guides render compact teaching diagrams', () => {
   const expectedBoards = {
-    queen: ['queen-box'],
+    queen: ['queen-corner-cage'],
     rook: ['rook-phase-two-box'],
     'two-bishops': ['bishop-wall', 'bishop-corner-finish'],
   } as const
@@ -1270,12 +1270,21 @@ test('major-piece and two-bishops guides render compact teaching diagrams', () =
 
   const queenBoard = getMateRuleSet('queen').help.noteBoards[0]!
   assert.deepEqual(queenBoard.pieces, [
-    { square: 'a1', piece: 'K' },
-    { square: 'c4', piece: 'Q' },
-    { square: 'g7', piece: 'k' },
+    { square: 'a3', piece: 'K' },
+    { square: 'd2', piece: 'Q' },
+    { square: 'a1', piece: 'k' },
   ])
-  assert.equal(queenBoard.highlights.length, 20)
-  assert.ok(queenBoard.highlights.every(({ kind }) => kind === 'box'))
+  assert.deepEqual(queenBoard.layout, {
+    files: 4,
+    ranks: 4,
+    fileOffset: 0,
+  })
+  assert.deepEqual(queenBoard.highlights, [
+    { square: 'a1', kind: 'cage' },
+    { square: 'b1', kind: 'cage' },
+    { square: 'b3', kind: 'support' },
+  ])
+  assert.deepEqual(queenBoard.arrows, [{ from: 'a3', to: 'b3' }])
 
   const queenMarkup = renderToStaticMarkup(
     <MatePriorityGuideDialog
@@ -1284,21 +1293,27 @@ test('major-piece and two-bishops guides render compact teaching diagrams', () =
       ruleSet={getMateRuleSet('queen')}
     />,
   )
-  assert.match(queenMarkup, />Queen box</)
-  assert.match(queenMarkup, /bound a 4 × 5 box containing Black/)
-  assert.match(queenMarkup, /data-highlight-kind="box"/)
+  assert.match(queenMarkup, />two-square corner cage</)
+  assert.match(queenMarkup, /Only a1 and b1 remain/)
+  assert.match(queenMarkup, /data-highlight-kind="cage"/)
+  assert.match(queenMarkup, /data-arrow="a3-b3"/)
   assert.match(
     queenMarkup,
-    /aria-label="Queen box\. White king on a1\. White queen on c4\. Black king on g7\./,
+    /aria-label="two-square corner cage\. White king on a3\. White queen on d2\. Black king on a1\./,
   )
 
   const rookBoard = getMateRuleSet('rook').help.noteBoards[0]!
   assert.deepEqual(rookBoard.pieces, [
-    { square: 'c3', piece: 'K' },
-    { square: 'e2', piece: 'R' },
-    { square: 'g6', piece: 'k' },
+    { square: 'b2', piece: 'K' },
+    { square: 'd1', piece: 'R' },
+    { square: 'f5', piece: 'k' },
   ])
-  assert.equal(rookBoard.highlights.length, 24)
+  assert.deepEqual(rookBoard.layout, {
+    files: 6,
+    ranks: 6,
+    fileOffset: 0,
+  })
+  assert.equal(rookBoard.highlights.length, 12)
   assert.ok(rookBoard.highlights.every(({ kind }) => kind === 'box'))
 
   const rookMarkup = renderToStaticMarkup(
@@ -1308,7 +1323,7 @@ test('major-piece and two-bishops guides render compact teaching diagrams', () =
       ruleSet={getMateRuleSet('rook')}
     />,
   )
-  assert.match(rookMarkup, />Phase 2 box</)
+  assert.match(rookMarkup, />phase 2 box</)
   assert.match(rookMarkup, /file is between the kings/)
   assert.match(rookMarkup, /data-highlight-kind="box"/)
 
@@ -1316,6 +1331,16 @@ test('major-piece and two-bishops guides render compact teaching diagrams', () =
   const [wallBoard, cornerBoard] = bishopsRuleSet.help.noteBoards
   assert.ok(wallBoard)
   assert.ok(cornerBoard)
+  assert.deepEqual(wallBoard.layout, {
+    files: 6,
+    ranks: 6,
+    fileOffset: 0,
+  })
+  assert.deepEqual(cornerBoard.layout, {
+    files: 5,
+    ranks: 5,
+    fileOffset: 0,
+  })
   assert.ok(wallBoard.highlights.every(({ kind }) => kind === 'wall'))
   assert.deepEqual(
     new Set(cornerBoard.highlights.map(({ kind }) => kind)),
@@ -1329,13 +1354,13 @@ test('major-piece and two-bishops guides render compact teaching diagrams', () =
       ruleSet={bishopsRuleSet}
     />,
   )
-  assert.match(bishopsMarkup, />Bishop wall</)
-  assert.match(bishopsMarkup, />Corner finish</)
+  assert.match(bishopsMarkup, />bishop wall</)
+  assert.match(bishopsMarkup, />corner finish</)
   assert.match(bishopsMarkup, /data-highlight-kind="wall"/)
   assert.match(bishopsMarkup, /data-highlight-kind="support"/)
   assert.match(
     bishopsMarkup,
-    /aria-label="Corner finish\. White king on b3\. White bishop on d4\. White bishop on e4\. Black king on a1\./,
+    /aria-label="corner finish\. White king on b3\. White bishop on d4\. White bishop on e4\. Black king on a1\./,
   )
 })
 
@@ -1375,7 +1400,7 @@ test('Rook and Two Bishops separate the finish guarantee from human priorities',
     )
     assert.match(
       markup,
-      />finish guarantee<\/strong>[\s\S]*You do not need to calculate this/,
+      />finish guarantee<\/strong>[\s\S]*rules out repetition/,
       mateId,
     )
     assert.equal(
@@ -2106,11 +2131,11 @@ test('Mate exposes stable desktop and narrow-layout structure', () => {
   )
   assert.match(
     css,
-    /\.leg-mate-note-board\s*\{[^}]*width:\s*min\(100%, 18rem\)/s,
+    /\.leg-mate-note-board\s*\{[^}]*width:\s*min\(100%, 14rem\)/s,
   )
   assert.match(
     css,
-    /\.leg-mate-guide-note-boards\s*\{[^}]*grid-template-columns:\s*repeat\(auto-fit, minmax\(11rem, 18rem\)\)/s,
+    /\.leg-mate-guide-note-boards\s*\{[^}]*grid-template-columns:\s*repeat\(auto-fit, minmax\(10rem, 14rem\)\)/s,
   )
   assert.match(
     css,

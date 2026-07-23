@@ -122,6 +122,7 @@ export type RuleNoteBoardHighlight = {
     | 'key'
     | 'red'
     | 'box'
+    | 'cage'
     | 'wall'
     | 'support'
 }

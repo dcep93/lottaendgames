@@ -36,10 +36,10 @@ descriptions without changing evaluator order.
 
 After `mate`, `pieces safe`, and `no stalemate`:
 
-1. `corner cage` — Trap Black in a corner and its neighboring edge square,
-   then bring White's king to a mating-support square.
+1. `corner cage` — Trap Black in a corner and the neighboring edge square.
+   Then bring White's king to a mating-support square.
    - Retains cage construction before cage-support approach.
-2. `tighten the net` — Move White's pieces off the edge, keep the queen a
+2. `tighten the net` — Move White's pieces off the edge. Keep the queen a
    knight's move from Black's king, then shrink the box's shorter side before
    its longer side.
    - Retains edge occupancy, queen-knight distance, and ordered box dimensions.
@@ -50,15 +50,15 @@ After `mate`, `pieces safe`, and `no stalemate`:
 
 After the universal rules and `finish guarantee`:
 
-1. `build the box` — Use a checking push when it drives Black away from White's
-   king; otherwise place the rook between the kings to make a phase 2 box. When
-   Black reaches an edge, shrink the box.
+1. `build the box` — Check only when it pushes Black away from White's king.
+   Otherwise, place the rook between the kings to build a phase 2 box; once
+   Black reaches an edge, shrink it.
    - Retains checking-push priority before box establishment.
-2. `waiting move` — When the kings are a knight's move apart, keep the box with
-   a rook move. Prefer White's king between the rook and Black's king, without
-   placing the rook beside White's king.
-3. `bring the king` — Move White's king closer. If moves remain tied, keep the
-   rook farther from Black.
+2. `waiting move` — When the kings are a knight's move apart, keep the box by
+   moving the rook. Prefer White's king between the rook and Black's king, and
+   don't leave the rook beside White's king.
+3. `bring the king` — Move White's king closer. If moves are still tied, keep
+   the rook farther from Black.
    - Retains king approach before rook-distance comparison.
 
 ### Two Bishops
@@ -66,14 +66,13 @@ After the universal rules and `finish guarantee`:
 After the universal rules and `finish guarantee`:
 
 1. `waiting move` — When White's king holds Black back, keep the wall with a
-   quiet bishop move so Black must give ground. Near a corner, move the
-   corner-color bishop first.
-2. `corner finish` — Drive Black to the edge and keep it there. Bring White's
-   king to a support square a knight's move from the mating corner, then take
-   direct opposition.
+   quiet bishop move so Black must give ground. Near a corner, move the bishop
+   that controls that corner first.
+2. `corner finish` — Drive Black to the edge and keep it there. Put White's
+   king a knight's move from the mating corner, then take direct opposition.
    - Retains corner support, phase 2, and direct-opposition comparisons.
-3. `bishop wall` — Keep White's king out of the bishops' lines, place the
-   bishops side by side, and shrink Black's room.
+3. `bishop wall` — Keep White's king clear of the bishops' lines. Place the
+   bishops side by side, then shrink Black's room.
    - Retains screening, bishop adjacency, and reachable-area comparisons.
 4. `king closer` — Move White's king closer to Black's king.
 
