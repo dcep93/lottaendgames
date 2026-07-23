@@ -17,6 +17,7 @@ import {
   getWhiteBishopSquares,
   isTwoBishopsPhaseTwoPosition,
   sharesAnyEdge,
+  whiteBishopsAreAdjacent,
 } from './twoBishopsGeometry'
 
 function blackKingColorBishopStayedPut(
@@ -58,6 +59,31 @@ function getKnightMoveSquares(square: Square): Square[] {
   ).filter((candidate): candidate is Square => candidate !== null)
 }
 
+function getCornersAheadOfWhiteKing(
+  blackKing: Square,
+  whiteKing: Square,
+): Square[] {
+  const corners = getCurrentEdgeCorners(blackKing)
+  if (corners.length < 2) return corners
+  const black = squareCoordinates(blackKing)
+  const white = squareCoordinates(whiteKing)
+  const useFiles = black.rank === 0 || black.rank === 7
+  const blackAxis = useFiles ? black.file : black.rank
+  const whiteAxis = useFiles ? white.file : white.rank
+  if (blackAxis === whiteAxis) return corners
+  const direction = Math.sign(blackAxis - whiteAxis)
+  const cornerAxes = corners.map((corner) => {
+    const square = squareCoordinates(corner)
+    return useFiles ? square.file : square.rank
+  })
+  const targetAxis =
+    direction > 0 ? Math.max(...cornerAxes) : Math.min(...cornerAxes)
+  return corners.filter((corner) => {
+    const square = squareCoordinates(corner)
+    return (useFiles ? square.file : square.rank) === targetAxis
+  })
+}
+
 export function getPhaseTwoCornerSupportDistance(
   fen: string,
   resultFen: string,
@@ -71,6 +97,69 @@ export function getPhaseTwoCornerSupportDistance(
   )
   if (nearbyCorners.length !== 1) return null
   const supportSquares = getKnightMoveSquares(nearbyCorners[0])
+  return Math.min(
+    ...supportSquares.map((square) =>
+      kingDistance(whiteKing.square, square),
+    ),
+  )
+}
+
+export function getTwoBishopsMatingSupportDistance(
+  fen: string,
+  resultFen: string,
+): number | null {
+  if (!isTwoBishopsPhaseTwoPosition(fen)) return null
+  if (!whiteBishopsAreAdjacent(fen)) {
+    const nearbyCornerDistance = getPhaseTwoCornerSupportDistance(
+      fen,
+      resultFen,
+    )
+    if (nearbyCornerDistance !== null) return nearbyCornerDistance
+    const blackKing = findPiece(fen, 'b', 'k')
+    const startingWhiteKing = findPiece(fen, 'w', 'k')
+    const resultWhiteKing = findPiece(resultFen, 'w', 'k')
+    if (!blackKing || !startingWhiteKing || !resultWhiteKing) return null
+    const supportedCorners = getCurrentEdgeCorners(blackKing.square).filter(
+      (corner) =>
+        getKnightMoveSquares(corner).includes(startingWhiteKing.square),
+    )
+    if (supportedCorners.length === 0) return null
+    return Math.min(
+      ...supportedCorners
+        .flatMap(getKnightMoveSquares)
+        .map((square) => kingDistance(resultWhiteKing.square, square)),
+    )
+  }
+  const blackKing = findPiece(fen, 'b', 'k')
+  const startingWhiteKing = findPiece(fen, 'w', 'k')
+  const whiteKing = findPiece(resultFen, 'w', 'k')
+  if (!blackKing || !startingWhiteKing || !whiteKing) return null
+  const edgeCorners = getCurrentEdgeCorners(blackKing.square)
+  if (edgeCorners.length === 0) return null
+  const nearestCornerDistance = Math.min(
+    ...edgeCorners.map((corner) =>
+      kingDistance(blackKing.square, corner),
+    ),
+  )
+  const targetCorners =
+    nearestCornerDistance <= 1
+      ? edgeCorners.filter(
+          (corner) =>
+            kingDistance(blackKing.square, corner) ===
+            nearestCornerDistance,
+        )
+      : getCornersAheadOfWhiteKing(
+          blackKing.square,
+          startingWhiteKing.square,
+        )
+  const supportSquares = targetCorners.flatMap(getKnightMoveSquares)
+  if (supportSquares.includes(startingWhiteKing.square)) {
+    return Math.min(
+      ...supportSquares.map((square) =>
+        kingDistance(whiteKing.square, square),
+      ),
+    )
+  }
   return Math.min(
     ...supportSquares.map((square) =>
       kingDistance(whiteKing.square, square),
@@ -123,6 +212,14 @@ export function phaseTwoForceOpponentOppositionPenalty(
   resultFen: string,
 ): number {
   if (!isTwoBishopsPhaseTwoPosition(fen)) return 0
+  if (whiteBishopsAreAdjacent(fen)) return 0
+  const startingBishops = getWhiteBishopSquares(fen)
+  if (
+    startingBishops.length === 2 &&
+    kingDistance(startingBishops[0], startingBishops[1]) > 3
+  ) {
+    return 0
+  }
   if (
     !getChess(resultFen).isCheck() &&
     !blackKingColorBishopStayedPut(fen, resultFen)
@@ -149,21 +246,19 @@ export function phaseTwoForceOpponentOppositionPenalty(
   })
 }
 
-function whiteKingOccupiesBishopControlledSquare(fen: string): boolean {
-  const whiteKing = findPiece(fen, 'w', 'k')
-  return Boolean(
-    whiteKing &&
-      getWhiteBishopSquares(fen).some((bishop) =>
-        bishopControlsOrOccupiesSquare(fen, bishop, whiteKing.square),
-      ),
-  )
-}
-
 export function phaseTwoTakeDirectOppositionPenalty(
   fen: string,
   resultFen: string,
 ): number {
   if (!isTwoBishopsPhaseTwoPosition(fen)) return 0
+  if (whiteBishopsAreAdjacent(fen)) return 0
+  const startingBishops = getWhiteBishopSquares(fen)
+  if (
+    startingBishops.length === 2 &&
+    kingDistance(startingBishops[0], startingBishops[1]) > 3
+  ) {
+    return 0
+  }
   const startingWhiteKing = findPiece(fen, 'w', 'k')
   const resultWhiteKing = findPiece(resultFen, 'w', 'k')
   const resultBlackKing = findPiece(resultFen, 'b', 'k')
@@ -178,10 +273,7 @@ export function phaseTwoTakeDirectOppositionPenalty(
   ) {
     return 1
   }
-  const kingMoved = startingWhiteKing.square !== resultWhiteKing.square
-  return kingMoved && whiteKingOccupiesBishopControlledSquare(resultFen)
-    ? 1
-    : 0
+  return 0
 }
 
 function getEdgeSquaresTwoFromSquare(square: Square): Square[] {
@@ -256,22 +348,33 @@ export function phaseTwoPushFromControlledEdgeSquarePenalty(
 }
 
 function getTargetEdgeCorners(
-  resultFen: string,
+  fen: string,
   blackKing: Square,
 ): Square[] {
-  const currentEdgeCorners = getCurrentEdgeCorners(blackKing)
-  if (currentEdgeCorners.length === 0) return []
-  const whiteKing = findPiece(resultFen, 'w', 'k')
+  const whiteKing = findPiece(fen, 'w', 'k')
   if (!whiteKing) return []
-  const bestWhiteKingDistance = Math.min(
-    ...currentEdgeCorners.map((corner) =>
-      kingDistance(whiteKing.square, corner),
-    ),
+  return getCornersAheadOfWhiteKing(blackKing, whiteKing.square)
+}
+
+export function phaseTwoNewSupportBlockerPenalty(
+  fen: string,
+  resultFen: string,
+): number {
+  if (!isTwoBishopsPhaseTwoPosition(fen)) return 0
+  const blackKing = findPiece(fen, 'b', 'k')
+  if (!blackKing) return 0
+  const targetCorners = getTargetEdgeCorners(fen, blackKing.square)
+  if (targetCorners.length === 0) return 0
+  const supportSquares = new Set(targetCorners.flatMap(getKnightMoveSquares))
+  const startingBlockers = getWhiteBishopSquares(fen).filter((square) =>
+    supportSquares.has(square),
+  ).length
+  if (startingBlockers > 0) return 0
+  return getWhiteBishopSquares(resultFen).some((square) =>
+    supportSquares.has(square),
   )
-  return currentEdgeCorners.filter(
-    (corner) =>
-      kingDistance(whiteKing.square, corner) === bestWhiteKingDistance,
-  )
+    ? 1
+    : 0
 }
 
 function getCurrentEdgeCornerDistance(
@@ -298,10 +401,7 @@ export function phaseTwoForceOpponentCornerPenalty(
   if (!isTwoBishopsPhaseTwoPosition(fen)) return 0
   const startingBlackKing = findPiece(fen, 'b', 'k')
   if (!startingBlackKing) return 0
-  const targetCorners = getTargetEdgeCorners(
-    resultFen,
-    startingBlackKing.square,
-  )
+  const targetCorners = getTargetEdgeCorners(fen, startingBlackKing.square)
   if (targetCorners.length === 0) return 0
   const blackMoves = getChess(resultFen).moves()
   if (blackMoves.length === 0) return 0

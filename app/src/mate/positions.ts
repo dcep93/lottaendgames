@@ -10,6 +10,7 @@ import {
   getChess,
   getEndgamePieces,
   getSquareTransform,
+  kingDistance,
   randomTransformFen,
   squareColor,
   transformFen,
@@ -129,6 +130,44 @@ export function isSupportedTwoKnightsPawnStart(
     : supportedTwoKnightsPawnStarts[mode].has(canonicalFen)
 }
 
+export function isViableTwoBishopsStart(fen: string): boolean {
+  const chess = getChess(fen)
+  const pieces = chess.board().flat().filter((piece) => piece !== null)
+  const blackKing = pieces.find(
+    (piece) => piece.color === 'b' && piece.type === 'k',
+  )
+  const bishops = pieces.filter(
+    (piece) => piece.color === 'w' && piece.type === 'b',
+  )
+  if (!blackKing || bishops.length !== 2 || chess.turn() !== 'w') {
+    return false
+  }
+  if (
+    bishops.every(
+      (bishop) => kingDistance(blackKing.square, bishop.square) > 1,
+    )
+  ) {
+    return true
+  }
+
+  return chess.moves().some((san) => {
+    const afterWhite = getChess(fen)
+    afterWhite.move(san)
+    if (afterWhite.isCheckmate()) return true
+    if (afterWhite.isGameOver()) return false
+    return afterWhite.moves().every((blackSan) => {
+      const afterBlack = getChess(afterWhite.fen())
+      afterBlack.move(blackSan)
+      return afterBlack
+        .board()
+        .flat()
+        .filter(
+          (piece) => piece?.color === 'w' && piece.type === 'b',
+        ).length === 2
+    })
+  })
+}
+
 function generateTwoKnightsPawnPosition(
   mode: MateMode,
   random: () => number,
@@ -184,7 +223,10 @@ function generateStandardAttempt(
   }
 
   const fen = `${boardFenFromPlacements(placements)} w - - 0 1`
-  return validateMatePosition(mateId, fen).ok ? fen : null
+  if (!validateMatePosition(mateId, fen).ok) return null
+  return mateId !== 'two-bishops' || isViableTwoBishopsStart(fen)
+    ? fen
+    : null
 }
 
 function getCatalogEntry(mateId: MateId): MateCatalogEntry {

@@ -1,23 +1,22 @@
-import { findPiece, getChess, kingDistance } from '../chess'
+import {
+  findPiece,
+  getChess,
+  kingDistance,
+  manhattanDistance,
+} from '../chess'
 import { getEndgameReturnToPositionMoves } from './majorPieces'
 import { compareScoresByRules, selectIdealMoves } from './selection'
 import {
-  blackCanTakeWhiteBishops,
-  blackCanWalkUpToWhiteBishop,
   centerDistance,
   distanceToNearestUnprotectedWhiteBishop,
+  getBlackKingReachableArea,
   getTwoBishopsPhaseLabel,
-  getWhiteBishopDistanceToSquare,
+  getWhiteBishopSquares,
   getWhiteKingBishopScreeningPenalty,
   whiteBishopsAreAdjacent,
 } from './twoBishopsGeometry'
 import {
-  getPhaseTwoCornerSupportDistance,
-  phaseTwoBishopCornerDistance,
-  phaseTwoCheckPenalty,
-  phaseTwoForceOpponentCornerPenalty,
-  phaseTwoForceOpponentOppositionPenalty,
-  phaseTwoPushFromControlledEdgeSquarePenalty,
+  getTwoBishopsMatingSupportDistance,
   phaseTwoStayPhaseTwoPenalty,
   phaseTwoTakeDirectOppositionPenalty,
 } from './twoBishopsPhaseTwo'
@@ -26,6 +25,10 @@ import {
   twoBishopsPhaseTwoWaitingMovePenalty,
   type TwoBishopsWaitingMoveContext,
 } from './twoBishopsWaitingMoves'
+import {
+  getTwoBishopsProofDistance,
+  isTwoBishopsProofProgress,
+} from './twoBishopsProof'
 import type {
   MateRuleSet,
   OpponentCandidates,
@@ -38,19 +41,17 @@ export type TwoBishopsWhiteMoveScore = {
   readonly matePenalty: number
   readonly stalematePenalty: number
   readonly bishopSafetyPenalty: number
+  readonly proofProgressPenalty: number
+  readonly proofWorstReplyDistance: number
   readonly phaseTwoStayPhaseTwoPenalty: number
   readonly phaseTwoWaitingMovePenalty: number
-  readonly phaseTwoCornerSupportDistance: number | null
-  readonly phaseTwoForceOpponentOppositionPenalty: number
+  readonly matingSupportDistance: number | null
   readonly phaseTwoTakeDirectOppositionPenalty: number
-  readonly phaseTwoPushFromControlledEdgeSquarePenalty: number
-  readonly phaseTwoForceOpponentCornerPenalty: number
-  readonly phaseTwoCheckPenalty: number
-  readonly phaseTwoBishopCornerDistance: number
   readonly kingBishopScreeningPenalty: number
   readonly bishopAdjacencyPenalty: number
-  readonly bishopBlackKingDistance: number
+  readonly blackKingReachableArea: number
   readonly whiteBlackKingDistance: number
+  readonly whiteBlackKingManhattanDistance: number
 }
 
 export type TwoBishopsBlackMoveScore = {
@@ -58,6 +59,15 @@ export type TwoBishopsBlackMoveScore = {
   readonly centerDistance: number
   readonly unprotectedBishopDistance: number
 }
+
+type TwoBishopsProofPrefix = Pick<
+  TwoBishopsWhiteMoveScore,
+  | 'matePenalty'
+  | 'stalematePenalty'
+  | 'bishopSafetyPenalty'
+  | 'proofProgressPenalty'
+  | 'proofWorstReplyDistance'
+>
 
 const WHITE_INTRO =
   "White's best moves are the moves that survive these priorities in order. If several moves are still tied after a priority, they all remain best moves."
@@ -76,10 +86,66 @@ const twoBishopsHelp: RuleHelp = {
     'Move towards an unprotected bishop.',
   ],
   notes: [
-    "Phase 2 is where Black's king is on an edge and White's king controls at least 2 squares in front of Black's king. Phase 2 also includes positions where White's king is two diagonal squares from Black's king and Black is forced to move along the edge toward White's king.",
-    'A phase 2 waiting move keeps the mating net while making Black move.',
+    "Phase 2 begins when Black's king is on an edge and White's king controls at least two squares in front of it. The diagonal approach that forces Black along the edge also counts.",
+    'No backtracking is checked from the current board against a bundled proof of every legal two-bishop position. It uses no move history, engine, or network request; the human rules choose among the moves that pass.',
   ],
   noteBoards: [],
+}
+
+function scoreTwoBishopsProofPrefix(
+  fen: string,
+  san: string,
+  waitingMoveContext: TwoBishopsWaitingMoveContext,
+): TwoBishopsProofPrefix {
+  const chess = getChess(fen)
+  const move = chess.move(san)
+  const resultFen = chess.fen()
+  const currentProofDistance = getTwoBishopsProofDistance(fen)
+  const replyProofDistances = chess.moves().map((reply) => {
+    const afterBlack = getChess(resultFen)
+    afterBlack.move(reply)
+    return getTwoBishopsProofDistance(afterBlack.fen())
+  })
+  const proofWorstReplyDistance = chess.isCheckmate()
+    ? 0
+    : replyProofDistances.length > 0 &&
+        replyProofDistances.every((distance) => distance !== null)
+      ? Math.max(...replyProofDistances)
+      : 255
+  const isSupportedCornerWaitingMove = waitingMoveContext.supportedCornerMoves.some(
+    (candidate) => candidate.from === move.from && candidate.to === move.to,
+  )
+  const startingBishops = getWhiteBishopSquares(fen)
+  const resultBishops = getWhiteBishopSquares(resultFen)
+  const startingBishopDistance =
+    startingBishops.length === 2
+      ? kingDistance(startingBishops[0], startingBishops[1])
+      : 99
+  const resultingBishopDistance =
+    resultBishops.length === 2
+      ? kingDistance(resultBishops[0], resultBishops[1])
+      : 99
+  return {
+    matePenalty: chess.isCheckmate() ? 0 : 1,
+    stalematePenalty: !chess.isCheckmate() && chess.isStalemate() ? 1 : 0,
+    bishopSafetyPenalty: replyProofDistances.some(
+      (distance) => distance === null,
+    )
+      ? 1
+      : 0,
+    proofProgressPenalty:
+      chess.isCheckmate() ||
+      isTwoBishopsProofProgress({
+        currentDistance: currentProofDistance,
+        worstReplyDistance: proofWorstReplyDistance,
+        supportedCornerWait: isSupportedCornerWaitingMove,
+        startingBishopDistance,
+        resultingBishopDistance,
+      })
+        ? 0
+        : 1,
+    proofWorstReplyDistance,
+  }
 }
 
 export function scoreTwoBishopsWhiteMove(
@@ -87,6 +153,11 @@ export function scoreTwoBishopsWhiteMove(
   san: string,
   waitingMoveContext: TwoBishopsWaitingMoveContext =
     getTwoBishopsWaitingMoveContext(fen),
+  proofPrefix: TwoBishopsProofPrefix = scoreTwoBishopsProofPrefix(
+    fen,
+    san,
+    waitingMoveContext,
+  ),
 ): TwoBishopsWhiteMoveScore {
   const chess = getChess(fen)
   const move = chess.move(san)
@@ -94,44 +165,29 @@ export function scoreTwoBishopsWhiteMove(
   const blackKing = findPiece(resultFen, 'b', 'k')
   const whiteKing = findPiece(resultFen, 'w', 'k')
   return {
-    matePenalty: chess.isCheckmate() ? 0 : 1,
-    stalematePenalty: !chess.isCheckmate() && chess.isStalemate() ? 1 : 0,
-    bishopSafetyPenalty:
-      blackCanTakeWhiteBishops(resultFen) ||
-      blackCanWalkUpToWhiteBishop(resultFen)
-        ? 1
-        : 0,
+    ...proofPrefix,
     phaseTwoStayPhaseTwoPenalty: phaseTwoStayPhaseTwoPenalty(fen, resultFen),
     phaseTwoWaitingMovePenalty: twoBishopsPhaseTwoWaitingMovePenalty(
       move.from,
       move.to,
       waitingMoveContext,
     ),
-    phaseTwoCornerSupportDistance: getPhaseTwoCornerSupportDistance(
+    matingSupportDistance: getTwoBishopsMatingSupportDistance(
       fen,
       resultFen,
     ),
-    phaseTwoForceOpponentOppositionPenalty:
-      phaseTwoForceOpponentOppositionPenalty(fen, resultFen),
     phaseTwoTakeDirectOppositionPenalty:
       phaseTwoTakeDirectOppositionPenalty(fen, resultFen),
-    phaseTwoPushFromControlledEdgeSquarePenalty:
-      phaseTwoPushFromControlledEdgeSquarePenalty(fen, resultFen),
-    phaseTwoForceOpponentCornerPenalty: phaseTwoForceOpponentCornerPenalty(
-      fen,
-      resultFen,
-    ),
-    phaseTwoCheckPenalty: phaseTwoCheckPenalty(fen, resultFen),
-    phaseTwoBishopCornerDistance: phaseTwoBishopCornerDistance(fen, resultFen),
-    kingBishopScreeningPenalty:
-      getWhiteKingBishopScreeningPenalty(resultFen),
+    kingBishopScreeningPenalty: getWhiteKingBishopScreeningPenalty(resultFen),
     bishopAdjacencyPenalty: whiteBishopsAreAdjacent(resultFen) ? 0 : 1,
-    bishopBlackKingDistance: blackKing
-      ? getWhiteBishopDistanceToSquare(resultFen, blackKing.square)
-      : 99,
+    blackKingReachableArea: getBlackKingReachableArea(resultFen),
     whiteBlackKingDistance:
       whiteKing && blackKing
         ? kingDistance(whiteKing.square, blackKing.square)
+        : 99,
+    whiteBlackKingManhattanDistance:
+      whiteKing && blackKing
+        ? manhattanDistance(whiteKing.square, blackKing.square)
         : 99,
   }
 }
@@ -146,6 +202,14 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
     compare: (first, second) => first.matePenalty - second.matePenalty,
   },
   {
+    id: 'bishops safe',
+    shortLabel: 'pieces safe',
+    guideOrder: 1,
+    helpText: '',
+    compare: (first, second) =>
+      first.bishopSafetyPenalty - second.bishopSafetyPenalty,
+  },
+  {
     id: 'no stalemate',
     shortLabel: 'no stalemate',
     guideOrder: 2,
@@ -154,12 +218,32 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
       first.stalematePenalty - second.stalematePenalty,
   },
   {
-    id: 'bishops safe',
-    shortLabel: 'pieces safe',
-    guideOrder: 1,
-    helpText: '',
+    id: 'no backtracking',
+    shortLabel: 'no backtracking',
+    helpText:
+      'Every Black reply must shorten the remaining forced mate. Near the corner, one waiting move may hold the distance while it separates the bishops.',
     compare: (first, second) =>
-      first.bishopSafetyPenalty - second.bishopSafetyPenalty,
+      first.proofProgressPenalty - second.proofProgressPenalty,
+  },
+  {
+    id: 'waiting move',
+    shortLabel: 'waiting move',
+    helpText:
+      "When White's king holds Black back, move a bishop without loosening the net so Black must give ground. Near the corner, use the corner-color bishop while the bishops are close; then continue with the king or other bishop.",
+    compare: (first, second) =>
+      first.phaseTwoWaitingMovePenalty - second.phaseTwoWaitingMovePenalty,
+  },
+  {
+    id: 'corner support',
+    shortLabel: 'corner support',
+    helpText:
+      "Move White's king toward a square a knight's move from the mating corner, without letting Black leave the edge.",
+    applies: (score) => score.matingSupportDistance !== null,
+    compare: (first, second) =>
+      (first.matingSupportDistance ?? 0) -
+        (second.matingSupportDistance ?? 0) ||
+      first.phaseTwoStayPhaseTwoPenalty -
+        second.phaseTwoStayPhaseTwoPenalty,
   },
   {
     id: 'keep phase two',
@@ -170,74 +254,12 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
       second.phaseTwoStayPhaseTwoPenalty,
   },
   {
-    id: 'waiting move',
-    shortLabel: 'waiting move',
-    helpText:
-      "When the kings are a knight's move apart and the bishops are together, move a bishop one square toward the center without losing phase 2.",
-    compare: (first, second) =>
-      first.phaseTwoWaitingMovePenalty - second.phaseTwoWaitingMovePenalty,
-  },
-  {
-    id: 'corner support',
-    shortLabel: 'corner support',
-    helpText:
-      "When Black is in a corner or one edge-square beside it, place White's king a knight's move from that corner.",
-    applies: (score) => score.phaseTwoCornerSupportDistance !== null,
-    compare: (first, second) =>
-      (first.phaseTwoCornerSupportDistance ?? 0) -
-      (second.phaseTwoCornerSupportDistance ?? 0),
-  },
-  {
-    id: 'force opponent to take opposition',
-    shortLabel: 'force opponent to take opposition',
-    helpText:
-      "Phase 2: force Black along the edge toward direct king opposition without moving the bishop on the black king's current color, unless it's a check.",
-    compare: (first, second) =>
-      first.phaseTwoForceOpponentOppositionPenalty -
-      second.phaseTwoForceOpponentOppositionPenalty,
-  },
-  {
     id: 'take direct opposition',
     shortLabel: 'take direct opposition',
-    helpText:
-      'Phase 2: take direct king opposition, unless it moves the white king into a square controlled by a bishop.',
+    helpText: "Put White's king two squares in front of Black's king.",
     compare: (first, second) =>
       first.phaseTwoTakeDirectOppositionPenalty -
       second.phaseTwoTakeDirectOppositionPenalty,
-  },
-  {
-    id: 'push from controlled edge square',
-    shortLabel: 'push from controlled edge square',
-    helpText:
-      "Phase 2: when the kings are in direct opposition and a bishop controls the edge square two squares from Black's king and diagonally two squares from White's king, force Black's king away from that controlled edge square.",
-    compare: (first, second) =>
-      first.phaseTwoPushFromControlledEdgeSquarePenalty -
-      second.phaseTwoPushFromControlledEdgeSquarePenalty,
-  },
-  {
-    id: 'force opponent toward corner',
-    shortLabel: 'force opponent toward corner',
-    helpText:
-      "Phase 2: force Black towards the corner along its current edge and closer to White's king.",
-    compare: (first, second) =>
-      first.phaseTwoForceOpponentCornerPenalty -
-      second.phaseTwoForceOpponentCornerPenalty,
-  },
-  {
-    id: 'check king',
-    shortLabel: 'check king',
-    helpText: 'Phase 2: Check the king.',
-    compare: (first, second) =>
-      first.phaseTwoCheckPenalty - second.phaseTwoCheckPenalty,
-  },
-  {
-    id: 'bishops far from corner',
-    shortLabel: 'bishops farther from corner',
-    helpText:
-      "Phase 2: Prefer bishops to be farther from the corner closest to Black's king.",
-    compare: (first, second) =>
-      second.phaseTwoBishopCornerDistance -
-      first.phaseTwoBishopCornerDistance,
   },
   {
     id: 'avoid bishop screening',
@@ -250,23 +272,26 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
   {
     id: 'bishops together',
     shortLabel: 'bishops together',
-    helpText: 'Keep the bishops adjacent.',
+    helpText: 'Keep the bishops beside each other so their diagonals form a wall.',
     compare: (first, second) =>
       first.bishopAdjacencyPenalty - second.bishopAdjacencyPenalty,
   },
   {
     id: 'coordinate bishops',
     shortLabel: 'coordinate bishops',
-    helpText: "Force Black's king away from the bishops.",
+    helpText:
+      "Use the bishop wall to shrink Black's room.",
     compare: (first, second) =>
-      first.bishopBlackKingDistance - second.bishopBlackKingDistance,
+      first.blackKingReachableArea - second.blackKingReachableArea,
   },
   {
     id: 'king closer',
     shortLabel: 'king closer',
-    helpText: "Minimize distance from White's king to Black's king.",
+    helpText: "Move White's king closer to Black's king.",
     compare: (first, second) =>
-      first.whiteBlackKingDistance - second.whiteBlackKingDistance,
+      first.whiteBlackKingDistance - second.whiteBlackKingDistance ||
+      first.whiteBlackKingManhattanDistance -
+        second.whiteBlackKingManhattanDistance,
   },
 ]
 
@@ -282,9 +307,39 @@ function scoreWhiteCandidates(
   moves: readonly string[],
 ): readonly ScoredMove<TwoBishopsWhiteMoveScore>[] {
   const waitingMoveContext = getTwoBishopsWaitingMoveContext(fen)
-  return moves.map((san) => ({
+  const prefixed = moves.map((san) => ({
     san,
-    score: scoreTwoBishopsWhiteMove(fen, san, waitingMoveContext),
+    score: scoreTwoBishopsProofPrefix(fen, san, waitingMoveContext),
+  }))
+  let prefixSurvivors = [...prefixed]
+  for (const field of [
+    'matePenalty',
+    'bishopSafetyPenalty',
+    'stalematePenalty',
+    'proofProgressPenalty',
+  ] as const) {
+    const best = Math.min(
+      ...prefixSurvivors.map(({ score }) => score[field]),
+    )
+    prefixSurvivors = prefixSurvivors.filter(
+      ({ score }) => score[field] === best,
+    )
+    if (field === 'matePenalty' && best === 0) break
+  }
+  const survivingMoves = new Set(prefixSurvivors.map(({ san }) => san))
+  const completed = new Map(
+    prefixed
+      .filter(({ san }) => survivingMoves.has(san))
+      .map(({ san, score }) => [
+        san,
+        scoreTwoBishopsWhiteMove(fen, san, waitingMoveContext, score),
+      ]),
+  )
+  const neutralSuffix = completed.values().next().value
+  if (!neutralSuffix) return []
+  return prefixed.map(({ san, score }) => ({
+    san,
+    score: completed.get(san) ?? { ...neutralSuffix, ...score },
   }))
 }
 
@@ -393,6 +448,9 @@ export {
   getPhaseTwoControlledOppositionEdgeSquares,
 } from './twoBishopsPhaseTwo'
 export {
+  getTwoBishopsAdjacentWallWaitingMoves,
   getTwoBishopsKnightDistanceWaitingMoves,
+  getTwoBishopsPhaseOneOppositionWaitingMoves,
   getTwoBishopsPhaseTwoWaitingMoveTargets,
+  getTwoBishopsSupportedCornerWaitingMoves,
 } from './twoBishopsWaitingMoves'

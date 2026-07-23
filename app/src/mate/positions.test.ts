@@ -34,6 +34,7 @@ import { generateMatePosition } from './positions'
 import {
   assertTwoKnightsPawnPositionManifest,
   isSupportedTwoKnightsPawnStart,
+  isViableTwoBishopsStart,
 } from './positions'
 import { parseTwoKnightsPawnManifest } from './twoKnightsPawnData'
 
@@ -399,8 +400,30 @@ test('Standard and Train generation stay legal across all implemented sets', () 
         { ok: true },
         `${context} structural validation`,
       )
+      if (mate.id === 'two-bishops') {
+        assert.equal(
+          isViableTwoBishopsStart(first),
+          true,
+          `${context} viable start`,
+        )
+      }
     }
   }
+})
+
+test('Two Bishops generation rejects an unavoidable capture-or-stalemate draw', () => {
+  assert.equal(
+    isViableTwoBishopsStart(
+      '8/8/8/B7/8/K7/8/kB6 w - - 0 1',
+    ),
+    false,
+  )
+  assert.equal(
+    isViableTwoBishopsStart(
+      '4B3/8/8/8/8/1K6/3B4/k7 w - - 0 1',
+    ),
+    true,
+  )
 })
 
 test('Standard generation is deterministic with an injected random source', () => {

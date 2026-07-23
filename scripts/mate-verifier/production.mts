@@ -17,6 +17,7 @@ import {
   type SquareTransform,
 } from '../../app/src/mate/chess.ts'
 import { getMateRuleSet } from '../../app/src/mate/rules/index.ts'
+import { isViableTwoBishopsStart } from '../../app/src/mate/positions.ts'
 import {
   getMateTerminalOutcome,
   type MateTerminalOutcome,
@@ -352,6 +353,7 @@ function* enumerateUnrestrictedStandardRoots(
     if (pieceIndex === pieces.length) {
       const fen = `${boardFenFromPlacements(placements)} w - - 0 1`
       if (!validateMatePosition(mateId, fen).ok) return
+      if (mateId === 'two-bishops' && !isViableTwoBishopsStart(fen)) return
       yield makeRoot(fen, 'standard exhaustive placement')
       return
     }

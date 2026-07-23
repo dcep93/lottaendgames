@@ -2,63 +2,112 @@
 
 ## Goal
 
-Make the Two Bishops teaching policy terminate from every theoretically winning supported starting position without repetition or a 50-move draw. Every decision must depend only on the current board. The modal must explain the same priorities the evaluator uses.
+Teach KBB-v-K with rules a human can recognize from the current board while
+guaranteeing that every recommended White move survives every legal Black
+reply. From every supported generated start, the policy must mate without a
+repetition or 50-move draw.
 
-Some legal KBBK positions are already drawn. For example, White may have to choose between moving an attacked bishop and causing immediate stalemate or losing that bishop on Black's next move. No policy can force mate from such a root. Standard generation and exhaustive root enumeration must reject these positions, while the verifier must continue treating the same outcome as a failure if the policy reaches it from a winning root.
+White's decision must not read move history. Rotating or reflecting a position
+must preserve the decision.
 
-## Rejected Approaches
+## Policy
 
-- Move-history and repetition penalties are not allowed because a human cannot infer them from the current board.
-- Tablebase distance, shortest mate, and hidden search tie-breaks are not allowed because they cannot produce an honest human-facing reason.
-- Position-specific FEN or square exceptions are not allowed because they do not teach reusable technique.
+White compares legal moves in this order:
 
-## Strategy
+1. `mate` — Checkmate immediately when it is available.
+2. `pieces safe` — Do not leave a bishop available for Black to take.
+3. `no stalemate` — Do not stalemate Black.
+4. `no backtracking` — Every Black reply must shorten the remaining forced
+   mate. One corner waiting move may hold the distance while changing the
+   bishops from close together to separated.
+5. `waiting move` — When White's king holds Black back, move a bishop without
+   loosening the net so Black must give ground. Near the corner, use the
+   corner-color bishop while the bishops are close; then continue with the king
+   or other bishop.
+6. `corner support` — Move White's king toward a mating-support square a
+   knight's move from the target corner without letting Black leave the edge.
+7. `keep phase two` — Enter or remain in phase 2.
+8. `take direct opposition` — Put White's king two squares in front of Black's
+   king.
+9. `avoid bishop screening` — Keep White's king from blocking a bishop ray to
+   Black's king.
+10. `bishops together` — Keep the bishops beside each other so their diagonals
+    form a wall.
+11. `coordinate bishops` — Use that wall to shrink Black's reachable region.
+12. `king closer` — Move White's king closer to Black's king.
 
-Use a position-based geometric progress ladder. Keep the universal safety rules first and express each phase-two maneuver as a visible board relationship. Special waiting maneuvers come before `keep phase two`, because preserving the mating net can require a bishop-wall move whose Black replies temporarily fall outside the phase label. Every new exhaustive counterexample must be fixed by generalizing a position class, tested under all eight rotations and reflections, and described in the modal.
+The modal presents these exact priorities with short lowercase titles. The
+evaluator may contain geometric edge-case handling inside a named rule, but it
+must never contradict the displayed action.
 
-When the kings are a knight's move apart, use these waiting ideas:
+## Position-Only Completion Guard
 
-1. If the bishops are together and a safe, quiet one-square move toward the center preserves phase 2, make that move. At a supported corner, a centerward check yields to the corner-tempo rules below because it lets Black step away and can recreate the position.
-2. Otherwise, make a non-checking bishop move that places the bishops as close together as possible. If several moves are equally close, minimize bishops on the board edge. This preserves the bishop wall instead of following Black sideways with White's king.
+`no backtracking` is a filter, not a shortest-mate tie-break. Human rules choose
+among every move that passes it.
 
-Away from a corner, when the bishops are already together, prefer a non-checking bishop wait that keeps them together and does not increase the number of bishops on the board edge—unless another bishop move forces Black farther along the edge toward a corner.
+The repository contains a compact White-to-move KBB-v-K distance-to-mate table.
+It is generated offline from the Gaviota four-piece tablebase, reduced by all
+eight board symmetries, and bundled with the app. Runtime lookup:
 
-When Black is one edge-square from a corner, first use a bishop check if it forces every legal Black reply into that corner. If no check does so, force Black into the corner while keeping the bishops as close together as possible. This corner-forcing move comes before moving White's king toward corner support.
+- reads only the current board;
+- makes no engine or network request;
+- ignores halfmove and fullmove counters;
+- returns the same value under every rotation and reflection.
 
-For a supported corner, apply these waiting ideas in order:
+For an ordinary White move, the largest distance after any legal Black reply
+must be smaller than the current distance.
 
-1. If every nearest corner-support square for White's king is occupied by a bishop, move the blocking bishop out of the way.
-2. If a bishop occupies the corner edge closest to White's king, move that bishop off the edge or move White's king to the other support square. A forcing check is allowed when it clears the edge.
-3. If the bishops can be brought together safely without checking, bring them together.
-4. Otherwise, make a non-checking move with the bishop on the same square color as the corner. Place it as far as possible from both edges that meet at the corner: maximize its distance from the nearer edge.
+The single allowed equal-distance case is the supported-corner waiting pattern:
 
-The third step changes `1. Bc3+` to `1. Bh6` in `4B3/8/8/8/8/1K6/3B4/k7 w - - 0 1`. It also chooses `Bh6` instead of the edge-hugging `Bh2` in `4B3/8/8/8/5B2/1K6/8/k7 w - - 0 1`.
+- the move is selected by the visible `waiting move` geometry;
+- the bishops start at most three king moves apart;
+- the move leaves the bishops more than three king moves apart.
 
-## Modal Standard
+Black cannot change the bishop distance. Therefore the equal-distance exception
+cannot be selected on the following White turn. A strictly decreasing move must
+occur before another corner wait can become eligible.
 
-Rule titles remain short and lowercase. Explanations must:
+## Proof
 
-- say what visible condition activates the rule;
-- say which piece should move and what geometric result to seek;
-- avoid history, implementation language, mate distance, and unexplained phrases such as “advance the setup”;
-- match the evaluator exactly, including the order of alternatives.
+The generated table contains 386,792 winning canonical entries. Every nonzero
+White-turn distance is odd, and the maximum is 37 plies.
 
-The `waiting move` explanation may contain several sentences because it covers distinct visible phase-two formations, but each sentence must state one recognizable condition and action.
+An ordinary policy turn lowers the distance by at least two plies. A corner
+wait can happen at most once between two ordinary decreasing turns. The worst
+case is therefore:
 
-## Iteration and Proof
+- 19 decreasing White turns;
+- at most 19 waiting White turns;
+- 75 total plies.
 
-After each rule change:
+That is below the 100-ply 50-move threshold from every generated Standard root.
+The verifier separately checks the stored halfmove clock and proof distance of
+each curated Training Wheels seed.
 
-1. Add a focused regression for the reported position and the rejected looping move.
-2. Run the regression under all eight board symmetries.
-3. Run lint, the focused Two Bishops test file, and the production build.
-4. Run the exhaustive Two Bishops verifier.
-5. If it reports another cycle or 50-move line, reduce it to its minimal cycle, inspect the board geometry, and add the smallest general teaching rule that makes genuine progress.
-
-Completion requires the exhaustive verifier to pass with no cycle and no 50-move failure. The final modal copy and tests must still match the resulting policy.
-
-`pieces safe` treats a Black king approach as dangerous only when the approached bishop is not protected by White's king. A protected bishop may be used in a forcing corner-check pattern.
+Because distance strictly falls at least every other White turn, returning to a
+previous board position is impossible.
 
 ## Winning Root Boundary
 
-A generated Two Bishops root is eligible only if White has at least one legal first move that checkmates or leaves a non-terminal position where every legal Black reply retains both bishops. This position-only test rejects immediate, unavoidable capture-or-stalemate draws without weakening verification after play begins.
+Standard generation uses opposite-colored bishops and rejects a legal root when
+White has no first move that mates or leaves both bishops present after every
+legal Black reply. This excludes unavoidable capture-or-stalemate draws, which
+KBB-v-K cannot force-mate from.
+
+Training Wheels positions are symmetry transforms of curated legal seeds.
+
+## Verification
+
+`npm run verify:mate -- --mate two-bishops` audits the complete decoded proof
+table, its metadata, the ordered proof-rule prefix, the progress predicate, the
+global 75-ply bound, and each curated seed's halfmove clock. It does not expand
+a large in-memory game graph.
+
+Focused regressions cover:
+
+- the requested first move `Bh6`;
+- the required follow-up `Kg5` instead of reversing with `Bf8`;
+- both previously found four-ply supported-corner oscillations;
+- all eight board symmetries;
+- independence from FEN move counters;
+- the proof-table size, maximum distance, and one-way wait predicate.

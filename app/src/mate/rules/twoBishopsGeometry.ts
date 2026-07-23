@@ -1,5 +1,6 @@
 import type { Square } from 'chess.js'
 import {
+  allSquares,
   edgeDistance,
   findPiece,
   getChess,
@@ -46,12 +47,26 @@ export function blackCanWalkUpToWhiteBishop(fen: string): boolean {
     const move = nextChess.move(san)
     if (move.captured === 'b') return false
     const blackKing = findPiece(nextChess.fen(), 'b', 'k')
-    return Boolean(
-      blackKing &&
-        getWhiteBishopSquares(nextChess.fen()).some(
-          (square) => kingDistance(blackKing.square, square) <= 1,
-        ),
-    )
+    if (!blackKing) return false
+    return getWhiteBishopSquares(nextChess.fen()).some((square) => {
+      if (
+        kingDistance(blackKing.square, square) > 1 ||
+        whiteBishopIsProtectedByKing(nextChess.fen(), square)
+      ) {
+        return false
+      }
+      const escapeMoves = getChess(nextChess.fen())
+        .moves({ verbose: true })
+        .filter((escape) => escape.piece === 'b' && escape.from === square)
+      return !escapeMoves.some((escape) => {
+        const afterEscape = getChess(nextChess.fen())
+        afterEscape.move(escape.san)
+        return (
+          getWhiteBishopSquares(afterEscape.fen()).length === 2 &&
+          !blackCanTakeWhiteBishops(afterEscape.fen())
+        )
+      })
+    })
   })
 }
 
@@ -63,6 +78,86 @@ export function getWhiteBishopDistanceToSquare(
     (distance, square) => distance + kingDistance(square, target),
     0,
   )
+}
+
+function bishopControlsSquareWithoutBlackBlocker(
+  fen: string,
+  bishop: Square,
+  target: Square,
+): boolean {
+  if (bishop === target) return true
+  if (!sameDiagonal(bishop, target)) return false
+  const source = squareCoordinates(bishop)
+  const destination = squareCoordinates(target)
+  const fileStep = Math.sign(destination.file - source.file)
+  const rankStep = Math.sign(destination.rank - source.rank)
+  const chess = getChess(fen)
+  let file = source.file + fileStep
+  let rank = source.rank + rankStep
+  while (file !== destination.file || rank !== destination.rank) {
+    const square = squareFromCoordinates(file, rank)
+    if (!square) return false
+    const blocker = chess.get(square)
+    if (blocker?.color === 'w' && blocker.type === 'b') return false
+    file += fileStep
+    rank += rankStep
+  }
+  return true
+}
+
+/** Number of mutually reachable safe squares available to Black's king. */
+export function getBlackKingReachableArea(fen: string): number {
+  const chess = getChess(fen)
+  const blackKing = findPiece(fen, 'b', 'k')
+  const bishops = getWhiteBishopSquares(fen)
+  if (!blackKing || bishops.length !== 2) return 64
+
+  const safeSquares = new Set(
+    allSquares().filter((square) => {
+      const occupant = chess.get(square)
+      return (
+        !(occupant?.color === 'w' && occupant.type === 'b') &&
+        bishops.every(
+          (bishop) =>
+            !bishopControlsSquareWithoutBlackBlocker(fen, bishop, square),
+        )
+      )
+    }),
+  )
+  const seeds = safeSquares.has(blackKing.square)
+    ? [blackKing.square]
+    : chess
+        .moves({ verbose: true })
+        .filter((move) => move.piece === 'k' && safeSquares.has(move.to))
+        .map((move) => move.to)
+  let largestArea = 0
+  for (const seed of seeds) {
+    const reached = new Set<Square>([seed])
+    const pending: Square[] = [seed]
+    while (pending.length > 0) {
+      const square = pending.pop()!
+      const { file, rank } = squareCoordinates(square)
+      for (let fileOffset = -1; fileOffset <= 1; fileOffset += 1) {
+        for (let rankOffset = -1; rankOffset <= 1; rankOffset += 1) {
+          if (fileOffset === 0 && rankOffset === 0) continue
+          const neighbor = squareFromCoordinates(
+            file + fileOffset,
+            rank + rankOffset,
+          )
+          if (
+            neighbor &&
+            safeSquares.has(neighbor) &&
+            !reached.has(neighbor)
+          ) {
+            reached.add(neighbor)
+            pending.push(neighbor)
+          }
+        }
+      }
+    }
+    largestArea = Math.max(largestArea, reached.size)
+  }
+  return largestArea
 }
 
 export function getWhiteKingDistanceToBishops(
