@@ -167,14 +167,14 @@ test('rook box geometry is symmetric across every board transform', () => {
   }
 })
 
-test('strongest-box geometry classifies Ke1 as enlargement', () => {
+test('strongest-box geometry preserves a wall shared with White king', () => {
   const before = getRookBoxFromFen(MATURE_DUAL_AXIS_FEN)
   const afterKe1 = getRookBoxFromFen(movedFen(MATURE_DUAL_AXIS_FEN, 'Ke1'))
 
   assert.equal(before.size, 3)
   assert.deepEqual(before.strongestCuts.map((cut) => cut.axis), ['file'])
-  assert.equal(afterKe1.size, 6)
-  assert.deepEqual(afterKe1.strongestCuts.map((cut) => cut.axis), ['rank'])
+  assert.equal(afterKe1.size, 3)
+  assert.deepEqual(afterKe1.strongestCuts.map((cut) => cut.axis), ['file'])
 })
 
 test('strongest-box geometry classifies both Ke2 moves as preservation', () => {

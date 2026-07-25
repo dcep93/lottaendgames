@@ -12,12 +12,14 @@ import {
   getBlackKingReachableArea,
   getWhiteKingBishopScreeningPenalty,
 } from './twoBishopsGeometry'
+import { selectIdealMoves } from './selection'
 
 const WHITE_RULE_IDS = [
   'mate',
   'bishops safe',
   'no stalemate',
-  'finish guarantee',
+  'two-bishops proof filter',
+  'corner check',
   'waiting move',
   'corner finish',
   'corner finish',
@@ -33,7 +35,9 @@ test('Two Bishops exposes concise position-only teaching rules', () => {
     twoBishopsWhiteRules.map(({ id }) => id),
     WHITE_RULE_IDS,
   )
-  for (const rule of twoBishopsWhiteRules.slice(3)) {
+  for (const rule of twoBishopsWhiteRules
+    .slice(3)
+    .filter(({ presentationRole }) => presentationRole !== 'internal')) {
     assert.ok(rule.helpText.length > 0, `${rule.id} needs an explanation`)
     assert.ok(rule.helpText.length < 240, `${rule.id} is too verbose`)
   }
@@ -47,12 +51,33 @@ test('Two Bishops exposes concise position-only teaching rules', () => {
       'mate',
       'bishops safe',
       'no stalemate',
-      'finish guarantee',
+      'corner check',
       'waiting move',
       'corner finish',
       'bishop wall',
       'king closer',
     ],
+  )
+})
+
+test('corner check independently breaks the human-rule loop', () => {
+  const fen = '8/8/8/1B6/8/8/2K5/k1B5 w - - 14 8'
+  const chess = getChess(fen)
+  const humanRules = twoBishopsWhiteRules.filter(
+    ({ presentationRole }) => presentationRole !== 'internal',
+  )
+  const humanMoves = selectIdealMoves(
+    chess.moves().map((san) => ({
+      san,
+      score: scoreTwoBishopsWhiteMove(fen, san),
+    })),
+    humanRules,
+  )
+
+  assert.deepEqual(humanMoves, ['Bb2+'])
+  assert.equal(
+    getMateRuleSet('two-bishops').currentWhiteHint(fen)?.id,
+    'corner check',
   )
 })
 
@@ -91,7 +116,7 @@ test('former supported-corner oscillations now leave the cycle', () => {
   )
 })
 
-test('all recommended moves in the regression positions pass the proof guard', () => {
+test('all recommended moves in the regression positions pass the internal proof filter', () => {
   const ruleSet = getMateRuleSet('two-bishops')
   for (const fen of [
     '5Bk1/3B4/5K2/8/8/8/8/8 w - - 0 1',
@@ -174,7 +199,7 @@ test('Black captures before seeking the center or a bishop', () => {
   assert.ok(compareTwoBishopsBlackScores(capture, quiet) < 0)
 })
 
-test('Black resistance and the finish guarantee stay explicit', () => {
+test('Black resistance stays explicit without exposing the proof filter', () => {
   const ruleSet = getMateRuleSet('two-bishops')
   const help = ruleSet.help
   assert.deepEqual(help.blackPriorities, [
@@ -183,10 +208,11 @@ test('Black resistance and the finish guarantee stay explicit', () => {
     'Move toward the center.',
     'Move toward an unprotected bishop.',
   ])
-  const guard = ruleSet.whiteRuleDescriptions.find(
-    ({ presentationRole }) => presentationRole === 'guard',
+  assert.equal(
+    ruleSet.whiteRuleDescriptions.some(
+      ({ presentationRole }) =>
+        presentationRole === 'guard' || presentationRole === 'internal',
+    ),
+    false,
   )
-  assert.equal(guard?.id, 'finish guarantee')
-  assert.match(guard?.helpText ?? '', /repetition/)
-  assert.match(guard?.helpText ?? '', /fifty-move draw/)
 })

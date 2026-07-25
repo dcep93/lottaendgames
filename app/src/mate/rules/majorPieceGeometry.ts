@@ -283,7 +283,11 @@ export function getRookCuts(
   const black = squareCoordinates(blackKing.square)
   return Object.freeze(
     ROOK_AXES.flatMap((axis) => {
-      if (!isStrictlyBetween(rook[axis], white[axis], black[axis])) {
+      if (
+        rook[axis] === 0 ||
+        rook[axis] === 7 ||
+        !isBetweenBlackAndWhiteWall(rook[axis], white[axis], black[axis])
+      ) {
         return []
       }
       return [
@@ -301,6 +305,16 @@ export function getRookCuts(
       ]
     }),
   )
+}
+
+function isBetweenBlackAndWhiteWall(
+  rook: number,
+  white: number,
+  black: number,
+): boolean {
+  return black < white
+    ? black < rook && rook <= white
+    : white <= rook && rook < black
 }
 
 export function getRookBox(

@@ -95,6 +95,7 @@ export default function MateRuleNoteBoard({
 }) {
   const markerId = React.useId()
   const layout = board.layout ?? DEFAULT_BOARD_LAYOUT
+  const isFullBoard = layout.files === 8 && layout.ranks === 8
   const highlights = new Map(
     board.highlights.map((highlight) => [highlight.square, highlight.kind]),
   )
@@ -116,7 +117,11 @@ export default function MateRuleNoteBoard({
   }
 
   return (
-    <figure className="leg-mate-note-board">
+    <figure
+      className={`leg-mate-note-board${
+        isFullBoard ? ' leg-mate-note-board--full' : ''
+      }`}
+    >
       <figcaption>
         <strong>{board.title}</strong>
         {board.caption === '' ? null : <span>{board.caption}</span>}

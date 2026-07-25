@@ -2,84 +2,60 @@
 
 ## Goal
 
-Repair the Rook checkmate evaluator and its training guide together. The app
-must recommend moves from the actual rook wall on the board, explain those
-moves with short human rules, and retain an exhaustive guarantee against loops
-and fifty-move draws.
+Teach the ordinary rook mate as one repeatable method: build a safe rook wall,
+use the king and waiting moves to make Black yield opposition, shrink the box,
+and mate Black on whichever edge it reaches. White does not try to force Black
+into a corner.
 
-## Problems
+## Board-only evaluator
 
-The current implementation has five related problems:
+White's visible priorities are:
 
-1. `shrink the box` ranks a move by adding two board-edge distances even though
-   only the active rook wall confines Black. This reverses `Rg7` and `Rf4` in
-   `8/5R2/8/4K3/8/7k/8/8 w - - 0 1`: `Rg7` creates a one-file box, while `Rf4`
-   leaves a two-file box.
-2. `finish` is a tactical mate-in-two search presented as a human strategy. It
-   duplicates `mate` and hides the geometric reason the position progresses.
-3. `force opposition` says White should take opposition and combines that with
-   king approach. The method needs separate waiting-move and king-approach
-   rules.
-4. `box Black in` sometimes prefers parking the rook beside White's king. The
-   strategy needs a distinct distant-rook-wall concept instead.
-5. Phase 2 is a useful concept, but the current explanation and shaded diagram
-   obscure it. Phase 1 establishes the first box; Phase 2 preserves and shrinks
-   that box.
+1. `mate` — Checkmate immediately.
+2. `pieces safe` — Do not lose the rook.
+3. `no stalemate` — Keep Black a legal reply.
+4. `cover escape squares` — Cover the squares beside Black's king so the rook
+   can mate.
+5. `shrink the box` — Move the rook wall closer to leave Black less room.
+6. `king proximity` — Bring White's king towards Black's.
+7. `rook box size` — Use the rook to make a box around Black's king.
 
-## Evaluator
+The evaluator reads only the current board. It does not use move counters,
+history, orientation-specific squares, a shortest-mate table, or corner
+distance. Small geometric safety checks may exist inside these rules, but they
+must not contradict the displayed strategy.
 
-Use `getRookBoxFromFen` as the single source of truth for the current and
-resulting box. A shrinking move must create a real rook wall and reduce its
-one-dimensional `size`; tied shrinking moves prefer the smallest resulting
-size. Do not add the irrelevant perpendicular edge distance.
+The shrink rule keeps the proven rook-wall test as its eligibility check. Among
+safe wall-closing moves, the actual remaining box selects the smaller result.
+This makes `Rg7` correct in
+`8/5R2/8/4K3/8/7k/8/8 w - - 0 1` without letting an arbitrary rook shift
+override the opposition method.
 
-The remaining board-only priorities may retain small geometric safety
-exceptions when exhaustive counterexamples require them, but those exceptions
-must not contradict the displayed rule. Do not use move counters, history,
-orientation-specific squares, exact mate rank, or literal FEN exceptions to
-select White's move.
+## Phase 2
 
-Remove the `finish` / mate-in-two priority from White's evaluator. Its
-termination role must be replaced by visible, position-based geometry. When
-establishing a box or choosing a waiting rook move, prefer a rook wall that is
-far from both kings.
-
-## Training Guide
-
-Keep the universal rules unchanged. Present the Rook strategy with concise,
-lowercase labels and explanations:
-
-1. `edge waiting move` — With the kings in opposition on the edge, move the
-   rook inward on the same line. Black must step sideways, then the rook mates.
-2. `shrink the box` — Move the rook wall closer, and never make the box bigger.
-   If Black blocks it, check Black backward first. A checking push counts as a
-   shrink only when every legal Black reply establishes a smaller real box.
-3. `king closer` — Move White's king closer to Black without losing the box.
-4. `force opposition` — When the king cannot advance, use a rook waiting move
-   to give Black the move and force opposition. This applies when the kings are
-   already in direct opposition or are a knight's move apart.
-5. `distant rook wall` — Keep the rook wall on White's side of Black and far
-   from both kings.
-
-Keep Phase 2 as a visible concept and define it precisely:
+Phase 2 remains a real concept:
 
 > Phase 2 begins once the rook is between the kings and Black is boxed on one
 > side.
 
-Keep the phase-2 diagram, but remove every highlighted or shaded box square.
-The rook wall and opposing kings must explain the geometry without an overlay.
-Its caption becomes:
-
-> The kings are in opposition while the rook holds the box.
+The phase-2 diagram shows a full 8×8 board with the kings in opposition and the
+rook holding the wall. It uses no shaded squares; the pieces themselves explain
+the geometry.
 
 ## Verification
 
-Add literal regressions for the guide copy and for the supplied `Rg7` position.
-Run the focused Rook tests, presentation tests, lint, and production build.
+The implementation must include literal regressions for the rule order, copy,
+phase-2 diagram, and supplied `Rg7` position. The production policy must then be
+derived and exhaustively verified one heavy process at a time.
 
-Then run the production Rook policy derivation and exhaustive verifier with
-identity state keys, one heavy process at a time. The final policy must cover
-every tied optimal White move and every legal Black reply without a loop,
-stalemate, material loss, rule gap, or fifty-move draw. If the corrected box
-geometry exposes a counterexample, reduce it to a minimal line and refine only
-a position-based rule that a human can understand.
+Acceptance requires:
+
+- every legal rook-mate position is covered;
+- every tied recommended White move survives every legal Black reply;
+- no repetition cycle exists;
+- no stalemate or rook loss is recommended; and
+- the longest forced line finishes before the fifty-move draw.
+
+The symmetry-reduced derivation covers 21,950 structural White positions and
+5,476 structural Black positions. The repaired policy ranks every root and has
+a maximum White rank of 65 plies, safely below 100 plies.

@@ -22,7 +22,7 @@ const EXPECTED_RULE_PREFIX = [
  * Exhaustive certificate for the position-only KBB-v-K policy.
  *
  * Every nonzero table entry is an exact White-to-move distance to mate. The
- * fourth White rule rejects every move whose worst legal Black reply does not
+ * internal White filter rejects every move whose worst legal Black reply does not
  * lower that distance, except for a one-way corner waiting move. That wait
  * starts with bishops at most three king moves apart and ends with them farther
  * apart, so it cannot be selected again until a strictly decreasing move has
@@ -64,10 +64,10 @@ export function verifyTwoBishopsProofCertificate(): MateVerificationResult {
   if (
     rulePrefix.length !== EXPECTED_RULE_PREFIX.length ||
     rulePrefix.some((id, index) => id !== EXPECTED_RULE_PREFIX[index]) ||
-    proofGuard?.presentationRole !== 'guard'
+    proofGuard?.presentationRole !== 'internal'
   ) {
     return incomplete(
-      `Two Bishops proof guard must immediately follow ${EXPECTED_RULE_PREFIX.join(', ')}`,
+      `Two Bishops proof filter must immediately follow ${EXPECTED_RULE_PREFIX.join(', ')}`,
     )
   }
 

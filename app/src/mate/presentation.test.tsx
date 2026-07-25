@@ -1240,7 +1240,7 @@ test('priority guide follows registered facade order and renders typed diagrams'
   assert.doesNotMatch(markup, /<img\b|\ssrc=/)
 })
 
-test('Rook and Two Bishops render compact diagrams while Queen stays text-only', () => {
+test('Rook and Two Bishops render diagrams while Queen stays text-only', () => {
   const expectedBoards = {
     rook: ['rook-phase-two-box'],
     'two-bishops': ['bishop-wall', 'bishop-corner-finish'],
@@ -1262,7 +1262,7 @@ test('Rook and Two Bishops render compact diagrams while Queen stays text-only',
       />,
     )
 
-    assert.match(markup, /class="leg-mate-note-board"/)
+    assert.match(markup, /class="leg-mate-note-board(?:\s|")/)
     assert.doesNotMatch(markup, /<img\b|\ssrc=/)
   }
 
@@ -1277,24 +1277,27 @@ test('Rook and Two Bishops render compact diagrams while Queen stays text-only',
   assert.match(queenMarkup, />two-square corner cage</)
   assert.match(queenMarkup, /two squares near a corner/)
   assert.doesNotMatch(queenMarkup, />king toward cage support</)
-  assert.match(queenMarkup, />white pieces off edge</)
+  assert.doesNotMatch(queenMarkup, />white pieces off edge</)
   assert.match(queenMarkup, />queen a knight move from black</)
+  assert.match(
+    queenMarkup,
+    /but not on the edge of the board/,
+  )
   assert.match(queenMarkup, />queen box size</)
   assert.doesNotMatch(queenMarkup, /class="leg-mate-note-board"/)
 
   const rookBoard = getMateRuleSet('rook').help.noteBoards[0]!
   assert.deepEqual(rookBoard.pieces, [
-    { square: 'b3', piece: 'K' },
-    { square: 'c1', piece: 'R' },
-    { square: 'd3', piece: 'k' },
+    { square: 'd5', piece: 'K' },
+    { square: 'e1', piece: 'R' },
+    { square: 'f5', piece: 'k' },
   ])
   assert.deepEqual(rookBoard.layout, {
-    files: 6,
-    ranks: 6,
+    files: 8,
+    ranks: 8,
     fileOffset: 0,
   })
-  assert.equal(rookBoard.highlights.length, 18)
-  assert.ok(rookBoard.highlights.every(({ kind }) => kind === 'box'))
+  assert.deepEqual(rookBoard.highlights, [])
 
   const rookMarkup = renderToStaticMarkup(
     <MatePriorityGuideDialog
@@ -1305,7 +1308,9 @@ test('Rook and Two Bishops render compact diagrams while Queen stays text-only',
   )
   assert.match(rookMarkup, />phase 2 box</)
   assert.match(rookMarkup, /kings are in opposition/)
-  assert.match(rookMarkup, /data-highlight-kind="box"/)
+  assert.match(rookMarkup, /leg-mate-guide-note-boards--full/)
+  assert.match(rookMarkup, /leg-mate-note-board--full/)
+  assert.doesNotMatch(rookMarkup, /data-highlight-kind="box"/)
   assert.match(rookMarkup, /<svg/)
   assert.doesNotMatch(rookMarkup, /♔|♖|♚/)
 
@@ -1370,7 +1375,7 @@ test('mate guides omit empty notes and place useful notes before shortcuts', () 
   }
 })
 
-test('Rook stays board-based while Two Bishops keeps its proof guard', () => {
+test('Rook and Two Bishops stay board-based without proof guards', () => {
   const rookMarkup = renderToStaticMarkup(
     <MatePriorityGuideDialog
       {...MATE_TRAINING_INFO_PROPS}
@@ -1380,10 +1385,12 @@ test('Rook stays board-based while Two Bishops keeps its proof guard', () => {
   )
   assert.doesNotMatch(rookMarkup, /finish guarantee|leg-mate-guide-guards/)
   for (const label of [
-    'finish',
+    'keep the box',
+    'waiting move',
+    'cover escape squares',
     'shrink the box',
-    'force opposition',
-    'box black in',
+    'king proximity',
+    'rook box size',
   ]) {
     assert.match(rookMarkup, new RegExp(`>${label}<`))
   }
@@ -1391,18 +1398,13 @@ test('Rook stays board-based while Two Bishops keeps its proof guard', () => {
   const bishopsMarkup = renderToStaticMarkup(
     <MatePriorityGuideDialog
       {...MATE_TRAINING_INFO_PROPS}
-      highlightedReasonId="finish guarantee"
       onClose={() => undefined}
       ruleSet={getMateRuleSet('two-bishops')}
     />,
   )
-  assert.match(
+  assert.doesNotMatch(
     bishopsMarkup,
-    /class="leg-mate-guide-guards"[\s\S]*class="leg-mate-guide-guard leg-mate-guide-priority-highlighted"/,
-  )
-  assert.match(
-    bishopsMarkup,
-    />finish guarantee<\/strong>[\s\S]*rules out repetition/,
+    /finish guarantee|leg-mate-guide-guards|rules out repetition/,
   )
 
   const queenMarkup = renderToStaticMarkup(
@@ -2126,6 +2128,14 @@ test('Mate exposes stable desktop and narrow-layout structure', () => {
   assert.match(
     css,
     /\.leg-mate-guide-note-boards\s*\{[^}]*grid-template-columns:\s*repeat\(auto-fit, minmax\(10rem, 14rem\)\)/s,
+  )
+  assert.match(
+    css,
+    /\.leg-mate-guide-note-boards--full\s*\{[^}]*grid-template-columns:\s*minmax\(10rem, 18rem\)/s,
+  )
+  assert.match(
+    css,
+    /\.leg-mate-note-board--full\s*\{[^}]*width:\s*min\(100%, 18rem\)/s,
   )
   assert.match(
     css,

@@ -40,11 +40,11 @@ Keep the universal priorities first:
 Then use these Rook priorities:
 
 4. `keep the box` — Keep Black inside its current box.
-5. `waiting move` — When the kings are a knight's move apart, keep the box and
-   move the rook to the board edge on White's side. If White's king blocks that
-   edge and Black is already on an edge, use the other edge. When the kings face
-   each other, keep the box and move the rook diagonally beside White's king,
-   toward the center.
+5. `waiting move` — Whenever the kings are a knight's move apart, keep the box
+   and move the rook to the board edge on White's side, wherever Black is. If
+   White's king blocks that edge and Black happens to be on an edge, use the
+   other edge. When the kings face each other, keep the box and move the rook
+   diagonally beside White's king, toward the center.
 6. `cover escape squares` — Cover the squares beside Black's king so the rook
    can mate.
 7. `shrink the box` — Move the rook wall closer to leave Black less room.

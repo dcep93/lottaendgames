@@ -43,6 +43,7 @@ export type TwoBishopsWhiteMoveScore = {
   readonly bishopSafetyPenalty: number
   readonly proofProgressPenalty: number
   readonly proofWorstReplyDistance: number
+  readonly cornerCheckPenalty: number
   readonly phaseTwoStayPhaseTwoPenalty: number
   readonly phaseTwoWaitingMovePenalty: number
   readonly matingSupportDistance: number | null
@@ -74,8 +75,8 @@ const WHITE_INTRO =
 
 const BLACK_INTRO =
   'Black uses its own priorities to put up the strongest resistance. Black is not trying to help the mate; it looks for the most stubborn legal reply.'
-const FINISH_GUARANTEE_HELP =
-  'Every recommended move keeps mate forced and rules out repetition or a fifty-move draw.'
+const CORNER_CHECK_HELP =
+  "When Black is in a corner and White's king controls the nearby escape squares, check with a bishop beside White's king."
 const WAITING_MOVE_HELP =
   "When White's king holds Black back, keep the wall with a quiet bishop move so Black must give ground. Near a corner, move the bishop that controls that corner first."
 const CORNER_FINISH_HELP =
@@ -207,23 +208,37 @@ export function scoreTwoBishopsWhiteMove(
     waitingMoveContext,
   ),
 ): TwoBishopsWhiteMoveScore {
+  const beforeBlackKing = findPiece(fen, 'b', 'k')
   const chess = getChess(fen)
   const move = chess.move(san)
   const resultFen = chess.fen()
   const blackKing = findPiece(resultFen, 'b', 'k')
   const whiteKing = findPiece(resultFen, 'w', 'k')
+  const phaseTwoPenalty = phaseTwoStayPhaseTwoPenalty(fen, resultFen)
+  const matingSupportDistance = getTwoBishopsMatingSupportDistance(
+    fen,
+    resultFen,
+  )
   return {
     ...proofPrefix,
-    phaseTwoStayPhaseTwoPenalty: phaseTwoStayPhaseTwoPenalty(fen, resultFen),
+    cornerCheckPenalty:
+      beforeBlackKing &&
+      isCornerSquare(beforeBlackKing.square) &&
+      move.piece === 'b' &&
+      chess.isCheck() &&
+      whiteKing &&
+      kingDistance(move.to, whiteKing.square) === 1 &&
+      phaseTwoPenalty === 0 &&
+      matingSupportDistance === 0
+        ? 0
+        : 1,
+    phaseTwoStayPhaseTwoPenalty: phaseTwoPenalty,
     phaseTwoWaitingMovePenalty: twoBishopsPhaseTwoWaitingMovePenalty(
       move.from,
       move.to,
       waitingMoveContext,
     ),
-    matingSupportDistance: getTwoBishopsMatingSupportDistance(
-      fen,
-      resultFen,
-    ),
+    matingSupportDistance,
     phaseTwoTakeDirectOppositionPenalty:
       phaseTwoTakeDirectOppositionPenalty(fen, resultFen),
     kingBishopScreeningPenalty: getWhiteKingBishopScreeningPenalty(resultFen),
@@ -266,12 +281,19 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
       first.stalematePenalty - second.stalematePenalty,
   },
   {
-    id: 'finish guarantee',
-    shortLabel: 'finish guarantee',
-    helpText: FINISH_GUARANTEE_HELP,
-    presentationRole: 'guard',
+    id: 'two-bishops proof filter',
+    shortLabel: 'two-bishops proof filter',
+    helpText: '',
+    presentationRole: 'internal',
     compare: (first, second) =>
       first.proofProgressPenalty - second.proofProgressPenalty,
+  },
+  {
+    id: 'corner check',
+    shortLabel: 'corner check',
+    helpText: CORNER_CHECK_HELP,
+    compare: (first, second) =>
+      first.cornerCheckPenalty - second.cornerCheckPenalty,
   },
   {
     id: 'waiting move',
@@ -339,6 +361,15 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
   },
 ]
 
+function isCornerSquare(square: string): boolean {
+  return (
+    square === 'a1' ||
+    square === 'a8' ||
+    square === 'h1' ||
+    square === 'h8'
+  )
+}
+
 export function compareTwoBishopsWhiteScores(
   first: TwoBishopsWhiteMoveScore,
   second: TwoBishopsWhiteMoveScore,
@@ -351,40 +382,22 @@ function scoreWhiteCandidates(
   moves: readonly string[],
 ): readonly ScoredMove<TwoBishopsWhiteMoveScore>[] {
   const waitingMoveContext = getTwoBishopsWaitingMoveContext(fen)
-  const prefixed = moves.map((san) => ({
-    san,
-    score: scoreTwoBishopsProofPrefix(fen, san, waitingMoveContext),
-  }))
-  let prefixSurvivors = [...prefixed]
-  for (const field of [
-    'matePenalty',
-    'bishopSafetyPenalty',
-    'stalematePenalty',
-    'proofProgressPenalty',
-  ] as const) {
-    const best = Math.min(
-      ...prefixSurvivors.map(({ score }) => score[field]),
+  return moves.map((san) => {
+    const proofPrefix = scoreTwoBishopsProofPrefix(
+      fen,
+      san,
+      waitingMoveContext,
     )
-    prefixSurvivors = prefixSurvivors.filter(
-      ({ score }) => score[field] === best,
-    )
-    if (field === 'matePenalty' && best === 0) break
-  }
-  const survivingMoves = new Set(prefixSurvivors.map(({ san }) => san))
-  const completed = new Map(
-    prefixed
-      .filter(({ san }) => survivingMoves.has(san))
-      .map(({ san, score }) => [
+    return {
+      san,
+      score: scoreTwoBishopsWhiteMove(
+        fen,
         san,
-        scoreTwoBishopsWhiteMove(fen, san, waitingMoveContext, score),
-      ]),
-  )
-  const neutralSuffix = completed.values().next().value
-  if (!neutralSuffix) return []
-  return prefixed.map(({ san, score }) => ({
-    san,
-    score: completed.get(san) ?? { ...neutralSuffix, ...score },
-  }))
+        waitingMoveContext,
+        proofPrefix,
+      ),
+    }
+  })
 }
 
 export function getIdealTwoBishopsWhiteMoves(fen: string): string[] {

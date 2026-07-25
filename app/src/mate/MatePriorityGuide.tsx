@@ -188,7 +188,16 @@ export default function MatePriorityGuideDialog({
                 </ul>
               )}
               {ruleSet.help.noteBoards.length === 0 ? null : (
-                <div className="leg-mate-guide-note-boards">
+                <div
+                  className={`leg-mate-guide-note-boards${
+                    ruleSet.help.noteBoards.some(
+                      ({ layout }) =>
+                        layout?.files === 8 && layout.ranks === 8,
+                    )
+                      ? ' leg-mate-guide-note-boards--full'
+                      : ''
+                  }`}
+                >
                   {ruleSet.help.noteBoards.map((board) => (
                     <MateRuleNoteBoard board={board} key={board.id} />
                   ))}

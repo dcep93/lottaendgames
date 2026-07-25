@@ -854,6 +854,41 @@ test('a correctness guard stays exact while ideal moves receive a teaching hint'
   }
 })
 
+test('an internal correctness filter stays exact without entering presentation', () => {
+  const internalRule: OrderedRule<TestScore> = {
+    id: 'internal proof filter',
+    shortLabel: 'internal proof filter',
+    helpText: '',
+    presentationRole: 'internal',
+    compare: (left, right) => left.safe - right.safe,
+  }
+  const internalCandidates: readonly ScoredMove<TestScore>[] = [
+    { san: 'Ka2', score: { safe: 0, closer: 0 } },
+    { san: 'Kb2', score: { safe: 1, closer: 2 } },
+  ]
+  const internalRuleSet: MateRuleSet<TestScore> = {
+    ...rookRuleSet,
+    id: 'bishop-knight',
+    whiteRules: [internalRule, closerRule],
+    whiteMoves: () => internalCandidates.map(({ san }) => san),
+    scoreWhite: (_fen, san) =>
+      internalCandidates.find((candidate) => candidate.san === san)!.score,
+  }
+  const unregister = registerMateRuleSet(internalRuleSet)
+  try {
+    const registered = getMateRuleSet('bishop-knight')
+    assert.deepEqual(registered.idealWhiteMoves('fen'), ['Ka2'])
+    assert.deepEqual(
+      registered.whiteRuleDescriptions.map(({ id }) => id),
+      ['closer'],
+    )
+    assert.equal(registered.currentWhiteHint('fen')?.id, 'closer')
+    assert.equal(registered.explainWhiteMove('fen', 'Kb2')?.id, 'closer')
+  } finally {
+    unregister()
+  }
+})
+
 test('all-tied candidates have no current hint or move reason', () => {
   const tiedCandidates = candidates.slice(0, 2)
 

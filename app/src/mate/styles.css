@@ -709,6 +709,10 @@
   margin-top: 0.35rem;
 }
 
+.leg-mate-guide-note-boards--full {
+  grid-template-columns: minmax(10rem, 18rem);
+}
+
 .leg-mate-note-board {
   display: grid;
   gap: 0.45rem;
@@ -719,6 +723,10 @@
   border-radius: 0.55rem;
   padding: 0.65rem;
   background: rgba(18, 13, 11, 0.64);
+}
+
+.leg-mate-note-board--full {
+  width: min(100%, 18rem);
 }
 
 .leg-mate-note-board figcaption {

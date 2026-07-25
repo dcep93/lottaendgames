@@ -381,11 +381,14 @@ function createRegisteredMateRuleSet<Score>(
     : undefined
   const ruleEntries = Object.freeze(
     whiteRules.map((orderedRule, index) => {
-      const description = registerDescription(
-        orderedRule,
-        orderedRule.guideOrder,
-        index,
-      )
+      const description =
+        orderedRule.presentationRole === 'internal'
+          ? undefined
+          : registerDescription(
+              orderedRule,
+              orderedRule.guideOrder,
+              index,
+            )
       return { orderedRule, description }
     }),
   )
@@ -464,7 +467,11 @@ function createRegisteredMateRuleSet<Score>(
         san === undefined || idealMoves.includes(san)
           ? currentTeachingHint(candidates, whiteRules, san)
           : explainMove(candidates, whiteRules, san)
-      return describeRule(rule)
+      return describeRule(
+        rule?.presentationRole === 'internal'
+          ? currentTeachingHint(candidates, whiteRules)
+          : rule,
+      )
     },
     currentWhiteHint: (fen) => {
       const moves = getLegalWhiteMoves(fen)

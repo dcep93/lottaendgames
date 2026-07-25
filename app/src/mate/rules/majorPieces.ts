@@ -38,8 +38,9 @@ export type QueenWhiteMoveScore = {
   readonly queenCapturePenalty: number
   readonly stalematePenalty: number
   readonly cagePenalty: number
-  readonly whitePieceEdgePenalty: number
+  readonly queenEdgePenalty: number
   readonly queenKnightMovePenalty: number
+  readonly whiteKingEdgePenalty: number
   readonly queenBoxShorterSide: number
   readonly queenBoxLongerSide: number
   readonly whiteKingBetweenPiecesPenalty: number
@@ -71,13 +72,12 @@ const RETURN_POSITION_PRIORITY =
 const CAPTURE_LOOSE_PIECE_PRIORITY = "Take a piece if White isn't looking."
 const QUEEN_CORNER_CAGE_HELP =
   'Keep Black confined to two squares near a corner.'
-const QUEEN_OFF_EDGE_HELP = "Keep White's pieces off edge squares."
 const QUEEN_KNIGHT_MOVE_HELP =
-  "Keep the queen a knight's move from Black's king."
+  "Keep the queen a knight's move from Black's king, but not on the edge of the board."
 const QUEEN_BOX_SIZE_HELP =
   "Shrink the box's shorter side before its longer side."
 const QUEEN_KING_CLOSER_HELP =
-  "Move White's king closer without crossing the tighter side of the queen's box."
+  "Move White's king closer to Black, but keep it off the edge and do not cross the tighter side of the queen's box."
 const queenHelp: RuleHelp = {
   title: 'How best moves are chosen',
   whiteIntro: WHITE_INTRO,
@@ -96,49 +96,27 @@ const rookHelp: RuleHelp = {
   whiteIntro: WHITE_INTRO,
   blackIntro: BLACK_INTRO,
   blackPriorities: [
-    RETURN_POSITION_PRIORITY,
-    CAPTURE_LOOSE_PIECE_PRIORITY,
-    'Move toward the nearest box wall.',
-    "If the rook is diagonally beside White's king, chase it.",
-    'Avoid giving White opposition.',
-    'Move toward the rook.',
+    'Return to the previous board position when possible.',
+    "Take a piece if White isn't looking.",
+    'Press the nearest box wall, chasing the rook when possible.',
+    'Avoid giving White opposition, then move toward the rook.',
   ],
   notes: [
-    'The method: box Black in, force opposition, shrink the box, and repeat.',
-    "Phase 2 begins when the rook's rank or file is between the kings, boxing Black onto one side.",
+    'Phase 2 means the rook has boxed Black onto one side.',
+    'The box can drive Black to any edge; no corner is required.',
   ],
   noteBoards: [
     {
       id: 'rook-phase-two-box',
       title: 'phase 2 box',
-      caption:
-        "The kings are in opposition, and the rook's file boxes Black onto the highlighted side.",
-      layout: { files: 6, ranks: 6, fileOffset: 0 },
+      caption: 'The kings are in opposition while the rook holds the box.',
+      layout: { files: 8, ranks: 8, fileOffset: 0 },
       pieces: [
-        { square: 'b3', piece: 'K' },
-        { square: 'c1', piece: 'R' },
-        { square: 'd3', piece: 'k' },
+        { square: 'd5', piece: 'K' },
+        { square: 'e1', piece: 'R' },
+        { square: 'f5', piece: 'k' },
       ],
-      highlights: [
-        'd1',
-        'e1',
-        'f1',
-        'd2',
-        'e2',
-        'f2',
-        'd3',
-        'e3',
-        'f3',
-        'd4',
-        'e4',
-        'f4',
-        'd5',
-        'e5',
-        'f5',
-        'd6',
-        'e6',
-        'f6',
-      ].map((square) => ({ square, kind: 'box' as const })),
+      highlights: [],
     },
   ],
 }
@@ -184,15 +162,16 @@ export function scoreQueenWhiteMove(
     queenCapturePenalty: blackCanTakeWhiteMajorPiece(resultFen, 'q') ? 1 : 0,
     stalematePenalty: !chess.isCheckmate() && chess.isStalemate() ? 1 : 0,
     cagePenalty: resultCage ? 0 : 1,
-    whitePieceEdgePenalty: [whiteQueen, whiteKing].filter(
-      (piece) => piece && edgeDistance(piece.square) === 0,
-    ).length,
+    queenEdgePenalty:
+      whiteQueen && edgeDistance(whiteQueen.square) === 0 ? 1 : 0,
     queenKnightMovePenalty:
       whiteQueen &&
       blackKing &&
       isKnightMove(whiteQueen.square, blackKing.square)
         ? 0
         : 1,
+    whiteKingEdgePenalty:
+      whiteKing && edgeDistance(whiteKing.square) === 0 ? 1 : 0,
     queenBoxShorterSide: queenBox?.shorterSide ?? 99,
     queenBoxLongerSide: queenBox?.longerSide ?? 99,
     whiteKingBetweenPiecesPenalty:
@@ -242,18 +221,19 @@ export const queenWhiteRules: readonly OrderedRule<QueenWhiteMoveScore>[] = [
     compare: (first, second) => first.cagePenalty - second.cagePenalty,
   },
   {
-    id: 'white pieces off edge',
-    shortLabel: 'white pieces off edge',
-    helpText: QUEEN_OFF_EDGE_HELP,
-    compare: (first, second) =>
-      first.whitePieceEdgePenalty - second.whitePieceEdgePenalty,
-  },
-  {
     id: 'queen knight move',
     shortLabel: 'queen a knight move from black',
     helpText: QUEEN_KNIGHT_MOVE_HELP,
     compare: (first, second) =>
+      first.queenEdgePenalty - second.queenEdgePenalty ||
       first.queenKnightMovePenalty - second.queenKnightMovePenalty,
+  },
+  {
+    id: 'king closer',
+    shortLabel: 'king closer',
+    helpText: QUEEN_KING_CLOSER_HELP,
+    compare: (first, second) =>
+      first.whiteKingEdgePenalty - second.whiteKingEdgePenalty,
   },
   {
     id: 'queen box size',

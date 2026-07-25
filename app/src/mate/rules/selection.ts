@@ -342,7 +342,12 @@ export function currentTeachingHint<Score>(
 ): OrderedRule<Score> | undefined {
   const selection = selectCandidatesByRules(candidates, rules)
   const decisiveRule = selection.lastEliminatingRule
-  if (decisiveRule?.presentationRole !== 'guard') return decisiveRule
+  if (
+    decisiveRule?.presentationRole !== 'guard' &&
+    decisiveRule?.presentationRole !== 'internal'
+  ) {
+    return decisiveRule
+  }
 
   const idealCandidates =
     san === undefined
@@ -351,14 +356,20 @@ export function currentTeachingHint<Score>(
   if (idealCandidates.length === 0) return decisiveRule
   const rejectedByGuard = candidates.filter(
     (candidate) =>
-      selection.eliminatedBy.get(candidate)?.presentationRole === 'guard',
+      selection.eliminatedBy.get(candidate)?.presentationRole === 'guard' ||
+      selection.eliminatedBy.get(candidate)?.presentationRole === 'internal',
   )
   let best:
     | { readonly rule: OrderedRule<Score>; readonly support: number }
     | undefined
 
   for (const rule of rules) {
-    if (rule.presentationRole === 'guard') continue
+    if (
+      rule.presentationRole === 'guard' ||
+      rule.presentationRole === 'internal'
+    ) {
+      continue
+    }
     let support = 0
     for (const ideal of idealCandidates) {
       for (const rejected of rejectedByGuard) {
