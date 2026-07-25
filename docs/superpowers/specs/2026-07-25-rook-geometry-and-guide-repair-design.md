@@ -21,7 +21,7 @@ The current implementation has five related problems:
    make Black step into opposition with either a king move or a rook waiting
    move.
 4. `box Black in` sometimes prefers parking the rook beside White's king. The
-   main strategy should keep the rook wall far from both kings.
+   strategy needs a distinct distant-rook-wall concept instead.
 5. Phase 2 is a useful concept, but the current explanation and shaded diagram
    obscure it. Phase 1 establishes the first box; Phase 2 preserves and shrinks
    that box.
@@ -52,7 +52,7 @@ lowercase labels and explanations:
 1. `shrink the box` — Use the rook to leave Black as little room as possible.
 2. `force opposition` — Use White's king or a rook waiting move to make Black
    step into opposition.
-3. `box black in` — Put the rook between the kings and keep it far from both.
+3. `distant rook wall` — Box Black in with the rook far from both kings.
 
 Keep Phase 2 as a visible concept and define it precisely:
 
