@@ -6,12 +6,16 @@ Keep Phase 2 notes focused on memorable chess guidance. Remove narration about w
 
 ## Scope
 
-- Queen: retain the geometric definition of Phase 2 and remove the White-turn display sentence.
+- Queen: remove the Phase 2 note entirely. Its visible strategy rules already
+  explain the useful queen geometry without naming an additional phase.
+  Because Queen then has neither notes nor diagrams, omit its empty Notes
+  section from the modal.
 - Rook: retain that the Rook cuts between the kings and remove the White-turn display sentence.
 - Two Bishops: retain the position definition and square explanation, but remove the White-turn applicability sentence.
 - Update exact-copy tests to lock in the shorter text.
 
-This is a copy-only change. Evaluator behavior, phase detection, and rendering conditions do not change.
+This is a copy-only change. Evaluator behavior, phase detection, shared board
+badges, log values, and rendering conditions do not change.
 
 ## Copy rule
 
