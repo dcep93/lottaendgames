@@ -19,7 +19,7 @@ The Legend contains these two explanations in order:
 
 ## Layout
 
-On wider screens, the footer is a two-column grid with Keyboard Shortcuts on the left and Legend on the right. On narrow screens, it becomes one column with Keyboard Shortcuts above Legend. Both sections retain the existing modal section treatment.
+On wider screens, the footer is a two-column grid with Keyboard Shortcuts on the left and Legend on the right. The tracks use a 40/60 split so the longer Legend copy has more room. On narrow screens, it becomes one column with Keyboard Shortcuts above Legend. Both sections retain the existing modal section treatment.
 
 ## Scope
 
@@ -27,4 +27,4 @@ This change only reorganizes explanatory content in the shared modal. It does no
 
 ## Verification
 
-Presentation tests will verify that every rule set receives the shared structure, the two legend lines appear under the Legend heading rather than Notes, Notes precedes the footer, Keyboard Shortcuts precedes Legend, and the footer changes from two columns to one at the narrow-screen breakpoint.
+Presentation tests will verify that every rule set receives the shared structure, the two legend lines appear under the Legend heading rather than Notes, Notes precedes the footer, Keyboard Shortcuts precedes Legend, the Legend receives the wider desktop track, and the footer changes from two columns to one at the narrow-screen breakpoint.
