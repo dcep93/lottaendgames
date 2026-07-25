@@ -19,12 +19,10 @@ import {
   getMajorEndgamePhase,
   getMajorEndgamePhaseLabel,
   getQueenBoxDimensions,
-  getQueenCageKingApproachDistance,
-  getQueenCageKingApproachManhattanDistance,
   getQueenTwoSquareCage,
   getRookBox,
   getRookBoxFromFen,
-  isQueenRankOrFileChannelBetween,
+  isQueenTighterChannelBetween,
 } from './majorPieceGeometry'
 import { lookupMajorPieceMateProgress } from './majorPieceMateProgress'
 import { compareScoresByRules, selectIdealMoves } from './selection'
@@ -44,9 +42,6 @@ export type QueenWhiteMoveScore = {
   readonly queenKnightMovePenalty: number
   readonly queenBoxShorterSide: number
   readonly queenBoxLongerSide: number
-  readonly cageKingApproachPriority: 0 | 1 | 2
-  readonly cageKingApproachDistance: number | null
-  readonly cageKingApproachManhattanDistance: number | null
   readonly whiteKingBetweenPiecesPenalty: number
   readonly kingDistance: number | null
   readonly kingManhattanDistance: number | null
@@ -94,15 +89,13 @@ const FINISH_GUARANTEE_HELP =
   'Every recommended move keeps mate forced and rules out repetition or a fifty-move draw.'
 const QUEEN_CORNER_CAGE_HELP =
   'Keep Black confined to two squares near a corner.'
-const QUEEN_CAGE_SUPPORT_HELP =
-  "With the two-square corner cage established, bring White's king toward a mating-support square."
 const QUEEN_OFF_EDGE_HELP = "Move White's pieces off edge squares."
 const QUEEN_KNIGHT_MOVE_HELP =
   "Keep the queen a knight's move from Black's king."
 const QUEEN_BOX_SIZE_HELP =
   "Shrink the box's shorter side before its longer side."
 const QUEEN_KING_CLOSER_HELP =
-  "Move White's king closer without stepping between the queen and Black's king on the queen's rank or file."
+  "Move White's king closer without crossing the tighter side of the queen's box."
 const ROOK_BUILD_BOX_HELP =
   "Check only when it pushes Black away from White's king. Otherwise, place the rook between the kings to build a phase 2 box; once Black reaches an edge, shrink it."
 const ROOK_WAITING_MOVE_HELP =
@@ -202,8 +195,6 @@ export function scoreQueenWhiteMove(
   fen: string,
   san: string,
 ): QueenWhiteMoveScore {
-  const startingCage = getQueenTwoSquareCage(fen, 'b')
-  const shouldWalkCageKing = startingCage !== null
   const chess = getChess(fen)
   const move = chess.move(san)
   const resultFen = chess.fen()
@@ -214,22 +205,6 @@ export function scoreQueenWhiteMove(
   const queenBox =
     whiteQueen && blackKing
       ? getQueenBoxDimensions(whiteQueen.square, blackKing.square)
-      : null
-  const cageKingApproachDistance =
-    shouldWalkCageKing && resultCage && move.piece === 'k' && whiteKing && whiteQueen
-      ? getQueenCageKingApproachDistance(
-          whiteKing.square,
-          whiteQueen.square,
-          startingCage.corner,
-        )
-      : null
-  const cageKingApproachManhattanDistance =
-    cageKingApproachDistance !== null && whiteKing && whiteQueen
-      ? getQueenCageKingApproachManhattanDistance(
-          whiteKing.square,
-          whiteQueen.square,
-          startingCage!.corner,
-        )
       : null
   return {
     matePenalty: chess.isCheckmate() ? 0 : 1,
@@ -247,22 +222,12 @@ export function scoreQueenWhiteMove(
         : 1,
     queenBoxShorterSide: queenBox?.shorterSide ?? 99,
     queenBoxLongerSide: queenBox?.longerSide ?? 99,
-    cageKingApproachPriority:
-      shouldWalkCageKing && resultCage
-        ? move.piece !== 'k'
-          ? 1
-          : cageKingApproachDistance === null
-            ? 2
-            : 0
-        : 0,
-    cageKingApproachDistance,
-    cageKingApproachManhattanDistance,
     whiteKingBetweenPiecesPenalty:
       move.piece === 'k' &&
       whiteQueen &&
       whiteKing &&
       blackKing &&
-      isQueenRankOrFileChannelBetween(whiteKing, whiteQueen, blackKing)
+      isQueenTighterChannelBetween(whiteKing, whiteQueen, blackKing)
         ? 1
         : 0,
     kingDistance:
@@ -302,21 +267,6 @@ export const queenWhiteRules: readonly OrderedRule<QueenWhiteMoveScore>[] = [
     shortLabel: 'two-square corner cage',
     helpText: QUEEN_CORNER_CAGE_HELP,
     compare: (first, second) => first.cagePenalty - second.cagePenalty,
-  },
-  {
-    id: 'king to cage',
-    shortLabel: 'king toward cage support',
-    helpText: QUEEN_CAGE_SUPPORT_HELP,
-    compare: (first, second) =>
-      first.cageKingApproachPriority - second.cageKingApproachPriority ||
-      compareOptionalDistances(
-        first.cageKingApproachDistance,
-        second.cageKingApproachDistance,
-      ) ||
-      compareOptionalDistances(
-        first.cageKingApproachManhattanDistance,
-        second.cageKingApproachManhattanDistance,
-      ),
   },
   {
     id: 'white pieces off edge',
@@ -861,7 +811,5 @@ export const rookRuleSet: MateRuleSet<RookWhiteMoveScore> = {
 
 export {
   getMajorEndgamePhase,
-  getQueenCageKingApproachDistance,
-  getQueenCageKingApproachManhattanDistance,
   getQueenTwoSquareCage,
 }

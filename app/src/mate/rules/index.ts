@@ -41,8 +41,6 @@ export {
   getIdealRookBlackMoves,
   getIdealRookWhiteMoves,
   getMajorEndgamePhase,
-  getQueenCageKingApproachDistance,
-  getQueenCageKingApproachManhattanDistance,
   getQueenTwoSquareCage,
   queenRuleSet,
   queenWhiteRules,
@@ -61,12 +59,19 @@ export type {
 } from './majorPieces'
 
 export {
+  getQueenBoxAxisSides,
   getRookBox,
   getRookBoxFromFen,
   getRookCuts,
   isQueenRankOrFileChannelBetween,
+  isQueenTighterChannelBetween,
 } from './majorPieceGeometry'
-export type { RookAxis, RookBox, RookCut } from './majorPieceGeometry'
+export type {
+  QueenBoxAxisSides,
+  RookAxis,
+  RookBox,
+  RookCut,
+} from './majorPieceGeometry'
 
 export {
   bishopKnightRuleSet,

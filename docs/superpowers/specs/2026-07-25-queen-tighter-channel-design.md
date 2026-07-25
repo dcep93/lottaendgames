@@ -50,3 +50,11 @@ Add literal and symmetry tests for rank-tighter, file-tighter, and tied boxes.
 Pin the `Qb5`, `Ka7`, `Kc5` position so `Kc6` has no channel penalty and is
 recommended. Re-run focused Queen tests, the complete identity-keyed Queen
 rank, the full Mate suite, lint, and build.
+
+## Result
+
+The symmetry-reduced graph passed with `king toward cage support` omitted:
+17,972 roots and 17,991 White states ranked, with a maximum line of 37 plies.
+The identity-keyed graph also passed: all 17,972 roots and 30,506 White states
+ranked, again with a maximum line of 37 plies. The rule is therefore redundant
+under tighter-axis geometry and is removed from both the evaluator and guide.

@@ -1,15 +1,12 @@
-import type { PieceSymbol, Square } from 'chess.js'
+import type { Square } from 'chess.js'
 import {
-  allSquares,
   boardFenFromPlacements,
   edgeDistance,
   findPiece,
   getChess,
   getEndgamePiecePlacements,
-  isKnightMove,
   isStrictlyBetween,
   kingDistance,
-  manhattanDistance,
   sideToMoveCanCapturePiece,
   squareCoordinates,
   squareFromCoordinates,
@@ -53,6 +50,11 @@ export type QueenBoxDimensions = {
   readonly longerSide: number
 }
 
+export type QueenBoxAxisSides = {
+  readonly fileSide: number
+  readonly rankSide: number
+}
+
 export function isMajorPieceBetweenKings(
   majorPiece: PieceSquare,
   whiteKing: PieceSquare,
@@ -78,6 +80,26 @@ export function isQueenRankOrFileChannelBetween(
   return (
     isStrictlyBetween(target.rank, first.rank, second.rank) ||
     isStrictlyBetween(target.file, first.file, second.file)
+  )
+}
+
+export function isQueenTighterChannelBetween(
+  square: PieceSquare,
+  queenBoundary: PieceSquare,
+  blackBoundary: PieceSquare,
+): boolean {
+  const target = squareCoordinates(square.square)
+  const queen = squareCoordinates(queenBoundary.square)
+  const black = squareCoordinates(blackBoundary.square)
+  const { fileSide, rankSide } = getQueenBoxAxisSides(
+    queenBoundary.square,
+    blackBoundary.square,
+  )
+  return (
+    (rankSide <= fileSide &&
+      isStrictlyBetween(target.rank, queen.rank, black.rank)) ||
+    (fileSide <= rankSide &&
+      isStrictlyBetween(target.file, queen.file, black.file))
   )
 }
 
@@ -121,45 +143,38 @@ export function getQueenBoxDimensions(
   whiteQueenSquare: Square,
   blackKingSquare: Square,
 ): QueenBoxDimensions {
+  const { fileSide, rankSide } = getQueenBoxAxisSides(
+    whiteQueenSquare,
+    blackKingSquare,
+  )
+  return Object.freeze({
+    shorterSide: Math.min(fileSide, rankSide),
+    longerSide: Math.max(fileSide, rankSide),
+  })
+}
+
+export function getQueenBoxAxisSides(
+  whiteQueenSquare: Square,
+  blackKingSquare: Square,
+): QueenBoxAxisSides {
   const queen = squareCoordinates(whiteQueenSquare)
   const black = squareCoordinates(blackKingSquare)
-  const width =
+  const fileSide =
     queen.file === black.file
       ? 8
       : black.file > queen.file
         ? 7 - queen.file
         : queen.file
-  const height =
+  const rankSide =
     queen.rank === black.rank
       ? 8
       : black.rank > queen.rank
         ? 7 - queen.rank
         : queen.rank
   return Object.freeze({
-    shorterSide: Math.min(width, height),
-    longerSide: Math.max(width, height),
+    fileSide,
+    rankSide,
   })
-}
-
-export function getQueenMoveDistance(
-  beforeQueenSquare: Square | undefined,
-  afterQueenSquare: Square | undefined,
-  piece: PieceSymbol | undefined,
-): number | null {
-  if (piece === 'q' && beforeQueenSquare && afterQueenSquare) {
-    return kingDistance(beforeQueenSquare, afterQueenSquare)
-  }
-  return null
-}
-
-export function compareQueenMoveDistances(
-  first: number | null,
-  second: number | null,
-): number {
-  if (first === null || second === null) {
-    return 0
-  }
-  return first - second
 }
 
 function queenCagePairs(): readonly QueenTwoSquareCage[] {
@@ -256,41 +271,6 @@ export function getQueenTwoSquareCage(
     }
   }
   return null
-}
-
-function queenCageKingTargetSquares(
-  whiteQueenSquare: Square,
-  corner: Square,
-): readonly Square[] {
-  return allSquares().filter(
-    (square) =>
-      isKnightMove(square, corner) &&
-      isKnightMove(square, whiteQueenSquare),
-  )
-}
-
-export function getQueenCageKingApproachDistance(
-  whiteKingSquare: Square,
-  whiteQueenSquare: Square,
-  corner: Square,
-): number | null {
-  const distances = queenCageKingTargetSquares(
-    whiteQueenSquare,
-    corner,
-  ).map((square) => kingDistance(whiteKingSquare, square))
-  return distances.length === 0 ? null : Math.min(...distances)
-}
-
-export function getQueenCageKingApproachManhattanDistance(
-  whiteKingSquare: Square,
-  whiteQueenSquare: Square,
-  corner: Square,
-): number | null {
-  const distances = queenCageKingTargetSquares(
-    whiteQueenSquare,
-    corner,
-  ).map((square) => manhattanDistance(whiteKingSquare, square))
-  return distances.length === 0 ? null : Math.min(...distances)
 }
 
 export function getRookCuts(

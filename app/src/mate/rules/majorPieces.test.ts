@@ -17,7 +17,6 @@ import {
   compareRookWhiteScores,
   getEndgameReturnToPositionMoves,
   getMateRuleSet,
-  getQueenCageKingApproachDistance,
   getQueenTwoSquareCage,
   isQueenRankOrFileChannelBetween,
   queenRuleSet,
@@ -52,8 +51,8 @@ const QUEEN_WHITE_FIXTURES: readonly WhiteFixture[] = [
   },
   {
     fen: '7k/8/8/6Q1/8/5K2/8/8 w - - 0 1',
-    idealMoves: ['Kf4'],
-    hint: 'king to cage',
+    idealMoves: ['Kg4'],
+    hint: 'king closer',
     phase: '2/2',
   },
   {
@@ -71,7 +70,7 @@ const QUEEN_WHITE_FIXTURES: readonly WhiteFixture[] = [
   {
     fen: '7k/4Q3/4K3/8/8/8/8/8 w - - 18 10',
     idealMoves: ['Kf6'],
-    hint: 'king to cage',
+    hint: 'king closer',
     phase: '2/2',
   },
   {
@@ -113,25 +112,25 @@ const QUEEN_WHITE_FIXTURES: readonly WhiteFixture[] = [
   {
     fen: '6k1/4Q3/8/8/8/5K2/8/8 w - - 0 1',
     idealMoves: ['Kg4'],
-    hint: 'king to cage',
+    hint: 'king closer',
     phase: '2/2',
   },
   {
     fen: 'k7/8/8/1Q6/2K5/8/8/8 w - - 6 4',
     idealMoves: ['Kc5'],
-    hint: 'king to cage',
+    hint: 'king closer',
     phase: '2/2',
   },
   {
     fen: '7k/8/8/6Q1/5K2/8/8/8 w - - 6 4',
     idealMoves: ['Kf5'],
-    hint: 'king to cage',
+    hint: 'king closer',
     phase: '2/2',
   },
   {
     fen: '4K2k/4Q3/8/8/8/8/8/8 w - - 10 6',
     idealMoves: ['Kd7'],
-    hint: 'king to cage',
+    hint: 'white pieces off edge',
     phase: '1/2',
   },
   {
@@ -376,9 +375,9 @@ const QUEEN_ENDGAME_LINE_FIXTURES = [
       ['Kg8', 'Kh8', 'Kh6'],
       ['Qg5'],
       ['Kh7'],
-      ['Kf3'],
+      ['Kg3'],
       ['Kh8'],
-      ['Kf4'],
+      ['Kg4'],
       ['Kh7'],
       ['Kf5'],
       ['Kh8'],
@@ -492,7 +491,7 @@ const QUEEN_ENDGAME_LINE_FIXTURES = [
       ['Ka1'],
       ['Kc6'],
       ['Ka2'],
-      ['Kc5'],
+      ['Kb5'],
       ['Ka1'],
       ['Kc4'],
       ['Ka2'],
@@ -546,7 +545,7 @@ const QUEEN_ENDGAME_LINE_FIXTURES = [
       ['Kb8'],
       ['Qd7'],
       ['Ka8'],
-      ['Ke6'],
+      ['Ke7'],
       ['Kb8'],
       ['Kd6'],
       ['Ka8'],
@@ -628,7 +627,6 @@ test('queen and rook preserve evaluator order with universal priority labels', (
       'queen safe',
       'no stalemate',
       'corner cage',
-      'king to cage',
       'white pieces off edge',
       'queen knight move',
       'queen box size',
@@ -656,7 +654,6 @@ test('queen and rook preserve evaluator order with universal priority labels', (
       'pieces safe',
       'no stalemate',
       'two-square corner cage',
-      'king toward cage support',
       'white pieces off edge',
       'queen a knight move from black',
       'queen box size',
@@ -691,12 +688,6 @@ test('queen and rook preserve evaluator order with universal priority labels', (
         helpText: 'Keep Black confined to two squares near a corner.',
       },
       {
-        id: 'king to cage',
-        shortLabel: 'king toward cage support',
-        helpText:
-          "With the two-square corner cage established, bring White's king toward a mating-support square.",
-      },
-      {
         id: 'white pieces off edge',
         shortLabel: 'white pieces off edge',
         helpText: "Move White's pieces off edge squares.",
@@ -715,13 +706,13 @@ test('queen and rook preserve evaluator order with universal priority labels', (
         id: 'king closer',
         shortLabel: 'king closer',
         helpText:
-          "Move White's king closer without stepping between the queen and Black's king on the queen's rank or file.",
+          "Move White's king closer without crossing the tighter side of the queen's box.",
       },
     ],
   )
   assert.equal(
     queenWhiteRules.find(({ id }) => id === 'king closer')?.helpText,
-    "Move White's king closer without stepping between the queen and Black's king on the queen's rank or file.",
+    "Move White's king closer without crossing the tighter side of the queen's box.",
   )
   assert.equal(
     new Set(
@@ -786,7 +777,6 @@ test('queen and rook preserve evaluator order with universal priority labels', (
       'queen safe',
       'no stalemate',
       'corner cage',
-      'king to cage',
       'white pieces off edge',
       'queen knight move',
       'queen box size',
@@ -844,9 +834,6 @@ test('queen white score fields and compound comparisons match literals', () => {
     queenKnightMovePenalty: 1,
     queenBoxShorterSide: 4,
     queenBoxLongerSide: 8,
-    cageKingApproachPriority: 0,
-    cageKingApproachDistance: null,
-    cageKingApproachManhattanDistance: null,
     whiteKingBetweenPiecesPenalty: 0,
     kingDistance: 2,
     kingManhattanDistance: 2,
@@ -860,9 +847,6 @@ test('queen white score fields and compound comparisons match literals', () => {
     queenKnightMovePenalty: 0,
     queenBoxShorterSide: 5,
     queenBoxLongerSide: 7,
-    cageKingApproachPriority: 0,
-    cageKingApproachDistance: null,
-    cageKingApproachManhattanDistance: null,
     whiteKingBetweenPiecesPenalty: 0,
     kingDistance: 2,
     kingManhattanDistance: 2,
@@ -881,9 +865,6 @@ test('queen white score fields and compound comparisons match literals', () => {
     queenKnightMovePenalty: 0,
     queenBoxShorterSide: 4,
     queenBoxLongerSide: 5,
-    cageKingApproachPriority: 0,
-    cageKingApproachDistance: null,
-    cageKingApproachManhattanDistance: null,
     whiteKingBetweenPiecesPenalty: 0,
     kingDistance: 3,
     kingManhattanDistance: 3,
@@ -897,9 +878,6 @@ test('queen white score fields and compound comparisons match literals', () => {
     queenKnightMovePenalty: 0,
     queenBoxShorterSide: 4,
     queenBoxLongerSide: 6,
-    cageKingApproachPriority: 0,
-    cageKingApproachDistance: null,
-    cageKingApproachManhattanDistance: null,
     whiteKingBetweenPiecesPenalty: 0,
     kingDistance: 3,
     kingManhattanDistance: 3,
@@ -932,6 +910,18 @@ test('queen king proximity uses king moves then row-plus-file distance', () => {
     compareQueenWhiteScores(closerByRowAndFile, fartherByRowAndFile),
     -1,
   )
+})
+
+test('queen king proximity allows the wider rank channel in a 3-by-1 box', () => {
+  const fen = '8/k7/8/1QK5/8/8/8/8 w - - 2 2'
+  const awayFromSupport = scoreQueenWhiteMove(fen, 'Kb4')
+  const towardSupport = scoreQueenWhiteMove(fen, 'Kc6')
+
+  assert.equal(awayFromSupport.whiteKingBetweenPiecesPenalty, 0)
+  assert.equal(towardSupport.whiteKingBetweenPiecesPenalty, 0)
+  assert.equal(towardSupport.kingDistance, 2)
+  assert.equal(awayFromSupport.kingDistance, 3)
+  assert.deepEqual(getMateRuleSet('queen').idealWhiteMoves(fen), ['Kc6'])
 })
 
 test('queen channel geometry names the rank-or-file projection used by phase', () => {
@@ -967,35 +957,10 @@ test('queen cage, safety, stalemate, and exact finishing line match literals', (
   )
 
   const cageFen = '6k1/4Q3/8/8/8/5K2/8/8 w - - 0 1'
-  const cageApproach = scoreQueenWhiteMove(cageFen, 'Kg4')
-  assert.equal(cageApproach.cageKingApproachPriority, 0)
-  assert.equal(cageApproach.cageKingApproachDistance, 2)
-  assert.equal(cageApproach.cageKingApproachManhattanDistance, 2)
-  assert.equal(
-    getQueenCageKingApproachDistance('g6', 'a3', 'h8'),
-    null,
-  )
   for (const san of getMateRuleSet('queen').idealWhiteMoves(cageFen)) {
     const cageChess = getChess(cageFen)
     const move = cageChess.move(san)
-    const whiteKing = cageChess
-      .board()
-      .flat()
-      .find((piece) => piece?.color === 'w' && piece.type === 'k')
-    const whiteQueen = cageChess
-      .board()
-      .flat()
-      .find((piece) => piece?.color === 'w' && piece.type === 'q')
     assert.equal(move.piece, 'k')
-    assert.ok(whiteKing && whiteQueen)
-    assert.equal(
-      getQueenCageKingApproachDistance(
-        whiteKing.square,
-        whiteQueen.square,
-        'h8',
-      ),
-      2,
-    )
   }
 
   for (const fen of [

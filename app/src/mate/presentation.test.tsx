@@ -1277,7 +1277,7 @@ test('Rook and Two Bishops render compact diagrams while Queen stays text-only',
   assert.deepEqual(getMateRuleSet('queen').help.noteBoards, [])
   assert.match(queenMarkup, />two-square corner cage</)
   assert.match(queenMarkup, /two squares near a corner/)
-  assert.match(queenMarkup, />king toward cage support</)
+  assert.doesNotMatch(queenMarkup, />king toward cage support</)
   assert.match(queenMarkup, />white pieces off edge</)
   assert.match(queenMarkup, />queen a knight move from black</)
   assert.match(queenMarkup, />queen box size</)

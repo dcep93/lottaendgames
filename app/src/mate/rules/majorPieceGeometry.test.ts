@@ -2,8 +2,10 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import { getChess, SQUARE_TRANSFORMS, transformFen } from '../chess'
 import {
+  getQueenBoxAxisSides,
   getQueenBoxDimensions,
   getRookBoxFromFen,
+  isQueenTighterChannelBetween,
   type RookAxis,
 } from './majorPieceGeometry'
 
@@ -21,6 +23,61 @@ test('queen box dimensions sort the rectangle sides', () => {
 
   assert.deepEqual(dimensions, { shorterSide: 3, longerSide: 6 })
   assert.equal(Object.isFrozen(dimensions), true)
+})
+
+test('queen box keeps the file and rank side identities', () => {
+  const sides = getQueenBoxAxisSides('b5', 'a7')
+
+  assert.deepEqual(sides, { fileSide: 1, rankSide: 3 })
+  assert.equal(Object.isFrozen(sides), true)
+})
+
+test('queen king channel protects only the tighter box side', () => {
+  assert.equal(
+    isQueenTighterChannelBetween(
+      { square: 'd6' },
+      { square: 'c5' },
+      { square: 'a7' },
+    ),
+    false,
+    'the wider rank channel stays open when the file side is tighter',
+  )
+  assert.equal(
+    isQueenTighterChannelBetween(
+      { square: 'b6' },
+      { square: 'c5' },
+      { square: 'a7' },
+    ),
+    true,
+    'the tighter file channel stays protected',
+  )
+  assert.equal(
+    isQueenTighterChannelBetween(
+      { square: 'f4' },
+      { square: 'e3' },
+      { square: 'g1' },
+    ),
+    false,
+    'the wider file channel stays open when the rank side is tighter',
+  )
+  assert.equal(
+    isQueenTighterChannelBetween(
+      { square: 'f2' },
+      { square: 'e3' },
+      { square: 'g1' },
+    ),
+    true,
+    'the tighter rank channel stays protected',
+  )
+  assert.equal(
+    isQueenTighterChannelBetween(
+      { square: 'b4' },
+      { square: 'c3' },
+      { square: 'a1' },
+    ),
+    true,
+    'both channels stay protected when the sides tie',
+  )
 })
 
 test('queen box dimensions are symmetric across board transforms', () => {
