@@ -51,8 +51,10 @@ Then use these Rook priorities:
 ## Geometry
 
 `keep the box` activates only when a box already exists. A candidate survives
-when the resulting position still has a box no larger than the current one.
-When no box exists, every move ties at this rule.
+when it leaves the rook wall in place or moves the rook to a box no larger than
+the current one. A White king move does not alter the rook wall or release
+Black, including when the king steps onto the rook's rank or file. When no box
+exists, every move ties at this rule.
 
 `waiting move` activates only when a box exists and the kings are a knight's
 move apart. A qualifying move must:
@@ -82,10 +84,17 @@ the reduced regression cycle, `Rb5` moved along the same fifth-rank wall and
 left Black's box at size 3. It must tie at `shrink the box`, allowing `king
 proximity` to advance White's king instead.
 
+`king proximity` may move White's king onto the rook wall when that safe move
+brings it closer to Black. It must not require the rook wall to remain strictly
+between the kings after a king move; that phase test describes the board layout,
+not whether the rook still confines Black.
+
 ## Verification
 
 - Pin `Rh2` as the sole best move and `waiting move` as its reason.
 - Test the keep-box and waiting scores directly.
+- Prove a safe White king move onto the rook wall keeps the box and may satisfy
+  `king proximity`.
 - Prove a lateral rook move along the same wall does not satisfy `shrink the
   box`.
 - Transform the fixture through all eight board symmetries.
