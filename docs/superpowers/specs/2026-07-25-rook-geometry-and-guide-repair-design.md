@@ -49,7 +49,9 @@ far from both kings.
 Keep the universal rules unchanged. Present the Rook strategy with concise,
 lowercase labels and explanations:
 
-1. `shrink the box` — Use the rook to leave Black as little room as possible.
+1. `shrink the box` — Move the rook wall closer. If Black blocks it, check
+   Black backward first. A checking push counts as a shrink only when every
+   legal Black reply establishes a smaller real box.
 2. `king closer` — Move White's king closer to Black without losing the box.
 3. `force opposition` — When the king cannot advance, use a rook waiting move
    to give Black the move and force opposition. This applies when the kings are
