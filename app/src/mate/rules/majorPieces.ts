@@ -1,4 +1,3 @@
-import type { Square } from 'chess.js'
 import {
   edgeDistance,
   findPiece,
@@ -10,21 +9,17 @@ import {
   kingWalkCenterDistance,
   manhattanDistance,
   positionKey,
-  squareCoordinates,
 } from '../chess'
 import {
   blackCanTakeWhiteMajorPiece,
-  blackMustMoveAwayFromWhiteKing,
   getAxisDistance,
   getMajorEndgamePhase,
   getMajorEndgamePhaseLabel,
   getQueenBoxDimensions,
   getQueenTwoSquareCage,
   getRookBox,
-  getRookBoxFromFen,
   isQueenTighterChannelBetween,
 } from './majorPieceGeometry'
-import { lookupMajorPieceMateProgress } from './majorPieceMateProgress'
 import { compareScoresByRules, selectIdealMoves } from './selection'
 import type {
   MateRuleSet,
@@ -32,6 +27,11 @@ import type {
   OrderedRule,
   RuleHelp,
 } from './types'
+import {
+  rookStrategyRules,
+  scoreRookStrategyMove,
+  type RookStrategyScore,
+} from './rookStrategy'
 
 export type QueenWhiteMoveScore = {
   readonly matePenalty: number
@@ -52,22 +52,6 @@ export type QueenBlackMoveScore = {
   readonly centerDistance: number
 }
 
-export type RookWhiteMoveScore = {
-  readonly matePenalty: number
-  readonly rookCapturePenalty: number
-  readonly stalematePenalty: number
-  readonly proofProgressPenalty: number
-  readonly rookWaitingPenalty: number
-  readonly rookEstablishBoxPenalty: number
-  readonly rookPhaseTwoBoxSize: number | null
-  readonly rookFinishBoxSize: number | null
-  readonly forcingCheckPenalty: number
-  readonly kingApproachPriority: 0 | 1 | 2
-  readonly kingDistance: number | null
-  readonly kingManhattanDistance: number | null
-  readonly rookBlackDistanceScore: number | null
-}
-
 export type RookBlackMoveScore = {
   readonly captureRookPenalty: number
   readonly cutLineDistance: number
@@ -85,8 +69,6 @@ const BLACK_INTRO =
 const RETURN_POSITION_PRIORITY =
   'Return to the previous board position when a legal reply can recreate it.'
 const CAPTURE_LOOSE_PIECE_PRIORITY = "Take a piece if White isn't looking."
-const FINISH_GUARANTEE_HELP =
-  'Every recommended move keeps mate forced and rules out repetition or a fifty-move draw.'
 const QUEEN_CORNER_CAGE_HELP =
   'Keep Black confined to two squares near a corner.'
 const QUEEN_OFF_EDGE_HELP = "Keep White's pieces off edge squares."
@@ -96,13 +78,6 @@ const QUEEN_BOX_SIZE_HELP =
   "Shrink the box's shorter side before its longer side."
 const QUEEN_KING_CLOSER_HELP =
   "Move White's king closer without crossing the tighter side of the queen's box."
-const ROOK_BUILD_BOX_HELP =
-  "Check only when it pushes Black away from White's king. Otherwise, place the rook between the kings to build a phase 2 box; once Black reaches an edge, shrink it."
-const ROOK_WAITING_MOVE_HELP =
-  "When the kings are a knight's move apart, keep the box by moving the rook. Prefer White's king between the rook and Black's king, and don't leave the rook beside White's king."
-const ROOK_BRING_KING_HELP =
-  "Move White's king closer. If moves are still tied, keep the rook farther from Black."
-
 const queenHelp: RuleHelp = {
   title: 'How best moves are chosen',
   whiteIntro: WHITE_INTRO,
@@ -131,7 +106,8 @@ const rookHelp: RuleHelp = {
     'Move toward the rook.',
   ],
   notes: [
-    "Phase 2 means the rook's rank or file is strictly between the two kings on that axis.",
+    'The method: box Black in, force opposition, shrink the box, and repeat.',
+    "Phase 2 begins when the rook's rank or file is between the kings, boxing Black onto one side.",
   ],
   noteBoards: [
     {
@@ -182,13 +158,6 @@ function selectBestMoves<Score>(
   return scoredMoves
     .filter((candidate) => compareScores(candidate.score, bestScore) === 0)
     .map(({ san }) => san)
-}
-
-function compareOptionalDistances(
-  first: number | null,
-  second: number | null,
-): number {
-  return first === null || second === null ? 0 : first - second
 }
 
 export function scoreQueenWhiteMove(
@@ -323,282 +292,22 @@ export function getIdealQueenWhiteMoves(fen: string): string[] {
   )]
 }
 
+export type RookWhiteMoveScore = RookStrategyScore
+
+export const rookWhiteRules = rookStrategyRules
+
 export function scoreRookWhiteMove(
   fen: string,
   san: string,
 ): RookWhiteMoveScore {
-  const beforeMateProgress = lookupMajorPieceMateProgress('rook', fen)
-  const beforeRook = findPiece(fen, 'w', 'r')
-  const beforeWhiteKing = findPiece(fen, 'w', 'k')
-  const beforeBlackKing = findPiece(fen, 'b', 'k')
-  const beforeBox = getRookBoxFromFen(fen)
-  const beforeIsPhaseTwo = getMajorEndgamePhase(fen, 'r') === 2
-  const blackEdgeDistance = beforeBlackKing
-    ? edgeDistance(beforeBlackKing.square)
-    : null
-  const needsRookWaitingMove = Boolean(
-    beforeBox.size !== null &&
-      beforeWhiteKing &&
-      beforeBlackKing &&
-      isKnightMove(beforeWhiteKing.square, beforeBlackKing.square),
-  )
-  const chess = getChess(fen)
-  const move = chess.move(san)
-  const resultFen = chess.fen()
-  const whiteRook = findPiece(resultFen, 'w', 'r')
-  const whiteKing = findPiece(resultFen, 'w', 'k')
-  const blackKing = findPiece(resultFen, 'b', 'k')
-  const rookIsSafe = !blackCanTakeWhiteMajorPiece(resultFen, 'r')
-  const resultBox = getRookBoxFromFen(resultFen)
-  const preservesOrShrinksBox = Boolean(
-    beforeBox.size !== null &&
-      resultBox.size !== null &&
-      resultBox.size <= beforeBox.size,
-  )
-  const retainsStrongestBoundary = Boolean(
-    beforeRook &&
-      whiteRook &&
-      beforeBox.strongestCuts.some((beforeCut) =>
-        resultBox.cuts.some(
-          (resultCut) =>
-            resultCut.axis === beforeCut.axis &&
-            squareCoordinates(whiteRook.square)[resultCut.axis] ===
-              squareCoordinates(beforeRook.square)[beforeCut.axis],
-        ),
-      ),
-  )
-  const resultRookBlackDistance =
-    whiteRook && blackKing
-      ? manhattanDistance(whiteRook.square, blackKing.square)
-      : null
-  const rookEndsAdjacentToWhiteKing = Boolean(
-    whiteRook &&
-      whiteKing &&
-      kingDistance(whiteRook.square, whiteKing.square) === 1,
-  )
-  const rookWaitingMove = Boolean(
-    needsRookWaitingMove &&
-      move.piece === 'r' &&
-      move.captured === undefined &&
-      !chess.isCheck() &&
-      rookIsSafe &&
-      beforeRook &&
-      whiteRook &&
-      whiteKing &&
-      blackKing &&
-      !rookEndsAdjacentToWhiteKing &&
-      preservesOrShrinksBox &&
-      retainsStrongestBoundary
-  )
-  const preferredRookWaitingMove = Boolean(
-    rookWaitingMove &&
-      beforeRook &&
-      whiteRook &&
-      whiteKing &&
-      blackKing &&
-      waitingWhiteKingBetweenOtherPieces(
-        beforeRook.square,
-        whiteRook.square,
-        whiteKing.square,
-        blackKing.square,
-      ),
-  )
-  const resultMateProgress = lookupMajorPieceMateProgress('rook', resultFen)
-  const establishesPhaseTwoBox = Boolean(
-    getMajorEndgamePhase(resultFen, 'r') === 2 &&
-      (!beforeIsPhaseTwo || preservesOrShrinksBox),
-  )
-  const beforeKingFileDistance =
-    beforeWhiteKing && beforeBlackKing
-      ? getAxisDistance(
-          beforeWhiteKing.square,
-          beforeBlackKing.square,
-          'file',
-        )
-      : null
-  const beforeKingRankDistance =
-    beforeWhiteKing && beforeBlackKing
-      ? getAxisDistance(
-          beforeWhiteKing.square,
-          beforeBlackKing.square,
-          'rank',
-        )
-      : null
-  const resultKingFileDistance =
-    whiteKing && blackKing
-      ? getAxisDistance(whiteKing.square, blackKing.square, 'file')
-      : null
-  const resultKingRankDistance =
-    whiteKing && blackKing
-      ? getAxisDistance(whiteKing.square, blackKing.square, 'rank')
-      : null
-  const resultKingDistance =
-    whiteKing && blackKing
-      ? kingDistance(whiteKing.square, blackKing.square)
-      : null
-  const kingMoveRegressesAxis = Boolean(
-    beforeKingFileDistance !== null &&
-      beforeKingRankDistance !== null &&
-      resultKingFileDistance !== null &&
-      resultKingRankDistance !== null &&
-      (resultKingFileDistance > beforeKingFileDistance ||
-        resultKingRankDistance > beforeKingRankDistance),
-  )
-  const kingMoveImprovesAxis = Boolean(
-    beforeKingFileDistance !== null &&
-      beforeKingRankDistance !== null &&
-      resultKingFileDistance !== null &&
-      resultKingRankDistance !== null &&
-      (resultKingFileDistance < beforeKingFileDistance ||
-        resultKingRankDistance < beforeKingRankDistance),
-  )
-  const kingApproachPriority: 0 | 1 | 2 =
-    move.piece !== 'k'
-      ? 1
-      : kingMoveImprovesAxis && !kingMoveRegressesAxis
-        ? 0
-        : 2
-  const forcingCheck =
-    chess.isCheck() &&
-    !chess.isCheckmate() &&
-    blackMustMoveAwayFromWhiteKing(resultFen)
-  const makesMateProgress =
-    beforeMateProgress.kind === 'winning' &&
-    resultMateProgress.kind === 'winning' &&
-    resultMateProgress.rank < beforeMateProgress.rank
-  return {
-    matePenalty: chess.isCheckmate() ? 0 : 1,
-    rookCapturePenalty: rookIsSafe ? 0 : 1,
-    stalematePenalty: !chess.isCheckmate() && chess.isStalemate() ? 1 : 0,
-    proofProgressPenalty: makesMateProgress ? 0 : 1,
-    rookWaitingPenalty: !needsRookWaitingMove
-      ? 0
-      : preferredRookWaitingMove
-        ? 0
-        : rookWaitingMove
-          ? 1
-          : 2,
-    rookEstablishBoxPenalty: establishesPhaseTwoBox ? 0 : 1,
-    rookPhaseTwoBoxSize: establishesPhaseTwoBox ? resultBox.size : null,
-    rookFinishBoxSize:
-      blackEdgeDistance === 0 && establishesPhaseTwoBox
-        ? resultBox.size
-        : null,
-    forcingCheckPenalty: forcingCheck ? 0 : 1,
-    kingApproachPriority,
-    kingDistance: resultKingDistance,
-    kingManhattanDistance:
-      whiteKing && blackKing
-        ? manhattanDistance(whiteKing.square, blackKing.square)
-        : null,
-    rookBlackDistanceScore:
-      resultRookBlackDistance === null ? null : -resultRookBlackDistance,
-  }
+  return scoreRookStrategyMove(fen, san)
 }
-
-export const rookWhiteRules: readonly OrderedRule<RookWhiteMoveScore>[] = [
-  {
-    id: 'mate',
-    shortLabel: 'mate',
-    helpText: '',
-    compare: (first, second) => first.matePenalty - second.matePenalty,
-  },
-  {
-    id: 'rook safe',
-    shortLabel: 'pieces safe',
-    helpText: '',
-    compare: (first, second) =>
-      first.rookCapturePenalty - second.rookCapturePenalty,
-  },
-  {
-    id: 'no stalemate',
-    shortLabel: 'no stalemate',
-    helpText: '',
-    compare: (first, second) =>
-      first.stalematePenalty - second.stalematePenalty,
-  },
-  {
-    id: 'finish guarantee',
-    shortLabel: 'finish guarantee',
-    helpText: FINISH_GUARANTEE_HELP,
-    presentationRole: 'guard',
-    compare: (first, second) =>
-      first.proofProgressPenalty - second.proofProgressPenalty,
-  },
-  {
-    id: 'build box',
-    shortLabel: 'build the box',
-    helpText: ROOK_BUILD_BOX_HELP,
-    compare: (first, second) =>
-      first.forcingCheckPenalty - second.forcingCheckPenalty,
-  },
-  {
-    id: 'build box',
-    shortLabel: 'build the box',
-    helpText: ROOK_BUILD_BOX_HELP,
-    compare: (first, second) =>
-      first.rookEstablishBoxPenalty - second.rookEstablishBoxPenalty ||
-      compareOptionalDistances(
-        first.rookFinishBoxSize,
-        second.rookFinishBoxSize,
-      ),
-  },
-  {
-    id: 'rook waiting move',
-    shortLabel: 'waiting move',
-    helpText: ROOK_WAITING_MOVE_HELP,
-    compare: (first, second) =>
-      first.rookWaitingPenalty - second.rookWaitingPenalty,
-  },
-  {
-    id: 'bring king',
-    shortLabel: 'bring the king',
-    helpText: ROOK_BRING_KING_HELP,
-    applies: (score) =>
-      score.kingDistance !== null && score.kingManhattanDistance !== null,
-    compare: (first, second) =>
-      first.kingApproachPriority - second.kingApproachPriority ||
-      first.kingDistance! - second.kingDistance! ||
-      first.kingManhattanDistance! - second.kingManhattanDistance!,
-  },
-  {
-    id: 'bring king',
-    shortLabel: 'bring the king',
-    helpText: ROOK_BRING_KING_HELP,
-    applies: (score) => score.rookBlackDistanceScore !== null,
-    compare: (first, second) =>
-      first.rookBlackDistanceScore! - second.rookBlackDistanceScore!,
-  },
-]
 
 export function compareRookWhiteScores(
   first: RookWhiteMoveScore,
   second: RookWhiteMoveScore,
 ): number {
   return compareScoresByRules(first, second, rookWhiteRules)
-}
-
-function waitingWhiteKingBetweenOtherPieces(
-  beforeRookSquare: Square,
-  resultRookSquare: Square,
-  whiteKingSquare: Square,
-  blackKingSquare: Square,
-): boolean {
-  const beforeRook = squareCoordinates(beforeRookSquare)
-  const resultRook = squareCoordinates(resultRookSquare)
-  const whiteKing = squareCoordinates(whiteKingSquare)
-  const blackKing = squareCoordinates(blackKingSquare)
-  const movementAxis =
-    beforeRook.file === resultRook.file ? 'rank' : 'file'
-  const lower = Math.min(
-    resultRook[movementAxis],
-    blackKing[movementAxis],
-  )
-  const upper = Math.max(
-    resultRook[movementAxis],
-    blackKing[movementAxis],
-  )
-  return lower < whiteKing[movementAxis] && whiteKing[movementAxis] < upper
 }
 
 export function getIdealRookWhiteMoves(fen: string): string[] {

@@ -188,8 +188,9 @@ test('reconstructs the former exact Rook loop as undoable ordinary history', () 
     getMateRuleSet('rook').whiteRuleDescriptions.map(({ id }) => id),
   )
   assert.ok(incorrectMoves.length > 0)
-  assert.ok(
+  assert.equal(
     incorrectMoves.some(({ reasonId }) => reasonId === 'finish guarantee'),
+    false,
   )
   assert.ok(
     incorrectMoves.every(

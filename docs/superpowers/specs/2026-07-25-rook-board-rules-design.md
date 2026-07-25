@@ -8,6 +8,10 @@ verification, but it must not select moves or appear as a teaching priority.
 
 Every displayed priority must identify one distinct evaluator decision.
 
+A phase 2 box exists only when the rook's rank or file is strictly between the
+two kings. White's king cannot stand on the rook wall: it would block the
+rook's ray and let Black cross the supposed boundary.
+
 ## Rejected Approaches
 
 Hiding `finish guarantee` while retaining its lookup would make the guide
@@ -17,30 +21,32 @@ explain the algorithm.
 
 ## White Priorities
 
-Keep the three universal priorities first:
+The production evaluator follows a board-only KRK strategy whose termination
+has been formally verified. Keep the three universal priorities first:
 
 1. `mate`
 2. `pieces safe`
 3. `no stalemate`
 
-Replace the bundled Rook priorities with these board-based stages:
+Then use four visible strategy ideas:
 
-1. `push with check` — Check when every reply pushes Black farther from White's
-   king.
-2. `establish box` — Put the rook between the kings without enlarging an
-   existing phase 2 box.
-3. `shrink box` — When Black reaches an edge, make the box smaller.
-4. `waiting move` — When the kings are a knight's move apart, make a safe,
-   quiet rook move that keeps the box and does not finish beside White's king.
-5. `king between pieces` — For a waiting move, prefer White's king between the
-   rook and Black's king.
-6. `king closer` — Move White's king closer to Black's king.
-7. `rook farther` — Among otherwise tied moves, keep the rook farther from
-   Black's king.
+1. `finish` — Checkmate now, or make the final setup when every Black reply
+   allows checkmate.
+2. `shrink the box` — When the rook can safely make Black's box smaller, leave
+   Black the smallest box.
+3. `force opposition` — Bring White's king into opposition. When a waiting move
+   is needed, keep the box and make Black move.
+4. `box Black in` — Put the rook between the kings. If Black is too close,
+   bring the rook beside White's king or move it to a safe edge first.
 
-Splitting the current compound comparisons must initially preserve their
-lexicographic behavior. `finish guarantee` and `proofProgressPenalty` are
-removed from production selection entirely.
+The learner's repeatable technique is: box Black in, use the king and waiting
+moves to force opposition, shrink the box, and repeat until the finish. The
+evaluator retains exact geometric tie-breaks inside those four ideas, but no
+tie-break becomes a separate concept in the modal.
+
+`finish guarantee` and `proofProgressPenalty` are removed from production
+selection entirely. The verifier may use generated mate ranks diagnostically,
+but the app never uses them to select or explain a move.
 
 ## Loop-Driven Refinement
 
@@ -71,3 +77,6 @@ The final production policy must:
   reproducibility.
 
 Run only one exhaustive verifier process at a time.
+
+The completed symmetry derivation ranks 21,950 White states and 5,476 Black
+states with a maximum forced mate of 65 plies.

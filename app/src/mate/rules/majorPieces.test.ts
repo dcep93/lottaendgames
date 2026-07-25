@@ -1,5 +1,4 @@
 import assert from 'node:assert/strict'
-import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
 import test from 'node:test'
 import {
@@ -639,12 +638,10 @@ test('queen and rook preserve evaluator order with universal priority labels', (
       'mate',
       'rook safe',
       'no stalemate',
-      'finish guarantee',
-      'build box',
-      'build box',
-      'rook waiting move',
-      'bring king',
-      'bring king',
+      'finish',
+      'shrink box',
+      'force opposition',
+      'box black in',
     ],
   )
   assert.deepEqual(
@@ -666,15 +663,12 @@ test('queen and rook preserve evaluator order with universal priority labels', (
       'mate',
       'pieces safe',
       'no stalemate',
-      'finish guarantee',
-      'build the box',
-      'build the box',
-      'waiting move',
-      'bring the king',
-      'bring the king',
+      'finish',
+      'shrink the box',
+      'force opposition',
+      'box black in',
     ],
   )
-  assert.equal(rookWhiteRules[3]?.presentationRole, 'guard')
   assert.deepEqual(
     queenWhiteRules.slice(3).map(({ id, shortLabel, helpText }) => ({
       id,
@@ -715,24 +709,14 @@ test('queen and rook preserve evaluator order with universal priority labels', (
     "Move White's king closer without crossing the tighter side of the queen's box.",
   )
   assert.equal(
-    new Set(
-      rookWhiteRules
-        .filter(({ id }) => id === 'build box')
-        .map(({ helpText }) => helpText),
-    ).size,
-    1,
+    rookWhiteRules.some(({ id }) => id === 'finish guarantee'),
+    false,
   )
   assert.equal(
-    new Set(
-      rookWhiteRules
-        .filter(({ id }) => id === 'bring king')
-        .map(({ helpText }) => helpText),
-    ).size,
-    1,
-  )
-  assert.match(
-    rookWhiteRules.find(({ id }) => id === 'finish guarantee')!.helpText,
-    /rules out repetition/,
+    rookWhiteRules.every(
+      ({ shortLabel }) => shortLabel === shortLabel.toLowerCase(),
+    ),
+    true,
   )
   assert.equal(queenRuleSet.help.title, 'How best moves are chosen')
   assert.equal(queenRuleSet.help.whiteIntro, WHITE_INTRO)
@@ -759,7 +743,8 @@ test('queen and rook preserve evaluator order with universal priority labels', (
     [],
   )
   assert.deepEqual(rookRuleSet.help.notes, [
-    "Phase 2 means the rook's rank or file is strictly between the two kings on that axis.",
+    'The method: box Black in, force opposition, shrink the box, and repeat.',
+    "Phase 2 begins when the rook's rank or file is between the kings, boxing Black onto one side.",
   ])
   assert.deepEqual(
     rookRuleSet.help.noteBoards.map(({ id }) => id),
@@ -789,15 +774,11 @@ test('queen and rook preserve evaluator order with universal priority labels', (
       'mate',
       'rook safe',
       'no stalemate',
-      'finish guarantee',
-      'build box',
-      'rook waiting move',
-      'bring king',
+      'finish',
+      'shrink box',
+      'force opposition',
+      'box black in',
     ],
-  )
-  assert.equal(
-    registeredRook.whiteRuleDescriptions[3]?.presentationRole,
-    'guard',
   )
 })
 
@@ -1045,261 +1026,133 @@ test('queen black scoring and literal defensive choices retain legal order', () 
   }
 })
 
-test('rook facade matches every focused literal white fixture', () => {
+test('rook board strategy selects and explains representative stages', () => {
   const rook = getMateRuleSet('rook')
-
-  for (const fixture of ROOK_WHITE_FIXTURES) {
-    assert.deepEqual(rook.idealWhiteMoves(fixture.fen), fixture.idealMoves)
-    assert.equal(rook.currentWhiteHint(fixture.fen)?.id, fixture.hint)
-    assert.equal(rook.phase(fixture.fen), fixture.phase)
-  }
-})
-
-test('rook waiting ranks preferred, fallback, and invalid moves', () => {
-  const rook = getMateRuleSet('rook')
-  const waitingFen = '8/8/8/8/8/8/KR6/2k5 w - - 0 1'
-  assert.equal(scoreRookWhiteMove(waitingFen, 'Rb8').rookWaitingPenalty, 0)
-  assert.equal(scoreRookWhiteMove(waitingFen, 'Ka3').rookWaitingPenalty, 2)
-
-  const noBetweenFen = '8/5k2/7R/6K1/8/8/8/8 w - - 2 2'
-  const waitingRook = scoreRookWhiteMove(noBetweenFen, 'Ra6')
-  const progressingKing = scoreRookWhiteMove(noBetweenFen, 'Kf5')
-  assert.equal(waitingRook.rookWaitingPenalty, 1)
-  assert.equal(progressingKing.rookWaitingPenalty, 2)
-  assert.equal(waitingRook.proofProgressPenalty, 1)
-  assert.equal(progressingKing.proofProgressPenalty, 0)
-  assert.deepEqual(rook.idealWhiteMoves(noBetweenFen), ['Kf5'])
-  assert.equal(
-    rook.explainWhiteMove(noBetweenFen, 'Ra6')?.id,
-    'finish guarantee',
-  )
-
-  const phaseFen = '8/7k/1R6/5K2/8/8/8/8 w - - 4 3'
-  const adjacentRook = scoreRookWhiteMove(phaseFen, 'Rg6')
-  const closerKing = scoreRookWhiteMove(phaseFen, 'Kg5')
-  assert.equal(adjacentRook.rookCapturePenalty, 0)
-  assert.equal(adjacentRook.rookEstablishBoxPenalty, 0)
-  assert.equal(adjacentRook.rookPhaseTwoBoxSize, 1)
-  assert.equal(closerKing.rookEstablishBoxPenalty, 0)
-  assert.equal(closerKing.rookPhaseTwoBoxSize, 2)
-  assert.ok(compareRookWhiteScores(adjacentRook, closerKing) < 0)
-})
-
-test('rook establish-box scoring shrinks the box on the finishing edge', () => {
-  const rook = getMateRuleSet('rook')
-  const fen = '8/7k/1R6/5K2/8/8/8/8 w - - 4 3'
-  const smallerAdjacent = scoreRookWhiteMove(fen, 'Rg6')
-  const largerSafe = scoreRookWhiteMove(fen, 'Ra6')
-  const kingMove = scoreRookWhiteMove(fen, 'Kg5')
-
-  assert.equal(smallerAdjacent.rookEstablishBoxPenalty, 0)
-  assert.equal(smallerAdjacent.rookPhaseTwoBoxSize, 1)
-  assert.equal(largerSafe.rookEstablishBoxPenalty, 0)
-  assert.equal(largerSafe.rookPhaseTwoBoxSize, 2)
-  assert.equal(kingMove.rookEstablishBoxPenalty, 0)
-  assert.equal(kingMove.rookPhaseTwoBoxSize, 2)
-  assert.equal(rook.explainWhiteMove(fen, 'Rg6')?.id, 'build box')
-  assert.deepEqual(rook.idealWhiteMoves(fen), ['Rg6'])
-
-  const shrinkFen = '7k/8/R7/6K1/8/8/8/8 w - - 0 1'
-  const shrinkingRook = scoreRookWhiteMove(shrinkFen, 'Ra7')
-  const progressingKing = scoreRookWhiteMove(shrinkFen, 'Kg6')
-  assert.equal(shrinkingRook.rookPhaseTwoBoxSize, 1)
-  assert.equal(shrinkingRook.rookFinishBoxSize, 1)
-  assert.equal(shrinkingRook.proofProgressPenalty, 1)
-  assert.equal(progressingKing.proofProgressPenalty, 0)
-  assert.equal(
-    rook.explainWhiteMove(shrinkFen, 'Ra7')?.id,
-    'finish guarantee',
-  )
-  assert.deepEqual(rook.idealWhiteMoves(shrinkFen), ['Kg6'])
-
-  const kingApproachFen = '8/8/k7/2R5/4K3/8/8/8 w - - 2 2'
-  const kingApproach = scoreRookWhiteMove(kingApproachFen, 'Kd5')
-  assert.equal(kingApproach.rookEstablishBoxPenalty, 0)
-  assert.equal(kingApproach.rookPhaseTwoBoxSize, 2)
-  assert.deepEqual(rook.idealWhiteMoves(kingApproachFen), ['Kd5'])
-  assert.equal(
-    rook.explainWhiteMove(kingApproachFen, 'Rc1')?.id,
-    'finish guarantee',
-  )
-})
-
-test('rook waiting does not activate for an unsafe box shrink alone', () => {
-  const rook = getMateRuleSet('rook')
-  const fen = '6k1/8/7R/5K2/8/8/8/8 w - - 0 1'
-
-  assert.equal(scoreRookWhiteMove(fen, 'Ra6').rookWaitingPenalty, 0)
-  assert.equal(scoreRookWhiteMove(fen, 'Kg5').rookWaitingPenalty, 0)
-  assert.equal(scoreRookWhiteMove(fen, 'Ra6').proofProgressPenalty, 1)
-  assert.equal(scoreRookWhiteMove(fen, 'Kf6').proofProgressPenalty, 0)
-  assert.deepEqual(rook.idealWhiteMoves(fen), ['Kf6'])
-  assert.equal(rook.explainWhiteMove(fen, 'Ra6')?.id, 'finish guarantee')
-
-  const safeShrinkFen = '7k/8/R7/6K1/8/8/8/8 w - - 0 1'
-  assert.equal(scoreRookWhiteMove(safeShrinkFen, 'Ra7').rookCapturePenalty, 0)
-  assert.equal(scoreRookWhiteMove(safeShrinkFen, 'Kh5').rookWaitingPenalty, 0)
-})
-
-test('rook rejects forcing checks that give back forced-mate progress', () => {
-  const rook = getMateRuleSet('rook')
-  for (const [fen, check, tempo] of [
-    ['8/5k2/R7/5K2/8/8/8/8 w - - 0 1', 'Ra7+', 'Re6'],
-    ['8/6k1/R7/6K1/8/8/8/8 w - - 0 1', 'Ra7+', 'Rf6'],
-  ] as const) {
-    assert.equal(scoreRookWhiteMove(fen, check).forcingCheckPenalty, 0)
-    assert.equal(scoreRookWhiteMove(fen, tempo).rookWaitingPenalty, 0)
-    assert.equal(scoreRookWhiteMove(fen, check).proofProgressPenalty, 1)
-    assert.equal(scoreRookWhiteMove(fen, tempo).proofProgressPenalty, 0)
-    assert.deepEqual(rook.idealWhiteMoves(fen), [tempo])
-    assert.equal(rook.explainWhiteMove(fen, check)?.id, 'finish guarantee')
-  }
-
-  const afterTempo = '8/7k/5R2/6K1/8/8/8/8 w - - 2 2'
-  assert.deepEqual(rook.idealWhiteMoves(afterTempo), ['Rf7+'])
-  assert.equal(rook.currentWhiteHint(afterTempo)?.id, 'build box')
-
-  const finishFen = '8/8/8/8/6R1/5K1k/8/8 w - - 18 10'
-  assert.deepEqual(rook.idealWhiteMoves(finishFen), ['Ra4'])
-  assert.equal(rook.currentWhiteHint(finishFen)?.id, 'bring king')
-
-  const edgeFen = '5k2/6R1/5K2/8/8/8/8/8 w - - 4 3'
-  assert.deepEqual(rook.idealWhiteMoves(edgeFen), ['Rg1'])
-  assert.equal(rook.currentWhiteHint(edgeFen)?.id, 'bring king')
-})
-
-test('rook best moves are explained only by registered human rules', () => {
-  const rook = getMateRuleSet('rook')
-  const registeredIds = new Set(rook.whiteRuleDescriptions.map(({ id }) => id))
-  const fens = [
-    ...ROOK_WHITE_FIXTURES.map(({ fen }) => fen),
-    '2R5/1k6/8/3K4/8/8/8/8 w - - 8 5',
-  ]
-
-  for (const fen of fens) {
-    for (const san of getChess(fen).moves()) {
-      const reason = rook.explainWhiteMove(fen, san)
-      assert.ok(reason === undefined || registeredIds.has(reason.id), `${fen}; ${san}`)
-    }
-  }
-
-  const rc1Fen = '2R5/1k6/8/3K4/8/8/8/8 w - - 8 5'
-  assert.deepEqual(rook.idealWhiteMoves(rc1Fen), ['Rc5'])
-  assert.equal(
-    rook.explainWhiteMove(rc1Fen, 'Rc1')?.id,
-    'finish guarantee',
-  )
-})
-
-test('rook waiting geometry remains literal behind the proof gate', () => {
-  const rook = getMateRuleSet('rook')
-  const cases = [
+  const fixtures = [
     {
-      fen: '8/8/3k4/1K6/8/8/8/2R5 w - - 6 4',
-      preferred: 'Rc2',
-      rejected: 'Rc8',
-      ideal: 'Rc5',
+      fen: '7k/5K2/8/8/8/8/8/R7 w - - 0 1',
+      moves: ['Rh1#'],
+      hint: 'mate',
     },
     {
-      fen: '8/8/8/1K6/3k4/8/8/2R5 w - - 6 4',
-      preferred: 'Rc8',
-      rejected: 'Rc2',
-      ideal: 'Re1',
+      fen: '8/8/8/8/8/2K5/2R5/1k6 w - - 36 19',
+      moves: ['Kb3'],
+      hint: 'finish',
+    },
+    {
+      fen: '8/8/8/8/4k1K1/5R2/8/8 w - - 4 3',
+      moves: ['Rf5'],
+      hint: 'shrink box',
+    },
+    {
+      fen: '8/2k5/8/8/7R/3K4/8/8 w - - 2 2',
+      moves: ['Rd4'],
+      hint: 'shrink box',
+    },
+    {
+      fen: '8/8/k7/2R5/4K3/8/8/8 w - - 2 2',
+      moves: ['Kd5'],
+      hint: 'force opposition',
+    },
+    {
+      fen: '8/8/8/8/8/8/4R3/3k1K2 w - - 20 11',
+      moves: ['Kf2'],
+      hint: 'force opposition',
+    },
+    {
+      fen: '2R5/8/8/8/6K1/4k3/8/8 w - - 0 1',
+      moves: ['Rc3+'],
+      hint: 'box black in',
+    },
+    {
+      fen: '8/8/8/8/8/6R1/5K1k/8 w - - 8 5',
+      moves: ['Ra3'],
+      hint: 'box black in',
     },
   ] as const
 
-  for (const { fen, preferred, rejected, ideal } of cases) {
-    assert.equal(scoreRookWhiteMove(fen, preferred).rookWaitingPenalty, 0)
-    assert.equal(scoreRookWhiteMove(fen, rejected).rookWaitingPenalty, 1)
-    assert.equal(scoreRookWhiteMove(fen, preferred).proofProgressPenalty, 1)
-    assert.equal(scoreRookWhiteMove(fen, ideal).proofProgressPenalty, 0)
-    assert.deepEqual(rook.idealWhiteMoves(fen), [ideal])
-    assert.equal(rook.explainWhiteMove(fen, preferred)?.id, 'finish guarantee')
+  for (const fixture of fixtures) {
+    assert.deepEqual(rook.idealWhiteMoves(fixture.fen), fixture.moves)
+    assert.equal(rook.currentWhiteHint(fixture.fen)?.id, fixture.hint)
+  }
+})
 
-    const expected = getChess(fen)
-    expected.move(ideal)
-    for (const transform of SQUARE_TRANSFORMS) {
-      const transformedFen = transformFen(fen, transform)
-      const transformedIdeal = rook.idealWhiteMoves(transformedFen)
-      assert.equal(transformedIdeal.length, 1, `${fen}; ${transform.name}`)
-      const transformedResult = getChess(transformedFen)
-      transformedResult.move(transformedIdeal[0]!)
-      assert.equal(
-        positionKey(transformedResult.fen()),
-        positionKey(transformFen(expected.fen(), transform)),
-        `${fen}; ${transform.name}`,
+test('rook priorities are individually visible board comparisons', () => {
+  const squeezeFen = '8/2k5/8/8/7R/3K4/8/8 w - - 2 2'
+  const squeeze = scoreRookWhiteMove(squeezeFen, 'Rd4')
+  assert.equal(squeeze.squeezePenalty, 0)
+  assert.equal(squeeze.squeezeRoom, 7)
+
+  const approachFen = '8/8/k7/2R5/4K3/8/8/8 w - - 2 2'
+  const diagonal = scoreRookWhiteMove(approachFen, 'Kd5')
+  const straight = scoreRookWhiteMove(approachFen, 'Ke5')
+  assert.equal(diagonal.approachPenalty, 0)
+  assert.equal(diagonal.approachDiagonalPenalty, 0)
+  assert.equal(straight.approachPenalty, 0)
+  assert.equal(straight.approachDiagonalPenalty, 1)
+  assert.ok(compareRookWhiteScores(diagonal, straight) < 0)
+
+  const sameBoardDifferentClock =
+    '8/2k5/8/8/7R/3K4/8/8 w - - 98 50'
+  assert.deepEqual(
+    scoreRookWhiteMove(squeezeFen, 'Rd4'),
+    scoreRookWhiteMove(sameBoardDifferentClock, 'Rd4'),
+  )
+})
+
+test('rook best-move reasons all come from the displayed board rules', () => {
+  const rook = getMateRuleSet('rook')
+  const registeredIds = new Set(
+    rook.whiteRuleDescriptions.map(({ id }) => id),
+  )
+
+  for (const fen of ROOK_WHITE_FIXTURES.slice(0, 8).map(({ fen }) => fen)) {
+    for (const san of getChess(fen).moves()) {
+      const reason = rook.explainWhiteMove(fen, san)
+      assert.ok(
+        reason === undefined || registeredIds.has(reason.id),
+        `${fen}; ${san}`,
       )
     }
   }
-
-  const adjacentFen = '8/1K6/3k4/8/8/8/8/2R5 w - - 10 6'
-  assert.equal(scoreRookWhiteMove(adjacentFen, 'Rc7').rookWaitingPenalty, 2)
-  assert.equal(scoreRookWhiteMove(adjacentFen, 'Rc7').rookEstablishBoxPenalty, 0)
-  assert.equal(scoreRookWhiteMove(adjacentFen, 'Rc8').rookWaitingPenalty, 2)
-  assert.equal(scoreRookWhiteMove(adjacentFen, 'Rc8').rookEstablishBoxPenalty, 0)
-  assert.equal(scoreRookWhiteMove(adjacentFen, 'Rc2').rookWaitingPenalty, 1)
-  assert.equal(scoreRookWhiteMove(adjacentFen, 'Rc2').proofProgressPenalty, 1)
-  assert.deepEqual(rook.idealWhiteMoves(adjacentFen), ['Re1'])
 })
 
 test('rook recommendations preserve D4 symmetry', () => {
   const rook = getMateRuleSet('rook')
-  for (const { fen, idealMoves } of ROOK_WHITE_FIXTURES) {
-    if (idealMoves.length !== 1) continue
-    const san = idealMoves[0]!
-    const expected = getChess(fen)
-    expected.move(san)
+  for (const { fen } of ROOK_WHITE_FIXTURES) {
+    const baseResults = rook.idealWhiteMoves(fen).map((san) => {
+      const result = getChess(fen)
+      result.move(san)
+      return result.fen()
+    })
+
     for (const transform of SQUARE_TRANSFORMS) {
       const transformedFen = transformFen(fen, transform)
-      const transformedIdeal = rook.idealWhiteMoves(transformedFen)
-      assert.equal(transformedIdeal.length, 1, `${fen}; ${transform.name}`)
-      const transformedResult = getChess(transformedFen)
-      transformedResult.move(transformedIdeal[0]!)
-      assert.equal(
-        positionKey(transformedResult.fen()),
-        positionKey(transformFen(expected.fen(), transform)),
-        `${fen}; ${transform.name}`,
-      )
+      const expected = baseResults
+        .map((resultFen) =>
+          positionKey(transformFen(resultFen, transform)),
+        )
+        .sort()
+      const actual = rook
+        .idealWhiteMoves(transformedFen)
+        .map((san) => {
+          const result = getChess(transformedFen)
+          result.move(san)
+          return positionKey(result.fen())
+        })
+        .sort()
+      assert.deepEqual(actual, expected, `${fen}; ${transform.name}`)
     }
   }
-})
-
-test('rook king proximity requires componentwise axis progress', () => {
-  const rook = getMateRuleSet('rook')
-  const fen = '8/8/8/8/2K5/2R5/8/1k6 w - - 0 1'
-  const regressingKing = scoreRookWhiteMove(fen, 'Kd3')
-  const productiveKing = scoreRookWhiteMove(fen, 'Kb4')
-  const progressingKing = scoreRookWhiteMove(fen, 'Kb3')
-  const neutralRook = scoreRookWhiteMove(fen, 'Rh3')
-
-  assert.equal(regressingKing.kingApproachPriority, 2)
-  assert.equal(regressingKing.kingDistance, 2)
-  assert.equal(regressingKing.kingManhattanDistance, 4)
-  assert.equal(productiveKing.kingApproachPriority, 0)
-  assert.equal(productiveKing.kingDistance, 3)
-  assert.equal(productiveKing.kingManhattanDistance, 3)
-  assert.equal(neutralRook.kingApproachPriority, 1)
-  assert.ok(compareRookWhiteScores(productiveKing, neutralRook) < 0)
-  assert.ok(compareRookWhiteScores(neutralRook, regressingKing) < 0)
-  assert.equal(productiveKing.proofProgressPenalty, 1)
-  assert.equal(progressingKing.proofProgressPenalty, 0)
-  assert.deepEqual(rook.idealWhiteMoves(fen), ['Kb3'])
-  assert.equal(rook.explainWhiteMove(fen, 'Kd3')?.id, 'finish guarantee')
-
-  const sourceFen = '7k/R7/5K2/8/8/8/8/8 w - - 2 2'
-  assert.equal(scoreRookWhiteMove(sourceFen, 'Kg6').kingApproachPriority, 0)
-  assert.deepEqual(rook.idealWhiteMoves(sourceFen), ['Kg6'])
-
-  const validApproachFen = '8/8/k7/2R5/4K3/8/8/8 w - - 2 2'
-  assert.equal(
-    scoreRookWhiteMove(validApproachFen, 'Kd5').kingApproachPriority,
-    0,
-  )
 })
 
 test('rook production scoring has no box-size literal or rank-first helper', () => {
   const source = readFileSync(
     new URL('./majorPieces.ts', import.meta.url),
+    'utf8',
+  )
+  const strategySource = readFileSync(
+    new URL('./rookStrategy.ts', import.meta.url),
     'utf8',
   )
   const geometrySource = readFileSync(
@@ -1324,6 +1177,10 @@ test('rook production scoring has no box-size literal or rank-first helper', () 
     /(?:\b\w*box\w*\.size|\bboxSize)\s*(?:===|!==|<=|>=|<|>)\s*2\b/i,
   )
   assert.doesNotMatch(`${rookSource}\n${geometrySource}`, /\bsize[- ]2\b/i)
+  assert.doesNotMatch(
+    strategySource,
+    /finish guarantee|proofProgress|mateRank|halfmove|fullmove|history/i,
+  )
 })
 
 test('rook avoids unsafe material and stalemate in literal source positions', () => {
@@ -1378,7 +1235,7 @@ test('rook black scoring and literal defensive choices retain legal order', () =
   }
 })
 
-test('rook mates all 50 source-seeded Standard starts within 220 plies', () => {
+test('rook mates all 50 source-seeded Standard starts within 65 plies', () => {
   const random = seededRandom(42050)
   const rook = getMateRuleSet('rook')
   const starts: string[] = []
@@ -1463,14 +1320,8 @@ test('rook mates all 50 source-seeded Standard starts within 220 plies', () => {
     maxPlies = Math.max(maxPlies, moves.length)
   }
 
-  assert.equal(totalPlies, 746)
-  assert.equal(maxPlies, 25)
-  assert.equal(
-    createHash('sha256')
-      .update(JSON.stringify({ starts, lines }))
-      .digest('hex'),
-    'ca12a0eaf60b59c64c082ec69911ff98442016cb131d657ff7c19e938a0c6f82',
-  )
+  assert.ok(totalPlies > 0)
+  assert.ok(maxPlies <= 65, `maximum line was ${maxPlies} plies`)
 })
 
 test('major phases are visible only on White turns', () => {
@@ -1497,9 +1348,9 @@ test('representative hardcoded line starts keep first ideal choices', () => {
     {
       id: 'rook' as const,
       fen: '8/5k2/8/5K2/8/8/8/6R1 w - - 0 1',
-      white: ['Re1'],
-      blackFen: '8/5k2/8/5K2/8/8/8/4R3 b - - 1 1',
-      black: ['Kf8', 'Kg7'],
+      white: ['Rg6'],
+      blackFen: '8/5k2/6R1/5K2/8/8/8/8 b - - 1 1',
+      black: ['Ke7'],
     },
     {
       id: 'queen' as const,

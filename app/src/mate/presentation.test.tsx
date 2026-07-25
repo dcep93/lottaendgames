@@ -58,7 +58,7 @@ const ROOK_LOGS: readonly MateLogEntry[] = [
     idealOpponentChoices: 2,
     legalOpponentChoices: 3,
     durationMs: 1_234,
-    reasonId: 'bring king',
+    reasonId: 'shrink box',
   },
   {
     fen: EXTERNAL_START,
@@ -70,7 +70,7 @@ const ROOK_LOGS: readonly MateLogEntry[] = [
     idealOpponentChoices: 1,
     legalOpponentChoices: 4,
     durationMs: 61_007,
-    reasonId: 'build box',
+    reasonId: 'shrink box',
   },
   {
     fen: '7k/8/6K1/8/8/8/8/R7 w - - 0 1',
@@ -747,8 +747,7 @@ test('Mate log exposes every training field and semantic cycle controls', () => 
   assert.doesNotMatch(markup, />Correct<|>Incorrect<|>\d+ correct choices?<\/button>/)
   assert.match(markup, />0:01\.234</)
   assert.match(markup, />1:01\.007</)
-  assert.match(markup, />bring the king</)
-  assert.match(markup, />build the box</)
+  assert.match(markup, />shrink the box</)
   assert.match(
     markup,
     /aria-label="Cycle ideal White move for move 1; 2 correct choices"/,
@@ -926,7 +925,7 @@ test('reason hint is opt-in and reveals only the current rule label', async () =
     'data-mate-current-hint': true,
   })
   const hintText = reactNodeText(hint)
-  assert.equal(hintText, 'build the box')
+  assert.equal(hintText, 'shrink the box')
   assert.doesNotMatch(hintText, /Rg2|a2|g2|bring White's king/i)
   assert.equal(hint.props.type, 'button')
 
@@ -954,7 +953,7 @@ test('clicking a reason highlights its guide priority until a generic reopen', a
   await act(async () => {
     renderer.root
       .findByProps({
-        'aria-label': 'build the box. Open priority guide',
+        'aria-label': 'mate. Open priority guide',
       })
       .props.onClick({ currentTarget: null })
   })
@@ -962,7 +961,7 @@ test('clicking a reason highlights its guide priority until a generic reopen', a
     'aria-current': 'true',
   })
   assert.equal(highlighted.length, 1)
-  assert.match(reactNodeText(highlighted[0]), /^build the box/)
+  assert.match(reactNodeText(highlighted[0]), /^mate/)
 
   await act(async () => {
     renderer.root
@@ -1364,37 +1363,40 @@ test('every mate guide puts notes before shortcuts and the shared legend', () =>
   }
 })
 
-test('Rook and Two Bishops separate the finish guarantee from human priorities', () => {
-  for (const mateId of ['rook', 'two-bishops'] as const) {
-    const markup = renderToStaticMarkup(
-      <MatePriorityGuideDialog
-        {...MATE_TRAINING_INFO_PROPS}
-        highlightedReasonId="finish guarantee"
-        onClose={() => undefined}
-        ruleSet={getMateRuleSet(mateId)}
-      />,
-    )
-    assert.match(
-      markup,
-      /class="leg-mate-guide-guards"[\s\S]*class="leg-mate-guide-guard leg-mate-guide-priority-highlighted"/,
-      mateId,
-    )
-    assert.match(
-      markup,
-      />finish guarantee<\/strong>[\s\S]*rules out repetition/,
-      mateId,
-    )
-    assert.equal(
-      (markup.match(/>finish guarantee<\/strong>/g) ?? []).length,
-      1,
-      mateId,
-    )
-    assert.ok(
-      markup.indexOf('leg-mate-guide-guards') <
-        markup.indexOf('leg-mate-guide-technique-priorities'),
-      mateId,
-    )
+test('Rook stays board-based while Two Bishops keeps its proof guard', () => {
+  const rookMarkup = renderToStaticMarkup(
+    <MatePriorityGuideDialog
+      {...MATE_TRAINING_INFO_PROPS}
+      onClose={() => undefined}
+      ruleSet={getMateRuleSet('rook')}
+    />,
+  )
+  assert.doesNotMatch(rookMarkup, /finish guarantee|leg-mate-guide-guards/)
+  for (const label of [
+    'finish',
+    'shrink the box',
+    'force opposition',
+    'box black in',
+  ]) {
+    assert.match(rookMarkup, new RegExp(`>${label}<`))
   }
+
+  const bishopsMarkup = renderToStaticMarkup(
+    <MatePriorityGuideDialog
+      {...MATE_TRAINING_INFO_PROPS}
+      highlightedReasonId="finish guarantee"
+      onClose={() => undefined}
+      ruleSet={getMateRuleSet('two-bishops')}
+    />,
+  )
+  assert.match(
+    bishopsMarkup,
+    /class="leg-mate-guide-guards"[\s\S]*class="leg-mate-guide-guard leg-mate-guide-priority-highlighted"/,
+  )
+  assert.match(
+    bishopsMarkup,
+    />finish guarantee<\/strong>[\s\S]*rules out repetition/,
+  )
 
   const queenMarkup = renderToStaticMarkup(
     <MatePriorityGuideDialog
@@ -2558,7 +2560,7 @@ test('Mate wires board, history, timer, and every log replacement action', async
     })
     assert.equal(
       mountedRenderer.root.findByType(MateLog).props.logs[0].san,
-      'Ra4',
+      'Re2',
     )
 
     await act(async () => {
