@@ -97,6 +97,12 @@ proximity` to advance White's king instead.
 `king proximity` may move White's king onto the rook wall when that safe move
 brings it closer to Black.
 
+Define closer componentwise: the move must reduce the file or rank distance to
+Black without increasing the other axis. Among such moves, minimize king-move
+distance and then row-plus-file distance. A genuine closer king move outranks a
+rook move; a rook move outranks a king move that retreats. Do not measure
+distance to an internal rook-support or critical square.
+
 Describe Phase 2 as:
 
 > Phase 2 means the rook has boxed Black onto one side.
@@ -119,6 +125,8 @@ area.
 - Test the keep-box and waiting scores directly.
 - Prove a safe White king move onto the rook wall keeps the box and may satisfy
   `king proximity`.
+- Prove `king proximity` uses Black's king directly and rejects moves that
+  increase either axis.
 - Prove the inclusive wall remains the strongest box on the following turn, so
   a waiting move cannot abandon it.
 - Prove a boxless position establishes a rook box before advancing White's
