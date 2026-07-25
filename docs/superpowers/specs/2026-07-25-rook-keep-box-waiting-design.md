@@ -41,7 +41,8 @@ Then use these Rook priorities:
 
 4. `keep the box` — Keep Black inside its current box.
 5. `waiting move` — When the kings are a knight's move apart, keep the box and
-   move the rook to the board edge on White's side.
+   move the rook to the board edge on White's side. If White's king blocks that
+   edge, use the other edge.
 6. `cover escape squares` — Cover the squares beside Black's king so the rook
    can mate.
 7. `shrink the box` — Move the rook wall closer to leave Black less room.
@@ -66,8 +67,13 @@ move apart. A qualifying move must:
 - preserve or shrink the existing box;
 - retain a strongest current rook wall;
 - finish on a board edge; and
-- finish on the same side of Black's king as White's king along the rook's
-  movement axis.
+- preferably finish on the same side of Black's king as White's king along the
+  rook's movement axis.
+
+If the rook starts beside White's king and no preferred-side edge move is
+legal, an otherwise qualifying move to the opposite edge is the fallback.
+Preferred-side moves outrank fallback moves, and fallback moves outrank
+non-waiting moves.
 
 If no legal move qualifies, the rule leaves all candidates tied. No square,
 orientation, box-size literal, move counter, or history check is allowed.
@@ -104,6 +110,8 @@ area.
 ## Verification
 
 - Pin `Rh2` as the sole best move and `waiting move` as its reason.
+- Pin the opposite-edge fallback where White's adjacent king blocks the
+  preferred route.
 - Test the keep-box and waiting scores directly.
 - Prove a safe White king move onto the rook wall keeps the box and may satisfy
   `king proximity`.
