@@ -72,10 +72,22 @@ In the target position, the second rank is the current wall. Both horizontal
 edge moves keep that wall, but only `Rh2` finishes on White's side of Black.
 `Kb3` keeps the box but loses at `waiting move`.
 
+`shrink the box` must compare the actual rook-box geometry. A rook move shrinks
+the box only when the resulting box is smaller than the current box. Moving
+sideways along the same wall does not shrink the box, even if it moves the rook
+closer to Black.
+
+This distinction prevents the waiting move from being immediately undone. In
+the reduced regression cycle, `Rb5` moved along the same fifth-rank wall and
+left Black's box at size 3. It must tie at `shrink the box`, allowing `king
+proximity` to advance White's king instead.
+
 ## Verification
 
 - Pin `Rh2` as the sole best move and `waiting move` as its reason.
 - Test the keep-box and waiting scores directly.
+- Prove a lateral rook move along the same wall does not satisfy `shrink the
+  box`.
 - Transform the fixture through all eight board symmetries.
 - Require every returned reason to match a displayed rule.
 - Run the focused Rook tests, complete Mate suite, lint, and production build.
