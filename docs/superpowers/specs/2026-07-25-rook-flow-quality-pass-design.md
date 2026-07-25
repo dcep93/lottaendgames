@@ -2,15 +2,9 @@
 
 ## Goal
 
-Make the Rook trainer teach one memorable, position-based method without
-weakening its exhaustive safety:
-
-> Make a safe box. Bring White's king toward Black. When the kings face each
-> other, wait with the rook so Black steps back. Shrink the box and repeat. At
-> the edge, cover Black's escapes and mate.
-
-The method does not aim for a corner. Black may be mated anywhere along an
-edge.
+Make the Rook trainer teach a concise, position-based method without weakening
+its exhaustive safety. The method does not aim for a corner. Black may be
+mated anywhere along an edge.
 
 ## Scope
 
@@ -18,7 +12,6 @@ Keep the proven White evaluator and Black resistance policy intact unless a
 verification failure exposes a real move/reason mismatch. Improve the teaching
 contract around that policy:
 
-- the strategy must be visible before the detailed priority list;
 - every reason label must describe the board feature that actually selected the
   move;
 - the Black resistance explanation must describe the algorithm without
@@ -38,25 +31,23 @@ Keep the three universal priorities unchanged:
 
 Use these Rook priorities:
 
-4. `edge net` — When Black reaches an edge, cover the squares beside it so the
-   rook can mate.
+4. `cover escape squares` — Cover the squares beside Black's king so the rook
+   can mate.
 5. `shrink the box` — Move the rook wall closer to leave Black less room.
-6. `force opposition` — Bring White's king closer. When the kings face each
-   other, wait with the rook so Black must step back.
-7. `box black in` — Make a safe rook wall between the kings. If Black attacks
-   the rook, move it to safety.
+6. `king proximity` — Bring White's king towards Black's.
+7. `rook box size` — Use the rook to make a box around Black's king.
 
-The method summary appears immediately below `White best moves`, before the
-universal priorities. The numbered priorities remain in evaluator order so the
-move log's reason column and the guide cannot disagree.
+Do not add a separate strategy summary above the priorities. The numbered
+priorities remain in evaluator order so the move log's reason column and the
+guide cannot disagree.
 
 ## Black resistance
 
 Retain the existing algorithm and present it as four human ideas:
 
 1. Return to the previous board position when possible.
-2. Take the rook if White leaves it loose.
-3. Press the nearest box wall; if the rook sits beside White's king, chase it.
+2. Take a piece if White isn't looking.
+3. Press the nearest box wall, chasing the rook when possible.
 4. Avoid giving White opposition, then move toward the rook.
 
 These bullets preserve the current comparison order while combining one narrow
@@ -85,19 +76,15 @@ on desktop while allowing it to fit naturally on a narrow screen.
 
 ## Data and component boundaries
 
-Add an optional `strategySummary` field to `RuleHelp`. The priority-guide
-component renders it only when supplied, so other mating guides retain their
-current content. Snapshot and freeze it with the rest of registered help data.
-
 Add a full-board modifier to `MateRuleNoteBoard` based on an 8×8 layout. Use it
 only for sizing; board semantics remain data-driven.
 
 ## Verification
 
-- Pin the exact Rook summary, priority copy, Black resistance copy, Phase 2
-  notes, centered pieces, full-board layout, lack of shading, and full-board
-  sizing class.
-- Confirm the strategy summary is absent from guides that do not define one.
+- Pin the exact Rook priority copy, Black resistance copy, Phase 2 notes,
+  centered pieces, full-board layout, lack of shading, and full-board sizing
+  class.
+- Confirm no strategy-summary element appears in the guide.
 - Inspect the Rook guide at desktop and a 390-pixel mobile viewport.
 - Run focused rule and presentation tests, the complete Mate suite, lint, and
   production build.
