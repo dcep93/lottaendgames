@@ -44,6 +44,17 @@ moves to force opposition, shrink the box, and repeat until the finish. The
 evaluator retains exact geometric tie-breaks inside those four ideas, but no
 tie-break becomes a separate concept in the modal.
 
+## Phase 2 Diagram
+
+The diagram uses the same SVG chess pieces as the playable board instead of
+Unicode glyphs. Show White's king on b3, Black's king on d3, and the rook on
+c1. The kings are in direct opposition with c3 between them, while the rook's
+c-file confines Black to the right side.
+
+Preserve the light/dark checker pattern inside the boxed area. Mark the box
+with a restrained neutral sepia overlay and border, never the app's pink accent
+color. The caption explicitly names both opposition and the rook wall.
+
 `finish guarantee` and `proofProgressPenalty` are removed from production
 selection entirely. The verifier may use generated mate ranks diagnostically,
 but the app never uses them to select or explain a move.
