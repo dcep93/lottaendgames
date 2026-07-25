@@ -89,7 +89,7 @@ const FINISH_GUARANTEE_HELP =
   'Every recommended move keeps mate forced and rules out repetition or a fifty-move draw.'
 const QUEEN_CORNER_CAGE_HELP =
   'Keep Black confined to two squares near a corner.'
-const QUEEN_OFF_EDGE_HELP = "Move White's pieces off edge squares."
+const QUEEN_OFF_EDGE_HELP = "Keep White's pieces off edge squares."
 const QUEEN_KNIGHT_MOVE_HELP =
   "Keep the queen a knight's move from Black's king."
 const QUEEN_BOX_SIZE_HELP =

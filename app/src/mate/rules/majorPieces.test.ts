@@ -690,7 +690,7 @@ test('queen and rook preserve evaluator order with universal priority labels', (
       {
         id: 'white pieces off edge',
         shortLabel: 'white pieces off edge',
-        helpText: "Move White's pieces off edge squares.",
+        helpText: "Keep White's pieces off edge squares.",
       },
       {
         id: 'queen knight move',
