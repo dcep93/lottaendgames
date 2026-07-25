@@ -52,11 +52,13 @@ lowercase labels and explanations:
 1. `shrink the box` — Move the rook wall closer, and never make the box bigger.
    If Black blocks it, check Black backward first. A checking push counts as a
    shrink only when every legal Black reply establishes a smaller real box.
-2. `king closer` — Move White's king closer to Black without losing the box.
-3. `force opposition` — When the king cannot advance, use a rook waiting move
+2. `drive along the edge` — With Black confined to the edge, place the rook in
+   front of White's king to drive Black toward a corner.
+3. `king closer` — Move White's king closer to Black without losing the box.
+4. `force opposition` — When the king cannot advance, use a rook waiting move
    to give Black the move and force opposition. This applies when the kings are
    already in direct opposition or are a knight's move apart.
-4. `distant rook wall` — Keep the rook wall on White's side of Black and far
+5. `distant rook wall` — Keep the rook wall on White's side of Black and far
    from both kings.
 
 Keep Phase 2 as a visible concept and define it precisely:
