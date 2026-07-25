@@ -1237,7 +1237,7 @@ test('priority guide follows registered facade order and renders typed diagrams'
   assert.match(markup, /data-highlight-kind="zone"/)
   assert.match(markup, /data-highlight-kind="key"/)
   assert.match(markup, /data-arrow="e5-f6"/)
-  assert.doesNotMatch(markup, /<img\b|https?:\/\//)
+  assert.doesNotMatch(markup, /<img\b|\ssrc=/)
 })
 
 test('Rook and Two Bishops render compact diagrams while Queen stays text-only', () => {
@@ -1263,7 +1263,7 @@ test('Rook and Two Bishops render compact diagrams while Queen stays text-only',
     )
 
     assert.match(markup, /class="leg-mate-note-board"/)
-    assert.doesNotMatch(markup, /<img\b|https?:\/\//)
+    assert.doesNotMatch(markup, /<img\b|\ssrc=/)
   }
 
   const queenMarkup = renderToStaticMarkup(
@@ -1284,16 +1284,16 @@ test('Rook and Two Bishops render compact diagrams while Queen stays text-only',
 
   const rookBoard = getMateRuleSet('rook').help.noteBoards[0]!
   assert.deepEqual(rookBoard.pieces, [
-    { square: 'b2', piece: 'K' },
-    { square: 'd1', piece: 'R' },
-    { square: 'f5', piece: 'k' },
+    { square: 'b3', piece: 'K' },
+    { square: 'c1', piece: 'R' },
+    { square: 'd3', piece: 'k' },
   ])
   assert.deepEqual(rookBoard.layout, {
     files: 6,
     ranks: 6,
     fileOffset: 0,
   })
-  assert.equal(rookBoard.highlights.length, 12)
+  assert.equal(rookBoard.highlights.length, 18)
   assert.ok(rookBoard.highlights.every(({ kind }) => kind === 'box'))
 
   const rookMarkup = renderToStaticMarkup(
@@ -1304,8 +1304,10 @@ test('Rook and Two Bishops render compact diagrams while Queen stays text-only',
     />,
   )
   assert.match(rookMarkup, />phase 2 box</)
-  assert.match(rookMarkup, /file is between the kings/)
+  assert.match(rookMarkup, /kings are in opposition/)
   assert.match(rookMarkup, /data-highlight-kind="box"/)
+  assert.match(rookMarkup, /<svg/)
+  assert.doesNotMatch(rookMarkup, /♔|♖|♚/)
 
   const bishopsRuleSet = getMateRuleSet('two-bishops')
   const [wallBoard, cornerBoard] = bishopsRuleSet.help.noteBoards
@@ -2122,7 +2124,7 @@ test('Mate exposes stable desktop and narrow-layout structure', () => {
   )
   assert.match(
     css,
-    /\.leg-mate-note-board-piece\s*\{[^}]*font-size:\s*clamp\(1\.45rem, 7vw, 2\.25rem\)/s,
+    /\.leg-mate-note-board-piece svg\s*\{[^}]*width:\s*88%;[^}]*height:\s*88%/s,
   )
   assert.match(
     css,

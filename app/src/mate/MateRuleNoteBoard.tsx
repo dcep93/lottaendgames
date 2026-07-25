@@ -1,4 +1,5 @@
 import React from 'react'
+import { defaultPieces } from 'react-chessboard'
 import type {
   RuleNoteBoard,
   RuleNoteBoardHighlight,
@@ -18,19 +19,19 @@ const DEFAULT_BOARD_LAYOUT: BoardLayout = {
 
 const BOARD_FILES = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'] as const
 
-const PIECE_GLYPHS = {
-  K: '♔',
-  Q: '♕',
-  R: '♖',
-  B: '♗',
-  N: '♘',
-  P: '♙',
-  k: '♚',
-  q: '♛',
-  r: '♜',
-  b: '♝',
-  n: '♞',
-  p: '♟',
+const PIECE_RENDER_KEYS = {
+  K: 'wK',
+  Q: 'wQ',
+  R: 'wR',
+  B: 'wB',
+  N: 'wN',
+  P: 'wP',
+  k: 'bK',
+  q: 'bQ',
+  r: 'bR',
+  b: 'bB',
+  n: 'bN',
+  p: 'bP',
 } as const
 
 const PIECE_NAMES = {
@@ -191,6 +192,8 @@ export default function MateRuleNoteBoard({
         >
           {board.pieces.map((piece) => {
             const position = squareGridPosition(piece.square, layout)
+            const renderPiece =
+              defaultPieces[PIECE_RENDER_KEYS[piece.piece]]
             return (
               <span
                 className="leg-mate-note-board-piece"
@@ -200,7 +203,7 @@ export default function MateRuleNoteBoard({
                   gridRow: position.row,
                 }}
               >
-                {PIECE_GLYPHS[piece.piece]}
+                {renderPiece({ square: piece.square })}
               </span>
             )
           })}
