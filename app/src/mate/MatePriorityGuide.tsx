@@ -176,21 +176,26 @@ export default function MatePriorityGuideDialog({
             </section>
           </div>
 
-          <section className="leg-mate-guide-section">
-            <h3>Notes</h3>
-            <ul>
-              {ruleSet.help.notes.map((note, index) => (
-                <li key={`${index}-${note}`}>{note}</li>
-              ))}
-            </ul>
-            {ruleSet.help.noteBoards.length === 0 ? null : (
-              <div className="leg-mate-guide-note-boards">
-                {ruleSet.help.noteBoards.map((board) => (
-                  <MateRuleNoteBoard board={board} key={board.id} />
-                ))}
-              </div>
-            )}
-          </section>
+          {ruleSet.help.notes.length === 0 &&
+          ruleSet.help.noteBoards.length === 0 ? null : (
+            <section className="leg-mate-guide-section">
+              <h3>Notes</h3>
+              {ruleSet.help.notes.length === 0 ? null : (
+                <ul>
+                  {ruleSet.help.notes.map((note, index) => (
+                    <li key={`${index}-${note}`}>{note}</li>
+                  ))}
+                </ul>
+              )}
+              {ruleSet.help.noteBoards.length === 0 ? null : (
+                <div className="leg-mate-guide-note-boards">
+                  {ruleSet.help.noteBoards.map((board) => (
+                    <MateRuleNoteBoard board={board} key={board.id} />
+                  ))}
+                </div>
+              )}
+            </section>
+          )}
 
           <div className="leg-mate-guide-footer">
             <section className="leg-mate-guide-section">

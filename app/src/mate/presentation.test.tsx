@@ -1346,7 +1346,7 @@ test('Rook and Two Bishops render compact diagrams while Queen stays text-only',
   )
 })
 
-test('every mate guide puts notes before shortcuts and the shared legend', () => {
+test('mate guides omit empty notes and place useful notes before shortcuts', () => {
   for (const { id } of MATE_CATALOG) {
     const markup = renderToStaticMarkup(
       <MatePriorityGuideDialog
@@ -1359,8 +1359,13 @@ test('every mate guide puts notes before shortcuts and the shared legend', () =>
     const shortcutsAt = markup.indexOf('>Keyboard shortcuts<')
     const legendAt = markup.indexOf('>Legend<')
 
-    assert.ok(notesAt >= 0, `${id}: Notes missing`)
-    assert.ok(shortcutsAt > notesAt, `${id}: shortcuts must follow Notes`)
+    if (id === 'queen') {
+      assert.equal(notesAt, -1, 'queen: empty Notes should be omitted')
+    } else {
+      assert.ok(notesAt >= 0, `${id}: Notes missing`)
+      assert.ok(shortcutsAt > notesAt, `${id}: shortcuts must follow Notes`)
+    }
+    assert.ok(shortcutsAt >= 0, `${id}: shortcuts missing`)
     assert.ok(legendAt > shortcutsAt, `${id}: Legend must follow shortcuts`)
   }
 })

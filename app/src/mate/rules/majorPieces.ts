@@ -87,9 +87,7 @@ const queenHelp: RuleHelp = {
     CAPTURE_LOOSE_PIECE_PRIORITY,
     'Move toward the center, where Black has the most room to resist.',
   ],
-  notes: [
-    "Phase 2 means the queen's rank or file is strictly between the two kings on that axis.",
-  ],
+  notes: [],
   noteBoards: [],
 }
 

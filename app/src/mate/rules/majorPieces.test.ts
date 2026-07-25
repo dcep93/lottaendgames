@@ -735,9 +735,7 @@ test('queen and rook preserve evaluator order with universal priority labels', (
     'Avoid giving White opposition.',
     'Move toward the rook.',
   ])
-  assert.deepEqual(queenRuleSet.help.notes, [
-    "Phase 2 means the queen's rank or file is strictly between the two kings on that axis.",
-  ])
+  assert.deepEqual(queenRuleSet.help.notes, [])
   assert.deepEqual(
     queenRuleSet.help.noteBoards.map(({ id }) => id),
     [],
