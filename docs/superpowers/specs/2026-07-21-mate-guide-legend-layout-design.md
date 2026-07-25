@@ -19,7 +19,7 @@ The Legend contains these two explanations in order:
 
 ## Layout
 
-On wider screens, the footer is a two-column grid with Keyboard Shortcuts on the left and Legend on the right. The tracks use a 30/70 split so the compact shortcuts leave substantially more room for the longer Legend copy. On narrow screens, it becomes one column with Keyboard Shortcuts above Legend. Both sections retain the existing modal section treatment.
+On wider screens, the footer is a two-column grid with Keyboard Shortcuts on the left and Legend on the right. Keyboard Shortcuts receives only its intrinsic content width, while Legend grows into all remaining space. On narrow screens, it becomes one column with Keyboard Shortcuts above Legend. Both sections retain the existing modal section treatment.
 
 ## Scope
 
