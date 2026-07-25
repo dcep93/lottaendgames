@@ -17,9 +17,9 @@ The current implementation has five related problems:
    leaves a two-file box.
 2. `finish` is a tactical mate-in-two search presented as a human strategy. It
    duplicates `mate` and hides the geometric reason the position progresses.
-3. `force opposition` says White should take opposition, but the method is to
-   make Black step into opposition with either a king move or a rook waiting
-   move.
+3. `force opposition` says White should take opposition and combines that with
+   king approach. The method needs separate waiting-move and king-approach
+   rules.
 4. `box Black in` sometimes prefers parking the rook beside White's king. The
    strategy needs a distinct distant-rook-wall concept instead.
 5. Phase 2 is a useful concept, but the current explanation and shaded diagram
@@ -50,9 +50,10 @@ Keep the universal rules unchanged. Present the Rook strategy with concise,
 lowercase labels and explanations:
 
 1. `shrink the box` — Use the rook to leave Black as little room as possible.
-2. `force opposition` — Use White's king or a rook waiting move to make Black
-   step into opposition.
-3. `distant rook wall` — Box Black in with the rook far from both kings.
+2. `force opposition` — When the kings are a knight's move apart, use a rook
+   waiting move to make Black move.
+3. `king closer` — Move White's king closer to Black without losing the box.
+4. `distant rook wall` — Box Black in with the rook far from both kings.
 
 Keep Phase 2 as a visible concept and define it precisely:
 
