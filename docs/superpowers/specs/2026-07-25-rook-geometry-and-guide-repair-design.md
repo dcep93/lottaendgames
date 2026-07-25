@@ -56,7 +56,8 @@ lowercase labels and explanations:
 3. `force opposition` — When the king cannot advance, use a rook waiting move
    to give Black the move and force opposition. This applies when the kings are
    already in direct opposition or are a knight's move apart.
-4. `distant rook wall` — Box Black in with the rook far from both kings.
+4. `distant rook wall` — Keep the rook wall on White's side of Black and far
+   from both kings.
 
 Keep Phase 2 as a visible concept and define it precisely:
 
