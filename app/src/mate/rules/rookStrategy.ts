@@ -34,7 +34,7 @@ export type RookStrategyScore = {
 const FINISH_HELP =
   "Checkmate now, or make the final setup when every Black reply allows checkmate."
 const SHRINK_BOX_HELP =
-  "When the rook can safely make Black's box smaller, leave Black the smallest box."
+  'Use the rook to leave Black as little room as possible.'
 const FORCE_OPPOSITION_HELP =
   "Bring White's king into opposition. When a waiting move is needed, keep the box and make Black move."
 const BOX_BLACK_IN_HELP =

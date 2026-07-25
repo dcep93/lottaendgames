@@ -718,6 +718,10 @@ test('queen and rook preserve evaluator order with universal priority labels', (
     ),
     true,
   )
+  assert.equal(
+    rookWhiteRules.find(({ id }) => id === 'shrink box')?.helpText,
+    'Use the rook to leave Black as little room as possible.',
+  )
   assert.equal(queenRuleSet.help.title, 'How best moves are chosen')
   assert.equal(queenRuleSet.help.whiteIntro, WHITE_INTRO)
   assert.equal(queenRuleSet.help.blackIntro, BLACK_INTRO)
