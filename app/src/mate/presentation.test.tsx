@@ -2117,7 +2117,7 @@ test('Mate exposes stable desktop and narrow-layout structure', () => {
   )
   assert.match(
     css,
-    /\.leg-mate-guide-footer\s*\{[^}]*display:\s*grid;[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\);[^}]*gap:\s*1\.1rem/s,
+    /\.leg-mate-guide-footer\s*\{[^}]*display:\s*grid;[^}]*grid-template-columns:\s*minmax\(0, 2fr\) minmax\(0, 3fr\);[^}]*gap:\s*1\.1rem/s,
   )
   assert.match(
     css,
