@@ -28,8 +28,8 @@ The removed rule also kept White's King off edge squares, and removing that
 behavior recreates a king-shuffle loop. Move that responsibility into the
 existing `king closer` priority and say so explicitly:
 
-> **king closer** — Keep White's king off the edge, then move it closer without
-> crossing the tighter side of the queen's box.
+> **king closer** — Move White's king closer to Black, but keep it off the edge
+> and do not cross the tighter side of the queen's box.
 
 This keeps both displayed rules aligned with their evaluator comparisons.
 
