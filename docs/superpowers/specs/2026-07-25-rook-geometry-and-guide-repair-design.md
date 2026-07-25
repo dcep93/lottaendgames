@@ -15,13 +15,16 @@ The current implementation has five related problems:
    only the active rook wall confines Black. This reverses `Rg7` and `Rf4` in
    `8/5R2/8/4K3/8/7k/8/8 w - - 0 1`: `Rg7` creates a one-file box, while `Rf4`
    leaves a two-file box.
-2. `finish` says “Checkmate now,” duplicating the universal `mate` priority.
-3. `force opposition` combines king approach and waiting moves in a dense
-   explanation.
-4. `box Black in` foregrounds rare rescue details instead of the core rook-wall
-   idea.
-5. The phase-2 note and diagram caption repeat terminology instead of
-   reinforcing the mating method.
+2. `finish` is a tactical mate-in-two search presented as a human strategy. It
+   duplicates `mate` and hides the geometric reason the position progresses.
+3. `force opposition` says White should take opposition, but the method is to
+   make Black step into opposition with either a king move or a rook waiting
+   move.
+4. `box Black in` sometimes prefers parking the rook beside White's king. The
+   main strategy should keep the rook wall far from both kings.
+5. Phase 2 is a useful concept, but the current explanation and shaded diagram
+   obscure it. Phase 1 establishes the first box; Phase 2 preserves and shrinks
+   that box.
 
 ## Evaluator
 
@@ -36,24 +39,31 @@ must not contradict the displayed rule. Do not use move counters, history,
 orientation-specific squares, exact mate rank, or literal FEN exceptions to
 select White's move.
 
+Remove the `finish` / mate-in-two priority from White's evaluator. Its
+termination role must be replaced by visible, position-based geometry. When
+establishing a box or choosing a waiting rook move, prefer a rook wall that is
+far from both kings.
+
 ## Training Guide
 
 Keep the universal rules unchanged. Present the Rook strategy with concise,
 lowercase labels and explanations:
 
-1. `set up mate` — Make a move after which every Black reply allows checkmate.
-2. `shrink the box` — Use the rook to leave Black as little room as possible.
-3. `force opposition` — Move the king into opposition, or use a waiting move
-   that keeps the box.
-4. `box black in` — Put the rook between the kings.
+1. `shrink the box` — Use the rook to leave Black as little room as possible.
+2. `force opposition` — Use White's king or a rook waiting move to make Black
+   step into opposition.
+3. `box black in` — Put the rook between the kings and keep it far from both.
 
-Keep the method note, but shorten the phase definition to:
+Keep Phase 2 as a visible concept and define it precisely:
 
-> Phase 2: the rook is between the kings, keeping Black on one side.
+> Phase 2 begins once the rook is between the kings and Black is boxed on one
+> side.
 
-Keep the phase-2 diagram. Its caption becomes:
+Keep the phase-2 diagram, but remove every highlighted or shaded box square.
+The rook wall and opposing kings must explain the geometry without an overlay.
+Its caption becomes:
 
-> The kings oppose each other while the rook holds the box.
+> The kings are in opposition while the rook holds the box.
 
 ## Verification
 
