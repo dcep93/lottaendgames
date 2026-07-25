@@ -45,8 +45,8 @@ Then use these Rook priorities:
 6. `cover escape squares` — Cover the squares beside Black's king so the rook
    can mate.
 7. `shrink the box` — Move the rook wall closer to leave Black less room.
-8. `king proximity` — Bring White's king towards Black's.
-9. `rook box size` — Use the rook to make a box around Black's king.
+8. `rook box size` — Use the rook to make a box around Black's king.
+9. `king proximity` — Bring White's king towards Black's.
 
 ## Geometry
 
@@ -96,6 +96,11 @@ Describe Phase 2 as:
 This remains accurate whether the wall is strictly between the kings or White's
 king has stepped onto it.
 
+`rook box size` is the establish-box rule. It applies before `king proximity`
+when no box exists, then ties all candidates once a box exists. A rook wall on
+the board edge is not a box because it removes no squares from Black's available
+area.
+
 ## Verification
 
 - Pin `Rh2` as the sole best move and `waiting move` as its reason.
@@ -104,6 +109,8 @@ king has stepped onto it.
   `king proximity`.
 - Prove the inclusive wall remains the strongest box on the following turn, so
   a waiting move cannot abandon it.
+- Prove a boxless position establishes a rook box before advancing White's
+  king, and that an edge wall is not misclassified as a box.
 - Prove a lateral rook move along the same wall does not satisfy `shrink the
   box`.
 - Transform the fixture through all eight board symmetries.
