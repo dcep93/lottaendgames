@@ -49,16 +49,18 @@ far from both kings.
 Keep the universal rules unchanged. Present the Rook strategy with concise,
 lowercase labels and explanations:
 
-1. `shrink the box` — Move the rook wall closer, and never make the box bigger.
+1. `force the corner` — With the kings in opposition on the edge, move the
+   rook away so Black must enter the corner.
+2. `shrink the box` — Move the rook wall closer, and never make the box bigger.
    If Black blocks it, check Black backward first. A checking push counts as a
    shrink only when every legal Black reply establishes a smaller real box.
-2. `drive along the edge` — With Black confined to the edge, place the rook in
+3. `drive along the edge` — With Black confined to the edge, place the rook in
    front of White's king to drive Black toward a corner.
-3. `king closer` — Move White's king closer to Black without losing the box.
-4. `force opposition` — When the king cannot advance, use a rook waiting move
+4. `king closer` — Move White's king closer to Black without losing the box.
+5. `force opposition` — When the king cannot advance, use a rook waiting move
    to give Black the move and force opposition. This applies when the kings are
    already in direct opposition or are a knight's move apart.
-5. `distant rook wall` — Keep the rook wall on White's side of Black and far
+6. `distant rook wall` — Keep the rook wall on White's side of Black and far
    from both kings.
 
 Keep Phase 2 as a visible concept and define it precisely:
