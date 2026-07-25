@@ -50,10 +50,10 @@ Keep the universal rules unchanged. Present the Rook strategy with concise,
 lowercase labels and explanations:
 
 1. `shrink the box` — Use the rook to leave Black as little room as possible.
-2. `force opposition` — Use a rook waiting move to give Black the move and
-   force opposition. This applies when the kings are already in direct
-   opposition or are a knight's move apart.
-3. `king closer` — Move White's king closer to Black without losing the box.
+2. `king closer` — Move White's king closer to Black without losing the box.
+3. `force opposition` — When the king cannot advance, use a rook waiting move
+   to give Black the move and force opposition. This applies when the kings are
+   already in direct opposition or are a knight's move apart.
 4. `distant rook wall` — Box Black in with the rook far from both kings.
 
 Keep Phase 2 as a visible concept and define it precisely:
