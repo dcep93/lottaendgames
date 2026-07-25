@@ -42,8 +42,9 @@ Then use these Rook priorities:
 4. `keep the box` — Keep Black inside its current box.
 5. `waiting move` — When the kings are a knight's move apart, keep the box and
    move the rook to the board edge on White's side. If White's king blocks that
-   edge, use the other edge. When the kings face each other, keep the box and
-   move the rook diagonally beside White's king, toward the center.
+   edge and Black is already on an edge, use the other edge. When the kings face
+   each other, keep the box and move the rook diagonally beside White's king,
+   toward the center.
 6. `cover escape squares` — Cover the squares beside Black's king so the rook
    can mate.
 7. `shrink the box` — Move the rook wall closer to leave Black less room.
@@ -70,8 +71,9 @@ move apart or in direct opposition. Every qualifying move must:
 
 For knight-distance, the move must finish on a board edge. A move on White's
 side of Black outranks the opposite edge. If the rook starts beside White's
-king and no preferred-side edge move is legal, the opposite edge is the
-fallback.
+king, no preferred-side edge move is legal, and Black is already on an edge,
+the opposite edge is the fallback. Away from the edge, a blocked preferred
+route does not activate the fallback.
 
 For direct opposition, the rook must finish diagonally beside White's king.
 When both sides are legal, prefer the square closer to the center. This keeps
