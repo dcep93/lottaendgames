@@ -42,7 +42,8 @@ Then use these Rook priorities:
 4. `keep the box` — Keep Black inside its current box.
 5. `waiting move` — When the kings are a knight's move apart, keep the box and
    move the rook to the board edge on White's side. If White's king blocks that
-   edge, use the other edge.
+   edge, use the other edge. When the kings face each other, keep the box and
+   move the rook as far from Black as safely possible.
 6. `cover escape squares` — Cover the squares beside Black's king so the rook
    can mate.
 7. `shrink the box` — Move the rook wall closer to leave Black less room.
@@ -60,20 +61,21 @@ next turn forgetting the wall. When no box exists, every move ties at this
 rule.
 
 `waiting move` activates only when a box exists and the kings are a knight's
-move apart. A qualifying move must:
+move apart or in direct opposition. Every qualifying move must:
 
 - move the rook without capture or check;
 - leave the rook safe;
 - preserve or shrink the existing box;
-- retain a strongest current rook wall;
-- finish on a board edge; and
-- preferably finish on the same side of Black's king as White's king along the
-  rook's movement axis.
+- retain a strongest current rook wall.
 
-If the rook starts beside White's king and no preferred-side edge move is
-legal, an otherwise qualifying move to the opposite edge is the fallback.
-Preferred-side moves outrank fallback moves, and fallback moves outrank
-non-waiting moves.
+For knight-distance, the move must finish on a board edge. A move on White's
+side of Black outranks the opposite edge. If the rook starts beside White's
+king and no preferred-side edge move is legal, the opposite edge is the
+fallback.
+
+For direct opposition, qualifying rook moves are ranked by distance from Black,
+with the farthest safe move preferred. This spends a tempo without surrendering
+the wall.
 
 If no legal move qualifies, the rule leaves all candidates tied. No square,
 orientation, box-size literal, move counter, or history check is allowed.
@@ -112,6 +114,8 @@ area.
 - Pin `Rh2` as the sole best move and `waiting move` as its reason.
 - Pin the opposite-edge fallback where White's adjacent king blocks the
   preferred route.
+- Pin a direct-opposition position where the farthest safe rook move replaces a
+  looping king move.
 - Test the keep-box and waiting scores directly.
 - Prove a safe White king move onto the rook wall keeps the box and may satisfy
   `king proximity`.
