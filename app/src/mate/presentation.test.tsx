@@ -1241,9 +1241,8 @@ test('priority guide follows registered facade order and renders typed diagrams'
   assert.doesNotMatch(markup, /<img\b|https?:\/\//)
 })
 
-test('major-piece and two-bishops guides render compact teaching diagrams', () => {
+test('Rook and Two Bishops render compact diagrams while Queen stays text-only', () => {
   const expectedBoards = {
-    queen: ['queen-corner-cage'],
     rook: ['rook-phase-two-box'],
     'two-bishops': ['bishop-wall', 'bishop-corner-finish'],
   } as const
@@ -1268,24 +1267,6 @@ test('major-piece and two-bishops guides render compact teaching diagrams', () =
     assert.doesNotMatch(markup, /<img\b|https?:\/\//)
   }
 
-  const queenBoard = getMateRuleSet('queen').help.noteBoards[0]!
-  assert.deepEqual(queenBoard.pieces, [
-    { square: 'a3', piece: 'K' },
-    { square: 'd2', piece: 'Q' },
-    { square: 'a1', piece: 'k' },
-  ])
-  assert.deepEqual(queenBoard.layout, {
-    files: 4,
-    ranks: 4,
-    fileOffset: 0,
-  })
-  assert.deepEqual(queenBoard.highlights, [
-    { square: 'a1', kind: 'cage' },
-    { square: 'b1', kind: 'cage' },
-    { square: 'b3', kind: 'support' },
-  ])
-  assert.deepEqual(queenBoard.arrows, [{ from: 'a3', to: 'b3' }])
-
   const queenMarkup = renderToStaticMarkup(
     <MatePriorityGuideDialog
       {...MATE_TRAINING_INFO_PROPS}
@@ -1293,14 +1274,14 @@ test('major-piece and two-bishops guides render compact teaching diagrams', () =
       ruleSet={getMateRuleSet('queen')}
     />,
   )
+  assert.deepEqual(getMateRuleSet('queen').help.noteBoards, [])
   assert.match(queenMarkup, />two-square corner cage</)
-  assert.match(queenMarkup, /Only a1 and b1 remain/)
-  assert.match(queenMarkup, /data-highlight-kind="cage"/)
-  assert.match(queenMarkup, /data-arrow="a3-b3"/)
-  assert.match(
-    queenMarkup,
-    /aria-label="two-square corner cage\. White king on a3\. White queen on d2\. Black king on a1\./,
-  )
+  assert.match(queenMarkup, /two squares near a corner/)
+  assert.match(queenMarkup, />king toward cage support</)
+  assert.match(queenMarkup, />white pieces off edge</)
+  assert.match(queenMarkup, />queen a knight move from black</)
+  assert.match(queenMarkup, />queen box size</)
+  assert.doesNotMatch(queenMarkup, /class="leg-mate-note-board"/)
 
   const rookBoard = getMateRuleSet('rook').help.noteBoards[0]!
   assert.deepEqual(rookBoard.pieces, [

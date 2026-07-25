@@ -47,13 +47,13 @@ const QUEEN_WHITE_FIXTURES: readonly WhiteFixture[] = [
   {
     fen: '8/8/8/8/4k3/8/8/3QK3 w - - 0 1',
     idealMoves: ['Qd6'],
-    hint: 'tighten net',
+    hint: 'queen box size',
     phase: '1/2',
   },
   {
     fen: '7k/8/8/6Q1/8/5K2/8/8 w - - 0 1',
     idealMoves: ['Kf4'],
-    hint: 'corner cage',
+    hint: 'king to cage',
     phase: '2/2',
   },
   {
@@ -71,25 +71,25 @@ const QUEEN_WHITE_FIXTURES: readonly WhiteFixture[] = [
   {
     fen: '7k/4Q3/4K3/8/8/8/8/8 w - - 18 10',
     idealMoves: ['Kf6'],
-    hint: 'corner cage',
+    hint: 'king to cage',
     phase: '2/2',
   },
   {
     fen: '8/8/K7/8/3k4/Q7/8/8 w - - 0 1',
     idealMoves: ['Qf3'],
-    hint: 'tighten net',
+    hint: 'queen box size',
     phase: '1/2',
   },
   {
     fen: '8/8/3K4/8/8/4k3/7Q/8 w - - 0 1',
     idealMoves: ['Qc2'],
-    hint: 'tighten net',
+    hint: 'queen box size',
     phase: '1/2',
   },
   {
     fen: '8/8/3K4/5Q2/8/4k3/8/8 w - - 14 8',
     idealMoves: ['Qg4'],
-    hint: 'tighten net',
+    hint: 'queen box size',
     phase: '2/2',
   },
   {
@@ -107,37 +107,37 @@ const QUEEN_WHITE_FIXTURES: readonly WhiteFixture[] = [
   {
     fen: '8/8/8/8/8/K7/2Q5/k7 w - - 0 1',
     idealMoves: ['Qb2#'],
-    hint: 'tighten net',
+    hint: 'white pieces off edge',
     phase: '2/2',
   },
   {
     fen: '6k1/4Q3/8/8/8/5K2/8/8 w - - 0 1',
     idealMoves: ['Kg4'],
-    hint: 'corner cage',
+    hint: 'king to cage',
     phase: '2/2',
   },
   {
     fen: 'k7/8/8/1Q6/2K5/8/8/8 w - - 6 4',
     idealMoves: ['Kc5'],
-    hint: 'corner cage',
+    hint: 'king to cage',
     phase: '2/2',
   },
   {
     fen: '7k/8/8/6Q1/5K2/8/8/8 w - - 6 4',
     idealMoves: ['Kf5'],
-    hint: 'corner cage',
+    hint: 'king to cage',
     phase: '2/2',
   },
   {
     fen: '4K2k/4Q3/8/8/8/8/8/8 w - - 10 6',
     idealMoves: ['Kd7'],
-    hint: 'corner cage',
+    hint: 'king to cage',
     phase: '1/2',
   },
   {
     fen: '8/8/4k3/8/8/3Q4/1K6/8 w - - 0 1',
     idealMoves: ['Qd4'],
-    hint: 'tighten net',
+    hint: 'queen knight move',
     phase: '2/2',
   },
 ]
@@ -628,10 +628,10 @@ test('queen and rook preserve evaluator order with universal priority labels', (
       'queen safe',
       'no stalemate',
       'corner cage',
-      'corner cage',
-      'tighten net',
-      'tighten net',
-      'tighten net',
+      'king to cage',
+      'white pieces off edge',
+      'queen knight move',
+      'queen box size',
       'king closer',
     ],
   )
@@ -655,11 +655,11 @@ test('queen and rook preserve evaluator order with universal priority labels', (
       'mate',
       'pieces safe',
       'no stalemate',
-      'corner cage',
-      'corner cage',
-      'tighten the net',
-      'tighten the net',
-      'tighten the net',
+      'two-square corner cage',
+      'king toward cage support',
+      'white pieces off edge',
+      'queen a knight move from black',
+      'queen box size',
       'king closer',
     ],
   )
@@ -678,21 +678,46 @@ test('queen and rook preserve evaluator order with universal priority labels', (
     ],
   )
   assert.equal(rookWhiteRules[3]?.presentationRole, 'guard')
-  assert.equal(
-    new Set(
-      queenWhiteRules
-        .filter(({ id }) => id === 'corner cage')
-        .map(({ helpText }) => helpText),
-    ).size,
-    1,
-  )
-  assert.equal(
-    new Set(
-      queenWhiteRules
-        .filter(({ id }) => id === 'tighten net')
-        .map(({ helpText }) => helpText),
-    ).size,
-    1,
+  assert.deepEqual(
+    queenWhiteRules.slice(3).map(({ id, shortLabel, helpText }) => ({
+      id,
+      shortLabel,
+      helpText,
+    })),
+    [
+      {
+        id: 'corner cage',
+        shortLabel: 'two-square corner cage',
+        helpText: 'Keep Black confined to two squares near a corner.',
+      },
+      {
+        id: 'king to cage',
+        shortLabel: 'king toward cage support',
+        helpText:
+          "With the two-square corner cage established, bring White's king toward a mating-support square.",
+      },
+      {
+        id: 'white pieces off edge',
+        shortLabel: 'white pieces off edge',
+        helpText: "Move White's pieces off edge squares.",
+      },
+      {
+        id: 'queen knight move',
+        shortLabel: 'queen a knight move from black',
+        helpText: "Keep the queen a knight's move from Black's king.",
+      },
+      {
+        id: 'queen box size',
+        shortLabel: 'queen box size',
+        helpText: "Shrink the box's shorter side before its longer side.",
+      },
+      {
+        id: 'king closer',
+        shortLabel: 'king closer',
+        helpText:
+          "Move White's king closer without stepping between the queen and Black's king on the queen's rank or file.",
+      },
+    ],
   )
   assert.equal(
     queenWhiteRules.find(({ id }) => id === 'king closer')?.helpText,
@@ -740,7 +765,7 @@ test('queen and rook preserve evaluator order with universal priority labels', (
   ])
   assert.deepEqual(
     queenRuleSet.help.noteBoards.map(({ id }) => id),
-    ['queen-corner-cage'],
+    [],
   )
   assert.deepEqual(rookRuleSet.help.notes, [
     "Phase 2 means the rook's rank or file is strictly between the two kings on that axis.",
@@ -761,7 +786,10 @@ test('queen and rook preserve evaluator order with universal priority labels', (
       'queen safe',
       'no stalemate',
       'corner cage',
-      'tighten net',
+      'king to cage',
+      'white pieces off edge',
+      'queen knight move',
+      'queen box size',
       'king closer',
     ],
   )
@@ -793,8 +821,14 @@ test('queen facade matches every focused literal white fixture', () => {
   }
 
   const incorrectFen = '8/8/4k3/8/8/3Q4/1K6/8 w - - 0 1'
-  assert.equal(queen.explainWhiteMove(incorrectFen, 'Qa6+')?.id, 'tighten net')
-  assert.equal(queen.explainWhiteMove(incorrectFen, 'Qd4')?.id, 'tighten net')
+  assert.equal(
+    queen.explainWhiteMove(incorrectFen, 'Qa6+')?.id,
+    'white pieces off edge',
+  )
+  assert.equal(
+    queen.explainWhiteMove(incorrectFen, 'Qd4')?.id,
+    'queen knight move',
+  )
 })
 
 test('queen white score fields and compound comparisons match literals', () => {

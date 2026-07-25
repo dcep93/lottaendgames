@@ -56,7 +56,6 @@ const HIGHLIGHT_NAMES: Readonly<
   key: 'key square',
   red: 'red escape square',
   box: 'box square',
-  cage: 'cage square',
   wall: 'bishop wall square',
   support: 'king support square',
 }

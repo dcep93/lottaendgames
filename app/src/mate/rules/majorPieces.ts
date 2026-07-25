@@ -93,9 +93,14 @@ const CAPTURE_LOOSE_PIECE_PRIORITY = "Take a piece if White isn't looking."
 const FINISH_GUARANTEE_HELP =
   'Every recommended move keeps mate forced and rules out repetition or a fifty-move draw.'
 const QUEEN_CORNER_CAGE_HELP =
-  "Trap Black in a corner and the neighboring edge square. Then bring White's king to a mating-support square."
-const QUEEN_TIGHTEN_NET_HELP =
-  "Move White's pieces off the edge. Keep the queen a knight's move from Black's king, then shrink the box's shorter side before its longer side."
+  'Keep Black confined to two squares near a corner.'
+const QUEEN_CAGE_SUPPORT_HELP =
+  "With the two-square corner cage established, bring White's king toward a mating-support square."
+const QUEEN_OFF_EDGE_HELP = "Move White's pieces off edge squares."
+const QUEEN_KNIGHT_MOVE_HELP =
+  "Keep the queen a knight's move from Black's king."
+const QUEEN_BOX_SIZE_HELP =
+  "Shrink the box's shorter side before its longer side."
 const QUEEN_KING_CLOSER_HELP =
   "Move White's king closer without stepping between the queen and Black's king on the queen's rank or file."
 const ROOK_BUILD_BOX_HELP =
@@ -117,26 +122,7 @@ const queenHelp: RuleHelp = {
   notes: [
     "Phase 2 means the queen's rank or file is strictly between the two kings on that axis.",
   ],
-  noteBoards: [
-    {
-      id: 'queen-corner-cage',
-      title: 'two-square corner cage',
-      caption:
-        'Only a1 and b1 remain. Keep the cage while the king walks to b3.',
-      layout: { files: 4, ranks: 4, fileOffset: 0 },
-      pieces: [
-        { square: 'a3', piece: 'K' },
-        { square: 'd2', piece: 'Q' },
-        { square: 'a1', piece: 'k' },
-      ],
-      highlights: [
-        { square: 'a1', kind: 'cage' },
-        { square: 'b1', kind: 'cage' },
-        { square: 'b3', kind: 'support' },
-      ],
-      arrows: [{ from: 'a3', to: 'b3' }],
-    },
-  ],
+  noteBoards: [],
 }
 
 const rookHelp: RuleHelp = {
@@ -313,14 +299,14 @@ export const queenWhiteRules: readonly OrderedRule<QueenWhiteMoveScore>[] = [
   },
   {
     id: 'corner cage',
-    shortLabel: 'corner cage',
+    shortLabel: 'two-square corner cage',
     helpText: QUEEN_CORNER_CAGE_HELP,
     compare: (first, second) => first.cagePenalty - second.cagePenalty,
   },
   {
-    id: 'corner cage',
-    shortLabel: 'corner cage',
-    helpText: QUEEN_CORNER_CAGE_HELP,
+    id: 'king to cage',
+    shortLabel: 'king toward cage support',
+    helpText: QUEEN_CAGE_SUPPORT_HELP,
     compare: (first, second) =>
       first.cageKingApproachPriority - second.cageKingApproachPriority ||
       compareOptionalDistances(
@@ -333,23 +319,23 @@ export const queenWhiteRules: readonly OrderedRule<QueenWhiteMoveScore>[] = [
       ),
   },
   {
-    id: 'tighten net',
-    shortLabel: 'tighten the net',
-    helpText: QUEEN_TIGHTEN_NET_HELP,
+    id: 'white pieces off edge',
+    shortLabel: 'white pieces off edge',
+    helpText: QUEEN_OFF_EDGE_HELP,
     compare: (first, second) =>
       first.whitePieceEdgePenalty - second.whitePieceEdgePenalty,
   },
   {
-    id: 'tighten net',
-    shortLabel: 'tighten the net',
-    helpText: QUEEN_TIGHTEN_NET_HELP,
+    id: 'queen knight move',
+    shortLabel: 'queen a knight move from black',
+    helpText: QUEEN_KNIGHT_MOVE_HELP,
     compare: (first, second) =>
       first.queenKnightMovePenalty - second.queenKnightMovePenalty,
   },
   {
-    id: 'tighten net',
-    shortLabel: 'tighten the net',
-    helpText: QUEEN_TIGHTEN_NET_HELP,
+    id: 'queen box size',
+    shortLabel: 'queen box size',
+    helpText: QUEEN_BOX_SIZE_HELP,
     compare: (first, second) =>
       first.queenBoxShorterSide - second.queenBoxShorterSide ||
       first.queenBoxLongerSide - second.queenBoxLongerSide,
