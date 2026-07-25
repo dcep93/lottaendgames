@@ -32,8 +32,7 @@ Then use four visible strategy ideas:
 
 1. `finish` — Checkmate now, or make the final setup when every Black reply
    allows checkmate.
-2. `shrink the box` — When the rook can safely make Black's box smaller, leave
-   Black the smallest box.
+2. `shrink the box` — Use the rook to leave Black as little room as possible.
 3. `force opposition` — Bring White's king into opposition. When a waiting move
    is needed, keep the box and make Black move.
 4. `box Black in` — Put the rook between the kings. If Black is too close,
