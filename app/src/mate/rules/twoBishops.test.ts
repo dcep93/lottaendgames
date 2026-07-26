@@ -41,9 +41,38 @@ test('Two Bishops exposes concise position-only teaching rules', () => {
     assert.ok(rule.helpText.length > 0, `${rule.id} needs an explanation`)
     assert.ok(rule.helpText.length < 240, `${rule.id} is too verbose`)
   }
-  assert.match(
-    twoBishopsWhiteRules.find(({ id }) => id === 'waiting move')!.helpText,
-    /controls that corner/,
+  assert.deepEqual(
+    twoBishopsWhiteRules
+      .filter(
+        ({ id }, index) =>
+          ['corner check', 'waiting move', 'corner finish', 'bishop wall'].includes(
+            id,
+          ) &&
+          twoBishopsWhiteRules.findIndex((rule) => rule.id === id) === index,
+      )
+      .map(({ id, helpText }) => ({ id, helpText })),
+    [
+      {
+        id: 'corner check',
+        helpText:
+          'If Black is in a corner and a bishop can check from beside White’s king, play that check.',
+      },
+      {
+        id: 'waiting move',
+        helpText:
+          'Make a safe, nonchecking bishop move that does not increase the number of squares Black can reach. Near a corner, move the bishop that controls it.',
+      },
+      {
+        id: 'corner finish',
+        helpText:
+          'Keep Black on the edge. Move White’s king a knight’s move from the target corner, then take direct opposition.',
+      },
+      {
+        id: 'bishop wall',
+        helpText:
+          'Keep White’s king out of the bishops’ lines. Place the bishops side by side, then reduce the number of squares Black can reach.',
+      },
+    ],
   )
   assert.deepEqual(
     getMateRuleSet('two-bishops').whiteRuleDescriptions.map(({ id }) => id),
@@ -58,6 +87,29 @@ test('Two Bishops exposes concise position-only teaching rules', () => {
       'king closer',
     ],
   )
+})
+
+test('corner finish diagram shows exactly one mate in one', () => {
+  const cornerBoard = getMateRuleSet('two-bishops').help.noteBoards.find(
+    ({ id }) => id === 'bishop-corner-finish',
+  )
+  assert.ok(cornerBoard)
+  assert.deepEqual(cornerBoard.pieces, [
+    { square: 'b3', piece: 'K' },
+    { square: 'c2', piece: 'B' },
+    { square: 'd2', piece: 'B' },
+    { square: 'a1', piece: 'k' },
+  ])
+  assert.equal(cornerBoard.caption, 'White to move: Bc3#.')
+
+  const fen = '8/8/8/8/8/1K6/2BB4/k7 w - - 0 1'
+  const chess = getChess(fen)
+  const matingMoves = chess.moves().filter((san) => {
+    const afterWhite = getChess(fen)
+    afterWhite.move(san)
+    return afterWhite.isCheckmate()
+  })
+  assert.deepEqual(matingMoves, ['Bc3#'])
 })
 
 test('corner check independently breaks the human-rule loop', () => {

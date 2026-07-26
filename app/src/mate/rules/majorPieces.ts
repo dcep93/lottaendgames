@@ -77,7 +77,7 @@ const QUEEN_KNIGHT_MOVE_HELP =
 const QUEEN_BOX_SIZE_HELP =
   "Shrink the box's shorter side before its longer side."
 const QUEEN_KING_CLOSER_HELP =
-  "Move White's king closer to Black, but keep it off the edge and do not cross the tighter side of the queen's box."
+  "Move White's king closer to Black, do not cross the tighter side of the queen's box, but not on the edge of the board."
 const queenHelp: RuleHelp = {
   title: 'How best moves are chosen',
   whiteIntro: WHITE_INTRO,

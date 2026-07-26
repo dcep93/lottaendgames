@@ -1319,20 +1319,17 @@ test('Rook and Two Bishops render diagrams while Queen stays text-only', () => {
   assert.ok(wallBoard)
   assert.ok(cornerBoard)
   assert.deepEqual(wallBoard.layout, {
-    files: 6,
-    ranks: 6,
+    files: 8,
+    ranks: 8,
     fileOffset: 0,
   })
   assert.deepEqual(cornerBoard.layout, {
-    files: 5,
-    ranks: 5,
+    files: 8,
+    ranks: 8,
     fileOffset: 0,
   })
-  assert.ok(wallBoard.highlights.every(({ kind }) => kind === 'wall'))
-  assert.deepEqual(
-    new Set(cornerBoard.highlights.map(({ kind }) => kind)),
-    new Set(['support', 'wall']),
-  )
+  assert.deepEqual(wallBoard.highlights, [])
+  assert.deepEqual(cornerBoard.highlights, [])
 
   const bishopsMarkup = renderToStaticMarkup(
     <MatePriorityGuideDialog
@@ -1343,11 +1340,16 @@ test('Rook and Two Bishops render diagrams while Queen stays text-only', () => {
   )
   assert.match(bishopsMarkup, />bishop wall</)
   assert.match(bishopsMarkup, />corner finish</)
-  assert.match(bishopsMarkup, /data-highlight-kind="wall"/)
-  assert.match(bishopsMarkup, /data-highlight-kind="support"/)
+  assert.match(bishopsMarkup, /White to move: Bc3#\./)
+  assert.match(bishopsMarkup, /leg-mate-guide-note-boards--full/)
+  assert.equal(
+    bishopsMarkup.match(/leg-mate-note-board--full/g)?.length,
+    2,
+  )
+  assert.doesNotMatch(bishopsMarkup, /data-highlight-kind=/)
   assert.match(
     bishopsMarkup,
-    /aria-label="corner finish\. White king on b3\. White bishop on d4\. White bishop on e4\. Black king on a1\./,
+    /aria-label="corner finish\. White king on b3\. White bishop on c2\. White bishop on d2\. Black king on a1\./,
   )
 })
 

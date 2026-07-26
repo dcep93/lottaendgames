@@ -695,7 +695,7 @@ test('queen and rook preserve evaluator order with universal priority labels', (
         id: 'king closer',
         shortLabel: 'king closer',
         helpText:
-          "Move White's king closer to Black, but keep it off the edge and do not cross the tighter side of the queen's box.",
+          "Move White's king closer to Black, do not cross the tighter side of the queen's box, but not on the edge of the board.",
       },
       {
         id: 'queen box size',
@@ -706,13 +706,13 @@ test('queen and rook preserve evaluator order with universal priority labels', (
         id: 'king closer',
         shortLabel: 'king closer',
         helpText:
-          "Move White's king closer to Black, but keep it off the edge and do not cross the tighter side of the queen's box.",
+          "Move White's king closer to Black, do not cross the tighter side of the queen's box, but not on the edge of the board.",
       },
     ],
   )
   assert.equal(
     queenWhiteRules.find(({ id }) => id === 'king closer')?.helpText,
-    "Move White's king closer to Black, but keep it off the edge and do not cross the tighter side of the queen's box.",
+    "Move White's king closer to Black, do not cross the tighter side of the queen's box, but not on the edge of the board.",
   )
   assert.equal(
     rookWhiteRules.some(({ id }) => id === 'finish guarantee'),
@@ -740,23 +740,20 @@ test('queen and rook preserve evaluator order with universal priority labels', (
     [
       {
         shortLabel: 'rook box',
-        helpText:
-          'Make a safe box around Black. Keep it, and shrink it whenever possible.',
+        helpText: 'Create, keep and shrink a box around Black.',
       },
       {
         shortLabel: 'rook box',
-        helpText:
-          'Make a safe box around Black. Keep it, and shrink it whenever possible.',
+        helpText: 'Create, keep and shrink a box around Black.',
       },
       {
         shortLabel: 'waiting move',
         helpText:
-          "When the kings are a knight's move apart, keep the box and move the rook to an edge so Black must move.",
+          'Move the rook, keeping any existing box, as far from Black’s king as possible, but necessarily closer to White’s king than Black’s.',
       },
       {
         shortLabel: 'rook box',
-        helpText:
-          'Make a safe box around Black. Keep it, and shrink it whenever possible.',
+        helpText: 'Create, keep and shrink a box around Black.',
       },
       {
         shortLabel: 'king closer',
@@ -1139,8 +1136,8 @@ test('rook board strategy selects and explains representative stages', () => {
     },
     {
       fen: '2R5/8/8/8/6K1/4k3/8/8 w - - 0 1',
-      moves: ['Rd8', 'Rc4'],
-      hint: 'king closer',
+      moves: ['Rh8'],
+      hint: 'waiting move',
     },
     {
       fen: '8/8/8/8/8/6R1/5K1k/8 w - - 8 5',
@@ -1158,12 +1155,18 @@ test('rook board strategy selects and explains representative stages', () => {
 test('rook priorities are individually visible board comparisons', () => {
   const waitingFen = '8/8/8/8/8/2K5/2R5/1k6 w - - 36 19'
   const waiting = scoreRookWhiteMove(waitingFen, 'Rh2')
+  const shorterWait = scoreRookWhiteMove(waitingFen, 'Rd2')
   const earlyFinish = scoreRookWhiteMove(waitingFen, 'Kb3')
   const lostBox = scoreRookWhiteMove(waitingFen, 'Rc1+')
   assert.equal(waiting.keepBoxPenalty, 0)
   assert.equal(earlyFinish.keepBoxPenalty, 0)
   assert.equal(lostBox.keepBoxPenalty, 1)
   assert.equal(waiting.waitingMovePenalty, 0)
+  assert.equal(shorterWait.waitingMovePenalty, 0)
+  assert.ok(
+    waiting.waitingMoveBlackDistanceScore <
+      shorterWait.waitingMoveBlackDistanceScore,
+  )
   assert.ok(
     earlyFinish.waitingMovePenalty > waiting.waitingMovePenalty,
   )
@@ -1171,22 +1174,19 @@ test('rook priorities are individually visible board comparisons', () => {
 
   const nonEdgeWaitingFen =
     '8/3K4/5k2/8/8/8/4R3/8 w - - 0 1'
-  const nonEdgeWaiting = scoreRookWhiteMove(
+  const inwardRookMove = scoreRookWhiteMove(
     nonEdgeWaitingFen,
     'Re8',
   )
-  const nonEdgeKingMove = scoreRookWhiteMove(
-    nonEdgeWaitingFen,
-    'Kd6',
+  assert.equal(inwardRookMove.waitingMovePenalty, 1)
+
+  const farthestSquareFen =
+    'R7/8/8/8/8/5K2/7k/8 w - - 2 2'
+  const stepsBackInward = scoreRookWhiteMove(
+    farthestSquareFen,
+    'Ra7',
   )
-  assert.equal(nonEdgeWaiting.waitingMovePenalty, 0)
-  assert.ok(
-    nonEdgeKingMove.waitingMovePenalty >
-      nonEdgeWaiting.waitingMovePenalty,
-  )
-  assert.ok(
-    compareRookWhiteScores(nonEdgeWaiting, nonEdgeKingMove) < 0,
-  )
+  assert.equal(stepsBackInward.waitingMovePenalty, 1)
 
   const squeezeFen = '8/5R2/8/4K3/8/7k/8/8 w - - 0 1'
   const squeeze = scoreRookWhiteMove(squeezeFen, 'Rg7')

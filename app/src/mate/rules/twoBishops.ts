@@ -76,13 +76,13 @@ const WHITE_INTRO =
 const BLACK_INTRO =
   'Black uses its own priorities to put up the strongest resistance. Black is not trying to help the mate; it looks for the most stubborn legal reply.'
 const CORNER_CHECK_HELP =
-  "When Black is in a corner and White's king controls the nearby escape squares, check with a bishop beside White's king."
+  'If Black is in a corner and a bishop can check from beside White’s king, play that check.'
 const WAITING_MOVE_HELP =
-  "When White's king holds Black back, keep the wall with a quiet bishop move so Black must give ground. Near a corner, move the bishop that controls that corner first."
+  'Make a safe, nonchecking bishop move that does not increase the number of squares Black can reach. Near a corner, move the bishop that controls it.'
 const CORNER_FINISH_HELP =
-  "Drive Black to the edge and keep it there. Put White's king a knight's move from the mating corner, then take direct opposition."
+  'Keep Black on the edge. Move White’s king a knight’s move from the target corner, then take direct opposition.'
 const BISHOP_WALL_HELP =
-  "Keep White's king clear of the bishops' lines. Place the bishops side by side, then shrink Black's room."
+  'Keep White’s king out of the bishops’ lines. Place the bishops side by side, then reduce the number of squares Black can reach.'
 
 const twoBishopsHelp: RuleHelp = {
   title: 'How best moves are chosen',
@@ -102,41 +102,28 @@ const twoBishopsHelp: RuleHelp = {
       id: 'bishop-wall',
       title: 'bishop wall',
       caption:
-        "Keep the bishops beside each other so their diagonals form one wall and shrink Black's room.",
-      layout: { files: 6, ranks: 6, fileOffset: 0 },
+        'Side-by-side bishops form a wall. Move the wall to reduce the number of squares Black can reach.',
+      layout: { files: 8, ranks: 8, fileOffset: 0 },
       pieces: [
         { square: 'b1', piece: 'K' },
         { square: 'c2', piece: 'B' },
         { square: 'd2', piece: 'B' },
         { square: 'f6', piece: 'k' },
       ],
-      highlights: [
-        'd3',
-        'e4',
-        'f5',
-        'e3',
-        'f4',
-      ].map((square) => ({ square, kind: 'wall' as const })),
+      highlights: [],
     },
     {
       id: 'bishop-corner-finish',
       title: 'corner finish',
-      caption:
-        "The king supports from a knight's move away while the bishop wall covers the corner and last escape.",
-      layout: { files: 5, ranks: 5, fileOffset: 0 },
+      caption: 'White to move: Bc3#.',
+      layout: { files: 8, ranks: 8, fileOffset: 0 },
       pieces: [
         { square: 'b3', piece: 'K' },
-        { square: 'd4', piece: 'B' },
-        { square: 'e4', piece: 'B' },
+        { square: 'c2', piece: 'B' },
+        { square: 'd2', piece: 'B' },
         { square: 'a1', piece: 'k' },
       ],
-      highlights: [
-        { square: 'a2', kind: 'support' },
-        { square: 'b2', kind: 'support' },
-        { square: 'b3', kind: 'support' },
-        { square: 'a1', kind: 'wall' },
-        { square: 'b1', kind: 'wall' },
-      ],
+      highlights: [],
     },
   ],
 }

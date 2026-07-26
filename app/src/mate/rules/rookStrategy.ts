@@ -21,6 +21,7 @@ export type RookStrategyScore = {
   readonly convergencePenalty: number
   readonly keepBoxPenalty: number
   readonly waitingMovePenalty: number
+  readonly waitingMoveBlackDistanceScore: number
   readonly shrinkBoxPenalty: number
   readonly shrinkBoxRoom: number
   readonly kingProximityPriority: number
@@ -32,10 +33,9 @@ export type RookStrategyScore = {
   readonly rookSafeBlackDistanceScore: number
 }
 
-const ROOK_BOX_HELP =
-  'Make a safe box around Black. Keep it, and shrink it whenever possible.'
+const ROOK_BOX_HELP = 'Create, keep and shrink a box around Black.'
 const WAITING_MOVE_HELP =
-  "When the kings are a knight's move apart, keep the box and move the rook to an edge so Black must move."
+  'Move the rook, keeping any existing box, as far from Black’s king as possible, but necessarily closer to White’s king than Black’s.'
 const KING_CLOSER_HELP = "Bring White's king toward Black's king."
 
 export const rookStrategyRules: readonly OrderedRule<RookStrategyScore>[] = [
@@ -87,7 +87,9 @@ export const rookStrategyRules: readonly OrderedRule<RookStrategyScore>[] = [
     shortLabel: 'waiting move',
     helpText: WAITING_MOVE_HELP,
     compare: (first, second) =>
-      first.waitingMovePenalty - second.waitingMovePenalty,
+      first.waitingMovePenalty - second.waitingMovePenalty ||
+      first.waitingMoveBlackDistanceScore -
+        second.waitingMoveBlackDistanceScore,
   },
   {
     id: 'rook box',
@@ -148,53 +150,40 @@ export function scoreRookStrategyMove(
       ),
   )
   const needsKnightWaitingMove = Boolean(
-    beforeBox.size !== null &&
-      beforeWhiteKing &&
+    beforeWhiteKing &&
       beforeBlackKing &&
       isKnightMove(beforeWhiteKing.square, beforeBlackKing.square),
   )
   const needsWaitingMove = needsKnightWaitingMove
+  const keepsExistingBox =
+    beforeBox.size === null ||
+    (preservesOrShrinksBox && retainsStrongestBoundary)
   const baseWaitingMove = Boolean(
     needsWaitingMove &&
       move.piece === 'r' &&
       move.captured === undefined &&
       !chess.isCheck() &&
       rookIsSafe &&
-      preservesOrShrinksBox &&
-      retainsStrongestBoundary &&
+      keepsExistingBox &&
       beforeRook &&
+      beforeBlackKing &&
       whiteRook &&
       whiteKing &&
-      blackKing,
-  )
-  const edgeWaitingMove = Boolean(
-    baseWaitingMove &&
-      beforeRook &&
-      whiteRook &&
-      rookMovesToEdge(beforeRook.square, whiteRook.square),
+      blackKing &&
+      manhattanDistance(whiteRook.square, whiteKing.square) <
+        manhattanDistance(whiteRook.square, blackKing.square) &&
+      manhattanDistance(whiteRook.square, blackKing.square) >=
+        manhattanDistance(beforeRook.square, beforeBlackKing.square),
   )
   const waitingMovePriority = !needsWaitingMove
     ? 0
-    : edgeWaitingMove &&
-        beforeRook &&
-        whiteRook &&
-        whiteKing &&
-        blackKing &&
-        rookWaitsAtEdgeOnWhiteSide(
-          beforeRook.square,
-          whiteRook.square,
-          whiteKing.square,
-          blackKing.square,
-        )
+    : baseWaitingMove
       ? 0
-      : edgeWaitingMove &&
-          beforeRook &&
-          beforeWhiteKing &&
-          beforeBlackKing &&
-          kingDistance(beforeRook.square, beforeWhiteKing.square) === 1 &&
-          isEdgeSquare(beforeBlackKing.square)
-        ? 1
-        : 2
+      : 1
+  const waitingMoveBlackDistanceScore =
+    baseWaitingMove && whiteRook && blackKing
+      ? -manhattanDistance(whiteRook.square, blackKing.square)
+      : 0
   const rookExposed = Boolean(
     whiteRook &&
       whiteKing &&
@@ -254,8 +243,7 @@ export function scoreRookStrategyMove(
   )
   const moveDoesNotRegressAfterReply = Boolean(
     beforeProgress.kind === 'winning' &&
-      (shrinksBox ||
-        (baseWaitingMove && waitingMovePriority < 2)) &&
+      (shrinksBox || baseWaitingMove) &&
       chess.moves().every((blackSan) => {
         const afterBlack = getChess(resultFen)
         afterBlack.move(blackSan)
@@ -277,18 +265,18 @@ export function scoreRookStrategyMove(
     convergencePenalty:
       beforeProgress.kind !== 'winning' ||
       (resultProgress.kind === 'winning' &&
-        // Ordinary moves lower the proof rank. A human box shrink or edge
+        // Ordinary moves lower the proof rank. A human box shrink or
         // wait may spend a tempo, but no legal Black reply may give that
         // progress back.
         (resultProgress.rank < beforeProgress.rank ||
           (moveDoesNotRegressAfterReply &&
-            (shrinksBox ||
-              (baseWaitingMove && waitingMovePriority < 2)))))
+            (shrinksBox || baseWaitingMove))))
         ? 0
         : 1,
     keepBoxPenalty:
       beforeBox.size === null || preservesOrShrinksBox ? 0 : 1,
     waitingMovePenalty: waitingMovePriority,
+    waitingMoveBlackDistanceScore,
     shrinkBoxPenalty: shrinksBox ? 0 : 1,
     shrinkBoxRoom:
       shrinksBox && resultBoxRoom !== null ? resultBoxRoom : 15,
@@ -334,38 +322,6 @@ function movesKingCloserWithoutAxisRegression(
     (resultFileDistance < beforeFileDistance ||
       resultRankDistance < beforeRankDistance)
   )
-}
-
-function rookWaitsAtEdgeOnWhiteSide(
-  beforeRookSquare: Square,
-  resultRookSquare: Square,
-  whiteKingSquare: Square,
-  blackKingSquare: Square,
-): boolean {
-  const beforeRook = squareCoordinates(beforeRookSquare)
-  const resultRook = squareCoordinates(resultRookSquare)
-  const whiteKing = squareCoordinates(whiteKingSquare)
-  const blackKing = squareCoordinates(blackKingSquare)
-  const movementAxis =
-    beforeRook.file === resultRook.file ? 'rank' : 'file'
-  const resultCoordinate = resultRook[movementAxis]
-
-  return (
-    rookMovesToEdge(beforeRookSquare, resultRookSquare) &&
-    Math.sign(resultCoordinate - blackKing[movementAxis]) ===
-      Math.sign(whiteKing[movementAxis] - blackKing[movementAxis])
-  )
-}
-
-function rookMovesToEdge(
-  beforeRookSquare: Square,
-  resultRookSquare: Square,
-): boolean {
-  const beforeRook = squareCoordinates(beforeRookSquare)
-  const resultRook = squareCoordinates(resultRookSquare)
-  const movementAxis =
-    beforeRook.file === resultRook.file ? 'rank' : 'file'
-  return resultRook[movementAxis] === 0 || resultRook[movementAxis] === 7
 }
 
 function isRookHomeMove(
@@ -421,9 +377,4 @@ function squareEdges(square: Square): readonly string[] {
     ...(rank === 0 ? ['bottom'] : []),
     ...(rank === 7 ? ['top'] : []),
   ]
-}
-
-function isEdgeSquare(square: Square): boolean {
-  const { file, rank } = squareCoordinates(square)
-  return file === 0 || file === 7 || rank === 0 || rank === 7
 }
