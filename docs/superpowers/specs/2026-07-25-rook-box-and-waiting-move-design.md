@@ -7,7 +7,7 @@ Keep the Rook checkmate lesson terse while making every displayed rule describe 
 ## Visible rules
 
 - **rook box** — Create, keep and shrink a box around Black.
-- **waiting move** — Keep any existing box. Move the rook closer to White's king than Black's, as far from Black's king as possible.
+- **waiting move** — Move the rook, keeping any existing box, as far from Black’s king as possible, but necessarily closer to White’s king than Black’s.
 
 “As far as possible” means the Rook's resulting king-move distance from Black's king, not the number of squares the Rook travels.
 
@@ -21,7 +21,7 @@ A waiting move is preferred when the kings are a knight's move apart. It must:
 4. End with the Rook strictly closer to White's king than Black's king.
 5. Among moves satisfying those conditions, maximize the Rook's distance from Black's king.
 
-The rule is position-only. It does not inspect move history or a move counter. The internal convergence proof remains an invisible safety check, not a lesson shown to the user: after a box shrink or waiting move, every legal Black reply must leave the proof strictly closer to mate.
+The rule is position-only. It does not inspect move history or a move counter. The existing internal convergence proof remains an invisible safety check, not a lesson shown to the user.
 
 ## Verification
 
