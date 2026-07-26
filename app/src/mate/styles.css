@@ -184,6 +184,24 @@
   color: var(--leg-muted);
 }
 
+.leg-mate-build-log {
+  max-width: 100%;
+  margin: 0.25rem 0 0.5rem;
+  overflow-x: auto;
+  border: 0.0625rem solid var(--leg-border);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  color: var(--leg-text);
+  background: rgba(0, 0, 0, 0.2);
+  font: 0.8rem/1.45 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    'Liberation Mono', monospace;
+  white-space: pre;
+}
+
+.leg-mate-build-log code {
+  font: inherit;
+}
+
 .leg-mate-empty-state .leg-mate-empty-state-intro {
   max-width: 54rem;
   color: var(--leg-text);

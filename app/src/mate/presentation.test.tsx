@@ -1878,8 +1878,17 @@ test('Mate sidebar intercepts only unmodified primary link clicks', async () => 
 })
 
 test('Mate landing keeps the catalog visible without mounting a drill', () => {
+  const buildGitLog = [
+    'commit bb62efe68e885f71ce9df21ea707537a51b653bf',
+    'Author: Daniel Cepeda <dcep93@gmail.com>',
+    'AuthorDate: 2026-07-25T23:41:53-04:00',
+    'Commit: Daniel Cepeda <dcep93@gmail.com>',
+    'CommitDate: 2026-07-25T23:41:53-04:00',
+    'Message: Fix rook convergence and simplify bishop knight guide',
+  ].join('\n')
   const markup = renderToStaticMarkup(
     <Mate
+      buildGitLog={buildGitLog}
       moduleSelector={<nav aria-label="Modules" />}
       onNavigate={() => undefined}
       route={{
@@ -1896,12 +1905,24 @@ test('Mate landing keeps the catalog visible without mounting a drill', () => {
   const slopAlertAt = markup.indexOf('>Slop Alert</h2>')
   const explanationAt = markup.indexOf(explanation)
   const chooserAt = markup.indexOf('Choose a mating set')
+  const buildLogAt = markup.indexOf('aria-label="Build Git log"')
   const explanationWordCount = explanation.trim().split(/\s+/).length
   assert.ok(slopAlertAt >= 0)
-  assert.ok(explanationAt > slopAlertAt)
+  assert.ok(buildLogAt > slopAlertAt)
+  assert.ok(explanationAt > buildLogAt)
   assert.ok(chooserAt > explanationAt)
   assert.ok(explanationWordCount >= 50 && explanationWordCount <= 100)
   assert.match(markup, /href="\/mate\/queen"/)
+  assert.match(
+    markup,
+    /commit bb62efe68e885f71ce9df21ea707537a51b653bf/,
+  )
+  assert.match(markup, /AuthorDate: 2026-07-25T23:41:53-04:00/)
+  assert.match(markup, /CommitDate: 2026-07-25T23:41:53-04:00/)
+  assert.match(
+    markup,
+    /Message: Fix rook convergence and simplify bishop knight guide/,
+  )
   assert.match(markup, />Standard<\/span>/)
   assert.match(markup, />Training Wheels<\/span>/)
   assert.doesNotMatch(markup, /leg-mate-workspace/)
