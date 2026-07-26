@@ -19,7 +19,8 @@ A waiting move is preferred when the kings are a knight's move apart. It must:
 2. Leave the Rook safe.
 3. Preserve the current box and its strongest wall when a box already exists.
 4. End with the Rook's row-plus-file distance strictly smaller to White's king than Black's king.
-5. Among moves satisfying those conditions, maximize the Rook's row-plus-file distance from Black's king.
+5. Preserve or increase the Rook's distance from Black's king; the current square is the baseline, so stepping inward does not become a waiting move merely because every legal Rook move is worse.
+6. Among moves satisfying those conditions, maximize the Rook's row-plus-file distance from Black's king.
 
 The rule is position-only. It does not inspect move history or a move counter. The existing internal convergence proof remains an invisible safety check, not a lesson shown to the user.
 
