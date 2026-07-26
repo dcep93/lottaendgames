@@ -14,8 +14,8 @@ The title and position in the existing Rook priority list remain unchanged.
 
 Add a `kingOppositionPenalty` to the Rook score:
 
-- `1` when the resulting White and Black kings are in direct opposition: on the same rank or file with exactly one square between them;
-- `0` otherwise.
+- `0` for a White king move whose resulting square does not put the kings in direct opposition;
+- `1` for a White king move that takes direct opposition, or for a non-king move.
 
 Compare this penalty first inside the existing `king closer` rule. Retain the current king-move proximity classification, king-move distance, and row-plus-file distance as later tie-breaks. The calculation depends only on the resulting board.
 
