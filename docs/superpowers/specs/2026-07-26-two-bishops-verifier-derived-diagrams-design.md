@@ -17,21 +17,17 @@ The chosen position for each diagram must:
 
 ## Counting model
 
-The existing Two Bishops certificate proves every symmetry-reduced winning
-White-to-move position, but it does not retain policy-graph observations.
-Diagram generation will add an explicit analytics pass over those certified
-positions.
+The existing Two Bishops checker proves every winning White-to-move position by
+scanning a compact DTM certificate. The certificate has already reduced Black's
+square to a fundamental region, but positions on symmetry axes still appear in
+more than one reflected form. Diagram generation will count those certificate
+observations and then fully canonicalize each position across all eight board
+rotations and reflections.
 
-Each canonical certified position receives:
-
-1. one observation for appearing as a verifier root; and
-2. one observation for every optimal White move and legal Black reply whose
-   continuation canonicalizes to that position.
-
-This is root frequency plus incoming policy-graph edge frequency. It measures
-how often the loop checker encounters a structural position without inflating
-the count for rotations or reflections. Repeated branches still count because
-they are distinct ways for the checked policy to reach the same position.
+Each certificate entry contributes one observation to its fully canonical
+position. This measures what the exhaustive checker actually sees and makes the
+remaining symmetry duplicates useful as frequency rather than silently treating
+the partially reduced table as fully reduced.
 
 For every observed position, the generator asks the registered production rule
 set for `currentWhiteHint`. A position is relevant to a diagram only when that
@@ -43,18 +39,20 @@ position key.
 
 An opt-in script will:
 
-1. decode and enumerate the canonical winning positions in the bundled KBB-v-K
+1. decode and enumerate the certified winning positions in the bundled KBB-v-K
    proof table;
-2. expand each position through the production Two Bishops adapter;
-3. accumulate canonical observation counts;
-4. classify positions by their active visible rule;
+2. fully canonicalize each position and accumulate certificate observation
+   counts;
+3. consider candidates from greatest count to least, using the canonical key
+   for deterministic ordering;
+4. classify candidates by their active visible production rule;
 5. select the winner for `bishop wall` and `corner finish`; and
 6. write a small TypeScript artifact containing the canonical FEN, rule id,
    observation count, and generation metadata.
 
-The normal test and certificate commands will not regenerate the artifact.
-Generation is deliberately explicit because a full policy census is expensive.
-A lightweight check mode will fail when recomputed output differs, for use when
+The normal test command will not regenerate the artifact. Generation is
+deliberately explicit because the complete certificate scan is broader than a
+unit test. A check mode will fail when recomputed output differs, for use when
 the policy intentionally changes.
 
 ## Rendering
@@ -74,8 +72,8 @@ current rule text and the live board position remain the source of truth.
 
 Tests will cover:
 
-- the frequency collector on a small synthetic graph, including symmetry-key
-  aggregation and deterministic tie-breaking;
+- the frequency collector on a small synthetic position set, including
+  symmetry-key aggregation and deterministic tie-breaking;
 - proof-table enumeration metadata;
 - each generated FEN is legal and canonical;
 - each generated FEN's active hint matches its diagram rule;
