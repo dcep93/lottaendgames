@@ -24,12 +24,13 @@ The current target corner is derived from the Queen and Black king:
 A Queen move satisfies `corner cage` only when:
 
 1. its resulting box has a target corner compatible with the current box;
-2. neither corresponding side of the box grows; and
-3. at least one corresponding side shrinks.
+2. its resulting shorter side is smaller than the current shorter side; or
+3. the shorter sides tie and its resulting longer side is smaller.
 
-Among qualifying Queen moves, compare the resulting shorter side first and the
-longer side second. This remains an implementation detail rather than rendered
-teaching text.
+This lexicographic comparison permits one side to grow when the other becomes
+narrower. It matches the strategic value of confining Black to fewer ranks or
+files. The shorter-side-first comparison remains an implementation detail
+rather than rendered teaching text.
 
 King moves may preserve the current box and continue to the later rules. The
 existing requirements that White’s king remain outside the box and that Black
@@ -46,11 +47,21 @@ lose at `corner cage` even though its sorted rectangle dimensions are smaller.
 A legal king move may preserve the `h8` box and be selected by the later
 king-movement rule.
 
+From:
+
+`3k4/8/2Q5/2K5/8/8/8/8 w - - 0 1`
+
+the current `h8` box is `5 × 2`. `Qb7` produces a `6 × 1` box toward the same
+corner, keeps White’s king outside, and leaves Black at least two safe squares.
+Because the shorter side improves from two to one, `Qb7` must satisfy
+`corner cage`.
+
 ## Verification
 
-- Unit-test target-corner classification and strict same-corner shrink under all
-  board rotations and reflections.
-- Regression-test that `Qc6` is rejected at `corner cage`.
+- Unit-test target-corner classification and lexicographic same-corner shrink
+  under all board rotations and reflections.
+- Regression-test that `Qc6` is rejected and `Qb7` is accepted at
+  `corner cage`.
 - Run the Queen rule, geometry, and presentation tests.
 - Run the exhaustive Queen verifier at low priority only when no other verifier
   process is consuming substantial resources.
