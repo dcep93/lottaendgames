@@ -359,8 +359,8 @@ test('registered rule sets may prepare a pure candidate score batch', () => {
 test('a decisive move override preserves its ordered legal subset and explains every rejected move', () => {
   let batchCalls = 0
   const lookupDescription = {
-    id: 'enter mating net',
-    shortLabel: 'enter mating net',
+    id: 'mating net',
+    shortLabel: 'mating net',
     helpText: 'Follow the known mating net.',
   }
   const lookupOverride: WhiteMoveOverride = {
@@ -419,8 +419,8 @@ test('a decisive move override preserves its ordered legal subset and explains e
 
 test('registered move overrides snapshot descriptions and selector functions', () => {
   const mutableDescription = {
-    id: 'enter mating net',
-    shortLabel: 'enter mating net',
+    id: 'mating net',
+    shortLabel: 'mating net',
     helpText: 'Original mating-net help.',
   }
   const mutableOverride = {
@@ -441,8 +441,8 @@ test('registered move overrides snapshot descriptions and selector functions', (
     const registered = getMateRuleSet('bishop-knight')
     assert.deepEqual(registered.idealWhiteMoves('fen'), ['Kb2'])
     assert.deepEqual(registered.currentWhiteHint('fen'), {
-      id: 'enter mating net',
-      shortLabel: 'enter mating net',
+      id: 'mating net',
+      shortLabel: 'mating net',
       helpText: 'Original mating-net help.',
     })
   } finally {

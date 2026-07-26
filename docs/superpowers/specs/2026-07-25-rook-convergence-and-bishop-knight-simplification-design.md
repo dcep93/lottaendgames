@@ -13,21 +13,22 @@ The visible strategy has three ideas after the universal rules:
 
 1. **rook box** — Make a safe box around Black. Keep it, and shrink it whenever
    possible.
-2. **waiting move** — When the box cannot shrink and White's king cannot get
-   closer, move the rook without changing the box so Black must move.
+2. **waiting move** — When the kings are a knight's move apart, keep the box
+   and move the rook to an edge so Black must move.
 3. **king closer** — Bring White's king toward Black's king.
 
 The current implementation can prefer a waiting move over a safe shrink and
 repeat a position. Merely reordering the existing rules still leaves many
 cycles. Add an internal, position-only convergence filter backed by the exact
-KRK progress table. When the current position is a supported winning position,
-a recommended White move must lead to a supported winning position with a
-strictly smaller rank.
+KRK progress table. A move normally lowers the exact progress rank. The filter
+also permits the two slower human operations—shrinking the box and a proper
+edge waiting move—when every legal Black reply leaves the rank no worse than
+before the move.
 
-This is not a shortest-mate rule. Every rank-decreasing move survives the
-filter, so the board-based teaching priorities still choose among all safe
-progress moves. The filter is internal: it does not appear in the modal,
-reason column, or user vocabulary.
+This is not a shortest-mate rule. Every rank-decreasing move survives, and the
+documented box and waiting techniques may take a slower route. The board-based
+teaching priorities still choose among the safe progress moves. The filter is
+internal: it does not appear in the modal, reason column, or user vocabulary.
 
 Merge the existing keep-box, shrink-box, and establish-box comparators under
 the single visible `rook box` explanation. Remove `cover escape squares`; its

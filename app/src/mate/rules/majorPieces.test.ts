@@ -638,12 +638,12 @@ test('queen and rook preserve evaluator order with universal priority labels', (
       'mate',
       'rook safe',
       'no stalemate',
-      'keep box',
+      'rook convergence',
+      'rook box',
+      'rook box',
       'waiting move',
-      'cover escape squares',
-      'shrink box',
-      'rook box size',
-      'king proximity',
+      'rook box',
+      'king closer',
     ],
   )
   assert.deepEqual(
@@ -665,12 +665,12 @@ test('queen and rook preserve evaluator order with universal priority labels', (
       'mate',
       'pieces safe',
       'no stalemate',
-      'keep the box',
+      'rook convergence',
+      'rook box',
+      'rook box',
       'waiting move',
-      'cover escape squares',
-      'shrink the box',
-      'rook box size',
-      'king proximity',
+      'rook box',
+      'king closer',
     ],
   )
   assert.deepEqual(
@@ -725,40 +725,42 @@ test('queen and rook preserve evaluator order with universal priority labels', (
     true,
   )
   assert.equal(
-    rookWhiteRules.find(({ id }) => id === 'shrink box')?.helpText,
-    'Move the rook wall closer to leave Black less room.',
+    rookWhiteRules.find(({ id }) => id === 'rook convergence')
+      ?.presentationRole,
+    'internal',
   )
   assert.deepEqual(
-    rookWhiteRules.slice(3).map(({ shortLabel, helpText }) => ({
-      shortLabel,
-      helpText,
-    })),
+    rookWhiteRules
+      .filter(({ presentationRole }) => presentationRole !== 'internal')
+      .slice(3)
+      .map(({ shortLabel, helpText }) => ({
+        shortLabel,
+        helpText,
+      })),
     [
       {
-        shortLabel: 'keep the box',
-        helpText: 'Keep Black inside its current box.',
+        shortLabel: 'rook box',
+        helpText:
+          'Make a safe box around Black. Keep it, and shrink it whenever possible.',
+      },
+      {
+        shortLabel: 'rook box',
+        helpText:
+          'Make a safe box around Black. Keep it, and shrink it whenever possible.',
       },
       {
         shortLabel: 'waiting move',
         helpText:
-          "Whenever the kings are a knight's move apart, keep the box and move the rook to the board edge on White's side. This applies wherever Black is. If White's king blocks that edge and Black happens to be on an edge, use the other edge. When the kings face each other, keep the box and move the rook diagonally beside White's king, toward the center.",
+          "When the kings are a knight's move apart, keep the box and move the rook to an edge so Black must move.",
       },
       {
-        shortLabel: 'cover escape squares',
+        shortLabel: 'rook box',
         helpText:
-          "Cover the squares beside Black's king so the rook can mate.",
+          'Make a safe box around Black. Keep it, and shrink it whenever possible.',
       },
       {
-        shortLabel: 'shrink the box',
-        helpText: 'Move the rook wall closer to leave Black less room.',
-      },
-      {
-        shortLabel: 'rook box size',
-        helpText: "Use the rook to make a box around Black's king.",
-      },
-      {
-        shortLabel: 'king proximity',
-        helpText: "Bring White's king towards Black's.",
+        shortLabel: 'king closer',
+        helpText: "Bring White's king toward Black's king.",
       },
     ],
   )
@@ -813,12 +815,9 @@ test('queen and rook preserve evaluator order with universal priority labels', (
       'mate',
       'rook safe',
       'no stalemate',
-      'keep box',
+      'rook box',
       'waiting move',
-      'cover escape squares',
-      'shrink box',
-      'rook box size',
-      'king proximity',
+      'king closer',
     ],
   )
 })
@@ -1100,53 +1099,53 @@ test('rook board strategy selects and explains representative stages', () => {
     },
     {
       fen: '8/8/8/8/8/8/4RK2/3k4 w - - 0 1',
-      moves: ['Ra2'],
-      hint: 'waiting move',
+      moves: ['Ke3'],
+      hint: 'rook box',
     },
     {
       fen: '8/4R3/3k1K2/8/8/8/8/8 w - - 32 17',
       moves: ['Re5'],
-      hint: 'waiting move',
+      hint: 'rook box',
     },
     {
       fen: '4R3/8/8/8/8/8/3K1k2/8 w - - 2 2',
       moves: ['Re3'],
-      hint: 'waiting move',
+      hint: 'rook box',
     },
     {
       fen: '8/8/8/8/4k1K1/5R2/8/8 w - - 4 3',
       moves: ['Rf5'],
-      hint: 'waiting move',
+      hint: 'rook box',
     },
     {
       fen: '8/5R2/8/4K3/8/7k/8/8 w - - 0 1',
       moves: ['Rg7'],
-      hint: 'shrink box',
+      hint: 'rook box',
     },
     {
       fen: '8/2k5/8/8/7R/3K4/8/8 w - - 2 2',
-      moves: ['Rh6'],
-      hint: 'shrink box',
+      moves: ['Rd4'],
+      hint: 'rook box',
     },
     {
       fen: '8/8/k7/2R5/4K3/8/8/8 w - - 2 2',
       moves: ['Kd5'],
-      hint: 'king proximity',
+      hint: 'king closer',
     },
     {
       fen: '8/8/8/8/8/8/4R3/3k1K2 w - - 20 11',
       moves: ['Kf2'],
-      hint: 'king proximity',
+      hint: 'rook box',
     },
     {
       fen: '2R5/8/8/8/6K1/4k3/8/8 w - - 0 1',
-      moves: ['Rc3+'],
-      hint: 'rook box size',
+      moves: ['Rd8', 'Rc4'],
+      hint: 'king closer',
     },
     {
       fen: '8/8/8/8/8/6R1/5K1k/8 w - - 8 5',
-      moves: ['Ra3'],
-      hint: 'rook box size',
+      moves: ['Rf3', 'Re3', 'Rd3', 'Rc3', 'Rb3', 'Ra3'],
+      hint: 'king closer',
     },
   ] as const
 
@@ -1219,6 +1218,16 @@ test('rook priorities are individually visible board comparisons', () => {
     scoreRookWhiteMove(squeezeFen, 'Rg7'),
     scoreRookWhiteMove(sameBoardDifferentClock, 'Rg7'),
   )
+})
+
+test('rook shrinks instead of repeating the former waiting-move loop', () => {
+  const rook = getMateRuleSet('rook')
+  const fen = '5k2/3K4/4R3/8/8/8/8/8 w - - 6 4'
+
+  assert.deepEqual(rook.idealWhiteMoves(fen), ['Re7'])
+  assert.equal(rook.currentWhiteHint(fen)?.id, 'rook box')
+  assert.equal(scoreRookWhiteMove(fen, 'Re7').convergencePenalty, 0)
+  assert.equal(scoreRookWhiteMove(fen, 'Re1').convergencePenalty, 1)
 })
 
 test('rook best-move reasons all come from the displayed board rules', () => {
@@ -1469,7 +1478,7 @@ test('representative hardcoded line starts keep first ideal choices', () => {
     {
       id: 'rook' as const,
       fen: '8/5k2/8/5K2/8/8/8/6R1 w - - 0 1',
-      white: ['Rg6'],
+      white: ['Re1'],
       blackFen: '8/5k2/6R1/5K2/8/8/8/8 b - - 1 1',
       black: ['Ke7'],
     },

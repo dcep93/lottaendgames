@@ -220,13 +220,13 @@ export function scoreKnightAndBishopWhiteMove(
 }
 
 const ENTER_MATING_NET_HELP =
-  '[mate] Follow the known knight-and-bishop mating net when it is available.'
+  'Follow the finishing pattern toward a bishop-colored corner.'
 const PREPARE_ZONE_X_HELP =
-  "Prepare the knight's route into an established Zone X cage. Establish the bishop and knight geometry that prepares Zone X, preferring the setup with the closest pieces. Once the bishop and Zone X setup are established, move White's king toward Black's king; otherwise move the knight by the shortest path to its stable Zone X square."
+  'Coordinate the bishop and knight to confine Black along the edge.'
 const BRING_KING_CLOSER_HELP =
-  "Keep White's king in the middle 16 squares while bringing it closer to Black's king and staying on the color opposite the bishop; when outside the middle 16, walk toward it first. The color rule can also yield when the two kings are two diagonal squares apart and the adjacent bishop is a knight move from Black's king. Do not increase the distance between the kings."
+  "Bring White's king closer without letting Black out of the cage."
 const KNIGHT_CLOSER_CENTER_HELP =
-  "Avoid the bishop-opposition loop and keep the knight behind White's king relative to Black's king. At the final placement step, compare two knight moves first by how close the knight is to White's king, then compare the resulting knight square by center distance and, finally, prefer it farther from Black's king. Keep moves that do not lose a head-to-head comparison; if those comparisons cycle, use center distance and then distance from Black's king to break the cycle."
+  "Bring the knight closer to White's king and the center."
 
 function compareKnightAndBishopFinalSourcePriority(
   first: KnightAndBishopWhiteMoveScore,
@@ -243,8 +243,8 @@ function compareKnightAndBishopFinalSourcePriority(
 
 const bishopKnightWhiteMoveOverride: WhiteMoveOverride = {
   description: {
-    id: 'enter mating net',
-    shortLabel: 'enter mating net',
+    id: 'mating net',
+    shortLabel: 'mating net',
     helpText: ENTER_MATING_NET_HELP,
   },
   guideOrder: 3,
@@ -283,25 +283,25 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     compare: (first, second) => first.pieceSafetyScore - second.pieceSafetyScore,
   },
   {
-    id: 'enter mating net',
-    shortLabel: 'enter mating net',
+    id: 'mating net',
+    shortLabel: 'mating net',
     guideOrder: 3,
     helpText: ENTER_MATING_NET_HELP,
     compare: (first, second) =>
       first.phaseTwoEntryScore - second.phaseTwoEntryScore,
   },
   {
-    id: 'key square pattern',
-    shortLabel: 'key square pattern',
+    id: 'knight key square',
+    shortLabel: 'knight key square',
     guideOrder: 4,
     helpText:
-      "[prepare] Reach the knight's key-square pattern when available.",
+      'Place the knight between the kings to seal Black on the edge.',
     compare: (first, second) =>
       first.keySquarePatternScore - second.keySquarePatternScore,
   },
   {
-    id: 'prepare zone x',
-    shortLabel: 'prepare zone x',
+    id: 'build the cage',
+    shortLabel: 'build the cage',
     guideOrder: 5,
     helpText: PREPARE_ZONE_X_HELP,
     compare: (first, second) =>
@@ -309,16 +309,16 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       second.zoneXEstablishedKnightRouteScore,
   },
   {
-    id: 'force zone x',
-    shortLabel: 'force zone x',
+    id: 'build the cage',
+    shortLabel: 'build the cage',
     guideOrder: 6,
-    helpText: '[prepare] Force Black into Zone X when it is available.',
+    helpText: PREPARE_ZONE_X_HELP,
     compare: (first, second) =>
       first.zoneXEntryScore - second.zoneXEntryScore,
   },
   {
-    id: 'prepare zone x',
-    shortLabel: 'prepare zone x',
+    id: 'build the cage',
+    shortLabel: 'build the cage',
     helpText: PREPARE_ZONE_X_HELP,
     compare: (first, second) =>
       first.zoneXPrepareScore - second.zoneXPrepareScore ||
@@ -326,8 +326,8 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     stopWhenBest: (score) => score.zoneXDriftScore === 0,
   },
   {
-    id: 'bring king closer',
-    shortLabel: 'bring king closer',
+    id: 'king closer',
+    shortLabel: 'king closer',
     guideOrder: 7,
     helpText: BRING_KING_CLOSER_HELP,
     compare: (first, second) =>
@@ -335,25 +335,26 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       second.kingCloserOppositeBishopScore,
   },
   {
-    id: 'bring king closer',
-    shortLabel: 'bring king closer',
+    id: 'king closer',
+    shortLabel: 'king closer',
     helpText: BRING_KING_CLOSER_HELP,
     compare: (first, second) =>
       first.kingDistanceRegressionScore -
       second.kingDistanceRegressionScore,
   },
   {
-    id: 'knight closer center',
-    shortLabel: 'knight closer center',
+    id: 'knight closer',
+    shortLabel: 'knight closer',
     helpText: KNIGHT_CLOSER_CENTER_HELP,
     compare: (first, second) =>
       first.bishopOppositionLoopScore - second.bishopOppositionLoopScore ||
       first.knightBehindWhiteKingScore - second.knightBehindWhiteKingScore,
   },
   {
-    id: 'bishop front',
-    shortLabel: 'bishop front',
-    helpText: "Establish, maintain, or prepare the bishop on the square in front of White's king, between the kings.",
+    id: 'bishop in front',
+    shortLabel: 'bishop in front',
+    helpText:
+      "Place the bishop between the kings, directly in front of White's king.",
     compare: (first, second) =>
       first.bishopInFrontScore - second.bishopInFrontScore ||
       first.bishopFrontPreparationScore -
@@ -361,8 +362,8 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       first.bishopBlackKingDistance - second.bishopBlackKingDistance,
   },
   {
-    id: 'knight closer center',
-    shortLabel: 'knight closer center',
+    id: 'knight closer',
+    shortLabel: 'knight closer',
     helpText: KNIGHT_CLOSER_CENTER_HELP,
     subpriorities: [
       {
@@ -514,28 +515,25 @@ export function getKnightAndBishopOpponentCandidates(
 const bishopKnightHelp: RuleHelp = {
   title: 'How best moves are chosen',
   whiteIntro:
-    'White first uses immediate mates and known mating-net moves when they apply. Otherwise, best moves are the moves that survive these priorities in order; tied moves all remain best moves.',
+    'White uses immediate mates and the finishing pattern first. Otherwise, these priorities choose among legal moves.',
   blackIntro:
     'Black uses its own priorities to put up the strongest resistance. Black is not trying to help the mate; it looks for the most stubborn legal reply.',
   blackPriorities: [
-    'Return to the previous full position when a legal reply can recreate it.',
+    'Return to the previous position when possible.',
     "Take a piece if White isn't looking.",
-    'Move toward unprotected minor pieces.',
-    'Run toward the center when possible.',
-    'Keep as many legal replies as possible.',
-    "Stay away from White's king.",
-    "Resist being driven toward the bishop's mating corner.",
+    'Run toward the center.',
+    "Stay away from White's king and the bishop-colored corner.",
   ],
   notes: [
-    "Zone X is the blue pair defined by the stable knight/bishop/edge geometry. It exists only when the minor pieces are in yellow position and White's king can block the red escape square.",
-    'During the exact W-maneuver setup, or when at least one reply stays in the known mating net, every legal Black reply remains available.',
+    'The mating corners are the two corners controlled by the bishop.',
   ],
   noteBoards: [
     {
       id: 'zone-x',
-      title: 'Zone X',
-      caption: '',
-      layout: { files: 14, ranks: 8, fileOffset: 3 },
+      title: 'edge cage',
+      caption:
+        "The bishop and knight fence Black along the edge while White's king closes in.",
+      layout: { files: 8, ranks: 8, fileOffset: 0 },
       pieces: [
         { square: 'f8', piece: 'k' },
         { square: 'e5', piece: 'K' },
@@ -553,10 +551,10 @@ const bishopKnightHelp: RuleHelp = {
     },
     {
       id: 'key-square',
-      title: 'Key Square',
+      title: 'knight key square',
       caption:
-        'Move the knight to the key square between the kings, while the black king is on the edge. The bishop cuts off the red escape squares.',
-      layout: { files: 14, ranks: 8, fileOffset: 3 },
+        'The knight seals the edge square between the kings; the bishop covers the side escapes.',
+      layout: { files: 8, ranks: 8, fileOffset: 0 },
       pieces: [
         { square: 'd8', piece: 'k' },
         { square: 'd6', piece: 'K' },

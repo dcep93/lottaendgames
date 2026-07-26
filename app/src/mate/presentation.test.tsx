@@ -58,7 +58,7 @@ const ROOK_LOGS: readonly MateLogEntry[] = [
     idealOpponentChoices: 2,
     legalOpponentChoices: 3,
     durationMs: 1_234,
-    reasonId: 'shrink box',
+    reasonId: 'rook box',
   },
   {
     fen: EXTERNAL_START,
@@ -70,7 +70,7 @@ const ROOK_LOGS: readonly MateLogEntry[] = [
     idealOpponentChoices: 1,
     legalOpponentChoices: 4,
     durationMs: 61_007,
-    reasonId: 'shrink box',
+    reasonId: 'rook box',
   },
   {
     fen: '7k/8/6K1/8/8/8/8/R7 w - - 0 1',
@@ -747,7 +747,7 @@ test('Mate log exposes every training field and semantic cycle controls', () => 
   assert.doesNotMatch(markup, />Correct<|>Incorrect<|>\d+ correct choices?<\/button>/)
   assert.match(markup, />0:01\.234</)
   assert.match(markup, />1:01\.007</)
-  assert.match(markup, />shrink the box</)
+  assert.match(markup, />rook box</)
   assert.match(
     markup,
     /aria-label="Cycle ideal White move for move 1; 2 correct choices"/,
@@ -925,7 +925,7 @@ test('reason hint is opt-in and reveals only the current rule label', async () =
     'data-mate-current-hint': true,
   })
   const hintText = reactNodeText(hint)
-  assert.equal(hintText, 'shrink the box')
+  assert.equal(hintText, 'rook box')
   assert.doesNotMatch(hintText, /Rg2|a2|g2|bring White's king/i)
   assert.equal(hint.props.type, 'button')
 
@@ -1230,10 +1230,10 @@ test('priority guide follows registered facade order and renders typed diagrams'
     assert.ok(decodedMarkup.includes(note))
     assert.ok(decodedMarkup.indexOf(note) < correctnessNoteAt)
   }
-  assert.match(markup, />Zone X</)
-  assert.match(markup, />Key Square</)
-  assert.match(markup, /aria-label="Zone X\. Black king on f8/)
-  assert.match(markup, /aria-label="Key Square\. Black king on d8/)
+  assert.match(markup, />edge cage</)
+  assert.match(markup, />knight key square</)
+  assert.match(markup, /aria-label="edge cage\. Black king on f8/)
+  assert.match(markup, /aria-label="knight key square\. Black king on d8/)
   assert.match(markup, /data-highlight-kind="zone"/)
   assert.match(markup, /data-highlight-kind="key"/)
   assert.match(markup, /data-arrow="e5-f6"/)
@@ -1375,7 +1375,7 @@ test('mate guides omit empty notes and place useful notes before shortcuts', () 
   }
 })
 
-test('Rook and Two Bishops stay board-based without proof guards', () => {
+test('Rook and Two Bishops keep correctness filters out of the guide', () => {
   const rookMarkup = renderToStaticMarkup(
     <MatePriorityGuideDialog
       {...MATE_TRAINING_INFO_PROPS}
@@ -1384,14 +1384,7 @@ test('Rook and Two Bishops stay board-based without proof guards', () => {
     />,
   )
   assert.doesNotMatch(rookMarkup, /finish guarantee|leg-mate-guide-guards/)
-  for (const label of [
-    'keep the box',
-    'waiting move',
-    'cover escape squares',
-    'shrink the box',
-    'king proximity',
-    'rook box size',
-  ]) {
+  for (const label of ['rook box', 'waiting move', 'king closer']) {
     assert.match(rookMarkup, new RegExp(`>${label}<`))
   }
 
@@ -2577,7 +2570,7 @@ test('Mate wires board, history, timer, and every log replacement action', async
     })
     assert.equal(
       mountedRenderer.root.findByType(MateLog).props.logs[0].san,
-      'Re2',
+      'Rb4',
     )
 
     await act(async () => {

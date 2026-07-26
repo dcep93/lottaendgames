@@ -1,9 +1,7 @@
 import type { Square } from 'chess.js'
 import {
-  edgeDistance,
   findPiece,
   getChess,
-  hasDirectKingOpposition,
   isKnightMove,
   kingDistance,
   manhattanDistance,
@@ -13,16 +11,16 @@ import {
   blackCanTakeWhiteMajorPiece,
   getRookBoxFromFen,
 } from './majorPieceGeometry'
+import { lookupMajorPieceMateProgress } from './majorPieceMateProgress'
 import type { OrderedRule } from './types'
 
 export type RookStrategyScore = {
   readonly matePenalty: number
   readonly rookCapturePenalty: number
   readonly stalematePenalty: number
+  readonly convergencePenalty: number
   readonly keepBoxPenalty: number
   readonly waitingMovePenalty: number
-  readonly waitingMoveCenterScore: number
-  readonly edgeNetPenalty: number
   readonly shrinkBoxPenalty: number
   readonly shrinkBoxRoom: number
   readonly kingProximityPriority: number
@@ -34,15 +32,11 @@ export type RookStrategyScore = {
   readonly rookSafeBlackDistanceScore: number
 }
 
-const COVER_ESCAPE_SQUARES_HELP =
-  "Cover the squares beside Black's king so the rook can mate."
-const KEEP_BOX_HELP = 'Keep Black inside its current box.'
+const ROOK_BOX_HELP =
+  'Make a safe box around Black. Keep it, and shrink it whenever possible.'
 const WAITING_MOVE_HELP =
-  "Whenever the kings are a knight's move apart, keep the box and move the rook to the board edge on White's side. This applies wherever Black is. If White's king blocks that edge and Black happens to be on an edge, use the other edge. When the kings face each other, keep the box and move the rook diagonally beside White's king, toward the center."
-const SHRINK_BOX_HELP =
-  'Move the rook wall closer to leave Black less room.'
-const KING_PROXIMITY_HELP = "Bring White's king towards Black's."
-const ROOK_BOX_SIZE_HELP = "Use the rook to make a box around Black's king."
+  "When the kings are a knight's move apart, keep the box and move the rook to an edge so Black must move."
+const KING_CLOSER_HELP = "Bring White's king toward Black's king."
 
 export const rookStrategyRules: readonly OrderedRule<RookStrategyScore>[] = [
   {
@@ -66,39 +60,39 @@ export const rookStrategyRules: readonly OrderedRule<RookStrategyScore>[] = [
       first.stalematePenalty - second.stalematePenalty,
   },
   {
-    id: 'keep box',
-    shortLabel: 'keep the box',
-    helpText: KEEP_BOX_HELP,
+    id: 'rook convergence',
+    shortLabel: 'rook convergence',
+    helpText: '',
+    presentationRole: 'internal',
+    compare: (first, second) =>
+      first.convergencePenalty - second.convergencePenalty,
+  },
+  {
+    id: 'rook box',
+    shortLabel: 'rook box',
+    helpText: ROOK_BOX_HELP,
     compare: (first, second) =>
       first.keepBoxPenalty - second.keepBoxPenalty,
+  },
+  {
+    id: 'rook box',
+    shortLabel: 'rook box',
+    helpText: ROOK_BOX_HELP,
+    compare: (first, second) =>
+      first.shrinkBoxPenalty - second.shrinkBoxPenalty ||
+      first.shrinkBoxRoom - second.shrinkBoxRoom,
   },
   {
     id: 'waiting move',
     shortLabel: 'waiting move',
     helpText: WAITING_MOVE_HELP,
     compare: (first, second) =>
-      first.waitingMovePenalty - second.waitingMovePenalty ||
-      first.waitingMoveCenterScore - second.waitingMoveCenterScore,
+      first.waitingMovePenalty - second.waitingMovePenalty,
   },
   {
-    id: 'cover escape squares',
-    shortLabel: 'cover escape squares',
-    helpText: COVER_ESCAPE_SQUARES_HELP,
-    compare: (first, second) =>
-      first.edgeNetPenalty - second.edgeNetPenalty,
-  },
-  {
-    id: 'shrink box',
-    shortLabel: 'shrink the box',
-    helpText: SHRINK_BOX_HELP,
-    compare: (first, second) =>
-      first.shrinkBoxPenalty - second.shrinkBoxPenalty ||
-      first.shrinkBoxRoom - second.shrinkBoxRoom,
-  },
-  {
-    id: 'rook box size',
-    shortLabel: 'rook box size',
-    helpText: ROOK_BOX_SIZE_HELP,
+    id: 'rook box',
+    shortLabel: 'rook box',
+    helpText: ROOK_BOX_HELP,
     compare: (first, second) =>
       first.rookHomePenalty - second.rookHomePenalty ||
       first.rookHomeBlackDistance - second.rookHomeBlackDistance ||
@@ -107,9 +101,9 @@ export const rookStrategyRules: readonly OrderedRule<RookStrategyScore>[] = [
         second.rookSafeBlackDistanceScore,
   },
   {
-    id: 'king proximity',
-    shortLabel: 'king proximity',
-    helpText: KING_PROXIMITY_HELP,
+    id: 'king closer',
+    shortLabel: 'king closer',
+    helpText: KING_CLOSER_HELP,
     compare: (first, second) =>
       first.kingProximityPriority - second.kingProximityPriority ||
       first.kingDistance - second.kingDistance ||
@@ -129,6 +123,8 @@ export function scoreRookStrategyMove(
   const chess = getChess(fen)
   const move = chess.move(san)
   const resultFen = chess.fen()
+  const beforeProgress = lookupMajorPieceMateProgress('rook', fen)
+  const resultProgress = lookupMajorPieceMateProgress('rook', resultFen)
   const whiteRook = findPiece(resultFen, 'w', 'r')
   const whiteKing = findPiece(resultFen, 'w', 'k')
   const blackKing = findPiece(resultFen, 'b', 'k')
@@ -157,17 +153,7 @@ export function scoreRookStrategyMove(
       beforeBlackKing &&
       isKnightMove(beforeWhiteKing.square, beforeBlackKing.square),
   )
-  const needsOppositionWaitingMove = Boolean(
-    beforeBox.size !== null &&
-      beforeWhiteKing &&
-      beforeBlackKing &&
-      hasDirectKingOpposition(
-        beforeWhiteKing.square,
-        beforeBlackKing.square,
-      ),
-  )
-  const needsWaitingMove =
-    needsKnightWaitingMove || needsOppositionWaitingMove
+  const needsWaitingMove = needsKnightWaitingMove
   const baseWaitingMove = Boolean(
     needsWaitingMove &&
       move.piece === 'r' &&
@@ -187,22 +173,9 @@ export function scoreRookStrategyMove(
       whiteRook &&
       rookMovesToEdge(beforeRook.square, whiteRook.square),
   )
-  const oppositionWaitingMove = Boolean(
-    baseWaitingMove &&
-      whiteRook &&
-      whiteKing &&
-      squaresAreDiagonallyAdjacent(
-        whiteRook.square,
-        whiteKing.square,
-      ),
-  )
   const waitingMovePriority = !needsWaitingMove
     ? 0
-    : needsOppositionWaitingMove
-      ? oppositionWaitingMove
-        ? 0
-        : 1
-      : edgeWaitingMove &&
+    : edgeWaitingMove &&
         beforeRook &&
         whiteRook &&
         whiteKing &&
@@ -271,20 +244,6 @@ export function scoreRookStrategyMove(
       kingDistance(whiteRook.square, blackKing.square) > 2 &&
       !chess.isStalemate(),
   )
-  const setsEdgeNet =
-    beforeBlackKing &&
-    isEdgeSquare(beforeBlackKing.square) &&
-    !chess.isCheckmate() &&
-    chess.moves().length > 0 &&
-    chess.moves().every((blackSan) => {
-      const afterBlack = getChess(resultFen)
-      afterBlack.move(blackSan)
-      return afterBlack.moves().some((whiteSan) => {
-        const afterWhite = getChess(afterBlack.fen())
-        afterWhite.move(whiteSan)
-        return afterWhite.isCheckmate()
-      })
-    })
   const shrinksBox = Boolean(
     move.piece === 'r' &&
       beforeBoxRoom !== null &&
@@ -293,21 +252,43 @@ export function scoreRookStrategyMove(
       !rookExposed &&
       !chess.isStalemate(),
   )
+  const moveDoesNotRegressAfterReply = Boolean(
+    beforeProgress.kind === 'winning' &&
+      (shrinksBox ||
+        (baseWaitingMove && waitingMovePriority < 2)) &&
+      chess.moves().every((blackSan) => {
+        const afterBlack = getChess(resultFen)
+        afterBlack.move(blackSan)
+        const progress = lookupMajorPieceMateProgress(
+          'rook',
+          afterBlack.fen(),
+        )
+        return (
+          progress.kind === 'winning' &&
+          progress.rank <= beforeProgress.rank
+        )
+      }),
+  )
 
   return {
     matePenalty: chess.isCheckmate() ? 0 : 1,
     rookCapturePenalty: rookIsSafe ? 0 : 1,
     stalematePenalty: !chess.isCheckmate() && chess.isStalemate() ? 1 : 0,
+    convergencePenalty:
+      beforeProgress.kind !== 'winning' ||
+      (resultProgress.kind === 'winning' &&
+        // Ordinary moves lower the proof rank. A human box shrink or edge
+        // wait may spend a tempo, but no legal Black reply may give that
+        // progress back.
+        (resultProgress.rank < beforeProgress.rank ||
+          (moveDoesNotRegressAfterReply &&
+            (shrinksBox ||
+              (baseWaitingMove && waitingMovePriority < 2)))))
+        ? 0
+        : 1,
     keepBoxPenalty:
       beforeBox.size === null || preservesOrShrinksBox ? 0 : 1,
     waitingMovePenalty: waitingMovePriority,
-    waitingMoveCenterScore:
-      needsOppositionWaitingMove &&
-      oppositionWaitingMove &&
-      whiteRook
-        ? -edgeDistance(whiteRook.square)
-        : 0,
-    edgeNetPenalty: setsEdgeNet ? 0 : 1,
     shrinkBoxPenalty: shrinksBox ? 0 : 1,
     shrinkBoxRoom:
       shrinksBox && resultBoxRoom !== null ? resultBoxRoom : 15,
@@ -332,18 +313,6 @@ export function scoreRookStrategyMove(
         ? -kingDistance(whiteRook.square, blackKing.square)
         : 0,
   }
-}
-
-function squaresAreDiagonallyAdjacent(
-  firstSquare: Square,
-  secondSquare: Square,
-): boolean {
-  const first = squareCoordinates(firstSquare)
-  const second = squareCoordinates(secondSquare)
-  return (
-    Math.abs(first.file - second.file) === 1 &&
-    Math.abs(first.rank - second.rank) === 1
-  )
 }
 
 function movesKingCloserWithoutAxisRegression(
