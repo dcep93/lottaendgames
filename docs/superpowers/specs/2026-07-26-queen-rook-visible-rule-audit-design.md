@@ -15,13 +15,14 @@ The Queen selector is aligned:
 | Immediate mate | `mate` |
 | Queen cannot be captured | `pieces safe` |
 | Avoid stalemate | `no stalemate` |
-| White King outside the cage, at least two safe squares, shorter side then longer side | `corner cage` |
+| White King outside the cage, at least two safe squares, narrowest queen-to-corner box | `corner cage` |
 | Queen a knight's move from Black and off the edge | `knight's move away` |
 | White King stays outside the tighter channel and off the edge, then approaches Black | `king closer` |
 | Black recreates the previous position, captures the Queen, then approaches the center | Rendered Black priorities |
 
-One Queen tie-break detail remains unrendered by explicit user request:
+Two Queen implementation details remain unrendered by explicit user request:
 
+- The corner cage compares its shorter side first, then its longer side.
 - Row-plus-file King distance breaks ties after king-move distance under
   `king closer`.
 
@@ -63,9 +64,9 @@ Implement `rook box` directly:
 
 The existing `waiting move` and `king closer` comparisons remain:
 
-- `waiting move` applies when the kings are a knight's move apart; it keeps the
-  box, leaves the Rook closer to White than Black and not touching White, then
-  maximizes distance from Black.
+- `waiting move` applies when the kings are a knight's move apart or every
+  direct box shrink hangs the Rook; it keeps the box, leaves the Rook closer to
+  White than Black and not touching White, then maximizes distance from Black.
 - `king closer` reduces at least one axis without increasing the other,
   preferably without taking opposition.
 
