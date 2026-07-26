@@ -17,17 +17,21 @@ The chosen position for each diagram must:
 
 ## Counting model
 
-The existing Two Bishops checker proves every winning White-to-move position by
-scanning a compact DTM certificate. The certificate has already reduced Black's
-square to a fundamental region, but positions on symmetry axes still appear in
-more than one reflected form. Diagram generation will count those certificate
-observations and then fully canonicalize each position across all eight board
-rotations and reflections.
+The existing compact DTM certificate remains the exhaustive proof, while the
+diagram census runs the production policy graph over a fixed, deterministic
+prefix of the loop checker's symmetry-reduced roots. The prefix size is recorded
+in the generated artifact.
 
-Each certificate entry contributes one observation to its fully canonical
-position. This measures what the exhaustive checker actually sees and makes the
-remaining symmetry duplicates useful as frequency rather than silently treating
-the partially reduced table as fully reduced.
+The census uses the production adapter's canonical key, which fully reduces all
+eight rotations and reflections. A root contributes one observation to its
+canonical position. Every continuing optimal-White/legal-Black branch contributes
+one observation to its canonical child.
+
+The search expands each structural position once and caches its branches. When a
+branch reaches a position that is already active or memoized, recursion stops,
+but the census still reads that position's cached expansion and increments each
+of its children. This preserves finite loop-checker behavior without erasing the
+frequency signal at a repeated parent.
 
 For every observed position, the generator asks the registered production rule
 set for `currentWhiteHint`. A position is relevant to a diagram only when that
@@ -39,10 +43,9 @@ position key.
 
 An opt-in script will:
 
-1. decode and enumerate the certified winning positions in the bundled KBB-v-K
-   proof table;
-2. fully canonicalize each position and accumulate certificate observation
-   counts;
+1. enumerate a fixed prefix of the production loop checker's canonical roots;
+2. traverse and cache the production policy graph, accumulating canonical
+   encounter counts with the repeated-parent rule above;
 3. consider candidates from greatest count to least, using the canonical key
    for deterministic ordering;
 4. classify candidates by their active visible production rule;
@@ -51,9 +54,11 @@ An opt-in script will:
    observation count, and generation metadata.
 
 The normal test command will not regenerate the artifact. Generation is
-deliberately explicit because the complete certificate scan is broader than a
-unit test. A check mode will fail when recomputed output differs, for use when
-the policy intentionally changes.
+deliberately explicit because policy traversal is broader than a unit test. A
+check mode will fail when recomputed output differs, for use when the policy
+intentionally changes. Traversal remains single-threaded, caches every expensive
+position expansion, reports progress, and uses a recorded root limit to avoid
+resource spikes.
 
 ## Rendering
 
@@ -72,9 +77,8 @@ current rule text and the live board position remain the source of truth.
 
 Tests will cover:
 
-- the frequency collector on a small synthetic position set, including
-  symmetry-key aggregation and deterministic tie-breaking;
-- proof-table enumeration metadata;
+- the frequency collector on a small synthetic graph, including repeated-parent
+  child increments and deterministic tie-breaking;
 - each generated FEN is legal and canonical;
 - each generated FEN's active hint matches its diagram rule;
 - rendered piece placement exactly matches the generated FEN;
