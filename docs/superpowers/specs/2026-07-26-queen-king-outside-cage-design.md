@@ -12,13 +12,16 @@ at least 2 safe squares.
 
 ## Geometry
 
-Use the existing queen-to-corner box exactly as defined. Its squares are the
-corner-side rectangle beyond the Queen's rank and file; the Queen's wall itself
-is not inside the box.
+Use two aligned views of the same queen-to-corner box:
 
-White's king is enclosed when its resulting square is one of those existing box
-squares. Do not change the box dimensions, safe-square definition, or corner
-selection.
+- Black's safe-square area remains the open rectangle beyond the Queen's rank
+  and file.
+- White-king containment uses the closed rectangle and includes the Queen's
+  rank/file wall toward the corner.
+
+White's king is enclosed when its resulting square is inside that closed
+rectangle. Do not change the box dimensions, Black safe-square definition, or
+corner selection.
 
 ## Selection mechanics
 
@@ -36,9 +39,12 @@ selector total without adding a hidden override.
 ## Verification
 
 - Assert the exact rendered copy.
-- Assert the cage boundary does not count as inside.
+- Assert the Queen wall counts as inside for White-king containment but not as a
+  Black safe square.
 - Assert a resulting White-king square in the existing cage receives the
   penalty.
+- Assert `Qb5` is rejected after `Qc4 Ka1` because White's king on `b4` lies on
+  the cage wall.
 - Assert an otherwise competing outside-cage result is preferred.
 - Preserve D4 rotation/reflection symmetry.
 - Run the Queen-focused tests and exhaustive Queen verifier. Report any cycle
