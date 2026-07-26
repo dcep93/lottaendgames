@@ -22,7 +22,7 @@ Queen training info gains one full 8×8 board:
 - title: `phase 2: corner cage`;
 - Black king on `a8`;
 - White Queen on `d7`;
-- White King on `a6`;
+- White King on `h1`;
 - no caption, arrows, or highlighted squares.
 
 Rook training info keeps its existing full 8×8 board and pieces, but:
