@@ -9,8 +9,11 @@ resulting rectangle is smaller.
 
 ## Rendered rule
 
-**corner cage** — Only move the queen to shrink Black’s box toward the same
-corner. Keep White’s king outside and leave Black at least two safe squares.
+**corner cage** — Move the queen to shrink Black’s box toward a fixed corner.
+Keep White’s king outside and leave Black at least two safe squares.
+
+“Fixed corner” means the target corner derived from the current board. It does
+not introduce move history.
 
 ## Geometry
 
