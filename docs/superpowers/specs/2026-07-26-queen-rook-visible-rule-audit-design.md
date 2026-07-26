@@ -51,9 +51,8 @@ Implement `rook box` directly:
 
 1. If no box exists, prefer moves that create one.
 2. If a box exists, reject moves that enlarge or lose it.
-3. Among Rook moves that create or shrink a box, prefer the smallest
-   guaranteed box. King moves may preserve a wall but do not receive
-   Rook-shrink credit.
+3. A shrink must move a current strongest wall inward toward the same board
+   edge. A smaller wall toward a different edge receives no shrink credit.
 4. A checking squeeze uses the largest box Black can obtain among all legal
    replies.
 5. If no candidate creates a box, prefer a Rook move and maximize its king-move
