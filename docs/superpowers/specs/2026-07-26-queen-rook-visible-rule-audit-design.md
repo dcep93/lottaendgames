@@ -20,14 +20,14 @@ The Queen selector is aligned:
 | White King stays outside the tighter channel and off the edge, then approaches Black | `king closer` |
 | Black recreates the previous position, captures the Queen, then approaches the center | Rendered Black priorities |
 
-Two Queen tie-break details remain unrendered by explicit user request:
+One Queen tie-break detail remains unrendered by explicit user request:
 
-- Shorter Queen travel only compares multiple Queen moves that already satisfy
-  `knight's move away`.
 - Row-plus-file King distance breaks ties after king-move distance under
   `king closer`.
 
-Neither detail can override the visible condition of its rule.
+Shorter Queen travel is now rendered inside `knight's move away`; it only
+compares multiple Queen moves that already satisfy that placement. Neither
+tie-break can override the visible condition of its rule.
 
 The Queen and Rook production selectors do not import the existing major-piece
 mate-progress lookup.

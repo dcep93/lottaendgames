@@ -7,11 +7,11 @@ the Queen a knight's move from Black and off the edge.
 
 ## Rendered rule
 
-**queen a knight's move away** — Keep the queen a knight's move from Black
-without moving onto the edge.
+**knight's move away** — Keep the queen a knight's move from Black without
+moving onto the edge, preferring shorter moves.
 
-The short-move tie-break is an implementation detail of this same rule and is
-not rendered as a separate sentence or priority.
+The short-move tie-break is rendered as a clause of the same rule, not as a
+separate priority.
 
 ## Selection mechanics
 
@@ -30,7 +30,7 @@ hidden selector or a separate explanation reason.
 
 ## Verification
 
-- Assert the exact rendered copy omits the short-move sentence.
+- Assert the exact rendered copy includes the short-move clause.
 - Assert two qualifying placements prefer the shorter Queen move.
 - Assert two non-qualifying Queen moves are not separated by move length.
 - Assert King moves never participate in the short-Queen-move tie-break.
