@@ -45,13 +45,16 @@ Implement `rook box` directly:
 
 1. If no box exists, prefer moves that create one.
 2. If a box exists, reject moves that enlarge or lose it.
-3. Among surviving box moves, prefer the smallest guaranteed box.
+3. Among Rook moves that create or shrink a box, prefer the smallest
+   guaranteed box. King moves may preserve a wall but do not receive
+   Rook-shrink credit.
 4. A checking squeeze uses the largest box Black can obtain among all legal
    replies.
 5. If no candidate creates a box, prefer a Rook move and maximize its king-move
    distance from Black; use row-plus-file distance only as a tie-break.
 6. If the starting Rook is attacked, maximize the same distance only after box
-   creation, preservation, and size have been resolved.
+   creation, preservation, and size have been resolved. When `waiting move`
+   applies, its stricter placement conditions decide instead.
 
 The existing `waiting move` and `king closer` comparisons remain:
 
@@ -80,5 +83,6 @@ a concealed selector.
 - A source audit must reject the removed Rook heuristic names and all
   tablebase/progress/history selectors in Queen or Rook White scoring.
 - TypeScript and diff checks must pass.
-- Run the exhaustive Queen cycle diagnostic and the exhaustive Rook verifier
-  sequentially at low priority. Report failures without inventing another rule.
+- Reuse the latest exhaustive Queen cycle result when Queen selection code is
+  unchanged; otherwise rerun it. Run the exhaustive Rook verifier at low
+  priority. Report failures without inventing another rule.
