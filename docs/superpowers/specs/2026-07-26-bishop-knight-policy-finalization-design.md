@@ -109,6 +109,20 @@ exceptions:
 Resource-heavy graph runs must be sequential. A bounded run that grows without
 useful progress should be stopped rather than allowed to exhaust the machine.
 
+### Bishop wall refinement
+
+The first phase should express the human plan directly: drive Black away from
+White's king and toward an edge. A visible `build the wall` rule therefore
+prefers a safe bishop move that places the bishop orthogonally adjacent to
+White's king on Black's side of the king. Among otherwise equal wall moves, it
+prefers the move whose legal Black replies leave Black with the least access to
+the center.
+
+This rule is position-only, D4-symmetric, and uses one-ply legal reply geometry.
+It is not a tablebase, route lookup, history check, or encoded position. The
+canonical focused witness should select `Bd5`; after `...Ke3`, the same rule
+should select `Be4`.
+
 ## Integrity checks
 
 Automated tests must prove:
