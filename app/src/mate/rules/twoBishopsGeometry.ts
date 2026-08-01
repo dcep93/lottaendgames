@@ -10,8 +10,6 @@ import {
   withFenTurn,
 } from '../chess'
 
-const CORNERS = ['a1', 'a8', 'h1', 'h8'] as const
-
 export function centerDistance(square: Square): number {
   const { file, rank } = squareCoordinates(square)
   return (
@@ -28,67 +26,20 @@ export function getWhiteBishopSquares(fen: string): Square[] {
     .map((piece) => piece!.square)
 }
 
-export function blackCanTakeWhiteBishops(fen: string): boolean {
-  const chess = getChess(fen)
-  if (chess.turn() !== 'b') return false
-  const currentCount = getWhiteBishopSquares(fen).length
-  return chess.moves().some((san) => {
-    const nextChess = getChess(fen)
-    nextChess.move(san)
-    return getWhiteBishopSquares(nextChess.fen()).length < currentCount
-  })
-}
-
-export function blackCanWalkUpToWhiteBishop(fen: string): boolean {
-  const chess = getChess(fen)
-  if (chess.turn() !== 'b') return false
-  return chess.moves().some((san) => {
-    const nextChess = getChess(fen)
-    const move = nextChess.move(san)
-    if (move.captured === 'b') return false
-    const blackKing = findPiece(nextChess.fen(), 'b', 'k')
-    if (!blackKing) return false
-    return getWhiteBishopSquares(nextChess.fen()).some((square) => {
-      if (
-        kingDistance(blackKing.square, square) > 1 ||
-        whiteBishopIsProtectedByKing(nextChess.fen(), square)
-      ) {
-        return false
-      }
-      const escapeMoves = getChess(nextChess.fen())
-        .moves({ verbose: true })
-        .filter((escape) => escape.piece === 'b' && escape.from === square)
-      return !escapeMoves.some((escape) => {
-        const afterEscape = getChess(nextChess.fen())
-        afterEscape.move(escape.san)
-        return (
-          getWhiteBishopSquares(afterEscape.fen()).length === 2 &&
-          !blackCanTakeWhiteBishops(afterEscape.fen())
-        )
-      })
-    })
-  })
-}
-
-export function getWhiteBishopDistanceToSquare(
-  fen: string,
-  target: Square,
-): number {
-  return getWhiteBishopSquares(fen).reduce(
-    (distance, square) => distance + kingDistance(square, target),
-    0,
-  )
-}
-
 function bishopControlsSquareWithoutBlackBlocker(
   fen: string,
   bishop: Square,
   target: Square,
 ): boolean {
   if (bishop === target) return true
-  if (!sameDiagonal(bishop, target)) return false
   const source = squareCoordinates(bishop)
   const destination = squareCoordinates(target)
+  if (
+    Math.abs(source.file - destination.file) !==
+    Math.abs(source.rank - destination.rank)
+  ) {
+    return false
+  }
   const fileStep = Math.sign(destination.file - source.file)
   const rankStep = Math.sign(destination.rank - source.rank)
   const chess = getChess(fen)
@@ -105,7 +56,7 @@ function bishopControlsSquareWithoutBlackBlocker(
   return true
 }
 
-/** Number of mutually reachable safe squares available to Black's king. */
+/** Number of mutually reachable bishop-safe squares available to Black's king. */
 export function getBlackKingReachableArea(fen: string): number {
   const chess = getChess(fen)
   const blackKing = findPiece(fen, 'b', 'k')
@@ -160,61 +111,6 @@ export function getBlackKingReachableArea(fen: string): number {
   return largestArea
 }
 
-export function getWhiteKingDistanceToBishops(
-  fen: string,
-  whiteKing: Square,
-): number {
-  return getWhiteBishopSquares(fen).reduce(
-    (distance, square) => distance + kingDistance(whiteKing, square),
-    0,
-  )
-}
-
-function squareScreensSquareFromSource(
-  source: Square,
-  screen: Square,
-  target: Square,
-): boolean {
-  const sourceCoordinates = squareCoordinates(source)
-  const screenCoordinates = squareCoordinates(screen)
-  const targetCoordinates = squareCoordinates(target)
-  const sourceToTargetFile =
-    targetCoordinates.file - sourceCoordinates.file
-  const sourceToTargetRank =
-    targetCoordinates.rank - sourceCoordinates.rank
-  const sourceToScreenFile =
-    screenCoordinates.file - sourceCoordinates.file
-  const sourceToScreenRank =
-    screenCoordinates.rank - sourceCoordinates.rank
-  return (
-    screen !== source &&
-    screen !== target &&
-    Math.abs(sourceToTargetFile) === Math.abs(sourceToTargetRank) &&
-    Math.abs(sourceToScreenFile) === Math.abs(sourceToScreenRank) &&
-    Math.sign(sourceToScreenFile) === Math.sign(sourceToTargetFile) &&
-    Math.sign(sourceToScreenRank) === Math.sign(sourceToTargetRank) &&
-    Math.abs(sourceToScreenFile) < Math.abs(sourceToTargetFile)
-  )
-}
-
-export function getWhiteKingBishopScreeningPenalty(fen: string): number {
-  const blackKing = findPiece(fen, 'b', 'k')
-  const whiteKing = findPiece(fen, 'w', 'k')
-  if (!blackKing || !whiteKing) return 0
-  return getWhiteBishopSquares(fen).reduce(
-    (screening, bishop) =>
-      screening +
-      (squareScreensSquareFromSource(
-        blackKing.square,
-        whiteKing.square,
-        bishop,
-      )
-        ? 1
-        : 0),
-    0,
-  )
-}
-
 export function whiteBishopsAreAdjacent(fen: string): boolean {
   const bishops = getWhiteBishopSquares(fen)
   return bishops.length === 2 && kingDistance(bishops[0], bishops[1]) === 1
@@ -239,28 +135,7 @@ export function distanceToNearestUnprotectedWhiteBishop(fen: string): number {
   )
 }
 
-export function isCorner(square: Square): boolean {
-  return CORNERS.includes(square as (typeof CORNERS)[number])
-}
-
-export function closestCorner(square: Square): Square {
-  return [...CORNERS].sort(
-    (first, second) =>
-      kingDistance(square, first) - kingDistance(square, second),
-  )[0]
-}
-
-export function getCurrentEdgeCorners(square: Square): Square[] {
-  const { file, rank } = squareCoordinates(square)
-  const corners: Square[] = []
-  if (file === 0) corners.push('a1', 'a8')
-  if (file === 7) corners.push('h1', 'h8')
-  if (rank === 0) corners.push('a1', 'h1')
-  if (rank === 7) corners.push('a8', 'h8')
-  return [...new Set(corners)]
-}
-
-export function sharesAnyEdge(first: Square, second: Square): boolean {
+function sharesAnyEdge(first: Square, second: Square): boolean {
   const a = squareCoordinates(first)
   const b = squareCoordinates(second)
   return (
@@ -269,70 +144,6 @@ export function sharesAnyEdge(first: Square, second: Square): boolean {
     (a.rank === 0 && b.rank === 0) ||
     (a.rank === 7 && b.rank === 7)
   )
-}
-
-function sameDiagonal(first: Square, second: Square): boolean {
-  const a = squareCoordinates(first)
-  const b = squareCoordinates(second)
-  return Math.abs(a.file - b.file) === Math.abs(a.rank - b.rank)
-}
-
-export function bishopControlsOrOccupiesSquare(
-  fen: string,
-  bishop: Square,
-  target: Square,
-): boolean {
-  if (bishop === target) return true
-  if (!sameDiagonal(bishop, target)) return false
-  const bishopCoordinates = squareCoordinates(bishop)
-  const targetCoordinates = squareCoordinates(target)
-  const fileStep = Math.sign(targetCoordinates.file - bishopCoordinates.file)
-  const rankStep = Math.sign(targetCoordinates.rank - bishopCoordinates.rank)
-  let file = bishopCoordinates.file + fileStep
-  let rank = bishopCoordinates.rank + rankStep
-  const chess = getChess(fen)
-  while (file !== targetCoordinates.file || rank !== targetCoordinates.rank) {
-    const square = squareFromCoordinates(file, rank)
-    if (!square || chess.get(square)) return false
-    file += fileStep
-    rank += rankStep
-  }
-  return true
-}
-
-export function getBlackKingFrontSquares(blackKing: Square): Square[] {
-  const { file, rank } = squareCoordinates(blackKing)
-  if (rank === 0 && file === 0) return ['a2', 'b1', 'b2']
-  if (rank === 0 && file === 7) return ['h2', 'g1', 'g2']
-  if (rank === 7 && file === 0) return ['a7', 'b8', 'b7']
-  if (rank === 7 && file === 7) return ['h7', 'g8', 'g7']
-  const candidates: Array<Square | null> = []
-  if (rank === 0) {
-    candidates.push(
-      squareFromCoordinates(file - 1, rank + 1),
-      squareFromCoordinates(file, rank + 1),
-      squareFromCoordinates(file + 1, rank + 1),
-    )
-  } else if (rank === 7) {
-    candidates.push(
-      squareFromCoordinates(file - 1, rank - 1),
-      squareFromCoordinates(file, rank - 1),
-      squareFromCoordinates(file + 1, rank - 1),
-    )
-  } else if (file === 0) {
-    candidates.push(
-      squareFromCoordinates(file + 1, rank - 1),
-      squareFromCoordinates(file + 1, rank),
-      squareFromCoordinates(file + 1, rank + 1),
-    )
-  } else if (file === 7) {
-    candidates.push(
-      squareFromCoordinates(file - 1, rank - 1),
-      squareFromCoordinates(file - 1, rank),
-      squareFromCoordinates(file - 1, rank + 1),
-    )
-  }
-  return candidates.filter((square): square is Square => square !== null)
 }
 
 export function isTwoBishopsPhaseTwoPosition(fen: string): boolean {
@@ -359,9 +170,7 @@ export function isTwoBishopsPhaseTwoPosition(fen: string): boolean {
     blackMoves.length > 0 &&
     getBlackKingReachableArea(fen) <= 3 &&
     blackMoves.every((move) => edgeDistance(move.to) === 0)
-  const blackAlreadyTrapped =
-    blackTrappedOnCurrentEdge || blackTrappedInCornerCage
-  if (blackAlreadyTrapped) return true
+  if (blackTrappedOnCurrentEdge || blackTrappedInCornerCage) return true
 
   return getChess(fen)
     .moves({ verbose: true })

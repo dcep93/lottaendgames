@@ -11,6 +11,7 @@ export type MateLogProps = {
   readonly fen: string
   readonly logs: readonly MateLogEntry[]
   readonly mateMode: MateMode
+  readonly startingFen: string
   readonly ruleSet: RegisteredMateRuleSet
   readonly onCycleIdealWhite: (logIndex: number) => void
   readonly onCycleIdealBlack: (logIndex: number) => void
@@ -79,6 +80,7 @@ export default function MateLog({
   fen,
   logs,
   mateMode,
+  startingFen,
   ruleSet,
   onCycleIdealWhite,
   onCycleIdealBlack,
@@ -144,6 +146,10 @@ export default function MateLog({
           >
             Training info
           </button>
+        </div>
+        <div className="leg-mate-starting-fen">
+          <span className="leg-mate-starting-fen-label">Starting FEN</span>
+          <span aria-label="Starting position FEN">{startingFen}</span>
         </div>
         {hint === undefined ? null : (
           <button

@@ -416,6 +416,7 @@ export default function MateWorkspace({
           onCycleIdealWhite={cycleIdealWhite}
           onCycleLegalBlack={cycleLegalBlack}
           ruleSet={ruleSet}
+          startingFen={session.startingFen}
         />
       </div>
     </section>

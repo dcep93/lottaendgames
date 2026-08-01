@@ -45,6 +45,7 @@ const QUEEN_START = '8/8/8/8/4k3/8/8/3QK3 w - - 0 1'
 
 const MATE_TRAINING_INFO_PROPS = {
   mateMode: 'standard' as const,
+  startingFen: ROOK_START,
 }
 
 const ROOK_LOGS: readonly MateLogEntry[] = [
@@ -704,6 +705,12 @@ test('Mate log exposes every training field and semantic cycle controls', () => 
   }
   assert.match(markup, /<thead class="leg-mate-visually-hidden">/)
   assert.doesNotMatch(markup, /aria-label="Open Mate priority guide"/)
+  assert.match(
+    markup,
+    new RegExp(
+      `Training info</button></div><div class="leg-mate-starting-fen"><span class="leg-mate-starting-fen-label">Starting FEN</span><span aria-label="Starting position FEN">${ROOK_START}</span>`,
+    ),
+  )
   assert.match(markup, />Rg2</)
   assert.match(markup, />Kg7</)
   assert.equal((markup.match(/<th scope="col"/g) ?? []).length, 8)
@@ -1265,7 +1272,7 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
   const expectedBoards = {
     queen: ['queen-phase-two-corner-cage'],
     rook: ['rook-phase-two-box'],
-    'two-bishops': ['bishop-corner-finish'],
+    'two-bishops': ['bishop-conclave-step', 'bishop-corner-finish'],
   } as const
 
   for (const [mateId, boardIds] of Object.entries(expectedBoards)) {
@@ -1364,8 +1371,16 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
   assert.doesNotMatch(rookMarkup, /♔|♖|♚/)
 
   const bishopsRuleSet = getMateRuleSet('two-bishops')
-  const [cornerBoard] = bishopsRuleSet.help.noteBoards
+  const [conclaveBoard, cornerBoard] = bishopsRuleSet.help.noteBoards
+  assert.ok(conclaveBoard)
   assert.ok(cornerBoard)
+  assert.deepEqual(conclaveBoard.layout, {
+    files: 8,
+    ranks: 8,
+    fileOffset: 0,
+  })
+  assert.deepEqual(conclaveBoard.highlights, [])
+  assert.deepEqual(conclaveBoard.arrows, [{ from: 'f5', to: 'e4' }])
   assert.deepEqual(cornerBoard.layout, {
     files: 8,
     ranks: 8,
@@ -1380,8 +1395,12 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
       ruleSet={bishopsRuleSet}
     />,
   )
-  assert.match(bishopsMarkup, />tighten wall</)
+  assert.match(bishopsMarkup, />conclave step</)
   assert.match(bishopsMarkup, />corner finish</)
+  assert.doesNotMatch(
+    bishopsMarkup,
+    />edge finish<|>form wall<|>push with king<|>advance wall<|>waiting move</,
+  )
   assert.match(
     bishopsMarkup,
     /Keep Black on the edge while White’s king reaches the finish\./,
@@ -1389,13 +1408,14 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
   assert.match(bishopsMarkup, /leg-mate-guide-note-boards--full/)
   assert.equal(
     bishopsMarkup.match(/leg-mate-note-board--full/g)?.length,
-    1,
+    2,
   )
   assert.doesNotMatch(bishopsMarkup, /data-highlight-kind=/)
   assert.match(
     bishopsMarkup,
     /aria-label="corner finish\. Black king on c8\. White king on a5\. White bishop on b5\. White bishop on c5\./,
   )
+  assert.match(bishopsMarkup, /data-arrow="f5-e4"/)
 })
 
 test('mate guides omit empty notes and place useful notes before shortcuts', () => {
@@ -1452,6 +1472,10 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
     bishopsMarkup,
     /mate progress|forced mate|proof distance/,
   )
+  assert.match(bishopsMarkup, />king closer</)
+  assert.match(bishopsMarkup, />conclave step</)
+  assert.match(bishopsMarkup, />finish wall</)
+  assert.match(bishopsMarkup, />start wall</)
 
   const queenMarkup = renderToStaticMarkup(
     <MatePriorityGuideDialog
@@ -2223,7 +2247,7 @@ test('Mate exposes stable desktop and narrow-layout structure', () => {
   )
   assert.match(
     css,
-    /\.leg-mate-guide-note-boards--full\s*\{[^}]*grid-template-columns:\s*minmax\(10rem, 18rem\)/s,
+    /\.leg-mate-guide-note-boards--full\s*\{[^}]*grid-template-columns:\s*repeat\(auto-fit, minmax\(10rem, 18rem\)\)/s,
   )
   assert.match(
     css,
