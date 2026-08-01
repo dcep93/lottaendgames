@@ -702,6 +702,8 @@ test('Mate log exposes every training field and semantic cycle controls', () => 
     assert.ok(next > headerCursor, `Header out of order: ${header}`)
     headerCursor = next
   }
+  assert.match(markup, /<thead class="leg-mate-visually-hidden">/)
+  assert.doesNotMatch(markup, /aria-label="Open Mate priority guide"/)
   assert.match(markup, />Rg2</)
   assert.match(markup, />Kg7</)
   assert.equal((markup.match(/<th scope="col"/g) ?? []).length, 8)
@@ -729,20 +731,28 @@ test('Mate log exposes every training field and semantic cycle controls', () => 
   )
   assert.match(
     markup,
-    /class="leg-mate-log-replies"[\s\S]*?>2<\/button><span aria-hidden="true">\/<\/span>[\s\S]*?>3<\/button><\/td>/,
+    /class="leg-mate-log-replies leg-mate-log-status-cell leg-mate-log-status-cell--multiple"[\s\S]*?>2<\/button><span aria-hidden="true">\/<\/span>[\s\S]*?>3<\/button><\/td>/,
   )
   assert.ok(
     markup.indexOf('class="leg-mate-log-correctness"') <
-      markup.indexOf('class="leg-mate-log-replies"'),
+      markup.indexOf('class="leg-mate-log-replies '),
     'Correctness cell should precede Black replies',
   )
   assert.match(
     markup,
-    /aria-label="Correct"[^>]*role="img"[^>]*>👍<\/span><button[^>]*aria-label="Cycle ideal White move for move 1; 2 correct choices"[^>]*>\/2<\/button>/,
+    /aria-label="Correct"[^>]*role="img"[^>]*>✓<\/span><button[^>]*aria-label="Cycle ideal White move for move 1; 2 correct choices"[^>]*>2<\/button>/,
   )
   assert.match(
     markup,
-    /aria-label="Incorrect"[^>]*role="img"[^>]*>👎<\/span><button[^>]*aria-label="Cycle ideal White move for move 2; 1 correct choice"[^>]*>\/1<\/button>/,
+    /aria-label="Incorrect"[^>]*role="img"[^>]*>×<\/span><button[^>]*aria-label="Cycle ideal White move for move 2; 1 correct choice"[^>]*>1<\/button>/,
+  )
+  assert.match(
+    markup,
+    /class="leg-mate-log-status-cell leg-mate-log-status-cell--wrong"[\s\S]*aria-label="Incorrect"/,
+  )
+  assert.match(
+    markup,
+    /class="leg-mate-log-status-cell leg-mate-log-status-cell--multiple"[\s\S]*aria-label="Correct"/,
   )
   assert.doesNotMatch(markup, />Correct<|>Incorrect<|>\d+ correct choices?<\/button>/)
   assert.match(markup, />0:01\.234</)
@@ -766,15 +776,35 @@ test('Mate log exposes every training field and semantic cycle controls', () => 
   )
   assert.match(
     markup,
-    /aria-label="Cycle ideal Black reply for move 2; 1 ideal reply"(?![^>]*disabled)/,
+    /aria-label="Cycle ideal Black reply for move 2; 1 ideal reply"[^>]*disabled/,
   )
   assert.match(
     markup,
     /aria-label="Cycle ideal White move for move 3; 1 correct choice"[^>]*disabled/,
   )
+  assert.doesNotMatch(markup, /Cycle ideal Black reply for move 3/)
+  assert.doesNotMatch(markup, /Cycle any legal Black reply for move 3/)
   assert.match(
     markup,
-    /aria-label="Cycle ideal Black reply for move 3; 0 ideal replies"[^>]*disabled/,
+    /<td class="leg-mate-log-replies leg-mate-log-status-cell"><\/td>/,
+  )
+
+  const nonIdealReplyMarkup = renderToStaticMarkup(
+    <MateLog
+      {...MATE_TRAINING_INFO_PROPS}
+      fen={ROOK_START}
+      logs={ROOK_LOGS.map((log, index) =>
+        index === 1 ? { ...log, opponentSan: 'Kh8' } : log,
+      )}
+      onCycleIdealBlack={() => undefined}
+      onCycleIdealWhite={() => undefined}
+      onCycleLegalBlack={() => undefined}
+      ruleSet={getMateRuleSet('rook')}
+    />,
+  )
+  assert.match(
+    nonIdealReplyMarkup,
+    /aria-label="Cycle ideal Black reply for move 2; 1 ideal reply"(?![^>]*disabled)/,
   )
   assert.equal(idealWhiteIndexes.length, 0)
   assert.equal(idealBlackIndexes.length, 0)
@@ -1029,6 +1059,7 @@ test('current hint scoring is lazy and memoized by its exact inputs', async () =
   ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
     .IS_REACT_ACT_ENVIRONMENT = true
   const baseRuleSet = getMateRuleSet('rook')
+  const emptyLogs = Object.freeze([])
   let hintCalls = 0
   let whiteMovePreflightCalls = 0
   const makeRuleSetSpy = () => ({
@@ -1060,7 +1091,7 @@ test('current hint scoring is lazy and memoized by its exact inputs', async () =
         <MateLog
           {...MATE_TRAINING_INFO_PROPS}
           fen={fen}
-          logs={[]}
+          logs={emptyLogs}
           onCycleIdealBlack={() => undefined}
           onCycleIdealWhite={() => undefined}
           onCycleLegalBlack={() => undefined}
@@ -1124,15 +1155,9 @@ test('priority guide follows registered facade order and renders typed diagrams'
   const evaluatorWhiteIds = knightAndBishopWhiteRules
     .map(({ id }) => id)
     .filter((id, index, ids) => ids.indexOf(id) === index)
-  const expectedWhiteIds = [
-    evaluatorWhiteIds[0],
-    evaluatorWhiteIds[2],
-    evaluatorWhiteIds[1],
-    ...evaluatorWhiteIds.slice(3),
-  ]
   assert.deepEqual(
     ruleSet.whiteRuleDescriptions.map(({ id }) => id),
-    expectedWhiteIds,
+    evaluatorWhiteIds,
   )
   const markup = renderToStaticMarkup(
     <MatePriorityGuideDialog
@@ -1178,23 +1203,20 @@ test('priority guide follows registered facade order and renders typed diagrams'
   assert.match(markup, />White best moves</)
   assert.match(markup, />Black resistance</)
   assert.match(markup, />Notes</)
-  assert.match(markup, />Legend</)
-  assert.match(markup, /class="leg-mate-guide-footer"/)
+  assert.doesNotMatch(markup, />Legend</)
+  assert.doesNotMatch(markup, /class="leg-mate-guide-footer"/)
   const correctnessNote =
-    'Correctness: 👍 means White chose a best move; 👎 means White did not. /N is the number of best White moves.'
+    'Correctness: ✓ means White chose a best move; × means White did not. The number is how many best White moves were available.'
   const blackRepliesNote =
     'Black replies: X / Y means X best-resistance replies out of Y legal replies.'
-  const correctnessNoteAt = decodedMarkup.indexOf(correctnessNote)
-  const blackRepliesNoteAt = decodedMarkup.indexOf(blackRepliesNote)
-  assert.ok(correctnessNoteAt >= 0)
-  assert.ok(blackRepliesNoteAt > correctnessNoteAt)
+  assert.equal(decodedMarkup.includes(correctnessNote), false)
+  assert.equal(decodedMarkup.includes(blackRepliesNote), false)
   assert.doesNotMatch(markup, /class="leg-mate-guide-supporting"/)
   const sectionOrder = [
     '>White best moves<',
     '>Black resistance<',
     '>Notes<',
     '>Keyboard shortcuts<',
-    '>Legend<',
   ]
   let sectionCursor = -1
   for (const heading of sectionOrder) {
@@ -1205,13 +1227,9 @@ test('priority guide follows registered facade order and renders typed diagrams'
   const prioritiesAt = markup.indexOf('leg-mate-guide-priorities')
   assert.ok(prioritiesAt < markup.indexOf('>Notes<'))
   assert.ok(markup.indexOf('>Notes<') < markup.indexOf('>Keyboard shortcuts<'))
-  assert.ok(
-    markup.indexOf('>Keyboard shortcuts<') < markup.indexOf('>Legend<'),
-  )
-  assert.ok(decodedMarkup.indexOf('>Legend<') < correctnessNoteAt)
 
   let cursor = -1
-  for (const id of expectedWhiteIds) {
+  for (const id of evaluatorWhiteIds) {
     const rule = ruleSet.whiteRuleDescriptions.find(
       (description) => description.id === id,
     )
@@ -1228,7 +1246,10 @@ test('priority guide follows registered facade order and renders typed diagrams'
   }
   for (const note of ruleSet.help.notes) {
     assert.ok(decodedMarkup.includes(note))
-    assert.ok(decodedMarkup.indexOf(note) < correctnessNoteAt)
+    assert.ok(
+      decodedMarkup.indexOf(note) <
+        decodedMarkup.indexOf('>Keyboard shortcuts<'),
+    )
   }
   assert.match(markup, />edge cage</)
   assert.match(markup, />knight key square</)
@@ -1240,10 +1261,11 @@ test('priority guide follows registered facade order and renders typed diagrams'
   assert.doesNotMatch(markup, /<img\b|\ssrc=/)
 })
 
-test('Rook and Two Bishops render diagrams while Queen stays text-only', () => {
+test('major-piece and Two Bishops guides render mechanically current diagrams', () => {
   const expectedBoards = {
+    queen: ['queen-phase-two-corner-cage'],
     rook: ['rook-phase-two-box'],
-    'two-bishops': ['bishop-wall', 'bishop-corner-finish'],
+    'two-bishops': ['bishop-corner-finish'],
   } as const
 
   for (const [mateId, boardIds] of Object.entries(expectedBoards)) {
@@ -1273,18 +1295,39 @@ test('Rook and Two Bishops render diagrams while Queen stays text-only', () => {
       ruleSet={getMateRuleSet('queen')}
     />,
   )
-  assert.deepEqual(getMateRuleSet('queen').help.noteBoards, [])
-  assert.match(queenMarkup, />two-square corner cage</)
-  assert.match(queenMarkup, /two squares near a corner/)
-  assert.doesNotMatch(queenMarkup, />king toward cage support</)
-  assert.doesNotMatch(queenMarkup, />white pieces off edge</)
-  assert.match(queenMarkup, />queen a knight move from black</)
+  const queenBoard = getMateRuleSet('queen').help.noteBoards[0]!
+  assert.deepEqual(queenBoard.pieces, [
+    { square: 'a8', piece: 'k' },
+    { square: 'd7', piece: 'Q' },
+    { square: 'h1', piece: 'K' },
+  ])
+  assert.deepEqual(queenBoard.layout, {
+    files: 8,
+    ranks: 8,
+    fileOffset: 0,
+  })
+  assert.deepEqual(queenBoard.highlights, [])
+  assert.doesNotMatch(queenMarkup, />queen forward</)
+  assert.match(queenMarkup, />corner cage</)
   assert.match(
     queenMarkup,
-    /but not on the edge of the board/,
+    /Move the queen to shrink Black’s box toward a fixed corner\. Keep White’s king outside and leave Black at least two safe squares/,
   )
-  assert.match(queenMarkup, />queen box size</)
-  assert.doesNotMatch(queenMarkup, /class="leg-mate-note-board"/)
+  assert.doesNotMatch(queenMarkup, /shorter side first|longer side/)
+  assert.doesNotMatch(queenMarkup, />king toward cage support</)
+  assert.doesNotMatch(queenMarkup, />white pieces off edge</)
+  assert.match(queenMarkup, />knight&#x27;s move away</)
+  assert.match(
+    queenMarkup,
+    /without moving onto the edge/,
+  )
+  assert.doesNotMatch(queenMarkup, /Prefer shorter moves/)
+  assert.doesNotMatch(queenMarkup, />keep queen box|>queen box size</)
+  assert.match(queenMarkup, />phase 2: corner cage</)
+  assert.match(queenMarkup, /leg-mate-guide-note-boards--full/)
+  assert.match(queenMarkup, /leg-mate-note-board--full/)
+  assert.doesNotMatch(queenMarkup, />Notes</)
+  assert.doesNotMatch(queenMarkup, /data-highlight-kind=/)
 
   const rookBoard = getMateRuleSet('rook').help.noteBoards[0]!
   assert.deepEqual(rookBoard.pieces, [
@@ -1306,29 +1349,28 @@ test('Rook and Two Bishops render diagrams while Queen stays text-only', () => {
       ruleSet={getMateRuleSet('rook')}
     />,
   )
-  assert.match(rookMarkup, />phase 2 box</)
-  assert.match(rookMarkup, /kings are in opposition/)
+  assert.match(rookMarkup, />phase 2: box</)
+  assert.doesNotMatch(rookMarkup, /kings are in opposition/)
+  assert.doesNotMatch(
+    rookMarkup,
+    /The box can drive Black to any edge/,
+  )
   assert.match(rookMarkup, /leg-mate-guide-note-boards--full/)
   assert.match(rookMarkup, /leg-mate-note-board--full/)
   assert.doesNotMatch(rookMarkup, /data-highlight-kind="box"/)
+  assert.doesNotMatch(rookMarkup, />Notes</)
+  assert.doesNotMatch(rookMarkup, /Phase 2 begins/)
   assert.match(rookMarkup, /<svg/)
   assert.doesNotMatch(rookMarkup, /♔|♖|♚/)
 
   const bishopsRuleSet = getMateRuleSet('two-bishops')
-  const [wallBoard, cornerBoard] = bishopsRuleSet.help.noteBoards
-  assert.ok(wallBoard)
+  const [cornerBoard] = bishopsRuleSet.help.noteBoards
   assert.ok(cornerBoard)
-  assert.deepEqual(wallBoard.layout, {
-    files: 8,
-    ranks: 8,
-    fileOffset: 0,
-  })
   assert.deepEqual(cornerBoard.layout, {
     files: 8,
     ranks: 8,
     fileOffset: 0,
   })
-  assert.deepEqual(wallBoard.highlights, [])
   assert.deepEqual(cornerBoard.highlights, [])
 
   const bishopsMarkup = renderToStaticMarkup(
@@ -1338,18 +1380,21 @@ test('Rook and Two Bishops render diagrams while Queen stays text-only', () => {
       ruleSet={bishopsRuleSet}
     />,
   )
-  assert.match(bishopsMarkup, />bishop wall</)
+  assert.match(bishopsMarkup, />tighten wall</)
   assert.match(bishopsMarkup, />corner finish</)
-  assert.match(bishopsMarkup, /White to move: Bc3#\./)
+  assert.match(
+    bishopsMarkup,
+    /Keep Black on the edge while White’s king reaches the finish\./,
+  )
   assert.match(bishopsMarkup, /leg-mate-guide-note-boards--full/)
   assert.equal(
     bishopsMarkup.match(/leg-mate-note-board--full/g)?.length,
-    2,
+    1,
   )
   assert.doesNotMatch(bishopsMarkup, /data-highlight-kind=/)
   assert.match(
     bishopsMarkup,
-    /aria-label="corner finish\. White king on b3\. White bishop on c2\. White bishop on d2\. Black king on a1\./,
+    /aria-label="corner finish\. Black king on c8\. White king on a5\. White bishop on b5\. White bishop on c5\./,
   )
 })
 
@@ -1364,20 +1409,21 @@ test('mate guides omit empty notes and place useful notes before shortcuts', () 
     )
     const notesAt = markup.indexOf('>Notes<')
     const shortcutsAt = markup.indexOf('>Keyboard shortcuts<')
-    const legendAt = markup.indexOf('>Legend<')
 
-    if (id === 'queen') {
-      assert.equal(notesAt, -1, 'queen: empty Notes should be omitted')
+    if (id === 'queen' || id === 'rook') {
+      assert.equal(notesAt, -1, `${id}: empty Notes should be omitted`)
     } else {
       assert.ok(notesAt >= 0, `${id}: Notes missing`)
       assert.ok(shortcutsAt > notesAt, `${id}: shortcuts must follow Notes`)
     }
     assert.ok(shortcutsAt >= 0, `${id}: shortcuts missing`)
-    assert.ok(legendAt > shortcutsAt, `${id}: Legend must follow shortcuts`)
+    assert.equal(markup.indexOf('>Legend<'), -1, `${id}: Legend remains`)
+    assert.doesNotMatch(markup, /Correctness: ✓/)
+    assert.doesNotMatch(markup, /Black replies: X \/ Y/)
   }
 })
 
-test('Rook and Two Bishops keep correctness filters out of the guide', () => {
+test('Rook and Two Bishops omit proof-distance teaching rules', () => {
   const rookMarkup = renderToStaticMarkup(
     <MatePriorityGuideDialog
       {...MATE_TRAINING_INFO_PROPS}
@@ -1389,6 +1435,7 @@ test('Rook and Two Bishops keep correctness filters out of the guide', () => {
   for (const label of ['rook box', 'waiting move', 'king closer']) {
     assert.match(rookMarkup, new RegExp(`>${label}<`))
   }
+  assert.doesNotMatch(rookMarkup, /mate progress|forced mate closer/)
 
   const bishopsMarkup = renderToStaticMarkup(
     <MatePriorityGuideDialog
@@ -1400,6 +1447,10 @@ test('Rook and Two Bishops keep correctness filters out of the guide', () => {
   assert.doesNotMatch(
     bishopsMarkup,
     /finish guarantee|leg-mate-guide-guards|rules out repetition/,
+  )
+  assert.doesNotMatch(
+    bishopsMarkup,
+    /mate progress|forced mate|proof distance/,
   )
 
   const queenMarkup = renderToStaticMarkup(
@@ -2089,7 +2140,23 @@ test('Mate exposes stable desktop and narrow-layout structure', () => {
   assert.match(css, /\.leg-mate-log-scroll\s*\{[^}]*overflow-x:\s*auto/s)
   assert.match(
     css,
-    /\.leg-mate-log-table\s*\{[^}]*min-width:\s*44rem/s,
+    /\.leg-mate-log-table\s*\{[^}]*min-width:\s*44rem;[^}]*font-family:\s*inherit;[^}]*font-size:\s*0\.9rem/s,
+  )
+  assert.doesNotMatch(
+    css,
+    /\.leg-mate-log-table\s*\{[^}]*Courier New/s,
+  )
+  assert.match(
+    css,
+    /\.leg-mate-log-table thead th\s*\{[^}]*font-size:\s*0\.82rem/s,
+  )
+  assert.match(
+    css,
+    /\.leg-mate-log-table button\s*\{[^}]*font-size:\s*inherit/s,
+  )
+  assert.match(
+    css,
+    /\.leg-mate-log-choice-button\s*\{[^}]*width:\s*2\.5rem/s,
   )
   assert.match(
     css,
@@ -2102,6 +2169,18 @@ test('Mate exposes stable desktop and narrow-layout structure', () => {
   assert.match(
     css,
     /\.leg-mate-log-flexible-column\s*\{[^}]*width:\s*auto/s,
+  )
+  assert.match(
+    css,
+    /\.leg-mate-log-status-cell--wrong\s*\{[^}]*rgba\(210,\s*82,\s*101,\s*0\.16\)/s,
+  )
+  assert.match(
+    css,
+    /\.leg-mate-log-status-cell--multiple\s*\{[^}]*rgba\(88,\s*143,\s*199,\s*0\.17\)/s,
+  )
+  assert.match(
+    css,
+    /\.leg-mate-log-correctness-mark\s*\{[^}]*width:\s*1em;[^}]*color:\s*var\(--leg-text\);[^}]*font-size:\s*1\.75rem;[^}]*font-weight:\s*900;[^}]*text-align:\s*center/s,
   )
   assert.doesNotMatch(css, /\.leg-mate-log-table\s*\{[^}]*min-width:\s*(?:58|62)rem/s)
   assert.match(css, /@media\s*\(max-width:\s*48rem\)/)
@@ -2133,10 +2212,7 @@ test('Mate exposes stable desktop and narrow-layout structure', () => {
     css,
     /\.leg-mate-guide-shortcuts div\s*\{[^}]*display:\s*inline-flex;[^}]*gap:\s*0\.4rem/s,
   )
-  assert.match(
-    css,
-    /\.leg-mate-guide-footer\s*\{[^}]*display:\s*grid;[^}]*grid-template-columns:\s*max-content minmax\(0, 1fr\);[^}]*gap:\s*1\.1rem/s,
-  )
+  assert.doesNotMatch(css, /\.leg-mate-guide-footer/)
   assert.match(
     css,
     /\.leg-mate-note-board\s*\{[^}]*width:\s*min\(100%, 14rem\)/s,
@@ -2156,10 +2232,6 @@ test('Mate exposes stable desktop and narrow-layout structure', () => {
   assert.match(
     css,
     /\.leg-mate-note-board-piece svg\s*\{[^}]*width:\s*88%;[^}]*height:\s*88%/s,
-  )
-  assert.match(
-    css,
-    /@media\s*\(max-width:\s*48rem\)[\s\S]*\.leg-mate-guide-footer\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\)/,
   )
   assert.match(
     css,
@@ -2263,6 +2335,45 @@ test('Mate loads replay history at its final position for Undo and Redo', async 
     assert.equal(
       mountedRenderer.root.findByType(MateBoardProbe).props.fen,
       ROOK_AFTER_REPLY,
+    )
+  } finally {
+    if (renderer) await act(async () => renderer?.unmount())
+  }
+})
+
+test('Mate loads a start-cursor replay with Redo seeded', async () => {
+  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
+    .IS_REACT_ACT_ENVIRONMENT = true
+  let renderer: ReactTestRenderer | undefined
+
+  try {
+    await act(async () => {
+      renderer = TestRenderer.create(
+        matePage(
+          'rook',
+          'standard',
+          ROOK_START,
+          ['Ra8+', 'Kg7'],
+          () => undefined,
+          0,
+        ),
+      )
+    })
+    const mountedRenderer = renderer as ReactTestRenderer
+    assert.equal(
+      mountedRenderer.root.findByType(MateBoardProbe).props.fen,
+      ROOK_START,
+    )
+    assert.equal(mountedRenderer.root.findByType(MateLog).props.logs.length, 0)
+    assert.equal(mountedRenderer.root.findByType(MateControls).props.canUndo, false)
+    assert.equal(mountedRenderer.root.findByType(MateControls).props.canRedo, true)
+
+    await act(async () => {
+      mountedRenderer.root.findByType(MateControls).props.onRedo()
+    })
+    assert.equal(
+      mountedRenderer.root.findByType(MateBoardProbe).props.fen,
+      ROOK_AFTER_WHITE,
     )
   } finally {
     if (renderer) await act(async () => renderer?.unmount())
@@ -2411,7 +2522,7 @@ test('Mate Play Best stages White before committing Black and cancels on route c
     assert.notEqual(whiteFen, MULTI_BLACK_START)
     assert.equal(mountedRenderer.root.findByType(MateBoardProbe).props.disabled, true)
     assert.equal(mountedRenderer.root.findByType(MateControls).props.busy, true)
-    assert.equal(mountedRenderer.root.findByType(MateLog).props.busy, true)
+    assert.equal('busy' in mountedRenderer.root.findByType(MateLog).props, false)
     assert.equal(mountedRenderer.root.findByType(MateLog).props.logs.length, 0)
     assert.equal(
       mountedRenderer.root.findByType(MateControls).props.onStartOver(),
@@ -2449,6 +2560,55 @@ test('Mate Play Best stages White before committing Black and cancels on route c
     })
     assert.equal(mountedRenderer.root.findByType(MateBoardProbe).props.fen, QUEEN_START)
     assert.equal(mountedRenderer.root.findByType(MateLog).props.logs.length, 0)
+  } finally {
+    if (renderer) await act(async () => renderer?.unmount())
+    Math.random = originalRandom
+  }
+})
+
+test('Mate Play Best does not flash historical log choices as disabled', async () => {
+  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
+    .IS_REACT_ACT_ENVIRONMENT = true
+  const originalRandom = Math.random
+  Math.random = () => 0
+  let renderer: ReactTestRenderer | undefined
+
+  try {
+    await act(async () => {
+      renderer = TestRenderer.create(
+        matePage('rook', 'standard', MULTI_BLACK_START),
+      )
+    })
+    const mountedRenderer = renderer as ReactTestRenderer
+    await act(async () => {
+      mountedRenderer.root.findByType(MateBoardProbe).props.onMove('Rd1')
+    })
+
+    const choiceState = () =>
+      mountedRenderer.root
+        .findAll(
+          (node) =>
+            node.type === 'button' &&
+            node.props.className === 'leg-mate-log-choice-button',
+        )
+        .map((button) => ({
+          disabled: Boolean(button.props.disabled),
+          label: button.props['aria-label'] as string,
+        }))
+
+    const before = choiceState()
+    assert.ok(before.length > 0)
+    assert.ok(before.some(({ disabled }) => !disabled))
+
+    await act(async () => {
+      assert.equal(
+        mountedRenderer.root.findByType(MateControls).props.onPlayBest(),
+        true,
+      )
+    })
+
+    assert.equal(mountedRenderer.root.findByType(MateControls).props.busy, true)
+    assert.deepEqual(choiceState(), before)
   } finally {
     if (renderer) await act(async () => renderer?.unmount())
     Math.random = originalRandom
@@ -2593,7 +2753,14 @@ test('Mate wires board, history, timer, and every log replacement action', async
     })
     assert.equal(
       mountedRenderer.root.findByType(MateLog).props.logs[0].san,
-      'Rb4',
+      'Re2',
+    )
+    assert.ok(
+      getMateRuleSet('rook')
+        .idealWhiteMoves(CYCLING_WHITE_START)
+        .includes(
+          mountedRenderer.root.findByType(MateLog).props.logs[0].san,
+        ),
     )
 
     await act(async () => {
@@ -3152,6 +3319,7 @@ function matePage(
   sharedFen: string | null,
   sharedMoves: readonly string[] | null = null,
   onReplaceHref: (href: string) => void = () => undefined,
+  sharedReplayCursor: 0 | null = null,
 ) {
   return (
     <Mate
@@ -3165,6 +3333,7 @@ function matePage(
         mateMode,
         sharedFen,
         ...(sharedMoves === null ? {} : { sharedMoves }),
+        ...(sharedReplayCursor === 0 ? { sharedReplayCursor: 0 as const } : {}),
       }}
     />
   )

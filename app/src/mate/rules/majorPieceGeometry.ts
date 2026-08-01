@@ -15,9 +15,11 @@ import {
 
 export type MajorPieceType = 'q' | 'r'
 export type RookAxis = 'rank' | 'file'
+export type RookEdge = 'north' | 'east' | 'south' | 'west'
 
 export type RookCut = {
   readonly axis: RookAxis
+  readonly edge: RookEdge
   readonly size: number
   readonly closest: boolean
 }
@@ -55,6 +57,8 @@ export type QueenBoxAxisSides = {
   readonly rankSide: number
 }
 
+export type QueenBoxCorner = 'a1' | 'a8' | 'h1' | 'h8'
+
 export function isMajorPieceBetweenKings(
   majorPiece: PieceSquare,
   whiteKing: PieceSquare,
@@ -66,20 +70,6 @@ export function isMajorPieceBetweenKings(
   return (
     isStrictlyBetween(major.rank, white.rank, black.rank) ||
     isStrictlyBetween(major.file, white.file, black.file)
-  )
-}
-
-export function isQueenRankOrFileChannelBetween(
-  square: PieceSquare,
-  firstBoundary: PieceSquare,
-  secondBoundary: PieceSquare,
-): boolean {
-  const target = squareCoordinates(square.square)
-  const first = squareCoordinates(firstBoundary.square)
-  const second = squareCoordinates(secondBoundary.square)
-  return (
-    isStrictlyBetween(target.rank, first.rank, second.rank) ||
-    isStrictlyBetween(target.file, first.file, second.file)
   )
 }
 
@@ -118,7 +108,7 @@ export function getMajorEndgamePhase(
   }
   const isPhaseTwo =
     pieceType === 'q'
-      ? isQueenRankOrFileChannelBetween(majorPiece, whiteKing, blackKing)
+      ? getQueenTwoSquareCage(fen) !== null
       : isMajorPieceBetweenKings(majorPiece, whiteKing, blackKing)
   return isPhaseTwo ? 2 : 1
 }
@@ -153,6 +143,74 @@ export function getQueenBoxDimensions(
   })
 }
 
+export function getQueenBoxSquares(
+  whiteQueenSquare: Square,
+  blackKingSquare: Square,
+): readonly Square[] {
+  const queen = squareCoordinates(whiteQueenSquare)
+  const black = squareCoordinates(blackKingSquare)
+  const axisRange = (queenCoordinate: number, blackCoordinate: number) =>
+    queenCoordinate === blackCoordinate
+      ? Array.from({ length: 8 }, (_, coordinate) => coordinate)
+      : blackCoordinate < queenCoordinate
+        ? Array.from({ length: queenCoordinate }, (_, coordinate) => coordinate)
+        : Array.from(
+            { length: 7 - queenCoordinate },
+            (_, index) => queenCoordinate + index + 1,
+          )
+  const files = axisRange(queen.file, black.file)
+  const ranks = axisRange(queen.rank, black.rank)
+
+  return Object.freeze(
+    ranks.flatMap((rank) =>
+      files.map((file) => {
+        const square = squareFromCoordinates(file, rank)
+        if (square === null) {
+          throw new Error('Queen box generated an invalid square')
+        }
+        return square
+      }),
+    ),
+  )
+}
+
+export function isSquareInClosedQueenBox(
+  square: Square,
+  whiteQueenSquare: Square,
+  blackKingSquare: Square,
+): boolean {
+  const target = squareCoordinates(square)
+  const queen = squareCoordinates(whiteQueenSquare)
+  const black = squareCoordinates(blackKingSquare)
+  const isOnCornerSide = (
+    targetCoordinate: number,
+    queenCoordinate: number,
+    blackCoordinate: number,
+  ) =>
+    queenCoordinate === blackCoordinate ||
+    (blackCoordinate < queenCoordinate
+      ? targetCoordinate <= queenCoordinate
+      : targetCoordinate >= queenCoordinate)
+
+  return (
+    isOnCornerSide(target.file, queen.file, black.file) &&
+    isOnCornerSide(target.rank, queen.rank, black.rank)
+  )
+}
+
+export function getQueenBoxSafeSquareCount(fen: string): number {
+  const whiteQueen = findPiece(fen, 'w', 'q')
+  const blackKing = findPiece(fen, 'b', 'k')
+  if (!whiteQueen || !blackKing) return 0
+
+  const chess = getChess(fen)
+  chess.remove(blackKing.square)
+  return getQueenBoxSquares(whiteQueen.square, blackKing.square).filter(
+    (square) =>
+      chess.get(square) === undefined && !chess.isAttacked(square, 'w'),
+  ).length
+}
+
 export function getQueenBoxAxisSides(
   whiteQueenSquare: Square,
   blackKingSquare: Square,
@@ -175,6 +233,59 @@ export function getQueenBoxAxisSides(
     fileSide,
     rankSide,
   })
+}
+
+export function getQueenBoxCorners(
+  whiteQueenSquare: Square,
+  blackKingSquare: Square,
+): readonly QueenBoxCorner[] {
+  const queen = squareCoordinates(whiteQueenSquare)
+  const black = squareCoordinates(blackKingSquare)
+  const files: readonly ('a' | 'h')[] =
+    queen.file === black.file
+      ? ['a', 'h']
+      : black.file < queen.file
+        ? ['a']
+        : ['h']
+  const ranks: readonly ('1' | '8')[] =
+    queen.rank === black.rank
+      ? ['1', '8']
+      : black.rank < queen.rank
+        ? ['1']
+        : ['8']
+
+  return Object.freeze(
+    files.flatMap((file) =>
+      ranks.map((rank) => `${file}${rank}` as QueenBoxCorner),
+    ),
+  )
+}
+
+export function isQueenSameCornerBoxShrink(
+  currentQueenSquare: Square,
+  resultQueenSquare: Square,
+  blackKingSquare: Square,
+): boolean {
+  const currentCorners = getQueenBoxCorners(
+    currentQueenSquare,
+    blackKingSquare,
+  )
+  const resultCorners = getQueenBoxCorners(resultQueenSquare, blackKingSquare)
+  const keepsCorner = resultCorners.some((corner) =>
+    currentCorners.includes(corner),
+  )
+  if (!keepsCorner) return false
+
+  const current = getQueenBoxDimensions(
+    currentQueenSquare,
+    blackKingSquare,
+  )
+  const result = getQueenBoxDimensions(resultQueenSquare, blackKingSquare)
+  return (
+    result.shorterSide < current.shorterSide ||
+    (result.shorterSide === current.shorterSide &&
+      result.longerSide < current.longerSide)
+  )
 }
 
 function queenCagePairs(): readonly QueenTwoSquareCage[] {
@@ -246,6 +357,89 @@ function queenCagePairIsStable(
   })
 }
 
+function queenEdgeSegmentsContaining(
+  square: Square,
+): readonly (readonly Square[])[] {
+  const edges = [
+    Array.from({ length: 8 }, (_, file) =>
+      squareFromCoordinates(file, 0),
+    ),
+    Array.from({ length: 8 }, (_, file) =>
+      squareFromCoordinates(file, 7),
+    ),
+    Array.from({ length: 8 }, (_, rank) =>
+      squareFromCoordinates(0, rank),
+    ),
+    Array.from({ length: 8 }, (_, rank) =>
+      squareFromCoordinates(7, rank),
+    ),
+  ].map((edge) =>
+    edge.filter((candidate): candidate is Square => candidate !== null),
+  )
+
+  return edges.flatMap((edge) => {
+    const squareIndex = edge.indexOf(square)
+    if (squareIndex === -1) {
+      return []
+    }
+    const segments: Square[][] = []
+    for (let start = 0; start <= squareIndex; start += 1) {
+      for (let end = squareIndex + 1; end <= edge.length; end += 1) {
+        if (start === 0 || end === edge.length) {
+          segments.push(edge.slice(start, end))
+        }
+      }
+    }
+    return segments
+  })
+}
+
+function queenEdgeSegmentIsStable(
+  fen: string,
+  segment: readonly Square[],
+): boolean {
+  return segment.every((blackKingSquare) => {
+    const segmentFen = withBlackKingOnSquare(fen, blackKingSquare, 'b')
+    if (segmentFen === null) {
+      return false
+    }
+    const moves = getChess(segmentFen).moves({ verbose: true })
+    return (
+      moves.length > 0 &&
+      moves.every(
+        (move) =>
+          move.piece === 'k' &&
+          move.captured !== 'q' &&
+          segment.includes(move.to),
+      )
+    )
+  })
+}
+
+export function getQueenEdgeCageSize(
+  fen: string,
+  turnOverride?: 'w' | 'b',
+): number | null {
+  const cageFen = turnOverride ? withFenTurn(fen, turnOverride) : fen
+  let moves: string[]
+  try {
+    moves = getChess(cageFen).moves()
+  } catch {
+    return null
+  }
+  const blackKing = findPiece(cageFen, 'b', 'k')
+  if (!blackKing || moves.length === 0 || edgeDistance(blackKing.square) !== 0) {
+    return null
+  }
+
+  return (
+    [...queenEdgeSegmentsContaining(blackKing.square)]
+      .sort((first, second) => first.length - second.length)
+      .find((segment) => queenEdgeSegmentIsStable(cageFen, segment))
+      ?.length ?? null
+  )
+}
+
 export function getQueenTwoSquareCage(
   fen: string,
   turnOverride?: 'w' | 'b',
@@ -293,6 +487,11 @@ export function getRookCuts(
       return [
         Object.freeze({
           axis,
+          edge: getRookCutEdge(
+            whiteRook.square,
+            blackKing.square,
+            axis,
+          ),
           size: getRookOneDimensionalBoxSize(
             whiteRook.square,
             blackKing.square,
@@ -307,14 +506,25 @@ export function getRookCuts(
   )
 }
 
+function getRookCutEdge(
+  whiteRookSquare: Square,
+  blackKingSquare: Square,
+  axis: RookAxis,
+): RookEdge {
+  const rook = squareCoordinates(whiteRookSquare)
+  const black = squareCoordinates(blackKingSquare)
+  if (axis === 'rank') {
+    return black.rank > rook.rank ? 'north' : 'south'
+  }
+  return black.file > rook.file ? 'east' : 'west'
+}
+
 function isBetweenBlackAndWhiteWall(
   rook: number,
   white: number,
   black: number,
 ): boolean {
-  return black < white
-    ? black < rook && rook <= white
-    : white <= rook && rook < black
+  return isStrictlyBetween(rook, white, black)
 }
 
 export function getRookBox(

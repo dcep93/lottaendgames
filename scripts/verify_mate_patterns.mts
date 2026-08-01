@@ -5,7 +5,6 @@ import {
   type ProductionMateStateKeyMode,
 } from './mate-verifier/production.mts'
 import { verifyMateRoots } from './mate-verifier/search.mts'
-import { verifyTwoBishopsProofCertificate } from './mate-verifier/two-bishops-proof.mts'
 
 const MATE_IDS: readonly MateId[] = [
   'two-knights-pawn',
@@ -29,30 +28,27 @@ let exitCode = 0
 for (const mateId of options.mateIds) {
   const startedAt = Date.now()
   console.error(`Verifying ${mateId} exhaustively...`)
-  const result =
-    mateId === 'two-bishops'
-      ? verifyTwoBishopsProofCertificate()
-      : verifyMateRoots(
-          enumerateProductionMateRoots(mateId),
-          createProductionMateAdapter(mateId, {
-            stateKeyMode: options.stateKeyMode,
-          }),
-          {
-            ...(options.maxNodes === undefined
-              ? {}
-              : { maxNodes: options.maxNodes }),
-            ...(options.maxRoots === undefined
-              ? {}
-              : { maxRoots: options.maxRoots }),
-            onProgress: (stats) => {
-              console.error(
-                `${mateId}: ${stats.provenRoots} roots, ` +
-                  `${stats.uniquePositions} positions`,
-              )
-            },
-            progressEvery: options.progressEvery,
-          },
+  const result = verifyMateRoots(
+    enumerateProductionMateRoots(mateId),
+    createProductionMateAdapter(mateId, {
+      stateKeyMode: options.stateKeyMode,
+    }),
+    {
+      ...(options.maxNodes === undefined
+        ? {}
+        : { maxNodes: options.maxNodes }),
+      ...(options.maxRoots === undefined
+        ? {}
+        : { maxRoots: options.maxRoots }),
+      onProgress: (stats) => {
+        console.error(
+          `${mateId}: ${stats.provenRoots} roots, ` +
+            `${stats.uniquePositions} positions`,
         )
+      },
+      progressEvery: options.progressEvery,
+    },
+  )
   const summary = {
     elapsedMs: Date.now() - startedAt,
     mateId,

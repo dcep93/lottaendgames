@@ -1,11 +1,7 @@
 import type { MateId } from '../types'
 import { bishopKnightRuleSet } from './bishopKnight'
 import { queenRuleSet, rookRuleSet } from './majorPieces'
-import {
-  currentTeachingHint,
-  explainMove,
-  selectIdealMoves,
-} from './selection'
+import { explainMove, selectIdealMoves } from './selection'
 import { twoBishopsRuleSet } from './twoBishops'
 import { twoKnightsPawnRuleSet } from './twoKnightsPawn'
 import type {
@@ -21,7 +17,6 @@ import type {
 export {
   compareScoresByRules,
   currentHint,
-  currentTeachingHint,
   explainMove,
   findCandidateBySan,
   firstDifferingRule,
@@ -63,7 +58,6 @@ export {
   getRookBox,
   getRookBoxFromFen,
   getRookCuts,
-  isQueenRankOrFileChannelBetween,
   isQueenTighterChannelBetween,
 } from './majorPieceGeometry'
 export type {
@@ -71,6 +65,7 @@ export type {
   RookAxis,
   RookBox,
   RookCut,
+  RookEdge,
 } from './majorPieceGeometry'
 
 export {
@@ -278,7 +273,6 @@ function snapshotOrderedRule<Score>(
     ...(orderedRule.presentationRole === undefined
       ? {}
       : { presentationRole: orderedRule.presentationRole }),
-    guideOrder: orderedRule.guideOrder,
     ...(applies
       ? { applies: Object.freeze((score: Score) => applies(score)) }
       : {}),
@@ -300,7 +294,6 @@ function snapshotOrderedRule<Score>(
 
 type SnapshottedWhiteMoveOverride = {
   readonly description: RuleDescription
-  readonly guideOrder: number | undefined
   readonly select: WhiteMoveOverride['select']
 }
 
@@ -311,7 +304,6 @@ function snapshotWhiteMoveOverride(
   const sourceSelect = override.select
   return Object.freeze({
     description: Object.freeze({ ...override.description }),
-    guideOrder: override.guideOrder,
     select: Object.freeze((fen: string, legalMoves: readonly string[]) =>
       sourceSelect(fen, legalMoves),
     ),
@@ -337,11 +329,8 @@ function createRegisteredMateRuleSet<Score>(
     ruleSet.whiteMoveOverride,
   )
   const descriptionsById = new Map<string, RuleDescription>()
-  const descriptionOrderById = new Map<string, number>()
   const registerDescription = (
     source: RuleDescription,
-    guideOrder?: number,
-    fallbackOrder = 0,
   ): RuleDescription => {
     const existing = descriptionsById.get(source.id)
     if (
@@ -363,42 +352,20 @@ function createRegisteredMateRuleSet<Score>(
           : { presentationRole: source.presentationRole }),
       })
     descriptionsById.set(source.id, description)
-    descriptionOrderById.set(
-      source.id,
-      Math.min(
-        descriptionOrderById.get(source.id) ?? Number.POSITIVE_INFINITY,
-        guideOrder ?? fallbackOrder,
-      ),
-    )
     return description
   }
   const overrideDescription = whiteMoveOverride
-    ? registerDescription(
-        whiteMoveOverride.description,
-        whiteMoveOverride.guideOrder,
-        whiteRules.length,
-      )
+    ? registerDescription(whiteMoveOverride.description)
     : undefined
   const ruleEntries = Object.freeze(
-    whiteRules.map((orderedRule, index) => {
-      const description =
-        orderedRule.presentationRole === 'internal'
-          ? undefined
-          : registerDescription(
-              orderedRule,
-              orderedRule.guideOrder,
-              index,
-            )
+    whiteRules.map((orderedRule) => {
+      const description = registerDescription(orderedRule)
       return { orderedRule, description }
     }),
   )
   const whiteRuleDescriptions = Object.freeze([
     ...descriptionsById.values(),
-  ].sort(
-    (first, second) =>
-      (descriptionOrderById.get(first.id) ?? 0) -
-      (descriptionOrderById.get(second.id) ?? 0),
-  ))
+  ])
   const getLegalWhiteMoves = (fen: string): readonly string[] =>
     Object.freeze([...whiteMoves(fen)])
   const selectedOverrideMoves = (
@@ -462,22 +429,13 @@ function createRegisteredMateRuleSet<Score>(
       if (san !== undefined && !moves.includes(san)) return undefined
       if (selectedOverrideMoves(fen, moves)) return overrideDescription
       const candidates = scoredWhiteMoves(fen, moves)
-      const idealMoves = selectIdealMoves(candidates, whiteRules)
-      const rule =
-        san === undefined || idealMoves.includes(san)
-          ? currentTeachingHint(candidates, whiteRules, san)
-          : explainMove(candidates, whiteRules, san)
-      return describeRule(
-        rule?.presentationRole === 'internal'
-          ? currentTeachingHint(candidates, whiteRules)
-          : rule,
-      )
+      return describeRule(explainMove(candidates, whiteRules, san))
     },
     currentWhiteHint: (fen) => {
       const moves = getLegalWhiteMoves(fen)
       if (selectedOverrideMoves(fen, moves)) return overrideDescription
       return describeRule(
-        currentTeachingHint(scoredWhiteMoves(fen, moves), whiteRules),
+        explainMove(scoredWhiteMoves(fen, moves), whiteRules),
       )
     },
   })
@@ -503,7 +461,36 @@ export function registerMateRuleSet<Score>(
 function registerBuiltInMateRuleSet<Score>(
   ruleSet: MateRuleSet<Score>,
 ): void {
+  if (ruleSet.whiteMoveOverride) {
+    throw new Error(
+      `Built-in mate rule ${ruleSet.id} cannot bypass its visible priorities`,
+    )
+  }
+  const ids = new Set<string>()
+  for (const rule of ruleSet.whiteRules) {
+    if (rule.guideOrder !== undefined) {
+      throw new Error(
+        `Built-in mate rule ${ruleSet.id} cannot reorder selector ${rule.id}`,
+      )
+    }
+    if (ids.has(rule.id)) {
+      throw new Error(
+        `Built-in mate rule ${ruleSet.id} repeats selector ${rule.id}`,
+      )
+    }
+    ids.add(rule.id)
+  }
   const registeredRuleSet = createRegisteredMateRuleSet(ruleSet)
+  const evaluatorIds = ruleSet.whiteRules.map(({ id }) => id)
+  const renderedIds = registeredRuleSet.whiteRuleDescriptions.map(({ id }) => id)
+  if (
+    evaluatorIds.length !== renderedIds.length ||
+    evaluatorIds.some((id, index) => id !== renderedIds[index])
+  ) {
+    throw new Error(
+      `Built-in mate rule ${ruleSet.id} must render every selector in evaluator order`,
+    )
+  }
   if (builtInMateRuleSets.has(registeredRuleSet.id)) {
     throw new Error(`Mate rules already registered as built-in: ${registeredRuleSet.id}`)
   }

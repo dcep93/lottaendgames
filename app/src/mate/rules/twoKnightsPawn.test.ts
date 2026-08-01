@@ -20,9 +20,9 @@ import {
 } from './index'
 
 const WHITE_RULE_IDS = [
-  'mate',
-  'no stalemate',
-  'knights safe',
+      'mate',
+      'knights safe',
+      'no stalemate',
   'stop pawn promotion',
   'blockade pawn',
   'follow verified construction',
@@ -40,12 +40,7 @@ test('Two Knights vs Pawn exposes the exact explicit ordered priorities', () => 
   )
   assert.deepEqual(
     ruleSet.whiteRuleDescriptions.map(({ id }) => id),
-    [
-      WHITE_RULE_IDS[0],
-      WHITE_RULE_IDS[2],
-      WHITE_RULE_IDS[1],
-      ...WHITE_RULE_IDS.slice(3),
-    ],
+    WHITE_RULE_IDS,
   )
   assert.deepEqual(
     ruleSet.help.blackPriorities,
@@ -53,9 +48,9 @@ test('Two Knights vs Pawn exposes the exact explicit ordered priorities', () => 
       'Promote the pawn immediately when possible.',
       "Take a knight if White leaves one loose.",
       'Move toward an unprotected knight.',
-      'Keep the king near the center and preserve actual legal king mobility.',
+      'Keep the king near the center, then maximize its legal moves.',
       'When the earlier resistance priorities tie, advance the pawn as far as legally possible.',
-      "Stay away from White's king and coordinated knights.",
+      "Maximize the combined distance from White's king and the nearest knight.",
     ],
   )
   assert.match(ruleSet.help.notes[0] ?? '', /Syzygy/i)

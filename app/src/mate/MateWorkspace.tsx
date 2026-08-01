@@ -52,6 +52,7 @@ export type MateWorkspaceProps = {
   readonly mateMode: MateMode
   readonly sharedFen: string | null
   readonly sharedMoves: readonly string[] | null
+  readonly sharedReplayCursor: 0 | null
   readonly onReplaceHref?: (href: string) => void
 }
 
@@ -77,6 +78,7 @@ export default function MateWorkspace({
   onReplaceHref,
   sharedFen,
   sharedMoves,
+  sharedReplayCursor,
 }: MateWorkspaceProps) {
   const deps = PRODUCTION_MATE_DEPS
   const ruleSet = React.useMemo(() => deps.getRuleSet(mateId), [deps, mateId])
@@ -88,6 +90,7 @@ export default function MateWorkspace({
             mateId,
             mode: mateMode,
             moves: sharedMoves,
+            startAtBeginning: sharedReplayCursor === 0,
             startingFen: sharedFen,
           },
           deps,
@@ -406,7 +409,6 @@ export default function MateWorkspace({
           timerNow={deps.now}
         />
         <MateLog
-          busy={playBestAnimation !== null}
           fen={session.fen}
           logs={session.logs}
           mateMode={mateMode}

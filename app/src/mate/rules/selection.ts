@@ -1,6 +1,6 @@
 import type { OrderedRule, RuleSubpriority, ScoredMove } from './types'
 
-type CandidateSelection<Score> = {
+export type CandidateSelection<Score> = {
   readonly idealCandidates: readonly ScoredMove<Score>[]
   readonly eliminatedBy: ReadonlyMap<ScoredMove<Score>, OrderedRule<Score>>
   readonly lastEliminatingRule: OrderedRule<Score> | undefined
@@ -144,7 +144,7 @@ function immutableScores<Score>(
   return Object.freeze(candidates.map(({ score }) => score))
 }
 
-function selectCandidatesByRules<Score>(
+export function selectCandidatesByRules<Score>(
   candidates: readonly ScoredMove<Score>[],
   rules: readonly OrderedRule<Score>[],
 ): CandidateSelection<Score> {
@@ -328,71 +328,4 @@ export function currentHint<Score>(
   rules: readonly OrderedRule<Score>[],
 ): OrderedRule<Score> | undefined {
   return explainMove(candidates, rules)
-}
-
-/**
- * Keeps correctness guards exact while attributing an ideal move to a
- * board-visible teaching priority whenever one truthfully favors it over the
- * alternatives rejected by the guard.
- */
-export function currentTeachingHint<Score>(
-  candidates: readonly ScoredMove<Score>[],
-  rules: readonly OrderedRule<Score>[],
-  san?: string,
-): OrderedRule<Score> | undefined {
-  const selection = selectCandidatesByRules(candidates, rules)
-  const decisiveRule = selection.lastEliminatingRule
-  if (
-    decisiveRule?.presentationRole !== 'guard' &&
-    decisiveRule?.presentationRole !== 'internal'
-  ) {
-    return decisiveRule
-  }
-
-  const idealCandidates =
-    san === undefined
-      ? selection.idealCandidates
-      : selection.idealCandidates.filter((candidate) => candidate.san === san)
-  if (idealCandidates.length === 0) return decisiveRule
-  const rejectedByGuard = candidates.filter(
-    (candidate) =>
-      selection.eliminatedBy.get(candidate)?.presentationRole === 'guard' ||
-      selection.eliminatedBy.get(candidate)?.presentationRole === 'internal',
-  )
-  let best:
-    | { readonly rule: OrderedRule<Score>; readonly support: number }
-    | undefined
-
-  for (const rule of rules) {
-    if (
-      rule.presentationRole === 'guard' ||
-      rule.presentationRole === 'internal'
-    ) {
-      continue
-    }
-    let support = 0
-    for (const ideal of idealCandidates) {
-      for (const rejected of rejectedByGuard) {
-        if (
-          !ruleApplies(rule, ideal.score) ||
-          !ruleApplies(rule, rejected.score)
-        ) {
-          continue
-        }
-        for (const subpriority of ruleSubpriorities(rule)) {
-          const scores = Object.freeze([ideal.score, rejected.score])
-          if (subpriority.when && !subpriority.when(scores)) continue
-          const comparison = subpriorityPairComparison(
-            rule,
-            subpriority,
-            scores,
-          )
-          if (comparison < 0) support += 1
-          if (comparison !== 0) break
-        }
-      }
-    }
-    if (support > (best?.support ?? 0)) best = { rule, support }
-  }
-  return best?.rule
 }

@@ -9,7 +9,10 @@ import {
   getChess,
   getEndgamePiecePlacements,
   getSquareTransform,
+  isKnightMove,
   kingDistance,
+  squareCoords,
+  squareFromCoords,
   transformFen,
   transformSquare,
   validateMatePosition,
@@ -36,6 +39,22 @@ export type ProductionMateStateKeyMode = 'identity' | 'symmetry'
 
 export type ProductionMateAdapterOptions = {
   readonly stateKeyMode?: ProductionMateStateKeyMode
+  readonly transitionCache?: ProductionMateTransitionCache
+}
+
+export type ProductionLegalTransition = {
+  readonly outcome: MateTerminalOutcome | undefined
+  readonly resetsHalfmoveClock: boolean
+  readonly san: string
+  readonly state: string
+}
+
+export type ProductionMateTransitionCache = {
+  readonly getLegalTransitions: (
+    mateId: MateId,
+    state: string,
+    compute: () => readonly ProductionLegalTransition[],
+  ) => readonly ProductionLegalTransition[]
 }
 
 const TWO_KNIGHTS_PAWN_TRANSFORMS = Object.freeze([
@@ -79,149 +98,167 @@ export function createProductionMateAdapter(
 ): MateVerificationAdapter<ProductionMateVerificationState> {
   const ruleSet = getMateRuleSet(mateId)
   const stateKeyMode = options.stateKeyMode ?? 'symmetry'
-  return {
-    key: (state) =>
-      stateKeyMode === 'identity'
-        ? identityVerifierPositionKey(state)
-        : canonicalVerifierPositionKey(mateId, state),
-    render: (state) => state,
-    expand: (state) => {
-      const white = getChess(normalizeVerifierState(state))
-      const idealWhiteMoves = [...new Set(ruleSet.idealWhiteMoves(white.fen()))]
-      if (idealWhiteMoves.length === 0) {
-        return {
-          blackReplies: 0,
-          branches: [
-            failureBranch(
-              'rule-gap',
-              `No optimal White move in ${white.fen()}`,
-              [],
-              [],
-              [white.fen()],
-            ),
-          ],
-          whiteChoices: 0,
-        }
-      }
-
-      const legalWhiteMoves = new Set(white.moves())
-      const branches: MateVerificationBranch<string>[] = []
-      let blackReplies = 0
-      for (const whiteSan of idealWhiteMoves) {
-        if (!legalWhiteMoves.has(whiteSan)) {
-          branches.push(
-            failureBranch(
-              'illegal-white-move',
-              `Rule set returned illegal White move ${whiteSan}`,
-              [whiteSan],
-              [],
-              [white.fen()],
-            ),
-          )
-          continue
-        }
-
-        const afterWhite = getChess(white.fen())
-        const whiteMove = afterWhite.move(whiteSan)
-        if (whiteMove === null) {
-          branches.push(
-            failureBranch(
-              'illegal-white-move',
-              `Rule set returned unplayable White move ${whiteSan}`,
-              [whiteSan],
-              [],
-              [afterWhite.fen()],
-            ),
-          )
-          continue
-        }
-        const afterWhiteState = normalizeVerifierState(afterWhite.fen())
-        const whiteReset = resetsHalfmoveClock(whiteMove)
-        const afterWhiteOutcome = getMateTerminalOutcome(mateId, afterWhite.fen())
-        if (afterWhiteOutcome === 'checkmate') {
-          branches.push({
-            kind: 'mate',
-            moves: [whiteMove.san],
-            resetsHalfmoveClock: [whiteReset],
-            states: [afterWhiteState],
-          })
-          continue
-        }
-        if (afterWhiteOutcome !== undefined) {
-          branches.push(
-            failureBranch(
-              terminalFailureKind(afterWhiteOutcome, 'white'),
-              `White move ${whiteMove.san} ended as ${afterWhiteOutcome}`,
-              [whiteMove.san],
-              [whiteReset],
-              [afterWhiteState],
-            ),
-          )
-          continue
-        }
-
-        const legalBlackMoves = afterWhite.moves()
-        if (legalBlackMoves.length === 0) {
-          branches.push(
-            failureBranch(
-              'no-legal-black-move',
-              `Non-terminal position has no legal Black move after ${whiteMove.san}`,
-              [whiteMove.san],
-              [whiteReset],
-              [afterWhiteState],
-            ),
-          )
-          continue
-        }
-
-        blackReplies += legalBlackMoves.length
-        for (const blackSan of legalBlackMoves) {
-          const afterBlack = getChess(afterWhite.fen())
-          const blackMove = afterBlack.move(blackSan)
-          if (blackMove === null) {
-            branches.push(
-              failureBranch(
-                'no-legal-black-move',
-                `chess.js rejected listed Black move ${blackSan}`,
-                [whiteMove.san, blackSan],
-                [whiteReset],
-                [afterWhiteState, afterWhiteState],
-              ),
-            )
-            continue
-          }
-          const afterBlackState = normalizeVerifierState(afterBlack.fen())
-          const resets = [whiteReset, resetsHalfmoveClock(blackMove)]
-          const afterBlackOutcome = getMateTerminalOutcome(mateId, afterBlack.fen())
-          if (afterBlackOutcome !== undefined) {
-            branches.push(
-              failureBranch(
-                terminalFailureKind(afterBlackOutcome, 'black'),
-                `Black response ${blackMove.san} ended as ${afterBlackOutcome}`,
-                [whiteMove.san, blackMove.san],
-                resets,
-                [afterWhiteState, afterBlackState],
-              ),
-            )
-            continue
-          }
-          branches.push({
-            kind: 'continue',
-            moves: [whiteMove.san, blackMove.san],
-            next: afterBlackState,
-            resetsHalfmoveClock: resets,
-            states: [afterWhiteState, afterBlackState],
-          })
-        }
-      }
-
+  const expandUncached = (
+    state: ProductionMateVerificationState,
+  ): import('./types.mts').MateVerificationExpansion<string> => {
+    const whiteState = normalizeVerifierState(state)
+    const white = getChess(whiteState)
+    const idealWhiteMoves = [
+      ...new Set(ruleSet.idealWhiteMoves(white.fen())),
+    ]
+    if (idealWhiteMoves.length === 0) {
       return {
-        blackReplies,
-        branches,
-        whiteChoices: idealWhiteMoves.length,
+        blackReplies: 0,
+        branches: [
+          failureBranch(
+            'rule-gap',
+            `No optimal White move in ${white.fen()}`,
+            [],
+            [],
+            [white.fen()],
+          ),
+        ],
+        whiteChoices: 0,
       }
-    },
+    }
+
+    const legalWhiteTransitions = getLegalTransitions(
+      mateId,
+      whiteState,
+      options.transitionCache,
+    )
+    const legalWhiteMoves = new Map(
+      legalWhiteTransitions.map((transition) => [
+        transition.san,
+        transition,
+      ]),
+    )
+    const branches: MateVerificationBranch<string>[] = []
+    let blackReplies = 0
+    for (const whiteSan of idealWhiteMoves) {
+      const whiteMove = legalWhiteMoves.get(whiteSan)
+      if (whiteMove === undefined) {
+        branches.push(
+          failureBranch(
+            'illegal-white-move',
+            `Rule set returned illegal White move ${whiteSan}`,
+            [whiteSan],
+            [],
+            [white.fen()],
+          ),
+        )
+        continue
+      }
+
+      if (whiteMove.outcome === 'checkmate') {
+        branches.push({
+          kind: 'mate',
+          moves: [whiteMove.san],
+          resetsHalfmoveClock: [whiteMove.resetsHalfmoveClock],
+          states: [whiteMove.state],
+        })
+        continue
+      }
+      if (whiteMove.outcome !== undefined) {
+        branches.push(
+          failureBranch(
+            terminalFailureKind(whiteMove.outcome, 'white'),
+            `White move ${whiteMove.san} ended as ${whiteMove.outcome}`,
+            [whiteMove.san],
+            [whiteMove.resetsHalfmoveClock],
+            [whiteMove.state],
+          ),
+        )
+        continue
+      }
+
+      const legalBlackMoves = getLegalTransitions(
+        mateId,
+        whiteMove.state,
+        options.transitionCache,
+      )
+      if (legalBlackMoves.length === 0) {
+        branches.push(
+          failureBranch(
+            'no-legal-black-move',
+            `Non-terminal position has no legal Black move after ${whiteMove.san}`,
+            [whiteMove.san],
+            [whiteMove.resetsHalfmoveClock],
+            [whiteMove.state],
+          ),
+        )
+        continue
+      }
+
+      blackReplies += legalBlackMoves.length
+      for (const blackMove of legalBlackMoves) {
+        const resets = [
+          whiteMove.resetsHalfmoveClock,
+          blackMove.resetsHalfmoveClock,
+        ]
+        if (blackMove.outcome !== undefined) {
+          branches.push(
+            failureBranch(
+              terminalFailureKind(blackMove.outcome, 'black'),
+              `Black response ${blackMove.san} ended as ${blackMove.outcome}`,
+              [whiteMove.san, blackMove.san],
+              resets,
+              [whiteMove.state, blackMove.state],
+            ),
+          )
+          continue
+        }
+        branches.push({
+          kind: 'continue',
+          moves: [whiteMove.san, blackMove.san],
+          next: blackMove.state,
+          resetsHalfmoveClock: resets,
+          states: [whiteMove.state, blackMove.state],
+        })
+      }
+    }
+
+    return {
+      blackReplies,
+      branches,
+      whiteChoices: idealWhiteMoves.length,
+    }
   }
+  return {
+    key:
+      stateKeyMode === 'identity'
+        ? identityVerifierPositionKey
+        : (state) => canonicalVerifierPositionKey(mateId, state),
+    render: (state) => state,
+    expand: expandUncached,
+  }
+}
+
+function getLegalTransitions(
+  mateId: MateId,
+  state: string,
+  cache: ProductionMateTransitionCache | undefined,
+): readonly ProductionLegalTransition[] {
+  const normalized = normalizeVerifierState(state)
+  const compute = (): readonly ProductionLegalTransition[] => {
+    const chess = getChess(normalized)
+    return chess.moves().map((san) => {
+      const after = getChess(normalized)
+      const move = after.move(san)
+      if (move === null) {
+        throw new Error(`chess.js rejected listed move ${san}`)
+      }
+      return {
+        outcome: getMateTerminalOutcome(mateId, after.fen()),
+        resetsHalfmoveClock: resetsHalfmoveClock(move),
+        san: move.san,
+        state: normalizeVerifierState(after.fen()),
+      }
+    })
+  }
+  return cache === undefined
+    ? compute()
+    : cache.getLegalTransitions(mateId, normalized, compute)
 }
 
 export function* enumerateProductionMateRoots(
@@ -352,6 +389,16 @@ function* enumerateUnrestrictedStandardRoots(
   function* visit(pieceIndex: number): Generator<MateVerificationRoot<string>> {
     if (pieceIndex === pieces.length) {
       const fen = `${boardFenFromPlacements(placements)} w - - 0 1`
+      if (mateId === 'bishop-knight') {
+        if (!isLegalBishopKnightRootPlacement(placements)) return
+        yield {
+          fen,
+          halfmoveClock: 0,
+          source: 'standard exhaustive placement',
+          state: fen,
+        }
+        return
+      }
       if (!validateMatePosition(mateId, fen).ok) return
       if (mateId === 'two-bishops' && !isViableTwoBishopsStart(fen)) return
       yield makeRoot(fen, 'standard exhaustive placement')
@@ -376,6 +423,13 @@ function* enumerateUnrestrictedStandardRoots(
       const square = squares[squareIndex]!
       if (used.has(square)) continue
       if (
+        mateId === 'bishop-knight' &&
+        pieceIndex === 0 &&
+        square !== canonicalSquareOrbitRepresentative(square)
+      ) {
+        continue
+      }
+      if (
         template.type === 'k' &&
         previous?.type === 'k' &&
         kingDistance(previous.square, square) <= 1
@@ -391,6 +445,86 @@ function* enumerateUnrestrictedStandardRoots(
   }
 
   yield* visit(0)
+}
+
+function canonicalSquareOrbitRepresentative(
+  square: EndgamePiecePlacement['square'],
+): EndgamePiecePlacement['square'] {
+  return SQUARE_TRANSFORMS.map((transform) =>
+    transformSquare(square, transform),
+  ).sort()[0]!
+}
+
+export function isLegalBishopKnightRootPlacement(
+  placements: readonly EndgamePiecePlacement[],
+): boolean {
+  const blackKing = placements.find(
+    ({ color, type }) => color === 'b' && type === 'k',
+  )
+  const whiteKing = placements.find(
+    ({ color, type }) => color === 'w' && type === 'k',
+  )
+  const bishop = placements.find(
+    ({ color, type }) => color === 'w' && type === 'b',
+  )
+  const knight = placements.find(
+    ({ color, type }) => color === 'w' && type === 'n',
+  )
+  if (!blackKing || !whiteKing || !bishop || !knight) return false
+  if (kingDistance(blackKing.square, whiteKing.square) <= 1) return false
+
+  const occupied = new Set(placements.map(({ square }) => square))
+  if (
+    isKnightMove(knight.square, blackKing.square) ||
+    bishopAttacksSquare(bishop.square, blackKing.square, occupied)
+  ) {
+    return false
+  }
+
+  return allSquares().some((destination) => {
+    if (kingDistance(blackKing.square, destination) !== 1) return false
+    if (kingDistance(whiteKing.square, destination) <= 1) return false
+
+    const knightRemains = destination !== knight.square
+    if (knightRemains && isKnightMove(knight.square, destination)) {
+      return false
+    }
+
+    const bishopRemains = destination !== bishop.square
+    if (bishopRemains) {
+      const afterCapture = new Set(occupied)
+      afterCapture.delete(blackKing.square)
+      afterCapture.delete(destination)
+      if (bishopAttacksSquare(bishop.square, destination, afterCapture)) {
+        return false
+      }
+    }
+    return true
+  })
+}
+
+function bishopAttacksSquare(
+  bishopSquare: EndgamePiecePlacement['square'],
+  targetSquare: EndgamePiecePlacement['square'],
+  occupied: ReadonlySet<string>,
+): boolean {
+  const bishop = squareCoords(bishopSquare)
+  const target = squareCoords(targetSquare)
+  const fileDelta = target.file - bishop.file
+  const rankDelta = target.rank - bishop.rank
+  if (Math.abs(fileDelta) !== Math.abs(rankDelta) || fileDelta === 0) {
+    return false
+  }
+  const fileStep = Math.sign(fileDelta)
+  const rankStep = Math.sign(rankDelta)
+  for (let distance = 1; distance < Math.abs(fileDelta); distance += 1) {
+    const square = squareFromCoords(
+      bishop.file + fileStep * distance,
+      bishop.rank + rankStep * distance,
+    )
+    if (square && occupied.has(square)) return false
+  }
+  return true
 }
 
 function makeRoot(fen: string, source: string): MateVerificationRoot<string> {

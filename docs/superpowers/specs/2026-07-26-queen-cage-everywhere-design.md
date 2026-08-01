@@ -26,6 +26,9 @@ confined and receives the existing sentinel length of eight.
 before `queen a knight's move away`. It therefore selects a safe cage shrink
 before placement and king-proximity preferences.
 
+Before comparing dimensions, the cage must leave Black at least two squares
+that are not occupied or attacked by White.
+
 For
 `5Q2/8/8/8/1K6/8/2k5/8 w - - 0 1`, `Qf3` creates a `2 × 5` cage and must
 defeat moves that leave the `5 × 7` cage unchanged.

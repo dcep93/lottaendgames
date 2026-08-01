@@ -1,6 +1,9 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { diagnoseMatePolicySccs } from './policy-scc.mts'
+import {
+  diagnoseMatePolicySccs,
+  MatePolicySccSession,
+} from './policy-scc.mts'
 import type {
   MateVerificationAdapter,
   MateVerificationBranch,
@@ -160,4 +163,61 @@ test('reports an acyclic graph and a rule gap without treating either as a cycle
   assert.equal(result.stats.cyclicComponents, 0)
   assert.equal(result.stats.ruleGaps, 1)
   assert.equal(result.failureSamples[0]?.kind, 'rule-gap')
+})
+
+test('incremental rungs extend the prior closure without re-expanding it', () => {
+  let expansionCalls = 0
+  const countedAdapter = adapter({
+    A: expansion([move('A', 'B')]),
+    B: expansion([mate]),
+    C: expansion([move('C', 'D')]),
+    D: expansion([mate]),
+  })
+  const session = new MatePolicySccSession({
+    ...countedAdapter,
+    expand: (state) => {
+      expansionCalls += 1
+      return countedAdapter.expand(state)
+    },
+  })
+
+  const first = session.extend([root('A')])
+  const second = session.extend([root('A'), root('C')])
+  const repeated = session.extend([root('A'), root('C')])
+  const cold = diagnoseMatePolicySccs(
+    [root('A'), root('C')],
+    countedAdapter,
+  )
+
+  assert.equal(first.cache.newStates, 2)
+  assert.equal(second.cache.newStates, 2)
+  assert.equal(second.cache.newRoots, 1)
+  assert.equal(repeated.cache.newStates, 0)
+  assert.equal(repeated.cache.newEdges, 0)
+  assert.equal(repeated.cache.expansionMisses, 0)
+  assert.equal(expansionCalls, 4)
+  assert.deepEqual(second.result.stats, cold.stats)
+})
+
+test('a persisted session snapshot resumes with no old graph work', () => {
+  const graphAdapter = adapter({
+    A: expansion([move('A', 'B')]),
+    B: expansion([mate]),
+    C: expansion([move('C', 'A')]),
+  })
+  const firstSession = new MatePolicySccSession(graphAdapter)
+  firstSession.extend([root('A')])
+  const resumed = new MatePolicySccSession(
+    graphAdapter,
+    {},
+    firstSession.snapshot(),
+  )
+
+  const rung = resumed.extend([root('A'), root('C')])
+
+  assert.equal(rung.cache.newRoots, 1)
+  assert.equal(rung.cache.newStates, 1)
+  assert.equal(rung.cache.newEdges, 1)
+  assert.equal(rung.result.stats.whiteStates, 3)
+  assert.equal(rung.result.stats.continueEdges, 2)
 })

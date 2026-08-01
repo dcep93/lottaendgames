@@ -2,9 +2,13 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import {
   SQUARE_TRANSFORMS,
+  allSquares,
+  boardFenFromPlacements,
   getChess,
   getSquareTransform,
   transformFen,
+  validateMatePosition,
+  type EndgamePiecePlacement,
 } from '../../app/src/mate/chess.ts'
 import { getMateRuleSet } from '../../app/src/mate/rules/index.ts'
 import {
@@ -12,6 +16,7 @@ import {
   canonicalVerifierPositionKey,
   enumerateProductionMateRoots,
   identityVerifierPositionKey,
+  isLegalBishopKnightRootPlacement,
   normalizeVerifierState,
 } from './production.mts'
 import { verifyMateRoots } from './search.mts'
@@ -412,6 +417,40 @@ test('manifest-backed KNN enumeration keeps one root per symmetry orbit', () => 
       'train source 1 via identity',
     ],
   )
+})
+
+test('fast bishop-and-knight root legality matches production validation', () => {
+  const squares = allSquares()
+  let randomState = 123_456_789
+  const random = () => {
+    randomState =
+      (Math.imul(randomState, 1_664_525) + 1_013_904_223) >>> 0
+    return randomState
+  }
+
+  for (let sample = 0; sample < 1_024; sample += 1) {
+    const used = new Set<string>()
+    const pickSquare = () => {
+      let square = squares[random() % squares.length]!
+      while (used.has(square)) {
+        square = squares[random() % squares.length]!
+      }
+      used.add(square)
+      return square
+    }
+    const placements: EndgamePiecePlacement[] = [
+      { color: 'b', isPawn: false, square: pickSquare(), type: 'k' },
+      { color: 'w', isPawn: false, square: pickSquare(), type: 'k' },
+      { color: 'w', isPawn: false, square: pickSquare(), type: 'b' },
+      { color: 'w', isPawn: false, square: pickSquare(), type: 'n' },
+    ]
+    const fen = `${boardFenFromPlacements(placements)} w - - 0 1`
+    assert.equal(
+      isLegalBishopKnightRootPlacement(placements),
+      validateMatePosition('bishop-knight', fen).ok,
+      fen,
+    )
+  }
 })
 
 test('production expansion counts every legal Black response', () => {

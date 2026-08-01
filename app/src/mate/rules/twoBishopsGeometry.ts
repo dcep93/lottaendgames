@@ -175,11 +175,25 @@ function squareScreensSquareFromSource(
   screen: Square,
   target: Square,
 ): boolean {
+  const sourceCoordinates = squareCoordinates(source)
+  const screenCoordinates = squareCoordinates(screen)
+  const targetCoordinates = squareCoordinates(target)
+  const sourceToTargetFile =
+    targetCoordinates.file - sourceCoordinates.file
+  const sourceToTargetRank =
+    targetCoordinates.rank - sourceCoordinates.rank
+  const sourceToScreenFile =
+    screenCoordinates.file - sourceCoordinates.file
+  const sourceToScreenRank =
+    screenCoordinates.rank - sourceCoordinates.rank
   return (
     screen !== source &&
     screen !== target &&
-    kingDistance(source, screen) + kingDistance(screen, target) ===
-      kingDistance(source, target)
+    Math.abs(sourceToTargetFile) === Math.abs(sourceToTargetRank) &&
+    Math.abs(sourceToScreenFile) === Math.abs(sourceToScreenRank) &&
+    Math.sign(sourceToScreenFile) === Math.sign(sourceToTargetFile) &&
+    Math.sign(sourceToScreenRank) === Math.sign(sourceToTargetRank) &&
+    Math.abs(sourceToScreenFile) < Math.abs(sourceToTargetFile)
   )
 }
 
@@ -321,57 +335,53 @@ export function getBlackKingFrontSquares(blackKing: Square): Square[] {
   return candidates.filter((square): square is Square => square !== null)
 }
 
-function isDiagonalEdgeWalkPhaseTwo(
-  fen: string,
-  blackKing: Square,
-  whiteKing: Square,
-): boolean {
-  const black = squareCoordinates(blackKing)
-  const white = squareCoordinates(whiteKing)
-  if (
-    Math.abs(black.file - white.file) !== 2 ||
-    Math.abs(black.rank - white.rank) !== 2
-  ) {
-    return false
-  }
-  const moves = getChess(withFenTurn(fen, 'b')).moves({ verbose: true })
-  if (moves.length === 0) return false
-  return moves.every((move) => {
-    if (move.from !== blackKing || edgeDistance(move.to) !== 0) return false
-    const target = squareCoordinates(move.to)
-    const movesTowardWhiteOnFileEdge =
-      (black.file === 0 || black.file === 7) &&
-      target.file === black.file &&
-      Math.abs(target.rank - white.rank) <
-        Math.abs(black.rank - white.rank)
-    const movesTowardWhiteOnRankEdge =
-      (black.rank === 0 || black.rank === 7) &&
-      target.rank === black.rank &&
-      Math.abs(target.file - white.file) <
-        Math.abs(black.file - white.file)
-    return movesTowardWhiteOnFileEdge || movesTowardWhiteOnRankEdge
-  })
-}
-
 export function isTwoBishopsPhaseTwoPosition(fen: string): boolean {
   if (getChess(fen).turn() !== 'w') return false
   const blackKing = findPiece(fen, 'b', 'k')
-  const whiteKing = findPiece(fen, 'w', 'k')
   if (
     !blackKing ||
-    !whiteKing ||
     getWhiteBishopSquares(fen).length !== 2 ||
     edgeDistance(blackKing.square) !== 0
   ) {
     return false
   }
-  const controlledFrontSquares = getBlackKingFrontSquares(
-    blackKing.square,
-  ).filter((square) => kingDistance(whiteKing.square, square) === 1)
-  return (
-    controlledFrontSquares.length >= 2 ||
-    isDiagonalEdgeWalkPhaseTwo(fen, blackKing.square, whiteKing.square)
-  )
+  const blackMoves = getChess(withFenTurn(fen, 'b'))
+    .moves({ verbose: true })
+    .filter((move) => move.from === blackKing.square)
+  const blackTrappedOnCurrentEdge =
+    blackMoves.length > 0 &&
+    blackMoves.every(
+      (move) =>
+        edgeDistance(move.to) === 0 &&
+        sharesAnyEdge(blackKing.square, move.to),
+    )
+  const blackTrappedInCornerCage =
+    blackMoves.length > 0 &&
+    getBlackKingReachableArea(fen) <= 3 &&
+    blackMoves.every((move) => edgeDistance(move.to) === 0)
+  const blackAlreadyTrapped =
+    blackTrappedOnCurrentEdge || blackTrappedInCornerCage
+  if (blackAlreadyTrapped) return true
+
+  return getChess(fen)
+    .moves({ verbose: true })
+    .filter((move) => move.piece === 'k')
+    .some((move) => {
+      const afterWhite = getChess(fen)
+      afterWhite.move(move.san)
+      if (afterWhite.isStalemate()) return false
+      const replies = afterWhite
+        .moves({ verbose: true })
+        .filter((reply) => reply.from === blackKing.square)
+      return (
+        replies.length > 0 &&
+        replies.every(
+          (reply) =>
+            edgeDistance(reply.to) === 0 &&
+            sharesAnyEdge(blackKing.square, reply.to),
+        )
+      )
+    })
 }
 
 export function getTwoBishopsPhaseLabel(fen: string): string {

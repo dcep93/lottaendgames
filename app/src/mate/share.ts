@@ -24,6 +24,7 @@ export type MateReplayDecodeResult =
       readonly ok: true
       readonly fen: string
       readonly moves: readonly string[] | null
+      readonly cursor?: 0
     }
   | { readonly ok: false }
 
@@ -82,13 +83,16 @@ export function encodeMateLiveFen(fen: string): string {
 export function encodeMateReplay(
   fen: string,
   moves: readonly string[],
+  cursor: 0 | null = null,
 ): string {
   if (moves.length === 0 || moves.length > MATE_REPLAY_MAX_PLIES) {
     throw new RangeError(
       `Mate replay requires 1-${MATE_REPLAY_MAX_PLIES} plies`,
     )
   }
-  return `${encodeMateFen(fen)}&moves=${moves.map(encodeURIComponent).join(',')}`
+  return `${encodeMateFen(fen)}&moves=${moves.map(encodeURIComponent).join(',')}${
+    cursor === 0 ? '&cursor=0' : ''
+  }`
 }
 
 export function decodeMateReplay(
@@ -98,7 +102,7 @@ export function decodeMateReplay(
 ): MateReplayDecodeResult {
   if (!hash.startsWith('#fen=')) return INVALID_MATE_REPLAY
   const parts = hash.slice(1).split('&')
-  if (parts.length > 2 || parts[0]?.startsWith('fen=') !== true) {
+  if (parts.length > 3 || parts[0]?.startsWith('fen=') !== true) {
     return INVALID_MATE_REPLAY
   }
   const fenResult = decodeMateFen(`#${parts[0]}`, mateId, mode)
@@ -113,6 +117,10 @@ export function decodeMateReplay(
   }
   const encodedMoves = movesField.slice('moves='.length)
   if (encodedMoves === '') return INVALID_MATE_REPLAY
+  const cursorField = parts[2]
+  if (cursorField !== undefined && cursorField !== 'cursor=0') {
+    return INVALID_MATE_REPLAY
+  }
 
   let decodedMoves: string
   try {
@@ -154,6 +162,7 @@ export function decodeMateReplay(
     ok: true,
     fen: fenResult.fen,
     moves: Object.freeze(canonicalMoves),
+    ...(cursorField === 'cursor=0' ? { cursor: 0 as const } : {}),
   }
 }
 

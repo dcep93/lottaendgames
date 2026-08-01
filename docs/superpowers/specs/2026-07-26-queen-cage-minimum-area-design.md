@@ -1,5 +1,8 @@
 # Queen cage minimum area
 
+> Superseded by `2026-07-26-queen-cage-safe-squares-design.md`, which replaces
+> raw area with the user-visible safe-square count.
+
 ## Goal
 
 Keep the Queen `corner cage` description and selector mechanically aligned:
@@ -15,8 +18,9 @@ cage`, reject a candidate whose box area is less than two before comparing
 eligible boxes by shorter side and then longer side.
 
 The universal `mate`, `pieces safe`, and `no stalemate` priorities remain
-higher. Therefore an immediate checkmate is still selected even when its final
-geometry occupies one square.
+higher. A sole immediate checkmate therefore still defeats every non-mating
+move. When multiple immediate mates survive, `corner cage` may reject a
+one-square result in favor of another mate.
 
 Do not clamp a one-square box to invented dimensions or add a hidden selector.
 Expose the minimum-area comparison as part of the existing visible `corner

@@ -8,25 +8,16 @@ import {
   getTwoBishopsProofDistance,
   isTwoBishopsProofProgress,
 } from '../../app/src/mate/rules/twoBishopsProof.ts'
-import { twoBishopsWhiteRules } from '../../app/src/mate/rules/twoBishops.ts'
 import type { MateVerificationResult } from './types.mts'
 
 const EXPECTED_TABLE_BYTES = 10 * 64 * 32 * 32
-const EXPECTED_RULE_PREFIX = [
-  'mate',
-  'bishops safe',
-  'no stalemate',
-] as const
 
 /**
- * Exhaustive certificate for the position-only KBB-v-K policy.
+ * Validates the offline KBB-v-K exact-distance reference table.
  *
  * Every nonzero table entry is an exact White-to-move distance to mate. The
- * internal White filter rejects every move whose worst legal Black reply does not
- * lower that distance, except for a one-way corner waiting move. That wait
- * starts with bishops at most three king moves apart and ends with them farther
- * apart, so it cannot be selected again until a strictly decreasing move has
- * happened. DTM therefore falls at least every other White turn.
+ * production selector does not use this table; verify_mate_patterns.mts
+ * traverses the production rules themselves.
  */
 export function verifyTwoBishopsProofCertificate(): MateVerificationResult {
   const data = Buffer.from(TWO_BISHOPS_PROOF_DATA_BASE64, 'base64')
@@ -57,20 +48,6 @@ export function verifyTwoBishopsProofCertificate(): MateVerificationResult {
     )
   }
 
-  const rulePrefix = twoBishopsWhiteRules
-    .slice(0, EXPECTED_RULE_PREFIX.length)
-    .map(({ id }) => id)
-  const proofGuard = twoBishopsWhiteRules[EXPECTED_RULE_PREFIX.length]
-  if (
-    rulePrefix.length !== EXPECTED_RULE_PREFIX.length ||
-    rulePrefix.some((id, index) => id !== EXPECTED_RULE_PREFIX[index]) ||
-    proofGuard?.presentationRole !== 'internal'
-  ) {
-    return incomplete(
-      `Two Bishops proof filter must immediately follow ${EXPECTED_RULE_PREFIX.join(', ')}`,
-    )
-  }
-
   for (
     let currentDistance = 1;
     currentDistance <= maximumDistance;
@@ -81,20 +58,28 @@ export function verifyTwoBishopsProofCertificate(): MateVerificationResult {
       worstReplyDistance <= maximumDistance;
       worstReplyDistance += 1
     ) {
-      for (const supportedCornerWait of [false, true]) {
-        for (let startingBishopDistance = 0; startingBishopDistance <= 7; startingBishopDistance += 1) {
-          for (let resultingBishopDistance = 0; resultingBishopDistance <= 7; resultingBishopDistance += 1) {
+      for (const edgeWaitingMove of [false, true]) {
+        for (
+          let startingBishopDistance = 0;
+          startingBishopDistance <= 7;
+          startingBishopDistance += 1
+        ) {
+          for (
+            let resultingBishopDistance = 0;
+            resultingBishopDistance <= 7;
+            resultingBishopDistance += 1
+          ) {
             const accepted = isTwoBishopsProofProgress({
               currentDistance,
               worstReplyDistance,
-              supportedCornerWait,
+              edgeWaitingMove,
               startingBishopDistance,
               resultingBishopDistance,
             })
             const proven =
               worstReplyDistance < currentDistance ||
               (worstReplyDistance === currentDistance &&
-                supportedCornerWait &&
+                edgeWaitingMove &&
                 startingBishopDistance <= 3 &&
                 resultingBishopDistance > 3)
             if (accepted !== proven) {

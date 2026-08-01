@@ -2,6 +2,7 @@ import type { Square } from 'chess.js'
 import {
   findPiece,
   getChess,
+  hasDirectKingOpposition,
   isKnightMove,
   kingDistance,
   manhattanDistance,
@@ -11,32 +12,35 @@ import {
   blackCanTakeWhiteMajorPiece,
   getRookBoxFromFen,
 } from './majorPieceGeometry'
-import { lookupMajorPieceMateProgress } from './majorPieceMateProgress'
-import type { OrderedRule } from './types'
+import type { RookBox } from './majorPieceGeometry'
+import type { OrderedRule, ScoredMove } from './types'
 
 export type RookStrategyScore = {
   readonly matePenalty: number
   readonly rookCapturePenalty: number
   readonly stalematePenalty: number
-  readonly convergencePenalty: number
   readonly keepBoxPenalty: number
+  readonly rookBoxBlackDistanceScore: number
+  readonly resultHasBox: boolean
+  readonly noBoxRookMovePenalty: number
+  readonly noBoxRookBlackDistanceScore: number
+  readonly waitingMoveApplies: boolean
   readonly waitingMovePenalty: number
   readonly waitingMoveBlackDistanceScore: number
   readonly shrinkBoxPenalty: number
   readonly shrinkBoxRoom: number
+  readonly kingOppositionPenalty: number
   readonly kingProximityPriority: number
   readonly kingDistance: number
   readonly kingManhattanDistance: number
-  readonly rookHomePenalty: number
-  readonly rookHomeBlackDistance: number
-  readonly rookSafePenalty: number
-  readonly rookSafeBlackDistanceScore: number
 }
 
-const ROOK_BOX_HELP = 'Create, keep and shrink a box around Black.'
+const ROOK_BOX_HELP =
+  'Create, keep, and shrink Black’s box against the board edge. Move an attacked rook as far away as the box allows. If no box is possible, move the rook as far from Black as possible.'
 const WAITING_MOVE_HELP =
-  'Move the rook, keeping any existing box, as far from Black’s king as possible, but necessarily closer to White’s king than Black’s.'
-const KING_CLOSER_HELP = "Bring White's king toward Black's king."
+  "When the kings are a knight's move apart, or every box shrink hangs the rook, keep the box and move the rook, as far from Black as possible, but closer to White's king, but not touching White's king."
+const KING_CLOSER_HELP =
+  "Move White's king closer to Black's king, preferably without taking opposition."
 
 export const rookStrategyRules: readonly OrderedRule<RookStrategyScore>[] = [
   {
@@ -60,47 +64,43 @@ export const rookStrategyRules: readonly OrderedRule<RookStrategyScore>[] = [
       first.stalematePenalty - second.stalematePenalty,
   },
   {
-    id: 'rook convergence',
-    shortLabel: 'rook convergence',
-    helpText: '',
-    presentationRole: 'internal',
-    compare: (first, second) =>
-      first.convergencePenalty - second.convergencePenalty,
-  },
-  {
     id: 'rook box',
     shortLabel: 'rook box',
     helpText: ROOK_BOX_HELP,
-    compare: (first, second) =>
-      first.keepBoxPenalty - second.keepBoxPenalty,
-  },
-  {
-    id: 'rook box',
-    shortLabel: 'rook box',
-    helpText: ROOK_BOX_HELP,
-    compare: (first, second) =>
-      first.shrinkBoxPenalty - second.shrinkBoxPenalty ||
-      first.shrinkBoxRoom - second.shrinkBoxRoom,
+    subpriorities: [
+      {
+        compare: (first, second) =>
+          first.keepBoxPenalty - second.keepBoxPenalty,
+      },
+      {
+        compare: (first, second) =>
+          first.shrinkBoxPenalty - second.shrinkBoxPenalty ||
+          first.shrinkBoxRoom - second.shrinkBoxRoom,
+      },
+      {
+        compare: (first, second) =>
+          first.rookBoxBlackDistanceScore -
+          second.rookBoxBlackDistanceScore,
+      },
+      {
+        when: (scores) =>
+          scores.every(({ resultHasBox }) => !resultHasBox),
+        compare: (first, second) =>
+          first.noBoxRookMovePenalty - second.noBoxRookMovePenalty ||
+          first.noBoxRookBlackDistanceScore -
+            second.noBoxRookBlackDistanceScore,
+      },
+    ],
   },
   {
     id: 'waiting move',
     shortLabel: 'waiting move',
     helpText: WAITING_MOVE_HELP,
+    applies: (score) => score.waitingMoveApplies,
     compare: (first, second) =>
       first.waitingMovePenalty - second.waitingMovePenalty ||
       first.waitingMoveBlackDistanceScore -
         second.waitingMoveBlackDistanceScore,
-  },
-  {
-    id: 'rook box',
-    shortLabel: 'rook box',
-    helpText: ROOK_BOX_HELP,
-    compare: (first, second) =>
-      first.rookHomePenalty - second.rookHomePenalty ||
-      first.rookHomeBlackDistance - second.rookHomeBlackDistance ||
-      first.rookSafePenalty - second.rookSafePenalty ||
-      first.rookSafeBlackDistanceScore -
-        second.rookSafeBlackDistanceScore,
   },
   {
     id: 'king closer',
@@ -108,6 +108,7 @@ export const rookStrategyRules: readonly OrderedRule<RookStrategyScore>[] = [
     helpText: KING_CLOSER_HELP,
     compare: (first, second) =>
       first.kingProximityPriority - second.kingProximityPriority ||
+      first.kingOppositionPenalty - second.kingOppositionPenalty ||
       first.kingDistance - second.kingDistance ||
       first.kingManhattanDistance - second.kingManhattanDistance,
   },
@@ -117,47 +118,90 @@ export function scoreRookStrategyMove(
   fen: string,
   san: string,
 ): RookStrategyScore {
+  return scoreRookStrategyMoveWithContext(
+    fen,
+    san,
+    positionNeedsRookWaitingMove(fen),
+  )
+}
+
+export function scoreRookStrategyCandidates(
+  fen: string,
+  moves: readonly string[],
+): readonly ScoredMove<RookStrategyScore>[] {
+  const needsWaitingMove = positionNeedsRookWaitingMove(fen)
+  return moves.map((san) => ({
+    san,
+    score: scoreRookStrategyMoveWithContext(
+      fen,
+      san,
+      needsWaitingMove,
+    ),
+  }))
+}
+
+function scoreRookStrategyMoveWithContext(
+  fen: string,
+  san: string,
+  needsWaitingMove: boolean,
+): RookStrategyScore {
   const beforeRook = findPiece(fen, 'w', 'r')
   const beforeWhiteKing = findPiece(fen, 'w', 'k')
   const beforeBlackKing = findPiece(fen, 'b', 'k')
   const beforeBox = getRookBoxFromFen(fen)
-  const beforeBoxRoom = beforeBox.size
+  const beforeRookAttacked = Boolean(
+    beforeRook &&
+      beforeBlackKing &&
+      kingDistance(beforeBlackKing.square, beforeRook.square) === 1,
+  )
   const chess = getChess(fen)
   const move = chess.move(san)
   const resultFen = chess.fen()
-  const beforeProgress = lookupMajorPieceMateProgress('rook', fen)
-  const resultProgress = lookupMajorPieceMateProgress('rook', resultFen)
   const whiteRook = findPiece(resultFen, 'w', 'r')
   const whiteKing = findPiece(resultFen, 'w', 'k')
   const blackKing = findPiece(resultFen, 'b', 'k')
   const resultBox = getRookBoxFromFen(resultFen)
-  const resultBoxRoom = resultBox.size
   const rookIsSafe = !blackCanTakeWhiteMajorPiece(resultFen, 'r')
-  const preservesOrShrinksBox =
+  const blackReplies = chess.isCheck() ? chess.moves() : []
+  const checkingSqueezeReplyRooms =
+    move.piece === 'r' &&
     beforeBox.size !== null &&
-    resultBox.size !== null &&
-    resultBox.size <= beforeBox.size
-  const retainsStrongestBoundary = Boolean(
-    beforeRook &&
-      whiteRook &&
-      beforeBox.strongestCuts.some((beforeCut) =>
-        resultBox.cuts.some(
-          (resultCut) =>
-            resultCut.axis === beforeCut.axis &&
-            squareCoordinates(whiteRook.square)[resultCut.axis] ===
-              squareCoordinates(beforeRook.square)[beforeCut.axis],
-        ),
-      ),
+    rookIsSafe &&
+    blackReplies.length > 0
+      ? blackReplies.map((blackSan) => {
+          const reply = getChess(resultFen)
+          reply.move(blackSan)
+          return getSameEdgeShrinkRoom(
+            beforeBox,
+            getRookBoxFromFen(reply.fen()),
+          )
+        })
+      : []
+  const forcedCheckingSqueezeRoom =
+    checkingSqueezeReplyRooms.length > 0 &&
+    checkingSqueezeReplyRooms.every(
+      (room): room is number => room !== null,
+    )
+      ? Math.max(...checkingSqueezeReplyRooms)
+      : null
+  const directShrinkRoom =
+    move.piece === 'r'
+      ? getSameEdgeShrinkRoom(beforeBox, resultBox)
+      : null
+  const shrinkRoom = forcedCheckingSqueezeRoom ?? directShrinkRoom
+  const preservesStrongestWall = retainsStrongestEdge(
+    beforeBox,
+    resultBox,
   )
-  const needsKnightWaitingMove = Boolean(
-    beforeWhiteKing &&
-      beforeBlackKing &&
-      isKnightMove(beforeWhiteKing.square, beforeBlackKing.square),
-  )
-  const needsWaitingMove = needsKnightWaitingMove
+  const createsBox = beforeBox.size === null && resultBox.size !== null
+  const shrinksExistingBox =
+    beforeBox.size !== null && shrinkRoom !== null
   const keepsExistingBox =
-    beforeBox.size === null ||
-    (preservesOrShrinksBox && retainsStrongestBoundary)
+    beforeBox.size === null || shrinksExistingBox || preservesStrongestWall
+  const satisfiesBoxRule =
+    beforeBox.size === null ? createsBox : keepsExistingBox
+  const resultHasBox =
+    forcedCheckingSqueezeRoom !== null || resultBox.size !== null
   const baseWaitingMove = Boolean(
     needsWaitingMove &&
       move.piece === 'r' &&
@@ -170,10 +214,9 @@ export function scoreRookStrategyMove(
       whiteRook &&
       whiteKing &&
       blackKing &&
-      manhattanDistance(whiteRook.square, whiteKing.square) <
-        manhattanDistance(whiteRook.square, blackKing.square) &&
-      manhattanDistance(whiteRook.square, blackKing.square) >=
-        manhattanDistance(beforeRook.square, beforeBlackKing.square),
+      kingDistance(whiteRook.square, whiteKing.square) > 1 &&
+      kingDistance(whiteRook.square, whiteKing.square) <
+        kingDistance(whiteRook.square, blackKing.square),
   )
   const waitingMovePriority = !needsWaitingMove
     ? 0
@@ -182,15 +225,21 @@ export function scoreRookStrategyMove(
       : 1
   const waitingMoveBlackDistanceScore =
     baseWaitingMove && whiteRook && blackKing
-      ? -manhattanDistance(whiteRook.square, blackKing.square)
+      ? -(
+          kingDistance(whiteRook.square, blackKing.square) * 16 +
+          manhattanDistance(whiteRook.square, blackKing.square)
+        )
       : 0
-  const rookExposed = Boolean(
-    whiteRook &&
-      whiteKing &&
-      blackKing &&
-      kingDistance(whiteKing.square, whiteRook.square) >
-        kingDistance(blackKing.square, whiteRook.square),
+  const noBoxRookMove = Boolean(
+    move.piece === 'r' && whiteRook && blackKing,
   )
+  const noBoxRookBlackDistanceScore =
+    noBoxRookMove && whiteRook && blackKing
+      ? -(
+          kingDistance(whiteRook.square, blackKing.square) * 16 +
+          manhattanDistance(whiteRook.square, blackKing.square)
+        )
+      : 0
   const kingGetsCloser = Boolean(
     move.piece === 'k' &&
       beforeWhiteKing &&
@@ -203,83 +252,40 @@ export function scoreRookStrategyMove(
         blackKing.square,
       ),
   )
-  const rookHome = Boolean(
-    beforeBox.size === null &&
-      move.piece === 'r' &&
-      beforeRook &&
-      beforeWhiteKing &&
-      beforeBlackKing &&
-      whiteRook &&
-      whiteKing &&
-      blackKing &&
-      isRookHomeMove(
-        beforeWhiteKing.square,
-        beforeRook.square,
-        beforeBlackKing.square,
-        whiteRook.square,
-      ) &&
-      (kingDistance(whiteRook.square, blackKing.square) > 1 ||
-        kingDistance(whiteRook.square, whiteKing.square) === 1) &&
-      !chess.isStalemate(),
-  )
-  const rookSafe = Boolean(
-    beforeBox.size === null &&
-      move.piece === 'r' &&
-      beforeRook &&
-      whiteRook &&
-      whiteKing &&
-      blackKing &&
-      movedToDifferentEdge(beforeRook.square, whiteRook.square) &&
-      kingDistance(whiteRook.square, blackKing.square) > 2 &&
-      !chess.isStalemate(),
-  )
-  const shrinksBox = Boolean(
-    move.piece === 'r' &&
-      beforeBoxRoom !== null &&
-      resultBoxRoom !== null &&
-      resultBoxRoom < beforeBoxRoom &&
-      !rookExposed &&
-      !chess.isStalemate(),
-  )
-  const moveDoesNotRegressAfterReply = Boolean(
-    beforeProgress.kind === 'winning' &&
-      (shrinksBox || baseWaitingMove) &&
-      chess.moves().every((blackSan) => {
-        const afterBlack = getChess(resultFen)
-        afterBlack.move(blackSan)
-        const progress = lookupMajorPieceMateProgress(
-          'rook',
-          afterBlack.fen(),
-        )
-        return (
-          progress.kind === 'winning' &&
-          progress.rank <= beforeProgress.rank
-        )
-      }),
-  )
-
   return {
     matePenalty: chess.isCheckmate() ? 0 : 1,
     rookCapturePenalty: rookIsSafe ? 0 : 1,
     stalematePenalty: !chess.isCheckmate() && chess.isStalemate() ? 1 : 0,
-    convergencePenalty:
-      beforeProgress.kind !== 'winning' ||
-      (resultProgress.kind === 'winning' &&
-        // Ordinary moves lower the proof rank. A human box shrink or
-        // wait may spend a tempo, but no legal Black reply may give that
-        // progress back.
-        (resultProgress.rank < beforeProgress.rank ||
-          (moveDoesNotRegressAfterReply &&
-            (shrinksBox || baseWaitingMove))))
-        ? 0
-        : 1,
-    keepBoxPenalty:
-      beforeBox.size === null || preservesOrShrinksBox ? 0 : 1,
+    keepBoxPenalty: satisfiesBoxRule ? 0 : 1,
+    rookBoxBlackDistanceScore:
+      beforeBox.size !== null &&
+      beforeRookAttacked &&
+      !needsWaitingMove &&
+      move.piece === 'r' &&
+      rookIsSafe &&
+      keepsExistingBox &&
+      whiteRook &&
+      blackKing
+        ? -(
+            kingDistance(whiteRook.square, blackKing.square) * 16 +
+            manhattanDistance(whiteRook.square, blackKing.square)
+          )
+        : 0,
+    resultHasBox,
+    noBoxRookMovePenalty: noBoxRookMove ? 0 : 1,
+    noBoxRookBlackDistanceScore,
+    waitingMoveApplies: needsWaitingMove,
     waitingMovePenalty: waitingMovePriority,
     waitingMoveBlackDistanceScore,
-    shrinkBoxPenalty: shrinksBox ? 0 : 1,
-    shrinkBoxRoom:
-      shrinksBox && resultBoxRoom !== null ? resultBoxRoom : 15,
+    shrinkBoxPenalty: shrinksExistingBox ? 0 : 1,
+    shrinkBoxRoom: shrinkRoom ?? 15,
+    kingOppositionPenalty:
+      move.piece === 'k' &&
+      whiteKing &&
+      blackKing &&
+      hasDirectKingOpposition(whiteKing.square, blackKing.square)
+        ? 1
+        : 0,
     kingProximityPriority:
       move.piece !== 'k' ? 1 : kingGetsCloser ? 0 : 2,
     kingDistance:
@@ -290,17 +296,79 @@ export function scoreRookStrategyMove(
       whiteKing && blackKing
         ? manhattanDistance(whiteKing.square, blackKing.square)
         : 16,
-    rookHomePenalty: rookHome ? 0 : 1,
-    rookHomeBlackDistance:
-      rookHome && whiteRook && blackKing
-        ? manhattanDistance(whiteRook.square, blackKing.square)
-        : 16,
-    rookSafePenalty: rookSafe ? 0 : 1,
-    rookSafeBlackDistanceScore:
-      rookSafe && whiteRook && blackKing
-        ? -kingDistance(whiteRook.square, blackKing.square)
-        : 0,
   }
+}
+
+function positionNeedsRookWaitingMove(fen: string): boolean {
+  const beforeRook = findPiece(fen, 'w', 'r')
+  const beforeWhiteKing = findPiece(fen, 'w', 'k')
+  const beforeBlackKing = findPiece(fen, 'b', 'k')
+  const beforeBox = getRookBoxFromFen(fen)
+  return Boolean(
+    beforeRook &&
+      beforeWhiteKing &&
+      beforeBlackKing &&
+      beforeBox.size !== null &&
+      (isKnightMove(beforeWhiteKing.square, beforeBlackKing.square) ||
+        everyDirectRookShrinkHangs(fen, beforeBox)),
+  )
+}
+
+function everyDirectRookShrinkHangs(
+  fen: string,
+  beforeBox: RookBox,
+): boolean {
+  const shrinkingResults = getChess(fen)
+    .moves()
+    .flatMap((san) => {
+      const candidate = getChess(fen)
+      const move = candidate.move(san)
+      if (move?.piece !== 'r') {
+        return []
+      }
+      const resultFen = candidate.fen()
+      const shrinkRoom = getSameEdgeShrinkRoom(
+        beforeBox,
+        getRookBoxFromFen(resultFen),
+      )
+      return shrinkRoom !== null
+        ? [blackCanTakeWhiteMajorPiece(resultFen, 'r')]
+        : []
+    })
+
+  return (
+    shrinkingResults.length > 0 &&
+    shrinkingResults.every((hangsRook) => hangsRook)
+  )
+}
+
+function getSameEdgeShrinkRoom(
+  beforeBox: RookBox,
+  resultBox: RookBox,
+): number | null {
+  const rooms = beforeBox.strongestCuts.flatMap((beforeCut) =>
+    resultBox.cuts
+      .filter(
+        (resultCut) =>
+          resultCut.edge === beforeCut.edge &&
+          resultCut.size < beforeCut.size,
+      )
+      .map((resultCut) => resultCut.size),
+  )
+  return rooms.length > 0 ? Math.min(...rooms) : null
+}
+
+function retainsStrongestEdge(
+  beforeBox: RookBox,
+  resultBox: RookBox,
+): boolean {
+  return beforeBox.strongestCuts.some((beforeCut) =>
+    resultBox.cuts.some(
+      (resultCut) =>
+        resultCut.edge === beforeCut.edge &&
+        resultCut.size === beforeCut.size,
+    ),
+  )
 }
 
 function movesKingCloserWithoutAxisRegression(
@@ -322,59 +390,4 @@ function movesKingCloserWithoutAxisRegression(
     (resultFileDistance < beforeFileDistance ||
       resultRankDistance < beforeRankDistance)
   )
-}
-
-function isRookHomeMove(
-  whiteKingSquare: Square,
-  beforeRookSquare: Square,
-  blackKingSquare: Square,
-  resultRookSquare: Square,
-): boolean {
-  const white = squareCoordinates(whiteKingSquare)
-  const beforeRook = squareCoordinates(beforeRookSquare)
-  const black = squareCoordinates(blackKingSquare)
-  const resultRook = squareCoordinates(resultRookSquare)
-  return (
-    (black.file < white.file &&
-      beforeRook.file !== white.file - 1 &&
-      resultRook.file === white.file - 1) ||
-    (black.file > white.file &&
-      beforeRook.file !== white.file + 1 &&
-      resultRook.file === white.file + 1) ||
-    (black.rank < white.rank &&
-      beforeRook.rank !== white.rank - 1 &&
-      resultRook.rank === white.rank - 1) ||
-    (black.rank > white.rank &&
-      beforeRook.rank !== white.rank + 1 &&
-      resultRook.rank === white.rank + 1) ||
-    (beforeRook.file === white.file &&
-      white.file === black.file &&
-      Math.abs(resultRook.file - white.file) === 1) ||
-    (beforeRook.rank === white.rank &&
-      white.rank === black.rank &&
-      Math.abs(resultRook.rank - white.rank) === 1)
-  )
-}
-
-function movedToDifferentEdge(
-  beforeSquare: Square,
-  resultSquare: Square,
-): boolean {
-  const beforeEdges = squareEdges(beforeSquare)
-  const resultEdges = squareEdges(resultSquare)
-  return (
-    resultEdges.length > 0 &&
-    (beforeEdges.length === 0 ||
-      resultEdges.some((edge) => !beforeEdges.includes(edge)))
-  )
-}
-
-function squareEdges(square: Square): readonly string[] {
-  const { file, rank } = squareCoordinates(square)
-  return [
-    ...(file === 0 ? ['left'] : []),
-    ...(file === 7 ? ['right'] : []),
-    ...(rank === 0 ? ['bottom'] : []),
-    ...(rank === 7 ? ['top'] : []),
-  ]
 }

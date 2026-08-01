@@ -340,14 +340,116 @@ export function knightAndBishopWhiteMoveForcesZone5(
   return knightAndBishopAllBlackRepliesStayInZone5(chess.fen(), zone5);
 }
 
-export function getKnightAndBishopZoneXEntryScore(fen: string, san: string): number {
-  const moveForcesZone5 = knightAndBishopWhiteMoveForcesZone5(fen, san);
-  const prepareMove = getKnightAndBishopZoneXPrepareMove(fen);
+function knightAndBishopResultForcesZone5(resultFen: string): boolean {
+  const chess = getChess(resultFen);
+  if (chess.turn() !== "b" || chess.isCheckmate() || chess.isStalemate()) {
+    return false;
+  }
+  const zone5 = getKnightAndBishopZone5PathInstance(resultFen);
+  return knightAndBishopAllBlackRepliesStayInZone5(resultFen, zone5);
+}
+
+export type KnightAndBishopZoneXScoreContext = {
+  readonly beforeBlackKingSquare: Square | undefined;
+  readonly beforeKnightSquare: Square | undefined;
+  readonly beforeWhiteKingSquare: Square | undefined;
+  readonly driftTarget: Square | undefined;
+  readonly establishedKnightRouteTarget: Square | undefined;
+  readonly hasKingProgressMove: boolean;
+  readonly prepareMove: string | undefined;
+  readonly prepareMoveForcesZone5: boolean;
+  readonly setup: KnightAndBishopZoneXSetup | undefined;
+  readonly waitingMoveActive: boolean;
+  readonly zone5: KnightAndBishopZone5 | undefined;
+};
+
+export function createKnightAndBishopZoneXScoreContext(
+  fen: string
+): KnightAndBishopZoneXScoreContext {
+  const zone5 = getKnightAndBishopZone5(fen);
+  const prepareMove = getKnightAndBishopZoneXPrepareMove(fen, zone5);
+  const beforeBlackKing = findPiece(fen, "b", "k");
+  const beforeKnight = findPiece(fen, "w", "n");
+  const beforeWhiteKing = findPiece(fen, "w", "k");
+  return {
+    beforeBlackKingSquare: beforeBlackKing?.square,
+    beforeKnightSquare: beforeKnight?.square,
+    beforeWhiteKingSquare: beforeWhiteKing?.square,
+    driftTarget: getKnightAndBishopZoneXKnightDriftTarget(fen),
+    establishedKnightRouteTarget:
+      getKnightAndBishopEstablishedZoneXKnightRouteTarget(fen),
+    hasKingProgressMove: knightAndBishopHasZoneXKingProgressMove(fen),
+    prepareMove,
+    prepareMoveForcesZone5: prepareMove
+      ? knightAndBishopWhiteMoveForcesZone5(fen, prepareMove)
+      : false,
+    setup: getKnightAndBishopZoneXSetup(fen),
+    waitingMoveActive: Boolean(
+      zone5 &&
+        beforeWhiteKing?.square === zone5.targetKingSquare &&
+        !prepareMove
+    ),
+    zone5,
+  };
+}
+
+export function getKnightAndBishopZoneXWaitingMoveScore(
+  fen: string,
+  resultFen: string,
+  move: ReturnType<Chess["move"]>,
+  context?: KnightAndBishopZoneXScoreContext
+): number {
+  const waitingMoveActive =
+    context?.waitingMoveActive ??
+    (() => {
+      const zone5 = getKnightAndBishopZone5(fen);
+      const whiteKing = findPiece(fen, "w", "k");
+      return Boolean(
+        zone5 &&
+          whiteKing?.square === zone5.targetKingSquare &&
+          !getKnightAndBishopZoneXPrepareMove(fen, zone5)
+      );
+    })();
+  if (!waitingMoveActive) {
+    return 0;
+  }
+  if (move?.piece !== "b") {
+    return 1;
+  }
+  const afterWhite = getChess(resultFen);
+  const replies = afterWhite.moves();
+  if (afterWhite.turn() !== "b" || replies.length === 0) {
+    return 1;
+  }
+  return replies.every((san) => {
+    const afterBlack = getChess(resultFen);
+    afterBlack.move(san);
+    const blackKing = findPiece(afterBlack.fen(), "b", "k");
+    return Boolean(blackKing && edgeDistance(blackKing.square) === 0);
+  })
+    ? 0
+    : 1;
+}
+
+export function getKnightAndBishopZoneXEntryScore(
+  fen: string,
+  san: string,
+  resultFen?: string,
+  context?: KnightAndBishopZoneXScoreContext
+): number {
+  const moveForcesZone5 = resultFen
+    ? knightAndBishopResultForcesZone5(resultFen)
+    : knightAndBishopWhiteMoveForcesZone5(fen, san);
+  const prepareMove = context
+    ? context.prepareMove
+    : getKnightAndBishopZoneXPrepareMove(fen);
   if (prepareMove) {
     const prepareMoveForcesZone5 =
       prepareMove === san
         ? moveForcesZone5
-        : knightAndBishopWhiteMoveForcesZone5(fen, prepareMove);
+        : context
+          ? context.prepareMoveForcesZone5
+          : knightAndBishopWhiteMoveForcesZone5(fen, prepareMove);
     if (prepareMoveForcesZone5) {
       return prepareMove === san ? 0 : moveForcesZone5 ? 1 : 2;
     }
@@ -356,13 +458,13 @@ export function getKnightAndBishopZoneXEntryScore(fen: string, san: string): num
 }
 
 export function getKnightAndBishopZoneXPrepareMove(
-  fen: string
+  fen: string,
+  zoneX = getKnightAndBishopZone5(fen)
 ): string | undefined {
   const chess = getChess(fen);
   if (chess.turn() !== "w") {
     return undefined;
   }
-  const zoneX = getKnightAndBishopZone5(fen);
   const bishop = findPiece(fen, "w", "b");
   const whiteKing = findPiece(fen, "w", "k");
   const blackKing = findPiece(fen, "b", "k");
@@ -469,14 +571,19 @@ export function getKnightAndBishopEstablishedZoneXKnightRouteTarget(
 export function getKnightAndBishopEstablishedZoneXKnightRouteScore(
   fen: string,
   resultFen: string,
-  move: ReturnType<Chess["move"]>
+  move: ReturnType<Chess["move"]>,
+  context?: KnightAndBishopZoneXScoreContext
 ): number {
-  const target = getKnightAndBishopEstablishedZoneXKnightRouteTarget(fen);
-  const beforeKnight = findPiece(fen, "w", "n");
+  const target = context
+    ? context.establishedKnightRouteTarget
+    : getKnightAndBishopEstablishedZoneXKnightRouteTarget(fen);
+  const beforeKnightSquare = context
+    ? context.beforeKnightSquare
+    : findPiece(fen, "w", "n")?.square;
   const afterKnight = findPiece(resultFen, "w", "n");
   if (
     !target ||
-    !beforeKnight ||
+    !beforeKnightSquare ||
     !afterKnight ||
     move?.piece !== "n" ||
     edgeDistance(afterKnight.square) === 0
@@ -484,7 +591,7 @@ export function getKnightAndBishopEstablishedZoneXKnightRouteScore(
     return 99;
   }
   const beforeDistance = getKnightDistanceToAnySquare(
-    beforeKnight.square,
+    beforeKnightSquare,
     [target]
   );
   const afterDistance = getKnightDistanceToAnySquare(
@@ -498,13 +605,14 @@ export function getKnightAndBishopZoneXPrepareScore(
   fen: string,
   _san: string,
   resultFen: string,
-  move: ReturnType<Chess["move"]>
+  move: ReturnType<Chess["move"]>,
+  context?: KnightAndBishopZoneXScoreContext
 ): {
   zoneXPrepareScore: number;
   zoneXPreparePieceProximity: number;
   zoneXDriftScore: number;
 } {
-  const setup = getKnightAndBishopZoneXSetup(fen);
+  const setup = context ? context.setup : getKnightAndBishopZoneXSetup(fen);
   if (!setup) {
     const resultSetup = getKnightAndBishopZoneXSetup(resultFen);
     if (
@@ -521,12 +629,21 @@ export function getKnightAndBishopZoneXPrepareScore(
         zoneXDriftScore: 99,
       };
     }
-    const driftTarget = getKnightAndBishopZoneXKnightDriftTarget(fen);
-    const beforeKnight = findPiece(fen, "w", "n");
+    const driftTarget = context
+      ? context.driftTarget
+      : getKnightAndBishopZoneXKnightDriftTarget(fen);
+    const beforeKnightSquare = context
+      ? context.beforeKnightSquare
+      : findPiece(fen, "w", "n")?.square;
     const afterKnight = findPiece(resultFen, "w", "n");
-    if (driftTarget && beforeKnight && afterKnight && move?.piece === "n") {
+    if (
+      driftTarget &&
+      beforeKnightSquare &&
+      afterKnight &&
+      move?.piece === "n"
+    ) {
       const beforeDistance = getKnightDistanceToAnySquare(
-        beforeKnight.square,
+        beforeKnightSquare,
         [driftTarget]
       );
       const afterDistance = getKnightDistanceToAnySquare(
@@ -548,19 +665,26 @@ export function getKnightAndBishopZoneXPrepareScore(
     };
   }
 
-  if (knightAndBishopHasZoneXKingProgressMove(fen)) {
-    const beforeWhiteKing = findPiece(fen, "w", "k");
-    const beforeBlackKing = findPiece(fen, "b", "k");
+  if (
+    context?.hasKingProgressMove ??
+    knightAndBishopHasZoneXKingProgressMove(fen)
+  ) {
+    const beforeWhiteKingSquare = context
+      ? context.beforeWhiteKingSquare
+      : findPiece(fen, "w", "k")?.square;
+    const beforeBlackKingSquare = context
+      ? context.beforeBlackKingSquare
+      : findPiece(fen, "b", "k")?.square;
     const afterWhiteKing = findPiece(resultFen, "w", "k");
     const afterBlackKing = findPiece(resultFen, "b", "k");
     const movedKingCloser =
       move?.piece === "k" &&
-      beforeWhiteKing &&
-      beforeBlackKing &&
+      beforeWhiteKingSquare &&
+      beforeBlackKingSquare &&
       afterWhiteKing &&
       afterBlackKing &&
       manhattanDistance(afterWhiteKing.square, afterBlackKing.square) <
-        manhattanDistance(beforeWhiteKing.square, beforeBlackKing.square);
+        manhattanDistance(beforeWhiteKingSquare, beforeBlackKingSquare);
     return {
       zoneXPrepareScore: movedKingCloser
         ? manhattanDistance(afterWhiteKing!.square, afterBlackKing!.square)

@@ -12,11 +12,6 @@ export type MatePriorityGuideDialogProps = {
   readonly returnFocusTo?: HTMLElement | null
 }
 
-const MOVE_LOG_LEGEND = Object.freeze([
-  'Correctness: 👍 means White chose a best move; 👎 means White did not. /N is the number of best White moves.',
-  'Black replies: X / Y means X best-resistance replies out of Y legal replies.',
-])
-
 function isFocusable(element: HTMLElement): boolean {
   return (
     !element.hasAttribute('disabled') &&
@@ -179,13 +174,15 @@ export default function MatePriorityGuideDialog({
           {ruleSet.help.notes.length === 0 &&
           ruleSet.help.noteBoards.length === 0 ? null : (
             <section className="leg-mate-guide-section">
-              <h3>Notes</h3>
               {ruleSet.help.notes.length === 0 ? null : (
-                <ul>
-                  {ruleSet.help.notes.map((note, index) => (
-                    <li key={`${index}-${note}`}>{note}</li>
-                  ))}
-                </ul>
+                <>
+                  <h3>Notes</h3>
+                  <ul>
+                    {ruleSet.help.notes.map((note, index) => (
+                      <li key={`${index}-${note}`}>{note}</li>
+                    ))}
+                  </ul>
+                </>
               )}
               {ruleSet.help.noteBoards.length === 0 ? null : (
                 <div
@@ -206,38 +203,27 @@ export default function MatePriorityGuideDialog({
             </section>
           )}
 
-          <div className="leg-mate-guide-footer">
-            <section className="leg-mate-guide-section">
-              <h3>Keyboard shortcuts</h3>
-              <dl className="leg-mate-guide-shortcuts">
-                <div>
-                  <dt><kbd>Enter</kbd></dt>
-                  <dd>Start over</dd>
-                </div>
-                <div>
-                  <dt><kbd>←</kbd></dt>
-                  <dd>Undo</dd>
-                </div>
-                <div>
-                  <dt><kbd>↑</kbd></dt>
-                  <dd>Play best move</dd>
-                </div>
-                <div>
-                  <dt><kbd>→</kbd></dt>
-                  <dd>Redo</dd>
-                </div>
-              </dl>
-            </section>
-
-            <section className="leg-mate-guide-section">
-              <h3>Legend</h3>
-              <ul>
-                {MOVE_LOG_LEGEND.map((entry) => (
-                  <li key={entry}>{entry}</li>
-                ))}
-              </ul>
-            </section>
-          </div>
+          <section className="leg-mate-guide-section">
+            <h3>Keyboard shortcuts</h3>
+            <dl className="leg-mate-guide-shortcuts">
+              <div>
+                <dt><kbd>Enter</kbd></dt>
+                <dd>Start over</dd>
+              </div>
+              <div>
+                <dt><kbd>←</kbd></dt>
+                <dd>Undo</dd>
+              </div>
+              <div>
+                <dt><kbd>↑</kbd></dt>
+                <dd>Play best move</dd>
+              </div>
+              <div>
+                <dt><kbd>→</kbd></dt>
+                <dd>Redo</dd>
+              </div>
+            </dl>
+          </section>
         </div>
       </section>
     </div>

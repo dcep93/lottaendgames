@@ -1,5 +1,7 @@
 import {
+  edgeDistance,
   findPiece,
+  getChess,
   isKnightMove,
   kingDistance,
   manhattanDistance,
@@ -14,6 +16,65 @@ import {
   sameDiagonal,
   sameSquareColor,
 } from './bishopKnightGeometry'
+
+export function knightAndBishopBlackEdgeEscapeScore(fen: string): number {
+  const blackKing = findPiece(fen, 'b', 'k')
+  const chess = getChess(fen)
+  if (
+    !blackKing ||
+    edgeDistance(blackKing.square) !== 0 ||
+    chess.turn() !== 'b'
+  ) {
+    return 0
+  }
+  return chess.moves().some((san) => {
+    const next = getChess(fen)
+    next.move(san)
+    const nextBlackKing = findPiece(next.fen(), 'b', 'k')
+    return Boolean(nextBlackKing && edgeDistance(nextBlackKing.square) > 0)
+  })
+    ? 1
+    : 0
+}
+
+export function knightAndBishopBishopWallScore(fen: string): number {
+  const whiteKing = findPiece(fen, 'w', 'k')
+  const blackKing = findPiece(fen, 'b', 'k')
+  const bishop = findPiece(fen, 'w', 'b')
+  if (!whiteKing || !blackKing || !bishop) return 2
+
+  const whiteKingCoords = squareCoords(whiteKing.square)
+  const blackKingCoords = squareCoords(blackKing.square)
+  const bishopCoords = squareCoords(bishop.square)
+  const edgeAdjacent =
+    Math.abs(bishopCoords.file - whiteKingCoords.file) +
+      Math.abs(bishopCoords.rank - whiteKingCoords.rank) ===
+    1
+  if (!edgeAdjacent) return 2
+
+  const blackFile = blackKingCoords.file - whiteKingCoords.file
+  const blackRank = blackKingCoords.rank - whiteKingCoords.rank
+  const bishopFile = bishopCoords.file - whiteKingCoords.file
+  const bishopRank = bishopCoords.rank - whiteKingCoords.rank
+  return blackFile * bishopFile + blackRank * bishopRank > 0 ? 0 : 1
+}
+
+export function knightAndBishopBlackCenterAccessScore(fen: string): number {
+  const chess = getChess(fen)
+  const replies = chess.turn() === 'b' ? chess.moves() : []
+  if (replies.length === 0) {
+    const blackKing = findPiece(fen, 'b', 'k')
+    return blackKing ? -centerDistance(blackKing.square) : 0
+  }
+  return -Math.min(
+    ...replies.map((san) => {
+      const next = getChess(fen)
+      next.move(san)
+      const blackKing = findPiece(next.fen(), 'b', 'k')
+      return blackKing ? centerDistance(blackKing.square) : 0
+    }),
+  )
+}
 
 export function knightAndBishopKingCloserOppositeBishopScore(
   fen: string,
@@ -44,6 +105,7 @@ export function knightAndBishopKingCloserOppositeBishopScore(
     return 99;
   }
   if (
+    edgeDistance(beforeBlackKing.square) > 0 &&
     knightAndBishopKingApproachesMiddle16(fen, resultFen, piece)
   ) {
     return 50 + middle16Distance(afterWhiteKing.square);
@@ -54,6 +116,8 @@ export function knightAndBishopKingCloserOppositeBishopScore(
     afterBlackKing.square
   );
   if (
+    kingDistance(afterWhiteKing.square, afterBlackKing.square) >=
+      kingDistance(beforeWhiteKing.square, beforeBlackKing.square) ||
     afterDistance >=
     squaredEuclideanDistance(
       beforeWhiteKing.square,

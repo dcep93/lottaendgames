@@ -1,17 +1,22 @@
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
 import test from 'node:test'
 import {
   compareScoresByRules,
   currentHint,
-  currentTeachingHint,
+  bishopKnightRuleSet,
   explainMove,
   findCandidateBySan,
   firstDifferingRule,
   getMateRuleSet,
   isMoveIdeal,
   rankUndefeatedScores,
+  queenRuleSet,
   registerMateRuleSet,
+  rookRuleSet as builtInRookRuleSet,
   selectIdealMoves,
+  twoBishopsRuleSet,
+  twoKnightsPawnRuleSet,
 } from './index'
 import type {
   MateRuleSet,
@@ -50,6 +55,48 @@ const candidates: readonly ScoredMove<TestScore>[] = [
   { san: 'Kc2', score: { safe: 0, closer: 2 } },
   { san: 'Kh1', score: { safe: 1, closer: 0 } },
 ]
+
+test('every built-in modal is the visible evaluator sequence', () => {
+  for (const ruleSet of [
+    queenRuleSet,
+    builtInRookRuleSet,
+    twoBishopsRuleSet,
+    bishopKnightRuleSet,
+    twoKnightsPawnRuleSet,
+  ]) {
+    const ids = ruleSet.whiteRules.map(({ id }) => id)
+    assert.equal(new Set(ids).size, ids.length, ruleSet.id)
+    assert.equal(ruleSet.whiteMoveOverride, undefined, ruleSet.id)
+    assert.equal(
+      ruleSet.whiteRules.some(
+        ({ guideOrder }) => guideOrder !== undefined,
+      ),
+      false,
+      ruleSet.id,
+    )
+    assert.deepEqual(
+      getMateRuleSet(ruleSet.id).whiteRuleDescriptions.map(({ id }) => id),
+      ruleSet.whiteRules.map(({ id }) => id),
+      ruleSet.id,
+    )
+  }
+})
+
+test('the production framework cannot hide or relabel a selector stage', () => {
+  const sources = [
+    './index.ts',
+    './selection.ts',
+    './types.ts',
+  ].map((path) =>
+    readFileSync(new URL(path, import.meta.url), 'utf8'),
+  ).join('\n')
+
+  assert.doesNotMatch(sources, /currentTeachingHint/)
+  assert.doesNotMatch(
+    sources,
+    /presentationRole\s*\??\s*:[^\n]*internal|presentationRole\s*===?\s*['"]internal/,
+  )
+})
 
 type OptionalDistanceScore = {
   readonly safe: number
@@ -400,12 +447,12 @@ test('a decisive move override preserves its ordered legal subset and explains e
     )
     assert.equal(registered.explainWhiteMove('fen', 'illegal'), undefined)
     assert.deepEqual(registered.whiteRuleDescriptions, [
+      lookupDescription,
       {
         id: 'safe',
         shortLabel: 'Keep it safe',
         helpText: 'Keep the piece safe.',
       },
-      lookupDescription,
       {
         id: 'closer',
         shortLabel: 'King closer',
@@ -804,7 +851,7 @@ test('a correct played move explains the closest non-ideal candidate', () => {
   assert.equal(currentHint(candidates, rules), closerRule)
 })
 
-test('a correctness guard stays exact while ideal moves receive a teaching hint', () => {
+test('a visible correctness guard is reported as the exact reason', () => {
   const guardRule: OrderedRule<TestScore> = {
     id: 'finish guarantee',
     shortLabel: 'finish guarantee',
@@ -821,10 +868,6 @@ test('a correctness guard stays exact while ideal moves receive a teaching hint'
 
   assert.deepEqual(selectIdealMoves(guardCandidates, guardRules), ['Ka2'])
   assert.equal(currentHint(guardCandidates, guardRules), guardRule)
-  assert.equal(
-    currentTeachingHint(guardCandidates, guardRules),
-    closerRule,
-  )
 
   const guardRuleSet: MateRuleSet<TestScore> = {
     ...rookRuleSet,
@@ -837,8 +880,11 @@ test('a correctness guard stays exact while ideal moves receive a teaching hint'
   const unregister = registerMateRuleSet(guardRuleSet)
   try {
     const registered = getMateRuleSet('bishop-knight')
-    assert.equal(registered.currentWhiteHint('fen')?.id, 'closer')
-    assert.equal(registered.explainWhiteMove('fen', 'Ka2')?.id, 'closer')
+    assert.equal(registered.currentWhiteHint('fen')?.id, 'finish guarantee')
+    assert.equal(
+      registered.explainWhiteMove('fen', 'Ka2')?.id,
+      'finish guarantee',
+    )
     assert.equal(
       registered.explainWhiteMove('fen', 'Kb2')?.id,
       'finish guarantee',
@@ -849,41 +895,6 @@ test('a correctness guard stays exact while ideal moves receive a teaching hint'
       helpText: 'Reject moves that can stall.',
       presentationRole: 'guard',
     })
-  } finally {
-    unregister()
-  }
-})
-
-test('an internal correctness filter stays exact without entering presentation', () => {
-  const internalRule: OrderedRule<TestScore> = {
-    id: 'internal proof filter',
-    shortLabel: 'internal proof filter',
-    helpText: '',
-    presentationRole: 'internal',
-    compare: (left, right) => left.safe - right.safe,
-  }
-  const internalCandidates: readonly ScoredMove<TestScore>[] = [
-    { san: 'Ka2', score: { safe: 0, closer: 0 } },
-    { san: 'Kb2', score: { safe: 1, closer: 2 } },
-  ]
-  const internalRuleSet: MateRuleSet<TestScore> = {
-    ...rookRuleSet,
-    id: 'bishop-knight',
-    whiteRules: [internalRule, closerRule],
-    whiteMoves: () => internalCandidates.map(({ san }) => san),
-    scoreWhite: (_fen, san) =>
-      internalCandidates.find((candidate) => candidate.san === san)!.score,
-  }
-  const unregister = registerMateRuleSet(internalRuleSet)
-  try {
-    const registered = getMateRuleSet('bishop-knight')
-    assert.deepEqual(registered.idealWhiteMoves('fen'), ['Ka2'])
-    assert.deepEqual(
-      registered.whiteRuleDescriptions.map(({ id }) => id),
-      ['closer'],
-    )
-    assert.equal(registered.currentWhiteHint('fen')?.id, 'closer')
-    assert.equal(registered.explainWhiteMove('fen', 'Kb2')?.id, 'closer')
   } finally {
     unregister()
   }

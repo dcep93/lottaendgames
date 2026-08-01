@@ -217,6 +217,26 @@ test('reconstructs the former exact Rook loop as undoable ordinary history', () 
   assert.equal(restored.fen, replay.fen)
 })
 
+test('reconstructs a replay at its beginning with Redo history seeded', () => {
+  const deps = createDeps()
+  const replay = createMateReplaySession(
+    {
+      mateId: 'rook',
+      mode: 'standard',
+      moves: ['Ra8+', 'Kg7'],
+      startAtBeginning: true,
+      startingFen: START_FEN,
+    },
+    deps,
+  )
+
+  assert.equal(replay.fen, getChess(START_FEN).fen())
+  assert.deepEqual(replay.logs, [])
+  assert.equal(replay.historyIndex, 0)
+  assert.equal(replay.history.length, 3)
+  assert.equal(redoMateMove(replay).historyIndex, 1)
+})
+
 test('records White and automatic Black moves as separate history steps', () => {
   const deps = createDeps({
     times: [1_000, 1_600],

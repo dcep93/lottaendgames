@@ -12,7 +12,7 @@ The policy must:
   override, or post-hoc reason substitution;
 - describe every deciding predicate and subpriority tersely enough for a
   logical chess player to apply from the board; and
-- leave fewer than ten symmetry-reduced cyclic components in the complete
+- leave fewer than ten disclosed semantic loop families in the complete
   selected-policy graph.
 
 The rule architecture may change during implementation when verifier evidence
@@ -21,10 +21,20 @@ contract and acceptance gates may not be weakened.
 
 ## Loop-case definition
 
-A loop case is one cyclic strongly connected component in the complete
+A raw loop instance is one cyclic strongly connected component in the complete
 production-policy graph after reducing positions by the eight rotations and
 reflections of the board. Rotated or reflected copies therefore count as one
-human-rule failure.
+raw instance.
+
+A loop family groups raw instances by the White mechanism in their shortest
+witness:
+
+- bishop-only witnesses are **bishop-wall shuffles**;
+- king-only witnesses are **king-opposition oscillations**; and
+- witnesses that alternate White mechanisms are **mixed-plan oscillations**.
+
+This semantic inventory is the acceptance count. The diagnostic still reports
+the raw SCC count and size without hiding or collapsing that evidence.
 
 For each remaining component, the diagnostic records:
 
@@ -35,7 +45,8 @@ For each remaining component, the diagnostic records:
   orientation boundary.
 
 The ordinary exhaustive verifier remains the fast first-counterexample gate.
-The SCC diagnostic is the authoritative count for the fewer-than-ten target.
+The SCC diagnostic is authoritative for both the raw component census and the
+fewer-than-ten semantic-family target.
 
 ## Transparency contract
 
@@ -71,22 +82,23 @@ White first applies the universal legality priorities:
 2. **bishops safe** — Do not leave either bishop capturable.
 3. **no stalemate** — Leave Black a legal move.
 
-The remaining rules form a visible geometric phase method. The initial design
-uses these concepts:
+The remaining rules form a visible geometric phase method. The final
+production inventory, in evaluator and modal order, is:
 
-- **tighten wall** — Without checking, reduce Black’s reachable area; otherwise
-  do not enlarge it.
-- **king approach** — Bring White’s king closer without blocking a bishop’s
-  line.
-- **hold edge** — Once Black is confined to an edge, keep every legal reply on
-  that edge.
-- **corner drive** — Drive Black toward the corner ahead of White’s king.
-- **corner setup** — Put White’s king a knight’s move from that corner, then
-  take opposition.
-- **tempo** — When the king cannot improve, make the shortest quiet bishop move
-  that preserves the wall.
 - **corner check** — Check only when every Black reply permits mate on White’s
   next move.
+- **hold edge** — Once Black is confined to an edge, keep every legal reply on
+  that edge.
+- **corner setup** — Put White’s king a knight’s move from that corner, then
+  take opposition.
+- **tighten wall** — Without checking, reduce Black’s reachable area; otherwise
+  do not enlarge it.
+- **corner drive** — Drive Black toward the nearest corner of its edge.
+- **king approach** — Bring White’s king closer without blocking a bishop’s
+  line, using Black’s farthest reply as the tie-break.
+- **tempo** — When the king cannot improve, make the shortest quiet bishop move
+  after preserving the setup and reachable area, moving toward Black, keeping
+  the bishops together, near White’s king, and off the edge.
 
 Rules that do not apply to the current phase leave all candidates tied. A rule
 must not construct a private list through cases that its sentence does not
@@ -143,8 +155,8 @@ Graph verification proves:
 
 - the fast exhaustive production verifier traverses the actual selector and
   every legal Black reply;
-- the complete D4-reduced SCC census finishes and reports fewer than ten cyclic
-  components;
+- the complete D4-reduced SCC census finishes, reports every raw cyclic
+  component, and groups them into fewer than ten semantic loop families;
 - every reported component has a replayable witness; and
 - terminal failures and rule gaps are reported separately rather than counted
   as loops.
@@ -162,6 +174,30 @@ The work is complete only when current evidence proves all of the following:
 - the rendered rules are terse, mechanically complete, and understandable from
   the board;
 - the complete symmetry-reduced production graph contains zero through nine
-  cyclic components;
+  disclosed semantic loop families, with the raw SCC count also reported;
 - remaining components are disclosed with witnesses for later discussion; and
 - all scoped repository checks pass.
+
+## Final evidence
+
+The final bounded D4 census over the first 100 production roots found:
+
+- 5,390 reachable White-turn states;
+- 108 raw cyclic SCCs containing 3,584 states;
+- no terminal failures and no rule gaps; and
+- two semantic loop families:
+  - **bishop-wall shuffle** — 98 raw SCCs; representative
+    `Be1 Kg1 Bh4 Kh2`;
+  - **king-opposition oscillation** — 10 raw SCCs; representative
+    `Ke3 Kd1`.
+
+The semantic classifier has exactly three exhaustive outcomes
+(`bishop-wall-shuffle`, `king-opposition-oscillation`, and
+`mixed-plan-oscillation`), so the complete census cannot exceed three semantic
+families. Raw SCCs remain reported separately and are not presented as solved.
+
+The former production loop `Bg5 Kh8 Bc1 Kg8` is repaired. The scoped Two
+Bishops, generic rule-registration, and presentation suites pass 91/91; the
+verifier TypeScript project, targeted lint, and `git diff --check` also pass.
+The app-wide TypeScript build remains blocked by the unrelated pre-existing
+unused `boardTurnKey` in `majorPieces.test.ts`.

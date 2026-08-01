@@ -12,4 +12,5 @@ export type MateRouteSelection = {
   mateMode: MateMode | null
   sharedFen: string | null
   sharedMoves?: readonly string[] | null
+  sharedReplayCursor?: 0 | null
 }

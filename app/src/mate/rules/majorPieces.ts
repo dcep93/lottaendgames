@@ -16,8 +16,12 @@ import {
   getMajorEndgamePhase,
   getMajorEndgamePhaseLabel,
   getQueenBoxDimensions,
+  getQueenBoxSafeSquareCount,
+  getQueenEdgeCageSize,
   getQueenTwoSquareCage,
   getRookBox,
+  isSquareInClosedQueenBox,
+  isQueenSameCornerBoxShrink,
   isQueenTighterChannelBetween,
 } from './majorPieceGeometry'
 import { compareScoresByRules, selectIdealMoves } from './selection'
@@ -29,6 +33,7 @@ import type {
 } from './types'
 import {
   rookStrategyRules,
+  scoreRookStrategyCandidates,
   scoreRookStrategyMove,
   type RookStrategyScore,
 } from './rookStrategy'
@@ -37,12 +42,15 @@ export type QueenWhiteMoveScore = {
   readonly matePenalty: number
   readonly queenCapturePenalty: number
   readonly stalematePenalty: number
-  readonly cagePenalty: number
-  readonly queenEdgePenalty: number
-  readonly queenKnightMovePenalty: number
+  readonly cageWhiteKingPenalty: number
+  readonly cageMinimumSafeSquaresPenalty: number
+  readonly cageSafeSquareCount: number
+  readonly cageMovePenalty: number
+  readonly cageShorterSide: number
+  readonly cageLongerSide: number
+  readonly queenMoveDistance: number | null
+  readonly queenPlacementPenalty: number
   readonly whiteKingEdgePenalty: number
-  readonly queenBoxShorterSide: number
-  readonly queenBoxLongerSide: number
   readonly whiteKingBetweenPiecesPenalty: number
   readonly kingDistance: number | null
   readonly kingManhattanDistance: number | null
@@ -71,13 +79,11 @@ const RETURN_POSITION_PRIORITY =
   'Return to the previous board position when a legal reply can recreate it.'
 const CAPTURE_LOOSE_PIECE_PRIORITY = "Take a piece if White isn't looking."
 const QUEEN_CORNER_CAGE_HELP =
-  'Keep Black confined to two squares near a corner.'
+  'Move the queen to shrink Black’s box toward a fixed corner. Keep White’s king outside and leave Black at least two safe squares.'
 const QUEEN_KNIGHT_MOVE_HELP =
-  "Keep the queen a knight's move from Black's king, but not on the edge of the board."
-const QUEEN_BOX_SIZE_HELP =
-  "Shrink the box's shorter side before its longer side."
+  "Keep the queen a knight's move from Black without moving onto the edge, preferring shorter moves."
 const QUEEN_KING_CLOSER_HELP =
-  "Move White's king closer to Black, do not cross the tighter side of the queen's box, but not on the edge of the board."
+  "Move White's king closer to Black without crossing the tighter side of the queen's box or moving onto the edge."
 const queenHelp: RuleHelp = {
   title: 'How best moves are chosen',
   whiteIntro: WHITE_INTRO,
@@ -85,10 +91,23 @@ const queenHelp: RuleHelp = {
   blackPriorities: [
     RETURN_POSITION_PRIORITY,
     CAPTURE_LOOSE_PIECE_PRIORITY,
-    'Move toward the center, where Black has the most room to resist.',
+    'Move toward the center.',
   ],
   notes: [],
-  noteBoards: [],
+  noteBoards: [
+    {
+      id: 'queen-phase-two-corner-cage',
+      title: 'phase 2: corner cage',
+      caption: '',
+      layout: { files: 8, ranks: 8, fileOffset: 0 },
+      pieces: [
+        { square: 'a8', piece: 'k' },
+        { square: 'd7', piece: 'Q' },
+        { square: 'h1', piece: 'K' },
+      ],
+      highlights: [],
+    },
+  ],
 }
 
 const rookHelp: RuleHelp = {
@@ -98,18 +117,17 @@ const rookHelp: RuleHelp = {
   blackPriorities: [
     'Return to the previous board position when possible.',
     "Take a piece if White isn't looking.",
-    'Press the nearest box wall, chasing the rook when possible.',
-    'Avoid giving White opposition, then move toward the rook.',
+    'Move toward the nearest box wall.',
+    'If the rook is diagonally beside White’s king, move toward it.',
+    'Avoid giving White opposition.',
+    'Move toward the rook.',
   ],
-  notes: [
-    'Phase 2 means the rook has boxed Black onto one side.',
-    'The box can drive Black to any edge; no corner is required.',
-  ],
+  notes: [],
   noteBoards: [
     {
       id: 'rook-phase-two-box',
-      title: 'phase 2 box',
-      caption: 'The kings are in opposition while the rook holds the box.',
+      title: 'phase 2: box',
+      caption: '',
       layout: { files: 8, ranks: 8, fileOffset: 0 },
       pieces: [
         { square: 'd5', piece: 'K' },
@@ -147,33 +165,62 @@ export function scoreQueenWhiteMove(
   san: string,
 ): QueenWhiteMoveScore {
   const chess = getChess(fen)
+  const currentWhiteQueen = findPiece(fen, 'w', 'q')
+  const currentBlackKing = findPiece(fen, 'b', 'k')
   const move = chess.move(san)
   const resultFen = chess.fen()
   const whiteQueen = findPiece(resultFen, 'w', 'q')
   const whiteKing = findPiece(resultFen, 'w', 'k')
   const blackKing = findPiece(resultFen, 'b', 'k')
-  const resultCage = getQueenTwoSquareCage(resultFen)
-  const queenBox =
+  const cageDimensions =
     whiteQueen && blackKing
       ? getQueenBoxDimensions(whiteQueen.square, blackKing.square)
-      : null
+      : { shorterSide: 8, longerSide: 8 }
+  const queenPlacementPreferred = Boolean(
+    whiteQueen &&
+      blackKing &&
+      isKnightMove(whiteQueen.square, blackKing.square) &&
+      edgeDistance(whiteQueen.square) > 0,
+  )
+  const cageSafeSquareCount = getQueenBoxSafeSquareCount(resultFen)
   return {
     matePenalty: chess.isCheckmate() ? 0 : 1,
     queenCapturePenalty: blackCanTakeWhiteMajorPiece(resultFen, 'q') ? 1 : 0,
     stalematePenalty: !chess.isCheckmate() && chess.isStalemate() ? 1 : 0,
-    cagePenalty: resultCage ? 0 : 1,
-    queenEdgePenalty:
-      whiteQueen && edgeDistance(whiteQueen.square) === 0 ? 1 : 0,
-    queenKnightMovePenalty:
+    cageWhiteKingPenalty:
       whiteQueen &&
+      whiteKing &&
       blackKing &&
-      isKnightMove(whiteQueen.square, blackKing.square)
-        ? 0
-        : 1,
+      isSquareInClosedQueenBox(
+        whiteKing.square,
+        whiteQueen.square,
+        blackKing.square,
+      )
+        ? 1
+        : 0,
+    cageMinimumSafeSquaresPenalty: cageSafeSquareCount >= 2 ? 0 : 1,
+    cageSafeSquareCount,
+    cageMovePenalty:
+      move.piece === 'q' &&
+      !(
+        currentWhiteQueen &&
+        currentBlackKing &&
+        whiteQueen &&
+        isQueenSameCornerBoxShrink(
+          currentWhiteQueen.square,
+          whiteQueen.square,
+          currentBlackKing.square,
+        )
+      )
+        ? 1
+        : 0,
+    cageShorterSide: cageDimensions.shorterSide,
+    cageLongerSide: cageDimensions.longerSide,
+    queenMoveDistance:
+      move.piece === 'q' ? kingDistance(move.from, move.to) : null,
+    queenPlacementPenalty: queenPlacementPreferred ? 0 : 1,
     whiteKingEdgePenalty:
       whiteKing && edgeDistance(whiteKing.square) === 0 ? 1 : 0,
-    queenBoxShorterSide: queenBox?.shorterSide ?? 99,
-    queenBoxLongerSide: queenBox?.longerSide ?? 99,
     whiteKingBetweenPiecesPenalty:
       move.piece === 'k' &&
       whiteQueen &&
@@ -216,32 +263,49 @@ export const queenWhiteRules: readonly OrderedRule<QueenWhiteMoveScore>[] = [
   },
   {
     id: 'corner cage',
-    shortLabel: 'two-square corner cage',
+    shortLabel: 'corner cage',
     helpText: QUEEN_CORNER_CAGE_HELP,
-    compare: (first, second) => first.cagePenalty - second.cagePenalty,
+    compare: (first, second) =>
+      first.cageWhiteKingPenalty - second.cageWhiteKingPenalty ||
+      first.cageMinimumSafeSquaresPenalty -
+        second.cageMinimumSafeSquaresPenalty ||
+      first.cageMovePenalty - second.cageMovePenalty ||
+      first.cageShorterSide - second.cageShorterSide ||
+      first.cageLongerSide - second.cageLongerSide,
   },
   {
     id: 'queen knight move',
-    shortLabel: 'queen a knight move from black',
+    shortLabel: "knight's move away",
     helpText: QUEEN_KNIGHT_MOVE_HELP,
-    compare: (first, second) =>
-      first.queenEdgePenalty - second.queenEdgePenalty ||
-      first.queenKnightMovePenalty - second.queenKnightMovePenalty,
-  },
-  {
-    id: 'king closer',
-    shortLabel: 'king closer',
-    helpText: QUEEN_KING_CLOSER_HELP,
-    compare: (first, second) =>
-      first.whiteKingEdgePenalty - second.whiteKingEdgePenalty,
-  },
-  {
-    id: 'queen box size',
-    shortLabel: 'queen box size',
-    helpText: QUEEN_BOX_SIZE_HELP,
-    compare: (first, second) =>
-      first.queenBoxShorterSide - second.queenBoxShorterSide ||
-      first.queenBoxLongerSide - second.queenBoxLongerSide,
+    subpriorities: [
+      {
+        compare: (first, second) =>
+          first.queenPlacementPenalty -
+          second.queenPlacementPenalty,
+      },
+      {
+        when: (scores) =>
+          scores.every(
+            ({ queenPlacementPenalty }) =>
+              queenPlacementPenalty === 0,
+          ) &&
+          scores.filter(
+            ({ queenMoveDistance }) => queenMoveDistance !== null,
+          ).length > 1,
+        rank: (scores) => {
+          const queenDistances = scores.flatMap(({ queenMoveDistance }) =>
+            queenMoveDistance === null ? [] : [queenMoveDistance],
+          )
+          const shortestQueenMove = Math.min(...queenDistances)
+          return scores.map(({ queenMoveDistance }) =>
+            queenMoveDistance !== null &&
+            queenMoveDistance > shortestQueenMove
+              ? 1
+              : 0,
+          )
+        },
+      },
+    ],
   },
   {
     id: 'king closer',
@@ -249,11 +313,22 @@ export const queenWhiteRules: readonly OrderedRule<QueenWhiteMoveScore>[] = [
     helpText: QUEEN_KING_CLOSER_HELP,
     applies: (score) =>
       score.kingDistance !== null && score.kingManhattanDistance !== null,
-    compare: (first, second) =>
-      first.whiteKingBetweenPiecesPenalty -
-        second.whiteKingBetweenPiecesPenalty ||
-      first.kingDistance! - second.kingDistance! ||
-      first.kingManhattanDistance! - second.kingManhattanDistance!,
+    subpriorities: [
+      {
+        compare: (first, second) =>
+          first.whiteKingBetweenPiecesPenalty -
+          second.whiteKingBetweenPiecesPenalty,
+      },
+      {
+        compare: (first, second) =>
+          first.whiteKingEdgePenalty - second.whiteKingEdgePenalty,
+      },
+      {
+        compare: (first, second) =>
+          first.kingDistance! - second.kingDistance! ||
+          first.kingManhattanDistance! - second.kingManhattanDistance!,
+      },
+    ],
   },
 ]
 
@@ -301,7 +376,7 @@ export function getIdealRookWhiteMoves(fen: string): string[] {
     return moves
   }
   return [...selectIdealMoves(
-    moves.map((san) => ({ san, score: scoreRookWhiteMove(fen, san) })),
+    scoreRookStrategyCandidates(fen, moves),
     rookWhiteRules,
   )]
 }
@@ -495,6 +570,7 @@ export const rookRuleSet: MateRuleSet<RookWhiteMoveScore> = {
   id: 'rook',
   phase: (fen) => getMajorEndgamePhaseLabel(fen, 'r'),
   scoreWhite: scoreRookWhiteMove,
+  scoreWhiteCandidates: scoreRookStrategyCandidates,
   whiteRules: rookWhiteRules,
   whiteMoves: whiteLegalMoves,
   blackCandidates: (fen, previousTurnFen) =>
@@ -504,5 +580,6 @@ export const rookRuleSet: MateRuleSet<RookWhiteMoveScore> = {
 
 export {
   getMajorEndgamePhase,
+  getQueenEdgeCageSize,
   getQueenTwoSquareCage,
 }

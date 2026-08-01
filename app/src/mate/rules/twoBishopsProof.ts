@@ -156,13 +156,13 @@ export function getTwoBishopsProofDistance(fen: string): number | null {
 export function isTwoBishopsProofProgress({
   currentDistance,
   worstReplyDistance,
-  supportedCornerWait,
+  edgeWaitingMove,
   startingBishopDistance,
   resultingBishopDistance,
 }: {
   readonly currentDistance: number | null
   readonly worstReplyDistance: number
-  readonly supportedCornerWait: boolean
+  readonly edgeWaitingMove: boolean
   readonly startingBishopDistance: number
   readonly resultingBishopDistance: number
 }): boolean {
@@ -170,7 +170,7 @@ export function isTwoBishopsProofProgress({
   if (worstReplyDistance < currentDistance) return true
   return (
     worstReplyDistance === currentDistance &&
-    supportedCornerWait &&
+    edgeWaitingMove &&
     startingBishopDistance <= 3 &&
     resultingBishopDistance > 3
   )

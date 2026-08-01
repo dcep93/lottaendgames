@@ -55,12 +55,14 @@ export default function Mate({
                 selectedDrill.mode,
                 route.sharedFen,
                 route.sharedMoves ?? null,
+                route.sharedReplayCursor ?? null,
               )}
               mateId={selectedDrill.set.id}
               mateMode={selectedDrill.mode}
               onReplaceHref={onReplaceHref}
               sharedFen={route.sharedFen}
               sharedMoves={route.sharedMoves ?? null}
+              sharedReplayCursor={route.sharedReplayCursor ?? null}
             />
           ) : (
             <section className="leg-mate-empty-state">
@@ -100,6 +102,7 @@ function drillKey(
   mateMode: MateMode,
   sharedFen: string | null,
   sharedMoves: readonly string[] | null,
+  sharedReplayCursor: 0 | null,
 ): string {
-  return `${mateId}:${mateMode}:${sharedFen ?? ''}:${sharedMoves?.join(' ') ?? ''}`
+  return `${mateId}:${mateMode}:${sharedFen ?? ''}:${sharedMoves?.join(' ') ?? ''}:${sharedReplayCursor ?? ''}`
 }

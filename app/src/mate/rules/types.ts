@@ -34,8 +34,8 @@ export type OrderedRule<Score> = {
   readonly id: string
   readonly shortLabel: string
   readonly helpText: string
-  /** Marks a correctness filter that is separated from, or omitted from, teaching rules. */
-  readonly presentationRole?: 'guard' | 'internal'
+  /** Marks a visible correctness guard in the teaching rules. */
+  readonly presentationRole?: 'guard'
   /** Places a deduplicated rule in the visible guide without reordering its evaluator stage. */
   readonly guideOrder?: number
   /**
@@ -66,7 +66,7 @@ export type RuleDescription = {
   readonly id: string
   readonly shortLabel: string
   readonly helpText: string
-  readonly presentationRole?: 'guard' | 'internal'
+  readonly presentationRole?: 'guard'
 }
 
 export type WhiteMoveOverrideSelection =

@@ -73,9 +73,9 @@ const twoKnightsPawnHelp: RuleHelp = {
     'Promote the pawn immediately when possible.',
     'Take a knight if White leaves one loose.',
     'Move toward an unprotected knight.',
-    'Keep the king near the center and preserve actual legal king mobility.',
+    'Keep the king near the center, then maximize its legal moves.',
     'When the earlier resistance priorities tie, advance the pawn as far as legally possible.',
-    "Stay away from White's king and coordinated knights.",
+    "Maximize the combined distance from White's king and the nearest knight.",
   ],
   notes: [
     'The bundled starts and every White edge in the committed construction were verified as unconditional wins before release. The optional Syzygy audit is an offline content check; the browser never queries a tablebase or network service.',
@@ -331,26 +331,23 @@ export const twoKnightsPawnWhiteRules: readonly OrderedRule<TwoKnightsPawnWhiteM
   {
     id: 'mate',
     shortLabel: 'mate',
-    guideOrder: 0,
     helpText: '',
     stopWhenBest: (score) => score.matePenalty === 0,
     compare: (first, second) => first.matePenalty - second.matePenalty,
   },
   {
-    id: 'no stalemate',
-    shortLabel: 'no stalemate',
-    guideOrder: 2,
-    helpText: '',
-    compare: (first, second) =>
-      first.stalematePenalty - second.stalematePenalty,
-  },
-  {
     id: 'knights safe',
     shortLabel: 'pieces safe',
-    guideOrder: 1,
     helpText: '',
     compare: (first, second) =>
       first.knightSafetyPenalty - second.knightSafetyPenalty,
+  },
+  {
+    id: 'no stalemate',
+    shortLabel: 'no stalemate',
+    helpText: '',
+    compare: (first, second) =>
+      first.stalematePenalty - second.stalematePenalty,
   },
   {
     id: 'stop pawn promotion',
@@ -398,7 +395,7 @@ export const twoKnightsPawnWhiteRules: readonly OrderedRule<TwoKnightsPawnWhiteM
     id: 'confine black king',
     shortLabel: 'confine black king',
     helpText:
-      "After the pawn is securely blockaded, follow the verified construction: coordinate White's king and free knight to shrink Black's reachable region and drive the king into the mating cage.",
+      "After the pawn is securely blockaded, shrink Black's reachable region, then move Black closer to the edge.",
     applies: (score) => score.confinementReady,
     subpriorities: [
       {

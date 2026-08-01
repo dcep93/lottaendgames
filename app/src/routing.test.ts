@@ -157,6 +157,23 @@ assert.deepEqual(
   },
 )
 assert.deepEqual(
+  resolveAppRoute(
+    '/mate/rook',
+    encodeMateReplay(sharedRookTrainFen, rookReplayMoves, 0),
+  ),
+  {
+    href: `/mate/rook${encodeMateReplay(sharedRookTrainFen, rookReplayMoves, 0)}`,
+    route: {
+      module: 'mate',
+      mateId: 'rook',
+      mateMode: 'standard',
+      sharedFen: sharedRookTrainFen,
+      sharedMoves: rookReplayMoves,
+      sharedReplayCursor: 0,
+    },
+  },
+)
+assert.deepEqual(
   resolveAppRoute('/mate/rook', encodeMateLiveFen(sharedRookMateFen)),
   {
     href: `/mate/rook${encodeMateLiveFen(sharedRookMateFen)}`,

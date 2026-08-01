@@ -464,7 +464,8 @@
   border-collapse: collapse;
   color: var(--leg-soft);
   background: var(--leg-panel-strong);
-  font-size: 0.76rem;
+  font-family: inherit;
+  font-size: 0.9rem;
   line-height: 1.35;
 }
 
@@ -495,13 +496,17 @@
   top: 0;
   color: var(--leg-text);
   background: #2a1e19;
-  font-size: 0.68rem;
+  font-size: 0.82rem;
   font-weight: 850;
   letter-spacing: 0.025em;
 }
 
 .leg-mate-log-table tbody th {
   color: var(--leg-brown);
+}
+
+.leg-mate-log-plain-text {
+  font-weight: 700;
 }
 
 .leg-mate-log-table tbody tr:hover {
@@ -515,8 +520,12 @@
   padding: 0.32em 0.5em !important;
 }
 
+.leg-mate-log-table button {
+  font-size: inherit;
+}
+
 .leg-mate-log-choice-button {
-  min-width: 2.1em;
+  width: 2.5rem;
   font-variant-numeric: tabular-nums;
 }
 
@@ -539,9 +548,41 @@
   font-weight: 800;
 }
 
-.leg-mate-log-emoji {
-  font-size: 1.05em;
+.leg-mate-log-status-cell {
+  background-clip: padding-box;
+  transition:
+    background-color 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.leg-mate-log-status-cell--wrong {
+  background:
+    linear-gradient(
+      100deg,
+      rgba(210, 82, 101, 0.16),
+      rgba(210, 82, 101, 0.08)
+    );
+  box-shadow: inset 0 0 0 0.0625rem rgba(231, 118, 133, 0.18);
+}
+
+.leg-mate-log-status-cell--multiple {
+  background:
+    linear-gradient(
+      100deg,
+      rgba(88, 143, 199, 0.17),
+      rgba(88, 143, 199, 0.08)
+    );
+  box-shadow: inset 0 0 0 0.0625rem rgba(126, 176, 224, 0.18);
+}
+
+.leg-mate-log-correctness-mark {
+  display: inline-block;
+  width: 1em;
+  color: var(--leg-text);
+  font-size: 1.75rem;
+  font-weight: 900;
   line-height: 1;
+  text-align: center;
 }
 
 .leg-mate-guide-backdrop {
@@ -600,13 +641,6 @@
 .leg-mate-guide-priorities {
   align-items: start;
   grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
-}
-
-.leg-mate-guide-footer {
-  display: grid;
-  grid-template-columns: max-content minmax(0, 1fr);
-  gap: 1.1rem;
-  align-items: start;
 }
 
 .leg-mate-guide-section {
@@ -883,10 +917,6 @@
 }
 
 @media (max-width: 48rem) {
-  .leg-mate-guide-footer {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
   .leg-mate-sidebar {
     display: grid;
     grid-template-areas:

@@ -5,10 +5,10 @@
 Make the evaluator, correctness result, reason column, and training modal describe
 one identical decision process for every mating pattern.
 
-Queen, Rook, and Two Bishops must remain loop-free and avoid fifty-move draws
-under every recommended White move and every legal Black reply. Bishop-and-
-Knight and Two-Knights-vs-Pawn must obey the same explanation contract, but this
-pass does not require eliminating every loop in those two unfinished strategies.
+Every pattern must obey the explanation contract. Loop and fifty-move
+verification must traverse the production selector and report failures
+honestly; an exact-distance table may not conceal a failure in the displayed
+strategy.
 
 ## Non-negotiable invariant
 
@@ -28,9 +28,8 @@ For any position:
 - If no displayed priority distinguishes tied legal moves, no reason is invented.
 
 The evaluator may compute tablebase distances, proof ranks, or other diagnostics
-for offline verification, but those values may not affect move selection unless
-they are represented by a displayed rule whose wording accurately describes the
-mechanism.
+for offline verification. If one affects move selection, it must be represented
+by a displayed rule whose wording accurately describes the mechanism.
 
 ## Shared selection architecture
 
@@ -40,14 +39,15 @@ The shared selector will expose one immutable decision trace containing:
 - the priority that last reduced the survivor set; and
 - the exact priority that eliminated each rejected candidate.
 
-The registered rule-set facade will use that trace directly for correctness and
-reasons. `currentTeachingHint`, which currently replaces an internal decision
-with a visible rule that merely favors the winner, will be removed.
+The registered rule-set facade uses that trace directly for correctness and
+reasons. The former `currentTeachingHint` substitution, which replaced an
+internal decision with a visible rule that merely favored the winner, is
+removed.
 
 Built-in rule sets may not contain `presentationRole: internal`. A visible guard
 is mechanically permissible, but it must appear in the modal and must be
-returned as the actual reason when decisive. This pass will remove the existing
-Rook and Two Bishops hidden guards rather than rename them.
+returned as the actual reason when decisive. The former Rook and Two Bishops
+hidden guards are removed rather than renamed.
 
 Displayed priority order will be derived from evaluator order. `guideOrder` may
 not make the modal contradict evaluation order. Universal priorities will
@@ -71,7 +71,8 @@ order will be audited together:
 
 - two-square corner cage;
 - queen a knight move from Black, off the edge;
-- queen box size, shorter side before longer side; and
+- queen placement, including the two-safe-square minimum and preference to
+  shrink Black's box; and
 - king closer, including its channel and edge restrictions.
 
 Each description will state every subpriority in its actual order. Exhaustive
@@ -79,36 +80,36 @@ Queen verification must still pass after consolidation.
 
 ### Rook
 
-The hidden `rook convergence` stage will be removed from selection. Proof ranks
-remain available only to the verifier.
+The hidden exact-distance completion guard is removed. The production selector
+does not import or query the Queen/Rook rank table.
 
-The visible evaluator will use three teachable concepts:
+The remaining visible evaluator uses three teachable geometric concepts:
 
 - rook box: create, keep, and shrink Black's box;
 - waiting move: when required by the king geometry, preserve the box and place
-  the rook as far from Black as possible while closer to White; and
+  the rook as far from Black as possible while closer to White and not
+  adjacent to White's king; and
 - king closer: approach Black without taking opposition when another equally
   close approach exists.
 
 All score fields currently grouped under those concepts will be reordered or
 consolidated so the prose is a complete description of the comparison. The
-exhaustive Rook verifier will identify any regression; fixes must be expressed
-as visible board geometry, never as a reintroduced proof-rank selector.
+exhaustive Rook verifier will identify and report any regression without
+changing the selector.
 
 ### Two Bishops
 
-The `two-bishops proof filter` will be removed from selection. DTM remains an
-offline oracle.
+The hidden exact-distance completion guard is removed. The production selector
+does not import or query the KBB-v-K proof table.
 
 The repeated `corner finish` and `bishop wall` stages will each become one rule
 with explicit subpriorities. The waiting-move predicate and its prose will be
 made identical; a move such as `Bg4` cannot satisfy the prose while being
 rejected by a narrower private predicate.
 
-Verification will first search the production policy for loops and fifty-move
-failures. Each failure will be repaired with a visible, position-only rule.
-The bundled tablebase will then confirm that recommended moves retain a forced
-mate and respect the fifty-move bound. It will never choose among them.
+Verification will search the production policy for loops and fifty-move
+failures. The bundled table remains an independent offline diagnostic and
+cannot decide a move or provide a reason.
 
 The generated modal diagrams will be regenerated because their active reasons
 now come from the exact visible trace.
@@ -151,9 +152,9 @@ A repository audit will fail when:
 - a built-in rule has no visible description.
 
 Pattern regression fixtures will include the reported Two Bishops `Bg4`
-position. Exhaustive or certificate verification will cover Queen, Rook, and
-Two Bishops. Focused fixture verification will cover Bishop-and-Knight and
-Two-Knights.
+position. Production-graph verification will cover Queen, Rook, and Two
+Bishops; table certificates validate only their own offline data. Focused
+fixture verification will cover Bishop-and-Knight and Two-Knights.
 
 ## Completion criteria
 
@@ -161,6 +162,7 @@ Two-Knights.
 - No hidden built-in White selector remains.
 - Modal order equals evaluator order for all five patterns.
 - Every tested correct and incorrect move reports its mechanical discriminator.
-- Queen, Rook, and Two Bishops pass their exhaustive loop and fifty-move checks.
+- Queen, Rook, and Two Bishops verification reports the actual production
+  policy result, including any loop or fifty-move failure.
 - All focused tests, TypeScript checks, lint, production build, and desktop/mobile
   modal checks pass.

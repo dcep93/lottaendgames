@@ -62,6 +62,7 @@ export type MateSessionSelection = {
 
 export type MateReplaySessionSelection = MateSessionSelection & {
   readonly moves: readonly string[]
+  readonly startAtBeginning?: boolean
   readonly startingFen: string
 }
 
@@ -251,7 +252,9 @@ function completeWhiteTurn(options: {
     idealWhiteMoves.length === 0
       ? undefined
       : ruleSet.explainWhiteMove(preMoveFen, canonicalSan) ??
-        (isCorrect ? ruleSet.currentWhiteHint(preMoveFen) : undefined)
+        (isCorrect
+          ? ruleSet.currentWhiteHint(preMoveFen)
+          : undefined)
   const whiteFen = chess.fen()
   const whiteOutcome = getMateTerminalOutcome(mateId, whiteFen)
   let outcome = whiteOutcome
@@ -409,7 +412,7 @@ export function createMateReplaySession(
       session.startedAtMs,
     )
   }
-  return session
+  return selection.startAtBeginning ? applySnapshot(session, 0) : session
 }
 
 export function playWhiteMove(
@@ -462,7 +465,9 @@ export function playBestMateMove(
   deps: MateSessionDeps,
 ): MateSession {
   if (session.outcome !== undefined) return session
-  const idealMoves = deps.getRuleSet(session.mateId).idealWhiteMoves(session.fen)
+  const idealMoves = deps
+    .getRuleSet(session.mateId)
+    .idealWhiteMoves(session.fen)
   const san = chooseMove(idealMoves, deps.random)
   return san === undefined ? session : playWhiteMove(session, san, deps)
 }
@@ -520,11 +525,11 @@ export function replaceHistoricalWhiteMove(
   if (canonicalSan === undefined || originalLog.san === canonicalSan) {
     return session
   }
+  const prefixLogs = session.logs.slice(0, logIndex)
   const idealMoves = deps
     .getRuleSet(session.mateId)
     .idealWhiteMoves(originalLog.fen)
   if (!idealMoves.includes(canonicalSan)) return session
-  const prefixLogs = session.logs.slice(0, logIndex)
   const completed = completeWhiteTurn({
     mateId: session.mateId,
     preMoveFen: originalLog.fen,

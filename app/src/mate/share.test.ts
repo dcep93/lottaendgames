@@ -101,6 +101,25 @@ test('encodes and canonicalizes a complete legal replay line', () => {
     ),
     { ok: true, fen: ROOK_LOOP_START, moves: ['Rb3', 'Kc5'] },
   )
+
+  const startCursorHash = encodeMateReplay(
+    ROOK_LOOP_START,
+    ['Rb3', 'Kc5'],
+    0,
+  )
+  assert.equal(
+    startCursorHash,
+    `${encodeMateFen(ROOK_LOOP_START)}&moves=Rb3,Kc5&cursor=0`,
+  )
+  assert.deepEqual(
+    decodeMateReplay(startCursorHash, 'rook', 'standard'),
+    {
+      ok: true,
+      fen: ROOK_LOOP_START,
+      moves: ['Rb3', 'Kc5'],
+      cursor: 0,
+    },
+  )
 })
 
 test('rejects malformed, incomplete, terminal, and oversized replays', () => {
@@ -111,6 +130,8 @@ test('rejects malformed, incomplete, terminal, and oversized replays', () => {
     `${encodeMateFen(ROOK_LOOP_START)}&moves=${encodeURIComponent('Rb3 nope')}`,
     `${encodeMateFen(ROOK_LOOP_START)}&moves=${encodeURIComponent(' Rb3 Kc5')}`,
     `${encodeMateFen(ROOK_LOOP_START)}&moves=${encodeURIComponent('Rb3 Kc5')}&extra=true`,
+    `${encodeMateFen(ROOK_LOOP_START)}&moves=Rb3,Kc5&cursor=1`,
+    `${encodeMateFen(ROOK_LOOP_START)}&cursor=0`,
     `${encodeMateFen(mateStart)}&moves=${encodeURIComponent('Ra8# Kh7')}`,
     `${encodeMateFen(ROOK_LOOP_START)}&moves=${encodeURIComponent(
       Array.from({ length: MATE_REPLAY_MAX_PLIES + 2 }, () => 'x').join(' '),

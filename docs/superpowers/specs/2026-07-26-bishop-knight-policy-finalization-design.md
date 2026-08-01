@@ -116,12 +116,20 @@ White's king and toward an edge. A visible `build the wall` rule therefore
 prefers a safe bishop move that places the bishop orthogonally adjacent to
 White's king on Black's side of the king. Among otherwise equal wall moves, it
 prefers the move whose legal Black replies leave Black with the least access to
-the center.
+the center. Keep applying the rule until Black actually reaches an edge; the
+second rank or file is still part of the drive, not the edge-cage phase.
 
 This rule is position-only, D4-symmetric, and uses one-ply legal reply geometry.
 It is not a tablebase, route lookup, history check, or encoded position. The
 canonical focused witness should select `Bd5`; after `...Ke3`, the same rule
 should select `Be4`.
+
+At the handoff, `edge cage` first keeps Black on the edge whenever a safe move
+can do so. This is the direct continuation of the wall plan and prevents White
+from approaching in a way that simply releases Black back toward the center.
+Zone X preparation is only a way to reach that edge phase; it no longer
+overrides ordinary coordination after Black is already on the edge unless the
+move completes the cage immediately.
 
 ## Integrity checks
 
@@ -148,3 +156,27 @@ the displayed rules are concise and mechanically exact, the existing mating
 net remains unchanged, the authoritative graph reports fewer than 20 loop
 families, every remaining family has a playable witness, and the focused tests,
 TypeScript checks, lint, production build, and diff checks pass.
+
+## 2026-07-29 rule audit
+
+The nine visible priorities split into three groups:
+
+- `mate`, `pieces safe`, and `no stalemate` are direct universal safeguards.
+- `mating net` is the one allowed use of the frozen 119-entry finishing data.
+- `build the wall`, `edge cage`, `knight key square`, `king closer`, and
+  `coordinate pieces` must stand on ordinary chess geometry alone.
+
+The audit found that `build the wall` was incorrectly allowing a king move to
+create the bishop-next-to-king shape. The rendered instruction describes a
+bishop move, so only a bishop move may receive that priority.
+
+The current Zone X implementation is not an acceptable long-term teaching
+rule. It contains translated canonical setups, a named route target, drift
+targets, and several conditional preparation mechanisms behind the single
+label `edge cage`. A future measured candidate should replace it with direct
+edge containment and consolidate it with `knight key square`.
+
+Likewise, the predicates named for an opposition loop and a diagonal approach
+are witness-shaped exceptions rather than independent chess concepts. They
+must be deleted when their containing `king closer` and `coordinate pieces`
+rules are next revised, not extended with more exceptions.

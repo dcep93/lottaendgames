@@ -155,7 +155,11 @@ function resolveMateRoute(pathname: string, hash: string): RouteResolution {
     const canonicalHash =
       decoded.moves === null
         ? encodeMateFen(decoded.fen)
-        : encodeMateReplay(decoded.fen, decoded.moves)
+        : encodeMateReplay(
+            decoded.fen,
+            decoded.moves,
+            decoded.cursor ?? null,
+          )
     return {
       href: `${href}${canonicalHash}`,
       route: {
@@ -164,6 +168,7 @@ function resolveMateRoute(pathname: string, hash: string): RouteResolution {
         mateMode,
         sharedFen: decoded.fen,
         ...(decoded.moves === null ? {} : { sharedMoves: decoded.moves }),
+        ...(decoded.cursor === 0 ? { sharedReplayCursor: 0 as const } : {}),
       },
     }
   }

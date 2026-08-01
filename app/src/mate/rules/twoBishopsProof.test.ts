@@ -72,14 +72,14 @@ test('an equal-distance proof step is only the one-way corner wait', () => {
     isTwoBishopsProofProgress({
       currentDistance: 7,
       worstReplyDistance: 7,
-      supportedCornerWait: true,
+      edgeWaitingMove: true,
       startingBishopDistance: 2,
       resultingBishopDistance: 4,
     }),
     true,
   )
   for (const mutation of [
-    { supportedCornerWait: false },
+    { edgeWaitingMove: false },
     { startingBishopDistance: 4 },
     { resultingBishopDistance: 3 },
     { worstReplyDistance: 9 },
@@ -88,7 +88,7 @@ test('an equal-distance proof step is only the one-way corner wait', () => {
       isTwoBishopsProofProgress({
         currentDistance: 7,
         worstReplyDistance: 7,
-        supportedCornerWait: true,
+        edgeWaitingMove: true,
         startingBishopDistance: 2,
         resultingBishopDistance: 4,
         ...mutation,
