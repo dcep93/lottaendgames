@@ -532,6 +532,71 @@ test('passes the prior White-turn FEN to Black reply selection', () => {
   assert.deepEqual(seenPreviousFens, [undefined, getChess(START_FEN).fen()])
 })
 
+test('uses one combined White analysis for correctness and explanation', () => {
+  let analysisCalls = 0
+  const ruleSet = createRuleSet({
+    analyzeWhitePosition: () => {
+      analysisCalls += 1
+      return {
+        idealWhiteMoves: ['Ra8+'],
+        currentWhiteHint: finishRule,
+        explainWhiteMove: () => finishRule,
+      }
+    },
+    idealWhiteMoves: () => {
+      throw new Error('legacy idealWhiteMoves should not be called')
+    },
+    explainWhiteMove: () => {
+      throw new Error('legacy explainWhiteMove should not be called')
+    },
+    currentWhiteHint: () => {
+      throw new Error('legacy currentWhiteHint should not be called')
+    },
+  })
+  const deps = createDeps({
+    times: [1_000, 1_100],
+    randoms: [0],
+    ruleSet,
+  })
+  const session = createMateSession(
+    { mateId: 'rook', mode: 'standard' },
+    deps,
+  )
+  const played = playWhiteMove(session, 'Ra8+', deps)
+
+  assert.equal(analysisCalls, 1)
+  assert.equal(played.logs[0]?.reasonId, finishRule.id)
+  assert.equal(played.logs[0]?.isCorrect, true)
+})
+
+test('persists a refined reason label without changing the rule id', () => {
+  const refinedFinishRule = {
+    ...finishRule,
+    shortLabel: 'finish the net — subtype',
+  }
+  const ruleSet = createRuleSet({
+    analyzeWhitePosition: () => ({
+      idealWhiteMoves: ['Ra8+'],
+      currentWhiteHint: refinedFinishRule,
+      explainWhiteMove: () => refinedFinishRule,
+    }),
+  })
+  const deps = createDeps({
+    times: [1_000, 1_100],
+    randoms: [0],
+    ruleSet,
+  })
+  const session = createMateSession(
+    { mateId: 'rook', mode: 'standard' },
+    deps,
+  )
+  const played = playWhiteMove(session, 'Ra8+', deps)
+
+  assert.equal(played.logs[0]?.reasonId, finishRule.id)
+  assert.equal(played.logs[0]?.reasonLabel, 'finish the net — subtype')
+  assert.equal(played.history[2]?.logs[0]?.reasonLabel, 'finish the net — subtype')
+})
+
 test('recognizes terminal outcomes and freezes the finish timestamp', () => {
   const mateFen = '7k/5K2/8/8/8/8/R7/8 w - - 0 1'
   const mateRules = createRuleSet({

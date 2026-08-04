@@ -8,8 +8,12 @@ import {
   kingDistance,
   kingWalkCenterDistance,
   manhattanDistance,
-  positionKey,
 } from '../chess'
+import {
+  applyUniversalBlackPriorities,
+  BLACK_CAPTURE_PRIORITY,
+  BLACK_RETURN_PRIORITY,
+} from './blackPriorities'
 import {
   blackCanTakeWhiteMajorPiece,
   getAxisDistance,
@@ -75,9 +79,6 @@ const WHITE_INTRO =
 const BLACK_INTRO =
   'Black uses its own priorities to put up the strongest resistance. Black is not trying to help the mate; it looks for the most stubborn legal reply.'
 
-const RETURN_POSITION_PRIORITY =
-  'Return to the previous board position when a legal reply can recreate it.'
-const CAPTURE_LOOSE_PIECE_PRIORITY = "Take a piece if White isn't looking."
 const QUEEN_CORNER_CAGE_HELP =
   'Move the queen to shrink Black’s box toward a fixed corner. Keep White’s king outside and leave Black at least two safe squares.'
 const QUEEN_KNIGHT_MOVE_HELP =
@@ -89,8 +90,8 @@ const queenHelp: RuleHelp = {
   whiteIntro: WHITE_INTRO,
   blackIntro: BLACK_INTRO,
   blackPriorities: [
-    RETURN_POSITION_PRIORITY,
-    CAPTURE_LOOSE_PIECE_PRIORITY,
+    BLACK_CAPTURE_PRIORITY,
+    BLACK_RETURN_PRIORITY,
     'Move toward the center.',
   ],
   notes: [],
@@ -115,8 +116,8 @@ const rookHelp: RuleHelp = {
   whiteIntro: WHITE_INTRO,
   blackIntro: BLACK_INTRO,
   blackPriorities: [
-    'Return to the previous board position when possible.',
-    "Take a piece if White isn't looking.",
+    BLACK_CAPTURE_PRIORITY,
+    BLACK_RETURN_PRIORITY,
     'Move toward the nearest box wall.',
     'If the rook is diagonally beside White’s king, move toward it.',
     'Avoid giving White opposition.',
@@ -508,22 +509,6 @@ export function getIdealRookBlackMoves(
   )
 }
 
-export function getEndgameReturnToPositionMoves(
-  fen: string,
-  previousTurnFen: string | undefined,
-  moves: readonly string[] = getChess(fen).moves(),
-): string[] {
-  if (!previousTurnFen) {
-    return []
-  }
-  const previousPositionKey = positionKey(previousTurnFen)
-  return moves.filter((san) => {
-    const nextChess = getChess(fen)
-    const move = nextChess.move(san)
-    return move !== null && positionKey(nextChess.fen()) === previousPositionKey
-  })
-}
-
 function getMajorBlackCandidates(
   fen: string,
   previousTurnFen: string | undefined,
@@ -533,20 +518,17 @@ function getMajorBlackCandidates(
   if (moves.length === 0) {
     return { moves, idealMoves: [] }
   }
-  const returnMoves = getEndgameReturnToPositionMoves(
+  const priorityMoves = applyUniversalBlackPriorities(
     fen,
     previousTurnFen,
     moves,
   )
-  if (returnMoves.length > 0) {
-    return { moves, idealMoves: returnMoves }
-  }
   return {
     moves,
     idealMoves:
       pieceType === 'q'
-        ? getIdealQueenBlackMoves(fen, moves)
-        : getIdealRookBlackMoves(fen, moves),
+        ? getIdealQueenBlackMoves(fen, priorityMoves)
+        : getIdealRookBlackMoves(fen, priorityMoves),
   }
 }
 

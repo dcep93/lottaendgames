@@ -403,6 +403,32 @@ test('registered rule sets may prepare a pure candidate score batch', () => {
   }
 })
 
+test('combined White analysis reuses one prepared score batch', () => {
+  let batchCalls = 0
+  const batchRuleSet: MateRuleSet<TestScore> = {
+    ...rookRuleSet,
+    id: 'bishop-knight',
+    scoreWhiteCandidates: (_fen, moves) => {
+      batchCalls += 1
+      return moves.map((san) => candidates.find((move) => move.san === san)!)
+    },
+  }
+  const unregister = registerMateRuleSet(batchRuleSet)
+
+  try {
+    const registered = getMateRuleSet('bishop-knight')
+    const analysis = registered.analyzeWhitePosition?.('fen')
+    assert.ok(analysis)
+    assert.deepEqual(analysis.idealWhiteMoves, ['Ka2', 'Kb2'])
+    assert.ok(analysis.currentWhiteHint)
+    assert.ok(analysis.explainWhiteMove('Kh1'))
+    assert.equal(analysis.explainWhiteMove('illegal'), undefined)
+    assert.equal(batchCalls, 1)
+  } finally {
+    unregister()
+  }
+})
+
 test('a decisive move override preserves its ordered legal subset and explains every rejected move', () => {
   let batchCalls = 0
   const lookupDescription = {

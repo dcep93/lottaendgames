@@ -80,6 +80,12 @@ test('reports every disjoint cyclic SCC and its shortest category', () => {
   assert.equal(result.stats.multiStateCycles, 1)
   assert.equal(result.stats.whiteStates, 7)
   assert.equal(result.stats.continueEdges, 6)
+  assert.deepEqual(result.positionOutcomes, {
+    loopLeadingPositions: 6,
+    mateTerminatingPositions: 1,
+    otherFailureLeadingPositions: 0,
+    totalPositions: 7,
+  })
   assert.deepEqual(
     result.cyclicComponents.map((component) => component.witness.category),
     ['self-loop', 'two-state-cycle', 'multi-state-cycle'],
@@ -113,6 +119,12 @@ test('explores all tied White choices and Black replies without early exit', () 
   assert.equal(result.stats.whiteStates, 3)
   assert.equal(result.cyclicComponents.length, 1)
   assert.equal(result.failureSamples[0]?.kind, 'stalemate')
+  assert.deepEqual(result.positionOutcomes, {
+    loopLeadingPositions: 1,
+    mateTerminatingPositions: 1,
+    otherFailureLeadingPositions: 1,
+    totalPositions: 3,
+  })
 })
 
 test('classifies a symmetry-collapsed transition as a structural self-loop', () => {
@@ -130,6 +142,29 @@ test('classifies a symmetry-collapsed transition as a structural self-loop', () 
   assert.equal(result.stats.whiteStates, 1)
   assert.equal(result.cyclicComponents[0]?.witness.category, 'self-loop')
   assert.equal(result.cyclicComponents[0]?.witness.transitions[0]?.toState, 'a')
+})
+
+test('can omit playable witnesses without changing position outcomes', () => {
+  const result = diagnoseMatePolicySccs(
+    [root('A')],
+    adapter({
+      A: expansion([move('A', 'A'), move('A', 'B')]),
+      B: expansion([mate]),
+    }),
+    { includeCycleWitnesses: false },
+  )
+
+  assert.equal(result.status, 'cyclic')
+  assert.equal(result.cycleWitnessesOmitted, true)
+  assert.equal(result.cyclicComponents.length, 0)
+  assert.equal(result.stats.cyclicComponents, 1)
+  assert.equal(result.stats.cyclicStates, 1)
+  assert.deepEqual(result.positionOutcomes, {
+    loopLeadingPositions: 1,
+    mateTerminatingPositions: 1,
+    otherFailureLeadingPositions: 0,
+    totalPositions: 2,
+  })
 })
 
 test('chooses the shortest cycle even inside a larger cyclic component', () => {
@@ -163,6 +198,43 @@ test('reports an acyclic graph and a rule gap without treating either as a cycle
   assert.equal(result.stats.cyclicComponents, 0)
   assert.equal(result.stats.ruleGaps, 1)
   assert.equal(result.failureSamples[0]?.kind, 'rule-gap')
+  assert.deepEqual(result.positionOutcomes, {
+    loopLeadingPositions: 0,
+    mateTerminatingPositions: 2,
+    otherFailureLeadingPositions: 1,
+    totalPositions: 3,
+  })
+})
+
+test('classifies every seen position by reverse reachability', () => {
+  const result = diagnoseMatePolicySccs(
+    [root('A'), root('D'), root('F')],
+    adapter({
+      A: expansion([move('A', 'B')]),
+      B: expansion([move('B', 'C')]),
+      C: expansion([move('C', 'C'), mate]),
+      D: expansion([move('D', 'E')]),
+      E: expansion([mate]),
+      F: expansion([move('F', 'G')]),
+      G: expansion([
+        {
+          failureKind: 'stalemate',
+          kind: 'failure',
+          message: 'draw branch',
+          moves: ['GW'],
+          resetsHalfmoveClock: [false],
+          states: ['draw'],
+        },
+      ]),
+    }),
+  )
+
+  assert.deepEqual(result.positionOutcomes, {
+    loopLeadingPositions: 3,
+    mateTerminatingPositions: 2,
+    otherFailureLeadingPositions: 2,
+    totalPositions: 7,
+  })
 })
 
 test('incremental rungs extend the prior closure without re-expanding it', () => {

@@ -499,13 +499,13 @@ test('queen and rook preserve evaluator order with universal priority labels', (
   assert.equal(queenRuleSet.help.blackIntro, BLACK_INTRO)
   assert.equal(rookRuleSet.help.blackIntro, BLACK_INTRO)
   assert.deepEqual(queenRuleSet.help.blackPriorities, [
-    'Return to the previous board position when a legal reply can recreate it.',
-    "Take a piece if White isn't looking.",
+    "Take a piece when White isn't looking.",
+    'Return to the previous board position when possible.',
     'Move toward the center.',
   ])
   assert.deepEqual(rookRuleSet.help.blackPriorities, [
+    "Take a piece when White isn't looking.",
     'Return to the previous board position when possible.',
-    "Take a piece if White isn't looking.",
     'Move toward the nearest box wall.',
     'If the rook is diagonally beside White’s king, move toward it.',
     'Avoid giving White opposition.',

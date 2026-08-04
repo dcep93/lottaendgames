@@ -150,6 +150,14 @@ export type RuleHelp = {
   readonly noteBoards: readonly RuleNoteBoard[]
 }
 
+export type WhitePositionAnalysis = {
+  readonly idealWhiteMoves: readonly string[]
+  readonly currentWhiteHint: RuleDescription | undefined
+  readonly explainWhiteMove: (
+    san?: string,
+  ) => RuleDescription | undefined
+}
+
 export type RegisteredMateRuleSet = {
   readonly id: MateId
   readonly phase: (fen: string) => string
@@ -160,6 +168,7 @@ export type RegisteredMateRuleSet = {
   ) => OpponentCandidates
   readonly help: RuleHelp
   readonly whiteRuleDescriptions: readonly RuleDescription[]
+  readonly analyzeWhitePosition?: (fen: string) => WhitePositionAnalysis
   readonly idealWhiteMoves: (fen: string) => readonly string[]
   readonly explainWhiteMove: (
     fen: string,
@@ -181,6 +190,14 @@ export type MateRuleSet<Score> = {
     moves: readonly string[],
   ) => readonly ScoredMove<Score>[]
   readonly whiteMoveOverride?: WhiteMoveOverride
+  /**
+   * Refines only the displayed reason label for a selected visible rule.
+   * The rule identity, help text, and move-selection behavior remain fixed.
+   */
+  readonly whiteRuleReasonLabel?: (
+    fen: string,
+    rule: OrderedRule<Score>,
+  ) => string | undefined
   readonly whiteRules: readonly OrderedRule<Score>[]
   readonly whiteMoves: (fen: string) => readonly string[]
   readonly blackCandidates: (

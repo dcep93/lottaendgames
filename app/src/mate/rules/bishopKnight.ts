@@ -11,7 +11,11 @@ import {
   squareCoords,
   squareFromCoords,
 } from "../chess";
-import { getEndgameReturnToPositionMoves } from "./majorPieces";
+import {
+  applyUniversalBlackPriorities,
+  BLACK_CAPTURE_PRIORITY,
+  BLACK_RETURN_PRIORITY,
+} from "./blackPriorities";
 import { centerDistance, sameDiagonal } from "./bishopKnightGeometry";
 import { getKnightAndBishopKeySquarePatternScore } from "./bishopKnightKeySquare";
 import {
@@ -1060,19 +1064,18 @@ export function getKnightAndBishopOpponentCandidates(
 ): OpponentCandidates {
   const moves = getChess(fen).moves();
   if (moves.length === 0) return { moves, idealMoves: [] };
-  const returnMoves = getEndgameReturnToPositionMoves(
+  const priorityMoves = applyUniversalBlackPriorities(
     fen,
     previousTurnFen,
     moves,
   );
-  if (returnMoves.length > 0) return { moves, idealMoves: returnMoves };
   if (
     isKnightAndBishopWManeuverPosition(fen) ||
-    knightAndBishopBlackHasLookupReply(fen, moves)
+    knightAndBishopBlackHasLookupReply(fen, priorityMoves)
   ) {
-    return { moves, idealMoves: moves };
+    return { moves, idealMoves: priorityMoves };
   }
-  return { moves, idealMoves: selectIdealBlackMoves(fen, moves) };
+  return { moves, idealMoves: selectIdealBlackMoves(fen, priorityMoves) };
 }
 
 const bishopKnightHelp: RuleHelp = {
@@ -1082,9 +1085,9 @@ const bishopKnightHelp: RuleHelp = {
   blackIntro:
     "Black uses its own priorities to put up the strongest resistance. Black is not trying to help the mate; it looks for the most stubborn legal reply.",
   blackPriorities: [
-    "Return to the previous position when possible.",
+    BLACK_CAPTURE_PRIORITY,
+    BLACK_RETURN_PRIORITY,
     "In the W maneuver, or when any reply enters the finishing route, treat every legal reply as equally strong.",
-    "Take a piece if White isn't looking.",
     "Move toward an unprotected bishop or knight.",
     "Run toward the center.",
     "Keep as many legal king moves as possible.",

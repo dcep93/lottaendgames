@@ -553,9 +553,9 @@
 }
 
 .leg-mate-log-reason-button {
-  max-width: 13rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  max-width: none;
+  text-align: left;
+  white-space: normal;
 }
 
 .leg-mate-log-correctness {
@@ -587,10 +587,10 @@
   background:
     linear-gradient(
       100deg,
-      rgba(88, 143, 199, 0.17),
-      rgba(88, 143, 199, 0.08)
+      rgba(88, 143, 199, 0.34),
+      rgba(88, 143, 199, 0.18)
     );
-  box-shadow: inset 0 0 0 0.0625rem rgba(126, 176, 224, 0.18);
+  box-shadow: inset 0 0 0 0.0625rem rgba(126, 176, 224, 0.42);
 }
 
 .leg-mate-log-correctness-mark {

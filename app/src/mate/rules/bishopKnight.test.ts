@@ -193,9 +193,9 @@ test("bishop-and-knight rules are registered", () => {
   });
   assert.equal(Object.isFrozen(ruleSet.help.noteBoards[0]?.pieces), true);
   assert.deepEqual(ruleSet.help.blackPriorities, [
-    "Return to the previous position when possible.",
+    "Take a piece when White isn't looking.",
+    "Return to the previous board position when possible.",
     "In the W maneuver, or when any reply enters the finishing route, treat every legal reply as equally strong.",
-    "Take a piece if White isn't looking.",
     "Move toward an unprotected bishop or knight.",
     "Run toward the center.",
     "Keep as many legal king moves as possible.",

@@ -32,6 +32,7 @@ export type MateLogEntry = {
   legalOpponentChoices?: number
   durationMs: number
   reasonId: string
+  reasonLabel?: string
 }
 
 export type MateSnapshot = {
@@ -242,7 +243,9 @@ function completeWhiteTurn(options: {
   const chess = getChess(preMoveFen)
   if (chess.turn() !== 'w') return undefined
   const ruleSet = deps.getRuleSet(mateId)
-  const idealWhiteMoves = ruleSet.idealWhiteMoves(preMoveFen)
+  const whiteAnalysis = ruleSet.analyzeWhitePosition?.(preMoveFen)
+  const idealWhiteMoves =
+    whiteAnalysis?.idealWhiteMoves ?? ruleSet.idealWhiteMoves(preMoveFen)
   const whiteMove = tryMove(chess, san)
   if (whiteMove === null) return undefined
 
@@ -251,9 +254,13 @@ function completeWhiteTurn(options: {
   const reason =
     idealWhiteMoves.length === 0
       ? undefined
-      : ruleSet.explainWhiteMove(preMoveFen, canonicalSan) ??
+      : (whiteAnalysis
+          ? whiteAnalysis.explainWhiteMove(canonicalSan)
+          : ruleSet.explainWhiteMove(preMoveFen, canonicalSan)) ??
         (isCorrect
-          ? ruleSet.currentWhiteHint(preMoveFen)
+          ? whiteAnalysis
+            ? whiteAnalysis.currentWhiteHint
+            : ruleSet.currentWhiteHint(preMoveFen)
           : undefined)
   const whiteFen = chess.fen()
   const whiteOutcome = getMateTerminalOutcome(mateId, whiteFen)
@@ -299,6 +306,17 @@ function completeWhiteTurn(options: {
     }
   }
 
+  const registeredReasonLabel =
+    reason === undefined
+      ? undefined
+      : ruleSet.whiteRuleDescriptions.find(
+          (description) => description.id === reason.id,
+        )?.shortLabel
+  const refinedReasonLabel =
+    reason !== undefined && registeredReasonLabel !== reason.shortLabel
+      ? reason.shortLabel
+      : undefined
+
   const whiteLog: MateLogEntry = {
     fen: preMoveFen,
     san: canonicalSan,
@@ -315,6 +333,9 @@ function completeWhiteTurn(options: {
     // The facade can legitimately have no differentiating rule when every
     // legal move ties. Keep the required log field stable and empty-safe.
     reasonId: reason?.id ?? NO_PREFERRED_RULE_ID,
+    ...(refinedReasonLabel === undefined
+      ? {}
+      : { reasonLabel: refinedReasonLabel }),
   }
   return {
     whiteFen,

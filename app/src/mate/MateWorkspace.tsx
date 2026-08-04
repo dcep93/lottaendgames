@@ -109,6 +109,11 @@ export default function MateWorkspace({
       deps,
     )
   })
+  const seededReplayHistoryRef = React.useRef(
+    sharedMoves !== null && sharedReplayCursor === 0
+      ? session.history
+      : null,
+  )
   const sessionRef = React.useRef(session)
   const playBestAnimationRef = React.useRef<PlayBestAnimation | null>(null)
   const playBestTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(
@@ -126,6 +131,7 @@ export default function MateWorkspace({
   }, [session])
 
   React.useEffect(() => {
+    if (session.history === seededReplayHistoryRef.current) return
     onReplaceHref?.(
       liveMateHref(
         session.mateId,

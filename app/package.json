@@ -9,6 +9,7 @@
     "check:mate-progress": "tsx ../scripts/mate-verifier/generate-major-piece-mate-progress.mts --check",
     "diagnose:mate-cycles": "tsx ../scripts/mate-verifier/diagnose-major-piece-policy-scc.mts",
     "develop:two-bishops": "tsx ../scripts/mate-verifier/verify-two-bishops-development.mts",
+    "measure:two-bishops-progress": "tsx ../scripts/mate-verifier/measure-two-bishops-progress.mts",
     "derive:mate-policy": "tsx ../scripts/mate-verifier/derive-major-piece-policy-ranks.mts",
     "lint": "oxlint",
     "preview": "vite preview",

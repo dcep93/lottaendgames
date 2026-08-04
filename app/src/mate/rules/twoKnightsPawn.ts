@@ -22,6 +22,11 @@ import type {
   RuleHelp,
   ScoredMove,
 } from './types'
+import {
+  applyUniversalBlackPriorities,
+  BLACK_CAPTURE_PRIORITY,
+  BLACK_RETURN_PRIORITY,
+} from './blackPriorities'
 
 export type TwoKnightsPawnTerminalOutcome =
   | 'checkmate'
@@ -70,8 +75,9 @@ const twoKnightsPawnHelp: RuleHelp = {
   whiteIntro: WHITE_INTRO,
   blackIntro: BLACK_INTRO,
   blackPriorities: [
+    BLACK_CAPTURE_PRIORITY,
+    BLACK_RETURN_PRIORITY,
     'Promote the pawn immediately when possible.',
-    'Take a knight if White leaves one loose.',
     'Move toward an unprotected knight.',
     'Keep the king near the center, then maximize its legal moves.',
     'When the earlier resistance priorities tie, advance the pawn as far as legally possible.',
@@ -558,12 +564,20 @@ export function getIdealTwoKnightsPawnBlackMoves(
     .map(({ san }) => san)
 }
 
-function getBlackCandidates(fen: string): OpponentCandidates {
+function getBlackCandidates(
+  fen: string,
+  previousTurnFen?: string,
+): OpponentCandidates {
   const chess = getChess(fen)
   const moves = chess.turn() === 'b' ? chess.moves() : []
+  const priorityMoves = applyUniversalBlackPriorities(
+    fen,
+    previousTurnFen,
+    moves,
+  )
   return {
     moves,
-    idealMoves: getIdealTwoKnightsPawnBlackMoves(fen, moves),
+    idealMoves: getIdealTwoKnightsPawnBlackMoves(fen, priorityMoves),
   }
 }
 

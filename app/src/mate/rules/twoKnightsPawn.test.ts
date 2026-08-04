@@ -45,8 +45,9 @@ test('Two Knights vs Pawn exposes the exact explicit ordered priorities', () => 
   assert.deepEqual(
     ruleSet.help.blackPriorities,
     [
+      "Take a piece when White isn't looking.",
+      'Return to the previous board position when possible.',
       'Promote the pawn immediately when possible.',
-      "Take a knight if White leaves one loose.",
       'Move toward an unprotected knight.',
       'Keep the king near the center, then maximize its legal moves.',
       'When the earlier resistance priorities tie, advance the pawn as far as legally possible.',

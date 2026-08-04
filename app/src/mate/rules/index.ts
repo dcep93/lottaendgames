@@ -11,6 +11,7 @@ import type {
   RuleDescription,
   RuleHelp,
   ScoredMove,
+  WhitePositionAnalysis,
   WhiteMoveOverride,
 } from './types'
 
@@ -30,7 +31,6 @@ export {
   compareQueenWhiteScores,
   compareRookBlackScores,
   compareRookWhiteScores,
-  getEndgameReturnToPositionMoves,
   getIdealQueenBlackMoves,
   getIdealQueenWhiteMoves,
   getIdealRookBlackMoves,
@@ -46,6 +46,8 @@ export {
   scoreRookBlackMove,
   scoreRookWhiteMove,
 } from './majorPieces'
+
+export { getEndgameReturnToPositionMoves } from './blackPriorities'
 export type {
   QueenBlackMoveScore,
   QueenWhiteMoveScore,
@@ -105,10 +107,14 @@ export {
   compareTwoBishopsWhiteScores,
   getIdealTwoBishopsBlackMoves,
   getIdealTwoBishopsWhiteMoves,
+  getProximateBishopWall,
+  getTwoBishopsDegenerateReasonLabel,
+  getTwoBishopsMatingPositionSquares,
   getTwoBishopsPhaseLabel,
   isTwoBishopsPhaseTwoPosition,
   scoreTwoBishopsBlackMove,
   scoreTwoBishopsWhiteMove,
+  TWO_BISHOPS_DEGENERATE_PRIORITY_ORDER,
   twoBishopsRuleSet,
   twoBishopsWhiteRules,
 } from './twoBishops'
@@ -150,6 +156,7 @@ export type {
   RuleNoteBoardPiece,
   RuleSubpriority,
   ScoredMove,
+  WhitePositionAnalysis,
   WhiteMoveOverride,
   WhiteMoveOverrideSelection,
 } from './types'
@@ -311,6 +318,7 @@ function createRegisteredMateRuleSet<Score>(
     phase,
     scoreWhite,
     scoreWhiteCandidates,
+    whiteRuleReasonLabel: sourceWhiteRuleReasonLabel,
     whiteMoves,
     blackCandidates,
     help,
@@ -321,6 +329,12 @@ function createRegisteredMateRuleSet<Score>(
   const whiteMoveOverride = snapshotWhiteMoveOverride(
     ruleSet.whiteMoveOverride,
   )
+  const whiteRuleReasonLabel = sourceWhiteRuleReasonLabel
+    ? Object.freeze(
+        (fen: string, rule: OrderedRule<Score>) =>
+          sourceWhiteRuleReasonLabel(fen, rule),
+      )
+    : undefined
   const descriptionsById = new Map<string, RuleDescription>()
   const registerDescription = (
     source: RuleDescription,
@@ -399,9 +413,54 @@ function createRegisteredMateRuleSet<Score>(
         }))
   }
   const describeRule = (
+    fen: string,
     orderedRule: OrderedRule<Score> | undefined,
-  ): RuleDescription | undefined =>
-    ruleEntries.find((entry) => entry.orderedRule === orderedRule)?.description
+  ): RuleDescription | undefined => {
+    const description = ruleEntries.find(
+      (entry) => entry.orderedRule === orderedRule,
+    )?.description
+    if (!description || !orderedRule || !whiteRuleReasonLabel) {
+      return description
+    }
+    const shortLabel = whiteRuleReasonLabel(fen, orderedRule)
+    if (shortLabel === undefined || shortLabel === description.shortLabel) {
+      return description
+    }
+    if (shortLabel.trim() === '') {
+      throw new Error(`rule ${orderedRule.id} reason label must not be empty`)
+    }
+    return Object.freeze({ ...description, shortLabel })
+  }
+
+  const analyzeWhitePosition = (fen: string): WhitePositionAnalysis => {
+    const moves = getLegalWhiteMoves(fen)
+    const overrideMoves = selectedOverrideMoves(fen, moves)
+    if (overrideMoves) {
+      return Object.freeze({
+        idealWhiteMoves: overrideMoves,
+        currentWhiteHint: overrideDescription,
+        explainWhiteMove: (san?: string) =>
+          san !== undefined && !moves.includes(san)
+            ? undefined
+            : overrideDescription,
+      })
+    }
+    const candidates = scoredWhiteMoves(fen, moves)
+    return Object.freeze({
+      idealWhiteMoves: selectIdealMoves(candidates, whiteRules),
+      currentWhiteHint: describeRule(
+        fen,
+        explainMove(candidates, whiteRules),
+      ),
+      explainWhiteMove: (san?: string) =>
+        san !== undefined && !moves.includes(san)
+          ? undefined
+          : describeRule(
+              fen,
+              explainMove(candidates, whiteRules, san),
+            ),
+    })
+  }
 
   return Object.freeze({
     id,
@@ -410,27 +469,12 @@ function createRegisteredMateRuleSet<Score>(
     blackCandidates,
     help: snapshotRuleHelp(help),
     whiteRuleDescriptions,
-    idealWhiteMoves: (fen) => {
-      const moves = getLegalWhiteMoves(fen)
-      return (
-        selectedOverrideMoves(fen, moves) ??
-        selectIdealMoves(scoredWhiteMoves(fen, moves), whiteRules)
-      )
-    },
-    explainWhiteMove: (fen, san) => {
-      const moves = getLegalWhiteMoves(fen)
-      if (san !== undefined && !moves.includes(san)) return undefined
-      if (selectedOverrideMoves(fen, moves)) return overrideDescription
-      const candidates = scoredWhiteMoves(fen, moves)
-      return describeRule(explainMove(candidates, whiteRules, san))
-    },
-    currentWhiteHint: (fen) => {
-      const moves = getLegalWhiteMoves(fen)
-      if (selectedOverrideMoves(fen, moves)) return overrideDescription
-      return describeRule(
-        explainMove(scoredWhiteMoves(fen, moves), whiteRules),
-      )
-    },
+    analyzeWhitePosition,
+    idealWhiteMoves: (fen) => analyzeWhitePosition(fen).idealWhiteMoves,
+    explainWhiteMove: (fen, san) =>
+      analyzeWhitePosition(fen).explainWhiteMove(san),
+    currentWhiteHint: (fen) =>
+      analyzeWhitePosition(fen).currentWhiteHint,
   })
 }
 

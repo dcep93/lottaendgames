@@ -7,7 +7,6 @@ import {
   kingDistance,
   squareCoordinates,
   squareFromCoordinates,
-  withFenTurn,
 } from '../chess'
 
 export function centerDistance(square: Square): number {
@@ -24,6 +23,67 @@ export function getWhiteBishopSquares(fen: string): Square[] {
     .flat()
     .filter((piece) => piece?.color === 'w' && piece.type === 'b')
     .map((piece) => piece!.square)
+}
+
+export type ProximateBishopWall = {
+  readonly moatAxis: 'file' | 'rank'
+  readonly moatIndex: number
+}
+
+export function getProximateBishopWall(
+  bishops: readonly Square[],
+  blackKing: Square,
+): ProximateBishopWall | null {
+  if (bishops.length !== 2) return null
+  const first = squareCoordinates(bishops[0])
+  const second = squareCoordinates(bishops[1])
+  const black = squareCoordinates(blackKing)
+
+  if (first.file === second.file && Math.abs(first.rank - second.rank) === 1) {
+    const wallFile = first.file
+    const minimumRank = Math.min(first.rank, second.rank)
+    const maximumRank = Math.max(first.rank, second.rank)
+    const sideDistance = black.file - wallFile
+    const absoluteSideDistance = Math.abs(sideDistance)
+    const alignedWithWall =
+      absoluteSideDistance === 2 &&
+      black.rank >= minimumRank &&
+      black.rank <= maximumRank
+    const alignedWithExtendedWall =
+      absoluteSideDistance === 3 &&
+      black.rank >= minimumRank - 1 &&
+      black.rank <= maximumRank + 1
+    return alignedWithWall || alignedWithExtendedWall
+      ? {
+          moatAxis: 'file',
+          moatIndex: wallFile + Math.sign(sideDistance),
+        }
+      : null
+  }
+
+  if (first.rank === second.rank && Math.abs(first.file - second.file) === 1) {
+    const wallRank = first.rank
+    const minimumFile = Math.min(first.file, second.file)
+    const maximumFile = Math.max(first.file, second.file)
+    const sideDistance = black.rank - wallRank
+    const absoluteSideDistance = Math.abs(sideDistance)
+    const alignedWithWall =
+      absoluteSideDistance === 2 &&
+      black.file >= minimumFile &&
+      black.file <= maximumFile
+    const alignedWithExtendedWall =
+      absoluteSideDistance === 3 &&
+      black.file >= minimumFile - 1 &&
+      black.file <= maximumFile + 1
+    return alignedWithWall || alignedWithExtendedWall
+      ? {
+          moatAxis: 'rank',
+          moatIndex: wallRank + Math.sign(sideDistance),
+        }
+      : null
+  }
+
+  return null
 }
 
 function bishopControlsSquareWithoutBlackBlocker(
@@ -116,6 +176,34 @@ export function whiteBishopsAreAdjacent(fen: string): boolean {
   return bishops.length === 2 && kingDistance(bishops[0], bishops[1]) === 1
 }
 
+export function whiteKingMasksBishop(fen: string): boolean {
+  const chess = getChess(fen)
+  for (const bishop of getWhiteBishopSquares(fen)) {
+    const source = squareCoordinates(bishop)
+    for (const [fileStep, rankStep] of [
+      [-1, -1],
+      [-1, 1],
+      [1, -1],
+      [1, 1],
+    ] as const) {
+      let file = source.file + fileStep
+      let rank = source.rank + rankStep
+      while (true) {
+        const square = squareFromCoordinates(file, rank)
+        if (!square) break
+        const occupant = chess.get(square)
+        if (occupant) {
+          if (occupant.color === 'w' && occupant.type === 'k') return true
+          break
+        }
+        file += fileStep
+        rank += rankStep
+      }
+    }
+  }
+  return false
+}
+
 function whiteBishopIsProtectedByKing(fen: string, square: Square): boolean {
   const whiteKing = findPiece(fen, 'w', 'k')
   return Boolean(whiteKing && kingDistance(whiteKing.square, square) <= 1)
@@ -135,62 +223,47 @@ export function distanceToNearestUnprotectedWhiteBishop(fen: string): number {
   )
 }
 
-function sharesAnyEdge(first: Square, second: Square): boolean {
-  const a = squareCoordinates(first)
-  const b = squareCoordinates(second)
-  return (
-    (a.file === 0 && b.file === 0) ||
-    (a.file === 7 && b.file === 7) ||
-    (a.rank === 0 && b.rank === 0) ||
-    (a.rank === 7 && b.rank === 7)
-  )
+export function areKingsAtPhaseTwoDistance(
+  whiteKing: Square,
+  blackKing: Square,
+): boolean {
+  return kingDistance(whiteKing, blackKing) === 2
 }
 
-export function isTwoBishopsPhaseTwoPosition(fen: string): boolean {
-  if (getChess(fen).turn() !== 'w') return false
+function isBlackForcedToRemainOnEdge(fen: string): boolean {
+  const chess = getChess(fen)
+  if (chess.turn() !== 'b') return false
   const blackKing = findPiece(fen, 'b', 'k')
+  const whiteKing = findPiece(fen, 'w', 'k')
   if (
     !blackKing ||
+    !whiteKing ||
     getWhiteBishopSquares(fen).length !== 2 ||
     edgeDistance(blackKing.square) !== 0
   ) {
     return false
   }
-  const blackMoves = getChess(withFenTurn(fen, 'b'))
+  if (!areKingsAtPhaseTwoDistance(whiteKing.square, blackKing.square)) {
+    return false
+  }
+  const blackMoves = chess
     .moves({ verbose: true })
     .filter((move) => move.from === blackKing.square)
-  const blackTrappedOnCurrentEdge =
+  return (
     blackMoves.length > 0 &&
-    blackMoves.every(
-      (move) =>
-        edgeDistance(move.to) === 0 &&
-        sharesAnyEdge(blackKing.square, move.to),
-    )
-  const blackTrappedInCornerCage =
-    blackMoves.length > 0 &&
-    getBlackKingReachableArea(fen) <= 3 &&
     blackMoves.every((move) => edgeDistance(move.to) === 0)
-  if (blackTrappedOnCurrentEdge || blackTrappedInCornerCage) return true
+  )
+}
 
-  return getChess(fen)
-    .moves({ verbose: true })
-    .filter((move) => move.piece === 'k')
-    .some((move) => {
-      const afterWhite = getChess(fen)
-      afterWhite.move(move.san)
-      if (afterWhite.isStalemate()) return false
-      const replies = afterWhite
-        .moves({ verbose: true })
-        .filter((reply) => reply.from === blackKing.square)
-      return (
-        replies.length > 0 &&
-        replies.every(
-          (reply) =>
-            edgeDistance(reply.to) === 0 &&
-            sharesAnyEdge(blackKing.square, reply.to),
-        )
-      )
-    })
+export function isTwoBishopsPhaseTwoPosition(fen: string): boolean {
+  const chess = getChess(fen)
+  if (chess.turn() === 'b') return isBlackForcedToRemainOnEdge(fen)
+
+  return chess.moves({ verbose: true }).some((move) => {
+    const afterMove = getChess(fen)
+    afterMove.move(move)
+    return isBlackForcedToRemainOnEdge(afterMove.fen())
+  })
 }
 
 export function getTwoBishopsPhaseLabel(fen: string): string {

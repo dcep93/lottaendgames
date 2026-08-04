@@ -69,6 +69,7 @@ export type MatePolicySccProgress = {
 }
 
 export type MatePolicySccOptions = {
+  readonly includeCycleWitnesses?: boolean
   readonly onProgress?: (progress: MatePolicySccProgress) => void
   readonly progressEvery?: number
 }
@@ -85,10 +86,19 @@ export type MatePolicySccCacheStats = {
 }
 
 export type MatePolicySccResult = {
+  readonly cycleWitnessesOmitted: boolean
   readonly cyclicComponents: readonly MatePolicyCyclicComponent[]
   readonly failureSamples: readonly MatePolicyGraphFailure[]
+  readonly positionOutcomes: MatePolicyPositionOutcomes
   readonly stats: MatePolicySccStats
   readonly status: 'acyclic' | 'cyclic'
+}
+
+export type MatePolicyPositionOutcomes = {
+  readonly loopLeadingPositions: number
+  readonly mateTerminatingPositions: number
+  readonly otherFailureLeadingPositions: number
+  readonly totalPositions: number
 }
 
 export type MatePolicySccRungResult = {
@@ -97,6 +107,7 @@ export type MatePolicySccRungResult = {
 }
 
 export type MatePolicySccSessionSnapshot<State> = {
+  readonly directFailureNodeIds: Uint32Array
   readonly edges: Uint32Array
   readonly failures: readonly MatePolicyGraphFailure[]
   readonly graphStats: MatePolicySccStats
@@ -208,6 +219,7 @@ export class MatePolicySccSession<State> {
   private readonly nodeStates: State[] = []
   private readonly rootKeys = new Set<string>()
   private readonly edges = new CompactEdgeStore()
+  private readonly directFailureNodeIds = new Set<number>()
   private readonly failures: MatePolicyGraphFailure[] = []
   private readonly expansions = new Map<
     string,
@@ -278,6 +290,7 @@ export class MatePolicySccSession<State> {
 
       if (expansion.whiteChoices === 0 || expansion.branches.length === 0) {
         this.graphStats.ruleGaps += 1
+        this.directFailureNodeIds.add(this.cursor)
         if (this.failures.length < FAILURE_SAMPLE_LIMIT) {
           this.failures.push({
             fromKey: key,
@@ -296,6 +309,7 @@ export class MatePolicySccSession<State> {
         }
         if (branch.kind === 'failure') {
           this.graphStats.failureBranches += 1
+          this.directFailureNodeIds.add(this.cursor)
           if (this.failures.length < FAILURE_SAMPLE_LIMIT) {
             this.failures.push({
               fromKey: key,
@@ -348,6 +362,7 @@ export class MatePolicySccSession<State> {
 
   snapshot(): MatePolicySccSessionSnapshot<State> {
     return {
+      directFailureNodeIds: Uint32Array.from(this.directFailureNodeIds),
       edges: this.edges.toFlatArray(),
       failures: [...this.failures],
       graphStats: {
@@ -381,6 +396,9 @@ export class MatePolicySccSession<State> {
       this.nodeStates.push(snapshot.nodeStates[nodeId]!)
     }
     for (const key of snapshot.rootKeys) this.rootKeys.add(key)
+    for (const nodeId of snapshot.directFailureNodeIds) {
+      this.directFailureNodeIds.add(nodeId)
+    }
     this.edges.appendFlat(snapshot.edges)
     this.failures.push(...snapshot.failures.slice(0, FAILURE_SAMPLE_LIMIT))
     Object.assign(this.graphStats, {
@@ -436,34 +454,68 @@ export class MatePolicySccSession<State> {
       ...this.adapter,
       expand: (state) => this.getExpansion(state),
     }
-    const cyclicComponents = components.cyclicNodeIds
-      .map((nodeIds) =>
-        describeCyclicComponent(
-          nodeIds,
-          this.nodeKeys,
-          this.nodeStates,
-          forward,
-          cachedAdapter,
-        ),
-      )
-      .sort(compareComponents)
-    const categoryCounts = countCategories(cyclicComponents)
-    const cyclicStates = cyclicComponents.reduce(
-      (sum, component) => sum + component.nodeKeys.length,
+    const includeCycleWitnesses =
+      this.options.includeCycleWitnesses ?? true
+    const cyclicComponents = includeCycleWitnesses
+      ? components.cyclicNodeIds
+          .map((nodeIds) =>
+            describeCyclicComponent(
+              nodeIds,
+              this.nodeKeys,
+              this.nodeStates,
+              forward,
+              cachedAdapter,
+            ),
+          )
+          .sort(compareComponents)
+      : []
+    const categoryCounts = includeCycleWitnesses
+      ? countCategories(cyclicComponents)
+      : {
+          'multi-state-cycle': 0,
+          'self-loop': 0,
+          'two-state-cycle': 0,
+        }
+    const cyclicStates = components.cyclicNodeIds.reduce(
+      (sum, nodeIds) => sum + nodeIds.length,
       0,
     )
-    const maximumCyclicComponentSize = cyclicComponents.reduce(
-      (maximum, component) =>
-        Math.max(maximum, component.nodeKeys.length),
+    const maximumCyclicComponentSize = components.cyclicNodeIds.reduce(
+      (maximum, nodeIds) => Math.max(maximum, nodeIds.length),
       0,
     )
+    const loopLeadingNodeIds = reverseReachableNodeIds(
+      components.cyclicNodeIds.flat(),
+      reverse,
+    )
+    const failureLeadingNodeIds = reverseReachableNodeIds(
+      this.directFailureNodeIds,
+      reverse,
+    )
+    let otherFailureLeadingPositions = 0
+    for (const nodeId of failureLeadingNodeIds) {
+      if (!loopLeadingNodeIds.has(nodeId)) {
+        otherFailureLeadingPositions += 1
+      }
+    }
+    const positionOutcomes: MatePolicyPositionOutcomes = {
+      loopLeadingPositions: loopLeadingNodeIds.size,
+      mateTerminatingPositions:
+        this.nodeStates.length -
+        loopLeadingNodeIds.size -
+        otherFailureLeadingPositions,
+      otherFailureLeadingPositions,
+      totalPositions: this.nodeStates.length,
+    }
 
     return {
+      cycleWitnessesOmitted: !includeCycleWitnesses,
       cyclicComponents,
       failureSamples: this.failures,
+      positionOutcomes,
       stats: {
         ...this.graphStats,
-        cyclicComponents: cyclicComponents.length,
+        cyclicComponents: components.cyclicNodeIds.length,
         cyclicStates,
         maximumCyclicComponentSize,
         multiStateCycles: categoryCounts['multi-state-cycle'],
@@ -471,9 +523,37 @@ export class MatePolicySccSession<State> {
         stronglyConnectedComponents: components.count,
         twoStateCycles: categoryCounts['two-state-cycle'],
       },
-      status: cyclicComponents.length === 0 ? 'acyclic' : 'cyclic',
+      status:
+        components.cyclicNodeIds.length === 0 ? 'acyclic' : 'cyclic',
     }
   }
+}
+
+function reverseReachableNodeIds(
+  starts: Iterable<number>,
+  reverse: CompactAdjacency,
+): ReadonlySet<number> {
+  const reachable = new Set<number>()
+  const stack: number[] = []
+  for (const nodeId of starts) {
+    if (reachable.has(nodeId)) continue
+    reachable.add(nodeId)
+    stack.push(nodeId)
+  }
+  while (stack.length > 0) {
+    const nodeId = stack.pop()!
+    for (
+      let edgeIndex = reverse.offsets[nodeId]!;
+      edgeIndex < reverse.offsets[nodeId + 1]!;
+      edgeIndex += 1
+    ) {
+      const predecessorId = reverse.targets[edgeIndex]!
+      if (reachable.has(predecessorId)) continue
+      reachable.add(predecessorId)
+      stack.push(predecessorId)
+    }
+  }
+  return reachable
 }
 
 function buildCompactAdjacency(

@@ -27,6 +27,7 @@ import {
   getMateRuleSet,
   knightAndBishopWhiteRules,
 } from './rules'
+import { TWO_BISHOPS_DIAGRAM_POSITIONS } from './rules/twoBishopsDiagramPositions'
 import type { MateLogEntry, MateTerminalOutcome } from './session'
 import { encodeMateFen } from './share'
 import { MATE_TIMER_PREFERENCE_KEY } from './timerPreference'
@@ -1018,6 +1019,44 @@ test('clicking a reason highlights its guide priority until a generic reopen', a
   await act(async () => renderer.unmount())
 })
 
+test('a refined reason label still opens its generic guide priority', async () => {
+  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
+    .IS_REACT_ACT_ENVIRONMENT = true
+  const logs = [
+    {
+      ...ROOK_LOGS[0]!,
+      reasonLabel: 'rook box — subtype',
+    },
+  ]
+  let renderer!: ReactTestRenderer
+  await act(async () => {
+    renderer = TestRenderer.create(
+      <MateLog
+        {...MATE_TRAINING_INFO_PROPS}
+        fen={ROOK_AFTER_REPLY}
+        logs={logs}
+        onCycleIdealBlack={() => undefined}
+        onCycleIdealWhite={() => undefined}
+        onCycleLegalBlack={() => undefined}
+        ruleSet={getMateRuleSet('rook')}
+      />,
+    )
+  })
+
+  const reason = renderer.root.findByProps({
+    'aria-label': 'rook box — subtype. Open priority guide',
+  })
+  assert.equal(reactNodeText(reason), 'rook box — subtype')
+  await act(async () => reason.props.onClick({ currentTarget: null }))
+  const highlighted = renderer.root.findAllByProps({
+    'aria-current': 'true',
+  })
+  assert.equal(highlighted.length, 1)
+  assert.match(reactNodeText(highlighted[0]), /^rook box/)
+
+  await act(async () => renderer.unmount())
+})
+
 test('pointer-opened guides release the opener while keyboard-opened guides restore it', async () => {
   ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
     .IS_REACT_ACT_ENVIRONMENT = true
@@ -1272,7 +1311,26 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
   const expectedBoards = {
     queen: ['queen-phase-two-corner-cage'],
     rook: ['rook-phase-two-box'],
-    'two-bishops': ['bishop-conclave-step', 'bishop-corner-finish'],
+    'two-bishops': [
+      'bishop-degenerate-knight-step-control',
+      'bishop-degenerate-wall-waiting-move',
+      'bishop-degenerate-corner-diagonals',
+      'bishop-degenerate-edge-repair',
+      'bishop-degenerate-edge-unmask',
+      'bishop-degenerate-diagonal-setup',
+      'bishop-degenerate-diagonal-waiting-move',
+      'bishop-degenerate-free-bishop',
+      'bishop-degenerate-waiting-move',
+      'bishop-degenerate-king-sidestep',
+      'bishop-degenerate-reform-wall',
+      'bishop-degenerate-king-lift',
+      'bishop-degenerate-bishop-retreat',
+      'bishop-degenerate-long-diagonal',
+      'bishop-mating-position',
+      'bishop-phase-two-wall',
+      'bishop-proximate-wall',
+      'bishop-conclave-step',
+    ],
   } as const
 
   for (const [mateId, boardIds] of Object.entries(expectedBoards)) {
@@ -1371,9 +1429,48 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
   assert.doesNotMatch(rookMarkup, /♔|♖|♚/)
 
   const bishopsRuleSet = getMateRuleSet('two-bishops')
-  const [conclaveBoard, cornerBoard] = bishopsRuleSet.help.noteBoards
+  const [
+    knightStepControlBoard,
+    wallWaitingMoveBoard,
+    cornerDiagonalsBoard,
+    edgeRepairBoard,
+    edgeUnmaskBoard,
+    diagonalSetupBoard,
+    diagonalWaitingBoard,
+    freeBishopBoard,
+    waitingMoveBoard,
+    kingSidestepBoard,
+    reformWallBoard,
+    kingLiftBoard,
+    bishopRetreatBoard,
+    longDiagonalBoard,
+    matingPositionBoard,
+    phaseTwoWallBoard,
+    proximateWallBoard,
+    conclaveBoard,
+  ] = bishopsRuleSet.help.noteBoards
+  assert.ok(knightStepControlBoard)
+  assert.ok(wallWaitingMoveBoard)
+  assert.ok(cornerDiagonalsBoard)
+  assert.ok(edgeRepairBoard)
+  assert.ok(edgeUnmaskBoard)
+  assert.ok(diagonalSetupBoard)
+  assert.ok(diagonalWaitingBoard)
+  assert.ok(freeBishopBoard)
+  assert.ok(waitingMoveBoard)
+  assert.ok(kingSidestepBoard)
+  assert.ok(reformWallBoard)
+  assert.ok(kingLiftBoard)
+  assert.ok(bishopRetreatBoard)
+  assert.ok(longDiagonalBoard)
+  assert.ok(matingPositionBoard)
+  assert.ok(phaseTwoWallBoard)
+  assert.ok(proximateWallBoard)
   assert.ok(conclaveBoard)
-  assert.ok(cornerBoard)
+  assert.deepEqual(
+    proximateWallBoard.highlights,
+    TWO_BISHOPS_DIAGRAM_POSITIONS.proximateWall.highlights,
+  )
   assert.deepEqual(conclaveBoard.layout, {
     files: 8,
     ranks: 8,
@@ -1381,12 +1478,76 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
   })
   assert.deepEqual(conclaveBoard.highlights, [])
   assert.deepEqual(conclaveBoard.arrows, [{ from: 'f5', to: 'e4' }])
-  assert.deepEqual(cornerBoard.layout, {
-    files: 8,
-    ranks: 8,
-    fileOffset: 0,
-  })
-  assert.deepEqual(cornerBoard.highlights, [])
+  assert.deepEqual(knightStepControlBoard.arrows, [
+    { from: 'g8', to: 'd5' },
+  ])
+  assert.deepEqual(
+    knightStepControlBoard.highlights.map(({ square }) => square),
+    ['h5', 'g2'],
+  )
+  assert.equal(
+    knightStepControlBoard.caption,
+    'With h5 uncontrolled, move the bishop to control g2.',
+  )
+  assert.deepEqual(wallWaitingMoveBoard.arrows, [
+    { from: 'f6', to: 'e5' },
+  ])
+  assert.deepEqual(
+    wallWaitingMoveBoard.highlights.map(({ square }) => square),
+    ['g8', 'h8'],
+  )
+  assert.equal(
+    wallWaitingMoveBoard.caption,
+    'Keep bishop control of both highlighted squares.',
+  )
+  assert.deepEqual(cornerDiagonalsBoard.arrows, [
+    { from: 'b7', to: 'f3' },
+  ])
+  assert.deepEqual(
+    cornerDiagonalsBoard.highlights.map(({ square }) => square),
+    ['f8', 'h5'],
+  )
+  assert.equal(
+    cornerDiagonalsBoard.caption,
+    "Preserve one bishop's control of f8. Ensure the other bishop controls h5.",
+  )
+  assert.deepEqual(edgeRepairBoard.arrows, [{ from: 'e1', to: 'd2' }])
+  assert.deepEqual(edgeUnmaskBoard.arrows, [{ from: 'e1', to: 'd2' }])
+  assert.deepEqual(diagonalSetupBoard.arrows, [
+    { from: 'c2', to: 'f5' },
+  ])
+  assert.deepEqual(
+    diagonalSetupBoard.highlights.map(({ square }) => square),
+    ['c8', 'd7', 'e6', 'f5', 'g4', 'h3'],
+  )
+  assert.deepEqual(diagonalWaitingBoard.arrows, [
+    { from: 'e8', to: 'h5' },
+  ])
+  assert.deepEqual(kingSidestepBoard.arrows, [{ from: 'f4', to: 'g4' }])
+  assert.deepEqual(reformWallBoard.arrows, [{ from: 'e5', to: 'f4' }])
+  assert.deepEqual(kingLiftBoard.arrows, [{ from: 'f3', to: 'g3' }])
+  assert.deepEqual(bishopRetreatBoard.arrows, [{ from: 'f7', to: 'e8' }])
+  assert.deepEqual(
+    longDiagonalBoard.highlights.map(({ square }) => square),
+    ['e3', 'd4', 'c5', 'b6'],
+  )
+  assert.equal(
+    longDiagonalBoard.caption,
+    "Move the bishop to any highlighted square. Don't move it to the edge.",
+  )
+  assert.deepEqual(matingPositionBoard.pieces, [
+    { square: 'h8', piece: 'k' },
+    { square: 'd4', piece: 'B' },
+    { square: 'c2', piece: 'B' },
+  ])
+  assert.deepEqual(
+    matingPositionBoard.highlights.map(({ square }) => square),
+    ['f8', 'f7'],
+  )
+  assert.deepEqual(
+    phaseTwoWallBoard.highlights.map(({ square }) => square),
+    ['b8', 'b7'],
+  )
 
   const bishopsMarkup = renderToStaticMarkup(
     <MatePriorityGuideDialog
@@ -1396,25 +1557,84 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
     />,
   )
   assert.match(bishopsMarkup, />conclave step</)
-  assert.match(bishopsMarkup, />corner finish</)
+  assert.match(bishopsMarkup, />degenerate — knight-step control</)
+  assert.match(
+    bishopsMarkup,
+    /With h5 uncontrolled, move the bishop to control g2\./,
+  )
+  assert.match(bishopsMarkup, />degenerate — wall waiting move</)
+  assert.match(
+    bishopsMarkup,
+    /Keep bishop control of both highlighted squares\./,
+  )
+  assert.match(bishopsMarkup, />degenerate — corner diagonals</)
+  assert.match(
+    bishopsMarkup,
+    /Preserve one bishop&#x27;s control of f8\. Ensure the other bishop controls h5\./,
+  )
+  assert.doesNotMatch(bishopsMarkup, />degenerate — bishop advance</)
+  assert.match(bishopsMarkup, />degenerate — edge repair</)
+  assert.match(bishopsMarkup, />degenerate — unmask edge bishop</)
+  assert.doesNotMatch(bishopsMarkup, />degenerate — diagonal king step</)
+  assert.match(bishopsMarkup, />degenerate — diagonal setup</)
+  assert.match(bishopsMarkup, />degenerate — diagonal waiting move</)
+  assert.match(bishopsMarkup, />degenerate — free bishop</)
+  assert.match(bishopsMarkup, />degenerate — waiting move</)
+  assert.match(bishopsMarkup, />degenerate — king sidestep</)
+  assert.match(bishopsMarkup, />degenerate — reform wall</)
+  assert.match(bishopsMarkup, />degenerate — king lift</)
+  assert.match(bishopsMarkup, />degenerate — bishop retreat</)
+  assert.match(bishopsMarkup, />degenerate — long diagonal</)
+  assert.match(bishopsMarkup, />mating position</)
+  assert.match(bishopsMarkup, />phase 2 wall</)
+  assert.match(bishopsMarkup, />proximate bishop wall</)
+  assert.match(bishopsMarkup, />sequester</)
+  assert.match(bishopsMarkup, />bishops away</)
+  assert.match(
+    bishopsMarkup,
+    /Force Black&#x27;s king towards the target corner, or otherwise use a bishop to control the square 2 away from Black&#x27;s current square\./,
+  )
+  assert.match(
+    bishopsMarkup,
+    /When deciding between bishop moves, prefer larger distance from the target corner\./,
+  )
+  assert.doesNotMatch(bishopsMarkup, />take opposition</)
+  assert.doesNotMatch(
+    bishopsMarkup,
+    />king distance<|>king position</,
+  )
   assert.doesNotMatch(
     bishopsMarkup,
     />edge finish<|>form wall<|>push with king<|>advance wall<|>waiting move</,
   )
   assert.match(
     bishopsMarkup,
-    /Keep Black on the edge while White’s king reaches the finish\./,
+    /Phase 2: Black&#x27;s king forced to the edge, White&#x27;s king two steps away from Black&#x27;s king\./,
   )
-  assert.match(bishopsMarkup, /leg-mate-guide-note-boards--full/)
-  assert.equal(
-    bishopsMarkup.match(/leg-mate-note-board--full/g)?.length,
-    2,
-  )
-  assert.doesNotMatch(bishopsMarkup, /data-highlight-kind=/)
   assert.match(
     bishopsMarkup,
-    /aria-label="corner finish\. Black king on c8\. White king on a5\. White bishop on b5\. White bishop on c5\./,
+    /Target corner: The corner farthest along Black&#x27;s edge from the bishops&#x27; controlled edge squares; on a tie, the corner closest to White&#x27;s king\./,
   )
+  assert.match(bishopsMarkup, /leg-mate-guide-note-boards--full/)
+  assert.equal(bishopsMarkup.match(/leg-mate-note-board--full/g)?.length, 18)
+  assert.equal(
+    bishopsMarkup.match(/data-highlight-kind="zone"/g)?.length,
+    32,
+  )
+  assert.match(
+    bishopsMarkup,
+    /White&#x27;s king in a mating position, play mate in 3/,
+  )
+  assert.match(
+    bishopsMarkup,
+    /Create or maintain a 2 square wall[^<]*not on the same side as the white king nor in the target corner[^<]*without placing a bishop on black&#x27;s edge/,
+  )
+  assert.match(bishopsMarkup, /data-arrow="e1-d2"/)
+  assert.match(bishopsMarkup, /data-arrow="f4-g4"/)
+  assert.match(bishopsMarkup, /data-arrow="e8-h5"/)
+  assert.match(bishopsMarkup, /data-arrow="c2-f5"/)
+  assert.match(bishopsMarkup, /data-arrow="e5-f4"/)
+  assert.match(bishopsMarkup, /data-arrow="f7-e8"/)
   assert.match(bishopsMarkup, /data-arrow="f5-e4"/)
 })
 
@@ -1472,7 +1692,25 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
     bishopsMarkup,
     /mate progress|forced mate|proof distance/,
   )
-  assert.match(bishopsMarkup, />king closer</)
+  assert.match(
+    bishopsMarkup,
+    />king closer<[^]*Bring White&#x27;s king closer to Black&#x27;s king\. If in phase 2, prefer the rank\/file 2 away from Black&#x27;s edge\./,
+  )
+  assert.doesNotMatch(bishopsMarkup, />lazy king</)
+  assert.match(bishopsMarkup, />support wall</)
+  assert.match(bishopsMarkup, />phase 2 wall</)
+  assert.match(bishopsMarkup, />sequester</)
+  assert.doesNotMatch(bishopsMarkup, />take opposition</)
+  assert.doesNotMatch(
+    bishopsMarkup,
+    />king distance<|>king position</,
+  )
+  assert.doesNotMatch(bishopsMarkup, />pieces off edge</)
+  assert.match(
+    bishopsMarkup,
+    /\(see notes\)/,
+  )
+  assert.doesNotMatch(bishopsMarkup, />force opposition<|>unmask</)
   assert.match(bishopsMarkup, />conclave step</)
   assert.match(bishopsMarkup, />finish wall</)
   assert.match(bishopsMarkup, />start wall</)
@@ -2126,6 +2364,14 @@ test('Mate exposes stable desktop and narrow-layout structure', () => {
   )
   assert.match(
     css,
+    /\.leg-mate-log-reason-button\s*\{[^}]*max-width:\s*none;[^}]*white-space:\s*normal/s,
+  )
+  assert.doesNotMatch(
+    css,
+    /\.leg-mate-log-reason-button\s*\{[^}]*text-overflow:\s*ellipsis/s,
+  )
+  assert.match(
+    css,
     /\.leg-mate-layout\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\)/s,
   )
   assert.doesNotMatch(css, /\.leg-mate-sidebar\s*\{[^}]*position:\s*sticky/s)
@@ -2200,7 +2446,7 @@ test('Mate exposes stable desktop and narrow-layout structure', () => {
   )
   assert.match(
     css,
-    /\.leg-mate-log-status-cell--multiple\s*\{[^}]*rgba\(88,\s*143,\s*199,\s*0\.17\)/s,
+    /\.leg-mate-log-status-cell--multiple\s*\{[^}]*rgba\(88,\s*143,\s*199,\s*0\.34\)[^}]*rgba\(88,\s*143,\s*199,\s*0\.18\)[^}]*rgba\(126,\s*176,\s*224,\s*0\.42\)/s,
   )
   assert.match(
     css,
@@ -2368,6 +2614,7 @@ test('Mate loads replay history at its final position for Undo and Redo', async 
 test('Mate loads a start-cursor replay with Redo seeded', async () => {
   ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
     .IS_REACT_ACT_ENVIRONMENT = true
+  const hrefs: string[] = []
   let renderer: ReactTestRenderer | undefined
 
   try {
@@ -2378,7 +2625,7 @@ test('Mate loads a start-cursor replay with Redo seeded', async () => {
           'standard',
           ROOK_START,
           ['Ra8+', 'Kg7'],
-          () => undefined,
+          (href) => hrefs.push(href),
           0,
         ),
       )
@@ -2391,6 +2638,7 @@ test('Mate loads a start-cursor replay with Redo seeded', async () => {
     assert.equal(mountedRenderer.root.findByType(MateLog).props.logs.length, 0)
     assert.equal(mountedRenderer.root.findByType(MateControls).props.canUndo, false)
     assert.equal(mountedRenderer.root.findByType(MateControls).props.canRedo, true)
+    assert.deepEqual(hrefs, [])
 
     await act(async () => {
       mountedRenderer.root.findByType(MateControls).props.onRedo()
@@ -2398,6 +2646,19 @@ test('Mate loads a start-cursor replay with Redo seeded', async () => {
     assert.equal(
       mountedRenderer.root.findByType(MateBoardProbe).props.fen,
       ROOK_AFTER_WHITE,
+    )
+    assert.deepEqual(hrefs, [])
+
+    await act(async () => {
+      mountedRenderer.root.findByType(MateBoardProbe).props.onMove('Kh7')
+    })
+    assert.equal(
+      mountedRenderer.root.findByType(MateBoardProbe).props.fen,
+      ROOK_AFTER_ALT_REPLY,
+    )
+    assert.equal(
+      hrefs.at(-1),
+      liveMateHref('rook', 'standard', ROOK_AFTER_ALT_REPLY),
     )
   } finally {
     if (renderer) await act(async () => renderer?.unmount())

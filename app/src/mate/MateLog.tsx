@@ -208,7 +208,9 @@ export default function MateLog({
               )
               const reason = descriptionsById.get(log.reasonId)
               const reasonLabel =
-                reason?.shortLabel ?? NO_PREFERRED_RULE_LABEL
+                log.reasonLabel ??
+                reason?.shortLabel ??
+                NO_PREFERRED_RULE_LABEL
               const correctChoiceText = choiceLabel(
                 correctChoices,
                 'correct choice',
