@@ -1508,9 +1508,12 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
     ranks: 8,
     fileOffset: 0,
   })
-  assert.deepEqual(martianConclaveBoard.highlights, [])
+  assert.deepEqual(
+    martianConclaveBoard.highlights.map(({ square }) => square),
+    ['e5', 'f5', 'f6'],
+  )
   assert.deepEqual(martianConclaveBoard.arrows, [
-    { from: 'f4', to: 'e5' },
+    { from: 'e4', to: 'd3' },
   ])
   assert.deepEqual(kingFlankBoard.layout, {
     files: 8,
@@ -1604,6 +1607,10 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
   assert.match(bishopsMarkup, /With a6 controlled, play Kc7./)
   assert.match(bishopsMarkup, />reverse conclave step</)
   assert.match(bishopsMarkup, />martian conclave step</)
+  assert.match(
+    bishopsMarkup,
+    /After the arrowed move, the bishops control the highlighted squares while the kings remain two steps apart\./,
+  )
   assert.match(bishopsMarkup, />degenerate — knight-step control</)
   assert.match(
     bishopsMarkup,
@@ -1672,7 +1679,7 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
   assert.equal(bishopsMarkup.match(/leg-mate-note-board--full/g)?.length, 22)
   assert.equal(
     bishopsMarkup.match(/data-highlight-kind="zone"/g)?.length,
-    33,
+    36,
   )
   assert.match(
     bishopsMarkup,
@@ -1763,7 +1770,7 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
   )
   assert.match(bishopsMarkup, />check<[^]*Play a check</)
   assert.doesNotMatch(bishopsMarkup, />lazy king</)
-  assert.match(bishopsMarkup, />support wall</)
+  assert.doesNotMatch(bishopsMarkup, />support wall</)
   assert.match(bishopsMarkup, />phase 2 wall</)
   assert.match(bishopsMarkup, />sequester</)
   assert.doesNotMatch(bishopsMarkup, />take opposition</)
