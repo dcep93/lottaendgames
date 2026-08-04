@@ -1957,10 +1957,8 @@ function scoreTwoBishopsWhiteMoveWithContext(
     move.piece === 'k' ? move.to : startingWhiteKing
   const sequesterTwoAwaySquares = getSequesterTwoAwaySquares(blackKing)
   const resultKingDistance =
-    blackKing &&
-    resultWhiteKingSquare &&
-    (move.piece === 'k' || isPhaseTwo)
-      ? manhattanDistance(resultWhiteKingSquare, blackKing)
+    blackKing && resultWhiteKingSquare
+      ? squaredEuclideanDistance(resultWhiteKingSquare, blackKing)
       : 99
   const mate = chess.isCheckmate()
   const blackMoves = chess.moves({ verbose: true })
@@ -2171,7 +2169,7 @@ function scoreTwoBishopsWhiteMoveWithContext(
           : 1,
     kingCloserDistance: resultKingDistance,
     kingCloserMiddleSixteenDistance:
-      resultWhiteKingSquare && (move.piece === 'k' || isPhaseTwo)
+      resultWhiteKingSquare
         ? distanceToMiddleSixteen(resultWhiteKingSquare)
         : 0,
   }

@@ -1074,19 +1074,52 @@ test('the final king closer metric permits screening a bishop', () => {
   const fen = '8/5k2/8/8/3K4/8/8/BB6 w - - 0 1'
   const screened = scoreTwoBishopsWhiteMove(fen, 'Ke5')
   const clear = scoreTwoBishopsWhiteMove(fen, 'Kd5')
-  assert.equal(screened.kingCloserDistance, 3)
-  assert.equal(clear.kingCloserDistance, 4)
+  assert.equal(screened.kingCloserDistance, 5)
+  assert.equal(clear.kingCloserDistance, 8)
 })
 
-test('king closer uniquely minimizes Manhattan distance within its survivors', () => {
+test('king closer uniquely minimizes squared Euclidean distance within its survivors', () => {
   const fen = '8/8/8/4BB2/6K1/8/5k2/8 w - - 34 18'
   const closest = scoreTwoBishopsWhiteMove(fen, 'Kf4')
   const farther = scoreTwoBishopsWhiteMove(fen, 'Kh3')
-  assert.equal(closest.kingCloserDistance, 2)
-  assert.equal(farther.kingCloserDistance, 3)
+  assert.equal(closest.kingCloserDistance, 4)
+  assert.equal(farther.kingCloserDistance, 5)
   const kingCloser = twoBishopsWhiteRules.find(({ id }) => id === 'king closer')
   assert.ok(kingCloser?.compare)
   assert.ok(kingCloser.compare(closest, farther) < 0)
+})
+
+test('king closer scores the resulting king after bishop moves in Phase 1', () => {
+  const fen = '3K4/1k1B4/3B4/8/8/8/8/8 w - - 4 3'
+  const bishopMove = scoreTwoBishopsWhiteMove(fen, 'Bc5')
+  const kingMove = scoreTwoBishopsWhiteMove(fen, 'Ke7')
+  const ruleSet = getMateRuleSet('two-bishops')
+
+  assert.equal(ruleSet.phase(fen), '1/2')
+  assert.equal(bishopMove.kingCloserDistance, 5)
+  assert.equal(bishopMove.kingCloserMiddleSixteenDistance, 2)
+  assert.equal(kingMove.kingCloserDistance, 9)
+  assert.deepEqual(ruleSet.idealWhiteMoves(fen), [
+    'Bc8+',
+    'Be8',
+    'Be6',
+    'Bf5',
+    'Bg4',
+    'Bh3',
+    'Bb5',
+    'Ba4',
+    'Bc7',
+    'Be7',
+    'Bf8',
+    'Be5',
+    'Bf4',
+    'Bg3',
+    'Bh2',
+    'Bc5',
+    'Bb4',
+    'Ba3',
+  ])
+  assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'king closer')
 })
 
 test('king closer prefers proximity to the middle sixteen after distance ties', () => {
@@ -1094,33 +1127,48 @@ test('king closer prefers proximity to the middle sixteen after distance ties', 
   const central = scoreTwoBishopsWhiteMove(fen, 'Ke5')
   const outside = scoreTwoBishopsWhiteMove(fen, 'Kc7')
   const fartherCentral = scoreTwoBishopsWhiteMove(fen, 'Kd5')
-  const ruleSet = getMateRuleSet('two-bishops')
+  const kingCloser = twoBishopsWhiteRules.find(({ id }) => id === 'king closer')
+  assert.ok(kingCloser?.compare)
 
   assert.equal(central.kingCloserDistance, outside.kingCloserDistance)
   assert.equal(central.kingCloserMiddleSixteenDistance, 0)
   assert.equal(outside.kingCloserMiddleSixteenDistance, 1)
-  assert.ok(compareTwoBishopsWhiteScores(central, outside) < 0)
-  assert.ok(compareTwoBishopsWhiteScores(outside, fartherCentral) < 0)
-  assert.deepEqual(ruleSet.idealWhiteMoves(fen), ['Ke5'])
-  assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'king closer')
+  assert.ok(kingCloser.compare(central, outside) < 0)
+  assert.ok(kingCloser.compare(outside, fartherCentral) < 0)
 
-  const sourceMove = getChess(fen).move('Ke5')
-  assert.ok(sourceMove)
+  const sourceCentral = getChess(fen).move('Ke5')
+  const sourceOutside = getChess(fen).move('Kc7')
+  assert.ok(sourceCentral)
+  assert.ok(sourceOutside)
   for (const transform of SQUARE_TRANSFORMS) {
     const transformedFen = getChess(transformFen(fen, transform)).fen()
-    const transformedMove = getChess(transformedFen)
-      .moves({ verbose: true })
-      .find(
-        ({ from, to }) =>
-          from === transformSquare(sourceMove.from, transform) &&
-          to === transformSquare(sourceMove.to, transform),
-      )
-    assert.ok(transformedMove, transform.name)
-    assert.deepEqual(
-      ruleSet.idealWhiteMoves(transformedFen),
-      [transformedMove.san],
+    const transformedMoves = getChess(transformedFen).moves({ verbose: true })
+    const transformedCentral = transformedMoves.find(
+      ({ from, to }) =>
+        from === transformSquare(sourceCentral.from, transform) &&
+        to === transformSquare(sourceCentral.to, transform),
+    )
+    const transformedOutside = transformedMoves.find(
+      ({ from, to }) =>
+        from === transformSquare(sourceOutside.from, transform) &&
+        to === transformSquare(sourceOutside.to, transform),
+    )
+    assert.ok(transformedCentral, transform.name)
+    assert.ok(transformedOutside, transform.name)
+    const centralScore = scoreTwoBishopsWhiteMove(
+      transformedFen,
+      transformedCentral.san,
+    )
+    const outsideScore = scoreTwoBishopsWhiteMove(
+      transformedFen,
+      transformedOutside.san,
+    )
+    assert.equal(
+      centralScore.kingCloserDistance,
+      outsideScore.kingCloserDistance,
       transform.name,
     )
+    assert.ok(kingCloser.compare(centralScore, outsideScore) < 0, transform.name)
   }
 })
 
@@ -1167,9 +1215,9 @@ test('king closer scores the resulting Phase 2 king position', () => {
   const fen = '8/3B4/8/8/8/4BK2/8/7k w - - 0 1'
 
   assert.equal(isTwoBishopsPhaseTwoPosition(fen), true)
-  assert.equal(scoreTwoBishopsWhiteMove(fen, 'Kf2').kingCloserDistance, 3)
-  assert.equal(scoreTwoBishopsWhiteMove(fen, 'Ke2').kingCloserDistance, 4)
-  assert.equal(scoreTwoBishopsWhiteMove(fen, 'Bc8').kingCloserDistance, 4)
+  assert.equal(scoreTwoBishopsWhiteMove(fen, 'Kf2').kingCloserDistance, 5)
+  assert.equal(scoreTwoBishopsWhiteMove(fen, 'Ke2').kingCloserDistance, 10)
+  assert.equal(scoreTwoBishopsWhiteMove(fen, 'Bc8').kingCloserDistance, 8)
 })
 
 test('bishop waiting moves preserve an already preferred Phase 2 king position', () => {
@@ -1191,7 +1239,7 @@ test('bishop waiting moves preserve an already preferred Phase 2 king position',
       0,
       `${transform.name}: preferred line`,
     )
-    assert.equal(score.kingCloserDistance, 4, `${transform.name}: distance`)
+    assert.equal(score.kingCloserDistance, 8, `${transform.name}: distance`)
     assert.equal(
       ruleSet.idealWhiteMoves(fen).includes(waitingMove.san),
       true,
@@ -1207,19 +1255,22 @@ test('king closer uses global distance before middle sixteen in Phase 2', () => 
   const outside = scoreTwoBishopsWhiteMove(source, 'Kg5')
 
   assert.equal(ruleSet.phase(source), '2/2')
-  assert.equal(central.kingCloserDistance, 4)
+  assert.equal(central.kingCloserDistance, 8)
   assert.equal(central.kingCloserMiddleSixteenDistance, 0)
-  assert.equal(outside.kingCloserDistance, 3)
+  assert.equal(outside.kingCloserDistance, 9)
   assert.equal(outside.kingCloserMiddleSixteenDistance, 1)
   assert.ok(
     compareTwoBishopsWhiteScores(
       {
         ...central,
-        kingCloserDistance: outside.kingCloserDistance,
-        kingCloserMiddleSixteenDistance:
-          outside.kingCloserMiddleSixteenDistance,
+        kingCloserDistance: 8,
+        kingCloserMiddleSixteenDistance: 1,
       },
-      central,
+      {
+        ...central,
+        kingCloserDistance: 9,
+        kingCloserMiddleSixteenDistance: 0,
+      },
     ) < 0,
   )
 })
