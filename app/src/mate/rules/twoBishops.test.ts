@@ -41,6 +41,8 @@ const WHITE_RULE_IDS = [
   'sequester',
   'bishops away',
   'conclave step',
+  'reverse conclave step',
+  'martian conclave step',
   'finish wall',
   'support wall',
   'start wall',
@@ -298,6 +300,16 @@ test('Two Bishops exposes each Phase 2 comparison as one visible rule', () => {
           'Phase 1: When the pieces are in the position shown, make the conclave step.',
       },
       {
+        shortLabel: 'reverse conclave step',
+        helpText:
+          'Phase 1: When the pieces are in the position shown, make the reverse conclave step.',
+      },
+      {
+        shortLabel: 'martian conclave step',
+        helpText:
+          'Phase 1: When the pieces are in the position shown, make the martian conclave step.',
+      },
+      {
         shortLabel: 'finish wall',
         helpText:
           'Phase 1: When possible, create the closest proximate bishop wall.',
@@ -310,12 +322,12 @@ test('Two Bishops exposes each Phase 2 comparison as one visible rule', () => {
       {
         shortLabel: 'start wall',
         helpText:
-          "Phase 1: Place a bishop in two-square opposition to Black's king.",
+          "Phase 1: Place a bishop in two-square opposition to Black's king, preferring shorter bishop moves, and not increasing distance to Black's king",
       },
       {
         shortLabel: 'king closer',
         helpText:
-          "Bring White's king closer to Black's king. If in phase 2, prefer the rank/file 2 away from Black's edge.",
+          "Bring White's king closer to Black's king, preferring proximity to the the middle 16 squares.",
       },
     ],
   )
@@ -330,9 +342,10 @@ test('Two Bishops exposes each Phase 2 comparison as one visible rule', () => {
       rule.id === 'degenerate' ||
       rule.id === 'force phase 2' ||
       rule.id === 'conclave step' ||
+      rule.id === 'reverse conclave step' ||
+      rule.id === 'martian conclave step' ||
       rule.id === 'finish wall' ||
-      rule.id === 'support wall' ||
-      rule.id === 'start wall'
+      rule.id === 'support wall'
     ) {
       assert.equal(typeof rule.applies, 'function')
       assert.equal(typeof rule.compare, 'function')
@@ -348,6 +361,10 @@ test('Two Bishops exposes each Phase 2 comparison as one visible rule', () => {
       assert.equal(typeof rule.applies, 'function')
       assert.equal(rule.compare, undefined)
       assert.equal(rule.subpriorities?.length, 1)
+    } else if (rule.id === 'start wall') {
+      assert.equal(typeof rule.applies, 'function')
+      assert.equal(rule.compare, undefined)
+      assert.equal(rule.subpriorities?.length, 2)
     } else if (rule.id === 'phase 2 wall') {
       assert.equal(typeof rule.applies, 'function')
       assert.equal(typeof rule.compare, 'function')
@@ -394,20 +411,42 @@ test('the visible strategic comparisons run in their displayed order', () => {
       : []
     const afterConclave =
       conclaveMoves.length > 0 ? conclaveMoves : afterBishopsAway
+    const reverseConclaveMoves = phaseOneRulesApply
+      ? afterConclave.filter(
+          (san) =>
+            scoreTwoBishopsWhiteMove(fen, san)
+              .reverseConclaveStepPenalty === 0,
+        )
+      : []
+    const afterReverseConclave =
+      reverseConclaveMoves.length > 0
+        ? reverseConclaveMoves
+        : afterConclave
+    const martianConclaveMoves = phaseOneRulesApply
+      ? afterReverseConclave.filter(
+          (san) =>
+            scoreTwoBishopsWhiteMove(fen, san)
+              .martianConclaveStepPenalty === 0,
+        )
+      : []
+    const afterMartianConclave =
+      martianConclaveMoves.length > 0
+        ? martianConclaveMoves
+        : afterReverseConclave
     const bestFinishWallPenalty = phaseOneRulesApply
       ? Math.min(
-          ...afterConclave.map(
+          ...afterMartianConclave.map(
             (san) => scoreTwoBishopsWhiteMove(fen, san).finishWallPenalty,
           ),
         )
       : 99
-    const finishWallMoves = afterConclave.filter(
+    const finishWallMoves = afterMartianConclave.filter(
       (san) =>
         scoreTwoBishopsWhiteMove(fen, san).finishWallPenalty ===
         bestFinishWallPenalty,
     )
     const afterFinish =
-      bestFinishWallPenalty < 99 ? finishWallMoves : afterConclave
+      bestFinishWallPenalty < 99 ? finishWallMoves : afterMartianConclave
     const kingMoves = phaseOneRulesApply
       ? afterFinish.filter(
           (san) =>
@@ -420,32 +459,46 @@ test('the visible strategic comparisons run in their displayed order', () => {
           (san) => scoreTwoBishopsWhiteMove(fen, san).startWallPenalty === 0,
         )
       : []
+    const shortestStartWallDistance =
+      startWallMoves.length > 0
+        ? Math.min(
+            ...startWallMoves.map(
+              (san) =>
+                scoreTwoBishopsWhiteMove(fen, san)
+                  .startWallMoveDistance!,
+            ),
+          )
+        : null
     const expectedAfterWall =
-      startWallMoves.length > 0 ? startWallMoves : afterKing
-    const bestPhaseTwoLinePenalty = Math.min(
-      ...expectedAfterWall.map(
-        (san) =>
-          scoreTwoBishopsWhiteMove(fen, san)
-            .kingCloserPhaseTwoLinePenalty,
-      ),
-    )
-    const preferredLineMoves = expectedAfterWall.filter(
-      (san) =>
-        scoreTwoBishopsWhiteMove(fen, san)
-          .kingCloserPhaseTwoLinePenalty === bestPhaseTwoLinePenalty,
-    )
+      shortestStartWallDistance === null
+        ? afterKing
+        : startWallMoves.filter(
+            (san) =>
+              scoreTwoBishopsWhiteMove(fen, san)
+                .startWallMoveDistance === shortestStartWallDistance,
+          )
     const bestKingCloserDistance = Math.min(
-      ...preferredLineMoves.map(
+      ...expectedAfterWall.map(
         (san) => scoreTwoBishopsWhiteMove(fen, san).kingCloserDistance,
       ),
     )
-    const closestKingMoves = preferredLineMoves.filter(
+    const closestKingMoves = expectedAfterWall.filter(
       (san) =>
         scoreTwoBishopsWhiteMove(fen, san).kingCloserDistance ===
         bestKingCloserDistance,
     )
-    const expectedFinal =
-      bestKingCloserDistance < 99 ? closestKingMoves : preferredLineMoves
+    const bestMiddleSixteenDistance = Math.min(
+      ...closestKingMoves.map(
+        (san) =>
+          scoreTwoBishopsWhiteMove(fen, san)
+            .kingCloserMiddleSixteenDistance,
+      ),
+    )
+    const expectedFinal = closestKingMoves.filter(
+      (san) =>
+        scoreTwoBishopsWhiteMove(fen, san)
+          .kingCloserMiddleSixteenDistance === bestMiddleSixteenDistance,
+    )
     assert.deepEqual(ruleSet.idealWhiteMoves(fen), expectedFinal, fen)
     for (const first of expectedFinal) {
       const firstScore = scoreTwoBishopsWhiteMove(fen, first)
@@ -462,12 +515,14 @@ test('the visible strategic comparisons run in their displayed order', () => {
           'forcePhaseTwoPenalty',
           'isPhaseTwoPosition',
           'kingCloserDistance',
-          'kingCloserPhaseTwoLinePenalty',
+          'kingCloserMiddleSixteenDistance',
+          'martianConclaveStepPenalty',
           'mateInThreeApplies',
           'mateInThreeTurns',
           'matePenalty',
           'phaseTwoWallApplies',
           'phaseTwoWallPenalty',
+          'reverseConclaveStepPenalty',
           'sequesterApplies',
           'sequesterBishopTargetDistance',
           'sequesterCurrentCornerDistance',
@@ -476,6 +531,7 @@ test('the visible strategic comparisons run in their displayed order', () => {
           'sequesterMaximumCornerReplyDistance',
           'sequesterTwoAwayControlPenalty',
           'stalematePenalty',
+          'startWallMoveDistance',
           'startWallPenalty',
           'supportWallPenalty',
         ],
@@ -509,12 +565,56 @@ test('the prepared Two Bishops batch matches public single-move scores', () => {
   )
 })
 
-test('start wall does not rebuild an adjacent wall', () => {
+test('start wall remains active when an adjacent bishop wall is not proximate', () => {
+  const fen = 'BB6/8/8/8/8/2K5/4k3/8 w - - 10 6'
+  const ruleSet = getMateRuleSet('two-bishops')
+
+  assert.equal(scoreTwoBishopsWhiteMove(fen, 'Be5').startWallPenalty, 0)
+  assert.ok(ruleSet.idealWhiteMoves(fen).includes('Be5'))
+  assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'start wall')
+})
+
+test('start wall remains active for a remote adjacent wall', () => {
   const ruleSet = getMateRuleSet('two-bishops')
   const fen = '8/2BB4/2K5/8/8/8/5k2/8 w - - 0 1'
-  assert.equal(scoreTwoBishopsWhiteMove(fen, 'Bf5').startWallPenalty, 1)
-  assert.equal(ruleSet.idealWhiteMoves(fen).includes('Bf5'), false)
-  assert.notEqual(ruleSet.currentWhiteHint(fen)?.id, 'start wall')
+  assert.equal(scoreTwoBishopsWhiteMove(fen, 'Bf5').startWallPenalty, 0)
+  assert.ok(ruleSet.idealWhiteMoves(fen).includes('Bf5'))
+  assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'start wall')
+})
+
+test('start wall prefers the shorter move only among wall-starting bishops', () => {
+  const fen = '8/3k4/8/5K2/8/4B3/1B6/8 w - - 0 1'
+  const long = scoreTwoBishopsWhiteMove(fen, 'Bbd4')
+  const short = scoreTwoBishopsWhiteMove(fen, 'Bed4')
+
+  assert.equal(long.startWallPenalty, 0)
+  assert.equal(short.startWallPenalty, 0)
+  assert.equal(long.startWallMoveDistance, 2)
+  assert.equal(short.startWallMoveDistance, 1)
+  assert.deepEqual(getMateRuleSet('two-bishops').idealWhiteMoves(fen), ['Bed4'])
+})
+
+test('start wall rejects bishop moves that increase squared Euclidean distance', () => {
+  const fen = '8/3k4/8/2B1K3/8/3B4/8/8 w - - 0 1'
+
+  for (const san of ['Ba7', 'Bd4']) {
+    const score = scoreTwoBishopsWhiteMove(fen, san)
+    assert.equal(score.startWallPenalty, 1, san)
+    assert.equal(score.startWallMoveDistance, null, san)
+  }
+})
+
+test('start wall does not compare bishop distance when no wall is starting', () => {
+  const fen = '8/8/8/5K1B/8/8/7k/4B3 w - - 0 1'
+  const short = scoreTwoBishopsWhiteMove(fen, 'Bg6')
+  const long = scoreTwoBishopsWhiteMove(fen, 'Be2')
+  const startWall = twoBishopsWhiteRules.find(({ id }) => id === 'start wall')
+
+  assert.equal(short.startWallPenalty, 1)
+  assert.equal(long.startWallPenalty, 1)
+  assert.equal(short.startWallMoveDistance, null)
+  assert.equal(long.startWallMoveDistance, null)
+  assert.equal(startWall?.subpriorities?.[1]?.when?.([short, long]), false)
 })
 
 test('finish wall follows Bf5 Ke3 with Be5', () => {
@@ -646,7 +746,14 @@ test('start wall is already satisfied when either bishop holds its position', ()
   assert.equal(scoreTwoBishopsWhiteMove(fen, 'Be2').startWallPenalty, 1)
 })
 
-test('start wall never selects when an adjacent bishop wall already exists', () => {
+test('start wall is disabled when the bishops already have a proximate wall', () => {
+  const fen = '8/8/2K5/4BB2/8/5k2/8/8 w - - 4 3'
+
+  assert.notEqual(getProximateBishopWall(['e5', 'f5'], 'f3'), null)
+  assert.equal(scoreTwoBishopsWhiteMove(fen, 'Bc3').startWallPenalty, 1)
+})
+
+test('start wall never selects when opposition already exists', () => {
   const source = '8/3B4/3B4/8/3k1K2/8/8/8 w - - 32 17'
   for (const transform of SQUARE_TRANSFORMS) {
     const fen = getChess(transformFen(source, transform)).fen()
@@ -668,6 +775,142 @@ test('conclave step selects Be4 in the supplied arrangement', () => {
   assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'conclave step')
 })
 
+test('reverse conclave step selects Kd6 in the supplied arrangement', () => {
+  const fen = '8/5k2/8/4K3/4BB2/8/8/8 w - - 0 1'
+  const ruleSet = getMateRuleSet('two-bishops')
+
+  assert.deepEqual(ruleSet.idealWhiteMoves(fen), ['Kd6'])
+  assert.equal(
+    scoreTwoBishopsWhiteMove(fen, 'Kd6').reverseConclaveStepPenalty,
+    0,
+  )
+  assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'reverse conclave step')
+})
+
+test('reverse conclave step follows translation and every D4 transform', () => {
+  const source = '8/5k2/8/4K3/4BB2/8/8/8 w - - 0 1'
+  const sourceMove = getChess(source).move('Kd6')
+  assert.ok(sourceMove)
+  const ruleSet = getMateRuleSet('two-bishops')
+
+  for (const transform of SQUARE_TRANSFORMS) {
+    const fen = getChess(transformFen(source, transform)).fen()
+    const move = getChess(fen)
+      .moves({ verbose: true })
+      .find(
+        ({ from, to }) =>
+          from === transformSquare(sourceMove.from, transform) &&
+          to === transformSquare(sourceMove.to, transform),
+      )
+    assert.ok(move, transform.name)
+    assert.equal(ruleSet.phase(fen), '1/2', transform.name)
+    assert.deepEqual(ruleSet.idealWhiteMoves(fen), [move.san], transform.name)
+    assert.equal(
+      scoreTwoBishopsWhiteMove(fen, move.san).reverseConclaveStepPenalty,
+      0,
+      transform.name,
+    )
+    assert.equal(
+      ruleSet.currentWhiteHint(fen)?.id,
+      'reverse conclave step',
+      transform.name,
+    )
+  }
+
+  const translated = '8/8/4k3/8/3K4/3BB3/8/8 w - - 0 1'
+  assert.equal(ruleSet.phase(translated), '1/2')
+  assert.deepEqual(ruleSet.idealWhiteMoves(translated), ['Kc5'])
+  assert.equal(
+    scoreTwoBishopsWhiteMove(translated, 'Kc5').reverseConclaveStepPenalty,
+    0,
+  )
+})
+
+test('reverse conclave step rejects the earlier draft and is inactive in Phase 2', () => {
+  const earlierDraft = '8/6k1/8/5K2/4BB2/8/8/8 w - - 0 1'
+  assert.equal(
+    scoreTwoBishopsWhiteMove(earlierDraft, 'Ke6')
+      .reverseConclaveStepPenalty,
+    1,
+  )
+
+  const phaseTwo = '7k/8/6K1/6BB/8/8/8/8 w - - 0 1'
+  const ruleSet = getMateRuleSet('two-bishops')
+  assert.equal(ruleSet.phase(phaseTwo), '2/2')
+  assert.notEqual(ruleSet.currentWhiteHint(phaseTwo)?.id, 'reverse conclave step')
+})
+
+test('martian conclave step selects Be5+ in the supplied arrangement', () => {
+  const fen = '8/8/3K1k2/8/4BB2/8/8/8 w - - 2 2'
+  const ruleSet = getMateRuleSet('two-bishops')
+
+  assert.equal(ruleSet.phase(fen), '1/2')
+  assert.deepEqual(ruleSet.idealWhiteMoves(fen), ['Be5+'])
+  assert.equal(
+    scoreTwoBishopsWhiteMove(fen, 'Be5+').martianConclaveStepPenalty,
+    0,
+  )
+  assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'martian conclave step')
+})
+
+test('martian conclave step follows translation and every D4 transform', () => {
+  const source = '8/8/3K1k2/8/4BB2/8/8/8 w - - 2 2'
+  const sourceMove = getChess(source).move('Be5+')
+  assert.ok(sourceMove)
+  const ruleSet = getMateRuleSet('two-bishops')
+
+  for (const transform of SQUARE_TRANSFORMS) {
+    const fen = getChess(transformFen(source, transform)).fen()
+    const move = getChess(fen)
+      .moves({ verbose: true })
+      .find(
+        ({ from, to }) =>
+          from === transformSquare(sourceMove.from, transform) &&
+          to === transformSquare(sourceMove.to, transform),
+      )
+    assert.ok(move, transform.name)
+    assert.equal(ruleSet.phase(fen), '1/2', transform.name)
+    assert.deepEqual(ruleSet.idealWhiteMoves(fen), [move.san], transform.name)
+    assert.equal(
+      scoreTwoBishopsWhiteMove(fen, move.san).martianConclaveStepPenalty,
+      0,
+      transform.name,
+    )
+    assert.equal(
+      ruleSet.currentWhiteHint(fen)?.id,
+      'martian conclave step',
+      transform.name,
+    )
+  }
+
+  const translated = '8/8/2K1k3/8/3BB3/8/8/8 w - - 0 1'
+  assert.equal(ruleSet.phase(translated), '1/2')
+  assert.deepEqual(ruleSet.idealWhiteMoves(translated), ['Bd5+'])
+  assert.equal(
+    scoreTwoBishopsWhiteMove(translated, 'Bd5+')
+      .martianConclaveStepPenalty,
+    0,
+  )
+})
+
+test('martian conclave step rejects nearby geometry and is inactive in Phase 2', () => {
+  const nearby = '8/5k2/3K4/8/4BB2/8/8/8 w - - 0 1'
+  assert.equal(
+    scoreTwoBishopsWhiteMove(nearby, 'Be5').martianConclaveStepPenalty,
+    1,
+  )
+
+  const phaseTwo = '8/8/5K1k/8/6BB/8/8/8 w - - 0 1'
+  const ruleSet = getMateRuleSet('two-bishops')
+  assert.equal(ruleSet.phase(phaseTwo), '2/2')
+  assert.equal(
+    scoreTwoBishopsWhiteMove(phaseTwo, 'Bg5+')
+      .martianConclaveStepPenalty,
+    0,
+  )
+  assert.notEqual(ruleSet.currentWhiteHint(phaseTwo)?.id, 'martian conclave step')
+})
+
 test('the final king closer metric permits screening a bishop', () => {
   const fen = '8/5k2/8/8/3K4/8/8/BB6 w - - 0 1'
   const screened = scoreTwoBishopsWhiteMove(fen, 'Ke5')
@@ -677,73 +920,121 @@ test('the final king closer metric permits screening a bishop', () => {
 })
 
 test('king closer uniquely minimizes Manhattan distance', () => {
-  const fen = '8/8/8/4BB2/6K1/8/8/4k3 w - - 34 18'
-  const closest = scoreTwoBishopsWhiteMove(fen, 'Kf3')
-  const farther = scoreTwoBishopsWhiteMove(fen, 'Kf4')
-  assert.equal(closest.kingCloserDistance, 3)
-  assert.equal(farther.kingCloserDistance, 4)
+  const fen = '8/8/8/4BB2/6K1/8/5k2/8 w - - 34 18'
+  const closest = scoreTwoBishopsWhiteMove(fen, 'Kf4')
+  const farther = scoreTwoBishopsWhiteMove(fen, 'Kh3')
+  assert.equal(closest.kingCloserDistance, 2)
+  assert.equal(farther.kingCloserDistance, 3)
   const ruleSet = getMateRuleSet('two-bishops')
-  assert.deepEqual(ruleSet.idealWhiteMoves(fen), ['Kf3'])
+  assert.deepEqual(ruleSet.idealWhiteMoves(fen), ['Kf4'])
   assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'king closer')
+})
+
+test('king closer prefers proximity to the middle sixteen after distance ties', () => {
+  const fen = '5k2/8/3K4/5BB1/8/8/8/8 w - - 0 1'
+  const central = scoreTwoBishopsWhiteMove(fen, 'Ke6')
+  const outside = scoreTwoBishopsWhiteMove(fen, 'Kd7')
+  const fartherCentral = scoreTwoBishopsWhiteMove(fen, 'Ke5')
+  const ruleSet = getMateRuleSet('two-bishops')
+
+  assert.equal(central.kingCloserDistance, outside.kingCloserDistance)
+  assert.equal(central.kingCloserMiddleSixteenDistance, 0)
+  assert.equal(outside.kingCloserMiddleSixteenDistance, 1)
+  assert.ok(compareTwoBishopsWhiteScores(central, outside) < 0)
+  assert.ok(compareTwoBishopsWhiteScores(outside, fartherCentral) < 0)
+  assert.deepEqual(ruleSet.idealWhiteMoves(fen), ['Ke6'])
+  assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'king closer')
+
+  const sourceMove = getChess(fen).move('Ke6')
+  assert.ok(sourceMove)
+  for (const transform of SQUARE_TRANSFORMS) {
+    const transformedFen = getChess(transformFen(fen, transform)).fen()
+    const transformedMove = getChess(transformedFen)
+      .moves({ verbose: true })
+      .find(
+        ({ from, to }) =>
+          from === transformSquare(sourceMove.from, transform) &&
+          to === transformSquare(sourceMove.to, transform),
+      )
+    assert.ok(transformedMove, transform.name)
+    assert.deepEqual(
+      ruleSet.idealWhiteMoves(transformedFen),
+      [transformedMove.san],
+      transform.name,
+    )
+  }
+})
+
+test('king closer prefers the nearer side of the middle sixteen', () => {
+  const fen = '5k2/8/7K/4BB2/8/8/8/8 w - - 0 1'
+  const nearer = scoreTwoBishopsWhiteMove(fen, 'Kg6')
+  const farther = scoreTwoBishopsWhiteMove(fen, 'Kh7')
+  const ruleSet = getMateRuleSet('two-bishops')
+
+  assert.equal(nearer.kingCloserDistance, farther.kingCloserDistance)
+  assert.equal(nearer.kingCloserMiddleSixteenDistance, 1)
+  assert.equal(farther.kingCloserMiddleSixteenDistance, 3)
+  assert.deepEqual(ruleSet.idealWhiteMoves(fen), ['Kg6'])
+  assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'king closer')
+})
+
+test('king closer middle sixteen uses the inclusive c3-f6 boundary', () => {
+  const lowBoundary = '8/7k/8/8/2K5/8/8/B2B4 w - - 0 1'
+  assert.equal(
+    scoreTwoBishopsWhiteMove(lowBoundary, 'Kc3')
+      .kingCloserMiddleSixteenDistance,
+    0,
+  )
+  assert.equal(
+    scoreTwoBishopsWhiteMove(lowBoundary, 'Kb3')
+      .kingCloserMiddleSixteenDistance,
+    1,
+  )
+
+  const highBoundary = 'B2B4/8/8/5K2/8/8/8/k7 w - - 0 1'
+  assert.equal(
+    scoreTwoBishopsWhiteMove(highBoundary, 'Kf6')
+      .kingCloserMiddleSixteenDistance,
+    0,
+  )
+  assert.equal(
+    scoreTwoBishopsWhiteMove(highBoundary, 'Kg6')
+      .kingCloserMiddleSixteenDistance,
+    1,
+  )
 })
 
 test('king closer scores the closest Phase 2 king move', () => {
   const fen = '8/3B4/8/8/8/4BK2/8/7k w - - 0 1'
 
   assert.equal(isTwoBishopsPhaseTwoPosition(fen), true)
-  assert.equal(
-    scoreTwoBishopsWhiteMove(fen, 'Kf2')
-      .kingCloserPhaseTwoLinePenalty,
-    0,
-  )
-  assert.equal(
-    scoreTwoBishopsWhiteMove(fen, 'Ke2')
-      .kingCloserPhaseTwoLinePenalty,
-    1,
-  )
   assert.equal(scoreTwoBishopsWhiteMove(fen, 'Kf2').kingCloserDistance, 3)
   assert.equal(scoreTwoBishopsWhiteMove(fen, 'Ke2').kingCloserDistance, 4)
   assert.equal(scoreTwoBishopsWhiteMove(fen, 'Bc8').kingCloserDistance, 99)
 })
 
-test('king closer scores the Phase 2 line before Manhattan distance', () => {
+test('king closer uses global distance before middle sixteen in Phase 2', () => {
   const source = '6k1/8/5BB1/5K2/8/8/8/8 w - - 0 1'
   const ruleSet = getMateRuleSet('two-bishops')
+  const central = scoreTwoBishopsWhiteMove(source, 'Ke6')
+  const outside = scoreTwoBishopsWhiteMove(source, 'Kg5')
 
   assert.equal(ruleSet.phase(source), '2/2')
-  assert.equal(
-    scoreTwoBishopsWhiteMove(source, 'Ke6')
-      .kingCloserPhaseTwoLinePenalty,
-    0,
+  assert.equal(central.kingCloserDistance, 4)
+  assert.equal(central.kingCloserMiddleSixteenDistance, 0)
+  assert.equal(outside.kingCloserDistance, 3)
+  assert.equal(outside.kingCloserMiddleSixteenDistance, 1)
+  assert.ok(
+    compareTwoBishopsWhiteScores(
+      {
+        ...central,
+        kingCloserDistance: outside.kingCloserDistance,
+        kingCloserMiddleSixteenDistance:
+          outside.kingCloserMiddleSixteenDistance,
+      },
+      central,
+    ) < 0,
   )
-  assert.equal(
-    scoreTwoBishopsWhiteMove(source, 'Kg5')
-      .kingCloserPhaseTwoLinePenalty,
-    1,
-  )
-  assert.equal(scoreTwoBishopsWhiteMove(source, 'Ke6').kingCloserDistance, 4)
-  assert.equal(scoreTwoBishopsWhiteMove(source, 'Kg5').kingCloserDistance, 3)
-  for (const transform of SQUARE_TRANSFORMS) {
-    const fen = getChess(transformFen(source, transform)).fen()
-    const from = transformSquare('f5', transform)
-    const to = transformSquare('e6', transform)
-    const expected = getChess(fen)
-      .moves({ verbose: true })
-      .find((move) => move.from === from && move.to === to)
-    assert.ok(expected, fen)
-    assert.equal(
-      scoreTwoBishopsWhiteMove(fen, expected.san)
-        .kingCloserPhaseTwoLinePenalty,
-      0,
-      fen,
-    )
-    assert.equal(
-      scoreTwoBishopsWhiteMove(fen, expected.san)
-        .kingCloserPhaseTwoLinePenalty,
-      0,
-      fen,
-    )
-  }
 })
 
 test('force phase 2 allows the king to leave the middle while clear of the edge', () => {
@@ -1749,6 +2040,73 @@ test('degenerate diagram order puts edge unmask before king lift', () => {
   )
 })
 
+test('degenerate king flank selects Kf6 in the supplied Phase 1 position', () => {
+  const fen = '8/3k4/8/4K3/4BB2/8/8/8 w - - 0 1'
+  const ruleSet = getMateRuleSet('two-bishops')
+
+  assert.equal(ruleSet.phase(fen), '1/2')
+  assert.deepEqual(ruleSet.idealWhiteMoves(fen), ['Kf6'])
+  assert.equal(scoreTwoBishopsWhiteMove(fen, 'Kf6').degenerateApplies, true)
+  assert.equal(scoreTwoBishopsWhiteMove(fen, 'Kf6').degeneratePenalty, 0)
+  assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'degenerate')
+  assert.equal(
+    getTwoBishopsDegenerateReasonLabel(fen),
+    'degenerate — king flank',
+  )
+})
+
+test('degenerate king flank follows translation and every D4 transform', () => {
+  const source = '8/3k4/8/4K3/4BB2/8/8/8 w - - 0 1'
+  const sourceMove = getChess(source).move('Kf6')
+  assert.ok(sourceMove)
+  const ruleSet = getMateRuleSet('two-bishops')
+
+  for (const transform of SQUARE_TRANSFORMS) {
+    const fen = getChess(transformFen(source, transform)).fen()
+    const move = getChess(fen)
+      .moves({ verbose: true })
+      .find(
+        ({ from, to }) =>
+          from === transformSquare(sourceMove.from, transform) &&
+          to === transformSquare(sourceMove.to, transform),
+      )
+    assert.ok(move, transform.name)
+    assert.equal(ruleSet.phase(fen), '1/2', transform.name)
+    assert.deepEqual(ruleSet.idealWhiteMoves(fen), [move.san], transform.name)
+    assert.equal(
+      getTwoBishopsDegenerateReasonLabel(fen),
+      'degenerate — king flank',
+      transform.name,
+    )
+  }
+
+  const translated = '8/2k5/8/3K4/3BB3/8/8/8 w - - 0 1'
+  assert.equal(ruleSet.phase(translated), '1/2')
+  assert.deepEqual(ruleSet.idealWhiteMoves(translated), ['Ke6'])
+  assert.equal(
+    getTwoBishopsDegenerateReasonLabel(translated),
+    'degenerate — king flank',
+  )
+})
+
+test('degenerate king flank rejects nearby geometry and is inactive in Phase 2', () => {
+  const nearby = '8/2k5/8/4K3/4BB2/8/8/8 w - - 0 1'
+  assert.equal(scoreTwoBishopsWhiteMove(nearby, 'Kf6').degenerateApplies, false)
+  assert.notEqual(
+    getTwoBishopsDegenerateReasonLabel(nearby),
+    'degenerate — king flank',
+  )
+
+  const phaseTwo = '8/k7/8/1K6/1BB5/8/8/8 w - - 0 1'
+  const ruleSet = getMateRuleSet('two-bishops')
+  assert.equal(ruleSet.phase(phaseTwo), '2/2')
+  assert.equal(scoreTwoBishopsWhiteMove(phaseTwo, 'Kc6').degenerateApplies, false)
+  assert.notEqual(
+    getTwoBishopsDegenerateReasonLabel(phaseTwo),
+    'degenerate — king flank',
+  )
+})
+
 test('degenerate sidesteps the king away from the relative bishop wall', () => {
   const source = '8/8/8/4BB2/5K2/8/5k2/8 w - - 32 17'
   const translated = '8/8/2BB4/3K4/8/3k4/8/8 w - - 0 1'
@@ -2426,6 +2784,7 @@ test('Two Bishops keeps its phase explanation and diagram', () => {
     'bishop-degenerate-diagonal-waiting-move',
     'bishop-degenerate-free-bishop',
     'bishop-degenerate-waiting-move',
+    'bishop-degenerate-king-flank',
     'bishop-degenerate-king-sidestep',
     'bishop-degenerate-reform-wall',
     'bishop-degenerate-king-lift',
@@ -2435,6 +2794,8 @@ test('Two Bishops keeps its phase explanation and diagram', () => {
     'bishop-phase-two-wall',
     'bishop-proximate-wall',
     'bishop-conclave-step',
+    'bishop-reverse-conclave-step',
+    'bishop-martian-conclave-step',
   ])
   assert.deepEqual(
     ruleSet.help.noteBoards
@@ -2557,7 +2918,18 @@ test('Two Bishops keeps its phase explanation and diagram', () => {
       piece: color === 'w' ? type.toUpperCase() : type,
     })),
   )
-  const kingSidestepBoard = ruleSet.help.noteBoards[9]!
+  const kingFlankBoard = ruleSet.help.noteBoards[9]!
+  assert.deepEqual(
+    kingFlankBoard.pieces,
+    getEndgamePiecePlacements(
+      TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateKingFlank.fen,
+    ).map(({ color, square, type }) => ({
+      square,
+      piece: color === 'w' ? type.toUpperCase() : type,
+    })),
+  )
+  assert.deepEqual(kingFlankBoard.arrows, [{ from: 'e5', to: 'f6' }])
+  const kingSidestepBoard = ruleSet.help.noteBoards[10]!
   assert.deepEqual(
     kingSidestepBoard.pieces,
     getEndgamePiecePlacements(
@@ -2580,7 +2952,7 @@ test('Two Bishops keeps its phase explanation and diagram', () => {
     )?.id,
     'degenerate',
   )
-  const reformWallBoard = ruleSet.help.noteBoards[10]!
+  const reformWallBoard = ruleSet.help.noteBoards[11]!
   assert.deepEqual(
     reformWallBoard.pieces,
     getEndgamePiecePlacements(
@@ -2603,7 +2975,7 @@ test('Two Bishops keeps its phase explanation and diagram', () => {
     )?.id,
     'degenerate',
   )
-  const kingLiftBoard = ruleSet.help.noteBoards[11]!
+  const kingLiftBoard = ruleSet.help.noteBoards[12]!
   assert.deepEqual(
     kingLiftBoard.pieces,
     getEndgamePiecePlacements(
@@ -2626,7 +2998,7 @@ test('Two Bishops keeps its phase explanation and diagram', () => {
     )?.shortLabel,
     'degenerate — king lift',
   )
-  const bishopRetreatBoard = ruleSet.help.noteBoards[12]!
+  const bishopRetreatBoard = ruleSet.help.noteBoards[13]!
   assert.deepEqual(
     bishopRetreatBoard.pieces,
     getEndgamePiecePlacements(
@@ -2637,7 +3009,7 @@ test('Two Bishops keeps its phase explanation and diagram', () => {
     })),
   )
   assert.deepEqual(bishopRetreatBoard.arrows, [{ from: 'f7', to: 'e8' }])
-  const longDiagonalBoard = ruleSet.help.noteBoards[13]!
+  const longDiagonalBoard = ruleSet.help.noteBoards[14]!
   assert.deepEqual(
     longDiagonalBoard.pieces,
     getEndgamePiecePlacements(
@@ -2655,7 +3027,7 @@ test('Two Bishops keeps its phase explanation and diagram', () => {
     longDiagonalBoard.caption,
     "Move the bishop to any highlighted square. Don't move it to the edge.",
   )
-  const matingPositionBoard = ruleSet.help.noteBoards[14]!
+  const matingPositionBoard = ruleSet.help.noteBoards[15]!
   assert.deepEqual(
     matingPositionBoard.pieces,
     TWO_BISHOPS_DIAGRAM_POSITIONS.matingPosition.pieces,
@@ -2664,7 +3036,7 @@ test('Two Bishops keeps its phase explanation and diagram', () => {
     matingPositionBoard.highlights.map(({ square }) => square),
     ['f8', 'f7'],
   )
-  const phaseTwoWallBoard = ruleSet.help.noteBoards[15]!
+  const phaseTwoWallBoard = ruleSet.help.noteBoards[16]!
   assert.deepEqual(
     phaseTwoWallBoard.pieces,
     getEndgamePiecePlacements(
@@ -2678,7 +3050,7 @@ test('Two Bishops keeps its phase explanation and diagram', () => {
     phaseTwoWallBoard.highlights.map(({ square }) => square),
     ['b8', 'b7'],
   )
-  const proximateWallBoard = ruleSet.help.noteBoards[16]!
+  const proximateWallBoard = ruleSet.help.noteBoards[17]!
   assert.deepEqual(
     proximateWallBoard.pieces,
     TWO_BISHOPS_DIAGRAM_POSITIONS.proximateWall.pieces,
@@ -2708,7 +3080,7 @@ test('Two Bishops keeps its phase explanation and diagram', () => {
       'g6',
     ],
   )
-  const conclaveBoard = ruleSet.help.noteBoards[17]!
+  const conclaveBoard = ruleSet.help.noteBoards[18]!
   assert.deepEqual(
     conclaveBoard.pieces,
     getEndgamePiecePlacements(TWO_BISHOPS_DIAGRAM_POSITIONS.conclaveStep.fen)
@@ -2718,6 +3090,44 @@ test('Two Bishops keeps its phase explanation and diagram', () => {
       })),
   )
   assert.deepEqual(conclaveBoard.arrows, [{ from: 'f5', to: 'e4' }])
+  const reverseConclaveBoard = ruleSet.help.noteBoards[19]!
+  assert.deepEqual(
+    reverseConclaveBoard.pieces,
+    getEndgamePiecePlacements(
+      TWO_BISHOPS_DIAGRAM_POSITIONS.reverseConclaveStep.fen,
+    ).map(({ color, square, type }) => ({
+      square,
+      piece: color === 'w' ? type.toUpperCase() : type,
+    })),
+  )
+  assert.deepEqual(reverseConclaveBoard.layout, {
+    files: 8,
+    ranks: 8,
+    fileOffset: 0,
+  })
+  assert.deepEqual(reverseConclaveBoard.highlights, [])
+  assert.deepEqual(reverseConclaveBoard.arrows, [
+    { from: 'e5', to: 'd6' },
+  ])
+  const martianConclaveBoard = ruleSet.help.noteBoards[20]!
+  assert.deepEqual(
+    martianConclaveBoard.pieces,
+    getEndgamePiecePlacements(
+      TWO_BISHOPS_DIAGRAM_POSITIONS.martianConclaveStep.fen,
+    ).map(({ color, square, type }) => ({
+      square,
+      piece: color === 'w' ? type.toUpperCase() : type,
+    })),
+  )
+  assert.deepEqual(martianConclaveBoard.layout, {
+    files: 8,
+    ranks: 8,
+    fileOffset: 0,
+  })
+  assert.deepEqual(martianConclaveBoard.highlights, [])
+  assert.deepEqual(martianConclaveBoard.arrows, [
+    { from: 'f4', to: 'e5' },
+  ])
 })
 
 test('Black captures before seeking the center or a bishop', () => {
