@@ -18,7 +18,7 @@ const reverseConclaveStepFen = getChess(
   '8/5k2/8/4K3/4BB2/8/8/8 w - - 0 1',
 ).fen()
 const martianConclaveStepFen = getChess(
-  '8/8/2K1k3/8/3BB3/8/8/8 w - - 4 3',
+  '8/4B3/4B2k/8/7K/8/8/8 w - - 0 1',
 ).fen()
 const phaseTwoWallFen = getChess(
   '2k5/8/4K3/8/5B2/5B2/8/8 w - - 4 3',
@@ -164,11 +164,11 @@ export const TWO_BISHOPS_DIAGRAM_POSITIONS = {
     phase: '1/2',
     fen: ${JSON.stringify(martianConclaveStepFen)},
     highlights: [
-      { square: 'e5', kind: 'zone' },
-      { square: 'f5', kind: 'zone' },
-      { square: 'f6', kind: 'zone' },
+      { square: 'g5', kind: 'zone' },
+      { square: 'g6', kind: 'zone' },
+      { square: 'h5', kind: 'zone' },
     ],
-    arrow: { from: 'e4', to: 'd3' },
+    arrow: { from: 'e6', to: 'f7' },
   },
   degenerateKnightStepControl: {
     phase: '2/2',

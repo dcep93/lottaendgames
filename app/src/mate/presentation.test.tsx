@@ -1510,10 +1510,10 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
   })
   assert.deepEqual(
     martianConclaveBoard.highlights.map(({ square }) => square),
-    ['e5', 'f5', 'f6'],
+    ['g5', 'g6', 'h5'],
   )
   assert.deepEqual(martianConclaveBoard.arrows, [
-    { from: 'e4', to: 'd3' },
+    { from: 'e6', to: 'f7' },
   ])
   assert.deepEqual(kingFlankBoard.layout, {
     files: 8,
@@ -1609,7 +1609,7 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
   assert.match(bishopsMarkup, />martian conclave step</)
   assert.match(
     bishopsMarkup,
-    /After the arrowed move, the bishops control the highlighted squares while the kings remain two steps apart\./,
+    /The adjacent bishops maximize control around Black&#x27;s king without checking\./,
   )
   assert.match(bishopsMarkup, />degenerate — knight-step control</)
   assert.match(

@@ -57,13 +57,13 @@ export const TWO_BISHOPS_DIAGRAM_POSITIONS = {
   },
   martianConclaveStep: {
     phase: '1/2',
-    fen: "8/8/2K1k3/8/3BB3/8/8/8 w - - 4 3",
+    fen: "8/4B3/4B2k/8/7K/8/8/8 w - - 0 1",
     highlights: [
-      { square: 'e5', kind: 'zone' },
-      { square: 'f5', kind: 'zone' },
-      { square: 'f6', kind: 'zone' },
+      { square: 'g5', kind: 'zone' },
+      { square: 'g6', kind: 'zone' },
+      { square: 'h5', kind: 'zone' },
     ],
-    arrow: { from: 'e4', to: 'd3' },
+    arrow: { from: 'e6', to: 'f7' },
   },
   degenerateKnightStepControl: {
     phase: '2/2',
