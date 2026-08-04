@@ -15,7 +15,7 @@ Use White's king as the relative origin. In the canonical orientation:
 - White's king is at `(0, 0)` (`d6`).
 - Black's king is at `(+2, 0)` (`f6`).
 - White's bishops are at `(+1, -2)` and `(+2, -2)` (`e4`, `f4`).
-- The bishop at `(+1, -2)` moves to `(+1, -1)` (`e5`).
+- The bishop at `(+2, -2)` moves to `(+1, -1)` (`f4` to `e5`).
 
 Match this relative arrangement under translation and all eight D4 rotations and reflections. Board-edge clipping and any other arrangement do not match.
 
@@ -29,7 +29,7 @@ The rule owns the reason whenever its move is the first surviving discriminator.
 
 ## Diagram
 
-Add a generated note-board entry titled `martian conclave step` using the exact supplied FEN, with no highlights and an arrow from `e4` to `e5`. The caption describes playing the arrowed bishop move.
+Add a generated note-board entry titled `martian conclave step` using the exact supplied FEN, with no highlights and an arrow from `f4` to `e5`. The caption describes playing the arrowed bishop move.
 
 ## Implementation
 
@@ -45,7 +45,7 @@ Tests must prove:
 
 - The canonical position uniquely recommends `Be5+` with reason `martian conclave step`.
 - The rule follows translation and every D4 transform.
-- The exact diagram uses the supplied position and arrow `e4 -> e5`.
+- The exact diagram uses the supplied position and arrow `f4 -> e5`.
 - The rule is inactive in Phase 2 and rejects nearby geometry.
 - The full Two Bishops rule and presentation suites, diagram generation check, TypeScript build, and diff check pass.
 - A fresh seeded cycle remains entirely in Phase 1; entering Phase 2 terminates loop search.
