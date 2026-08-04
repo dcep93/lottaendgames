@@ -1782,6 +1782,10 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
   assert.match(bishopsMarkup, />start wall</)
   assert.match(
     bishopsMarkup,
+    />bishop control<[^]*Phase 1: Prefer a bishop to control a square adjacent to Black&#x27;s king but not adjacent to White&#x27;s king\./,
+  )
+  assert.match(
+    bishopsMarkup,
     />start wall<[^]*Phase 1: Place a bishop in two-square opposition to Black&#x27;s king, preferring shorter bishop moves, and not increasing distance to Black&#x27;s king/,
   )
 
