@@ -69,7 +69,6 @@ export type TwoBishopsWhiteMoveScore = {
   readonly finishWallPenalty: number
   readonly startWallPenalty: number
   readonly startWallMoveDistance: number | null
-  readonly bishopControlPenalty: number
   readonly kingCloserPhaseTwoLinePenalty: number
   readonly kingCloserDistance: number
   readonly kingCloserMiddleSixteenDistance: number
@@ -2144,20 +2143,6 @@ function scoreTwoBishopsWhiteMoveWithContext(
     startWallMoveDistance: startsWall
       ? kingDistance(move.from, move.to)
       : null,
-    bishopControlPenalty:
-      blackKing &&
-      resultWhiteKingSquare &&
-      getKingAdjacentSquares(blackKing).some(
-        (target) =>
-          kingDistance(target, resultWhiteKingSquare) > 1 &&
-          resultBishops.some(
-            (bishop) =>
-              bishop !== target &&
-              bishopHasClearLineToSquare(resultFen, bishop, target),
-          ),
-      )
-        ? 0
-        : 1,
     kingCloserPhaseTwoLinePenalty:
       !isPhaseTwo ||
       blackKing === undefined ||
@@ -2180,22 +2165,6 @@ function distanceToMiddleSixteen(square: Square): number {
   const fileDistance = file < 2 ? 2 - file : file > 5 ? file - 5 : 0
   const rankDistance = rank < 2 ? 2 - rank : rank > 5 ? rank - 5 : 0
   return fileDistance + rankDistance
-}
-
-function getKingAdjacentSquares(square: Square): Square[] {
-  const origin = squareCoordinates(square)
-  const adjacent: Square[] = []
-  for (let fileOffset = -1; fileOffset <= 1; fileOffset += 1) {
-    for (let rankOffset = -1; rankOffset <= 1; rankOffset += 1) {
-      if (fileOffset === 0 && rankOffset === 0) continue
-      const target = squareFromCoordinates(
-        origin.file + fileOffset,
-        origin.rank + rankOffset,
-      )
-      if (target) adjacent.push(target)
-    }
-  }
-  return adjacent
 }
 
 function isInOpposition(
@@ -2551,15 +2520,6 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
           first.startWallMoveDistance! - second.startWallMoveDistance!,
       },
     ],
-  },
-  {
-    id: 'bishop control',
-    shortLabel: 'bishop control',
-    helpText:
-      "Phase 1: Prefer a bishop to control a square adjacent to Black's king but not adjacent to White's king.",
-    applies: (score) => !score.isPhaseTwoPosition,
-    compare: (first, second) =>
-      first.bishopControlPenalty - second.bishopControlPenalty,
   },
   {
     id: 'king closer',
