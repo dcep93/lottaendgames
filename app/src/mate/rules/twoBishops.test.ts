@@ -48,6 +48,7 @@ const WHITE_RULE_IDS = [
   'support wall',
   'start wall',
   'king closer',
+  'check',
 ] as const
 
 type UniversalOutcome = {
@@ -362,6 +363,10 @@ test('Two Bishops exposes each Phase 2 comparison as one visible rule', () => {
         helpText:
           "Bring White's king closer to Black's king, preferring proximity to the the middle 16 squares.",
       },
+      {
+        shortLabel: 'check',
+        helpText: 'Play a check',
+      },
     ],
   )
   assert.deepEqual(
@@ -378,7 +383,8 @@ test('Two Bishops exposes each Phase 2 comparison as one visible rule', () => {
       rule.id === 'reverse conclave step' ||
       rule.id === 'martian conclave step' ||
       rule.id === 'finish wall' ||
-      rule.id === 'support wall'
+      rule.id === 'support wall' ||
+      rule.id === 'check'
     ) {
       assert.equal(typeof rule.applies, 'function')
       assert.equal(typeof rule.compare, 'function')
@@ -550,11 +556,18 @@ test('the visible strategic comparisons run in their displayed order', () => {
             .kingCloserMiddleSixteenDistance,
       ),
     )
-    const expectedFinal = closestKingMoves.filter(
+    const afterKingCloser = closestKingMoves.filter(
       (san) =>
         scoreTwoBishopsWhiteMove(fen, san)
           .kingCloserMiddleSixteenDistance === bestMiddleSixteenDistance,
     )
+    const checkingMoves = phaseOneRulesApply
+      ? afterKingCloser.filter(
+          (san) => scoreTwoBishopsWhiteMove(fen, san).checkPenalty === 0,
+        )
+      : []
+    const expectedFinal =
+      checkingMoves.length > 0 ? checkingMoves : afterKingCloser
     assert.deepEqual(ruleSet.idealWhiteMoves(fen), expectedFinal, fen)
     for (const first of expectedFinal) {
       const firstScore = scoreTwoBishopsWhiteMove(fen, first)
@@ -564,6 +577,7 @@ test('the visible strategic comparisons run in their displayed order', () => {
           'bishopSafetyPenalty',
           'bishopsAwayCosineAlignment',
           'bishopsOnBlackEdgeCount',
+          'checkPenalty',
           'conclaveStepPenalty',
           'degenerateApplies',
           'degeneratePenalty',
@@ -998,27 +1012,8 @@ test('king closer scores the resulting king after bishop moves in Phase 1', () =
   assert.equal(bishopMove.kingCloserDistance, 5)
   assert.equal(bishopMove.kingCloserMiddleSixteenDistance, 2)
   assert.equal(kingMove.kingCloserDistance, 9)
-  assert.deepEqual(ruleSet.idealWhiteMoves(fen), [
-    'Bc8+',
-    'Be8',
-    'Be6',
-    'Bf5',
-    'Bg4',
-    'Bh3',
-    'Bb5',
-    'Ba4',
-    'Bc7',
-    'Be7',
-    'Bf8',
-    'Be5',
-    'Bf4',
-    'Bg3',
-    'Bh2',
-    'Bc5',
-    'Bb4',
-    'Ba3',
-  ])
-  assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'king closer')
+  assert.deepEqual(ruleSet.idealWhiteMoves(fen), ['Bc8+'])
+  assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'check')
 })
 
 test('king closer prefers proximity to the middle sixteen after distance ties', () => {
@@ -1117,6 +1112,46 @@ test('king closer scores the resulting Phase 2 king position', () => {
   assert.equal(scoreTwoBishopsWhiteMove(fen, 'Kf2').kingCloserDistance, 5)
   assert.equal(scoreTwoBishopsWhiteMove(fen, 'Ke2').kingCloserDistance, 10)
   assert.equal(scoreTwoBishopsWhiteMove(fen, 'Bc8').kingCloserDistance, 8)
+})
+
+test('check breaks a Phase 1 king closer tie in favor of check', () => {
+  const fen = '8/5k2/8/5K2/3BB3/8/8/8 w - - 0 1'
+
+  assert.equal(scoreTwoBishopsWhiteMove(fen, 'Bd5+').checkPenalty, 0)
+  assert.equal(scoreTwoBishopsWhiteMove(fen, 'Bc5').checkPenalty, 1)
+  assert.deepEqual(getMateRuleSet('two-bishops').idealWhiteMoves(fen), [
+    'Bd5+',
+  ])
+  assert.equal(
+    getMateRuleSet('two-bishops').currentWhiteHint(fen)?.id,
+    'check',
+  )
+})
+
+test('check leaves Phase 1 survivors tied when none gives check', () => {
+  const fen = '8/5k2/8/2B3K1/4B3/8/8/8 w - - 4 3'
+
+  assert.equal(scoreTwoBishopsWhiteMove(fen, 'Bd4').checkPenalty, 1)
+  assert.equal(scoreTwoBishopsWhiteMove(fen, 'Bc6').checkPenalty, 1)
+  assert.deepEqual(getMateRuleSet('two-bishops').idealWhiteMoves(fen), [
+    'Bd4',
+    'Bc6',
+  ])
+})
+
+test('check is inactive in Phase 2', () => {
+  const fen = '8/8/7k/5K2/8/6B1/6B1/8 w - - 0 1'
+  const rule = twoBishopsWhiteRules.find(({ id }) => id === 'check')
+
+  assert.ok(rule)
+  assert.equal(
+    rule.applies?.(scoreTwoBishopsWhiteMove(fen, 'Bf4+')),
+    false,
+  )
+  assert.equal(
+    rule.applies?.(scoreTwoBishopsWhiteMove(fen, 'Be5')),
+    false,
+  )
 })
 
 test('bishop waiting moves preserve an already preferred Phase 2 king position', () => {

@@ -72,6 +72,7 @@ export type TwoBishopsWhiteMoveScore = {
   readonly kingCloserPhaseTwoLinePenalty: number
   readonly kingCloserDistance: number
   readonly kingCloserMiddleSixteenDistance: number
+  readonly checkPenalty: number
 }
 
 export type TwoBishopsBlackMoveScore = {
@@ -2157,6 +2158,7 @@ function scoreTwoBishopsWhiteMoveWithContext(
       resultWhiteKingSquare
         ? distanceToMiddleSixteen(resultWhiteKingSquare)
         : 0,
+    checkPenalty: chess.isCheck() ? 0 : 1,
   }
 }
 
@@ -2532,6 +2534,13 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
       first.kingCloserDistance - second.kingCloserDistance ||
       first.kingCloserMiddleSixteenDistance -
         second.kingCloserMiddleSixteenDistance,
+  },
+  {
+    id: 'check',
+    shortLabel: 'check',
+    helpText: 'Play a check',
+    applies: (score) => !score.isPhaseTwoPosition,
+    compare: (first, second) => first.checkPenalty - second.checkPenalty,
   },
 ]
 
