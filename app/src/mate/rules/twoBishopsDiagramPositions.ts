@@ -50,6 +50,16 @@ export const TWO_BISHOPS_DIAGRAM_POSITIONS = {
     highlights: [{ square: 'a6', kind: 'zone' }],
     arrow: { from: 'c6', to: 'c7' },
   },
+  reverseConclaveStep: {
+    phase: '1/2',
+    fen: "8/5k2/8/4K3/4BB2/8/8/8 w - - 0 1",
+    arrow: { from: 'e5', to: 'd6' },
+  },
+  martianConclaveStep: {
+    phase: '1/2',
+    fen: "8/8/3K1k2/8/4BB2/8/8/8 w - - 2 2",
+    arrow: { from: 'f4', to: 'e5' },
+  },
   degenerateKnightStepControl: {
     phase: '2/2',
     fen: "6B1/6B1/8/8/5K2/7k/8/8 w - - 0 1",
@@ -132,6 +142,11 @@ export const TWO_BISHOPS_DIAGRAM_POSITIONS = {
   degenerateWaitingMove: {
     phase: '2/2',
     fen: "5B1k/1B3K2/8/8/8/8/8/8 w - - 0 1",
+  },
+  degenerateKingFlank: {
+    phase: '1/2',
+    fen: "8/3k4/8/4K3/4BB2/8/8/8 w - - 0 1",
+    arrow: { from: 'e5', to: 'f6' },
   },
   degenerateKingSidestep: {
     phase: '1/2',

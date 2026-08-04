@@ -1322,6 +1322,7 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
       'bishop-degenerate-diagonal-waiting-move',
       'bishop-degenerate-free-bishop',
       'bishop-degenerate-waiting-move',
+      'bishop-degenerate-king-flank',
       'bishop-degenerate-king-sidestep',
       'bishop-degenerate-reform-wall',
       'bishop-degenerate-king-lift',
@@ -1331,6 +1332,8 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
       'bishop-phase-two-wall',
       'bishop-proximate-wall',
       'bishop-conclave-step',
+      'bishop-reverse-conclave-step',
+      'bishop-martian-conclave-step',
     ],
   } as const
 
@@ -1441,6 +1444,7 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
     diagonalWaitingBoard,
     freeBishopBoard,
     waitingMoveBoard,
+    kingFlankBoard,
     kingSidestepBoard,
     reformWallBoard,
     kingLiftBoard,
@@ -1450,6 +1454,8 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
     phaseTwoWallBoard,
     proximateWallBoard,
     conclaveBoard,
+    reverseConclaveBoard,
+    martianConclaveBoard,
   ] = bishopsRuleSet.help.noteBoards
   assert.ok(mateInFourBoard)
   assert.ok(knightStepControlBoard)
@@ -1461,6 +1467,7 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
   assert.ok(diagonalWaitingBoard)
   assert.ok(freeBishopBoard)
   assert.ok(waitingMoveBoard)
+  assert.ok(kingFlankBoard)
   assert.ok(kingSidestepBoard)
   assert.ok(reformWallBoard)
   assert.ok(kingLiftBoard)
@@ -1470,6 +1477,8 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
   assert.ok(phaseTwoWallBoard)
   assert.ok(proximateWallBoard)
   assert.ok(conclaveBoard)
+  assert.ok(reverseConclaveBoard)
+  assert.ok(martianConclaveBoard)
   assert.deepEqual(
     proximateWallBoard.highlights,
     TWO_BISHOPS_DIAGRAM_POSITIONS.proximateWall.highlights,
@@ -1485,6 +1494,33 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
   })
   assert.deepEqual(conclaveBoard.highlights, [])
   assert.deepEqual(conclaveBoard.arrows, [{ from: 'f5', to: 'e4' }])
+  assert.deepEqual(reverseConclaveBoard.layout, {
+    files: 8,
+    ranks: 8,
+    fileOffset: 0,
+  })
+  assert.deepEqual(reverseConclaveBoard.highlights, [])
+  assert.deepEqual(reverseConclaveBoard.arrows, [
+    { from: 'e5', to: 'd6' },
+  ])
+  assert.deepEqual(martianConclaveBoard.layout, {
+    files: 8,
+    ranks: 8,
+    fileOffset: 0,
+  })
+  assert.deepEqual(martianConclaveBoard.highlights, [])
+  assert.deepEqual(martianConclaveBoard.arrows, [
+    { from: 'f4', to: 'e5' },
+  ])
+  assert.deepEqual(kingFlankBoard.layout, {
+    files: 8,
+    ranks: 8,
+    fileOffset: 0,
+  })
+  assert.deepEqual(kingFlankBoard.highlights, [])
+  assert.deepEqual(kingFlankBoard.arrows, [
+    { from: 'e5', to: 'f6' },
+  ])
   assert.deepEqual(knightStepControlBoard.arrows, [
     { from: 'g8', to: 'd5' },
   ])
@@ -1566,6 +1602,8 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
   assert.match(bishopsMarkup, />conclave step</)
   assert.match(bishopsMarkup, />degenerate — mate in 4</)
   assert.match(bishopsMarkup, /With a6 controlled, play Kc7./)
+  assert.match(bishopsMarkup, />reverse conclave step</)
+  assert.match(bishopsMarkup, />martian conclave step</)
   assert.match(bishopsMarkup, />degenerate — knight-step control</)
   assert.match(
     bishopsMarkup,
@@ -1589,6 +1627,7 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
   assert.match(bishopsMarkup, />degenerate — diagonal waiting move</)
   assert.match(bishopsMarkup, />degenerate — free bishop</)
   assert.match(bishopsMarkup, />degenerate — waiting move</)
+  assert.match(bishopsMarkup, />degenerate — king flank</)
   assert.match(bishopsMarkup, />degenerate — king sidestep</)
   assert.match(bishopsMarkup, />degenerate — reform wall</)
   assert.match(bishopsMarkup, />degenerate — king lift</)
@@ -1630,7 +1669,7 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
     /Target corner: Calculate after White&#x27;s move\. If a two-square bishop wall forces every Black reply along the edge in one direction, use that corner\. Otherwise, use the corner where White has the better relative king race; on a tie, use the nearest wall to cage Black, retaining both corners if still tied\./,
   )
   assert.match(bishopsMarkup, /leg-mate-guide-note-boards--full/)
-  assert.equal(bishopsMarkup.match(/leg-mate-note-board--full/g)?.length, 19)
+  assert.equal(bishopsMarkup.match(/leg-mate-note-board--full/g)?.length, 22)
   assert.equal(
     bishopsMarkup.match(/data-highlight-kind="zone"/g)?.length,
     33,
@@ -1720,7 +1759,7 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
   )
   assert.match(
     bishopsMarkup,
-    />king closer<[^]*Bring White&#x27;s king closer to Black&#x27;s king\. If in phase 2, prefer the rank\/file 2 away from Black&#x27;s edge\./,
+    />king closer<[^]*Bring White&#x27;s king closer to Black&#x27;s king, preferring proximity to the the middle 16 squares\./,
   )
   assert.doesNotMatch(bishopsMarkup, />lazy king</)
   assert.match(bishopsMarkup, />support wall</)
@@ -1738,8 +1777,13 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
   )
   assert.doesNotMatch(bishopsMarkup, />force opposition<|>unmask</)
   assert.match(bishopsMarkup, />conclave step</)
+  assert.match(bishopsMarkup, />martian conclave step</)
   assert.match(bishopsMarkup, />finish wall</)
   assert.match(bishopsMarkup, />start wall</)
+  assert.match(
+    bishopsMarkup,
+    />start wall<[^]*Phase 1: Place a bishop in two-square opposition to Black&#x27;s king, preferring shorter bishop moves, and not increasing distance to Black&#x27;s king/,
+  )
 
   const queenMarkup = renderToStaticMarkup(
     <MatePriorityGuideDialog

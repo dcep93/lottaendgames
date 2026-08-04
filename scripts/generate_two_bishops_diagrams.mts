@@ -14,6 +14,12 @@ const check = process.argv.includes('--check')
 const conclaveStepFen = getChess(
   '8/8/8/4BB2/8/3K4/5k2/8 w - - 16 9',
 ).fen()
+const reverseConclaveStepFen = getChess(
+  '8/5k2/8/4K3/4BB2/8/8/8 w - - 0 1',
+).fen()
+const martianConclaveStepFen = getChess(
+  '8/8/3K1k2/8/4BB2/8/8/8 w - - 2 2',
+).fen()
 const phaseTwoWallFen = getChess(
   '2k5/8/4K3/8/5B2/5B2/8/8 w - - 4 3',
 ).fen()
@@ -56,6 +62,9 @@ const degenerateDiagonalSetupFen = getChess(
 const degenerateDiagonalWaitingMoveFen = getChess(
   '4B1k1/8/4KB2/8/8/8/8/8 w - - 2 2',
 ).fen()
+const degenerateKingFlankFen = getChess(
+  '8/3k4/8/4K3/4BB2/8/8/8 w - - 0 1',
+).fen()
 const degenerateKingSidestepFen = getChess(
   '8/8/8/4BB2/5K2/8/5k2/8 w - - 32 17',
 ).fen()
@@ -83,6 +92,9 @@ for (const [label, fen] of [
   }
 }
 for (const [label, fen] of [
+  ['reverse conclave step', reverseConclaveStepFen],
+  ['martian conclave step', martianConclaveStepFen],
+  ['degenerate king flank', degenerateKingFlankFen],
   ['degenerate king sidestep', degenerateKingSidestepFen],
   ['degenerate reform wall', degenerateReformWallFen],
 ] as const) {
@@ -142,6 +154,16 @@ export const TWO_BISHOPS_DIAGRAM_POSITIONS = {
     fen: ${JSON.stringify(degenerateMateInFourFen)},
     highlights: [{ square: 'a6', kind: 'zone' }],
     arrow: { from: 'c6', to: 'c7' },
+  },
+  reverseConclaveStep: {
+    phase: '1/2',
+    fen: ${JSON.stringify(reverseConclaveStepFen)},
+    arrow: { from: 'e5', to: 'd6' },
+  },
+  martianConclaveStep: {
+    phase: '1/2',
+    fen: ${JSON.stringify(martianConclaveStepFen)},
+    arrow: { from: 'f4', to: 'e5' },
   },
   degenerateKnightStepControl: {
     phase: '2/2',
@@ -226,6 +248,11 @@ export const TWO_BISHOPS_DIAGRAM_POSITIONS = {
     phase: '2/2',
     fen: ${JSON.stringify(degenerateWaitingMoveFen)},
   },
+  degenerateKingFlank: {
+    phase: '1/2',
+    fen: ${JSON.stringify(degenerateKingFlankFen)},
+    arrow: { from: 'e5', to: 'f6' },
+  },
   degenerateKingSidestep: {
     phase: '1/2',
     fen: ${JSON.stringify(degenerateKingSidestepFen)},
@@ -251,6 +278,8 @@ if (check) {
 }
 
 process.stdout.write(`conclave step: ${conclaveStepFen}\n`)
+process.stdout.write(`reverse conclave step: ${reverseConclaveStepFen}\n`)
+process.stdout.write(`martian conclave step: ${martianConclaveStepFen}\n`)
 process.stdout.write(`phase 2 wall: ${phaseTwoWallFen}\n`)
 process.stdout.write(`degenerate mate in 4: ${degenerateMateInFourFen}\n`)
 process.stdout.write(
@@ -279,5 +308,6 @@ process.stdout.write(
 )
 process.stdout.write(`degenerate free bishop: ${degenerateFreeBishopFen}\n`)
 process.stdout.write(`degenerate waiting move: ${degenerateWaitingMoveFen}\n`)
+process.stdout.write(`degenerate king flank: ${degenerateKingFlankFen}\n`)
 process.stdout.write(`degenerate king sidestep: ${degenerateKingSidestepFen}\n`)
 process.stdout.write(`degenerate reform wall: ${degenerateReformWallFen}\n`)
