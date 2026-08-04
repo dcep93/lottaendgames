@@ -65,7 +65,7 @@ export type TwoBishopsWhiteMoveScore = {
   readonly conclaveStepPenalty: number
   readonly reverseConclaveStepPenalty: number
   readonly martianConclaveControlPenalty: number
-  readonly martianConclaveControlledSquareCount: number
+  readonly martianConclaveControlledRunLength: number
   readonly martianConclaveBishopDistance: number
   readonly finishWallPenalty: number
   readonly startWallPenalty: number
@@ -1960,20 +1960,15 @@ function scoreTwoBishopsWhiteMoveWithContext(
     blackKing && resultWhiteKingSquare
       ? squaredEuclideanDistance(resultWhiteKingSquare, blackKing)
       : 99
-  const martianConclaveTargets =
+  const martianConclaveControlledRunLength =
     blackKing && resultWhiteKingSquare
-      ? getAdjacentSquares(blackKing).filter(
-          (square) => kingDistance(square, resultWhiteKingSquare) > 1,
+      ? getMartianConclaveControlledRunLength(
+          chess,
+          blackKing,
+          resultWhiteKingSquare,
+          resultBishops,
         )
-      : []
-  const martianConclaveControlledSquareCount =
-    martianConclaveTargets.filter((target) =>
-      resultBishops.some(
-        (bishop) =>
-          bishop !== target &&
-          bishopHasClearLineToSquareOnBoard(chess, bishop, target),
-      ),
-    ).length
+      : 0
   const martianConclaveBishopDistance =
     resultBishops.length === 2
       ? squaredEuclideanDistance(resultBishops[0]!, resultBishops[1]!)
@@ -2135,10 +2130,10 @@ function scoreTwoBishopsWhiteMoveWithContext(
       blackKing &&
       resultWhiteKingSquare &&
       kingDistance(resultWhiteKingSquare, blackKing) === 2 &&
-      martianConclaveControlledSquareCount >= 3
+      martianConclaveControlledRunLength >= 3
         ? 0
         : 1,
-    martianConclaveControlledSquareCount,
+    martianConclaveControlledRunLength,
     martianConclaveBishopDistance,
     finishWallPenalty:
       blackKing &&
@@ -2197,20 +2192,51 @@ function isInOpposition(
   )
 }
 
-function getAdjacentSquares(square: Square): readonly Square[] {
-  const origin = squareCoordinates(square)
-  const adjacent: Square[] = []
-  for (let fileOffset = -1; fileOffset <= 1; fileOffset += 1) {
-    for (let rankOffset = -1; rankOffset <= 1; rankOffset += 1) {
-      if (fileOffset === 0 && rankOffset === 0) continue
-      const candidate = squareFromCoordinates(
-        origin.file + fileOffset,
-        origin.rank + rankOffset,
+const MARTIAN_CONCLAVE_RING_OFFSETS = [
+  { file: 0, rank: 1 },
+  { file: 1, rank: 1 },
+  { file: 1, rank: 0 },
+  { file: 1, rank: -1 },
+  { file: 0, rank: -1 },
+  { file: -1, rank: -1 },
+  { file: -1, rank: 0 },
+  { file: -1, rank: 1 },
+] as const
+
+function getMartianConclaveControlledRunLength(
+  chess: ReturnType<typeof getChess>,
+  blackKing: Square,
+  whiteKing: Square,
+  bishops: readonly Square[],
+): number {
+  const origin = squareCoordinates(blackKing)
+  const controlledRing = MARTIAN_CONCLAVE_RING_OFFSETS.map(
+    ({ file, rank }) => {
+      const target = squareFromCoordinates(
+        origin.file + file,
+        origin.rank + rank,
       )
-      if (candidate) adjacent.push(candidate)
-    }
+      return (
+        target !== null &&
+        kingDistance(target, whiteKing) > 1 &&
+        bishops.some(
+          (bishop) =>
+            bishop !== target &&
+            bishopHasClearLineToSquareOnBoard(chess, bishop, target),
+        )
+      )
+    },
+  )
+
+  let longest = 0
+  let current = 0
+  for (let index = 0; index < controlledRing.length * 2; index += 1) {
+    current = controlledRing[index % controlledRing.length]
+      ? Math.min(current + 1, controlledRing.length)
+      : 0
+    longest = Math.max(longest, current)
   }
-  return adjacent
+  return longest
 }
 
 type ConclaveStep = {
