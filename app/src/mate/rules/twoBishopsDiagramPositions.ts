@@ -44,6 +44,12 @@ export const TWO_BISHOPS_DIAGRAM_POSITIONS = {
     fen: "8/8/8/4BB2/8/3K4/5k2/8 w - - 16 9",
     arrow: { from: 'f5', to: 'e4' },
   },
+  degenerateMateInFour: {
+    phase: '2/2',
+    fen: "8/k7/2KB4/8/2B5/8/8/8 w - - 2 2",
+    highlights: [{ square: 'a6', kind: 'zone' }],
+    arrow: { from: 'c6', to: 'c7' },
+  },
   degenerateKnightStepControl: {
     phase: '2/2',
     fen: "6B1/6B1/8/8/5K2/7k/8/8 w - - 0 1",

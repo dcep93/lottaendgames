@@ -17,6 +17,9 @@ const conclaveStepFen = getChess(
 const phaseTwoWallFen = getChess(
   '2k5/8/4K3/8/5B2/5B2/8/8 w - - 4 3',
 ).fen()
+const degenerateMateInFourFen = getChess(
+  '8/k7/2KB4/8/2B5/8/8/8 w - - 2 2',
+).fen()
 const degenerateKnightStepControlFen = getChess(
   '6B1/6B1/8/8/5K2/7k/8/8 w - - 0 1',
 ).fen()
@@ -61,6 +64,7 @@ const degenerateReformWallFen = getChess(
 ).fen()
 for (const [label, fen] of [
   ['phase 2 wall', phaseTwoWallFen],
+  ['degenerate mate in 4', degenerateMateInFourFen],
   ['degenerate knight-step control', degenerateKnightStepControlFen],
   ['degenerate wall waiting move', degenerateWallWaitingMoveFen],
   ['degenerate corner diagonals', degenerateCornerDiagonalsFen],
@@ -132,6 +136,12 @@ export const TWO_BISHOPS_DIAGRAM_POSITIONS = {
   conclaveStep: {
     fen: ${JSON.stringify(conclaveStepFen)},
     arrow: { from: 'f5', to: 'e4' },
+  },
+  degenerateMateInFour: {
+    phase: '2/2',
+    fen: ${JSON.stringify(degenerateMateInFourFen)},
+    highlights: [{ square: 'a6', kind: 'zone' }],
+    arrow: { from: 'c6', to: 'c7' },
   },
   degenerateKnightStepControl: {
     phase: '2/2',
@@ -242,6 +252,7 @@ if (check) {
 
 process.stdout.write(`conclave step: ${conclaveStepFen}\n`)
 process.stdout.write(`phase 2 wall: ${phaseTwoWallFen}\n`)
+process.stdout.write(`degenerate mate in 4: ${degenerateMateInFourFen}\n`)
 process.stdout.write(
   `degenerate knight-step control: ${degenerateKnightStepControlFen}\n`,
 )
