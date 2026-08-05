@@ -1779,7 +1779,7 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
   )
   assert.ok(
     bishopsMarkup.indexOf('>unclutter bishops<') <
-      bishopsMarkup.indexOf('>adjacent bishops<'),
+      bishopsMarkup.indexOf('>restrict area<'),
   )
   assert.doesNotMatch(bishopsMarkup, />lazy king</)
   assert.doesNotMatch(bishopsMarkup, />support wall</)
@@ -1803,9 +1803,15 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
   assert.doesNotMatch(bishopsMarkup, />start wall</)
   assert.doesNotMatch(bishopsMarkup, />knight-step control</)
   assert.doesNotMatch(bishopsMarkup, />bishop control</)
+  assert.doesNotMatch(bishopsMarkup, />distant bishops</)
+  assert.doesNotMatch(bishopsMarkup, />adjacent bishops</)
   assert.match(
     bishopsMarkup,
-    />adjacent bishops<[^]*Phase 1: Place the bishops on adjacent diagonals, then adjacent squares/,
+    />restrict area<[^]*Phase 1: Use the bishops to control 2 diagonals adjacent to Black&#x27;s king, but not checking the king, preferring a smaller area \(min 6\) for Black\. White&#x27;s king should not be within the area or those diagonals\. If not possible, bishop control a square diagonally adjacent to Black&#x27;s king, preferring squares closer to the center of the board\. If a bishop is attacked while maintaining the restricted area, maintain the diagonal and move it as far as possible\./,
+  )
+  assert.ok(
+    bishopsMarkup.indexOf('>restrict area<') <
+      bishopsMarkup.indexOf('>king closer<'),
   )
 
   const queenMarkup = renderToStaticMarkup(
