@@ -6,7 +6,7 @@ Allow White's king to target either the restricted-area diagonal or a square one
 
 ## Behavior
 
-`king pushable` continues to prefer positions outside Black's restricted area. Among those positions, being directly on the restricted-area diagonal and being adjacent to it are equally acceptable. Positions farther away remain ordered by squared Euclidean distance.
+`king pushable` continues to prefer positions outside Black's restricted area. Among those positions, being directly on the restricted-area diagonal and being one king step from it are equally acceptable. Positions farther away remain ordered by squared Euclidean distance.
 
 The visible help text becomes:
 
@@ -16,8 +16,8 @@ Adjacency uses king geometry, so orthogonal and diagonal neighboring squares cou
 
 ## Implementation
 
-- Normalize the existing boundary distance by mapping raw squared distances `0` and `1` to `0`.
-- Preserve the ordering of all raw distances greater than `1` by subtracting one.
+- Normalize the existing boundary distance by mapping raw squared distances `0`, `1`, and `2` to `0`. The value `2` represents diagonal king-step adjacency.
+- Preserve the ordering of all raw distances greater than `2` by subtracting two.
 - Keep the outside-area penalty as the first comparison.
 - Update guide metadata, the independent policy pipeline, and focused scoring tests.
 

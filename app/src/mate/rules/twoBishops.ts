@@ -2650,7 +2650,7 @@ function scoreTwoBishopsWhiteMoveWithContext(
       resultWhiteKingSquare === undefined ||
       restrictAreaKingConfinements.length === 0
         ? 99
-        : distanceToRestrictedAreaKingBoundary(
+        : distanceToRestrictedAreaKingTarget(
             resultWhiteKingSquare,
             restrictAreaKingConfinements,
           ),
@@ -2838,12 +2838,12 @@ function getRestrictedAreaKingConfinements(
   return confinements.filter(({ area }) => area === smallestArea)
 }
 
-function distanceToRestrictedAreaKingBoundary(
+function distanceToRestrictedAreaKingTarget(
   king: Square,
   confinements: readonly BishopConfinement[],
 ): number {
   const kingCoordinates = squareCoordinates(king)
-  return Math.min(
+  const boundaryDistance = Math.min(
     ...confinements.flatMap(({ boundaries, orientation }) =>
       boundaries.flatMap((value) =>
         BOARD_SQUARE_COORDINATES.filter(
@@ -2859,6 +2859,7 @@ function distanceToRestrictedAreaKingBoundary(
       ),
     ),
   )
+  return Math.max(0, boundaryDistance - 2)
 }
 
 function kingIsInsideRestrictedArea(
@@ -3113,7 +3114,7 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
     id: 'king pushable',
     shortLabel: 'king pushable',
     helpText:
-      "Phase 1: Bring White's king toward the restricted-area diagonal while keeping it outside Black's restricted area.",
+      "Phase 1: Bring White's king to or adjacent to the restricted-area diagonal while keeping it outside Black's restricted area.",
     applies: (score) =>
       !score.isPhaseTwoPosition && score.kingPushableApplies,
     compare: (first, second) =>

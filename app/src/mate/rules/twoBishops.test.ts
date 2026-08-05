@@ -353,7 +353,7 @@ test('Two Bishops exposes each Phase 2 comparison as one visible rule', () => {
       {
         shortLabel: 'king pushable',
         helpText:
-          "Phase 1: Bring White's king toward the restricted-area diagonal while keeping it outside Black's restricted area.",
+          "Phase 1: Bring White's king to or adjacent to the restricted-area diagonal while keeping it outside Black's restricted area.",
       },
       {
         shortLabel: 'unclutter bishops',
@@ -926,19 +926,22 @@ test('prep restricted area prefers the controlled diagonal neighbor closest to c
   assert.ok(fallback.compare(central, farther) < 0)
 })
 
-test('king pushable keeps the king on the restricted-area diagonal before unclutter bishops', () => {
+test('king pushable accepts the diagonal and adjacent squares before unclutter bishops', () => {
   const fen = '8/8/7B/8/8/4K3/6k1/1B6 w - - 0 1'
   const along = scoreTwoBishopsWhiteMove(fen, 'Kf4')
-  const away = scoreTwoBishopsWhiteMove(fen, 'Ke2')
+  const adjacent = scoreTwoBishopsWhiteMove(fen, 'Kd4')
+  const inside = scoreTwoBishopsWhiteMove(fen, 'Ke2')
   const bishopWait = scoreTwoBishopsWhiteMove(fen, 'Bc2')
   const rule = twoBishopsWhiteRules.find(({ id }) => id === 'king pushable')
 
   assert.equal(along.kingPushableApplies, true)
   assert.equal(along.kingPushableDistance, 0)
-  assert.equal(away.kingPushableDistance, 1)
+  assert.equal(adjacent.kingPushableDistance, 0)
+  assert.equal(inside.kingPushableInsideAreaPenalty, 1)
   assert.equal(bishopWait.kingPushableDistance, 0)
   assert.ok(rule?.compare)
-  assert.ok(rule.compare(along, away) < 0)
+  assert.equal(rule.compare(along, adjacent), 0)
+  assert.ok(rule.compare(adjacent, inside) < 0)
   assert.equal(rule.compare(along, bishopWait), 0)
   const idealMoves = getMateRuleSet('two-bishops').idealWhiteMoves(fen)
   assert.deepEqual(idealMoves, ['Bg5'])
@@ -950,7 +953,7 @@ test('king pushable keeps the king on the restricted-area diagonal before unclut
 
   const sourceMove = getChess(fen)
     .moves({ verbose: true })
-    .find(({ san }) => san === 'Kf4')
+    .find(({ san }) => san === 'Kd4')
   assert.ok(sourceMove)
   for (const transform of SQUARE_TRANSFORMS) {
     const transformedFen = getChess(transformFen(fen, transform)).fen()
@@ -971,6 +974,31 @@ test('king pushable keeps the king on the restricted-area diagonal before unclut
   }
 })
 
+test('king pushable treats adjacency as acceptable in the supplied position', () => {
+  const fen = '8/8/8/3BK3/1k6/4B3/8/8 w - - 18 10'
+  const direct = scoreTwoBishopsWhiteMove(fen, 'Ke4')
+  const orthogonallyAdjacent = scoreTwoBishopsWhiteMove(fen, 'Kf4')
+  const diagonallyAdjacent = scoreTwoBishopsWhiteMove(fen, 'Ke6')
+  const farther = scoreTwoBishopsWhiteMove(fen, 'Kf6')
+  const rule = twoBishopsWhiteRules.find(({ id }) => id === 'king pushable')
+
+  assert.equal(direct.kingPushableInsideAreaPenalty, 0)
+  assert.equal(orthogonallyAdjacent.kingPushableInsideAreaPenalty, 0)
+  assert.equal(diagonallyAdjacent.kingPushableInsideAreaPenalty, 0)
+  assert.equal(farther.kingPushableInsideAreaPenalty, 0)
+  assert.equal(direct.kingPushableDistance, 0)
+  assert.equal(orthogonallyAdjacent.kingPushableDistance, 0)
+  assert.equal(diagonallyAdjacent.kingPushableDistance, 0)
+  assert.equal(farther.kingPushableDistance, 3)
+  assert.ok(rule?.compare)
+  assert.equal(rule.compare(direct, orthogonallyAdjacent), 0)
+  assert.equal(rule.compare(direct, diagonallyAdjacent), 0)
+  assert.ok(rule.compare(diagonallyAdjacent, farther) < 0)
+  const ruleSet = getMateRuleSet('two-bishops')
+  assert.deepEqual(ruleSet.idealWhiteMoves(fen), ['Kd6'])
+  assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'king closer')
+})
+
 test("king pushable keeps White's king outside Black's restricted area", () => {
   const fen = '8/8/8/8/6k1/3K4/2BB4/8 w - - 2 2'
   const expected = scoreTwoBishopsWhiteMove(fen, 'Kd4')
@@ -982,9 +1010,9 @@ test("king pushable keeps White's king outside Black's restricted area", () => {
   assert.equal(expected.kingPushableInsideAreaPenalty, 0)
   assert.equal(tiedDistance.kingPushableInsideAreaPenalty, 0)
   assert.equal(inside.kingPushableInsideAreaPenalty, 1)
-  assert.equal(expected.kingPushableDistance, 1)
-  assert.equal(tiedDistance.kingPushableDistance, 1)
-  assert.equal(inside.kingPushableDistance, 1)
+  assert.equal(expected.kingPushableDistance, 0)
+  assert.equal(tiedDistance.kingPushableDistance, 0)
+  assert.equal(inside.kingPushableDistance, 0)
   assert.deepEqual(ruleSet.idealWhiteMoves(fen), ['Kd4'])
   assert.equal(ruleSet.explainWhiteMove(fen, 'Ke2')?.id, 'king pushable')
 
@@ -1012,7 +1040,7 @@ test("king pushable keeps White's king outside Black's restricted area", () => {
       0,
       transform.name,
     )
-    assert.equal(transformedScore.kingPushableDistance, 1, transform.name)
+    assert.equal(transformedScore.kingPushableDistance, 0, transform.name)
   }
 })
 
