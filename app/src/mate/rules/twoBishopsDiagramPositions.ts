@@ -160,6 +160,11 @@ export const TWO_BISHOPS_DIAGRAM_POSITIONS = {
     phase: '2/2',
     fen: "5B1k/1B3K2/8/8/8/8/8/8 w - - 0 1",
   },
+  degeneratePhaseOneLoopEscape: {
+    phase: '1/2',
+    fen: "B7/B7/8/1k6/3K4/8/8/8 w - - 16 9",
+    arrow: { from: 'a8', to: 'f3' },
+  },
   degenerateKingFlank: {
     phase: '1/2',
     fen: "8/3k4/8/4K3/4BB2/8/8/8 w - - 0 1",

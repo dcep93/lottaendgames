@@ -56,6 +56,9 @@ const degenerateFreeBishopFen = getChess(
 const degenerateWaitingMoveFen = getChess(
   '5B1k/1B3K2/8/8/8/8/8/8 w - - 0 1',
 ).fen()
+const degeneratePhaseOneLoopEscapeFen = getChess(
+  'B7/B7/8/1k6/3K4/8/8/8 w - - 16 9',
+).fen()
 const degenerateEdgeRepairFen = getChess(
   '8/8/8/8/8/7k/5K2/3BB3 w - - 2 2',
 ).fen()
@@ -103,6 +106,7 @@ for (const [label, fen] of [
   }
 }
 for (const [label, fen] of [
+  ['degenerate phase 1 loop escape', degeneratePhaseOneLoopEscapeFen],
   ['degenerate king flank', degenerateKingFlankFen],
   ['degenerate king sidestep', degenerateKingSidestepFen],
   ['degenerate reform wall', degenerateReformWallFen],
@@ -274,6 +278,11 @@ export const TWO_BISHOPS_DIAGRAM_POSITIONS = {
     phase: '2/2',
     fen: ${JSON.stringify(degenerateWaitingMoveFen)},
   },
+  degeneratePhaseOneLoopEscape: {
+    phase: '1/2',
+    fen: ${JSON.stringify(degeneratePhaseOneLoopEscapeFen)},
+    arrow: { from: 'a8', to: 'f3' },
+  },
   degenerateKingFlank: {
     phase: '1/2',
     fen: ${JSON.stringify(degenerateKingFlankFen)},
@@ -340,6 +349,9 @@ process.stdout.write(
 )
 process.stdout.write(`degenerate free bishop: ${degenerateFreeBishopFen}\n`)
 process.stdout.write(`degenerate waiting move: ${degenerateWaitingMoveFen}\n`)
+process.stdout.write(
+  `degenerate phase 1 loop escape: ${degeneratePhaseOneLoopEscapeFen}\n`,
+)
 process.stdout.write(`degenerate king flank: ${degenerateKingFlankFen}\n`)
 process.stdout.write(`degenerate king sidestep: ${degenerateKingSidestepFen}\n`)
 process.stdout.write(`degenerate reform wall: ${degenerateReformWallFen}\n`)
