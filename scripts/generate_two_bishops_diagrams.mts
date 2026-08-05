@@ -17,8 +17,11 @@ const conclaveStepFen = getChess(
 const reverseConclaveStepFen = getChess(
   '8/5k2/8/4K3/4BB2/8/8/8 w - - 0 1',
 ).fen()
+const phaseOneKnightStepControlFen = getChess(
+  '8/6k1/4K3/8/8/8/7B/7B w - - 0 1',
+).fen()
 const martianConclaveStepFen = getChess(
-  '8/8/3K1k2/8/4BB2/8/8/8 w - - 2 2',
+  '8/4B3/4B2k/8/7K/8/8/8 w - - 0 1',
 ).fen()
 const phaseTwoWallFen = getChess(
   '2k5/8/4K3/8/5B2/5B2/8/8 w - - 4 3',
@@ -104,6 +107,7 @@ for (const [label, fen] of [
   }
 }
 for (const [label, fen] of [
+  ['knight-step control', phaseOneKnightStepControlFen],
   ['reverse conclave step', reverseConclaveStepFen],
   ['martian conclave step', martianConclaveStepFen],
   ['degenerate king flank', degenerateKingFlankFen],
@@ -166,6 +170,12 @@ export const TWO_BISHOPS_DIAGRAM_POSITIONS = {
       { square: 'g6', kind: 'zone' },
     ],
   },
+  phaseOneKnightStepControl: {
+    phase: '1/2',
+    fen: ${JSON.stringify(phaseOneKnightStepControlFen)},
+    highlights: [{ square: 'h6', kind: 'zone' }],
+    arrow: { from: 'h2', to: 'f4' },
+  },
   conclaveStep: {
     fen: ${JSON.stringify(conclaveStepFen)},
     arrow: { from: 'f5', to: 'e4' },
@@ -194,7 +204,8 @@ export const TWO_BISHOPS_DIAGRAM_POSITIONS = {
   martianConclaveStep: {
     phase: '1/2',
     fen: ${JSON.stringify(martianConclaveStepFen)},
-    arrow: { from: 'f4', to: 'e5' },
+    highlights: [{ square: 'g6', kind: 'zone' }],
+    arrow: { from: 'e6', to: 'f7' },
   },
   degenerateKnightStepControl: {
     phase: '2/2',
@@ -310,6 +321,9 @@ if (check) {
 }
 
 process.stdout.write(`conclave step: ${conclaveStepFen}\n`)
+process.stdout.write(
+  `knight-step control: ${phaseOneKnightStepControlFen}\n`,
+)
 process.stdout.write(`reverse conclave step: ${reverseConclaveStepFen}\n`)
 process.stdout.write(`martian conclave step: ${martianConclaveStepFen}\n`)
 process.stdout.write(`phase 2 wall: ${phaseTwoWallFen}\n`)

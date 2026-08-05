@@ -65,16 +65,20 @@ export type TwoBishopsWhiteMoveScore = {
   readonly bishopsOnBlackEdgeCount: number
   readonly forcePhaseTwoApplies: boolean
   readonly forcePhaseTwoPenalty: number
+  readonly phaseOneKnightStepControlApplies: boolean
+  readonly phaseOneKnightStepControlPenalty: number
   readonly conclaveStepPenalty: number
   readonly reverseConclaveStepPenalty: number
-  readonly martianConclaveStepPenalty: number
-  readonly supportWallPenalty: number
+  readonly martianConclaveApplies: boolean
+  readonly martianConclaveStructurePenalty: number
+  readonly martianConclaveControlledSquareCount: number
   readonly finishWallPenalty: number
   readonly startWallPenalty: number
   readonly startWallMoveDistance: number | null
   readonly kingCloserPhaseTwoLinePenalty: number
   readonly kingCloserDistance: number
   readonly kingCloserMiddleSixteenDistance: number
+  readonly checkPenalty: number
 }
 
 export type TwoBishopsBlackMoveScore = {
@@ -445,6 +449,20 @@ const twoBishopsHelp: RuleHelp = {
       highlights: TWO_BISHOPS_DIAGRAM_POSITIONS.proximateWall.highlights,
     },
     {
+      id: 'bishop-phase-one-knight-step-control',
+      title: 'knight-step control',
+      caption: 'Move the arrowed bishop to control the highlighted square.',
+      layout: { files: 8, ranks: 8, fileOffset: 0 },
+      pieces: noteBoardPieces(
+        TWO_BISHOPS_DIAGRAM_POSITIONS.phaseOneKnightStepControl.fen,
+      ),
+      highlights:
+        TWO_BISHOPS_DIAGRAM_POSITIONS.phaseOneKnightStepControl.highlights,
+      arrows: [
+        TWO_BISHOPS_DIAGRAM_POSITIONS.phaseOneKnightStepControl.arrow,
+      ],
+    },
+    {
       id: 'bishop-conclave-step',
       title: 'conclave step',
       caption: 'When the pieces have this arrangement, play the arrowed bishop move.',
@@ -467,12 +485,14 @@ const twoBishopsHelp: RuleHelp = {
     {
       id: 'bishop-martian-conclave-step',
       title: 'martian conclave step',
-      caption: 'When the pieces have this arrangement, play the arrowed bishop move.',
+      caption:
+        "The adjacent bishops maximize control around Black's king without checking or controlling squares adjacent to White's king.",
       layout: { files: 8, ranks: 8, fileOffset: 0 },
       pieces: noteBoardPieces(
         TWO_BISHOPS_DIAGRAM_POSITIONS.martianConclaveStep.fen,
       ),
-      highlights: [],
+      highlights:
+        TWO_BISHOPS_DIAGRAM_POSITIONS.martianConclaveStep.highlights,
       arrows: [TWO_BISHOPS_DIAGRAM_POSITIONS.martianConclaveStep.arrow],
     },
   ],
@@ -2115,9 +2135,9 @@ type TwoBishopsWhitePositionContext = {
   readonly blackKing: Square | undefined
   readonly startingWhiteKing: Square | undefined
   readonly startingBishops: readonly Square[]
+  readonly phaseOneKnightStepControlTargets: readonly Square[]
   readonly conclaveSteps: ReturnType<typeof getConclaveSteps>
   readonly reverseConclaveSteps: ReturnType<typeof getReverseConclaveSteps>
-  readonly martianConclaveSteps: ReturnType<typeof getMartianConclaveSteps>
   readonly isPhaseTwo: boolean
   readonly degenerateRepair: DegenerateRepair | null
   readonly mateInThreeApplies: boolean
@@ -2144,9 +2164,12 @@ function createTwoBishopsWhitePositionContext(
     blackKing,
     startingWhiteKing,
     startingBishops,
+    phaseOneKnightStepControlTargets:
+      blackKing && startingWhiteKing
+        ? getPhaseOneKnightStepControlTargets(startingWhiteKing, blackKing)
+        : [],
     conclaveSteps: getConclaveSteps(fen),
     reverseConclaveSteps: getReverseConclaveSteps(fen),
-    martianConclaveSteps: getMartianConclaveSteps(fen),
     isPhaseTwo,
     degenerateRepair,
     mateInThreeApplies: matePatternTurnsBySan.size > 0,
@@ -2191,9 +2214,9 @@ function scoreTwoBishopsWhiteMoveWithContext(
   const {
     blackKing,
     startingWhiteKing,
+    phaseOneKnightStepControlTargets,
     conclaveSteps,
     reverseConclaveSteps,
-    martianConclaveSteps,
     isPhaseTwo,
     degenerateRepair,
     mateInThreeApplies,
@@ -2214,11 +2237,30 @@ function scoreTwoBishopsWhiteMoveWithContext(
     move.piece === 'k' ? move.to : startingWhiteKing
   const sequesterTwoAwaySquares = getSequesterTwoAwaySquares(blackKing)
   const resultKingDistance =
-    blackKing &&
-    resultWhiteKingSquare &&
-    (move.piece === 'k' || isPhaseTwo)
-      ? manhattanDistance(resultWhiteKingSquare, blackKing)
+    blackKing && resultWhiteKingSquare
+      ? squaredEuclideanDistance(resultWhiteKingSquare, blackKing)
       : 99
+  const martianConclaveApplies = Boolean(
+    !isPhaseTwo &&
+    blackKing &&
+    startingWhiteKing &&
+    kingDistance(startingWhiteKing, blackKing) === 2,
+  )
+  const martianConclaveStructurePenalty =
+    resultBishops.length === 2 &&
+    areOrthogonallyAdjacent(resultBishops[0]!, resultBishops[1]!) &&
+    !chess.isCheck()
+      ? 0
+      : 1
+  const martianConclaveControlledSquareCount =
+    blackKing && resultWhiteKingSquare
+      ? getMartianConclaveControlledSquareCount(
+          chess,
+          blackKing,
+          resultWhiteKingSquare,
+          resultBishops,
+        )
+      : 0
   const mate = chess.isCheckmate()
   const blackMoves = chess.moves({ verbose: true })
   const bishopCanBeCaptured = blackMoves.some(
@@ -2358,6 +2400,20 @@ function scoreTwoBishopsWhiteMoveWithContext(
       )
         ? 0
         : 1,
+    phaseOneKnightStepControlApplies:
+      !isPhaseTwo && phaseOneKnightStepControlTargets.length > 0,
+    phaseOneKnightStepControlPenalty:
+      move.piece === 'b' &&
+      phaseOneKnightStepControlTargets.some(
+        (target) =>
+          resultBishops.some(
+            (bishop) =>
+              bishop !== target &&
+              bishopHasClearLineToSquareOnBoard(chess, bishop, target),
+          ),
+      )
+        ? 0
+        : 1,
     conclaveStepPenalty:
       move.piece === 'b' &&
       conclaveSteps.some(
@@ -2372,25 +2428,9 @@ function scoreTwoBishopsWhiteMoveWithContext(
       )
         ? 0
         : 1,
-    martianConclaveStepPenalty:
-      move.piece === 'b' &&
-      martianConclaveSteps.some(
-        (step) => step.from === move.from && step.to === move.to,
-      )
-        ? 0
-        : 1,
-    supportWallPenalty:
-      proximateWall &&
-      blackKing &&
-      startingWhiteKing &&
-      resultWhiteKingSquare &&
-      move.piece === 'k' &&
-      (kingDistance(resultWhiteKingSquare, blackKing) <
-        kingDistance(startingWhiteKing, blackKing) ||
-        distanceToWallMoat(resultWhiteKingSquare, proximateWall) <
-          distanceToWallMoat(startingWhiteKing, proximateWall))
-        ? 0
-        : 1,
+    martianConclaveApplies,
+    martianConclaveStructurePenalty,
+    martianConclaveControlledSquareCount,
     finishWallPenalty:
       blackKing &&
       move.piece === 'b' &&
@@ -2414,9 +2454,10 @@ function scoreTwoBishopsWhiteMoveWithContext(
           : 1,
     kingCloserDistance: resultKingDistance,
     kingCloserMiddleSixteenDistance:
-      resultWhiteKingSquare && (move.piece === 'k' || isPhaseTwo)
+      resultWhiteKingSquare
         ? distanceToMiddleSixteen(resultWhiteKingSquare)
         : 0,
+    checkPenalty: chess.isCheck() ? 0 : 1,
   }
 }
 
@@ -2447,12 +2488,72 @@ function isInOpposition(
   )
 }
 
-function distanceToWallMoat(
-  square: Square,
-  wall: ProximateBishopWall,
+const DIAGONAL_ADJACENT_OFFSETS = [
+  { file: -1, rank: -1 },
+  { file: -1, rank: 1 },
+  { file: 1, rank: -1 },
+  { file: 1, rank: 1 },
+] as const
+
+function getPhaseOneKnightStepControlTargets(
+  whiteKing: Square,
+  blackKing: Square,
+): readonly Square[] {
+  if (!isKnightMove(whiteKing, blackKing)) return []
+  const black = squareCoordinates(blackKing)
+  return DIAGONAL_ADJACENT_OFFSETS.map(({ file, rank }) =>
+    squareFromCoordinates(black.file + file, black.rank + rank),
+  ).filter(
+    (square): square is Square =>
+      square !== null && isInOpposition(square, whiteKing, 2),
+  )
+}
+
+const MARTIAN_CONCLAVE_RING_OFFSETS = [
+  { file: 0, rank: 1 },
+  { file: 1, rank: 1 },
+  { file: 1, rank: 0 },
+  { file: 1, rank: -1 },
+  { file: 0, rank: -1 },
+  { file: -1, rank: -1 },
+  { file: -1, rank: 0 },
+  { file: -1, rank: 1 },
+] as const
+
+function getMartianConclaveControlledSquareCount(
+  chess: ReturnType<typeof getChess>,
+  blackKing: Square,
+  whiteKing: Square,
+  bishops: readonly Square[],
 ): number {
-  const coordinates = squareCoordinates(square)
-  return Math.abs(coordinates[wall.moatAxis] - wall.moatIndex)
+  const origin = squareCoordinates(blackKing)
+  return MARTIAN_CONCLAVE_RING_OFFSETS.filter(
+    ({ file, rank }) => {
+      const target = squareFromCoordinates(
+        origin.file + file,
+        origin.rank + rank,
+      )
+      return (
+        target !== null &&
+        kingDistance(target, whiteKing) !== 1 &&
+        bishops.some(
+          (bishop) =>
+            bishop !== target &&
+            bishopHasClearLineToSquareOnBoard(chess, bishop, target),
+        )
+      )
+    },
+  ).length
+}
+
+function areOrthogonallyAdjacent(first: Square, second: Square): boolean {
+  const firstCoordinates = squareCoordinates(first)
+  const secondCoordinates = squareCoordinates(second)
+  return (
+    Math.abs(firstCoordinates.file - secondCoordinates.file) +
+      Math.abs(firstCoordinates.rank - secondCoordinates.rank) ===
+    1
+  )
 }
 
 type ConclaveStep = {
@@ -2551,56 +2652,6 @@ function getReverseConclaveSteps(fen: string): readonly ConclaveStep[] {
       )
     ) {
       steps.push({ from: whiteKing.square, to: target })
-    }
-  }
-  return steps
-}
-
-function getMartianConclaveSteps(fen: string): readonly ConclaveStep[] {
-  const whiteKing = findPiece(fen, 'w', 'k')
-  const blackKing = findPiece(fen, 'b', 'k')
-  const bishops = getWhiteBishopSquares(fen)
-  if (!whiteKing || !blackKing || bishops.length !== 2) return []
-  const bishopSet = new Set(bishops)
-  const steps: ConclaveStep[] = []
-
-  for (const transform of D4_RELATIVE_TRANSFORMS) {
-    const expectedBlackKing = relativeSquare(
-      whiteKing.square,
-      transform,
-      2,
-      0,
-    )
-    const movingBishop = relativeSquare(
-      whiteKing.square,
-      transform,
-      2,
-      -2,
-    )
-    const stationaryBishop = relativeSquare(
-      whiteKing.square,
-      transform,
-      1,
-      -2,
-    )
-    const target = relativeSquare(whiteKing.square, transform, 1, -1)
-    if (
-      expectedBlackKing === null ||
-      movingBishop === null ||
-      stationaryBishop === null ||
-      target === null ||
-      expectedBlackKing !== blackKing.square ||
-      !bishopSet.has(movingBishop) ||
-      !bishopSet.has(stationaryBishop)
-    ) {
-      continue
-    }
-    if (
-      !steps.some(
-        (step) => step.from === movingBishop && step.to === target,
-      )
-    ) {
-      steps.push({ from: movingBishop, to: target })
     }
   }
   return steps
@@ -2729,6 +2780,16 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
       first.phaseTwoWallPenalty - second.phaseTwoWallPenalty,
   },
   {
+    id: 'knight-step control',
+    shortLabel: 'knight-step control',
+    helpText:
+      "Phase 1: When the kings are a knight's move apart, use a bishop to control the square diagonal to Black's king and in 2 square opposition to White's king.",
+    applies: (score) => score.phaseOneKnightStepControlApplies,
+    compare: (first, second) =>
+      first.phaseOneKnightStepControlPenalty -
+      second.phaseOneKnightStepControlPenalty,
+  },
+  {
     id: 'conclave step',
     shortLabel: 'conclave step',
     helpText:
@@ -2750,10 +2811,25 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
     id: 'martian conclave step',
     shortLabel: 'martian conclave step',
     helpText:
-      'Phase 1: When the pieces are in the position shown, make the martian conclave step.',
-    applies: (score) => !score.isPhaseTwoPosition,
-    compare: (first, second) =>
-      first.martianConclaveStepPenalty - second.martianConclaveStepPenalty,
+      "Phase 1: When the kings are 2 steps apart, place the bishops on adjacent diagonals controlling maximum squares around the black king but not checking or adjacent to white's king.",
+    applies: (score) => score.martianConclaveApplies,
+    subpriorities: [
+      {
+        compare: (first, second) =>
+          first.martianConclaveStructurePenalty -
+          second.martianConclaveStructurePenalty,
+      },
+      {
+        when: (scores) =>
+          scores.every(
+            ({ martianConclaveStructurePenalty }) =>
+              martianConclaveStructurePenalty === 0,
+          ),
+        compare: (first, second) =>
+          second.martianConclaveControlledSquareCount -
+          first.martianConclaveControlledSquareCount,
+      },
+    ],
   },
   {
     id: 'finish wall',
@@ -2762,15 +2838,6 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
     applies: (score) => !score.isPhaseTwoPosition,
     compare: (first, second) =>
       first.finishWallPenalty - second.finishWallPenalty,
-  },
-  {
-    id: 'support wall',
-    shortLabel: 'support wall',
-    helpText:
-      "Phase 1: When the bishop wall is proximate, bring White's king closer to Black's king, or towards the wall's moat.",
-    applies: (score) => !score.isPhaseTwoPosition,
-    compare: (first, second) =>
-      first.supportWallPenalty - second.supportWallPenalty,
   },
   {
     id: 'start wall',
@@ -2805,6 +2872,13 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
       first.kingCloserDistance - second.kingCloserDistance ||
       first.kingCloserMiddleSixteenDistance -
         second.kingCloserMiddleSixteenDistance,
+  },
+  {
+    id: 'check',
+    shortLabel: 'check',
+    helpText: 'Play a check',
+    applies: (score) => !score.isPhaseTwoPosition,
+    compare: (first, second) => first.checkPenalty - second.checkPenalty,
   },
 ]
 
