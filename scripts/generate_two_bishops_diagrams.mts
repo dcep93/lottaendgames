@@ -11,18 +11,6 @@ const OUTPUT = fileURLToPath(
 )
 const check = process.argv.includes('--check')
 
-const conclaveStepFen = getChess(
-  '8/8/8/4BB2/8/3K4/5k2/8 w - - 16 9',
-).fen()
-const reverseConclaveStepFen = getChess(
-  '8/5k2/8/4K3/4BB2/8/8/8 w - - 0 1',
-).fen()
-const phaseOneKnightStepControlFen = getChess(
-  '8/6k1/4K3/8/8/8/7B/7B w - - 0 1',
-).fen()
-const martianConclaveStepFen = getChess(
-  '8/4B3/4B2k/8/7K/8/8/8 w - - 0 1',
-).fen()
 const phaseTwoWallFen = getChess(
   '2k5/8/4K3/8/5B2/5B2/8/8 w - - 4 3',
 ).fen()
@@ -107,9 +95,6 @@ for (const [label, fen] of [
   }
 }
 for (const [label, fen] of [
-  ['knight-step control', phaseOneKnightStepControlFen],
-  ['reverse conclave step', reverseConclaveStepFen],
-  ['martian conclave step', martianConclaveStepFen],
   ['degenerate king flank', degenerateKingFlankFen],
   ['degenerate king sidestep', degenerateKingSidestepFen],
   ['degenerate reform wall', degenerateReformWallFen],
@@ -170,16 +155,6 @@ export const TWO_BISHOPS_DIAGRAM_POSITIONS = {
       { square: 'g6', kind: 'zone' },
     ],
   },
-  phaseOneKnightStepControl: {
-    phase: '1/2',
-    fen: ${JSON.stringify(phaseOneKnightStepControlFen)},
-    highlights: [{ square: 'h6', kind: 'zone' }],
-    arrow: { from: 'h2', to: 'f4' },
-  },
-  conclaveStep: {
-    fen: ${JSON.stringify(conclaveStepFen)},
-    arrow: { from: 'f5', to: 'e4' },
-  },
   degeneratePhaseTwoOpposition: {
     phase: '2/2',
     fen: ${JSON.stringify(degeneratePhaseTwoOppositionFen)},
@@ -195,17 +170,6 @@ export const TWO_BISHOPS_DIAGRAM_POSITIONS = {
     fen: ${JSON.stringify(degenerateMateInFourFen)},
     highlights: [{ square: 'a6', kind: 'zone' }],
     arrow: { from: 'c6', to: 'c7' },
-  },
-  reverseConclaveStep: {
-    phase: '1/2',
-    fen: ${JSON.stringify(reverseConclaveStepFen)},
-    arrow: { from: 'e5', to: 'd6' },
-  },
-  martianConclaveStep: {
-    phase: '1/2',
-    fen: ${JSON.stringify(martianConclaveStepFen)},
-    highlights: [{ square: 'g6', kind: 'zone' }],
-    arrow: { from: 'e6', to: 'f7' },
   },
   degenerateKnightStepControl: {
     phase: '2/2',
@@ -320,12 +284,6 @@ if (check) {
   await writeFile(OUTPUT, source, 'utf8')
 }
 
-process.stdout.write(`conclave step: ${conclaveStepFen}\n`)
-process.stdout.write(
-  `knight-step control: ${phaseOneKnightStepControlFen}\n`,
-)
-process.stdout.write(`reverse conclave step: ${reverseConclaveStepFen}\n`)
-process.stdout.write(`martian conclave step: ${martianConclaveStepFen}\n`)
 process.stdout.write(`phase 2 wall: ${phaseTwoWallFen}\n`)
 process.stdout.write(`shepherd: ${shepherdFen}\n`)
 process.stdout.write(
