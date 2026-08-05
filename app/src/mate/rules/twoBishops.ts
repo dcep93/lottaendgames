@@ -445,7 +445,7 @@ const twoBishopsHelp: RuleHelp = {
       id: 'bishop-martian-conclave-step',
       title: 'martian conclave step',
       caption:
-        "The adjacent bishops maximize control around Black's king without checking.",
+        "The adjacent bishops maximize control around Black's king without checking or controlling squares adjacent to White's king.",
       layout: { files: 8, ranks: 8, fileOffset: 0 },
       pieces: noteBoardPieces(
         TWO_BISHOPS_DIAGRAM_POSITIONS.martianConclaveStep.fen,
@@ -1995,10 +1995,11 @@ function scoreTwoBishopsWhiteMoveWithContext(
       ? 0
       : 1
   const martianConclaveControlledSquareCount =
-    blackKing
+    blackKing && resultWhiteKingSquare
       ? getMartianConclaveControlledSquareCount(
           chess,
           blackKing,
+          resultWhiteKingSquare,
           resultBishops,
         )
       : 0
@@ -2264,6 +2265,7 @@ const MARTIAN_CONCLAVE_RING_OFFSETS = [
 function getMartianConclaveControlledSquareCount(
   chess: ReturnType<typeof getChess>,
   blackKing: Square,
+  whiteKing: Square,
   bishops: readonly Square[],
 ): number {
   const origin = squareCoordinates(blackKing)
@@ -2275,6 +2277,7 @@ function getMartianConclaveControlledSquareCount(
       )
       return (
         target !== null &&
+        kingDistance(target, whiteKing) !== 1 &&
         bishops.some(
           (bishop) =>
             bishop !== target &&
@@ -2537,7 +2540,7 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
     id: 'martian conclave step',
     shortLabel: 'martian conclave step',
     helpText:
-      'Phase 1: When the kings are 2 steps apart, place the bishops on adjacent diagonals controlling maximum squares around the black king but not checking.',
+      "Phase 1: When the kings are 2 steps apart, place the bishops on adjacent diagonals controlling maximum squares around the black king but not checking or adjacent to white's king.",
     applies: (score) => score.martianConclaveApplies,
     subpriorities: [
       {

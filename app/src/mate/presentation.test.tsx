@@ -1524,11 +1524,15 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
   })
   assert.deepEqual(
     martianConclaveBoard.highlights.map(({ square }) => square),
-    ['g5', 'g6', 'h5'],
+    ['g6'],
   )
   assert.deepEqual(martianConclaveBoard.arrows, [
     { from: 'e6', to: 'f7' },
   ])
+  assert.equal(
+    martianConclaveBoard.caption,
+    "The adjacent bishops maximize control around Black's king without checking or controlling squares adjacent to White's king.",
+  )
   assert.deepEqual(kingFlankBoard.layout, {
     files: 8,
     ranks: 8,
@@ -1628,7 +1632,7 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
   assert.match(bishopsMarkup, />martian conclave step</)
   assert.match(
     bishopsMarkup,
-    /The adjacent bishops maximize control around Black&#x27;s king without checking\./,
+    /The adjacent bishops maximize control around Black&#x27;s king without checking or controlling squares adjacent to White&#x27;s king\./,
   )
   assert.match(bishopsMarkup, />degenerate — knight-step control</)
   assert.match(
@@ -1698,7 +1702,7 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
   assert.equal(bishopsMarkup.match(/leg-mate-note-board--full/g)?.length, 23)
   assert.equal(
     bishopsMarkup.match(/data-highlight-kind="zone"/g)?.length,
-    37,
+    35,
   )
   assert.match(
     bishopsMarkup,

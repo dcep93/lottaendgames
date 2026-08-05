@@ -173,11 +173,7 @@ export const TWO_BISHOPS_DIAGRAM_POSITIONS = {
   martianConclaveStep: {
     phase: '1/2',
     fen: ${JSON.stringify(martianConclaveStepFen)},
-    highlights: [
-      { square: 'g5', kind: 'zone' },
-      { square: 'g6', kind: 'zone' },
-      { square: 'h5', kind: 'zone' },
-    ],
+    highlights: [{ square: 'g6', kind: 'zone' }],
     arrow: { from: 'e6', to: 'f7' },
   },
   degenerateKnightStepControl: {
