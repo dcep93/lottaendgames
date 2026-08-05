@@ -69,6 +69,7 @@ export type TwoBishopsWhiteMoveScore = {
   readonly kingCloserDistance: number
   readonly kingCloserMiddleSixteenDistance: number
   readonly checkPenalty: number
+  readonly clutteredBishopsCount: number
 }
 
 export type TwoBishopsBlackMoveScore = {
@@ -84,6 +85,22 @@ const BLACK_INTRO =
   'Black uses its own priorities to put up the strongest resistance. Black is not trying to help the mate; it looks for the most stubborn legal reply.'
 
 const BOARD_CORNERS: readonly Square[] = ['a1', 'a8', 'h1', 'h8']
+
+const MATE_PREP_LIGHT_DIAGONAL: readonly Square[] = [
+  'd1',
+  'e2',
+  'f3',
+  'g4',
+  'h5',
+]
+const MATE_PREP_DARK_DIAGONAL: readonly Square[] = [
+  'c1',
+  'd2',
+  'e3',
+  'f4',
+  'g5',
+  'h6',
+]
 
 type RelativeTransform = (
   file: number,
@@ -143,6 +160,7 @@ const TWO_BISHOPS_DEGENERATE_REASON_LABELS = {
   kingFlank: 'degenerate — king flank',
   kingSidestep: 'degenerate — king sidestep',
   reformWall: 'degenerate — reform wall',
+  ignoreLightBishop: 'degenerate — ignore light-squared bishop',
 } as const
 
 type TwoBishopsDegenerateReasonLabel =
@@ -150,7 +168,7 @@ type TwoBishopsDegenerateReasonLabel =
 
 export const TWO_BISHOPS_DEGENERATE_PRIORITY_ORDER = [
   TWO_BISHOPS_DEGENERATE_REASON_LABELS.phaseTwoOpposition,
-  TWO_BISHOPS_DEGENERATE_REASON_LABELS.matePrep,
+  TWO_BISHOPS_DEGENERATE_REASON_LABELS.ignoreLightBishop,
   TWO_BISHOPS_DEGENERATE_REASON_LABELS.mateInFour,
   TWO_BISHOPS_DEGENERATE_REASON_LABELS.knightStepControl,
   TWO_BISHOPS_DEGENERATE_REASON_LABELS.wallWaitingMove,
@@ -167,6 +185,7 @@ export const TWO_BISHOPS_DEGENERATE_PRIORITY_ORDER = [
   TWO_BISHOPS_DEGENERATE_REASON_LABELS.kingLift,
   TWO_BISHOPS_DEGENERATE_REASON_LABELS.bishopRetreat,
   TWO_BISHOPS_DEGENERATE_REASON_LABELS.longDiagonal,
+  TWO_BISHOPS_DEGENERATE_REASON_LABELS.matePrep,
 ] as const
 
 const twoBishopsHelp: RuleHelp = {
@@ -181,7 +200,7 @@ const twoBishopsHelp: RuleHelp = {
   ],
   notes: [
     "Phase 2: Black's king forced to the edge, White's king two steps away from Black's king.",
-    "Target corner: Calculate after White's move in Phase 2. In the corner-diagonals position, its cutoff points to the opposite corner and continues to do so when Black steps around that corner. Otherwise, when the kings are in opposition and more bishops stand on one physical side of White's king, choose the opposite corner. When deciding between bishop moves, prefer the stronger bishop majority. Otherwise, choose the corner where White wins the king race by the greatest Chebyshev-distance lead. If neither method decides, choose the corner closest to White's king. Retain tied corners.",
+    "Target corner: Calculate after White's move in Phase 2. If Black is in or one edge square from a corner, use that corner. Otherwise, in the corner-diagonals position, its cutoff points to the opposite corner and continues to do so when Black steps around that corner. Otherwise, when the kings are in opposition and more bishops stand on one physical side of White's king, choose the opposite corner. When deciding between bishop moves, prefer the stronger bishop majority. Otherwise, choose the corner where White wins the king race by the greatest Chebyshev-distance lead. If neither method decides, choose the corner closest to White's king. Retain tied corners.",
   ],
   noteBoards: [
     {
@@ -198,15 +217,18 @@ const twoBishopsHelp: RuleHelp = {
       ],
     },
     {
-      id: 'bishop-degenerate-mate-prep',
-      title: 'degenerate — mate prep',
-      caption: 'Take opposition with the king.',
+      id: 'bishop-degenerate-ignore-light-bishop',
+      title: 'degenerate — ignore light-squared bishop',
+      caption:
+        "Ignore the light-squared bishop's location. Move the dark-squared bishop to h6.",
       layout: { files: 8, ranks: 8, fileOffset: 0 },
       pieces: noteBoardPieces(
-        TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateMatePrep.fen,
+        TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateIgnoreLightBishop.fen,
       ),
       highlights: [],
-      arrows: [TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateMatePrep.arrow],
+      arrows: [
+        TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateIgnoreLightBishop.arrow,
+      ],
     },
     {
       id: 'bishop-degenerate-mate-in-four',
@@ -399,6 +421,17 @@ const twoBishopsHelp: RuleHelp = {
       ),
       highlights:
         TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateLongDiagonal.highlights,
+    },
+    {
+      id: 'bishop-degenerate-mate-prep',
+      title: 'degenerate — mate prep',
+      caption: 'Take opposition with the king.',
+      layout: { files: 8, ranks: 8, fileOffset: 0 },
+      pieces: noteBoardPieces(
+        TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateMatePrep.fen,
+      ),
+      highlights: [],
+      arrows: [TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateMatePrep.arrow],
     },
     {
       id: 'bishop-mating-position',
@@ -635,6 +668,16 @@ function getResultTargetCornerSelection(
   if (edgeCorners.length <= 1) {
     return {
       corners: edgeCorners,
+      score: 0,
+      cornerDiagonalsTarget: false,
+    }
+  }
+  const adjacentCorners = edgeCorners.filter(
+    (corner) => kingDistance(blackKing, corner) === 1,
+  )
+  if (adjacentCorners.length > 0) {
+    return {
+      corners: adjacentCorners,
       score: 0,
       cornerDiagonalsTarget: false,
     }
@@ -1114,20 +1157,43 @@ function getMatePrepDegenerateRepair(
   bishops: readonly Square[],
 ): DegenerateRepair | null {
   const legalMoves = getChess(fen).moves({ verbose: true })
-  const bishopSet = new Set(bishops)
 
   for (const transform of SQUARE_TRANSFORMS) {
-    const expectedBlackKing = transformSquare('g8', transform)
-    const expectedWhiteKing = transformSquare('f6', transform)
-    const expectedBishops = [
-      transformSquare('d4', transform),
-      transformSquare('f3', transform),
-    ]
-    const target = transformSquare('g6', transform)
+    const expectedBlackKing = transformSquare('h2', transform)
+    const expectedWhiteKing = transformSquare('f3', transform)
+    const target = transformSquare('f2', transform)
+    const lightDiagonal = MATE_PREP_LIGHT_DIAGONAL.map((square) =>
+      transformSquare(square, transform),
+    )
+    const darkDiagonal = MATE_PREP_DARK_DIAGONAL.map((square) =>
+      transformSquare(square, transform),
+    )
+    const lightBishop = bishops.find(
+      (bishop) =>
+        squareColor(bishop) ===
+        squareColor(transformSquare('d1', transform)),
+    )
+    const darkBishop = bishops.find(
+      (bishop) =>
+        squareColor(bishop) ===
+        squareColor(transformSquare('c1', transform)),
+    )
+    const bishopCanAccess = (
+      bishop: Square | undefined,
+      diagonal: readonly Square[],
+    ): boolean =>
+      bishop !== undefined &&
+      legalMoves.some(
+        (move) =>
+          move.piece === 'b' &&
+          move.from === bishop &&
+          diagonal.includes(move.to),
+      )
     if (
       blackKing !== expectedBlackKing ||
       whiteKing !== expectedWhiteKing ||
-      !expectedBishops.every((square) => bishopSet.has(square))
+      !bishopCanAccess(lightBishop, lightDiagonal) ||
+      !bishopCanAccess(darkBishop, darkDiagonal)
     ) {
       continue
     }
@@ -1143,6 +1209,45 @@ function getMatePrepDegenerateRepair(
         to: target,
         stopAfterRepair: true,
         reasonLabel: TWO_BISHOPS_DEGENERATE_REASON_LABELS.matePrep,
+      }
+    }
+  }
+  return null
+}
+
+function getIgnoreLightBishopDegenerateRepair(
+  fen: string,
+  blackKing: Square,
+  whiteKing: Square,
+  bishops: readonly Square[],
+): DegenerateRepair | null {
+  const legalMoves = getChess(fen).moves({ verbose: true })
+
+  for (const transform of SQUARE_TRANSFORMS) {
+    const expectedBlackKing = transformSquare('g8', transform)
+    const expectedWhiteKing = transformSquare('f6', transform)
+    const darkBishop = transformSquare('g7', transform)
+    const target = transformSquare('h6', transform)
+    if (
+      blackKing !== expectedBlackKing ||
+      whiteKing !== expectedWhiteKing ||
+      !bishops.includes(darkBishop)
+    ) {
+      continue
+    }
+    const repairIsLegal = legalMoves.some(
+      (move) =>
+        move.piece === 'b' &&
+        move.from === darkBishop &&
+        move.to === target,
+    )
+    if (repairIsLegal) {
+      return {
+        from: darkBishop,
+        to: target,
+        stopAfterRepair: true,
+        reasonLabel:
+          TWO_BISHOPS_DEGENERATE_REASON_LABELS.ignoreLightBishop,
       }
     }
   }
@@ -1838,6 +1943,15 @@ function getDegenerateRepair(
             bishops,
           )
         : null,
+    [TWO_BISHOPS_DEGENERATE_REASON_LABELS.ignoreLightBishop]: () =>
+      isPhaseTwo
+        ? getIgnoreLightBishopDegenerateRepair(
+            fen,
+            blackKing,
+            whiteKing,
+            bishops,
+          )
+        : null,
     [TWO_BISHOPS_DEGENERATE_REASON_LABELS.mateInFour]: () =>
       isPhaseTwo
         ? getMateInFourDegenerateRepair(
@@ -2312,6 +2426,12 @@ function scoreTwoBishopsWhiteMoveWithContext(
         ? distanceToMiddleSixteen(resultWhiteKingSquare)
         : 0,
     checkPenalty: chess.isCheck() ? 0 : 1,
+    clutteredBishopsCount: resultBishops.filter(
+      (bishop) =>
+        Math.min(
+          ...BOARD_CORNERS.map((corner) => kingDistance(bishop, corner)),
+        ) <= 2,
+    ).length,
   }
 }
 
@@ -2484,6 +2604,13 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
     applies: (score) => score.phaseTwoWallApplies,
     compare: (first, second) =>
       first.phaseTwoWallPenalty - second.phaseTwoWallPenalty,
+  },
+  {
+    id: 'unclutter bishops',
+    shortLabel: 'unclutter bishops',
+    helpText: 'Prefer bishops more than two king steps from a corner.',
+    compare: (first, second) =>
+      first.clutteredBishopsCount - second.clutteredBishopsCount,
   },
   {
     id: 'adjacent bishops',

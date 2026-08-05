@@ -56,8 +56,13 @@ export const TWO_BISHOPS_DIAGRAM_POSITIONS = {
   },
   degenerateMatePrep: {
     phase: '2/2',
-    fen: "6k1/8/5K2/8/3B4/5B2/8/8 w - - 0 1",
-    arrow: { from: 'f6', to: 'g6' },
+    fen: "8/8/8/8/8/5K2/7k/3BB3 w - - 0 1",
+    arrow: { from: 'f3', to: 'f2' },
+  },
+  degenerateIgnoreLightBishop: {
+    phase: '2/2',
+    fen: "4B1k1/6B1/5K2/8/8/8/8/8 w - - 0 1",
+    arrow: { from: 'g7', to: 'h6' },
   },
   degenerateMateInFour: {
     phase: '2/2',

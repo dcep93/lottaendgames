@@ -1313,7 +1313,7 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
     rook: ['rook-phase-two-box'],
     'two-bishops': [
       'bishop-degenerate-phase-two-opposition',
-      'bishop-degenerate-mate-prep',
+      'bishop-degenerate-ignore-light-bishop',
       'bishop-degenerate-mate-in-four',
       'bishop-degenerate-knight-step-control',
       'bishop-degenerate-wall-waiting-move',
@@ -1330,6 +1330,7 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
       'bishop-degenerate-king-lift',
       'bishop-degenerate-bishop-retreat',
       'bishop-degenerate-long-diagonal',
+      'bishop-degenerate-mate-prep',
       'bishop-mating-position',
       'bishop-shepherd',
       'bishop-phase-two-wall',
@@ -1435,7 +1436,7 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
   const bishopsRuleSet = getMateRuleSet('two-bishops')
   const [
     phaseTwoOppositionBoard,
-    matePrepBoard,
+    ignoreLightBishopBoard,
     mateInFourBoard,
     knightStepControlBoard,
     wallWaitingMoveBoard,
@@ -1452,12 +1453,14 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
     kingLiftBoard,
     bishopRetreatBoard,
     longDiagonalBoard,
+    matePrepBoard,
     matingPositionBoard,
     shepherdBoard,
     phaseTwoWallBoard,
     proximateWallBoard,
   ] = bishopsRuleSet.help.noteBoards
   assert.ok(phaseTwoOppositionBoard)
+  assert.ok(ignoreLightBishopBoard)
   assert.ok(matePrepBoard)
   assert.ok(mateInFourBoard)
   assert.ok(knightStepControlBoard)
@@ -1494,6 +1497,10 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
   assert.deepEqual(
     phaseTwoOppositionBoard.arrows,
     [TWO_BISHOPS_DIAGRAM_POSITIONS.degeneratePhaseTwoOpposition.arrow],
+  )
+  assert.deepEqual(
+    ignoreLightBishopBoard.arrows,
+    [TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateIgnoreLightBishop.arrow],
   )
   assert.deepEqual(
     matePrepBoard.arrows,
@@ -1666,10 +1673,10 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
   )
   assert.match(
     bishopsMarkup,
-    /Target corner: Calculate after White&#x27;s move in Phase 2\. In the corner-diagonals position, its cutoff points to the opposite corner and continues to do so when Black steps around that corner\. Otherwise, when the kings are in opposition and more bishops stand on one physical side of White&#x27;s king, choose the opposite corner\. When deciding between bishop moves, prefer the stronger bishop majority\. Otherwise, choose the corner where White wins the king race by the greatest Chebyshev-distance lead\. If neither method decides, choose the corner closest to White&#x27;s king\. Retain tied corners\./,
+    /Target corner: Calculate after White&#x27;s move in Phase 2\. If Black is in or one edge square from a corner, use that corner\. Otherwise, in the corner-diagonals position, its cutoff points to the opposite corner and continues to do so when Black steps around that corner\. Otherwise, when the kings are in opposition and more bishops stand on one physical side of White&#x27;s king, choose the opposite corner\. When deciding between bishop moves, prefer the stronger bishop majority\. Otherwise, choose the corner where White wins the king race by the greatest Chebyshev-distance lead\. If neither method decides, choose the corner closest to White&#x27;s king\. Retain tied corners\./,
   )
   assert.match(bishopsMarkup, /leg-mate-guide-note-boards--full/)
-  assert.equal(bishopsMarkup.match(/leg-mate-note-board--full/g)?.length, 22)
+  assert.equal(bishopsMarkup.match(/leg-mate-note-board--full/g)?.length, 23)
   assert.equal(
     bishopsMarkup.match(/data-highlight-kind="zone"/g)?.length,
     35,
@@ -1762,6 +1769,18 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
     />king closer<[^]*Bring White&#x27;s king closer to Black&#x27;s king, preferring proximity to the the middle 16 squares\./,
   )
   assert.match(bishopsMarkup, />check<[^]*Play a check</)
+  assert.match(
+    bishopsMarkup,
+    />unclutter bishops<[^]*Prefer bishops more than two king steps from a corner\./,
+  )
+  assert.ok(
+    bishopsMarkup.indexOf('>phase 2 wall<') <
+      bishopsMarkup.indexOf('>unclutter bishops<'),
+  )
+  assert.ok(
+    bishopsMarkup.indexOf('>unclutter bishops<') <
+      bishopsMarkup.indexOf('>adjacent bishops<'),
+  )
   assert.doesNotMatch(bishopsMarkup, />lazy king</)
   assert.doesNotMatch(bishopsMarkup, />support wall</)
   assert.match(bishopsMarkup, />phase 2 wall</)
