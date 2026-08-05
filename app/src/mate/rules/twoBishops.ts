@@ -62,6 +62,8 @@ export type TwoBishopsWhiteMoveScore = {
   readonly bishopsAwayCosineAlignment: number
   readonly forcePhaseTwoApplies: boolean
   readonly forcePhaseTwoPenalty: number
+  readonly phaseOneKnightStepControlApplies: boolean
+  readonly phaseOneKnightStepControlPenalty: number
   readonly conclaveStepPenalty: number
   readonly reverseConclaveStepPenalty: number
   readonly martianConclaveApplies: boolean
@@ -404,6 +406,20 @@ const twoBishopsHelp: RuleHelp = {
       layout: { files: 8, ranks: 8, fileOffset: 0 },
       pieces: TWO_BISHOPS_DIAGRAM_POSITIONS.proximateWall.pieces,
       highlights: TWO_BISHOPS_DIAGRAM_POSITIONS.proximateWall.highlights,
+    },
+    {
+      id: 'bishop-phase-one-knight-step-control',
+      title: 'knight-step control',
+      caption: 'Move the arrowed bishop to control the highlighted square.',
+      layout: { files: 8, ranks: 8, fileOffset: 0 },
+      pieces: noteBoardPieces(
+        TWO_BISHOPS_DIAGRAM_POSITIONS.phaseOneKnightStepControl.fen,
+      ),
+      highlights:
+        TWO_BISHOPS_DIAGRAM_POSITIONS.phaseOneKnightStepControl.highlights,
+      arrows: [
+        TWO_BISHOPS_DIAGRAM_POSITIONS.phaseOneKnightStepControl.arrow,
+      ],
     },
     {
       id: 'bishop-conclave-step',
@@ -1872,6 +1888,7 @@ type TwoBishopsWhitePositionContext = {
   readonly blackKing: Square | undefined
   readonly startingWhiteKing: Square | undefined
   readonly startingBishops: readonly Square[]
+  readonly phaseOneKnightStepControlTargets: readonly Square[]
   readonly conclaveSteps: ReturnType<typeof getConclaveSteps>
   readonly reverseConclaveSteps: ReturnType<typeof getReverseConclaveSteps>
   readonly isPhaseTwo: boolean
@@ -1899,6 +1916,10 @@ function createTwoBishopsWhitePositionContext(
     blackKing,
     startingWhiteKing,
     startingBishops,
+    phaseOneKnightStepControlTargets:
+      blackKing && startingWhiteKing
+        ? getPhaseOneKnightStepControlTargets(startingWhiteKing, blackKing)
+        : [],
     conclaveSteps: getConclaveSteps(fen),
     reverseConclaveSteps: getReverseConclaveSteps(fen),
     isPhaseTwo,
@@ -1936,6 +1957,7 @@ function scoreTwoBishopsWhiteMoveWithContext(
   const {
     blackKing,
     startingWhiteKing,
+    phaseOneKnightStepControlTargets,
     conclaveSteps,
     reverseConclaveSteps,
     isPhaseTwo,
@@ -2119,6 +2141,17 @@ function scoreTwoBishopsWhiteMoveWithContext(
       )
         ? 0
         : 1,
+    phaseOneKnightStepControlApplies:
+      !isPhaseTwo && phaseOneKnightStepControlTargets.length > 0,
+    phaseOneKnightStepControlPenalty:
+      move.piece === 'b' &&
+      phaseOneKnightStepControlTargets.some(
+        (target) =>
+          move.to !== target &&
+          bishopHasClearLineToSquareOnBoard(chess, move.to, target),
+      )
+        ? 0
+        : 1,
     conclaveStepPenalty:
       move.piece === 'b' &&
       conclaveSteps.some(
@@ -2190,6 +2223,27 @@ function isInOpposition(
   return (
     (fileDistance === 0 && rankDistance === distance) ||
     (rankDistance === 0 && fileDistance === distance)
+  )
+}
+
+const DIAGONAL_ADJACENT_OFFSETS = [
+  { file: -1, rank: -1 },
+  { file: -1, rank: 1 },
+  { file: 1, rank: -1 },
+  { file: 1, rank: 1 },
+] as const
+
+function getPhaseOneKnightStepControlTargets(
+  whiteKing: Square,
+  blackKing: Square,
+): readonly Square[] {
+  if (!isKnightMove(whiteKing, blackKing)) return []
+  const black = squareCoordinates(blackKing)
+  return DIAGONAL_ADJACENT_OFFSETS.map(({ file, rank }) =>
+    squareFromCoordinates(black.file + file, black.rank + rank),
+  ).filter(
+    (square): square is Square =>
+      square !== null && isInOpposition(square, whiteKing, 2),
   )
 }
 
@@ -2447,6 +2501,16 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
     applies: (score) => score.phaseTwoWallApplies,
     compare: (first, second) =>
       first.phaseTwoWallPenalty - second.phaseTwoWallPenalty,
+  },
+  {
+    id: 'knight-step control',
+    shortLabel: 'knight-step control',
+    helpText:
+      "Phase 1: When the kings are a knight's move apart, use a bishop to control the square diagonal to Black's king and in 2 square opposition to White's king.",
+    applies: (score) => score.phaseOneKnightStepControlApplies,
+    compare: (first, second) =>
+      first.phaseOneKnightStepControlPenalty -
+      second.phaseOneKnightStepControlPenalty,
   },
   {
     id: 'conclave step',

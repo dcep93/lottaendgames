@@ -1331,6 +1331,7 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
       'bishop-mating-position',
       'bishop-phase-two-wall',
       'bishop-proximate-wall',
+      'bishop-phase-one-knight-step-control',
       'bishop-conclave-step',
       'bishop-reverse-conclave-step',
       'bishop-martian-conclave-step',
@@ -1453,6 +1454,7 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
     matingPositionBoard,
     phaseTwoWallBoard,
     proximateWallBoard,
+    phaseOneKnightStepControlBoard,
     conclaveBoard,
     reverseConclaveBoard,
     martianConclaveBoard,
@@ -1476,6 +1478,7 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
   assert.ok(matingPositionBoard)
   assert.ok(phaseTwoWallBoard)
   assert.ok(proximateWallBoard)
+  assert.ok(phaseOneKnightStepControlBoard)
   assert.ok(conclaveBoard)
   assert.ok(reverseConclaveBoard)
   assert.ok(martianConclaveBoard)
@@ -1486,6 +1489,17 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
   assert.deepEqual(
     mateInFourBoard.highlights,
     TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateMateInFour.highlights,
+  )
+  assert.deepEqual(
+    phaseOneKnightStepControlBoard.highlights.map(({ square }) => square),
+    ['h6'],
+  )
+  assert.deepEqual(phaseOneKnightStepControlBoard.arrows, [
+    { from: 'h2', to: 'f4' },
+  ])
+  assert.equal(
+    phaseOneKnightStepControlBoard.caption,
+    'Move the arrowed bishop to control the highlighted square.',
   )
   assert.deepEqual(conclaveBoard.layout, {
     files: 8,
@@ -1603,6 +1617,11 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
     />,
   )
   assert.match(bishopsMarkup, />conclave step</)
+  assert.match(bishopsMarkup, />knight-step control</)
+  assert.match(
+    bishopsMarkup,
+    /Move the arrowed bishop to control the highlighted square\./,
+  )
   assert.match(bishopsMarkup, />degenerate — mate in 4</)
   assert.match(bishopsMarkup, /With a6 controlled, play Kc7./)
   assert.match(bishopsMarkup, />reverse conclave step</)
@@ -1676,10 +1695,10 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
     /Target corner: Calculate after White&#x27;s move\. If a two-square bishop wall forces every Black reply along the edge in one direction, use that corner\. Otherwise, use the corner where White has the better relative king race; on a tie, use the nearest wall to cage Black, retaining both corners if still tied\./,
   )
   assert.match(bishopsMarkup, /leg-mate-guide-note-boards--full/)
-  assert.equal(bishopsMarkup.match(/leg-mate-note-board--full/g)?.length, 22)
+  assert.equal(bishopsMarkup.match(/leg-mate-note-board--full/g)?.length, 23)
   assert.equal(
     bishopsMarkup.match(/data-highlight-kind="zone"/g)?.length,
-    36,
+    37,
   )
   assert.match(
     bishopsMarkup,

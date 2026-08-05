@@ -40,6 +40,12 @@ export const TWO_BISHOPS_DIAGRAM_POSITIONS = {
       { square: 'g6', kind: 'zone' },
     ],
   },
+  phaseOneKnightStepControl: {
+    phase: '1/2',
+    fen: "8/6k1/4K3/8/8/8/7B/7B w - - 0 1",
+    highlights: [{ square: 'h6', kind: 'zone' }],
+    arrow: { from: 'h2', to: 'f4' },
+  },
   conclaveStep: {
     fen: "8/8/8/4BB2/8/3K4/5k2/8 w - - 16 9",
     arrow: { from: 'f5', to: 'e4' },
