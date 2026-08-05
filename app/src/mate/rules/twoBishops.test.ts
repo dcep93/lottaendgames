@@ -358,7 +358,7 @@ test('Two Bishops exposes each Phase 2 comparison as one visible rule', () => {
       {
         shortLabel: 'king pushable',
         helpText:
-          'Phase 1: Bring the White king towards the restricted area diagonal',
+          "Phase 1: Bring White's king toward the restricted-area diagonal while keeping it outside Black's restricted area.",
       },
       {
         shortLabel: 'king closer',
@@ -543,13 +543,28 @@ test('the visible strategic comparisons run in their displayed order', () => {
     const kingPushableApplies = afterPrepRestrictArea.some(
       (san) => scoreTwoBishopsWhiteMove(fen, san).kingPushableApplies,
     )
-    const bestKingPushableDistance = Math.min(
+    const bestKingPushableInsideAreaPenalty = Math.min(
       ...afterPrepRestrictArea.map(
+        (san) =>
+          scoreTwoBishopsWhiteMove(fen, san)
+            .kingPushableInsideAreaPenalty,
+      ),
+    )
+    const outsideAreaMoves = kingPushableApplies
+      ? afterPrepRestrictArea.filter(
+          (san) =>
+            scoreTwoBishopsWhiteMove(fen, san)
+              .kingPushableInsideAreaPenalty ===
+            bestKingPushableInsideAreaPenalty,
+        )
+      : afterPrepRestrictArea
+    const bestKingPushableDistance = Math.min(
+      ...outsideAreaMoves.map(
         (san) => scoreTwoBishopsWhiteMove(fen, san).kingPushableDistance,
       ),
     )
     const afterKingPushable = kingPushableApplies
-      ? afterPrepRestrictArea.filter(
+      ? outsideAreaMoves.filter(
           (san) =>
             scoreTwoBishopsWhiteMove(fen, san).kingPushableDistance ===
             bestKingPushableDistance,
@@ -632,6 +647,7 @@ test('the visible strategic comparisons run in their displayed order', () => {
           'kingCloserPhaseTwoLinePenalty',
           'kingPushableApplies',
           'kingPushableDistance',
+          'kingPushableInsideAreaPenalty',
           'mateInThreeApplies',
           'mateInThreeTurns',
           'matePenalty',
@@ -976,6 +992,56 @@ test('king pushable keeps the king on the restricted-area diagonal before king c
           scoreTwoBishopsWhiteMove(transformedFen, san)
             .kingPushableDistance === 0,
       ),
+      transform.name,
+    )
+  }
+})
+
+test("king pushable keeps White's king outside Black's restricted area", () => {
+  const fen = '8/8/8/8/6k1/3K4/2BB4/8 w - - 2 2'
+  const expected = scoreTwoBishopsWhiteMove(fen, 'Kd4')
+  const tiedDistance = scoreTwoBishopsWhiteMove(fen, 'Kc3')
+  const inside = scoreTwoBishopsWhiteMove(fen, 'Ke2')
+  const ruleSet = getMateRuleSet('two-bishops')
+
+  assert.equal(expected.kingPushableApplies, true)
+  assert.equal(expected.kingPushableInsideAreaPenalty, 0)
+  assert.equal(tiedDistance.kingPushableInsideAreaPenalty, 0)
+  assert.equal(inside.kingPushableInsideAreaPenalty, 1)
+  assert.equal(expected.kingPushableDistance, 1)
+  assert.equal(tiedDistance.kingPushableDistance, 1)
+  assert.equal(inside.kingPushableDistance, 1)
+  assert.deepEqual(ruleSet.idealWhiteMoves(fen), ['Kd4'])
+  assert.equal(ruleSet.explainWhiteMove(fen, 'Ke2')?.id, 'king pushable')
+
+  const sourceMove = getChess(fen)
+    .moves({ verbose: true })
+    .find(({ san }) => san === 'Kd4')
+  assert.ok(sourceMove)
+  for (const transform of SQUARE_TRANSFORMS) {
+    const transformedFen = getChess(transformFen(fen, transform)).fen()
+    const transformedMove: Move | undefined = getChess(transformedFen)
+      .moves({ verbose: true })
+      .find(
+        ({ from, to }) =>
+          from === transformSquare(sourceMove.from, transform) &&
+          to === transformSquare(sourceMove.to, transform),
+      )
+    assert.ok(transformedMove, transform.name)
+    const transformedScore = scoreTwoBishopsWhiteMove(
+      transformedFen,
+      transformedMove.san,
+    )
+    assert.equal(transformedScore.kingPushableApplies, true, transform.name)
+    assert.equal(
+      transformedScore.kingPushableInsideAreaPenalty,
+      0,
+      transform.name,
+    )
+    assert.equal(transformedScore.kingPushableDistance, 1, transform.name)
+    assert.deepEqual(
+      getMateRuleSet('two-bishops').idealWhiteMoves(transformedFen),
+      [transformedMove.san],
       transform.name,
     )
   }
