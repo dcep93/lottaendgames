@@ -72,6 +72,8 @@ export type TwoBishopsWhiteMoveScore = {
   readonly restrictAreaEscapePenalty: number
   readonly restrictAreaEscapeTravelLength: number
   readonly restrictAreaDiagonalCenterDistance: number
+  readonly kingPushableApplies: boolean
+  readonly kingPushableDistance: number
   readonly bishopsFurtherDistance: number
   readonly kingCloserPhaseTwoLinePenalty: number
   readonly kingCloserDistance: number
@@ -2347,6 +2349,7 @@ type TwoBishopsWhitePositionContext = {
   readonly matePatternTurnsBySan: ReadonlyMap<string, 2 | 3>
   readonly shepherdMoves: readonly string[]
   readonly restrictAreaEscapeBoundaries: readonly RestrictAreaEscapeBoundary[]
+  readonly restrictAreaKingBoundaries: readonly RestrictAreaKingBoundary[]
 }
 
 function createTwoBishopsWhitePositionContext(
@@ -2384,6 +2387,18 @@ function createTwoBishopsWhitePositionContext(
               value: diagonalInvariant(bishop, orientation),
             })),
         )
+  const restrictAreaKingBoundaries =
+    isPhaseTwo ||
+    blackKing === undefined ||
+    startingWhiteKing === undefined ||
+    whiteKingScreensBishopFromBlackAdjacentSquare(
+      getChess(fen),
+      startingBishops,
+      blackKing,
+      startingWhiteKing,
+    )
+      ? []
+      : getRestrictedAreaKingBoundaries(startingBishops, blackKing)
   return {
     blackKing,
     startingWhiteKing,
@@ -2393,6 +2408,7 @@ function createTwoBishopsWhitePositionContext(
     mateInThreeApplies: matePatternTurnsBySan.size > 0,
     matePatternTurnsBySan,
     restrictAreaEscapeBoundaries,
+    restrictAreaKingBoundaries,
     shepherdMoves:
       isPhaseTwo
         ? getShepherdMoves(
@@ -2430,6 +2446,7 @@ function scoreTwoBishopsWhiteMoveWithContext(
     matePatternTurnsBySan,
     shepherdMoves,
     restrictAreaEscapeBoundaries,
+    restrictAreaKingBoundaries,
   } = context
   const chess = getChess(fen)
   const move = chess.move(san)
@@ -2634,6 +2651,15 @@ function scoreTwoBishopsWhiteMoveWithContext(
       nonCheckingResult && controlledDiagonalSquares.length > 0
         ? Math.min(...controlledDiagonalSquares.map(centerDistance))
         : 99,
+    kingPushableApplies: restrictAreaKingBoundaries.length > 0,
+    kingPushableDistance:
+      resultWhiteKingSquare === undefined ||
+      restrictAreaKingBoundaries.length === 0
+        ? 99
+        : distanceToRestrictedAreaKingBoundary(
+            resultWhiteKingSquare,
+            restrictAreaKingBoundaries,
+          ),
     bishopsFurtherDistance:
       blackKing === undefined
         ? 0
@@ -2714,11 +2740,17 @@ type DiagonalOrientation = 'difference' | 'sum'
 
 type BishopConfinement = {
   readonly area: number
+  readonly boundaries: readonly [number, number]
   readonly orientation: DiagonalOrientation
 }
 
 type RestrictAreaEscapeBoundary = {
   readonly bishop: Square
+  readonly orientation: DiagonalOrientation
+  readonly value: number
+}
+
+type RestrictAreaKingBoundary = {
   readonly orientation: DiagonalOrientation
   readonly value: number
 }
@@ -2776,6 +2808,7 @@ function getBishopConfinements(
           area: BOARD_SQUARE_COORDINATES.filter(
             (square) => invariant(square) < minimum,
           ).length,
+          boundaries: [minimum, maximum],
           orientation,
         },
       ]
@@ -2786,12 +2819,48 @@ function getBishopConfinements(
           area: BOARD_SQUARE_COORDINATES.filter(
             (square) => invariant(square) > maximum,
           ).length,
+          boundaries: [minimum, maximum],
           orientation,
         },
       ]
     }
     return []
   })
+}
+
+function getRestrictedAreaKingBoundaries(
+  bishops: readonly Square[],
+  blackKing: Square,
+): readonly RestrictAreaKingBoundary[] {
+  const confinements = getBishopConfinements(bishops, blackKing)
+  if (confinements.length === 0) return []
+  const smallestArea = Math.min(...confinements.map(({ area }) => area))
+  return confinements
+    .filter(({ area }) => area === smallestArea)
+    .flatMap(({ boundaries, orientation }) =>
+      boundaries.map((value) => ({ orientation, value })),
+    )
+}
+
+function distanceToRestrictedAreaKingBoundary(
+  king: Square,
+  boundaries: readonly RestrictAreaKingBoundary[],
+): number {
+  const kingCoordinates = squareCoordinates(king)
+  return Math.min(
+    ...boundaries.flatMap(({ orientation, value }) =>
+      BOARD_SQUARE_COORDINATES.filter(
+        (square) =>
+          (orientation === 'difference'
+            ? square.file - square.rank
+            : square.file + square.rank) === value,
+      ).map(
+        (square) =>
+          (square.file - kingCoordinates.file) ** 2 +
+          (square.rank - kingCoordinates.rank) ** 2,
+      ),
+    ),
+  )
 }
 
 function getBishopConfinementArea(
@@ -3034,6 +3103,16 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
           second.restrictAreaDiagonalCenterDistance,
       },
     ],
+  },
+  {
+    id: 'king pushable',
+    shortLabel: 'king pushable',
+    helpText:
+      'Phase 1: Bring the White king towards the restricted area diagonal',
+    applies: (score) =>
+      !score.isPhaseTwoPosition && score.kingPushableApplies,
+    compare: (first, second) =>
+      first.kingPushableDistance - second.kingPushableDistance,
   },
   {
     id: 'king closer',
