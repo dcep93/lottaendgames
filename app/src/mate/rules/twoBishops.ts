@@ -2147,8 +2147,11 @@ function scoreTwoBishopsWhiteMoveWithContext(
       move.piece === 'b' &&
       phaseOneKnightStepControlTargets.some(
         (target) =>
-          move.to !== target &&
-          bishopHasClearLineToSquareOnBoard(chess, move.to, target),
+          resultBishops.some(
+            (bishop) =>
+              bishop !== target &&
+              bishopHasClearLineToSquareOnBoard(chess, bishop, target),
+          ),
       )
         ? 0
         : 1,
