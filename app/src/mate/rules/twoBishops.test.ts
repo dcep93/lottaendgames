@@ -1504,6 +1504,65 @@ test('opposition bishop side makes Bg7 target a8 under D4 symmetry', () => {
   }
 })
 
+test('sequester accepts enforceable corner progress before target strength', () => {
+  const source = '2kB4/8/2K5/1B6/8/8/8/8 w - - 2 2'
+  const sourceMoves = getChess(source).moves({ verbose: true })
+  const expectedSource = sourceMoves.find(({ san }) => san === 'Be7')
+  const strongerSource = sourceMoves.find(({ san }) => san === 'Ba5')
+  assert.ok(expectedSource)
+  assert.ok(strongerSource)
+  const ruleSet = getMateRuleSet('two-bishops')
+
+  for (const transform of SQUARE_TRANSFORMS) {
+    const fen = getChess(transformFen(source, transform)).fen()
+    const moves = getChess(fen).moves({ verbose: true })
+    const transformedMove = (
+      sourceMove: { readonly from: Square; readonly to: Square },
+    ): (typeof moves)[number] | undefined =>
+      moves.find(
+        ({ from, to }) =>
+          from === transformSquare(sourceMove.from, transform) &&
+          to === transformSquare(sourceMove.to, transform),
+      )
+    const expected = transformedMove(expectedSource)
+    const stronger = transformedMove(strongerSource)
+    assert.ok(expected, transform.name)
+    assert.ok(stronger, transform.name)
+
+    const expectedScore = scoreTwoBishopsWhiteMove(fen, expected.san)
+    const strongerScore = scoreTwoBishopsWhiteMove(fen, stronger.san)
+    assert.ok(
+      expectedScore.sequesterTargetCornerScore <
+        strongerScore.sequesterTargetCornerScore,
+      transform.name,
+    )
+    assert.ok(
+      expectedScore.sequesterMaximumCornerReplyDistance <
+        expectedScore.sequesterCurrentCornerDistance,
+      transform.name,
+    )
+    assert.ok(
+      strongerScore.sequesterMaximumCornerReplyDistance >
+        strongerScore.sequesterCurrentCornerDistance,
+      transform.name,
+    )
+    const idealMoves = ruleSet.idealWhiteMoves(fen)
+    assert.ok(idealMoves.includes(expected.san), transform.name)
+    assert.ok(!idealMoves.includes(stronger.san), transform.name)
+    assert.ok(
+      idealMoves.every((san) => {
+        const score = scoreTwoBishopsWhiteMove(fen, san)
+        return (
+          score.sequesterMaximumCornerReplyDistance <
+          score.sequesterCurrentCornerDistance
+        )
+      }),
+      transform.name,
+    )
+    assert.equal(ruleSet.explainWhiteMove(fen, stronger.san)?.id, 'sequester')
+  }
+})
+
 test('shepherd uniquely takes opposition toward the target under D4 symmetry', () => {
   const source = '3k4/6BB/4K3/8/8/8/8/8 w - - 0 1'
   const sourceMove = getChess(source)
@@ -1915,7 +1974,7 @@ test('near-corner target overrides the controlled two-away cutoff under D4 symme
   }
 })
 
-test('near-corner target supersedes the corner-diagonals cutoff', () => {
+test('mate prep falls through when neither bishop controls its diagonal', () => {
   const source = '8/3B4/8/8/8/2K3B1/8/1k6 w - - 2 2'
   const sourceMoves = getChess(source).moves({ verbose: true })
   const expectedSource = sourceMoves.find(({ san }) => san === 'Bf4')
@@ -1951,15 +2010,25 @@ test('near-corner target supersedes the corner-diagonals cutoff', () => {
     assert.equal(expectedScore.sequesterMaximumCornerReplyDistance, 1)
     assert.equal(driftingScore.sequesterCurrentCornerDistance, 1)
     assert.equal(driftingScore.sequesterMaximumCornerReplyDistance, 2)
-    assert.deepEqual(ruleSet.idealWhiteMoves(fen), [matePrep.san], transform.name)
-    assert.equal(
-      ruleSet.currentWhiteHint(fen)?.shortLabel,
+    assert.notEqual(
+      getTwoBishopsDegenerateReasonLabel(fen),
       'degenerate — mate prep',
+      transform.name,
     )
+    assert.ok(
+      ruleSet.idealWhiteMoves(fen).includes(drifting.san),
+      transform.name,
+    )
+    assert.equal(
+      ruleSet.idealWhiteMoves(fen).includes(matePrep.san),
+      false,
+      transform.name,
+    )
+    assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'sequester')
   }
 })
 
-test('near-corner target neutralizes bishop-side target strength', () => {
+test('near-corner target keeps only the valid corner-diagonals occupancy', () => {
   const source = '8/k7/2K5/5BB1/8/8/8/8 w - - 2 2'
   const sourceMoves = getChess(source).moves({ verbose: true })
   const expectedSource = sourceMoves.find(({ san }) => san === 'Bd2')
@@ -1986,14 +2055,14 @@ test('near-corner target neutralizes bishop-side target strength', () => {
     const expectedScore = scoreTwoBishopsWhiteMove(fen, expected.san)
     const splitScore = scoreTwoBishopsWhiteMove(fen, split.san)
     assert.equal(expectedScore.degeneratePenalty, 0)
-    assert.equal(splitScore.degeneratePenalty, 0)
+    assert.equal(splitScore.degeneratePenalty, 1)
     assert.equal(expectedScore.sequesterCornerDiagonalsTarget, false)
     assert.equal(splitScore.sequesterCornerDiagonalsTarget, false)
     assert.equal(expectedScore.sequesterTargetCornerScore, 0)
     assert.equal(splitScore.sequesterTargetCornerScore, 0)
     assert.deepEqual(
-      new Set(ruleSet.idealWhiteMoves(fen)),
-      new Set([expected.san, split.san]),
+      ruleSet.idealWhiteMoves(fen),
+      [expected.san],
       transform.name,
     )
     assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'degenerate')
@@ -2206,7 +2275,7 @@ test('force phase 2 rejects a move that does not hold Black on the edge', () => 
     true,
   )
   assert.equal(ruleSet.idealWhiteMoves(fen).includes('Ke4'), false)
-  assert.equal(ruleSet.explainWhiteMove(fen, 'Ke4')?.id, 'force phase 2')
+  assert.equal(ruleSet.explainWhiteMove(fen, 'Ke4')?.id, 'degenerate')
   for (const san of ruleSet.idealWhiteMoves(fen)) {
     assert.equal(scoreTwoBishopsWhiteMove(fen, san).forcePhaseTwoPenalty, 0)
   }
@@ -2355,6 +2424,101 @@ test('degenerate corner diagonals rejects f7 under D4 symmetry', () => {
   }
 })
 
+test('degenerate corner diagonals requires occupancy on the d1-h5 diagonal', () => {
+  const source = '8/3BB2k/5K2/8/8/8/8/8 w - - 0 1'
+  const sourceBadMove = getChess(source)
+    .moves({ verbose: true })
+    .find(({ san }) => san === 'Be8')
+  const sourceGoodMove = getChess(source)
+    .moves({ verbose: true })
+    .find(({ san }) => san === 'Bg4')
+  assert.ok(sourceBadMove)
+  assert.ok(sourceGoodMove)
+  const ruleSet = getMateRuleSet('two-bishops')
+
+  for (const transform of SQUARE_TRANSFORMS) {
+    const fen = getChess(transformFen(source, transform)).fen()
+    const legalMoves = getChess(fen).moves({ verbose: true })
+    const badMove: (typeof legalMoves)[number] | undefined = legalMoves.find(
+      ({ from, to }) =>
+        from === transformSquare(sourceBadMove.from, transform) &&
+        to === transformSquare(sourceBadMove.to, transform),
+    )
+    const goodMove: (typeof legalMoves)[number] | undefined = legalMoves.find(
+      ({ from, to }) =>
+        from === transformSquare(sourceGoodMove.from, transform) &&
+        to === transformSquare(sourceGoodMove.to, transform),
+    )
+    assert.ok(badMove, transform.name)
+    assert.ok(goodMove, transform.name)
+    assert.equal(
+      scoreTwoBishopsWhiteMove(fen, badMove.san).degeneratePenalty,
+      1,
+      transform.name,
+    )
+    assert.deepEqual(
+      ruleSet.idealWhiteMoves(fen),
+      [goodMove.san],
+      transform.name,
+    )
+  }
+})
+
+test('degenerate xx uniquely establishes h6 control under D4 symmetry', () => {
+  const source = TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateXx.fen
+  const sourceMove = getChess(source)
+    .moves({ verbose: true })
+    .find(({ san }) => san === 'Bd2')
+  assert.ok(sourceMove)
+  const ruleSet = getMateRuleSet('two-bishops')
+
+  for (const transform of SQUARE_TRANSFORMS) {
+    const fen = getChess(transformFen(source, transform)).fen()
+    const moves = getChess(fen).moves({ verbose: true })
+    const expected: (typeof moves)[number] | undefined = moves.find(
+      ({ from, to }) =>
+        from === transformSquare(sourceMove.from, transform) &&
+        to === transformSquare(sourceMove.to, transform),
+    )
+    assert.ok(expected, transform.name)
+    assert.deepEqual(
+      ruleSet.idealWhiteMoves(fen),
+      [expected.san],
+      transform.name,
+    )
+    assert.equal(
+      getTwoBishopsDegenerateReasonLabel(fen),
+      'degenerate — xx',
+      transform.name,
+    )
+    assert.equal(
+      scoreTwoBishopsWhiteMove(fen, expected.san).degeneratePenalty,
+      0,
+      transform.name,
+    )
+  }
+})
+
+test('degenerate xx ignores the dark bishop starting square', () => {
+  const fen = '5K1k/5B2/8/8/8/B7/8/8 w - - 0 1'
+
+  assert.deepEqual(getMateRuleSet('two-bishops').idealWhiteMoves(fen), ['Bc1'])
+  assert.equal(getTwoBishopsDegenerateReasonLabel(fen), 'degenerate — xx')
+})
+
+test('degenerate xx rejects translations and fixed-piece near misses', () => {
+  for (const fen of [
+    '8/5K1k/5B2/8/8/1B6/8/8 w - - 0 1',
+    '5K1k/8/4B3/8/1B6/8/8/8 w - - 0 1',
+  ]) {
+    assert.notEqual(
+      getTwoBishopsDegenerateReasonLabel(fen),
+      'degenerate — xx',
+      fen,
+    )
+  }
+})
+
 test('degenerate mate prep uniquely selects Kf2 under D4 symmetry', () => {
   const source = TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateMatePrep.fen
   const sourceMove = getChess(source)
@@ -2433,7 +2597,7 @@ test('degenerate phase 2 opposition rejects translations and altered geometry', 
   }
 })
 
-test('degenerate mate prep accepts one-move access to both diagonals under D4 symmetry', () => {
+test('degenerate mate prep accepts light control plus dark one-move access under D4 symmetry', () => {
   const source = '8/8/8/8/8/5K2/7k/3BB3 w - - 0 1'
   const sourceMove = getChess(source)
     .moves({ verbose: true })
@@ -2460,19 +2624,44 @@ test('degenerate mate prep accepts one-move access to both diagonals under D4 sy
   }
 })
 
-test('degenerate mate prep rejects a bishop without one-move diagonal access', () => {
-  const source = '8/8/8/8/8/5K2/3B3k/1B6 w - - 0 1'
+test('degenerate mate prep accepts established dark control under D4 symmetry', () => {
+  const source = 'B7/8/8/8/8/4BK2/7k/8 w - - 0 1'
+  const sourceMove = getChess(source)
+    .moves({ verbose: true })
+    .find(({ san }) => san === 'Kf2')
+  assert.ok(sourceMove)
   const ruleSet = getMateRuleSet('two-bishops')
 
   for (const transform of SQUARE_TRANSFORMS) {
     const fen = getChess(transformFen(source, transform)).fen()
+    const legalMoves = getChess(fen).moves({ verbose: true })
+    const expected: (typeof legalMoves)[number] | undefined = legalMoves.find(
+      ({ from, to }) =>
+        from === transformSquare(sourceMove.from, transform) &&
+        to === transformSquare(sourceMove.to, transform),
+    )
+    assert.ok(expected, transform.name)
     assert.equal(ruleSet.phase(fen), '2/2', transform.name)
+    assert.deepEqual(ruleSet.idealWhiteMoves(fen), [expected.san], transform.name)
+    assert.equal(
+      getTwoBishopsDegenerateReasonLabel(fen),
+      'degenerate — mate prep',
+      transform.name,
+    )
+  }
+})
+
+test('degenerate mate prep rejects dark access without established diagonal control', () => {
+  const source = '8/7k/5K2/8/8/6B1/8/5B2 w - - 0 1'
+
+  for (const transform of SQUARE_TRANSFORMS) {
+    const fen = getChess(transformFen(source, transform)).fen()
+    assert.equal(getMateRuleSet('two-bishops').phase(fen), '2/2', transform.name)
     assert.notEqual(
       getTwoBishopsDegenerateReasonLabel(fen),
       'degenerate — mate prep',
       transform.name,
     )
-    assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'sequester', transform.name)
   }
 })
 
@@ -3390,6 +3579,7 @@ test('every selected degenerate reason has a matching diagram title', () => {
     TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateKnightStepControl.fen,
     TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateWallWaitingMove.fen,
     TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateCornerDiagonals.fen,
+    TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateXx.fen,
     kingLiftFen('h1'),
     edgeRepairFen('h3', 'd1'),
     edgeRepairFen('h3', 'c2'),
@@ -3722,6 +3912,7 @@ test('Two Bishops keeps its phase explanation and diagram', () => {
     'bishop-degenerate-knight-step-control',
     'bishop-degenerate-wall-waiting-move',
     'bishop-degenerate-corner-diagonals',
+    'bishop-degenerate-xx',
     'bishop-degenerate-edge-repair',
     'bishop-degenerate-edge-unmask',
     'bishop-degenerate-diagonal-setup',
@@ -3762,7 +3953,11 @@ test('Two Bishops keeps its phase explanation and diagram', () => {
     ignoreLightBishopBoard.caption,
     "Ignore the light-squared bishop's location. Move the dark-squared bishop to h6.",
   )
-  const matePrepBoard = ruleSet.help.noteBoards[18]!
+  const xxBoard = ruleSet.help.noteBoards[6]!
+  assert.deepEqual(xxBoard.highlights, [{ square: 'h6', kind: 'zone' }])
+  assert.deepEqual(xxBoard.arrows, [{ from: 'b4', to: 'd2' }])
+  assert.equal(xxBoard.caption, 'Control h6 with the dark-squared bishop.')
+  const matePrepBoard = ruleSet.help.noteBoards[19]!
   assert.deepEqual(matePrepBoard.arrows, [{ from: 'f3', to: 'f2' }])
   assert.equal(matePrepBoard.caption, 'Take opposition with the king.')
   const mateInFourBoard = ruleSet.help.noteBoards[2]!
@@ -3803,12 +3998,12 @@ test('Two Bishops keeps its phase explanation and diagram', () => {
   )
   assert.equal(
     cornerDiagonalsBoard.caption,
-    "Preserve one bishop's control of f8 and the other's control of h5, or tighten the h5 cutoff by controlling h6. The cutoff still identifies h8 after Black steps around the corner.",
+    "Preserve one bishop's control of f8 and the other's control of d1 h5 diagonal, or tighten the h5 cutoff by controlling h6. The cutoff still identifies h8 after Black steps around the corner.",
   )
   assert.deepEqual(cornerDiagonalsBoard.arrows, [
     { from: 'b7', to: 'f3' },
   ])
-  const edgeRepairBoard = ruleSet.help.noteBoards[6]!
+  const edgeRepairBoard = ruleSet.help.noteBoards[7]!
   assert.deepEqual(
     edgeRepairBoard.pieces,
     getEndgamePiecePlacements(
@@ -3819,7 +4014,7 @@ test('Two Bishops keeps its phase explanation and diagram', () => {
     })),
   )
   assert.deepEqual(edgeRepairBoard.arrows, [{ from: 'e1', to: 'd2' }])
-  const edgeUnmaskBoard = ruleSet.help.noteBoards[7]!
+  const edgeUnmaskBoard = ruleSet.help.noteBoards[8]!
   assert.deepEqual(
     edgeUnmaskBoard.pieces,
     getEndgamePiecePlacements(
@@ -3830,7 +4025,7 @@ test('Two Bishops keeps its phase explanation and diagram', () => {
     })),
   )
   assert.deepEqual(edgeUnmaskBoard.arrows, [{ from: 'e1', to: 'd2' }])
-  const diagonalSetupBoard = ruleSet.help.noteBoards[8]!
+  const diagonalSetupBoard = ruleSet.help.noteBoards[9]!
   assert.deepEqual(diagonalSetupBoard.arrows, [
     { from: 'c2', to: 'f5' },
   ])
@@ -3844,7 +4039,7 @@ test('Two Bishops keeps its phase explanation and diagram', () => {
     ),
     ['Bf5'],
   )
-  const diagonalWaitingBoard = ruleSet.help.noteBoards[9]!
+  const diagonalWaitingBoard = ruleSet.help.noteBoards[10]!
   assert.deepEqual(diagonalWaitingBoard.arrows, [
     { from: 'e8', to: 'h5' },
   ])
@@ -3866,7 +4061,7 @@ test('Two Bishops keeps its phase explanation and diagram', () => {
     )?.id,
     'degenerate',
   )
-  const freeBishopBoard = ruleSet.help.noteBoards[10]!
+  const freeBishopBoard = ruleSet.help.noteBoards[11]!
   assert.deepEqual(
     freeBishopBoard.pieces,
     getEndgamePiecePlacements(
@@ -3876,7 +4071,7 @@ test('Two Bishops keeps its phase explanation and diagram', () => {
       piece: color === 'w' ? type.toUpperCase() : type,
     })),
   )
-  const waitingMoveBoard = ruleSet.help.noteBoards[11]!
+  const waitingMoveBoard = ruleSet.help.noteBoards[12]!
   assert.deepEqual(
     waitingMoveBoard.pieces,
     getEndgamePiecePlacements(
@@ -3886,7 +4081,7 @@ test('Two Bishops keeps its phase explanation and diagram', () => {
       piece: color === 'w' ? type.toUpperCase() : type,
     })),
   )
-  const kingFlankBoard = ruleSet.help.noteBoards[12]!
+  const kingFlankBoard = ruleSet.help.noteBoards[13]!
   assert.deepEqual(
     kingFlankBoard.pieces,
     getEndgamePiecePlacements(
@@ -3897,7 +4092,7 @@ test('Two Bishops keeps its phase explanation and diagram', () => {
     })),
   )
   assert.deepEqual(kingFlankBoard.arrows, [{ from: 'e5', to: 'f6' }])
-  const kingSidestepBoard = ruleSet.help.noteBoards[13]!
+  const kingSidestepBoard = ruleSet.help.noteBoards[14]!
   assert.deepEqual(
     kingSidestepBoard.pieces,
     getEndgamePiecePlacements(
@@ -3920,7 +4115,7 @@ test('Two Bishops keeps its phase explanation and diagram', () => {
     )?.id,
     'degenerate',
   )
-  const reformWallBoard = ruleSet.help.noteBoards[14]!
+  const reformWallBoard = ruleSet.help.noteBoards[15]!
   assert.deepEqual(
     reformWallBoard.pieces,
     getEndgamePiecePlacements(
@@ -3943,7 +4138,7 @@ test('Two Bishops keeps its phase explanation and diagram', () => {
     )?.id,
     'degenerate',
   )
-  const kingLiftBoard = ruleSet.help.noteBoards[15]!
+  const kingLiftBoard = ruleSet.help.noteBoards[16]!
   assert.deepEqual(
     kingLiftBoard.pieces,
     getEndgamePiecePlacements(
@@ -3966,7 +4161,7 @@ test('Two Bishops keeps its phase explanation and diagram', () => {
     )?.shortLabel,
     'degenerate — king lift',
   )
-  const bishopRetreatBoard = ruleSet.help.noteBoards[16]!
+  const bishopRetreatBoard = ruleSet.help.noteBoards[17]!
   assert.deepEqual(
     bishopRetreatBoard.pieces,
     getEndgamePiecePlacements(
@@ -3977,7 +4172,7 @@ test('Two Bishops keeps its phase explanation and diagram', () => {
     })),
   )
   assert.deepEqual(bishopRetreatBoard.arrows, [{ from: 'f7', to: 'e8' }])
-  const longDiagonalBoard = ruleSet.help.noteBoards[17]!
+  const longDiagonalBoard = ruleSet.help.noteBoards[18]!
   assert.deepEqual(
     longDiagonalBoard.pieces,
     getEndgamePiecePlacements(
@@ -3995,7 +4190,7 @@ test('Two Bishops keeps its phase explanation and diagram', () => {
     longDiagonalBoard.caption,
     "Move the bishop to any highlighted square. Don't move it to the edge.",
   )
-  const matingPositionBoard = ruleSet.help.noteBoards[19]!
+  const matingPositionBoard = ruleSet.help.noteBoards[20]!
   assert.deepEqual(
     matingPositionBoard.pieces,
     TWO_BISHOPS_DIAGRAM_POSITIONS.matingPosition.pieces,
@@ -4004,7 +4199,7 @@ test('Two Bishops keeps its phase explanation and diagram', () => {
     matingPositionBoard.highlights.map(({ square }) => square),
     ['f8', 'f7'],
   )
-  const shepherdBoard = ruleSet.help.noteBoards[20]!
+  const shepherdBoard = ruleSet.help.noteBoards[21]!
   assert.deepEqual(
     shepherdBoard.highlights.map(({ square }) => square),
     ['a8', 'f8'],
@@ -4018,7 +4213,7 @@ test('Two Bishops keeps its phase explanation and diagram', () => {
     ruleSet.currentWhiteHint(TWO_BISHOPS_DIAGRAM_POSITIONS.shepherd.fen)?.id,
     'shepherd',
   )
-  const phaseTwoWallBoard = ruleSet.help.noteBoards[21]!
+  const phaseTwoWallBoard = ruleSet.help.noteBoards[22]!
   assert.deepEqual(
     phaseTwoWallBoard.pieces,
     getEndgamePiecePlacements(
@@ -4032,7 +4227,7 @@ test('Two Bishops keeps its phase explanation and diagram', () => {
     phaseTwoWallBoard.highlights.map(({ square }) => square),
     ['b8', 'b7'],
   )
-  const proximateWallBoard = ruleSet.help.noteBoards[22]!
+  const proximateWallBoard = ruleSet.help.noteBoards[23]!
   assert.deepEqual(
     proximateWallBoard.pieces,
     TWO_BISHOPS_DIAGRAM_POSITIONS.proximateWall.pieces,

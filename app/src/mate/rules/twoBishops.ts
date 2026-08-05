@@ -155,6 +155,7 @@ const TWO_BISHOPS_DEGENERATE_REASON_LABELS = {
   knightStepControl: 'degenerate — knight-step control',
   wallWaitingMove: 'degenerate — wall waiting move',
   cornerDiagonals: 'degenerate — corner diagonals',
+  xx: 'degenerate — xx',
   kingLift: 'degenerate — king lift',
   bishopRetreat: 'degenerate — bishop retreat',
   longDiagonal: 'degenerate — long diagonal',
@@ -180,6 +181,7 @@ export const TWO_BISHOPS_DEGENERATE_PRIORITY_ORDER = [
   TWO_BISHOPS_DEGENERATE_REASON_LABELS.knightStepControl,
   TWO_BISHOPS_DEGENERATE_REASON_LABELS.wallWaitingMove,
   TWO_BISHOPS_DEGENERATE_REASON_LABELS.cornerDiagonals,
+  TWO_BISHOPS_DEGENERATE_REASON_LABELS.xx,
   TWO_BISHOPS_DEGENERATE_REASON_LABELS.edgeRepair,
   TWO_BISHOPS_DEGENERATE_REASON_LABELS.edgeUnmask,
   TWO_BISHOPS_DEGENERATE_REASON_LABELS.diagonalSetup,
@@ -281,7 +283,7 @@ const twoBishopsHelp: RuleHelp = {
       id: 'bishop-degenerate-corner-diagonals',
       title: 'degenerate — corner diagonals',
       caption:
-        "Preserve one bishop's control of f8 and the other's control of h5, or tighten the h5 cutoff by controlling h6. The cutoff still identifies h8 after Black steps around the corner.",
+        "Preserve one bishop's control of f8 and the other's control of d1 h5 diagonal, or tighten the h5 cutoff by controlling h6. The cutoff still identifies h8 after Black steps around the corner.",
       layout: { files: 8, ranks: 8, fileOffset: 0 },
       pieces: noteBoardPieces(
         TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateCornerDiagonals.fen,
@@ -291,6 +293,17 @@ const twoBishopsHelp: RuleHelp = {
       arrows: [
         TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateCornerDiagonals.arrow,
       ],
+    },
+    {
+      id: 'bishop-degenerate-xx',
+      title: 'degenerate — xx',
+      caption: 'Control h6 with the dark-squared bishop.',
+      layout: { files: 8, ranks: 8, fileOffset: 0 },
+      pieces: noteBoardPieces(
+        TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateXx.fen,
+      ),
+      highlights: TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateXx.highlights,
+      arrows: [TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateXx.arrow],
     },
     {
       id: 'bishop-degenerate-edge-repair',
@@ -925,8 +938,10 @@ function getCornerDiagonalsDegenerateRepair(
 
     const heldSquare = transformSquare('f8', transform)
     const targetSquare = transformSquare('h5', transform)
+    const targetDiagonalSquares = MATE_PREP_LIGHT_DIAGONAL.map(
+      (square) => transformSquare(square, transform),
+    )
     const interveningEdgeSquare = transformSquare('h6', transform)
-    const forbiddenTargetBishopSquare = transformSquare('f7', transform)
     const holdingBishop = bishops.find(
       (bishop) =>
         bishop !== heldSquare &&
@@ -951,13 +966,7 @@ function getCornerDiagonalsDegenerateRepair(
             resultBishops.some(
               (targetBishop) =>
                 targetBishop !== heldBishop &&
-                targetBishop !== targetSquare &&
-                targetBishop !== forbiddenTargetBishopSquare &&
-                bishopHasClearLineToSquare(
-                  resultFen,
-                  targetBishop,
-                  targetSquare,
-                ),
+                targetDiagonalSquares.includes(targetBishop),
             ),
         )
         const advancesEdgeCutoff =
@@ -979,6 +988,57 @@ function getCornerDiagonalsDegenerateRepair(
       return {
         allowedSans,
         reasonLabel: TWO_BISHOPS_DEGENERATE_REASON_LABELS.cornerDiagonals,
+      }
+    }
+  }
+
+  return null
+}
+
+function getXxDegenerateRepair(
+  fen: string,
+  blackKing: Square,
+  whiteKing: Square,
+  bishops: readonly Square[],
+): DegenerateRepair | null {
+  const legalMoves = getChess(fen).moves({ verbose: true })
+
+  for (const transform of SQUARE_TRANSFORMS) {
+    const expectedBlackKing = transformSquare('h8', transform)
+    const expectedWhiteKing = transformSquare('f8', transform)
+    const expectedLightBishop = transformSquare('f7', transform)
+    const controlSquare = transformSquare('h6', transform)
+    const darkBishop = bishops.find(
+      (bishop) =>
+        bishop !== expectedLightBishop &&
+        squareColor(bishop) === squareColor(controlSquare),
+    )
+    if (
+      blackKing !== expectedBlackKing ||
+      whiteKing !== expectedWhiteKing ||
+      !bishops.includes(expectedLightBishop) ||
+      darkBishop === undefined
+    ) {
+      continue
+    }
+
+    const allowedSans = legalMoves
+      .filter((move) => move.piece === 'b' && move.from === darkBishop)
+      .filter((move) => {
+        const after = getChess(fen)
+        after.move(move.san)
+        return bishopHasClearLineToSquare(
+          after.fen(),
+          move.to,
+          controlSquare,
+        )
+      })
+      .map((move) => move.san)
+    if (allowedSans.length > 0) {
+      return {
+        allowedSans,
+        stopAfterRepair: true,
+        reasonLabel: TWO_BISHOPS_DEGENERATE_REASON_LABELS.xx,
       }
     }
   }
@@ -1196,11 +1256,18 @@ function getMatePrepDegenerateRepair(
           move.from === bishop &&
           diagonal.includes(move.to),
       )
+    const bishopControls = (
+      bishop: Square | undefined,
+      diagonal: readonly Square[],
+    ): boolean => bishop !== undefined && diagonal.includes(bishop)
+    const bishopGatePasses =
+      bishopControls(darkBishop, darkDiagonal) ||
+      (bishopControls(lightBishop, lightDiagonal) &&
+        bishopCanAccess(darkBishop, darkDiagonal))
     if (
       blackKing !== expectedBlackKing ||
       whiteKing !== expectedWhiteKing ||
-      !bishopCanAccess(lightBishop, lightDiagonal) ||
-      !bishopCanAccess(darkBishop, darkDiagonal)
+      !bishopGatePasses
     ) {
       continue
     }
@@ -1995,6 +2062,15 @@ function getDegenerateRepair(
             bishops,
           )
         : null,
+    [TWO_BISHOPS_DEGENERATE_REASON_LABELS.xx]: () =>
+      isPhaseTwo
+        ? getXxDegenerateRepair(
+            fen,
+            blackKing,
+            whiteKing,
+            bishops,
+          )
+        : null,
     [TWO_BISHOPS_DEGENERATE_REASON_LABELS.edgeRepair]: () =>
       isPhaseTwo
         ? getEdgeDegenerateRepair(blackKing, whiteKing, bishops)
@@ -2689,11 +2765,6 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
     applies: (score) => score.sequesterApplies,
     subpriorities: [
       {
-        compare: (first, second) =>
-          second.sequesterTargetCornerScore -
-          first.sequesterTargetCornerScore,
-      },
-      {
         when: (scores) =>
           scores.some(
             (score) =>
@@ -2705,6 +2776,11 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
           first.sequesterCurrentCornerDistance -
           (second.sequesterMaximumCornerReplyDistance -
             second.sequesterCurrentCornerDistance),
+      },
+      {
+        compare: (first, second) =>
+          second.sequesterTargetCornerScore -
+          first.sequesterTargetCornerScore,
       },
       {
         when: (scores) =>

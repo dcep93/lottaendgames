@@ -1318,6 +1318,7 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
       'bishop-degenerate-knight-step-control',
       'bishop-degenerate-wall-waiting-move',
       'bishop-degenerate-corner-diagonals',
+      'bishop-degenerate-xx',
       'bishop-degenerate-edge-repair',
       'bishop-degenerate-edge-unmask',
       'bishop-degenerate-diagonal-setup',
@@ -1441,6 +1442,7 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
     knightStepControlBoard,
     wallWaitingMoveBoard,
     cornerDiagonalsBoard,
+    xxBoard,
     edgeRepairBoard,
     edgeUnmaskBoard,
     diagonalSetupBoard,
@@ -1466,6 +1468,7 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
   assert.ok(knightStepControlBoard)
   assert.ok(wallWaitingMoveBoard)
   assert.ok(cornerDiagonalsBoard)
+  assert.ok(xxBoard)
   assert.ok(edgeRepairBoard)
   assert.ok(edgeUnmaskBoard)
   assert.ok(diagonalSetupBoard)
@@ -1506,6 +1509,13 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
     matePrepBoard.arrows,
     [TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateMatePrep.arrow],
   )
+  assert.deepEqual(
+    xxBoard.highlights,
+    TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateXx.highlights,
+  )
+  assert.deepEqual(xxBoard.arrows, [
+    TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateXx.arrow,
+  ])
   assert.deepEqual(
     mateInFourBoard.highlights,
     TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateMateInFour.highlights,
@@ -1550,7 +1560,7 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
   )
   assert.equal(
     cornerDiagonalsBoard.caption,
-    "Preserve one bishop's control of f8 and the other's control of h5, or tighten the h5 cutoff by controlling h6. The cutoff still identifies h8 after Black steps around the corner.",
+    "Preserve one bishop's control of f8 and the other's control of d1 h5 diagonal, or tighten the h5 cutoff by controlling h6. The cutoff still identifies h8 after Black steps around the corner.",
   )
   assert.deepEqual(edgeRepairBoard.arrows, [{ from: 'e1', to: 'd2' }])
   assert.deepEqual(edgeUnmaskBoard.arrows, [{ from: 'e1', to: 'd2' }])
@@ -1618,8 +1628,10 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
   assert.match(bishopsMarkup, />degenerate — corner diagonals</)
   assert.match(
     bishopsMarkup,
-    /Preserve one bishop&#x27;s control of f8 and the other&#x27;s control of h5, or tighten the h5 cutoff by controlling h6\./,
+    /Preserve one bishop&#x27;s control of f8 and the other&#x27;s control of d1 h5 diagonal, or tighten the h5 cutoff by controlling h6\./,
   )
+  assert.match(bishopsMarkup, />degenerate — xx</)
+  assert.match(bishopsMarkup, /Control h6 with the dark-squared bishop\./)
   assert.doesNotMatch(bishopsMarkup, />degenerate — bishop advance</)
   assert.match(bishopsMarkup, />degenerate — edge repair</)
   assert.match(bishopsMarkup, />degenerate — unmask edge bishop</)
@@ -1676,10 +1688,10 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
     /Target corner: Calculate after White&#x27;s move in Phase 2\. If Black is in or one edge square from a corner, use that corner\. Otherwise, in the corner-diagonals position, its cutoff points to the opposite corner and continues to do so when Black steps around that corner\. Otherwise, when the kings are in opposition and more bishops stand on one physical side of White&#x27;s king, choose the opposite corner\. When deciding between bishop moves, prefer the stronger bishop majority\. Otherwise, choose the corner where White wins the king race by the greatest Chebyshev-distance lead\. If neither method decides, choose the corner closest to White&#x27;s king\. Retain tied corners\./,
   )
   assert.match(bishopsMarkup, /leg-mate-guide-note-boards--full/)
-  assert.equal(bishopsMarkup.match(/leg-mate-note-board--full/g)?.length, 23)
+  assert.equal(bishopsMarkup.match(/leg-mate-note-board--full/g)?.length, 24)
   assert.equal(
     bishopsMarkup.match(/data-highlight-kind="zone"/g)?.length,
-    35,
+    36,
   )
   assert.match(
     bishopsMarkup,

@@ -98,6 +98,12 @@ export const TWO_BISHOPS_DIAGRAM_POSITIONS = {
     ],
     arrow: { from: 'b7', to: 'f3' },
   },
+  degenerateXx: {
+    phase: '2/2',
+    fen: "5K1k/5B2/8/8/1B6/8/8/8 w - - 0 1",
+    highlights: [{ square: 'h6', kind: 'zone' }],
+    arrow: { from: 'b4', to: 'd2' },
+  },
   degenerateKingLift: {
     phase: '2/2',
     fen: "8/8/8/5B2/8/5K2/3B4/7k w - - 2 2",

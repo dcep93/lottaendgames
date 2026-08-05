@@ -38,6 +38,9 @@ const degenerateWallWaitingMoveFen = getChess(
 const degenerateCornerDiagonalsFen = getChess(
   '8/1B5k/5K2/8/1B6/8/8/8 w - - 0 1',
 ).fen()
+const degenerateXxFen = getChess(
+  '5K1k/5B2/8/8/1B6/8/8/8 w - - 0 1',
+).fen()
 const degenerateKingLiftFen = getChess(
   '8/8/8/5B2/8/5K2/3B4/7k w - - 2 2',
 ).fen()
@@ -84,6 +87,7 @@ for (const [label, fen] of [
   ['degenerate knight-step control', degenerateKnightStepControlFen],
   ['degenerate wall waiting move', degenerateWallWaitingMoveFen],
   ['degenerate corner diagonals', degenerateCornerDiagonalsFen],
+  ['degenerate xx', degenerateXxFen],
   ['degenerate king lift', degenerateKingLiftFen],
   ['degenerate bishop retreat', degenerateBishopRetreatFen],
   ['degenerate long diagonal', degenerateLongDiagonalFen],
@@ -208,6 +212,12 @@ export const TWO_BISHOPS_DIAGRAM_POSITIONS = {
     ],
     arrow: { from: 'b7', to: 'f3' },
   },
+  degenerateXx: {
+    phase: '2/2',
+    fen: ${JSON.stringify(degenerateXxFen)},
+    highlights: [{ square: 'h6', kind: 'zone' }],
+    arrow: { from: 'b4', to: 'd2' },
+  },
   degenerateKingLift: {
     phase: '2/2',
     fen: ${JSON.stringify(degenerateKingLiftFen)},
@@ -312,6 +322,7 @@ process.stdout.write(
 process.stdout.write(
   `degenerate corner diagonals: ${degenerateCornerDiagonalsFen}\n`,
 )
+process.stdout.write(`degenerate xx: ${degenerateXxFen}\n`)
 process.stdout.write(`degenerate king lift: ${degenerateKingLiftFen}\n`)
 process.stdout.write(
   `degenerate bishop retreat: ${degenerateBishopRetreatFen}\n`,
