@@ -4,13 +4,15 @@
 
 Revise the visible Phase 1 priority to:
 
-> **restrict area** — Phase 1: Use the bishops to control 2 diagonals adjacent to Black's king, but not checking the king, preferring a smaller area (min 6) for Black. If not possible, bishop control a square diagonally adjacent to Black's king, preferring squares closer to the center of the board.
+> **restrict area** — Phase 1: Use the bishops to control 2 diagonals adjacent to Black's king, but not checking the king, preferring a smaller area (min 6) for Black. White's king should not be within the area or those diagonals. If not possible, bishop control a square diagonally adjacent to Black's king, preferring squares closer to the center of the board.
 
 ## Confinement Geometry
 
 The primary stage recognizes two bishops on adjacent parallel board diagonals. For each of the two diagonal orientations, represent each bishop's diagonal by its file/rank invariant. The orientation qualifies when the bishops' invariant values differ by one and Black's king lies strictly outside the pair.
 
-The raw Black-side area is the number of board squares strictly beyond the nearer boundary diagonal on Black's side. This is a geometric cage count: boundary squares are excluded, and piece attacks, blockers, and White's king do not change the area.
+The raw Black-side area is the number of board squares strictly beyond the nearer boundary diagonal on Black's side. This is a geometric cage count: boundary squares are excluded, and piece attacks and blockers do not change the area.
+
+White's king must lie strictly beyond the opposite boundary diagonal. If Black lies below both adjacent diagonal values, White must lie above both; if Black lies above both, White must lie below both. White on either boundary or within Black's side of the cage invalidates that orientation.
 
 If both orientations qualify, use the smaller raw area. A checking result does not qualify.
 
@@ -32,6 +34,6 @@ Replace the controlled-diagonal-count threshold with the confinement-area score.
 
 - Assert the exact visible wording and rule order.
 - Assert raw and clamped areas for `Kd5`, `Bc7`, and `Bc8` in the supplied position, and assert that `Kd5` is uniquely selected by `king closer`.
-- Cover smaller versus larger cages, both diagonal orientations, checking exclusion, fallback activation and center preference, Phase 2 inactivity, D4 symmetry, and translation behavior.
+- Cover smaller versus larger cages, both diagonal orientations, White inside the area, White on each boundary, checking exclusion, fallback activation and center preference, Phase 2 inactivity, D4 symmetry, and translation behavior.
 - Run focused and full Two Bishops and presentation tests, TypeScript, lint, diagram freshness, and diff hygiene.
 - Find a strict exact-repetition Phase 1 loop, treating entry into Phase 2 as termination, and open it on the isolated port 5174 server.
