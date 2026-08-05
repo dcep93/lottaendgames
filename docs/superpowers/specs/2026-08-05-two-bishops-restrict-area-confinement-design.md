@@ -4,7 +4,7 @@
 
 Revise the visible Phase 1 priority to:
 
-> **restrict area** — Phase 1: Use the bishops to control 2 diagonals adjacent to Black's king, but not checking the king, preferring a smaller area (min 6) for Black. White's king should not be within the area or those diagonals. If not possible, bishop control a square diagonally adjacent to Black's king, preferring squares closer to the center of the board.
+> **restrict area** — Phase 1: Use the bishops to control 2 diagonals adjacent to Black's king, but not checking the king, preferring a smaller area (min 6) for Black. White's king should not be within the area or those diagonals. If not possible, bishop control a square diagonally adjacent to Black's king, preferring squares closer to the center of the board. If a bishop is attacked while maintaining the restricted area, maintain the diagonal and move it as far as possible.
 
 ## Confinement Geometry
 
@@ -24,6 +24,12 @@ Clamp every qualifying raw area to a minimum comparison value of six:
 
 Prefer the smaller comparison area. This means cages smaller than six do not gain additional priority. In the supplied position, preserving the existing cage with `Kd5`, playing `Bc7`, and shrinking it further with `Bc8` all compare as area six; the later `king closer` rule selects `Kd5`.
 
+## Attacked Bishop Escape
+
+When the starting position already has a valid restricted-area cage and Black's king attacks a bishop, add a tiebreak after area comparison and before `king closer`. Prefer a legal surviving move by the attacked bishop that keeps it on one of its current qualifying cage boundary diagonals. Among those moves, maximize bishop travel length measured in traversed diagonal squares.
+
+The tiebreak applies only when at least one surviving candidate performs such an escape. It does not force an impossible boundary-preserving move, does not reward moving the unthreatened bishop, and does not select a different cage diagonal merely because the resulting comparison area is equal.
+
 Use the existing fallback only when every surviving candidate lacks a qualifying non-checking adjacent-diagonal cage. Among non-checking results controlling a square diagonally adjacent to Black's king, prefer the controlled target closest to the center using the existing Manhattan distance to the central four squares.
 
 ## Scope
@@ -34,6 +40,6 @@ Replace the controlled-diagonal-count threshold with the confinement-area score.
 
 - Assert the exact visible wording and rule order.
 - Assert raw and clamped areas for `Kd5`, `Bc7`, and `Bc8` in the supplied position, and assert that `Kd5` is uniquely selected by `king closer`.
-- Cover smaller versus larger cages, both diagonal orientations, White inside the area, White on each boundary, checking exclusion, fallback activation and center preference, Phase 2 inactivity, D4 symmetry, and translation behavior.
+- Cover smaller versus larger cages, both diagonal orientations, White inside the area, White on each boundary, checking exclusion, attacked-bishop boundary preservation and maximum travel, no-op behavior when no escape survives, fallback activation and center preference, Phase 2 inactivity, D4 symmetry, and translation behavior.
 - Run focused and full Two Bishops and presentation tests, TypeScript, lint, diagram freshness, and diff hygiene.
 - Find a strict exact-repetition Phase 1 loop, treating entry into Phase 2 as termination, and open it on the isolated port 5174 server.
