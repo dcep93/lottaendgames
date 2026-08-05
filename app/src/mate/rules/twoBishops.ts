@@ -3061,13 +3061,6 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
       first.phaseTwoWallPenalty - second.phaseTwoWallPenalty,
   },
   {
-    id: 'unclutter bishops',
-    shortLabel: 'unclutter bishops',
-    helpText: 'Prefer bishops more than two king steps from a corner.',
-    compare: (first, second) =>
-      first.clutteredBishopsCount - second.clutteredBishopsCount,
-  },
-  {
     id: 'ideal cage',
     shortLabel: 'ideal cage',
     helpText:
@@ -3127,6 +3120,13 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
       first.kingPushableInsideAreaPenalty -
         second.kingPushableInsideAreaPenalty ||
       first.kingPushableDistance - second.kingPushableDistance,
+  },
+  {
+    id: 'unclutter bishops',
+    shortLabel: 'unclutter bishops',
+    helpText: 'Prefer bishops more than two king steps from a corner.',
+    compare: (first, second) =>
+      first.clutteredBishopsCount - second.clutteredBishopsCount,
   },
   {
     id: 'king closer',

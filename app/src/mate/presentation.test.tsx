@@ -1794,11 +1794,15 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
   )
   assert.ok(
     bishopsMarkup.indexOf('>phase 2 wall<') <
+      bishopsMarkup.indexOf('>ideal cage<'),
+  )
+  assert.ok(
+    bishopsMarkup.indexOf('>king pushable<') <
       bishopsMarkup.indexOf('>unclutter bishops<'),
   )
   assert.ok(
     bishopsMarkup.indexOf('>unclutter bishops<') <
-      bishopsMarkup.indexOf('>ideal cage<'),
+      bishopsMarkup.indexOf('>king closer<'),
   )
   assert.doesNotMatch(bishopsMarkup, />lazy king</)
   assert.doesNotMatch(bishopsMarkup, />support wall</)
