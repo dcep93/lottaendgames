@@ -1843,7 +1843,7 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
   )
   assert.match(
     bishopsMarkup,
-    />prep restricted area<[^]*Phase 1: Bishop control a square diagonally adjacent to Black&#x27;s king, preferring squares closer to the center of the board\. If a bishop is attacked while maintaining the restricted area, maintain the diagonal and move it as far as possible\./,
+    />prep restricted area<[^]*Phase 1: Bishop control a square diagonally adjacent to Black&#x27;s king, preferring squares closer to the center of the board\./,
   )
   assert.match(
     bishopsMarkup,

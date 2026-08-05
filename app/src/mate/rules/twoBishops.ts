@@ -68,9 +68,6 @@ export type TwoBishopsWhiteMoveScore = {
   readonly forcePhaseTwoPenalty: number
   readonly idealCagePenalty: number
   readonly restrictAreaRawArea: number
-  readonly restrictAreaEscapeApplies: boolean
-  readonly restrictAreaEscapePenalty: number
-  readonly restrictAreaEscapeTravelLength: number
   readonly restrictAreaDiagonalCenterDistance: number
   readonly kingPushableApplies: boolean
   readonly kingPushableDistance: number
@@ -2349,7 +2346,6 @@ type TwoBishopsWhitePositionContext = {
   readonly mateInThreeApplies: boolean
   readonly matePatternTurnsBySan: ReadonlyMap<string, 2 | 3>
   readonly shepherdMoves: readonly string[]
-  readonly restrictAreaEscapeBoundaries: readonly RestrictAreaEscapeBoundary[]
   readonly restrictAreaKingConfinements: readonly BishopConfinement[]
 }
 
@@ -2366,28 +2362,6 @@ function createTwoBishopsWhitePositionContext(
     startingWhiteKing,
     blackKing,
   )
-  const restrictAreaEscapeBoundaries =
-    blackKing === undefined ||
-    startingWhiteKing === undefined ||
-    whiteKingScreensBishopFromBlackAdjacentSquare(
-      getChess(fen),
-      startingBishops,
-      blackKing,
-      startingWhiteKing,
-    )
-      ? []
-      : getBishopConfinements(
-          startingBishops,
-          blackKing,
-        ).flatMap(({ orientation }) =>
-          startingBishops
-            .filter((bishop) => kingDistance(bishop, blackKing) === 1)
-            .map((bishop) => ({
-              bishop,
-              orientation,
-              value: diagonalInvariant(bishop, orientation),
-            })),
-        )
   const restrictAreaKingConfinements =
     isPhaseTwo ||
     blackKing === undefined
@@ -2401,7 +2375,6 @@ function createTwoBishopsWhitePositionContext(
     degenerateRepair,
     mateInThreeApplies: matePatternTurnsBySan.size > 0,
     matePatternTurnsBySan,
-    restrictAreaEscapeBoundaries,
     restrictAreaKingConfinements,
     shepherdMoves:
       isPhaseTwo
@@ -2439,7 +2412,6 @@ function scoreTwoBishopsWhiteMoveWithContext(
     mateInThreeApplies,
     matePatternTurnsBySan,
     shepherdMoves,
-    restrictAreaEscapeBoundaries,
     restrictAreaKingConfinements,
   } = context
   const chess = getChess(fen)
@@ -2558,14 +2530,6 @@ function scoreTwoBishopsWhiteMoveWithContext(
     )
       ? 0
       : 1
-  const restrictAreaEscapesAttackedBishop =
-    move.piece === 'b' &&
-    restrictAreaRawArea !== 99 &&
-    restrictAreaEscapeBoundaries.some(
-      ({ bishop, orientation, value }) =>
-        move.from === bishop &&
-        diagonalInvariant(move.to, orientation) === value,
-    )
   return {
     isPhaseTwoPosition: isPhaseTwo,
     matePenalty: mate ? 0 : 1,
@@ -2636,11 +2600,6 @@ function scoreTwoBishopsWhiteMoveWithContext(
         : 1,
     idealCagePenalty,
     restrictAreaRawArea,
-    restrictAreaEscapeApplies: restrictAreaEscapeBoundaries.length > 0,
-    restrictAreaEscapePenalty: restrictAreaEscapesAttackedBishop ? 0 : 1,
-    restrictAreaEscapeTravelLength: restrictAreaEscapesAttackedBishop
-      ? kingDistance(move.from, move.to)
-      : 0,
     restrictAreaDiagonalCenterDistance:
       nonCheckingResult && controlledDiagonalSquares.length > 0
         ? Math.min(...controlledDiagonalSquares.map(centerDistance))
@@ -2745,12 +2704,6 @@ type BishopConfinement = {
   readonly blackSide: -1 | 1
   readonly boundaries: readonly [number, number]
   readonly orientation: DiagonalOrientation
-}
-
-type RestrictAreaEscapeBoundary = {
-  readonly bishop: Square
-  readonly orientation: DiagonalOrientation
-  readonly value: number
 }
 
 type IdealCage = {
@@ -3083,22 +3036,9 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
     id: 'prep restricted area',
     shortLabel: 'prep restricted area',
     helpText:
-      "Phase 1: Bishop control a square diagonally adjacent to Black's king, preferring squares closer to the center of the board. If a bishop is attacked while maintaining the restricted area, maintain the diagonal and move it as far as possible.",
+      "Phase 1: Bishop control a square diagonally adjacent to Black's king, preferring squares closer to the center of the board.",
     applies: (score) => !score.isPhaseTwoPosition,
     subpriorities: [
-      {
-        when: (scores) =>
-          scores.some(
-            ({ restrictAreaEscapeApplies, restrictAreaEscapePenalty }) =>
-              restrictAreaEscapeApplies &&
-              restrictAreaEscapePenalty === 0,
-          ),
-        compare: (first, second) =>
-          first.restrictAreaEscapePenalty -
-            second.restrictAreaEscapePenalty ||
-          second.restrictAreaEscapeTravelLength -
-            first.restrictAreaEscapeTravelLength,
-      },
       {
         when: (scores) =>
           scores.every(
