@@ -1790,7 +1790,7 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
   assert.match(bishopsMarkup, />check<[^]*Play a check</)
   assert.match(
     bishopsMarkup,
-    />unclutter bishops<[^]*Phase 2: Prefer bishops more than two king steps from a corner\./,
+    />unclutter bishops<[^]*Prefer bishops more than two king steps from a corner\./,
   )
   assert.ok(
     bishopsMarkup.indexOf('>phase 2 wall<') <

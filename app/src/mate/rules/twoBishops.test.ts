@@ -337,8 +337,7 @@ test('Two Bishops exposes each Phase 2 comparison as one visible rule', () => {
       },
       {
         shortLabel: 'unclutter bishops',
-        helpText:
-          'Phase 2: Prefer bishops more than two king steps from a corner.',
+        helpText: 'Prefer bishops more than two king steps from a corner.',
       },
       {
         shortLabel: 'ideal cage',
@@ -411,7 +410,6 @@ test('Two Bishops exposes each Phase 2 comparison as one visible rule', () => {
       rule.id === 'ideal cage' ||
       rule.id === 'restricted area' ||
       rule.id === 'king pushable' ||
-      rule.id === 'unclutter bishops' ||
       rule.id === 'bishops further'
     ) {
       assert.equal(typeof rule.applies, 'function')
@@ -456,18 +454,14 @@ test('the visible strategic comparisons run in their displayed order', () => {
       fen,
       afterBishopsOffEdge,
     )
-    const phaseTwoUnclutterCandidates = afterPhaseTwoWall.filter(
-      (san) => scoreTwoBishopsWhiteMove(fen, san).isPhaseTwoPosition,
-    )
     const bestClutteredBishopsCount = Math.min(
-      ...phaseTwoUnclutterCandidates.map(
+      ...afterPhaseTwoWall.map(
         (san) =>
           scoreTwoBishopsWhiteMove(fen, san).clutteredBishopsCount,
       ),
     )
     const afterUnclutterBishops = afterPhaseTwoWall.filter(
       (san) =>
-        !scoreTwoBishopsWhiteMove(fen, san).isPhaseTwoPosition ||
         scoreTwoBishopsWhiteMove(fen, san).clutteredBishopsCount ===
           bestClutteredBishopsCount,
     )
@@ -850,7 +844,8 @@ test('prep restricted area moves an attacked cage bishop farthest along its boun
   assert.ok(escape?.compare)
   assert.ok(escape.compare(farthest, short) < 0)
   assert.deepEqual(ruleSet.idealWhiteMoves(fen), ['Ba5'])
-  assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'prep restricted area')
+  assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'restricted area')
+  assert.equal(ruleSet.explainWhiteMove(fen, 'Bb6')?.id, 'unclutter bishops')
 
   const sourceMove = getChess(fen)
     .moves({ verbose: true })
@@ -931,7 +926,7 @@ test('prep restricted area prefers the controlled diagonal neighbor closest to c
   assert.ok(fallback.compare(central, farther) < 0)
 })
 
-test('king pushable keeps the king on the restricted-area diagonal before king closer', () => {
+test('king pushable keeps the king on the restricted-area diagonal within uncluttered survivors', () => {
   const fen = '8/8/7B/8/8/4K3/6k1/1B6 w - - 0 1'
   const along = scoreTwoBishopsWhiteMove(fen, 'Kf4')
   const away = scoreTwoBishopsWhiteMove(fen, 'Ke2')
@@ -946,17 +941,15 @@ test('king pushable keeps the king on the restricted-area diagonal before king c
   assert.ok(rule.compare(along, away) < 0)
   assert.equal(rule.compare(along, bishopWait), 0)
   const idealMoves = getMateRuleSet('two-bishops').idealWhiteMoves(fen)
-  assert.ok(idealMoves.includes('Kf4'))
-  assert.ok(!idealMoves.includes('Ke2'))
-  assert.ok(
-    idealMoves.every(
-      (san) =>
-        scoreTwoBishopsWhiteMove(fen, san).kingPushableDistance === 0,
-    ),
+  assert.deepEqual(idealMoves, ['Bg5'])
+  assert.equal(
+    getMateRuleSet('two-bishops').explainWhiteMove(fen, 'Kf4')?.id,
+    'unclutter bishops',
   )
+  assert.ok(!idealMoves.includes('Ke2'))
   assert.equal(
     getMateRuleSet('two-bishops').explainWhiteMove(fen, 'Ke2')?.id,
-    'king pushable',
+    'unclutter bishops',
   )
 
   const sourceMove = getChess(fen)
@@ -979,21 +972,6 @@ test('king pushable keeps the king on the restricted-area diagonal before king c
     )
     assert.equal(transformedScore.kingPushableApplies, true, transform.name)
     assert.equal(transformedScore.kingPushableDistance, 0, transform.name)
-    const transformedIdealMoves = getMateRuleSet(
-      'two-bishops',
-    ).idealWhiteMoves(transformedFen)
-    assert.ok(
-      transformedIdealMoves.includes(transformedMove.san),
-      transform.name,
-    )
-    assert.ok(
-      transformedIdealMoves.every(
-        (san) =>
-          scoreTwoBishopsWhiteMove(transformedFen, san)
-            .kingPushableDistance === 0,
-      ),
-      transform.name,
-    )
   }
 })
 
@@ -1011,8 +989,9 @@ test("king pushable keeps White's king outside Black's restricted area", () => {
   assert.equal(expected.kingPushableDistance, 1)
   assert.equal(tiedDistance.kingPushableDistance, 1)
   assert.equal(inside.kingPushableDistance, 1)
-  assert.deepEqual(ruleSet.idealWhiteMoves(fen), ['Kd4'])
-  assert.equal(ruleSet.explainWhiteMove(fen, 'Ke2')?.id, 'king pushable')
+  assert.deepEqual(ruleSet.idealWhiteMoves(fen), ['Ba4'])
+  assert.equal(ruleSet.explainWhiteMove(fen, 'Kd4')?.id, 'unclutter bishops')
+  assert.equal(ruleSet.explainWhiteMove(fen, 'Ke2')?.id, 'unclutter bishops')
 
   const sourceMove = getChess(fen)
     .moves({ verbose: true })
@@ -1039,11 +1018,6 @@ test("king pushable keeps White's king outside Black's restricted area", () => {
       transform.name,
     )
     assert.equal(transformedScore.kingPushableDistance, 1, transform.name)
-    assert.deepEqual(
-      getMateRuleSet('two-bishops').idealWhiteMoves(transformedFen),
-      [transformedMove.san],
-      transform.name,
-    )
   }
 })
 
@@ -1254,7 +1228,8 @@ test('king closer scores Phase 1 bishop moves after cage exclusion', () => {
   const kingCloser = twoBishopsWhiteRules.find(({ id }) => id === 'king closer')
   assert.ok(kingCloser?.compare)
   assert.ok(kingCloser.compare(bishopMove, kingMove) < 0)
-  assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'restricted area')
+  assert.deepEqual(ruleSet.idealWhiteMoves(fen), ['Ke7'])
+  assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'king closer')
 })
 
 test('king closer prefers proximity to the middle sixteen after distance ties', () => {
@@ -1411,7 +1386,8 @@ test('unclutter bishops prefers fewer bishops within two king steps of a corner'
   assert.equal(clear.clutteredBishopsCount, 0)
   assert.equal(cluttered.clutteredBishopsCount, 1)
   assert.ok(unclutter?.compare)
-  assert.equal(unclutter.applies?.(clear), false)
+  assert.equal(clear.isPhaseTwoPosition, false)
+  assert.equal(unclutter.applies, undefined)
   assert.ok(unclutter.compare(clear, cluttered) < 0)
 
   const phaseTwoFen = '2k5/8/4K3/8/5B2/5B2/8/8 w - - 4 3'
@@ -1419,7 +1395,6 @@ test('unclutter bishops prefers fewer bishops within two king steps of a corner'
   const phaseTwoCluttered = scoreTwoBishopsWhiteMove(phaseTwoFen, 'Bc7')
   assert.equal(phaseTwoClear.isPhaseTwoPosition, true)
   assert.equal(phaseTwoCluttered.isPhaseTwoPosition, true)
-  assert.equal(unclutter.applies?.(phaseTwoClear), true)
   assert.ok(unclutter.compare(phaseTwoClear, phaseTwoCluttered) < 0)
 })
 
