@@ -23,6 +23,15 @@ const martianConclaveStepFen = getChess(
 const phaseTwoWallFen = getChess(
   '2k5/8/4K3/8/5B2/5B2/8/8 w - - 4 3',
 ).fen()
+const shepherdFen = getChess(
+  '3k4/6BB/4K3/8/8/8/8/8 w - - 0 1',
+).fen()
+const degeneratePhaseTwoOppositionFen = getChess(
+  '6k1/1B6/4K3/8/3B4/8/8/8 w - - 0 1',
+).fen()
+const degenerateMatePrepFen = getChess(
+  '6k1/8/5K2/8/3B4/5B2/8/8 w - - 0 1',
+).fen()
 const degenerateMateInFourFen = getChess(
   '8/k7/2KB4/8/2B5/8/8/8 w - - 2 2',
 ).fen()
@@ -73,6 +82,9 @@ const degenerateReformWallFen = getChess(
 ).fen()
 for (const [label, fen] of [
   ['phase 2 wall', phaseTwoWallFen],
+  ['shepherd', shepherdFen],
+  ['degenerate phase 2 opposition', degeneratePhaseTwoOppositionFen],
+  ['degenerate mate prep', degenerateMatePrepFen],
   ['degenerate mate in 4', degenerateMateInFourFen],
   ['degenerate knight-step control', degenerateKnightStepControlFen],
   ['degenerate wall waiting move', degenerateWallWaitingMoveFen],
@@ -125,6 +137,15 @@ export const TWO_BISHOPS_DIAGRAM_POSITIONS = {
       { square: 'b7', kind: 'zone' },
     ],
   },
+  shepherd: {
+    phase: '2/2',
+    fen: ${JSON.stringify(shepherdFen)},
+    highlights: [
+      { square: 'a8', kind: 'key' },
+      { square: 'f8', kind: 'zone' },
+    ],
+    arrow: { from: 'e6', to: 'd6' },
+  },
   proximateWall: {
     pieces: [
       { square: 'd4', piece: 'B' },
@@ -148,6 +169,16 @@ export const TWO_BISHOPS_DIAGRAM_POSITIONS = {
   conclaveStep: {
     fen: ${JSON.stringify(conclaveStepFen)},
     arrow: { from: 'f5', to: 'e4' },
+  },
+  degeneratePhaseTwoOpposition: {
+    phase: '2/2',
+    fen: ${JSON.stringify(degeneratePhaseTwoOppositionFen)},
+    arrow: { from: 'e6', to: 'f6' },
+  },
+  degenerateMatePrep: {
+    phase: '2/2',
+    fen: ${JSON.stringify(degenerateMatePrepFen)},
+    arrow: { from: 'f6', to: 'g6' },
   },
   degenerateMateInFour: {
     phase: '2/2',
@@ -189,6 +220,7 @@ export const TWO_BISHOPS_DIAGRAM_POSITIONS = {
     highlights: [
       { square: 'f8', kind: 'zone' },
       { square: 'h5', kind: 'zone' },
+      { square: 'h6', kind: 'zone' },
     ],
     arrow: { from: 'b7', to: 'f3' },
   },
@@ -281,6 +313,11 @@ process.stdout.write(`conclave step: ${conclaveStepFen}\n`)
 process.stdout.write(`reverse conclave step: ${reverseConclaveStepFen}\n`)
 process.stdout.write(`martian conclave step: ${martianConclaveStepFen}\n`)
 process.stdout.write(`phase 2 wall: ${phaseTwoWallFen}\n`)
+process.stdout.write(`shepherd: ${shepherdFen}\n`)
+process.stdout.write(
+  `degenerate phase 2 opposition: ${degeneratePhaseTwoOppositionFen}\n`,
+)
+process.stdout.write(`degenerate mate prep: ${degenerateMatePrepFen}\n`)
 process.stdout.write(`degenerate mate in 4: ${degenerateMateInFourFen}\n`)
 process.stdout.write(
   `degenerate knight-step control: ${degenerateKnightStepControlFen}\n`,

@@ -52,14 +52,17 @@ export type TwoBishopsWhiteMoveScore = {
   readonly mateInThreeTurns: number
   readonly phaseTwoWallApplies: boolean
   readonly phaseTwoWallPenalty: number
+  readonly shepherdApplies: boolean
+  readonly shepherdPenalty: number
   readonly sequesterApplies: boolean
   readonly sequesterHasTargetCorner: boolean
+  readonly sequesterCornerDiagonalsTarget: boolean
+  readonly sequesterTargetCornerScore: number
   readonly sequesterCurrentCornerDistance: number
   readonly sequesterMaximumCornerReplyDistance: number
   readonly sequesterTwoAwayControlPenalty: number
   readonly sequesterIsBishopMove: boolean
   readonly bishopsOnBlackEdgeCount: number
-  readonly bishopsAwayCosineAlignment: number
   readonly forcePhaseTwoApplies: boolean
   readonly forcePhaseTwoPenalty: number
   readonly conclaveStepPenalty: number
@@ -128,6 +131,8 @@ type DegenerateRepair = {
 }
 
 const TWO_BISHOPS_DEGENERATE_REASON_LABELS = {
+  phaseTwoOpposition: 'degenerate — phase 2 opposition',
+  matePrep: 'degenerate — mate prep',
   mateInFour: 'degenerate — mate in 4',
   knightStepControl: 'degenerate — knight-step control',
   wallWaitingMove: 'degenerate — wall waiting move',
@@ -150,6 +155,8 @@ type TwoBishopsDegenerateReasonLabel =
   (typeof TWO_BISHOPS_DEGENERATE_REASON_LABELS)[keyof typeof TWO_BISHOPS_DEGENERATE_REASON_LABELS]
 
 export const TWO_BISHOPS_DEGENERATE_PRIORITY_ORDER = [
+  TWO_BISHOPS_DEGENERATE_REASON_LABELS.phaseTwoOpposition,
+  TWO_BISHOPS_DEGENERATE_REASON_LABELS.matePrep,
   TWO_BISHOPS_DEGENERATE_REASON_LABELS.mateInFour,
   TWO_BISHOPS_DEGENERATE_REASON_LABELS.knightStepControl,
   TWO_BISHOPS_DEGENERATE_REASON_LABELS.wallWaitingMove,
@@ -180,9 +187,33 @@ const twoBishopsHelp: RuleHelp = {
   ],
   notes: [
     "Phase 2: Black's king forced to the edge, White's king two steps away from Black's king.",
-    "Target corner: Calculate after White's move. If a two-square bishop wall forces every Black reply along the edge in one direction, use that corner. Otherwise, use the corner where White has the better relative king race; on a tie, use the nearest wall to cage Black, retaining both corners if still tied.",
+    "Target corner: Calculate after White's move in Phase 2. In the corner-diagonals position, its cutoff points to the opposite corner and continues to do so when Black steps around that corner. Otherwise, when the kings are in opposition and more bishops stand on one physical side of White's king, choose the opposite corner. When deciding between bishop moves, prefer the stronger bishop majority. Otherwise, choose the corner where White wins the king race by the greatest Chebyshev-distance lead. If neither method decides, choose the corner closest to White's king. Retain tied corners.",
   ],
   noteBoards: [
+    {
+      id: 'bishop-degenerate-phase-two-opposition',
+      title: 'degenerate — phase 2 opposition',
+      caption: 'Take opposition with the king.',
+      layout: { files: 8, ranks: 8, fileOffset: 0 },
+      pieces: noteBoardPieces(
+        TWO_BISHOPS_DIAGRAM_POSITIONS.degeneratePhaseTwoOpposition.fen,
+      ),
+      highlights: [],
+      arrows: [
+        TWO_BISHOPS_DIAGRAM_POSITIONS.degeneratePhaseTwoOpposition.arrow,
+      ],
+    },
+    {
+      id: 'bishop-degenerate-mate-prep',
+      title: 'degenerate — mate prep',
+      caption: 'Take opposition with the king.',
+      layout: { files: 8, ranks: 8, fileOffset: 0 },
+      pieces: noteBoardPieces(
+        TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateMatePrep.fen,
+      ),
+      highlights: [],
+      arrows: [TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateMatePrep.arrow],
+    },
     {
       id: 'bishop-degenerate-mate-in-four',
       title: 'degenerate — mate in 4',
@@ -227,7 +258,7 @@ const twoBishopsHelp: RuleHelp = {
       id: 'bishop-degenerate-corner-diagonals',
       title: 'degenerate — corner diagonals',
       caption:
-        "Preserve one bishop's control of f8. Ensure the other bishop controls h5.",
+        "Preserve one bishop's control of f8 and the other's control of h5, or tighten the h5 cutoff by controlling h6. The cutoff still identifies h8 after Black steps around the corner.",
       layout: { files: 8, ranks: 8, fileOffset: 0 },
       pieces: noteBoardPieces(
         TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateCornerDiagonals.fen,
@@ -382,6 +413,16 @@ const twoBishopsHelp: RuleHelp = {
       layout: { files: 8, ranks: 8, fileOffset: 0 },
       pieces: TWO_BISHOPS_DIAGRAM_POSITIONS.matingPosition.pieces,
       highlights: TWO_BISHOPS_DIAGRAM_POSITIONS.matingPosition.highlights,
+    },
+    {
+      id: 'bishop-shepherd',
+      title: 'shepherd',
+      caption:
+        'With the far edge square controlled, take opposition toward the target corner.',
+      layout: { files: 8, ranks: 8, fileOffset: 0 },
+      pieces: noteBoardPieces(TWO_BISHOPS_DIAGRAM_POSITIONS.shepherd.fen),
+      highlights: TWO_BISHOPS_DIAGRAM_POSITIONS.shepherd.highlights,
+      arrows: [TWO_BISHOPS_DIAGRAM_POSITIONS.shepherd.arrow],
     },
     {
       id: 'bishop-phase-two-wall',
@@ -598,8 +639,8 @@ function getControlledPhaseTwoWalls(
 ): readonly PhaseTwoWall[] {
   return walls.filter(
     (wall) =>
-      kingDistance(whiteKing, wall.edgeSquare) > 1 &&
-      kingDistance(whiteKing, wall.inwardSquare) > 1 &&
+      manhattanDistance(whiteKing, wall.edgeSquare) > 1 &&
+      manhattanDistance(whiteKing, wall.inwardSquare) > 1 &&
       bishopsControlPhaseTwoWall(fen, bishops, wall),
   )
 }
@@ -614,101 +655,141 @@ function getBlackEdgeCorners(blackKing: Square): readonly Square[] {
   return []
 }
 
-function getResultTargetCorners(
+function getResultTargetCornerSelection(
+  startingFen: string,
   blackKing: Square | undefined,
   whiteKing: Square | undefined,
-  chess: ReturnType<typeof getChess>,
   bishops: readonly Square[],
-  blackReplyKings: readonly Square[],
-): readonly Square[] {
-  if (!blackKing || !whiteKing) return []
+): {
+  readonly corners: readonly Square[]
+  readonly score: number
+  readonly cornerDiagonalsTarget: boolean
+} {
+  if (!blackKing || !whiteKing) {
+    return { corners: [], score: 0, cornerDiagonalsTarget: false }
+  }
   const edgeCorners = getBlackEdgeCorners(blackKing)
-  if (edgeCorners.length <= 1) return edgeCorners
+  if (edgeCorners.length <= 1) {
+    return {
+      corners: edgeCorners,
+      score: 0,
+      cornerDiagonalsTarget: false,
+    }
+  }
 
   const black = squareCoordinates(blackKing)
   const edgeAxis = black.file === 0 || black.file === 7 ? 'rank' : 'file'
-  const fixedAxis = edgeAxis === 'rank' ? 'file' : 'rank'
-  const controlledWalls = getControlledPhaseTwoWalls(
-    chess.fen(),
-    bishops,
-    getAllPhaseTwoWalls(blackKing),
-    whiteKing,
-  )
-  const directions = blackReplyKings.map((reply) => {
-    const coordinates = squareCoordinates(reply)
-    if (coordinates[fixedAxis] !== black[fixedAxis]) return 0
-    return Math.sign(coordinates[edgeAxis] - black[edgeAxis])
-  })
-  if (
-    blackReplyKings.length > 0 &&
-    controlledWalls.length > 0 &&
-    directions.every((direction) => direction !== 0) &&
-    directions.every((direction) => direction === directions[0])
-  ) {
-    const direction = directions[0]!
-    return edgeCorners.filter((corner) => {
-      const cornerAxis = squareCoordinates(corner)[edgeAxis]
-      return Math.sign(cornerAxis - black[edgeAxis]) === direction
-    })
+  const getFixedTargetStrength = (targetCorner: Square): number => {
+    const whiteAxis = squareCoordinates(whiteKing)[edgeAxis]
+    const targetDirection = Math.sign(
+      squareCoordinates(targetCorner)[edgeAxis] - whiteAxis,
+    )
+    const supportingBishops = bishops.filter(
+      (bishop) =>
+        Math.sign(squareCoordinates(bishop)[edgeAxis] - whiteAxis) ===
+        -targetDirection,
+    ).length
+    return Math.max(1, supportingBishops)
   }
-
-  const raceScores = edgeCorners.map(
-    (corner) =>
-      kingDistance(whiteKing, corner) - kingDistance(blackKing, corner),
-  )
-  const minimumRaceScore = Math.min(...raceScores)
-  const raceWinners = edgeCorners.filter(
-    (_, index) => raceScores[index] === minimumRaceScore,
-  )
-  if (raceWinners.length <= 1 || controlledWalls.length === 0) {
-    return raceWinners
-  }
-
-  const blackAxis = black[edgeAxis]
-  const wallDirections = controlledWalls.map(({ edgeSquare }) => {
-    const wallAxis = squareCoordinates(edgeSquare)[edgeAxis]
-    return {
-      distance: Math.abs(blackAxis - wallAxis),
-      targetAxis: wallAxis > blackAxis ? 0 : 7,
+  const startingBishops = getWhiteBishopSquares(startingFen)
+  for (const transform of SQUARE_TRANSFORMS) {
+    if (whiteKing !== transformSquare('f6', transform)) {
+      continue
     }
-  })
-  const nearestWallDistance = Math.min(
-    ...wallDirections.map(({ distance }) => distance),
-  )
-  const nearestTargetAxes = new Set(
-    wallDirections
-      .filter(({ distance }) => distance === nearestWallDistance)
-      .map(({ targetAxis }) => targetAxis),
-  )
-  const wallWinners = raceWinners.filter((corner) =>
-    nearestTargetAxes.has(squareCoordinates(corner)[edgeAxis]),
-  )
-  return wallWinners.length === 1 ? wallWinners : raceWinners
-}
+    const heldSquare = transformSquare('f8', transform)
+    const cutoffSquare = transformSquare('h5', transform)
+    const cutoffBishop = startingBishops.find(
+      (bishop) =>
+        bishop !== cutoffSquare &&
+        bishopHasClearLineToSquare(startingFen, bishop, cutoffSquare),
+    )
+    if (
+      blackKing === transformSquare('g8', transform) &&
+      cutoffBishop
+    ) {
+      const targetCorner = transformSquare('h8', transform)
+      return {
+        corners: [targetCorner],
+        score: getFixedTargetStrength(targetCorner),
+        cornerDiagonalsTarget: true,
+      }
+    }
+    if (blackKing !== transformSquare('h7', transform)) continue
+    const heldBishop = startingBishops.find(
+      (bishop) =>
+        bishop !== heldSquare &&
+        bishopHasClearLineToSquare(startingFen, bishop, heldSquare),
+    )
+    if (heldBishop && cutoffBishop && heldBishop !== cutoffBishop) {
+      const targetCorner = transformSquare('h8', transform)
+      return {
+        corners: [targetCorner],
+        score: getFixedTargetStrength(targetCorner),
+        cornerDiagonalsTarget: true,
+      }
+    }
+  }
 
-function cosineEdgeTargetBishop(
-  blackKing: Square,
-  targetCorner: Square,
-  bishop: Square,
-): number {
-  const black = squareCoordinates(blackKing)
-  const target = squareCoordinates(targetCorner)
-  const piece = squareCoordinates(bishop)
-  const fileDelta = piece.file - target.file
-  const rankDelta = piece.rank - target.rank
-  const magnitude = Math.hypot(fileDelta, rankDelta)
-  if (magnitude === 0) return 0
+  if (isInOpposition(whiteKing, blackKing, 1)) {
+    const whiteAxis = squareCoordinates(whiteKing)[edgeAxis]
+    const physicalSideCount = bishops.reduce(
+      (sum, bishop) =>
+        sum + Math.sign(squareCoordinates(bishop)[edgeAxis] - whiteAxis),
+      0,
+    )
+    if (physicalSideCount !== 0) {
+      const targetCoordinate =
+        physicalSideCount > 0
+          ? Math.min(
+              ...edgeCorners.map(
+                (corner) => squareCoordinates(corner)[edgeAxis],
+              ),
+            )
+          : Math.max(
+              ...edgeCorners.map(
+                (corner) => squareCoordinates(corner)[edgeAxis],
+              ),
+            )
+      return {
+        corners: edgeCorners.filter(
+          (corner) =>
+            squareCoordinates(corner)[edgeAxis] === targetCoordinate,
+        ),
+        score: Math.abs(physicalSideCount),
+        cornerDiagonalsTarget: false,
+      }
+    }
+  }
 
-  if (BOARD_CORNERS.includes(blackKing)) {
-    return Math.max(Math.abs(fileDelta), Math.abs(rankDelta)) / magnitude
+  const races = edgeCorners.map((corner) => ({
+    corner,
+    whiteDistance: kingDistance(whiteKing, corner),
+    lead:
+      kingDistance(blackKing, corner) -
+      kingDistance(whiteKing, corner),
+  }))
+  const winningRaces = races.filter(({ lead }) => lead > 0)
+  if (winningRaces.length > 0) {
+    const bestLead = Math.max(...winningRaces.map(({ lead }) => lead))
+    return {
+      corners: winningRaces
+        .filter(({ lead }) => lead === bestLead)
+        .map(({ corner }) => corner),
+      score: bestLead,
+      cornerDiagonalsTarget: false,
+    }
   }
-  if (black.file === 0 || black.file === 7) {
-    return Math.abs(rankDelta) / magnitude
+
+  const closestWhiteDistance = Math.min(
+    ...races.map(({ whiteDistance }) => whiteDistance),
+  )
+  return {
+    corners: races
+      .filter(({ whiteDistance }) => whiteDistance === closestWhiteDistance)
+      .map(({ corner }) => corner),
+    score: 0,
+    cornerDiagonalsTarget: false,
   }
-  if (black.rank === 0 || black.rank === 7) {
-    return Math.abs(fileDelta) / magnitude
-  }
-  return 0
 }
 
 function getSequesterTwoAwaySquares(
@@ -730,6 +811,53 @@ function getSequesterTwoAwaySquares(
     )
   }
   return candidates.filter((square): square is Square => square !== null)
+}
+
+function getShepherdMoves(
+  fen: string,
+  blackKing: Square | undefined,
+  whiteKing: Square | undefined,
+  bishops: readonly Square[],
+): readonly string[] {
+  if (!blackKing || !whiteKing) return []
+  const twoAwaySquares = getSequesterTwoAwaySquares(blackKing)
+  if (twoAwaySquares.length === 0) return []
+
+  return getChess(fen)
+    .moves({ verbose: true })
+    .filter((move) => {
+      if (
+        move.piece !== 'k' ||
+        !isInOpposition(move.to, blackKing, 1)
+      ) {
+        return false
+      }
+      const targetCorners = getResultTargetCornerSelection(
+        fen,
+        blackKing,
+        move.to,
+        bishops,
+      ).corners
+      return targetCorners.some((targetCorner) => {
+        if (
+          kingDistance(move.to, targetCorner) >=
+          kingDistance(whiteKing, targetCorner)
+        ) {
+          return false
+        }
+        return twoAwaySquares.some(
+          (twoAwaySquare) =>
+            kingDistance(twoAwaySquare, targetCorner) >
+              kingDistance(blackKing, targetCorner) &&
+            bishops.some(
+              (bishop) =>
+                bishop !== twoAwaySquare &&
+                bishopHasClearLineToSquare(fen, bishop, twoAwaySquare),
+            ),
+        )
+      })
+    })
+    .map(({ san }) => san)
 }
 
 function bishopHasClearLineToSquare(
@@ -784,6 +912,8 @@ function getCornerDiagonalsDegenerateRepair(
 
     const heldSquare = transformSquare('f8', transform)
     const targetSquare = transformSquare('h5', transform)
+    const interveningEdgeSquare = transformSquare('h6', transform)
+    const forbiddenTargetBishopSquare = transformSquare('f7', transform)
     const holdingBishop = bishops.find(
       (bishop) =>
         bishop !== heldSquare &&
@@ -797,7 +927,7 @@ function getCornerDiagonalsDegenerateRepair(
         after.move(move.san)
         const resultFen = after.fen()
         const resultBishops = getWhiteBishopSquares(resultFen)
-        return resultBishops.some(
+        const preservesBothControls = resultBishops.some(
           (heldBishop) =>
             heldBishop !== heldSquare &&
             bishopHasClearLineToSquare(
@@ -809,6 +939,7 @@ function getCornerDiagonalsDegenerateRepair(
               (targetBishop) =>
                 targetBishop !== heldBishop &&
                 targetBishop !== targetSquare &&
+                targetBishop !== forbiddenTargetBishopSquare &&
                 bishopHasClearLineToSquare(
                   resultFen,
                   targetBishop,
@@ -816,6 +947,19 @@ function getCornerDiagonalsDegenerateRepair(
                 ),
             ),
         )
+        const advancesEdgeCutoff =
+          !resultBishops.includes(heldSquare) &&
+          resultBishops.some((bishop) =>
+            bishopHasClearLineToSquare(resultFen, bishop, targetSquare),
+          ) &&
+          resultBishops.some((bishop) =>
+            bishopHasClearLineToSquare(
+              resultFen,
+              bishop,
+              interveningEdgeSquare,
+            ),
+          )
+        return preservesBothControls || advancesEdgeCutoff
       })
       .map((move) => move.san)
     if (allowedSans.length > 0) {
@@ -994,6 +1138,91 @@ function getMateInFourDegenerateRepair(
         to: target,
         stopAfterRepair: true,
         reasonLabel: TWO_BISHOPS_DEGENERATE_REASON_LABELS.mateInFour,
+      }
+    }
+  }
+  return null
+}
+
+function getMatePrepDegenerateRepair(
+  fen: string,
+  blackKing: Square,
+  whiteKing: Square,
+  bishops: readonly Square[],
+): DegenerateRepair | null {
+  const legalMoves = getChess(fen).moves({ verbose: true })
+  const bishopSet = new Set(bishops)
+
+  for (const transform of SQUARE_TRANSFORMS) {
+    const expectedBlackKing = transformSquare('g8', transform)
+    const expectedWhiteKing = transformSquare('f6', transform)
+    const expectedBishops = [
+      transformSquare('d4', transform),
+      transformSquare('f3', transform),
+    ]
+    const target = transformSquare('g6', transform)
+    if (
+      blackKing !== expectedBlackKing ||
+      whiteKing !== expectedWhiteKing ||
+      !expectedBishops.every((square) => bishopSet.has(square))
+    ) {
+      continue
+    }
+    const repairIsLegal = legalMoves.some(
+      (move) =>
+        move.piece === 'k' &&
+        move.from === expectedWhiteKing &&
+        move.to === target,
+    )
+    if (repairIsLegal) {
+      return {
+        from: expectedWhiteKing,
+        to: target,
+        stopAfterRepair: true,
+        reasonLabel: TWO_BISHOPS_DEGENERATE_REASON_LABELS.matePrep,
+      }
+    }
+  }
+  return null
+}
+
+function getPhaseTwoOppositionDegenerateRepair(
+  fen: string,
+  blackKing: Square,
+  whiteKing: Square,
+  bishops: readonly Square[],
+): DegenerateRepair | null {
+  const legalMoves = getChess(fen).moves({ verbose: true })
+  const bishopSet = new Set(bishops)
+
+  for (const transform of SQUARE_TRANSFORMS) {
+    const expectedBlackKing = transformSquare('g8', transform)
+    const expectedWhiteKing = transformSquare('e6', transform)
+    const expectedBishops = [
+      transformSquare('b7', transform),
+      transformSquare('d4', transform),
+    ]
+    const target = transformSquare('f6', transform)
+    if (
+      blackKing !== expectedBlackKing ||
+      whiteKing !== expectedWhiteKing ||
+      !expectedBishops.every((square) => bishopSet.has(square))
+    ) {
+      continue
+    }
+    const repairIsLegal = legalMoves.some(
+      (move) =>
+        move.piece === 'k' &&
+        move.from === expectedWhiteKing &&
+        move.to === target,
+    )
+    if (repairIsLegal) {
+      return {
+        from: expectedWhiteKing,
+        to: target,
+        stopAfterRepair: true,
+        reasonLabel:
+          TWO_BISHOPS_DEGENERATE_REASON_LABELS.phaseTwoOpposition,
       }
     }
   }
@@ -1628,6 +1857,24 @@ function getDegenerateRepair(
     TwoBishopsDegenerateReasonLabel,
     () => DegenerateRepair | null
   > = {
+    [TWO_BISHOPS_DEGENERATE_REASON_LABELS.phaseTwoOpposition]: () =>
+      isPhaseTwo
+        ? getPhaseTwoOppositionDegenerateRepair(
+            fen,
+            blackKing,
+            whiteKing,
+            bishops,
+          )
+        : null,
+    [TWO_BISHOPS_DEGENERATE_REASON_LABELS.matePrep]: () =>
+      isPhaseTwo
+        ? getMatePrepDegenerateRepair(
+            fen,
+            blackKing,
+            whiteKing,
+            bishops,
+          )
+        : null,
     [TWO_BISHOPS_DEGENERATE_REASON_LABELS.mateInFour]: () =>
       isPhaseTwo
         ? getMateInFourDegenerateRepair(
@@ -1875,6 +2122,7 @@ type TwoBishopsWhitePositionContext = {
   readonly degenerateRepair: DegenerateRepair | null
   readonly mateInThreeApplies: boolean
   readonly matePatternTurnsBySan: ReadonlyMap<string, 2 | 3>
+  readonly shepherdMoves: readonly string[]
   readonly hasStartingWallPosition: boolean
   readonly proximateWall: ProximateBishopWall | null
 }
@@ -1903,6 +2151,15 @@ function createTwoBishopsWhitePositionContext(
     degenerateRepair,
     mateInThreeApplies: matePatternTurnsBySan.size > 0,
     matePatternTurnsBySan,
+    shepherdMoves:
+      isPhaseTwo
+        ? getShepherdMoves(
+            fen,
+            blackKing,
+            startingWhiteKing,
+            startingBishops,
+          )
+        : [],
     hasStartingWallPosition:
       blackKing !== undefined &&
       startingBishops.some((bishop) =>
@@ -1941,6 +2198,7 @@ function scoreTwoBishopsWhiteMoveWithContext(
     degenerateRepair,
     mateInThreeApplies,
     matePatternTurnsBySan,
+    shepherdMoves,
     hasStartingWallPosition,
     proximateWall,
   } = context
@@ -1973,13 +2231,15 @@ function scoreTwoBishopsWhiteMoveWithContext(
       return findPiece(replyChess.fen(), 'b', 'k')?.square
     })
     .filter((square): square is Square => square !== undefined)
-  const targetCorners = getResultTargetCorners(
-    blackKing,
-    resultWhiteKingSquare,
-    chess,
-    resultBishops,
-    blackReplyKings,
-  )
+  const targetSelection = isPhaseTwo
+      ? getResultTargetCornerSelection(
+          fen,
+          blackKing,
+          resultWhiteKingSquare,
+          resultBishops,
+        )
+    : { corners: [], score: 0, cornerDiagonalsTarget: false }
+  const targetCorners = targetSelection.corners
   const phaseTwoWalls =
     isPhaseTwo && blackKing
       ? targetCorners.flatMap((corner) =>
@@ -2012,18 +2272,6 @@ function scoreTwoBishopsWhiteMoveWithContext(
               ...blackReplyKings.map((square) =>
                 manhattanDistance(square, corner),
               ),
-            ),
-          ),
-        )
-  const bishopsAwayCosineAlignment =
-    blackKing === undefined || targetCorners.length === 0
-      ? 0
-      : Math.max(
-          ...targetCorners.map((corner) =>
-            resultBishops.reduce(
-              (sum, bishop) =>
-                sum + cosineEdgeTargetBishop(blackKing, corner, bishop),
-              0,
             ),
           ),
         )
@@ -2067,8 +2315,19 @@ function scoreTwoBishopsWhiteMoveWithContext(
         : 99,
     phaseTwoWallApplies: phaseTwoWalls.length > 0,
     phaseTwoWallPenalty: resultHasPhaseTwoWall ? 0 : 1,
+    shepherdApplies: shepherdMoves.length > 0,
+    shepherdPenalty: shepherdMoves.includes(move.san) ? 0 : 1,
     sequesterApplies: isPhaseTwo,
     sequesterHasTargetCorner: targetCorners.length > 0,
+    sequesterCornerDiagonalsTarget:
+      targetSelection.cornerDiagonalsTarget,
+    sequesterTargetCornerScore:
+      move.piece === 'k' &&
+      blackKing !== undefined &&
+      resultWhiteKingSquare !== undefined &&
+      isInOpposition(resultWhiteKingSquare, blackKing, 1)
+        ? 0
+        : targetSelection.score,
     sequesterCurrentCornerDistance: currentCornerDistance,
     sequesterMaximumCornerReplyDistance: maximumCornerReplyDistance,
     sequesterTwoAwayControlPenalty:
@@ -2088,7 +2347,6 @@ function scoreTwoBishopsWhiteMoveWithContext(
         : 1,
     sequesterIsBishopMove: move.piece === 'b',
     bishopsOnBlackEdgeCount,
-    bishopsAwayCosineAlignment,
     forcePhaseTwoApplies: true,
     forcePhaseTwoPenalty:
       resultWhiteKingSquare !== undefined &&
@@ -2398,6 +2656,15 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
       first.forcePhaseTwoPenalty - second.forcePhaseTwoPenalty,
   },
   {
+    id: 'shepherd',
+    shortLabel: 'shepherd',
+    helpText:
+      "Phase 2: When a bishop controls the edge square 2 away from Black's king and further from the target square, take opposition, moving towards the target corner.",
+    applies: (score) => score.shepherdApplies,
+    compare: (first, second) =>
+      first.shepherdPenalty - second.shepherdPenalty,
+  },
+  {
     id: 'sequester',
     shortLabel: 'sequester',
     helpText:
@@ -2406,10 +2673,30 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
     subpriorities: [
       {
         compare: (first, second) =>
+          second.sequesterTargetCornerScore -
+          first.sequesterTargetCornerScore,
+      },
+      {
+        when: (scores) =>
+          scores.some(
+            (score) =>
+              score.sequesterMaximumCornerReplyDistance <
+              score.sequesterCurrentCornerDistance,
+          ),
+        compare: (first, second) =>
           first.sequesterMaximumCornerReplyDistance -
           first.sequesterCurrentCornerDistance -
           (second.sequesterMaximumCornerReplyDistance -
             second.sequesterCurrentCornerDistance),
+      },
+      {
+        when: (scores) =>
+          scores.every(
+            (score) => score.sequesterCornerDiagonalsTarget,
+          ),
+        compare: (first, second) =>
+          first.sequesterMaximumCornerReplyDistance -
+          second.sequesterMaximumCornerReplyDistance,
       },
       {
         when: (scores) =>
@@ -2431,22 +2718,6 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
     applies: (score) => score.isPhaseTwoPosition,
     compare: (first, second) =>
       first.bishopsOnBlackEdgeCount - second.bishopsOnBlackEdgeCount,
-  },
-  {
-    id: 'bishops away',
-    shortLabel: 'bishops away',
-    helpText:
-      'Phase 2: Maximize cosine(edge, target corner, bishop) for each bishop.',
-    applies: (score) => score.sequesterApplies,
-    subpriorities: [
-      {
-        when: (scores) =>
-          scores.every((score) => score.sequesterIsBishopMove),
-        compare: (first, second) =>
-          second.bishopsAwayCosineAlignment -
-          first.bishopsAwayCosineAlignment,
-      },
-    ],
   },
   {
     id: 'phase 2 wall',

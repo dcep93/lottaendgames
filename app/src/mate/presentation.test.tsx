@@ -1312,6 +1312,8 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
     queen: ['queen-phase-two-corner-cage'],
     rook: ['rook-phase-two-box'],
     'two-bishops': [
+      'bishop-degenerate-phase-two-opposition',
+      'bishop-degenerate-mate-prep',
       'bishop-degenerate-mate-in-four',
       'bishop-degenerate-knight-step-control',
       'bishop-degenerate-wall-waiting-move',
@@ -1329,6 +1331,7 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
       'bishop-degenerate-bishop-retreat',
       'bishop-degenerate-long-diagonal',
       'bishop-mating-position',
+      'bishop-shepherd',
       'bishop-phase-two-wall',
       'bishop-proximate-wall',
       'bishop-conclave-step',
@@ -1434,6 +1437,8 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
 
   const bishopsRuleSet = getMateRuleSet('two-bishops')
   const [
+    phaseTwoOppositionBoard,
+    matePrepBoard,
     mateInFourBoard,
     knightStepControlBoard,
     wallWaitingMoveBoard,
@@ -1451,12 +1456,15 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
     bishopRetreatBoard,
     longDiagonalBoard,
     matingPositionBoard,
+    shepherdBoard,
     phaseTwoWallBoard,
     proximateWallBoard,
     conclaveBoard,
     reverseConclaveBoard,
     martianConclaveBoard,
   ] = bishopsRuleSet.help.noteBoards
+  assert.ok(phaseTwoOppositionBoard)
+  assert.ok(matePrepBoard)
   assert.ok(mateInFourBoard)
   assert.ok(knightStepControlBoard)
   assert.ok(wallWaitingMoveBoard)
@@ -1474,14 +1482,31 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
   assert.ok(bishopRetreatBoard)
   assert.ok(longDiagonalBoard)
   assert.ok(matingPositionBoard)
+  assert.ok(shepherdBoard)
   assert.ok(phaseTwoWallBoard)
   assert.ok(proximateWallBoard)
   assert.ok(conclaveBoard)
   assert.ok(reverseConclaveBoard)
   assert.ok(martianConclaveBoard)
   assert.deepEqual(
+    shepherdBoard.highlights,
+    TWO_BISHOPS_DIAGRAM_POSITIONS.shepherd.highlights,
+  )
+  assert.deepEqual(
+    shepherdBoard.arrows,
+    [TWO_BISHOPS_DIAGRAM_POSITIONS.shepherd.arrow],
+  )
+  assert.deepEqual(
     proximateWallBoard.highlights,
     TWO_BISHOPS_DIAGRAM_POSITIONS.proximateWall.highlights,
+  )
+  assert.deepEqual(
+    phaseTwoOppositionBoard.arrows,
+    [TWO_BISHOPS_DIAGRAM_POSITIONS.degeneratePhaseTwoOpposition.arrow],
+  )
+  assert.deepEqual(
+    matePrepBoard.arrows,
+    [TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateMatePrep.arrow],
   )
   assert.deepEqual(
     mateInFourBoard.highlights,
@@ -1548,11 +1573,11 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
   ])
   assert.deepEqual(
     cornerDiagonalsBoard.highlights.map(({ square }) => square),
-    ['f8', 'h5'],
+    ['f8', 'h5', 'h6'],
   )
   assert.equal(
     cornerDiagonalsBoard.caption,
-    "Preserve one bishop's control of f8. Ensure the other bishop controls h5.",
+    "Preserve one bishop's control of f8 and the other's control of h5, or tighten the h5 cutoff by controlling h6. The cutoff still identifies h8 after Black steps around the corner.",
   )
   assert.deepEqual(edgeRepairBoard.arrows, [{ from: 'e1', to: 'd2' }])
   assert.deepEqual(edgeUnmaskBoard.arrows, [{ from: 'e1', to: 'd2' }])
@@ -1600,6 +1625,8 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
     />,
   )
   assert.match(bishopsMarkup, />conclave step</)
+  assert.match(bishopsMarkup, />degenerate — mate prep</)
+  assert.match(bishopsMarkup, /Take opposition with the king\./)
   assert.match(bishopsMarkup, />degenerate — mate in 4</)
   assert.match(bishopsMarkup, /With a6 controlled, play Kc7./)
   assert.match(bishopsMarkup, />reverse conclave step</)
@@ -1617,7 +1644,7 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
   assert.match(bishopsMarkup, />degenerate — corner diagonals</)
   assert.match(
     bishopsMarkup,
-    /Preserve one bishop&#x27;s control of f8\. Ensure the other bishop controls h5\./,
+    /Preserve one bishop&#x27;s control of f8 and the other&#x27;s control of h5, or tighten the h5 cutoff by controlling h6\./,
   )
   assert.doesNotMatch(bishopsMarkup, />degenerate — bishop advance</)
   assert.match(bishopsMarkup, />degenerate — edge repair</)
@@ -1634,11 +1661,19 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
   assert.match(bishopsMarkup, />degenerate — bishop retreat</)
   assert.match(bishopsMarkup, />degenerate — long diagonal</)
   assert.match(bishopsMarkup, />mating position</)
+  assert.match(bishopsMarkup, />shepherd</)
   assert.match(bishopsMarkup, />phase 2 wall</)
   assert.match(bishopsMarkup, />proximate bishop wall</)
   assert.match(bishopsMarkup, />sequester</)
   assert.match(bishopsMarkup, />bishops off edge</)
-  assert.match(bishopsMarkup, />bishops away</)
+  assert.match(
+    bishopsMarkup,
+    /When a bishop controls the edge square 2 away from Black&#x27;s king and further from the target square, take opposition, moving towards the target corner\./,
+  )
+  assert.match(
+    bishopsMarkup,
+    /With the far edge square controlled, take opposition toward the target corner\./,
+  )
   assert.match(
     bishopsMarkup,
     /Force Black&#x27;s king towards the target corner, or otherwise use a bishop to control the square 2 away from Black&#x27;s current square\./,
@@ -1647,10 +1682,8 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
     bishopsMarkup,
     /Prefer fewer bishops on Black&#x27;s edge./,
   )
-  assert.match(
-    bishopsMarkup,
-    /Maximize cosine\(edge, target corner, bishop\) for each bishop\./,
-  )
+  assert.doesNotMatch(bishopsMarkup, />bishops away</)
+  assert.doesNotMatch(bishopsMarkup, /Maximize cosine/)
   assert.doesNotMatch(bishopsMarkup, />take opposition</)
   assert.doesNotMatch(
     bishopsMarkup,
@@ -1666,13 +1699,13 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
   )
   assert.match(
     bishopsMarkup,
-    /Target corner: Calculate after White&#x27;s move\. If a two-square bishop wall forces every Black reply along the edge in one direction, use that corner\. Otherwise, use the corner where White has the better relative king race; on a tie, use the nearest wall to cage Black, retaining both corners if still tied\./,
+    /Target corner: Calculate after White&#x27;s move in Phase 2\. In the corner-diagonals position, its cutoff points to the opposite corner and continues to do so when Black steps around that corner\. Otherwise, when the kings are in opposition and more bishops stand on one physical side of White&#x27;s king, choose the opposite corner\. When deciding between bishop moves, prefer the stronger bishop majority\. Otherwise, choose the corner where White wins the king race by the greatest Chebyshev-distance lead\. If neither method decides, choose the corner closest to White&#x27;s king\. Retain tied corners\./,
   )
   assert.match(bishopsMarkup, /leg-mate-guide-note-boards--full/)
-  assert.equal(bishopsMarkup.match(/leg-mate-note-board--full/g)?.length, 22)
+  assert.equal(bishopsMarkup.match(/leg-mate-note-board--full/g)?.length, 25)
   assert.equal(
     bishopsMarkup.match(/data-highlight-kind="zone"/g)?.length,
-    33,
+    35,
   )
   assert.match(
     bishopsMarkup,
@@ -1683,15 +1716,15 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
     /Create or maintain a 2 square wall adjacent to Black&#x27;s king and opposite the target corner\./,
   )
   assert.ok(
+    bishopsMarkup.indexOf('>shepherd<') <
+      bishopsMarkup.indexOf('>sequester<'),
+  )
+  assert.ok(
     bishopsMarkup.indexOf('>sequester<') <
       bishopsMarkup.indexOf('>bishops off edge<'),
   )
   assert.ok(
     bishopsMarkup.indexOf('>bishops off edge<') <
-      bishopsMarkup.indexOf('>bishops away<'),
-  )
-  assert.ok(
-    bishopsMarkup.indexOf('>bishops away<') <
       bishopsMarkup.indexOf('>phase 2 wall<'),
   )
   assert.match(bishopsMarkup, /data-arrow="e1-d2"/)
@@ -1701,6 +1734,7 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
   assert.match(bishopsMarkup, /data-arrow="e5-f4"/)
   assert.match(bishopsMarkup, /data-arrow="f7-e8"/)
   assert.match(bishopsMarkup, /data-arrow="f5-e4"/)
+  assert.match(bishopsMarkup, /data-arrow="e6-d6"/)
 })
 
 test('mate guides omit empty notes and place useful notes before shortcuts', () => {

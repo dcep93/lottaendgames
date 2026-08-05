@@ -20,6 +20,15 @@ export const TWO_BISHOPS_DIAGRAM_POSITIONS = {
       { square: 'b7', kind: 'zone' },
     ],
   },
+  shepherd: {
+    phase: '2/2',
+    fen: "3k4/6BB/4K3/8/8/8/8/8 w - - 0 1",
+    highlights: [
+      { square: 'a8', kind: 'key' },
+      { square: 'f8', kind: 'zone' },
+    ],
+    arrow: { from: 'e6', to: 'd6' },
+  },
   proximateWall: {
     pieces: [
       { square: 'd4', piece: 'B' },
@@ -43,6 +52,16 @@ export const TWO_BISHOPS_DIAGRAM_POSITIONS = {
   conclaveStep: {
     fen: "8/8/8/4BB2/8/3K4/5k2/8 w - - 16 9",
     arrow: { from: 'f5', to: 'e4' },
+  },
+  degeneratePhaseTwoOpposition: {
+    phase: '2/2',
+    fen: "6k1/1B6/4K3/8/3B4/8/8/8 w - - 0 1",
+    arrow: { from: 'e6', to: 'f6' },
+  },
+  degenerateMatePrep: {
+    phase: '2/2',
+    fen: "6k1/8/5K2/8/3B4/5B2/8/8 w - - 0 1",
+    arrow: { from: 'f6', to: 'g6' },
   },
   degenerateMateInFour: {
     phase: '2/2',
@@ -84,6 +103,7 @@ export const TWO_BISHOPS_DIAGRAM_POSITIONS = {
     highlights: [
       { square: 'f8', kind: 'zone' },
       { square: 'h5', kind: 'zone' },
+      { square: 'h6', kind: 'zone' },
     ],
     arrow: { from: 'b7', to: 'f3' },
   },
