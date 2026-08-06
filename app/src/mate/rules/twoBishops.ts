@@ -959,14 +959,9 @@ function bishopHasClearLineToSquareOnBoard(
   bishop: Square,
   target: Square,
 ): boolean {
+  if (!bishopIsAlignedWithSquare(bishop, target)) return false
   const source = squareCoordinates(bishop)
   const destination = squareCoordinates(target)
-  if (
-    Math.abs(source.file - destination.file) !==
-    Math.abs(source.rank - destination.rank)
-  ) {
-    return false
-  }
   const fileStep = Math.sign(destination.file - source.file)
   const rankStep = Math.sign(destination.rank - source.rank)
   let file = source.file + fileStep
@@ -978,6 +973,19 @@ function bishopHasClearLineToSquareOnBoard(
     rank += rankStep
   }
   return true
+}
+
+function bishopIsAlignedWithSquare(
+  bishop: Square,
+  target: Square,
+): boolean {
+  const source = squareCoordinates(bishop)
+  const destination = squareCoordinates(target)
+  return (
+    bishop !== target &&
+    Math.abs(source.file - destination.file) ===
+      Math.abs(source.rank - destination.rank)
+  )
 }
 
 function getCornerDiagonalsDegenerateRepair(
@@ -2573,8 +2581,7 @@ function scoreTwoBishopsWhiteMoveWithContext(
     (target) =>
       resultBishops.some(
         (bishop) =>
-          bishop !== target &&
-          bishopHasClearLineToSquareOnBoard(chess, bishop, target),
+          bishopIsAlignedWithSquare(bishop, target),
       ),
   )
   const ruleYControlledAdjacentCount = Math.max(
@@ -3037,7 +3044,7 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
     id: 'rule z',
     shortLabel: 'rule z',
     helpText:
-      'Phase 1: Control the target square with a bishop without checking, unless following rule v.',
+      'Phase 1: Control or x ray the target square with a bishop without checking, unless following rule v.',
     applies: (score) => score.ruleZApplies,
     subpriorities: [
       {

@@ -1809,7 +1809,7 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
   )
   assert.match(
     bishopsMarkup,
-    />rule z<[^]*Control the target square with a bishop without checking, unless following rule v\./,
+    />rule z<[^]*Control or x ray the target square with a bishop without checking, unless following rule v\./,
   )
   assert.match(
     bishopsMarkup,
