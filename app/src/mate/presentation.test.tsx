@@ -1811,6 +1811,10 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
     bishopsMarkup,
     />rule v<[^]*If the king already controls the target square, check the king, from not the target square\./,
   )
+  assert.match(
+    bishopsMarkup,
+    />rule u<[^]*Prefer bishops further from Black&#x27;s king, and not on an edge\./,
+  )
   assert.match(bishopsMarkup, />check<[^]*Play a check</)
   assert.match(
     bishopsMarkup,
@@ -1822,6 +1826,10 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
   )
   assert.ok(
     bishopsMarkup.indexOf('>rule v<') <
+      bishopsMarkup.indexOf('>rule u<'),
+  )
+  assert.ok(
+    bishopsMarkup.indexOf('>rule u<') <
       bishopsMarkup.indexOf('>unclutter bishops<'),
   )
   assert.ok(

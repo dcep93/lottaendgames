@@ -45,6 +45,7 @@ const WHITE_RULE_IDS = [
   'rule x',
   'rule w',
   'rule v',
+  'rule u',
   'unclutter bishops',
   'king closer',
   'check',
@@ -360,6 +361,11 @@ test('Two Bishops exposes each Phase 2 comparison as one visible rule', () => {
           'Phase 1: If the king already controls the target square, check the king, from not the target square.',
       },
       {
+        shortLabel: 'rule u',
+        helpText:
+          "Phase 1: Prefer bishops further from Black's king, and not on an edge.",
+      },
+      {
         shortLabel: 'unclutter bishops',
         helpText:
           'Phase 2: Prefer bishops more than two king steps from a corner.',
@@ -417,7 +423,7 @@ test('Two Bishops exposes each Phase 2 comparison as one visible rule', () => {
       } else {
         assert.equal(typeof rule.subpriorities[0]?.compare, 'function')
       }
-    } else if (rule.id === 'rule v') {
+    } else if (rule.id === 'rule v' || rule.id === 'rule u') {
       assert.equal(typeof rule.applies, 'function')
       assert.equal(typeof rule.compare, 'function')
       assert.equal(rule.subpriorities, undefined)
@@ -552,7 +558,21 @@ test('the visible strategic comparisons run in their displayed order', () => {
             bestRuleVPenalty,
         )
       : afterRuleW
-    const phaseTwoUnclutterCandidates = afterRuleV.filter(
+    const phaseOneRuleUCandidates = afterRuleV.filter(
+      (san) => !scoreTwoBishopsWhiteMove(fen, san).isPhaseTwoPosition,
+    )
+    const bestRuleUScore = Math.max(
+      0,
+      ...phaseOneRuleUCandidates.map(
+        (san) => scoreTwoBishopsWhiteMove(fen, san).ruleUScore,
+      ),
+    )
+    const afterRuleU = afterRuleV.filter(
+      (san) =>
+        scoreTwoBishopsWhiteMove(fen, san).isPhaseTwoPosition ||
+        scoreTwoBishopsWhiteMove(fen, san).ruleUScore === bestRuleUScore,
+    )
+    const phaseTwoUnclutterCandidates = afterRuleU.filter(
       (san) => scoreTwoBishopsWhiteMove(fen, san).isPhaseTwoPosition,
     )
     const bestClutteredBishopsCount = Math.min(
@@ -561,7 +581,7 @@ test('the visible strategic comparisons run in their displayed order', () => {
           scoreTwoBishopsWhiteMove(fen, san).clutteredBishopsCount,
       ),
     )
-    const afterUnclutterBishops = afterRuleV.filter(
+    const afterUnclutterBishops = afterRuleU.filter(
       (san) =>
         !scoreTwoBishopsWhiteMove(fen, san).isPhaseTwoPosition ||
         scoreTwoBishopsWhiteMove(fen, san).clutteredBishopsCount ===
@@ -632,6 +652,7 @@ test('the visible strategic comparisons run in their displayed order', () => {
           'matePenalty',
           'phaseTwoWallApplies',
           'phaseTwoWallPenalty',
+          'ruleUScore',
           'ruleVApplies',
           'ruleVPenalty',
           'ruleWDistance',
@@ -794,6 +815,49 @@ test('rule v replaces rule z once White king controls the target', () => {
     'Bd8+',
   ])
   assert.equal(getMateRuleSet('two-bishops').currentWhiteHint(fen)?.id, 'rule v')
+})
+
+test('rule u maximizes summed non-edge bishop distance from Black king', () => {
+  const fen = '8/8/5k2/8/8/2K5/B6B/8 w - - 0 1'
+  const edge = scoreTwoBishopsWhiteMove(fen, 'Kd4')
+  const near = scoreTwoBishopsWhiteMove(fen, 'Bf4')
+  const far = scoreTwoBishopsWhiteMove(fen, 'Bg3')
+  const rule = twoBishopsWhiteRules.find(({ id }) => id === 'rule u')
+
+  assert.equal(edge.ruleUScore, 0)
+  assert.equal(near.ruleUScore, 2)
+  assert.equal(far.ruleUScore, 3)
+  assert.equal(rule?.applies?.(far), true)
+  assert.ok(rule?.compare)
+  assert.ok(rule.compare(far, near) < 0)
+  assert.ok(rule.compare(near, edge) < 0)
+
+  const phaseTwo = scoreTwoBishopsWhiteMove(
+    '2k5/8/4K3/8/5B2/5B2/8/8 w - - 4 3',
+    'Be4',
+  )
+  assert.equal(phaseTwo.isPhaseTwoPosition, true)
+  assert.equal(rule.applies?.(phaseTwo), false)
+
+  const sourceMove = getChess(fen).move('Bg3')
+  assert.ok(sourceMove)
+  for (const transform of SQUARE_TRANSFORMS) {
+    const transformedFen = getChess(transformFen(fen, transform)).fen()
+    const transformedMove = getChess(transformedFen)
+      .moves({ verbose: true })
+      .find(
+        ({ from, to }) =>
+          from === transformSquare(sourceMove.from, transform) &&
+          to === transformSquare(sourceMove.to, transform),
+      )
+    assert.ok(transformedMove, transform.name)
+    assert.equal(
+      scoreTwoBishopsWhiteMove(transformedFen, transformedMove.san)
+        .ruleUScore,
+      far.ruleUScore,
+      transform.name,
+    )
+  }
 })
 
 test('rule z remains active when every rule-v check is unsafe', () => {

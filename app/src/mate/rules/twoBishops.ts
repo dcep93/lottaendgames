@@ -71,6 +71,7 @@ export type TwoBishopsWhiteMoveScore = {
   readonly ruleWDistance: number
   readonly ruleVApplies: boolean
   readonly ruleVPenalty: number
+  readonly ruleUScore: number
   readonly kingCloserPhaseTwoLinePenalty: number
   readonly kingCloserDistance: number
   readonly kingCloserMiddleSixteenDistance: number
@@ -2613,6 +2614,17 @@ function scoreTwoBishopsWhiteMoveWithContext(
       !isPhaseTwo && whiteKingControlsPhaseOneTarget,
     ruleVPenalty:
       chess.isCheck() && !phaseOneTargetSquares.includes(move.to) ? 0 : 1,
+    ruleUScore:
+      blackKing === undefined
+        ? 0
+        : resultBishops.reduce(
+            (score, bishop) =>
+              score +
+              (edgeDistance(bishop) === 0
+                ? 0
+                : kingDistance(bishop, blackKing)),
+            0,
+          ),
     kingCloserPhaseTwoLinePenalty:
       !isPhaseTwo ||
       blackKing === undefined ||
@@ -2922,6 +2934,14 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
       'Phase 1: If the king already controls the target square, check the king, from not the target square.',
     applies: (score) => score.ruleVApplies,
     compare: (first, second) => first.ruleVPenalty - second.ruleVPenalty,
+  },
+  {
+    id: 'rule u',
+    shortLabel: 'rule u',
+    helpText:
+      "Phase 1: Prefer bishops further from Black's king, and not on an edge.",
+    applies: (score) => !score.isPhaseTwoPosition,
+    compare: (first, second) => second.ruleUScore - first.ruleUScore,
   },
   {
     id: 'unclutter bishops',
