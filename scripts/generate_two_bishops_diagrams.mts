@@ -59,8 +59,11 @@ const degenerateWaitingMoveFen = getChess(
 const degeneratePhaseOneLoopEscapeFen = getChess(
   'B7/B7/8/1k6/3K4/8/8/8 w - - 16 9',
 ).fen()
-const degenerateMiddleishTargetFen = getChess(
+const degenerateMiddleishTargetAFen = getChess(
   '8/8/8/1k1BK3/3B4/8/8/8 w - - 12 7',
+).fen()
+const degenerateMiddleishTargetBFen = getChess(
+  '8/8/3K4/3BB3/8/3k4/8/8 w - - 14 8',
 ).fen()
 const degenerateEdgeRepairFen = getChess(
   '8/8/8/8/8/7k/5K2/3BB3 w - - 2 2',
@@ -109,7 +112,8 @@ for (const [label, fen] of [
   }
 }
 for (const [label, fen] of [
-  ['degenerate middleish target', degenerateMiddleishTargetFen],
+  ['degenerate middleish target a', degenerateMiddleishTargetAFen],
+  ['degenerate middleish target b', degenerateMiddleishTargetBFen],
   ['degenerate phase 1 loop escape', degeneratePhaseOneLoopEscapeFen],
   ['degenerate king flank', degenerateKingFlankFen],
   ['degenerate king sidestep', degenerateKingSidestepFen],
@@ -282,10 +286,15 @@ export const TWO_BISHOPS_DIAGRAM_POSITIONS = {
     phase: '2/2',
     fen: ${JSON.stringify(degenerateWaitingMoveFen)},
   },
-  degenerateMiddleishTarget: {
+  degenerateMiddleishTargetA: {
     phase: '1/2',
-    fen: ${JSON.stringify(degenerateMiddleishTargetFen)},
+    fen: ${JSON.stringify(degenerateMiddleishTargetAFen)},
     arrow: { from: 'e5', to: 'd6' },
+  },
+  degenerateMiddleishTargetB: {
+    phase: '1/2',
+    fen: ${JSON.stringify(degenerateMiddleishTargetBFen)},
+    arrow: { from: 'd6', to: 'c5' },
   },
   degeneratePhaseOneLoopEscape: {
     phase: '1/2',
@@ -359,7 +368,10 @@ process.stdout.write(
 process.stdout.write(`degenerate free bishop: ${degenerateFreeBishopFen}\n`)
 process.stdout.write(`degenerate waiting move: ${degenerateWaitingMoveFen}\n`)
 process.stdout.write(
-  `degenerate middleish target: ${degenerateMiddleishTargetFen}\n`,
+  `degenerate middleish target a: ${degenerateMiddleishTargetAFen}\n`,
+)
+process.stdout.write(
+  `degenerate middleish target b: ${degenerateMiddleishTargetBFen}\n`,
 )
 process.stdout.write(
   `degenerate phase 1 loop escape: ${degeneratePhaseOneLoopEscapeFen}\n`,

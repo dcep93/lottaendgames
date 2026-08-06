@@ -3506,8 +3506,8 @@ test('degenerate diagram order puts edge unmask before king lift', () => {
   )
 })
 
-test('degenerate middleish target selects Kd6 in the supplied Phase 1 position', () => {
-  const fen = TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateMiddleishTarget.fen
+test('degenerate middleish target a selects Kd6 in the supplied Phase 1 position', () => {
+  const fen = TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateMiddleishTargetA.fen
   const ruleSet = getMateRuleSet('two-bishops')
 
   assert.equal(ruleSet.phase(fen), '1/2')
@@ -3517,12 +3517,12 @@ test('degenerate middleish target selects Kd6 in the supplied Phase 1 position',
   assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'degenerate')
   assert.equal(
     getTwoBishopsDegenerateReasonLabel(fen),
-    'degenerate — middleish target',
+    'degenerate — middleish target a',
   )
 })
 
-test('degenerate middleish target follows every D4 transform', () => {
-  const source = TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateMiddleishTarget.fen
+test('degenerate middleish target a follows every D4 transform', () => {
+  const source = TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateMiddleishTargetA.fen
   const sourceMove = getChess(source).move('Kd6')
   assert.ok(sourceMove)
   const ruleSet = getMateRuleSet('two-bishops')
@@ -3541,13 +3541,13 @@ test('degenerate middleish target follows every D4 transform', () => {
     assert.deepEqual(ruleSet.idealWhiteMoves(fen), [expected.san], transform.name)
     assert.equal(
       getTwoBishopsDegenerateReasonLabel(fen),
-      'degenerate — middleish target',
+      'degenerate — middleish target a',
       transform.name,
     )
   }
 })
 
-test('degenerate middleish target rejects translations and nearby geometry', () => {
+test('degenerate middleish target a rejects translations and nearby geometry', () => {
   for (const fen of [
     '8/8/1k1BK3/3B4/8/8/8/8 w - - 0 1',
     '8/8/8/3BK3/1k1B4/8/8/8 w - - 0 1',
@@ -3555,7 +3555,62 @@ test('degenerate middleish target rejects translations and nearby geometry', () 
   ]) {
     assert.notEqual(
       getTwoBishopsDegenerateReasonLabel(fen),
-      'degenerate — middleish target',
+      'degenerate — middleish target a',
+      fen,
+    )
+  }
+})
+
+test('degenerate middleish target b selects Kc5 in the supplied Phase 1 position', () => {
+  const fen = TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateMiddleishTargetB.fen
+  const ruleSet = getMateRuleSet('two-bishops')
+
+  assert.equal(ruleSet.phase(fen), '1/2')
+  assert.deepEqual(ruleSet.idealWhiteMoves(fen), ['Kc5'])
+  assert.equal(scoreTwoBishopsWhiteMove(fen, 'Kc5').degenerateApplies, true)
+  assert.equal(scoreTwoBishopsWhiteMove(fen, 'Kc5').degeneratePenalty, 0)
+  assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'degenerate')
+  assert.equal(
+    getTwoBishopsDegenerateReasonLabel(fen),
+    'degenerate — middleish target b',
+  )
+})
+
+test('degenerate middleish target b follows every D4 transform', () => {
+  const source = TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateMiddleishTargetB.fen
+  const sourceMove = getChess(source).move('Kc5')
+  assert.ok(sourceMove)
+  const ruleSet = getMateRuleSet('two-bishops')
+
+  for (const transform of SQUARE_TRANSFORMS) {
+    const fen = getChess(transformFen(source, transform)).fen()
+    const expected = getChess(fen)
+      .moves({ verbose: true })
+      .find(
+        ({ from, to }) =>
+          from === transformSquare(sourceMove.from, transform) &&
+          to === transformSquare(sourceMove.to, transform),
+      )
+    assert.ok(expected, transform.name)
+    assert.equal(ruleSet.phase(fen), '1/2', transform.name)
+    assert.deepEqual(ruleSet.idealWhiteMoves(fen), [expected.san], transform.name)
+    assert.equal(
+      getTwoBishopsDegenerateReasonLabel(fen),
+      'degenerate — middleish target b',
+      transform.name,
+    )
+  }
+})
+
+test('degenerate middleish target b rejects translations and nearby geometry', () => {
+  for (const fen of [
+    '8/3K4/3BB3/8/3k4/8/8/8 w - - 0 1',
+    '8/8/3K4/3BB3/8/8/3k4/8 w - - 0 1',
+    '8/k7/8/1K6/1BB5/8/8/8 w - - 0 1',
+  ]) {
+    assert.notEqual(
+      getTwoBishopsDegenerateReasonLabel(fen),
+      'degenerate — middleish target b',
       fen,
     )
   }
@@ -4021,7 +4076,8 @@ test('every selected degenerate reason has a matching diagram title', () => {
     TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateDiagonalWaitingMove.fen,
     '2B5/8/8/8/8/4B3/5K2/7k w - - 0 1',
     TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateWaitingMove.fen,
-    TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateMiddleishTarget.fen,
+    TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateMiddleishTargetA.fen,
+    TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateMiddleishTargetB.fen,
     TWO_BISHOPS_DIAGRAM_POSITIONS.degeneratePhaseOneLoopEscape.fen,
     TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateKingSidestep.fen,
     TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateReformWall.fen,
@@ -4356,7 +4412,8 @@ test('Two Bishops keeps its phase explanation and diagram', () => {
     'bishop-degenerate-diagonal-waiting-move',
     'bishop-degenerate-free-bishop',
     'bishop-degenerate-waiting-move',
-    'bishop-degenerate-middleish-target',
+    'bishop-degenerate-middleish-target-a',
+    'bishop-degenerate-middleish-target-b',
     'bishop-degenerate-phase-one-loop-escape',
     'bishop-degenerate-king-flank',
     'bishop-degenerate-king-sidestep',
@@ -4524,7 +4581,7 @@ test('Two Bishops keeps its phase explanation and diagram', () => {
       piece: color === 'w' ? type.toUpperCase() : type,
     })),
   )
-  const kingFlankBoard = ruleSet.help.noteBoards[15]!
+  const kingFlankBoard = ruleSet.help.noteBoards[16]!
   assert.deepEqual(
     kingFlankBoard.pieces,
     getEndgamePiecePlacements(
@@ -4535,7 +4592,7 @@ test('Two Bishops keeps its phase explanation and diagram', () => {
     })),
   )
   assert.deepEqual(kingFlankBoard.arrows, [{ from: 'e5', to: 'f6' }])
-  const kingSidestepBoard = ruleSet.help.noteBoards[16]!
+  const kingSidestepBoard = ruleSet.help.noteBoards[17]!
   assert.deepEqual(
     kingSidestepBoard.pieces,
     getEndgamePiecePlacements(
@@ -4558,7 +4615,7 @@ test('Two Bishops keeps its phase explanation and diagram', () => {
     )?.id,
     'degenerate',
   )
-  const reformWallBoard = ruleSet.help.noteBoards[17]!
+  const reformWallBoard = ruleSet.help.noteBoards[18]!
   assert.deepEqual(
     reformWallBoard.pieces,
     getEndgamePiecePlacements(
@@ -4581,7 +4638,7 @@ test('Two Bishops keeps its phase explanation and diagram', () => {
     )?.id,
     'degenerate',
   )
-  const kingLiftBoard = ruleSet.help.noteBoards[18]!
+  const kingLiftBoard = ruleSet.help.noteBoards[19]!
   assert.deepEqual(
     kingLiftBoard.pieces,
     getEndgamePiecePlacements(
@@ -4604,7 +4661,7 @@ test('Two Bishops keeps its phase explanation and diagram', () => {
     )?.shortLabel,
     'degenerate — king lift',
   )
-  const bishopRetreatBoard = ruleSet.help.noteBoards[19]!
+  const bishopRetreatBoard = ruleSet.help.noteBoards[20]!
   assert.deepEqual(
     bishopRetreatBoard.pieces,
     getEndgamePiecePlacements(
@@ -4615,7 +4672,7 @@ test('Two Bishops keeps its phase explanation and diagram', () => {
     })),
   )
   assert.deepEqual(bishopRetreatBoard.arrows, [{ from: 'f7', to: 'e8' }])
-  const longDiagonalBoard = ruleSet.help.noteBoards[20]!
+  const longDiagonalBoard = ruleSet.help.noteBoards[21]!
   assert.deepEqual(
     longDiagonalBoard.pieces,
     getEndgamePiecePlacements(
@@ -4633,7 +4690,7 @@ test('Two Bishops keeps its phase explanation and diagram', () => {
     longDiagonalBoard.caption,
     "Move the bishop to any highlighted square. Don't move it to the edge.",
   )
-  const matingPositionBoard = ruleSet.help.noteBoards[22]!
+  const matingPositionBoard = ruleSet.help.noteBoards[23]!
   assert.deepEqual(
     matingPositionBoard.pieces,
     TWO_BISHOPS_DIAGRAM_POSITIONS.matingPosition.pieces,
@@ -4642,7 +4699,7 @@ test('Two Bishops keeps its phase explanation and diagram', () => {
     matingPositionBoard.highlights.map(({ square }) => square),
     ['f8', 'f7'],
   )
-  const shepherdBoard = ruleSet.help.noteBoards[23]!
+  const shepherdBoard = ruleSet.help.noteBoards[24]!
   assert.deepEqual(
     shepherdBoard.highlights.map(({ square }) => square),
     ['a8', 'f8'],
@@ -4656,7 +4713,7 @@ test('Two Bishops keeps its phase explanation and diagram', () => {
     ruleSet.currentWhiteHint(TWO_BISHOPS_DIAGRAM_POSITIONS.shepherd.fen)?.id,
     'shepherd',
   )
-  const phaseTwoWallBoard = ruleSet.help.noteBoards[24]!
+  const phaseTwoWallBoard = ruleSet.help.noteBoards[25]!
   assert.deepEqual(
     phaseTwoWallBoard.pieces,
     getEndgamePiecePlacements(
@@ -4670,7 +4727,7 @@ test('Two Bishops keeps its phase explanation and diagram', () => {
     phaseTwoWallBoard.highlights.map(({ square }) => square),
     ['b8', 'b7'],
   )
-  const proximateWallBoard = ruleSet.help.noteBoards[25]!
+  const proximateWallBoard = ruleSet.help.noteBoards[26]!
   assert.deepEqual(
     proximateWallBoard.pieces,
     TWO_BISHOPS_DIAGRAM_POSITIONS.proximateWall.pieces,

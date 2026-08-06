@@ -166,7 +166,8 @@ const TWO_BISHOPS_DEGENERATE_REASON_LABELS = {
   diagonalWaitingMove: 'degenerate — diagonal waiting move',
   freeBishop: 'degenerate — free bishop',
   waitingMove: 'degenerate — waiting move',
-  middleishTarget: 'degenerate — middleish target',
+  middleishTargetA: 'degenerate — middleish target a',
+  middleishTargetB: 'degenerate — middleish target b',
   phaseOneLoopEscape: 'degenerate — phase 1 loop escape',
   kingFlank: 'degenerate — king flank',
   kingSidestep: 'degenerate — king sidestep',
@@ -191,7 +192,8 @@ export const TWO_BISHOPS_DEGENERATE_PRIORITY_ORDER = [
   TWO_BISHOPS_DEGENERATE_REASON_LABELS.diagonalWaitingMove,
   TWO_BISHOPS_DEGENERATE_REASON_LABELS.freeBishop,
   TWO_BISHOPS_DEGENERATE_REASON_LABELS.waitingMove,
-  TWO_BISHOPS_DEGENERATE_REASON_LABELS.middleishTarget,
+  TWO_BISHOPS_DEGENERATE_REASON_LABELS.middleishTargetA,
+  TWO_BISHOPS_DEGENERATE_REASON_LABELS.middleishTargetB,
   TWO_BISHOPS_DEGENERATE_REASON_LABELS.phaseOneLoopEscape,
   TWO_BISHOPS_DEGENERATE_REASON_LABELS.kingFlank,
   TWO_BISHOPS_DEGENERATE_REASON_LABELS.kingSidestep,
@@ -380,16 +382,29 @@ const twoBishopsHelp: RuleHelp = {
       highlights: [],
     },
     {
-      id: 'bishop-degenerate-middleish-target',
-      title: 'degenerate — middleish target',
-      caption: "Move White's king to the arrowed middleish target.",
+      id: 'bishop-degenerate-middleish-target-a',
+      title: 'degenerate — middleish target a',
+      caption: "Move White's king to middleish target A.",
       layout: { files: 8, ranks: 8, fileOffset: 0 },
       pieces: noteBoardPieces(
-        TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateMiddleishTarget.fen,
+        TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateMiddleishTargetA.fen,
       ),
       highlights: [],
       arrows: [
-        TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateMiddleishTarget.arrow,
+        TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateMiddleishTargetA.arrow,
+      ],
+    },
+    {
+      id: 'bishop-degenerate-middleish-target-b',
+      title: 'degenerate — middleish target b',
+      caption: "Move White's king to middleish target B.",
+      layout: { files: 8, ranks: 8, fileOffset: 0 },
+      pieces: noteBoardPieces(
+        TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateMiddleishTargetB.fen,
+      ),
+      highlights: [],
+      arrows: [
+        TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateMiddleishTargetB.arrow,
       ],
     },
     {
@@ -1839,7 +1854,7 @@ function getPhaseOneLoopEscapeDegenerateRepair(
   return null
 }
 
-function getMiddleishTargetDegenerateRepair(
+function getMiddleishTargetADegenerateRepair(
   fen: string,
   blackKing: Square,
   whiteKing: Square,
@@ -1872,7 +1887,47 @@ function getMiddleishTargetDegenerateRepair(
       return {
         from: whiteKing,
         to: target,
-        reasonLabel: TWO_BISHOPS_DEGENERATE_REASON_LABELS.middleishTarget,
+        reasonLabel: TWO_BISHOPS_DEGENERATE_REASON_LABELS.middleishTargetA,
+      }
+    }
+  }
+  return null
+}
+
+function getMiddleishTargetBDegenerateRepair(
+  fen: string,
+  blackKing: Square,
+  whiteKing: Square,
+  bishops: readonly Square[],
+): DegenerateRepair | null {
+  const bishopSet = new Set(bishops)
+  const legalMoves = getChess(fen).moves({ verbose: true })
+
+  for (const transform of SQUARE_TRANSFORMS) {
+    const expectedBlackKing = transformSquare('d3', transform)
+    const expectedWhiteKing = transformSquare('d6', transform)
+    const firstBishop = transformSquare('d5', transform)
+    const secondBishop = transformSquare('e5', transform)
+    const target = transformSquare('c5', transform)
+    if (
+      blackKing !== expectedBlackKing ||
+      whiteKing !== expectedWhiteKing ||
+      !bishopSet.has(firstBishop) ||
+      !bishopSet.has(secondBishop)
+    ) {
+      continue
+    }
+    const targetIsLegal = legalMoves.some(
+      (move) =>
+        move.piece === 'k' &&
+        move.from === whiteKing &&
+        move.to === target,
+    )
+    if (targetIsLegal) {
+      return {
+        from: whiteKing,
+        to: target,
+        reasonLabel: TWO_BISHOPS_DEGENERATE_REASON_LABELS.middleishTargetB,
       }
     }
   }
@@ -2238,9 +2293,18 @@ function getDegenerateRepair(
       isPhaseTwo
         ? getWaitingMoveDegenerateRepair(blackKing, whiteKing, bishops)
         : null,
-    [TWO_BISHOPS_DEGENERATE_REASON_LABELS.middleishTarget]: () =>
+    [TWO_BISHOPS_DEGENERATE_REASON_LABELS.middleishTargetA]: () =>
       !isPhaseTwo
-        ? getMiddleishTargetDegenerateRepair(
+        ? getMiddleishTargetADegenerateRepair(
+            fen,
+            blackKing,
+            whiteKing,
+            bishops,
+          )
+        : null,
+    [TWO_BISHOPS_DEGENERATE_REASON_LABELS.middleishTargetB]: () =>
+      !isPhaseTwo
+        ? getMiddleishTargetBDegenerateRepair(
             fen,
             blackKing,
             whiteKing,
