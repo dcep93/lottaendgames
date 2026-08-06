@@ -1809,7 +1809,7 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
   )
   assert.match(
     bishopsMarkup,
-    />rule v<[^]*If the king already controls the target square, check the king, from not the target square\./,
+    />rule v<[^]*If rule y is satisfied and the king already controls the target square, check the king, from not the target square\./,
   )
   assert.match(
     bishopsMarkup,

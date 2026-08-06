@@ -2633,7 +2633,9 @@ function scoreTwoBishopsWhiteMoveWithContext(
             ),
           ),
     ruleVApplies:
-      !isPhaseTwo && whiteKingControlsPhaseOneTarget,
+      !isPhaseTwo &&
+      whiteKingControlsPhaseOneTarget &&
+      ruleYControlledAdjacentCount === 2,
     ruleVPenalty:
       chess.isCheck() && !phaseOneTargetSquares.includes(move.to) ? 0 : 1,
     ruleUScore:
@@ -2967,7 +2969,7 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
     id: 'rule v',
     shortLabel: 'rule v',
     helpText:
-      'Phase 1: If the king already controls the target square, check the king, from not the target square.',
+      'Phase 1: If rule y is satisfied and the king already controls the target square, check the king, from not the target square.',
     applies: (score) => score.ruleVApplies,
     compare: (first, second) => first.ruleVPenalty - second.ruleVPenalty,
   },

@@ -363,7 +363,7 @@ test('Two Bishops exposes each Phase 2 comparison as one visible rule', () => {
       {
         shortLabel: 'rule v',
         helpText:
-          'Phase 1: If the king already controls the target square, check the king, from not the target square.',
+          'Phase 1: If rule y is satisfied and the king already controls the target square, check the king, from not the target square.',
       },
       {
         shortLabel: 'rule u',
@@ -842,15 +842,17 @@ test('rule w moves White king toward the Phase 1 target square', () => {
   assert.ok(priority.compare(wait, away) < 0)
 })
 
-test('rule v replaces rule z once White king controls the target', () => {
-  const fen = '8/8/5k2/B7/3K4/8/B7/8 w - - 0 1'
-  const checking = scoreTwoBishopsWhiteMove(fen, 'Bd8+')
-  const quiet = scoreTwoBishopsWhiteMove(fen, 'Bb6')
+test('rule v replaces rule z once rule y and king control are satisfied', () => {
+  const fen = '8/8/5K2/8/3k4/8/8/2B4B w - - 0 1'
+  const checking = scoreTwoBishopsWhiteMove(fen, 'Bb2+')
+  const quiet = scoreTwoBishopsWhiteMove(fen, 'Bf4')
   const ruleZ = twoBishopsWhiteRules.find(({ id }) => id === 'rule z')
   const ruleV = twoBishopsWhiteRules.find(({ id }) => id === 'rule v')
 
   assert.equal(checking.ruleZApplies, true)
   assert.equal(quiet.ruleZApplies, true)
+  assert.equal(checking.ruleYControlledAdjacentCount, 2)
+  assert.equal(quiet.ruleYControlledAdjacentCount, 2)
   assert.equal(checking.ruleVApplies, true)
   assert.equal(checking.ruleVPenalty, 0)
   assert.equal(quiet.ruleVPenalty, 1)
@@ -859,9 +861,24 @@ test('rule v replaces rule z once White king controls the target', () => {
   assert.ok(ruleV?.compare)
   assert.ok(ruleV.compare(checking, quiet) < 0)
   assert.deepEqual(getMateRuleSet('two-bishops').idealWhiteMoves(fen), [
-    'Bd8+',
+    'Bb2+',
   ])
   assert.equal(getMateRuleSet('two-bishops').currentWhiteHint(fen)?.id, 'rule v')
+})
+
+test('rule v does not bypass rule z when its check loses rule-y control', () => {
+  const fen = '8/8/5k2/B7/3K4/8/B7/8 w - - 0 1'
+  const checking = scoreTwoBishopsWhiteMove(fen, 'Bd8+')
+  const fallback = scoreTwoBishopsWhiteMove(fen, 'Bc7')
+  const ruleZ = twoBishopsWhiteRules.find(({ id }) => id === 'rule z')
+  const ruleSet = getMateRuleSet('two-bishops')
+
+  assert.equal(checking.ruleYControlledAdjacentCount, 1)
+  assert.equal(checking.ruleVPenalty, 0)
+  assert.equal(checking.ruleVApplies, false)
+  assert.equal(ruleZ?.subpriorities?.[0]?.when?.([checking, fallback]), true)
+  assert.deepEqual(ruleSet.idealWhiteMoves(fen), ['Bc7'])
+  assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'rule z')
 })
 
 test('rule u maximizes summed bishop distance from Black king', () => {
