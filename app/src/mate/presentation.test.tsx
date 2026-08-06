@@ -1325,6 +1325,7 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
       'bishop-degenerate-diagonal-waiting-move',
       'bishop-degenerate-free-bishop',
       'bishop-degenerate-waiting-move',
+      'bishop-degenerate-middleish-target',
       'bishop-degenerate-phase-one-loop-escape',
       'bishop-degenerate-king-flank',
       'bishop-degenerate-king-sidestep',
@@ -1450,6 +1451,7 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
     diagonalWaitingBoard,
     freeBishopBoard,
     waitingMoveBoard,
+    middleishTargetBoard,
     phaseOneLoopEscapeBoard,
     kingFlankBoard,
     kingSidestepBoard,
@@ -1477,6 +1479,7 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
   assert.ok(diagonalWaitingBoard)
   assert.ok(freeBishopBoard)
   assert.ok(waitingMoveBoard)
+  assert.ok(middleishTargetBoard)
   assert.ok(phaseOneLoopEscapeBoard)
   assert.ok(kingFlankBoard)
   assert.ok(kingSidestepBoard)
@@ -1508,6 +1511,9 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
     phaseOneLoopEscapeBoard.arrows,
     [TWO_BISHOPS_DIAGRAM_POSITIONS.degeneratePhaseOneLoopEscape.arrow],
   )
+  assert.deepEqual(middleishTargetBoard.arrows, [
+    TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateMiddleishTarget.arrow,
+  ])
   assert.deepEqual(
     ignoreLightBishopBoard.arrows,
     [TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateIgnoreLightBishop.arrow],
@@ -1699,7 +1705,7 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
     /Phase 1 Target Square: It&#x27;s the square adjacent to Black&#x27;s king furthest from the corner closest to Black&#x27;s king\./,
   )
   assert.match(bishopsMarkup, /leg-mate-guide-note-boards--full/)
-  assert.equal(bishopsMarkup.match(/leg-mate-note-board--full/g)?.length, 25)
+  assert.equal(bishopsMarkup.match(/leg-mate-note-board--full/g)?.length, 26)
   assert.equal(
     bishopsMarkup.match(/data-highlight-kind="zone"/g)?.length,
     36,
