@@ -1805,6 +1805,10 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
   )
   assert.match(
     bishopsMarkup,
+    />rule zz<[^]*Keep bishops out of the corner 6 squares\./,
+  )
+  assert.match(
+    bishopsMarkup,
     />rule z<[^]*Control the target square with a bishop without checking, unless following rule v\./,
   )
   assert.match(
@@ -1838,6 +1842,10 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
   )
   assert.ok(
     bishopsMarkup.indexOf('>phase 2 wall<') <
+      bishopsMarkup.indexOf('>rule zz<'),
+  )
+  assert.ok(
+    bishopsMarkup.indexOf('>rule zz<') <
       bishopsMarkup.indexOf('>rule z<'),
   )
   assert.ok(
@@ -1891,6 +1899,7 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
     assert.doesNotMatch(bishopsMarkup, new RegExp(`>${removed}<`))
   }
   const targetRuleLabels = [
+    'rule zz',
     'rule z',
     'rule y',
     'rule a',

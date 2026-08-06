@@ -40,6 +40,7 @@ const WHITE_RULE_IDS = [
   'sequester',
   'bishops off edge',
   'phase 2 wall',
+  'rule zz',
   'rule z',
   'rule y',
   'rule a',
@@ -338,6 +339,10 @@ test('Two Bishops exposes each Phase 2 comparison as one visible rule', () => {
           "Phase 2: Create or maintain a 2 square wall adjacent to Black's king and opposite the target corner.",
       },
       {
+        shortLabel: 'rule zz',
+        helpText: 'Phase 1: Keep bishops out of the corner 6 squares.',
+      },
+      {
         shortLabel: 'rule z',
         helpText:
           'Phase 1: Control the target square with a bishop without checking, unless following rule v.',
@@ -396,6 +401,7 @@ test('Two Bishops exposes each Phase 2 comparison as one visible rule', () => {
       rule.id === 'degenerate' ||
       rule.id === 'force phase 2' ||
       rule.id === 'shepherd' ||
+      rule.id === 'rule zz' ||
       rule.id === 'check'
     ) {
       assert.equal(typeof rule.applies, 'function')
@@ -477,29 +483,44 @@ test('the visible strategic comparisons run in their displayed order', () => {
     const phaseOneRulesApply = !afterPhaseTwoWall.some(
       (san) => scoreTwoBishopsWhiteMove(fen, san).isPhaseTwoPosition,
     )
+    const bestRuleZZCornerSixBishopsCount = Math.min(
+      ...afterPhaseTwoWall.map(
+        (san) =>
+          scoreTwoBishopsWhiteMove(fen, san)
+            .ruleZZCornerSixBishopsCount,
+      ),
+    )
+    const afterRuleZZ = phaseOneRulesApply
+      ? afterPhaseTwoWall.filter(
+          (san) =>
+            scoreTwoBishopsWhiteMove(fen, san)
+              .ruleZZCornerSixBishopsCount ===
+            bestRuleZZCornerSixBishopsCount,
+        )
+      : afterPhaseTwoWall
     const targetBuildRulesApply =
       phaseOneRulesApply &&
-      !afterPhaseTwoWall.some(
+      !afterRuleZZ.some(
         (san) => {
           const score = scoreTwoBishopsWhiteMove(fen, san)
           return score.ruleVApplies && score.ruleVPenalty === 0
         },
       )
-    const ruleZApplies = afterPhaseTwoWall.some(
+    const ruleZApplies = afterRuleZZ.some(
       (san) => scoreTwoBishopsWhiteMove(fen, san).ruleZApplies,
     )
     const bestRuleZPenalty = Math.min(
-      ...afterPhaseTwoWall.map(
+      ...afterRuleZZ.map(
         (san) => scoreTwoBishopsWhiteMove(fen, san).ruleZPenalty,
       ),
     )
     const afterRuleZ = ruleZApplies
-      ? afterPhaseTwoWall.filter(
+      ? afterRuleZZ.filter(
           (san) =>
             scoreTwoBishopsWhiteMove(fen, san).ruleZPenalty ===
             bestRuleZPenalty,
         )
-      : afterPhaseTwoWall
+      : afterRuleZZ
     const bestRuleYControlledAdjacentCount = Math.max(
       ...afterRuleZ.map(
         (san) =>
@@ -682,6 +703,7 @@ test('the visible strategic comparisons run in their displayed order', () => {
           'ruleYControlledAdjacentCount',
           'ruleZApplies',
           'ruleZPenalty',
+          'ruleZZCornerSixBishopsCount',
           'sequesterApplies',
           'sequesterCornerDiagonalsTarget',
           'sequesterCurrentCornerDistance',
@@ -722,6 +744,59 @@ test('the prepared Two Bishops batch matches public single-move scores', () => {
       score: scoreTwoBishopsWhiteMove(fen, san),
     })),
   )
+})
+
+test('rule zz ranks bishops outside the four corner-six triangles', () => {
+  const fen = '8/8/4k3/8/4B3/8/4K3/2B5 w - - 0 1'
+  const zero = scoreTwoBishopsWhiteMove(fen, 'Bf4')
+  const one = scoreTwoBishopsWhiteMove(fen, 'Kf2')
+  const two = scoreTwoBishopsWhiteMove(fen, 'Bb1')
+  const rule = twoBishopsWhiteRules.find(({ id }) => id === 'rule zz')
+
+  assert.equal(zero.ruleZZCornerSixBishopsCount, 0)
+  assert.equal(one.ruleZZCornerSixBishopsCount, 1)
+  assert.equal(two.ruleZZCornerSixBishopsCount, 2)
+  assert.equal(rule?.applies?.(zero), true)
+  assert.ok(rule?.compare)
+  assert.ok(rule.compare(zero, one) < 0)
+  assert.ok(rule.compare(one, two) < 0)
+})
+
+test('rule zz uniquely clears a corner-six bishop under every D4 transform', () => {
+  const source = '3B4/1B6/3k4/8/8/5K2/8/8 w - - 0 1'
+  const sourceMove = getChess(source).move('Be4')
+  assert.ok(sourceMove)
+  const ruleSet = getMateRuleSet('two-bishops')
+
+  for (const transform of SQUARE_TRANSFORMS) {
+    const fen = getChess(transformFen(source, transform)).fen()
+    const expected = getChess(fen)
+      .moves({ verbose: true })
+      .find(
+        ({ from, to }) =>
+          from === transformSquare(sourceMove.from, transform) &&
+          to === transformSquare(sourceMove.to, transform),
+      )
+    assert.ok(expected, transform.name)
+    assert.deepEqual(ruleSet.idealWhiteMoves(fen), [expected.san], transform.name)
+    assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'rule zz', transform.name)
+    assert.equal(
+      scoreTwoBishopsWhiteMove(fen, expected.san)
+        .ruleZZCornerSixBishopsCount,
+      0,
+      transform.name,
+    )
+  }
+})
+
+test('rule zz is inactive in Phase 2', () => {
+  const fen = '2k5/8/4K3/8/5B2/5B2/8/8 w - - 4 3'
+  const score = scoreTwoBishopsWhiteMove(fen, 'Bg4')
+  const rule = twoBishopsWhiteRules.find(({ id }) => id === 'rule zz')
+
+  assert.equal(score.isPhaseTwoPosition, true)
+  assert.equal(score.ruleZZCornerSixBishopsCount, 0)
+  assert.equal(rule?.applies?.(score), false)
 })
 
 test('Phase 1 target-square rules use the square opposite the nearest corner', () => {
@@ -855,11 +930,11 @@ test('rule x maximizes travel when an attacked bishop moves', () => {
 })
 
 test('rule x makes the longest attacked-bishop move uniquely ideal', () => {
-  const fen = '5B2/8/8/4k3/4B3/8/4K3/8 w - - 0 1'
+  const fen = '8/8/8/8/8/6kB/8/B4K2 w - - 0 1'
   const ruleSet = getMateRuleSet('two-bishops')
 
   assert.equal(ruleSet.phase(fen), '1/2')
-  assert.deepEqual(ruleSet.idealWhiteMoves(fen), ['Bb7'])
+  assert.deepEqual(ruleSet.idealWhiteMoves(fen), ['Bd7'])
   assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'rule x')
 })
 
@@ -880,7 +955,7 @@ test('rule w moves White king toward the Phase 1 target square', () => {
   assert.ok(priority.compare(wait, away) < 0)
 })
 
-test('rule v replaces rule z once rule y and king control are satisfied', () => {
+test('rule zz precedes rule v even when rule v would replace rule z', () => {
   const fen = '8/8/5K2/8/3k4/8/8/2B4B w - - 0 1'
   const checking = scoreTwoBishopsWhiteMove(fen, 'Bb2+')
   const quiet = scoreTwoBishopsWhiteMove(fen, 'Bf4')
@@ -898,13 +973,17 @@ test('rule v replaces rule z once rule y and king control are satisfied', () => 
   assert.equal(ruleZ?.subpriorities?.[0]?.when?.([checking, quiet]), false)
   assert.ok(ruleV?.compare)
   assert.ok(ruleV.compare(checking, quiet) < 0)
+  assert.ok(
+    quiet.ruleZZCornerSixBishopsCount <
+      checking.ruleZZCornerSixBishopsCount,
+  )
   assert.deepEqual(getMateRuleSet('two-bishops').idealWhiteMoves(fen), [
-    'Bb2+',
+    'Bf4',
   ])
-  assert.equal(getMateRuleSet('two-bishops').currentWhiteHint(fen)?.id, 'rule v')
+  assert.equal(getMateRuleSet('two-bishops').currentWhiteHint(fen)?.id, 'rule z')
 })
 
-test('rule v does not bypass rule z when its check loses rule-y control', () => {
+test('rule zz precedes rule z when a check loses rule-y control', () => {
   const fen = '8/8/5k2/B7/3K4/8/B7/8 w - - 0 1'
   const checking = scoreTwoBishopsWhiteMove(fen, 'Bd8+')
   const fallback = scoreTwoBishopsWhiteMove(fen, 'Bc7')
@@ -915,8 +994,10 @@ test('rule v does not bypass rule z when its check loses rule-y control', () => 
   assert.equal(checking.ruleVPenalty, 1)
   assert.equal(checking.ruleVApplies, false)
   assert.equal(ruleZ?.subpriorities?.[0]?.when?.([checking, fallback]), true)
-  assert.deepEqual(ruleSet.idealWhiteMoves(fen), ['Bc7'])
-  assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'rule z')
+  assert.equal(checking.ruleZPenalty, 1)
+  assert.equal(fallback.ruleZPenalty, 0)
+  assert.deepEqual(ruleSet.idealWhiteMoves(fen), ['Bb3'])
+  assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'rule u')
 })
 
 test('rule v eliminates non-rule-v moves before rule u', () => {
@@ -1000,9 +1081,9 @@ test('rule u breaks a rule-w tie with greater summed bishop distance', () => {
 })
 
 test('rule a prefers fewer bishops on non-central board edges', () => {
-  const fen = '2B5/1K6/5k2/8/5B2/8/8/8 w - - 0 1'
-  const fewerEdges = scoreTwoBishopsWhiteMove(fen, 'Bg4')
-  const moreEdges = scoreTwoBishopsWhiteMove(fen, 'Bg3')
+  const fen = '2B5/3K4/8/8/8/7k/5B2/8 w - - 0 1'
+  const fewerEdges = scoreTwoBishopsWhiteMove(fen, 'Bb7')
+  const moreEdges = scoreTwoBishopsWhiteMove(fen, 'Ba6')
   const rule = twoBishopsWhiteRules.find(({ id }) => id === 'rule a')
   const priority = rule?.subpriorities?.[0]
 
@@ -1012,10 +1093,7 @@ test('rule a prefers fewer bishops on non-central board edges', () => {
   assert.equal(rule?.applies?.(fewerEdges), true)
   assert.ok(priority?.compare)
   assert.ok(priority.compare(fewerEdges, moreEdges) < 0)
-  assert.deepEqual(getMateRuleSet('two-bishops').idealWhiteMoves(fen), [
-    'Bd7',
-    'Bg4',
-  ])
+  assert.deepEqual(getMateRuleSet('two-bishops').idealWhiteMoves(fen), ['Bb7'])
   assert.equal(getMateRuleSet('two-bishops').currentWhiteHint(fen)?.id, 'rule a')
 })
 

@@ -63,6 +63,7 @@ export type TwoBishopsWhiteMoveScore = {
   readonly bishopsOnBlackEdgeCount: number
   readonly forcePhaseTwoApplies: boolean
   readonly forcePhaseTwoPenalty: number
+  readonly ruleZZCornerSixBishopsCount: number
   readonly ruleZApplies: boolean
   readonly ruleZPenalty: number
   readonly ruleYControlledAdjacentCount: number
@@ -2739,6 +2740,13 @@ function scoreTwoBishopsWhiteMoveWithContext(
       )
         ? 0
         : 1,
+    ruleZZCornerSixBishopsCount: isPhaseTwo
+      ? 0
+      : resultBishops.filter((bishop) =>
+          BOARD_CORNERS.some(
+            (corner) => manhattanDistance(bishop, corner) <= 2,
+          ),
+        ).length,
     ruleZApplies: !isPhaseTwo,
     ruleZPenalty:
       targetControlledByBishop && !chess.isCheck() ? 0 : 1,
@@ -3015,6 +3023,15 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
     applies: (score) => score.phaseTwoWallApplies,
     compare: (first, second) =>
       first.phaseTwoWallPenalty - second.phaseTwoWallPenalty,
+  },
+  {
+    id: 'rule zz',
+    shortLabel: 'rule zz',
+    helpText: 'Phase 1: Keep bishops out of the corner 6 squares.',
+    applies: (score) => !score.isPhaseTwoPosition,
+    compare: (first, second) =>
+      first.ruleZZCornerSixBishopsCount -
+      second.ruleZZCornerSixBishopsCount,
   },
   {
     id: 'rule z',
