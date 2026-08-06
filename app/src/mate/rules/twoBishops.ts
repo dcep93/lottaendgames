@@ -2460,7 +2460,7 @@ function scoreTwoBishopsWhiteMoveWithContext(
           2,
           commonAdjacentSquares.filter(
             (square) =>
-              bishop !== square &&
+              bishop === square ||
               bishopHasClearLineToSquareOnBoard(chess, bishop, square),
           ).length,
         ),
@@ -2906,7 +2906,7 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
     id: 'rule y',
     shortLabel: 'rule y',
     helpText:
-      "Phase 1: Use a bishop to control the two squares adjacent to Black's king and also the target square.",
+      "Phase 1: Use a bishop to control or occupy the two squares adjacent to Black's king and also the target square.",
     applies: (score) => !score.isPhaseTwoPosition,
     subpriorities: [
       {

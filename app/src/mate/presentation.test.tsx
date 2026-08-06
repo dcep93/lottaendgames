@@ -1797,7 +1797,7 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
   )
   assert.match(
     bishopsMarkup,
-    />rule y<[^]*Use a bishop to control the two squares adjacent to Black&#x27;s king and also the target square\./,
+    />rule y<[^]*Use a bishop to control or occupy the two squares adjacent to Black&#x27;s king and also the target square\./,
   )
   assert.match(
     bishopsMarkup,
