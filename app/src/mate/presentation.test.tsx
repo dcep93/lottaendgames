@@ -1830,15 +1830,15 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
   )
   assert.ok(
     bishopsMarkup.indexOf('>rule y<') <
-      bishopsMarkup.indexOf('>rule u<'),
-  )
-  assert.ok(
-    bishopsMarkup.indexOf('>rule u<') <
       bishopsMarkup.indexOf('>rule a<'),
   )
   assert.ok(
     bishopsMarkup.indexOf('>rule a<') <
       bishopsMarkup.indexOf('>rule x<'),
+  )
+  assert.ok(
+    bishopsMarkup.indexOf('>rule v<') <
+      bishopsMarkup.indexOf('>rule u<'),
   )
   assert.ok(
     bishopsMarkup.indexOf('>unclutter bishops<') <
@@ -1881,11 +1881,11 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
   const targetRuleLabels = [
     'rule z',
     'rule y',
-    'rule u',
     'rule a',
     'rule x',
     'rule w',
     'rule v',
+    'rule u',
   ]
   for (const [index, label] of targetRuleLabels.entries()) {
     const next = targetRuleLabels[index + 1]
