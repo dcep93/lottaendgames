@@ -405,9 +405,18 @@ test('Two Bishops exposes each Phase 2 comparison as one visible rule', () => {
       rule.id === 'rule z' ||
       rule.id === 'rule y' ||
       rule.id === 'rule x' ||
-      rule.id === 'rule w' ||
-      rule.id === 'rule v'
+      rule.id === 'rule w'
     ) {
+      assert.equal(typeof rule.applies, 'function')
+      assert.equal(rule.compare, undefined)
+      assert.equal(rule.subpriorities?.length, 1)
+      assert.equal(typeof rule.subpriorities[0]?.when, 'function')
+      if (rule.id === 'rule x') {
+        assert.equal(typeof rule.subpriorities[0]?.rank, 'function')
+      } else {
+        assert.equal(typeof rule.subpriorities[0]?.compare, 'function')
+      }
+    } else if (rule.id === 'rule v') {
       assert.equal(typeof rule.applies, 'function')
       assert.equal(typeof rule.compare, 'function')
       assert.equal(rule.subpriorities, undefined)
@@ -456,7 +465,10 @@ test('the visible strategic comparisons run in their displayed order', () => {
     const targetBuildRulesApply =
       phaseOneRulesApply &&
       !afterPhaseTwoWall.some(
-        (san) => scoreTwoBishopsWhiteMove(fen, san).ruleVApplies,
+        (san) => {
+          const score = scoreTwoBishopsWhiteMove(fen, san)
+          return score.ruleVApplies && score.ruleVPenalty === 0
+        },
       )
     const ruleZApplies = afterPhaseTwoWall.some(
       (san) => scoreTwoBishopsWhiteMove(fen, san).ruleZApplies,
@@ -671,10 +683,14 @@ test('Phase 1 target-square rules use the square opposite the nearest corner', (
   assert.equal(targetOccupationCheck.ruleZPenalty, 1)
   assert.equal(targetControl.ruleYControlledAdjacentCount, 2)
   assert.equal(targetOccupationCheck.ruleYControlledAdjacentCount, 0)
-  assert.ok(ruleZ?.compare)
-  assert.ok(ruleZ.compare(targetControl, targetOccupationCheck) < 0)
-  assert.ok(ruleY?.compare)
-  assert.ok(ruleY.compare(targetControl, targetOccupationCheck) < 0)
+  const ruleZPriority = ruleZ?.subpriorities?.[0]
+  const ruleYPriority = ruleY?.subpriorities?.[0]
+  assert.equal(ruleZPriority?.when?.([targetControl, targetOccupationCheck]), true)
+  assert.ok(ruleZPriority?.compare)
+  assert.ok(ruleZPriority.compare(targetControl, targetOccupationCheck) < 0)
+  assert.equal(ruleYPriority?.when?.([targetControl, targetOccupationCheck]), true)
+  assert.ok(ruleYPriority?.compare)
+  assert.ok(ruleYPriority.compare(targetControl, targetOccupationCheck) < 0)
 
   const sourceMove = getChess(fen)
     .moves({ verbose: true })
@@ -704,17 +720,19 @@ test('Phase 1 target-square rules use the square opposite the nearest corner', (
 })
 
 test('rule x maximizes travel when an attacked bishop moves', () => {
-  const fen = '8/8/5k2/6B1/8/2K5/B7/8 w - - 0 1'
-  const near = scoreTwoBishopsWhiteMove(fen, 'Bf4')
-  const far = scoreTwoBishopsWhiteMove(fen, 'Bc1')
+  const fen = '8/8/5k2/5B2/8/2K5/8/B7 w - - 0 1'
+  const near = scoreTwoBishopsWhiteMove(fen, 'Be6')
+  const far = scoreTwoBishopsWhiteMove(fen, 'Bb1')
   const rule = twoBishopsWhiteRules.find(({ id }) => id === 'rule x')
 
   assert.equal(near.ruleXApplies, true)
   assert.equal(far.ruleXApplies, true)
   assert.equal(near.ruleXTravelLength, 1)
   assert.equal(far.ruleXTravelLength, 4)
-  assert.ok(rule?.compare)
-  assert.ok(rule.compare(far, near) < 0)
+  const priority = rule?.subpriorities?.[0]
+  assert.equal(priority?.when?.([near, far]), true)
+  assert.ok(priority?.rank)
+  assert.deepEqual(priority.rank([near, far]), [1, 0])
 })
 
 test('rule w moves White king toward the Phase 1 target square', () => {
@@ -727,9 +745,11 @@ test('rule w moves White king toward the Phase 1 target square', () => {
   assert.equal(toward.ruleWDistance, 2)
   assert.equal(away.ruleWDistance, 13)
   assert.equal(wait.ruleWDistance, 8)
-  assert.ok(rule?.compare)
-  assert.ok(rule.compare(toward, wait) < 0)
-  assert.ok(rule.compare(wait, away) < 0)
+  const priority = rule?.subpriorities?.[0]
+  assert.equal(priority?.when?.([toward, away, wait]), true)
+  assert.ok(priority?.compare)
+  assert.ok(priority.compare(toward, wait) < 0)
+  assert.ok(priority.compare(wait, away) < 0)
 })
 
 test('rule v replaces rule z once White king controls the target', () => {
@@ -739,18 +759,35 @@ test('rule v replaces rule z once White king controls the target', () => {
   const ruleZ = twoBishopsWhiteRules.find(({ id }) => id === 'rule z')
   const ruleV = twoBishopsWhiteRules.find(({ id }) => id === 'rule v')
 
-  assert.equal(checking.ruleZApplies, false)
-  assert.equal(quiet.ruleZApplies, false)
+  assert.equal(checking.ruleZApplies, true)
+  assert.equal(quiet.ruleZApplies, true)
   assert.equal(checking.ruleVApplies, true)
   assert.equal(checking.ruleVPenalty, 0)
   assert.equal(quiet.ruleVPenalty, 1)
-  assert.equal(ruleZ?.applies?.(checking), false)
+  assert.equal(ruleZ?.applies?.(checking), true)
+  assert.equal(ruleZ?.subpriorities?.[0]?.when?.([checking, quiet]), false)
   assert.ok(ruleV?.compare)
   assert.ok(ruleV.compare(checking, quiet) < 0)
   assert.deepEqual(getMateRuleSet('two-bishops').idealWhiteMoves(fen), [
     'Bd8+',
   ])
   assert.equal(getMateRuleSet('two-bishops').currentWhiteHint(fen)?.id, 'rule v')
+})
+
+test('rule z remains active when every rule-v check is unsafe', () => {
+  const fen = '8/8/8/8/3KBk1B/8/8/8 w - - 22 12'
+  const ruleSet = getMateRuleSet('two-bishops')
+  const expected = scoreTwoBishopsWhiteMove(fen, 'Bf6')
+  const unsafeCheck = scoreTwoBishopsWhiteMove(fen, 'Bg5+')
+  const ruleZ = twoBishopsWhiteRules.find(({ id }) => id === 'rule z')
+
+  assert.equal(expected.bishopSafetyPenalty, 0)
+  assert.equal(expected.ruleZPenalty, 0)
+  assert.equal(unsafeCheck.bishopSafetyPenalty, 1)
+  assert.equal(unsafeCheck.ruleVPenalty, 0)
+  assert.equal(ruleZ?.subpriorities?.[0]?.when?.([expected]), true)
+  assert.deepEqual(ruleSet.idealWhiteMoves(fen), ['Bf6'])
+  assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'rule z')
 })
 
 test('the Phase 1 target-square stack is inactive in Phase 2', () => {

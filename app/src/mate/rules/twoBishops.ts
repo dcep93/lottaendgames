@@ -2582,17 +2582,13 @@ function scoreTwoBishopsWhiteMoveWithContext(
       )
         ? 0
         : 1,
-    ruleZApplies:
-      !isPhaseTwo && !whiteKingControlsPhaseOneTarget,
+    ruleZApplies: !isPhaseTwo,
     ruleZPenalty:
       targetControlledByBishop && !chess.isCheck() ? 0 : 1,
     ruleYControlledAdjacentCount: targetControlledByBishop
       ? Math.min(2, controlledBlackAdjacentSquares.length)
       : 0,
-    ruleXApplies:
-      !isPhaseTwo &&
-      !whiteKingControlsPhaseOneTarget &&
-      movedAttackedBishop,
+    ruleXApplies: !isPhaseTwo && movedAttackedBishop,
     ruleXTravelLength: movedAttackedBishop
       ? Math.max(
           Math.abs(
@@ -2713,6 +2709,20 @@ function getPhaseOneTargetSquares(
     }
   }
   return [...targetSquares]
+}
+
+function hasAvailableRuleVMove(
+  scores: readonly TwoBishopsWhiteMoveScore[],
+): boolean {
+  return scores.some(
+    (score) => score.ruleVApplies && score.ruleVPenalty === 0,
+  )
+}
+
+function targetBuildRulesApply(
+  scores: readonly TwoBishopsWhiteMoveScore[],
+): boolean {
+  return !hasAvailableRuleVMove(scores)
 }
 
 export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore>[] = [
@@ -2843,36 +2853,67 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
     helpText:
       'Phase 1: Control the target square with a bishop without checking, unless following rule v.',
     applies: (score) => score.ruleZApplies,
-    compare: (first, second) => first.ruleZPenalty - second.ruleZPenalty,
+    subpriorities: [
+      {
+        when: targetBuildRulesApply,
+        compare: (first, second) =>
+          first.ruleZPenalty - second.ruleZPenalty,
+      },
+    ],
   },
   {
     id: 'rule y',
     shortLabel: 'rule y',
     helpText:
       "Phase 1: Use a bishop to control the two squares adjacent to Black's king and also the target square.",
-    applies: (score) =>
-      !score.isPhaseTwoPosition && !score.ruleVApplies,
-    compare: (first, second) =>
-      second.ruleYControlledAdjacentCount -
-      first.ruleYControlledAdjacentCount,
+    applies: (score) => !score.isPhaseTwoPosition,
+    subpriorities: [
+      {
+        when: targetBuildRulesApply,
+        compare: (first, second) =>
+          second.ruleYControlledAdjacentCount -
+          first.ruleYControlledAdjacentCount,
+      },
+    ],
   },
   {
     id: 'rule x',
     shortLabel: 'rule x',
     helpText:
       'Phase 1: If moving an attacked bishop, move it as far as possible.',
-    applies: (score) => score.ruleXApplies,
-    compare: (first, second) =>
-      second.ruleXTravelLength - first.ruleXTravelLength,
+    applies: (score) => !score.isPhaseTwoPosition,
+    subpriorities: [
+      {
+        when: targetBuildRulesApply,
+        rank: (scores) => {
+          const longestTravel = Math.max(
+            0,
+            ...scores
+              .filter((score) => score.ruleXApplies)
+              .map((score) => score.ruleXTravelLength),
+          )
+          return scores.map((score) =>
+            !score.ruleXApplies ||
+            score.ruleXTravelLength === longestTravel
+              ? 0
+              : 1,
+          )
+        },
+      },
+    ],
   },
   {
     id: 'rule w',
     shortLabel: 'rule w',
     helpText: 'Phase 1: Move the king towards the target square.',
-    applies: (score) =>
-      !score.isPhaseTwoPosition && !score.ruleVApplies,
-    compare: (first, second) =>
-      first.ruleWDistance - second.ruleWDistance,
+    applies: (score) => !score.isPhaseTwoPosition,
+    subpriorities: [
+      {
+        when: targetBuildRulesApply,
+        compare: (first, second) =>
+          first.ruleWDistance - second.ruleWDistance,
+      },
+    ],
   },
   {
     id: 'rule v',
