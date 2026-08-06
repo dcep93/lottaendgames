@@ -20,7 +20,7 @@ The help notes rename `Target corner` to `Phase 2 Target Corner` and add:
 
 All five rules apply only to positions that start in Phase 1.
 
-1. `rule z` prefers a non-checking result in which either bishop has a clear line to any target square. It is inactive when White's king already controls a target square in the starting position, allowing rule v to govern that case.
+1. `rule z` prefers a non-checking result in which either bishop has a clear line to any target square. When White's king already controls a target square in the starting position, rules z through w are inactive so rule v governs that branch.
 2. `rule y` prefers a result in which the bishops control the target and at least two Black-king-adjacent squares in total. The target counts as one of those adjacent squares. Results that do not reach two are ordered by the number controlled, so partial progress remains useful.
 3. `rule x` applies only to candidates that move a bishop attacked by Black's king in the starting position. Among those candidates it maximizes diagonal travel length. Other candidate types remain untouched at this priority.
 4. `rule w` minimizes White's resulting squared Euclidean distance to the nearest target square. Bishop moves preserve the current king distance, so a king move wins only when it makes genuine progress.

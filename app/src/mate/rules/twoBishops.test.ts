@@ -40,13 +40,13 @@ const WHITE_RULE_IDS = [
   'sequester',
   'bishops off edge',
   'phase 2 wall',
-  'ideal cage',
-  'restricted area',
-  'prep restricted area',
-  'king pushable',
+  'rule z',
+  'rule y',
+  'rule x',
+  'rule w',
+  'rule v',
   'unclutter bishops',
   'king closer',
-  'bishops further',
   'check',
 ] as const
 
@@ -336,24 +336,28 @@ test('Two Bishops exposes each Phase 2 comparison as one visible rule', () => {
           "Phase 2: Create or maintain a 2 square wall adjacent to Black's king and opposite the target corner.",
       },
       {
-        shortLabel: 'ideal cage',
+        shortLabel: 'rule z',
         helpText:
-          "Phase 1: Have 2 adjacent bishops, exactly one on the edge, 3 squares from the corner, with Black's king inside the 5-square corner area",
+          'Phase 1: Control the target square with a bishop without checking, unless following rule v.',
       },
       {
-        shortLabel: 'restricted area',
+        shortLabel: 'rule y',
         helpText:
-          "Phase 1: Use the bishops to control 2 diagonals adjacent to Black's king, but not checking the king, preferring a smaller area for Black. White's king should not screen a bishop from a Black king-adjacent square",
+          "Phase 1: Use a bishop to control the two squares adjacent to Black's king and also the target square.",
       },
       {
-        shortLabel: 'prep restricted area',
+        shortLabel: 'rule x',
         helpText:
-          "Phase 1: Bishop control a square diagonally adjacent to Black's king, preferring squares closer to the center of the board.",
+          'Phase 1: If moving an attacked bishop, move it as far as possible.',
       },
       {
-        shortLabel: 'king pushable',
+        shortLabel: 'rule w',
+        helpText: 'Phase 1: Move the king towards the target square.',
+      },
+      {
+        shortLabel: 'rule v',
         helpText:
-          "Phase 1: Bring White's king to or adjacent to the restricted-area diagonal while keeping it outside Black's restricted area.",
+          'Phase 1: If the king already controls the target square, check the king, from not the target square.',
       },
       {
         shortLabel: 'unclutter bishops',
@@ -363,11 +367,6 @@ test('Two Bishops exposes each Phase 2 comparison as one visible rule', () => {
         shortLabel: 'king closer',
         helpText:
           "Bring White's king closer to Black's king, preferring proximity to the the middle 16 squares.",
-      },
-      {
-        shortLabel: 'bishops further',
-        helpText:
-          "Phase 1: Prefer bishops to be further from Black's king",
       },
       {
         shortLabel: 'check',
@@ -402,15 +401,12 @@ test('Two Bishops exposes each Phase 2 comparison as one visible rule', () => {
       assert.equal(typeof rule.applies, 'function')
       assert.equal(typeof rule.compare, 'function')
       assert.equal(rule.subpriorities, undefined)
-    } else if (rule.id === 'prep restricted area') {
-      assert.equal(typeof rule.applies, 'function')
-      assert.equal(rule.compare, undefined)
-      assert.equal(rule.subpriorities?.length, 1)
     } else if (
-      rule.id === 'ideal cage' ||
-      rule.id === 'restricted area' ||
-      rule.id === 'king pushable' ||
-      rule.id === 'bishops further'
+      rule.id === 'rule z' ||
+      rule.id === 'rule y' ||
+      rule.id === 'rule x' ||
+      rule.id === 'rule w' ||
+      rule.id === 'rule v'
     ) {
       assert.equal(typeof rule.applies, 'function')
       assert.equal(typeof rule.compare, 'function')
@@ -457,85 +453,93 @@ test('the visible strategic comparisons run in their displayed order', () => {
     const phaseOneRulesApply = !afterPhaseTwoWall.some(
       (san) => scoreTwoBishopsWhiteMove(fen, san).isPhaseTwoPosition,
     )
-    const bestIdealCagePenalty = Math.min(
+    const targetBuildRulesApply =
+      phaseOneRulesApply &&
+      !afterPhaseTwoWall.some(
+        (san) => scoreTwoBishopsWhiteMove(fen, san).ruleVApplies,
+      )
+    const ruleZApplies = afterPhaseTwoWall.some(
+      (san) => scoreTwoBishopsWhiteMove(fen, san).ruleZApplies,
+    )
+    const bestRuleZPenalty = Math.min(
       ...afterPhaseTwoWall.map(
-        (san) => scoreTwoBishopsWhiteMove(fen, san).idealCagePenalty,
+        (san) => scoreTwoBishopsWhiteMove(fen, san).ruleZPenalty,
       ),
     )
-    const afterIdealCage = phaseOneRulesApply
+    const afterRuleZ = ruleZApplies
       ? afterPhaseTwoWall.filter(
           (san) =>
-            scoreTwoBishopsWhiteMove(fen, san).idealCagePenalty ===
-            bestIdealCagePenalty,
+            scoreTwoBishopsWhiteMove(fen, san).ruleZPenalty ===
+            bestRuleZPenalty,
         )
       : afterPhaseTwoWall
-    const bestRestrictArea = Math.min(
-      ...afterIdealCage.map(
-        (san) => scoreTwoBishopsWhiteMove(fen, san).restrictAreaRawArea,
-      ),
-    )
-    const restrictAreaMoves = phaseOneRulesApply
-      ? afterIdealCage.filter(
-          (san) =>
-            scoreTwoBishopsWhiteMove(fen, san).restrictAreaRawArea ===
-            bestRestrictArea,
-        )
-      : afterIdealCage
-    const bestRestrictAreaFallbackDistance = Math.min(
-      ...restrictAreaMoves.map(
+    const bestRuleYControlledAdjacentCount = Math.max(
+      ...afterRuleZ.map(
         (san) =>
           scoreTwoBishopsWhiteMove(fen, san)
-            .restrictAreaDiagonalCenterDistance,
+            .ruleYControlledAdjacentCount,
       ),
     )
-    const afterPrepRestrictArea =
-      !phaseOneRulesApply
-        ? restrictAreaMoves
-        : bestRestrictArea !== 99
-          ? restrictAreaMoves
-          : restrictAreaMoves.filter(
-            (san) =>
-              scoreTwoBishopsWhiteMove(fen, san)
-                .restrictAreaDiagonalCenterDistance ===
-              bestRestrictAreaFallbackDistance,
-            )
-    const kingPushableApplies = afterPrepRestrictArea.some(
-      (san) => scoreTwoBishopsWhiteMove(fen, san).kingPushableApplies,
-    )
-    const bestKingPushableInsideAreaPenalty = Math.min(
-      ...afterPrepRestrictArea.map(
-        (san) =>
-          scoreTwoBishopsWhiteMove(fen, san)
-            .kingPushableInsideAreaPenalty,
-      ),
-    )
-    const outsideAreaMoves = kingPushableApplies
-      ? afterPrepRestrictArea.filter(
+    const afterRuleY = targetBuildRulesApply
+      ? afterRuleZ.filter(
           (san) =>
             scoreTwoBishopsWhiteMove(fen, san)
-              .kingPushableInsideAreaPenalty ===
-            bestKingPushableInsideAreaPenalty,
+              .ruleYControlledAdjacentCount ===
+            bestRuleYControlledAdjacentCount,
         )
-      : afterPrepRestrictArea
-    const bestKingPushableDistance = Math.min(
-      ...outsideAreaMoves.map(
-        (san) => scoreTwoBishopsWhiteMove(fen, san).kingPushableDistance,
+      : afterRuleZ
+    const ruleXMoves = afterRuleY.filter(
+      (san) => scoreTwoBishopsWhiteMove(fen, san).ruleXApplies,
+    )
+    const bestRuleXTravelLength =
+      ruleXMoves.length === 0
+        ? 0
+        : Math.max(
+            ...ruleXMoves.map(
+              (san) =>
+                scoreTwoBishopsWhiteMove(fen, san).ruleXTravelLength,
+            ),
+          )
+    const afterRuleX = afterRuleY.filter(
+      (san) =>
+        !scoreTwoBishopsWhiteMove(fen, san).ruleXApplies ||
+        scoreTwoBishopsWhiteMove(fen, san).ruleXTravelLength ===
+          bestRuleXTravelLength,
+    )
+    const bestRuleWDistance = Math.min(
+      ...afterRuleX.map(
+        (san) => scoreTwoBishopsWhiteMove(fen, san).ruleWDistance,
       ),
     )
-    const afterKingPushable = kingPushableApplies
-      ? outsideAreaMoves.filter(
+    const afterRuleW = targetBuildRulesApply
+      ? afterRuleX.filter(
           (san) =>
-            scoreTwoBishopsWhiteMove(fen, san).kingPushableDistance ===
-            bestKingPushableDistance,
+            scoreTwoBishopsWhiteMove(fen, san).ruleWDistance ===
+            bestRuleWDistance,
         )
-      : afterPrepRestrictArea
+      : afterRuleX
+    const ruleVApplies = afterRuleW.some(
+      (san) => scoreTwoBishopsWhiteMove(fen, san).ruleVApplies,
+    )
+    const bestRuleVPenalty = Math.min(
+      ...afterRuleW.map(
+        (san) => scoreTwoBishopsWhiteMove(fen, san).ruleVPenalty,
+      ),
+    )
+    const afterRuleV = ruleVApplies
+      ? afterRuleW.filter(
+          (san) =>
+            scoreTwoBishopsWhiteMove(fen, san).ruleVPenalty ===
+            bestRuleVPenalty,
+        )
+      : afterRuleW
     const bestClutteredBishopsCount = Math.min(
-      ...afterKingPushable.map(
+      ...afterRuleV.map(
         (san) =>
           scoreTwoBishopsWhiteMove(fen, san).clutteredBishopsCount,
       ),
     )
-    const afterUnclutterBishops = afterKingPushable.filter(
+    const afterUnclutterBishops = afterRuleV.filter(
       (san) =>
         scoreTwoBishopsWhiteMove(fen, san).clutteredBishopsCount ===
           bestClutteredBishopsCount,
@@ -574,26 +578,13 @@ test('the visible strategic comparisons run in their displayed order', () => {
         scoreTwoBishopsWhiteMove(fen, san)
           .kingCloserMiddleSixteenDistance === bestMiddleSixteenDistance,
     )
-    const bestBishopsFurtherDistance = Math.max(
-      ...afterKingCloser.map(
-        (san) =>
-          scoreTwoBishopsWhiteMove(fen, san).bishopsFurtherDistance,
-      ),
-    )
-    const afterBishopsFurther = phaseOneRulesApply
-      ? afterKingCloser.filter(
-          (san) =>
-            scoreTwoBishopsWhiteMove(fen, san)
-              .bishopsFurtherDistance === bestBishopsFurtherDistance,
-        )
-      : afterKingCloser
     const checkingMoves = phaseOneRulesApply
-      ? afterBishopsFurther.filter(
+      ? afterKingCloser.filter(
           (san) => scoreTwoBishopsWhiteMove(fen, san).checkPenalty === 0,
         )
       : []
     const expectedFinal =
-      checkingMoves.length > 0 ? checkingMoves : afterBishopsFurther
+      checkingMoves.length > 0 ? checkingMoves : afterKingCloser
     assert.deepEqual(ruleSet.idealWhiteMoves(fen), expectedFinal, fen)
     for (const first of expectedFinal) {
       const firstScore = scoreTwoBishopsWhiteMove(fen, first)
@@ -601,7 +592,6 @@ test('the visible strategic comparisons run in their displayed order', () => {
         Object.keys(firstScore).sort(),
         [
           'bishopSafetyPenalty',
-          'bishopsFurtherDistance',
           'bishopsOnBlackEdgeCount',
           'checkPenalty',
           'clutteredBishopsCount',
@@ -610,21 +600,23 @@ test('the visible strategic comparisons run in their displayed order', () => {
           'degenerateTerminal',
           'forcePhaseTwoApplies',
           'forcePhaseTwoPenalty',
-          'idealCagePenalty',
           'isPhaseTwoPosition',
           'kingCloserDistance',
           'kingCloserMiddleSixteenDistance',
           'kingCloserPhaseTwoLinePenalty',
-          'kingPushableApplies',
-          'kingPushableDistance',
-          'kingPushableInsideAreaPenalty',
           'mateInThreeApplies',
           'mateInThreeTurns',
           'matePenalty',
           'phaseTwoWallApplies',
           'phaseTwoWallPenalty',
-          'restrictAreaDiagonalCenterDistance',
-          'restrictAreaRawArea',
+          'ruleVApplies',
+          'ruleVPenalty',
+          'ruleWDistance',
+          'ruleXApplies',
+          'ruleXTravelLength',
+          'ruleYControlledAdjacentCount',
+          'ruleZApplies',
+          'ruleZPenalty',
           'sequesterApplies',
           'sequesterCornerDiagonalsTarget',
           'sequesterCurrentCornerDistance',
@@ -667,444 +659,111 @@ test('the prepared Two Bishops batch matches public single-move scores', () => {
   )
 })
 
-test('ideal cage recognizes the exact five-square corner formation', () => {
-  const fen = '8/8/8/4K3/BB6/8/1k6/8 w - - 0 1'
-  const preserved = scoreTwoBishopsWhiteMove(fen, 'Kd5')
-  const broken = scoreTwoBishopsWhiteMove(fen, 'Bc5')
-  const rule = twoBishopsWhiteRules.find(({ id }) => id === 'ideal cage')
+test('Phase 1 target-square rules use the square opposite the nearest corner', () => {
+  const fen = '8/8/5k2/8/8/2K5/B6B/8 w - - 0 1'
+  const targetControl = scoreTwoBishopsWhiteMove(fen, 'Bg3')
+  const targetOccupationCheck = scoreTwoBishopsWhiteMove(fen, 'Be5+')
+  const ruleZ = twoBishopsWhiteRules.find(({ id }) => id === 'rule z')
+  const ruleY = twoBishopsWhiteRules.find(({ id }) => id === 'rule y')
 
-  assert.equal(preserved.idealCagePenalty, 0)
-  assert.equal(broken.idealCagePenalty, 1)
+  assert.equal(targetControl.ruleZApplies, true)
+  assert.equal(targetControl.ruleZPenalty, 0)
+  assert.equal(targetOccupationCheck.ruleZPenalty, 1)
+  assert.equal(targetControl.ruleYControlledAdjacentCount, 2)
+  assert.equal(targetOccupationCheck.ruleYControlledAdjacentCount, 0)
+  assert.ok(ruleZ?.compare)
+  assert.ok(ruleZ.compare(targetControl, targetOccupationCheck) < 0)
+  assert.ok(ruleY?.compare)
+  assert.ok(ruleY.compare(targetControl, targetOccupationCheck) < 0)
+
+  const sourceMove = getChess(fen)
+    .moves({ verbose: true })
+    .find(({ san }) => san === 'Bg3')
+  assert.ok(sourceMove)
+  for (const transform of SQUARE_TRANSFORMS) {
+    const transformedFen = getChess(transformFen(fen, transform)).fen()
+    const transformedMove: Move | undefined = getChess(transformedFen)
+      .moves({ verbose: true })
+      .find(
+        ({ from, to }) =>
+          from === transformSquare(sourceMove.from, transform) &&
+          to === transformSquare(sourceMove.to, transform),
+      )
+    assert.ok(transformedMove, transform.name)
+    const transformedScore = scoreTwoBishopsWhiteMove(
+      transformedFen,
+      transformedMove.san,
+    )
+    assert.equal(transformedScore.ruleZPenalty, 0, transform.name)
+    assert.equal(
+      transformedScore.ruleYControlledAdjacentCount,
+      2,
+      transform.name,
+    )
+  }
+})
+
+test('rule x maximizes travel when an attacked bishop moves', () => {
+  const fen = '8/8/5k2/6B1/8/2K5/B7/8 w - - 0 1'
+  const near = scoreTwoBishopsWhiteMove(fen, 'Bf4')
+  const far = scoreTwoBishopsWhiteMove(fen, 'Bc1')
+  const rule = twoBishopsWhiteRules.find(({ id }) => id === 'rule x')
+
+  assert.equal(near.ruleXApplies, true)
+  assert.equal(far.ruleXApplies, true)
+  assert.equal(near.ruleXTravelLength, 1)
+  assert.equal(far.ruleXTravelLength, 4)
   assert.ok(rule?.compare)
-  assert.ok(rule.compare(preserved, broken) < 0)
-
-  const outside = scoreTwoBishopsWhiteMove(
-    '8/8/8/4K3/BB6/3k4/8/8 w - - 0 1',
-    'Kd5',
-  )
-  const edgeBishopTooClose = scoreTwoBishopsWhiteMove(
-    '8/8/8/4K3/8/BB6/8/k7 w - - 0 1',
-    'Kd5',
-  )
-  const bothBishopsOnEdge = scoreTwoBishopsWhiteMove(
-    '8/8/8/B3K3/B7/8/1k6/8 w - - 0 1',
-    'Kd5',
-  )
-  assert.equal(outside.idealCagePenalty, 1)
-  assert.equal(edgeBishopTooClose.idealCagePenalty, 1)
-  assert.equal(bothBishopsOnEdge.idealCagePenalty, 1)
-
-  const sourceMove = getChess(fen)
-    .moves({ verbose: true })
-    .find(({ san }) => san === 'Kd5')
-  assert.ok(sourceMove)
-  for (const transform of SQUARE_TRANSFORMS) {
-    const transformedFen = getChess(transformFen(fen, transform)).fen()
-    const transformedMove: Move | undefined = getChess(transformedFen)
-      .moves({ verbose: true })
-      .find(
-        ({ from, to }) =>
-          from === transformSquare(sourceMove.from, transform) &&
-          to === transformSquare(sourceMove.to, transform),
-      )
-    assert.ok(transformedMove, transform.name)
-    assert.equal(
-      scoreTwoBishopsWhiteMove(transformedFen, transformedMove.san)
-        .idealCagePenalty,
-      0,
-      transform.name,
-    )
-  }
+  assert.ok(rule.compare(far, near) < 0)
 })
 
-test('restricted area prefers every raw confinement reduction', () => {
-  const fen = '3B4/k2B4/8/8/4K3/8/8/8 w - - 2 2'
-  const kingMove = scoreTwoBishopsWhiteMove(fen, 'Kd5')
-  const sameArea = scoreTwoBishopsWhiteMove(fen, 'Bc7')
-  const smallerArea = scoreTwoBishopsWhiteMove(fen, 'Bc8')
-  const largerArea = scoreTwoBishopsWhiteMove(fen, 'Be7')
-  const ruleSet = getMateRuleSet('two-bishops')
-  const restrictedArea = twoBishopsWhiteRules.find(
-    ({ id }) => id === 'restricted area',
-  )
+test('rule w moves White king toward the Phase 1 target square', () => {
+  const fen = '8/8/5k2/8/8/2K5/B6B/8 w - - 0 1'
+  const toward = scoreTwoBishopsWhiteMove(fen, 'Kd4')
+  const away = scoreTwoBishopsWhiteMove(fen, 'Kb3')
+  const wait = scoreTwoBishopsWhiteMove(fen, 'Bg3')
+  const rule = twoBishopsWhiteRules.find(({ id }) => id === 'rule w')
 
-  assert.equal(kingMove.restrictAreaRawArea, 6)
-  assert.equal(sameArea.restrictAreaRawArea, 6)
-  assert.equal(smallerArea.restrictAreaRawArea, 3)
-  assert.equal(largerArea.restrictAreaRawArea, 10)
-  assert.ok(restrictedArea?.compare)
-  assert.ok(restrictedArea.compare(smallerArea, kingMove) < 0)
-  assert.ok(restrictedArea.compare(kingMove, largerArea) < 0)
-  assert.deepEqual(ruleSet.idealWhiteMoves(fen), ['Kd5'])
-  assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'king pushable')
+  assert.equal(toward.ruleWDistance, 2)
+  assert.equal(away.ruleWDistance, 13)
+  assert.equal(wait.ruleWDistance, 8)
+  assert.ok(rule?.compare)
+  assert.ok(rule.compare(toward, wait) < 0)
+  assert.ok(rule.compare(wait, away) < 0)
 })
 
-test("restricted area permits White's king anywhere it does not screen a bishop", () => {
-  const opposite = scoreTwoBishopsWhiteMove(
-    '3B4/k2B4/8/8/4K3/8/8/8 w - - 2 2',
-    'Bc7',
-  )
-  const inside = scoreTwoBishopsWhiteMove(
-    '2KB4/k2B4/8/8/8/8/8/8 w - - 0 1',
-    'Bc7',
-  )
-  const nearBoundary = scoreTwoBishopsWhiteMove(
-    '3B4/k2B4/8/K7/8/8/8/8 w - - 0 1',
-    'Bc7',
-  )
-  const farBoundary = scoreTwoBishopsWhiteMove(
-    '3B4/k2B4/8/8/K7/8/8/8 w - - 0 1',
-    'Bc7',
-  )
-  const screened = scoreTwoBishopsWhiteMove(
-    '2KB4/k2B4/8/8/8/8/8/8 w - - 0 1',
-    'Kc7',
-  )
+test('rule v replaces rule z once White king controls the target', () => {
+  const fen = '8/8/5k2/B7/3K4/8/B7/8 w - - 0 1'
+  const checking = scoreTwoBishopsWhiteMove(fen, 'Bd8+')
+  const quiet = scoreTwoBishopsWhiteMove(fen, 'Bb6')
+  const ruleZ = twoBishopsWhiteRules.find(({ id }) => id === 'rule z')
+  const ruleV = twoBishopsWhiteRules.find(({ id }) => id === 'rule v')
 
-  assert.equal(opposite.restrictAreaRawArea, 6)
-  assert.equal(inside.restrictAreaRawArea, 6)
-  assert.equal(nearBoundary.restrictAreaRawArea, 6)
-  assert.equal(farBoundary.restrictAreaRawArea, 6)
-  assert.equal(screened.restrictAreaRawArea, 99)
-
-  const screenedFen = '2KB4/k2B4/8/8/8/8/8/8 w - - 0 1'
-  const screenedMove = getChess(screenedFen)
-    .moves({ verbose: true })
-    .find(({ san }) => san === 'Kc7')
-  assert.ok(screenedMove)
-  for (const transform of SQUARE_TRANSFORMS) {
-    const transformedFen = getChess(
-      transformFen(screenedFen, transform),
-    ).fen()
-    const transformedMove: Move | undefined = getChess(transformedFen)
-      .moves({ verbose: true })
-      .find(
-        ({ from, to }) =>
-          from === transformSquare(screenedMove.from, transform) &&
-          to === transformSquare(screenedMove.to, transform),
-      )
-    assert.ok(transformedMove, transform.name)
-    assert.equal(
-      scoreTwoBishopsWhiteMove(transformedFen, transformedMove.san)
-        .restrictAreaRawArea,
-      99,
-      transform.name,
-    )
-  }
-})
-
-test('prep restricted area lets lower priorities choose between maintained boundaries', () => {
-  const fen = '8/8/8/3BK3/8/3kB3/8/8 w - - 14 8'
-  const nearer = scoreTwoBishopsWhiteMove(fen, 'Bc5')
-  const farther = scoreTwoBishopsWhiteMove(fen, 'Ba7')
-  const ruleSet = getMateRuleSet('two-bishops')
-  const prep = twoBishopsWhiteRules.find(
-    ({ id }) => id === 'prep restricted area',
-  )
-
-  assert.equal(nearer.restrictAreaRawArea, 21)
-  assert.equal(farther.restrictAreaRawArea, 21)
-  assert.equal(nearer.clutteredBishopsCount, 0)
-  assert.equal(farther.clutteredBishopsCount, 1)
-  assert.equal(prep?.subpriorities?.length, 1)
-  assert.equal(prep?.subpriorities?.[0]?.when?.([nearer, farther]), false)
-  assert.deepEqual(ruleSet.idealWhiteMoves(fen), ['Bc5'])
-  assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'bishops further')
-  assert.equal(ruleSet.explainWhiteMove(fen, 'Ba7')?.id, 'unclutter bishops')
-
-  const sourceMove = getChess(fen)
-    .moves({ verbose: true })
-    .find(({ san }) => san === 'Bc5')
-  assert.ok(sourceMove)
-  for (const transform of SQUARE_TRANSFORMS) {
-    const transformedFen = getChess(transformFen(fen, transform)).fen()
-    const transformedMove: Move | undefined = getChess(transformedFen)
-      .moves({ verbose: true })
-      .find(
-        ({ from, to }) =>
-          from === transformSquare(sourceMove.from, transform) &&
-          to === transformSquare(sourceMove.to, transform),
-      )
-    assert.ok(transformedMove, transform.name)
-    assert.deepEqual(
-      getMateRuleSet('two-bishops').idealWhiteMoves(transformedFen),
-      [transformedMove.san],
-      transform.name,
-    )
-  }
-})
-
-test('restricted area recognizes the other adjacent-diagonal orientation', () => {
-  const fen = '8/8/8/BB6/3K4/8/1k6/8 w - - 0 1'
-  const smallerArea = scoreTwoBishopsWhiteMove(fen, 'Ba4')
-  const largerArea = scoreTwoBishopsWhiteMove(fen, 'Bb4')
-
-  assert.equal(smallerArea.restrictAreaRawArea, 6)
-  assert.equal(largerArea.restrictAreaRawArea, 10)
+  assert.equal(checking.ruleZApplies, false)
+  assert.equal(quiet.ruleZApplies, false)
+  assert.equal(checking.ruleVApplies, true)
+  assert.equal(checking.ruleVPenalty, 0)
+  assert.equal(quiet.ruleVPenalty, 1)
+  assert.equal(ruleZ?.applies?.(checking), false)
+  assert.ok(ruleV?.compare)
+  assert.ok(ruleV.compare(checking, quiet) < 0)
   assert.deepEqual(getMateRuleSet('two-bishops').idealWhiteMoves(fen), [
-    'Ba4',
+    'Bd8+',
   ])
+  assert.equal(getMateRuleSet('two-bishops').currentWhiteHint(fen)?.id, 'rule v')
 })
 
-test('restricted area excludes a checking adjacent-diagonal cage', () => {
-  const fen = 'KB6/8/B7/8/3k4/8/8/8 w - - 0 1'
-  const quiet = scoreTwoBishopsWhiteMove(fen, 'Bc7')
-  const checking = scoreTwoBishopsWhiteMove(fen, 'Ba7+')
-
-  assert.equal(quiet.restrictAreaRawArea, 54)
-  assert.equal(checking.restrictAreaRawArea, 99)
-  assert.equal(checking.restrictAreaDiagonalCenterDistance, 99)
-})
-
-test('prep restricted area prefers the controlled diagonal neighbor closest to center', () => {
-  const fen = '7B/3k4/8/8/8/8/3KB3/8 w - - 0 1'
-  const central = scoreTwoBishopsWhiteMove(fen, 'Bf3')
-  const farther = scoreTwoBishopsWhiteMove(fen, 'Ba6')
-  const prepRestrictedArea = twoBishopsWhiteRules.find(
-    ({ id }) => id === 'prep restricted area',
-  )
-  const fallback = prepRestrictedArea?.subpriorities?.[0]
-
-  assert.equal(central.restrictAreaRawArea, 99)
-  assert.equal(farther.restrictAreaRawArea, 99)
-  assert.equal(central.restrictAreaDiagonalCenterDistance, 2)
-  assert.equal(farther.restrictAreaDiagonalCenterDistance, 4)
-  assert.equal(fallback?.when?.([central, farther]), true)
-  assert.ok(fallback?.compare)
-  assert.ok(fallback.compare(central, farther) < 0)
-})
-
-test('king pushable accepts the diagonal and adjacent squares before unclutter bishops', () => {
-  const fen = '8/8/7B/8/8/4K3/6k1/1B6 w - - 0 1'
-  const along = scoreTwoBishopsWhiteMove(fen, 'Kf4')
-  const adjacent = scoreTwoBishopsWhiteMove(fen, 'Kd4')
-  const inside = scoreTwoBishopsWhiteMove(fen, 'Ke2')
-  const bishopWait = scoreTwoBishopsWhiteMove(fen, 'Bc2')
-  const rule = twoBishopsWhiteRules.find(({ id }) => id === 'king pushable')
-
-  assert.equal(along.kingPushableApplies, true)
-  assert.equal(along.kingPushableDistance, 0)
-  assert.equal(adjacent.kingPushableDistance, 0)
-  assert.equal(inside.kingPushableInsideAreaPenalty, 1)
-  assert.equal(bishopWait.kingPushableDistance, 0)
-  assert.ok(rule?.compare)
-  assert.equal(rule.compare(along, adjacent), 0)
-  assert.ok(rule.compare(adjacent, inside) < 0)
-  assert.equal(rule.compare(along, bishopWait), 0)
-  const idealMoves = getMateRuleSet('two-bishops').idealWhiteMoves(fen)
-  assert.deepEqual(idealMoves, ['Bg5'])
-  assert.ok(!idealMoves.includes('Ke2'))
-  assert.equal(
-    getMateRuleSet('two-bishops').explainWhiteMove(fen, 'Ke2')?.id,
-    'king pushable',
-  )
-
-  const sourceMove = getChess(fen)
-    .moves({ verbose: true })
-    .find(({ san }) => san === 'Kd4')
-  assert.ok(sourceMove)
-  for (const transform of SQUARE_TRANSFORMS) {
-    const transformedFen = getChess(transformFen(fen, transform)).fen()
-    const transformedMove: Move | undefined = getChess(transformedFen)
-      .moves({ verbose: true })
-      .find(
-        ({ from, to }) =>
-          from === transformSquare(sourceMove.from, transform) &&
-          to === transformSquare(sourceMove.to, transform),
-      )
-    assert.ok(transformedMove, transform.name)
-    const transformedScore = scoreTwoBishopsWhiteMove(
-      transformedFen,
-      transformedMove.san,
-    )
-    assert.equal(transformedScore.kingPushableApplies, true, transform.name)
-    assert.equal(transformedScore.kingPushableDistance, 0, transform.name)
-  }
-})
-
-test('king pushable treats adjacency as acceptable in the supplied position', () => {
-  const fen = '8/8/8/3BK3/1k6/4B3/8/8 w - - 18 10'
-  const direct = scoreTwoBishopsWhiteMove(fen, 'Ke4')
-  const orthogonallyAdjacent = scoreTwoBishopsWhiteMove(fen, 'Kf4')
-  const diagonallyAdjacent = scoreTwoBishopsWhiteMove(fen, 'Ke6')
-  const farther = scoreTwoBishopsWhiteMove(fen, 'Kf6')
-  const rule = twoBishopsWhiteRules.find(({ id }) => id === 'king pushable')
-
-  assert.equal(direct.kingPushableInsideAreaPenalty, 0)
-  assert.equal(orthogonallyAdjacent.kingPushableInsideAreaPenalty, 0)
-  assert.equal(diagonallyAdjacent.kingPushableInsideAreaPenalty, 0)
-  assert.equal(farther.kingPushableInsideAreaPenalty, 0)
-  assert.equal(direct.kingPushableDistance, 0)
-  assert.equal(orthogonallyAdjacent.kingPushableDistance, 0)
-  assert.equal(diagonallyAdjacent.kingPushableDistance, 0)
-  assert.equal(farther.kingPushableDistance, 3)
-  assert.ok(rule?.compare)
-  assert.equal(rule.compare(direct, orthogonallyAdjacent), 0)
-  assert.equal(rule.compare(direct, diagonallyAdjacent), 0)
-  assert.ok(rule.compare(diagonallyAdjacent, farther) < 0)
-  const ruleSet = getMateRuleSet('two-bishops')
-  assert.deepEqual(ruleSet.idealWhiteMoves(fen), ['Kd6'])
-  assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'king closer')
-})
-
-test("king pushable keeps White's king outside Black's restricted area", () => {
-  const fen = '8/8/8/8/6k1/3K4/2BB4/8 w - - 2 2'
-  const expected = scoreTwoBishopsWhiteMove(fen, 'Kd4')
-  const tiedDistance = scoreTwoBishopsWhiteMove(fen, 'Kc3')
-  const inside = scoreTwoBishopsWhiteMove(fen, 'Ke2')
-  const ruleSet = getMateRuleSet('two-bishops')
-
-  assert.equal(expected.kingPushableApplies, true)
-  assert.equal(expected.kingPushableInsideAreaPenalty, 0)
-  assert.equal(tiedDistance.kingPushableInsideAreaPenalty, 0)
-  assert.equal(inside.kingPushableInsideAreaPenalty, 1)
-  assert.equal(expected.kingPushableDistance, 0)
-  assert.equal(tiedDistance.kingPushableDistance, 0)
-  assert.equal(inside.kingPushableDistance, 0)
-  assert.deepEqual(ruleSet.idealWhiteMoves(fen), ['Kd4'])
-  assert.equal(ruleSet.explainWhiteMove(fen, 'Ke2')?.id, 'king pushable')
-
-  const sourceMove = getChess(fen)
-    .moves({ verbose: true })
-    .find(({ san }) => san === 'Kd4')
-  assert.ok(sourceMove)
-  for (const transform of SQUARE_TRANSFORMS) {
-    const transformedFen = getChess(transformFen(fen, transform)).fen()
-    const transformedMove: Move | undefined = getChess(transformedFen)
-      .moves({ verbose: true })
-      .find(
-        ({ from, to }) =>
-          from === transformSquare(sourceMove.from, transform) &&
-          to === transformSquare(sourceMove.to, transform),
-      )
-    assert.ok(transformedMove, transform.name)
-    const transformedScore = scoreTwoBishopsWhiteMove(
-      transformedFen,
-      transformedMove.san,
-    )
-    assert.equal(transformedScore.kingPushableApplies, true, transform.name)
-    assert.equal(
-      transformedScore.kingPushableInsideAreaPenalty,
-      0,
-      transform.name,
-    )
-    assert.equal(transformedScore.kingPushableDistance, 0, transform.name)
-  }
-})
-
-test('king pushable is inactive without a Phase 1 restricted area', () => {
-  const phaseOne = scoreTwoBishopsWhiteMove(
-    '7B/3k4/8/8/8/8/3KB3/8 w - - 0 1',
-    'Bf3',
-  )
-  const phaseTwo = scoreTwoBishopsWhiteMove(
-    '8/8/8/5K1k/8/8/6BB/8 w - - 4 3',
-    'Ke6',
-  )
-  const rule = twoBishopsWhiteRules.find(({ id }) => id === 'king pushable')
-
-  assert.equal(phaseOne.kingPushableApplies, false)
-  assert.equal(phaseOne.kingPushableDistance, 99)
-  assert.equal(phaseTwo.isPhaseTwoPosition, true)
-  assert.equal(rule?.applies?.(phaseTwo), false)
-})
-
-test('the Phase 1 cage stack is inactive in Phase 2', () => {
+test('the Phase 1 target-square stack is inactive in Phase 2', () => {
   const score = scoreTwoBishopsWhiteMove(
     '8/8/8/5K1k/8/8/6BB/8 w - - 4 3',
     'Ke6',
   )
   assert.equal(score.isPhaseTwoPosition, true)
-  for (const id of [
-    'ideal cage',
-    'restricted area',
-    'prep restricted area',
-    'king pushable',
-    'bishops further',
-  ]) {
+  for (const id of ['rule z', 'rule y', 'rule x', 'rule w', 'rule v']) {
     const rule = twoBishopsWhiteRules.find((candidate) => candidate.id === id)
     assert.equal(rule?.applies?.(score), false, id)
   }
 })
-
-test('restricted area follows D4 symmetry and recomputes area after translation', () => {
-  const source = '3B4/k2B4/8/8/4K3/8/8/8 w - - 2 2'
-  const sourceMove = getChess(source)
-    .moves({ verbose: true })
-    .find(({ san }) => san === 'Kd5')
-  assert.ok(sourceMove)
-
-  for (const transform of SQUARE_TRANSFORMS) {
-    const fen = getChess(transformFen(source, transform)).fen()
-    const expected = getChess(fen)
-      .moves({ verbose: true })
-      .find(
-        ({ from, to }) =>
-          from === transformSquare(sourceMove.from, transform) &&
-          to === transformSquare(sourceMove.to, transform),
-    )
-    assert.ok(expected, transform.name)
-    const score = scoreTwoBishopsWhiteMove(fen, expected.san)
-    assert.equal(score.restrictAreaRawArea, 6, transform.name)
-  }
-
-  const translated = scoreTwoBishopsWhiteMove(
-    '4B3/1k2B3/8/8/5K2/8/8/8 w - - 2 2',
-    'Ke5',
-  )
-  assert.equal(translated.restrictAreaRawArea, 10)
-})
-
-test('bishops further maximizes combined squared Euclidean distance', () => {
-  const fen = '8/8/8/3k4/8/2B1K3/8/1B6 w - - 0 1'
-  const farther = scoreTwoBishopsWhiteMove(fen, 'Ba5')
-  const nearer = scoreTwoBishopsWhiteMove(fen, 'Bd4')
-  const kingMove = scoreTwoBishopsWhiteMove(fen, 'Kf3')
-  const rule = twoBishopsWhiteRules.find(
-    ({ id }) => id === 'bishops further',
-  )
-
-  assert.equal(farther.bishopsFurtherDistance, 29)
-  assert.equal(nearer.bishopsFurtherDistance, 21)
-  assert.equal(kingMove.bishopsFurtherDistance, 25)
-  assert.ok(rule?.compare)
-  assert.ok(rule.compare(farther, nearer) < 0)
-
-  const sourceMoves = getChess(fen).moves({ verbose: true })
-  const fartherMove = sourceMoves.find(({ san }) => san === 'Ba5')
-  const nearerMove = sourceMoves.find(({ san }) => san === 'Bd4')
-  assert.ok(fartherMove)
-  assert.ok(nearerMove)
-  for (const transform of SQUARE_TRANSFORMS) {
-    const transformedFen = getChess(transformFen(fen, transform)).fen()
-    const transformedMoves = getChess(transformedFen).moves({ verbose: true })
-    const transformedFarther: Move | undefined = transformedMoves.find(
-      ({ from, to }) =>
-        from === transformSquare(fartherMove.from, transform) &&
-        to === transformSquare(fartherMove.to, transform),
-    )
-    const transformedNearer: Move | undefined = transformedMoves.find(
-      ({ from, to }) =>
-        from === transformSquare(nearerMove.from, transform) &&
-        to === transformSquare(nearerMove.to, transform),
-    )
-    assert.ok(transformedFarther, transform.name)
-    assert.ok(transformedNearer, transform.name)
-    assert.equal(
-      scoreTwoBishopsWhiteMove(transformedFen, transformedFarther.san)
-        .bishopsFurtherDistance,
-      29,
-      transform.name,
-    )
-    assert.equal(
-      scoreTwoBishopsWhiteMove(transformedFen, transformedNearer.san)
-        .bishopsFurtherDistance,
-      21,
-      transform.name,
-    )
-  }
-})
-
 test('proximate wall matches the exact symmetric twelve-square stencil', () => {
   const bishops = ['d6', 'd7'] as const
   const right = ['f6', 'f7', 'g5', 'g6', 'g7', 'g8'] as const
@@ -1186,7 +845,7 @@ test('king closer uniquely minimizes squared Euclidean distance within its survi
   assert.ok(kingCloser.compare(closest, farther) < 0)
 })
 
-test('king closer scores Phase 1 bishop moves after cage exclusion', () => {
+test('king closer scores Phase 1 bishop moves after target-square rules', () => {
   const fen = '3K4/1k1B4/3B4/8/8/8/8/8 w - - 4 3'
   const bishopMove = scoreTwoBishopsWhiteMove(fen, 'Bc5')
   const kingMove = scoreTwoBishopsWhiteMove(fen, 'Ke7')
@@ -1199,8 +858,6 @@ test('king closer scores Phase 1 bishop moves after cage exclusion', () => {
   const kingCloser = twoBishopsWhiteRules.find(({ id }) => id === 'king closer')
   assert.ok(kingCloser?.compare)
   assert.ok(kingCloser.compare(bishopMove, kingMove) < 0)
-  assert.deepEqual(ruleSet.idealWhiteMoves(fen), ['Bc7'])
-  assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'restricted area')
 })
 
 test('king closer prefers proximity to the middle sixteen after distance ties', () => {
@@ -1307,10 +964,6 @@ test('check prefers a checking move between otherwise tied Phase 1 candidates', 
   const quiet = scoreTwoBishopsWhiteMove(fen, 'Bc2')
   const check = twoBishopsWhiteRules.find(({ id }) => id === 'check')
 
-  assert.equal(checking.restrictAreaRawArea, 99)
-  assert.equal(quiet.restrictAreaRawArea, 99)
-  assert.equal(checking.restrictAreaDiagonalCenterDistance, 99)
-  assert.equal(quiet.restrictAreaDiagonalCenterDistance, 99)
   assert.equal(checking.kingCloserDistance, quiet.kingCloserDistance)
   assert.equal(checking.kingCloserMiddleSixteenDistance, quiet.kingCloserMiddleSixteenDistance)
   assert.equal(checking.checkPenalty, 0)
@@ -4294,7 +3947,8 @@ test('Two Bishops keeps its phase explanation and diagram', () => {
   const ruleSet = getMateRuleSet('two-bishops')
   assert.deepEqual(ruleSet.help.notes, [
     "Phase 2: Black's king forced to the edge, White's king two steps away from Black's king.",
-    "Target corner: Calculate after White's move in Phase 2. If Black is in or one edge square from a corner, use that corner. Otherwise, in the corner-diagonals position, its cutoff points to the opposite corner and continues to do so when Black steps around that corner. Otherwise, when the kings are in opposition and more bishops stand on one physical side of White's king, choose the opposite corner. When deciding between bishop moves, prefer the stronger bishop majority. Otherwise, choose the corner where White wins the king race by the greatest Chebyshev-distance lead. If neither method decides, choose the corner closest to White's king. Retain tied corners.",
+    "Phase 2 Target Corner: Calculate after White's move in Phase 2. If Black is in or one edge square from a corner, use that corner. Otherwise, in the corner-diagonals position, its cutoff points to the opposite corner and continues to do so when Black steps around that corner. Otherwise, when the kings are in opposition and more bishops stand on one physical side of White's king, choose the opposite corner. When deciding between bishop moves, prefer the stronger bishop majority. Otherwise, choose the corner where White wins the king race by the greatest Chebyshev-distance lead. If neither method decides, choose the corner closest to White's king. Retain tied corners.",
+    "Phase 1 Target Square: It's the square adjacent to Black's king furthest from the corner closest to Black's king.",
   ])
   assert.deepEqual(ruleSet.help.noteBoards.map(({ id }) => id), [
     'bishop-degenerate-phase-two-opposition',

@@ -1,7 +1,6 @@
 import type { Square } from 'chess.js'
 import {
   SQUARE_TRANSFORMS,
-  allSquares,
   edgeDistance,
   findPiece,
   getChess,
@@ -39,8 +38,6 @@ import type {
   ScoredMove,
 } from './types'
 
-const BOARD_SQUARE_COORDINATES = allSquares().map(squareCoordinates)
-
 export type TwoBishopsWhiteMoveScore = {
   readonly isPhaseTwoPosition: boolean
   readonly matePenalty: number
@@ -66,13 +63,14 @@ export type TwoBishopsWhiteMoveScore = {
   readonly bishopsOnBlackEdgeCount: number
   readonly forcePhaseTwoApplies: boolean
   readonly forcePhaseTwoPenalty: number
-  readonly idealCagePenalty: number
-  readonly restrictAreaRawArea: number
-  readonly restrictAreaDiagonalCenterDistance: number
-  readonly kingPushableApplies: boolean
-  readonly kingPushableDistance: number
-  readonly kingPushableInsideAreaPenalty: number
-  readonly bishopsFurtherDistance: number
+  readonly ruleZApplies: boolean
+  readonly ruleZPenalty: number
+  readonly ruleYControlledAdjacentCount: number
+  readonly ruleXApplies: boolean
+  readonly ruleXTravelLength: number
+  readonly ruleWDistance: number
+  readonly ruleVApplies: boolean
+  readonly ruleVPenalty: number
   readonly kingCloserPhaseTwoLinePenalty: number
   readonly kingCloserDistance: number
   readonly kingCloserMiddleSixteenDistance: number
@@ -212,7 +210,8 @@ const twoBishopsHelp: RuleHelp = {
   ],
   notes: [
     "Phase 2: Black's king forced to the edge, White's king two steps away from Black's king.",
-    "Target corner: Calculate after White's move in Phase 2. If Black is in or one edge square from a corner, use that corner. Otherwise, in the corner-diagonals position, its cutoff points to the opposite corner and continues to do so when Black steps around that corner. Otherwise, when the kings are in opposition and more bishops stand on one physical side of White's king, choose the opposite corner. When deciding between bishop moves, prefer the stronger bishop majority. Otherwise, choose the corner where White wins the king race by the greatest Chebyshev-distance lead. If neither method decides, choose the corner closest to White's king. Retain tied corners.",
+    "Phase 2 Target Corner: Calculate after White's move in Phase 2. If Black is in or one edge square from a corner, use that corner. Otherwise, in the corner-diagonals position, its cutoff points to the opposite corner and continues to do so when Black steps around that corner. Otherwise, when the kings are in opposition and more bishops stand on one physical side of White's king, choose the opposite corner. When deciding between bishop moves, prefer the stronger bishop majority. Otherwise, choose the corner where White wins the king race by the greatest Chebyshev-distance lead. If neither method decides, choose the corner closest to White's king. Retain tied corners.",
+    "Phase 1 Target Square: It's the square adjacent to Black's king furthest from the corner closest to Black's king.",
   ],
   noteBoards: [
     {
@@ -2341,12 +2340,13 @@ type TwoBishopsWhitePositionContext = {
   readonly blackKing: Square | undefined
   readonly startingWhiteKing: Square | undefined
   readonly startingBishops: readonly Square[]
+  readonly phaseOneTargetSquares: readonly Square[]
+  readonly whiteKingControlsPhaseOneTarget: boolean
   readonly isPhaseTwo: boolean
   readonly degenerateRepair: DegenerateRepair | null
   readonly mateInThreeApplies: boolean
   readonly matePatternTurnsBySan: ReadonlyMap<string, 2 | 3>
   readonly shepherdMoves: readonly string[]
-  readonly restrictAreaKingConfinements: readonly BishopConfinement[]
 }
 
 function createTwoBishopsWhitePositionContext(
@@ -2356,26 +2356,30 @@ function createTwoBishopsWhitePositionContext(
   const startingWhiteKing = findPiece(fen, 'w', 'k')?.square
   const startingBishops = getWhiteBishopSquares(fen)
   const isPhaseTwo = isTwoBishopsPhaseTwoPosition(fen)
+  const phaseOneTargetSquares = isPhaseTwo
+    ? []
+    : getPhaseOneTargetSquares(blackKing)
+  const whiteKingControlsPhaseOneTarget =
+    startingWhiteKing !== undefined &&
+    phaseOneTargetSquares.some(
+      (target) => kingDistance(startingWhiteKing, target) === 1,
+    )
   const degenerateRepair = getDegenerateRepair(fen, isPhaseTwo)
   const matePatternTurnsBySan = getMatePatternTurnsBySan(
     fen,
     startingWhiteKing,
     blackKing,
   )
-  const restrictAreaKingConfinements =
-    isPhaseTwo ||
-    blackKing === undefined
-      ? []
-      : getRestrictedAreaKingConfinements(startingBishops, blackKing)
   return {
     blackKing,
     startingWhiteKing,
     startingBishops,
+    phaseOneTargetSquares,
+    whiteKingControlsPhaseOneTarget,
     isPhaseTwo,
     degenerateRepair,
     mateInThreeApplies: matePatternTurnsBySan.size > 0,
     matePatternTurnsBySan,
-    restrictAreaKingConfinements,
     shepherdMoves:
       isPhaseTwo
         ? getShepherdMoves(
@@ -2412,7 +2416,9 @@ function scoreTwoBishopsWhiteMoveWithContext(
     mateInThreeApplies,
     matePatternTurnsBySan,
     shepherdMoves,
-    restrictAreaKingConfinements,
+    startingBishops,
+    phaseOneTargetSquares,
+    whiteKingControlsPhaseOneTarget,
   } = context
   const chess = getChess(fen)
   const move = chess.move(san)
@@ -2420,6 +2426,27 @@ function scoreTwoBishopsWhiteMoveWithContext(
   const resultBishops = getWhiteBishopSquares(resultFen)
   const resultWhiteKingSquare =
     move.piece === 'k' ? move.to : startingWhiteKing
+  const targetControlledByBishop = phaseOneTargetSquares.some(
+    (target) =>
+      resultBishops.some(
+        (bishop) =>
+          bishop !== target &&
+          bishopHasClearLineToSquareOnBoard(chess, bishop, target),
+      ),
+  )
+  const controlledBlackAdjacentSquares = getAdjacentSquares(blackKing).filter(
+    (target) =>
+      resultBishops.some(
+        (bishop) =>
+          bishop !== target &&
+          bishopHasClearLineToSquareOnBoard(chess, bishop, target),
+      ),
+  )
+  const movedAttackedBishop =
+    move.piece === 'b' &&
+    blackKing !== undefined &&
+    startingBishops.includes(move.from) &&
+    kingDistance(move.from, blackKing) === 1
   const sequesterTwoAwaySquares = getSequesterTwoAwaySquares(blackKing)
   const resultKingDistance =
     blackKing && resultWhiteKingSquare
@@ -2487,49 +2514,6 @@ function scoreTwoBishopsWhiteMoveWithContext(
       : resultBishops.filter((bishop) =>
           isOnBlackKingsEdge(bishop, blackKing),
         ).length
-  const blackKingDiagonalSquares = getAdjacentSquares(blackKing).filter(
-    (target) =>
-      blackKing !== undefined &&
-      squareCoordinates(target).file !== squareCoordinates(blackKing).file &&
-      squareCoordinates(target).rank !== squareCoordinates(blackKing).rank,
-  )
-  const controlledDiagonalSquares = blackKingDiagonalSquares.filter(
-    (target) =>
-      resultBishops.some(
-        (bishop) =>
-          bishop !== target &&
-          bishopHasClearLineToSquareOnBoard(chess, bishop, target),
-      ),
-  )
-  const nonCheckingResult = !chess.isCheck()
-  const confinementArea = getBishopConfinementArea(
-    resultBishops,
-    blackKing,
-  )
-  const whiteKingScreensRestrictedArea =
-    blackKing !== undefined &&
-    resultWhiteKingSquare !== undefined &&
-    whiteKingScreensBishopFromBlackAdjacentSquare(
-      chess,
-      resultBishops,
-      blackKing,
-      resultWhiteKingSquare,
-    )
-  const restrictAreaRawArea =
-    nonCheckingResult &&
-    !whiteKingScreensRestrictedArea &&
-    confinementArea !== null
-      ? confinementArea
-      : 99
-  const idealCagePenalty =
-    blackKing !== undefined &&
-    IDEAL_CAGES.some(
-      ({ bishops, blackArea }) =>
-        blackArea.includes(blackKing) &&
-        bishops.every((bishop) => resultBishops.includes(bishop)),
-    )
-      ? 0
-      : 1
   return {
     isPhaseTwoPosition: isPhaseTwo,
     matePenalty: mate ? 0 : 1,
@@ -2598,37 +2582,41 @@ function scoreTwoBishopsWhiteMoveWithContext(
       )
         ? 0
         : 1,
-    idealCagePenalty,
-    restrictAreaRawArea,
-    restrictAreaDiagonalCenterDistance:
-      nonCheckingResult && controlledDiagonalSquares.length > 0
-        ? Math.min(...controlledDiagonalSquares.map(centerDistance))
-        : 99,
-    kingPushableApplies: restrictAreaKingConfinements.length > 0,
-    kingPushableDistance:
-      resultWhiteKingSquare === undefined ||
-      restrictAreaKingConfinements.length === 0
+    ruleZApplies:
+      !isPhaseTwo && !whiteKingControlsPhaseOneTarget,
+    ruleZPenalty:
+      targetControlledByBishop && !chess.isCheck() ? 0 : 1,
+    ruleYControlledAdjacentCount: targetControlledByBishop
+      ? Math.min(2, controlledBlackAdjacentSquares.length)
+      : 0,
+    ruleXApplies:
+      !isPhaseTwo &&
+      !whiteKingControlsPhaseOneTarget &&
+      movedAttackedBishop,
+    ruleXTravelLength: movedAttackedBishop
+      ? Math.max(
+          Math.abs(
+            squareCoordinates(move.from).file -
+              squareCoordinates(move.to).file,
+          ),
+          Math.abs(
+            squareCoordinates(move.from).rank -
+              squareCoordinates(move.to).rank,
+          ),
+        )
+      : 0,
+    ruleWDistance:
+      resultWhiteKingSquare === undefined || phaseOneTargetSquares.length === 0
         ? 99
-        : distanceToRestrictedAreaKingTarget(
-            resultWhiteKingSquare,
-            restrictAreaKingConfinements,
+        : Math.min(
+            ...phaseOneTargetSquares.map((target) =>
+              squaredEuclideanDistance(resultWhiteKingSquare, target),
+            ),
           ),
-    kingPushableInsideAreaPenalty:
-      resultWhiteKingSquare !== undefined &&
-      kingIsInsideRestrictedArea(
-        resultWhiteKingSquare,
-        restrictAreaKingConfinements,
-      )
-        ? 1
-        : 0,
-    bishopsFurtherDistance:
-      blackKing === undefined
-        ? 0
-        : resultBishops.reduce(
-            (total, bishop) =>
-              total + squaredEuclideanDistance(bishop, blackKing),
-            0,
-          ),
+    ruleVApplies:
+      !isPhaseTwo && whiteKingControlsPhaseOneTarget,
+    ruleVPenalty:
+      chess.isCheck() && !phaseOneTargetSquares.includes(move.to) ? 0 : 1,
     kingCloserPhaseTwoLinePenalty:
       !isPhaseTwo ||
       blackKing === undefined ||
@@ -2697,199 +2685,34 @@ function getAdjacentSquares(square: Square | undefined): Square[] {
   return adjacent
 }
 
-type DiagonalOrientation = 'difference' | 'sum'
-
-type BishopConfinement = {
-  readonly area: number
-  readonly blackSide: -1 | 1
-  readonly boundaries: readonly [number, number]
-  readonly orientation: DiagonalOrientation
-}
-
-type IdealCage = {
-  readonly bishops: readonly Square[]
-  readonly blackArea: readonly Square[]
-}
-
-const IDEAL_CAGES: readonly IdealCage[] = SQUARE_TRANSFORMS.map(
-  (transform) => ({
-    bishops: [
-      transformSquare('a4', transform),
-      transformSquare('b4', transform),
-    ],
-    blackArea: ['a1', 'b1', 'c1', 'a2', 'b2'].map((square) =>
-      transformSquare(square as Square, transform),
-    ),
-  }),
-)
-
-const DIAGONAL_ORIENTATIONS: readonly DiagonalOrientation[] = [
-  'difference',
-  'sum',
-]
-
-function diagonalInvariant(
-  square: Square,
-  orientation: DiagonalOrientation,
-): number {
-  const { file, rank } = squareCoordinates(square)
-  return orientation === 'difference' ? file - rank : file + rank
-}
-
-function getBishopConfinements(
-  bishops: readonly Square[],
+function getPhaseOneTargetSquares(
   blackKing: Square | undefined,
-): readonly BishopConfinement[] {
-  if (bishops.length !== 2 || blackKing === undefined) {
-    return []
-  }
-  const blackCoordinates = squareCoordinates(blackKing)
-  return DIAGONAL_ORIENTATIONS.flatMap<BishopConfinement>((orientation) => {
-    const invariant = ({ file, rank }: { file: number; rank: number }) =>
-      orientation === 'difference' ? file - rank : file + rank
-    const first = diagonalInvariant(bishops[0]!, orientation)
-    const second = diagonalInvariant(bishops[1]!, orientation)
-    if (Math.abs(first - second) !== 1) return []
-    const minimum = Math.min(first, second)
-    const maximum = Math.max(first, second)
-    const black = invariant(blackCoordinates)
-    if (black < minimum) {
-      return [
-        {
-          area: BOARD_SQUARE_COORDINATES.filter(
-            (square) => invariant(square) < minimum,
-          ).length,
-          blackSide: -1,
-          boundaries: [minimum, maximum],
-          orientation,
-        },
-      ]
-    }
-    if (black > maximum) {
-      return [
-        {
-          area: BOARD_SQUARE_COORDINATES.filter(
-            (square) => invariant(square) > maximum,
-          ).length,
-          blackSide: 1,
-          boundaries: [minimum, maximum],
-          orientation,
-        },
-      ]
-    }
-    return []
-  })
-}
-
-function getRestrictedAreaKingConfinements(
-  bishops: readonly Square[],
-  blackKing: Square,
-): readonly BishopConfinement[] {
-  const confinements = getBishopConfinements(bishops, blackKing)
-  if (confinements.length === 0) return []
-  const smallestArea = Math.min(...confinements.map(({ area }) => area))
-  return confinements.filter(({ area }) => area === smallestArea)
-}
-
-function distanceToRestrictedAreaKingTarget(
-  king: Square,
-  confinements: readonly BishopConfinement[],
-): number {
-  const kingCoordinates = squareCoordinates(king)
-  const boundaryDistance = Math.min(
-    ...confinements.flatMap(({ boundaries, orientation }) =>
-      boundaries.flatMap((value) =>
-        BOARD_SQUARE_COORDINATES.filter(
-          (square) =>
-            (orientation === 'difference'
-              ? square.file - square.rank
-              : square.file + square.rank) === value,
-        ).map(
-          (square) =>
-            (square.file - kingCoordinates.file) ** 2 +
-            (square.rank - kingCoordinates.rank) ** 2,
-        ),
-      ),
+): readonly Square[] {
+  if (blackKing === undefined) return []
+  const closestCornerDistance = Math.min(
+    ...BOARD_CORNERS.map((corner) =>
+      squaredEuclideanDistance(blackKing, corner),
     ),
   )
-  return Math.max(0, boundaryDistance - 2)
-}
-
-function kingIsInsideRestrictedArea(
-  king: Square,
-  confinements: readonly BishopConfinement[],
-): boolean {
-  const coordinates = squareCoordinates(king)
-  return confinements.some(({ blackSide, boundaries, orientation }) => {
-    const value =
-      orientation === 'difference'
-        ? coordinates.file - coordinates.rank
-        : coordinates.file + coordinates.rank
-    return blackSide < 0
-      ? value < boundaries[0]
-      : value > boundaries[1]
-  })
-}
-
-function getBishopConfinementArea(
-  bishops: readonly Square[],
-  blackKing: Square | undefined,
-): number | null {
-  const confinements = getBishopConfinements(bishops, blackKing)
-  return confinements.length === 0
-    ? null
-    : Math.min(...confinements.map(({ area }) => area))
-}
-
-function whiteKingScreensBishopFromBlackAdjacentSquare(
-  chess: ReturnType<typeof getChess>,
-  bishops: readonly Square[],
-  blackKing: Square,
-  whiteKing: Square,
-): boolean {
-  return getAdjacentSquares(blackKing).some((target) =>
-    bishops.some((bishop) =>
-      whiteKingIsOnlyBishopRayBlocker(
-        chess,
-        bishop,
-        target,
-        whiteKing,
-      ),
-    ),
+  const closestCorners = BOARD_CORNERS.filter(
+    (corner) =>
+      squaredEuclideanDistance(blackKing, corner) === closestCornerDistance,
   )
-}
-
-function whiteKingIsOnlyBishopRayBlocker(
-  chess: ReturnType<typeof getChess>,
-  bishop: Square,
-  target: Square,
-  whiteKing: Square,
-): boolean {
-  const source = squareCoordinates(bishop)
-  const destination = squareCoordinates(target)
-  if (
-    Math.abs(source.file - destination.file) !==
-    Math.abs(source.rank - destination.rank)
-  ) {
-    return false
-  }
-  const fileStep = Math.sign(destination.file - source.file)
-  const rankStep = Math.sign(destination.rank - source.rank)
-  let whiteKingBlocks = false
-  let file = source.file + fileStep
-  let rank = source.rank + rankStep
-  while (file !== destination.file || rank !== destination.rank) {
-    const square = squareFromCoordinates(file, rank)
-    if (square === null) return false
-    if (square === whiteKing) {
-      whiteKingBlocks = true
-    } else if (chess.get(square)) {
-      return false
+  const adjacentSquares = getAdjacentSquares(blackKing)
+  const targetSquares = new Set<Square>()
+  for (const corner of closestCorners) {
+    const furthestDistance = Math.max(
+      ...adjacentSquares.map((square) =>
+        squaredEuclideanDistance(square, corner),
+      ),
+    )
+    for (const square of adjacentSquares) {
+      if (squaredEuclideanDistance(square, corner) === furthestDistance) {
+        targetSquares.add(square)
+      }
     }
-    file += fileStep
-    rank += rankStep
   }
-  return whiteKingBlocks
+  return [...targetSquares]
 }
 
 export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore>[] = [
@@ -3015,52 +2838,49 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
       first.phaseTwoWallPenalty - second.phaseTwoWallPenalty,
   },
   {
-    id: 'ideal cage',
-    shortLabel: 'ideal cage',
+    id: 'rule z',
+    shortLabel: 'rule z',
     helpText:
-      "Phase 1: Have 2 adjacent bishops, exactly one on the edge, 3 squares from the corner, with Black's king inside the 5-square corner area",
-    applies: (score) => !score.isPhaseTwoPosition,
-    compare: (first, second) =>
-      first.idealCagePenalty - second.idealCagePenalty,
+      'Phase 1: Control the target square with a bishop without checking, unless following rule v.',
+    applies: (score) => score.ruleZApplies,
+    compare: (first, second) => first.ruleZPenalty - second.ruleZPenalty,
   },
   {
-    id: 'restricted area',
-    shortLabel: 'restricted area',
+    id: 'rule y',
+    shortLabel: 'rule y',
     helpText:
-      "Phase 1: Use the bishops to control 2 diagonals adjacent to Black's king, but not checking the king, preferring a smaller area for Black. White's king should not screen a bishop from a Black king-adjacent square",
-    applies: (score) => !score.isPhaseTwoPosition,
-    compare: (first, second) =>
-      first.restrictAreaRawArea - second.restrictAreaRawArea,
-  },
-  {
-    id: 'prep restricted area',
-    shortLabel: 'prep restricted area',
-    helpText:
-      "Phase 1: Bishop control a square diagonally adjacent to Black's king, preferring squares closer to the center of the board.",
-    applies: (score) => !score.isPhaseTwoPosition,
-    subpriorities: [
-      {
-        when: (scores) =>
-          scores.every(
-            ({ restrictAreaRawArea }) => restrictAreaRawArea === 99,
-          ),
-        compare: (first, second) =>
-          first.restrictAreaDiagonalCenterDistance -
-          second.restrictAreaDiagonalCenterDistance,
-      },
-    ],
-  },
-  {
-    id: 'king pushable',
-    shortLabel: 'king pushable',
-    helpText:
-      "Phase 1: Bring White's king to or adjacent to the restricted-area diagonal while keeping it outside Black's restricted area.",
+      "Phase 1: Use a bishop to control the two squares adjacent to Black's king and also the target square.",
     applies: (score) =>
-      !score.isPhaseTwoPosition && score.kingPushableApplies,
+      !score.isPhaseTwoPosition && !score.ruleVApplies,
     compare: (first, second) =>
-      first.kingPushableInsideAreaPenalty -
-        second.kingPushableInsideAreaPenalty ||
-      first.kingPushableDistance - second.kingPushableDistance,
+      second.ruleYControlledAdjacentCount -
+      first.ruleYControlledAdjacentCount,
+  },
+  {
+    id: 'rule x',
+    shortLabel: 'rule x',
+    helpText:
+      'Phase 1: If moving an attacked bishop, move it as far as possible.',
+    applies: (score) => score.ruleXApplies,
+    compare: (first, second) =>
+      second.ruleXTravelLength - first.ruleXTravelLength,
+  },
+  {
+    id: 'rule w',
+    shortLabel: 'rule w',
+    helpText: 'Phase 1: Move the king towards the target square.',
+    applies: (score) =>
+      !score.isPhaseTwoPosition && !score.ruleVApplies,
+    compare: (first, second) =>
+      first.ruleWDistance - second.ruleWDistance,
+  },
+  {
+    id: 'rule v',
+    shortLabel: 'rule v',
+    helpText:
+      'Phase 1: If the king already controls the target square, check the king, from not the target square.',
+    applies: (score) => score.ruleVApplies,
+    compare: (first, second) => first.ruleVPenalty - second.ruleVPenalty,
   },
   {
     id: 'unclutter bishops',
@@ -3080,15 +2900,6 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
       first.kingCloserDistance - second.kingCloserDistance ||
       first.kingCloserMiddleSixteenDistance -
         second.kingCloserMiddleSixteenDistance,
-  },
-  {
-    id: 'bishops further',
-    shortLabel: 'bishops further',
-    helpText:
-      "Phase 1: Prefer bishops to be further from Black's king",
-    applies: (score) => !score.isPhaseTwoPosition,
-    compare: (first, second) =>
-      second.bishopsFurtherDistance - first.bishopsFurtherDistance,
   },
   {
     id: 'check',

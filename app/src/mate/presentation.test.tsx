@@ -1692,7 +1692,11 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
   )
   assert.match(
     bishopsMarkup,
-    /Target corner: Calculate after White&#x27;s move in Phase 2\. If Black is in or one edge square from a corner, use that corner\. Otherwise, in the corner-diagonals position, its cutoff points to the opposite corner and continues to do so when Black steps around that corner\. Otherwise, when the kings are in opposition and more bishops stand on one physical side of White&#x27;s king, choose the opposite corner\. When deciding between bishop moves, prefer the stronger bishop majority\. Otherwise, choose the corner where White wins the king race by the greatest Chebyshev-distance lead\. If neither method decides, choose the corner closest to White&#x27;s king\. Retain tied corners\./,
+    /Phase 2 Target Corner: Calculate after White&#x27;s move in Phase 2\. If Black is in or one edge square from a corner, use that corner\. Otherwise, in the corner-diagonals position, its cutoff points to the opposite corner and continues to do so when Black steps around that corner\. Otherwise, when the kings are in opposition and more bishops stand on one physical side of White&#x27;s king, choose the opposite corner\. When deciding between bishop moves, prefer the stronger bishop majority\. Otherwise, choose the corner where White wins the king race by the greatest Chebyshev-distance lead\. If neither method decides, choose the corner closest to White&#x27;s king\. Retain tied corners\./,
+  )
+  assert.match(
+    bishopsMarkup,
+    /Phase 1 Target Square: It&#x27;s the square adjacent to Black&#x27;s king furthest from the corner closest to Black&#x27;s king\./,
   )
   assert.match(bishopsMarkup, /leg-mate-guide-note-boards--full/)
   assert.equal(bishopsMarkup.match(/leg-mate-note-board--full/g)?.length, 25)
@@ -1789,7 +1793,23 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
   )
   assert.match(
     bishopsMarkup,
-    />king pushable<[^]*Bring White&#x27;s king to or adjacent to the restricted-area diagonal while keeping it outside Black&#x27;s restricted area\./,
+    />rule z<[^]*Control the target square with a bishop without checking, unless following rule v\./,
+  )
+  assert.match(
+    bishopsMarkup,
+    />rule y<[^]*Use a bishop to control the two squares adjacent to Black&#x27;s king and also the target square\./,
+  )
+  assert.match(
+    bishopsMarkup,
+    />rule x<[^]*If moving an attacked bishop, move it as far as possible\./,
+  )
+  assert.match(
+    bishopsMarkup,
+    />rule w<[^]*Move the king towards the target square\./,
+  )
+  assert.match(
+    bishopsMarkup,
+    />rule v<[^]*If the king already controls the target square, check the king, from not the target square\./,
   )
   assert.match(bishopsMarkup, />check<[^]*Play a check</)
   assert.match(
@@ -1798,10 +1818,10 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
   )
   assert.ok(
     bishopsMarkup.indexOf('>phase 2 wall<') <
-      bishopsMarkup.indexOf('>ideal cage<'),
+      bishopsMarkup.indexOf('>rule z<'),
   )
   assert.ok(
-    bishopsMarkup.indexOf('>king pushable<') <
+    bishopsMarkup.indexOf('>rule v<') <
       bishopsMarkup.indexOf('>unclutter bishops<'),
   )
   assert.ok(
@@ -1833,38 +1853,25 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
   assert.doesNotMatch(bishopsMarkup, />distant bishops</)
   assert.doesNotMatch(bishopsMarkup, />adjacent bishops</)
   assert.doesNotMatch(bishopsMarkup, />restrict area</)
-  assert.match(
-    bishopsMarkup,
-    />ideal cage<[^]*Phase 1: Have 2 adjacent bishops, exactly one on the edge, 3 squares from the corner, with Black&#x27;s king inside the 5-square corner area/,
-  )
-  assert.match(
-    bishopsMarkup,
-    />restricted area<[^]*Phase 1: Use the bishops to control 2 diagonals adjacent to Black&#x27;s king, but not checking the king, preferring a smaller area for Black\. White&#x27;s king should not screen a bishop from a Black king-adjacent square/,
-  )
-  assert.match(
-    bishopsMarkup,
-    />prep restricted area<[^]*Phase 1: Bishop control a square diagonally adjacent to Black&#x27;s king, preferring squares closer to the center of the board\./,
-  )
-  assert.match(
-    bishopsMarkup,
-    />bishops further<[^]*Phase 1: Prefer bishops to be further from Black&#x27;s king/,
-  )
-  assert.ok(
-    bishopsMarkup.indexOf('>ideal cage<') <
-      bishopsMarkup.indexOf('>restricted area<'),
-  )
-  assert.ok(
-    bishopsMarkup.indexOf('>restricted area<') <
-      bishopsMarkup.indexOf('>prep restricted area<'),
-  )
-  assert.ok(
-    bishopsMarkup.indexOf('>prep restricted area<') <
-      bishopsMarkup.indexOf('>king closer<'),
-  )
-  assert.ok(
-    bishopsMarkup.indexOf('>king closer<') <
-      bishopsMarkup.indexOf('>bishops further<'),
-  )
+  for (const removed of [
+    'ideal cage',
+    'restricted area',
+    'prep restricted area',
+    'king pushable',
+    'bishops further',
+  ]) {
+    assert.doesNotMatch(bishopsMarkup, new RegExp(`>${removed}<`))
+  }
+  const targetRuleLabels = ['rule z', 'rule y', 'rule x', 'rule w', 'rule v']
+  for (const [index, label] of targetRuleLabels.entries()) {
+    const next = targetRuleLabels[index + 1]
+    if (next) {
+      assert.ok(
+        bishopsMarkup.indexOf(`>${label}<`) <
+          bishopsMarkup.indexOf(`>${next}<`),
+      )
+    }
+  }
 
   const queenMarkup = renderToStaticMarkup(
     <MatePriorityGuideDialog
