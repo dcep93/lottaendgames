@@ -63,7 +63,7 @@ export type TwoBishopsWhiteMoveScore = {
   readonly bishopsOnBlackEdgeCount: number
   readonly forcePhaseTwoApplies: boolean
   readonly forcePhaseTwoPenalty: number
-  readonly ruleZZCornerSixBishopsCount: number
+  readonly ruleZZCornerFiveLBishopsCount: number
   readonly ruleZApplies: boolean
   readonly ruleZPenalty: number
   readonly ruleYControlledAdjacentCount: number
@@ -94,6 +94,19 @@ const BLACK_INTRO =
   'Black uses its own priorities to put up the strongest resistance. Black is not trying to help the mate; it looks for the most stubborn legal reply.'
 
 const BOARD_CORNERS: readonly Square[] = ['a1', 'a8', 'h1', 'h8']
+
+function isInCornerFiveL(square: Square): boolean {
+  const position = squareCoordinates(square)
+  return BOARD_CORNERS.some((corner) => {
+    const cornerPosition = squareCoordinates(corner)
+    const fileDistance = Math.abs(position.file - cornerPosition.file)
+    const rankDistance = Math.abs(position.rank - cornerPosition.rank)
+    return (
+      (fileDistance === 0 && rankDistance <= 2) ||
+      (rankDistance === 0 && fileDistance <= 2)
+    )
+  })
+}
 
 const MATE_PREP_LIGHT_DIAGONAL: readonly Square[] = [
   'd1',
@@ -2747,13 +2760,9 @@ function scoreTwoBishopsWhiteMoveWithContext(
       )
         ? 0
         : 1,
-    ruleZZCornerSixBishopsCount: isPhaseTwo
+    ruleZZCornerFiveLBishopsCount: isPhaseTwo
       ? 0
-      : resultBishops.filter((bishop) =>
-          BOARD_CORNERS.some(
-            (corner) => manhattanDistance(bishop, corner) <= 2,
-          ),
-        ).length,
+      : resultBishops.filter(isInCornerFiveL).length,
     ruleZApplies: !isPhaseTwo,
     ruleZPenalty:
       targetControlledByBishop && !chess.isCheck() ? 0 : 1,
@@ -3034,11 +3043,11 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
   {
     id: 'rule zz',
     shortLabel: 'rule zz',
-    helpText: 'Phase 1: Keep bishops out of the corner 6 squares.',
+    helpText: 'Phase 1: Keep bishops out of the corner 5-square L.',
     applies: (score) => !score.isPhaseTwoPosition,
     compare: (first, second) =>
-      first.ruleZZCornerSixBishopsCount -
-      second.ruleZZCornerSixBishopsCount,
+      first.ruleZZCornerFiveLBishopsCount -
+      second.ruleZZCornerFiveLBishopsCount,
   },
   {
     id: 'rule z',
