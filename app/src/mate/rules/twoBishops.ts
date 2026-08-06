@@ -72,6 +72,7 @@ export type TwoBishopsWhiteMoveScore = {
   readonly ruleVApplies: boolean
   readonly ruleVPenalty: number
   readonly ruleUScore: number
+  readonly ruleAEdgeBishopsCount: number
   readonly kingCloserPhaseTwoLinePenalty: number
   readonly kingCloserDistance: number
   readonly kingCloserMiddleSixteenDistance: number
@@ -2624,16 +2625,16 @@ function scoreTwoBishopsWhiteMoveWithContext(
     ruleVPenalty:
       chess.isCheck() && !phaseOneTargetSquares.includes(move.to) ? 0 : 1,
     ruleUScore:
-      blackKing === undefined
+      blackKing === undefined || resultBishops.length === 0
         ? 0
-        : resultBishops.reduce(
-            (score, bishop) =>
-              score +
-              (edgeDistance(bishop) === 0
-                ? 0
-                : kingDistance(bishop, blackKing)),
-            0,
+        : Math.min(
+            ...resultBishops.map((bishop) =>
+              kingDistance(bishop, blackKing),
+            ),
           ),
+    ruleAEdgeBishopsCount: resultBishops.filter(
+      (bishop) => edgeDistance(bishop) === 0,
+    ).length,
     kingCloserPhaseTwoLinePenalty:
       !isPhaseTwo ||
       blackKing === undefined ||
@@ -2898,6 +2899,32 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
     ],
   },
   {
+    id: 'rule u',
+    shortLabel: 'rule u',
+    helpText: "Phase 1: Prefer bishops further from Black's king.",
+    applies: (score) => !score.isPhaseTwoPosition,
+    subpriorities: [
+      {
+        when: targetBuildRulesApply,
+        compare: (first, second) =>
+          second.ruleUScore - first.ruleUScore,
+      },
+    ],
+  },
+  {
+    id: 'rule a',
+    shortLabel: 'rule a',
+    helpText: 'Prefer fewer bishops on the edge.',
+    applies: (score) => !score.isPhaseTwoPosition,
+    subpriorities: [
+      {
+        when: targetBuildRulesApply,
+        compare: (first, second) =>
+          first.ruleAEdgeBishopsCount - second.ruleAEdgeBishopsCount,
+      },
+    ],
+  },
+  {
     id: 'rule x',
     shortLabel: 'rule x',
     helpText:
@@ -2943,14 +2970,6 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
       'Phase 1: If the king already controls the target square, check the king, from not the target square.',
     applies: (score) => score.ruleVApplies,
     compare: (first, second) => first.ruleVPenalty - second.ruleVPenalty,
-  },
-  {
-    id: 'rule u',
-    shortLabel: 'rule u',
-    helpText:
-      "Phase 1: Prefer bishops further from Black's king, and not on an edge.",
-    applies: (score) => !score.isPhaseTwoPosition,
-    compare: (first, second) => second.ruleUScore - first.ruleUScore,
   },
   {
     id: 'unclutter bishops',

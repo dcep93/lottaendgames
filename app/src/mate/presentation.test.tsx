@@ -1813,7 +1813,11 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
   )
   assert.match(
     bishopsMarkup,
-    />rule u<[^]*Prefer bishops further from Black&#x27;s king, and not on an edge\./,
+    />rule u<[^]*Prefer bishops further from Black&#x27;s king\./,
+  )
+  assert.match(
+    bishopsMarkup,
+    />rule a<[^]*Prefer fewer bishops on the edge\./,
   )
   assert.match(bishopsMarkup, />check<[^]*Play a check</)
   assert.match(
@@ -1825,12 +1829,16 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
       bishopsMarkup.indexOf('>rule z<'),
   )
   assert.ok(
-    bishopsMarkup.indexOf('>rule v<') <
+    bishopsMarkup.indexOf('>rule y<') <
       bishopsMarkup.indexOf('>rule u<'),
   )
   assert.ok(
     bishopsMarkup.indexOf('>rule u<') <
-      bishopsMarkup.indexOf('>unclutter bishops<'),
+      bishopsMarkup.indexOf('>rule a<'),
+  )
+  assert.ok(
+    bishopsMarkup.indexOf('>rule a<') <
+      bishopsMarkup.indexOf('>rule x<'),
   )
   assert.ok(
     bishopsMarkup.indexOf('>unclutter bishops<') <
@@ -1870,7 +1878,15 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
   ]) {
     assert.doesNotMatch(bishopsMarkup, new RegExp(`>${removed}<`))
   }
-  const targetRuleLabels = ['rule z', 'rule y', 'rule x', 'rule w', 'rule v']
+  const targetRuleLabels = [
+    'rule z',
+    'rule y',
+    'rule u',
+    'rule a',
+    'rule x',
+    'rule w',
+    'rule v',
+  ]
   for (const [index, label] of targetRuleLabels.entries()) {
     const next = targetRuleLabels[index + 1]
     if (next) {
