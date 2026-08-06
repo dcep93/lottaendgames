@@ -2435,13 +2435,24 @@ function scoreTwoBishopsWhiteMoveWithContext(
           bishopHasClearLineToSquareOnBoard(chess, bishop, target),
       ),
   )
-  const controlledBlackAdjacentSquares = getAdjacentSquares(blackKing).filter(
-    (target) =>
-      resultBishops.some(
-        (bishop) =>
+  const ruleYControlledAdjacentCount = Math.max(
+    0,
+    ...resultBishops.map((bishop) => {
+      const bishopControlsTarget = phaseOneTargetSquares.some(
+        (target) =>
           bishop !== target &&
           bishopHasClearLineToSquareOnBoard(chess, bishop, target),
-      ),
+      )
+      if (!bishopControlsTarget) return 0
+      return Math.min(
+        2,
+        getAdjacentSquares(blackKing).filter(
+          (target) =>
+            bishop !== target &&
+            bishopHasClearLineToSquareOnBoard(chess, bishop, target),
+        ).length,
+      )
+    }),
   )
   const movedAttackedBishop =
     move.piece === 'b' &&
@@ -2586,9 +2597,7 @@ function scoreTwoBishopsWhiteMoveWithContext(
     ruleZApplies: !isPhaseTwo,
     ruleZPenalty:
       targetControlledByBishop && !chess.isCheck() ? 0 : 1,
-    ruleYControlledAdjacentCount: targetControlledByBishop
-      ? Math.min(2, controlledBlackAdjacentSquares.length)
-      : 0,
+    ruleYControlledAdjacentCount,
     ruleXApplies: !isPhaseTwo && movedAttackedBishop,
     ruleXTravelLength: movedAttackedBishop
       ? Math.max(

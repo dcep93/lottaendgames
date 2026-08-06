@@ -705,7 +705,7 @@ test('the prepared Two Bishops batch matches public single-move scores', () => {
 
 test('Phase 1 target-square rules use the square opposite the nearest corner', () => {
   const fen = '8/8/5k2/8/8/2K5/B6B/8 w - - 0 1'
-  const targetControl = scoreTwoBishopsWhiteMove(fen, 'Bg3')
+  const targetControl = scoreTwoBishopsWhiteMove(fen, 'Bf4')
   const targetOccupationCheck = scoreTwoBishopsWhiteMove(fen, 'Be5+')
   const ruleZ = twoBishopsWhiteRules.find(({ id }) => id === 'rule z')
   const ruleY = twoBishopsWhiteRules.find(({ id }) => id === 'rule y')
@@ -726,7 +726,7 @@ test('Phase 1 target-square rules use the square opposite the nearest corner', (
 
   const sourceMove = getChess(fen)
     .moves({ verbose: true })
-    .find(({ san }) => san === 'Bg3')
+    .find(({ san }) => san === 'Bf4')
   assert.ok(sourceMove)
   for (const transform of SQUARE_TRANSFORMS) {
     const transformedFen = getChess(transformFen(fen, transform)).fen()
@@ -749,6 +749,17 @@ test('Phase 1 target-square rules use the square opposite the nearest corner', (
       transform.name,
     )
   }
+})
+
+test('rule y requires one bishop to supply target and adjacent control', () => {
+  const fen = '1B6/4k1B1/8/8/3K4/8/8/8 w - - 0 1'
+  const splitControl = scoreTwoBishopsWhiteMove(fen, 'Kc4')
+  const singleBishopControl = scoreTwoBishopsWhiteMove(fen, 'Bge5')
+
+  assert.equal(splitControl.ruleZPenalty, 0)
+  assert.equal(splitControl.ruleYControlledAdjacentCount, 1)
+  assert.equal(singleBishopControl.ruleZPenalty, 0)
+  assert.equal(singleBishopControl.ruleYControlledAdjacentCount, 2)
 })
 
 test('rule x maximizes travel when an attacked bishop moves', () => {
