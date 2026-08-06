@@ -2926,7 +2926,9 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
   {
     id: 'unclutter bishops',
     shortLabel: 'unclutter bishops',
-    helpText: 'Prefer bishops more than two king steps from a corner.',
+    helpText:
+      'Phase 2: Prefer bishops more than two king steps from a corner.',
+    applies: (score) => score.isPhaseTwoPosition,
     compare: (first, second) =>
       first.clutteredBishopsCount - second.clutteredBishopsCount,
   },

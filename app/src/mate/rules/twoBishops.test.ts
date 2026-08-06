@@ -361,7 +361,8 @@ test('Two Bishops exposes each Phase 2 comparison as one visible rule', () => {
       },
       {
         shortLabel: 'unclutter bishops',
-        helpText: 'Prefer bishops more than two king steps from a corner.',
+        helpText:
+          'Phase 2: Prefer bishops more than two king steps from a corner.',
       },
       {
         shortLabel: 'king closer',
@@ -420,7 +421,10 @@ test('Two Bishops exposes each Phase 2 comparison as one visible rule', () => {
       assert.equal(typeof rule.applies, 'function')
       assert.equal(typeof rule.compare, 'function')
       assert.equal(rule.subpriorities, undefined)
-    } else if (rule.id === 'phase 2 wall') {
+    } else if (
+      rule.id === 'phase 2 wall' ||
+      rule.id === 'unclutter bishops'
+    ) {
       assert.equal(typeof rule.applies, 'function')
       assert.equal(typeof rule.compare, 'function')
       assert.equal(rule.subpriorities, undefined)
@@ -548,14 +552,18 @@ test('the visible strategic comparisons run in their displayed order', () => {
             bestRuleVPenalty,
         )
       : afterRuleW
+    const phaseTwoUnclutterCandidates = afterRuleV.filter(
+      (san) => scoreTwoBishopsWhiteMove(fen, san).isPhaseTwoPosition,
+    )
     const bestClutteredBishopsCount = Math.min(
-      ...afterRuleV.map(
+      ...phaseTwoUnclutterCandidates.map(
         (san) =>
           scoreTwoBishopsWhiteMove(fen, san).clutteredBishopsCount,
       ),
     )
     const afterUnclutterBishops = afterRuleV.filter(
       (san) =>
+        !scoreTwoBishopsWhiteMove(fen, san).isPhaseTwoPosition ||
         scoreTwoBishopsWhiteMove(fen, san).clutteredBishopsCount ===
           bestClutteredBishopsCount,
     )
@@ -1062,7 +1070,7 @@ test('unclutter bishops prefers fewer bishops within two king steps of a corner'
   assert.equal(cluttered.clutteredBishopsCount, 1)
   assert.ok(unclutter?.compare)
   assert.equal(clear.isPhaseTwoPosition, false)
-  assert.equal(unclutter.applies, undefined)
+  assert.equal(unclutter.applies?.(clear), false)
   assert.ok(unclutter.compare(clear, cluttered) < 0)
 
   const phaseTwoFen = '2k5/8/4K3/8/5B2/5B2/8/8 w - - 4 3'
@@ -1070,6 +1078,7 @@ test('unclutter bishops prefers fewer bishops within two king steps of a corner'
   const phaseTwoCluttered = scoreTwoBishopsWhiteMove(phaseTwoFen, 'Bc7')
   assert.equal(phaseTwoClear.isPhaseTwoPosition, true)
   assert.equal(phaseTwoCluttered.isPhaseTwoPosition, true)
+  assert.equal(unclutter.applies?.(phaseTwoClear), true)
   assert.ok(unclutter.compare(phaseTwoClear, phaseTwoCluttered) < 0)
 })
 
