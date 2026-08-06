@@ -2472,6 +2472,10 @@ function scoreTwoBishopsWhiteMoveWithContext(
     blackKing !== undefined &&
     startingBishops.includes(move.from) &&
     kingDistance(move.from, blackKing) === 1
+  const ruleVApplies =
+    !isPhaseTwo &&
+    whiteKingControlsPhaseOneTarget &&
+    ruleYControlledAdjacentCount === 2
   const sequesterTwoAwaySquares = getSequesterTwoAwaySquares(blackKing)
   const resultKingDistance =
     blackKing && resultWhiteKingSquare
@@ -2632,12 +2636,13 @@ function scoreTwoBishopsWhiteMoveWithContext(
               squaredEuclideanDistance(resultWhiteKingSquare, target),
             ),
           ),
-    ruleVApplies:
-      !isPhaseTwo &&
-      whiteKingControlsPhaseOneTarget &&
-      ruleYControlledAdjacentCount === 2,
+    ruleVApplies,
     ruleVPenalty:
-      chess.isCheck() && !phaseOneTargetSquares.includes(move.to) ? 0 : 1,
+      ruleVApplies &&
+      chess.isCheck() &&
+      !phaseOneTargetSquares.includes(move.to)
+        ? 0
+        : 1,
     ruleUScore:
       blackKing === undefined
         ? 0
@@ -2970,7 +2975,7 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
     shortLabel: 'rule v',
     helpText:
       'Phase 1: If rule y is satisfied and the king already controls the target square, check the king, from not the target square.',
-    applies: (score) => score.ruleVApplies,
+    applies: (score) => !score.isPhaseTwoPosition,
     compare: (first, second) => first.ruleVPenalty - second.ruleVPenalty,
   },
   {

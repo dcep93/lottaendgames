@@ -874,11 +874,32 @@ test('rule v does not bypass rule z when its check loses rule-y control', () => 
   const ruleSet = getMateRuleSet('two-bishops')
 
   assert.equal(checking.ruleYControlledAdjacentCount, 1)
-  assert.equal(checking.ruleVPenalty, 0)
+  assert.equal(checking.ruleVPenalty, 1)
   assert.equal(checking.ruleVApplies, false)
   assert.equal(ruleZ?.subpriorities?.[0]?.when?.([checking, fallback]), true)
   assert.deepEqual(ruleSet.idealWhiteMoves(fen), ['Bc7'])
   assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'rule z')
+})
+
+test('rule v eliminates non-rule-v moves before rule u', () => {
+  const fen = '8/8/1BB5/4K3/8/3k4/8/8 w - - 56 29'
+  const checking = scoreTwoBishopsWhiteMove(fen, 'Bb5+')
+  const farther = scoreTwoBishopsWhiteMove(fen, 'Bd8')
+  const ruleV = twoBishopsWhiteRules.find(({ id }) => id === 'rule v')
+  const ruleSet = getMateRuleSet('two-bishops')
+
+  assert.equal(checking.ruleYControlledAdjacentCount, 2)
+  assert.equal(checking.ruleVApplies, true)
+  assert.equal(checking.ruleVPenalty, 0)
+  assert.equal(farther.ruleVApplies, false)
+  assert.equal(farther.ruleVPenalty, 1)
+  assert.ok(checking.ruleUScore < farther.ruleUScore)
+  assert.equal(ruleV?.applies?.(checking), true)
+  assert.equal(ruleV?.applies?.(farther), true)
+  assert.ok(ruleV?.compare)
+  assert.ok(ruleV.compare(checking, farther) < 0)
+  assert.deepEqual(ruleSet.idealWhiteMoves(fen), ['Bb5+'])
+  assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'rule v')
 })
 
 test('rule u maximizes summed bishop distance from Black king', () => {
