@@ -348,7 +348,7 @@ test('Two Bishops exposes each Phase 2 comparison as one visible rule', () => {
       {
         shortLabel: 'rule x',
         helpText:
-          'Phase 1: If moving an attacked bishop, move it as far as possible.',
+          'Phase 1: Prefer moving an attacked bishop as far as possible.',
       },
       {
         shortLabel: 'rule w',
@@ -512,12 +512,15 @@ test('the visible strategic comparisons run in their displayed order', () => {
                 scoreTwoBishopsWhiteMove(fen, san).ruleXTravelLength,
             ),
           )
-    const afterRuleX = afterRuleY.filter(
-      (san) =>
-        !scoreTwoBishopsWhiteMove(fen, san).ruleXApplies ||
-        scoreTwoBishopsWhiteMove(fen, san).ruleXTravelLength ===
-          bestRuleXTravelLength,
-    )
+    const afterRuleX =
+      targetBuildRulesApply && ruleXMoves.length > 0
+        ? afterRuleY.filter(
+            (san) =>
+              scoreTwoBishopsWhiteMove(fen, san).ruleXApplies &&
+              scoreTwoBishopsWhiteMove(fen, san).ruleXTravelLength ===
+                bestRuleXTravelLength,
+          )
+        : afterRuleY
     const bestRuleWDistance = Math.min(
       ...afterRuleX.map(
         (san) => scoreTwoBishopsWhiteMove(fen, san).ruleWDistance,
@@ -723,16 +726,27 @@ test('rule x maximizes travel when an attacked bishop moves', () => {
   const fen = '8/8/5k2/5B2/8/2K5/8/B7 w - - 0 1'
   const near = scoreTwoBishopsWhiteMove(fen, 'Be6')
   const far = scoreTwoBishopsWhiteMove(fen, 'Bb1')
+  const other = scoreTwoBishopsWhiteMove(fen, 'Kd4')
   const rule = twoBishopsWhiteRules.find(({ id }) => id === 'rule x')
 
   assert.equal(near.ruleXApplies, true)
   assert.equal(far.ruleXApplies, true)
   assert.equal(near.ruleXTravelLength, 1)
   assert.equal(far.ruleXTravelLength, 4)
+  assert.equal(other.ruleXApplies, false)
   const priority = rule?.subpriorities?.[0]
-  assert.equal(priority?.when?.([near, far]), true)
+  assert.equal(priority?.when?.([near, far, other]), true)
   assert.ok(priority?.rank)
-  assert.deepEqual(priority.rank([near, far]), [1, 0])
+  assert.deepEqual(priority.rank([near, far, other]), [1, 0, 1])
+})
+
+test('rule x makes the longest attacked-bishop move uniquely ideal', () => {
+  const fen = '8/3Bk3/8/3K4/5B2/8/8/8 w - - 16 9'
+  const ruleSet = getMateRuleSet('two-bishops')
+
+  assert.equal(ruleSet.phase(fen), '1/2')
+  assert.deepEqual(ruleSet.idealWhiteMoves(fen), ['Bh3'])
+  assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'rule x')
 })
 
 test('rule w moves White king toward the Phase 1 target square', () => {

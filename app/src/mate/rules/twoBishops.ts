@@ -2880,7 +2880,7 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
     id: 'rule x',
     shortLabel: 'rule x',
     helpText:
-      'Phase 1: If moving an attacked bishop, move it as far as possible.',
+      'Phase 1: Prefer moving an attacked bishop as far as possible.',
     applies: (score) => !score.isPhaseTwoPosition,
     subpriorities: [
       {
@@ -2893,7 +2893,7 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
               .map((score) => score.ruleXTravelLength),
           )
           return scores.map((score) =>
-            !score.ruleXApplies ||
+            score.ruleXApplies &&
             score.ruleXTravelLength === longestTravel
               ? 0
               : 1,
