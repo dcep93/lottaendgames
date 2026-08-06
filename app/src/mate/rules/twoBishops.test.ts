@@ -340,7 +340,8 @@ test('Two Bishops exposes each Phase 2 comparison as one visible rule', () => {
       },
       {
         shortLabel: 'rule zz',
-        helpText: 'Phase 1: Keep bishops out of the corner 5-square L.',
+        helpText:
+          "Phase 1: Keep bishops more than 2 steps away from Black's closest corner.",
       },
       {
         shortLabel: 'rule z',
@@ -484,19 +485,19 @@ test('the visible strategic comparisons run in their displayed order', () => {
     const phaseOneRulesApply = !afterPhaseTwoWall.some(
       (san) => scoreTwoBishopsWhiteMove(fen, san).isPhaseTwoPosition,
     )
-    const bestRuleZZCornerFiveLBishopsCount = Math.min(
+    const bestRuleZZClosestCornerBishopsCount = Math.min(
       ...afterPhaseTwoWall.map(
         (san) =>
           scoreTwoBishopsWhiteMove(fen, san)
-            .ruleZZCornerFiveLBishopsCount,
+            .ruleZZClosestCornerBishopsCount,
       ),
     )
     const afterRuleZZ = phaseOneRulesApply
       ? afterPhaseTwoWall.filter(
           (san) =>
             scoreTwoBishopsWhiteMove(fen, san)
-              .ruleZZCornerFiveLBishopsCount ===
-            bestRuleZZCornerFiveLBishopsCount,
+              .ruleZZClosestCornerBishopsCount ===
+            bestRuleZZClosestCornerBishopsCount,
         )
       : afterPhaseTwoWall
     const targetBuildRulesApply =
@@ -716,7 +717,7 @@ test('the visible strategic comparisons run in their displayed order', () => {
           'ruleYControlledAdjacentCount',
           'ruleZApplies',
           'ruleZPenalty',
-          'ruleZZCornerFiveLBishopsCount',
+          'ruleZZClosestCornerBishopsCount',
           'sequesterApplies',
           'sequesterCornerDiagonalsTarget',
           'sequesterCurrentCornerDistance',
@@ -759,35 +760,47 @@ test('the prepared Two Bishops batch matches public single-move scores', () => {
   )
 })
 
-test('rule zz ranks bishops outside the four corner-five Ls', () => {
-  const fen = '8/8/4k3/8/4B3/8/4K3/2B5 w - - 0 1'
+test("rule zz ranks bishops outside Black's closest-corner zone", () => {
+  const fen = '8/8/8/8/1k2B3/8/4K3/2B5 w - - 0 1'
   const zero = scoreTwoBishopsWhiteMove(fen, 'Bf4')
   const one = scoreTwoBishopsWhiteMove(fen, 'Kf2')
   const two = scoreTwoBishopsWhiteMove(fen, 'Bb1')
   const rule = twoBishopsWhiteRules.find(({ id }) => id === 'rule zz')
 
-  assert.equal(zero.ruleZZCornerFiveLBishopsCount, 0)
-  assert.equal(one.ruleZZCornerFiveLBishopsCount, 1)
-  assert.equal(two.ruleZZCornerFiveLBishopsCount, 2)
+  assert.equal(zero.ruleZZClosestCornerBishopsCount, 0)
+  assert.equal(one.ruleZZClosestCornerBishopsCount, 1)
+  assert.equal(two.ruleZZClosestCornerBishopsCount, 2)
   assert.equal(rule?.applies?.(zero), true)
   assert.ok(rule?.compare)
   assert.ok(rule.compare(zero, one) < 0)
   assert.ok(rule.compare(one, two) < 0)
 })
 
-test('rule zz includes exactly a123b1c1 under every D4 transform', () => {
-  const included: readonly Square[] = ['a1', 'a2', 'a3', 'b1', 'c1']
-  const excluded: readonly Square[] = ['b2']
+test('rule zz uses a two-king-step boundary under every D4 transform', () => {
+  const included: readonly Square[] = [
+    'a1',
+    'a2',
+    'a3',
+    'b1',
+    'b2',
+    'b3',
+    'c1',
+    'c2',
+    'c3',
+  ]
+  const excluded: readonly Square[] = ['d1']
 
   for (const sourceSquare of [...included, ...excluded]) {
     const source = new Chess()
     source.clear()
-    assert.equal(source.put({ color: 'w', type: 'k' }, 'e2'), true)
-    assert.equal(source.put({ color: 'b', type: 'k' }, 'g4'), true)
+    assert.equal(source.put({ color: 'w', type: 'k' }, 'f2'), true)
+    const blackKing =
+      sourceSquare === 'a3' || sourceSquare === 'c3' ? 'c4' : 'b4'
+    assert.equal(source.put({ color: 'b', type: 'k' }, blackKing), true)
     assert.equal(source.put({ color: 'w', type: 'b' }, 'e4'), true)
     assert.equal(source.put({ color: 'w', type: 'b' }, sourceSquare), true)
     const sourceFen = source.fen()
-    const sourceMove = source.move('Kf2')
+    const sourceMove = source.move('Kg2')
     assert.ok(sourceMove, sourceSquare)
 
     for (const transform of SQUARE_TRANSFORMS) {
@@ -802,7 +815,7 @@ test('rule zz includes exactly a123b1c1 under every D4 transform', () => {
       assert.ok(expected, `${sourceSquare} ${transform.name}`)
       assert.equal(
         scoreTwoBishopsWhiteMove(fen, expected.san)
-          .ruleZZCornerFiveLBishopsCount,
+          .ruleZZClosestCornerBishopsCount,
         included.includes(sourceSquare) ? 1 : 0,
         `${sourceSquare} ${transform.name}`,
       )
@@ -810,9 +823,9 @@ test('rule zz includes exactly a123b1c1 under every D4 transform', () => {
   }
 })
 
-test('rule zz uniquely clears a corner-five-L bishop under every D4 transform', () => {
-  const source = '8/8/k7/8/1K6/B7/8/3B4 w - - 0 1'
-  const sourceMove = getChess(source).move('Bb2')
+test('rule zz uniquely clears a closest-corner-zone bishop under every D4 transform', () => {
+  const source = '8/8/8/3K4/8/B3k3/8/7B w - - 0 1'
+  const sourceMove = getChess(source).move('Be4')
   assert.ok(sourceMove)
   const ruleSet = getMateRuleSet('two-bishops')
 
@@ -830,7 +843,7 @@ test('rule zz uniquely clears a corner-five-L bishop under every D4 transform', 
     assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'rule zz', transform.name)
     assert.equal(
       scoreTwoBishopsWhiteMove(fen, expected.san)
-        .ruleZZCornerFiveLBishopsCount,
+        .ruleZZClosestCornerBishopsCount,
       0,
       transform.name,
     )
@@ -843,7 +856,7 @@ test('rule zz is inactive in Phase 2', () => {
   const rule = twoBishopsWhiteRules.find(({ id }) => id === 'rule zz')
 
   assert.equal(score.isPhaseTwoPosition, true)
-  assert.equal(score.ruleZZCornerFiveLBishopsCount, 0)
+  assert.equal(score.ruleZZClosestCornerBishopsCount, 0)
   assert.equal(rule?.applies?.(score), false)
 })
 
@@ -954,8 +967,9 @@ test('rule y counts a bishop occupying a common-adjacent square', () => {
 
   assert.equal(occupied.ruleYControlledAdjacentCount, 2)
   assert.equal(misses.ruleYControlledAdjacentCount, 1)
-  assert.deepEqual(ruleSet.idealWhiteMoves(fen), ['Bd4'])
-  assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'rule y')
+  const integrationFen = '8/8/6k1/K7/1B4B1/8/8/8 w - - 0 1'
+  assert.deepEqual(ruleSet.idealWhiteMoves(integrationFen), ['Be7'])
+  assert.equal(ruleSet.currentWhiteHint(integrationFen)?.id, 'rule y')
 
   const sourceMove = getChess(fen).move('Bd4')
   assert.ok(sourceMove)
@@ -1028,7 +1042,7 @@ test('rule w moves White king toward the Phase 1 target square', () => {
   assert.ok(priority.compare(wait, away) < 0)
 })
 
-test('rule v wins when b2 does not add a corner-five-L penalty', () => {
+test('rule zz precedes rule v when b2 is near Black\'s closest corner', () => {
   const fen = '8/8/5K2/8/3k4/8/8/2B4B w - - 0 1'
   const checking = scoreTwoBishopsWhiteMove(fen, 'Bb2+')
   const quiet = scoreTwoBishopsWhiteMove(fen, 'Bf4')
@@ -1046,14 +1060,14 @@ test('rule v wins when b2 does not add a corner-five-L penalty', () => {
   assert.equal(ruleZ?.subpriorities?.[0]?.when?.([checking, quiet]), false)
   assert.ok(ruleV?.compare)
   assert.ok(ruleV.compare(checking, quiet) < 0)
-  assert.equal(
-    quiet.ruleZZCornerFiveLBishopsCount,
-    checking.ruleZZCornerFiveLBishopsCount,
+  assert.ok(
+    quiet.ruleZZClosestCornerBishopsCount <
+      checking.ruleZZClosestCornerBishopsCount,
   )
   assert.deepEqual(getMateRuleSet('two-bishops').idealWhiteMoves(fen), [
-    'Bb2+',
+    'Bf4',
   ])
-  assert.equal(getMateRuleSet('two-bishops').currentWhiteHint(fen)?.id, 'rule v')
+  assert.equal(getMateRuleSet('two-bishops').currentWhiteHint(fen)?.id, 'rule z')
 })
 
 test('rule zz precedes rule z when a check loses rule-y control', () => {
@@ -1069,8 +1083,8 @@ test('rule zz precedes rule z when a check loses rule-y control', () => {
   assert.equal(ruleZ?.subpriorities?.[0]?.when?.([checking, fallback]), true)
   assert.equal(checking.ruleZPenalty, 1)
   assert.equal(fallback.ruleZPenalty, 0)
-  assert.deepEqual(ruleSet.idealWhiteMoves(fen), ['Bb3'])
-  assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'rule u')
+  assert.deepEqual(ruleSet.idealWhiteMoves(fen), ['Bc7', 'Bc3'])
+  assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'rule z')
 })
 
 test('rule v eliminates non-rule-v moves before rule u', () => {

@@ -63,7 +63,7 @@ export type TwoBishopsWhiteMoveScore = {
   readonly bishopsOnBlackEdgeCount: number
   readonly forcePhaseTwoApplies: boolean
   readonly forcePhaseTwoPenalty: number
-  readonly ruleZZCornerFiveLBishopsCount: number
+  readonly ruleZZClosestCornerBishopsCount: number
   readonly ruleZApplies: boolean
   readonly ruleZPenalty: number
   readonly ruleYControlledAdjacentCount: number
@@ -94,19 +94,6 @@ const BLACK_INTRO =
   'Black uses its own priorities to put up the strongest resistance. Black is not trying to help the mate; it looks for the most stubborn legal reply.'
 
 const BOARD_CORNERS: readonly Square[] = ['a1', 'a8', 'h1', 'h8']
-
-function isInCornerFiveL(square: Square): boolean {
-  const position = squareCoordinates(square)
-  return BOARD_CORNERS.some((corner) => {
-    const cornerPosition = squareCoordinates(corner)
-    const fileDistance = Math.abs(position.file - cornerPosition.file)
-    const rankDistance = Math.abs(position.rank - cornerPosition.rank)
-    return (
-      (fileDistance === 0 && rankDistance <= 2) ||
-      (rankDistance === 0 && fileDistance <= 2)
-    )
-  })
-}
 
 const MATE_PREP_LIGHT_DIAGONAL: readonly Square[] = [
   'd1',
@@ -2760,9 +2747,13 @@ function scoreTwoBishopsWhiteMoveWithContext(
       )
         ? 0
         : 1,
-    ruleZZCornerFiveLBishopsCount: isPhaseTwo
+    ruleZZClosestCornerBishopsCount: isPhaseTwo
       ? 0
-      : resultBishops.filter(isInCornerFiveL).length,
+      : resultBishops.filter((bishop) =>
+          getClosestBoardCorners(blackKing).some(
+            (corner) => kingDistance(bishop, corner) <= 2,
+          ),
+        ).length,
     ruleZApplies: !isPhaseTwo,
     ruleZPenalty:
       targetControlledByBishop && !chess.isCheck() ? 0 : 1,
@@ -2877,16 +2868,8 @@ function getAdjacentSquares(square: Square | undefined): Square[] {
 function getPhaseOneTargetSquares(
   blackKing: Square | undefined,
 ): readonly Square[] {
-  if (blackKing === undefined) return []
-  const closestCornerDistance = Math.min(
-    ...BOARD_CORNERS.map((corner) =>
-      squaredEuclideanDistance(blackKing, corner),
-    ),
-  )
-  const closestCorners = BOARD_CORNERS.filter(
-    (corner) =>
-      squaredEuclideanDistance(blackKing, corner) === closestCornerDistance,
-  )
+  const closestCorners = getClosestBoardCorners(blackKing)
+  if (closestCorners.length === 0) return []
   const adjacentSquares = getAdjacentSquares(blackKing)
   const targetSquares = new Set<Square>()
   for (const corner of closestCorners) {
@@ -2902,6 +2885,21 @@ function getPhaseOneTargetSquares(
     }
   }
   return [...targetSquares]
+}
+
+function getClosestBoardCorners(
+  square: Square | undefined,
+): readonly Square[] {
+  if (square === undefined) return []
+  const closestCornerDistance = Math.min(
+    ...BOARD_CORNERS.map((corner) =>
+      squaredEuclideanDistance(square, corner),
+    ),
+  )
+  return BOARD_CORNERS.filter(
+    (corner) =>
+      squaredEuclideanDistance(square, corner) === closestCornerDistance,
+  )
 }
 
 function hasAvailableRuleVMove(
@@ -3043,11 +3041,12 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
   {
     id: 'rule zz',
     shortLabel: 'rule zz',
-    helpText: 'Phase 1: Keep bishops out of the corner 5-square L.',
+    helpText:
+      "Phase 1: Keep bishops more than 2 steps away from Black's closest corner.",
     applies: (score) => !score.isPhaseTwoPosition,
     compare: (first, second) =>
-      first.ruleZZCornerFiveLBishopsCount -
-      second.ruleZZCornerFiveLBishopsCount,
+      first.ruleZZClosestCornerBishopsCount -
+      second.ruleZZClosestCornerBishopsCount,
   },
   {
     id: 'rule z',

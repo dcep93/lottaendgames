@@ -1805,7 +1805,7 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
   )
   assert.match(
     bishopsMarkup,
-    />rule zz<[^]*Keep bishops out of the corner 5-square L\./,
+    />rule zz<[^]*Keep bishops more than 2 steps away from Black&#x27;s closest corner\./,
   )
   assert.match(
     bishopsMarkup,
