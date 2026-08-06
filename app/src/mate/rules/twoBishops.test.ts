@@ -349,7 +349,7 @@ test('Two Bishops exposes each Phase 2 comparison as one visible rule', () => {
       },
       {
         shortLabel: 'rule a',
-        helpText: 'Prefer fewer bishops on the edge.',
+        helpText: 'Prefer fewer bishops on a non central edge square.',
       },
       {
         shortLabel: 'rule x',
@@ -515,17 +515,19 @@ test('the visible strategic comparisons run in their displayed order', () => {
             bestRuleYControlledAdjacentCount,
         )
       : afterRuleZ
-    const bestRuleAEdgeBishopsCount = Math.min(
+    const bestRuleANonCentralEdgeBishopsCount = Math.min(
       ...afterRuleY.map(
         (san) =>
-          scoreTwoBishopsWhiteMove(fen, san).ruleAEdgeBishopsCount,
+          scoreTwoBishopsWhiteMove(fen, san)
+            .ruleANonCentralEdgeBishopsCount,
       ),
     )
     const afterRuleA = targetBuildRulesApply
       ? afterRuleY.filter(
           (san) =>
             scoreTwoBishopsWhiteMove(fen, san)
-              .ruleAEdgeBishopsCount === bestRuleAEdgeBishopsCount,
+              .ruleANonCentralEdgeBishopsCount ===
+            bestRuleANonCentralEdgeBishopsCount,
         )
       : afterRuleY
     const ruleXMoves = afterRuleA.filter(
@@ -670,7 +672,7 @@ test('the visible strategic comparisons run in their displayed order', () => {
           'matePenalty',
           'phaseTwoWallApplies',
           'phaseTwoWallPenalty',
-          'ruleAEdgeBishopsCount',
+          'ruleANonCentralEdgeBishopsCount',
           'ruleUScore',
           'ruleVApplies',
           'ruleVPenalty',
@@ -872,7 +874,7 @@ test('rule u maximizes summed bishop distance from Black king', () => {
   assert.equal(far.ruleUScore, 6)
   assert.equal(near.ruleUScore, 4)
   assert.equal(fartherEdgeMove.ruleUScore, 7)
-  assert.equal(far.ruleAEdgeBishopsCount, 1)
+  assert.equal(far.ruleANonCentralEdgeBishopsCount, 1)
   assert.equal(rule?.applies?.(far), true)
   assert.ok(rule?.compare)
   assert.ok(rule.compare(far, near) < 0)
@@ -916,12 +918,12 @@ test('rule u breaks a rule-w tie with greater summed bishop distance', () => {
   assert.equal(kingWait.ruleUScore, 4)
   assert.equal(bishopFarther.ruleUScore, 5)
   assert.equal(edgeBishop.ruleUScore, 6)
-  assert.equal(edgeBishop.ruleAEdgeBishopsCount, 1)
+  assert.equal(edgeBishop.ruleANonCentralEdgeBishopsCount, 1)
   assert.deepEqual(ruleSet.idealWhiteMoves(fen), ['Bc7', 'Bg3'])
   assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'rule u')
 })
 
-test('rule a prefers fewer bishops on any board edge', () => {
+test('rule a prefers fewer bishops on non-central board edges', () => {
   const fen = '8/8/5k2/3K4/5B2/7B/8/8 w - - 18 10'
   const fewerEdges = scoreTwoBishopsWhiteMove(fen, 'Bg4')
   const moreEdges = scoreTwoBishopsWhiteMove(fen, 'Bg3')
@@ -929,8 +931,8 @@ test('rule a prefers fewer bishops on any board edge', () => {
   const priority = rule?.subpriorities?.[0]
 
   assert.ok(fewerEdges.ruleUScore < moreEdges.ruleUScore)
-  assert.equal(fewerEdges.ruleAEdgeBishopsCount, 0)
-  assert.equal(moreEdges.ruleAEdgeBishopsCount, 1)
+  assert.equal(fewerEdges.ruleANonCentralEdgeBishopsCount, 0)
+  assert.equal(moreEdges.ruleANonCentralEdgeBishopsCount, 1)
   assert.equal(rule?.applies?.(fewerEdges), true)
   assert.ok(priority?.compare)
   assert.ok(priority.compare(fewerEdges, moreEdges) < 0)
@@ -939,6 +941,51 @@ test('rule a prefers fewer bishops on any board edge', () => {
     'Bd7',
   ])
   assert.equal(getMateRuleSet('two-bishops').currentWhiteHint(fen)?.id, 'rule a')
+})
+
+test('rule a exempts exactly two central squares on every edge', () => {
+  const fen = '8/3B4/6k1/3K2B1/8/8/8/8 w - - 30 16'
+  const centralEdge = scoreTwoBishopsWhiteMove(fen, 'Bd8')
+  const nonCentralEdge = scoreTwoBishopsWhiteMove(fen, 'Bc1')
+  const ruleSet = getMateRuleSet('two-bishops')
+
+  assert.equal(centralEdge.ruleANonCentralEdgeBishopsCount, 0)
+  assert.equal(nonCentralEdge.ruleANonCentralEdgeBishopsCount, 1)
+  assert.deepEqual(ruleSet.idealWhiteMoves(fen), ['Bd8'])
+  assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'rule x')
+
+  const centralMove = getChess(fen).move('Bd8')
+  const nonCentralMove = getChess(fen).move('Bc1')
+  assert.ok(centralMove)
+  assert.ok(nonCentralMove)
+  for (const transform of SQUARE_TRANSFORMS) {
+    const transformedFen = getChess(transformFen(fen, transform)).fen()
+    const legalMoves = getChess(transformedFen).moves({ verbose: true })
+    const transformedCentral = legalMoves.find(
+      ({ from, to }) =>
+        from === transformSquare(centralMove.from, transform) &&
+        to === transformSquare(centralMove.to, transform),
+    )
+    const transformedNonCentral = legalMoves.find(
+      ({ from, to }) =>
+        from === transformSquare(nonCentralMove.from, transform) &&
+        to === transformSquare(nonCentralMove.to, transform),
+    )
+    assert.ok(transformedCentral, transform.name)
+    assert.ok(transformedNonCentral, transform.name)
+    assert.equal(
+      scoreTwoBishopsWhiteMove(transformedFen, transformedCentral.san)
+        .ruleANonCentralEdgeBishopsCount,
+      0,
+      transform.name,
+    )
+    assert.equal(
+      scoreTwoBishopsWhiteMove(transformedFen, transformedNonCentral.san)
+        .ruleANonCentralEdgeBishopsCount,
+      1,
+      transform.name,
+    )
+  }
 })
 
 test('rule z remains active when every rule-v check is unsafe', () => {

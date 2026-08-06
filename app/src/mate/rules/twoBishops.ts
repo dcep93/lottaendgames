@@ -72,7 +72,7 @@ export type TwoBishopsWhiteMoveScore = {
   readonly ruleVApplies: boolean
   readonly ruleVPenalty: number
   readonly ruleUScore: number
-  readonly ruleAEdgeBishopsCount: number
+  readonly ruleANonCentralEdgeBishopsCount: number
   readonly kingCloserPhaseTwoLinePenalty: number
   readonly kingCloserDistance: number
   readonly kingCloserMiddleSixteenDistance: number
@@ -634,6 +634,18 @@ function isOnBlackKingsEdge(square: Square, blackKing: Square): boolean {
     (black.rank === 0 && candidate.rank === 0) ||
     (black.rank === 7 && candidate.rank === 7)
   )
+}
+
+function isNonCentralEdgeSquare(square: Square): boolean {
+  if (edgeDistance(square) !== 0) return false
+  const { file, rank } = squareCoordinates(square)
+  const centralFile = file === 3 || file === 4
+  const centralRank = rank === 3 || rank === 4
+  const centralHorizontalEdge =
+    (rank === 0 || rank === 7) && centralFile
+  const centralVerticalEdge =
+    (file === 0 || file === 7) && centralRank
+  return !centralHorizontalEdge && !centralVerticalEdge
 }
 
 function isOnPhaseTwoKingLine(
@@ -2632,8 +2644,8 @@ function scoreTwoBishopsWhiteMoveWithContext(
               score + kingDistance(bishop, blackKing),
             0,
           ),
-    ruleAEdgeBishopsCount: resultBishops.filter(
-      (bishop) => edgeDistance(bishop) === 0,
+    ruleANonCentralEdgeBishopsCount: resultBishops.filter(
+      isNonCentralEdgeSquare,
     ).length,
     kingCloserPhaseTwoLinePenalty:
       !isPhaseTwo ||
@@ -2901,13 +2913,14 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
   {
     id: 'rule a',
     shortLabel: 'rule a',
-    helpText: 'Prefer fewer bishops on the edge.',
+    helpText: 'Prefer fewer bishops on a non central edge square.',
     applies: (score) => !score.isPhaseTwoPosition,
     subpriorities: [
       {
         when: targetBuildRulesApply,
         compare: (first, second) =>
-          first.ruleAEdgeBishopsCount - second.ruleAEdgeBishopsCount,
+          first.ruleANonCentralEdgeBishopsCount -
+          second.ruleANonCentralEdgeBishopsCount,
       },
     ],
   },
