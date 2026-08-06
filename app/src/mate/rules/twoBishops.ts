@@ -101,14 +101,6 @@ const MATE_PREP_LIGHT_DIAGONAL: readonly Square[] = [
   'g4',
   'h5',
 ]
-const MATE_PREP_DARK_DIAGONAL: readonly Square[] = [
-  'c1',
-  'd2',
-  'e3',
-  'f4',
-  'g5',
-  'h6',
-]
 
 type RelativeTransform = (
   file: number,
@@ -151,7 +143,6 @@ type DegenerateRepair = {
 
 const TWO_BISHOPS_DEGENERATE_REASON_LABELS = {
   phaseTwoOpposition: 'degenerate — phase 2 opposition',
-  matePrep: 'degenerate — mate prep',
   mateInFour: 'degenerate — mate in 4',
   knightStepControl: 'degenerate — knight-step control',
   wallWaitingMove: 'degenerate — wall waiting move',
@@ -197,7 +188,6 @@ export const TWO_BISHOPS_DEGENERATE_PRIORITY_ORDER = [
   TWO_BISHOPS_DEGENERATE_REASON_LABELS.kingLift,
   TWO_BISHOPS_DEGENERATE_REASON_LABELS.bishopRetreat,
   TWO_BISHOPS_DEGENERATE_REASON_LABELS.longDiagonal,
-  TWO_BISHOPS_DEGENERATE_REASON_LABELS.matePrep,
 ] as const
 
 const twoBishopsHelp: RuleHelp = {
@@ -457,17 +447,6 @@ const twoBishopsHelp: RuleHelp = {
       ),
       highlights:
         TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateLongDiagonal.highlights,
-    },
-    {
-      id: 'bishop-degenerate-mate-prep',
-      title: 'degenerate — mate prep',
-      caption: 'Take opposition with the king.',
-      layout: { files: 8, ranks: 8, fileOffset: 0 },
-      pieces: noteBoardPieces(
-        TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateMatePrep.fen,
-      ),
-      highlights: [],
-      arrows: [TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateMatePrep.arrow],
     },
     {
       id: 'bishop-mating-position',
@@ -1227,78 +1206,6 @@ function getMateInFourDegenerateRepair(
         to: target,
         stopAfterRepair: true,
         reasonLabel: TWO_BISHOPS_DEGENERATE_REASON_LABELS.mateInFour,
-      }
-    }
-  }
-  return null
-}
-
-function getMatePrepDegenerateRepair(
-  fen: string,
-  blackKing: Square,
-  whiteKing: Square,
-  bishops: readonly Square[],
-): DegenerateRepair | null {
-  const legalMoves = getChess(fen).moves({ verbose: true })
-
-  for (const transform of SQUARE_TRANSFORMS) {
-    const expectedBlackKing = transformSquare('h2', transform)
-    const expectedWhiteKing = transformSquare('f3', transform)
-    const target = transformSquare('f2', transform)
-    const lightDiagonal = MATE_PREP_LIGHT_DIAGONAL.map((square) =>
-      transformSquare(square, transform),
-    )
-    const darkDiagonal = MATE_PREP_DARK_DIAGONAL.map((square) =>
-      transformSquare(square, transform),
-    )
-    const lightBishop = bishops.find(
-      (bishop) =>
-        squareColor(bishop) ===
-        squareColor(transformSquare('d1', transform)),
-    )
-    const darkBishop = bishops.find(
-      (bishop) =>
-        squareColor(bishop) ===
-        squareColor(transformSquare('c1', transform)),
-    )
-    const bishopCanAccess = (
-      bishop: Square | undefined,
-      diagonal: readonly Square[],
-    ): boolean =>
-      bishop !== undefined &&
-      legalMoves.some(
-        (move) =>
-          move.piece === 'b' &&
-          move.from === bishop &&
-          diagonal.includes(move.to),
-      )
-    const bishopControls = (
-      bishop: Square | undefined,
-      diagonal: readonly Square[],
-    ): boolean => bishop !== undefined && diagonal.includes(bishop)
-    const bishopGatePasses =
-      bishopControls(darkBishop, darkDiagonal) ||
-      (bishopControls(lightBishop, lightDiagonal) &&
-        bishopCanAccess(darkBishop, darkDiagonal))
-    if (
-      blackKing !== expectedBlackKing ||
-      whiteKing !== expectedWhiteKing ||
-      !bishopGatePasses
-    ) {
-      continue
-    }
-    const repairIsLegal = legalMoves.some(
-      (move) =>
-        move.piece === 'k' &&
-        move.from === expectedWhiteKing &&
-        move.to === target,
-    )
-    if (repairIsLegal) {
-      return {
-        from: expectedWhiteKing,
-        to: target,
-        stopAfterRepair: true,
-        reasonLabel: TWO_BISHOPS_DEGENERATE_REASON_LABELS.matePrep,
       }
     }
   }
@@ -2065,15 +1972,6 @@ function getDegenerateRepair(
             bishops,
           )
         : null,
-    [TWO_BISHOPS_DEGENERATE_REASON_LABELS.matePrep]: () =>
-      isPhaseTwo
-        ? getMatePrepDegenerateRepair(
-            fen,
-            blackKing,
-            whiteKing,
-            bishops,
-          )
-        : null,
     [TWO_BISHOPS_DEGENERATE_REASON_LABELS.ignoreLightBishop]: () =>
       isPhaseTwo
         ? getIgnoreLightBishopDegenerateRepair(
@@ -2600,12 +2498,8 @@ function scoreTwoBishopsWhiteMoveWithContext(
       sequesterTwoAwaySquares.some((twoAwaySquare) =>
         resultBishops.some(
           (bishop) =>
-            bishop !== twoAwaySquare &&
-            bishopHasClearLineToSquare(
-              resultFen,
-              bishop,
-              twoAwaySquare,
-            ),
+            bishop === twoAwaySquare ||
+            bishopHasClearLineToSquare(resultFen, bishop, twoAwaySquare),
         ),
       )
         ? 0
@@ -2917,7 +2811,7 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
     id: 'sequester',
     shortLabel: 'sequester',
     helpText:
-      "Phase 2: Force Black's king towards the target corner, or otherwise use a bishop to control the square 2 away from Black's current square.",
+      "Phase 2: Force Black's king towards the target corner, or otherwise use a bishop to control/occupy the square 2 away from Black's current square.",
     applies: (score) => score.sequesterApplies,
     subpriorities: [
       {
@@ -2939,10 +2833,6 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
           first.sequesterTargetCornerScore,
       },
       {
-        when: (scores) =>
-          scores.every(
-            (score) => score.sequesterCornerDiagonalsTarget,
-          ),
         compare: (first, second) =>
           first.sequesterMaximumCornerReplyDistance -
           second.sequesterMaximumCornerReplyDistance,

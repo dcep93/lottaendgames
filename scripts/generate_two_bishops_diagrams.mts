@@ -20,9 +20,6 @@ const shepherdFen = getChess(
 const degeneratePhaseTwoOppositionFen = getChess(
   '6k1/1B6/4K3/8/3B4/8/8/8 w - - 0 1',
 ).fen()
-const degenerateMatePrepFen = getChess(
-  '8/8/8/8/8/5K2/7k/3BB3 w - - 0 1',
-).fen()
 const degenerateIgnoreLightBishopFen = getChess(
   '4B1k1/6B1/5K2/8/8/8/8/8 w - - 0 1',
 ).fen()
@@ -84,7 +81,6 @@ for (const [label, fen] of [
   ['phase 2 wall', phaseTwoWallFen],
   ['shepherd', shepherdFen],
   ['degenerate phase 2 opposition', degeneratePhaseTwoOppositionFen],
-  ['degenerate mate prep', degenerateMatePrepFen],
   ['degenerate ignore light-squared bishop', degenerateIgnoreLightBishopFen],
   ['degenerate mate in 4', degenerateMateInFourFen],
   ['degenerate knight-step control', degenerateKnightStepControlFen],
@@ -171,11 +167,6 @@ export const TWO_BISHOPS_DIAGRAM_POSITIONS = {
     phase: '2/2',
     fen: ${JSON.stringify(degeneratePhaseTwoOppositionFen)},
     arrow: { from: 'e6', to: 'f6' },
-  },
-  degenerateMatePrep: {
-    phase: '2/2',
-    fen: ${JSON.stringify(degenerateMatePrepFen)},
-    arrow: { from: 'f3', to: 'f2' },
   },
   degenerateIgnoreLightBishop: {
     phase: '2/2',
@@ -317,7 +308,6 @@ process.stdout.write(`shepherd: ${shepherdFen}\n`)
 process.stdout.write(
   `degenerate phase 2 opposition: ${degeneratePhaseTwoOppositionFen}\n`,
 )
-process.stdout.write(`degenerate mate prep: ${degenerateMatePrepFen}\n`)
 process.stdout.write(
   `degenerate ignore light-squared bishop: ${degenerateIgnoreLightBishopFen}\n`,
 )
