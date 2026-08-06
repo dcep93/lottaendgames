@@ -705,28 +705,21 @@ test('the prepared Two Bishops batch matches public single-move scores', () => {
 
 test('Phase 1 target-square rules use the square opposite the nearest corner', () => {
   const fen = '8/8/5k2/8/8/2K5/B6B/8 w - - 0 1'
-  const targetControl = scoreTwoBishopsWhiteMove(fen, 'Bf4')
+  const targetControl = scoreTwoBishopsWhiteMove(fen, 'Bg3')
   const targetOccupationCheck = scoreTwoBishopsWhiteMove(fen, 'Be5+')
   const ruleZ = twoBishopsWhiteRules.find(({ id }) => id === 'rule z')
-  const ruleY = twoBishopsWhiteRules.find(({ id }) => id === 'rule y')
 
   assert.equal(targetControl.ruleZApplies, true)
   assert.equal(targetControl.ruleZPenalty, 0)
   assert.equal(targetOccupationCheck.ruleZPenalty, 1)
-  assert.equal(targetControl.ruleYControlledAdjacentCount, 2)
-  assert.equal(targetOccupationCheck.ruleYControlledAdjacentCount, 0)
   const ruleZPriority = ruleZ?.subpriorities?.[0]
-  const ruleYPriority = ruleY?.subpriorities?.[0]
   assert.equal(ruleZPriority?.when?.([targetControl, targetOccupationCheck]), true)
   assert.ok(ruleZPriority?.compare)
   assert.ok(ruleZPriority.compare(targetControl, targetOccupationCheck) < 0)
-  assert.equal(ruleYPriority?.when?.([targetControl, targetOccupationCheck]), true)
-  assert.ok(ruleYPriority?.compare)
-  assert.ok(ruleYPriority.compare(targetControl, targetOccupationCheck) < 0)
 
   const sourceMove = getChess(fen)
     .moves({ verbose: true })
-    .find(({ san }) => san === 'Bf4')
+    .find(({ san }) => san === 'Bg3')
   assert.ok(sourceMove)
   for (const transform of SQUARE_TRANSFORMS) {
     const transformedFen = getChess(transformFen(fen, transform)).fen()
@@ -743,23 +736,46 @@ test('Phase 1 target-square rules use the square opposite the nearest corner', (
       transformedMove.san,
     )
     assert.equal(transformedScore.ruleZPenalty, 0, transform.name)
+  }
+})
+
+test('rule y uses one bishop to control the two common-adjacent squares', () => {
+  const fen = '8/4k3/8/3KBB2/8/8/8/8 w - - 36 19'
+  const farther = scoreTwoBishopsWhiteMove(fen, 'Bg3')
+  const movedController = scoreTwoBishopsWhiteMove(fen, 'Bg4')
+  const missesCommonSquares = scoreTwoBishopsWhiteMove(fen, 'Bc2')
+  const rule = twoBishopsWhiteRules.find(({ id }) => id === 'rule y')
+  const priority = rule?.subpriorities?.[0]
+  const ruleSet = getMateRuleSet('two-bishops')
+
+  assert.equal(farther.ruleYControlledAdjacentCount, 2)
+  assert.equal(movedController.ruleYControlledAdjacentCount, 2)
+  assert.equal(missesCommonSquares.ruleYControlledAdjacentCount, 0)
+  assert.ok(priority?.compare)
+  assert.equal(priority.compare(farther, movedController), 0)
+  assert.ok(priority.compare(movedController, missesCommonSquares) < 0)
+  assert.deepEqual(ruleSet.idealWhiteMoves(fen), ['Bg3'])
+  assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'rule u')
+
+  const sourceMove = getChess(fen).move('Bg4')
+  assert.ok(sourceMove)
+  for (const transform of SQUARE_TRANSFORMS) {
+    const transformedFen = getChess(transformFen(fen, transform)).fen()
+    const transformedMove = getChess(transformedFen)
+      .moves({ verbose: true })
+      .find(
+        ({ from, to }) =>
+          from === transformSquare(sourceMove.from, transform) &&
+          to === transformSquare(sourceMove.to, transform),
+      )
+    assert.ok(transformedMove, transform.name)
     assert.equal(
-      transformedScore.ruleYControlledAdjacentCount,
+      scoreTwoBishopsWhiteMove(transformedFen, transformedMove.san)
+        .ruleYControlledAdjacentCount,
       2,
       transform.name,
     )
   }
-})
-
-test('rule y requires one bishop to supply target and adjacent control', () => {
-  const fen = '1B6/4k1B1/8/8/3K4/8/8/8 w - - 0 1'
-  const splitControl = scoreTwoBishopsWhiteMove(fen, 'Kc4')
-  const singleBishopControl = scoreTwoBishopsWhiteMove(fen, 'Bge5')
-
-  assert.equal(splitControl.ruleZPenalty, 0)
-  assert.equal(splitControl.ruleYControlledAdjacentCount, 1)
-  assert.equal(singleBishopControl.ruleZPenalty, 0)
-  assert.equal(singleBishopControl.ruleYControlledAdjacentCount, 2)
 })
 
 test('rule x maximizes travel when an attacked bishop moves', () => {
