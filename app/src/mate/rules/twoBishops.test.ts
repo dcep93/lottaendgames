@@ -382,7 +382,7 @@ test('Two Bishops exposes each Phase 2 comparison as one visible rule', () => {
       {
         shortLabel: 'king closer',
         helpText:
-          "Bring White's king closer to Black's king, preferring proximity to the the middle 16 squares.",
+          "Phase 2: Bring White's king closer to Black's king, preferring proximity to the the middle 16 squares.",
       },
       {
         shortLabel: 'check',
@@ -440,7 +440,8 @@ test('Two Bishops exposes each Phase 2 comparison as one visible rule', () => {
       assert.equal(rule.subpriorities, undefined)
     } else if (
       rule.id === 'phase 2 wall' ||
-      rule.id === 'unclutter bishops'
+      rule.id === 'unclutter bishops' ||
+      rule.id === 'king closer'
     ) {
       assert.equal(typeof rule.applies, 'function')
       assert.equal(typeof rule.compare, 'function')
@@ -628,8 +629,11 @@ test('the visible strategic comparisons run in their displayed order', () => {
         scoreTwoBishopsWhiteMove(fen, san).clutteredBishopsCount ===
           bestClutteredBishopsCount,
     )
+    const phaseTwoKingCloserCandidates = afterUnclutterBishops.filter(
+      (san) => scoreTwoBishopsWhiteMove(fen, san).isPhaseTwoPosition,
+    )
     const bestPhaseTwoLinePenalty = Math.min(
-      ...afterUnclutterBishops.map(
+      ...phaseTwoKingCloserCandidates.map(
         (san) =>
           scoreTwoBishopsWhiteMove(fen, san)
             .kingCloserPhaseTwoLinePenalty,
@@ -637,21 +641,29 @@ test('the visible strategic comparisons run in their displayed order', () => {
     )
     const preferredLineMoves = afterUnclutterBishops.filter(
       (san) =>
+        !scoreTwoBishopsWhiteMove(fen, san).isPhaseTwoPosition ||
         scoreTwoBishopsWhiteMove(fen, san)
           .kingCloserPhaseTwoLinePenalty === bestPhaseTwoLinePenalty,
     )
+    const phaseTwoPreferredLineMoves = preferredLineMoves.filter(
+      (san) => scoreTwoBishopsWhiteMove(fen, san).isPhaseTwoPosition,
+    )
     const bestKingCloserDistance = Math.min(
-      ...preferredLineMoves.map(
+      ...phaseTwoPreferredLineMoves.map(
         (san) => scoreTwoBishopsWhiteMove(fen, san).kingCloserDistance,
       ),
     )
     const closestKingMoves = preferredLineMoves.filter(
       (san) =>
+        !scoreTwoBishopsWhiteMove(fen, san).isPhaseTwoPosition ||
         scoreTwoBishopsWhiteMove(fen, san).kingCloserDistance ===
         bestKingCloserDistance,
     )
+    const phaseTwoClosestKingMoves = closestKingMoves.filter(
+      (san) => scoreTwoBishopsWhiteMove(fen, san).isPhaseTwoPosition,
+    )
     const bestMiddleSixteenDistance = Math.min(
-      ...closestKingMoves.map(
+      ...phaseTwoClosestKingMoves.map(
         (san) =>
           scoreTwoBishopsWhiteMove(fen, san)
             .kingCloserMiddleSixteenDistance,
@@ -659,6 +671,7 @@ test('the visible strategic comparisons run in their displayed order', () => {
     )
     const afterKingCloser = closestKingMoves.filter(
       (san) =>
+        !scoreTwoBishopsWhiteMove(fen, san).isPhaseTwoPosition ||
         scoreTwoBishopsWhiteMove(fen, san)
           .kingCloserMiddleSixteenDistance === bestMiddleSixteenDistance,
     )
@@ -1316,7 +1329,7 @@ test('king closer uniquely minimizes squared Euclidean distance within its survi
   assert.ok(kingCloser.compare(closest, farther) < 0)
 })
 
-test('king closer scores Phase 1 bishop moves after target-square rules', () => {
+test('king closer keeps Phase 1 metrics diagnostic but does not apply', () => {
   const fen = '3K4/1k1B4/3B4/8/8/8/8/8 w - - 4 3'
   const bishopMove = scoreTwoBishopsWhiteMove(fen, 'Bc5')
   const kingMove = scoreTwoBishopsWhiteMove(fen, 'Ke7')
@@ -1327,6 +1340,8 @@ test('king closer scores Phase 1 bishop moves after target-square rules', () => 
   assert.equal(bishopMove.kingCloserMiddleSixteenDistance, 2)
   assert.equal(kingMove.kingCloserDistance, 9)
   const kingCloser = twoBishopsWhiteRules.find(({ id }) => id === 'king closer')
+  assert.equal(kingCloser?.applies?.(bishopMove), false)
+  assert.equal(kingCloser?.applies?.(kingMove), false)
   assert.ok(kingCloser?.compare)
   assert.ok(kingCloser.compare(bishopMove, kingMove) < 0)
 })
@@ -1422,9 +1437,12 @@ test('king closer middle sixteen uses the inclusive c3-f6 boundary', () => {
 
 test('king closer scores the resulting Phase 2 king position', () => {
   const fen = '8/3B4/8/8/8/4BK2/8/7k w - - 0 1'
+  const rule = twoBishopsWhiteRules.find(({ id }) => id === 'king closer')
+  const score = scoreTwoBishopsWhiteMove(fen, 'Kf2')
 
   assert.equal(isTwoBishopsPhaseTwoPosition(fen), true)
-  assert.equal(scoreTwoBishopsWhiteMove(fen, 'Kf2').kingCloserDistance, 5)
+  assert.equal(rule?.applies?.(score), true)
+  assert.equal(score.kingCloserDistance, 5)
   assert.equal(scoreTwoBishopsWhiteMove(fen, 'Ke2').kingCloserDistance, 10)
   assert.equal(scoreTwoBishopsWhiteMove(fen, 'Bc8').kingCloserDistance, 8)
 })
