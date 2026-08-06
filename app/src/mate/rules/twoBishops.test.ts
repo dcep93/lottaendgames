@@ -862,16 +862,16 @@ test('rule v replaces rule z once White king controls the target', () => {
   assert.equal(getMateRuleSet('two-bishops').currentWhiteHint(fen)?.id, 'rule v')
 })
 
-test('rule u maximizes the nearer bishop distance from Black king', () => {
+test('rule u maximizes summed bishop distance from Black king', () => {
   const fen = '8/8/5k2/3K4/5B2/7B/8/8 w - - 18 10'
   const far = scoreTwoBishopsWhiteMove(fen, 'Bg3')
   const near = scoreTwoBishopsWhiteMove(fen, 'Bg4')
   const fartherEdgeMove = scoreTwoBishopsWhiteMove(fen, 'Bb8')
   const rule = twoBishopsWhiteRules.find(({ id }) => id === 'rule u')
 
-  assert.equal(far.ruleUScore, 3)
-  assert.equal(near.ruleUScore, 2)
-  assert.equal(fartherEdgeMove.ruleUScore, 3)
+  assert.equal(far.ruleUScore, 6)
+  assert.equal(near.ruleUScore, 4)
+  assert.equal(fartherEdgeMove.ruleUScore, 7)
   assert.equal(far.ruleAEdgeBishopsCount, 1)
   assert.equal(rule?.applies?.(far), true)
   assert.ok(rule?.compare)
@@ -903,6 +903,22 @@ test('rule u maximizes the nearer bishop distance from Black king', () => {
       transform.name,
     )
   }
+})
+
+test('rule u breaks a rule-w tie with greater summed bishop distance', () => {
+  const fen = '8/8/5k2/3K4/5BB1/8/8/8 w - - 22 12'
+  const kingWait = scoreTwoBishopsWhiteMove(fen, 'Ke4')
+  const bishopFarther = scoreTwoBishopsWhiteMove(fen, 'Bc7')
+  const edgeBishop = scoreTwoBishopsWhiteMove(fen, 'Bb8')
+  const ruleSet = getMateRuleSet('two-bishops')
+
+  assert.equal(kingWait.ruleWDistance, bishopFarther.ruleWDistance)
+  assert.equal(kingWait.ruleUScore, 4)
+  assert.equal(bishopFarther.ruleUScore, 5)
+  assert.equal(edgeBishop.ruleUScore, 6)
+  assert.equal(edgeBishop.ruleAEdgeBishopsCount, 1)
+  assert.deepEqual(ruleSet.idealWhiteMoves(fen), ['Bc7', 'Bg3'])
+  assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'rule u')
 })
 
 test('rule a prefers fewer bishops on any board edge', () => {

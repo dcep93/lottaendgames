@@ -2625,12 +2625,12 @@ function scoreTwoBishopsWhiteMoveWithContext(
     ruleVPenalty:
       chess.isCheck() && !phaseOneTargetSquares.includes(move.to) ? 0 : 1,
     ruleUScore:
-      blackKing === undefined || resultBishops.length === 0
+      blackKing === undefined
         ? 0
-        : Math.min(
-            ...resultBishops.map((bishop) =>
-              kingDistance(bishop, blackKing),
-            ),
+        : resultBishops.reduce(
+            (score, bishop) =>
+              score + kingDistance(bishop, blackKing),
+            0,
           ),
     ruleAEdgeBishopsCount: resultBishops.filter(
       (bishop) => edgeDistance(bishop) === 0,
