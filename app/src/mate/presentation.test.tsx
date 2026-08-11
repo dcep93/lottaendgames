@@ -1700,7 +1700,7 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
   )
   assert.match(
     bishopsMarkup,
-    /Phase 1 Target Square: Each square diagonally adjacent to Black&#x27;s king is a possible target\. Its target corner is the corner opposite it through Black&#x27;s king\. After each White move, prefer the target with the lowest maximum king-step distance between Black&#x27;s legal replies and its target corner\. Retain tied targets\./,
+    /Phase 1 Target Square: A square diagonally adjacent to Black&#x27;s king is possible when a bishop controls or x rays it without checking and a bishop controls or occupies both squares adjacent to the target and Black&#x27;s king\. Its target corner is the corner opposite it through Black&#x27;s king\. Prefer the possible target whose target corner is closest to Black&#x27;s king before White moves\. Retain tied targets\./,
   )
   assert.match(bishopsMarkup, /leg-mate-guide-note-boards--full/)
   assert.equal(bishopsMarkup.match(/leg-mate-note-board--full/g)?.length, 26)

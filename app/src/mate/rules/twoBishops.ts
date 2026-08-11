@@ -212,7 +212,7 @@ const twoBishopsHelp: RuleHelp = {
   notes: [
     "Phase 2: Black's king forced to the edge, White's king two steps away from Black's king.",
     "Phase 2 Target Corner: Calculate after White's move in Phase 2. If Black is in or one edge square from a corner, use that corner. Otherwise, in the corner-diagonals position, its cutoff points to the opposite corner and continues to do so when Black steps around that corner. Otherwise, when the kings are in opposition and more bishops stand on one physical side of White's king, choose the opposite corner. When deciding between bishop moves, prefer the stronger bishop majority. Otherwise, choose the corner where White wins the king race by the greatest Chebyshev-distance lead. If neither method decides, choose the corner closest to White's king. Retain tied corners.",
-    "Phase 1 Target Square: Each square diagonally adjacent to Black's king is a possible target. Its target corner is the corner opposite it through Black's king. After each White move, prefer the target with the lowest maximum king-step distance between Black's legal replies and its target corner. Retain tied targets.",
+    "Phase 1 Target Square: A square diagonally adjacent to Black's king is possible when a bishop controls or x rays it without checking and a bishop controls or occupies both squares adjacent to the target and Black's king. Its target corner is the corner opposite it through Black's king. Prefer the possible target whose target corner is closest to Black's king before White moves. Retain tied targets.",
   ],
   noteBoards: [
     {
@@ -2530,13 +2530,7 @@ function scoreTwoBishopsWhiteMoveWithContext(
             square,
             corner,
             quality:
-              blackReplyKings.length === 0
-                ? 99
-                : Math.max(
-                    ...blackReplyKings.map((reply) =>
-                      kingDistance(reply, corner),
-                    ),
-                  ),
+              blackKing === undefined ? 99 : kingDistance(blackKing, corner),
             controlledByBishop,
             ruleYControlledAdjacentCount: ruleYCount,
             ruleVEligible:
@@ -2553,12 +2547,20 @@ function scoreTwoBishopsWhiteMoveWithContext(
   const controlledTargetPairs = scoredPhaseOneTargetPairs.filter(
     ({ controlledByBishop }) => controlledByBishop && !chess.isCheck(),
   )
+  const possibleTargetPairs = controlledTargetPairs.filter(
+    ({ ruleYControlledAdjacentCount }) =>
+      ruleYControlledAdjacentCount === 2,
+  )
+  const constructionTargetPairs =
+    ruleVTargetPairs.length > 0 ? ruleVTargetPairs : possibleTargetPairs
+  const fallbackTargetPairs =
+    controlledTargetPairs.length > 0
+      ? controlledTargetPairs
+      : scoredPhaseOneTargetPairs
   const selectableTargetPairs =
-    ruleVTargetPairs.length > 0
-      ? ruleVTargetPairs
-      : controlledTargetPairs.length > 0
-        ? controlledTargetPairs
-        : scoredPhaseOneTargetPairs
+    constructionTargetPairs.length > 0
+      ? constructionTargetPairs
+      : fallbackTargetPairs
   const phaseOneTargetQuality =
     selectableTargetPairs.length === 0
       ? 99
@@ -2722,7 +2724,7 @@ function scoreTwoBishopsWhiteMoveWithContext(
           ),
         ).length,
     ruleZApplies: !isPhaseTwo,
-    ruleZPenalty: controlledTargetPairs.length > 0 ? 0 : 1,
+    ruleZPenalty: possibleTargetPairs.length > 0 ? 0 : 1,
     ruleYControlledAdjacentCount,
     ruleXApplies: !isPhaseTwo && movedUndefendedAttackedBishop,
     ruleXTravelLength: movedUndefendedAttackedBishop
@@ -2870,6 +2872,15 @@ function targetBuildRulesApply(
   return !hasAvailableRuleVMove(scores)
 }
 
+function targetQualityRulesApply(
+  scores: readonly TwoBishopsWhiteMoveScore[],
+): boolean {
+  return (
+    targetBuildRulesApply(scores) &&
+    scores.every(({ ruleZPenalty }) => ruleZPenalty === 0)
+  )
+}
+
 export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore>[] = [
   {
     id: 'mate',
@@ -3011,7 +3022,7 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
           first.ruleZPenalty - second.ruleZPenalty,
       },
       {
-        when: targetBuildRulesApply,
+        when: targetQualityRulesApply,
         compare: (first, second) =>
           first.phaseOneTargetQuality - second.phaseOneTargetQuality,
       },
