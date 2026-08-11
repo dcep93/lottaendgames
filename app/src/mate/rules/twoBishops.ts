@@ -3027,8 +3027,8 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
       {
         when: targetBuildRulesApply,
         compare: (first, second) =>
-          second.ruleYControlledAdjacentCount -
-          first.ruleYControlledAdjacentCount,
+          (first.ruleYControlledAdjacentCount === 2 ? 0 : 1) -
+          (second.ruleYControlledAdjacentCount === 2 ? 0 : 1),
       },
     ],
   },

@@ -542,19 +542,16 @@ test('the visible strategic comparisons run in their displayed order', () => {
             bestPhaseOneTargetQuality,
         )
       : afterRuleZ
-    const bestRuleYControlledAdjacentCount = Math.max(
-      ...afterRuleZQuality.map(
-        (san) =>
-          scoreTwoBishopsWhiteMove(fen, san)
-            .ruleYControlledAdjacentCount,
-      ),
+    const ruleYCanBeSatisfied = afterRuleZQuality.some(
+      (san) =>
+        scoreTwoBishopsWhiteMove(fen, san).ruleYControlledAdjacentCount === 2,
     )
     const afterRuleY = targetBuildRulesApply
       ? afterRuleZQuality.filter(
           (san) =>
+            !ruleYCanBeSatisfied ||
             scoreTwoBishopsWhiteMove(fen, san)
-              .ruleYControlledAdjacentCount ===
-            bestRuleYControlledAdjacentCount,
+              .ruleYControlledAdjacentCount === 2,
         )
       : afterRuleZQuality
     const bestRuleANonCentralEdgeBishopsCount = Math.min(
@@ -984,6 +981,22 @@ test('rule y uses one bishop to control the two common-adjacent squares', () => 
       transform.name,
     )
   }
+})
+
+test('rule y gives no partial preference before rule w', () => {
+  const fen = '8/8/8/6K1/8/8/4B2k/4B3 w - - 2 2'
+  const partial = scoreTwoBishopsWhiteMove(fen, 'Bg4')
+  const none = scoreTwoBishopsWhiteMove(fen, 'Kg4')
+  const rule = twoBishopsWhiteRules.find(({ id }) => id === 'rule y')
+  const priority = rule?.subpriorities?.[0]
+  const ruleSet = getMateRuleSet('two-bishops')
+
+  assert.equal(partial.ruleYControlledAdjacentCount, 1)
+  assert.equal(none.ruleYControlledAdjacentCount, 0)
+  assert.ok(priority?.compare)
+  assert.equal(priority.compare(partial, none), 0)
+  assert.deepEqual(ruleSet.idealWhiteMoves(fen), ['Kg4'])
+  assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'rule w')
 })
 
 test('rule y counts a bishop occupying a common-adjacent square', () => {
