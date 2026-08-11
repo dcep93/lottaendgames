@@ -2,13 +2,13 @@
 
 ## Goal
 
-Replace the static Phase 1 target square with a candidate-specific target-square and target-corner pair. In `8/8/6B1/8/1K1k4/6B1/8/8 w - - 0 1`, `Bf4` must uniquely win by selecting `e3` as its target square and `a8` as the opposite target corner.
+Replace the static Phase 1 target square with possible target-square and target-corner pairs. Target quality belongs to the pair in the starting position, so every White move selecting the same pair receives the same quality. In `8/8/6B1/8/1K1k4/6B1/8/8 w - - 0 1`, `Bf4` must uniquely win by selecting `e3` as its target square and `a8` as the opposite target corner.
 
 ## Rendered English
 
 The Phase 1 target note becomes:
 
-> Phase 1 Target Square: Each square diagonally adjacent to Black's king is a possible target. Its target corner is the corner opposite it through Black's king. After each White move, prefer the target with the lowest maximum king-step distance between Black's legal replies and its target corner. Retain tied targets.
+> Phase 1 Target Square: A square diagonally adjacent to Black's king is possible when a bishop controls or x rays it without checking and a bishop controls or occupies both squares adjacent to the target and Black's king. Its target corner is the corner opposite it through Black's king. Prefer the possible target whose target corner is closest to Black's king before White moves. Retain tied targets.
 
 Update the affected rules to read:
 
@@ -24,24 +24,25 @@ Rule Y and Rule V retain their existing rendered English. Phase 2 text and behav
 
 Generate every on-board square diagonally adjacent to Black's king. Pair each target square with the board corner reached in the opposite file and rank directions through Black's king. For example, with Black on `d4`, `e3` pairs with `a8`.
 
-After each candidate White move, enumerate every legal Black reply. Score each target pair by the maximum Chebyshev distance from Black's resulting king square to that pair's target corner. Lower quality scores are better. Preserve every pair tied for the best score.
+Score each target pair once from the starting position by the Chebyshev distance from Black's king to that pair's target corner. Lower quality scores are better. Preserve every pair tied for the best score. The same target pair always has the same quality across White candidates.
 
-Checkmate and stalemate continue to be handled by their earlier terminal priorities. Target quality is evaluated only for nonterminal positions.
+After each candidate White move, a normal target pair is possible only when a bishop controls or x rays its target without checking and one bishop controls or occupies both squares adjacent to both the target and Black's king. A Rule V target is possible under Rule V's existing checking exception when its king-control, Rule Y, and checking geometry are satisfied.
 
 ## Candidate Selection
 
 For each White candidate, compute target-pair facts together so later rules cannot select incompatible targets:
 
-1. When the Rule V path is active, prefer the best-quality pairs satisfying Rule V's king-control, Rule Y, and checking geometry.
-2. Otherwise, prefer the best-quality pairs whose target square is controlled or x-rayed by a bishop without checking.
-3. If no pair satisfies the applicable construction condition, retain the globally best-quality pairs.
+1. When the Rule V path is active, prefer the best-quality possible pairs satisfying Rule V's king-control, Rule Y, and checking geometry.
+2. Otherwise, prefer the best-quality possible pairs satisfying both Rule Z target control and full Rule Y common-adjacent control.
+3. A candidate with no possible pair loses Rule Z to any candidate with a possible pair. If no surviving candidate has a possible pair, target quality does not distinguish them and later priorities decide.
+4. Keep the best-quality controlled pair, or the best-quality global pair when none is controlled, as fallback geometry for later priorities.
 
 Exact quality ties remain active throughout scoring.
 
 ## Rule Integration
 
 - Rule ZZ counts bishops within two king steps of the selected target corner.
-- Rule Z first prefers a controlled or x-rayed target, then minimizes target quality.
+- Rule Z first prefers a possible target, then minimizes intrinsic target quality. Target quality is skipped when no surviving candidate has a possible target.
 - Rule Y measures only the two squares adjacent to both Black's king and a selected target square.
 - Rule W minimizes White's squared Euclidean distance to the selected target square, then maximizes White's Chebyshev distance from its paired target corner.
 - Rule V requires White-king control, Rule-Y satisfaction, and the checking bishop's destination to agree with the same selected target pair.
@@ -51,7 +52,8 @@ Expose the selected target squares, selected target corners, target quality, and
 ## Verification
 
 - Assert that `Bf4` uniquely wins the supplied position with Rule Z as the visible reason.
-- Assert that `Bf4` selects `e3` and `a8` with quality `3`.
+- Assert that `Bf4` selects possible target `e3` and `a8` with intrinsic quality `4`; the lower-quality `e5` pair is ineligible because Rule Y cannot be satisfied for it after `Bf4`.
+- Assert that moves selecting the same target pair receive the same quality even when they allow different Black replies.
 - Cover exact target-quality ties and target-control fallback behavior.
 - Cover consistent Rule ZZ, Rule Y, Rule W, and Rule V use of the selected pair.
 - Run every fixture through all D4 rotations and reflections.
