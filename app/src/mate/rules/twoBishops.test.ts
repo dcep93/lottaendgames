@@ -47,6 +47,7 @@ const WHITE_RULE_IDS = [
   'rule x',
   'rule w',
   'rule v',
+  'rule uu',
   'rule u',
   'unclutter bishops',
   'king closer',
@@ -373,6 +374,11 @@ test('Two Bishops exposes each Phase 2 comparison as one visible rule', () => {
           'Phase 1: If rule y is satisfied and the king already controls the target square, check the king, from not the target square.',
       },
       {
+        shortLabel: 'rule uu',
+        helpText:
+          "Phase 1: The bishop colored opposite to Black's king's square should control squares adjacent to the other bishop.",
+      },
+      {
         shortLabel: 'rule u',
         helpText: "Phase 1: Prefer bishops further from Black's king.",
       },
@@ -442,7 +448,11 @@ test('Two Bishops exposes each Phase 2 comparison as one visible rule', () => {
           assert.equal(typeof subpriority.compare, 'function')
         }
       }
-    } else if (rule.id === 'rule v' || rule.id === 'rule u') {
+    } else if (
+      rule.id === 'rule v' ||
+      rule.id === 'rule uu' ||
+      rule.id === 'rule u'
+    ) {
       assert.equal(typeof rule.applies, 'function')
       assert.equal(typeof rule.compare, 'function')
       assert.equal(rule.subpriorities, undefined)
@@ -634,7 +644,24 @@ test('the visible strategic comparisons run in their displayed order', () => {
             bestRuleVPenalty,
         )
       : afterRuleW
-    const phaseOneRuleUCandidates = afterRuleV.filter(
+    const phaseOneRuleUUCandidates = afterRuleV.filter(
+      (san) => !scoreTwoBishopsWhiteMove(fen, san).isPhaseTwoPosition,
+    )
+    const bestRuleUUAdjacentControlCount = Math.max(
+      0,
+      ...phaseOneRuleUUCandidates.map(
+        (san) =>
+          scoreTwoBishopsWhiteMove(fen, san)
+            .ruleUUAdjacentControlCount,
+      ),
+    )
+    const afterRuleUU = afterRuleV.filter(
+      (san) =>
+        scoreTwoBishopsWhiteMove(fen, san).isPhaseTwoPosition ||
+        scoreTwoBishopsWhiteMove(fen, san)
+          .ruleUUAdjacentControlCount === bestRuleUUAdjacentControlCount,
+    )
+    const phaseOneRuleUCandidates = afterRuleUU.filter(
       (san) => !scoreTwoBishopsWhiteMove(fen, san).isPhaseTwoPosition,
     )
     const bestRuleUScore = Math.max(
@@ -643,7 +670,7 @@ test('the visible strategic comparisons run in their displayed order', () => {
         (san) => scoreTwoBishopsWhiteMove(fen, san).ruleUScore,
       ),
     )
-    const afterRuleU = afterRuleV.filter(
+    const afterRuleU = afterRuleUU.filter(
       (san) =>
         scoreTwoBishopsWhiteMove(fen, san).isPhaseTwoPosition ||
         scoreTwoBishopsWhiteMove(fen, san).ruleUScore === bestRuleUScore,
@@ -745,6 +772,7 @@ test('the visible strategic comparisons run in their displayed order', () => {
           'phaseTwoWallPenalty',
           'ruleANonCentralEdgeBishopsCount',
           'ruleUScore',
+          'ruleUUAdjacentControlCount',
           'ruleVApplies',
           'ruleVPenalty',
           'ruleWDistance',
@@ -1214,6 +1242,47 @@ test('rule v eliminates non-rule-v moves before rule u', () => {
   assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'rule v')
 })
 
+test('rule uu maximizes opposite-color bishop control around the other bishop', () => {
+  const source = '1B1K2k1/8/8/7B/8/8/8/8 w - - 0 1'
+  const full = scoreTwoBishopsWhiteMove(source, 'Bf4')
+  const partial = scoreTwoBishopsWhiteMove(source, 'Bg3')
+  const none = scoreTwoBishopsWhiteMove(source, 'Bc7')
+  const rule = twoBishopsWhiteRules.find(({ id }) => id === 'rule uu')
+  const ruleSet = getMateRuleSet('two-bishops')
+
+  assert.equal(full.ruleUUAdjacentControlCount, 2)
+  assert.equal(partial.ruleUUAdjacentControlCount, 1)
+  assert.equal(none.ruleUUAdjacentControlCount, 0)
+  assert.ok(rule?.compare)
+  assert.ok(rule.compare(full, partial) < 0)
+  assert.ok(rule.compare(partial, none) < 0)
+  assert.ok(full.ruleUScore < partial.ruleUScore)
+  assert.deepEqual(ruleSet.idealWhiteMoves(source), ['Bf4'])
+  assert.equal(ruleSet.currentWhiteHint(source)?.id, 'rule uu')
+
+  const sourceMove = getChess(source).move('Bf4')
+  assert.ok(sourceMove)
+  for (const transform of SQUARE_TRANSFORMS) {
+    const fen = getChess(transformFen(source, transform)).fen()
+    const expected = getChess(fen)
+      .moves({ verbose: true })
+      .find(
+        ({ from, to }) =>
+          from === transformSquare(sourceMove.from, transform) &&
+          to === transformSquare(sourceMove.to, transform),
+      )
+    assert.ok(expected, transform.name)
+    assert.equal(
+      scoreTwoBishopsWhiteMove(fen, expected.san)
+        .ruleUUAdjacentControlCount,
+      2,
+      transform.name,
+    )
+    assert.deepEqual(ruleSet.idealWhiteMoves(fen), [expected.san], transform.name)
+    assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'rule uu', transform.name)
+  }
+})
+
 test('rule u maximizes summed bishop distance from Black king', () => {
   const fen = '8/8/5k2/3K4/5B2/7B/8/8 w - - 18 10'
   const far = scoreTwoBishopsWhiteMove(fen, 'Bg3')
@@ -1363,6 +1432,7 @@ test('the Phase 1 target-square stack is inactive in Phase 2', () => {
     'rule x',
     'rule w',
     'rule v',
+    'rule uu',
     'rule u',
   ]) {
     const rule = twoBishopsWhiteRules.find((candidate) => candidate.id === id)

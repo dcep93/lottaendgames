@@ -1821,6 +1821,10 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
   )
   assert.match(
     bishopsMarkup,
+    />rule uu<[^]*The bishop colored opposite to Black&#x27;s king&#x27;s square should control squares adjacent to the other bishop\./,
+  )
+  assert.match(
+    bishopsMarkup,
     />rule u<[^]*Prefer bishops further from Black&#x27;s king\./,
   )
   assert.match(
@@ -1850,6 +1854,10 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
   )
   assert.ok(
     bishopsMarkup.indexOf('>rule v<') <
+      bishopsMarkup.indexOf('>rule uu<'),
+  )
+  assert.ok(
+    bishopsMarkup.indexOf('>rule uu<') <
       bishopsMarkup.indexOf('>rule u<'),
   )
   assert.ok(
@@ -1898,6 +1906,7 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
     'rule x',
     'rule w',
     'rule v',
+    'rule uu',
     'rule u',
   ]
   for (const [index, label] of targetRuleLabels.entries()) {

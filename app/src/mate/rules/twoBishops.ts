@@ -76,6 +76,7 @@ export type TwoBishopsWhiteMoveScore = {
   readonly ruleWDistance: number
   readonly ruleVApplies: boolean
   readonly ruleVPenalty: number
+  readonly ruleUUAdjacentControlCount: number
   readonly ruleUScore: number
   readonly ruleANonCentralEdgeBishopsCount: number
   readonly kingCloserPhaseTwoLinePenalty: number
@@ -2579,6 +2580,9 @@ function scoreTwoBishopsWhiteMoveWithContext(
   const ruleVApplies = selectedTargetPairs.some(
     ({ ruleVEligible }) => ruleVEligible,
   )
+  const ruleUUAdjacentControlCount = isPhaseTwo
+    ? 0
+    : getRuleUUAdjacentControlCount(chess, resultBishops, blackKing)
   const ruleWDistance =
     resultWhiteKingSquare === undefined || selectedTargetPairs.length === 0
       ? 99
@@ -2743,6 +2747,7 @@ function scoreTwoBishopsWhiteMoveWithContext(
     ruleWTargetCornerDistance,
     ruleVApplies,
     ruleVPenalty: ruleVApplies ? 0 : 1,
+    ruleUUAdjacentControlCount,
     ruleUScore:
       blackKing === undefined
         ? 0
@@ -2856,6 +2861,30 @@ function getPhaseOneTargetPairs(
     }
   }
   return pairs
+}
+
+function getRuleUUAdjacentControlCount(
+  chess: ReturnType<typeof getChess>,
+  bishops: readonly Square[],
+  blackKing: Square | undefined,
+): number {
+  if (blackKing === undefined || bishops.length !== 2) return 0
+  const blackSquareColor = squareColorIndex(blackKing)
+  const controllingBishop = bishops.find(
+    (bishop) => squareColorIndex(bishop) !== blackSquareColor,
+  )
+  const anchorBishop = bishops.find((bishop) => bishop !== controllingBishop)
+  if (controllingBishop === undefined || anchorBishop === undefined) return 0
+  return getAdjacentSquares(anchorBishop).filter(
+    (square) =>
+      square !== controllingBishop &&
+      bishopHasClearLineToSquareOnBoard(chess, controllingBishop, square),
+  ).length
+}
+
+function squareColorIndex(square: Square): 0 | 1 {
+  const { file, rank } = squareCoordinates(square)
+  return ((file + rank) % 2) as 0 | 1
 }
 
 function hasAvailableRuleVMove(
@@ -3110,6 +3139,16 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
       'Phase 1: If rule y is satisfied and the king already controls the target square, check the king, from not the target square.',
     applies: (score) => !score.isPhaseTwoPosition,
     compare: (first, second) => first.ruleVPenalty - second.ruleVPenalty,
+  },
+  {
+    id: 'rule uu',
+    shortLabel: 'rule uu',
+    helpText:
+      "Phase 1: The bishop colored opposite to Black's king's square should control squares adjacent to the other bishop.",
+    applies: (score) => !score.isPhaseTwoPosition,
+    compare: (first, second) =>
+      second.ruleUUAdjacentControlCount -
+      first.ruleUUAdjacentControlCount,
   },
   {
     id: 'rule u',
