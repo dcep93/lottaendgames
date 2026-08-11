@@ -1700,7 +1700,7 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
   )
   assert.match(
     bishopsMarkup,
-    /Phase 1 Target Square: It&#x27;s the square adjacent to Black&#x27;s king furthest from the corner closest to Black&#x27;s king\./,
+    /Phase 1 Target Square: Each square diagonally adjacent to Black&#x27;s king is a possible target\. Its target corner is the corner opposite it through Black&#x27;s king\. After each White move, prefer the target with the lowest maximum king-step distance between Black&#x27;s legal replies and its target corner\. Retain tied targets\./,
   )
   assert.match(bishopsMarkup, /leg-mate-guide-note-boards--full/)
   assert.equal(bishopsMarkup.match(/leg-mate-note-board--full/g)?.length, 26)
@@ -1797,11 +1797,11 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
   )
   assert.match(
     bishopsMarkup,
-    />rule zz<[^]*Keep bishops more than 2 steps away from Black&#x27;s closest corner\./,
+    />rule zz<[^]*Keep bishops more than 2 steps away from the target corner\./,
   )
   assert.match(
     bishopsMarkup,
-    />rule z<[^]*Control or x ray the target square with a bishop without checking, unless following rule v\./,
+    />rule z<[^]*Control or x ray the best target square with a bishop without checking, unless following rule v\./,
   )
   assert.match(
     bishopsMarkup,
@@ -1809,11 +1809,11 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
   )
   assert.match(
     bishopsMarkup,
-    />rule x<[^]*Prefer moving an attacked bishop as far as possible\./,
+    />rule x<[^]*Prefer moving an undefended attacked bishop as far as possible\./,
   )
   assert.match(
     bishopsMarkup,
-    />rule w<[^]*Move the king towards the target square\./,
+    />rule w<[^]*Move the king towards the target square, preferring further distance from the target corner\./,
   )
   assert.match(
     bishopsMarkup,
