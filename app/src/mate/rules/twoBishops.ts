@@ -63,21 +63,6 @@ export type TwoBishopsWhiteMoveScore = {
   readonly bishopsOnBlackEdgeCount: number
   readonly forcePhaseTwoApplies: boolean
   readonly forcePhaseTwoPenalty: number
-  readonly phaseOneTargetSquares: readonly Square[]
-  readonly phaseOneTargetCorners: readonly Square[]
-  readonly phaseOneTargetQuality: number
-  readonly ruleZZTargetCornerBishopsCount: number
-  readonly ruleZApplies: boolean
-  readonly ruleZPenalty: number
-  readonly ruleYControlledAdjacentCount: number
-  readonly ruleXApplies: boolean
-  readonly ruleXTravelLength: number
-  readonly ruleWTargetCornerDistance: number
-  readonly ruleWDistance: number
-  readonly ruleVApplies: boolean
-  readonly ruleVPenalty: number
-  readonly ruleUScore: number
-  readonly ruleANonCentralEdgeBishopsCount: number
   readonly kingCloserPhaseTwoLinePenalty: number
   readonly kingCloserDistance: number
   readonly kingCloserMiddleSixteenDistance: number
@@ -212,7 +197,6 @@ const twoBishopsHelp: RuleHelp = {
   notes: [
     "Phase 2: Black's king forced to the edge, White's king two steps away from Black's king.",
     "Phase 2 Target Corner: Calculate after White's move in Phase 2. If Black is in or one edge square from a corner, use that corner. Otherwise, in the corner-diagonals position, its cutoff points to the opposite corner and continues to do so when Black steps around that corner. Otherwise, when the kings are in opposition and more bishops stand on one physical side of White's king, choose the opposite corner. When deciding between bishop moves, prefer the stronger bishop majority. Otherwise, choose the corner where White wins the king race by the greatest Chebyshev-distance lead. If neither method decides, choose the corner closest to White's king. Retain tied corners.",
-    "Phase 1 Target Square: A square diagonally adjacent to Black's king is possible when a bishop controls or x rays it without checking and a bishop controls or occupies both squares adjacent to the target and Black's king. Its target corner is the corner opposite it through Black's king. Prefer the possible target whose target corner is closest to Black's king before White moves. Retain tied targets.",
   ],
   noteBoards: [
     {
@@ -648,18 +632,6 @@ function isOnBlackKingsEdge(square: Square, blackKing: Square): boolean {
     (black.rank === 0 && candidate.rank === 0) ||
     (black.rank === 7 && candidate.rank === 7)
   )
-}
-
-function isNonCentralEdgeSquare(square: Square): boolean {
-  if (edgeDistance(square) !== 0) return false
-  const { file, rank } = squareCoordinates(square)
-  const centralFile = file === 3 || file === 4
-  const centralRank = rank === 3 || rank === 4
-  const centralHorizontalEdge =
-    (rank === 0 || rank === 7) && centralFile
-  const centralVerticalEdge =
-    (file === 0 || file === 7) && centralRank
-  return !centralHorizontalEdge && !centralVerticalEdge
 }
 
 function isOnPhaseTwoKingLine(
@@ -2457,7 +2429,6 @@ function scoreTwoBishopsWhiteMoveWithContext(
     mateInThreeApplies,
     matePatternTurnsBySan,
     shepherdMoves,
-    startingBishops,
   } = context
   const chess = getChess(fen)
   const move = chess.move(san)
@@ -2465,22 +2436,6 @@ function scoreTwoBishopsWhiteMoveWithContext(
   const resultBishops = getWhiteBishopSquares(resultFen)
   const resultWhiteKingSquare =
     move.piece === 'k' ? move.to : startingWhiteKing
-  const movedAttackedBishop =
-    move.piece === 'b' &&
-    blackKing !== undefined &&
-    startingBishops.includes(move.from) &&
-    kingDistance(move.from, blackKing) === 1
-  const movedUndefendedAttackedBishop =
-    movedAttackedBishop &&
-    !(
-      startingWhiteKing !== undefined &&
-      kingDistance(move.from, startingWhiteKing) === 1
-    ) &&
-    !startingBishops.some(
-      (bishop) =>
-        bishop !== move.from &&
-        bishopHasClearLineToSquare(fen, bishop, move.from),
-    )
   const sequesterTwoAwaySquares = getSequesterTwoAwaySquares(blackKing)
   const resultKingDistance =
     blackKing && resultWhiteKingSquare
@@ -2498,107 +2453,6 @@ function scoreTwoBishopsWhiteMoveWithContext(
       return findPiece(replyChess.fen(), 'b', 'k')?.square
     })
     .filter((square): square is Square => square !== undefined)
-  const scoredPhaseOneTargetPairs: readonly ScoredPhaseOneTargetPair[] =
-    isPhaseTwo
-      ? []
-      : getPhaseOneTargetPairs(blackKing).map(({ square, corner }) => {
-          const targetAdjacentSquares = new Set(getAdjacentSquares(square))
-          const commonAdjacentSquares = getAdjacentSquares(blackKing).filter(
-            (adjacent) => targetAdjacentSquares.has(adjacent),
-          )
-          const ruleYCount = Math.max(
-            0,
-            ...resultBishops.map((bishop) =>
-              Math.min(
-                2,
-                commonAdjacentSquares.filter(
-                  (adjacent) =>
-                    bishop === adjacent ||
-                    bishopHasClearLineToSquareOnBoard(
-                      chess,
-                      bishop,
-                      adjacent,
-                    ),
-                ).length,
-              ),
-            ),
-          )
-          const controlledByBishop = resultBishops.some((bishop) =>
-            bishopIsAlignedWithSquare(bishop, square),
-          )
-          return {
-            square,
-            corner,
-            quality:
-              blackKing === undefined ? 99 : kingDistance(blackKing, corner),
-            controlledByBishop,
-            ruleYControlledAdjacentCount: ruleYCount,
-            ruleVEligible:
-              startingWhiteKing !== undefined &&
-              kingDistance(startingWhiteKing, square) === 1 &&
-              ruleYCount === 2 &&
-              chess.isCheck() &&
-              move.to !== square,
-          }
-        })
-  const ruleVTargetPairs = scoredPhaseOneTargetPairs.filter(
-    ({ ruleVEligible }) => ruleVEligible,
-  )
-  const controlledTargetPairs = scoredPhaseOneTargetPairs.filter(
-    ({ controlledByBishop }) => controlledByBishop && !chess.isCheck(),
-  )
-  const possibleTargetPairs = controlledTargetPairs.filter(
-    ({ ruleYControlledAdjacentCount }) =>
-      ruleYControlledAdjacentCount === 2,
-  )
-  const constructionTargetPairs =
-    ruleVTargetPairs.length > 0 ? ruleVTargetPairs : possibleTargetPairs
-  const fallbackTargetPairs =
-    controlledTargetPairs.length > 0
-      ? controlledTargetPairs
-      : scoredPhaseOneTargetPairs
-  const selectableTargetPairs =
-    constructionTargetPairs.length > 0
-      ? constructionTargetPairs
-      : fallbackTargetPairs
-  const phaseOneTargetQuality =
-    selectableTargetPairs.length === 0
-      ? 99
-      : Math.min(...selectableTargetPairs.map(({ quality }) => quality))
-  const selectedTargetPairs = selectableTargetPairs.filter(
-    ({ quality }) => quality === phaseOneTargetQuality,
-  )
-  const phaseOneTargetSquares = selectedTargetPairs.map(({ square }) => square)
-  const phaseOneTargetCorners = selectedTargetPairs.map(({ corner }) => corner)
-  const ruleYControlledAdjacentCount = Math.max(
-    0,
-    ...selectedTargetPairs.map(
-      ({ ruleYControlledAdjacentCount: count }) => count,
-    ),
-  )
-  const ruleVApplies = selectedTargetPairs.some(
-    ({ ruleVEligible }) => ruleVEligible,
-  )
-  const ruleWDistance =
-    resultWhiteKingSquare === undefined || selectedTargetPairs.length === 0
-      ? 99
-      : Math.min(
-          ...selectedTargetPairs.map(({ square }) =>
-            squaredEuclideanDistance(resultWhiteKingSquare, square),
-          ),
-        )
-  const ruleWTargetCornerDistance =
-    resultWhiteKingSquare === undefined || selectedTargetPairs.length === 0
-      ? 0
-      : Math.max(
-          ...selectedTargetPairs
-            .filter(
-              ({ square }) =>
-                squaredEuclideanDistance(resultWhiteKingSquare, square) ===
-                ruleWDistance,
-            )
-            .map(({ corner }) => kingDistance(resultWhiteKingSquare, corner)),
-        )
   const targetSelection = isPhaseTwo
       ? getResultTargetCornerSelection(
           fen,
@@ -2713,47 +2567,6 @@ function scoreTwoBishopsWhiteMoveWithContext(
       )
         ? 0
         : 1,
-    phaseOneTargetSquares,
-    phaseOneTargetCorners,
-    phaseOneTargetQuality,
-    ruleZZTargetCornerBishopsCount: isPhaseTwo
-      ? 0
-      : resultBishops.filter((bishop) =>
-          phaseOneTargetCorners.some(
-            (corner) => kingDistance(bishop, corner) <= 2,
-          ),
-        ).length,
-    ruleZApplies: !isPhaseTwo,
-    ruleZPenalty: possibleTargetPairs.length > 0 ? 0 : 1,
-    ruleYControlledAdjacentCount,
-    ruleXApplies: !isPhaseTwo && movedUndefendedAttackedBishop,
-    ruleXTravelLength: movedUndefendedAttackedBishop
-      ? Math.max(
-          Math.abs(
-            squareCoordinates(move.from).file -
-              squareCoordinates(move.to).file,
-          ),
-          Math.abs(
-            squareCoordinates(move.from).rank -
-              squareCoordinates(move.to).rank,
-          ),
-        )
-      : 0,
-    ruleWDistance,
-    ruleWTargetCornerDistance,
-    ruleVApplies,
-    ruleVPenalty: ruleVApplies ? 0 : 1,
-    ruleUScore:
-      blackKing === undefined
-        ? 0
-        : resultBishops.reduce(
-            (score, bishop) =>
-              score + kingDistance(bishop, blackKing),
-            0,
-          ),
-    ruleANonCentralEdgeBishopsCount: resultBishops.filter(
-      isNonCentralEdgeSquare,
-    ).length,
     kingCloserPhaseTwoLinePenalty:
       !isPhaseTwo ||
       blackKing === undefined ||
@@ -2802,82 +2615,6 @@ function isInOpposition(
   return (
     (fileDistance === 0 && rankDistance === distance) ||
     (rankDistance === 0 && fileDistance === distance)
-  )
-}
-
-function getAdjacentSquares(square: Square | undefined): Square[] {
-  if (square === undefined) return []
-  const origin = squareCoordinates(square)
-  const adjacent: Square[] = []
-  for (let fileStep = -1; fileStep <= 1; fileStep += 1) {
-    for (let rankStep = -1; rankStep <= 1; rankStep += 1) {
-      if (fileStep === 0 && rankStep === 0) continue
-      const target = squareFromCoordinates(
-        origin.file + fileStep,
-        origin.rank + rankStep,
-      )
-      if (target !== null) adjacent.push(target)
-    }
-  }
-  return adjacent
-}
-
-type PhaseOneTargetPair = {
-  readonly square: Square
-  readonly corner: Square
-}
-
-type ScoredPhaseOneTargetPair = PhaseOneTargetPair & {
-  readonly quality: number
-  readonly controlledByBishop: boolean
-  readonly ruleYControlledAdjacentCount: number
-  readonly ruleVEligible: boolean
-}
-
-function getPhaseOneTargetPairs(
-  blackKing: Square | undefined,
-): readonly PhaseOneTargetPair[] {
-  if (blackKing === undefined) return []
-  const origin = squareCoordinates(blackKing)
-  const pairs: PhaseOneTargetPair[] = []
-  for (const fileStep of [-1, 1] as const) {
-    for (const rankStep of [-1, 1] as const) {
-      const square = squareFromCoordinates(
-        origin.file + fileStep,
-        origin.rank + rankStep,
-      )
-      const corner = squareFromCoordinates(
-        fileStep < 0 ? 7 : 0,
-        rankStep < 0 ? 7 : 0,
-      )
-      if (square !== null && corner !== null) {
-        pairs.push({ square, corner })
-      }
-    }
-  }
-  return pairs
-}
-
-function hasAvailableRuleVMove(
-  scores: readonly TwoBishopsWhiteMoveScore[],
-): boolean {
-  return scores.some(
-    (score) => score.ruleVApplies && score.ruleVPenalty === 0,
-  )
-}
-
-function targetBuildRulesApply(
-  scores: readonly TwoBishopsWhiteMoveScore[],
-): boolean {
-  return !hasAvailableRuleVMove(scores)
-}
-
-function targetQualityRulesApply(
-  scores: readonly TwoBishopsWhiteMoveScore[],
-): boolean {
-  return (
-    targetBuildRulesApply(scores) &&
-    scores.every(({ ruleZPenalty }) => ruleZPenalty === 0)
   )
 }
 
@@ -2998,125 +2735,6 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
     applies: (score) => score.phaseTwoWallApplies,
     compare: (first, second) =>
       first.phaseTwoWallPenalty - second.phaseTwoWallPenalty,
-  },
-  {
-    id: 'rule zz',
-    shortLabel: 'rule zz',
-    helpText:
-      'Phase 1: Keep bishops more than 2 steps away from the target corner.',
-    applies: (score) => !score.isPhaseTwoPosition,
-    compare: (first, second) =>
-      first.ruleZZTargetCornerBishopsCount -
-      second.ruleZZTargetCornerBishopsCount,
-  },
-  {
-    id: 'rule z',
-    shortLabel: 'rule z',
-    helpText:
-      'Phase 1: Control or x ray the best target square with a bishop without checking, unless following rule v.',
-    applies: (score) => score.ruleZApplies,
-    subpriorities: [
-      {
-        when: targetBuildRulesApply,
-        compare: (first, second) =>
-          first.ruleZPenalty - second.ruleZPenalty,
-      },
-      {
-        when: targetQualityRulesApply,
-        compare: (first, second) =>
-          first.phaseOneTargetQuality - second.phaseOneTargetQuality,
-      },
-    ],
-  },
-  {
-    id: 'rule y',
-    shortLabel: 'rule y',
-    helpText:
-      "Phase 1: Use a bishop to control or occupy the two squares adjacent to Black's king and also the target square.",
-    applies: (score) => !score.isPhaseTwoPosition,
-    subpriorities: [
-      {
-        when: targetBuildRulesApply,
-        compare: (first, second) =>
-          (first.ruleYControlledAdjacentCount === 2 ? 0 : 1) -
-          (second.ruleYControlledAdjacentCount === 2 ? 0 : 1),
-      },
-    ],
-  },
-  {
-    id: 'rule a',
-    shortLabel: 'rule a',
-    helpText: 'Prefer fewer bishops on a non central edge square.',
-    applies: (score) => !score.isPhaseTwoPosition,
-    subpriorities: [
-      {
-        when: targetBuildRulesApply,
-        compare: (first, second) =>
-          first.ruleANonCentralEdgeBishopsCount -
-          second.ruleANonCentralEdgeBishopsCount,
-      },
-    ],
-  },
-  {
-    id: 'rule x',
-    shortLabel: 'rule x',
-    helpText:
-      'Phase 1: Prefer moving an undefended attacked bishop as far as possible.',
-    applies: (score) => !score.isPhaseTwoPosition,
-    subpriorities: [
-      {
-        when: targetBuildRulesApply,
-        rank: (scores) => {
-          const longestTravel = Math.max(
-            0,
-            ...scores
-              .filter((score) => score.ruleXApplies)
-              .map((score) => score.ruleXTravelLength),
-          )
-          return scores.map((score) =>
-            score.ruleXApplies &&
-            score.ruleXTravelLength === longestTravel
-              ? 0
-              : 1,
-          )
-        },
-      },
-    ],
-  },
-  {
-    id: 'rule w',
-    shortLabel: 'rule w',
-    helpText:
-      'Phase 1: Move the king towards the target square, preferring further distance from the target corner.',
-    applies: (score) => !score.isPhaseTwoPosition,
-    subpriorities: [
-      {
-        when: targetBuildRulesApply,
-        compare: (first, second) =>
-          first.ruleWDistance - second.ruleWDistance,
-      },
-      {
-        when: targetBuildRulesApply,
-        compare: (first, second) =>
-          second.ruleWTargetCornerDistance -
-          first.ruleWTargetCornerDistance,
-      },
-    ],
-  },
-  {
-    id: 'rule v',
-    shortLabel: 'rule v',
-    helpText:
-      'Phase 1: If rule y is satisfied and the king already controls the target square, check the king, from not the target square.',
-    applies: (score) => !score.isPhaseTwoPosition,
-    compare: (first, second) => first.ruleVPenalty - second.ruleVPenalty,
-  },
-  {
-    id: 'rule u',
-    shortLabel: 'rule u',
-    helpText: "Phase 1: Prefer bishops further from Black's king.",
-    applies: (score) => !score.isPhaseTwoPosition,
-    compare: (first, second) => second.ruleUScore - first.ruleUScore,
   },
   {
     id: 'unclutter bishops',

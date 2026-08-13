@@ -1698,9 +1698,9 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
     bishopsMarkup,
     /Phase 2 Target Corner: Calculate after White&#x27;s move in Phase 2\. If Black is in or one edge square from a corner, use that corner\. Otherwise, in the corner-diagonals position, its cutoff points to the opposite corner and continues to do so when Black steps around that corner\. Otherwise, when the kings are in opposition and more bishops stand on one physical side of White&#x27;s king, choose the opposite corner\. When deciding between bishop moves, prefer the stronger bishop majority\. Otherwise, choose the corner where White wins the king race by the greatest Chebyshev-distance lead\. If neither method decides, choose the corner closest to White&#x27;s king\. Retain tied corners\./,
   )
-  assert.match(
+  assert.doesNotMatch(
     bishopsMarkup,
-    /Phase 1 Target Square: A square diagonally adjacent to Black&#x27;s king is possible when a bishop controls or x rays it without checking and a bishop controls or occupies both squares adjacent to the target and Black&#x27;s king\. Its target corner is the corner opposite it through Black&#x27;s king\. Prefer the possible target whose target corner is closest to Black&#x27;s king before White moves\. Retain tied targets\./,
+    /Phase 1 Target Square/,
   )
   assert.match(bishopsMarkup, /leg-mate-guide-note-boards--full/)
   assert.equal(bishopsMarkup.match(/leg-mate-note-board--full/g)?.length, 26)
@@ -1795,37 +1795,9 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
     bishopsMarkup,
     />king closer<[^]*Phase 2: Bring White&#x27;s king closer to Black&#x27;s king, preferring proximity to the the middle 16 squares\./,
   )
-  assert.match(
+  assert.doesNotMatch(
     bishopsMarkup,
-    />rule zz<[^]*Keep bishops more than 2 steps away from the target corner\./,
-  )
-  assert.match(
-    bishopsMarkup,
-    />rule z<[^]*Control or x ray the best target square with a bishop without checking, unless following rule v\./,
-  )
-  assert.match(
-    bishopsMarkup,
-    />rule y<[^]*Use a bishop to control or occupy the two squares adjacent to Black&#x27;s king and also the target square\./,
-  )
-  assert.match(
-    bishopsMarkup,
-    />rule x<[^]*Prefer moving an undefended attacked bishop as far as possible\./,
-  )
-  assert.match(
-    bishopsMarkup,
-    />rule w<[^]*Move the king towards the target square, preferring further distance from the target corner\./,
-  )
-  assert.match(
-    bishopsMarkup,
-    />rule v<[^]*If rule y is satisfied and the king already controls the target square, check the king, from not the target square\./,
-  )
-  assert.match(
-    bishopsMarkup,
-    />rule u<[^]*Prefer bishops further from Black&#x27;s king\./,
-  )
-  assert.match(
-    bishopsMarkup,
-    />rule a<[^]*Prefer fewer bishops on a non central edge square\./,
+    />rule zz<|>rule z<|>rule y<|>rule a<|>rule x<|>rule w<|>rule v<|>rule u</,
   )
   assert.match(bishopsMarkup, />check<[^]*Play a check</)
   assert.match(
@@ -1834,23 +1806,7 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
   )
   assert.ok(
     bishopsMarkup.indexOf('>phase 2 wall<') <
-      bishopsMarkup.indexOf('>rule zz<'),
-  )
-  assert.ok(
-    bishopsMarkup.indexOf('>rule zz<') <
-      bishopsMarkup.indexOf('>rule z<'),
-  )
-  assert.ok(
-    bishopsMarkup.indexOf('>rule y<') <
-      bishopsMarkup.indexOf('>rule a<'),
-  )
-  assert.ok(
-    bishopsMarkup.indexOf('>rule a<') <
-      bishopsMarkup.indexOf('>rule x<'),
-  )
-  assert.ok(
-    bishopsMarkup.indexOf('>rule v<') <
-      bishopsMarkup.indexOf('>rule u<'),
+      bishopsMarkup.indexOf('>unclutter bishops<'),
   )
   assert.ok(
     bishopsMarkup.indexOf('>unclutter bishops<') <
@@ -1890,26 +1846,6 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
   ]) {
     assert.doesNotMatch(bishopsMarkup, new RegExp(`>${removed}<`))
   }
-  const targetRuleLabels = [
-    'rule zz',
-    'rule z',
-    'rule y',
-    'rule a',
-    'rule x',
-    'rule w',
-    'rule v',
-    'rule u',
-  ]
-  for (const [index, label] of targetRuleLabels.entries()) {
-    const next = targetRuleLabels[index + 1]
-    if (next) {
-      assert.ok(
-        bishopsMarkup.indexOf(`>${label}<`) <
-          bishopsMarkup.indexOf(`>${next}<`),
-      )
-    }
-  }
-
   const queenMarkup = renderToStaticMarkup(
     <MatePriorityGuideDialog
       {...MATE_TRAINING_INFO_PROPS}
