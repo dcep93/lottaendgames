@@ -500,6 +500,16 @@ const twoBishopsHelp: RuleHelp = {
       highlights: TWO_BISHOPS_DIAGRAM_POSITIONS.phaseTwoWall.highlights,
     },
     {
+      id: 'bishop-rule-a',
+      title: 'rule a',
+      caption:
+        "When the kings are a knight's move apart, control the highlighted flank square with a bishop.",
+      layout: { files: 8, ranks: 8, fileOffset: 0 },
+      pieces: noteBoardPieces(TWO_BISHOPS_DIAGRAM_POSITIONS.ruleA.fen),
+      highlights: TWO_BISHOPS_DIAGRAM_POSITIONS.ruleA.highlights,
+      arrows: [TWO_BISHOPS_DIAGRAM_POSITIONS.ruleA.arrow],
+    },
+    {
       id: 'bishop-proximate-wall',
       title: 'proximate bishop wall',
       caption:
@@ -2372,7 +2382,7 @@ type TwoBishopsWhitePositionContext = {
   readonly mateInThreeApplies: boolean
   readonly matePatternTurnsBySan: ReadonlyMap<string, 2 | 3>
   readonly shepherdMoves: readonly string[]
-  readonly ruleATargetSquares: readonly Square[]
+  readonly ruleAFlankSquares: readonly Square[]
 }
 
 function createTwoBishopsWhitePositionContext(
@@ -2396,10 +2406,10 @@ function createTwoBishopsWhitePositionContext(
     degenerateRepair,
     mateInThreeApplies: matePatternTurnsBySan.size > 0,
     matePatternTurnsBySan,
-    ruleATargetSquares:
+    ruleAFlankSquares:
       isPhaseTwo || blackKing === undefined || startingWhiteKing === undefined
         ? []
-        : getInwardOppositionSquares(startingWhiteKing, blackKing),
+        : getFlankSquares(startingWhiteKing, blackKing),
     shepherdMoves:
       isPhaseTwo
         ? getShepherdMoves(
@@ -2435,7 +2445,7 @@ function scoreTwoBishopsWhiteMoveWithContext(
     degenerateRepair,
     mateInThreeApplies,
     matePatternTurnsBySan,
-    ruleATargetSquares,
+    ruleAFlankSquares,
     shepherdMoves,
   } = context
   const chess = getChess(fen)
@@ -2575,14 +2585,14 @@ function scoreTwoBishopsWhiteMoveWithContext(
       )
         ? 0
         : 1,
-    ruleAApplies: ruleATargetSquares.length > 0,
+    ruleAApplies: ruleAFlankSquares.length > 0,
     ruleAPenalty:
       move.piece === 'b' &&
-      ruleATargetSquares.length > 0 &&
-      ruleATargetSquares.every((target) =>
+      ruleAFlankSquares.length > 0 &&
+      ruleAFlankSquares.every((target) =>
         resultBishops.some(
           (bishop) =>
-            bishop === target ||
+            bishop !== target &&
             bishopHasClearLineToSquare(resultFen, bishop, target),
         ),
       )
@@ -2639,12 +2649,12 @@ function isInOpposition(
   )
 }
 
-function getInwardOppositionSquares(
+function getFlankSquares(
   whiteKing: Square,
   blackKing: Square,
 ): Square[] {
+  if (!isKnightMove(whiteKing, blackKing)) return []
   const origin = squareCoordinates(blackKing)
-  const currentCenterDistance = centerDistance(blackKing)
   const targets: Square[] = []
   for (let fileStep = -1; fileStep <= 1; fileStep += 1) {
     for (let rankStep = -1; rankStep <= 1; rankStep += 1) {
@@ -2655,8 +2665,8 @@ function getInwardOppositionSquares(
       )
       if (
         target !== null &&
-        centerDistance(target) < currentCenterDistance &&
-        isInOpposition(whiteKing, target, 1)
+        target !== whiteKing &&
+        isKnightMove(whiteKing, target)
       ) {
         targets.push(target)
       }
@@ -2796,7 +2806,7 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
     id: 'rule a',
     shortLabel: 'rule a',
     helpText:
-      'Phase 1: Use a bishop to disallow black from moving towards the center into opposition.',
+      "Phase 1: When the kings are a knight's move apart, use a bishop to control the flank square. The flank square is the square adjacent to Black's king and also a knight's move from White's king.",
     applies: (score) => score.ruleAApplies,
     compare: (first, second) => first.ruleAPenalty - second.ruleAPenalty,
   },

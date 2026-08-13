@@ -17,6 +17,9 @@ const phaseTwoWallFen = getChess(
 const shepherdFen = getChess(
   '3k4/6BB/4K3/8/8/8/8/8 w - - 0 1',
 ).fen()
+const ruleAFen = getChess(
+  '8/3B4/8/8/4K2B/8/3k4/8 w - - 0 1',
+).fen()
 const degeneratePhaseTwoOppositionFen = getChess(
   '6k1/1B6/4K3/8/3B4/8/8/8 w - - 0 1',
 ).fen()
@@ -114,6 +117,7 @@ for (const [label, fen] of [
   ['degenerate king flank', degenerateKingFlankFen],
   ['degenerate king sidestep', degenerateKingSidestepFen],
   ['degenerate reform wall', degenerateReformWallFen],
+  ['rule a', ruleAFen],
 ] as const) {
   if (getTwoBishopsPhaseLabel(fen) !== '1/2') {
     throw new Error(`Two Bishops ${label} diagram must display Phase 1`)
@@ -150,6 +154,12 @@ export const TWO_BISHOPS_DIAGRAM_POSITIONS = {
       { square: 'f8', kind: 'zone' },
     ],
     arrow: { from: 'e6', to: 'd6' },
+  },
+  ruleA: {
+    phase: '1/2',
+    fen: ${JSON.stringify(ruleAFen)},
+    highlights: [{ square: 'c3', kind: 'key' }],
+    arrow: { from: 'h4', to: 'f6' },
   },
   proximateWall: {
     pieces: [
@@ -323,6 +333,7 @@ if (check) {
 
 process.stdout.write(`phase 2 wall: ${phaseTwoWallFen}\n`)
 process.stdout.write(`shepherd: ${shepherdFen}\n`)
+process.stdout.write(`rule a: ${ruleAFen}\n`)
 process.stdout.write(
   `degenerate phase 2 opposition: ${degeneratePhaseTwoOppositionFen}\n`,
 )
