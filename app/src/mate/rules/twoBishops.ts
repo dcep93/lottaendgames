@@ -2749,8 +2749,7 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
     id: 'king closer',
     shortLabel: 'king closer',
     helpText:
-      "Phase 2: Bring White's king closer to Black's king, preferring proximity to the the middle 16 squares.",
-    applies: (score) => score.isPhaseTwoPosition,
+      "Bring White's king closer to Black's king, preferring proximity to the the middle 16 squares.",
     compare: (first, second) =>
       first.kingCloserPhaseTwoLinePenalty -
         second.kingCloserPhaseTwoLinePenalty ||
