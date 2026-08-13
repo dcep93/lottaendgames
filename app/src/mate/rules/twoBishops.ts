@@ -1,6 +1,7 @@
 import type { Square } from 'chess.js'
 import {
   SQUARE_TRANSFORMS,
+  allSquares,
   edgeDistance,
   findPiece,
   getChess,
@@ -63,10 +64,16 @@ export type TwoBishopsWhiteMoveScore = {
   readonly bishopsOnBlackEdgeCount: number
   readonly forcePhaseTwoApplies: boolean
   readonly forcePhaseTwoPenalty: number
+  readonly rulePPApplies: boolean
+  readonly rulePPPenalty: number
   readonly rulePApplies: boolean
   readonly rulePPenalty: number
   readonly ruleQApplies: boolean
   readonly ruleQPenalty: number
+  readonly ruleRApplies: boolean
+  readonly ruleRPenalty: number
+  readonly ruleSApplies: boolean
+  readonly ruleSPenalty: number
   readonly ruleBScore: number
   readonly kingCloserPhaseTwoLinePenalty: number
   readonly kingCloserDistance: number
@@ -199,10 +206,7 @@ const twoBishopsHelp: RuleHelp = {
     'Move toward the center.',
     'Move toward an unprotected bishop.',
   ],
-  notes: [
-    "Phase 2: Black's king forced to the edge, White's king two steps away from Black's king.",
-    "Phase 2 Target Corner: Calculate after White's move in Phase 2. If Black is in or one edge square from a corner, use that corner. Otherwise, in the corner-diagonals position, its cutoff points to the opposite corner and continues to do so when Black steps around that corner. Otherwise, when the kings are in opposition and more bishops stand on one physical side of White's king, choose the opposite corner. When deciding between bishop moves, prefer the stronger bishop majority. Otherwise, choose the corner where White wins the king race by the greatest Chebyshev-distance lead. If neither method decides, choose the corner closest to White's king. Retain tied corners.",
-  ],
+  notes: [],
   noteBoards: [
     {
       id: 'bishop-degenerate-phase-two-opposition',
@@ -503,14 +507,14 @@ const twoBishopsHelp: RuleHelp = {
       highlights: TWO_BISHOPS_DIAGRAM_POSITIONS.phaseTwoWall.highlights,
     },
     {
-      id: 'bishop-rule-q',
-      title: 'rule q',
+      id: 'bishop-rule-s',
+      title: 'rule s',
       caption:
         "When the kings are a knight's move apart, control the highlighted flank square with a bishop.",
       layout: { files: 8, ranks: 8, fileOffset: 0 },
-      pieces: noteBoardPieces(TWO_BISHOPS_DIAGRAM_POSITIONS.ruleQ.fen),
-      highlights: TWO_BISHOPS_DIAGRAM_POSITIONS.ruleQ.highlights,
-      arrows: [TWO_BISHOPS_DIAGRAM_POSITIONS.ruleQ.arrow],
+      pieces: noteBoardPieces(TWO_BISHOPS_DIAGRAM_POSITIONS.ruleS.fen),
+      highlights: TWO_BISHOPS_DIAGRAM_POSITIONS.ruleS.highlights,
+      arrows: [TWO_BISHOPS_DIAGRAM_POSITIONS.ruleS.arrow],
     },
     {
       id: 'bishop-proximate-wall',
@@ -521,7 +525,7 @@ const twoBishopsHelp: RuleHelp = {
       pieces: TWO_BISHOPS_DIAGRAM_POSITIONS.proximateWall.pieces,
       highlights: TWO_BISHOPS_DIAGRAM_POSITIONS.proximateWall.highlights,
     },
-  ],
+  ].filter(({ id }) => id === 'bishop-rule-s'),
 }
 
 function noteBoardPieces(fen: string): readonly RuleNoteBoardPiece[] {
@@ -2385,8 +2389,11 @@ type TwoBishopsWhitePositionContext = {
   readonly mateInThreeApplies: boolean
   readonly matePatternTurnsBySan: ReadonlyMap<string, 2 | 3>
   readonly shepherdMoves: readonly string[]
-  readonly rulePInwardFlankSquares: readonly Square[]
-  readonly ruleQFlankSquares: readonly Square[]
+  readonly rulePPInwardFlankSquares: readonly Square[]
+  readonly rulePApplies: boolean
+  readonly ruleQTakeOppositionSquare: Square | null
+  readonly ruleRTakeOppositionSquare: Square | null
+  readonly ruleSFlankSquares: readonly Square[]
 }
 
 function createTwoBishopsWhitePositionContext(
@@ -2410,12 +2417,39 @@ function createTwoBishopsWhitePositionContext(
     degenerateRepair,
     mateInThreeApplies: matePatternTurnsBySan.size > 0,
     matePatternTurnsBySan,
-    rulePInwardFlankSquares:
-      isPhaseTwo || blackKing === undefined || startingWhiteKing === undefined
+    rulePPInwardFlankSquares:
+      blackKing === undefined || startingWhiteKing === undefined
         ? []
         : getInwardFlankSquares(startingWhiteKing, blackKing),
-    ruleQFlankSquares:
-      isPhaseTwo || blackKing === undefined || startingWhiteKing === undefined
+    rulePApplies:
+      blackKing !== undefined &&
+      startingWhiteKing !== undefined &&
+      positionSatisfiesRulePP(
+        fen,
+        startingWhiteKing,
+        blackKing,
+        startingBishops,
+      ),
+    ruleQTakeOppositionSquare:
+      blackKing === undefined || startingWhiteKing === undefined
+        ? null
+        : getRuleQTakeOppositionSquare(
+            fen,
+            startingWhiteKing,
+            blackKing,
+            startingBishops,
+          ),
+    ruleRTakeOppositionSquare:
+      blackKing === undefined || startingWhiteKing === undefined
+        ? null
+        : getRuleRTakeOppositionSquare(
+            fen,
+            startingWhiteKing,
+            blackKing,
+            startingBishops,
+          ),
+    ruleSFlankSquares:
+      blackKing === undefined || startingWhiteKing === undefined
         ? []
         : getFlankSquares(startingWhiteKing, blackKing),
     shepherdMoves:
@@ -2453,8 +2487,11 @@ function scoreTwoBishopsWhiteMoveWithContext(
     degenerateRepair,
     mateInThreeApplies,
     matePatternTurnsBySan,
-    rulePInwardFlankSquares,
-    ruleQFlankSquares,
+    rulePPInwardFlankSquares,
+    rulePApplies,
+    ruleQTakeOppositionSquare,
+    ruleRTakeOppositionSquare,
+    ruleSFlankSquares,
     shepherdMoves,
   } = context
   const chess = getChess(fen)
@@ -2594,11 +2631,11 @@ function scoreTwoBishopsWhiteMoveWithContext(
       )
         ? 0
         : 1,
-    rulePApplies: rulePInwardFlankSquares.length > 0,
-    rulePPenalty:
+    rulePPApplies: rulePPInwardFlankSquares.length > 0,
+    rulePPPenalty:
       move.piece === 'b' &&
-      rulePInwardFlankSquares.length > 0 &&
-      rulePInwardFlankSquares.every((target) =>
+      rulePPInwardFlankSquares.length > 0 &&
+      rulePPInwardFlankSquares.every((target) =>
         resultBishops.some(
           (bishop) =>
             bishop !== target &&
@@ -2607,11 +2644,31 @@ function scoreTwoBishopsWhiteMoveWithContext(
       )
         ? 0
         : 1,
-    ruleQApplies: ruleQFlankSquares.length > 0,
-    ruleQPenalty:
+    rulePApplies,
+    rulePPenalty:
+      rulePApplies &&
       move.piece === 'b' &&
-      ruleQFlankSquares.length > 0 &&
-      ruleQFlankSquares.every((target) =>
+      blackKing !== undefined &&
+      resultWhiteKingSquare !== undefined &&
+      checkingBishopsShareSideOfWhiteKing(
+        resultFen,
+        resultBishops,
+        resultWhiteKingSquare,
+        blackKing,
+      )
+        ? 0
+        : 1,
+    ruleQApplies: ruleQTakeOppositionSquare !== null,
+    ruleQPenalty:
+      move.piece === 'k' && move.to === ruleQTakeOppositionSquare ? 0 : 1,
+    ruleRApplies: ruleRTakeOppositionSquare !== null,
+    ruleRPenalty:
+      move.piece === 'k' && move.to === ruleRTakeOppositionSquare ? 0 : 1,
+    ruleSApplies: ruleSFlankSquares.length > 0,
+    ruleSPenalty:
+      move.piece === 'b' &&
+      ruleSFlankSquares.length > 0 &&
+      ruleSFlankSquares.every((target) =>
         resultBishops.some(
           (bishop) =>
             bishop !== target &&
@@ -2677,6 +2734,193 @@ function isInOpposition(
     (fileDistance === 0 && rankDistance === distance) ||
     (rankDistance === 0 && fileDistance === distance)
   )
+}
+
+function bishopsControlTargets(
+  fen: string,
+  bishops: readonly Square[],
+  targets: readonly Square[],
+): boolean {
+  return (
+    targets.length > 0 &&
+    targets.every((target) =>
+      bishops.some(
+        (bishop) =>
+          bishop !== target &&
+          bishopHasClearLineToSquare(fen, bishop, target),
+      ),
+    )
+  )
+}
+
+function positionSatisfiesRulePP(
+  fen: string,
+  whiteKing: Square,
+  blackKing: Square,
+  bishops: readonly Square[],
+): boolean {
+  return bishopsControlTargets(
+    fen,
+    bishops,
+    getInwardFlankSquares(whiteKing, blackKing),
+  )
+}
+
+function squaresShareKingSide(
+  first: Square,
+  second: Square,
+  king: Square,
+): boolean {
+  const firstCoordinates = squareCoordinates(first)
+  const secondCoordinates = squareCoordinates(second)
+  const kingCoordinates = squareCoordinates(king)
+  const firstFile = firstCoordinates.file - kingCoordinates.file
+  const secondFile = secondCoordinates.file - kingCoordinates.file
+  const firstRank = firstCoordinates.rank - kingCoordinates.rank
+  const secondRank = secondCoordinates.rank - kingCoordinates.rank
+  return (
+    (firstFile < 0 && secondFile < 0) ||
+    (firstFile > 0 && secondFile > 0) ||
+    (firstRank < 0 && secondRank < 0) ||
+    (firstRank > 0 && secondRank > 0)
+  )
+}
+
+function checkingBishopsShareSideOfWhiteKing(
+  fen: string,
+  bishops: readonly Square[],
+  whiteKing: Square,
+  blackKing: Square,
+): boolean {
+  return bishops.some(
+    (checkingBishop, checkingIndex) =>
+      bishopHasClearLineToSquare(fen, checkingBishop, blackKing) &&
+      bishops.some(
+        (otherBishop, otherIndex) =>
+          otherIndex !== checkingIndex &&
+          squaresShareKingSide(
+            checkingBishop,
+            otherBishop,
+            whiteKing,
+          ),
+      ),
+  )
+}
+
+function getTakeOppositionSquare(
+  whiteKing: Square,
+  blackKing: Square,
+): Square | null {
+  if (!isKnightMove(whiteKing, blackKing)) return null
+  return (
+    allSquares().find(
+      (square) =>
+        kingDistance(whiteKing, square) === 1 &&
+        isInOpposition(square, blackKing, 1),
+    ) ?? null
+  )
+}
+
+function getRuleQTakeOppositionSquare(
+  fen: string,
+  whiteKing: Square,
+  blackKing: Square,
+  bishops: readonly Square[],
+): Square | null {
+  const takeOppositionSquare = getTakeOppositionSquare(
+    whiteKing,
+    blackKing,
+  )
+  if (takeOppositionSquare === null) return null
+  const oppositionSquares = allSquares().filter(
+    (square) =>
+      kingDistance(square, blackKing) === 1 &&
+      isInOpposition(whiteKing, square, 1),
+  )
+  return bishopsControlTargets(fen, bishops, oppositionSquares)
+    ? takeOppositionSquare
+    : null
+}
+
+function squaresShareDiagonalLine(
+  first: Square,
+  second: Square,
+  useSum: boolean,
+): boolean {
+  const firstCoordinates = squareCoordinates(first)
+  const secondCoordinates = squareCoordinates(second)
+  return useSum
+    ? firstCoordinates.file + firstCoordinates.rank ===
+        secondCoordinates.file + secondCoordinates.rank
+    : firstCoordinates.file - firstCoordinates.rank ===
+        secondCoordinates.file - secondCoordinates.rank
+}
+
+function bishopControlsRuleRDiagonal(
+  fen: string,
+  bishop: Square,
+  whiteKing: Square,
+  blackKing: Square,
+  firstControlledSquare: Square,
+): boolean {
+  const squares = allSquares().filter(
+    (square) =>
+      square !== whiteKing &&
+      square !== blackKing &&
+      square !== bishop &&
+      bishopHasClearLineToSquare(fen, bishop, square),
+  )
+  for (const useSum of [true, false]) {
+    const diagonal = squares.filter((square) =>
+      squaresShareDiagonalLine(bishop, square, useSum),
+    )
+    if (
+      diagonal.some((square) => kingDistance(square, whiteKing) === 1) &&
+      diagonal.some((square) => kingDistance(square, blackKing) === 1) &&
+      diagonal.some(
+        (square) => manhattanDistance(square, firstControlledSquare) === 1,
+      )
+    ) {
+      return true
+    }
+  }
+  return false
+}
+
+function getRuleRTakeOppositionSquare(
+  fen: string,
+  whiteKing: Square,
+  blackKing: Square,
+  bishops: readonly Square[],
+): Square | null {
+  const takeOppositionSquare = getTakeOppositionSquare(
+    whiteKing,
+    blackKing,
+  )
+  if (takeOppositionSquare === null) return null
+  const firstControlledSquares = allSquares().filter(
+    (square) =>
+      isKnightMove(whiteKing, square) &&
+      kingDistance(square, blackKing) === 2 &&
+      bishops.some(
+        (bishop) =>
+          bishop !== square &&
+          bishopHasClearLineToSquare(fen, bishop, square),
+      ),
+  )
+  return firstControlledSquares.some((firstControlledSquare) =>
+    bishops.some((bishop) =>
+      bishopControlsRuleRDiagonal(
+        fen,
+        bishop,
+        whiteKing,
+        blackKing,
+        firstControlledSquare,
+      ),
+    ),
+  )
+    ? takeOppositionSquare
+    : null
 }
 
 function getFlankSquares(
@@ -2760,115 +3004,19 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
       first.stalematePenalty - second.stalematePenalty,
   },
   {
-    id: 'mate in 3',
-    shortLabel: 'mate in 3',
+    id: 'rule pp',
+    shortLabel: 'rule pp',
     helpText:
-      "With Black's king in the corner and White's king in a mating position, play mate in 3.",
-    applies: (score) => score.mateInThreeApplies,
+      'When the kings are in opposition, use a bishop to control the inward flank square.',
+    applies: (score) => score.rulePPApplies,
     compare: (first, second) =>
-      first.mateInThreeTurns - second.mateInThreeTurns,
-  },
-  {
-    id: 'degenerate',
-    shortLabel: 'degenerate',
-    helpText: 'repair degenerate positions',
-    applies: (score) => score.degenerateApplies,
-    stopWhenBest: (score) =>
-      score.degenerateTerminal && score.degeneratePenalty === 0,
-    compare: (first, second) =>
-      first.degeneratePenalty - second.degeneratePenalty,
-  },
-  {
-    id: 'force phase 2',
-    shortLabel: 'force phase 2',
-    helpText: '(see notes)',
-    applies: (score) => score.forcePhaseTwoApplies,
-    compare: (first, second) =>
-      first.forcePhaseTwoPenalty - second.forcePhaseTwoPenalty,
-  },
-  {
-    id: 'shepherd',
-    shortLabel: 'shepherd',
-    helpText:
-      "Phase 2: When a bishop controls the edge square 2 away from Black's king and further from the target square, take opposition, moving towards the target corner.",
-    applies: (score) => score.shepherdApplies,
-    compare: (first, second) =>
-      first.shepherdPenalty - second.shepherdPenalty,
-  },
-  {
-    id: 'sequester',
-    shortLabel: 'sequester',
-    helpText:
-      "Phase 2: Force Black's king towards the target corner, or otherwise use a bishop to control/occupy the square 2 away from Black's current square.",
-    applies: (score) => score.sequesterApplies,
-    subpriorities: [
-      {
-        when: (scores) =>
-          scores.some(
-            (score) =>
-              score.sequesterMaximumCornerReplyDistance <
-              score.sequesterCurrentCornerDistance,
-          ),
-        compare: (first, second) =>
-          first.sequesterMaximumCornerReplyDistance -
-          first.sequesterCurrentCornerDistance -
-          (second.sequesterMaximumCornerReplyDistance -
-            second.sequesterCurrentCornerDistance),
-      },
-      {
-        compare: (first, second) =>
-          second.sequesterTargetCornerScore -
-          first.sequesterTargetCornerScore,
-      },
-      {
-        compare: (first, second) =>
-          first.sequesterMaximumCornerReplyDistance -
-          second.sequesterMaximumCornerReplyDistance,
-      },
-      {
-        when: (scores) =>
-          scores.every(
-            (score) =>
-              score.sequesterMaximumCornerReplyDistance >=
-              score.sequesterCurrentCornerDistance,
-          ),
-        compare: (first, second) =>
-          first.sequesterTwoAwayControlPenalty -
-          second.sequesterTwoAwayControlPenalty,
-      },
-    ],
-  },
-  {
-    id: 'bishops off edge',
-    shortLabel: 'bishops off edge',
-    helpText: "Phase 2: Prefer fewer bishops on Black's edge.",
-    applies: (score) => score.isPhaseTwoPosition,
-    compare: (first, second) =>
-      first.bishopsOnBlackEdgeCount - second.bishopsOnBlackEdgeCount,
-  },
-  {
-    id: 'phase 2 wall',
-    shortLabel: 'phase 2 wall',
-    helpText:
-      "Phase 2: Create or maintain a 2 square wall adjacent to Black's king and opposite the target corner.",
-    applies: (score) => score.phaseTwoWallApplies,
-    compare: (first, second) =>
-      first.phaseTwoWallPenalty - second.phaseTwoWallPenalty,
-  },
-  {
-    id: 'unclutter bishops',
-    shortLabel: 'unclutter bishops',
-    helpText:
-      'Phase 2: Prefer bishops more than two king steps from a corner.',
-    applies: (score) => score.isPhaseTwoPosition,
-    compare: (first, second) =>
-      first.clutteredBishopsCount - second.clutteredBishopsCount,
+      first.rulePPPenalty - second.rulePPPenalty,
   },
   {
     id: 'rule p',
     shortLabel: 'rule p',
     helpText:
-      'Phase 1: When the kings are in opposition, use a bishop to control the inward flank square.',
+      "If Rule pp is satisfied, check the king, only from the same side of White's king as the other bishop.",
     applies: (score) => score.rulePApplies,
     compare: (first, second) => first.rulePPenalty - second.rulePPenalty,
   },
@@ -2876,9 +3024,25 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
     id: 'rule q',
     shortLabel: 'rule q',
     helpText:
-      "Phase 1: When the kings are a knight's move apart, use a bishop to control the flank square. The flank square is the square adjacent to Black's king and also a knight's move from White's king.",
+      "When the kings are a knight's move apart, and a bishop controls the square in opposition to White's king, take opposition.",
     applies: (score) => score.ruleQApplies,
     compare: (first, second) => first.ruleQPenalty - second.ruleQPenalty,
+  },
+  {
+    id: 'rule r',
+    shortLabel: 'rule r',
+    helpText:
+      "When the kings are a knight's move apart, and a bishop controls the square a knight's move from White's king and 2 squares from Black's king, and a bishop can control the diagonal containing the squares adjacent to the kings and also edge adjacent to that first bishop-controlled square, take opposition.",
+    applies: (score) => score.ruleRApplies,
+    compare: (first, second) => first.ruleRPenalty - second.ruleRPenalty,
+  },
+  {
+    id: 'rule s',
+    shortLabel: 'rule s',
+    helpText:
+      "When the kings are a knight's move apart, use a bishop to control the flank square. The flank square is the square adjacent to Black's king and also a knight's move from White's king.",
+    applies: (score) => score.ruleSApplies,
+    compare: (first, second) => first.ruleSPenalty - second.ruleSPenalty,
   },
   {
     id: 'king closer',
@@ -2886,25 +3050,9 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
     helpText:
       "Bring White's king closer to Black's king, preferring proximity to the the middle 16 squares.",
     compare: (first, second) =>
-      first.kingCloserPhaseTwoLinePenalty -
-        second.kingCloserPhaseTwoLinePenalty ||
       first.kingCloserDistance - second.kingCloserDistance ||
       first.kingCloserMiddleSixteenDistance -
         second.kingCloserMiddleSixteenDistance,
-  },
-  {
-    id: 'rule b',
-    shortLabel: 'rule b',
-    helpText: "Phase 1: Prefer bishops further from White's king.",
-    applies: (score) => !score.isPhaseTwoPosition,
-    compare: (first, second) => second.ruleBScore - first.ruleBScore,
-  },
-  {
-    id: 'check',
-    shortLabel: 'check',
-    helpText: 'Play a check',
-    applies: (score) => !score.isPhaseTwoPosition,
-    compare: (first, second) => first.checkPenalty - second.checkPenalty,
   },
 ]
 

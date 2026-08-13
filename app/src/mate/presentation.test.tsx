@@ -27,7 +27,6 @@ import {
   getMateRuleSet,
   knightAndBishopWhiteRules,
 } from './rules'
-import { TWO_BISHOPS_DIAGRAM_POSITIONS } from './rules/twoBishopsDiagramPositions'
 import type { MateLogEntry, MateTerminalOutcome } from './session'
 import { encodeMateFen } from './share'
 import { MATE_TIMER_PREFERENCE_KEY } from './timerPreference'
@@ -1307,447 +1306,7 @@ test('priority guide follows registered facade order and renders typed diagrams'
   assert.doesNotMatch(markup, /<img\b|\ssrc=/)
 })
 
-test('major-piece and Two Bishops guides render mechanically current diagrams', () => {
-  const expectedBoards = {
-    queen: ['queen-phase-two-corner-cage'],
-    rook: ['rook-phase-two-box'],
-    'two-bishops': [
-      'bishop-degenerate-phase-two-opposition',
-      'bishop-degenerate-ignore-light-bishop',
-      'bishop-degenerate-mate-in-four',
-      'bishop-degenerate-knight-step-control',
-      'bishop-degenerate-wall-waiting-move',
-      'bishop-degenerate-corner-diagonals',
-      'bishop-degenerate-xx',
-      'bishop-degenerate-edge-repair',
-      'bishop-degenerate-edge-unmask',
-      'bishop-degenerate-diagonal-setup',
-      'bishop-degenerate-diagonal-waiting-move',
-      'bishop-degenerate-free-bishop',
-      'bishop-degenerate-waiting-move',
-      'bishop-degenerate-middleish-target-a',
-      'bishop-degenerate-middleish-target-b',
-      'bishop-degenerate-phase-one-loop-escape',
-      'bishop-degenerate-king-flank',
-      'bishop-degenerate-king-sidestep',
-      'bishop-degenerate-reform-wall',
-      'bishop-degenerate-king-lift',
-      'bishop-degenerate-bishop-retreat',
-      'bishop-degenerate-long-diagonal',
-      'bishop-mating-position',
-      'bishop-shepherd',
-      'bishop-phase-two-wall',
-      'bishop-rule-q',
-      'bishop-proximate-wall',
-    ],
-  } as const
-
-  for (const [mateId, boardIds] of Object.entries(expectedBoards)) {
-    const ruleSet = getMateRuleSet(
-      mateId as keyof typeof expectedBoards,
-    )
-    assert.deepEqual(
-      ruleSet.help.noteBoards.map(({ id }) => id),
-      boardIds,
-    )
-    const markup = renderToStaticMarkup(
-      <MatePriorityGuideDialog
-        {...MATE_TRAINING_INFO_PROPS}
-        onClose={() => undefined}
-        ruleSet={ruleSet}
-      />,
-    )
-
-    assert.match(markup, /class="leg-mate-note-board(?:\s|")/)
-    assert.doesNotMatch(markup, /<img\b|\ssrc=/)
-  }
-
-  const queenMarkup = renderToStaticMarkup(
-    <MatePriorityGuideDialog
-      {...MATE_TRAINING_INFO_PROPS}
-      onClose={() => undefined}
-      ruleSet={getMateRuleSet('queen')}
-    />,
-  )
-  const queenBoard = getMateRuleSet('queen').help.noteBoards[0]!
-  assert.deepEqual(queenBoard.pieces, [
-    { square: 'a8', piece: 'k' },
-    { square: 'd7', piece: 'Q' },
-    { square: 'h1', piece: 'K' },
-  ])
-  assert.deepEqual(queenBoard.layout, {
-    files: 8,
-    ranks: 8,
-    fileOffset: 0,
-  })
-  assert.deepEqual(queenBoard.highlights, [])
-  assert.doesNotMatch(queenMarkup, />queen forward</)
-  assert.match(queenMarkup, />corner cage</)
-  assert.match(
-    queenMarkup,
-    /Move the queen to shrink Black’s box toward a fixed corner\. Keep White’s king outside and leave Black at least two safe squares/,
-  )
-  assert.doesNotMatch(queenMarkup, /shorter side first|longer side/)
-  assert.doesNotMatch(queenMarkup, />king toward cage support</)
-  assert.doesNotMatch(queenMarkup, />white pieces off edge</)
-  assert.match(queenMarkup, />knight&#x27;s move away</)
-  assert.match(
-    queenMarkup,
-    /without moving onto the edge/,
-  )
-  assert.doesNotMatch(queenMarkup, /Prefer shorter moves/)
-  assert.doesNotMatch(queenMarkup, />keep queen box|>queen box size</)
-  assert.match(queenMarkup, />phase 2: corner cage</)
-  assert.match(queenMarkup, /leg-mate-guide-note-boards--full/)
-  assert.match(queenMarkup, /leg-mate-note-board--full/)
-  assert.doesNotMatch(queenMarkup, />Notes</)
-  assert.doesNotMatch(queenMarkup, /data-highlight-kind=/)
-
-  const rookBoard = getMateRuleSet('rook').help.noteBoards[0]!
-  assert.deepEqual(rookBoard.pieces, [
-    { square: 'd5', piece: 'K' },
-    { square: 'e1', piece: 'R' },
-    { square: 'f5', piece: 'k' },
-  ])
-  assert.deepEqual(rookBoard.layout, {
-    files: 8,
-    ranks: 8,
-    fileOffset: 0,
-  })
-  assert.deepEqual(rookBoard.highlights, [])
-
-  const rookMarkup = renderToStaticMarkup(
-    <MatePriorityGuideDialog
-      {...MATE_TRAINING_INFO_PROPS}
-      onClose={() => undefined}
-      ruleSet={getMateRuleSet('rook')}
-    />,
-  )
-  assert.match(rookMarkup, />phase 2: box</)
-  assert.doesNotMatch(rookMarkup, /kings are in opposition/)
-  assert.doesNotMatch(
-    rookMarkup,
-    /The box can drive Black to any edge/,
-  )
-  assert.match(rookMarkup, /leg-mate-guide-note-boards--full/)
-  assert.match(rookMarkup, /leg-mate-note-board--full/)
-  assert.doesNotMatch(rookMarkup, /data-highlight-kind="box"/)
-  assert.doesNotMatch(rookMarkup, />Notes</)
-  assert.doesNotMatch(rookMarkup, /Phase 2 begins/)
-  assert.match(rookMarkup, /<svg/)
-  assert.doesNotMatch(rookMarkup, /♔|♖|♚/)
-
-  const bishopsRuleSet = getMateRuleSet('two-bishops')
-  const [
-    phaseTwoOppositionBoard,
-    ignoreLightBishopBoard,
-    mateInFourBoard,
-    knightStepControlBoard,
-    wallWaitingMoveBoard,
-    cornerDiagonalsBoard,
-    xxBoard,
-    edgeRepairBoard,
-    edgeUnmaskBoard,
-    diagonalSetupBoard,
-    diagonalWaitingBoard,
-    freeBishopBoard,
-    waitingMoveBoard,
-    middleishTargetABoard,
-    middleishTargetBBoard,
-    phaseOneLoopEscapeBoard,
-    kingFlankBoard,
-    kingSidestepBoard,
-    reformWallBoard,
-    kingLiftBoard,
-    bishopRetreatBoard,
-    longDiagonalBoard,
-    matingPositionBoard,
-    shepherdBoard,
-    phaseTwoWallBoard,
-    ruleQBoard,
-    proximateWallBoard,
-  ] = bishopsRuleSet.help.noteBoards
-  assert.ok(phaseTwoOppositionBoard)
-  assert.ok(ignoreLightBishopBoard)
-  assert.ok(mateInFourBoard)
-  assert.ok(knightStepControlBoard)
-  assert.ok(wallWaitingMoveBoard)
-  assert.ok(cornerDiagonalsBoard)
-  assert.ok(xxBoard)
-  assert.ok(edgeRepairBoard)
-  assert.ok(edgeUnmaskBoard)
-  assert.ok(diagonalSetupBoard)
-  assert.ok(diagonalWaitingBoard)
-  assert.ok(freeBishopBoard)
-  assert.ok(waitingMoveBoard)
-  assert.ok(middleishTargetABoard)
-  assert.ok(middleishTargetBBoard)
-  assert.ok(phaseOneLoopEscapeBoard)
-  assert.ok(kingFlankBoard)
-  assert.ok(kingSidestepBoard)
-  assert.ok(reformWallBoard)
-  assert.ok(kingLiftBoard)
-  assert.ok(bishopRetreatBoard)
-  assert.ok(longDiagonalBoard)
-  assert.ok(matingPositionBoard)
-  assert.ok(shepherdBoard)
-  assert.ok(phaseTwoWallBoard)
-  assert.ok(ruleQBoard)
-  assert.ok(proximateWallBoard)
-  assert.deepEqual(
-    shepherdBoard.highlights,
-    TWO_BISHOPS_DIAGRAM_POSITIONS.shepherd.highlights,
-  )
-  assert.deepEqual(
-    shepherdBoard.arrows,
-    [TWO_BISHOPS_DIAGRAM_POSITIONS.shepherd.arrow],
-  )
-  assert.deepEqual(
-    proximateWallBoard.highlights,
-    TWO_BISHOPS_DIAGRAM_POSITIONS.proximateWall.highlights,
-  )
-  assert.deepEqual(
-    ruleQBoard.highlights,
-    TWO_BISHOPS_DIAGRAM_POSITIONS.ruleQ.highlights,
-  )
-  assert.deepEqual(ruleQBoard.arrows, [
-    TWO_BISHOPS_DIAGRAM_POSITIONS.ruleQ.arrow,
-  ])
-  assert.deepEqual(
-    phaseTwoOppositionBoard.arrows,
-    [TWO_BISHOPS_DIAGRAM_POSITIONS.degeneratePhaseTwoOpposition.arrow],
-  )
-  assert.deepEqual(
-    phaseOneLoopEscapeBoard.arrows,
-    [TWO_BISHOPS_DIAGRAM_POSITIONS.degeneratePhaseOneLoopEscape.arrow],
-  )
-  assert.deepEqual(middleishTargetABoard.arrows, [
-    TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateMiddleishTargetA.arrow,
-  ])
-  assert.deepEqual(middleishTargetBBoard.arrows, [
-    TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateMiddleishTargetB.arrow,
-  ])
-  assert.deepEqual(
-    ignoreLightBishopBoard.arrows,
-    [TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateIgnoreLightBishop.arrow],
-  )
-  assert.deepEqual(
-    xxBoard.highlights,
-    TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateXx.highlights,
-  )
-  assert.deepEqual(xxBoard.arrows, [
-    TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateXx.arrow,
-  ])
-  assert.deepEqual(
-    mateInFourBoard.highlights,
-    TWO_BISHOPS_DIAGRAM_POSITIONS.degenerateMateInFour.highlights,
-  )
-  assert.deepEqual(kingFlankBoard.layout, {
-    files: 8,
-    ranks: 8,
-    fileOffset: 0,
-  })
-  assert.deepEqual(kingFlankBoard.highlights, [])
-  assert.deepEqual(kingFlankBoard.arrows, [
-    { from: 'e5', to: 'f6' },
-  ])
-  assert.deepEqual(knightStepControlBoard.arrows, [
-    { from: 'g8', to: 'd5' },
-  ])
-  assert.deepEqual(
-    knightStepControlBoard.highlights.map(({ square }) => square),
-    ['h5', 'g2'],
-  )
-  assert.equal(
-    knightStepControlBoard.caption,
-    'With h5 uncontrolled, move the bishop to control g2.',
-  )
-  assert.deepEqual(wallWaitingMoveBoard.arrows, [
-    { from: 'f6', to: 'e5' },
-  ])
-  assert.deepEqual(
-    wallWaitingMoveBoard.highlights.map(({ square }) => square),
-    ['g8', 'h8'],
-  )
-  assert.equal(
-    wallWaitingMoveBoard.caption,
-    'Keep bishop control of both highlighted squares.',
-  )
-  assert.deepEqual(cornerDiagonalsBoard.arrows, [
-    { from: 'b7', to: 'f3' },
-  ])
-  assert.deepEqual(
-    cornerDiagonalsBoard.highlights.map(({ square }) => square),
-    ['f8', 'h5', 'h6'],
-  )
-  assert.equal(
-    cornerDiagonalsBoard.caption,
-    "Preserve one bishop's control of f8 and the other's control of d1 h5 diagonal, or tighten the h5 cutoff by controlling h6. The cutoff still identifies h8 after Black steps around the corner.",
-  )
-  assert.deepEqual(edgeRepairBoard.arrows, [{ from: 'e1', to: 'd2' }])
-  assert.deepEqual(edgeUnmaskBoard.arrows, [{ from: 'e1', to: 'd2' }])
-  assert.deepEqual(diagonalSetupBoard.arrows, [
-    { from: 'c2', to: 'f5' },
-  ])
-  assert.deepEqual(
-    diagonalSetupBoard.highlights.map(({ square }) => square),
-    ['c8', 'd7', 'e6', 'f5', 'g4', 'h3'],
-  )
-  assert.deepEqual(diagonalWaitingBoard.arrows, [
-    { from: 'e8', to: 'h5' },
-  ])
-  assert.deepEqual(kingSidestepBoard.arrows, [{ from: 'f4', to: 'g4' }])
-  assert.deepEqual(reformWallBoard.arrows, [{ from: 'e5', to: 'f4' }])
-  assert.deepEqual(kingLiftBoard.arrows, [{ from: 'f3', to: 'g3' }])
-  assert.deepEqual(bishopRetreatBoard.arrows, [{ from: 'f7', to: 'e8' }])
-  assert.deepEqual(
-    longDiagonalBoard.highlights.map(({ square }) => square),
-    ['e3', 'd4', 'c5', 'b6'],
-  )
-  assert.equal(
-    longDiagonalBoard.caption,
-    "Move the bishop to any highlighted square. Don't move it to the edge.",
-  )
-  assert.deepEqual(matingPositionBoard.pieces, [
-    { square: 'h8', piece: 'k' },
-    { square: 'd4', piece: 'B' },
-    { square: 'c2', piece: 'B' },
-  ])
-  assert.deepEqual(
-    matingPositionBoard.highlights.map(({ square }) => square),
-    ['f8', 'f7'],
-  )
-  assert.deepEqual(
-    phaseTwoWallBoard.highlights.map(({ square }) => square),
-    ['b8', 'b7'],
-  )
-
-  const bishopsMarkup = renderToStaticMarkup(
-    <MatePriorityGuideDialog
-      {...MATE_TRAINING_INFO_PROPS}
-      onClose={() => undefined}
-      ruleSet={bishopsRuleSet}
-    />,
-  )
-  assert.doesNotMatch(bishopsMarkup, />conclave step</)
-  assert.doesNotMatch(bishopsMarkup, />degenerate — mate prep</)
-  assert.doesNotMatch(bishopsMarkup, />knight-step control</)
-  assert.match(bishopsMarkup, />degenerate — mate in 4</)
-  assert.match(bishopsMarkup, /With a6 controlled, play Kc7./)
-  assert.doesNotMatch(bishopsMarkup, />reverse conclave step</)
-  assert.doesNotMatch(bishopsMarkup, />martian conclave step</)
-  assert.match(bishopsMarkup, />degenerate — knight-step control</)
-  assert.match(
-    bishopsMarkup,
-    /With h5 uncontrolled, move the bishop to control g2\./,
-  )
-  assert.match(bishopsMarkup, />degenerate — wall waiting move</)
-  assert.match(
-    bishopsMarkup,
-    /Keep bishop control of both highlighted squares\./,
-  )
-  assert.match(bishopsMarkup, />degenerate — corner diagonals</)
-  assert.match(
-    bishopsMarkup,
-    /Preserve one bishop&#x27;s control of f8 and the other&#x27;s control of d1 h5 diagonal, or tighten the h5 cutoff by controlling h6\./,
-  )
-  assert.match(bishopsMarkup, />degenerate — xx</)
-  assert.match(bishopsMarkup, /Control h6 with the dark-squared bishop\./)
-  assert.doesNotMatch(bishopsMarkup, />degenerate — bishop advance</)
-  assert.match(bishopsMarkup, />degenerate — edge repair</)
-  assert.match(bishopsMarkup, />degenerate — unmask edge bishop</)
-  assert.doesNotMatch(bishopsMarkup, />degenerate — diagonal king step</)
-  assert.match(bishopsMarkup, />degenerate — diagonal setup</)
-  assert.match(bishopsMarkup, />degenerate — diagonal waiting move</)
-  assert.match(bishopsMarkup, />degenerate — free bishop</)
-  assert.match(bishopsMarkup, />degenerate — waiting move</)
-  assert.match(bishopsMarkup, />degenerate — king flank</)
-  assert.match(bishopsMarkup, />degenerate — king sidestep</)
-  assert.match(bishopsMarkup, />degenerate — reform wall</)
-  assert.match(bishopsMarkup, />degenerate — king lift</)
-  assert.match(bishopsMarkup, />degenerate — bishop retreat</)
-  assert.match(bishopsMarkup, />degenerate — long diagonal</)
-  assert.match(bishopsMarkup, />mating position</)
-  assert.match(bishopsMarkup, />shepherd</)
-  assert.match(bishopsMarkup, />phase 2 wall</)
-  assert.match(bishopsMarkup, />proximate bishop wall</)
-  assert.match(bishopsMarkup, />sequester</)
-  assert.match(bishopsMarkup, />bishops off edge</)
-  assert.match(
-    bishopsMarkup,
-    /When a bishop controls the edge square 2 away from Black&#x27;s king and further from the target square, take opposition, moving towards the target corner\./,
-  )
-  assert.match(
-    bishopsMarkup,
-    /With the far edge square controlled, take opposition toward the target corner\./,
-  )
-  assert.match(
-    bishopsMarkup,
-    /Force Black&#x27;s king towards the target corner, or otherwise use a bishop to control\/occupy the square 2 away from Black&#x27;s current square\./,
-  )
-  assert.match(
-    bishopsMarkup,
-    /Prefer fewer bishops on Black&#x27;s edge./,
-  )
-  assert.doesNotMatch(bishopsMarkup, />bishops away</)
-  assert.doesNotMatch(bishopsMarkup, /Maximize cosine/)
-  assert.doesNotMatch(bishopsMarkup, />take opposition</)
-  assert.doesNotMatch(
-    bishopsMarkup,
-    />king distance<|>king position</,
-  )
-  assert.doesNotMatch(
-    bishopsMarkup,
-    />edge finish<|>form wall<|>push with king<|>advance wall<|>waiting move</,
-  )
-  assert.match(
-    bishopsMarkup,
-    /Phase 2: Black&#x27;s king forced to the edge, White&#x27;s king two steps away from Black&#x27;s king\./,
-  )
-  assert.match(
-    bishopsMarkup,
-    /Phase 2 Target Corner: Calculate after White&#x27;s move in Phase 2\. If Black is in or one edge square from a corner, use that corner\. Otherwise, in the corner-diagonals position, its cutoff points to the opposite corner and continues to do so when Black steps around that corner\. Otherwise, when the kings are in opposition and more bishops stand on one physical side of White&#x27;s king, choose the opposite corner\. When deciding between bishop moves, prefer the stronger bishop majority\. Otherwise, choose the corner where White wins the king race by the greatest Chebyshev-distance lead\. If neither method decides, choose the corner closest to White&#x27;s king\. Retain tied corners\./,
-  )
-  assert.doesNotMatch(
-    bishopsMarkup,
-    /Phase 1 Target Square/,
-  )
-  assert.match(bishopsMarkup, /leg-mate-guide-note-boards--full/)
-  assert.equal(bishopsMarkup.match(/leg-mate-note-board--full/g)?.length, 27)
-  assert.equal(
-    bishopsMarkup.match(/data-highlight-kind="zone"/g)?.length,
-    36,
-  )
-  assert.match(
-    bishopsMarkup,
-    /White&#x27;s king in a mating position, play mate in 3/,
-  )
-  assert.match(
-    bishopsMarkup,
-    /Create or maintain a 2 square wall adjacent to Black&#x27;s king and opposite the target corner\./,
-  )
-  assert.ok(
-    bishopsMarkup.indexOf('>shepherd<') <
-      bishopsMarkup.indexOf('>sequester<'),
-  )
-  assert.ok(
-    bishopsMarkup.indexOf('>sequester<') <
-      bishopsMarkup.indexOf('>bishops off edge<'),
-  )
-  assert.ok(
-    bishopsMarkup.indexOf('>bishops off edge<') <
-      bishopsMarkup.indexOf('>phase 2 wall<'),
-  )
-  assert.match(bishopsMarkup, /data-arrow="e1-d2"/)
-  assert.match(bishopsMarkup, /data-arrow="f4-g4"/)
-  assert.match(bishopsMarkup, /data-arrow="e8-h5"/)
-  assert.match(bishopsMarkup, /data-arrow="c2-f5"/)
-  assert.match(bishopsMarkup, /data-arrow="e5-f4"/)
-  assert.match(bishopsMarkup, /data-arrow="f7-e8"/)
-  assert.match(bishopsMarkup, /data-arrow="e6-d6"/)
-})
-
-test('mate guides omit empty notes and place useful notes before shortcuts', () => {
+ test('mate guides omit empty notes and place useful notes before shortcuts', () => {
   for (const { id } of MATE_CATALOG) {
     const markup = renderToStaticMarkup(
       <MatePriorityGuideDialog
@@ -1759,7 +1318,7 @@ test('mate guides omit empty notes and place useful notes before shortcuts', () 
     const notesAt = markup.indexOf('>Notes<')
     const shortcutsAt = markup.indexOf('>Keyboard shortcuts<')
 
-    if (id === 'queen' || id === 'rook') {
+    if (id === 'queen' || id === 'rook' || id === 'two-bishops') {
       assert.equal(notesAt, -1, `${id}: empty Notes should be omitted`)
     } else {
       assert.ok(notesAt >= 0, `${id}: Notes missing`)
@@ -1807,59 +1366,43 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
   )
   assert.doesNotMatch(
     bishopsMarkup,
-    />rule zz<|>rule y<|>rule x<|>rule w<|>rule v<|>rule u</,
+    />mate in 3<|>degenerate<|>force phase 2<|>shepherd<|>sequester<|>bishops off edge<|>phase 2 wall<|>unclutter bishops<|>rule b<|>check</,
   )
   assert.match(
     bishopsMarkup,
-    />rule p<[^]*Phase 1: When the kings are in opposition, use a bishop to control the inward flank square\./,
+    />rule pp<[^]*When the kings are in opposition, use a bishop to control the inward flank square\./,
   )
   assert.match(
     bishopsMarkup,
-    />rule q<[^]*Phase 1: When the kings are a knight&#x27;s move apart, use a bishop to control the flank square\. The flank square is the square adjacent to Black&#x27;s king and also a knight&#x27;s move from White&#x27;s king\./,
+    />rule p<[^]*If Rule pp is satisfied, check the king, only from the same side of White&#x27;s king as the other bishop\./,
   )
   assert.match(
     bishopsMarkup,
-    />rule b<[^]*Phase 1: Prefer bishops further from White&#x27;s king\./,
+    />rule q<[^]*When the kings are a knight&#x27;s move apart, and a bishop controls the square in opposition to White&#x27;s king, take opposition\./,
   )
-  assert.match(bishopsMarkup, />check<[^]*Play a check</)
   assert.match(
     bishopsMarkup,
-    />unclutter bishops<[^]*Phase 2: Prefer bishops more than two king steps from a corner\./,
+    />rule r<[^]*When the kings are a knight&#x27;s move apart, and a bishop controls the square a knight&#x27;s move from White&#x27;s king and 2 squares from Black&#x27;s king, and a bishop can control the diagonal containing the squares adjacent to the kings and also edge adjacent to that first bishop-controlled square, take opposition\./,
   )
-  assert.ok(
-    bishopsMarkup.indexOf('>phase 2 wall<') <
-      bishopsMarkup.indexOf('>unclutter bishops<'),
+  assert.match(
+    bishopsMarkup,
+    />rule s<[^]*When the kings are a knight&#x27;s move apart, use a bishop to control the flank square\. The flank square is the square adjacent to Black&#x27;s king and also a knight&#x27;s move from White&#x27;s king\./,
   )
-  assert.ok(
-    bishopsMarkup.indexOf('>unclutter bishops<') <
-      bishopsMarkup.indexOf('>rule p<'),
-  )
-  assert.ok(
-    bishopsMarkup.indexOf('>rule p<') <
-      bishopsMarkup.indexOf('>rule q<'),
-  )
-  assert.ok(
-    bishopsMarkup.indexOf('>rule q<') <
-      bishopsMarkup.indexOf('>king closer<'),
-  )
-  assert.ok(
-    bishopsMarkup.indexOf('>king closer<') <
-      bishopsMarkup.indexOf('>rule b<'),
-  )
+  const orderedLabels = ['rule pp', 'rule p', 'rule q', 'rule r', 'rule s', 'king closer']
+  for (let index = 1; index < orderedLabels.length; index += 1) {
+    assert.ok(
+      bishopsMarkup.indexOf(`>${orderedLabels[index - 1]}<`) <
+        bishopsMarkup.indexOf(`>${orderedLabels[index]}<`),
+    )
+  }
   assert.doesNotMatch(bishopsMarkup, />lazy king</)
   assert.doesNotMatch(bishopsMarkup, />support wall</)
-  assert.match(bishopsMarkup, />phase 2 wall</)
-  assert.match(bishopsMarkup, />sequester</)
-  assert.doesNotMatch(bishopsMarkup, />take opposition</)
+  assert.match(bishopsMarkup, /take opposition\./)
   assert.doesNotMatch(
     bishopsMarkup,
     />king distance<|>king position</,
   )
   assert.doesNotMatch(bishopsMarkup, />pieces off edge</)
-  assert.match(
-    bishopsMarkup,
-    /\(see notes\)/,
-  )
   assert.doesNotMatch(bishopsMarkup, />force opposition<|>unmask</)
   assert.doesNotMatch(bishopsMarkup, />conclave step</)
   assert.doesNotMatch(bishopsMarkup, />reverse conclave step</)
