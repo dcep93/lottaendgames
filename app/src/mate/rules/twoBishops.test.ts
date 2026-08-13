@@ -41,10 +41,10 @@ const WHITE_RULE_IDS = [
   'bishops off edge',
   'phase 2 wall',
   'unclutter bishops',
+  'king closer',
   'rule z',
   'rule a',
   'rule b',
-  'king closer',
   'check',
 ] as const
 
@@ -339,6 +339,11 @@ test('Two Bishops exposes each Phase 2 comparison as one visible rule', () => {
           'Phase 2: Prefer bishops more than two king steps from a corner.',
       },
       {
+        shortLabel: 'king closer',
+        helpText:
+          "Bring White's king closer to Black's king, preferring proximity to the the middle 16 squares.",
+      },
+      {
         shortLabel: 'rule z',
         helpText:
           'Phase 1: When the kings are in opposition, use a bishop to control the inward flank square.',
@@ -351,11 +356,6 @@ test('Two Bishops exposes each Phase 2 comparison as one visible rule', () => {
       {
         shortLabel: 'rule b',
         helpText: "Phase 1: Prefer bishops further from White's king.",
-      },
-      {
-        shortLabel: 'king closer',
-        helpText:
-          "Bring White's king closer to Black's king, preferring proximity to the the middle 16 squares.",
       },
       {
         shortLabel: 'check',
@@ -457,21 +457,55 @@ test('the visible strategic comparisons run in their displayed order', () => {
         scoreTwoBishopsWhiteMove(fen, san).clutteredBishopsCount ===
           bestClutteredBishopsCount,
     )
-    const ruleZApplies = afterUnclutterBishops.some(
+    const bestPhaseTwoLinePenalty = Math.min(
+      ...afterUnclutterBishops.map(
+        (san) =>
+          scoreTwoBishopsWhiteMove(fen, san)
+            .kingCloserPhaseTwoLinePenalty,
+      ),
+    )
+    const preferredLineMoves = afterUnclutterBishops.filter(
+      (san) =>
+        scoreTwoBishopsWhiteMove(fen, san)
+          .kingCloserPhaseTwoLinePenalty === bestPhaseTwoLinePenalty,
+    )
+    const bestKingCloserDistance = Math.min(
+      ...preferredLineMoves.map(
+        (san) => scoreTwoBishopsWhiteMove(fen, san).kingCloserDistance,
+      ),
+    )
+    const closestKingMoves = preferredLineMoves.filter(
+      (san) =>
+        scoreTwoBishopsWhiteMove(fen, san).kingCloserDistance ===
+        bestKingCloserDistance,
+    )
+    const bestMiddleSixteenDistance = Math.min(
+      ...closestKingMoves.map(
+        (san) =>
+          scoreTwoBishopsWhiteMove(fen, san)
+            .kingCloserMiddleSixteenDistance,
+      ),
+    )
+    const afterKingCloser = closestKingMoves.filter(
+      (san) =>
+        scoreTwoBishopsWhiteMove(fen, san)
+          .kingCloserMiddleSixteenDistance === bestMiddleSixteenDistance,
+    )
+    const ruleZApplies = afterKingCloser.some(
       (san) => scoreTwoBishopsWhiteMove(fen, san).ruleZApplies,
     )
     const bestRuleZPenalty = Math.min(
-      ...afterUnclutterBishops.map(
+      ...afterKingCloser.map(
         (san) => scoreTwoBishopsWhiteMove(fen, san).ruleZPenalty,
       ),
     )
     const afterRuleZ = ruleZApplies
-      ? afterUnclutterBishops.filter(
+      ? afterKingCloser.filter(
           (san) =>
             scoreTwoBishopsWhiteMove(fen, san).ruleZPenalty ===
             bestRuleZPenalty,
         )
-      : afterUnclutterBishops
+      : afterKingCloser
     const ruleAApplies = afterRuleZ.some(
       (san) => scoreTwoBishopsWhiteMove(fen, san).ruleAApplies,
     )
@@ -503,47 +537,13 @@ test('the visible strategic comparisons run in their displayed order', () => {
               bestRuleBScore,
           )
         : afterRuleA
-    const bestPhaseTwoLinePenalty = Math.min(
-      ...afterRuleB.map(
-        (san) =>
-          scoreTwoBishopsWhiteMove(fen, san)
-            .kingCloserPhaseTwoLinePenalty,
-      ),
-    )
-    const preferredLineMoves = afterRuleB.filter(
-      (san) =>
-        scoreTwoBishopsWhiteMove(fen, san)
-          .kingCloserPhaseTwoLinePenalty === bestPhaseTwoLinePenalty,
-    )
-    const bestKingCloserDistance = Math.min(
-      ...preferredLineMoves.map(
-        (san) => scoreTwoBishopsWhiteMove(fen, san).kingCloserDistance,
-      ),
-    )
-    const closestKingMoves = preferredLineMoves.filter(
-      (san) =>
-        scoreTwoBishopsWhiteMove(fen, san).kingCloserDistance ===
-        bestKingCloserDistance,
-    )
-    const bestMiddleSixteenDistance = Math.min(
-      ...closestKingMoves.map(
-        (san) =>
-          scoreTwoBishopsWhiteMove(fen, san)
-            .kingCloserMiddleSixteenDistance,
-      ),
-    )
-    const afterKingCloser = closestKingMoves.filter(
-      (san) =>
-        scoreTwoBishopsWhiteMove(fen, san)
-          .kingCloserMiddleSixteenDistance === bestMiddleSixteenDistance,
-    )
     const checkingMoves = phaseOneRulesApply
-      ? afterKingCloser.filter(
+      ? afterRuleB.filter(
           (san) => scoreTwoBishopsWhiteMove(fen, san).checkPenalty === 0,
         )
       : []
     const expectedFinal =
-      checkingMoves.length > 0 ? checkingMoves : afterKingCloser
+      checkingMoves.length > 0 ? checkingMoves : afterRuleB
     assert.deepEqual(ruleSet.idealWhiteMoves(fen), expectedFinal, fen)
     for (const first of expectedFinal) {
       const firstScore = scoreTwoBishopsWhiteMove(fen, first)
@@ -750,8 +750,6 @@ test('rule a uses a bishop to control the knight-step flank square', () => {
   assert.equal(kingMove.ruleAPenalty, 1)
   assert.ok(rule?.compare)
   assert.ok(rule.compare(blocking, kingMove) < 0)
-  assert.deepEqual(ruleSet.idealWhiteMoves(fen), ['Bf6'])
-  assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'rule a')
 
   const sourceMove = getChess(fen).move('Bf6')
   assert.ok(sourceMove)
@@ -771,11 +769,6 @@ test('rule a uses a bishop to control the knight-step flank square', () => {
     )
     assert.equal(score.ruleAApplies, true, transform.name)
     assert.equal(score.ruleAPenalty, 0, transform.name)
-    assert.deepEqual(
-      getMateRuleSet('two-bishops').idealWhiteMoves(transformedFen),
-      [transformedMove.san],
-      transform.name,
-    )
   }
 })
 

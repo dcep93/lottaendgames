@@ -1832,6 +1832,10 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
   )
   assert.ok(
     bishopsMarkup.indexOf('>unclutter bishops<') <
+      bishopsMarkup.indexOf('>king closer<'),
+  )
+  assert.ok(
+    bishopsMarkup.indexOf('>king closer<') <
       bishopsMarkup.indexOf('>rule z<'),
   )
   assert.ok(
@@ -1841,10 +1845,6 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
   assert.ok(
     bishopsMarkup.indexOf('>rule a<') <
       bishopsMarkup.indexOf('>rule b<'),
-  )
-  assert.ok(
-    bishopsMarkup.indexOf('>rule b<') <
-      bishopsMarkup.indexOf('>king closer<'),
   )
   assert.doesNotMatch(bishopsMarkup, />lazy king</)
   assert.doesNotMatch(bishopsMarkup, />support wall</)

@@ -2865,6 +2865,18 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
       first.clutteredBishopsCount - second.clutteredBishopsCount,
   },
   {
+    id: 'king closer',
+    shortLabel: 'king closer',
+    helpText:
+      "Bring White's king closer to Black's king, preferring proximity to the the middle 16 squares.",
+    compare: (first, second) =>
+      first.kingCloserPhaseTwoLinePenalty -
+        second.kingCloserPhaseTwoLinePenalty ||
+      first.kingCloserDistance - second.kingCloserDistance ||
+      first.kingCloserMiddleSixteenDistance -
+        second.kingCloserMiddleSixteenDistance,
+  },
+  {
     id: 'rule z',
     shortLabel: 'rule z',
     helpText:
@@ -2886,18 +2898,6 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
     helpText: "Phase 1: Prefer bishops further from White's king.",
     applies: (score) => !score.isPhaseTwoPosition,
     compare: (first, second) => second.ruleBScore - first.ruleBScore,
-  },
-  {
-    id: 'king closer',
-    shortLabel: 'king closer',
-    helpText:
-      "Bring White's king closer to Black's king, preferring proximity to the the middle 16 squares.",
-    compare: (first, second) =>
-      first.kingCloserPhaseTwoLinePenalty -
-        second.kingCloserPhaseTwoLinePenalty ||
-      first.kingCloserDistance - second.kingCloserDistance ||
-      first.kingCloserMiddleSixteenDistance -
-        second.kingCloserMiddleSixteenDistance,
   },
   {
     id: 'check',
