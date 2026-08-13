@@ -2,13 +2,13 @@
 
 ## Rule
 
-Add this Phase 1 priority after Rule C and immediately before `king closer`:
+Add this priority after Rule C and immediately before `king closer` in both phases:
 
 > **rule d** — When the Black king is 1 step away from the corner, and the White king is 2 steps away from that corner, make sure the White king doesn't screen the bishops.
 
 ## Applicability
 
-Rule D applies when the starting position is Phase 1 and at least one board corner is exactly one king step from Black's king and exactly two king steps from White's king.
+Rule D applies in either phase when at least one board corner is exactly one king step from Black's king and exactly two king steps from White's king.
 
 ## Screening
 
@@ -22,5 +22,5 @@ Moves with no screened bishop ray beat moves with at least one. Rule D is binary
 - Cover the current Phase 1 loop geometry where `Kf2` screens the e1 bishop from g3.
 - Cover a non-screening move from the same position.
 - Verify rotations and reflections.
-- Verify inactivity outside the corner-distance condition and in Phase 2.
+- Verify inactivity outside the corner-distance condition and activation in Phase 2.
 - Run focused tests, lint, build, diagram freshness, and the strict Phase 1 loop gate.
