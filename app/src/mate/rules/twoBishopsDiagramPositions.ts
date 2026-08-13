@@ -29,7 +29,7 @@ export const TWO_BISHOPS_DIAGRAM_POSITIONS = {
     ],
     arrow: { from: 'e6', to: 'd6' },
   },
-  ruleA: {
+  ruleQ: {
     phase: '1/2',
     fen: "8/3B4/8/8/4K2B/8/3k4/8 w - - 0 1",
     highlights: [{ square: 'c3', kind: 'key' }],

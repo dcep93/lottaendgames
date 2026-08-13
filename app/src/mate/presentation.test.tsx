@@ -1337,7 +1337,7 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
       'bishop-mating-position',
       'bishop-shepherd',
       'bishop-phase-two-wall',
-      'bishop-rule-a',
+      'bishop-rule-q',
       'bishop-proximate-wall',
     ],
   } as const
@@ -1464,7 +1464,7 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
     matingPositionBoard,
     shepherdBoard,
     phaseTwoWallBoard,
-    ruleABoard,
+    ruleQBoard,
     proximateWallBoard,
   ] = bishopsRuleSet.help.noteBoards
   assert.ok(phaseTwoOppositionBoard)
@@ -1492,7 +1492,7 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
   assert.ok(matingPositionBoard)
   assert.ok(shepherdBoard)
   assert.ok(phaseTwoWallBoard)
-  assert.ok(ruleABoard)
+  assert.ok(ruleQBoard)
   assert.ok(proximateWallBoard)
   assert.deepEqual(
     shepherdBoard.highlights,
@@ -1507,11 +1507,11 @@ test('major-piece and Two Bishops guides render mechanically current diagrams', 
     TWO_BISHOPS_DIAGRAM_POSITIONS.proximateWall.highlights,
   )
   assert.deepEqual(
-    ruleABoard.highlights,
-    TWO_BISHOPS_DIAGRAM_POSITIONS.ruleA.highlights,
+    ruleQBoard.highlights,
+    TWO_BISHOPS_DIAGRAM_POSITIONS.ruleQ.highlights,
   )
-  assert.deepEqual(ruleABoard.arrows, [
-    TWO_BISHOPS_DIAGRAM_POSITIONS.ruleA.arrow,
+  assert.deepEqual(ruleQBoard.arrows, [
+    TWO_BISHOPS_DIAGRAM_POSITIONS.ruleQ.arrow,
   ])
   assert.deepEqual(
     phaseTwoOppositionBoard.arrows,
@@ -1811,11 +1811,11 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
   )
   assert.match(
     bishopsMarkup,
-    />rule z<[^]*Phase 1: When the kings are in opposition, use a bishop to control the inward flank square\./,
+    />rule p<[^]*Phase 1: When the kings are in opposition, use a bishop to control the inward flank square\./,
   )
   assert.match(
     bishopsMarkup,
-    />rule a<[^]*Phase 1: When the kings are a knight&#x27;s move apart, use a bishop to control the flank square\. The flank square is the square adjacent to Black&#x27;s king and also a knight&#x27;s move from White&#x27;s king\./,
+    />rule q<[^]*Phase 1: When the kings are a knight&#x27;s move apart, use a bishop to control the flank square\. The flank square is the square adjacent to Black&#x27;s king and also a knight&#x27;s move from White&#x27;s king\./,
   )
   assert.match(
     bishopsMarkup,
@@ -1832,18 +1832,18 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
   )
   assert.ok(
     bishopsMarkup.indexOf('>unclutter bishops<') <
+      bishopsMarkup.indexOf('>rule p<'),
+  )
+  assert.ok(
+    bishopsMarkup.indexOf('>rule p<') <
+      bishopsMarkup.indexOf('>rule q<'),
+  )
+  assert.ok(
+    bishopsMarkup.indexOf('>rule q<') <
       bishopsMarkup.indexOf('>king closer<'),
   )
   assert.ok(
     bishopsMarkup.indexOf('>king closer<') <
-      bishopsMarkup.indexOf('>rule z<'),
-  )
-  assert.ok(
-    bishopsMarkup.indexOf('>rule z<') <
-      bishopsMarkup.indexOf('>rule a<'),
-  )
-  assert.ok(
-    bishopsMarkup.indexOf('>rule a<') <
       bishopsMarkup.indexOf('>rule b<'),
   )
   assert.doesNotMatch(bishopsMarkup, />lazy king</)
