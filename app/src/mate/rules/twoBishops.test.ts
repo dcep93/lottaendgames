@@ -346,7 +346,7 @@ test('Two Bishops exposes each Phase 2 comparison as one visible rule', () => {
       {
         shortLabel: 'rule q',
         helpText:
-          "Phase 1: When the kings are a knight's move apart, use a bishop to control the flank square. The flank square is the square adjacent to Black's king and also a knight's move from White's king.",
+          "Phase 1: When the kings are a knight's move apart, use a bishop to prevent Black from stepping into king opposition, unless that square is further from the center than Black's current square.",
       },
       {
         shortLabel: 'king closer',
@@ -736,9 +736,9 @@ test('rule p is neutral without direct opposition and in Phase 2', () => {
   assert.equal(phaseTwo.rulePPenalty, 1)
 })
 
-test('rule q uses a bishop to control the knight-step flank square', () => {
+test('rule q uses a bishop to prevent a step into king opposition', () => {
   const fen = '8/3B4/8/8/4K2B/8/3k4/8 w - - 0 1'
-  const blocking = scoreTwoBishopsWhiteMove(fen, 'Bf6')
+  const blocking = scoreTwoBishopsWhiteMove(fen, 'Bb5')
   const kingMove = scoreTwoBishopsWhiteMove(fen, 'Kd4')
   const rule = twoBishopsWhiteRules.find(({ id }) => id === 'rule q')
   const ruleSet = getMateRuleSet('two-bishops')
@@ -751,7 +751,7 @@ test('rule q uses a bishop to control the knight-step flank square', () => {
   assert.ok(rule?.compare)
   assert.ok(rule.compare(blocking, kingMove) < 0)
 
-  const sourceMove = getChess(fen).move('Bf6')
+  const sourceMove = getChess(fen).move('Bb5')
   assert.ok(sourceMove)
   for (const transform of SQUARE_TRANSFORMS) {
     const transformedFen = getChess(transformFen(fen, transform)).fen()
@@ -787,6 +787,14 @@ test('rule q is neutral without knight-separated kings and in Phase 2', () => {
   assert.equal(phaseTwo.isPhaseTwoPosition, true)
   assert.equal(phaseTwo.ruleQApplies, false)
   assert.equal(phaseTwo.ruleQPenalty, 1)
+})
+
+test('rule q is neutral when the opposition square is further from center', () => {
+  const fen = '8/8/8/8/8/1k6/3B4/K1B5 w - - 0 1'
+  const score = scoreTwoBishopsWhiteMove(fen, 'Be3')
+
+  assert.equal(score.ruleQApplies, false)
+  assert.equal(score.ruleQPenalty, 1)
 })
 
 test('rule b maximizes summed bishop distance from White king', () => {
@@ -4281,9 +4289,9 @@ test('Two Bishops keeps its phase explanation and diagram', () => {
     ),
   )
   assert.deepEqual(ruleQBoard.highlights, [
-    { square: 'c3', kind: 'key' },
+    { square: 'e2', kind: 'key' },
   ])
-  assert.deepEqual(ruleQBoard.arrows, [{ from: 'h4', to: 'f6' }])
+  assert.deepEqual(ruleQBoard.arrows, [{ from: 'd7', to: 'b5' }])
   const proximateWallBoard = ruleSet.help.noteBoards[26]!
   assert.deepEqual(
     proximateWallBoard.pieces,

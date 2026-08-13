@@ -158,8 +158,8 @@ export const TWO_BISHOPS_DIAGRAM_POSITIONS = {
   ruleQ: {
     phase: '1/2',
     fen: ${JSON.stringify(ruleQFen)},
-    highlights: [{ square: 'c3', kind: 'key' }],
-    arrow: { from: 'h4', to: 'f6' },
+    highlights: [{ square: 'e2', kind: 'key' }],
+    arrow: { from: 'd7', to: 'b5' },
   },
   proximateWall: {
     pieces: [
