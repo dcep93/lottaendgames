@@ -32,8 +32,8 @@ export const TWO_BISHOPS_DIAGRAM_POSITIONS = {
   ruleQ: {
     phase: '1/2',
     fen: "8/3B4/8/8/4K2B/8/3k4/8 w - - 0 1",
-    highlights: [{ square: 'e2', kind: 'key' }],
-    arrow: { from: 'd7', to: 'b5' },
+    highlights: [{ square: 'c3', kind: 'key' }],
+    arrow: { from: 'h4', to: 'f6' },
   },
   proximateWall: {
     pieces: [

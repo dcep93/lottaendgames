@@ -1815,7 +1815,7 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
   )
   assert.match(
     bishopsMarkup,
-    />rule q<[^]*Phase 1: When the kings are a knight&#x27;s move apart, use a bishop to prevent Black from stepping into king opposition, unless that square is further from the center than Black&#x27;s current square\./,
+    />rule q<[^]*Phase 1: When the kings are a knight&#x27;s move apart, use a bishop to control the flank square\. The flank square is the square adjacent to Black&#x27;s king and also a knight&#x27;s move from White&#x27;s king\./,
   )
   assert.match(
     bishopsMarkup,
