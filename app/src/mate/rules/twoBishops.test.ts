@@ -41,6 +41,7 @@ const WHITE_RULE_IDS = [
   'bishops off edge',
   'phase 2 wall',
   'unclutter bishops',
+  'rule a',
   'king closer',
   'check',
 ] as const
@@ -336,6 +337,11 @@ test('Two Bishops exposes each Phase 2 comparison as one visible rule', () => {
           'Phase 2: Prefer bishops more than two king steps from a corner.',
       },
       {
+        shortLabel: 'rule a',
+        helpText:
+          'Phase 1: Use a bishop to disallow black from moving towards the center into opposition.',
+      },
+      {
         shortLabel: 'king closer',
         helpText:
           "Bring White's king closer to Black's king, preferring proximity to the the middle 16 squares.",
@@ -375,7 +381,8 @@ test('Two Bishops exposes each Phase 2 comparison as one visible rule', () => {
       assert.equal(rule.subpriorities, undefined)
     } else if (
       rule.id === 'phase 2 wall' ||
-      rule.id === 'unclutter bishops'
+      rule.id === 'unclutter bishops' ||
+      rule.id === 'rule a'
     ) {
       assert.equal(typeof rule.applies, 'function')
       assert.equal(typeof rule.compare, 'function')
@@ -437,14 +444,29 @@ test('the visible strategic comparisons run in their displayed order', () => {
         scoreTwoBishopsWhiteMove(fen, san).clutteredBishopsCount ===
           bestClutteredBishopsCount,
     )
-    const bestPhaseTwoLinePenalty = Math.min(
+    const ruleAApplies = afterUnclutterBishops.some(
+      (san) => scoreTwoBishopsWhiteMove(fen, san).ruleAApplies,
+    )
+    const bestRuleAPenalty = Math.min(
       ...afterUnclutterBishops.map(
+        (san) => scoreTwoBishopsWhiteMove(fen, san).ruleAPenalty,
+      ),
+    )
+    const afterRuleA = ruleAApplies
+      ? afterUnclutterBishops.filter(
+          (san) =>
+            scoreTwoBishopsWhiteMove(fen, san).ruleAPenalty ===
+            bestRuleAPenalty,
+        )
+      : afterUnclutterBishops
+    const bestPhaseTwoLinePenalty = Math.min(
+      ...afterRuleA.map(
         (san) =>
           scoreTwoBishopsWhiteMove(fen, san)
             .kingCloserPhaseTwoLinePenalty,
       ),
     )
-    const preferredLineMoves = afterUnclutterBishops.filter(
+    const preferredLineMoves = afterRuleA.filter(
       (san) =>
         scoreTwoBishopsWhiteMove(fen, san)
           .kingCloserPhaseTwoLinePenalty === bestPhaseTwoLinePenalty,
@@ -502,6 +524,8 @@ test('the visible strategic comparisons run in their displayed order', () => {
           'matePenalty',
           'phaseTwoWallApplies',
           'phaseTwoWallPenalty',
+          'ruleAApplies',
+          'ruleAPenalty',
           'sequesterApplies',
           'sequesterCornerDiagonalsTarget',
           'sequesterCurrentCornerDistance',
@@ -612,6 +636,66 @@ test('the final king closer metric permits screening a bishop', () => {
   const clear = scoreTwoBishopsWhiteMove(fen, 'Kd5')
   assert.equal(screened.kingCloserDistance, 5)
   assert.equal(clear.kingCloserDistance, 8)
+})
+
+test('rule a uses a bishop to block Black\'s inward opposition square', () => {
+  const fen = '8/1B4k1/3BK3/8/8/8/8/8 w - - 2 2'
+  const blocking = scoreTwoBishopsWhiteMove(fen, 'Be4')
+  const kingMove = scoreTwoBishopsWhiteMove(fen, 'Ke7')
+  const rule = twoBishopsWhiteRules.find(({ id }) => id === 'rule a')
+  const ruleSet = getMateRuleSet('two-bishops')
+
+  assert.equal(ruleSet.phase(fen), '1/2')
+  assert.equal(blocking.ruleAApplies, true)
+  assert.equal(blocking.ruleAPenalty, 0)
+  assert.equal(kingMove.ruleAApplies, true)
+  assert.equal(kingMove.ruleAPenalty, 1)
+  assert.ok(rule?.compare)
+  assert.ok(rule.compare(blocking, kingMove) < 0)
+  assert.deepEqual(ruleSet.idealWhiteMoves(fen), ['Be4'])
+  assert.equal(ruleSet.currentWhiteHint(fen)?.id, 'rule a')
+
+  const sourceMove = getChess(fen).move('Be4')
+  assert.ok(sourceMove)
+  for (const transform of SQUARE_TRANSFORMS) {
+    const transformedFen = getChess(transformFen(fen, transform)).fen()
+    const transformedMove = getChess(transformedFen)
+      .moves({ verbose: true })
+      .find(
+        ({ from, to }) =>
+          from === transformSquare(sourceMove.from, transform) &&
+          to === transformSquare(sourceMove.to, transform),
+      )
+    assert.ok(transformedMove, transform.name)
+    const score = scoreTwoBishopsWhiteMove(
+      transformedFen,
+      transformedMove.san,
+    )
+    assert.equal(score.ruleAApplies, true, transform.name)
+    assert.equal(score.ruleAPenalty, 0, transform.name)
+    assert.deepEqual(
+      getMateRuleSet('two-bishops').idealWhiteMoves(transformedFen),
+      [transformedMove.san],
+      transform.name,
+    )
+  }
+})
+
+test('rule a is neutral without an inward-opposition square and in Phase 2', () => {
+  const noTarget = scoreTwoBishopsWhiteMove(
+    '8/1B2K3/3B2k1/8/8/8/8/8 w - - 0 1',
+    'Ke6',
+  )
+  const phaseTwo = scoreTwoBishopsWhiteMove(
+    '2k5/8/4K3/8/5B2/5B2/8/8 w - - 4 3',
+    'Be4',
+  )
+
+  assert.equal(noTarget.ruleAApplies, false)
+  assert.equal(noTarget.ruleAPenalty, 1)
+  assert.equal(phaseTwo.isPhaseTwoPosition, true)
+  assert.equal(phaseTwo.ruleAApplies, false)
+  assert.equal(phaseTwo.ruleAPenalty, 1)
 })
 
 test('king closer uniquely minimizes squared Euclidean distance within its survivors', () => {

@@ -63,6 +63,8 @@ export type TwoBishopsWhiteMoveScore = {
   readonly bishopsOnBlackEdgeCount: number
   readonly forcePhaseTwoApplies: boolean
   readonly forcePhaseTwoPenalty: number
+  readonly ruleAApplies: boolean
+  readonly ruleAPenalty: number
   readonly kingCloserPhaseTwoLinePenalty: number
   readonly kingCloserDistance: number
   readonly kingCloserMiddleSixteenDistance: number
@@ -2370,6 +2372,7 @@ type TwoBishopsWhitePositionContext = {
   readonly mateInThreeApplies: boolean
   readonly matePatternTurnsBySan: ReadonlyMap<string, 2 | 3>
   readonly shepherdMoves: readonly string[]
+  readonly ruleATargetSquares: readonly Square[]
 }
 
 function createTwoBishopsWhitePositionContext(
@@ -2393,6 +2396,10 @@ function createTwoBishopsWhitePositionContext(
     degenerateRepair,
     mateInThreeApplies: matePatternTurnsBySan.size > 0,
     matePatternTurnsBySan,
+    ruleATargetSquares:
+      isPhaseTwo || blackKing === undefined || startingWhiteKing === undefined
+        ? []
+        : getInwardOppositionSquares(startingWhiteKing, blackKing),
     shepherdMoves:
       isPhaseTwo
         ? getShepherdMoves(
@@ -2428,6 +2435,7 @@ function scoreTwoBishopsWhiteMoveWithContext(
     degenerateRepair,
     mateInThreeApplies,
     matePatternTurnsBySan,
+    ruleATargetSquares,
     shepherdMoves,
   } = context
   const chess = getChess(fen)
@@ -2567,6 +2575,19 @@ function scoreTwoBishopsWhiteMoveWithContext(
       )
         ? 0
         : 1,
+    ruleAApplies: ruleATargetSquares.length > 0,
+    ruleAPenalty:
+      move.piece === 'b' &&
+      ruleATargetSquares.length > 0 &&
+      ruleATargetSquares.every((target) =>
+        resultBishops.some(
+          (bishop) =>
+            bishop === target ||
+            bishopHasClearLineToSquare(resultFen, bishop, target),
+        ),
+      )
+        ? 0
+        : 1,
     kingCloserPhaseTwoLinePenalty:
       !isPhaseTwo ||
       blackKing === undefined ||
@@ -2616,6 +2637,32 @@ function isInOpposition(
     (fileDistance === 0 && rankDistance === distance) ||
     (rankDistance === 0 && fileDistance === distance)
   )
+}
+
+function getInwardOppositionSquares(
+  whiteKing: Square,
+  blackKing: Square,
+): Square[] {
+  const origin = squareCoordinates(blackKing)
+  const currentCenterDistance = centerDistance(blackKing)
+  const targets: Square[] = []
+  for (let fileStep = -1; fileStep <= 1; fileStep += 1) {
+    for (let rankStep = -1; rankStep <= 1; rankStep += 1) {
+      if (fileStep === 0 && rankStep === 0) continue
+      const target = squareFromCoordinates(
+        origin.file + fileStep,
+        origin.rank + rankStep,
+      )
+      if (
+        target !== null &&
+        centerDistance(target) < currentCenterDistance &&
+        isInOpposition(whiteKing, target, 1)
+      ) {
+        targets.push(target)
+      }
+    }
+  }
+  return targets
 }
 
 export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore>[] = [
@@ -2744,6 +2791,14 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
     applies: (score) => score.isPhaseTwoPosition,
     compare: (first, second) =>
       first.clutteredBishopsCount - second.clutteredBishopsCount,
+  },
+  {
+    id: 'rule a',
+    shortLabel: 'rule a',
+    helpText:
+      'Phase 1: Use a bishop to disallow black from moving towards the center into opposition.',
+    applies: (score) => score.ruleAApplies,
+    compare: (first, second) => first.ruleAPenalty - second.ruleAPenalty,
   },
   {
     id: 'king closer',

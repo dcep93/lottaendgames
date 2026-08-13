@@ -1797,7 +1797,11 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
   )
   assert.doesNotMatch(
     bishopsMarkup,
-    />rule zz<|>rule z<|>rule y<|>rule a<|>rule x<|>rule w<|>rule v<|>rule u</,
+    />rule zz<|>rule z<|>rule y<|>rule x<|>rule w<|>rule v<|>rule u</,
+  )
+  assert.match(
+    bishopsMarkup,
+    />rule a<[^]*Phase 1: Use a bishop to disallow black from moving towards the center into opposition\./,
   )
   assert.match(bishopsMarkup, />check<[^]*Play a check</)
   assert.match(
@@ -1810,6 +1814,10 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
   )
   assert.ok(
     bishopsMarkup.indexOf('>unclutter bishops<') <
+      bishopsMarkup.indexOf('>rule a<'),
+  )
+  assert.ok(
+    bishopsMarkup.indexOf('>rule a<') <
       bishopsMarkup.indexOf('>king closer<'),
   )
   assert.doesNotMatch(bishopsMarkup, />lazy king</)
