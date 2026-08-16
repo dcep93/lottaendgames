@@ -59,6 +59,7 @@ const HIGHLIGHT_NAMES: Readonly<
   box: 'box square',
   wall: 'bishop wall square',
   support: 'king support square',
+  pink: 'possible Black king square',
 }
 
 function squareGridPosition(square: string, layout: BoardLayout) {

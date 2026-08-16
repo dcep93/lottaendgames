@@ -420,6 +420,53 @@ test('Play Best uniformly chooses among the current ideal White moves', () => {
   assert.equal(session.logs[0]?.isCorrect, true)
 })
 
+test('Play Best prefers an ideal turn that returns to the last position', () => {
+  const returningRuleSet = createRuleSet({
+    idealWhiteMoves: (fen) => {
+      const key = positionKey(fen)
+      if (key === positionKey(START_FEN)) return ['Ra3']
+      if (
+        key ===
+        positionKey('8/6k1/8/8/8/R7/8/K7 w - - 2 2')
+      ) {
+        return ['Ra2', 'Rh3']
+      }
+      return whiteMoves(fen).slice(0, 1)
+    },
+    blackCandidates: (fen) => {
+      const moves = getChess(fen).moves()
+      const preferred = moves.includes('Kg7')
+        ? ['Kg7']
+        : moves.includes('Kh8')
+          ? ['Kh8']
+          : moves.slice(0, 1)
+      return { moves, idealMoves: preferred }
+    },
+  })
+  const deps = createDeps({
+    times: [1_000, 1_100, 1_200],
+    randoms: [0, 0.75],
+    ruleSet: returningRuleSet,
+  })
+  let session = createMateSession(
+    {
+      mateId: 'rook',
+      mode: 'standard',
+      startingFen: START_FEN,
+    },
+    deps,
+  )
+  session = playWhiteMove(session, 'Ra3', deps)
+
+  const returned = playBestMateMove(session, deps)
+
+  assert.equal(returned.logs[1]?.san, 'Ra2')
+  assert.equal(returned.logs[1]?.opponentSan, 'Kh8')
+  assert.equal(positionKey(returned.fen), positionKey(START_FEN))
+  assert.notEqual(returned.fen, getChess(START_FEN).fen())
+  assert.equal(returned.logs[1]?.isCorrect, true)
+})
+
 test('historical White replacement truncates the line, preserves timing, and keeps a legal Black reply', () => {
   const deps = createDeps({
     times: [1_000, 1_400, 2_000, 3_000],

@@ -3,6 +3,7 @@ import {
   collectionIndex,
   getChess,
   materialMatchesMate,
+  positionKey,
 } from './chess'
 import {
   getTwoKnightsPawnTerminalOutcome,
@@ -179,12 +180,57 @@ function tryMove(chess: Chess, san: string) {
   }
 }
 
-function chooseMove(
-  moves: readonly string[],
+function chooseMove<T>(
+  moves: readonly T[],
   random: () => number,
-): string | undefined {
+): T | undefined {
   if (moves.length === 0) return undefined
   return moves[collectionIndex(moves.length, random())]
+}
+
+type ReturningTurn = {
+  readonly whiteSan: string
+  readonly blackSan: string
+}
+
+function returningPlayBestTurns(
+  session: MateSession,
+  idealWhiteMoves: readonly string[],
+  ruleSet: RegisteredMateRuleSet,
+): readonly ReturningTurn[] {
+  const targetFen = previousWhiteTurnFen(session.logs)
+  if (targetFen === undefined) return []
+  const targetKey = positionKey(targetFen)
+  const previousTurnFen = previousWhiteTurnFen(session.logs)
+  const returningTurns: ReturningTurn[] = []
+
+  for (const whiteSan of idealWhiteMoves) {
+    const afterWhite = getChess(session.fen)
+    const whiteMove = tryMove(afterWhite, whiteSan)
+    if (whiteMove === null) continue
+    const candidates = ruleSet.blackCandidates(
+      afterWhite.fen(),
+      previousTurnFen,
+    )
+    const blackMoves =
+      candidates.idealMoves.length > 0
+        ? candidates.idealMoves
+        : candidates.moves
+    for (const blackSan of blackMoves) {
+      const afterBlack = getChess(afterWhite.fen())
+      const blackMove = tryMove(afterBlack, blackSan)
+      if (
+        blackMove !== null &&
+        positionKey(afterBlack.fen()) === targetKey
+      ) {
+        returningTurns.push({
+          whiteSan: whiteMove.san,
+          blackSan: blackMove.san,
+        })
+      }
+    }
+  }
+  return returningTurns
 }
 
 function previousWhiteTurnFen(
@@ -436,10 +482,11 @@ export function createMateReplaySession(
   return selection.startAtBeginning ? applySnapshot(session, 0) : session
 }
 
-export function playWhiteMove(
+function playWhiteMoveWithPreferredReply(
   session: MateSession,
   san: string,
   deps: MateSessionDeps,
+  preferredOpponentSan?: string,
 ): MateSession {
   if (session.outcome !== undefined) return session
   const canonicalSan = canonicalWhiteSan(session.fen, san)
@@ -451,6 +498,7 @@ export function playWhiteMove(
     san: canonicalSan,
     prefixLogs: session.logs,
     durationMs: moveDurationMs(session, transitionAtMs),
+    preferredOpponentSan,
     deps,
   })
   if (completed === undefined) return session
@@ -460,6 +508,14 @@ export function playWhiteMove(
     session.logs,
     transitionAtMs,
   )
+}
+
+export function playWhiteMove(
+  session: MateSession,
+  san: string,
+  deps: MateSessionDeps,
+): MateSession {
+  return playWhiteMoveWithPreferredReply(session, san, deps)
 }
 
 export function playBlackMove(
@@ -486,9 +542,20 @@ export function playBestMateMove(
   deps: MateSessionDeps,
 ): MateSession {
   if (session.outcome !== undefined) return session
-  const idealMoves = deps
-    .getRuleSet(session.mateId)
-    .idealWhiteMoves(session.fen)
+  const ruleSet = deps.getRuleSet(session.mateId)
+  const idealMoves = ruleSet.idealWhiteMoves(session.fen)
+  const returningTurn = chooseMove(
+    returningPlayBestTurns(session, idealMoves, ruleSet),
+    deps.random,
+  )
+  if (returningTurn !== undefined) {
+    return playWhiteMoveWithPreferredReply(
+      session,
+      returningTurn.whiteSan,
+      deps,
+      returningTurn.blackSan,
+    )
+  }
   const san = chooseMove(idealMoves, deps.random)
   return san === undefined ? session : playWhiteMove(session, san, deps)
 }

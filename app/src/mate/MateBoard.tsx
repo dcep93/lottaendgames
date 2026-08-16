@@ -203,7 +203,7 @@ export function MateBoardSurface({
             id: 'leg-mate-board',
             allowDragOffBoard: false,
             allowDragging: !disabled && !isOptimistic,
-            allowDrawingArrows: false,
+            allowDrawingArrows: true,
             animationDurationInMs: isOptimistic
               ? 0
               : MATE_MOVE_ANIMATION_MS,

@@ -124,6 +124,7 @@ export type RuleNoteBoardHighlight = {
     | 'box'
     | 'wall'
     | 'support'
+    | 'pink'
 }
 
 export type RuleNoteBoardArrow = {

@@ -135,6 +135,27 @@ test('Mate board is a controlled, White-oriented phase surface', () => {
   assert.equal((markup.match(/<svg\b/g) ?? []).length, 4)
 })
 
+test('Mate board enables standard right-drag arrow drawing', () => {
+  let options: ChessboardOptions | undefined
+  function BoardProbe({ options: nextOptions }: BoardRendererProps) {
+    options = nextOptions
+    return <div />
+  }
+
+  renderToStaticMarkup(
+    <MateBoardSurface
+      boardRenderer={BoardProbe}
+      disabled={false}
+      fen={ROOK_START}
+      lastMove={null}
+      onMove={() => undefined}
+      phase="1/2"
+    />,
+  )
+
+  assert.equal(options?.allowDrawingArrows, true)
+})
+
 test('accessible piece names follow their controlled squares', () => {
   const markup = renderToStaticMarkup(
     <MateBoard
@@ -1362,42 +1383,63 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
   )
   assert.match(
     bishopsMarkup,
+    />rule s<[^]*Applies when the kings are a knight&#x27;s move apart and a bishop controls the primary squeeze diagonal\. Check from the tertiary squeeze diagonal or otherwise take opposition if a bishop can control the secondary squeeze diagonal in one move\./,
+  )
+  assert.match(
+    bishopsMarkup,
+    />rule t<[^]*When the kings are a knight&#x27;s move apart, force the Black king to either take opposition or widen the King moat\./,
+  )
+  assert.match(
+    bishopsMarkup,
+    />rule v<[^]*When the kings are in opposition and a bishop can control the secondary squeeze diagonal in one move, control the primary squeeze diagonal\./,
+  )
+  assert.match(
+    bishopsMarkup,
+    />rule w<[^]*When the kings are a knight&#x27;s move apart or two diagonal squares apart, use bishops to control the flank diagonals./,
+  )
+  assert.match(
+    bishopsMarkup,
     />king closer<[^]*Bring White&#x27;s king closer to Black&#x27;s king, preferring proximity to the the middle 16 squares\./,
+  )
+  assert.match(
+    bishopsMarkup,
+    /aria-label="rule s\. White bishop on e7\. White king on g4\. White bishop on d3\. Black king on f2\./,
+  )
+  assert.match(
+    bishopsMarkup,
+    /The tan diagonal is primary, the pink-outlined diagonal is secondary, and the white-outlined diagonal is tertiary\./,
+  )
+  assert.match(bishopsMarkup, /data-arrow="e7-c5"/)
+  assert.match(
+    bishopsMarkup,
+    /aria-label="rule t\. White bishop on h7\. Black king on g3\. White bishop on d2\. White king on e2\./,
+  )
+  assert.match(bishopsMarkup, /data-arrow="h7-f5"/)
+  assert.match(
+    bishopsMarkup,
+    /aria-label="rule v\. White bishop on f5\. White bishop on d2\. White king on e2\. Black king on g2\./,
+  )
+  assert.match(
+    bishopsMarkup,
+    /The tan diagonals are primary\. The pink-outlined diagonals are secondary\./,
+  )
+  assert.match(bishopsMarkup, /data-arrow="d2-f4"/)
+  assert.match(
+    bishopsMarkup,
+    /aria-label="rule w\. White king on e3\. White bishop on c3\. White bishop on c2\./,
+  )
+  assert.match(bishopsMarkup, /data-highlight-kind="wall"/)
+  assert.match(bishopsMarkup, /data-highlight-kind="pink"/)
+  assert.doesNotMatch(
+    bishopsMarkup,
+    />mate in 3<|>degenerate<|>force phase 2<|>shepherd<|>sequester<|>bishops off edge<|>phase 2 wall<|>unclutter bishops<|>check</,
   )
   assert.doesNotMatch(
     bishopsMarkup,
-    />mate in 3<|>degenerate<|>force phase 2<|>shepherd<|>sequester<|>bishops off edge<|>phase 2 wall<|>unclutter bishops<|>rule b<|>check</,
+    />rule a<|>rule b<|>rule bc<|>rule c<|>rule d<|>rule e</,
   )
-  assert.match(
-    bishopsMarkup,
-    />rule pp<[^]*When the kings are in opposition, use a bishop to control the inward flank square\./,
-  )
-  assert.match(
-    bishopsMarkup,
-    />rule p<[^]*If Rule pp is satisfied, check the king, only from the same side of White&#x27;s king as the other bishop\./,
-  )
-  assert.match(
-    bishopsMarkup,
-    />rule q<[^]*When the kings are a knight&#x27;s move apart, and a bishop controls the square in opposition to White&#x27;s king, take opposition\./,
-  )
-  assert.match(
-    bishopsMarkup,
-    />rule r<[^]*When the kings are a knight&#x27;s move apart, and a bishop controls the square a knight&#x27;s move from White&#x27;s king and 2 squares from Black&#x27;s king, and a bishop can control the diagonal containing the squares adjacent to the kings and also edge adjacent to that first bishop-controlled square, take opposition\./,
-  )
-  assert.match(
-    bishopsMarkup,
-    />rule s<[^]*When the kings are a knight&#x27;s move apart, use a bishop to control the flank square\. The flank square is the square adjacent to Black&#x27;s king and also a knight&#x27;s move from White&#x27;s king\./,
-  )
-  const orderedLabels = ['rule pp', 'rule p', 'rule q', 'rule r', 'rule s', 'king closer']
-  for (let index = 1; index < orderedLabels.length; index += 1) {
-    assert.ok(
-      bishopsMarkup.indexOf(`>${orderedLabels[index - 1]}<`) <
-        bishopsMarkup.indexOf(`>${orderedLabels[index]}<`),
-    )
-  }
   assert.doesNotMatch(bishopsMarkup, />lazy king</)
   assert.doesNotMatch(bishopsMarkup, />support wall</)
-  assert.match(bishopsMarkup, /take opposition\./)
   assert.doesNotMatch(
     bishopsMarkup,
     />king distance<|>king position</,

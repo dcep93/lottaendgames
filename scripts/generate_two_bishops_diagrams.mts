@@ -17,8 +17,14 @@ const phaseTwoWallFen = getChess(
 const shepherdFen = getChess(
   '3k4/6BB/4K3/8/8/8/8/8 w - - 0 1',
 ).fen()
+const ruleVFen = getChess(
+  '8/8/8/5B2/8/8/3BK1k1/8 w - - 8 5',
+).fen()
 const ruleSFen = getChess(
-  '8/3B4/8/8/4K2B/8/3k4/8 w - - 0 1',
+  '8/4B3/8/8/6K1/3B4/5k2/8 w - - 20 11',
+).fen()
+const ruleTFen = getChess(
+  '8/7B/8/8/8/6k1/3BK3/8 w - - 10 6',
 ).fen()
 const degeneratePhaseTwoOppositionFen = getChess(
   '6k1/1B6/4K3/8/3B4/8/8/8 w - - 0 1',
@@ -111,13 +117,15 @@ for (const [label, fen] of [
   }
 }
 for (const [label, fen] of [
+  ['rule s', ruleSFen],
+  ['rule t', ruleTFen],
+  ['rule v', ruleVFen],
   ['degenerate middleish target a', degenerateMiddleishTargetAFen],
   ['degenerate middleish target b', degenerateMiddleishTargetBFen],
   ['degenerate phase 1 loop escape', degeneratePhaseOneLoopEscapeFen],
   ['degenerate king flank', degenerateKingFlankFen],
   ['degenerate king sidestep', degenerateKingSidestepFen],
   ['degenerate reform wall', degenerateReformWallFen],
-  ['rule s', ruleSFen],
 ] as const) {
   if (getTwoBishopsPhaseLabel(fen) !== '1/2') {
     throw new Error(`Two Bishops ${label} diagram must display Phase 1`)
@@ -155,12 +163,6 @@ export const TWO_BISHOPS_DIAGRAM_POSITIONS = {
     ],
     arrow: { from: 'e6', to: 'd6' },
   },
-  ruleS: {
-    phase: '1/2',
-    fen: ${JSON.stringify(ruleSFen)},
-    highlights: [{ square: 'c3', kind: 'key' }],
-    arrow: { from: 'h4', to: 'f6' },
-  },
   proximateWall: {
     pieces: [
       { square: 'd4', piece: 'B' },
@@ -180,6 +182,74 @@ export const TWO_BISHOPS_DIAGRAM_POSITIONS = {
       { square: 'g5', kind: 'zone' },
       { square: 'g6', kind: 'zone' },
     ],
+  },
+  ruleW: {
+    pieces: [
+      { square: 'e3', piece: 'K' },
+      { square: 'c3', piece: 'B' },
+      { square: 'c2', piece: 'B' },
+    ],
+    highlights: [
+      { square: 'a1', kind: 'wall' },
+      { square: 'b2', kind: 'wall' },
+      { square: 'c3', kind: 'wall' },
+      { square: 'd4', kind: 'wall' },
+      { square: 'e5', kind: 'wall' },
+      { square: 'f6', kind: 'wall' },
+      { square: 'g7', kind: 'wall' },
+      { square: 'h8', kind: 'wall' },
+      { square: 'b1', kind: 'wall' },
+      { square: 'c2', kind: 'wall' },
+      { square: 'd3', kind: 'wall' },
+      { square: 'e4', kind: 'wall' },
+      { square: 'f5', kind: 'wall' },
+      { square: 'g6', kind: 'wall' },
+      { square: 'h7', kind: 'wall' },
+      { square: 'g4', kind: 'pink' },
+      { square: 'g5', kind: 'pink' },
+    ],
+  },
+  ruleS: {
+    phase: '1/2',
+    fen: ${JSON.stringify(ruleSFen)},
+    highlights: [
+      ${['b8', 'c7', 'd6', 'e5', 'f4', 'g3', 'h2'].map((square) => `{ square: '${square}', kind: 'wall' },`).join('\n      ')}
+      ${['a8', 'b7', 'c6', 'd5', 'e4', 'f3', 'g2', 'h1'].map((square) => `{ square: '${square}', kind: 'zone' },`).join('\n      ')}
+      ${['a7', 'b6', 'c5', 'd4', 'e3', 'f2', 'g1'].map((square) => `{ square: '${square}', kind: 'key' },`).join('\n      ')}
+    ],
+    arrow: { from: 'e7', to: 'c5' },
+  },
+  ruleV: {
+    phase: '1/2',
+    fen: ${JSON.stringify(ruleVFen)},
+    highlights: [
+      { square: 'f4', kind: 'wall' },
+      { square: 'g3', kind: 'wall' },
+      { square: 'h2', kind: 'wall' },
+      { square: 'g1', kind: 'wall' },
+      { square: 'e4', kind: 'zone' },
+      { square: 'f3', kind: 'zone' },
+      { square: 'g2', kind: 'zone' },
+      { square: 'h1', kind: 'zone' },
+      { square: 'f1', kind: 'zone' },
+      { square: 'h3', kind: 'zone' },
+    ],
+    arrow: { from: 'd2', to: 'f4' },
+  },
+  ruleT: {
+    phase: '1/2',
+    fen: ${JSON.stringify(ruleTFen)},
+    highlights: [
+      { square: 'f1', kind: 'wall' },
+      { square: 'f2', kind: 'wall' },
+      { square: 'f3', kind: 'wall' },
+      { square: 'f4', kind: 'wall' },
+      { square: 'f5', kind: 'wall' },
+      { square: 'f6', kind: 'wall' },
+      { square: 'f7', kind: 'wall' },
+      { square: 'f8', kind: 'wall' },
+    ],
+    arrow: { from: 'h7', to: 'f5' },
   },
   degeneratePhaseTwoOpposition: {
     phase: '2/2',
@@ -333,7 +403,6 @@ if (check) {
 
 process.stdout.write(`phase 2 wall: ${phaseTwoWallFen}\n`)
 process.stdout.write(`shepherd: ${shepherdFen}\n`)
-process.stdout.write(`rule s: ${ruleSFen}\n`)
 process.stdout.write(
   `degenerate phase 2 opposition: ${degeneratePhaseTwoOppositionFen}\n`,
 )
