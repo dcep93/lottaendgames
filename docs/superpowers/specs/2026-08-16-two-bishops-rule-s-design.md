@@ -12,12 +12,12 @@ The visible order becomes Rule S, Rule T, Rule V, Rule W, then king closer.
 
 For each legal White king move that creates direct opposition, derive the existing primary and secondary squeeze diagonals from the resulting king opposition. Direct opposition means the kings share a rank or file with one square between them.
 
-The starting bishops must satisfy distinct roles:
+On the board after the candidate king move, the bishops must satisfy distinct roles:
 
 1. one bishop has a clear attack to at least one square on the secondary squeeze diagonal; and
 2. the other bishop is not already on the primary squeeze diagonal and has a legal one-move destination on it.
 
-When those prerequisites hold, Rule S prefers the White king move that creates the corresponding opposition. If no legal opposition move has the required bishop preparation, Rule S ties every candidate.
+When those prerequisites hold, Rule S prefers the White king move that creates the corresponding opposition. A king move that screens the secondary bishop does not qualify. If no legal opposition move has the required bishop preparation, Rule S ties every candidate.
 
 In `8/4B3/8/8/5K2/3B4/6k1/8 w - - 18 10`, `Bd3` attacks `e4` on the prospective secondary diagonal and `Be7` can reach `c5` on the prospective primary diagonal. Rule S therefore makes `Kg4` uniquely correct.
 
