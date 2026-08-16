@@ -15,7 +15,7 @@ For each legal White king move that creates direct opposition, derive the existi
 The starting bishops must satisfy distinct roles:
 
 1. one bishop has a clear attack to at least one square on the secondary squeeze diagonal; and
-2. the other bishop has a legal one-move destination on the primary squeeze diagonal.
+2. the other bishop is not already on the primary squeeze diagonal and has a legal one-move destination on it.
 
 When those prerequisites hold, Rule S prefers the White king move that creates the corresponding opposition. If no legal opposition move has the required bishop preparation, Rule S ties every candidate.
 
