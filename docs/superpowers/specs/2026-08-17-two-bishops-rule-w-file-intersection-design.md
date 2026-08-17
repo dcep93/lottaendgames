@@ -6,9 +6,9 @@ Tighten Rule W's flank-diagonal geometry without changing its rendered text.
 
 ## Geometry
 
-A Rule W flank diagonal must intersect Black's file at an on-board square. A diagonal that exists elsewhere on the board but reaches Black's file only beyond rank 1 or rank 8 is not a flank diagonal.
+A Rule W flank diagonal must intersect both of Black's orthogonal lines at on-board squares: Black's file and Black's rank. A diagonal that reaches either line only beyond the board is not a flank diagonal. The rank requirement is the rotated counterpart of the requested file requirement and preserves D4 symmetry.
 
-Apply this requirement to both diagonals in every candidate Rule W pair. If either diagonal misses Black's file on the board, discard the pair before scoring full or partial Rule W credit.
+Apply this requirement to both diagonals in every candidate Rule W pair. If either diagonal misses either orthogonal line on the board, discard the pair before scoring full or partial Rule W credit.
 
 In the supplied position, the c4-f1 diagonal reaches the g-file below the board. Therefore the pair created by `Bc4` is invalid and `Bc4` receives no Rule W preference.
 
