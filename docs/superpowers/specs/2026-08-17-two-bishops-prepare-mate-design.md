@@ -20,14 +20,16 @@ Retain the squeeze geometries whose secondary diagonal is controlled by a starti
 
 Moving the secondary bishop along that diagonal and moving the other bishop while leaving the secondary bishop in place both maintain it. If the trigger or a prepared secondary diagonal is absent, the rule does not apply.
 
+When a candidate satisfies `prepare mate`, stop the priority pipeline at this rule. All qualifying quiet waits are correct, and later Rule T cannot replace the displayed reason.
+
 ## Supplied position
 
-In `8/8/2B5/2B5/8/8/2K5/k7 w - - 48 25`, Black's projected opposition escape is a2. The c6 bishop controls the matching secondary diagonal. Quiet bishop waits that preserve it survive `prepare mate`; later `bishop distance` makes `Bf8` unique. The displayed reason is `prepare mate` because this new priority eliminates the competing king move.
+In `8/8/2B5/2B5/8/8/2K5/k7 w - - 48 25`, Black's projected opposition escape is a2. The c6 bishop controls the matching secondary diagonal. `Bf8` is one of the correct quiet bishop waits that preserves it, and its displayed reason is `prepare mate`.
 
 ## Verification
 
 - Pin the priority immediately before `central king` and the exact rendered wording.
-- Assert `Bf8` is uniquely correct in the supplied Phase 2 position with reason `prepare mate`.
+- Assert `Bf8` is correct in the supplied Phase 2 position with reason `prepare mate`.
 - Cover all D4 rotations and reflections.
 - Reject king moves, checks, and bishop moves that abandon the prepared secondary diagonal.
 - Preserve prepared-batch equivalence and existing rule behavior outside the corner-knight trigger.
