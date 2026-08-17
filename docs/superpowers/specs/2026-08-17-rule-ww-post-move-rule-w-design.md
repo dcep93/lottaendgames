@@ -22,6 +22,8 @@ For every legal White candidate, derive Rule W's king relationship and flank-dia
 
 Remove the bishop-move preference from Rule W. King moves can therefore win when they produce the best resulting flank-diagonal pair. Rule W no longer excludes Phase 2. In `8/8/8/8/k7/2KB4/3B4/8 w - - 56 29`, `Kc2` is credited for the completed pair derived from White's king on `c2` after the move.
 
+Once the surviving candidates all have zero Rule W penalty, stop before lower priorities. Every candidate that completes both resulting flank diagonals remains correct, so `king closer` cannot remove `Kc2` merely because a bishop move also completes a pair.
+
 ## Diagram and ordering
 
 Insert Rule WW immediately before Rule W in the priority guide. Add a Rule WW board diagram using the supplied cage position after `Be5`: White king `f3`, Black king `g5`, bishops `e5` and `e6`. Mark both complete cage diagonals with distinct existing diagonal highlight styles. Keep Rule W and its existing diagram immediately after Rule WW, followed by `king closer`.
