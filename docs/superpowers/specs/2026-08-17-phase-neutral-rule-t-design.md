@@ -17,6 +17,8 @@ Remove Rule T's Phase 2 exclusion from its geometry constructor. Keep every othe
 
 Because Rule T precedes Rule W, a qualifying Phase 2 move is selected before Rule W can accept a completed flank pair.
 
+When every surviving Phase 2 candidate has zero Rule T penalty, stop at Rule T. This preserves Rule T as the displayed explanation instead of allowing Rule W's completed-pair stop to overwrite it.
+
 For `5k2/8/5BK1/5B2/8/8/8/8 w - - 6 4`, only `Bd7` satisfies the existing Rule T predicate. It leaves Black only `Kg8`, which takes moat opposition. Other bishop moves either allow `Ke8` or fail to force the required response, so `Bd7` is uniquely correct.
 
 ## Tests
