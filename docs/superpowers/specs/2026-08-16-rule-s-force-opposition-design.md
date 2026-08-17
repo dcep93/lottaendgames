@@ -13,10 +13,12 @@ Rule S remains Phase 1-only and applies when:
 
 Its preferred moves are:
 
-1. Bishop checks from the tertiary squeeze diagonal, when available.
+1. Bishop checks from the tertiary squeeze diagonal, when available without exposing a bishop to capture.
 2. Otherwise, White king moves that take opposition.
 
 The existing requirement that a bishop be able to reach the secondary squeeze diagonal before the opposition fallback is removed. “To force opposition” describes the purpose of the tertiary check; it does not require every immediate Black reply to be an opposition square.
+
+Safety is evaluated when Rule S chooses its branch. An unsafe tertiary check does not suppress the opposition fallback merely because it is geometrically available; this mirrors the higher-priority bishop-safety rule.
 
 The rendered English becomes:
 
@@ -28,4 +30,5 @@ The squeeze geometry and Rule S diagram remain unchanged.
 
 - The existing `Bc5+` tertiary-check position and all rotations/reflections remain uniquely correct.
 - In `8/8/8/1K6/8/k7/8/4BB2 w - - 0 1`, `Ka5` becomes uniquely correct even though no bishop can newly reach the secondary squeeze diagonal.
+- In `8/8/3B4/3B4/8/3K4/1k6/8 w - - 0 1`, the capturable `Ba3+` does not suppress the fallback, so `Kd2` is uniquely correct.
 - Rule S remains disabled in Phase 2.
