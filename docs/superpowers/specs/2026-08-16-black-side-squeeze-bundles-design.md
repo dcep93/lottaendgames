@@ -23,7 +23,7 @@ Rule order, Phase 1 restrictions, safety priorities, Black policy, and phase det
 
 ## Presentation
 
-Do not change rendered rule text or note-board diagrams. The diagrams continue to show the same named diagonals; the implementation now preserves which lines belong together.
+Do not change rendered rule text or board positions. Update Rule V's secondary highlights so the note board continues to show the same named bundle accurately.
 
 ## Verification
 
@@ -38,4 +38,4 @@ Do not change rendered rule text or note-board diagrams. The diagrams continue t
 
 ## Scope
 
-Do not add new visible rules, descriptions, diagrams, or phase behavior.
+Do not add new visible rules, descriptions, diagrams, or phase behavior. The existing Rule V diagram may receive corrected highlights.
