@@ -6,8 +6,8 @@ Replace the existing `central king` priority with:
 
 > **central pieces** — Prefer White's pieces in the middle 32 squares.
 
-Keep the priority in its current position immediately after `prepare mate` and
-before `edge flank`. The rule applies in both phases.
+Place the priority immediately after `rule w` and before `king closer`. The
+rule applies in both phases.
 
 ## Scoring
 
