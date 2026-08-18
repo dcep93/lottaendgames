@@ -38,11 +38,12 @@ The second outcome is the moat modifier.
 
 When the kings are a knight's move apart, evaluate each legal White king move
 that takes direct opposition. Derive both squeeze bundles from the resulting
-opposition. The anchored moat bishop is the bishop closest to an edge, with
-greater squared Euclidean distance from White's king breaking ties. The move
-completes this stage only when the anchored bishop controls the derived primary
-diagonal, the other bishop controls a derived secondary diagonal, and White's
-king moved closer to the anchored primary diagonal.
+opposition. The evaluator considers either bishop as the possible moat anchor
+and lets the squeeze geometry determine its role. The move completes this stage
+only when one candidate anchor controls the derived primary diagonal, the
+other bishop controls a derived secondary diagonal, and White's king moved
+closer to the anchored primary diagonal. Bishop edge placement and distance
+from White's king do not choose the anchor.
 
 ### Block the escape
 
@@ -55,6 +56,11 @@ opposition or farther from the current King moat.
 In the supplied line, `Bg4` completes the bishop boot. After `...Kc2`, `Kc4`
 completes the scoot. After `...Kd2`, the anchored `a3` bishop switches from the
 primary to the secondary role, so `Bc5` blocks the escape.
+
+The waiting-bishop line behaves the same way: `Bh5` completes the boot,
+`Kc4` takes opposition after `...Kc2`, and `Bc5` blocks after `...Kd2`.
+Although h5 is also an edge square, it must not displace a3 as the qualifying
+primary-diagonal anchor.
 
 The earlier `Ke4` scoot in the second supplied line is eligible again because
 the side restriction belongs to the initial boot geometry, not the later king
@@ -91,6 +97,8 @@ GIF deterministically from a repository script.
 - Assert the exact rule order and rendered wording.
 - Assert `Bg4`, `Kc4`, and `Bc5` are uniquely ideal with reason
   `boot scoot n block`.
+- Assert `Bh5`, `Kc4`, and `Bc5` are uniquely ideal in the supplied line, with
+  every White move explained by `boot scoot n block`.
 - Assert `Ke4` and `Bc7` are uniquely ideal under `boot scoot n block`.
 - Assert an initial boot is accepted only when its controlled secondary
   squeeze diagonal is on the board-wall side nearer the opposed kings. In the
