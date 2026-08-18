@@ -12,7 +12,7 @@ For `8/8/8/1B6/3B4/4K3/2k5/8 w - - 12 7`, `Bc4` must be preferred by Rule R.
 
 For a knight relationship, the axis on which the kings differ by two squares is the rear axis. The board edge beyond Black's king on that axis is the rear edge. The axis on which they differ by one square is the side axis, and the board edge beyond Black's king on that axis is the side edge.
 
-Rule R applies only when Black's king is strictly closer to the side edge than the rear edge. It reuses Rule S's primary and secondary squeeze-diagonal pairs so both rules agree about diagonal identity and symmetry.
+Rule R applies only when Black's king is strictly closer to the side edge than the rear edge. It reuses Rule S's primary squeeze geometry. Rule R's secondary is the adjacent diagonal reflected away from Black across that primary diagonal; this is the line occupied by `Bc4` in the supplied position.
 
 ## Scoring
 
@@ -22,7 +22,7 @@ Rule R applies when:
 - the side-edge distance is smaller than the rear-edge distance; and
 - a bishop controls a primary squeeze diagonal.
 
-Among legal White moves, Rule R prefers moves whose resulting position controls the matching secondary squeeze diagonal while retaining control of the primary diagonal. Rule R is evaluated before Rule S.
+Among legal White moves, Rule R prefers moves whose resulting position controls that matching reflected secondary squeeze diagonal with one bishop while a distinct bishop retains control of the primary diagonal. Rule R is evaluated before Rule S.
 
 ## Verification
 
