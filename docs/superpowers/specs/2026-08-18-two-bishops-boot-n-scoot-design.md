@@ -1,17 +1,17 @@
-# Two Bishops Boot N Scoot Design
+# Two Bishops Boot Scoot N Block Design
 
 ## Rule and order
 
 Add this priority immediately after `edge flank`:
 
-> **boot n scoot** — When the kings are in opposition and a bishop controls the secondary squeeze diagonal, use a bishop boot to scoot towards that moat diagonal then take opposition from the next position. You'll be able to force a king push soon.
+> **boot scoot n block** — When the kings are in opposition and a bishop controls the secondary squeeze diagonal, moat use a bishop to boot the king towards that squeeze diagonal. Then scoot to opposition on the next position. Finally, block the king's escape. (See gif)
 
 The rule applies in both phases. Existing universal safeguards and `edge flank`
 remain earlier; Rule S and every later priority remain after it.
 
-## Stateless two-stage geometry
+## Stateless three-stage geometry
 
-The evaluator recognizes both stages from the current board, without move
+The evaluator recognizes all three stages from the current board, without move
 history.
 
 ### Bishop boot
@@ -34,29 +34,27 @@ The second outcome is the moat modifier.
 
 When the kings are a knight's move apart, evaluate each legal White king move
 that takes direct opposition. Derive both squeeze bundles from the resulting
-opposition. The move completes this stage only when one bishop controls the
-derived primary diagonal, the other controls the derived secondary diagonal,
-and White's king moved closer to the controlled primary diagonal.
+opposition. The anchored moat bishop is the bishop closest to an edge, with
+greater squared Euclidean distance from White's king breaking ties. The move
+completes this stage only when the anchored bishop controls the derived primary
+diagonal, the other bishop controls a derived secondary diagonal, and White's
+king moved closer to the anchored primary diagonal.
 
-### Boot after the moat modifier
+### Block the escape
 
-Before taking opposition from a knight-separated position, evaluate whether a
-quiet bishop boot is available. Derive each direct-opposition square Black can
-reach from the current square and its squeeze geometries. When one bishop
-controls a secondary diagonal, a boot must move the other bishop, preserve the
-secondary controller, avoid check, and force every Black reply either into
-direct opposition or farther from the current King moat.
+When no scoot qualifies from a knight-separated position, derive the direct
+opposition created by the available White king move. If the anchored moat
+bishop instead controls a derived secondary diagonal, the block must move that
+bishop without checking and force every Black reply either into direct
+opposition or farther from the current King moat.
 
-A qualifying bishop boot takes precedence over taking opposition. If no boot
-qualifies, evaluate the king opposition stage above.
-
-In the supplied line, `Bg4` completes the bishop boot. After `...Kc2`, no quiet
-boot by the other bishop is available, so `Kc4` completes the opposition
-stage. After `...Kd2`, `Bc5` completes the next quiet boot.
+In the supplied line, `Bg4` completes the bishop boot. After `...Kc2`, `Kc4`
+completes the scoot. After `...Kd2`, the anchored `a3` bishop switches from the
+primary to the secondary role, so `Bc5` blocks the escape.
 
 In the second supplied line, `Ke4` completes the opposition stage. After
-`...Kf2`, `Bc7` completes the quiet boot while preserving the secondary
-controller.
+`...Kf2`, the anchored `a5` bishop switches from the primary to the secondary
+role, so `Bc7` blocks the escape.
 
 ## Guide note and animation
 
@@ -64,7 +62,7 @@ Replace the existing moat-opposition note with:
 
 > Moat modifier means Black may widen the King moat instead of satisfying the rule's requested response.
 
-Add an animated guide figure titled `boot n scoot` immediately after the edge
+Add an animated guide figure titled `boot scoot n block` immediately after the edge
 flank figure. Render the supplied line on a full board in this order:
 
 1. `8/8/4B3/8/3K4/B7/3k4/8 w - - 14 8`
@@ -86,8 +84,9 @@ GIF deterministically from a repository script.
 ## Verification
 
 - Assert the exact rule order and rendered wording.
-- Assert `Bg4` and then `Kc4` are uniquely ideal with reason `boot n scoot`.
-- Assert `Bc5`, `Ke4`, and `Bc7` are uniquely ideal under `boot n scoot`.
+- Assert `Bg4`, `Kc4`, and `Bc5` are uniquely ideal with reason
+  `boot scoot n block`.
+- Assert `Ke4` and `Bc7` are uniquely ideal under `boot scoot n block`.
 - Treat every White move in the rendered GIF sequence as an executable best-
   move assertion, so guide drift fails the test suite.
 - Cover translations, rotations, reflections, both stages, both phases, and
