@@ -59,9 +59,10 @@ In the supplied line, `Bg4` completes the bishop boot. After `...Kc2`, `Kc4`
 completes the scoot. After `...Kd2`, the anchored `a3` bishop switches from the
 primary to the secondary role, so `Bc5` blocks the escape.
 
-In the second supplied line, `Ke4` completes the opposition stage. After
-`...Kf2`, the anchored `a5` bishop switches from the primary to the secondary
-role, so `Bc7` blocks the escape.
+The new closer-wall constraint rejects `Ke4` in the second supplied line
+because the king on f4 moves toward the farther a-file wall. If its following
+position is loaded directly, the anchored `a5` bishop still defines the moat
+diagonal and `Bc7` remains the block move.
 
 ## Guide note and animation
 
@@ -93,7 +94,9 @@ GIF deterministically from a repository script.
 - Assert the exact rule order and rendered wording.
 - Assert `Bg4`, `Kc4`, and `Bc5` are uniquely ideal with reason
   `boot scoot n block`.
-- Assert `Ke4` and `Bc7` are uniquely ideal under `boot scoot n block`.
+- Assert the former `Ke4` scoot is rejected as movement toward the farther
+  wall while `Bc7` remains the uniquely ideal block when that following
+  position is loaded directly.
 - Assert the maneuver applies when the scoot heads toward the nearer wall and
   does not apply to an otherwise matching position whose scoot heads toward
   the farther wall.
