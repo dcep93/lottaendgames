@@ -35,19 +35,28 @@ The second outcome is the moat modifier.
 When the kings are a knight's move apart, evaluate each legal White king move
 that takes direct opposition. Derive both squeeze bundles from the resulting
 opposition. The move completes this stage only when one bishop controls the
-bundle's primary diagonal, the other controls its matching secondary diagonal,
-and White's king moved closer to that secondary diagonal. This recognizes the
-position immediately after the scoot without also claiming a later return
-toward the wrong squeeze bundle.
+derived primary diagonal, the other controls the derived secondary diagonal,
+and White's king moved closer to the controlled primary diagonal.
 
-In the supplied line, `Bg4` completes the bishop boot. After `...Kc2`, `Kc4`
-completes the opposition stage. After `...Kd2`, the existing Rule T selects
-`Bc5`; Boot N Scoot does not claim that third White move.
+### Boot after the moat modifier
+
+Before taking opposition from a knight-separated position, evaluate whether a
+quiet bishop boot is available. Derive each direct-opposition square Black can
+reach from the current square and its squeeze geometries. When one bishop
+controls a secondary diagonal, a boot must move the other bishop, preserve the
+secondary controller, avoid check, and force every Black reply either into
+direct opposition or farther from the current King moat.
+
+A qualifying bishop boot takes precedence over taking opposition. If no boot
+qualifies, evaluate the king opposition stage above.
+
+In the supplied line, `Bg4` completes the bishop boot. After `...Kc2`, no quiet
+boot by the other bishop is available, so `Kc4` completes the opposition
+stage. After `...Kd2`, `Bc5` completes the next quiet boot.
 
 In the second supplied line, `Ke4` completes the opposition stage. After
-`...Kf2`, Boot N Scoot no longer applies: `Kf4` would move toward the wrong
-secondary diagonal. The existing later rules then select `Bc7` and preserve
-the two-stage boundary.
+`...Kf2`, `Bc7` completes the quiet boot while preserving the secondary
+controller.
 
 ## Guide note and animation
 
@@ -78,9 +87,7 @@ GIF deterministically from a repository script.
 
 - Assert the exact rule order and rendered wording.
 - Assert `Bg4` and then `Kc4` are uniquely ideal with reason `boot n scoot`.
-- Assert `Bc5` remains uniquely ideal under Rule T.
-- Assert `Ke4` is uniquely ideal under `boot n scoot`, then `Bc7` is uniquely
-  ideal under the existing later priorities.
+- Assert `Bc5`, `Ke4`, and `Bc7` are uniquely ideal under `boot n scoot`.
 - Treat every White move in the rendered GIF sequence as an executable best-
   move assertion, so guide drift fails the test suite.
 - Cover translations, rotations, reflections, both stages, both phases, and
