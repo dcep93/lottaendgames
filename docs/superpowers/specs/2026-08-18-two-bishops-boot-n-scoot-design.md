@@ -4,7 +4,7 @@
 
 Add this priority immediately after `edge flank`:
 
-> **boot scoot n block** — When the kings are in opposition and a bishop controls the secondary squeeze diagonal, moat use a bishop to boot the king towards that squeeze diagonal. Then scoot to opposition on the next position. Only do this maneuver if the scoot is towards the closer wall. Finally, block the king's escape. (See gif)
+> **boot scoot n block** — When the kings are in opposition and a bishop controls the secondary squeeze diagonal on the side closer to the kings, moat use a bishop to boot the king towards that squeeze diagonal. Then scoot to opposition on the next position. Finally, block the king's escape. (See gif)
 
 The rule applies in both phases. Existing universal safeguards and `edge flank`
 remain earlier; Rule S and every later priority remain after it.
@@ -18,7 +18,11 @@ history.
 
 When the kings are in direct opposition, derive both existing opposition
 squeeze geometries. A geometry is prepared when one bishop controls its
-secondary diagonal.
+secondary diagonal and that diagonal is on the side closer to the kings. For
+vertical opposition, compare the kings' shared file with the a-file and h-file
+walls. For horizontal opposition, compare their shared rank with the first-
+rank and eighth-rank walls. Retain only the squeeze geometry on the nearer
+side.
 
 A bishop move completes the boot for a prepared geometry when it moves the
 other bishop, preserves the secondary controller, and every legal Black king
@@ -40,13 +44,6 @@ completes this stage only when the anchored bishop controls the derived primary
 diagonal, the other bishop controls a derived secondary diagonal, and White's
 king moved closer to the anchored primary diagonal.
 
-The scoot must also move toward the nearer board wall on its movement axis.
-For a file scoot, compare the a-file and h-file distances from White's starting
-king square; for a rank scoot, compare the first-rank and eighth-rank
-distances. The move is ineligible when it travels toward the farther of those
-two walls. This axis-specific comparison does not use Black's nearest edge or
-White's global edge distance.
-
 ### Block the escape
 
 When no scoot qualifies from a knight-separated position, derive the direct
@@ -59,10 +56,10 @@ In the supplied line, `Bg4` completes the bishop boot. After `...Kc2`, `Kc4`
 completes the scoot. After `...Kd2`, the anchored `a3` bishop switches from the
 primary to the secondary role, so `Bc5` blocks the escape.
 
-The new closer-wall constraint rejects `Ke4` in the second supplied line
-because the king on f4 moves toward the farther a-file wall. If its following
-position is loaded directly, the anchored `a5` bishop still defines the moat
-diagonal and `Bc7` remains the block move.
+The earlier `Ke4` scoot in the second supplied line is eligible again because
+the side restriction belongs to the initial boot geometry, not the later king
+move. If its following position is loaded directly, the anchored `a5` bishop
+still defines the moat diagonal and `Bc7` remains the block move.
 
 ## Guide note and animation
 
@@ -94,12 +91,11 @@ GIF deterministically from a repository script.
 - Assert the exact rule order and rendered wording.
 - Assert `Bg4`, `Kc4`, and `Bc5` are uniquely ideal with reason
   `boot scoot n block`.
-- Assert the former `Ke4` scoot is rejected as movement toward the farther
-  wall while `Bc7` remains the uniquely ideal block when that following
-  position is loaded directly.
-- Assert the maneuver applies when the scoot heads toward the nearer wall and
-  does not apply to an otherwise matching position whose scoot heads toward
-  the farther wall.
+- Assert `Ke4` and `Bc7` are uniquely ideal under `boot scoot n block`.
+- Assert an initial boot is accepted only when its controlled secondary
+  squeeze diagonal is on the board-wall side nearer the opposed kings. In the
+  supplied loop, `Bg3` is rejected because e-file kings are closer to the
+  h-file wall while the prepared diagonal is on the a-file side.
 - Treat every White move in the rendered GIF sequence as an executable best-
   move assertion, so guide drift fails the test suite.
 - Cover translations, rotations, reflections, both stages, both phases, and
