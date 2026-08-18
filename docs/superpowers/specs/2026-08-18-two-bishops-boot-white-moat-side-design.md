@@ -12,21 +12,22 @@ Rendered text:
 
 At the initial opposition position, derive the king moat from the two kings. The maneuver can begin only if each bishop is on the half-plane containing White's king. A bishop lying directly on the moat qualifies as being on White's side.
 
-Once the boot has occurred, the existing scoot and block recognizers continue the maneuver without reapplying the initial opposition-only gate.
+The stateless scoot and block recognizers also apply the inclusive White-side test against their current knight-step moat. This prevents an unrelated position from impersonating a valid continuation when its bishops are on the wrong side.
 
 ## Implementation
 
-Add an inclusive signed projection check against the existing opposition-moat geometry. Apply it before generating boot candidates in the opposition branch of `getBootNScootPreferredMoves`. Do not add a new scoring priority or alter later-stage helpers.
+Add a reusable inclusive signed projection check against the existing moat geometry. Apply it before generating boot candidates and in the scoot and block continuation helpers. Do not add a new scoring priority.
 
 ## Verification
 
 - Preserve the GIF's three best moves.
 - Add coverage for both bishops on White's side, a bishop exactly on the moat, and a bishop on Black's side.
+- Reject a false knight-step continuation whose bishops are on the wrong side.
 - Preserve translation/reflection/rotation coverage and apply the same gate in Phase 2.
 - Verify the rendered text, targeted tests, lint, and build.
 
 ## Assumptions
 
-- The new bishop-placement clause gates only boot initiation.
+- The bishop-placement clause gates boot initiation and independently validated continuations.
 - “On White's side” includes the moat itself.
 - The existing definition of king moat remains authoritative.
