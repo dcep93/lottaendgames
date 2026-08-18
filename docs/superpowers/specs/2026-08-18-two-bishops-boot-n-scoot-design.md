@@ -32,16 +32,33 @@ The second outcome is the moat modifier.
 
 ### Take opposition
 
-When the kings are a knight's move apart, use squared Euclidean distance to
-identify the bishop closest to Black's king. The second stage is available
-when that bishop controls a diagonal adjacent to Black's king. A White king
-move completes the stage when it takes direct opposition while moving closer
-to that diagonal. This recognizes the position immediately after the scoot
-without also claiming the later Rule T position.
+When the kings are a knight's move apart, evaluate each legal White king move
+that takes direct opposition. Derive both squeeze bundles from the resulting
+opposition. The move completes this stage only when one bishop controls the
+bundle's primary diagonal, the other controls its matching secondary diagonal,
+and White's king moved closer to that secondary diagonal. This recognizes the
+position immediately after the scoot without also claiming a later return
+toward the wrong squeeze bundle.
+
+### Boot after the moat modifier
+
+When the kings are a knight's move apart, derive each square where Black could
+return to direct opposition with White's king. For each resulting squeeze
+bundle whose secondary diagonal is already controlled, a quiet bishop move
+completes the boot when it moves the other bishop, preserves the secondary
+controller, and every legal Black reply either takes direct opposition or
+increases its orthogonal distance from the current King moat.
+
+This stage recognizes the continuation after Black uses the moat modifier.
+Checking bishop moves do not count as boots.
 
 In the supplied line, `Bg4` completes the bishop boot. After `...Kc2`, `Kc4`
 completes the opposition stage. After `...Kd2`, the existing Rule T selects
 `Bc5`; Boot N Scoot does not claim that third White move.
+
+In the second supplied line, `Ke4` completes the opposition stage. After
+`...Kf2`, `Bc7` is the quiet boot that preserves the prepared secondary
+diagonal and forces Black either back to opposition or farther from the moat.
 
 ## Guide note and animation
 
@@ -73,6 +90,9 @@ GIF deterministically from a repository script.
 - Assert the exact rule order and rendered wording.
 - Assert `Bg4` and then `Kc4` are uniquely ideal with reason `boot n scoot`.
 - Assert `Bc5` remains uniquely ideal under Rule T.
+- Assert `Ke4` and then `Bc7` are uniquely ideal under `boot n scoot`.
+- Treat every White move in the rendered GIF sequence as an executable best-
+  move assertion, so guide drift fails the test suite.
 - Cover translations, rotations, reflections, both stages, both phases, and
   negative geometry cases.
 - Verify the replacement note, animation metadata, GIF dimensions, frame
