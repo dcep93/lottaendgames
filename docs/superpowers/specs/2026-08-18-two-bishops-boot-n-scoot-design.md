@@ -4,7 +4,7 @@
 
 Add this priority immediately after `edge flank`:
 
-> **boot scoot n block** — When the kings are in opposition and a bishop controls the secondary squeeze diagonal, moat use a bishop to boot the king towards that squeeze diagonal. Then scoot to opposition on the next position. Finally, block the king's escape. (See gif)
+> **boot scoot n block** — When the kings are in opposition and a bishop controls the secondary squeeze diagonal, moat use a bishop to boot the king towards that squeeze diagonal. Then scoot to opposition on the next position. Only do this maneuver if the scoot is towards the closer wall. Finally, block the king's escape. (See gif)
 
 The rule applies in both phases. Existing universal safeguards and `edge flank`
 remain earlier; Rule S and every later priority remain after it.
@@ -39,6 +39,13 @@ greater squared Euclidean distance from White's king breaking ties. The move
 completes this stage only when the anchored bishop controls the derived primary
 diagonal, the other bishop controls a derived secondary diagonal, and White's
 king moved closer to the anchored primary diagonal.
+
+The scoot must also move toward the nearer board wall on its movement axis.
+For a file scoot, compare the a-file and h-file distances from White's starting
+king square; for a rank scoot, compare the first-rank and eighth-rank
+distances. The move is ineligible when it travels toward the farther of those
+two walls. This axis-specific comparison does not use Black's nearest edge or
+White's global edge distance.
 
 ### Block the escape
 
@@ -87,6 +94,9 @@ GIF deterministically from a repository script.
 - Assert `Bg4`, `Kc4`, and `Bc5` are uniquely ideal with reason
   `boot scoot n block`.
 - Assert `Ke4` and `Bc7` are uniquely ideal under `boot scoot n block`.
+- Assert the maneuver applies when the scoot heads toward the nearer wall and
+  does not apply to an otherwise matching position whose scoot heads toward
+  the farther wall.
 - Treat every White move in the rendered GIF sequence as an executable best-
   move assertion, so guide drift fails the test suite.
 - Cover translations, rotations, reflections, both stages, both phases, and
