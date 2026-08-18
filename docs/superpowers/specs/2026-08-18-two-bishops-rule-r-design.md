@@ -20,7 +20,7 @@ Rule R applies when:
 
 - the kings are a knight's move apart;
 - the side-edge distance is smaller than the rear-edge distance; and
-- a bishop controls a primary squeeze diagonal.
+- a bishop controls a primary squeeze diagonal while the matching reflected secondary is not already controlled.
 
 Among legal White moves, Rule R prefers moves whose resulting position controls that matching reflected secondary squeeze diagonal with one bishop while a distinct bishop retains control of the primary diagonal. Rule R is evaluated before Rule S.
 
