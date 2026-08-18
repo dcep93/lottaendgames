@@ -22,7 +22,7 @@ Rule R applies when:
 - the side-edge distance is smaller than the rear-edge distance; and
 - a bishop controls a primary squeeze diagonal.
 
-Among legal White moves, Rule R first prefers moves whose resulting position controls that matching reflected secondary squeeze diagonal with one bishop while a distinct bishop retains control of the primary diagonal. This applies both when establishing the pair and when preserving an existing pair. Among satisfying moves, reuse king closer and then bishop distance as Rule R tie-breakers. Rule R does not stop evaluation when those tie-breakers remain tied.
+Among legal White moves, Rule R first prefers moves whose resulting position controls that matching reflected secondary squeeze diagonal with one bishop while a distinct bishop retains control of the primary diagonal. This applies both when establishing the pair and when preserving an existing pair. Among satisfying moves, reuse king closer and then bishop distance as Rule R tie-breakers. After those tie-breakers, stop evaluation at Rule R so later priorities preserve any remaining tie.
 
 ## Verification
 
