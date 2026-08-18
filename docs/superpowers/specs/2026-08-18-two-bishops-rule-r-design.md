@@ -20,13 +20,14 @@ Rule R applies when:
 
 - the kings are a knight's move apart;
 - the side-edge distance is smaller than the rear-edge distance; and
-- a bishop controls a primary squeeze diagonal while the matching reflected secondary is not already controlled.
+- a bishop controls a primary squeeze diagonal.
 
-Among legal White moves, Rule R prefers moves whose resulting position controls that matching reflected secondary squeeze diagonal with one bishop while a distinct bishop retains control of the primary diagonal. Rule R is evaluated before Rule S.
+Among legal White moves, Rule R prefers moves whose resulting position controls that matching reflected secondary squeeze diagonal with one bishop while a distinct bishop retains control of the primary diagonal. This applies both when establishing the pair and when preserving an existing pair. Rule R is evaluated before Rule S.
 
 ## Verification
 
 - Assert `Bc4` is preferred in the supplied position and Rule R explains it.
+- Assert a move along an already controlled primary diagonal retains Rule R credit while the other bishop preserves the reflected secondary.
 - Assert transformed positions behave identically under every board symmetry.
 - Assert Rule R does not apply when the side edge is not strictly closer.
 - Run the focused Two Bishops and presentation tests, build, lint, generated-asset checks, and locate/open a fresh strict Phase 1 loop.
