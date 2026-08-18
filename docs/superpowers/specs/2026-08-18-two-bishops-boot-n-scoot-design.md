@@ -32,10 +32,12 @@ The second outcome is the moat modifier.
 
 ### Take opposition
 
-When the kings are a knight's move apart, a White king move completes the
-second stage when it takes direct opposition and the resulting position has
-distinct bishops controlling the matching primary and secondary squeeze
-diagonals.
+When the kings are a knight's move apart, use squared Euclidean distance to
+identify the bishop closest to Black's king. The second stage is available
+when that bishop controls a diagonal adjacent to Black's king. A White king
+move completes the stage when it takes direct opposition while moving closer
+to that diagonal. This recognizes the position immediately after the scoot
+without also claiming the later Rule T position.
 
 In the supplied line, `Bg4` completes the bishop boot. After `...Kc2`, `Kc4`
 completes the opposition stage. After `...Kd2`, the existing Rule T selects
