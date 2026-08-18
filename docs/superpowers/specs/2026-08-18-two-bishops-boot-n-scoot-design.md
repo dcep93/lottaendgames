@@ -38,20 +38,21 @@ The second outcome is the moat modifier.
 
 When the kings are a knight's move apart, evaluate each legal White king move
 that takes direct opposition. Derive both squeeze bundles from the resulting
-opposition. The evaluator considers either bishop as the possible moat anchor
-and lets the squeeze geometry determine its role. The move completes this stage
-only when one candidate anchor controls the derived primary diagonal, the
-other bishop controls a derived secondary diagonal, and White's king moved
-closer to the anchored primary diagonal. Bishop edge placement and distance
-from White's king do not choose the anchor.
+opposition. The nearer-side squeeze geometry determines the moat anchor. The
+move completes this stage only when one bishop controls that geometry's primary
+diagonal, the other bishop controls a derived secondary diagonal, and White's
+king moved closer to the anchored primary diagonal. Bishop edge placement and
+distance from White's king do not choose the anchor.
 
 ### Block the escape
 
 When no scoot qualifies from a knight-separated position, derive the direct
-opposition created by the available White king move. If the anchored moat
-bishop instead controls a derived secondary diagonal, the block must move that
-bishop without checking and force every Black reply either into direct
-opposition or farther from the current King moat.
+opposition created by the available White king move. If a bishop instead
+controls the nearer-side geometry's secondary diagonal while the other bishop
+controls a derived primary diagonal, the position is the block stage rather
+than a reverse scoot. The block must be a nonchecking bishop move that forces
+every Black reply either into direct opposition or farther from the current
+King moat.
 
 In the supplied line, `Bg4` completes the bishop boot. After `...Kc2`, `Kc4`
 completes the scoot. After `...Kd2`, the anchored `a3` bishop switches from the
@@ -61,11 +62,6 @@ The waiting-bishop line behaves the same way: `Bh5` completes the boot,
 `Kc4` takes opposition after `...Kc2`, and `Bc5` blocks after `...Kd2`.
 Although h5 is also an edge square, it must not displace a3 as the qualifying
 primary-diagonal anchor.
-
-The earlier `Ke4` scoot in the second supplied line is eligible again because
-the side restriction belongs to the initial boot geometry, not the later king
-move. If its following position is loaded directly, the anchored `a5` bishop
-still defines the moat diagonal and `Bc7` remains the block move.
 
 ## Guide note and animation
 
@@ -99,7 +95,6 @@ GIF deterministically from a repository script.
   `boot scoot n block`.
 - Assert `Bh5`, `Kc4`, and `Bc5` are uniquely ideal in the supplied line, with
   every White move explained by `boot scoot n block`.
-- Assert `Ke4` and `Bc7` are uniquely ideal under `boot scoot n block`.
 - Assert an initial boot is accepted only when its controlled secondary
   squeeze diagonal is on the board-wall side nearer the opposed kings. In the
   supplied loop, `Bg3` is rejected because e-file kings are closer to the
