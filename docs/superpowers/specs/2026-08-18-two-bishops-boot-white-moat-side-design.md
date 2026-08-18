@@ -2,7 +2,7 @@
 
 ## Scope
 
-Update the initial applicability of `boot scoot n block` and its rendered description. Preserve the existing boot, scoot, block, moat-widening, nearer-side, symmetry, and all-phase behavior.
+Update the initial applicability of `boot scoot n block` and its rendered description. Preserve the existing boot, scoot, block, moat-widening, nearer-side, symmetry, and all-phase rule scope.
 
 Rendered text:
 
@@ -22,7 +22,7 @@ Add an inclusive signed projection check against the existing opposition-moat ge
 
 - Preserve the GIF's three best moves.
 - Add coverage for both bishops on White's side, a bishop exactly on the moat, and a bishop on Black's side.
-- Preserve translation/reflection/rotation coverage and Phase 2 behavior.
+- Preserve translation/reflection/rotation coverage and apply the same gate in Phase 2.
 - Verify the rendered text, targeted tests, lint, and build.
 
 ## Assumptions
