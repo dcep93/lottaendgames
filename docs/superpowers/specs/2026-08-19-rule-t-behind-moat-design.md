@@ -2,7 +2,7 @@
 
 ## Design
 
-Rule T will require its forcing bishop to start strictly on Black's side of the king moat. A bishop starting on the moat or White's side receives no Rule T credit. The existing moat-opposition forcing test remains unchanged.
+Rule T will require its forcing bishop to finish on the moat or behind it on White's side. A bishop crossing to Black's side receives no Rule T credit. The existing moat-opposition forcing test remains unchanged.
 
 The rendered text becomes: “When the kings are a knight's move apart, use a bishop from behind the moat to force the Black king to take moat opposition.”
 
@@ -15,4 +15,4 @@ The rendered text becomes: “When the kings are a knight's move apart, use a bi
 
 ## Assumption
 
-“From behind the moat” describes the bishop's origin square and means strictly on Black's side.
+“From behind the moat” describes the bishop's resulting square. The moat itself counts with White's side.
