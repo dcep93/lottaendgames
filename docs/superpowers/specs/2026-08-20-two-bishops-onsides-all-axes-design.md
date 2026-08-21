@@ -4,8 +4,8 @@
 
 > **onsides** — Move a bishop behind Black's king as close as possible to the square behind White's king from Black's king's perspective.
 
-Only a bishop starting on Black's side of every active king moat is offsides and eligible to move. Every preferred destination must finish on White's side of at least one active moat and must be safe from attack by Black's next king move. Among those destinations, prefer the smallest squared Euclidean distance to the square one step beyond White's king from Black's perspective. Aligned kings define a midpoint moat even outside the existing knight-step and opposition geometries. The rule is inactive when neither bishop starts offsides or no eligible bishop can reach a qualifying destination.
+A bishop is offsides only when it lies beyond Black away from White on every nonzero king-difference axis; equality with Black on an axis is allowed, and at least one axis must be strictly beyond Black. Prefer legal moves that minimize the resulting number of offsides bishops. When repairing an offsides bishop, require a safe destination and break ties by the smallest squared Euclidean distance to the square one step beyond White's king from Black's perspective. When no bishop starts offsides, the rule acts only as a preservation guard against moves that newly place a bishop offsides.
 
 ## Verification
 
-Add focused regressions for all-axis geometry, equal king differentials, and categorical rejection of destinations that remain offsides. Compile TypeScript and load a verified loop at `cursor=0`.
+Add focused regressions for all-axis geometry, equality with Black's coordinate, repair of an offsides bishop, and categorical rejection of moves that newly go offsides. Compile TypeScript and load a verified loop at `cursor=0`.
