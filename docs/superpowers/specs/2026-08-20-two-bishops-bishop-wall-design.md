@@ -10,7 +10,7 @@ The canonical example is the position after `Be4` from `8/8/5K2/8/6k1/3BB3/8/8 w
 
 ## Geometry
 
-Treat a position as a bishop wall when the bishops are adjacent, both bishops are within three king-steps of Black's king, and White's king is exactly two king-steps from Black's king. Black's king must remain off the edge. Accept either of these moat-facing shapes:
+Treat a position as a bishop wall when the bishops are adjacent, both bishops are within three king-steps of Black's king, at least one bishop is exactly two king-steps from Black's king, and White's king is exactly two king-steps from Black's king. Black's king must remain off the edge. Accept either of these moat-facing shapes:
 
 - One bishop is in two-square orthogonal opposition to Black's king, and the bishops' adjacency axis is perpendicular to that opposition axis.
 - The kings are in two-square orthogonal opposition, one bishop is on the midpoint king moat, and the other bishop is one square toward White along the axis perpendicular to the moat.
@@ -25,7 +25,7 @@ Add a note-board diagram titled `bishop wall` showing the supplied position afte
 
 ## Verification
 
-Add focused tests for the exact rule order and copy, unique selection of `Be4`, all rotations/reflections, a translated instance, the added `Kc5/Ke5/Bd3/Be3` king-moat shape, rejection of walls with either bishop more than three king-steps from Black, rejection of adjacent bishops with mismatched king geometry, and the generated diagram. Run only focused Two Bishops tests and a bounded direct policy check.
+Add focused tests for the exact rule order and copy, unique selection of `Be4`, all rotations/reflections, a translated instance, the added `Kc5/Ke5/Bd3/Be3` king-moat shape, rejection of walls with either bishop more than three king-steps from Black, rejection of walls whose bishops are both three king-steps from Black, rejection of adjacent bishops with mismatched king geometry, and the generated diagram. Run only focused Two Bishops tests and a bounded direct policy check.
 
 ## Assumptions
 
