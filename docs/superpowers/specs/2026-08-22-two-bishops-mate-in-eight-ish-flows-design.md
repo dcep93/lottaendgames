@@ -9,16 +9,18 @@ Represent every distinct Phase 2 `mate in 8 ish` move flow in both the move-sele
 - **A — main line:** the existing Phase 2 mate pattern.
 - **B — waiting cycle:** `Bf2, Kh3, Be1, Kh2`, returning to the Phase 2 start.
 - **C — king walk:** from `8/8/8/7B/7B/5K2/8/6k1 w - - 0 1`, play `Kg3, Kf1, Kh3, Kg1, Be2, Kh1`; move 4 is any bishop waiting move along `d8–h4`; Black plays `Kg1`; move 5 is the corresponding bishop check; Black plays `Kh1`; then `Bf3#`.
+- **D — early `…Kh1` deviation:** follow flow A through `Kf2`, then after Black deviates with `…Kh1`, play any accepted waiting move on `d8–h4` or `d1–h5`; Black returns with `…Kh2`, and the position rejoins the main Phase 2 pattern.
 
 All flows apply under board rotations and reflections.
 
 ## Training Info
 
-Render three separate chess-piece GIF note boards titled `mate in 8 ish A`, `mate in 8 ish B`, and `mate in 8 ish C`. Flow C uses one representative waiting move/check pair in its GIF and explains that all equivalent move-4 waiting choices share the same diagram.
+Render four separate chess-piece GIF note boards titled `mate in 8 ish A`, `mate in 8 ish B`, `mate in 8 ish C`, and `mate in 8 ish D`. Flows C and D each use one representative waiting move in their GIF and explain that equivalent waiting choices share that diagram.
 
 ## Validation
 
-- Test every accepted move in flows A, B, and C.
+- Test every accepted move in flows A, B, C, and D.
 - Test all four canonical move-4 waiting destinations in flow C and their continuing checks.
-- Confirm transformed starts expose the same three flow choices.
+- Test the accepted waiting destinations on both diagonals in flow D and their rejoining continuations.
+- Confirm transformed starts expose the same four flow choices.
 - Regenerate GIF assets and verify them byte-for-byte with the generator’s `--check` mode.
