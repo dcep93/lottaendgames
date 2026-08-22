@@ -15,7 +15,7 @@ Use the exact canonical lower-right pattern and every board rotation or reflecti
 - one White bishop on `h4`, screened by the White king;
 - the other White bishop anywhere on the `d1–h5` diagonal.
 
-In that position Rule B uniquely selects `Kh3`. The target `h3` lies two edge squares from the associated corner `h1`.
+In a legal instance of that position Rule B assigns its unique best score to `Kh3`. The target `h3` lies two edge squares from the associated corner `h1`. The `e2` placement remains highlighted as part of the conceptual diagonal even though it checks `f1` and therefore cannot occur with White to move. Existing earlier priorities, including `mate in 8 ish`, remain authoritative when they apply.
 
 Do not generalize the rule to every position where a king happens to screen a bishop. Translations do not apply.
 
@@ -29,7 +29,7 @@ Render the canonical screen position with chess pieces. Highlight the flexible `
 
 ## Verification
 
-- Prove `Kh3` is uniquely preferred in the canonical position for every legal placement of the flexible bishop on `d1–h5`.
+- Prove Rule B recognizes every flexible bishop placement on `d1–h5`, assigns `Kh3` its unique best score in legal instances, and separately prove full-policy selection where no earlier priority applies.
 - Prove all rotations and reflections choose the transformed king move.
 - Prove near misses do not activate Rule B.
 - Verify the active rule order, generated diagram, Phase 2 flows, TypeScript build, and diagram drift check.

@@ -221,6 +221,20 @@ export const TWO_BISHOPS_DIAGRAM_POSITIONS = {
       { square: 'h2', kind: 'pink' },
     ],
   },
+  ruleB: {
+    pieces: [
+      { square: 'f1', piece: 'k' },
+      { square: 'g3', piece: 'K' },
+      { square: 'h4', piece: 'B' },
+      { square: 'd1', piece: 'B' },
+    ],
+    highlights: [
+      ${['d1', 'e2', 'f3', 'g4', 'h5'].map((square) => `{ square: '${square}', kind: 'wall' },`).join('\n      ')}
+      { square: 'h1', kind: 'pink' },
+      { square: 'h3', kind: 'key' },
+    ],
+    arrow: { from: 'g3', to: 'h3' },
+  },
   ruleN: {
     fen: ${JSON.stringify(ruleNFen)},
     highlights: [

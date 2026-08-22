@@ -37,6 +37,7 @@ import {
 } from './twoBishopsWallGeometry'
 import { getTwoBishopsPhaseTwoPatternMoves } from './twoBishopsPhaseTwoPattern'
 import { evaluateRuleACornerCage } from './twoBishopsCornerCage'
+import { evaluateRuleBScreenPosition } from './twoBishopsScreenPosition'
 import {
   TWO_BISHOPS_PHASE_TWO_CANONICAL_MOVES,
   TWO_BISHOPS_PHASE_TWO_START_FEN,
@@ -60,6 +61,8 @@ export type TwoBishopsWhiteMoveScore = {
   readonly prepareMatePenalty: number
   readonly ruleAApplies: boolean
   readonly ruleAPenalty: number
+  readonly ruleBApplies: boolean
+  readonly ruleBPenalty: number
   readonly ruleNApplies: boolean
   readonly ruleNPenalty: number
   readonly ruleOApplies: boolean
@@ -582,6 +585,15 @@ const twoBishopsHelp: RuleHelp = {
       highlights: TWO_BISHOPS_DIAGRAM_POSITIONS.ruleA.highlights,
     },
     {
+      id: 'bishop-rule-b',
+      title: 'rule b',
+      caption:
+        'The flexible bishop may occupy any highlighted d1–h5 square. Move the screened king to h3, two edge squares from h1.',
+      pieces: TWO_BISHOPS_DIAGRAM_POSITIONS.ruleB.pieces,
+      highlights: TWO_BISHOPS_DIAGRAM_POSITIONS.ruleB.highlights,
+      arrows: [TWO_BISHOPS_DIAGRAM_POSITIONS.ruleB.arrow],
+    },
+    {
       id: 'bishop-rule-n',
       title: 'rule n',
       caption:
@@ -982,6 +994,7 @@ const twoBishopsHelp: RuleHelp = {
       'bishop-mate-in-eight-ish-j',
       'bishop-mate-in-eight-ish-k',
       'bishop-rule-a',
+      'bishop-rule-b',
       'bishop-rule-n',
     ].includes(board.id),
   ),
@@ -2850,6 +2863,8 @@ type TwoBishopsWhitePositionContext = {
   readonly prepareMatePreferredMoves: readonly string[]
   readonly ruleAApplies: boolean
   readonly ruleAPenaltiesBySan: ReadonlyMap<string, number>
+  readonly ruleBApplies: boolean
+  readonly ruleBPenaltiesBySan: ReadonlyMap<string, number>
   readonly ruleNPreferredMoves: readonly string[]
   readonly ruleOApplies: boolean
   readonly ruleOWallAreasBySan: ReadonlyMap<string, number>
@@ -4629,6 +4644,7 @@ function createTwoBishopsWhitePositionContext(
   )
   const prepareMatePreferredMoves = getTwoBishopsPhaseTwoPatternMoves(fen)
   const ruleAEvaluation = evaluateRuleACornerCage(fen)
+  const ruleBEvaluation = evaluateRuleBScreenPosition(fen)
   const ruleNPreferredMoves = getRuleNPreferredMoves(fen)
   const ruleOWallAreasBySan = new Map<string, number>()
   for (const move of getChess(fen).moves({ verbose: true })) {
@@ -4756,6 +4772,8 @@ function createTwoBishopsWhitePositionContext(
     prepareMatePreferredMoves,
     ruleAApplies: ruleAEvaluation.applies,
     ruleAPenaltiesBySan: ruleAEvaluation.penaltiesBySan,
+    ruleBApplies: ruleBEvaluation.applies,
+    ruleBPenaltiesBySan: ruleBEvaluation.penaltiesBySan,
     ruleNPreferredMoves,
     ruleOApplies: ruleOWallAreasBySan.size > 0,
     ruleOWallAreasBySan,
@@ -4821,6 +4839,8 @@ function scoreTwoBishopsWhiteMoveWithContext(
     prepareMatePreferredMoves,
     ruleAApplies,
     ruleAPenaltiesBySan,
+    ruleBApplies,
+    ruleBPenaltiesBySan,
     ruleNPreferredMoves,
     ruleOApplies,
     ruleOWallAreasBySan,
@@ -4976,6 +4996,8 @@ function scoreTwoBishopsWhiteMoveWithContext(
       : 1,
     ruleAApplies,
     ruleAPenalty: ruleAPenaltiesBySan.get(move.san) ?? 999,
+    ruleBApplies,
+    ruleBPenalty: ruleBPenaltiesBySan.get(move.san) ?? 999,
     ruleNApplies: ruleNPreferredMoves.length > 0,
     ruleNPenalty: ruleNPreferredMoves.includes(move.san) ? 0 : 1,
     ruleOApplies,
@@ -5333,6 +5355,15 @@ const twoBishopsWhiteRuleCatalog: readonly OrderedRule<TwoBishopsWhiteMoveScore>
     compare: (first, second) => first.ruleAPenalty - second.ruleAPenalty,
   },
   {
+    id: 'rule b',
+    shortLabel: 'rule b',
+    helpText:
+      'In the screen position, move the king to 2 edge squares from the corner.',
+    applies: (score) => score.ruleBApplies,
+    stopWhenBest: (score) => score.ruleBPenalty === 0,
+    compare: (first, second) => first.ruleBPenalty - second.ruleBPenalty,
+  },
+  {
     id: 'rule n',
     shortLabel: 'rule n',
     helpText:
@@ -5578,6 +5609,7 @@ const ACTIVE_TWO_BISHOPS_WHITE_RULE_IDS = [
   'no stalemate',
   'mate in 8 ish',
   'rule a',
+  'rule b',
   'rule n',
   'rule o',
   'king closer',
@@ -5621,6 +5653,8 @@ function scoreWhiteCandidates(
       prepareMatePenalty: 0,
       ruleAApplies: false,
       ruleAPenalty: 0,
+      ruleBApplies: false,
+      ruleBPenalty: 0,
       ruleNApplies: false,
       ruleNPenalty: 0,
       ruleOApplies: false,
