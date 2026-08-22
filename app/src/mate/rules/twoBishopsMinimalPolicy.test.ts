@@ -54,12 +54,13 @@ test('Two Bishops help renders the Phase 2 animation and Rule N diagram', () => 
       'bishop-mate-in-eight-ish-f',
       'bishop-mate-in-eight-ish-g',
       'bishop-mate-in-eight-ish-h',
+      'bishop-mate-in-eight-ish-i',
       'bishop-rule-n',
     ],
   )
   assert.deepEqual(
     twoBishopsRuleSet.help.noteBoards
-      .slice(0, 8)
+      .slice(0, 9)
       .map(({ title, animationFrames, animationSrc }) => ({
         title,
         frameCount: animationFrames?.length,
@@ -113,6 +114,12 @@ test('Two Bishops help renders the Phase 2 animation and Rule N diagram', () => 
         title: 'mate in 8 ish H',
         frameCount: 12,
         firstFen: '8/8/8/8/8/5K2/4B2k/4B3 w - - 0 1',
+        animationSrc: undefined,
+      },
+      {
+        title: 'mate in 8 ish I',
+        frameCount: 10,
+        firstFen: '8/8/8/8/8/5K2/8/3BB2k w - - 0 1',
         animationSrc: undefined,
       },
     ],
