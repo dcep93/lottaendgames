@@ -103,15 +103,19 @@ export type {
 } from './bishopKnight'
 
 export {
+  areBishopsOnWhiteSideOfOppositionMoat,
   compareTwoBishopsBlackScores,
   compareTwoBishopsWhiteScores,
   getIdealTwoBishopsBlackMoves,
   getIdealTwoBishopsWhiteMoves,
   getProximateBishopWall,
+  getTwoBishopsEdgeFlankSquares,
   getTwoBishopsDegenerateReasonLabel,
   getTwoBishopsMatingPositionSquares,
   getTwoBishopsPhaseLabel,
   isTwoBishopsPhaseTwoPosition,
+  isTwoBishopsCentralPieceSquare,
+  isTwoBishopsSquareBehindBlack,
   scoreTwoBishopsBlackMove,
   scoreTwoBishopsWhiteMove,
   TWO_BISHOPS_DEGENERATE_PRIORITY_ORDER,
@@ -175,6 +179,12 @@ function snapshotRuleHelp(help: RuleHelp): RuleHelp {
         id: board.id,
         title: board.title,
         caption: board.caption,
+        ...(board.animationSrc === undefined
+          ? {}
+          : { animationSrc: board.animationSrc }),
+        ...(board.animationAlt === undefined
+          ? {}
+          : { animationAlt: board.animationAlt }),
         ...(board.layout === undefined
           ? {}
           : { layout: Object.freeze({ ...board.layout }) }),

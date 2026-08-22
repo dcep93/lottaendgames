@@ -2,9 +2,9 @@
 
 ## Rule
 
-> **death box** — When possible, place a bishop in opposition with a king on the edge, next to a bishop that is a knight's move from the Black king. Unless Black is in the corner.
+> **death box** — When possible, place a bishop in opposition with a king on the edge, next to a bishop that is a knight's move from the Black king, but not a knight's move from the corner.
 
-Death box is inactive when Black occupies a corner before White moves. All existing opposition, knight-distance, bishop-adjacency, and non-corner edge behavior remains unchanged.
+The bishop placed in opposition must not be a knight's move from the corner nearest Black's king. All existing edge, opposition, Black-king knight-distance, and bishop-adjacency behavior remains unchanged.
 
 ## Verification
 

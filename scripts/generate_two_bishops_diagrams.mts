@@ -26,6 +26,9 @@ const ruleSFen = getChess(
 const ruleTFen = getChess(
   '8/7B/8/8/8/6k1/3BK3/8 w - - 10 6',
 ).fen()
+const kingStutterFen = getChess(
+  '8/8/5B2/4KB1k/8/8/8/8 w - - 2 2',
+).fen()
 const degeneratePhaseTwoOppositionFen = getChess(
   '6k1/1B6/4K3/8/3B4/8/8/8 w - - 0 1',
 ).fen()
@@ -95,6 +98,7 @@ const degenerateReformWallFen = getChess(
 for (const [label, fen] of [
   ['phase 2 wall', phaseTwoWallFen],
   ['shepherd', shepherdFen],
+  ['king stutter', kingStutterFen],
   ['degenerate phase 2 opposition', degeneratePhaseTwoOppositionFen],
   ['degenerate ignore light-squared bishop', degenerateIgnoreLightBishopFen],
   ['degenerate mate in 4', degenerateMateInFourFen],
@@ -183,6 +187,17 @@ export const TWO_BISHOPS_DIAGRAM_POSITIONS = {
       { square: 'g6', kind: 'zone' },
     ],
   },
+  edgeFlank: {
+    pieces: [
+      { square: 'g4', piece: 'K' },
+      { square: 'h6', piece: 'k' },
+    ],
+    highlights: [
+      { square: 'f5', kind: 'pink' },
+      { square: 'f7', kind: 'pink' },
+    ],
+    arrow: { from: 'g4', to: 'f5' },
+  },
   ruleW: {
     pieces: [
       { square: 'e3', piece: 'K' },
@@ -209,11 +224,16 @@ export const TWO_BISHOPS_DIAGRAM_POSITIONS = {
       { square: 'g5', kind: 'pink' },
     ],
   },
+  kingStutter: {
+    phase: '2/2',
+    fen: ${JSON.stringify(kingStutterFen)},
+    arrow: { from: 'e5', to: 'e4' },
+  },
   ruleS: {
     phase: '1/2',
     fen: ${JSON.stringify(ruleSFen)},
     highlights: [
-      ${['b8', 'c7', 'd6', 'e5', 'f4', 'g3', 'h2'].map((square) => `{ square: '${square}', kind: 'wall' },`).join('\n      ')}
+      ${['a6', 'b5', 'c4', 'd3', 'e2', 'f1'].map((square) => `{ square: '${square}', kind: 'wall' },`).join('\n      ')}
       ${['a8', 'b7', 'c6', 'd5', 'e4', 'f3', 'g2', 'h1'].map((square) => `{ square: '${square}', kind: 'zone' },`).join('\n      ')}
       ${['a7', 'b6', 'c5', 'd4', 'e3', 'f2', 'g1'].map((square) => `{ square: '${square}', kind: 'key' },`).join('\n      ')}
     ],
@@ -227,12 +247,13 @@ export const TWO_BISHOPS_DIAGRAM_POSITIONS = {
       { square: 'g3', kind: 'wall' },
       { square: 'h2', kind: 'wall' },
       { square: 'g1', kind: 'wall' },
-      { square: 'e4', kind: 'zone' },
-      { square: 'f3', kind: 'zone' },
-      { square: 'g2', kind: 'zone' },
-      { square: 'h1', kind: 'zone' },
-      { square: 'f1', kind: 'zone' },
+      { square: 'c8', kind: 'zone' },
+      { square: 'd7', kind: 'zone' },
+      { square: 'e6', kind: 'zone' },
+      { square: 'f5', kind: 'zone' },
+      { square: 'g4', kind: 'zone' },
       { square: 'h3', kind: 'zone' },
+      { square: 'h1', kind: 'zone' },
     ],
     arrow: { from: 'd2', to: 'f4' },
   },
@@ -403,6 +424,7 @@ if (check) {
 
 process.stdout.write(`phase 2 wall: ${phaseTwoWallFen}\n`)
 process.stdout.write(`shepherd: ${shepherdFen}\n`)
+process.stdout.write(`king stutter: ${kingStutterFen}\n`)
 process.stdout.write(
   `degenerate phase 2 opposition: ${degeneratePhaseTwoOppositionFen}\n`,
 )

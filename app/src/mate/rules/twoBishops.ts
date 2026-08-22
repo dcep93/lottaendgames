@@ -13,6 +13,7 @@ import {
   squareCoordinates,
   squareFromCoordinates,
   transformSquare,
+  withFenTurn,
 } from '../chess'
 import { compareScoresByRules, selectIdealMoves } from './selection'
 import {
@@ -43,6 +44,19 @@ export type TwoBishopsWhiteMoveScore = {
   readonly matePenalty: number
   readonly bishopSafetyPenalty: number
   readonly stalematePenalty: number
+  readonly prepareMateApplies: boolean
+  readonly prepareMatePenalty: number
+  readonly ruleGApplies: boolean
+  readonly ruleGPenalty: number
+  readonly centralPiecesPenalty: number
+  readonly edgeFlankApplies: boolean
+  readonly edgeFlankPenalty: number
+  readonly onsidesApplies: boolean
+  readonly onsidesPenalty: number
+  readonly bootNScootApplies: boolean
+  readonly bootNScootPenalty: number
+  readonly bootNScootReplyCount: number
+  readonly bootNScootUniqueBest: boolean
   readonly degenerateApplies: boolean
   readonly degeneratePenalty: number
   readonly degenerateTerminal: boolean
@@ -63,19 +77,46 @@ export type TwoBishopsWhiteMoveScore = {
   readonly bishopsOnBlackEdgeCount: number
   readonly forcePhaseTwoApplies: boolean
   readonly forcePhaseTwoPenalty: number
+  readonly ruleRApplies: boolean
+  readonly ruleRPenalty: number
   readonly ruleSApplies: boolean
   readonly ruleSPenalty: number
   readonly ruleTApplies: boolean
   readonly ruleTPenalty: number
   readonly ruleTReplyCount: number
+  readonly ruleUUApplies: boolean
+  readonly ruleUUPenalty: number
+  readonly ruleUApplies: boolean
+  readonly ruleUPenalty: number
   readonly ruleVApplies: boolean
   readonly ruleVPenalty: number
+  readonly ruleVSqueezeEdgeDistance: number
   readonly ruleWApplies: boolean
+  readonly ruleWUrgentPenalty: number
   readonly ruleWPenalty: number
-  readonly ruleWBishopMovePenalty: number
+  readonly ruleYApplies: boolean
+  readonly ruleYPenalty: number
+  readonly ruleZApplies: boolean
+  readonly ruleZPenalty: number
+  readonly ruleZ1Applies: boolean
+  readonly ruleZ1Penalty: number
+  readonly ruleZZPenalty: number
+  readonly deathBoxApplies: boolean
+  readonly deathBoxPenalty: number
+  readonly megadethBoxApplies: boolean
+  readonly megadethBoxPenalty: number
+  readonly ruleZ2Applies: boolean
+  readonly ruleZ2Penalty: number
+  readonly kingStutterApplies: boolean
+  readonly kingStutterPenalty: number
   readonly kingCloserPhaseTwoLinePenalty: number
   readonly kingCloserDistance: number
   readonly kingCloserMiddleSixteenDistance: number
+  readonly centralKingPenalty: number
+  readonly unscreenBishopsCount: number
+  readonly unclutteredBishopsApplies: boolean
+  readonly unclutteredBishopsPenalty: number
+  readonly bishopDistance: number
   readonly checkPenalty: number
   readonly clutteredBishopsCount: number
 }
@@ -93,7 +134,6 @@ const BLACK_INTRO =
   'Black uses its own priorities to put up the strongest resistance. Black is not trying to help the mate; it looks for the most stubborn legal reply.'
 
 const BOARD_CORNERS: readonly Square[] = ['a1', 'a8', 'h1', 'h8']
-
 type FlankDiagonalAxis = 'difference' | 'sum'
 
 type FlankDiagonal = {
@@ -230,7 +270,9 @@ const twoBishopsHelp: RuleHelp = {
     'Move toward the center.',
     'Move toward an unprotected bishop.',
   ],
-  notes: [],
+  notes: [
+    "Moat modifier means Black may widen the King moat instead of satisfying the rule's requested response.",
+  ],
   noteBoards: [
     {
       id: 'bishop-degenerate-phase-two-opposition',
@@ -540,6 +582,27 @@ const twoBishopsHelp: RuleHelp = {
       highlights: TWO_BISHOPS_DIAGRAM_POSITIONS.proximateWall.highlights,
     },
     {
+      id: 'bishop-edge-flank',
+      title: 'edge flank',
+      caption:
+        "Pink squares are White's diagonal flank targets for Black's edge square.",
+      layout: { files: 8, ranks: 8, fileOffset: 0 },
+      pieces: TWO_BISHOPS_DIAGRAM_POSITIONS.edgeFlank.pieces,
+      highlights: TWO_BISHOPS_DIAGRAM_POSITIONS.edgeFlank.highlights,
+      arrows: [TWO_BISHOPS_DIAGRAM_POSITIONS.edgeFlank.arrow],
+    },
+    {
+      id: 'bishop-boot-scoot-n-block',
+      title: 'boot scoot n block',
+      caption: 'Boot the king, scoot to opposition, then block the escape.',
+      animationSrc: '/mate/two-bishops/boot-n-scoot.gif',
+      animationAlt:
+        'Boot Scoot N Block progression: Bg4, Black king to c2, White king to c4, Black king to d2, then Bc5.',
+      layout: { files: 8, ranks: 8, fileOffset: 0 },
+      pieces: [],
+      highlights: [],
+    },
+    {
       id: 'bishop-rule-s',
       title: 'rule s',
       caption:
@@ -577,12 +640,26 @@ const twoBishopsHelp: RuleHelp = {
       pieces: TWO_BISHOPS_DIAGRAM_POSITIONS.ruleW.pieces,
       highlights: TWO_BISHOPS_DIAGRAM_POSITIONS.ruleW.highlights,
     },
+    {
+      id: 'bishop-king-stutter',
+      title: 'king stutter',
+      caption: 'Do the arrowed king stutter step.',
+      layout: { files: 8, ranks: 8, fileOffset: 0 },
+      pieces: noteBoardPieces(
+        TWO_BISHOPS_DIAGRAM_POSITIONS.kingStutter.fen,
+      ),
+      highlights: [],
+      arrows: [TWO_BISHOPS_DIAGRAM_POSITIONS.kingStutter.arrow],
+    },
   ].filter(({ id }) =>
     [
+      'bishop-edge-flank',
+      'bishop-boot-scoot-n-block',
       'bishop-rule-s',
       'bishop-rule-t',
       'bishop-rule-v',
       'bishop-rule-w',
+      'bishop-king-stutter',
     ].includes(id),
   ),
 }
@@ -991,6 +1068,7 @@ function bishopHasClearLineToSquareOnBoard(
   chess: ReturnType<typeof getChess>,
   bishop: Square,
   target: Square,
+  ignoredBlocker?: Square,
 ): boolean {
   if (!bishopIsAlignedWithSquare(bishop, target)) return false
   const source = squareCoordinates(bishop)
@@ -1001,7 +1079,9 @@ function bishopHasClearLineToSquareOnBoard(
   let rank = source.rank + rankStep
   while (file !== destination.file || rank !== destination.rank) {
     const square = squareFromCoordinates(file, rank)
-    if (!square || chess.get(square)) return false
+    if (!square || (square !== ignoredBlocker && chess.get(square))) {
+      return false
+    }
     file += fileStep
     rank += rankStep
   }
@@ -2339,61 +2419,43 @@ function getDegenerateRepair(
   return null
 }
 
-function hasBishopCheckmate(fen: string): boolean {
-  return getChess(fen)
-    .moves({ verbose: true })
-    .filter((move) => move.piece === 'b')
-    .some((move) => {
-      const afterMate = getChess(fen)
-      afterMate.move(move.san)
-      return afterMate.isCheckmate()
-    })
-}
-
-function checkForcesCornerThenBishopMate(
-  fenAfterCheck: string,
+function bishopCheckForcesCornerThenOtherBishopMate(
+  fen: string,
   corner: Square,
-): boolean {
-  const afterCheck = getChess(fenAfterCheck)
-  if (!afterCheck.isCheck()) return false
-  const replies = afterCheck.moves({ verbose: true })
-  if (
-    replies.length !== 1 ||
-    replies[0]?.piece !== 'k' ||
-    replies[0].to !== corner
-  ) {
-    return false
-  }
-  afterCheck.move(replies[0].san)
-  return hasBishopCheckmate(afterCheck.fen())
-}
-
-function quietMoveForcesMateInThree(
-  fenAfterQuietMove: string,
-  corner: Square,
-): boolean {
-  const afterQuietMove = getChess(fenAfterQuietMove)
-  if (afterQuietMove.isCheck()) return false
-  const replies = afterQuietMove.moves({ verbose: true })
-  const forcedEdgeReply = replies[0]
-  if (
-    replies.length !== 1 ||
-    forcedEdgeReply?.piece !== 'k' ||
-    kingDistance(forcedEdgeReply.to, corner) !== 1 ||
-    edgeDistance(forcedEdgeReply.to) !== 0 ||
-    BOARD_CORNERS.includes(forcedEdgeReply.to)
-  ) {
-    return false
-  }
-  afterQuietMove.move(forcedEdgeReply.san)
-  return afterQuietMove
+): readonly string[] {
+  const startingBishops = getWhiteBishopSquares(fen)
+  const chess = getChess(fen)
+  const checks = chess
     .moves({ verbose: true })
-    .filter((move) => move.piece === 'b')
-    .some((move) => {
-      const afterCheck = getChess(afterQuietMove.fen())
-      afterCheck.move(move.san)
-      return checkForcesCornerThenBishopMate(afterCheck.fen(), corner)
-    })
+    .filter((move) => move.piece === 'b' && move.san.endsWith('+'))
+  const forcingChecks: string[] = []
+  for (const move of checks) {
+    const matingBishop = startingBishops.find(
+      (bishop) => bishop !== move.from,
+    )
+    if (matingBishop === undefined) continue
+    chess.move(move.san)
+    const replies = chess.moves({ verbose: true })
+    if (
+      replies.length === 1 &&
+      replies[0]?.piece === 'k' &&
+      replies[0].to === corner
+    ) {
+      chess.move(replies[0].san)
+      const hasMate = chess
+        .moves({ verbose: true })
+        .some(
+          (mate) =>
+            mate.piece === 'b' &&
+            mate.from === matingBishop &&
+            mate.san.endsWith('#'),
+        )
+      chess.undo()
+      if (hasMate) forcingChecks.push(move.san)
+    }
+    chess.undo()
+  }
+  return forcingChecks
 }
 
 function getMatePatternTurnsBySan(
@@ -2409,12 +2471,33 @@ function getMatePatternTurnsBySan(
     BOARD_CORNERS.includes(blackKing) &&
     isMatingPosition(whiteKing, blackKing)
   ) {
+    const chess = getChess(fen)
     for (const move of legalMoves) {
-      const afterQuietMove = getChess(fen)
-      afterQuietMove.move(move.san)
-      if (quietMoveForcesMateInThree(afterQuietMove.fen(), blackKing)) {
+      if (move.san.endsWith('+') || move.san.endsWith('#')) continue
+      chess.move(move.san)
+      const replies = chess.moves({ verbose: true })
+      const forcedEdgeReply = replies[0]
+      if (
+        replies.length !== 1 ||
+        forcedEdgeReply?.piece !== 'k' ||
+        kingDistance(forcedEdgeReply.to, blackKing) !== 1 ||
+        edgeDistance(forcedEdgeReply.to) !== 0 ||
+        BOARD_CORNERS.includes(forcedEdgeReply.to)
+      ) {
+        chess.undo()
+        continue
+      }
+      chess.move(forcedEdgeReply.san)
+      if (
+        bishopCheckForcesCornerThenOtherBishopMate(
+          chess.fen(),
+          blackKing,
+        ).length > 0
+      ) {
         turnsBySan.set(move.san, 3)
       }
+      chess.undo()
+      chess.undo()
     }
   }
 
@@ -2424,16 +2507,9 @@ function getMatePatternTurnsBySan(
       edgeDistance(blackKing) === 0 &&
       isMatingPosition(whiteKing, corner),
   )
-  for (const move of legalMoves) {
-    if (move.piece !== 'b') continue
-    const afterCheck = getChess(fen)
-    afterCheck.move(move.san)
-    if (
-      proximateCorners.some((corner) =>
-        checkForcesCornerThenBishopMate(afterCheck.fen(), corner),
-      )
-    ) {
-      turnsBySan.set(move.san, 2)
+  for (const corner of proximateCorners) {
+    for (const san of bishopCheckForcesCornerThenOtherBishopMate(fen, corner)) {
+      turnsBySan.set(san, 2)
     }
   }
   return turnsBySan
@@ -2448,10 +2524,180 @@ type TwoBishopsWhitePositionContext = {
   readonly mateInThreeApplies: boolean
   readonly matePatternTurnsBySan: ReadonlyMap<string, 2 | 3>
   readonly shepherdMoves: readonly string[]
+  readonly prepareMatePreferredMoves: readonly string[]
+  readonly ruleGPreferredMoves: readonly string[]
+  readonly onsidesPreferredMoves: readonly string[]
+  readonly bootNScootPreferredMoves: readonly string[]
+  readonly bootNScootUniqueBest: boolean
+  readonly ruleRPreferredMoves: readonly string[]
   readonly ruleSPreferredMoves: readonly string[]
   readonly ruleTGeometry: RuleTGeometry | null
-  readonly ruleVSqueezeGeometries: readonly SqueezeGeometry[]
-  readonly ruleWFlankDiagonalPairs: readonly FlankDiagonalPair[]
+  readonly ruleUUPreferredMoves: readonly string[]
+  readonly ruleUPreferredMoves: readonly string[]
+  readonly ruleVMatchingGeometriesBySan: ReadonlyMap<
+    string,
+    readonly SqueezeGeometry[]
+  >
+  readonly ruleWApplies: boolean
+  readonly ruleWUrgentSetup: boolean
+  readonly ruleWUrgentDiagonal: FlankDiagonal | undefined
+  readonly ruleWPenaltiesBySan: ReadonlyMap<string, number>
+  readonly ruleYThreatenedBishops: readonly Square[]
+  readonly deathBoxPreferredMoves: readonly string[]
+  readonly preserveExistingMegadethBox: boolean
+  readonly megadethBoxPreferredMoves: readonly string[]
+  readonly ruleZ1PreferredMoves: readonly string[]
+  readonly ruleZ2CompletedPairs: readonly FlankDiagonalPair[]
+  readonly kingStutterPreferredMoves: readonly string[]
+}
+
+function getKingStutterPreferredMoves(fen: string): readonly string[] {
+  const blackKing = findPiece(fen, 'b', 'k')?.square
+  const whiteKing = findPiece(fen, 'w', 'k')?.square
+  const bishops = getWhiteBishopSquares(fen)
+  if (
+    blackKing === undefined ||
+    whiteKing === undefined ||
+    bishops.length !== 2 ||
+    edgeDistance(blackKing) !== 0
+  ) {
+    return []
+  }
+  const bishopSet = new Set(bishops)
+  const legalMoves = getChess(fen).moves({ verbose: true })
+  const preferred = new Set<string>()
+
+  for (const transform of SQUARE_TRANSFORMS) {
+    const transformedBlack = squareCoordinates(
+      transformSquare('h5', transform),
+    )
+    const actualBlack = squareCoordinates(blackKing)
+    const fileTranslation = actualBlack.file - transformedBlack.file
+    const rankTranslation = actualBlack.rank - transformedBlack.rank
+    const translate = (square: Square): Square | null => {
+      const transformed = squareCoordinates(
+        transformSquare(square, transform),
+      )
+      return squareFromCoordinates(
+        transformed.file + fileTranslation,
+        transformed.rank + rankTranslation,
+      )
+    }
+    const expectedWhiteKing = translate('e5')
+    const firstBishop = translate('f5')
+    const secondBishop = translate('f6')
+    const target = translate('e4')
+    if (
+      expectedWhiteKing === null ||
+      firstBishop === null ||
+      secondBishop === null ||
+      target === null ||
+      whiteKing !== expectedWhiteKing ||
+      !bishopSet.has(firstBishop) ||
+      !bishopSet.has(secondBishop)
+    ) {
+      continue
+    }
+    const move = legalMoves.find(
+      (candidate) =>
+        candidate.piece === 'k' &&
+        candidate.from === whiteKing &&
+        candidate.to === target,
+    )
+    if (move !== undefined) preferred.add(move.san)
+  }
+
+  return [...preferred]
+}
+
+function isDeathBoxPosition(fen: string): boolean {
+  const blackKing = findPiece(fen, 'b', 'k')?.square
+  const bishops = getWhiteBishopSquares(fen)
+  if (
+    blackKing === undefined ||
+    edgeDistance(blackKing) !== 0 ||
+    bishops.length !== 2
+  ) {
+    return false
+  }
+  const closestCornerDistance = Math.min(
+    ...BOARD_CORNERS.map((corner) => kingDistance(blackKing, corner)),
+  )
+  const closestCorners = BOARD_CORNERS.filter(
+    (corner) => kingDistance(blackKing, corner) === closestCornerDistance,
+  )
+  return bishops.some(
+    (oppositionBishop, index) =>
+      isInOpposition(oppositionBishop, blackKing, 1) &&
+      edgeDistance(oppositionBishop) !== 0 &&
+      !closestCorners.some((corner) =>
+        isKnightMove(oppositionBishop, corner),
+      ) &&
+      bishops.some(
+        (knightBishop, otherIndex) =>
+          otherIndex !== index &&
+          edgeDistance(knightBishop) !== 0 &&
+          isKnightMove(knightBishop, blackKing) &&
+          kingDistance(oppositionBishop, knightBishop) === 1,
+      ),
+  )
+}
+
+function getDeathBoxPreferredMoves(fen: string): readonly string[] {
+  const preserveExistingDeathBox = isDeathBoxPosition(fen)
+  return getChess(fen)
+    .moves({ verbose: true })
+    .filter((move) => preserveExistingDeathBox || move.piece === 'b')
+    .filter((move) => {
+      const result = getChess(fen)
+      result.move(move.san)
+      return isDeathBoxPosition(result.fen())
+    })
+    .map((move) => move.san)
+}
+
+function getInwardEdgeAdjacentSquares(blackKing: Square): readonly Square[] {
+  const { file, rank } = squareCoordinates(blackKing)
+  return [
+    file === 0 ? squareFromCoordinates(1, rank) : null,
+    file === 7 ? squareFromCoordinates(6, rank) : null,
+    rank === 0 ? squareFromCoordinates(file, 1) : null,
+    rank === 7 ? squareFromCoordinates(file, 6) : null,
+  ].filter((square): square is Square => square !== null)
+}
+
+function isMegadethBoxPosition(fen: string): boolean {
+  const blackKing = findPiece(fen, 'b', 'k')?.square
+  const bishops = getWhiteBishopSquares(fen)
+  if (blackKing === undefined || bishops.length !== 2) return false
+  const inwardSquares = getInwardEdgeAdjacentSquares(blackKing)
+  if (inwardSquares.length === 0) return false
+  return bishops.some(
+    (controller, controllerIndex) =>
+      inwardSquares.some((inwardSquare) =>
+        bishopHasClearLineToSquare(fen, controller, inwardSquare),
+      ) &&
+      bishops.some(
+        (oppositionBishop, oppositionIndex) =>
+          oppositionIndex !== controllerIndex &&
+          distanceToMiddleSixteen(oppositionBishop) === 0 &&
+          isInOpposition(oppositionBishop, blackKing, 1) &&
+          kingDistance(controller, oppositionBishop) === 1,
+      ),
+  )
+}
+
+function getMegadethBoxPreferredMoves(fen: string): readonly string[] {
+  const preserveExistingMegadethBox = isMegadethBoxPosition(fen)
+  return getChess(fen)
+    .moves({ verbose: true })
+    .filter((move) => preserveExistingMegadethBox || move.piece === 'b')
+    .filter((move) => {
+      const result = getChess(fen)
+      result.move(move.san)
+      return isMegadethBoxPosition(result.fen())
+    })
+    .map((move) => move.san)
 }
 
 function squeezeProjection(
@@ -2462,13 +2708,48 @@ function squeezeProjection(
   return file * geometry.normalFile + rank * geometry.normalRank
 }
 
+function bishopsControlMatchedSqueezeRoles(
+  bishops: readonly Square[],
+  geometry: SqueezeGeometry,
+  firstIndex: number,
+  secondIndex: number,
+): boolean {
+  return bishops.some(
+    (firstBishop, firstBishopIndex) =>
+      squeezeProjection(firstBishop, geometry) === firstIndex &&
+      bishops.some(
+        (secondBishop, secondBishopIndex) =>
+          secondBishopIndex !== firstBishopIndex &&
+          squeezeProjection(secondBishop, geometry) === secondIndex,
+      ),
+  )
+}
+
+function getPrepareMatePreferredMoves(
+  whiteKing: Square | undefined,
+  blackKing: Square | undefined,
+  matePatternTurnsBySan: ReadonlyMap<string, 2 | 3>,
+): readonly string[] {
+  const hasMateInTwo = [...matePatternTurnsBySan.values()].includes(2)
+  if (
+    whiteKing === undefined ||
+    blackKing === undefined ||
+    !BOARD_CORNERS.some(
+      (corner) =>
+        manhattanDistance(blackKing, corner) <= 1 &&
+        (isKnightMove(whiteKing, corner) || hasMateInTwo),
+    )
+  ) {
+    return []
+  }
+  return [...matePatternTurnsBySan.keys()]
+}
+
 function getRuleTGeometry(
   whiteKing: Square | undefined,
   blackKing: Square | undefined,
-  isPhaseTwo: boolean,
 ): RuleTGeometry | null {
   if (
-    isPhaseTwo ||
     whiteKing === undefined ||
     blackKing === undefined ||
     !isKnightMove(whiteKing, blackKing)
@@ -2498,6 +2779,38 @@ function distanceFromKingMoat(
   const coordinate =
     geometry.axis === 'file' ? coordinates.file : coordinates.rank
   return Math.abs(coordinate - geometry.index)
+}
+
+function isSquareBehindWhiteKingFromBlackPerspective(
+  square: Square,
+  whiteKing: Square,
+  blackKing: Square,
+): boolean {
+  const white = squareCoordinates(whiteKing)
+  const black = squareCoordinates(blackKing)
+  const target = squareCoordinates(square)
+  const fileDelta = white.file - black.file
+  const rankDelta = white.rank - black.rank
+  if (Math.abs(fileDelta) > Math.abs(rankDelta)) {
+    return Math.sign(target.file - white.file) === Math.sign(fileDelta)
+  }
+  return Math.sign(target.rank - white.rank) === Math.sign(rankDelta)
+}
+
+function forcesMoatOpposition(
+  whiteKing: Square,
+  blackReplyKings: readonly Square[],
+  geometry: RuleTGeometry,
+): boolean {
+  return (
+    blackReplyKings.length > 0 &&
+    blackReplyKings.every(
+      (replyKing) =>
+        isInOpposition(whiteKing, replyKing, 1) ||
+        distanceFromKingMoat(replyKing, geometry) >
+          geometry.startingBlackDistance,
+    )
+  )
 }
 
 function getSqueezeGeometries(
@@ -2533,12 +2846,951 @@ function getSqueezeGeometries(
       normalFile,
       normalRank,
       primaryIndex: whiteProjection + 3,
-      secondaryIndex: whiteProjection + 2,
+      secondaryIndex: whiteProjection + 4,
     }
   })
 }
 
-function getSqueezeDiagonalSquares(
+function getOppositionMoatGeometry(
+  whiteKing: Square,
+  blackKing: Square,
+): RuleTGeometry | null {
+  if (!isInOpposition(whiteKing, blackKing, 1)) return null
+  const white = squareCoordinates(whiteKing)
+  const black = squareCoordinates(blackKing)
+  const axis = white.file === black.file ? 'rank' : 'file'
+  const index =
+    axis === 'file'
+      ? (white.file + black.file) / 2
+      : (white.rank + black.rank) / 2
+  const blackCoordinate = axis === 'file' ? black.file : black.rank
+  return {
+    axis,
+    index,
+    startingBlackDistance: Math.abs(blackCoordinate - index),
+  }
+}
+
+function getBishopDistanceMoatGeometries(
+  whiteKing: Square,
+  blackKing: Square,
+): readonly RuleTGeometry[] {
+  const singleMoat =
+    getRuleTGeometry(whiteKing, blackKing) ??
+    getOppositionMoatGeometry(whiteKing, blackKing)
+  if (singleMoat !== null) return [singleMoat]
+
+  const white = squareCoordinates(whiteKing)
+  const black = squareCoordinates(blackKing)
+  if (
+    Math.abs(white.file - black.file) !== 2 ||
+    Math.abs(white.rank - black.rank) !== 2
+  ) {
+    return []
+  }
+
+  return [
+    {
+      axis: 'file',
+      index: (white.file + black.file) / 2,
+      startingBlackDistance: 1,
+    },
+    {
+      axis: 'rank',
+      index: (white.rank + black.rank) / 2,
+      startingBlackDistance: 1,
+    },
+  ]
+}
+
+function signedWhiteSideDistanceFromMoat(
+  square: Square,
+  whiteKing: Square,
+  moat: RuleTGeometry,
+): number {
+  const white = squareCoordinates(whiteKing)
+  const target = squareCoordinates(square)
+  const whiteCoordinate = moat.axis === 'file' ? white.file : white.rank
+  const targetCoordinate = moat.axis === 'file' ? target.file : target.rank
+  return (
+    Math.sign(whiteCoordinate - moat.index) *
+    (targetCoordinate - moat.index)
+  )
+}
+
+function getRuleGPreferredMoves(
+  fen: string,
+  whiteKing: Square | undefined,
+  blackKing: Square | undefined,
+): readonly string[] {
+  if (whiteKing === undefined || blackKing === undefined) return []
+  const bishops = getWhiteBishopSquares(fen)
+  if (bishops.length !== 2) return []
+  const moats = getBishopDistanceMoatGeometries(whiteKing, blackKing)
+  if (moats.length === 0) return []
+  const legalMoves = getChess(fen).moves({ verbose: true })
+  const preferred = new Set<string>()
+  const blackSideBishops = bishops.filter((bishop) =>
+    moats.every(
+      (moat) =>
+        signedWhiteSideDistanceFromMoat(bishop, whiteKing, moat) < 0,
+    ),
+  )
+  if (blackSideBishops.length === 0) return []
+  const greatestWhiteDistance = Math.max(
+    ...blackSideBishops.map((bishop) => kingDistance(bishop, whiteKing)),
+  )
+  const selectedBishops = blackSideBishops.filter(
+    (bishop) => kingDistance(bishop, whiteKing) === greatestWhiteDistance,
+  )
+  const black = squareCoordinates(blackKing)
+
+  for (const moat of moats) {
+    const crossings = legalMoves.filter(
+      (move) => {
+        if (
+          move.piece !== 'b' ||
+          !selectedBishops.includes(move.from) ||
+          signedWhiteSideDistanceFromMoat(move.to, whiteKing, moat) <= 0
+        ) {
+          return false
+        }
+        const origin = squareCoordinates(move.from)
+        const destination = squareCoordinates(move.to)
+        return (
+          Math.abs(destination.file - black.file) >=
+            Math.abs(origin.file - black.file) &&
+          Math.abs(destination.rank - black.rank) >=
+            Math.abs(origin.rank - black.rank)
+        )
+      },
+    )
+    if (crossings.length === 0) continue
+    const greatestMoatDistance = Math.max(
+      ...crossings.map((move) => distanceFromKingMoat(move.to, moat)),
+    )
+    for (const move of crossings) {
+      if (distanceFromKingMoat(move.to, moat) === greatestMoatDistance) {
+        preferred.add(move.san)
+      }
+    }
+  }
+
+  return [...preferred]
+}
+
+function getRuleZFollowupTarget(
+  whiteKing: Square,
+  blackKing: Square,
+): Square | null {
+  const black = squareCoordinates(blackKing)
+  for (const corner of BOARD_CORNERS) {
+    if (!isKnightMove(whiteKing, corner)) continue
+    const cornerCoordinates = squareCoordinates(corner)
+    const fileStep = black.file - cornerCoordinates.file
+    const rankStep = black.rank - cornerCoordinates.rank
+    if (
+      !(
+        (Math.abs(fileStep) === 1 && rankStep === 0) ||
+        (fileStep === 0 && Math.abs(rankStep) === 1)
+      )
+    ) {
+      continue
+    }
+    return squareFromCoordinates(
+      cornerCoordinates.file + fileStep * 2,
+      cornerCoordinates.rank + rankStep * 2,
+    )
+  }
+  return null
+}
+
+export function areBishopsOnWhiteSideOfOppositionMoat(
+  whiteKing: Square,
+  blackKing: Square,
+  bishops: readonly Square[],
+): boolean {
+  const moat = getOppositionMoatGeometry(whiteKing, blackKing)
+  return (
+    moat !== null &&
+    areBishopsOnWhiteSideOfMoat(whiteKing, bishops, moat)
+  )
+}
+
+function isSquareOnWhiteSideOfMoat(
+  square: Square,
+  whiteKing: Square,
+  moat: RuleTGeometry,
+): boolean {
+  const white = squareCoordinates(whiteKing)
+  const whiteCoordinate =
+    moat.axis === 'file' ? white.file : white.rank
+  const coordinates = squareCoordinates(square)
+  const squareCoordinate =
+    moat.axis === 'file' ? coordinates.file : coordinates.rank
+  return (
+    Math.sign(whiteCoordinate - moat.index) *
+      (squareCoordinate - moat.index) >=
+    0
+  )
+}
+
+function areBishopsOnWhiteSideOfMoat(
+  whiteKing: Square,
+  bishops: readonly Square[],
+  moat: RuleTGeometry,
+): boolean {
+  if (bishops.length !== 2) return false
+  return bishops.every((bishop) =>
+    isSquareOnWhiteSideOfMoat(bishop, whiteKing, moat),
+  )
+}
+
+function getOnsidesPreferredMoves(
+  fen: string,
+  whiteKing: Square | undefined,
+  blackKing: Square | undefined,
+): readonly string[] {
+  if (whiteKing === undefined || blackKing === undefined) return []
+  const startingBishops = getWhiteBishopSquares(fen)
+  const startingOffsides = startingBishops.filter((bishop) =>
+    isTwoBishopsSquareOffsides(bishop, whiteKing, blackKing),
+  )
+  const legalMoves = getChess(fen).moves({ verbose: true })
+  const resultOffsidesCounts = new Map<string, number>()
+  for (const move of legalMoves) {
+    const result = getChess(fen)
+    result.move(move.san)
+    const resultWhiteKing = findPiece(result.fen(), 'w', 'k')?.square
+    const resultBlackKing = findPiece(result.fen(), 'b', 'k')?.square
+    const count =
+      resultWhiteKing === undefined || resultBlackKing === undefined
+        ? Number.POSITIVE_INFINITY
+        : getWhiteBishopSquares(result.fen()).filter((bishop) =>
+            isTwoBishopsSquareOffsides(
+              bishop,
+              resultWhiteKing,
+              resultBlackKing,
+            ),
+          ).length
+    resultOffsidesCounts.set(move.san, count)
+  }
+  if (startingOffsides.length === 0) {
+    const bishopMoves = legalMoves.filter((move) => move.piece === 'b')
+    const hasWorseningMove = bishopMoves.some(
+      (move) => (resultOffsidesCounts.get(move.san) ?? 0) > 0,
+    )
+    return hasWorseningMove
+      ? legalMoves
+          .filter(
+            (move) =>
+              move.piece !== 'b' ||
+              resultOffsidesCounts.get(move.san) === 0,
+          )
+          .map(({ san }) => san)
+      : []
+  }
+
+  const eligibleRepairs = legalMoves.filter(
+    (move) =>
+      move.piece === 'b' && startingOffsides.includes(move.from),
+  )
+  const minimumResultCount = Math.min(
+    ...eligibleRepairs.map(
+      (move) =>
+        resultOffsidesCounts.get(move.san) ?? Number.POSITIVE_INFINITY,
+    ),
+  )
+  if (minimumResultCount >= startingOffsides.length) return []
+  const white = squareCoordinates(whiteKing)
+  const black = squareCoordinates(blackKing)
+  const fileDirection = Math.sign(white.file - black.file)
+  const rankDirection = Math.sign(white.rank - black.rank)
+  const behindWhite = squareFromCoordinates(
+    white.file + fileDirection,
+    white.rank + rankDirection,
+  )
+  if (behindWhite === null) return []
+  const behind = squareCoordinates(behindWhite)
+  const repairMoves = eligibleRepairs
+    .filter(
+      (move) =>
+        resultOffsidesCounts.get(move.san) === minimumResultCount,
+    )
+    .filter(
+      (move) =>
+        !bishopDestinationCanBeAttackedOnNextMove(
+          fen,
+          move.san,
+          move.to,
+        ),
+    )
+  if (repairMoves.length === 0) return []
+  const targetDistance = (square: Square) => {
+    const target = squareCoordinates(square)
+    return (
+      (target.file - behind.file) ** 2 +
+      (target.rank - behind.rank) ** 2
+    )
+  }
+  const closestDistance = Math.min(
+    ...repairMoves.map((move) => targetDistance(move.to)),
+  )
+  return repairMoves
+    .filter((move) => targetDistance(move.to) === closestDistance)
+    .map(({ san }) => san)
+}
+
+function isTwoBishopsSquareOffsides(
+  square: Square,
+  whiteKing: Square,
+  blackKing: Square,
+): boolean {
+  const white = squareCoordinates(whiteKing)
+  const black = squareCoordinates(blackKing)
+  const target = squareCoordinates(square)
+  const projections: number[] = []
+  if (white.file !== black.file) {
+    projections.push(
+      Math.sign(white.file - black.file) *
+        (target.file - black.file),
+    )
+  }
+  if (white.rank !== black.rank) {
+    projections.push(
+      Math.sign(white.rank - black.rank) *
+        (target.rank - black.rank),
+    )
+  }
+  return (
+    projections.length > 0 &&
+    projections.every((projection) => projection <= 0) &&
+    projections.some((projection) => projection < 0)
+  )
+}
+
+function bishopDestinationCanBeAttackedOnNextMove(
+  fen: string,
+  san: string,
+  destination: Square,
+): boolean {
+  const result = getChess(fen)
+  result.move(san)
+  return result.moves({ verbose: true }).some(
+    (reply) =>
+      reply.piece === 'k' &&
+      kingDistance(reply.to, destination) <= 1,
+  )
+}
+
+function getOnsidesMoatGeometries(
+  whiteKing: Square,
+  blackKing: Square,
+): readonly RuleTGeometry[] {
+  const existing = getBishopDistanceMoatGeometries(
+    whiteKing,
+    blackKing,
+  )
+  if (existing.length > 0) return existing
+
+  const white = squareCoordinates(whiteKing)
+  const black = squareCoordinates(blackKing)
+  if (white.rank === black.rank && white.file !== black.file) {
+    return [
+      {
+        axis: 'file',
+        index: (white.file + black.file) / 2,
+        startingBlackDistance: Math.abs(black.file - white.file) / 2,
+      },
+    ]
+  }
+  if (white.file === black.file && white.rank !== black.rank) {
+    return [
+      {
+        axis: 'rank',
+        index: (white.rank + black.rank) / 2,
+        startingBlackDistance: Math.abs(black.rank - white.rank) / 2,
+      },
+    ]
+  }
+  return []
+}
+
+export function isTwoBishopsSquareBehindBlack(
+  square: Square,
+  whiteKing: Square,
+  blackKing: Square,
+): boolean {
+  const white = squareCoordinates(whiteKing)
+  const black = squareCoordinates(blackKing)
+  const target = squareCoordinates(square)
+  const fileDelta = Math.abs(white.file - black.file)
+  const rankDelta = Math.abs(white.rank - black.rank)
+  const behindFile =
+    fileDelta > 0 &&
+    Math.sign(white.file - black.file) *
+      (target.file - black.file) <
+      0
+  const behindRank =
+    rankDelta > 0 &&
+    Math.sign(white.rank - black.rank) *
+      (target.rank - black.rank) <
+      0
+
+  if (fileDelta === 0) return behindRank
+  if (rankDelta === 0) return behindFile
+  if (fileDelta < rankDelta) {
+    return behindFile && target.rank === black.rank
+  }
+  if (rankDelta < fileDelta) {
+    return behindRank && target.file === black.file
+  }
+  return false
+}
+
+function hasTwoBishopsBehindBlackRegion(
+  whiteKing: Square,
+  blackKing: Square,
+): boolean {
+  for (let file = 0; file < 8; file += 1) {
+    for (let rank = 0; rank < 8; rank += 1) {
+      const square = squareFromCoordinates(file, rank)
+      if (
+        square !== null &&
+        isTwoBishopsSquareBehindBlack(square, whiteKing, blackKing)
+      ) {
+        return true
+      }
+    }
+  }
+  return false
+}
+
+function hasTiedNonzeroKingDifferentials(
+  whiteKing: Square,
+  blackKing: Square,
+): boolean {
+  const white = squareCoordinates(whiteKing)
+  const black = squareCoordinates(blackKing)
+  const fileDelta = Math.abs(white.file - black.file)
+  const rankDelta = Math.abs(white.rank - black.rank)
+  return fileDelta > 0 && fileDelta === rankDelta
+}
+
+function isSqueezeGeometryOnNearerKingSide(
+  whiteKing: Square,
+  blackKing: Square,
+  geometry: SqueezeGeometry,
+): boolean {
+  const white = squareCoordinates(whiteKing)
+  const black = squareCoordinates(blackKing)
+
+  if (white.file === black.file) {
+    const nearerFileDirection = white.file < 3.5 ? -1 : 1
+    return geometry.normalFile === nearerFileDirection
+  }
+  if (white.rank === black.rank) {
+    const nearerRankDirection = white.rank < 3.5 ? -1 : 1
+    return geometry.normalRank === nearerRankDirection
+  }
+  return false
+}
+
+function getBootNScootBlockMoves(
+  fen: string,
+  whiteKing: Square,
+  blackKing: Square,
+  bishops: readonly Square[],
+): readonly string[] {
+  if (!isKnightMove(whiteKing, blackKing)) return []
+  const legalMoves = getChess(fen).moves({ verbose: true })
+  const oppositionBundles = legalMoves
+    .filter(
+      (move) =>
+        move.piece === 'k' &&
+        isInOpposition(move.to, blackKing, 1),
+    )
+    .map((move) => ({
+      move,
+      geometries: getSqueezeGeometries(move.to, blackKing),
+    }))
+  const blockAnchors = oppositionBundles.flatMap(
+    ({ move, geometries }) => {
+      const secondaryGeometry = geometries.find((geometry) =>
+        isSqueezeGeometryOnNearerKingSide(
+          move.to,
+          blackKing,
+          geometry,
+        ),
+      )
+      if (secondaryGeometry === undefined) return []
+      return bishops.filter(
+        (anchor) =>
+          squeezeProjection(anchor, secondaryGeometry) ===
+            secondaryGeometry.secondaryIndex &&
+          geometries.some((primaryGeometry) =>
+            bishops.some(
+              (primary) =>
+                primary !== anchor &&
+                squeezeProjection(primary, primaryGeometry) ===
+                  primaryGeometry.primaryIndex,
+            ),
+          ),
+      )
+    },
+  )
+  const knightMoat = getRuleTGeometry(whiteKing, blackKing)
+  if (blockAnchors.length === 0 || knightMoat === null) return []
+
+  return legalMoves
+    .filter((move) => {
+      if (move.piece !== 'b') return false
+      const result = getChess(fen)
+      result.move(move.san)
+      return (
+        !result.isCheck() &&
+        forcesMoatOpposition(
+          whiteKing,
+          result.moves({ verbose: true }).map(({ to }) => to),
+          knightMoat,
+        )
+      )
+    })
+    .map((move) => move.san)
+}
+
+function getBootNScootScootMoves(
+  fen: string,
+  whiteKing: Square,
+  blackKing: Square,
+  bishops: readonly Square[],
+): readonly string[] {
+  if (!isKnightMove(whiteKing, blackKing)) return []
+  const knightMoat = getRuleTGeometry(whiteKing, blackKing)
+  if (knightMoat === null) return []
+  const oppositionBundles = getChess(fen)
+    .moves({ verbose: true })
+    .filter(
+      (move) =>
+        move.piece === 'k' &&
+        isInOpposition(move.to, blackKing, 1),
+    )
+    .map((move) => ({
+      move,
+      geometries: getSqueezeGeometries(move.to, blackKing),
+    }))
+
+  return oppositionBundles
+    .filter(({ move, geometries }) => {
+      const primaryGeometry = geometries.find((geometry) =>
+        isSqueezeGeometryOnNearerKingSide(
+          move.to,
+          blackKing,
+          geometry,
+        ),
+      )
+      if (primaryGeometry === undefined) return false
+      const primaryAnchors = bishops.filter(
+        (anchor) =>
+          squeezeProjection(anchor, primaryGeometry) ===
+          primaryGeometry.primaryIndex,
+      )
+      const hasPreparedSqueeze =
+        primaryAnchors.length > 0 &&
+        Math.abs(
+          squeezeProjection(move.to, primaryGeometry) -
+            primaryGeometry.primaryIndex,
+        ) <
+          Math.abs(
+            squeezeProjection(whiteKing, primaryGeometry) -
+              primaryGeometry.primaryIndex,
+          ) &&
+        geometries.some((secondaryGeometry) =>
+          primaryAnchors.some((anchor) =>
+            bishops.some(
+              (secondary) =>
+                secondary !== anchor &&
+                squeezeProjection(secondary, secondaryGeometry) ===
+                  secondaryGeometry.secondaryIndex,
+            ),
+          ),
+        )
+      if (!hasPreparedSqueeze) return false
+
+      const result = getChess(fen)
+      result.move(move.san)
+      const replies = result.moves({ verbose: true })
+      return (
+        replies.length > 0 &&
+        replies.every((reply) => {
+          const widensMoat =
+            distanceFromKingMoat(reply.to, knightMoat) >
+            knightMoat.startingBlackDistance
+          if (widensMoat) return true
+          const afterReply = getChess(result.fen())
+          afterReply.move(reply.san)
+          return (
+            getBootNScootBlockMoves(
+              afterReply.fen(),
+              move.to,
+              reply.to,
+              getWhiteBishopSquares(afterReply.fen()),
+            ).length > 0
+          )
+        })
+      )
+    })
+    .map(({ move }) => move.san)
+}
+
+function getBootNScootPreferredMoves(
+  fen: string,
+  whiteKing: Square | undefined,
+  blackKing: Square | undefined,
+  bishops: readonly Square[],
+): readonly string[] {
+  if (whiteKing === undefined || blackKing === undefined) return []
+  const chess = getChess(fen)
+  const legalMoves = chess.moves({ verbose: true })
+  const preferred = new Set<string>()
+  const oppositionMoat = getOppositionMoatGeometry(whiteKing, blackKing)
+
+  if (oppositionMoat !== null) {
+    const squeezeGeometries = getSqueezeGeometries(
+      whiteKing,
+      blackKing,
+    )
+    const preparedGeometries = squeezeGeometries
+      .filter((geometry) =>
+        isSqueezeGeometryOnNearerKingSide(
+          whiteKing,
+          blackKing,
+          geometry,
+        ),
+      )
+      .map((geometry) => ({
+        geometry,
+        secondaryControllers: bishops.filter(
+          (bishop) =>
+            squeezeProjection(bishop, geometry) ===
+            geometry.secondaryIndex,
+        ),
+      }))
+      .filter(
+        ({ secondaryControllers }) => secondaryControllers.length > 0,
+      )
+
+    for (const move of legalMoves) {
+      if (move.piece !== 'b') continue
+      for (const { geometry, secondaryControllers } of preparedGeometries) {
+        if (secondaryControllers.includes(move.from)) continue
+        const controlsOtherPrimary = squeezeGeometries.some(
+          (otherGeometry) =>
+            otherGeometry !== geometry &&
+            squeezeProjection(move.to, otherGeometry) ===
+              otherGeometry.primaryIndex,
+        )
+        if (!controlsOtherPrimary) {
+          continue
+        }
+        const result = getChess(fen)
+        result.move(move.san)
+        const resultBishops = getWhiteBishopSquares(result.fen())
+        if (
+          !secondaryControllers.some((controller) =>
+            resultBishops.includes(controller),
+          )
+        ) {
+          continue
+        }
+        const startingSecondaryDistance = Math.abs(
+          squeezeProjection(blackKing, geometry) -
+            geometry.secondaryIndex,
+        )
+        const replies = result.moves({ verbose: true })
+        if (
+          replies.length > 0 &&
+          replies.every((reply) => {
+            const widensMoat =
+              distanceFromKingMoat(reply.to, oppositionMoat) >
+              oppositionMoat.startingBlackDistance
+            if (widensMoat) return true
+            const movesTowardSecondary =
+              Math.abs(
+                squeezeProjection(reply.to, geometry) -
+                  geometry.secondaryIndex,
+              ) < startingSecondaryDistance
+            if (!movesTowardSecondary) return false
+            const afterReply = getChess(result.fen())
+            afterReply.move(reply.san)
+            return (
+              getBootNScootScootMoves(
+                afterReply.fen(),
+                whiteKing,
+                reply.to,
+                getWhiteBishopSquares(afterReply.fen()),
+              ).length > 0
+            )
+          })
+        ) {
+          preferred.add(move.san)
+        }
+      }
+    }
+  }
+
+  if (isKnightMove(whiteKing, blackKing)) {
+    const blockMoves = getBootNScootBlockMoves(
+      fen,
+      whiteKing,
+      blackKing,
+      bishops,
+    )
+    if (blockMoves.length > 0) {
+      for (const san of blockMoves) preferred.add(san)
+      return [...preferred]
+    }
+
+    const scootMoves = getBootNScootScootMoves(
+      fen,
+      whiteKing,
+      blackKing,
+      bishops,
+    )
+    if (scootMoves.length > 0) {
+      for (const san of scootMoves) preferred.add(san)
+      return [...preferred]
+    }
+  }
+
+  return [...preferred]
+}
+
+function getRuleSKnightSqueezeGeometries(
+  whiteKing: Square | undefined,
+  blackKing: Square | undefined,
+  allowOffboardOppositeAnchor = false,
+): readonly KnightSqueezeGeometry[] {
+  if (
+    whiteKing === undefined ||
+    blackKing === undefined ||
+    !isKnightMove(whiteKing, blackKing)
+  ) {
+    return []
+  }
+  const white = squareCoordinates(whiteKing)
+  const black = squareCoordinates(blackKing)
+  const fileDelta = white.file - black.file
+  const rankDelta = white.rank - black.rank
+  const longAxis = Math.abs(fileDelta) === 2 ? 'file' : 'rank'
+  const longDirection = Math.sign(
+    longAxis === 'file' ? fileDelta : rankDelta,
+  ) as -1 | 1
+  const oppositeFile =
+    black.file - (longAxis === 'file' ? longDirection : 0)
+  const oppositeRank =
+    black.rank - (longAxis === 'rank' ? longDirection : 0)
+  const oppositeSquare = squareFromCoordinates(oppositeFile, oppositeRank)
+  if (!oppositeSquare && !allowOffboardOppositeAnchor) return []
+  const opposite = oppositeSquare
+    ? squareCoordinates(oppositeSquare)
+    : { file: oppositeFile, rank: oppositeRank }
+  return ([1, -1] as const).flatMap((direction) => {
+    const parallelSquare = squareFromCoordinates(
+      black.file + (longAxis === 'rank' ? direction : 0),
+      black.rank + (longAxis === 'file' ? direction : 0),
+    )
+    if (!parallelSquare) return []
+    const parallel = squareCoordinates(parallelSquare)
+    const primaryDirectionFile = parallel.file - opposite.file
+    const primaryDirectionRank = parallel.rank - opposite.rank
+    const normalFile = primaryDirectionRank as -1 | 1
+    const normalRank = -primaryDirectionFile as -1 | 1
+    const primaryIndex =
+      opposite.file * normalFile + opposite.rank * normalRank
+    const tertiaryIndex =
+      black.file * normalFile + black.rank * normalRank
+    return [
+      {
+        normalFile,
+        normalRank,
+        primaryIndex,
+        secondaryIndex: 2 * tertiaryIndex - primaryIndex,
+        tertiaryIndex,
+      },
+    ]
+  })
+}
+
+function getRuleSPreferredMoves(
+  fen: string,
+  whiteKing: Square | undefined,
+  blackKing: Square | undefined,
+  bishops: readonly Square[],
+): readonly string[] {
+  const geometries = getRuleSKnightSqueezeGeometries(
+    whiteKing,
+    blackKing,
+  )
+  const moatGeometry = getRuleTGeometry(
+    whiteKing,
+    blackKing,
+  )
+  if (
+    geometries.length === 0 ||
+    !whiteKing ||
+    !blackKing ||
+    !moatGeometry
+  ) {
+    return []
+  }
+  const legalMoves = getChess(fen).moves({ verbose: true })
+  const preparedGeometries = geometries
+    .map((geometry) => ({
+      geometry,
+      primaryControllers: bishops.filter(
+        (bishop) =>
+          squeezeProjection(bishop, geometry) === geometry.primaryIndex,
+      ),
+    }))
+    .filter(({ primaryControllers }) => primaryControllers.length > 0)
+  if (preparedGeometries.length === 0) return []
+  const tertiaryChecks = legalMoves
+    .filter((move) => {
+      if (move.piece !== 'b') return false
+      const matchesPreparedGeometry = preparedGeometries.some(
+        ({ geometry, primaryControllers }) =>
+          !primaryControllers.includes(move.from) &&
+          squeezeProjection(move.to, geometry) === geometry.tertiaryIndex,
+      )
+      if (!matchesPreparedGeometry) return false
+      const result = getChess(fen)
+      result.move(move.san)
+      const replies = result.moves({ verbose: true })
+      return (
+        result.isCheck() &&
+        !replies.some((reply) => reply.captured === 'b') &&
+        forcesMoatOpposition(
+          whiteKing,
+          replies.map(({ to }) => to),
+          moatGeometry,
+        )
+      )
+    })
+    .map(({ san }) => san)
+  if (tertiaryChecks.length > 0) return tertiaryChecks
+  return legalMoves
+    .filter(
+      (move) =>
+        move.piece === 'k' &&
+        isInOpposition(move.to, blackKing, 1) &&
+        preparedGeometries.some(({ geometry }) => {
+          const startingPrimaryDistance = Math.abs(
+            squeezeProjection(whiteKing, geometry) -
+              geometry.primaryIndex,
+          )
+          return (
+            Math.abs(
+              squeezeProjection(move.to, geometry) -
+                geometry.primaryIndex,
+            ) > startingPrimaryDistance
+          )
+        }),
+    )
+    .map(({ san }) => san)
+}
+
+function distanceToDirectedEdge(
+  coordinate: number,
+  direction: -1 | 1,
+): number {
+  return direction === -1 ? coordinate : 7 - coordinate
+}
+
+function isRuleRSideEdgeCloser(
+  whiteKing: Square,
+  blackKing: Square,
+): boolean {
+  if (!isKnightMove(whiteKing, blackKing)) return false
+  const white = squareCoordinates(whiteKing)
+  const black = squareCoordinates(blackKing)
+  const fileDelta = black.file - white.file
+  const rankDelta = black.rank - white.rank
+  const rearIsFile = Math.abs(fileDelta) === 2
+  const rearCoordinate = rearIsFile ? black.file : black.rank
+  const sideCoordinate = rearIsFile ? black.rank : black.file
+  const rearDirection = Math.sign(
+    rearIsFile ? fileDelta : rankDelta,
+  ) as -1 | 1
+  const sideDirection = Math.sign(
+    rearIsFile ? rankDelta : fileDelta,
+  ) as -1 | 1
+  return (
+    distanceToDirectedEdge(sideCoordinate, sideDirection) <
+    distanceToDirectedEdge(rearCoordinate, rearDirection)
+  )
+}
+
+function getRuleRPreferredMoves(
+  fen: string,
+  whiteKing: Square | undefined,
+  blackKing: Square | undefined,
+  _bishops: readonly Square[],
+): readonly string[] {
+  if (whiteKing === undefined || blackKing === undefined) return []
+
+  return getChess(fen)
+    .moves({ verbose: true })
+    .filter((move) => {
+      const result = getChess(fen)
+      result.move(move.san)
+      const resultFen = result.fen()
+      const resultWhiteKing = findPiece(resultFen, 'w', 'k')?.square
+      const resultBlackKing = findPiece(resultFen, 'b', 'k')?.square
+      if (
+        resultWhiteKing === undefined ||
+        resultBlackKing === undefined ||
+        !isRuleRSideEdgeCloser(resultWhiteKing, resultBlackKing)
+      ) {
+        return false
+      }
+      const resultBishops = getWhiteBishopSquares(result.fen())
+      const preparedGeometries = getRuleSKnightSqueezeGeometries(
+        resultWhiteKing,
+        resultBlackKing,
+      ).filter((geometry) =>
+        resultBishops.some(
+          (bishop) =>
+            squeezeProjection(bishop, geometry) === geometry.primaryIndex,
+        ),
+      )
+      const moat = getRuleTGeometry(resultWhiteKing, resultBlackKing)
+      if (preparedGeometries.length === 0 || moat === null) return false
+      return preparedGeometries.some((geometry) => {
+        const secondaryIndex =
+          2 * geometry.primaryIndex - geometry.tertiaryIndex
+        return resultBishops.some(
+          (primaryBishop, primaryBishopIndex) =>
+            squeezeProjection(primaryBishop, geometry) ===
+              geometry.primaryIndex &&
+            resultBishops.some(
+              (secondaryBishop, secondaryBishopIndex) =>
+                secondaryBishopIndex !== primaryBishopIndex &&
+                squeezeProjection(secondaryBishop, geometry) ===
+                  secondaryIndex &&
+                isSquareOnWhiteSideOfMoat(
+                  secondaryBishop,
+                  resultWhiteKing,
+                  moat,
+                ),
+            ),
+        )
+      })
+    })
+    .map(({ san }) => san)
+}
+
+function squeezeDiagonalSquares(
   geometry: SqueezeGeometry,
   index: number,
 ): readonly Square[] {
@@ -2554,119 +3806,283 @@ function getSqueezeDiagonalSquares(
   return squares
 }
 
-function bishopControlsSqueezeDiagonal(
-  fen: string,
+function bishopCanMoveToControlSqueezeDiagonal(
+  chess: ReturnType<typeof getChess>,
   bishop: Square,
   geometry: SqueezeGeometry,
   index: number,
+  targetAllowed: (target: Square) => boolean = () => true,
+  ignoredBlocker?: Square,
 ): boolean {
-  return getSqueezeDiagonalSquares(geometry, index).some(
-    (square) =>
-      square === bishop ||
-      bishopHasClearLineToSquare(fen, bishop, square),
+  return squeezeDiagonalSquares(geometry, index).some(
+    (target) =>
+      targetAllowed(target) &&
+      !chess.get(target) &&
+      bishopHasClearLineToSquareOnBoard(
+        chess,
+        bishop,
+        target,
+        ignoredBlocker,
+      ),
   )
 }
 
-function getRuleSKnightSqueezeGeometry(
+function getRuleUPreferredMoves(
+  fen: string,
   whiteKing: Square | undefined,
   blackKing: Square | undefined,
-  isPhaseTwo: boolean,
-): KnightSqueezeGeometry | null {
+): readonly string[] {
   if (
-    isPhaseTwo ||
     whiteKing === undefined ||
     blackKing === undefined ||
     !isKnightMove(whiteKing, blackKing)
   ) {
-    return null
+    return []
   }
-  const white = squareCoordinates(whiteKing)
-  const black = squareCoordinates(blackKing)
-  const normalFile = Math.sign(black.file - white.file) as -1 | 1
-  const normalRank = Math.sign(black.rank - white.rank) as -1 | 1
-  const whiteProjection =
-    white.file * normalFile + white.rank * normalRank
-  return {
-    normalFile,
-    normalRank,
-    primaryIndex: whiteProjection + 1,
-    secondaryIndex: whiteProjection + 2,
-    tertiaryIndex: whiteProjection + 3,
-  }
-}
-
-function getRuleSPreferredMoves(
-  fen: string,
-  whiteKing: Square | undefined,
-  blackKing: Square | undefined,
-  bishops: readonly Square[],
-  isPhaseTwo: boolean,
-): readonly string[] {
-  const geometry = getRuleSKnightSqueezeGeometry(
-    whiteKing,
-    blackKing,
-    isPhaseTwo,
-  )
-  if (!geometry || !whiteKing || !blackKing) return []
-  const legalMoves = getChess(fen).moves({ verbose: true })
-  const primaryControllers = bishops.filter((bishop) =>
-    bishopControlsSqueezeDiagonal(
-      fen,
-      bishop,
-      geometry,
-      geometry.primaryIndex,
-    ),
-  )
-  if (primaryControllers.length === 0) return []
-  const tertiaryChecks = legalMoves
+  const moat = getRuleTGeometry(whiteKing, blackKing)
+  if (moat === null) return []
+  return getChess(fen)
+    .moves({ verbose: true })
     .filter((move) => {
       if (
-        move.piece !== 'b' ||
-        !primaryControllers.includes(move.from) ||
-        squeezeProjection(move.to, geometry) !== geometry.tertiaryIndex
+        move.piece !== 'k' ||
+        !isInOpposition(move.to, blackKing, 1)
       ) {
         return false
       }
       const result = getChess(fen)
       result.move(move.san)
-      return result.isCheck()
+      const bishops = getWhiteBishopSquares(result.fen())
+      return getSqueezeGeometries(move.to, blackKing).some((geometry) => {
+        const startingDistance = Math.abs(
+          squeezeProjection(move.from, geometry) -
+            geometry.secondaryIndex,
+        )
+        const resultDistance = Math.abs(
+          squeezeProjection(move.to, geometry) -
+            geometry.secondaryIndex,
+        )
+        if (resultDistance <= startingDistance) return false
+        return bishops.some(
+          (secondaryBishop, secondaryIndex) =>
+            squeezeProjection(secondaryBishop, geometry) ===
+              geometry.secondaryIndex &&
+            isSquareOnWhiteSideOfMoat(
+              secondaryBishop,
+              whiteKing,
+              moat,
+            ) &&
+            bishops.some(
+              (primaryBishop, primaryIndex) =>
+                primaryIndex !== secondaryIndex &&
+                bishopCanMoveToControlSqueezeDiagonal(
+                  result,
+                  primaryBishop,
+                  geometry,
+                  geometry.primaryIndex,
+                  (target) =>
+                    isSquareOnWhiteSideOfMoat(
+                      target,
+                      whiteKing,
+                      moat,
+                    ),
+                ),
+            ),
+        )
+      })
     })
-    .map(({ san }) => san)
-  if (tertiaryChecks.length > 0) return tertiaryChecks
-  const canReachSecondary = legalMoves.some(
-    (move) =>
-      move.piece === 'b' &&
-      squeezeProjection(move.from, geometry) !==
-        geometry.secondaryIndex &&
-      squeezeProjection(move.to, geometry) === geometry.secondaryIndex,
-  )
-  if (!canReachSecondary) return []
-  return legalMoves
-    .filter(
-      (move) =>
-        move.piece === 'k' &&
-        isInOpposition(move.to, blackKing, 1),
-    )
     .map(({ san }) => san)
 }
 
-function getRuleVSqueezeGeometries(
+function moatDistanceFromBlackSideEdge(
+  blackKing: Square,
+  geometry: RuleTGeometry,
+): number {
+  const black = squareCoordinates(blackKing)
+  const coordinate =
+    geometry.axis === 'file' ? black.file : black.rank
+  const edge = coordinate < geometry.index ? 0 : 7
+  return Math.abs(geometry.index - edge)
+}
+
+function getRuleUUPreferredMoves(
   fen: string,
   whiteKing: Square | undefined,
   blackKing: Square | undefined,
-  isPhaseTwo: boolean,
-): readonly SqueezeGeometry[] {
-  if (isPhaseTwo || whiteKing === undefined || blackKing === undefined) {
+): readonly string[] {
+  const startingGeometry = getRuleTGeometry(whiteKing, blackKing)
+  if (
+    whiteKing === undefined ||
+    blackKing === undefined ||
+    startingGeometry === null
+  ) {
     return []
   }
+  const startingEdgeDistance = moatDistanceFromBlackSideEdge(
+    blackKing,
+    startingGeometry,
+  )
+
+  return getChess(fen)
+    .moves({ verbose: true })
+    .filter((move) => {
+      if (move.piece !== 'k') return false
+      const resultGeometry = getRuleTGeometry(move.to, blackKing)
+      return (
+        resultGeometry !== null &&
+        resultGeometry.axis !== startingGeometry.axis &&
+        startingEdgeDistance -
+          moatDistanceFromBlackSideEdge(blackKing, resultGeometry) >=
+          2
+      )
+    })
+    .map(({ san }) => san)
+}
+
+function getRuleVMatchingGeometriesBySan(
+  fen: string,
+  whiteKing: Square | undefined,
+  blackKing: Square | undefined,
+  bishops: readonly Square[],
+): ReadonlyMap<string, readonly SqueezeGeometry[]> {
+  if (whiteKing === undefined || blackKing === undefined) {
+    return new Map()
+  }
   const legalMoves = getChess(fen).moves({ verbose: true })
-  return getSqueezeGeometries(whiteKing, blackKing).filter((geometry) =>
-    legalMoves.some(
-      (move) =>
-        move.piece === 'b' &&
-        squeezeProjection(move.to, geometry) === geometry.secondaryIndex,
+  const squeezeGeometries = getSqueezeGeometries(whiteKing, blackKing)
+  const primaryControlledGeometries = squeezeGeometries.filter((geometry) =>
+    bishops.some(
+      (bishop) =>
+        squeezeProjection(bishop, geometry) === geometry.primaryIndex,
     ),
   )
+  const secondaryControlledGeometries = squeezeGeometries.filter(
+    (geometry) =>
+      bishops.some(
+        (bishop) =>
+          squeezeProjection(bishop, geometry) ===
+          geometry.secondaryIndex,
+      ),
+  )
+  const matchingGeometriesBySan = new Map<
+    string,
+    readonly SqueezeGeometry[]
+  >()
+  for (const move of legalMoves) {
+    const result = getChess(fen)
+    result.move(move.san)
+    const resultBishops = getWhiteBishopSquares(result.fen())
+    const matchingGeometries =
+      primaryControlledGeometries.length > 0
+        ? primaryControlledGeometries.filter(
+            (geometry) =>
+              move.piece === 'b' &&
+              result.isCheck() &&
+              isSquareOnSqueezeSideOfBlackKing(
+                move.to,
+                whiteKing,
+                blackKing,
+                geometry,
+              ) &&
+              resultBishops.some(
+                (primaryController) =>
+                  primaryController !== move.to &&
+                  squeezeProjection(primaryController, geometry) ===
+                    geometry.primaryIndex,
+              ),
+          )
+        : secondaryControlledGeometries.length > 0
+          ? secondaryControlledGeometries.filter((geometry) =>
+              bishopsControlMatchedSqueezeRoles(
+                resultBishops,
+                geometry,
+                geometry.primaryIndex,
+                geometry.secondaryIndex,
+              ),
+            )
+          : squeezeGeometries.filter(
+              (geometry) =>
+                move.piece === 'b' &&
+                squeezeProjection(move.to, geometry) ===
+                  geometry.primaryIndex &&
+                bishops.some(
+                  (prospectiveSecondary) =>
+                    prospectiveSecondary !== move.from &&
+                    bishopCanMoveToControlSqueezeDiagonal(
+                      result,
+                      prospectiveSecondary,
+                      geometry,
+                      geometry.secondaryIndex,
+                      () => true,
+                      whiteKing,
+                    ),
+                ),
+            )
+    if (matchingGeometries.length > 0) {
+      matchingGeometriesBySan.set(move.san, matchingGeometries)
+    }
+  }
+  return matchingGeometriesBySan
+}
+
+function getSqueezePrimaryAnchor(
+  whiteKing: Square,
+  blackKing: Square,
+  geometry: SqueezeGeometry,
+): Square | null {
+  const white = squareCoordinates(whiteKing)
+  const black = squareCoordinates(blackKing)
+  const candidates =
+    white.file === black.file
+      ? [
+          squareFromCoordinates(black.file - 1, black.rank),
+          squareFromCoordinates(black.file + 1, black.rank),
+        ]
+      : [
+          squareFromCoordinates(black.file, black.rank - 1),
+          squareFromCoordinates(black.file, black.rank + 1),
+        ]
+  return (
+    candidates.find(
+      (square): square is Square =>
+        square !== null &&
+        squeezeProjection(square, geometry) === geometry.primaryIndex,
+    ) ?? null
+  )
+}
+
+function isSquareOnSqueezeSideOfBlackKing(
+  square: Square,
+  whiteKing: Square,
+  blackKing: Square,
+  geometry: SqueezeGeometry,
+): boolean {
+  const anchor = getSqueezePrimaryAnchor(
+    whiteKing,
+    blackKing,
+    geometry,
+  )
+  if (anchor === null) return false
+  const white = squareCoordinates(whiteKing)
+  const black = squareCoordinates(blackKing)
+  const candidate = squareCoordinates(square)
+  const squeeze = squareCoordinates(anchor)
+  return white.file === black.file
+    ? (candidate.file - black.file) * (squeeze.file - black.file) > 0
+    : (candidate.rank - black.rank) * (squeeze.rank - black.rank) > 0
+}
+
+function squeezeGeometryEdgeDistance(
+  whiteKing: Square,
+  blackKing: Square,
+  geometry: SqueezeGeometry,
+): number {
+  const anchor = getSqueezePrimaryAnchor(
+    whiteKing,
+    blackKing,
+    geometry,
+  )
+  return anchor === null ? 0 : edgeDistance(anchor)
 }
 
 function flankDiagonalIndex(
@@ -2683,12 +4099,50 @@ function isFlankDiagonalOnBoard(diagonal: FlankDiagonal): boolean {
     : diagonal.index >= 0 && diagonal.index <= 14
 }
 
+function flankDiagonalIntersectsBlackFile(
+  diagonal: FlankDiagonal,
+  blackKing: Square,
+): boolean {
+  const black = squareCoordinates(blackKing)
+  const rankAtBlackFile =
+    diagonal.axis === 'difference'
+      ? black.file - diagonal.index
+      : diagonal.index - black.file
+  return rankAtBlackFile >= 0 && rankAtBlackFile < 8
+}
+
+function flankDiagonalIntersectsBlackRank(
+  diagonal: FlankDiagonal,
+  blackKing: Square,
+): boolean {
+  const black = squareCoordinates(blackKing)
+  const fileAtBlackRank =
+    diagonal.axis === 'difference'
+      ? black.rank + diagonal.index
+      : diagonal.index - black.rank
+  return fileAtBlackRank >= 0 && fileAtBlackRank < 8
+}
+
+function flankDiagonalIntersectsMoat(
+  diagonal: FlankDiagonal,
+  moat: RuleTGeometry,
+): boolean {
+  const otherCoordinate =
+    moat.axis === 'file'
+      ? diagonal.axis === 'difference'
+        ? moat.index - diagonal.index
+        : diagonal.index - moat.index
+      : diagonal.axis === 'difference'
+        ? moat.index + diagonal.index
+        : diagonal.index - moat.index
+  return otherCoordinate >= 0 && otherCoordinate < 8
+}
+
 function getRuleWFlankDiagonalPairs(
   whiteKing: Square | undefined,
   blackKing: Square | undefined,
-  isPhaseTwo: boolean,
 ): readonly FlankDiagonalPair[] {
-  if (isPhaseTwo || whiteKing === undefined || blackKing === undefined) {
+  if (whiteKing === undefined || blackKing === undefined) {
     return []
   }
   const white = squareCoordinates(whiteKing)
@@ -2697,9 +4151,13 @@ function getRuleWFlankDiagonalPairs(
   const rankDelta = black.rank - white.rank
   const isTwoDiagonalSteps =
     Math.abs(fileDelta) === 2 && Math.abs(rankDelta) === 2
-  if (!isKnightMove(whiteKing, blackKing) && !isTwoDiagonalSteps) {
+  const isKnightGeometry = isKnightMove(whiteKing, blackKing)
+  if (!isKnightGeometry && !isTwoDiagonalSteps) {
     return []
   }
+  const moat = isKnightGeometry
+    ? getRuleTGeometry(whiteKing, blackKing)
+    : null
 
   const axis: FlankDiagonalAxis =
     fileDelta * rankDelta > 0 ? 'difference' : 'sum'
@@ -2712,8 +4170,19 @@ function getRuleWFlankDiagonalPairs(
   const pairs: readonly FlankDiagonalPair[] = isTwoDiagonalSteps
     ? [makePair(-1), makePair(1)]
     : [makePair(blackIndex > whiteIndex ? -1 : 1)]
-  return pairs.filter((pair) => pair.every(isFlankDiagonalOnBoard))
+  return pairs.filter((pair) =>
+    pair.every(
+      (diagonal) =>
+        isFlankDiagonalOnBoard(diagonal) &&
+        (isTwoDiagonalSteps
+          ? flankDiagonalIntersectsBlackFile(diagonal, blackKing) &&
+            flankDiagonalIntersectsBlackRank(diagonal, blackKing)
+          : moat !== null && flankDiagonalIntersectsMoat(diagonal, moat)),
+    ),
+  )
 }
+
+const RULE_W_INCOMPLETE_PENALTY = 1
 
 function getRuleWPenalty(
   bishops: readonly Square[],
@@ -2734,6 +4203,138 @@ function getRuleWPenalty(
   )
 }
 
+function squeezeGeometryFlankAxis(
+  geometry: SqueezeGeometry,
+): FlankDiagonalAxis {
+  return geometry.normalFile === geometry.normalRank ? 'sum' : 'difference'
+}
+
+function getRuleZ1PreferredMoves(
+  fen: string,
+  whiteKing: Square | undefined,
+  blackKing: Square | undefined,
+  bishops: readonly Square[],
+): readonly string[] {
+  if (
+    whiteKing === undefined ||
+    blackKing === undefined ||
+    !isKnightMove(whiteKing, blackKing)
+  ) {
+    return []
+  }
+  const completedFlankAxes = new Set(
+    getRuleWFlankDiagonalPairs(whiteKing, blackKing)
+      .filter((pair) => getRuleWPenalty(bishops, [pair]) === 0)
+      .map((pair) => pair[0].axis),
+  )
+  if (completedFlankAxes.size === 0) return []
+  const matchingPrimaryGeometries = getRuleSKnightSqueezeGeometries(
+    whiteKing,
+    blackKing,
+    true,
+  ).filter((geometry) =>
+    !completedFlankAxes.has(squeezeGeometryFlankAxis(geometry)),
+  )
+  return getChess(fen)
+    .moves({ verbose: true })
+    .filter(
+      (move) =>
+        move.piece === 'b' &&
+        matchingPrimaryGeometries.some(
+          (geometry) =>
+            squeezeProjection(move.to, geometry) === geometry.primaryIndex,
+        ),
+    )
+    .map(({ san }) => san)
+}
+
+function bishopOccupiesFlankDiagonal(
+  bishops: readonly Square[],
+  diagonal: FlankDiagonal,
+): boolean {
+  return bishops.some(
+    (bishop) =>
+      flankDiagonalIndex(bishop, diagonal.axis) === diagonal.index,
+  )
+}
+
+function moveCanOccupyFlankDiagonal(
+  fen: string,
+  diagonal: FlankDiagonal,
+): boolean {
+  return getChess(fen).moves().some((san) => {
+    const result = getChess(fen)
+    result.move(san)
+    return bishopOccupiesFlankDiagonal(
+      getWhiteBishopSquares(result.fen()),
+      diagonal,
+    )
+  })
+}
+
+function squaresShareDiagonal(first: Square, second: Square): boolean {
+  const firstCoordinates = squareCoordinates(first)
+  const secondCoordinates = squareCoordinates(second)
+  return (
+    Math.abs(firstCoordinates.file - secondCoordinates.file) ===
+    Math.abs(firstCoordinates.rank - secondCoordinates.rank)
+  )
+}
+
+function bishopMoveDiagonalSeparatesKings(
+  from: Square,
+  to: Square,
+  whiteKing: Square | undefined,
+  blackKing: Square | undefined,
+): boolean {
+  if (whiteKing === undefined || blackKing === undefined) return false
+  const start = squareCoordinates(from)
+  const end = squareCoordinates(to)
+  const fileDelta = end.file - start.file
+  const rankDelta = end.rank - start.rank
+  if (
+    fileDelta === 0 ||
+    Math.abs(fileDelta) !== Math.abs(rankDelta)
+  ) {
+    return false
+  }
+  const sideOfMoveDiagonal = (square: Square): number => {
+    const point = squareCoordinates(square)
+    return (
+      fileDelta * (point.rank - start.rank) -
+      rankDelta * (point.file - start.file)
+    )
+  }
+  return (
+    sideOfMoveDiagonal(whiteKing) * sideOfMoveDiagonal(blackKing) < 0
+  )
+}
+
+function getRuleYThreatenedBishops(
+  fen: string,
+  whiteKing: Square | undefined,
+  blackKing: Square | undefined,
+  bishops: readonly Square[],
+): readonly Square[] {
+  if (
+    whiteKing === undefined ||
+    blackKing === undefined ||
+    bishops.length !== 2
+  ) {
+    return []
+  }
+  const blackMoves = getChess(withFenTurn(fen, 'b')).moves({
+    verbose: true,
+  })
+  return bishops.filter(
+    (bishop) =>
+      kingDistance(whiteKing, bishop) > 1 &&
+      blackMoves.some(
+        (reply) => kingDistance(reply.to, bishop) <= 1,
+      ),
+  )
+}
+
 function createTwoBishopsWhitePositionContext(
   fen: string,
 ): TwoBishopsWhitePositionContext {
@@ -2746,6 +4347,130 @@ function createTwoBishopsWhitePositionContext(
     fen,
     startingWhiteKing,
     blackKing,
+  )
+  const startingRuleWFlankDiagonalPairs = getRuleWFlankDiagonalPairs(
+    startingWhiteKing,
+    blackKing,
+  )
+  const ruleVMatchingGeometriesBySan = getRuleVMatchingGeometriesBySan(
+    fen,
+    startingWhiteKing,
+    blackKing,
+    startingBishops,
+  )
+  const ruleUPreferredMoves = getRuleUPreferredMoves(
+    fen,
+    startingWhiteKing,
+    blackKing,
+  )
+  const ruleUUPreferredMoves = getRuleUUPreferredMoves(
+    fen,
+    startingWhiteKing,
+    blackKing,
+  )
+  const prepareMatePreferredMoves = getPrepareMatePreferredMoves(
+    startingWhiteKing,
+    blackKing,
+    matePatternTurnsBySan,
+  )
+  const ruleGPreferredMoves = getRuleGPreferredMoves(
+    fen,
+    startingWhiteKing,
+    blackKing,
+  )
+  const onsidesPreferredMoves = getOnsidesPreferredMoves(
+    fen,
+    startingWhiteKing,
+    blackKing,
+  )
+  const bootNScootPreferredMoves = getBootNScootPreferredMoves(
+    fen,
+    startingWhiteKing,
+    blackKing,
+    startingBishops,
+  )
+  const ruleRPreferredMoves = getRuleRPreferredMoves(
+    fen,
+    startingWhiteKing,
+    blackKing,
+    startingBishops,
+  )
+  const bootNScootReplyCounts = bootNScootPreferredMoves.map((san) => {
+    const result = getChess(fen)
+    const move = result.move(san)
+    return move.piece === 'b' ? result.moves().length : 0
+  })
+  const bootNScootBestReplyCount = Math.min(...bootNScootReplyCounts)
+  const bootNScootUniqueBest =
+    bootNScootReplyCounts.filter(
+      (replyCount) => replyCount === bootNScootBestReplyCount,
+    ).length === 1
+  const startingRuleWCompletedPairs =
+    startingRuleWFlankDiagonalPairs.filter(
+      (pair) => getRuleWPenalty(startingBishops, [pair]) === 0,
+    )
+  const whiteKingCoordinates =
+    startingWhiteKing === undefined
+      ? undefined
+      : squareCoordinates(startingWhiteKing)
+  const blackKingCoordinates =
+    blackKing === undefined ? undefined : squareCoordinates(blackKing)
+  const ruleZ2CompletedPairs =
+    whiteKingCoordinates !== undefined &&
+    blackKingCoordinates !== undefined &&
+    Math.abs(whiteKingCoordinates.file - blackKingCoordinates.file) === 2 &&
+    Math.abs(whiteKingCoordinates.rank - blackKingCoordinates.rank) === 2
+      ? startingRuleWCompletedPairs
+      : []
+  const ruleWCompletedPair = startingRuleWCompletedPairs.length > 0
+  const ruleWUrgentDiagonal =
+    !ruleWCompletedPair &&
+    ruleUPreferredMoves.length === 0 &&
+    startingWhiteKing !== undefined &&
+    blackKing !== undefined &&
+    isKnightMove(startingWhiteKing, blackKing)
+      ? startingRuleWFlankDiagonalPairs[0]?.[0]
+      : undefined
+  const ruleWUrgentSetup =
+    ruleWUrgentDiagonal !== undefined &&
+    moveCanOccupyFlankDiagonal(fen, ruleWUrgentDiagonal)
+  const ruleWPenaltiesBySan = new Map(
+    getChess(fen).moves({ verbose: true }).map((move) => {
+      const result = getChess(fen)
+      result.move(move.san)
+      const resultWhiteKing =
+        move.piece === 'k' ? move.to : startingWhiteKing
+      const pairs = getRuleWFlankDiagonalPairs(
+        resultWhiteKing,
+        blackKing,
+      )
+      const preservesCompletedStartingPair =
+        move.piece === 'k' &&
+        startingRuleWCompletedPairs.some(
+          (pair) =>
+            getRuleWPenalty(getWhiteBishopSquares(result.fen()), [pair]) === 0,
+        )
+      return [
+        move.san,
+        preservesCompletedStartingPair ||
+        (pairs.length > 0 &&
+          getRuleWPenalty(getWhiteBishopSquares(result.fen()), pairs) === 0)
+          ? 0
+          : RULE_W_INCOMPLETE_PENALTY,
+      ] as const
+    }),
+  )
+  const ruleZ1PreferredMoves = getRuleZ1PreferredMoves(
+    fen,
+    startingWhiteKing,
+    blackKing,
+    startingBishops,
+  )
+  const ruleYThreatenedBishops = getRuleYThreatenedBishops(
+    fen,
+    startingWhiteKing,
+    blackKing,
+    startingBishops,
   )
   return {
     blackKing,
@@ -2764,29 +4489,39 @@ function createTwoBishopsWhitePositionContext(
             startingBishops,
           )
         : [],
+    prepareMatePreferredMoves,
+    ruleGPreferredMoves,
+    onsidesPreferredMoves,
+    bootNScootPreferredMoves,
+    bootNScootUniqueBest,
+    ruleRPreferredMoves,
     ruleSPreferredMoves: getRuleSPreferredMoves(
       fen,
       startingWhiteKing,
       blackKing,
       startingBishops,
-      isPhaseTwo,
     ),
     ruleTGeometry: getRuleTGeometry(
       startingWhiteKing,
       blackKing,
-      isPhaseTwo,
     ),
-    ruleVSqueezeGeometries: getRuleVSqueezeGeometries(
-      fen,
-      startingWhiteKing,
-      blackKing,
-      isPhaseTwo,
-    ),
-    ruleWFlankDiagonalPairs: getRuleWFlankDiagonalPairs(
-      startingWhiteKing,
-      blackKing,
-      isPhaseTwo,
-    ),
+    ruleUUPreferredMoves,
+    ruleUPreferredMoves,
+    ruleVMatchingGeometriesBySan,
+    ruleWApplies:
+      startingRuleWFlankDiagonalPairs.length > 0 &&
+      (ruleWUrgentSetup ||
+        [...ruleWPenaltiesBySan.values()].some((penalty) => penalty === 0)),
+    ruleWUrgentSetup,
+    ruleWUrgentDiagonal,
+    ruleWPenaltiesBySan,
+    ruleYThreatenedBishops,
+    deathBoxPreferredMoves: getDeathBoxPreferredMoves(fen),
+    preserveExistingMegadethBox: isMegadethBoxPosition(fen),
+    megadethBoxPreferredMoves: getMegadethBoxPreferredMoves(fen),
+    ruleZ1PreferredMoves,
+    ruleZ2CompletedPairs,
+    kingStutterPreferredMoves: getKingStutterPreferredMoves(fen),
   }
 }
 
@@ -2814,10 +4549,28 @@ function scoreTwoBishopsWhiteMoveWithContext(
     mateInThreeApplies,
     matePatternTurnsBySan,
     shepherdMoves,
+    prepareMatePreferredMoves,
+    ruleGPreferredMoves,
+    onsidesPreferredMoves,
+    bootNScootPreferredMoves,
+    bootNScootUniqueBest,
+    ruleRPreferredMoves,
     ruleSPreferredMoves,
     ruleTGeometry,
-    ruleVSqueezeGeometries,
-    ruleWFlankDiagonalPairs,
+    ruleUUPreferredMoves,
+    ruleUPreferredMoves,
+    ruleVMatchingGeometriesBySan,
+    ruleWApplies,
+    ruleWUrgentSetup,
+    ruleWUrgentDiagonal,
+    ruleWPenaltiesBySan,
+    ruleYThreatenedBishops,
+    deathBoxPreferredMoves,
+    preserveExistingMegadethBox,
+    megadethBoxPreferredMoves,
+    ruleZ1PreferredMoves,
+    ruleZ2CompletedPairs,
+    kingStutterPreferredMoves,
   } = context
   const chess = getChess(fen)
   const move = chess.move(san)
@@ -2894,19 +4647,94 @@ function scoreTwoBishopsWhiteMoveWithContext(
         ).length
   const ruleTForces =
     ruleTGeometry !== null &&
+    move.piece === 'b' &&
     resultWhiteKingSquare !== undefined &&
-    blackReplyKings.length > 0 &&
-    blackReplyKings.every(
-      (replyKing) =>
-        isInOpposition(resultWhiteKingSquare, replyKing, 1) ||
-        distanceFromKingMoat(replyKing, ruleTGeometry) >
-          ruleTGeometry.startingBlackDistance,
+    blackKing !== undefined &&
+    isSquareOnWhiteSideOfMoat(
+      move.from,
+      resultWhiteKingSquare,
+      ruleTGeometry,
+    ) &&
+    forcesMoatOpposition(
+      resultWhiteKingSquare,
+      blackReplyKings,
+      ruleTGeometry,
     )
+  const moveFrom = squareCoordinates(move.from)
+  const moveTo = squareCoordinates(move.to)
+  const isDiagonalWhiteKingMove =
+    move.piece === 'k' &&
+    Math.abs(moveTo.file - moveFrom.file) === 1 &&
+    Math.abs(moveTo.rank - moveFrom.rank) === 1
+  const matchingRuleVGeometries =
+    ruleVMatchingGeometriesBySan.get(move.san) ?? []
+  const ruleYTargetBishop =
+    move.piece === 'b'
+      ? ruleYThreatenedBishops.find(
+          (bishop) => bishop !== move.from,
+        )
+      : undefined
+  const ruleYPreventsAttack =
+    ruleYTargetBishop !== undefined &&
+    blackMoves.every(
+      (reply) => kingDistance(reply.to, ruleYTargetBishop) > 1,
+    )
+  const ruleYMovedBishopStaysSafe =
+    move.piece === 'b' &&
+    blackMoves.every((reply) => kingDistance(reply.to, move.to) > 1)
+  const resultMoats =
+    resultWhiteKingSquare === undefined || blackKing === undefined
+      ? []
+      : getBishopDistanceMoatGeometries(
+          resultWhiteKingSquare,
+          blackKing,
+        )
+  const ruleZCornerApplies =
+    blackKing !== undefined && BOARD_CORNERS.includes(blackKing)
+  const ruleZFollowupTarget =
+    startingWhiteKing === undefined || blackKing === undefined
+      ? null
+      : getRuleZFollowupTarget(startingWhiteKing, blackKing)
   return {
     isPhaseTwoPosition: isPhaseTwo,
     matePenalty: mate ? 0 : 1,
     bishopSafetyPenalty: bishopCanBeCaptured ? 1 : 0,
     stalematePenalty: !mate && chess.isStalemate() ? 1 : 0,
+    prepareMateApplies: prepareMatePreferredMoves.length > 0,
+    prepareMatePenalty: prepareMatePreferredMoves.includes(move.san)
+      ? 0
+      : 1,
+    ruleGApplies: ruleGPreferredMoves.length > 0,
+    ruleGPenalty: ruleGPreferredMoves.includes(move.san) ? 0 : 1,
+    centralPiecesPenalty: [resultWhiteKingSquare, ...resultBishops].filter(
+      (square) =>
+        square === undefined || !isTwoBishopsCentralPieceSquare(square),
+    ).length,
+    edgeFlankApplies:
+      blackKing !== undefined &&
+      startingWhiteKing !== undefined &&
+      edgeDistance(blackKing) === 0 &&
+      !BOARD_CORNERS.includes(blackKing) &&
+      isKnightMove(startingWhiteKing, blackKing),
+    edgeFlankPenalty:
+      blackKing !== undefined &&
+      resultWhiteKingSquare !== undefined &&
+      isKnightMove(resultWhiteKingSquare, blackKing) &&
+      isDiagonalWhiteKingMove &&
+      getTwoBishopsEdgeFlankSquares(blackKing).includes(
+        resultWhiteKingSquare,
+      )
+        ? 0
+          : 1,
+    onsidesApplies: onsidesPreferredMoves.length > 0,
+    onsidesPenalty: onsidesPreferredMoves.includes(move.san) ? 0 : 1,
+    bootNScootApplies: bootNScootPreferredMoves.length > 0,
+    bootNScootPenalty: bootNScootPreferredMoves.includes(move.san) ? 0 : 1,
+    bootNScootReplyCount:
+      bootNScootPreferredMoves.includes(move.san) && move.piece === 'b'
+        ? blackMoves.length
+        : 0,
+    bootNScootUniqueBest,
     degenerateApplies: degenerateRepair !== null,
     degeneratePenalty:
       degenerateRepair !== null &&
@@ -2966,28 +4794,107 @@ function scoreTwoBishopsWhiteMoveWithContext(
       )
         ? 0
         : 1,
+    ruleRApplies: ruleRPreferredMoves.length > 0,
+    ruleRPenalty: ruleRPreferredMoves.includes(move.san) ? 0 : 1,
     ruleSApplies: ruleSPreferredMoves.length > 0,
     ruleSPenalty: ruleSPreferredMoves.includes(move.san) ? 0 : 1,
     ruleTApplies: ruleTGeometry !== null,
     ruleTPenalty: ruleTForces ? 0 : 1,
     ruleTReplyCount: ruleTForces ? blackMoves.length : 99,
-    ruleVApplies: ruleVSqueezeGeometries.length > 0,
-    ruleVPenalty:
-      ruleVSqueezeGeometries.some((geometry) =>
-        resultBishops.some(
-          (bishop) =>
-            squeezeProjection(bishop, geometry) ===
-            geometry.primaryIndex,
-        ),
+    ruleUUApplies: ruleUUPreferredMoves.length > 0,
+    ruleUUPenalty: ruleUUPreferredMoves.includes(move.san) ? 0 : 1,
+    ruleUApplies: ruleUPreferredMoves.length > 0,
+    ruleUPenalty: ruleUPreferredMoves.includes(move.san) ? 0 : 1,
+    ruleVApplies: ruleVMatchingGeometriesBySan.size > 0,
+    ruleVPenalty: matchingRuleVGeometries.length > 0 ? 0 : 1,
+    ruleVSqueezeEdgeDistance:
+      startingWhiteKing === undefined || blackKing === undefined
+        ? 0
+        : Math.max(
+            0,
+            ...matchingRuleVGeometries.map((geometry) =>
+              squeezeGeometryEdgeDistance(
+                startingWhiteKing,
+                blackKing,
+                geometry,
+              ),
+            ),
+          ),
+    ruleWApplies,
+    ruleWUrgentPenalty:
+      ruleWUrgentSetup && ruleWUrgentDiagonal !== undefined
+        ? bishopOccupiesFlankDiagonal(
+              resultBishops,
+              ruleWUrgentDiagonal,
+            )
+          ? 0
+          : 1
+        : 0,
+    ruleWPenalty:
+      ruleWPenaltiesBySan.get(move.san) ?? RULE_W_INCOMPLETE_PENALTY,
+    ruleYApplies: ruleYThreatenedBishops.length > 0,
+    ruleYPenalty:
+      ruleYPreventsAttack &&
+      ruleYMovedBishopStaysSafe &&
+      move.piece === 'b' &&
+      bishopMoveDiagonalSeparatesKings(
+        move.from,
+        move.to,
+        startingWhiteKing,
+        blackKing,
       )
         ? 0
         : 1,
-    ruleWApplies: ruleWFlankDiagonalPairs.length > 0,
-    ruleWPenalty: getRuleWPenalty(
-      resultBishops,
-      ruleWFlankDiagonalPairs,
-    ),
-    ruleWBishopMovePenalty: move.piece === 'b' ? 0 : 1,
+    ruleZApplies: ruleZCornerApplies || ruleZFollowupTarget !== null,
+    ruleZPenalty:
+      ruleZCornerApplies
+        ? blackKing !== undefined &&
+          resultWhiteKingSquare !== undefined &&
+          isKnightMove(resultWhiteKingSquare, blackKing)
+          ? 0
+          : 1
+        : ruleZFollowupTarget !== null &&
+            move.piece === 'b' &&
+            resultBishops.some((bishop) =>
+              bishopHasClearLineToSquare(
+                resultFen,
+                bishop,
+                ruleZFollowupTarget,
+              ),
+            )
+          ? 0
+          : 1,
+    ruleZZPenalty:
+      preserveExistingMegadethBox ||
+      resultWhiteKingSquare === undefined ||
+      blackKing === undefined
+        ? 0
+        : resultBishops.filter(
+            (bishop) =>
+              kingDistance(resultWhiteKingSquare, bishop) +
+                kingDistance(bishop, blackKing) ===
+              kingDistance(resultWhiteKingSquare, blackKing),
+          ).length,
+    deathBoxApplies: deathBoxPreferredMoves.length > 0,
+    deathBoxPenalty: deathBoxPreferredMoves.includes(move.san) ? 0 : 1,
+    megadethBoxApplies: megadethBoxPreferredMoves.length > 0,
+    megadethBoxPenalty: megadethBoxPreferredMoves.includes(move.san)
+      ? 0
+      : 1,
+    ruleZ1Applies: ruleZ1PreferredMoves.length > 0,
+    ruleZ1Penalty: ruleZ1PreferredMoves.includes(move.san) ? 0 : 1,
+    ruleZ2Applies: ruleZ2CompletedPairs.length > 0,
+    ruleZ2Penalty:
+      move.piece === 'b' &&
+      ruleZ2CompletedPairs.some(
+        (pair) => getRuleWPenalty(resultBishops, [pair]) === 0,
+      )
+        ? 0
+        : 1,
+    kingStutterApplies: kingStutterPreferredMoves.length > 0,
+    kingStutterPenalty: kingStutterPreferredMoves.includes(move.san)
+      ? 0
+      : 1,
     kingCloserPhaseTwoLinePenalty:
       !isPhaseTwo ||
       blackKing === undefined ||
@@ -3002,6 +4909,52 @@ function scoreTwoBishopsWhiteMoveWithContext(
       resultWhiteKingSquare
         ? distanceToMiddleSixteen(resultWhiteKingSquare)
         : 0,
+    centralKingPenalty:
+      resultWhiteKingSquare !== undefined &&
+      isTwoBishopsCentralPieceSquare(resultWhiteKingSquare)
+        ? 0
+        : 1,
+    unscreenBishopsCount:
+      resultWhiteKingSquare === undefined
+        ? 0
+        : resultBishops.filter((bishop) =>
+            squaresShareDiagonal(bishop, resultWhiteKingSquare),
+          ).length,
+    unclutteredBishopsApplies:
+      blackKing !== undefined && BOARD_CORNERS.includes(blackKing),
+    unclutteredBishopsPenalty:
+      blackKing === undefined || !BOARD_CORNERS.includes(blackKing)
+        ? 0
+        : resultBishops.filter((bishop) => isKnightMove(bishop, blackKing))
+            .length,
+    bishopDistance:
+      blackKing === undefined ||
+      resultWhiteKingSquare === undefined
+        ? 0
+        : (resultMoats.length === 0 ||
+            (!hasTwoBishopsBehindBlackRegion(
+              resultWhiteKingSquare,
+              blackKing,
+            ) &&
+              !hasTiedNonzeroKingDifferentials(
+                resultWhiteKingSquare,
+                blackKing,
+              ))
+            ? resultBishops
+            : resultBishops.filter((bishop) =>
+                resultMoats.some((moat) =>
+                  isSquareOnWhiteSideOfMoat(
+                    bishop,
+                    resultWhiteKingSquare,
+                    moat,
+                  ),
+                ),
+              ))
+            .reduce(
+            (total, bishop) =>
+              total + Math.sqrt(squaredEuclideanDistance(bishop, blackKing)),
+            0,
+          ),
     checkPenalty: chess.isCheck() ? 0 : 1,
     clutteredBishopsCount: resultBishops.filter(
       (bishop) =>
@@ -3017,6 +4970,39 @@ function distanceToMiddleSixteen(square: Square): number {
   const fileDistance = file < 2 ? 2 - file : file > 5 ? file - 5 : 0
   const rankDistance = rank < 2 ? 2 - rank : rank > 5 ? rank - 5 : 0
   return fileDistance + rankDistance
+}
+
+export function isTwoBishopsCentralPieceSquare(square: Square): boolean {
+  const { file, rank } = squareCoordinates(square)
+  const insideMiddleSix =
+    file >= 1 && file <= 6 && rank >= 1 && rank <= 6
+  const isBoxCorner =
+    (file === 1 || file === 6) && (rank === 1 || rank === 6)
+  return insideMiddleSix && !isBoxCorner
+}
+
+export function getTwoBishopsEdgeFlankSquares(
+  blackKing: Square,
+): readonly Square[] {
+  const { file, rank } = squareCoordinates(blackKing)
+  const targets = new Set<Square>()
+  const addTarget = (targetFile: number, targetRank: number) => {
+    const square = squareFromCoordinates(targetFile, targetRank)
+    if (square !== null) targets.add(square)
+  }
+
+  if (file === 0 || file === 7) {
+    const inwardFile = file === 0 ? 2 : 5
+    addTarget(inwardFile, rank - 1)
+    addTarget(inwardFile, rank + 1)
+  }
+  if (rank === 0 || rank === 7) {
+    const inwardRank = rank === 0 ? 2 : 5
+    addTarget(file - 1, inwardRank)
+    addTarget(file + 1, inwardRank)
+  }
+
+  return [...targets]
 }
 
 function isInOpposition(
@@ -3062,10 +5048,90 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
       first.stalematePenalty - second.stalematePenalty,
   },
   {
+    id: 'prepare mate',
+    shortLabel: 'prepare mate',
+    helpText:
+      "With the black king in the corner 2 squares and the white king a knight's move from the corner, play mate in 3 or less.",
+    applies: (score) => score.prepareMateApplies,
+    stopWhenBest: (score) => score.prepareMatePenalty === 0,
+    compare: (first, second) =>
+      first.prepareMatePenalty - second.prepareMatePenalty,
+  },
+  {
+    id: 'rule g',
+    shortLabel: 'rule g',
+    helpText:
+      "Of bishops on Black's side of all king moats, take the one furthest from White and move it furthest from the king moat on White's side and not closer to black in either axis.",
+    applies: (score) => score.ruleGApplies,
+    compare: (first, second) => first.ruleGPenalty - second.ruleGPenalty,
+  },
+  {
+    id: 'edge flank',
+    shortLabel: 'edge flank',
+    helpText:
+      'When the black king is on the edge, but not in the corner, flank diagonally.',
+    applies: (score) => score.edgeFlankApplies,
+    compare: (first, second) =>
+      first.edgeFlankPenalty - second.edgeFlankPenalty,
+  },
+  {
+    id: 'central king',
+    shortLabel: 'central king',
+    helpText: "Prefer the king in the middle 32 squares.",
+    compare: (first, second) =>
+      first.centralKingPenalty - second.centralKingPenalty,
+  },
+  {
+    id: 'rule uu',
+    shortLabel: 'rule uu',
+    helpText:
+      "If the kings are a knight's move apart, flank if the swap reduces the moat's distance from the edge on Black's side by at least 2.",
+    applies: (score) => score.ruleUUApplies,
+    compare: (first, second) =>
+      first.ruleUUPenalty - second.ruleUUPenalty,
+  },
+  {
+    id: 'onsides',
+    shortLabel: 'onsides',
+    helpText:
+      "Move a bishop behind Black's king as close as possible to the square behind White's king from Black's king's perspective unless it can be attacked at that destination on the next move.",
+    applies: (score) => score.onsidesApplies,
+    compare: (first, second) =>
+      first.onsidesPenalty - second.onsidesPenalty,
+  },
+  {
+    id: 'boot scoot n block',
+    shortLabel: 'boot scoot n block',
+    helpText:
+      "When the kings are in opposition and a bishop controls the secondary squeeze diagonal on the side closer to the kings, use a bishop boot to control the other primary squeeze diagonal. Then scoot to opposition on the next position. Finally, block the king's escape. (See gif)",
+    applies: (score) => score.bootNScootApplies,
+    compare: (first, second) =>
+      first.bootNScootPenalty - second.bootNScootPenalty ||
+      first.bootNScootReplyCount - second.bootNScootReplyCount,
+    stopWhenBest: (score) =>
+      score.bootNScootUniqueBest && score.bootNScootPenalty === 0,
+  },
+  {
+    id: 'rule r',
+    shortLabel: 'rule r',
+    helpText:
+      "Applies when the kings are a knight's move apart and a bishop controls the primary squeeze diagonal. If the black king is closer to the side edge than the rear edge, control the secondary squeeze diagonal without placing a bishop offsides.",
+    applies: (score) => score.ruleRApplies,
+    compare: (first, second) =>
+      first.ruleRPenalty - second.ruleRPenalty ||
+      (first.ruleRPenalty === 0 && second.ruleRPenalty === 0
+        ? first.kingCloserMiddleSixteenDistance -
+            second.kingCloserMiddleSixteenDistance ||
+          first.kingCloserDistance - second.kingCloserDistance ||
+          second.bishopDistance - first.bishopDistance
+        : 0),
+    stopWhenBest: (score) => score.ruleRPenalty === 0,
+  },
+  {
     id: 'rule s',
     shortLabel: 'rule s',
     helpText:
-      "Applies when the kings are a knight's move apart and a bishop controls the primary squeeze diagonal. Check from the tertiary squeeze diagonal or otherwise take opposition if a bishop can control the secondary squeeze diagonal in one move.",
+      "Applies when the kings are a knight's move apart and a bishop controls the primary squeeze diagonal. Check from the tertiary squeeze diagonal to force moat opposition or otherwise take opposition, stepping away from the primary squeeze diagonal.",
     applies: (score) => score.ruleSApplies,
     compare: (first, second) => first.ruleSPenalty - second.ruleSPenalty,
   },
@@ -3073,19 +5139,31 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
     id: 'rule t',
     shortLabel: 'rule t',
     helpText:
-      "When the kings are a knight's move apart, force the Black king to either take opposition or widen the King moat.",
+      "When the kings are a knight's move apart, use a bishop from behind the moat to force the Black king to take moat opposition.",
     applies: (score) => score.ruleTApplies,
     compare: (first, second) =>
       first.ruleTPenalty - second.ruleTPenalty ||
       first.ruleTReplyCount - second.ruleTReplyCount,
+    stopWhenBest: (score) =>
+      score.isPhaseTwoPosition && score.ruleTPenalty === 0,
+  },
+  {
+    id: 'rule u',
+    shortLabel: 'rule u',
+    helpText:
+      "When the kings are a knight's move apart, a bishop controls the secondary squeeze diagonal from the white side of the moat, and a bishop can move to control the primary squeeze diagonal from the white side of the moat, take opposition away from the squeeze diagonal.",
+    applies: (score) => score.ruleUApplies,
+    compare: (first, second) => first.ruleUPenalty - second.ruleUPenalty,
   },
   {
     id: 'rule v',
     shortLabel: 'rule v',
     helpText:
-      'When the kings are in opposition and a bishop can control the secondary squeeze diagonal in one move, control the primary squeeze diagonal.',
+      'When the kings are in opposition and a bishop can control or x-ray the secondary squeeze diagonal in one move, control the primary squeeze diagonal. If a bishop already controls the primary squeeze diagonal, check from squeeze side.',
     applies: (score) => score.ruleVApplies,
-    compare: (first, second) => first.ruleVPenalty - second.ruleVPenalty,
+    compare: (first, second) =>
+      first.ruleVPenalty - second.ruleVPenalty ||
+      second.ruleVSqueezeEdgeDistance - first.ruleVSqueezeEdgeDistance,
   },
   {
     id: 'rule w',
@@ -3095,7 +5173,74 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
     applies: (score) => score.ruleWApplies,
     compare: (first, second) =>
       first.ruleWPenalty - second.ruleWPenalty ||
-      first.ruleWBishopMovePenalty - second.ruleWBishopMovePenalty,
+      first.ruleWUrgentPenalty - second.ruleWUrgentPenalty,
+  },
+  {
+    id: 'rule y',
+    shortLabel: 'rule y',
+    helpText:
+      'Use a bishop to prevent Black from attacking the other undefended bishop on their next move, moving along a diagonal that separates the kings, unless Black can attack it on the next move.',
+    applies: () => false,
+    compare: (first, second) =>
+      first.ruleYPenalty - second.ruleYPenalty,
+  },
+  {
+    id: 'rule z',
+    shortLabel: 'rule z',
+    helpText:
+      "If Black's king is in a corner, put White's king a knight's move away. If Black is one edge-square from that corner, use a bishop to control the next edge-square away from the corner.",
+    applies: (score) => score.ruleZApplies,
+    compare: (first, second) => first.ruleZPenalty - second.ruleZPenalty,
+  },
+  {
+    id: 'rule zz',
+    shortLabel: 'rule zz',
+    helpText: 'Keep bishops not on a shortest path between the kings.',
+    compare: (first, second) => first.ruleZZPenalty - second.ruleZZPenalty,
+  },
+  {
+    id: 'rule z1',
+    shortLabel: 'rule z1',
+    helpText:
+      "When the kings are a knight's move apart and bishops control the flank diagonals, use a bishop to control the primary squeeze diagonal.",
+    applies: (score) => score.ruleZ1Applies,
+    compare: (first, second) =>
+      first.ruleZ1Penalty - second.ruleZ1Penalty,
+  },
+  {
+    id: 'death box',
+    shortLabel: 'death box',
+    helpText:
+      "When possible, place a bishop in opposition with a king on the edge, next to a bishop that is a knight's move from the Black king, without either piece on the edge. Prefer keeping the death box.",
+    applies: (score) => score.deathBoxApplies,
+    compare: (first, second) =>
+      first.deathBoxPenalty - second.deathBoxPenalty,
+  },
+  {
+    id: 'megadeth box',
+    shortLabel: 'megadeth box',
+    helpText:
+      'With the king on the edge and a bishop controlling the inward adjacent square, place the other bishop in middle-16-squares opposition to the king, adjacent to the first bishop. Prefer keeping the megadeth box.',
+    applies: (score) => score.megadethBoxApplies,
+    compare: (first, second) =>
+      first.megadethBoxPenalty - second.megadethBoxPenalty,
+  },
+  {
+    id: 'rule z2',
+    shortLabel: 'rule z2',
+    helpText:
+      "When the kings are 2 diagonal squares apart and bishops control the 2 diagonals parallel and adjacent to the kings' diagonal, maintain those diagonals and don't move the king.",
+    applies: (score) => score.ruleZ2Applies,
+    compare: (first, second) =>
+      first.ruleZ2Penalty - second.ruleZ2Penalty,
+  },
+  {
+    id: 'king stutter',
+    shortLabel: 'king stutter',
+    helpText: 'Do a king stutter step.',
+    applies: (score) => score.kingStutterApplies,
+    compare: (first, second) =>
+      first.kingStutterPenalty - second.kingStutterPenalty,
   },
   {
     id: 'king closer',
@@ -3103,9 +5248,39 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
     helpText:
       "Bring White's king closer to Black's king, preferring proximity to the the middle 16 squares.",
     compare: (first, second) =>
-      first.kingCloserDistance - second.kingCloserDistance ||
       first.kingCloserMiddleSixteenDistance -
-        second.kingCloserMiddleSixteenDistance,
+        second.kingCloserMiddleSixteenDistance ||
+      first.kingCloserDistance - second.kingCloserDistance,
+  },
+  {
+    id: 'unscreen bishops',
+    shortLabel: 'unscreen bishops',
+    helpText: "Keep bishops off White's king's diagonal.",
+    compare: (first, second) =>
+      first.unscreenBishopsCount - second.unscreenBishopsCount,
+  },
+  {
+    id: 'uncluttered bishops',
+    shortLabel: 'uncluttered bishops',
+    helpText:
+      "If Black's king is in the corner, prefer bishops off of squares a knight's move from the corner.",
+    applies: (score) => score.unclutteredBishopsApplies,
+    compare: (first, second) =>
+      first.unclutteredBishopsPenalty - second.unclutteredBishopsPenalty,
+  },
+  {
+    id: 'central pieces',
+    shortLabel: 'central pieces',
+    helpText: "Prefer White's pieces in the middle 32 squares.",
+    compare: (first, second) =>
+      first.centralPiecesPenalty - second.centralPiecesPenalty,
+  },
+  {
+    id: 'bishop distance',
+    shortLabel: 'bishop distance',
+    helpText: "Prefer bishops onsides farther from Black's king.",
+    compare: (first, second) =>
+      second.bishopDistance - first.bishopDistance,
   },
 ]
 
@@ -3120,6 +5295,101 @@ function scoreWhiteCandidates(
   fen: string,
   moves: readonly string[],
 ): readonly ScoredMove<TwoBishopsWhiteMoveScore>[] {
+  const chess = getChess(fen)
+  const mateMoves = moves.filter((san) => {
+    chess.move(san)
+    const isMate = chess.isCheckmate()
+    chess.undo()
+    return isMate
+  })
+  if (mateMoves.length === 1) {
+    const mateSan = mateMoves[0]
+    const neutralScore = (matePenalty: number): TwoBishopsWhiteMoveScore => ({
+      isPhaseTwoPosition: false,
+      matePenalty,
+      bishopSafetyPenalty: 0,
+      stalematePenalty: 0,
+      prepareMateApplies: false,
+      prepareMatePenalty: 0,
+      ruleGApplies: false,
+      ruleGPenalty: 0,
+      centralPiecesPenalty: 0,
+      edgeFlankApplies: false,
+      edgeFlankPenalty: 0,
+      onsidesApplies: false,
+      onsidesPenalty: 0,
+      bootNScootApplies: false,
+      bootNScootPenalty: 0,
+      bootNScootReplyCount: 0,
+      bootNScootUniqueBest: false,
+      degenerateApplies: false,
+      degeneratePenalty: 0,
+      degenerateTerminal: false,
+      mateInThreeApplies: false,
+      mateInThreeTurns: 0,
+      phaseTwoWallApplies: false,
+      phaseTwoWallPenalty: 0,
+      shepherdApplies: false,
+      shepherdPenalty: 0,
+      sequesterApplies: false,
+      sequesterHasTargetCorner: false,
+      sequesterCornerDiagonalsTarget: false,
+      sequesterTargetCornerScore: 0,
+      sequesterCurrentCornerDistance: 0,
+      sequesterMaximumCornerReplyDistance: 0,
+      sequesterTwoAwayControlPenalty: 0,
+      sequesterIsBishopMove: false,
+      bishopsOnBlackEdgeCount: 0,
+      forcePhaseTwoApplies: false,
+      forcePhaseTwoPenalty: 0,
+      ruleRApplies: false,
+      ruleRPenalty: 0,
+      ruleSApplies: false,
+      ruleSPenalty: 0,
+      ruleTApplies: false,
+      ruleTPenalty: 0,
+      ruleTReplyCount: 0,
+      ruleUUApplies: false,
+      ruleUUPenalty: 0,
+      ruleUApplies: false,
+      ruleUPenalty: 0,
+      ruleVApplies: false,
+      ruleVPenalty: 0,
+      ruleVSqueezeEdgeDistance: 0,
+      ruleWApplies: false,
+      ruleWUrgentPenalty: 0,
+      ruleWPenalty: 0,
+      ruleYApplies: false,
+      ruleYPenalty: 0,
+      ruleZApplies: false,
+      ruleZPenalty: 0,
+      ruleZZPenalty: 0,
+      deathBoxApplies: false,
+      deathBoxPenalty: 0,
+      megadethBoxApplies: false,
+      megadethBoxPenalty: 0,
+      ruleZ1Applies: false,
+      ruleZ1Penalty: 0,
+      ruleZ2Applies: false,
+      ruleZ2Penalty: 0,
+      kingStutterApplies: false,
+      kingStutterPenalty: 0,
+      kingCloserPhaseTwoLinePenalty: 0,
+      kingCloserDistance: 0,
+      kingCloserMiddleSixteenDistance: 0,
+      centralKingPenalty: 0,
+      unscreenBishopsCount: 0,
+      unclutteredBishopsApplies: false,
+      unclutteredBishopsPenalty: 0,
+      bishopDistance: 0,
+      checkPenalty: 0,
+      clutteredBishopsCount: 0,
+    })
+    return moves.map((san) => ({
+      san,
+      score: neutralScore(san === mateSan ? 0 : 1),
+    }))
+  }
   const context = createTwoBishopsWhitePositionContext(fen)
   return moves.map((san) => ({
     san,

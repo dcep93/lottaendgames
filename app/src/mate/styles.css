@@ -821,6 +821,14 @@
   background: var(--leg-board-light);
 }
 
+.leg-mate-note-board-animation {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 0.3rem;
+}
+
 .leg-mate-note-board-squares,
 .leg-mate-note-board-pieces {
   position: absolute;

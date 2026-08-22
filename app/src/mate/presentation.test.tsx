@@ -1339,7 +1339,7 @@ test('priority guide follows registered facade order and renders typed diagrams'
     const notesAt = markup.indexOf('>Notes<')
     const shortcutsAt = markup.indexOf('>Keyboard shortcuts<')
 
-    if (id === 'queen' || id === 'rook' || id === 'two-bishops') {
+    if (id === 'queen' || id === 'rook') {
       assert.equal(notesAt, -1, `${id}: empty Notes should be omitted`)
     } else {
       assert.ok(notesAt >= 0, `${id}: Notes missing`)
@@ -1383,15 +1383,31 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
   )
   assert.match(
     bishopsMarkup,
-    />rule s<[^]*Applies when the kings are a knight&#x27;s move apart and a bishop controls the primary squeeze diagonal\. Check from the tertiary squeeze diagonal or otherwise take opposition if a bishop can control the secondary squeeze diagonal in one move\./,
+    />rule r<[^]*Applies when the kings are a knight&#x27;s move apart and a bishop controls the primary squeeze diagonal\. If the black king is closer to the side edge than the rear edge, control the secondary squeeze diagonal without placing a bishop offsides\./,
   )
   assert.match(
     bishopsMarkup,
-    />rule t<[^]*When the kings are a knight&#x27;s move apart, force the Black king to either take opposition or widen the King moat\./,
+    />rule s<[^]*Applies when the kings are a knight&#x27;s move apart and a bishop controls the primary squeeze diagonal\. Check from the tertiary squeeze diagonal to force moat opposition or otherwise take opposition, stepping away from the primary squeeze diagonal\./,
   )
   assert.match(
     bishopsMarkup,
-    />rule v<[^]*When the kings are in opposition and a bishop can control the secondary squeeze diagonal in one move, control the primary squeeze diagonal\./,
+    />rule t<[^]*When the kings are a knight&#x27;s move apart, use a bishop from behind the moat to force the Black king to take moat opposition\./,
+  )
+  assert.match(
+    bishopsMarkup,
+    /Moat modifier means Black may widen the King moat instead of satisfying the rule&#x27;s requested response\./,
+  )
+  assert.match(
+    bishopsMarkup,
+    />rule t<[^]*>rule u<[^]*When the kings are a knight&#x27;s move apart, a bishop controls the secondary squeeze diagonal from the white side of the moat, and a bishop can move to control the primary squeeze diagonal from the white side of the moat, take opposition away from the squeeze diagonal\./,
+  )
+  assert.match(
+    bishopsMarkup,
+    />rule u<[^]*>rule v<[^]*When the kings are in opposition and a bishop can control the secondary squeeze diagonal in one move, control the primary squeeze diagonal\. If a bishop already controls the primary squeeze diagonal, check from squeeze side\./,
+  )
+  assert.match(
+    bishopsMarkup,
+    />prepare mate<[^]*With the black king in the corner and the white king a knight&#x27;s move away, play an onsides bishop waiting move, maintaining the secondary squeeze diagonal\.[^]*>edge flank<[^]*When the black king is on the edge, flank diagonally\.[^]*>central king<[^]*Prefer the king in the middle 32 squares\.[^]*>onsides<[^]*Move a bishop behind the moat as close as possible to the square behind White&#x27;s king from Black&#x27;s king&#x27;s perspective\.[^]*>boot scoot n block<[^]*secondary squeeze diagonal on the side closer to the kings[^]*moat use a bishop to boot the king towards that squeeze diagonal\.[^]*Finally, block the king&#x27;s escape\. \(See gif\)[^]*>rule r<[^]*>rule s<[^]*>rule v<[^]*>rule w<[^]*>rule y<[^]*>king closer<[^]*>unscreen bishops<[^]*>central pieces<[^]*Prefer White&#x27;s pieces in the middle 32 squares\.[^]*>bishop distance</,
   )
   assert.match(
     bishopsMarkup,
@@ -1399,7 +1415,32 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
   )
   assert.match(
     bishopsMarkup,
+    />rule w<[^]*>rule y<[^]*Use a bishop to prevent Black from attacking the other undefended bishop on their next move, moving along a diagonal that separates the kings, unless Black can attack it on the next move\.<[^]*>king closer</,
+  )
+  assert.match(
+    bishopsMarkup,
     />king closer<[^]*Bring White&#x27;s king closer to Black&#x27;s king, preferring proximity to the the middle 16 squares\./,
+  )
+  assert.match(
+    bishopsMarkup,
+    />king closer<[^]*>unscreen bishops<[^]*Keep bishops off White&#x27;s king&#x27;s diagonal\./,
+  )
+  assert.match(
+    bishopsMarkup,
+    />unscreen bishops<[^]*>central pieces<[^]*>bishop distance<[^]*Prefer bishops onsides farther from Black&#x27;s king\./,
+  )
+  assert.match(
+    bishopsMarkup,
+    /aria-label="edge flank\. White king on g4\. Black king on h6\./,
+  )
+  assert.match(
+    bishopsMarkup,
+    /Pink squares are White&#x27;s diagonal flank targets for Black&#x27;s edge square\./,
+  )
+  assert.match(bishopsMarkup, /data-arrow="g4-f5"/)
+  assert.match(
+    bishopsMarkup,
+    /<img alt="Boot Scoot N Block progression: Bg4, Black king to c2, White king to c4, Black king to d2, then Bc5\." class="leg-mate-note-board-animation" src="\/mate\/two-bishops\/boot-n-scoot\.gif"\/?>/,
   )
   assert.match(
     bishopsMarkup,
@@ -2252,6 +2293,10 @@ test('Mate exposes stable desktop and narrow-layout structure', () => {
   assert.match(
     css,
     /\.leg-mate-note-board-piece svg\s*\{[^}]*width:\s*88%;[^}]*height:\s*88%/s,
+  )
+  assert.match(
+    css,
+    /\.leg-mate-note-board-animation\s*\{[^}]*width:\s*100%;[^}]*aspect-ratio:\s*1;[^}]*object-fit:\s*cover/s,
   )
   assert.match(
     css,

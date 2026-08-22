@@ -127,12 +127,13 @@ export default function MateRuleNoteBoard({
         <strong>{board.title}</strong>
         {board.caption === '' ? null : <span>{board.caption}</span>}
       </figcaption>
-      <div
-        aria-label={noteBoardLabel(board)}
-        className="leg-mate-note-board-surface"
-        role="img"
-        style={{ aspectRatio: `${layout.files} / ${layout.ranks}` }}
-      >
+      {board.animationSrc === undefined ? (
+        <div
+          aria-label={noteBoardLabel(board)}
+          className="leg-mate-note-board-surface"
+          role="img"
+          style={{ aspectRatio: `${layout.files} / ${layout.ranks}` }}
+        >
         <div
           aria-hidden="true"
           className="leg-mate-note-board-squares"
@@ -214,7 +215,14 @@ export default function MateRuleNoteBoard({
             )
           })}
         </div>
-      </div>
+        </div>
+      ) : (
+        <img
+          alt={board.animationAlt ?? noteBoardLabel(board)}
+          className="leg-mate-note-board-animation"
+          src={board.animationSrc}
+        />
+      )}
     </figure>
   )
 }

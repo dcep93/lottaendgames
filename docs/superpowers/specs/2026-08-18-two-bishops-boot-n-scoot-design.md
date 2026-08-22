@@ -4,7 +4,7 @@
 
 Add this priority immediately after `edge flank`:
 
-> **boot scoot n block** — When the kings are in opposition and a bishop controls the secondary squeeze diagonal on the side closer to the kings, moat use a bishop to boot the king towards that squeeze diagonal. Then scoot to opposition on the next position. Finally, block the king's escape. (See gif)
+> **boot scoot n block** — When the kings are in opposition and a bishop controls the secondary squeeze diagonal on the side closer to the kings, use a bishop boot to control the other primary squeeze diagonal. Then scoot to opposition on the next position. Finally, block the king's escape. (See gif)
 
 The rule applies in both phases. Existing universal safeguards and `edge flank`
 remain earlier; Rule S and every later priority remain after it.
@@ -25,7 +25,8 @@ rank and eighth-rank walls. Retain only the squeeze geometry on the nearer
 side.
 
 A bishop move completes the boot for a prepared geometry when it moves the
-other bishop, preserves the secondary controller, and every legal Black king
+other bishop onto the primary diagonal belonging to the other opposition
+squeeze geometry, preserves the secondary controller, and every legal Black king
 reply does at least one of the following:
 
 - moves strictly closer to the prepared secondary diagonal; or

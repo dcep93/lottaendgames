@@ -136,6 +136,8 @@ export type RuleNoteBoard = {
   readonly id: string
   readonly title: string
   readonly caption: string
+  readonly animationSrc?: string
+  readonly animationAlt?: string
   readonly layout?: RuleNoteBoardLayout
   readonly pieces: readonly RuleNoteBoardPiece[]
   readonly highlights: readonly RuleNoteBoardHighlight[]

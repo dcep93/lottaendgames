@@ -5,12 +5,12 @@
 Replace the Phase 1 `rule pp`, `rule p`, `rule q`, `rule r`, and `rule s`
 priorities with three new priorities while preserving `king closer`:
 
-1. **rule a** — Phase 1: When the kings are a knight's move apart, use a
-   bishop to control the flank square. The flank square is the square adjacent
-   to Black's king and also a knight's move from White's king.
-2. **rule b** — Phase 1: Keep bishops behind White's king, from Black's king's
+1. **rule a** — When the kings are a knight's move apart, use a bishop to
+   control the flank square. The flank square is the square adjacent to Black's
+   king and also a knight's move from White's king.
+2. **rule b** — Keep bishops behind White's king, from Black's king's
    perspective.
-3. **rule c** — Phase 1: Place bishops on adjacent diagonals.
+3. **rule c** — Place bishops on adjacent diagonals.
 
 The visible technique order is `rule a`, `rule b`, `rule c`, then
 `king closer`. The existing mate, bishop-safety, and stalemate safeguards stay
