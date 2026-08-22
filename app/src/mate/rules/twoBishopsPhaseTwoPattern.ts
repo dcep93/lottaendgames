@@ -23,6 +23,8 @@ const MATE_IN_EIGHT_ISH_F_START_FEN =
   '8/8/8/8/8/5K1k/8/3BB3 w - - 0 1'
 const MATE_IN_EIGHT_ISH_G_START_FEN =
   '8/8/8/8/8/8/3BBK1k/8 w - - 4 3'
+const MATE_IN_EIGHT_ISH_H_START_FEN =
+  '8/8/8/8/8/5K2/4B2k/4B3 w - - 0 1'
 const MATE_IN_EIGHT_ISH_F_WAITING_DIAGONAL = [
   'c8',
   'd7',
@@ -527,6 +529,84 @@ function buildGraph(): PhaseTwoPatternGraph {
 
     if (!visitFlowG(flowGStartFen, 0)) {
       throw new Error('Mate in 8 ish G must end in mate')
+    }
+
+    const flowHStartFen = transformFen(
+      MATE_IN_EIGHT_ISH_H_START_FEN,
+      transform,
+    )
+    const flowHMemo = new Map<string, boolean>()
+    const flowHBlackDestinations = ['h1', 'h2', 'h1', 'h2', 'h1'].map(
+      (square) => transformSquare(square as Square, transform),
+    )
+    const visitFlowH = (fen: string, stage: number): boolean => {
+      const key = `${stage}:${positionKey(fen)}`
+      const cached = flowHMemo.get(key)
+      if (cached !== undefined) return cached
+
+      const chess = getChess(fen)
+      if (chess.turn() !== 'w') {
+        flowHMemo.set(key, false)
+        return false
+      }
+
+      let succeeds = false
+      for (const move of chess.moves({ verbose: true })) {
+        const afterWhite = getChess(fen)
+        afterWhite.move(move)
+        const afterWhiteFen = afterWhite.fen()
+        const matches =
+          stage === 0
+            ? move.piece === 'k' &&
+              move.from === transformSquare('f3', transform) &&
+              move.to === transformSquare('f2', transform)
+            : stage === 1
+              ? move.piece === 'b' &&
+                move.from === transformSquare('e1', transform) &&
+                move.to === transformSquare('d2', transform)
+              : stage === 2
+                ? move.piece === 'b' &&
+                  move.from === transformSquare('e2', transform) &&
+                  move.to === transformSquare('g4', transform)
+                : stage === 3
+                  ? move.piece === 'b' &&
+                    move.from === transformSquare('g4', transform) &&
+                    flowFWaitingDiagonal.has(move.to)
+                  : stage === 4
+                    ? move.piece === 'b' &&
+                      afterWhite.isCheck() &&
+                      !afterWhite.isCheckmate()
+                    : move.piece === 'b' && afterWhite.isCheckmate()
+        if (!matches) continue
+
+        let downstream = stage === 5
+        if (stage < 5) {
+          const replies = afterWhite.moves({ verbose: true })
+          const matchingReplies = replies.filter(
+            (reply) => reply.to === flowHBlackDestinations[stage],
+          )
+          if (stage === 4 && replies.length !== 1) continue
+          downstream = matchingReplies.some((reply) => {
+            const afterBlack = getChess(afterWhiteFen)
+            afterBlack.move(reply)
+            return visitFlowH(afterBlack.fen(), stage + 1)
+          })
+        }
+        if (!downstream) continue
+
+        succeeds = true
+        positions.add(positionKey(fen))
+        positions.add(positionKey(afterWhiteFen))
+        recordWhiteMove(fen, move.san)
+      }
+
+      if (succeeds) positions.add(positionKey(fen))
+      flowHMemo.set(key, succeeds)
+      return succeeds
+    }
+
+    if (!visitFlowH(flowHStartFen, 0)) {
+      throw new Error('Mate in 8 ish H must end in mate')
     }
   }
 
