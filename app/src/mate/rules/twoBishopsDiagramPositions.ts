@@ -91,6 +91,22 @@ export const TWO_BISHOPS_DIAGRAM_POSITIONS = {
     fen: "8/8/5B2/4KB1k/8/8/8/8 w - - 2 2",
     arrow: { from: 'e5', to: 'e4' },
   },
+  ruleA: {
+    pieces: [
+      { square: 'f2', piece: 'K' },
+      { square: 'e6', piece: 'B' },
+    ],
+    highlights: [
+      { square: 'c8', kind: 'wall' },
+      { square: 'd7', kind: 'wall' },
+      { square: 'e6', kind: 'wall' },
+      { square: 'f5', kind: 'wall' },
+      { square: 'g4', kind: 'wall' },
+      { square: 'h3', kind: 'wall' },
+      { square: 'h1', kind: 'pink' },
+      { square: 'h2', kind: 'pink' },
+    ],
+  },
   ruleN: {
     fen: "8/8/8/8/8/2BB4/k7/2K5 w - - 0 1",
     highlights: [

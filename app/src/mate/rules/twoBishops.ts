@@ -36,6 +36,7 @@ import {
   getSmallestTwoBishopsWallArea,
 } from './twoBishopsWallGeometry'
 import { getTwoBishopsPhaseTwoPatternMoves } from './twoBishopsPhaseTwoPattern'
+import { evaluateRuleACornerCage } from './twoBishopsCornerCage'
 import {
   TWO_BISHOPS_PHASE_TWO_CANONICAL_MOVES,
   TWO_BISHOPS_PHASE_TWO_START_FEN,
@@ -57,6 +58,8 @@ export type TwoBishopsWhiteMoveScore = {
   readonly stalematePenalty: number
   readonly prepareMateApplies: boolean
   readonly prepareMatePenalty: number
+  readonly ruleAApplies: boolean
+  readonly ruleAPenalty: number
   readonly ruleNApplies: boolean
   readonly ruleNPenalty: number
   readonly ruleOApplies: boolean
@@ -571,6 +574,14 @@ const twoBishopsHelp: RuleHelp = {
       highlights: [],
     },
     {
+      id: 'bishop-rule-a',
+      title: 'rule a',
+      caption:
+        'Pink squares are Black\'s corner-edge squares. The highlighted c8–h3 diagonal is the corner cage diagonal.',
+      pieces: TWO_BISHOPS_DIAGRAM_POSITIONS.ruleA.pieces,
+      highlights: TWO_BISHOPS_DIAGRAM_POSITIONS.ruleA.highlights,
+    },
+    {
       id: 'bishop-rule-n',
       title: 'rule n',
       caption:
@@ -970,6 +981,7 @@ const twoBishopsHelp: RuleHelp = {
       'bishop-mate-in-eight-ish-i',
       'bishop-mate-in-eight-ish-j',
       'bishop-mate-in-eight-ish-k',
+      'bishop-rule-a',
       'bishop-rule-n',
     ].includes(board.id),
   ),
@@ -2836,6 +2848,8 @@ type TwoBishopsWhitePositionContext = {
   readonly matePatternTurnsBySan: ReadonlyMap<string, 2 | 3>
   readonly shepherdMoves: readonly string[]
   readonly prepareMatePreferredMoves: readonly string[]
+  readonly ruleAApplies: boolean
+  readonly ruleAPenaltiesBySan: ReadonlyMap<string, number>
   readonly ruleNPreferredMoves: readonly string[]
   readonly ruleOApplies: boolean
   readonly ruleOWallAreasBySan: ReadonlyMap<string, number>
@@ -4614,6 +4628,7 @@ function createTwoBishopsWhitePositionContext(
     blackKing,
   )
   const prepareMatePreferredMoves = getTwoBishopsPhaseTwoPatternMoves(fen)
+  const ruleAEvaluation = evaluateRuleACornerCage(fen)
   const ruleNPreferredMoves = getRuleNPreferredMoves(fen)
   const ruleOWallAreasBySan = new Map<string, number>()
   for (const move of getChess(fen).moves({ verbose: true })) {
@@ -4739,6 +4754,8 @@ function createTwoBishopsWhitePositionContext(
           )
         : [],
     prepareMatePreferredMoves,
+    ruleAApplies: ruleAEvaluation.applies,
+    ruleAPenaltiesBySan: ruleAEvaluation.penaltiesBySan,
     ruleNPreferredMoves,
     ruleOApplies: ruleOWallAreasBySan.size > 0,
     ruleOWallAreasBySan,
@@ -4802,6 +4819,8 @@ function scoreTwoBishopsWhiteMoveWithContext(
     matePatternTurnsBySan,
     shepherdMoves,
     prepareMatePreferredMoves,
+    ruleAApplies,
+    ruleAPenaltiesBySan,
     ruleNPreferredMoves,
     ruleOApplies,
     ruleOWallAreasBySan,
@@ -4955,6 +4974,8 @@ function scoreTwoBishopsWhiteMoveWithContext(
     prepareMatePenalty: prepareMatePreferredMoves.includes(move.san)
       ? 0
       : 1,
+    ruleAApplies,
+    ruleAPenalty: ruleAPenaltiesBySan.get(move.san) ?? 999,
     ruleNApplies: ruleNPreferredMoves.length > 0,
     ruleNPenalty: ruleNPreferredMoves.includes(move.san) ? 0 : 1,
     ruleOApplies,
@@ -5303,6 +5324,15 @@ const twoBishopsWhiteRuleCatalog: readonly OrderedRule<TwoBishopsWhiteMoveScore>
       first.prepareMatePenalty - second.prepareMatePenalty,
   },
   {
+    id: 'rule a',
+    shortLabel: 'rule a',
+    helpText:
+      "With Black's king in the 2 corner edge squares, place the White king a knight's move from that corner. Then, place a bishop on the corner cage diagonal. Then, play a bishop waiting move if necessary, until mate in 2.",
+    applies: (score) => score.ruleAApplies,
+    stopWhenBest: (score) => score.ruleAPenalty === 0,
+    compare: (first, second) => first.ruleAPenalty - second.ruleAPenalty,
+  },
+  {
     id: 'rule n',
     shortLabel: 'rule n',
     helpText:
@@ -5547,6 +5577,7 @@ const ACTIVE_TWO_BISHOPS_WHITE_RULE_IDS = [
   'bishops safe',
   'no stalemate',
   'mate in 8 ish',
+  'rule a',
   'rule n',
   'rule o',
   'king closer',
@@ -5588,6 +5619,8 @@ function scoreWhiteCandidates(
       stalematePenalty: 0,
       prepareMateApplies: false,
       prepareMatePenalty: 0,
+      ruleAApplies: false,
+      ruleAPenalty: 0,
       ruleNApplies: false,
       ruleNPenalty: 0,
       ruleOApplies: false,

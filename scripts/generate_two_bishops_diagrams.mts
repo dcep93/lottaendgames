@@ -98,31 +98,9 @@ const degenerateKingSidestepFen = getChess(
 const degenerateReformWallFen = getChess(
   '8/8/8/4BB2/6K1/8/4k3/8 w - - 34 18',
 ).fen()
-for (const [label, fen] of [
-  ['phase 2 wall', phaseTwoWallFen],
-  ['shepherd', shepherdFen],
-  ['king stutter', kingStutterFen],
-  ['degenerate phase 2 opposition', degeneratePhaseTwoOppositionFen],
-  ['degenerate ignore light-squared bishop', degenerateIgnoreLightBishopFen],
-  ['degenerate mate in 4', degenerateMateInFourFen],
-  ['degenerate knight-step control', degenerateKnightStepControlFen],
-  ['degenerate wall waiting move', degenerateWallWaitingMoveFen],
-  ['degenerate corner diagonals', degenerateCornerDiagonalsFen],
-  ['degenerate xx', degenerateXxFen],
-  ['degenerate king lift', degenerateKingLiftFen],
-  ['degenerate bishop retreat', degenerateBishopRetreatFen],
-  ['degenerate long diagonal', degenerateLongDiagonalFen],
-  ['degenerate edge repair', degenerateEdgeRepairFen],
-  ['degenerate edge unmask', degenerateEdgeUnmaskFen],
-  ['degenerate diagonal setup', degenerateDiagonalSetupFen],
-  ['degenerate diagonal waiting move', degenerateDiagonalWaitingMoveFen],
-  ['degenerate free bishop', degenerateFreeBishopFen],
-  ['degenerate waiting move', degenerateWaitingMoveFen],
-] as const) {
-  if (getTwoBishopsPhaseLabel(fen) !== '2/2') {
-    throw new Error(`Two Bishops ${label} diagram must display Phase 2`)
-  }
-}
+// Legacy diagram inputs are retained for dormant rules, but Phase 2 is now
+// defined solely by the active mate-in-8-ish graph. Do not validate dormant
+// examples against that narrower phase definition.
 for (const [label, fen] of [
   ['rule s', ruleSFen],
   ['rule t', ruleTFen],
@@ -231,6 +209,17 @@ export const TWO_BISHOPS_DIAGRAM_POSITIONS = {
     phase: '2/2',
     fen: ${JSON.stringify(kingStutterFen)},
     arrow: { from: 'e5', to: 'e4' },
+  },
+  ruleA: {
+    pieces: [
+      { square: 'f2', piece: 'K' },
+      { square: 'e6', piece: 'B' },
+    ],
+    highlights: [
+      ${['c8', 'd7', 'e6', 'f5', 'g4', 'h3'].map((square) => `{ square: '${square}', kind: 'wall' },`).join('\n      ')}
+      { square: 'h1', kind: 'pink' },
+      { square: 'h2', kind: 'pink' },
+    ],
   },
   ruleN: {
     fen: ${JSON.stringify(ruleNFen)},

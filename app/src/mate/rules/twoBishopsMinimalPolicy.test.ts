@@ -11,6 +11,7 @@ const ACTIVE_RULE_IDS = [
   'bishops safe',
   'no stalemate',
   'mate in 8 ish',
+  'rule a',
   'rule n',
   'rule o',
   'king closer',
@@ -39,7 +40,7 @@ test('king closer keeps the middle-sixteen tie-break first', () => {
   )
 })
 
-test('Two Bishops help renders the Phase 2 animation and Rule N diagram', () => {
+test('Two Bishops help renders the Phase 2 animation and active diagrams', () => {
   assert.deepEqual(twoBishopsRuleSet.help.notes, [
     "A bishop wall is two adjacent parallel diagonals, with the nearer diagonal adjacent to Black's king. White's king matters only when its screening lets Black escape.",
   ])
@@ -57,6 +58,7 @@ test('Two Bishops help renders the Phase 2 animation and Rule N diagram', () => 
       'bishop-mate-in-eight-ish-i',
       'bishop-mate-in-eight-ish-j',
       'bishop-mate-in-eight-ish-k',
+      'bishop-rule-a',
       'bishop-rule-n',
     ],
   )
@@ -136,6 +138,28 @@ test('Two Bishops help renders the Phase 2 animation and Rule N diagram', () => 
         firstFen: '8/8/8/8/7B/5K2/7k/3B4 w - - 0 1',
         animationSrc: undefined,
       },
+    ],
+  )
+
+  const ruleA = twoBishopsRuleSet.help.noteBoards.find(
+    ({ id }) => id === 'bishop-rule-a',
+  )
+  assert.ok(ruleA)
+  assert.deepEqual(ruleA.pieces, [
+    { square: 'f2', piece: 'K' },
+    { square: 'e6', piece: 'B' },
+  ])
+  assert.deepEqual(
+    ruleA.highlights.map(({ square, kind }) => [square, kind]),
+    [
+      ['c8', 'wall'],
+      ['d7', 'wall'],
+      ['e6', 'wall'],
+      ['f5', 'wall'],
+      ['g4', 'wall'],
+      ['h3', 'wall'],
+      ['h1', 'pink'],
+      ['h2', 'pink'],
     ],
   )
 })
