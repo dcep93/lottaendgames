@@ -558,6 +558,19 @@ const twoBishopsHelp: RuleHelp = {
       highlights: [],
     },
     {
+      id: 'bishop-mate-in-eight-ish-k',
+      title: 'mate in 8 ish K',
+      caption: 'Build Bg4, check with Bg3, then mate.',
+      animationFrames: mateInEightIshAnimationFrames(
+        '8/8/8/8/7B/5K2/7k/3B4 w - - 0 1',
+        ['Kf2', 'Kh1', 'Bg4', 'Kh2', 'Bg3+', 'Kh1', 'Bf3#'],
+      ),
+      animationAlt:
+        'Mate in 8 ish flow K building Bg4 before two checks, shown with chess pieces.',
+      pieces: [],
+      highlights: [],
+    },
+    {
       id: 'bishop-rule-n',
       title: 'rule n',
       caption:
@@ -956,6 +969,7 @@ const twoBishopsHelp: RuleHelp = {
       'bishop-mate-in-eight-ish-h',
       'bishop-mate-in-eight-ish-i',
       'bishop-mate-in-eight-ish-j',
+      'bishop-mate-in-eight-ish-k',
       'bishop-rule-n',
     ].includes(board.id),
   ),

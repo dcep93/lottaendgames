@@ -332,6 +332,19 @@ test('mate in 8 ish J follows the live browser line through mate', () => {
   assert.equal(chess.isCheckmate(), true)
 })
 
+test('mate in 8 ish K follows the live browser line through mate', () => {
+  const chess = getChess('8/8/8/8/7B/5K2/7k/3B4 w - - 0 1')
+  const moves = ['Kf2', 'Kh1', 'Bg4', 'Kh2', 'Bg3+', 'Kh1', 'Bf3#']
+  for (const san of moves) {
+    assert.equal(isTwoBishopsPhaseTwoPatternPosition(chess.fen()), true, san)
+    if (chess.turn() === 'w') {
+      assert.ok(getIdealTwoBishopsWhiteMoves(chess.fen()).includes(san), san)
+    }
+    chess.move(san)
+  }
+  assert.equal(chess.isCheckmate(), true)
+})
+
 test('Bf2 waiting loop is not part of the Phase 2 pattern', () => {
   const chess = getChess(TWO_BISHOPS_PHASE_TWO_START_FEN)
   assert.equal(getTwoBishopsPhaseLabel(chess.fen()), '2/2')

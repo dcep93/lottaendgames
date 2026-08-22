@@ -109,6 +109,15 @@ const MATE_IN_EIGHT_ISH_J_MOVES = [
   ['h2', 'h1', false],
   ['g4', 'f3', true],
 ] as const satisfies readonly (readonly [Square, Square, boolean])[]
+const MATE_IN_EIGHT_ISH_K_MOVES = [
+  ['f3', 'f2', true],
+  ['h2', 'h1', false],
+  ['d1', 'g4', true],
+  ['h1', 'h2', false],
+  ['h4', 'g3', true],
+  ['h2', 'h1', false],
+  ['g4', 'f3', true],
+] as const satisfies readonly (readonly [Square, Square, boolean])[]
 
 let graph: PhaseTwoPatternGraph | undefined
 
@@ -665,6 +674,21 @@ function buildGraph(): PhaseTwoPatternGraph {
     }
     if (!flowJ.isCheckmate()) {
       throw new Error('Mate in 8 ish J must end in mate')
+    }
+
+    const flowK = getChess(
+      transformFen(MATE_IN_EIGHT_ISH_J_START_FEN, transform),
+    )
+    for (const [from, to, recordWhite] of MATE_IN_EIGHT_ISH_K_MOVES) {
+      playFlowMove(
+        flowK,
+        transformSquare(from, transform),
+        transformSquare(to, transform),
+        recordWhite,
+      )
+    }
+    if (!flowK.isCheckmate()) {
+      throw new Error('Mate in 8 ish K must end in mate')
     }
   }
 
