@@ -611,6 +611,8 @@ test('prepare mate is inactive outside the corner L', () => {
 
 test('prepare mate follows the fixed setup, check, and mate maneuver', () => {
   const ruleSet = getMateRuleSet('two-bishops')
+  assert.ok(ruleSet.analyzeWhitePosition)
+  const analyzeWhitePosition = ruleSet.analyzeWhitePosition
   const stages = [
     {
       fen: '8/8/8/8/8/2B3K1/4B3/7k w - - 6 4',
@@ -630,7 +632,7 @@ test('prepare mate follows the fixed setup, check, and mate maneuver', () => {
   ] as const
 
   for (const stage of stages) {
-    const analysis = ruleSet.analyzeWhitePosition(stage.fen)
+    const analysis = analyzeWhitePosition(stage.fen)
     assert.equal(analysis.idealWhiteMoves.includes(stage.move), true)
     assert.equal(analysis.currentWhiteHint?.id, stage.reason)
   }
@@ -720,7 +722,10 @@ test('king stutter is inactive when Black is not on an edge', () => {
 
 test('unique immediate mate keeps incorrect-move explanations at mate', () => {
   const fen = '8/8/8/8/3B4/6K1/4B3/7k w - - 10 6'
-  const analysis = getMateRuleSet('two-bishops').analyzeWhitePosition(fen)
+  const ruleSet = getMateRuleSet('two-bishops')
+  assert.ok(ruleSet.analyzeWhitePosition)
+  const analysis = ruleSet.analyzeWhitePosition(fen)
+  assert.ok(analysis.explainWhiteMove)
 
   assert.deepEqual(analysis.idealWhiteMoves, ['Bf3#'])
   assert.equal(analysis.currentWhiteHint?.id, 'mate')
