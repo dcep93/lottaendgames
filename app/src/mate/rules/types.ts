@@ -1,3 +1,4 @@
+import type { Square } from 'chess.js'
 import type { MateId } from '../types'
 
 export type ScoredMove<Score> = {
@@ -132,12 +133,19 @@ export type RuleNoteBoardArrow = {
   readonly to: string
 }
 
+export type RuleNoteBoardAnimationFrame = {
+  readonly fen: string
+  readonly lastMove: readonly [Square, Square] | null
+  readonly durationMs: number
+}
+
 export type RuleNoteBoard = {
   readonly id: string
   readonly title: string
   readonly caption: string
   readonly animationSrc?: string
   readonly animationAlt?: string
+  readonly animationFrames?: readonly RuleNoteBoardAnimationFrame[]
   readonly layout?: RuleNoteBoardLayout
   readonly pieces: readonly RuleNoteBoardPiece[]
   readonly highlights: readonly RuleNoteBoardHighlight[]

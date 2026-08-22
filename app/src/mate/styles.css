@@ -829,6 +829,13 @@
   border-radius: 0.3rem;
 }
 
+.leg-mate-note-board-live-animation {
+  width: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 0.3rem;
+}
+
 .leg-mate-note-board-squares,
 .leg-mate-note-board-pieces {
   position: absolute;

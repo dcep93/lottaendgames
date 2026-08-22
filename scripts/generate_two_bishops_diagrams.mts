@@ -29,6 +29,9 @@ const ruleTFen = getChess(
 const kingStutterFen = getChess(
   '8/8/5B2/4KB1k/8/8/8/8 w - - 2 2',
 ).fen()
+const ruleNFen = getChess(
+  '8/8/8/8/8/2BB4/k7/2K5 w - - 0 1',
+).fen()
 const degeneratePhaseTwoOppositionFen = getChess(
   '6k1/1B6/4K3/8/3B4/8/8/8 w - - 0 1',
 ).fen()
@@ -228,6 +231,16 @@ export const TWO_BISHOPS_DIAGRAM_POSITIONS = {
     phase: '2/2',
     fen: ${JSON.stringify(kingStutterFen)},
     arrow: { from: 'e5', to: 'e4' },
+  },
+  ruleN: {
+    fen: ${JSON.stringify(ruleNFen)},
+    highlights: [
+      ${['a1', 'b2', 'c3', 'd4', 'e5', 'f6', 'g7', 'h8'].map((square) => `{ square: '${square}', kind: 'wall' },`).join('\n      ')}
+      ${['b1', 'c2', 'd3', 'e4', 'f5', 'g6', 'h7'].map((square) => `{ square: '${square}', kind: 'wall' },`).join('\n      ')}
+      ${['a2', 'b3', 'c4', 'd5', 'e6', 'f7', 'g8'].map((square) => `{ square: '${square}', kind: 'key' },`).join('\n      ')}
+      { square: 'b1', kind: 'pink' },
+    ],
+    arrow: { from: 'd3', to: 'c4' },
   },
   ruleS: {
     phase: '1/2',

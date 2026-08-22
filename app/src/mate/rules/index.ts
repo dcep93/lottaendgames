@@ -154,6 +154,7 @@ export type {
   RuleDescription,
   RuleHelp,
   RuleNoteBoard,
+  RuleNoteBoardAnimationFrame,
   RuleNoteBoardArrow,
   RuleNoteBoardHighlight,
   RuleNoteBoardLayout,
@@ -185,6 +186,25 @@ function snapshotRuleHelp(help: RuleHelp): RuleHelp {
         ...(board.animationAlt === undefined
           ? {}
           : { animationAlt: board.animationAlt }),
+        ...(board.animationFrames === undefined
+          ? {}
+          : {
+              animationFrames: Object.freeze(
+                board.animationFrames.map((frame) =>
+                  Object.freeze({
+                    fen: frame.fen,
+                    lastMove:
+                      frame.lastMove === null
+                        ? null
+                        : (Object.freeze([
+                            frame.lastMove[0],
+                            frame.lastMove[1],
+                          ]) as typeof frame.lastMove),
+                    durationMs: frame.durationMs,
+                  }),
+                ),
+              ),
+            }),
         ...(board.layout === undefined
           ? {}
           : { layout: Object.freeze({ ...board.layout }) }),

@@ -1,13 +1,13 @@
 import type { Square } from 'chess.js'
 import {
   allSquares,
-  edgeDistance,
   findPiece,
   getChess,
   kingDistance,
   squareCoordinates,
   squareFromCoordinates,
 } from '../chess'
+import { isTwoBishopsPhaseTwoPatternPosition } from './twoBishopsPhaseTwoPattern'
 
 export function centerDistance(square: Square): number {
   const { file, rank } = squareCoordinates(square)
@@ -230,40 +230,8 @@ export function areKingsAtPhaseTwoDistance(
   return kingDistance(whiteKing, blackKing) === 2
 }
 
-function isBlackForcedToRemainOnEdge(fen: string): boolean {
-  const chess = getChess(fen)
-  if (chess.turn() !== 'b') return false
-  const blackKing = findPiece(fen, 'b', 'k')
-  const whiteKing = findPiece(fen, 'w', 'k')
-  if (
-    !blackKing ||
-    !whiteKing ||
-    getWhiteBishopSquares(fen).length !== 2 ||
-    edgeDistance(blackKing.square) !== 0
-  ) {
-    return false
-  }
-  if (!areKingsAtPhaseTwoDistance(whiteKing.square, blackKing.square)) {
-    return false
-  }
-  const blackMoves = chess
-    .moves({ verbose: true })
-    .filter((move) => move.from === blackKing.square)
-  return (
-    blackMoves.length > 0 &&
-    blackMoves.every((move) => edgeDistance(move.to) === 0)
-  )
-}
-
 export function isTwoBishopsPhaseTwoPosition(fen: string): boolean {
-  const chess = getChess(fen)
-  if (chess.turn() === 'b') return isBlackForcedToRemainOnEdge(fen)
-
-  return chess.moves({ verbose: true }).some((move) => {
-    const afterMove = getChess(fen)
-    afterMove.move(move)
-    return isBlackForcedToRemainOnEdge(afterMove.fen())
-  })
+  return isTwoBishopsPhaseTwoPatternPosition(fen)
 }
 
 export function getTwoBishopsPhaseLabel(fen: string): string {

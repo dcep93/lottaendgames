@@ -30,11 +30,22 @@ import {
   areKingsAtPhaseTwoDistance,
 } from './twoBishopsGeometry'
 import { TWO_BISHOPS_DIAGRAM_POSITIONS } from './twoBishopsDiagramPositions'
+import {
+  countDistantTwoBishops,
+  getRuleNPreferredMoves,
+  getSmallestTwoBishopsWallArea,
+} from './twoBishopsWallGeometry'
+import { getTwoBishopsPhaseTwoPatternMoves } from './twoBishopsPhaseTwoPattern'
+import {
+  TWO_BISHOPS_PHASE_TWO_CANONICAL_MOVES,
+  TWO_BISHOPS_PHASE_TWO_START_FEN,
+} from './twoBishopsPhaseTwoPatternData'
 import type {
   MateRuleSet,
   OpponentCandidates,
   OrderedRule,
   RuleHelp,
+  RuleNoteBoardAnimationFrame,
   RuleNoteBoardPiece,
   ScoredMove,
 } from './types'
@@ -46,6 +57,10 @@ export type TwoBishopsWhiteMoveScore = {
   readonly stalematePenalty: number
   readonly prepareMateApplies: boolean
   readonly prepareMatePenalty: number
+  readonly ruleNApplies: boolean
+  readonly ruleNPenalty: number
+  readonly ruleOApplies: boolean
+  readonly ruleOPenalty: number
   readonly ruleGApplies: boolean
   readonly ruleGPenalty: number
   readonly centralPiecesPenalty: number
@@ -260,6 +275,28 @@ export const TWO_BISHOPS_DEGENERATE_PRIORITY_ORDER = [
   TWO_BISHOPS_DEGENERATE_REASON_LABELS.longDiagonal,
 ] as const
 
+function mateInEightIshAnimationFrames(
+  startFen: string,
+  moves: readonly string[],
+): readonly RuleNoteBoardAnimationFrame[] {
+  const chess = getChess(startFen)
+  const frames: RuleNoteBoardAnimationFrame[] = [
+    { fen: chess.fen(), lastMove: null, durationMs: 3000 },
+  ]
+  moves.forEach((san, index) => {
+    const move = chess.move(san)
+    if (move === null) {
+      throw new Error(`invalid mate in 8 ish animation move ${san}`)
+    }
+    frames.push({
+      fen: chess.fen(),
+      lastMove: [move.from, move.to],
+      durationMs: index === moves.length - 1 ? 1400 : 500,
+    })
+  })
+  return frames
+}
+
 const twoBishopsHelp: RuleHelp = {
   title: 'How best moves are chosen',
   whiteIntro: WHITE_INTRO,
@@ -271,9 +308,192 @@ const twoBishopsHelp: RuleHelp = {
     'Move toward an unprotected bishop.',
   ],
   notes: [
-    "Moat modifier means Black may widen the King moat instead of satisfying the rule's requested response.",
+    "A bishop wall is two adjacent parallel diagonals, with the nearer diagonal adjacent to Black's king. White's king matters only when its screening lets Black escape.",
   ],
   noteBoards: [
+    {
+      id: 'bishop-mate-in-eight-ish-a',
+      title: 'mate in 8 ish A',
+      caption: 'Follow the main Phase 2 pattern.',
+      animationFrames: mateInEightIshAnimationFrames(
+        TWO_BISHOPS_PHASE_TWO_START_FEN,
+        TWO_BISHOPS_PHASE_TWO_CANONICAL_MOVES,
+      ),
+      animationAlt:
+        'Mate in 8 ish flow A, shown with chess pieces.',
+      pieces: [],
+      highlights: [],
+    },
+    {
+      id: 'bishop-mate-in-eight-ish-b',
+      title: 'mate in 8 ish B',
+      caption: 'Answer the immediate …Kh1 response and continue to mate.',
+      animationFrames: mateInEightIshAnimationFrames(
+        TWO_BISHOPS_PHASE_TWO_START_FEN,
+        [
+          'Kf2',
+          'Kh1',
+          'Kf1',
+          'Kh2',
+          'Bg4',
+          'Kh1',
+          'Bh4',
+          'Kh2',
+          'Kf2',
+          'Kh1',
+          'Bg5',
+          'Kh2',
+          'Bf4+',
+          'Kh1',
+          'Bf3#',
+        ],
+      ),
+      animationAlt:
+        'Mate in 8 ish flow B immediate Kh1 response and mate, shown with chess pieces.',
+      pieces: [],
+      highlights: [],
+    },
+    {
+      id: 'bishop-mate-in-eight-ish-c',
+      title: 'mate in 8 ish C',
+      caption:
+        'Walk the king, wait on d8–h4, check, then mate. Equivalent waiting squares share this diagram.',
+      animationFrames: mateInEightIshAnimationFrames(
+        TWO_BISHOPS_PHASE_TWO_START_FEN,
+        [
+          'Kf2',
+          'Kh3',
+          'Kf1',
+          'Kh2',
+          'Bg4',
+          'Kh1',
+          'Bb4',
+          'Kh2',
+          'Bd6+',
+          'Kh1',
+          'Bf3#',
+        ],
+      ),
+      animationAlt:
+        'Mate in 8 ish flow C king walk, waiting move, check, and mate, shown with chess pieces.',
+      pieces: [],
+      highlights: [],
+    },
+    {
+      id: 'bishop-mate-in-eight-ish-d',
+      title: 'mate in 8 ish D',
+      caption:
+        'Answer the early …Kh1 deviation with a waiting move, then rejoin the main pattern. Equivalent waiting squares share this diagram.',
+      animationFrames: mateInEightIshAnimationFrames(
+        TWO_BISHOPS_PHASE_TWO_START_FEN,
+        [
+          'Bh4',
+          'Kh3',
+          'Bf6',
+          'Kh2',
+          'Kf2',
+          'Kh1',
+          'Be2',
+          'Kh2',
+          'Bg4',
+          'Kh1',
+          'Be7',
+          'Kh2',
+          'Bd6+',
+          'Kh1',
+          'Bf3#',
+        ],
+      ),
+      animationAlt:
+        'Mate in 8 ish flow D early Kh1 deviation and return to the main pattern, shown with chess pieces.',
+      pieces: [],
+      highlights: [],
+    },
+    {
+      id: 'bishop-mate-in-eight-ish-e',
+      title: 'mate in 8 ish E',
+      caption: 'Retreat the king, build the checks, then mate.',
+      animationFrames: mateInEightIshAnimationFrames(
+        TWO_BISHOPS_PHASE_TWO_START_FEN,
+        [
+          'Kf2',
+          'Kh3',
+          'Kf1',
+          'Kh2',
+          'Bg4',
+          'Kh1',
+          'Bh4',
+          'Kh2',
+          'Kf2',
+          'Kh1',
+          'Bf5',
+          'Kh2',
+          'Bg3+',
+          'Kh1',
+          'Be4#',
+        ],
+      ),
+      animationAlt:
+        'Mate in 8 ish flow E king retreat, bishop checks, and mate, shown with chess pieces.',
+      pieces: [],
+      highlights: [],
+    },
+    {
+      id: 'bishop-mate-in-eight-ish-f',
+      title: 'mate in 8 ish F',
+      caption:
+        'Move 4 may also be Bd1. On move 7, wait anywhere on c8–h3 except Bh3; moves 8 and 9 are check and mate.',
+      animationFrames: mateInEightIshAnimationFrames(
+        '8/8/8/8/8/5K1k/8/3BB3 w - - 0 1',
+        [
+          'Be2',
+          'Kh2',
+          'Kf2',
+          'Kh3',
+          'Bd2',
+          'Kh4',
+          'Bf3',
+          'Kh3',
+          'Bg5',
+          'Kh2',
+          'Bg4',
+          'Kh1',
+          'Bf5',
+          'Kh2',
+          'Bf4+',
+          'Kh1',
+          'Be4#',
+        ],
+      ),
+      animationAlt:
+        'Mate in 8 ish flow F with flexible waiting moves followed by check and mate, shown with chess pieces.',
+      pieces: [],
+      highlights: [],
+    },
+    {
+      id: 'bishop-mate-in-eight-ish-g',
+      title: 'mate in 8 ish G',
+      caption:
+        'On move 2, wait anywhere on c8–h3 except Bh3, then check and mate.',
+      animationFrames: mateInEightIshAnimationFrames(
+        '8/8/8/8/8/8/3BBK1k/8 w - - 4 3',
+        ['Bg4', 'Kh1', 'Bf5', 'Kh2', 'Bf4+', 'Kh1', 'Be4#'],
+      ),
+      animationAlt:
+        'Mate in 8 ish flow G with a flexible waiting move followed by check and mate, shown with chess pieces.',
+      pieces: [],
+      highlights: [],
+    },
+    {
+      id: 'bishop-rule-n',
+      title: 'rule n',
+      caption:
+        'White controls the pink escape square. The arrowed check shifts the wall to the highlighted tighter diagonal.',
+      layout: { files: 8, ranks: 8, fileOffset: 0 },
+      pieces: noteBoardPieces(TWO_BISHOPS_DIAGRAM_POSITIONS.ruleN.fen),
+      highlights: TWO_BISHOPS_DIAGRAM_POSITIONS.ruleN.highlights,
+      arrows: [TWO_BISHOPS_DIAGRAM_POSITIONS.ruleN.arrow],
+    },
     {
       id: 'bishop-degenerate-phase-two-opposition',
       title: 'degenerate — phase 2 opposition',
@@ -651,16 +871,17 @@ const twoBishopsHelp: RuleHelp = {
       highlights: [],
       arrows: [TWO_BISHOPS_DIAGRAM_POSITIONS.kingStutter.arrow],
     },
-  ].filter(({ id }) =>
+  ].filter((board) =>
     [
-      'bishop-edge-flank',
-      'bishop-boot-scoot-n-block',
-      'bishop-rule-s',
-      'bishop-rule-t',
-      'bishop-rule-v',
-      'bishop-rule-w',
-      'bishop-king-stutter',
-    ].includes(id),
+      'bishop-mate-in-eight-ish-a',
+      'bishop-mate-in-eight-ish-b',
+      'bishop-mate-in-eight-ish-c',
+      'bishop-mate-in-eight-ish-d',
+      'bishop-mate-in-eight-ish-e',
+      'bishop-mate-in-eight-ish-f',
+      'bishop-mate-in-eight-ish-g',
+      'bishop-rule-n',
+    ].includes(board.id),
   ),
 }
 
@@ -2525,6 +2746,9 @@ type TwoBishopsWhitePositionContext = {
   readonly matePatternTurnsBySan: ReadonlyMap<string, 2 | 3>
   readonly shepherdMoves: readonly string[]
   readonly prepareMatePreferredMoves: readonly string[]
+  readonly ruleNPreferredMoves: readonly string[]
+  readonly ruleOApplies: boolean
+  readonly ruleOWallAreasBySan: ReadonlyMap<string, number>
   readonly ruleGPreferredMoves: readonly string[]
   readonly onsidesPreferredMoves: readonly string[]
   readonly bootNScootPreferredMoves: readonly string[]
@@ -2725,26 +2949,6 @@ function bishopsControlMatchedSqueezeRoles(
   )
 }
 
-function getPrepareMatePreferredMoves(
-  whiteKing: Square | undefined,
-  blackKing: Square | undefined,
-  matePatternTurnsBySan: ReadonlyMap<string, 2 | 3>,
-): readonly string[] {
-  const hasMateInTwo = [...matePatternTurnsBySan.values()].includes(2)
-  if (
-    whiteKing === undefined ||
-    blackKing === undefined ||
-    !BOARD_CORNERS.some(
-      (corner) =>
-        manhattanDistance(blackKing, corner) <= 1 &&
-        (isKnightMove(whiteKing, corner) || hasMateInTwo),
-    )
-  ) {
-    return []
-  }
-  return [...matePatternTurnsBySan.keys()]
-}
-
 function getRuleTGeometry(
   whiteKing: Square | undefined,
   blackKing: Square | undefined,
@@ -2779,22 +2983,6 @@ function distanceFromKingMoat(
   const coordinate =
     geometry.axis === 'file' ? coordinates.file : coordinates.rank
   return Math.abs(coordinate - geometry.index)
-}
-
-function isSquareBehindWhiteKingFromBlackPerspective(
-  square: Square,
-  whiteKing: Square,
-  blackKing: Square,
-): boolean {
-  const white = squareCoordinates(whiteKing)
-  const black = squareCoordinates(blackKing)
-  const target = squareCoordinates(square)
-  const fileDelta = white.file - black.file
-  const rankDelta = white.rank - black.rank
-  if (Math.abs(fileDelta) > Math.abs(rankDelta)) {
-    return Math.sign(target.file - white.file) === Math.sign(fileDelta)
-  }
-  return Math.sign(target.rank - white.rank) === Math.sign(rankDelta)
 }
 
 function forcesMoatOpposition(
@@ -3181,39 +3369,6 @@ function bishopDestinationCanBeAttackedOnNextMove(
       reply.piece === 'k' &&
       kingDistance(reply.to, destination) <= 1,
   )
-}
-
-function getOnsidesMoatGeometries(
-  whiteKing: Square,
-  blackKing: Square,
-): readonly RuleTGeometry[] {
-  const existing = getBishopDistanceMoatGeometries(
-    whiteKing,
-    blackKing,
-  )
-  if (existing.length > 0) return existing
-
-  const white = squareCoordinates(whiteKing)
-  const black = squareCoordinates(blackKing)
-  if (white.rank === black.rank && white.file !== black.file) {
-    return [
-      {
-        axis: 'file',
-        index: (white.file + black.file) / 2,
-        startingBlackDistance: Math.abs(black.file - white.file) / 2,
-      },
-    ]
-  }
-  if (white.file === black.file && white.rank !== black.rank) {
-    return [
-      {
-        axis: 'rank',
-        index: (white.rank + black.rank) / 2,
-        startingBlackDistance: Math.abs(black.rank - white.rank) / 2,
-      },
-    ]
-  }
-  return []
 }
 
 export function isTwoBishopsSquareBehindBlack(
@@ -4368,11 +4523,15 @@ function createTwoBishopsWhitePositionContext(
     startingWhiteKing,
     blackKing,
   )
-  const prepareMatePreferredMoves = getPrepareMatePreferredMoves(
-    startingWhiteKing,
-    blackKing,
-    matePatternTurnsBySan,
-  )
+  const prepareMatePreferredMoves = getTwoBishopsPhaseTwoPatternMoves(fen)
+  const ruleNPreferredMoves = getRuleNPreferredMoves(fen)
+  const ruleOWallAreasBySan = new Map<string, number>()
+  for (const move of getChess(fen).moves({ verbose: true })) {
+    const result = getChess(fen)
+    result.move(move.san)
+    const area = getSmallestTwoBishopsWallArea(result.fen())
+    if (area !== null) ruleOWallAreasBySan.set(move.san, area)
+  }
   const ruleGPreferredMoves = getRuleGPreferredMoves(
     fen,
     startingWhiteKing,
@@ -4490,6 +4649,9 @@ function createTwoBishopsWhitePositionContext(
           )
         : [],
     prepareMatePreferredMoves,
+    ruleNPreferredMoves,
+    ruleOApplies: ruleOWallAreasBySan.size > 0,
+    ruleOWallAreasBySan,
     ruleGPreferredMoves,
     onsidesPreferredMoves,
     bootNScootPreferredMoves,
@@ -4550,6 +4712,9 @@ function scoreTwoBishopsWhiteMoveWithContext(
     matePatternTurnsBySan,
     shepherdMoves,
     prepareMatePreferredMoves,
+    ruleNPreferredMoves,
+    ruleOApplies,
+    ruleOWallAreasBySan,
     ruleGPreferredMoves,
     onsidesPreferredMoves,
     bootNScootPreferredMoves,
@@ -4560,10 +4725,6 @@ function scoreTwoBishopsWhiteMoveWithContext(
     ruleUUPreferredMoves,
     ruleUPreferredMoves,
     ruleVMatchingGeometriesBySan,
-    ruleWApplies,
-    ruleWUrgentSetup,
-    ruleWUrgentDiagonal,
-    ruleWPenaltiesBySan,
     ruleYThreatenedBishops,
     deathBoxPreferredMoves,
     preserveExistingMegadethBox,
@@ -4704,6 +4865,10 @@ function scoreTwoBishopsWhiteMoveWithContext(
     prepareMatePenalty: prepareMatePreferredMoves.includes(move.san)
       ? 0
       : 1,
+    ruleNApplies: ruleNPreferredMoves.length > 0,
+    ruleNPenalty: ruleNPreferredMoves.includes(move.san) ? 0 : 1,
+    ruleOApplies,
+    ruleOPenalty: ruleOWallAreasBySan.get(move.san) ?? 65,
     ruleGApplies: ruleGPreferredMoves.length > 0,
     ruleGPenalty: ruleGPreferredMoves.includes(move.san) ? 0 : 1,
     centralPiecesPenalty: [resultWhiteKingSquare, ...resultBishops].filter(
@@ -4820,18 +4985,9 @@ function scoreTwoBishopsWhiteMoveWithContext(
               ),
             ),
           ),
-    ruleWApplies,
-    ruleWUrgentPenalty:
-      ruleWUrgentSetup && ruleWUrgentDiagonal !== undefined
-        ? bishopOccupiesFlankDiagonal(
-              resultBishops,
-              ruleWUrgentDiagonal,
-            )
-          ? 0
-          : 1
-        : 0,
-    ruleWPenalty:
-      ruleWPenaltiesBySan.get(move.san) ?? RULE_W_INCOMPLETE_PENALTY,
+    ruleWApplies: blackKing !== undefined,
+    ruleWUrgentPenalty: 0,
+    ruleWPenalty: 2 - countDistantTwoBishops(resultFen),
     ruleYApplies: ruleYThreatenedBishops.length > 0,
     ruleYPenalty:
       ruleYPreventsAttack &&
@@ -5025,7 +5181,7 @@ function isInOpposition(
   )
 }
 
-export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore>[] = [
+const twoBishopsWhiteRuleCatalog: readonly OrderedRule<TwoBishopsWhiteMoveScore>[] = [
   {
     id: 'mate',
     shortLabel: 'mate',
@@ -5048,14 +5204,29 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
       first.stalematePenalty - second.stalematePenalty,
   },
   {
-    id: 'prepare mate',
-    shortLabel: 'prepare mate',
-    helpText:
-      "With the black king in the corner 2 squares and the white king a knight's move from the corner, play mate in 3 or less.",
+    id: 'mate in 8 ish',
+    shortLabel: 'mate in 8 ish',
+    helpText: 'In phase 2 (see diagram).',
     applies: (score) => score.prepareMateApplies,
     stopWhenBest: (score) => score.prepareMatePenalty === 0,
     compare: (first, second) =>
       first.prepareMatePenalty - second.prepareMatePenalty,
+  },
+  {
+    id: 'rule n',
+    shortLabel: 'rule n',
+    helpText:
+      "With a bishop wall and White's king controlling the escape square, shrink and check along the bishop wall.",
+    applies: (score) => score.ruleNApplies,
+    compare: (first, second) => first.ruleNPenalty - second.ruleNPenalty,
+  },
+  {
+    id: 'rule o',
+    shortLabel: 'rule o',
+    helpText:
+      "Prefer a bishop wall keeping Black's king in a smaller area of at least 4 squares.",
+    applies: (score) => score.ruleOApplies,
+    compare: (first, second) => first.ruleOPenalty - second.ruleOPenalty,
   },
   {
     id: 'rule g',
@@ -5168,12 +5339,9 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
   {
     id: 'rule w',
     shortLabel: 'rule w',
-    helpText:
-      "When the kings are a knight's move apart or two diagonal squares apart, use bishops to control the flank diagonals.",
+    helpText: "Prefer bishops 3 or more steps from Black's king.",
     applies: (score) => score.ruleWApplies,
-    compare: (first, second) =>
-      first.ruleWPenalty - second.ruleWPenalty ||
-      first.ruleWUrgentPenalty - second.ruleWUrgentPenalty,
+    compare: (first, second) => first.ruleWPenalty - second.ruleWPenalty,
   },
   {
     id: 'rule y',
@@ -5284,6 +5452,25 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
   },
 ]
 
+const ACTIVE_TWO_BISHOPS_WHITE_RULE_IDS = [
+  'mate',
+  'bishops safe',
+  'no stalemate',
+  'mate in 8 ish',
+  'rule n',
+  'rule o',
+  'king closer',
+  'rule w',
+] as const
+
+export const twoBishopsWhiteRules = ACTIVE_TWO_BISHOPS_WHITE_RULE_IDS.map(
+  (id) => {
+    const rule = twoBishopsWhiteRuleCatalog.find((candidate) => candidate.id === id)
+    if (rule === undefined) throw new Error(`Missing Two Bishops rule ${id}`)
+    return rule
+  },
+)
+
 export function compareTwoBishopsWhiteScores(
   first: TwoBishopsWhiteMoveScore,
   second: TwoBishopsWhiteMoveScore,
@@ -5311,6 +5498,10 @@ function scoreWhiteCandidates(
       stalematePenalty: 0,
       prepareMateApplies: false,
       prepareMatePenalty: 0,
+      ruleNApplies: false,
+      ruleNPenalty: 0,
+      ruleOApplies: false,
+      ruleOPenalty: 0,
       ruleGApplies: false,
       ruleGPenalty: 0,
       centralPiecesPenalty: 0,

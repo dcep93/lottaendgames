@@ -1,7 +1,12 @@
 import React from 'react'
-import { defaultPieces } from 'react-chessboard'
+import { Chessboard, defaultPieces } from 'react-chessboard'
+import {
+  MATE_MOVE_ANIMATION_MS,
+  getMateBoardSquareStyles,
+} from './boardInteraction'
 import type {
   RuleNoteBoard,
+  RuleNoteBoardAnimationFrame,
   RuleNoteBoardHighlight,
 } from './rules'
 
@@ -18,6 +23,7 @@ const DEFAULT_BOARD_LAYOUT: BoardLayout = {
 }
 
 const BOARD_FILES = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'] as const
+const EMPTY_ANIMATION_FRAMES: readonly RuleNoteBoardAnimationFrame[] = []
 
 const PIECE_RENDER_KEYS = {
   K: 'wK',
@@ -89,6 +95,92 @@ function noteBoardLabel(board: RuleNoteBoard): string {
   return parts.join(' ')
 }
 
+function AnimatedMateRuleNoteBoard({
+  board,
+}: {
+  readonly board: RuleNoteBoard
+}) {
+  const frames = board.animationFrames ?? EMPTY_ANIMATION_FRAMES
+  const surfaceRef = React.useRef<HTMLDivElement>(null)
+  const [frameIndex, setFrameIndex] = React.useState(0)
+  const [isVisible, setIsVisible] = React.useState(true)
+  const [reduceMotion, setReduceMotion] = React.useState(false)
+  const frame = frames[reduceMotion ? 0 : frameIndex] ?? frames[0]
+
+  React.useEffect(() => {
+    if (typeof IntersectionObserver === 'undefined') return
+    const surface = surfaceRef.current
+    if (surface === null) return
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsVisible(entry?.isIntersecting ?? true),
+      { rootMargin: '64px' },
+    )
+    observer.observe(surface)
+    return () => observer.disconnect()
+  }, [])
+
+  React.useEffect(() => {
+    if (typeof window === 'undefined' || window.matchMedia === undefined) return
+    const query = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const update = () => setReduceMotion(query.matches)
+    update()
+    query.addEventListener('change', update)
+    return () => query.removeEventListener('change', update)
+  }, [])
+
+  React.useEffect(() => {
+    setFrameIndex(0)
+  }, [frames])
+
+  React.useEffect(() => {
+    if (!isVisible || reduceMotion || frames.length < 2 || frame === undefined) {
+      return
+    }
+    const timer = window.setTimeout(
+      () => setFrameIndex((index) => (index + 1) % frames.length),
+      frame.durationMs,
+    )
+    return () => window.clearTimeout(timer)
+  }, [frame, frames.length, isVisible, reduceMotion])
+
+  if (frame === undefined) return null
+
+  return (
+    <div
+      aria-label={board.animationAlt ?? noteBoardLabel(board)}
+      className="leg-mate-note-board-live-animation"
+      ref={surfaceRef}
+      role="img"
+    >
+      <div aria-hidden="true">
+        <Chessboard
+          options={{
+            id: `${board.id}-animation`,
+            allowDragging: false,
+            allowDrawingArrows: false,
+            animationDurationInMs: MATE_MOVE_ANIMATION_MS,
+            boardOrientation: 'white',
+            boardStyle: {
+              borderRadius: '0.35rem',
+              overflow: 'hidden',
+              width: '100%',
+            },
+            pieces: defaultPieces,
+            position: frame.fen,
+            showAnimations: !reduceMotion,
+            showNotation: true,
+            squareStyles: getMateBoardSquareStyles(
+              frame.lastMove,
+              null,
+              new Map(),
+            ),
+          }}
+        />
+      </div>
+    </div>
+  )
+}
+
 export default function MateRuleNoteBoard({
   board,
 }: {
@@ -127,7 +219,9 @@ export default function MateRuleNoteBoard({
         <strong>{board.title}</strong>
         {board.caption === '' ? null : <span>{board.caption}</span>}
       </figcaption>
-      {board.animationSrc === undefined ? (
+      {board.animationFrames !== undefined ? (
+        <AnimatedMateRuleNoteBoard board={board} />
+      ) : board.animationSrc === undefined ? (
         <div
           aria-label={noteBoardLabel(board)}
           className="leg-mate-note-board-surface"

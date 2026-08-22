@@ -492,7 +492,7 @@ test('Train generation chooses a seed and a transform from the injected source',
       'train',
       sequenceRandom([0.75, 0.2]),
     ),
-    '8/8/k1KB4/3B4/8/8/8/8 w - - 38 20',
+    '8/8/8/8/8/2K5/k7/3BB3 w - - 0 1',
   )
 })
 

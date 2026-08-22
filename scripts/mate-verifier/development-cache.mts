@@ -352,9 +352,13 @@ export function createTwoBishopsDevelopmentFingerprints(): MateDevelopmentFinger
     [
       'app/src/mate/MatePriorityGuide.tsx',
       'app/src/mate/rules/index.ts',
+      'app/src/mate/rules/blackPriorities.ts',
       'app/src/mate/rules/selection.ts',
       'app/src/mate/rules/twoBishops.ts',
       'app/src/mate/rules/twoBishopsGeometry.ts',
+      'app/src/mate/rules/twoBishopsPhaseTwoPattern.ts',
+      'app/src/mate/rules/twoBishopsPhaseTwoPatternData.ts',
+      'app/src/mate/rules/twoBishopsWallGeometry.ts',
       'app/src/mate/rules/types.ts',
     ],
   )
