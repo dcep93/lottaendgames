@@ -8,7 +8,7 @@ Prevent Rule A from rebuilding a corner cage when White already has a forced mat
 
 Whenever Rule A applies, calculate White moves that force mate on White's following turn against every legal Black reply. If any exist, those moves take precedence over every Rule A construction stage. If none exist, retain the existing king-target, cage-diagonal, and waiting-move behavior.
 
-In `8/8/2B5/8/8/6K1/8/4B1k1 w - - 2 2`, `Bf2+` must beat `Ba6`: the former starts forced mate in two, while the latter rebuilds the cage and forces `Kh1`, recreating the prior position.
+In `2B5/8/8/8/8/6K1/8/4B1k1 w - - 2 2`, `Bf2+` must beat `Ba6`: the former starts forced mate in two, while the latter rebuilds the cage and forces `Kh1`, recreating the prior position.
 
 ## Verification
 

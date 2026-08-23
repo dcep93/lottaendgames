@@ -62,6 +62,33 @@ test('rule a selects the forced mate-in-two first move', () => {
   assert.equal(scoreTwoBishopsWhiteMove(fen, 'Bg3+').ruleAPenalty, 0)
 })
 
+test('rule a takes forced mate in two before rebuilding the cage', () => {
+  const fen = '2B5/8/8/8/8/6K1/8/4B1k1 w - - 2 2'
+  const move = getChess(fen).move('Bf2+')
+  assert.ok(move)
+  assert.deepEqual(getForcedMateInTwoMoves(fen), ['Bf2+'])
+  assert.deepEqual(getIdealTwoBishopsWhiteMoves(fen), ['Bf2+'])
+  assert.equal(scoreTwoBishopsWhiteMove(fen, 'Bf2+').ruleAPenalty, 0)
+  assert.ok(scoreTwoBishopsWhiteMove(fen, 'Ba6').ruleAPenalty > 0)
+
+  for (const transform of SQUARE_TRANSFORMS) {
+    const transformedFen = transformFen(fen, transform)
+    const expectedFrom = transformSquare(move.from, transform)
+    const expectedTo = transformSquare(move.to, transform)
+    const idealMoves = getIdealTwoBishopsWhiteMoves(transformedFen)
+    assert.ok(
+      idealMoves.some((san) => {
+        const transformedMove = getChess(transformedFen).move(san)
+        return (
+          transformedMove.from === expectedFrom &&
+          transformedMove.to === expectedTo
+        )
+      }),
+      transform.name,
+    )
+  }
+})
+
 test('rule a otherwise keeps bishop waiting moves on the completed cage', () => {
   const fen = '8/8/8/8/6B1/8/5K1k/4B3 w - - 0 1'
   const evaluation = evaluateRuleACornerCage(fen)

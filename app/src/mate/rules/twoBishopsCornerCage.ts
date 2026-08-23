@@ -174,8 +174,7 @@ export function evaluateRuleACornerCage(
     whiteKing,
     bishops,
   )
-  const mateInTwoMoves =
-    currentProgress === 2 ? new Set(getForcedMateInTwoMoves(fen)) : new Set()
+  const mateInTwoMoves = new Set(getForcedMateInTwoMoves(fen))
   const penaltiesBySan = new Map<string, number>()
 
   for (const move of getChess(fen).moves({ verbose: true })) {
@@ -191,7 +190,9 @@ export function evaluateRuleACornerCage(
     )
 
     let penalty: number
-    if (currentProgress === 0) {
+    if (mateInTwoMoves.size > 0) {
+      penalty = mateInTwoMoves.has(move.san) ? 0 : 100
+    } else if (currentProgress === 0) {
       penalty =
         move.piece === 'b' &&
         vacatesAdjacentSafeKingTarget(
@@ -215,8 +216,6 @@ export function evaluateRuleACornerCage(
               ? 10
               : 20
             : 100
-    } else if (mateInTwoMoves.size > 0) {
-      penalty = mateInTwoMoves.has(move.san) ? 0 : 100
     } else {
       const isWaitingMove =
         move.piece === 'b' &&
