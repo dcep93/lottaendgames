@@ -56,7 +56,7 @@ test('rule ww renders the outer-wall bishop preference', () => {
   const ruleWW = twoBishopsWhiteRules.find(({ id }) => id === 'rule ww')
   assert.equal(
     ruleWW?.helpText,
-    'Prefer moving the bishop of the outer wall.',
+    'Prefer the bishop of the outer wall off the edge of the board.',
   )
 
   const ruleSet = getMateRuleSet('two-bishops')
@@ -66,7 +66,7 @@ test('rule ww renders the outer-wall bishop preference', () => {
   const reply = getChess(fen)
   reply.move('Bg5+')
   reply.move('Kh3')
-  assert.equal(ruleSet.explainWhiteMove(reply.fen(), 'Bh6')?.id, 'rule ww')
+  assert.ok(!ruleSet.idealWhiteMoves(reply.fen()).includes('Bh6'))
 })
 
 test('Two Bishops help renders the Phase 2 animation and active diagrams', () => {

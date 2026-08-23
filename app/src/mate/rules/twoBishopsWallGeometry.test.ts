@@ -121,7 +121,7 @@ test('Rule O recognizes a bishop occupying its wall square', () => {
   )
 })
 
-test('Rule WW uniquely moves the outer-wall bishop without rejecting its return', () => {
+test('Rule WW keeps the resulting outer-wall bishop off the edge', () => {
   assert.deepEqual(getIdealTwoBishopsWhiteMoves(RULE_O_OCCUPIED_WALL_FEN), [
     'Bg5+',
   ])
@@ -134,14 +134,14 @@ test('Rule WW uniquely moves the outer-wall bishop without rejecting its return'
   const reply = getChess(RULE_O_OCCUPIED_WALL_FEN)
   reply.move('Bg5+')
   reply.move('Kh3')
-  assert.deepEqual(getIdealTwoBishopsWhiteMoves(reply.fen()), ['Bh6'])
+  assert.deepEqual(getIdealTwoBishopsWhiteMoves(reply.fen()), ['Bd1'])
   assert.equal(
-    scoreTwoBishopsWhiteMove(reply.fen(), 'Bh6')
+    scoreTwoBishopsWhiteMove(reply.fen(), 'Bd1')
       .ruleWWPenalty,
     0,
   )
   assert.equal(
-    scoreTwoBishopsWhiteMove(reply.fen(), 'Bg4+')
+    scoreTwoBishopsWhiteMove(reply.fen(), 'Bh6')
       .ruleWWPenalty,
     1,
   )
@@ -176,8 +176,8 @@ test('occupied Rule O wall geometry rotates and reflects', () => {
       .moves({ verbose: true })
       .find(
         ({ from, to }) =>
-          from === transformSquare('g5', transform) &&
-          to === transformSquare('h6', transform),
+          from === transformSquare('e2', transform) &&
+          to === transformSquare('d1', transform),
       )
     assert.ok(returnMove, transform.name)
     assert.deepEqual(getIdealTwoBishopsWhiteMoves(reply.fen()), [
