@@ -19,6 +19,10 @@ import {
 const LOADED_WALL_FEN =
   '2B5/8/6k1/8/3K3B/8/8/8 w - - 18 10'
 const RULE_N_FEN = '8/8/8/8/8/2BB4/k7/2K5 w - - 0 1'
+const RULE_N_DISTANCE_TWO_FEN =
+  '8/8/8/8/5K2/7k/4BB2/8 w - - 0 1'
+const RULE_N_DISTANCE_THREE_FEN =
+  '8/8/8/5K2/7k/4BB2/8/8 w - - 0 1'
 const RULE_O_OCCUPIED_WALL_FEN =
   '8/8/7B/8/5K1k/8/4B3/8 w - - 0 1'
 
@@ -58,6 +62,41 @@ test('Rule O ignores corner areas smaller than four squares', () => {
 
 test('Rule N recognizes the forced checking shrink', () => {
   assert.deepEqual(getRuleNPreferredMoves(RULE_N_FEN), ['Bc4+'])
+})
+
+test('Rule N requires Manhattan distance 3 from the wall corner', () => {
+  assert.deepEqual(getRuleNPreferredMoves(RULE_N_DISTANCE_TWO_FEN), [])
+  assert.deepEqual(getRuleNPreferredMoves(RULE_N_DISTANCE_THREE_FEN), [
+    'Bf2+',
+  ])
+
+  const acceptedMove = getChess(RULE_N_DISTANCE_THREE_FEN).move('Bf2+')
+  assert.ok(acceptedMove)
+  for (const transform of SQUARE_TRANSFORMS) {
+    assert.deepEqual(
+      getRuleNPreferredMoves(
+        transformFen(RULE_N_DISTANCE_TWO_FEN, transform),
+      ),
+      [],
+      transform.name,
+    )
+    const transformedFen = transformFen(
+      RULE_N_DISTANCE_THREE_FEN,
+      transform,
+    )
+    const transformedMove = getChess(transformedFen)
+      .moves({ verbose: true })
+      .find(
+        ({ from, to }) =>
+          from === transformSquare(acceptedMove.from, transform) &&
+          to === transformSquare(acceptedMove.to, transform),
+      )
+    assert.ok(transformedMove, transform.name)
+    assert.ok(
+      getRuleNPreferredMoves(transformedFen).includes(transformedMove.san),
+      transform.name,
+    )
+  }
 })
 
 test('wall and Rule N geometry rotate and reflect', () => {

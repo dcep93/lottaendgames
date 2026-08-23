@@ -52,6 +52,14 @@ test('rule a renders the unattackable waiting-move requirement', () => {
   )
 })
 
+test('rule n renders the Manhattan corner-distance gate', () => {
+  const ruleN = twoBishopsWhiteRules.find(({ id }) => id === 'rule n')
+  assert.equal(
+    ruleN?.helpText,
+    "With a bishop wall and White's king controlling the escape square, shrink and check along the bishop wall, from at least 3 squares from the corner.",
+  )
+})
+
 test('rule ww renders the outer-wall bishop preference', () => {
   const ruleWW = twoBishopsWhiteRules.find(({ id }) => id === 'rule ww')
   assert.equal(

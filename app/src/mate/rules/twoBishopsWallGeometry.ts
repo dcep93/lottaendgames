@@ -4,6 +4,7 @@ import {
   findPiece,
   getChess,
   kingDistance,
+  manhattanDistance,
   squareCoordinates,
   squareFromCoordinates,
   withFenTurn,
@@ -283,12 +284,7 @@ export function getRuleNPreferredMoves(fen: string): readonly string[] {
   return getChess(fen)
     .moves({ verbose: true })
     .filter((move) => {
-      if (
-        move.piece !== 'b' ||
-        !startingWalls.some((wall) => wall.wallBishops.includes(move.from))
-      ) {
-        return false
-      }
+      if (move.piece !== 'b') return false
       const checked = getChess(fen)
       checked.move(move.san)
       if (!checked.isCheck() || checked.isCheckmate()) return false
@@ -296,6 +292,12 @@ export function getRuleNPreferredMoves(fen: string): readonly string[] {
       if (replies.length === 0) return false
 
       return startingWalls.some((startingWall) => {
+        if (
+          !startingWall.wallBishops.includes(move.from) ||
+          manhattanDistance(move.to, startingWall.corner) < 3
+        ) {
+          return false
+        }
         let commonBoundaryKeys: Set<string> | undefined
         for (const reply of replies) {
           const result = getChess(checked.fen())

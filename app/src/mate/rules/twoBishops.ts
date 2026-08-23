@@ -5410,7 +5410,7 @@ const twoBishopsWhiteRuleCatalog: readonly OrderedRule<TwoBishopsWhiteMoveScore>
     id: 'rule n',
     shortLabel: 'rule n',
     helpText:
-      "With a bishop wall and White's king controlling the escape square, shrink and check along the bishop wall.",
+      "With a bishop wall and White's king controlling the escape square, shrink and check along the bishop wall, from at least 3 squares from the corner.",
     applies: (score) => score.ruleNApplies,
     compare: (first, second) => first.ruleNPenalty - second.ruleNPenalty,
   },
