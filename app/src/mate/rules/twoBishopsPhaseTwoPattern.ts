@@ -705,6 +705,10 @@ function getGraph(): PhaseTwoPatternGraph {
   return graph
 }
 
+export function initializeTwoBishopsPhaseTwoPattern(): void {
+  getGraph()
+}
+
 export function isTwoBishopsPhaseTwoPatternPosition(fen: string): boolean {
   return getGraph().positions.has(positionKey(fen))
 }

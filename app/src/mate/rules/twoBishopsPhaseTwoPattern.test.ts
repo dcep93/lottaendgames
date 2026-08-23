@@ -5,12 +5,23 @@ import { getIdealTwoBishopsWhiteMoves } from './twoBishops'
 import { getTwoBishopsPhaseLabel } from './twoBishopsGeometry'
 import {
   getTwoBishopsPhaseTwoPatternMoves,
+  initializeTwoBishopsPhaseTwoPattern,
   isTwoBishopsPhaseTwoPatternPosition,
 } from './twoBishopsPhaseTwoPattern'
 import {
   TWO_BISHOPS_PHASE_TWO_CANONICAL_MOVES,
   TWO_BISHOPS_PHASE_TWO_START_FEN,
 } from './twoBishopsPhaseTwoPatternData'
+
+test('explicit Phase 2 initialization is idempotent and preserves lookup moves', () => {
+  initializeTwoBishopsPhaseTwoPattern()
+  initializeTwoBishopsPhaseTwoPattern()
+
+  assert.deepEqual(
+    getTwoBishopsPhaseTwoPatternMoves(TWO_BISHOPS_PHASE_TWO_START_FEN),
+    ['Bh4', 'Kf2'],
+  )
+})
 
 test('canonical Phase 2 line is recognized and selected through mate', () => {
   const chess = getChess(TWO_BISHOPS_PHASE_TWO_START_FEN)
