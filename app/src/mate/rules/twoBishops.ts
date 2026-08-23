@@ -38,6 +38,7 @@ import {
 import { getTwoBishopsPhaseTwoPatternMoves } from './twoBishopsPhaseTwoPattern'
 import { evaluateRuleACornerCage } from './twoBishopsCornerCage'
 import { evaluateRuleBScreenPosition } from './twoBishopsScreenPosition'
+import { evaluateRuleAADiagonalEscape } from './twoBishopsDiagonalEscape'
 import {
   TWO_BISHOPS_PHASE_TWO_CANONICAL_MOVES,
   TWO_BISHOPS_PHASE_TWO_START_FEN,
@@ -59,6 +60,8 @@ export type TwoBishopsWhiteMoveScore = {
   readonly stalematePenalty: number
   readonly prepareMateApplies: boolean
   readonly prepareMatePenalty: number
+  readonly ruleAAApplies: boolean
+  readonly ruleAAPenalty: number
   readonly ruleAApplies: boolean
   readonly ruleAPenalty: number
   readonly ruleBApplies: boolean
@@ -577,6 +580,15 @@ const twoBishopsHelp: RuleHelp = {
       highlights: [],
     },
     {
+      id: 'bishop-rule-aa',
+      title: 'rule aa',
+      caption:
+        'The bishop controls f2. Move the other bishop to the highlighted a6–f1 diagonal, away from White\'s king.',
+      pieces: TWO_BISHOPS_DIAGRAM_POSITIONS.ruleAA.pieces,
+      highlights: TWO_BISHOPS_DIAGRAM_POSITIONS.ruleAA.highlights,
+      arrows: [TWO_BISHOPS_DIAGRAM_POSITIONS.ruleAA.arrow],
+    },
+    {
       id: 'bishop-rule-a',
       title: 'rule a',
       caption:
@@ -993,6 +1005,7 @@ const twoBishopsHelp: RuleHelp = {
       'bishop-mate-in-eight-ish-i',
       'bishop-mate-in-eight-ish-j',
       'bishop-mate-in-eight-ish-k',
+      'bishop-rule-aa',
       'bishop-rule-a',
       'bishop-rule-b',
       'bishop-rule-n',
@@ -2861,6 +2874,8 @@ type TwoBishopsWhitePositionContext = {
   readonly matePatternTurnsBySan: ReadonlyMap<string, 2 | 3>
   readonly shepherdMoves: readonly string[]
   readonly prepareMatePreferredMoves: readonly string[]
+  readonly ruleAAApplies: boolean
+  readonly ruleAAPenaltiesBySan: ReadonlyMap<string, number>
   readonly ruleAApplies: boolean
   readonly ruleAPenaltiesBySan: ReadonlyMap<string, number>
   readonly ruleBApplies: boolean
@@ -4643,6 +4658,7 @@ function createTwoBishopsWhitePositionContext(
     blackKing,
   )
   const prepareMatePreferredMoves = getTwoBishopsPhaseTwoPatternMoves(fen)
+  const ruleAAEvaluation = evaluateRuleAADiagonalEscape(fen)
   const ruleAEvaluation = evaluateRuleACornerCage(fen)
   const ruleBEvaluation = evaluateRuleBScreenPosition(fen)
   const ruleNPreferredMoves = getRuleNPreferredMoves(fen)
@@ -4770,6 +4786,8 @@ function createTwoBishopsWhitePositionContext(
           )
         : [],
     prepareMatePreferredMoves,
+    ruleAAApplies: ruleAAEvaluation.applies,
+    ruleAAPenaltiesBySan: ruleAAEvaluation.penaltiesBySan,
     ruleAApplies: ruleAEvaluation.applies,
     ruleAPenaltiesBySan: ruleAEvaluation.penaltiesBySan,
     ruleBApplies: ruleBEvaluation.applies,
@@ -4837,6 +4855,8 @@ function scoreTwoBishopsWhiteMoveWithContext(
     matePatternTurnsBySan,
     shepherdMoves,
     prepareMatePreferredMoves,
+    ruleAAApplies,
+    ruleAAPenaltiesBySan,
     ruleAApplies,
     ruleAPenaltiesBySan,
     ruleBApplies,
@@ -4994,6 +5014,8 @@ function scoreTwoBishopsWhiteMoveWithContext(
     prepareMatePenalty: prepareMatePreferredMoves.includes(move.san)
       ? 0
       : 1,
+    ruleAAApplies,
+    ruleAAPenalty: ruleAAPenaltiesBySan.get(move.san) ?? 999,
     ruleAApplies,
     ruleAPenalty: ruleAPenaltiesBySan.get(move.san) ?? 999,
     ruleBApplies,
@@ -5346,6 +5368,15 @@ const twoBishopsWhiteRuleCatalog: readonly OrderedRule<TwoBishopsWhiteMoveScore>
       first.prepareMatePenalty - second.prepareMatePenalty,
   },
   {
+    id: 'rule aa',
+    shortLabel: 'rule aa',
+    helpText:
+      "With the Black king one edge move from the corner, White king on edge a knight's move away, Bishop controls Black king's diagonal escape square, control the diagonal adjacent to Black's king directed away from White's king.",
+    applies: (score) => score.ruleAAApplies,
+    stopWhenBest: (score) => score.ruleAAPenalty === 0,
+    compare: (first, second) => first.ruleAAPenalty - second.ruleAAPenalty,
+  },
+  {
     id: 'rule a',
     shortLabel: 'rule a',
     helpText:
@@ -5608,6 +5639,7 @@ const ACTIVE_TWO_BISHOPS_WHITE_RULE_IDS = [
   'bishops safe',
   'no stalemate',
   'mate in 8 ish',
+  'rule aa',
   'rule a',
   'rule b',
   'rule n',
@@ -5651,6 +5683,8 @@ function scoreWhiteCandidates(
       stalematePenalty: 0,
       prepareMateApplies: false,
       prepareMatePenalty: 0,
+      ruleAAApplies: false,
+      ruleAAPenalty: 0,
       ruleAApplies: false,
       ruleAPenalty: 0,
       ruleBApplies: false,

@@ -210,6 +210,20 @@ export const TWO_BISHOPS_DIAGRAM_POSITIONS = {
     fen: ${JSON.stringify(kingStutterFen)},
     arrow: { from: 'e5', to: 'e4' },
   },
+  ruleAA: {
+    pieces: [
+      { square: 'g1', piece: 'k' },
+      { square: 'h3', piece: 'K' },
+      { square: 'h4', piece: 'B' },
+      { square: 'd1', piece: 'B' },
+    ],
+    highlights: [
+      ${['a6', 'b5', 'c4', 'd3', 'e2', 'f1'].map((square) => `{ square: '${square}', kind: 'wall' },`).join('\n      ')}
+      { square: 'f2', kind: 'key' },
+      { square: 'h1', kind: 'pink' },
+    ],
+    arrow: { from: 'd1', to: 'e2' },
+  },
   ruleA: {
     pieces: [
       { square: 'f2', piece: 'K' },

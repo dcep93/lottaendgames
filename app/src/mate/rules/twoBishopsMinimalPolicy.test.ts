@@ -11,6 +11,7 @@ const ACTIVE_RULE_IDS = [
   'bishops safe',
   'no stalemate',
   'mate in 8 ish',
+  'rule aa',
   'rule a',
   'rule b',
   'rule n',
@@ -59,6 +60,7 @@ test('Two Bishops help renders the Phase 2 animation and active diagrams', () =>
       'bishop-mate-in-eight-ish-i',
       'bishop-mate-in-eight-ish-j',
       'bishop-mate-in-eight-ish-k',
+      'bishop-rule-aa',
       'bishop-rule-a',
       'bishop-rule-b',
       'bishop-rule-n',
@@ -164,6 +166,31 @@ test('Two Bishops help renders the Phase 2 animation and active diagrams', () =>
       ['h2', 'pink'],
     ],
   )
+
+  const ruleAA = twoBishopsRuleSet.help.noteBoards.find(
+    ({ id }) => id === 'bishop-rule-aa',
+  )
+  assert.ok(ruleAA)
+  assert.deepEqual(ruleAA.pieces, [
+    { square: 'g1', piece: 'k' },
+    { square: 'h3', piece: 'K' },
+    { square: 'h4', piece: 'B' },
+    { square: 'd1', piece: 'B' },
+  ])
+  assert.deepEqual(
+    ruleAA.highlights.map(({ square, kind }) => [square, kind]),
+    [
+      ['a6', 'wall'],
+      ['b5', 'wall'],
+      ['c4', 'wall'],
+      ['d3', 'wall'],
+      ['e2', 'wall'],
+      ['f1', 'wall'],
+      ['f2', 'key'],
+      ['h1', 'pink'],
+    ],
+  )
+  assert.deepEqual(ruleAA.arrows, [{ from: 'd1', to: 'e2' }])
 
   const ruleB = twoBishopsRuleSet.help.noteBoards.find(
     ({ id }) => id === 'bishop-rule-b',
