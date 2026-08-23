@@ -22,6 +22,32 @@ test('rule a first places White king a knight move from the corner', () => {
   assert.equal(scoreTwoBishopsWhiteMove(fen, 'Kf2').ruleAPenalty, 0)
 })
 
+test('rule a vacates a safe adjacent king target occupied by a bishop', () => {
+  const fen = '8/8/8/8/8/5KB1/8/3B2k1 w - - 0 1'
+  const move = getChess(fen).move('Bh4')
+  assert.ok(move)
+  assert.deepEqual(getIdealTwoBishopsWhiteMoves(fen), ['Bh4'])
+  assert.equal(scoreTwoBishopsWhiteMove(fen, 'Bh4').ruleAPenalty, 1)
+  assert.ok(scoreTwoBishopsWhiteMove(fen, 'Ke3').ruleAPenalty > 1)
+
+  for (const transform of SQUARE_TRANSFORMS) {
+    const transformedFen = transformFen(fen, transform)
+    const expectedFrom = transformSquare(move.from, transform)
+    const expectedTo = transformSquare(move.to, transform)
+    const idealMoves = getIdealTwoBishopsWhiteMoves(transformedFen)
+    assert.ok(
+      idealMoves.some((san) => {
+        const transformedMove = getChess(transformedFen).move(san)
+        return (
+          transformedMove.from === expectedFrom &&
+          transformedMove.to === expectedTo
+        )
+      }),
+      transform.name,
+    )
+  }
+})
+
 test('rule a then places a bishop on the corner cage diagonal', () => {
   const fen = '8/8/8/8/8/8/5K1k/3BB3 w - - 0 1'
   assert.deepEqual(getIdealTwoBishopsWhiteMoves(fen), ['Bg4'])

@@ -96,6 +96,23 @@ function distanceToKingTarget(
   )
 }
 
+function vacatesAdjacentSafeKingTarget(
+  orientations: readonly CornerCageOrientation[],
+  whiteKing: Square,
+  blackKing: Square,
+  move: { readonly piece: string; readonly from: Square },
+): boolean {
+  return (
+    move.piece === 'b' &&
+    orientations.some(
+      (orientation) =>
+        orientation.kingTargets.has(move.from) &&
+        kingDistance(whiteKing, move.from) === 1 &&
+        kingDistance(blackKing, move.from) > 1,
+    )
+  )
+}
+
 export function getForcedMateInTwoMoves(fen: string): readonly string[] {
   const chess = getChess(fen)
   if (chess.turn() !== 'w') return []
@@ -176,8 +193,16 @@ export function evaluateRuleACornerCage(
     let penalty: number
     if (currentProgress === 0) {
       penalty =
-        move.piece !== 'k'
-          ? 100 + distanceToKingTarget(orientations, resultWhiteKing)
+        move.piece === 'b' &&
+        vacatesAdjacentSafeKingTarget(
+          orientations,
+          whiteKing,
+          blackKing,
+          move,
+        )
+          ? 1
+          : move.piece !== 'k'
+            ? 100 + distanceToKingTarget(orientations, resultWhiteKing)
           : resultProgress >= 1
             ? 0
             : 10 + distanceToKingTarget(orientations, resultWhiteKing)
