@@ -12,6 +12,7 @@ import {
 } from './twoBishops'
 import {
   getRuleNPreferredMoves,
+  getRuleWYPreferredMoves,
   getSmallestTwoBishopsWallArea,
   getTwoBishopsWalls,
 } from './twoBishopsWallGeometry'
@@ -25,6 +26,7 @@ const RULE_N_DISTANCE_THREE_FEN =
   '8/8/8/5K2/7k/4BB2/8/8 w - - 0 1'
 const RULE_O_OCCUPIED_WALL_FEN =
   '8/8/7B/8/5K1k/8/4B3/8 w - - 0 1'
+const RULE_WY_FEN = '8/8/8/8/8/5K2/4BB1k/8 w - - 0 1'
 
 test('wall area is measured from the nearer diagonal position', () => {
   const wall = getTwoBishopsWalls(LOADED_WALL_FEN).find(
@@ -126,6 +128,42 @@ test('wall and Rule N geometry rotate and reflect', () => {
       transform.name,
     )
   }
+})
+
+test('Rule WY moves the opposed wall bishop to the other opposition square', () => {
+  assert.deepEqual(getRuleWYPreferredMoves(RULE_WY_FEN), ['Bh4'])
+  assert.deepEqual(getIdealTwoBishopsWhiteMoves(RULE_WY_FEN), ['Bh4'])
+  assert.equal(scoreTwoBishopsWhiteMove(RULE_WY_FEN, 'Bh4').ruleWYPenalty, 0)
+
+  const move = getChess(RULE_WY_FEN).move('Bh4')
+  assert.ok(move)
+  for (const transform of SQUARE_TRANSFORMS) {
+    const transformedFen = transformFen(RULE_WY_FEN, transform)
+    const transformedMove = getChess(transformedFen)
+      .moves({ verbose: true })
+      .find(
+        ({ from, to }) =>
+          from === transformSquare(move.from, transform) &&
+          to === transformSquare(move.to, transform),
+      )
+    assert.ok(transformedMove, transform.name)
+    assert.deepEqual(
+      getRuleWYPreferredMoves(transformedFen),
+      [transformedMove.san],
+      transform.name,
+    )
+  }
+})
+
+test('Rule WY requires Black on the edge and a preserved wall', () => {
+  assert.deepEqual(
+    getRuleWYPreferredMoves('8/8/8/8/8/5K2/4B1k1/8 w - - 0 1'),
+    [],
+  )
+  assert.deepEqual(
+    getRuleWYPreferredMoves('8/8/8/8/8/5K2/4BBk1/8 w - - 0 1'),
+    [],
+  )
 })
 
 test('Rule W counts the post-move bishop distances at the threshold', () => {

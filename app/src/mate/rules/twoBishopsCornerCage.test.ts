@@ -35,9 +35,10 @@ test('rule a does not reward a king approach move', () => {
 
 test('rule a vacates a safe adjacent king target occupied by a bishop', () => {
   const fen = '8/8/8/8/8/5KB1/8/3B2k1 w - - 0 1'
-  const move = getChess(fen).move('Bh4')
+  const move = getChess(fen).move('Be1')
   assert.ok(move)
-  assert.deepEqual(getIdealTwoBishopsWhiteMoves(fen), ['Bh4'])
+  assert.deepEqual(getIdealTwoBishopsWhiteMoves(fen), ['Be1'])
+  assert.equal(scoreTwoBishopsWhiteMove(fen, 'Be1').ruleAPenalty, 1)
   assert.equal(scoreTwoBishopsWhiteMove(fen, 'Bh4').ruleAPenalty, 1)
   assert.ok(scoreTwoBishopsWhiteMove(fen, 'Ke3').ruleAPenalty > 1)
 

@@ -19,6 +19,7 @@ const ACTIVE_RULE_IDS = [
   'rule o',
   'king closer',
   'rule ww',
+  'rule wy',
   'rule w',
 ]
 
@@ -57,6 +58,14 @@ test('rule n renders the Manhattan corner-distance gate', () => {
   assert.equal(
     ruleN?.helpText,
     "With a bishop wall and White's king controlling the escape square, shrink and check along the bishop wall, from at least 3 squares from the corner.",
+  )
+})
+
+test('rule wy renders the opposition waiting move', () => {
+  const ruleWY = twoBishopsWhiteRules.find(({ id }) => id === 'rule wy')
+  assert.equal(
+    ruleWY?.helpText,
+    "With the Black king on edge opposition with a bishop that is a knight's move from the corner and also in a bishop wall, play a bishop waiting move to the other square in opposition with Black.",
   )
 })
 

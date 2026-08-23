@@ -1,8 +1,10 @@
 import type { Square } from 'chess.js'
 import {
   allSquares,
+  edgeDistance,
   findPiece,
   getChess,
+  isKnightMove,
   kingDistance,
   manhattanDistance,
   squareCoordinates,
@@ -323,6 +325,71 @@ export function getRuleNPreferredMoves(fen: string): readonly string[] {
       })
     })
     .map((move) => move.san)
+}
+
+function squaresAreInOpposition(
+  first: Square,
+  second: Square,
+): boolean {
+  const firstCoordinates = squareCoordinates(first)
+  const secondCoordinates = squareCoordinates(second)
+  const fileDistance = Math.abs(
+    firstCoordinates.file - secondCoordinates.file,
+  )
+  const rankDistance = Math.abs(
+    firstCoordinates.rank - secondCoordinates.rank,
+  )
+  return (
+    (fileDistance === 0 && rankDistance === 2) ||
+    (rankDistance === 0 && fileDistance === 2)
+  )
+}
+
+export function getRuleWYPreferredMoves(fen: string): readonly string[] {
+  const blackKing = findPiece(fen, 'b', 'k')?.square
+  if (blackKing === undefined || edgeDistance(blackKing) !== 0) return []
+
+  const qualifyingWalls = getTwoBishopsWalls(fen).flatMap((wall) =>
+    wall.wallBishops
+      .filter(
+        (bishop) =>
+          isKnightMove(bishop, wall.corner) &&
+          squaresAreInOpposition(bishop, blackKing),
+      )
+      .map((bishop) => ({ bishop, wall })),
+  )
+  if (qualifyingWalls.length === 0) return []
+
+  const preferred = new Set<string>()
+  for (const move of getChess(fen).moves({ verbose: true })) {
+    if (
+      move.piece !== 'b' ||
+      !squaresAreInOpposition(move.to, blackKing)
+    ) {
+      continue
+    }
+    const result = getChess(fen)
+    result.move(move.san)
+    if (result.isCheck() || result.isCheckmate() || result.isStalemate()) {
+      continue
+    }
+    const resultWalls = getTwoBishopsWalls(result.fen())
+    if (
+      qualifyingWalls.some(
+        ({ bishop, wall }) =>
+          move.from === bishop &&
+          move.to !== bishop &&
+          resultWalls.some(
+            (resultWall) =>
+              resultWall.corner === wall.corner &&
+              resultWall.wallBishops.includes(move.to),
+          ),
+      )
+    ) {
+      preferred.add(move.san)
+    }
+  }
+  return [...preferred]
 }
 
 export function countDistantTwoBishops(fen: string): number {

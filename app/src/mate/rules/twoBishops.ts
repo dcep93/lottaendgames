@@ -34,6 +34,7 @@ import { TWO_BISHOPS_DIAGRAM_POSITIONS } from './twoBishopsDiagramPositions'
 import {
   countDistantTwoBishops,
   getRuleNPreferredMoves,
+  getRuleWYPreferredMoves,
   getTwoBishopsWalls,
 } from './twoBishopsWallGeometry'
 import { getTwoBishopsPhaseTwoPatternMoves } from './twoBishopsPhaseTwoPattern'
@@ -118,6 +119,8 @@ export type TwoBishopsWhiteMoveScore = {
   readonly ruleVApplies: boolean
   readonly ruleVPenalty: number
   readonly ruleVSqueezeEdgeDistance: number
+  readonly ruleWYApplies: boolean
+  readonly ruleWYPenalty: number
   readonly ruleWApplies: boolean
   readonly ruleWUrgentPenalty: number
   readonly ruleWPenalty: number
@@ -2901,6 +2904,7 @@ type TwoBishopsWhitePositionContext = {
     string,
     readonly SqueezeGeometry[]
   >
+  readonly ruleWYPreferredMoves: readonly string[]
   readonly ruleWApplies: boolean
   readonly ruleWUrgentSetup: boolean
   readonly ruleWUrgentDiagonal: FlankDiagonal | undefined
@@ -4653,6 +4657,7 @@ function createTwoBishopsWhitePositionContext(
   const ruleAEvaluation = evaluateRuleACornerCage(fen)
   const ruleBEvaluation = evaluateRuleBScreenPosition(fen)
   const ruleNPreferredMoves = getRuleNPreferredMoves(fen)
+  const ruleWYPreferredMoves = getRuleWYPreferredMoves(fen)
   const ruleWWApplies = getTwoBishopsWalls(fen).length > 0
   const ruleOWallAreasBySan = new Map<string, number>()
   const ruleWWPenaltiesBySan = new Map<string, number>()
@@ -4821,6 +4826,7 @@ function createTwoBishopsWhitePositionContext(
     ruleUUPreferredMoves,
     ruleUPreferredMoves,
     ruleVMatchingGeometriesBySan,
+    ruleWYPreferredMoves,
     ruleWApplies:
       startingRuleWFlankDiagonalPairs.length > 0 &&
       (ruleWUrgentSetup ||
@@ -4884,6 +4890,7 @@ function scoreTwoBishopsWhiteMoveWithContext(
     ruleUUPreferredMoves,
     ruleUPreferredMoves,
     ruleVMatchingGeometriesBySan,
+    ruleWYPreferredMoves,
     ruleYThreatenedBishops,
     deathBoxPreferredMoves,
     preserveExistingMegadethBox,
@@ -5152,6 +5159,8 @@ function scoreTwoBishopsWhiteMoveWithContext(
               ),
             ),
           ),
+    ruleWYApplies: ruleWYPreferredMoves.length > 0,
+    ruleWYPenalty: ruleWYPreferredMoves.includes(move.san) ? 0 : 1,
     ruleWApplies: blackKing !== undefined,
     ruleWUrgentPenalty: 0,
     ruleWPenalty: 2 - countDistantTwoBishops(resultFen),
@@ -5538,6 +5547,14 @@ const twoBishopsWhiteRuleCatalog: readonly OrderedRule<TwoBishopsWhiteMoveScore>
     compare: (first, second) => first.ruleWWPenalty - second.ruleWWPenalty,
   },
   {
+    id: 'rule wy',
+    shortLabel: 'rule wy',
+    helpText:
+      "With the Black king on edge opposition with a bishop that is a knight's move from the corner and also in a bishop wall, play a bishop waiting move to the other square in opposition with Black.",
+    applies: (score) => score.ruleWYApplies,
+    compare: (first, second) => first.ruleWYPenalty - second.ruleWYPenalty,
+  },
+  {
     id: 'rule w',
     shortLabel: 'rule w',
     helpText: "Prefer bishops 3 or more steps from Black's king.",
@@ -5665,6 +5682,7 @@ const ACTIVE_TWO_BISHOPS_WHITE_RULE_IDS = [
   'rule o',
   'king closer',
   'rule ww',
+  'rule wy',
   'rule w',
 ] as const
 
@@ -5760,6 +5778,8 @@ function scoreWhiteCandidates(
       ruleVApplies: false,
       ruleVPenalty: 0,
       ruleVSqueezeEdgeDistance: 0,
+      ruleWYApplies: false,
+      ruleWYPenalty: 0,
       ruleWApplies: false,
       ruleWUrgentPenalty: 0,
       ruleWPenalty: 0,
