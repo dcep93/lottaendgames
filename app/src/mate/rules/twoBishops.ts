@@ -4594,6 +4594,22 @@ function bishopMoveDiagonalSeparatesKings(
   )
 }
 
+function ruleWWWallPenalty(
+  wallBishops: readonly [Square, Square],
+): number {
+  const [innerBishop, outerBishop] = wallBishops
+  const outerEdgeDistance = edgeDistance(outerBishop)
+  const onEdgePenalty = outerEdgeDistance === 0 ? 1 : 0
+  const oneSquareFromEdgePenalty = outerEdgeDistance === 1 ? 0 : 1
+  const adjacentBishopsPenalty =
+    kingDistance(innerBishop, outerBishop) === 1 ? 0 : 1
+  return (
+    onEdgePenalty * 4 +
+    oneSquareFromEdgePenalty * 2 +
+    adjacentBishopsPenalty
+  )
+}
+
 function getRuleYThreatenedBishops(
   fen: string,
   whiteKing: Square | undefined,
@@ -4675,9 +4691,11 @@ function createTwoBishopsWhitePositionContext(
     )
     ruleWWPenaltiesBySan.set(
       move.san,
-      smallestWalls.some(({ wallBishops }) => edgeDistance(wallBishops[1]) > 0)
-        ? 0
-        : 1,
+      Math.min(
+        ...smallestWalls.map(({ wallBishops }) =>
+          ruleWWWallPenalty(wallBishops),
+        ),
+      ),
     )
   }
   const ruleGPreferredMoves = getRuleGPreferredMoves(
@@ -5542,7 +5560,8 @@ const twoBishopsWhiteRuleCatalog: readonly OrderedRule<TwoBishopsWhiteMoveScore>
   {
     id: 'rule ww',
     shortLabel: 'rule ww',
-    helpText: 'Prefer the bishop of the outer wall off the edge of the board.',
+    helpText:
+      'Prefer the bishop of the outer wall off the edge of the board, ideally one square away from the edge and adjacent to the other bishop.',
     applies: (score) => score.ruleWWApplies,
     compare: (first, second) => first.ruleWWPenalty - second.ruleWWPenalty,
   },

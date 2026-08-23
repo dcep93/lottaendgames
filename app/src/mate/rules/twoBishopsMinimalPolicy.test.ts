@@ -73,7 +73,7 @@ test('rule ww renders the outer-wall bishop preference', () => {
   const ruleWW = twoBishopsWhiteRules.find(({ id }) => id === 'rule ww')
   assert.equal(
     ruleWW?.helpText,
-    'Prefer the bishop of the outer wall off the edge of the board.',
+    'Prefer the bishop of the outer wall off the edge of the board, ideally one square away from the edge and adjacent to the other bishop.',
   )
 
   const ruleSet = getMateRuleSet('two-bishops')
