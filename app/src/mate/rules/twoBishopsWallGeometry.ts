@@ -79,16 +79,35 @@ function cornerArea(
   )
 }
 
-function bishopControl(
+function bishopControls(
   fen: string,
   bishop: Square,
   target: Square,
-): WallControl | null {
+): readonly WallControl[] {
   const source = squareCoordinates(bishop)
   const destination = squareCoordinates(target)
+  if (bishop === target) {
+    return [
+      {
+        bishop,
+        diagonal: {
+          axis: 'difference',
+          index: source.file - source.rank,
+        },
+        screenedByWhiteKing: false,
+        square: target,
+      },
+      {
+        bishop,
+        diagonal: { axis: 'sum', index: source.file + source.rank },
+        screenedByWhiteKing: false,
+        square: target,
+      },
+    ]
+  }
   const fileDistance = Math.abs(source.file - destination.file)
   const rankDistance = Math.abs(source.rank - destination.rank)
-  if (fileDistance === 0 || fileDistance !== rankDistance) return null
+  if (fileDistance === 0 || fileDistance !== rankDistance) return []
 
   const diagonal: BishopWallDiagonal =
     source.file - destination.file === source.rank - destination.rank
@@ -102,7 +121,7 @@ function bishopControl(
   let screenedByWhiteKing = false
   while (file !== destination.file || rank !== destination.rank) {
     const square = squareFromCoordinates(file, rank)
-    if (square === null) return null
+    if (square === null) return []
     const blocker = chess.get(square)
     if (blocker !== undefined) {
       if (
@@ -112,13 +131,13 @@ function bishopControl(
       ) {
         screenedByWhiteKing = true
       } else {
-        return null
+        return []
       }
     }
     file += fileStep
     rank += rankStep
   }
-  return { bishop, diagonal, screenedByWhiteKing, square: target }
+  return [{ bishop, diagonal, screenedByWhiteKing, square: target }]
 }
 
 function blackKingDestinations(fen: string): ReadonlySet<Square> {
@@ -164,68 +183,77 @@ export function getTwoBishopsWalls(fen: string): readonly TwoBishopsWall[] {
         [bishops[0], bishops[1]],
         [bishops[1], bishops[0]],
       ] as const) {
-        const first = bishopControl(fen, firstBishop, firstSquare)
-        const second = bishopControl(fen, secondBishop, secondSquare)
-        if (first === null || second === null) continue
-        if (
-          first.diagonal.axis !== second.diagonal.axis ||
-          Math.abs(first.diagonal.index - second.diagonal.index) !== 1
-        ) {
-          continue
-        }
-        for (const corner of CORNERS) {
-          const firstDistance = diagonalDistanceFromCorner(
-            corner,
-            first.diagonal,
-          )
-          const secondDistance = diagonalDistanceFromCorner(
-            corner,
-            second.diagonal,
-          )
-          const nearerChoices: readonly [WallControl, WallControl][] =
-            firstDistance < secondDistance
-              ? [[first, second]]
-              : secondDistance < firstDistance
-                ? [[second, first]]
-                : [
-                    [first, second],
-                    [second, first],
-                  ]
-          for (const [nearer, farther] of nearerChoices) {
-            if (!adjacentSet.has(nearer.square)) continue
+        for (const first of bishopControls(
+          fen,
+          firstBishop,
+          firstSquare,
+        )) {
+          for (const second of bishopControls(
+            fen,
+            secondBishop,
+            secondSquare,
+          )) {
             if (
-              kingDistance(farther.square, blackKing) !==
-              kingDistanceToDiagonal(blackKing, farther.diagonal)
+              first.diagonal.axis !== second.diagonal.axis ||
+              Math.abs(first.diagonal.index - second.diagonal.index) !== 1
             ) {
               continue
             }
-            if (nearer.screenedByWhiteKing) continue
-            const areaSquares = cornerArea(corner, nearer.diagonal)
-            if (!areaSquares.includes(blackKing)) {
-              continue
+            for (const corner of CORNERS) {
+              const firstDistance = diagonalDistanceFromCorner(
+                corner,
+                first.diagonal,
+              )
+              const secondDistance = diagonalDistanceFromCorner(
+                corner,
+                second.diagonal,
+              )
+              const nearerChoices: readonly [WallControl, WallControl][] =
+                firstDistance < secondDistance
+                  ? [[first, second]]
+                  : secondDistance < firstDistance
+                    ? [[second, first]]
+                    : [
+                        [first, second],
+                        [second, first],
+                      ]
+              for (const [nearer, farther] of nearerChoices) {
+                if (!adjacentSet.has(nearer.square)) continue
+                if (
+                  kingDistance(farther.square, blackKing) !==
+                  kingDistanceToDiagonal(blackKing, farther.diagonal)
+                ) {
+                  continue
+                }
+                if (nearer.screenedByWhiteKing) continue
+                const areaSquares = cornerArea(corner, nearer.diagonal)
+                if (!areaSquares.includes(blackKing)) {
+                  continue
+                }
+                if (
+                  farther.screenedByWhiteKing &&
+                  legalBlackDestinations.has(farther.square)
+                ) {
+                  continue
+                }
+                const wall: TwoBishopsWall = {
+                  areaSquares,
+                  corner,
+                  escapeSquare: farther.square,
+                  fartherDiagonal: farther.diagonal,
+                  nearerDiagonal: nearer.diagonal,
+                  wallSquares: [nearer.square, farther.square],
+                  wallBishops: [nearer.bishop, farther.bishop],
+                }
+                const key = [
+                  corner,
+                  diagonalKey(nearer.diagonal),
+                  diagonalKey(farther.diagonal),
+                  ...wall.wallSquares.slice().sort(),
+                ].join('|')
+                walls.set(key, wall)
+              }
             }
-            if (
-              farther.screenedByWhiteKing &&
-              legalBlackDestinations.has(farther.square)
-            ) {
-              continue
-            }
-            const wall: TwoBishopsWall = {
-              areaSquares,
-              corner,
-              escapeSquare: farther.square,
-              fartherDiagonal: farther.diagonal,
-              nearerDiagonal: nearer.diagonal,
-              wallSquares: [nearer.square, farther.square],
-              wallBishops: [nearer.bishop, farther.bishop],
-            }
-            const key = [
-              corner,
-              diagonalKey(nearer.diagonal),
-              diagonalKey(farther.diagonal),
-              ...wall.wallSquares.slice().sort(),
-            ].join('|')
-            walls.set(key, wall)
           }
         }
       }

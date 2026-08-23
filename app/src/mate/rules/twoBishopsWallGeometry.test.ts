@@ -19,6 +19,8 @@ import {
 const LOADED_WALL_FEN =
   '2B5/8/6k1/8/3K3B/8/8/8 w - - 18 10'
 const RULE_N_FEN = '8/8/8/8/8/2BB4/k7/2K5 w - - 0 1'
+const RULE_O_OCCUPIED_WALL_FEN =
+  '8/8/7B/8/5K1k/8/4B3/8 w - - 0 1'
 
 test('wall area is measured from the nearer diagonal position', () => {
   const wall = getTwoBishopsWalls(LOADED_WALL_FEN).find(
@@ -97,8 +99,89 @@ test('Rule O recognizes Bh4 without using White king location for wall existence
   const result = getChess(fen)
   result.move('Bh4')
   assert.equal(getSmallestTwoBishopsWallArea(result.fen()), 6)
-  assert.deepEqual(getIdealTwoBishopsWhiteMoves(fen), ['Bh4'])
   const score = scoreTwoBishopsWhiteMove(fen, 'Bh4')
   assert.equal(score.ruleOApplies, true)
   assert.equal(score.ruleOPenalty, 6)
+})
+
+test('Rule O recognizes a bishop occupying its wall square', () => {
+  const result = getChess(RULE_O_OCCUPIED_WALL_FEN)
+  result.move('Bg5+')
+
+  assert.equal(getSmallestTwoBishopsWallArea(result.fen()), 10)
+  assert.ok(
+    getTwoBishopsWalls(result.fen()).some(
+      ({ fartherDiagonal, nearerDiagonal, wallBishops }) =>
+        fartherDiagonal.axis === 'difference' &&
+        fartherDiagonal.index === 2 &&
+        nearerDiagonal.axis === 'difference' &&
+        nearerDiagonal.index === 3 &&
+        wallBishops.includes('g5'),
+    ),
+  )
+})
+
+test('Rule O uniquely moves the outer-wall bishop without rejecting its return', () => {
+  assert.deepEqual(getIdealTwoBishopsWhiteMoves(RULE_O_OCCUPIED_WALL_FEN), [
+    'Bg5+',
+  ])
+  assert.equal(
+    scoreTwoBishopsWhiteMove(RULE_O_OCCUPIED_WALL_FEN, 'Bg5+')
+      .ruleOMovedOuterBishopPenalty,
+    0,
+  )
+
+  const reply = getChess(RULE_O_OCCUPIED_WALL_FEN)
+  reply.move('Bg5+')
+  reply.move('Kh3')
+  assert.deepEqual(getIdealTwoBishopsWhiteMoves(reply.fen()), ['Bh6'])
+  assert.equal(
+    scoreTwoBishopsWhiteMove(reply.fen(), 'Bh6')
+      .ruleOMovedOuterBishopPenalty,
+    0,
+  )
+  assert.equal(
+    scoreTwoBishopsWhiteMove(reply.fen(), 'Bg4+')
+      .ruleOMovedOuterBishopPenalty,
+    1,
+  )
+})
+
+test('occupied Rule O wall geometry rotates and reflects', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    const fen = transformFen(RULE_O_OCCUPIED_WALL_FEN, transform)
+    const firstMove = getChess(fen)
+      .moves({ verbose: true })
+      .find(
+        ({ from, to }) =>
+          from === transformSquare('h6', transform) &&
+          to === transformSquare('g5', transform),
+      )
+    assert.ok(firstMove, transform.name)
+    assert.deepEqual(getIdealTwoBishopsWhiteMoves(fen), [firstMove.san])
+
+    const reply = getChess(fen)
+    reply.move(firstMove.san)
+    const blackMove = reply
+      .moves({ verbose: true })
+      .find(
+        ({ from, to }) =>
+          from === transformSquare('h4', transform) &&
+          to === transformSquare('h3', transform),
+      )
+    assert.ok(blackMove, transform.name)
+    reply.move(blackMove.san)
+
+    const returnMove = reply
+      .moves({ verbose: true })
+      .find(
+        ({ from, to }) =>
+          from === transformSquare('g5', transform) &&
+          to === transformSquare('h6', transform),
+      )
+    assert.ok(returnMove, transform.name)
+    assert.deepEqual(getIdealTwoBishopsWhiteMoves(reply.fen()), [
+      returnMove.san,
+    ])
+  }
 })

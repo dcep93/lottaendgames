@@ -35,6 +35,7 @@ import {
   countDistantTwoBishops,
   getRuleNPreferredMoves,
   getSmallestTwoBishopsWallArea,
+  getTwoBishopsWalls,
 } from './twoBishopsWallGeometry'
 import { getTwoBishopsPhaseTwoPatternMoves } from './twoBishopsPhaseTwoPattern'
 import { evaluateRuleACornerCage } from './twoBishopsCornerCage'
@@ -71,6 +72,7 @@ export type TwoBishopsWhiteMoveScore = {
   readonly ruleNPenalty: number
   readonly ruleOApplies: boolean
   readonly ruleOPenalty: number
+  readonly ruleOMovedOuterBishopPenalty: number
   readonly ruleGApplies: boolean
   readonly ruleGPenalty: number
   readonly centralPiecesPenalty: number
@@ -2884,6 +2886,7 @@ type TwoBishopsWhitePositionContext = {
   readonly ruleNPreferredMoves: readonly string[]
   readonly ruleOApplies: boolean
   readonly ruleOWallAreasBySan: ReadonlyMap<string, number>
+  readonly ruleOOuterWallBishops: ReadonlySet<Square>
   readonly ruleGPreferredMoves: readonly string[]
   readonly onsidesPreferredMoves: readonly string[]
   readonly bootNScootPreferredMoves: readonly string[]
@@ -4649,6 +4652,9 @@ function createTwoBishopsWhitePositionContext(
   const ruleAEvaluation = evaluateRuleACornerCage(fen)
   const ruleBEvaluation = evaluateRuleBScreenPosition(fen)
   const ruleNPreferredMoves = getRuleNPreferredMoves(fen)
+  const ruleOOuterWallBishops = new Set(
+    getTwoBishopsWalls(fen).map((wall) => wall.wallBishops[1]),
+  )
   const ruleOWallAreasBySan = new Map<string, number>()
   for (const move of getChess(fen).moves({ verbose: true })) {
     const result = getChess(fen)
@@ -4782,6 +4788,7 @@ function createTwoBishopsWhitePositionContext(
     ruleNPreferredMoves,
     ruleOApplies: ruleOWallAreasBySan.size > 0,
     ruleOWallAreasBySan,
+    ruleOOuterWallBishops,
     ruleGPreferredMoves,
     onsidesPreferredMoves,
     bootNScootPreferredMoves,
@@ -4851,6 +4858,7 @@ function scoreTwoBishopsWhiteMoveWithContext(
     ruleNPreferredMoves,
     ruleOApplies,
     ruleOWallAreasBySan,
+    ruleOOuterWallBishops,
     ruleGPreferredMoves,
     onsidesPreferredMoves,
     bootNScootPreferredMoves,
@@ -5011,6 +5019,8 @@ function scoreTwoBishopsWhiteMoveWithContext(
     ruleNPenalty: ruleNPreferredMoves.includes(move.san) ? 0 : 1,
     ruleOApplies,
     ruleOPenalty: ruleOWallAreasBySan.get(move.san) ?? 65,
+    ruleOMovedOuterBishopPenalty:
+      move.piece === 'b' && ruleOOuterWallBishops.has(move.from) ? 0 : 1,
     ruleGApplies: ruleGPreferredMoves.length > 0,
     ruleGPenalty: ruleGPreferredMoves.includes(move.san) ? 0 : 1,
     centralPiecesPenalty: [resultWhiteKingSquare, ...resultBishops].filter(
@@ -5395,7 +5405,10 @@ const twoBishopsWhiteRuleCatalog: readonly OrderedRule<TwoBishopsWhiteMoveScore>
     helpText:
       "Prefer a bishop wall keeping Black's king in a smaller area of at least 4 squares.",
     applies: (score) => score.ruleOApplies,
-    compare: (first, second) => first.ruleOPenalty - second.ruleOPenalty,
+    compare: (first, second) =>
+      first.ruleOPenalty - second.ruleOPenalty ||
+      first.ruleOMovedOuterBishopPenalty -
+        second.ruleOMovedOuterBishopPenalty,
   },
   {
     id: 'rule g',
@@ -5680,6 +5693,7 @@ function scoreWhiteCandidates(
       ruleNPenalty: 0,
       ruleOApplies: false,
       ruleOPenalty: 0,
+      ruleOMovedOuterBishopPenalty: 0,
       ruleGApplies: false,
       ruleGPenalty: 0,
       centralPiecesPenalty: 0,
