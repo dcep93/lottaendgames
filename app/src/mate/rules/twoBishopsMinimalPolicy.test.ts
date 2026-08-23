@@ -42,6 +42,14 @@ test('king closer keeps the middle-sixteen tie-break first', () => {
   )
 })
 
+test('rule a renders the unattackable waiting-move requirement', () => {
+  const ruleA = twoBishopsWhiteRules.find(({ id }) => id === 'rule a')
+  assert.equal(
+    ruleA?.helpText,
+    "With Black's king in the 2 corner edge squares, place the White king a knight's move from that corner. Then, place a bishop on the corner cage diagonal. Then, play an unattackable bishop waiting move if necessary, until mate in 2.",
+  )
+})
+
 test('Two Bishops help renders the Phase 2 animation and active diagrams', () => {
   assert.deepEqual(twoBishopsRuleSet.help.notes, [
     "A bishop wall is two adjacent parallel diagonals, with the nearer diagonal adjacent to Black's king. White's king matters only when its screening lets Black escape.",

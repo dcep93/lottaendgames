@@ -97,6 +97,94 @@ test('rule a otherwise keeps bishop waiting moves on the completed cage', () => 
   assert.ok((evaluation.penaltiesBySan.get('Ke3') ?? 0) > 1)
 })
 
+test('rule a waiting moves preserve the established cage orientation', () => {
+  const fen = '8/8/B7/8/8/6K1/8/4B2k w - - 0 1'
+  const evaluation = evaluateRuleACornerCage(fen)
+  const swappedMove = getChess(fen).move('Bc8')
+  const maintainedMove = getChess(fen).move('Bb5')
+  assert.ok(swappedMove)
+  assert.ok(maintainedMove)
+  assert.ok(
+    (evaluation.penaltiesBySan.get('Bc8') ?? 0) >= 100,
+  )
+  assert.ok(
+    (evaluation.penaltiesBySan.get('Bb5') ?? 999) < 100,
+  )
+
+  for (const transform of SQUARE_TRANSFORMS) {
+    const transformedFen = transformFen(fen, transform)
+    const transformedChess = getChess(transformedFen)
+    const transformedMoves = transformedChess.moves({ verbose: true })
+    const transformedEvaluation = evaluateRuleACornerCage(transformedFen)
+    const transformedSwapped = transformedMoves.find(
+      (move) =>
+        move.from === transformSquare(swappedMove.from, transform) &&
+        move.to === transformSquare(swappedMove.to, transform),
+    )
+    const transformedMaintained = transformedMoves.find(
+      (move) =>
+        move.from === transformSquare(maintainedMove.from, transform) &&
+        move.to === transformSquare(maintainedMove.to, transform),
+    )
+    assert.ok(transformedSwapped, transform.name)
+    assert.ok(transformedMaintained, transform.name)
+    assert.ok(
+      (transformedEvaluation.penaltiesBySan.get(transformedSwapped.san) ?? 0) >=
+        100,
+      transform.name,
+    )
+    assert.ok(
+      (transformedEvaluation.penaltiesBySan.get(transformedMaintained.san) ??
+        999) < 100,
+      transform.name,
+    )
+  }
+})
+
+test('rule a waiting moves leave the moved bishop unattackable', () => {
+  const fen = '8/8/8/8/6B1/8/5K1k/4B3 w - - 0 1'
+  const evaluation = evaluateRuleACornerCage(fen)
+  const attackedMove = getChess(fen).move('Bh3')
+  const safeMove = getChess(fen).move('Bf5')
+  assert.ok(attackedMove)
+  assert.ok(safeMove)
+  assert.ok(
+    (evaluation.penaltiesBySan.get('Bh3') ?? 0) >= 100,
+  )
+  assert.ok(
+    (evaluation.penaltiesBySan.get('Bf5') ?? 999) < 100,
+  )
+
+  for (const transform of SQUARE_TRANSFORMS) {
+    const transformedFen = transformFen(fen, transform)
+    const transformedChess = getChess(transformedFen)
+    const transformedMoves = transformedChess.moves({ verbose: true })
+    const transformedEvaluation = evaluateRuleACornerCage(transformedFen)
+    const transformedAttacked = transformedMoves.find(
+      (move) =>
+        move.from === transformSquare(attackedMove.from, transform) &&
+        move.to === transformSquare(attackedMove.to, transform),
+    )
+    const transformedSafe = transformedMoves.find(
+      (move) =>
+        move.from === transformSquare(safeMove.from, transform) &&
+        move.to === transformSquare(safeMove.to, transform),
+    )
+    assert.ok(transformedAttacked, transform.name)
+    assert.ok(transformedSafe, transform.name)
+    assert.ok(
+      (transformedEvaluation.penaltiesBySan.get(transformedAttacked.san) ?? 0) >=
+        100,
+      transform.name,
+    )
+    assert.ok(
+      (transformedEvaluation.penaltiesBySan.get(transformedSafe.san) ?? 999) <
+        100,
+      transform.name,
+    )
+  }
+})
+
 test('rule a supports every rotation and reflection', () => {
   const fen = '8/8/8/8/8/8/5K1k/3BB3 w - - 0 1'
   const move = getChess(fen).move('Bg4')

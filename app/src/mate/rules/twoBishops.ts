@@ -22,6 +22,7 @@ import {
   BLACK_RETURN_PRIORITY,
 } from './blackPriorities'
 import {
+  bishopDestinationCanBeAttackedOnNextMove,
   centerDistance,
   distanceToNearestUnprotectedWhiteBishop,
   getTwoBishopsPhaseLabel,
@@ -3491,20 +3492,6 @@ function isTwoBishopsSquareOffsides(
   )
 }
 
-function bishopDestinationCanBeAttackedOnNextMove(
-  fen: string,
-  san: string,
-  destination: Square,
-): boolean {
-  const result = getChess(fen)
-  result.move(san)
-  return result.moves({ verbose: true }).some(
-    (reply) =>
-      reply.piece === 'k' &&
-      kingDistance(reply.to, destination) <= 1,
-  )
-}
-
 export function isTwoBishopsSquareBehindBlack(
   square: Square,
   whiteKing: Square,
@@ -5380,7 +5367,7 @@ const twoBishopsWhiteRuleCatalog: readonly OrderedRule<TwoBishopsWhiteMoveScore>
     id: 'rule a',
     shortLabel: 'rule a',
     helpText:
-      "With Black's king in the 2 corner edge squares, place the White king a knight's move from that corner. Then, place a bishop on the corner cage diagonal. Then, play a bishop waiting move if necessary, until mate in 2.",
+      "With Black's king in the 2 corner edge squares, place the White king a knight's move from that corner. Then, place a bishop on the corner cage diagonal. Then, play an unattackable bishop waiting move if necessary, until mate in 2.",
     applies: (score) => score.ruleAApplies,
     stopWhenBest: (score) => score.ruleAPenalty === 0,
     compare: (first, second) => first.ruleAPenalty - second.ruleAPenalty,

@@ -25,6 +25,20 @@ export function getWhiteBishopSquares(fen: string): Square[] {
     .map((piece) => piece!.square)
 }
 
+export function bishopDestinationCanBeAttackedOnNextMove(
+  fen: string,
+  san: string,
+  destination: Square,
+): boolean {
+  const result = getChess(fen)
+  result.move(san)
+  return result.moves({ verbose: true }).some(
+    (reply) =>
+      reply.piece === 'k' &&
+      kingDistance(reply.to, destination) <= 1,
+  )
+}
+
 export type ProximateBishopWall = {
   readonly moatAxis: 'file' | 'rank'
   readonly moatIndex: number

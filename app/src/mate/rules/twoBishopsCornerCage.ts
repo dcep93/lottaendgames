@@ -6,7 +6,10 @@ import {
   kingDistance,
   transformSquare,
 } from '../chess'
-import { getWhiteBishopSquares } from './twoBishopsGeometry'
+import {
+  bishopDestinationCanBeAttackedOnNextMove,
+  getWhiteBishopSquares,
+} from './twoBishopsGeometry'
 
 type CornerCageOrientation = {
   readonly corner: Square
@@ -174,6 +177,10 @@ export function evaluateRuleACornerCage(
     whiteKing,
     bishops,
   )
+  const completedOrientations = orientations.filter(
+    (orientation) =>
+      orientationProgress(orientation, whiteKing, bishops) === 2,
+  )
   const mateInTwoMoves = new Set(getForcedMateInTwoMoves(fen))
   const penaltiesBySan = new Map<string, number>()
 
@@ -219,10 +226,22 @@ export function evaluateRuleACornerCage(
     } else {
       const isWaitingMove =
         move.piece === 'b' &&
-        resultProgress === 2 &&
+        completedOrientations.some(
+          (orientation) =>
+            orientationProgress(
+              orientation,
+              resultWhiteKing,
+              resultBishops,
+            ) === 2,
+        ) &&
         !result.isCheck() &&
         !result.isCheckmate() &&
-        !result.isStalemate()
+        !result.isStalemate() &&
+        !bishopDestinationCanBeAttackedOnNextMove(
+          fen,
+          move.san,
+          move.to,
+        )
       penalty = !isWaitingMove
         ? 100 + (2 - resultProgress) * 100
         : waitingMoveReachesMateInTwo(result.fen())
