@@ -340,6 +340,8 @@ function snapshotWhiteMoveOverride(
   })
 }
 
+const WHITE_POSITION_ANALYSIS_CACHE_LIMIT = 256
+
 function createRegisteredMateRuleSet<Score>(
   ruleSet: MateRuleSet<Score>,
 ): RegisteredMateRuleSet {
@@ -462,7 +464,9 @@ function createRegisteredMateRuleSet<Score>(
     return Object.freeze({ ...description, shortLabel })
   }
 
-  const analyzeWhitePosition = (fen: string): WhitePositionAnalysis => {
+  const computeWhitePositionAnalysis = (
+    fen: string,
+  ): WhitePositionAnalysis => {
     const moves = getLegalWhiteMoves(fen)
     const overrideMoves = selectedOverrideMoves(fen, moves)
     if (overrideMoves) {
@@ -490,6 +494,32 @@ function createRegisteredMateRuleSet<Score>(
               explainMove(candidates, whiteRules, san),
             ),
     })
+  }
+
+  const whitePositionAnalysisCache = new Map<
+    string,
+    WhitePositionAnalysis
+  >()
+  const analyzeWhitePosition = (fen: string): WhitePositionAnalysis => {
+    const cached = whitePositionAnalysisCache.get(fen)
+    if (cached) {
+      whitePositionAnalysisCache.delete(fen)
+      whitePositionAnalysisCache.set(fen, cached)
+      return cached
+    }
+
+    const analysis = computeWhitePositionAnalysis(fen)
+    whitePositionAnalysisCache.set(fen, analysis)
+    if (
+      whitePositionAnalysisCache.size >
+      WHITE_POSITION_ANALYSIS_CACHE_LIMIT
+    ) {
+      const oldestFen = whitePositionAnalysisCache.keys().next().value
+      if (oldestFen !== undefined) {
+        whitePositionAnalysisCache.delete(oldestFen)
+      }
+    }
+    return analysis
   }
 
   return Object.freeze({

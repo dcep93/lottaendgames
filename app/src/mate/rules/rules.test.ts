@@ -429,6 +429,66 @@ test('combined White analysis reuses one prepared score batch', () => {
   }
 })
 
+test('registered White APIs share cached position analysis', () => {
+  let batchCalls = 0
+  const batchRuleSet: MateRuleSet<TestScore> = {
+    ...rookRuleSet,
+    id: 'bishop-knight',
+    scoreWhiteCandidates: (_fen, moves) => {
+      batchCalls += 1
+      return moves.map((san) => candidates.find((move) => move.san === san)!)
+    },
+  }
+  const unregister = registerMateRuleSet(batchRuleSet)
+
+  try {
+    const registered = getMateRuleSet('bishop-knight')
+    const firstAnalysis = registered.analyzeWhitePosition?.('fen')
+    assert.ok(firstAnalysis)
+    assert.deepEqual(registered.idealWhiteMoves('fen'), ['Ka2', 'Kb2'])
+    assert.ok(registered.currentWhiteHint('fen'))
+    assert.ok(registered.explainWhiteMove('fen', 'Kh1'))
+    assert.equal(registered.analyzeWhitePosition?.('fen'), firstAnalysis)
+    assert.equal(batchCalls, 1)
+
+    registered.idealWhiteMoves('different-fen')
+    assert.equal(batchCalls, 2)
+  } finally {
+    unregister()
+  }
+})
+
+test('registered White analysis cache evicts the least recently used position', () => {
+  let batchCalls = 0
+  const batchRuleSet: MateRuleSet<TestScore> = {
+    ...rookRuleSet,
+    id: 'bishop-knight',
+    scoreWhiteCandidates: (_fen, moves) => {
+      batchCalls += 1
+      return moves.map((san) => candidates.find((move) => move.san === san)!)
+    },
+  }
+  const unregister = registerMateRuleSet(batchRuleSet)
+
+  try {
+    const registered = getMateRuleSet('bishop-knight')
+    for (let index = 0; index < 256; index += 1) {
+      registered.idealWhiteMoves(`fen-${index}`)
+    }
+    assert.equal(batchCalls, 256)
+
+    registered.idealWhiteMoves('fen-0')
+    registered.idealWhiteMoves('fen-256')
+    registered.idealWhiteMoves('fen-0')
+    assert.equal(batchCalls, 257)
+
+    registered.idealWhiteMoves('fen-1')
+    assert.equal(batchCalls, 258)
+  } finally {
+    unregister()
+  }
+})
+
 test('a decisive move override preserves its ordered legal subset and explains every rejected move', () => {
   let batchCalls = 0
   const lookupDescription = {
