@@ -86,19 +86,6 @@ function maximumProgress(
   ) as 0 | 1 | 2
 }
 
-function distanceToKingTarget(
-  orientations: readonly CornerCageOrientation[],
-  whiteKing: Square,
-): number {
-  return Math.min(
-    ...orientations.flatMap((orientation) =>
-      [...orientation.kingTargets].map((target) =>
-        kingDistance(whiteKing, target),
-      ),
-    ),
-  )
-}
-
 function vacatesAdjacentSafeKingTarget(
   orientations: readonly CornerCageOrientation[],
   whiteKing: Square,
@@ -182,9 +169,30 @@ export function evaluateRuleACornerCage(
       orientationProgress(orientation, whiteKing, bishops) === 2,
   )
   const mateInTwoMoves = new Set(getForcedMateInTwoMoves(fen))
+  const legalMoves = getChess(fen).moves({ verbose: true })
+  const canAdvanceInitialStage = legalMoves.some(
+    (move) =>
+      (move.piece === 'k' &&
+        orientations.some((orientation) =>
+          orientation.kingTargets.has(move.to),
+        )) ||
+      vacatesAdjacentSafeKingTarget(
+        orientations,
+        whiteKing,
+        blackKing,
+        move,
+      ),
+  )
+  if (
+    mateInTwoMoves.size === 0 &&
+    currentProgress === 0 &&
+    !canAdvanceInitialStage
+  ) {
+    return { applies: false, penaltiesBySan: new Map() }
+  }
   const penaltiesBySan = new Map<string, number>()
 
-  for (const move of getChess(fen).moves({ verbose: true })) {
+  for (const move of legalMoves) {
     const result = getChess(fen)
     result.move(move)
     const resultWhiteKing =
@@ -209,11 +217,9 @@ export function evaluateRuleACornerCage(
           move,
         )
           ? 1
-          : move.piece !== 'k'
-            ? 100 + distanceToKingTarget(orientations, resultWhiteKing)
-          : resultProgress >= 1
+          : move.piece === 'k' && resultProgress >= 1
             ? 0
-            : 10 + distanceToKingTarget(orientations, resultWhiteKing)
+            : 100
     } else if (currentProgress === 1) {
       penalty =
         move.piece === 'b' && resultProgress === 2

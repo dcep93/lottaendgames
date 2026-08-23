@@ -10,6 +10,7 @@ import {
   getIdealTwoBishopsWhiteMoves,
   scoreTwoBishopsWhiteMove,
 } from './twoBishops'
+import { getMateRuleSet } from './index'
 import {
   evaluateRuleACornerCage,
   getForcedMateInTwoMoves,
@@ -20,6 +21,16 @@ test('rule a first places White king a knight move from the corner', () => {
   assert.deepEqual(getIdealTwoBishopsWhiteMoves(fen), ['Kf2'])
   assert.equal(scoreTwoBishopsWhiteMove(fen, 'Kf2').ruleAApplies, true)
   assert.equal(scoreTwoBishopsWhiteMove(fen, 'Kf2').ruleAPenalty, 0)
+})
+
+test('rule a does not reward a king approach move', () => {
+  const fen = '8/8/8/8/5K2/5B2/5B1k/8 w - - 0 1'
+  assert.equal(evaluateRuleACornerCage(fen).applies, false)
+  assert.equal(scoreTwoBishopsWhiteMove(fen, 'Ke3').ruleAApplies, false)
+  assert.notEqual(
+    getMateRuleSet('two-bishops').currentWhiteHint(fen)?.id,
+    'rule a',
+  )
 })
 
 test('rule a vacates a safe adjacent king target occupied by a bishop', () => {
