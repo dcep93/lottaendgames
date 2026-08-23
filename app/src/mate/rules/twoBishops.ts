@@ -72,7 +72,8 @@ export type TwoBishopsWhiteMoveScore = {
   readonly ruleNPenalty: number
   readonly ruleOApplies: boolean
   readonly ruleOPenalty: number
-  readonly ruleOMovedOuterBishopPenalty: number
+  readonly ruleWWApplies: boolean
+  readonly ruleWWPenalty: number
   readonly ruleGApplies: boolean
   readonly ruleGPenalty: number
   readonly centralPiecesPenalty: number
@@ -2886,7 +2887,7 @@ type TwoBishopsWhitePositionContext = {
   readonly ruleNPreferredMoves: readonly string[]
   readonly ruleOApplies: boolean
   readonly ruleOWallAreasBySan: ReadonlyMap<string, number>
-  readonly ruleOOuterWallBishops: ReadonlySet<Square>
+  readonly ruleWWOuterWallBishops: ReadonlySet<Square>
   readonly ruleGPreferredMoves: readonly string[]
   readonly onsidesPreferredMoves: readonly string[]
   readonly bootNScootPreferredMoves: readonly string[]
@@ -4652,7 +4653,7 @@ function createTwoBishopsWhitePositionContext(
   const ruleAEvaluation = evaluateRuleACornerCage(fen)
   const ruleBEvaluation = evaluateRuleBScreenPosition(fen)
   const ruleNPreferredMoves = getRuleNPreferredMoves(fen)
-  const ruleOOuterWallBishops = new Set(
+  const ruleWWOuterWallBishops = new Set(
     getTwoBishopsWalls(fen).map((wall) => wall.wallBishops[1]),
   )
   const ruleOWallAreasBySan = new Map<string, number>()
@@ -4788,7 +4789,7 @@ function createTwoBishopsWhitePositionContext(
     ruleNPreferredMoves,
     ruleOApplies: ruleOWallAreasBySan.size > 0,
     ruleOWallAreasBySan,
-    ruleOOuterWallBishops,
+    ruleWWOuterWallBishops,
     ruleGPreferredMoves,
     onsidesPreferredMoves,
     bootNScootPreferredMoves,
@@ -4858,7 +4859,7 @@ function scoreTwoBishopsWhiteMoveWithContext(
     ruleNPreferredMoves,
     ruleOApplies,
     ruleOWallAreasBySan,
-    ruleOOuterWallBishops,
+    ruleWWOuterWallBishops,
     ruleGPreferredMoves,
     onsidesPreferredMoves,
     bootNScootPreferredMoves,
@@ -5019,8 +5020,9 @@ function scoreTwoBishopsWhiteMoveWithContext(
     ruleNPenalty: ruleNPreferredMoves.includes(move.san) ? 0 : 1,
     ruleOApplies,
     ruleOPenalty: ruleOWallAreasBySan.get(move.san) ?? 65,
-    ruleOMovedOuterBishopPenalty:
-      move.piece === 'b' && ruleOOuterWallBishops.has(move.from) ? 0 : 1,
+    ruleWWApplies: ruleWWOuterWallBishops.size > 0,
+    ruleWWPenalty:
+      move.piece === 'b' && ruleWWOuterWallBishops.has(move.from) ? 0 : 1,
     ruleGApplies: ruleGPreferredMoves.length > 0,
     ruleGPenalty: ruleGPreferredMoves.includes(move.san) ? 0 : 1,
     centralPiecesPenalty: [resultWhiteKingSquare, ...resultBishops].filter(
@@ -5405,10 +5407,7 @@ const twoBishopsWhiteRuleCatalog: readonly OrderedRule<TwoBishopsWhiteMoveScore>
     helpText:
       "Prefer a bishop wall keeping Black's king in a smaller area of at least 4 squares.",
     applies: (score) => score.ruleOApplies,
-    compare: (first, second) =>
-      first.ruleOPenalty - second.ruleOPenalty ||
-      first.ruleOMovedOuterBishopPenalty -
-        second.ruleOMovedOuterBishopPenalty,
+    compare: (first, second) => first.ruleOPenalty - second.ruleOPenalty,
   },
   {
     id: 'rule g',
@@ -5517,6 +5516,13 @@ const twoBishopsWhiteRuleCatalog: readonly OrderedRule<TwoBishopsWhiteMoveScore>
     compare: (first, second) =>
       first.ruleVPenalty - second.ruleVPenalty ||
       second.ruleVSqueezeEdgeDistance - first.ruleVSqueezeEdgeDistance,
+  },
+  {
+    id: 'rule ww',
+    shortLabel: 'rule ww',
+    helpText: 'Prefer moving the bishop of the outer wall.',
+    applies: (score) => score.ruleWWApplies,
+    compare: (first, second) => first.ruleWWPenalty - second.ruleWWPenalty,
   },
   {
     id: 'rule w',
@@ -5645,6 +5651,7 @@ const ACTIVE_TWO_BISHOPS_WHITE_RULE_IDS = [
   'rule n',
   'rule o',
   'king closer',
+  'rule ww',
   'rule w',
 ] as const
 
@@ -5693,7 +5700,8 @@ function scoreWhiteCandidates(
       ruleNPenalty: 0,
       ruleOApplies: false,
       ruleOPenalty: 0,
-      ruleOMovedOuterBishopPenalty: 0,
+      ruleWWApplies: false,
+      ruleWWPenalty: 0,
       ruleGApplies: false,
       ruleGPenalty: 0,
       centralPiecesPenalty: 0,

@@ -121,13 +121,13 @@ test('Rule O recognizes a bishop occupying its wall square', () => {
   )
 })
 
-test('Rule O uniquely moves the outer-wall bishop without rejecting its return', () => {
+test('Rule WW uniquely moves the outer-wall bishop without rejecting its return', () => {
   assert.deepEqual(getIdealTwoBishopsWhiteMoves(RULE_O_OCCUPIED_WALL_FEN), [
     'Bg5+',
   ])
   assert.equal(
     scoreTwoBishopsWhiteMove(RULE_O_OCCUPIED_WALL_FEN, 'Bg5+')
-      .ruleOMovedOuterBishopPenalty,
+      .ruleWWPenalty,
     0,
   )
 
@@ -137,12 +137,12 @@ test('Rule O uniquely moves the outer-wall bishop without rejecting its return',
   assert.deepEqual(getIdealTwoBishopsWhiteMoves(reply.fen()), ['Bh6'])
   assert.equal(
     scoreTwoBishopsWhiteMove(reply.fen(), 'Bh6')
-      .ruleOMovedOuterBishopPenalty,
+      .ruleWWPenalty,
     0,
   )
   assert.equal(
     scoreTwoBishopsWhiteMove(reply.fen(), 'Bg4+')
-      .ruleOMovedOuterBishopPenalty,
+      .ruleWWPenalty,
     1,
   )
 })

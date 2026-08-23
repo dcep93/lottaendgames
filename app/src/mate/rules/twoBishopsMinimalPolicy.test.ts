@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
+import { getChess } from '../chess'
 import {
   getMateRuleSet,
   twoBishopsRuleSet,
@@ -17,6 +18,7 @@ const ACTIVE_RULE_IDS = [
   'rule n',
   'rule o',
   'king closer',
+  'rule ww',
   'rule w',
 ]
 
@@ -48,6 +50,23 @@ test('rule a renders the unattackable waiting-move requirement', () => {
     ruleA?.helpText,
     "With Black's king in the 2 corner edge squares, place the White king a knight's move from that corner. Then, place a bishop on the corner cage diagonal. Then, play an unattackable bishop waiting move if necessary, until mate in 2.",
   )
+})
+
+test('rule ww renders the outer-wall bishop preference', () => {
+  const ruleWW = twoBishopsWhiteRules.find(({ id }) => id === 'rule ww')
+  assert.equal(
+    ruleWW?.helpText,
+    'Prefer moving the bishop of the outer wall.',
+  )
+
+  const ruleSet = getMateRuleSet('two-bishops')
+  const fen = '8/8/7B/8/5K1k/8/4B3/8 w - - 0 1'
+  assert.equal(ruleSet.explainWhiteMove(fen, 'Bg5+')?.id, 'rule ww')
+
+  const reply = getChess(fen)
+  reply.move('Bg5+')
+  reply.move('Kh3')
+  assert.equal(ruleSet.explainWhiteMove(reply.fen(), 'Bh6')?.id, 'rule ww')
 })
 
 test('Two Bishops help renders the Phase 2 animation and active diagrams', () => {
