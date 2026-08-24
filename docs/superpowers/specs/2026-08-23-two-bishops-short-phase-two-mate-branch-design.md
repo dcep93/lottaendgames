@@ -2,17 +2,17 @@
 
 ## Goal
 
-Recognize the family of forced continuations reached after the eight Rule A
-moves that permit `Bf4+` after `…Kh2`:
+Recognize both families of forced continuations reached after the sixteen Rule A
+moves that permit a checking bishop move after Black's first reply:
 
-`Bf4+ Kh1`, followed by the unique mating bishop move.
+`Bf4+` or `Be3+`, `…Kh1`, followed by the unique mating bishop move.
 
 This is a valid short mate-in-8-ish branch and must outrank the Phase 1 fallback rules.
 
 ## Design
 
-- Add the eight exact branches and all rotations/reflections to the Phase 2 pattern graph.
-- Register only the audited continuations; do not broaden generic checking-move acceptance. `Bb2` and `Ba3` remain excluded because `Bf4+` is unavailable from those positions.
+- Add the sixteen exact branches and all rotations/reflections to the Phase 2 pattern graph.
+- Register only the audited continuations; do not broaden generic checking-move acceptance. The two non-checking choices in each family remain excluded.
 - Keep the existing flow labels and diagrams unchanged.
 - Verify that `Bf4+` is ideal with reason `mate in 8 ish`, Black's `Kh1` is uniquely ideal, and the resulting mating move is unique.
 
