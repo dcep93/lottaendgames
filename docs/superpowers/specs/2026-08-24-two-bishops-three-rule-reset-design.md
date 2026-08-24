@@ -2,7 +2,7 @@
 
 ## Goal
 
-Reset two-bishops training to one Phase 1 policy with a fixed Training Wheels position and four White move preferences.
+Reset two-bishops training to one Phase 1 policy with a fixed Training Wheels position and five White move preferences.
 
 ## Training position
 
@@ -12,10 +12,11 @@ Every nonterminal position is Phase 1. Phase 2 and its special flows are removed
 
 ## White rule order
 
-1. **rule g** — Prefer a bishop to control a corner-to-corner diagonal. Prefer the bishop itself off the corner.
+1. **rule g** — Prefer a bishop to control a corner without occupying one.
 2. **rule j** — Without checking, control a diagonal adjacent to an already controlled corner diagonal when the pair encloses Black's king.
 3. **rule q** — Prefer White's king strictly inside the inner bishop diagonal, on Black's enclosed side.
-4. **rule r** — Prefer smaller squared Euclidean distance between the kings.
+4. **rule q5** — Force Black to take edge opposition with White's king.
+5. **rule r** — Prefer smaller squared Euclidean distance between the kings.
 
 Normal legality and checkmate handling remain authoritative. No other White tie-breakers participate.
 
@@ -27,6 +28,8 @@ An adjacent diagonal is the immediately neighboring parallel diagonal. Rule J ap
 
 The bishop on that adjacent diagonal is the inner bishop. Rule Q is satisfied when White's king is beyond the inner diagonal on the same enclosed side as Black's king.
 
+Rule Q5 is satisfied only when every legal Black reply ends with Black on an edge and the kings in direct rank or file opposition, with one square between them.
+
 ## Verification
 
 - Assert the exact Training Wheels FEN and Phase 1 label.
@@ -34,5 +37,6 @@ The bishop on that adjacent diagonal is the inner bishop. Rule Q is satisfied wh
 - Test G's corner-diagonal and non-corner preference.
 - Test J's adjacency, enclosure, and no-check requirements.
 - Test Q against the `a8–h1` outer and `b8–h2` inner diagonals.
+- Test Q5 against all legal Black replies.
 - Test R with squared Euclidean king distance.
 - Run focused tests, build, lint, and the loop verifier; load the next unresolved loop at cursor 0.
