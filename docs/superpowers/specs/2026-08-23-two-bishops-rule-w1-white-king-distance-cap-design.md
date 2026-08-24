@@ -13,8 +13,8 @@ Rule W1 will no longer require Black's king to be within two moves of the wall c
 - Keep the existing Phase 2 and tightest-wall requirements.
 - Derive the target squares a knight's move from the applicable wall corner as before.
 - Measure the White king after the candidate move.
-- Qualify Rule W1 only when that resulting White king is within Chebyshev distance two of Black's king.
-- Among qualifying moves, prefer the smallest squared Euclidean distance from White's resulting king to a target square.
+- Keep Rule W1 applicable across the Phase 2 candidate group, but rank moves that leave the resulting White king within Chebyshev distance two of Black's king ahead of moves outside that cap.
+- Among moves with the same cap status, prefer the smallest squared Euclidean distance from White's resulting king to a target square.
 - Preserve existing screening diagnostics; this change only replaces the Black-to-corner distance gate.
 
 ## Tests
