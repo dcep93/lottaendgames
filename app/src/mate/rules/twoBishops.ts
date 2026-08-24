@@ -1,6 +1,7 @@
 import type { Square } from 'chess.js'
 import {
   SQUARE_TRANSFORMS,
+  allSquares,
   edgeDistance,
   findPiece,
   getChess,
@@ -32,12 +33,12 @@ import {
 } from './twoBishopsGeometry'
 import { TWO_BISHOPS_DIAGRAM_POSITIONS } from './twoBishopsDiagramPositions'
 import {
+  TWO_BISHOPS_PHASE_TWO_MINIMUM_DIAGONAL_DISTANCE,
   countDistantTwoBishops,
   getRuleNPreferredMoves,
   getRuleWYPreferredMoves,
   getTwoBishopsWalls,
 } from './twoBishopsWallGeometry'
-import { getTwoBishopsPhaseTwoPatternMoves } from './twoBishopsPhaseTwoPattern'
 import { evaluateRuleACornerCage } from './twoBishopsCornerCage'
 import { evaluateRuleBScreenPosition } from './twoBishopsScreenPosition'
 import { evaluateRuleAADiagonalEscape } from './twoBishopsDiagonalEscape'
@@ -60,10 +61,14 @@ export type TwoBishopsWhiteMoveScore = {
   readonly matePenalty: number
   readonly bishopSafetyPenalty: number
   readonly stalematePenalty: number
+  /** @deprecated Legacy compatibility field; the pattern graph was removed. */
   readonly prepareMateApplies: boolean
+  /** @deprecated Legacy compatibility field; the pattern graph was removed. */
   readonly prepareMatePenalty: number
   readonly ruleAAApplies: boolean
   readonly ruleAAPenalty: number
+  readonly ruleABApplies: boolean
+  readonly ruleABPenalty: number
   readonly ruleAApplies: boolean
   readonly ruleAPenalty: number
   readonly ruleBApplies: boolean
@@ -72,8 +77,10 @@ export type TwoBishopsWhiteMoveScore = {
   readonly ruleNPenalty: number
   readonly ruleOApplies: boolean
   readonly ruleOPenalty: number
-  readonly ruleWWApplies: boolean
-  readonly ruleWWPenalty: number
+  readonly ruleQApplies: boolean
+  readonly ruleQPenalty: number
+  readonly ruleW2Applies: boolean
+  readonly ruleW2Penalty: number
   readonly ruleGApplies: boolean
   readonly ruleGPenalty: number
   readonly centralPiecesPenalty: number
@@ -121,9 +128,19 @@ export type TwoBishopsWhiteMoveScore = {
   readonly ruleVSqueezeEdgeDistance: number
   readonly ruleWYApplies: boolean
   readonly ruleWYPenalty: number
+  readonly ruleWZApplies: boolean
+  readonly ruleWZPenalty: number
+  readonly ruleW3Applies: boolean
+  readonly ruleW3Penalty: number
   readonly ruleWApplies: boolean
   readonly ruleWUrgentPenalty: number
   readonly ruleWPenalty: number
+  readonly ruleXApplies: boolean
+  readonly ruleXPenalty: number
+  readonly ruleW1Applies: boolean
+  readonly ruleW1BlackDistancePenalty: number
+  readonly ruleW1ScreenPenalty: number
+  readonly ruleW1Penalty: number
   readonly ruleYApplies: boolean
   readonly ruleYPenalty: number
   readonly ruleZApplies: boolean
@@ -312,6 +329,10 @@ function mateInEightIshAnimationFrames(
   return frames
 }
 
+function includeObsoleteTwoBishopsHelpBoards(): boolean {
+  return false
+}
+
 const twoBishopsHelp: RuleHelp = {
   title: 'How best moves are chosen',
   whiteIntro: WHITE_INTRO,
@@ -323,9 +344,33 @@ const twoBishopsHelp: RuleHelp = {
     'Move toward an unprotected bishop.',
   ],
   notes: [
-    "A bishop wall is two adjacent parallel diagonals, with the nearer diagonal adjacent to Black's king. White's king matters only when its screening lets Black escape.",
+    "Phase 2: There is an eligible functional bishop wall at least 4 diagonals from its corner, with Black restricted inside it.",
   ],
-  noteBoards: [
+  noteBoards: !includeObsoleteTwoBishopsHelpBoards()
+    ? [
+        {
+          id: 'bishop-rule-n',
+          title: 'rule n',
+          caption:
+            'White controls the pink escape square. The arrowed check shifts the wall to the highlighted tighter diagonal.',
+          layout: { files: 8, ranks: 8, fileOffset: 0 },
+          pieces: noteBoardPieces(TWO_BISHOPS_DIAGRAM_POSITIONS.ruleN.fen),
+          highlights: TWO_BISHOPS_DIAGRAM_POSITIONS.ruleN.highlights,
+          arrows: [TWO_BISHOPS_DIAGRAM_POSITIONS.ruleN.arrow],
+        },
+        {
+          id: 'bishop-phase-two-wall',
+          title: 'phase 2 wall',
+          caption:
+            "The highlighted squares are the wall on the side away from White's king.",
+          layout: { files: 8, ranks: 8, fileOffset: 0 },
+          pieces: noteBoardPieces(
+            TWO_BISHOPS_DIAGRAM_POSITIONS.phaseTwoWall.fen,
+          ),
+          highlights: TWO_BISHOPS_DIAGRAM_POSITIONS.phaseTwoWall.highlights,
+        },
+      ]
+    : [
     {
       id: 'bishop-mate-in-eight-ish-a',
       title: 'mate in 8 ish A',
@@ -582,6 +627,31 @@ const twoBishopsHelp: RuleHelp = {
       ),
       animationAlt:
         'Mate in 8 ish flow K building Bg4 before two checks, shown with chess pieces.',
+      pieces: [],
+      highlights: [],
+    },
+    {
+      id: 'bishop-mate-in-eight-ish-l',
+      title: 'mate in 8 ish L',
+      caption: 'Walk with Kg3, build the wall, then check and mate.',
+      animationFrames: mateInEightIshAnimationFrames(
+        '8/8/8/7B/8/5K2/8/4B1k1 w - - 0 1',
+        [
+          'Kg3',
+          'Kf1',
+          'Bd2',
+          'Kg1',
+          'Be2',
+          'Kh1',
+          'Bb4',
+          'Kg1',
+          'Bc5+',
+          'Kh1',
+          'Bf3#',
+        ],
+      ),
+      animationAlt:
+        'Mate in 8 ish flow L walking with Kg3 before building the wall, checking, and mating, shown with chess pieces.',
       pieces: [],
       highlights: [],
     },
@@ -1000,20 +1070,7 @@ const twoBishopsHelp: RuleHelp = {
     },
   ].filter((board) =>
     [
-      'bishop-mate-in-eight-ish-a',
-      'bishop-mate-in-eight-ish-b',
-      'bishop-mate-in-eight-ish-c',
-      'bishop-mate-in-eight-ish-d',
-      'bishop-mate-in-eight-ish-e',
-      'bishop-mate-in-eight-ish-f',
-      'bishop-mate-in-eight-ish-g',
-      'bishop-mate-in-eight-ish-h',
-      'bishop-mate-in-eight-ish-i',
-      'bishop-mate-in-eight-ish-j',
-      'bishop-mate-in-eight-ish-k',
-      'bishop-rule-aa',
-      'bishop-rule-a',
-      'bishop-rule-b',
+      'bishop-phase-two-wall',
       'bishop-rule-n',
     ].includes(board.id),
   ),
@@ -2879,9 +2936,9 @@ type TwoBishopsWhitePositionContext = {
   readonly mateInThreeApplies: boolean
   readonly matePatternTurnsBySan: ReadonlyMap<string, 2 | 3>
   readonly shepherdMoves: readonly string[]
-  readonly prepareMatePreferredMoves: readonly string[]
   readonly ruleAAApplies: boolean
   readonly ruleAAPenaltiesBySan: ReadonlyMap<string, number>
+  readonly ruleABPenaltiesBySan: ReadonlyMap<string, number>
   readonly ruleAApplies: boolean
   readonly ruleAPenaltiesBySan: ReadonlyMap<string, number>
   readonly ruleBApplies: boolean
@@ -2889,9 +2946,10 @@ type TwoBishopsWhitePositionContext = {
   readonly ruleNPreferredMoves: readonly string[]
   readonly ruleOApplies: boolean
   readonly ruleOWallAreasBySan: ReadonlyMap<string, number>
-  readonly ruleWWApplies: boolean
-  readonly ruleWWPenaltiesBySan: ReadonlyMap<string, number>
-  readonly ruleGPreferredMoves: readonly string[]
+  readonly ruleQPreferredMoves: readonly string[]
+  readonly ruleW2PreferredMoves: readonly string[]
+  readonly ruleGTargetSquares: readonly Square[]
+  readonly ruleXCorners: readonly Square[]
   readonly onsidesPreferredMoves: readonly string[]
   readonly bootNScootPreferredMoves: readonly string[]
   readonly bootNScootUniqueBest: boolean
@@ -3234,80 +3292,19 @@ function getBishopDistanceMoatGeometries(
   ]
 }
 
-function signedWhiteSideDistanceFromMoat(
-  square: Square,
-  whiteKing: Square,
-  moat: RuleTGeometry,
-): number {
-  const white = squareCoordinates(whiteKing)
-  const target = squareCoordinates(square)
-  const whiteCoordinate = moat.axis === 'file' ? white.file : white.rank
-  const targetCoordinate = moat.axis === 'file' ? target.file : target.rank
-  return (
-    Math.sign(whiteCoordinate - moat.index) *
-    (targetCoordinate - moat.index)
+function getRuleGTargetSquares(blackKing: Square): readonly Square[] {
+  const proximateDistance = Math.min(
+    ...BOARD_CORNERS.map((corner) => kingDistance(blackKing, corner)),
   )
-}
-
-function getRuleGPreferredMoves(
-  fen: string,
-  whiteKing: Square | undefined,
-  blackKing: Square | undefined,
-): readonly string[] {
-  if (whiteKing === undefined || blackKing === undefined) return []
-  const bishops = getWhiteBishopSquares(fen)
-  if (bishops.length !== 2) return []
-  const moats = getBishopDistanceMoatGeometries(whiteKing, blackKing)
-  if (moats.length === 0) return []
-  const legalMoves = getChess(fen).moves({ verbose: true })
-  const preferred = new Set<string>()
-  const blackSideBishops = bishops.filter((bishop) =>
-    moats.every(
-      (moat) =>
-        signedWhiteSideDistanceFromMoat(bishop, whiteKing, moat) < 0,
+  return [
+    ...new Set(
+      BOARD_CORNERS.filter(
+        (corner) => kingDistance(blackKing, corner) === proximateDistance,
+      ).flatMap((corner) =>
+        allSquares().filter((square) => isKnightMove(corner, square)),
+      ),
     ),
-  )
-  if (blackSideBishops.length === 0) return []
-  const greatestWhiteDistance = Math.max(
-    ...blackSideBishops.map((bishop) => kingDistance(bishop, whiteKing)),
-  )
-  const selectedBishops = blackSideBishops.filter(
-    (bishop) => kingDistance(bishop, whiteKing) === greatestWhiteDistance,
-  )
-  const black = squareCoordinates(blackKing)
-
-  for (const moat of moats) {
-    const crossings = legalMoves.filter(
-      (move) => {
-        if (
-          move.piece !== 'b' ||
-          !selectedBishops.includes(move.from) ||
-          signedWhiteSideDistanceFromMoat(move.to, whiteKing, moat) <= 0
-        ) {
-          return false
-        }
-        const origin = squareCoordinates(move.from)
-        const destination = squareCoordinates(move.to)
-        return (
-          Math.abs(destination.file - black.file) >=
-            Math.abs(origin.file - black.file) &&
-          Math.abs(destination.rank - black.rank) >=
-            Math.abs(origin.rank - black.rank)
-        )
-      },
-    )
-    if (crossings.length === 0) continue
-    const greatestMoatDistance = Math.max(
-      ...crossings.map((move) => distanceFromKingMoat(move.to, moat)),
-    )
-    for (const move of crossings) {
-      if (distanceFromKingMoat(move.to, moat) === greatestMoatDistance) {
-        preferred.add(move.san)
-      }
-    }
-  }
-
-  return [...preferred]
+  ]
 }
 
 function getRuleZFollowupTarget(
@@ -4594,20 +4591,140 @@ function bishopMoveDiagonalSeparatesKings(
   )
 }
 
-function ruleWWWallPenalty(
-  wallBishops: readonly [Square, Square],
-): number {
-  const [innerBishop, outerBishop] = wallBishops
-  const outerEdgeDistance = edgeDistance(outerBishop)
-  const onEdgePenalty = outerEdgeDistance === 0 ? 1 : 0
-  const oneSquareFromEdgePenalty = outerEdgeDistance === 1 ? 0 : 1
-  const adjacentBishopsPenalty =
-    kingDistance(innerBishop, outerBishop) === 1 ? 0 : 1
-  return (
-    onEdgePenalty * 4 +
-    oneSquareFromEdgePenalty * 2 +
-    adjacentBishopsPenalty
+function getTightestPhaseTwoWalls(fen: string) {
+  const walls = getTwoBishopsWalls(fen).filter(
+    ({ cornerDiagonalDistance }) =>
+      cornerDiagonalDistance >=
+      TWO_BISHOPS_PHASE_TWO_MINIMUM_DIAGONAL_DISTANCE,
   )
+  const smallestArea = Math.min(
+    ...walls.map(({ areaSquares }) => areaSquares.length),
+  )
+  return walls.filter(
+    ({ areaSquares }) => areaSquares.length === smallestArea,
+  )
+}
+
+function isSquareOnWallDiagonal(
+  square: Square,
+  diagonal: { readonly axis: 'difference' | 'sum'; readonly index: number },
+): boolean {
+  const { file, rank } = squareCoordinates(square)
+  return (
+    (diagonal.axis === 'difference' ? file - rank : file + rank) ===
+    diagonal.index
+  )
+}
+
+function isSquareStrictlyBetweenOnDiagonal(
+  square: Square,
+  first: Square,
+  second: Square,
+): boolean {
+  if (square === first || square === second) return false
+  const start = squareCoordinates(first)
+  const end = squareCoordinates(second)
+  const totalFileDistance = Math.abs(end.file - start.file)
+  const totalRankDistance = Math.abs(end.rank - start.rank)
+  if (
+    totalFileDistance === 0 ||
+    totalFileDistance !== totalRankDistance
+  ) {
+    return false
+  }
+  return (
+    kingDistance(first, square) + kingDistance(square, second) ===
+    kingDistance(first, second)
+  )
+}
+
+const RULE_AB_NO_WALL_PENALTY = 8
+
+function getRuleW2PreferredMoves(
+  fen: string,
+  whiteKing: Square | undefined,
+  blackKing: Square | undefined,
+): readonly string[] {
+  if (
+    whiteKing === undefined ||
+    blackKing === undefined ||
+    !isTwoBishopsPhaseTwoPosition(fen) ||
+    !isInOpposition(whiteKing, blackKing, 1)
+  ) {
+    return []
+  }
+
+  const legalMoves = getChess(fen).moves({ verbose: true })
+  const distancesBySan = new Map<string, number>()
+  for (const wall of getTightestPhaseTwoWalls(fen)) {
+    const innerBishop = wall.wallBishops[0]
+    for (const move of legalMoves) {
+      if (
+        move.piece !== 'b' ||
+        move.from !== innerBishop ||
+        !isSquareOnWallDiagonal(move.to, wall.nearerDiagonal)
+      ) {
+        continue
+      }
+
+      const result = getChess(fen)
+      result.move(move.san)
+      const preservesWall = getTwoBishopsWalls(result.fen()).some(
+        (resultWall) =>
+          resultWall.corner === wall.corner &&
+          resultWall.nearerDiagonal.axis === wall.nearerDiagonal.axis &&
+          resultWall.nearerDiagonal.index === wall.nearerDiagonal.index &&
+          resultWall.fartherDiagonal.axis === wall.fartherDiagonal.axis &&
+          resultWall.fartherDiagonal.index === wall.fartherDiagonal.index &&
+          resultWall.wallBishops[0] === move.to,
+      )
+      if (!preservesWall) continue
+
+      distancesBySan.set(
+        move.san,
+        squaredEuclideanDistance(move.to, blackKing),
+      )
+    }
+  }
+
+  const maximumDistance = Math.max(...distancesBySan.values())
+  return [...distancesBySan]
+    .filter(([, distance]) => distance === maximumDistance)
+    .map(([san]) => san)
+}
+
+function getRuleQPreferredMoves(
+  fen: string,
+  whiteKing: Square | undefined,
+): readonly string[] {
+  if (
+    whiteKing === undefined ||
+    !BOARD_CORNERS.some((corner) => isKnightMove(whiteKing, corner))
+  ) {
+    return []
+  }
+
+  return getChess(fen)
+    .moves({ verbose: true })
+    .filter((move) => {
+      if (move.piece !== 'b') return false
+      const result = getChess(fen)
+      result.move(move.san)
+      const replies = result.moves({ verbose: true })
+      return (
+        replies.length > 0 &&
+        replies.every((reply) => {
+          const afterReply = getChess(result.fen())
+          afterReply.move(reply.san)
+          const blackKing = findPiece(afterReply.fen(), 'b', 'k')?.square
+          return (
+            blackKing !== undefined &&
+            isInOpposition(whiteKing, blackKing, 1)
+          )
+        })
+      )
+    })
+    .map(({ san }) => san)
 }
 
 function getRuleYThreatenedBishops(
@@ -4668,41 +4785,94 @@ function createTwoBishopsWhitePositionContext(
     startingWhiteKing,
     blackKing,
   )
-  const prepareMatePreferredMoves = getTwoBishopsPhaseTwoPatternMoves(fen)
   const ruleAAEvaluation = evaluateRuleAADiagonalEscape(fen)
   const ruleAEvaluation = evaluateRuleACornerCage(fen)
   const ruleBEvaluation = evaluateRuleBScreenPosition(fen)
   const ruleNPreferredMoves = getRuleNPreferredMoves(fen)
   const ruleWYPreferredMoves = getRuleWYPreferredMoves(fen)
-  const ruleWWApplies = getTwoBishopsWalls(fen).length > 0
-  const ruleOWallAreasBySan = new Map<string, number>()
-  const ruleWWPenaltiesBySan = new Map<string, number>()
-  for (const move of getChess(fen).moves({ verbose: true })) {
-    const result = getChess(fen)
-    result.move(move.san)
-    const resultWalls = getTwoBishopsWalls(result.fen()).filter(
-      ({ areaSquares }) => areaSquares.length >= 4,
-    )
-    if (resultWalls.length === 0) continue
-    const area = Math.min(...resultWalls.map(({ areaSquares }) => areaSquares.length))
-    ruleOWallAreasBySan.set(move.san, area)
-    const smallestWalls = resultWalls.filter(
-      ({ areaSquares }) => areaSquares.length === area,
-    )
-    ruleWWPenaltiesBySan.set(
-      move.san,
-      Math.min(
-        ...smallestWalls.map(({ wallBishops }) =>
-          ruleWWWallPenalty(wallBishops),
-        ),
-      ),
-    )
-  }
-  const ruleGPreferredMoves = getRuleGPreferredMoves(
+  const ruleQPreferredMoves = getRuleQPreferredMoves(
+    fen,
+    startingWhiteKing,
+  )
+  const ruleW2PreferredMoves = getRuleW2PreferredMoves(
     fen,
     startingWhiteKing,
     blackKing,
   )
+  const startingRuleOWallAreas = getTwoBishopsWalls(fen)
+    .filter(
+      ({ cornerDiagonalDistance }) =>
+        cornerDiagonalDistance >=
+        TWO_BISHOPS_PHASE_TWO_MINIMUM_DIAGONAL_DISTANCE,
+    )
+    .map(({ areaSquares }) => areaSquares.length)
+  const maximumRuleOWallArea =
+    startingRuleOWallAreas.length === 0
+      ? Number.POSITIVE_INFINITY
+      : Math.min(...startingRuleOWallAreas)
+  const ruleOWallAreasBySan = new Map<string, number>()
+  const ruleABPenaltiesBySan = new Map<string, number>()
+  for (const move of getChess(fen).moves({ verbose: true })) {
+    const result = getChess(fen)
+    result.move(move.san)
+    const allResultWalls = getTwoBishopsWalls(result.fen())
+    if (allResultWalls.length === 0) continue
+    const area = Math.min(
+      ...allResultWalls.map(({ areaSquares }) => areaSquares.length),
+    )
+    const tightestResultWalls = allResultWalls.filter(
+      ({ areaSquares }) => areaSquares.length === area,
+    )
+    const resultWhiteKing = findPiece(result.fen(), 'w', 'k')?.square
+    if (!isPhaseTwo && resultWhiteKing !== undefined) {
+      ruleABPenaltiesBySan.set(
+        move.san,
+        Math.min(
+          ...tightestResultWalls.map(({ fartherDiagonal }) =>
+            Math.min(
+              ...allSquares()
+                .filter((square) =>
+                  isSquareOnWallDiagonal(square, fartherDiagonal),
+                )
+                .map((square) => kingDistance(resultWhiteKing, square)),
+            ),
+          ),
+        ),
+      )
+    }
+    if (area > maximumRuleOWallArea) continue
+    const resultWalls = tightestResultWalls.filter(
+      ({ cornerDiagonalDistance }) =>
+        cornerDiagonalDistance >=
+          TWO_BISHOPS_PHASE_TWO_MINIMUM_DIAGONAL_DISTANCE,
+    )
+    if (resultWalls.length === 0) continue
+    ruleOWallAreasBySan.set(move.san, area)
+  }
+  const ruleGTargetSquares =
+    blackKing !== undefined ? getRuleGTargetSquares(blackKing) : []
+  const ruleXWallCorners = isPhaseTwo
+    ? [
+        ...new Set(
+          getTightestPhaseTwoWalls(fen).map(({ corner }) => corner),
+        ),
+      ]
+    : []
+  const ruleXCornerDistance =
+    blackKing === undefined || ruleXWallCorners.length === 0
+      ? 99
+      : Math.min(
+          ...ruleXWallCorners.map((corner) =>
+            kingDistance(blackKing, corner),
+          ),
+        )
+  const ruleXCorners =
+    blackKing === undefined
+      ? []
+      : ruleXWallCorners.filter(
+          (corner) =>
+            kingDistance(blackKing, corner) === ruleXCornerDistance,
+        )
   const onsidesPreferredMoves = getOnsidesPreferredMoves(
     fen,
     startingWhiteKing,
@@ -4814,9 +4984,9 @@ function createTwoBishopsWhitePositionContext(
             startingBishops,
           )
         : [],
-    prepareMatePreferredMoves,
     ruleAAApplies: ruleAAEvaluation.applies,
     ruleAAPenaltiesBySan: ruleAAEvaluation.penaltiesBySan,
+    ruleABPenaltiesBySan,
     ruleAApplies: ruleAEvaluation.applies,
     ruleAPenaltiesBySan: ruleAEvaluation.penaltiesBySan,
     ruleBApplies: ruleBEvaluation.applies,
@@ -4824,9 +4994,10 @@ function createTwoBishopsWhitePositionContext(
     ruleNPreferredMoves,
     ruleOApplies: ruleOWallAreasBySan.size > 0,
     ruleOWallAreasBySan,
-    ruleWWApplies,
-    ruleWWPenaltiesBySan,
-    ruleGPreferredMoves,
+    ruleQPreferredMoves,
+    ruleW2PreferredMoves,
+    ruleGTargetSquares,
+    ruleXCorners,
     onsidesPreferredMoves,
     bootNScootPreferredMoves,
     bootNScootUniqueBest,
@@ -4886,9 +5057,9 @@ function scoreTwoBishopsWhiteMoveWithContext(
     mateInThreeApplies,
     matePatternTurnsBySan,
     shepherdMoves,
-    prepareMatePreferredMoves,
     ruleAAApplies,
     ruleAAPenaltiesBySan,
+    ruleABPenaltiesBySan,
     ruleAApplies,
     ruleAPenaltiesBySan,
     ruleBApplies,
@@ -4896,9 +5067,10 @@ function scoreTwoBishopsWhiteMoveWithContext(
     ruleNPreferredMoves,
     ruleOApplies,
     ruleOWallAreasBySan,
-    ruleWWApplies,
-    ruleWWPenaltiesBySan,
-    ruleGPreferredMoves,
+    ruleQPreferredMoves,
+    ruleW2PreferredMoves,
+    ruleGTargetSquares,
+    ruleXCorners,
     onsidesPreferredMoves,
     bootNScootPreferredMoves,
     bootNScootUniqueBest,
@@ -4920,9 +5092,43 @@ function scoreTwoBishopsWhiteMoveWithContext(
   const chess = getChess(fen)
   const move = chess.move(san)
   const resultFen = chess.fen()
+  const resultIsPhaseTwo = isTwoBishopsPhaseTwoPosition(resultFen)
   const resultBishops = getWhiteBishopSquares(resultFen)
+  const resultWalls = getTwoBishopsWalls(resultFen)
+  const resultSmallestWallArea = Math.min(
+    ...resultWalls.map(({ areaSquares }) => areaSquares.length),
+  )
+  const resultTightestWalls = resultWalls.filter(
+    ({ areaSquares }) => areaSquares.length === resultSmallestWallArea,
+  )
   const resultWhiteKingSquare =
     move.piece === 'k' ? move.to : startingWhiteKing
+  const resultRuleW1Walls = getTightestPhaseTwoWalls(resultFen)
+  const resultRuleW1UnscreenedWalls =
+    resultWhiteKingSquare === undefined
+      ? []
+      : resultRuleW1Walls.filter(
+          ({ wallBishops, wallSquares }) =>
+            !isSquareStrictlyBetweenOnDiagonal(
+              resultWhiteKingSquare,
+              wallBishops[0],
+              wallSquares[0],
+            ),
+        )
+  const resultRuleW1DistanceWalls =
+    resultRuleW1UnscreenedWalls.length > 0
+      ? resultRuleW1UnscreenedWalls
+      : resultRuleW1Walls
+  const resultRuleW1Targets = isPhaseTwo && isTwoBishopsPhaseTwoPosition(resultFen)
+    ? [
+        ...new Set(
+          resultRuleW1DistanceWalls
+            .flatMap(({ corner }) =>
+              allSquares().filter((square) => isKnightMove(corner, square)),
+            ),
+        ),
+      ]
+    : []
   const sequesterTwoAwaySquares = getSequesterTwoAwaySquares(blackKing)
   const resultKingDistance =
     blackKing && resultWhiteKingSquare
@@ -5045,12 +5251,13 @@ function scoreTwoBishopsWhiteMoveWithContext(
     matePenalty: mate ? 0 : 1,
     bishopSafetyPenalty: bishopCanBeCaptured ? 1 : 0,
     stalematePenalty: !mate && chess.isStalemate() ? 1 : 0,
-    prepareMateApplies: prepareMatePreferredMoves.length > 0,
-    prepareMatePenalty: prepareMatePreferredMoves.includes(move.san)
-      ? 0
-      : 1,
+    prepareMateApplies: false,
+    prepareMatePenalty: 1,
     ruleAAApplies,
     ruleAAPenalty: ruleAAPenaltiesBySan.get(move.san) ?? 999,
+    ruleABApplies: ruleABPenaltiesBySan.size > 0,
+    ruleABPenalty:
+      ruleABPenaltiesBySan.get(move.san) ?? RULE_AB_NO_WALL_PENALTY,
     ruleAApplies,
     ruleAPenalty: ruleAPenaltiesBySan.get(move.san) ?? 999,
     ruleBApplies,
@@ -5059,10 +5266,19 @@ function scoreTwoBishopsWhiteMoveWithContext(
     ruleNPenalty: ruleNPreferredMoves.includes(move.san) ? 0 : 1,
     ruleOApplies,
     ruleOPenalty: ruleOWallAreasBySan.get(move.san) ?? 65,
-    ruleWWApplies,
-    ruleWWPenalty: ruleWWPenaltiesBySan.get(move.san) ?? 1,
-    ruleGApplies: ruleGPreferredMoves.length > 0,
-    ruleGPenalty: ruleGPreferredMoves.includes(move.san) ? 0 : 1,
+    ruleQApplies: ruleQPreferredMoves.length > 0,
+    ruleQPenalty: ruleQPreferredMoves.includes(move.san) ? 0 : 1,
+    ruleW2Applies: ruleW2PreferredMoves.length > 0,
+    ruleW2Penalty: ruleW2PreferredMoves.includes(move.san) ? 0 : 1,
+    ruleGApplies: resultIsPhaseTwo && ruleGTargetSquares.length > 0,
+    ruleGPenalty:
+      resultWhiteKingSquare === undefined || ruleGTargetSquares.length === 0
+        ? 0
+        : Math.min(
+            ...ruleGTargetSquares.map((target) =>
+              squaredEuclideanDistance(resultWhiteKingSquare, target),
+            ),
+          ),
     centralPiecesPenalty: [resultWhiteKingSquare, ...resultBishops].filter(
       (square) =>
         square === undefined || !isTwoBishopsCentralPieceSquare(square),
@@ -5179,9 +5395,52 @@ function scoreTwoBishopsWhiteMoveWithContext(
           ),
     ruleWYApplies: ruleWYPreferredMoves.length > 0,
     ruleWYPenalty: ruleWYPreferredMoves.includes(move.san) ? 0 : 1,
-    ruleWApplies: blackKing !== undefined,
+    ruleWZApplies: resultBishops.length === 2,
+    ruleWZPenalty:
+      resultBishops.length === 2 &&
+      kingDistance(resultBishops[0], resultBishops[1]) === 1
+        ? 0
+        : 1,
+    ruleW3Applies: !resultIsPhaseTwo && resultTightestWalls.length > 0,
+    ruleW3Penalty: resultTightestWalls.some(
+      ({ wallBishops }) => edgeDistance(wallBishops[1]) > 0,
+    )
+      ? 0
+      : 1,
+    ruleWApplies: blackKing !== undefined && !resultIsPhaseTwo,
     ruleWUrgentPenalty: 0,
     ruleWPenalty: 2 - countDistantTwoBishops(resultFen),
+    ruleXApplies: ruleXCorners.length > 0,
+    ruleXPenalty:
+      blackKing !== undefined &&
+      blackReplyKings.length > 0 &&
+      ruleXCorners.some((corner) =>
+        blackReplyKings.every(
+          (replySquare) =>
+            kingDistance(replySquare, corner) <
+            kingDistance(blackKing, corner),
+        ),
+      )
+        ? 0
+        : 1,
+    ruleW1Applies: resultRuleW1Targets.length > 0,
+    ruleW1BlackDistancePenalty:
+      blackKing === undefined || resultWhiteKingSquare === undefined
+        ? 0
+        : Math.max(0, kingDistance(resultWhiteKingSquare, blackKing) - 2),
+    ruleW1ScreenPenalty:
+      resultRuleW1Walls.length > 0 &&
+      resultRuleW1UnscreenedWalls.length === 0
+        ? 1
+        : 0,
+    ruleW1Penalty:
+      resultWhiteKingSquare === undefined || resultRuleW1Targets.length === 0
+        ? 0
+        : Math.min(
+            ...resultRuleW1Targets.map((target) =>
+              squaredEuclideanDistance(resultWhiteKingSquare, target),
+            ),
+          ),
     ruleYApplies: ruleYThreatenedBishops.length > 0,
     ruleYPenalty:
       ruleYPreventsAttack &&
@@ -5398,15 +5657,6 @@ const twoBishopsWhiteRuleCatalog: readonly OrderedRule<TwoBishopsWhiteMoveScore>
       first.stalematePenalty - second.stalematePenalty,
   },
   {
-    id: 'mate in 8 ish',
-    shortLabel: 'mate in 8 ish',
-    helpText: 'In phase 2 (see diagram).',
-    applies: (score) => score.prepareMateApplies,
-    stopWhenBest: (score) => score.prepareMatePenalty === 0,
-    compare: (first, second) =>
-      first.prepareMatePenalty - second.prepareMatePenalty,
-  },
-  {
     id: 'rule aa',
     shortLabel: 'rule aa',
     helpText:
@@ -5414,6 +5664,14 @@ const twoBishopsWhiteRuleCatalog: readonly OrderedRule<TwoBishopsWhiteMoveScore>
     applies: (score) => score.ruleAAApplies,
     stopWhenBest: (score) => score.ruleAAPenalty === 0,
     compare: (first, second) => first.ruleAAPenalty - second.ruleAAPenalty,
+  },
+  {
+    id: 'rule ab',
+    shortLabel: 'rule ab',
+    helpText:
+      'Phase 1: Prefer White king proximity to the outer bishop wall.',
+    applies: (score) => score.ruleABApplies,
+    compare: (first, second) => first.ruleABPenalty - second.ruleABPenalty,
   },
   {
     id: 'rule a',
@@ -5437,7 +5695,7 @@ const twoBishopsWhiteRuleCatalog: readonly OrderedRule<TwoBishopsWhiteMoveScore>
     id: 'rule n',
     shortLabel: 'rule n',
     helpText:
-      "With a bishop wall and White's king controlling the escape square, shrink and check along the bishop wall, from at least 3 squares from the corner.",
+      "With a bishop wall and White's king controlling the escape square, shrink and check along the bishop wall, from at least 4 diagonals from the corner.",
     applies: (score) => score.ruleNApplies,
     compare: (first, second) => first.ruleNPenalty - second.ruleNPenalty,
   },
@@ -5445,7 +5703,7 @@ const twoBishopsWhiteRuleCatalog: readonly OrderedRule<TwoBishopsWhiteMoveScore>
     id: 'rule o',
     shortLabel: 'rule o',
     helpText:
-      "Prefer a bishop wall keeping Black's king in a smaller area of at least 4 squares.",
+      "Prefer a bishop wall keeping Black's king in a smaller area from at least 4 diagonals from the corner.",
     applies: (score) => score.ruleOApplies,
     compare: (first, second) => first.ruleOPenalty - second.ruleOPenalty,
   },
@@ -5453,7 +5711,7 @@ const twoBishopsWhiteRuleCatalog: readonly OrderedRule<TwoBishopsWhiteMoveScore>
     id: 'rule g',
     shortLabel: 'rule g',
     helpText:
-      "Of bishops on Black's side of all king moats, take the one furthest from White and move it furthest from the king moat on White's side and not closer to black in either axis.",
+      "Phase 2: Prefer White's king closer to a square a knight's move away from Black's proximate corner.",
     applies: (score) => score.ruleGApplies,
     compare: (first, second) => first.ruleGPenalty - second.ruleGPenalty,
   },
@@ -5558,12 +5816,30 @@ const twoBishopsWhiteRuleCatalog: readonly OrderedRule<TwoBishopsWhiteMoveScore>
       second.ruleVSqueezeEdgeDistance - first.ruleVSqueezeEdgeDistance,
   },
   {
-    id: 'rule ww',
-    shortLabel: 'rule ww',
+    id: 'rule q',
+    shortLabel: 'rule q',
     helpText:
-      'Prefer the bishop of the outer wall off the edge of the board, ideally one square away from the edge and adjacent to the other bishop.',
-    applies: (score) => score.ruleWWApplies,
-    compare: (first, second) => first.ruleWWPenalty - second.ruleWWPenalty,
+      "With the king a knight's move from the corner, force opposition.",
+    applies: (score) => score.ruleQApplies,
+    compare: (first, second) => first.ruleQPenalty - second.ruleQPenalty,
+    stopWhenBest: (score) => score.ruleQPenalty === 0,
+  },
+  {
+    id: 'rule w1',
+    shortLabel: 'rule w1',
+    helpText:
+      "Phase 2: Prefer king proximity to the square a knight's move from Black's corner, but no more than 2 steps from Black's king.",
+    applies: (score) => score.ruleW1Applies,
+    compare: (first, second) =>
+      first.ruleW1BlackDistancePenalty - second.ruleW1BlackDistancePenalty ||
+      first.ruleW1Penalty - second.ruleW1Penalty,
+  },
+  {
+    id: 'rule w2',
+    shortLabel: 'rule w2',
+    helpText: "Prefer White's king closer to Black's king.",
+    compare: (first, second) =>
+      first.kingCloserDistance - second.kingCloserDistance,
   },
   {
     id: 'rule wy',
@@ -5574,11 +5850,32 @@ const twoBishopsWhiteRuleCatalog: readonly OrderedRule<TwoBishopsWhiteMoveScore>
     compare: (first, second) => first.ruleWYPenalty - second.ruleWYPenalty,
   },
   {
+    id: 'rule wz',
+    shortLabel: 'rule wz',
+    helpText: 'Prefer adjacent bishops.',
+    applies: (score) => score.ruleWZApplies,
+    compare: (first, second) => first.ruleWZPenalty - second.ruleWZPenalty,
+  },
+  {
+    id: 'rule w3',
+    shortLabel: 'rule w3',
+    helpText: 'Phase 1: Prefer outer wall bishop off the edge.',
+    applies: (score) => score.ruleW3Applies,
+    compare: (first, second) => first.ruleW3Penalty - second.ruleW3Penalty,
+  },
+  {
     id: 'rule w',
     shortLabel: 'rule w',
-    helpText: "Prefer bishops 3 or more steps from Black's king.",
+    helpText: "Phase 1: Prefer bishops 3 or more steps from Black's king.",
     applies: (score) => score.ruleWApplies,
     compare: (first, second) => first.ruleWPenalty - second.ruleWPenalty,
+  },
+  {
+    id: 'rule x',
+    shortLabel: 'rule x',
+    helpText: "Phase 2: Force Black's king towards the corner.",
+    applies: (score) => score.ruleXApplies,
+    compare: (first, second) => first.ruleXPenalty - second.ruleXPenalty,
   },
   {
     id: 'rule y',
@@ -5693,16 +5990,13 @@ const ACTIVE_TWO_BISHOPS_WHITE_RULE_IDS = [
   'mate',
   'bishops safe',
   'no stalemate',
-  'mate in 8 ish',
-  'rule aa',
-  'rule a',
-  'rule b',
+  'rule g',
   'rule n',
   'rule o',
-  'king closer',
-  'rule ww',
-  'rule wy',
+  'rule w2',
+  'rule w3',
   'rule w',
+  'rule x',
 ] as const
 
 export const twoBishopsWhiteRules = ACTIVE_TWO_BISHOPS_WHITE_RULE_IDS.map(
@@ -5720,6 +6014,121 @@ export function compareTwoBishopsWhiteScores(
   return compareScoresByRules(first, second, twoBishopsWhiteRules)
 }
 
+function neutralTwoBishopsWhiteMoveScore(
+  overrides: Partial<TwoBishopsWhiteMoveScore>,
+): TwoBishopsWhiteMoveScore {
+  return {
+    isPhaseTwoPosition: false,
+    matePenalty: 1,
+    bishopSafetyPenalty: 0,
+    stalematePenalty: 0,
+    prepareMateApplies: false,
+    prepareMatePenalty: 1,
+    ruleAAApplies: false,
+    ruleAAPenalty: 0,
+    ruleABApplies: false,
+    ruleABPenalty: 0,
+    ruleAApplies: false,
+    ruleAPenalty: 0,
+    ruleBApplies: false,
+    ruleBPenalty: 0,
+    ruleNApplies: false,
+    ruleNPenalty: 0,
+    ruleOApplies: false,
+    ruleOPenalty: 0,
+    ruleQApplies: false,
+    ruleQPenalty: 0,
+    ruleW2Applies: false,
+    ruleW2Penalty: 0,
+    ruleGApplies: false,
+    ruleGPenalty: 0,
+    centralPiecesPenalty: 0,
+    edgeFlankApplies: false,
+    edgeFlankPenalty: 0,
+    onsidesApplies: false,
+    onsidesPenalty: 0,
+    bootNScootApplies: false,
+    bootNScootPenalty: 0,
+    bootNScootReplyCount: 0,
+    bootNScootUniqueBest: false,
+    degenerateApplies: false,
+    degeneratePenalty: 0,
+    degenerateTerminal: false,
+    mateInThreeApplies: false,
+    mateInThreeTurns: 0,
+    phaseTwoWallApplies: false,
+    phaseTwoWallPenalty: 0,
+    shepherdApplies: false,
+    shepherdPenalty: 0,
+    sequesterApplies: false,
+    sequesterHasTargetCorner: false,
+    sequesterCornerDiagonalsTarget: false,
+    sequesterTargetCornerScore: 0,
+    sequesterCurrentCornerDistance: 0,
+    sequesterMaximumCornerReplyDistance: 0,
+    sequesterTwoAwayControlPenalty: 0,
+    sequesterIsBishopMove: false,
+    bishopsOnBlackEdgeCount: 0,
+    forcePhaseTwoApplies: false,
+    forcePhaseTwoPenalty: 0,
+    ruleRApplies: false,
+    ruleRPenalty: 0,
+    ruleSApplies: false,
+    ruleSPenalty: 0,
+    ruleTApplies: false,
+    ruleTPenalty: 0,
+    ruleTReplyCount: 0,
+    ruleUUApplies: false,
+    ruleUUPenalty: 0,
+    ruleUApplies: false,
+    ruleUPenalty: 0,
+    ruleVApplies: false,
+    ruleVPenalty: 0,
+    ruleVSqueezeEdgeDistance: 0,
+    ruleWYApplies: false,
+    ruleWYPenalty: 0,
+    ruleWZApplies: false,
+    ruleWZPenalty: 0,
+    ruleW3Applies: false,
+    ruleW3Penalty: 0,
+    ruleWApplies: false,
+    ruleWUrgentPenalty: 0,
+    ruleWPenalty: 0,
+    ruleXApplies: false,
+    ruleXPenalty: 1,
+    ruleW1Applies: false,
+    ruleW1BlackDistancePenalty: 0,
+    ruleW1ScreenPenalty: 0,
+    ruleW1Penalty: 0,
+    ruleYApplies: false,
+    ruleYPenalty: 0,
+    ruleZApplies: false,
+    ruleZPenalty: 0,
+    ruleZZPenalty: 0,
+    deathBoxApplies: false,
+    deathBoxPenalty: 0,
+    megadethBoxApplies: false,
+    megadethBoxPenalty: 0,
+    ruleZ1Applies: false,
+    ruleZ1Penalty: 0,
+    ruleZ2Applies: false,
+    ruleZ2Penalty: 0,
+    kingStutterApplies: false,
+    kingStutterPenalty: 0,
+    kingCloserPhaseTwoLinePenalty: 0,
+    kingCloserDistance: 0,
+    kingCloserMiddleSixteenDistance: 0,
+    centralKingPenalty: 0,
+    unscreenBishopsCount: 0,
+    unclutteredBishopsApplies: false,
+    unclutteredBishopsPenalty: 0,
+    bishopDistance: 0,
+    checkPenalty: 0,
+    clutteredBishopsCount: 0,
+    ...overrides,
+  }
+}
+
 function scoreWhiteCandidates(
   fen: string,
   moves: readonly string[],
@@ -5733,106 +6142,14 @@ function scoreWhiteCandidates(
   })
   if (mateMoves.length === 1) {
     const mateSan = mateMoves[0]
-    const neutralScore = (matePenalty: number): TwoBishopsWhiteMoveScore => ({
-      isPhaseTwoPosition: false,
-      matePenalty,
-      bishopSafetyPenalty: 0,
-      stalematePenalty: 0,
-      prepareMateApplies: false,
-      prepareMatePenalty: 0,
-      ruleAAApplies: false,
-      ruleAAPenalty: 0,
-      ruleAApplies: false,
-      ruleAPenalty: 0,
-      ruleBApplies: false,
-      ruleBPenalty: 0,
-      ruleNApplies: false,
-      ruleNPenalty: 0,
-      ruleOApplies: false,
-      ruleOPenalty: 0,
-      ruleWWApplies: false,
-      ruleWWPenalty: 0,
-      ruleGApplies: false,
-      ruleGPenalty: 0,
-      centralPiecesPenalty: 0,
-      edgeFlankApplies: false,
-      edgeFlankPenalty: 0,
-      onsidesApplies: false,
-      onsidesPenalty: 0,
-      bootNScootApplies: false,
-      bootNScootPenalty: 0,
-      bootNScootReplyCount: 0,
-      bootNScootUniqueBest: false,
-      degenerateApplies: false,
-      degeneratePenalty: 0,
-      degenerateTerminal: false,
-      mateInThreeApplies: false,
-      mateInThreeTurns: 0,
-      phaseTwoWallApplies: false,
-      phaseTwoWallPenalty: 0,
-      shepherdApplies: false,
-      shepherdPenalty: 0,
-      sequesterApplies: false,
-      sequesterHasTargetCorner: false,
-      sequesterCornerDiagonalsTarget: false,
-      sequesterTargetCornerScore: 0,
-      sequesterCurrentCornerDistance: 0,
-      sequesterMaximumCornerReplyDistance: 0,
-      sequesterTwoAwayControlPenalty: 0,
-      sequesterIsBishopMove: false,
-      bishopsOnBlackEdgeCount: 0,
-      forcePhaseTwoApplies: false,
-      forcePhaseTwoPenalty: 0,
-      ruleRApplies: false,
-      ruleRPenalty: 0,
-      ruleSApplies: false,
-      ruleSPenalty: 0,
-      ruleTApplies: false,
-      ruleTPenalty: 0,
-      ruleTReplyCount: 0,
-      ruleUUApplies: false,
-      ruleUUPenalty: 0,
-      ruleUApplies: false,
-      ruleUPenalty: 0,
-      ruleVApplies: false,
-      ruleVPenalty: 0,
-      ruleVSqueezeEdgeDistance: 0,
-      ruleWYApplies: false,
-      ruleWYPenalty: 0,
-      ruleWApplies: false,
-      ruleWUrgentPenalty: 0,
-      ruleWPenalty: 0,
-      ruleYApplies: false,
-      ruleYPenalty: 0,
-      ruleZApplies: false,
-      ruleZPenalty: 0,
-      ruleZZPenalty: 0,
-      deathBoxApplies: false,
-      deathBoxPenalty: 0,
-      megadethBoxApplies: false,
-      megadethBoxPenalty: 0,
-      ruleZ1Applies: false,
-      ruleZ1Penalty: 0,
-      ruleZ2Applies: false,
-      ruleZ2Penalty: 0,
-      kingStutterApplies: false,
-      kingStutterPenalty: 0,
-      kingCloserPhaseTwoLinePenalty: 0,
-      kingCloserDistance: 0,
-      kingCloserMiddleSixteenDistance: 0,
-      centralKingPenalty: 0,
-      unscreenBishopsCount: 0,
-      unclutteredBishopsApplies: false,
-      unclutteredBishopsPenalty: 0,
-      bishopDistance: 0,
-      checkPenalty: 0,
-      clutteredBishopsCount: 0,
-    })
     return moves.map((san) => ({
       san,
-      score: neutralScore(san === mateSan ? 0 : 1),
+      score: neutralTwoBishopsWhiteMoveScore({
+        matePenalty: san === mateSan ? 0 : 1,
+      }),
     }))
   }
+
   const context = createTwoBishopsWhitePositionContext(fen)
   return moves.map((san) => ({
     san,

@@ -7,7 +7,13 @@ import {
   squareCoordinates,
   squareFromCoordinates,
 } from '../chess'
-import { isTwoBishopsPhaseTwoPatternPosition } from './twoBishopsPhaseTwoPattern'
+import {
+  TWO_BISHOPS_PHASE_TWO_MINIMUM_DIAGONAL_DISTANCE,
+  getTwoBishopsWalls,
+} from './twoBishopsWallGeometry'
+import { getWhiteBishopSquares } from './twoBishopsPieces'
+
+export { getWhiteBishopSquares } from './twoBishopsPieces'
 
 export function centerDistance(square: Square): number {
   const { file, rank } = squareCoordinates(square)
@@ -15,14 +21,6 @@ export function centerDistance(square: Square): number {
     Math.min(Math.abs(file - 3), Math.abs(file - 4)) +
     Math.min(Math.abs(rank - 3), Math.abs(rank - 4))
   )
-}
-
-export function getWhiteBishopSquares(fen: string): Square[] {
-  return getChess(fen)
-    .board()
-    .flat()
-    .filter((piece) => piece?.color === 'w' && piece.type === 'b')
-    .map((piece) => piece!.square)
 }
 
 export function bishopDestinationCanBeAttackedOnNextMove(
@@ -245,7 +243,11 @@ export function areKingsAtPhaseTwoDistance(
 }
 
 export function isTwoBishopsPhaseTwoPosition(fen: string): boolean {
-  return isTwoBishopsPhaseTwoPatternPosition(fen)
+  return getTwoBishopsWalls(fen).some(
+    ({ cornerDiagonalDistance }) =>
+      cornerDiagonalDistance >=
+      TWO_BISHOPS_PHASE_TWO_MINIMUM_DIAGONAL_DISTANCE,
+  )
 }
 
 export function getTwoBishopsPhaseLabel(fen: string): string {

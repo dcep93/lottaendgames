@@ -1,8 +1,14 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { getChess } from '../chess'
+import {
+  SQUARE_TRANSFORMS,
+  getChess,
+  transformFen,
+  transformSquare,
+} from '../chess'
 import {
   getMateRuleSet,
+  scoreTwoBishopsWhiteMove,
   twoBishopsRuleSet,
   twoBishopsWhiteRules,
 } from './index'
@@ -11,19 +17,16 @@ const ACTIVE_RULE_IDS = [
   'mate',
   'bishops safe',
   'no stalemate',
-  'mate in 8 ish',
-  'rule aa',
-  'rule a',
-  'rule b',
+  'rule g',
   'rule n',
   'rule o',
-  'king closer',
-  'rule ww',
-  'rule wy',
+  'rule w2',
+  'rule w3',
   'rule w',
+  'rule x',
 ]
 
-test('Two Bishops activates the minimal wall policy in order', () => {
+test('Two Bishops activates only safeguards and the seven-rule wall policy', () => {
   assert.deepEqual(
     twoBishopsWhiteRules.map(({ id }) => id),
     ACTIVE_RULE_IDS,
@@ -34,229 +37,162 @@ test('Two Bishops activates the minimal wall policy in order', () => {
   )
 })
 
-test('king closer keeps the middle-sixteen tie-break first', () => {
-  const kingCloser = twoBishopsWhiteRules.find(
-    ({ id }) => id === 'king closer',
-  )
-  assert.ok(kingCloser?.compare)
-  assert.equal(
-    kingCloser.helpText,
-    "Bring White's king closer to Black's king, preferring proximity to the the middle 16 squares.",
+test('the seven active bishop rules render in order', () => {
+  assert.deepEqual(
+    twoBishopsWhiteRules.slice(3).map(({ id, helpText }) => ({
+      id,
+      helpText,
+    })),
+    [
+      {
+        id: 'rule g',
+        helpText:
+          "Phase 2: Prefer White's king closer to a square a knight's move away from Black's proximate corner.",
+      },
+      {
+        id: 'rule n',
+        helpText:
+          "With a bishop wall and White's king controlling the escape square, shrink and check along the bishop wall, from at least 4 diagonals from the corner.",
+      },
+      {
+        id: 'rule o',
+        helpText:
+          "Prefer a bishop wall keeping Black's king in a smaller area from at least 4 diagonals from the corner.",
+      },
+      {
+        id: 'rule w2',
+        helpText: "Prefer White's king closer to Black's king.",
+      },
+      {
+        id: 'rule w3',
+        helpText: 'Phase 1: Prefer outer wall bishop off the edge.',
+      },
+      {
+        id: 'rule w',
+        helpText: "Phase 1: Prefer bishops 3 or more steps from Black's king.",
+      },
+      {
+        id: 'rule x',
+        helpText: "Phase 2: Force Black's king towards the corner.",
+      },
+    ],
   )
 })
 
-test('rule a renders the unattackable waiting-move requirement', () => {
-  const ruleA = twoBishopsWhiteRules.find(({ id }) => id === 'rule a')
-  assert.equal(
-    ruleA?.helpText,
-    "With Black's king in the 2 corner edge squares, place the White king a knight's move from that corner. Then, place a bishop on the corner cage diagonal. Then, play an unattackable bishop waiting move if necessary, until mate in 2.",
-  )
+test('Rule X requires every legal Black reply to approach the wall corner', () => {
+  const ruleX = twoBishopsWhiteRules.find(({ id }) => id === 'rule x')
+  assert.ok(ruleX)
+  const compare = ruleX.compare
+  assert.ok(compare)
+
+  const fen = '8/B7/3K4/1B6/8/8/8/4k3 w - - 0 1'
+  const forcing = scoreTwoBishopsWhiteMove(fen, 'Bb6')
+  const permitsEscape = scoreTwoBishopsWhiteMove(fen, 'Bb8')
+
+  assert.equal(getMateRuleSet('two-bishops').phase(fen), '2/2')
+  assert.equal(forcing.ruleXApplies, true)
+  assert.equal(forcing.ruleXPenalty, 0)
+  assert.equal(permitsEscape.ruleXPenalty, 1)
+  assert.ok(compare(forcing, permitsEscape) < 0)
+
+  for (const transform of SQUARE_TRANSFORMS) {
+    const transformedFen = transformFen(fen, transform)
+    const chess = getChess(transformedFen)
+    const forcingMove = chess.moves({ verbose: true }).find(
+      ({ from, to }) =>
+        from === transformSquare('a7', transform) &&
+        to === transformSquare('b6', transform),
+    )
+    const escapeMove = chess.moves({ verbose: true }).find(
+      ({ from, to }) =>
+        from === transformSquare('a7', transform) &&
+        to === transformSquare('b8', transform),
+    )
+    assert.ok(forcingMove, transform.name)
+    assert.ok(escapeMove, transform.name)
+    assert.equal(
+      scoreTwoBishopsWhiteMove(transformedFen, forcingMove.san).ruleXPenalty,
+      0,
+      transform.name,
+    )
+    assert.equal(
+      scoreTwoBishopsWhiteMove(transformedFen, escapeMove.san).ruleXPenalty,
+      1,
+      transform.name,
+    )
+  }
 })
 
-test('rule n renders the Manhattan corner-distance gate', () => {
-  const ruleN = twoBishopsWhiteRules.find(({ id }) => id === 'rule n')
-  assert.equal(
-    ruleN?.helpText,
-    "With a bishop wall and White's king controlling the escape square, shrink and check along the bishop wall, from at least 3 squares from the corner.",
-  )
+test('Rule G prefers the resulting king nearer a corner-knight square when the move enters Phase 2', () => {
+  const ruleG = twoBishopsWhiteRules.find(({ id }) => id === 'rule g')
+  assert.ok(ruleG)
+  const compare = ruleG.compare
+  assert.ok(compare)
+
+  const phaseTwoFen = '8/8/8/8/5K2/4B2k/8/3B4 w - - 2 2'
+  const phaseOneFen = '8/8/8/8/7k/4BK2/8/3B4 w - - 0 1'
+  const closer = scoreTwoBishopsWhiteMove(phaseTwoFen, 'Kf3')
+  const farther = scoreTwoBishopsWhiteMove(phaseTwoFen, 'Ke4')
+
+  assert.equal(closer.ruleGApplies, true)
+  assert.equal(closer.ruleGPenalty, 1)
+  assert.equal(farther.ruleGPenalty, 5)
+  assert.ok(compare(closer, farther) < 0)
+  const entersPhaseTwo = scoreTwoBishopsWhiteMove(phaseOneFen, 'Kf2')
+  assert.equal(entersPhaseTwo.ruleGApplies, true)
+  assert.equal(entersPhaseTwo.ruleGPenalty, 0)
+
+  const tiedCornerFen = '8/8/5K2/4B2k/8/3B4/8/8 w - - 0 1'
+  const tiedCornerScore = scoreTwoBishopsWhiteMove(tiedCornerFen, 'Bf4')
+  assert.equal(tiedCornerScore.ruleGApplies, true)
+  assert.equal(tiedCornerScore.ruleGPenalty, 1)
+
+  for (const transform of SQUARE_TRANSFORMS) {
+    const fen = transformFen(phaseTwoFen, transform)
+    const chess = getChess(fen)
+    const from = transformSquare('f4', transform)
+    const closerTo = transformSquare('f3', transform)
+    const fartherTo = transformSquare('e4', transform)
+    const moves = chess.moves({ verbose: true })
+    const closerMove = moves.find(
+      (move) => move.from === from && move.to === closerTo,
+    )
+    const fartherMove = moves.find(
+      (move) => move.from === from && move.to === fartherTo,
+    )
+    assert.ok(closerMove, transform.name)
+    assert.ok(fartherMove, transform.name)
+    assert.ok(
+      compare(
+        scoreTwoBishopsWhiteMove(fen, closerMove.san),
+        scoreTwoBishopsWhiteMove(fen, fartherMove.san),
+      ) < 0,
+      transform.name,
+    )
+  }
 })
 
-test('rule wy renders the opposition waiting move', () => {
-  const ruleWY = twoBishopsWhiteRules.find(({ id }) => id === 'rule wy')
-  assert.equal(
-    ruleWY?.helpText,
-    "With the Black king on edge opposition with a bishop that is a knight's move from the corner and also in a bishop wall, play a bishop waiting move to the other square in opposition with Black.",
-  )
+test('Rule W2 compares resulting squared Euclidean king distance', () => {
+  const ruleW2 = twoBishopsWhiteRules.find(({ id }) => id === 'rule w2')
+  assert.ok(ruleW2)
+  const compare = ruleW2.compare
+  assert.ok(compare)
+
+  const fen = '8/8/6BB/4K3/6k1/8/8/8 w - - 4 3'
+  const closer = scoreTwoBishopsWhiteMove(fen, 'Ke4')
+  const farther = scoreTwoBishopsWhiteMove(fen, 'Kd6')
+
+  assert.equal(closer.kingCloserDistance, 4)
+  assert.equal(farther.kingCloserDistance, 13)
+  assert.ok(compare(closer, farther) < 0)
 })
 
-test('rule ww renders the outer-wall bishop preference', () => {
-  const ruleWW = twoBishopsWhiteRules.find(({ id }) => id === 'rule ww')
-  assert.equal(
-    ruleWW?.helpText,
-    'Prefer the bishop of the outer wall off the edge of the board, ideally one square away from the edge and adjacent to the other bishop.',
-  )
-
-  const ruleSet = getMateRuleSet('two-bishops')
-  const fen = '8/8/7B/8/5K1k/8/4B3/8 w - - 0 1'
-  assert.equal(ruleSet.explainWhiteMove(fen, 'Bg5+')?.id, 'rule ww')
-
-  const reply = getChess(fen)
-  reply.move('Bg5+')
-  reply.move('Kh3')
-  assert.ok(!ruleSet.idealWhiteMoves(reply.fen()).includes('Bh6'))
-})
-
-test('Two Bishops help renders the Phase 2 animation and active diagrams', () => {
+test('Training Info retains only the Phase 2 definition and Rule N diagram', () => {
   assert.deepEqual(twoBishopsRuleSet.help.notes, [
-    "A bishop wall is two adjacent parallel diagonals, with the nearer diagonal adjacent to Black's king. White's king matters only when its screening lets Black escape.",
+    "Phase 2: There is an eligible functional bishop wall at least 4 diagonals from its corner, with Black restricted inside it.",
   ])
   assert.deepEqual(
     twoBishopsRuleSet.help.noteBoards.map(({ id }) => id),
-    [
-      'bishop-mate-in-eight-ish-a',
-      'bishop-mate-in-eight-ish-b',
-      'bishop-mate-in-eight-ish-c',
-      'bishop-mate-in-eight-ish-d',
-      'bishop-mate-in-eight-ish-e',
-      'bishop-mate-in-eight-ish-f',
-      'bishop-mate-in-eight-ish-g',
-      'bishop-mate-in-eight-ish-h',
-      'bishop-mate-in-eight-ish-i',
-      'bishop-mate-in-eight-ish-j',
-      'bishop-mate-in-eight-ish-k',
-      'bishop-rule-aa',
-      'bishop-rule-a',
-      'bishop-rule-b',
-      'bishop-rule-n',
-    ],
+    ['bishop-rule-n', 'bishop-phase-two-wall'],
   )
-  assert.deepEqual(
-    twoBishopsRuleSet.help.noteBoards
-      .slice(0, 11)
-      .map(({ title, animationFrames, animationSrc }) => ({
-        title,
-        frameCount: animationFrames?.length,
-        firstFen: animationFrames?.[0]?.fen,
-        animationSrc,
-      })),
-    [
-      {
-        title: 'mate in 8 ish A',
-        frameCount: 16,
-        firstFen: '8/8/8/8/8/5K2/7k/3BB3 w - - 0 1',
-        animationSrc: undefined,
-      },
-      {
-        title: 'mate in 8 ish B',
-        frameCount: 16,
-        firstFen: '8/8/8/8/8/5K2/7k/3BB3 w - - 0 1',
-        animationSrc: undefined,
-      },
-      {
-        title: 'mate in 8 ish C',
-        frameCount: 12,
-        firstFen: '8/8/8/8/8/5K2/7k/3BB3 w - - 0 1',
-        animationSrc: undefined,
-      },
-      {
-        title: 'mate in 8 ish D',
-        frameCount: 16,
-        firstFen: '8/8/8/8/8/5K2/7k/3BB3 w - - 0 1',
-        animationSrc: undefined,
-      },
-      {
-        title: 'mate in 8 ish E',
-        frameCount: 16,
-        firstFen: '8/8/8/8/8/5K2/7k/3BB3 w - - 0 1',
-        animationSrc: undefined,
-      },
-      {
-        title: 'mate in 8 ish F',
-        frameCount: 18,
-        firstFen: '8/8/8/8/8/5K1k/8/3BB3 w - - 0 1',
-        animationSrc: undefined,
-      },
-      {
-        title: 'mate in 8 ish G',
-        frameCount: 8,
-        firstFen: '8/8/8/8/8/8/3BBK1k/8 w - - 4 3',
-        animationSrc: undefined,
-      },
-      {
-        title: 'mate in 8 ish H',
-        frameCount: 12,
-        firstFen: '8/8/8/8/8/5K2/4B2k/4B3 w - - 0 1',
-        animationSrc: undefined,
-      },
-      {
-        title: 'mate in 8 ish I',
-        frameCount: 10,
-        firstFen: '8/8/8/8/8/5K2/8/3BB2k w - - 0 1',
-        animationSrc: undefined,
-      },
-      {
-        title: 'mate in 8 ish J',
-        frameCount: 12,
-        firstFen: '8/8/8/8/7B/5K2/7k/3B4 w - - 0 1',
-        animationSrc: undefined,
-      },
-      {
-        title: 'mate in 8 ish K',
-        frameCount: 8,
-        firstFen: '8/8/8/8/7B/5K2/7k/3B4 w - - 0 1',
-        animationSrc: undefined,
-      },
-    ],
-  )
-
-  const ruleA = twoBishopsRuleSet.help.noteBoards.find(
-    ({ id }) => id === 'bishop-rule-a',
-  )
-  assert.ok(ruleA)
-  assert.deepEqual(ruleA.pieces, [
-    { square: 'f2', piece: 'K' },
-    { square: 'e6', piece: 'B' },
-  ])
-  assert.deepEqual(
-    ruleA.highlights.map(({ square, kind }) => [square, kind]),
-    [
-      ['c8', 'wall'],
-      ['d7', 'wall'],
-      ['e6', 'wall'],
-      ['f5', 'wall'],
-      ['g4', 'wall'],
-      ['h3', 'wall'],
-      ['h1', 'pink'],
-      ['h2', 'pink'],
-    ],
-  )
-
-  const ruleAA = twoBishopsRuleSet.help.noteBoards.find(
-    ({ id }) => id === 'bishop-rule-aa',
-  )
-  assert.ok(ruleAA)
-  assert.deepEqual(ruleAA.pieces, [
-    { square: 'g1', piece: 'k' },
-    { square: 'h3', piece: 'K' },
-    { square: 'h4', piece: 'B' },
-    { square: 'd1', piece: 'B' },
-  ])
-  assert.deepEqual(
-    ruleAA.highlights.map(({ square, kind }) => [square, kind]),
-    [
-      ['a6', 'wall'],
-      ['b5', 'wall'],
-      ['c4', 'wall'],
-      ['d3', 'wall'],
-      ['e2', 'wall'],
-      ['f1', 'wall'],
-      ['f2', 'key'],
-      ['h1', 'pink'],
-    ],
-  )
-  assert.deepEqual(ruleAA.arrows, [{ from: 'd1', to: 'e2' }])
-
-  const ruleB = twoBishopsRuleSet.help.noteBoards.find(
-    ({ id }) => id === 'bishop-rule-b',
-  )
-  assert.ok(ruleB)
-  assert.deepEqual(ruleB.pieces, [
-    { square: 'f1', piece: 'k' },
-    { square: 'g3', piece: 'K' },
-    { square: 'h4', piece: 'B' },
-    { square: 'd1', piece: 'B' },
-  ])
-  assert.deepEqual(
-    ruleB.highlights.map(({ square, kind }) => [square, kind]),
-    [
-      ['d1', 'wall'],
-      ['e2', 'wall'],
-      ['f3', 'wall'],
-      ['g4', 'wall'],
-      ['h5', 'wall'],
-      ['h1', 'pink'],
-      ['h3', 'key'],
-    ],
-  )
-  assert.deepEqual(ruleB.arrows, [{ from: 'g3', to: 'h3' }])
 })

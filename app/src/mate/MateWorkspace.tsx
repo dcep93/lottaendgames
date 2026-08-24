@@ -10,7 +10,6 @@ import {
   getMateRuleSet,
   type RegisteredMateRuleSet,
 } from './rules'
-import { initializeTwoBishopsPhaseTwoPattern } from './rules/twoBishopsPhaseTwoPattern'
 import {
   createMateSession,
   createMateReplaySession,
@@ -82,9 +81,6 @@ export default function MateWorkspace({
   sharedReplayCursor,
 }: MateWorkspaceProps) {
   const deps = PRODUCTION_MATE_DEPS
-  if (mateId === 'two-bishops') {
-    initializeTwoBishopsPhaseTwoPattern()
-  }
   const ruleSet = React.useMemo(() => deps.getRuleSet(mateId), [deps, mateId])
   const [session, setSession] = React.useState(() => {
     if (sharedFen !== null && sharedMoves !== null) {

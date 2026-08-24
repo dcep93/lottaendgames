@@ -2738,57 +2738,39 @@ test('Rule W requires eligible starting king geometry', () => {
   assert.notEqual(ruleSet.currentWhiteHint(fen)?.id, 'rule w')
 })
 
-test('Rule W is rotation/reflection invariant and applies in both phases', () => {
-  const cases = [
-    ['8/8/8/6k1/8/2B1K3/2B5/8 w - - 2 2', 'Bb2'],
-  ] as const
+test('Rule W is rotation/reflection invariant and applies only after Phase 1 moves', () => {
+  const phaseOneFen = '6k1/8/8/8/4K3/8/2B5/B7 w - - 0 1'
+  const sourceMove = getChess(phaseOneFen).move('Bd1')
+  assert.ok(sourceMove)
 
-  for (const [fen, san] of cases) {
-    const sourceMove = getChess(fen).move(san)
-    assert.ok(sourceMove)
-    for (const transform of SQUARE_TRANSFORMS) {
-      const transformedFen = getChess(transformFen(fen, transform)).fen()
-      const transformedMove = getChess(transformedFen)
-        .moves({ verbose: true })
-        .find(
-          ({ from, to }) =>
-            from === transformSquare(sourceMove.from, transform) &&
-            to === transformSquare(sourceMove.to, transform),
-        )
-      assert.ok(transformedMove, `${transform.name}: ${san}`)
-      const score = scoreTwoBishopsWhiteMove(
-        transformedFen,
-        transformedMove.san,
-      )
-      assert.equal(score.ruleWApplies, true, `${transform.name}: ${san}`)
-      assert.equal(
-        score.ruleWPenalty,
-        0,
-        `${transform.name}: ${san}`,
-      )
-    }
-  }
-
-  const incompleteFen = '8/8/8/8/6k1/4K3/2BB4/8 w - - 0 1'
   for (const transform of SQUARE_TRANSFORMS) {
-    const transformedFen = getChess(
-      transformFen(incompleteFen, transform),
-    ).fen()
+    const transformedFen = getChess(transformFen(phaseOneFen, transform)).fen()
+    const transformedMove = getChess(transformedFen)
+      .moves({ verbose: true })
+      .find(
+        ({ from, to }) =>
+          from === transformSquare(sourceMove.from, transform) &&
+          to === transformSquare(sourceMove.to, transform),
+      )
+    assert.ok(transformedMove, transform.name)
     assert.equal(
-      scoreTwoBishopsWhiteMove(
-        transformedFen,
-        getChess(transformedFen).moves()[0]!,
-      ).ruleWApplies,
+      scoreTwoBishopsWhiteMove(transformedFen, transformedMove.san)
+        .ruleWApplies,
       true,
       transform.name,
     )
   }
 
+  assert.equal(
+    scoreTwoBishopsWhiteMove(phaseOneFen, 'Bb1').ruleWApplies,
+    false,
+  )
+
   const phaseTwoFen = '8/8/8/8/k7/2KB4/3B4/8 w - - 56 29'
   assert.equal(isTwoBishopsPhaseTwoPosition(phaseTwoFen), true)
   assert.equal(
     scoreTwoBishopsWhiteMove(phaseTwoFen, 'Kc2').ruleWApplies,
-    true,
+    false,
   )
 })
 

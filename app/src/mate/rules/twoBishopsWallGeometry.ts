@@ -11,7 +11,7 @@ import {
   squareFromCoordinates,
   withFenTurn,
 } from '../chess'
-import { getWhiteBishopSquares } from './twoBishopsGeometry'
+import { getWhiteBishopSquares } from './twoBishopsPieces'
 
 type DiagonalAxis = 'difference' | 'sum'
 
@@ -30,6 +30,7 @@ type WallControl = {
 export type TwoBishopsWall = {
   readonly areaSquares: readonly Square[]
   readonly corner: Square
+  readonly cornerDiagonalDistance: number
   readonly escapeSquare: Square
   readonly fartherDiagonal: BishopWallDiagonal
   readonly nearerDiagonal: BishopWallDiagonal
@@ -38,6 +39,8 @@ export type TwoBishopsWall = {
 }
 
 const CORNERS: readonly Square[] = ['a1', 'a8', 'h1', 'h8']
+const RULE_N_MINIMUM_CORNER_MANHATTAN_DISTANCE = 4
+export const TWO_BISHOPS_PHASE_TWO_MINIMUM_DIAGONAL_DISTANCE = 4
 
 function diagonalValue(square: Square, axis: DiagonalAxis): number {
   const { file, rank } = squareCoordinates(square)
@@ -55,16 +58,19 @@ function diagonalDistanceFromCorner(
   return Math.abs(diagonalValue(corner, diagonal.axis) - diagonal.index)
 }
 
-function kingDistanceToDiagonal(
+function closestSquaresOnDiagonal(
   square: Square,
   diagonal: BishopWallDiagonal,
-): number {
-  return Math.min(
-    ...allSquares()
-      .filter(
-        (square) => diagonalValue(square, diagonal.axis) === diagonal.index,
-      )
-      .map((candidate) => kingDistance(candidate, square)),
+): readonly Square[] {
+  const candidates = allSquares().filter(
+    (candidate) =>
+      diagonalValue(candidate, diagonal.axis) === diagonal.index,
+  )
+  const minimumDistance = Math.min(
+    ...candidates.map((candidate) => kingDistance(candidate, square)),
+  )
+  return candidates.filter(
+    (candidate) => kingDistance(candidate, square) === minimumDistance,
   )
 }
 
@@ -152,20 +158,27 @@ function blackKingDestinations(fen: string): ReadonlySet<Square> {
   )
 }
 
-function adjacentSquares(square: Square): readonly Square[] {
-  const { file, rank } = squareCoordinates(square)
-  const result: Square[] = []
-  for (let fileOffset = -1; fileOffset <= 1; fileOffset += 1) {
-    for (let rankOffset = -1; rankOffset <= 1; rankOffset += 1) {
-      if (fileOffset === 0 && rankOffset === 0) continue
-      const adjacent = squareFromCoordinates(
-        file + fileOffset,
-        rank + rankOffset,
-      )
-      if (adjacent !== null) result.push(adjacent)
-    }
-  }
-  return result
+function blackCanExploitKingScreen(
+  fen: string,
+  bishop: Square,
+  diagonal: BishopWallDiagonal,
+  legalBlackDestinations: ReadonlySet<Square>,
+): boolean {
+  return [...legalBlackDestinations].some((destination) =>
+    bishopControls(fen, bishop, destination).some(
+      (control) =>
+        control.diagonal.axis === diagonal.axis &&
+        control.diagonal.index === diagonal.index &&
+        control.screenedByWhiteKing,
+    ),
+  )
+}
+
+function bishopDiagonal(
+  bishop: Square,
+  axis: DiagonalAxis,
+): BishopWallDiagonal {
+  return { axis, index: diagonalValue(bishop, axis) }
 }
 
 export function getTwoBishopsWalls(fen: string): readonly TwoBishopsWall[] {
@@ -176,88 +189,89 @@ export function getTwoBishopsWalls(fen: string): readonly TwoBishopsWall[] {
   }
 
   const legalBlackDestinations = blackKingDestinations(fen)
-  const adjacent = adjacentSquares(blackKing)
-  const adjacentSet = new Set(adjacent)
   const walls = new Map<string, TwoBishopsWall>()
-  for (const firstSquare of adjacent) {
-    for (const secondSquare of adjacentSquares(firstSquare)) {
-      if (secondSquare === blackKing) continue
-      for (const [firstBishop, secondBishop] of [
-        [bishops[0], bishops[1]],
-        [bishops[1], bishops[0]],
-      ] as const) {
-        for (const first of bishopControls(
-          fen,
-          firstBishop,
-          firstSquare,
-        )) {
-          for (const second of bishopControls(
+  for (const axis of ['difference', 'sum'] as const) {
+    const firstDiagonal = bishopDiagonal(bishops[0], axis)
+    const secondDiagonal = bishopDiagonal(bishops[1], axis)
+    if (Math.abs(firstDiagonal.index - secondDiagonal.index) !== 1) {
+      continue
+    }
+    for (const corner of CORNERS) {
+      const firstDistance = diagonalDistanceFromCorner(corner, firstDiagonal)
+      const secondDistance = diagonalDistanceFromCorner(corner, secondDiagonal)
+      const [nearerBishop, nearerDiagonal, fartherBishop, fartherDiagonal] =
+        firstDistance < secondDistance
+          ? [bishops[0], firstDiagonal, bishops[1], secondDiagonal]
+          : [bishops[1], secondDiagonal, bishops[0], firstDiagonal]
+      const areaSquares = cornerArea(corner, nearerDiagonal)
+      if (!areaSquares.includes(blackKing)) continue
+
+      for (const nearerSquare of closestSquaresOnDiagonal(
+        blackKing,
+        nearerDiagonal,
+      )) {
+        const nearer = bishopControls(fen, nearerBishop, nearerSquare).find(
+          ({ diagonal }) =>
+            diagonal.axis === nearerDiagonal.axis &&
+            diagonal.index === nearerDiagonal.index,
+        )
+        if (
+          nearer === undefined ||
+          blackCanExploitKingScreen(
             fen,
-            secondBishop,
-            secondSquare,
-          )) {
-            if (
-              first.diagonal.axis !== second.diagonal.axis ||
-              Math.abs(first.diagonal.index - second.diagonal.index) !== 1
-            ) {
-              continue
-            }
-            for (const corner of CORNERS) {
-              const firstDistance = diagonalDistanceFromCorner(
-                corner,
-                first.diagonal,
-              )
-              const secondDistance = diagonalDistanceFromCorner(
-                corner,
-                second.diagonal,
-              )
-              const nearerChoices: readonly [WallControl, WallControl][] =
-                firstDistance < secondDistance
-                  ? [[first, second]]
-                  : secondDistance < firstDistance
-                    ? [[second, first]]
-                    : [
-                        [first, second],
-                        [second, first],
-                      ]
-              for (const [nearer, farther] of nearerChoices) {
-                if (!adjacentSet.has(nearer.square)) continue
-                if (
-                  kingDistance(farther.square, blackKing) !==
-                  kingDistanceToDiagonal(blackKing, farther.diagonal)
-                ) {
-                  continue
-                }
-                if (nearer.screenedByWhiteKing) continue
-                const areaSquares = cornerArea(corner, nearer.diagonal)
-                if (!areaSquares.includes(blackKing)) {
-                  continue
-                }
-                if (
-                  farther.screenedByWhiteKing &&
-                  legalBlackDestinations.has(farther.square)
-                ) {
-                  continue
-                }
-                const wall: TwoBishopsWall = {
-                  areaSquares,
-                  corner,
-                  escapeSquare: farther.square,
-                  fartherDiagonal: farther.diagonal,
-                  nearerDiagonal: nearer.diagonal,
-                  wallSquares: [nearer.square, farther.square],
-                  wallBishops: [nearer.bishop, farther.bishop],
-                }
-                const key = [
-                  corner,
-                  diagonalKey(nearer.diagonal),
-                  diagonalKey(farther.diagonal),
-                  ...wall.wallSquares.slice().sort(),
-                ].join('|')
-                walls.set(key, wall)
-              }
-            }
+            nearerBishop,
+            nearerDiagonal,
+            legalBlackDestinations,
+          )
+        ) {
+          continue
+        }
+
+        for (const fartherSquare of closestSquaresOnDiagonal(
+          blackKing,
+          fartherDiagonal,
+        )) {
+          const farther = bishopControls(
+            fen,
+            fartherBishop,
+            fartherSquare,
+          ).find(
+            ({ diagonal }) =>
+              diagonal.axis === fartherDiagonal.axis &&
+              diagonal.index === fartherDiagonal.index,
+          )
+          if (farther === undefined) continue
+          if (
+            blackCanExploitKingScreen(
+              fen,
+              fartherBishop,
+              fartherDiagonal,
+              legalBlackDestinations,
+            )
+          ) {
+            continue
           }
+
+          const wall: TwoBishopsWall = {
+            areaSquares,
+            corner,
+            cornerDiagonalDistance: Math.min(
+              firstDistance,
+              secondDistance,
+            ),
+            escapeSquare: farther.square,
+            fartherDiagonal,
+            nearerDiagonal,
+            wallSquares: [nearer.square, farther.square],
+            wallBishops: [nearer.bishop, farther.bishop],
+          }
+          const key = [
+            corner,
+            diagonalKey(nearer.diagonal),
+            diagonalKey(farther.diagonal),
+            ...wall.wallSquares.slice().sort(),
+          ].join('|')
+          walls.set(key, wall)
         }
       }
     }
@@ -278,8 +292,14 @@ export function getSmallestTwoBishopsWallArea(
 export function getRuleNPreferredMoves(fen: string): readonly string[] {
   const whiteKing = findPiece(fen, 'w', 'k')?.square
   if (whiteKing === undefined) return []
-  const startingWalls = getTwoBishopsWalls(fen).filter(
+  const controlledStartingWalls = getTwoBishopsWalls(fen).filter(
     (wall) => kingDistance(whiteKing, wall.escapeSquare) <= 1,
+  )
+  const smallestStartingArea = Math.min(
+    ...controlledStartingWalls.map((wall) => wall.areaSquares.length),
+  )
+  const startingWalls = controlledStartingWalls.filter(
+    (wall) => wall.areaSquares.length === smallestStartingArea,
   )
   if (startingWalls.length === 0) return []
 
@@ -296,7 +316,8 @@ export function getRuleNPreferredMoves(fen: string): readonly string[] {
       return startingWalls.some((startingWall) => {
         if (
           !startingWall.wallBishops.includes(move.from) ||
-          manhattanDistance(move.to, startingWall.corner) < 3
+          manhattanDistance(move.to, startingWall.corner) <
+            RULE_N_MINIMUM_CORNER_MANHATTAN_DISTANCE
         ) {
           return false
         }
@@ -307,6 +328,8 @@ export function getRuleNPreferredMoves(fen: string): readonly string[] {
           const tighter = getTwoBishopsWalls(result.fen()).filter(
             (wall) =>
               wall.corner === startingWall.corner &&
+              wall.nearerDiagonal.axis ===
+                startingWall.nearerDiagonal.axis &&
               wall.areaSquares.length < startingWall.areaSquares.length,
           )
           if (tighter.length === 0) return false

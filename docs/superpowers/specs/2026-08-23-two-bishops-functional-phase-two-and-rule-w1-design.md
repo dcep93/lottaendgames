@@ -25,7 +25,7 @@ The Phase 2 label and all Phase-2-gated heuristics use this predicate. The expli
 
 ## Rule W1
 
-When the starting position is Phase 2, Rule W1 scores the resulting White-king square by its minimum king distance to either of the two legal knight-move squares from the qualifying wall corner. For the h1 corner, these squares are f2 and g3. When multiple qualifying corners exist, use the closest target over all qualifying corners.
+Rule W1 scores the resulting White-king square by its minimum squared Euclidean distance to either legal knight-move square from the tightest qualifying wall corner. For the h1 corner, these squares are f2 and g3. Looser complementary corner interpretations do not contribute targets.
 
 Rule O precedes Rule W1, so wall preservation and area minimization remain authoritative. Rule W1 resolves qualifying ties before the general `king closer` heuristic.
 
@@ -37,4 +37,3 @@ Rule O precedes Rule W1, so wall preservation and area minimization remain autho
 - Verify Rule W1 is ordered immediately before `king closer`, renders the requested text, evaluates after White's move, and respects every symmetry.
 - Run focused tests, build, lint, and diff checks.
 - Generate, reason through, and load a fresh exact loop at `cursor=0`.
-

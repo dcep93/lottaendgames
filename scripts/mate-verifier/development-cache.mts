@@ -358,7 +358,6 @@ export function createTwoBishopsDevelopmentFingerprints(): MateDevelopmentFinger
       'app/src/mate/rules/twoBishopsCornerCage.ts',
       'app/src/mate/rules/twoBishopsDiagonalEscape.ts',
       'app/src/mate/rules/twoBishopsGeometry.ts',
-      'app/src/mate/rules/twoBishopsPhaseTwoPattern.ts',
       'app/src/mate/rules/twoBishopsPhaseTwoPatternData.ts',
       'app/src/mate/rules/twoBishopsScreenPosition.ts',
       'app/src/mate/rules/twoBishopsWallGeometry.ts',
