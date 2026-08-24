@@ -17,16 +17,17 @@ Remove the obsolete runtime mate-pattern graph so Two Bishops initialization no 
 
 Rule text:
 
-> **rule x** — Phase 2: Force Black's king towards the corner.
+> **rule x** — Phase 2: Force Black's king towards the corner, preferring checks.
 
 Rule X appears after Rule W and therefore breaks only ties left by every earlier priority.
 
-When the starting position is Phase 2, determine the corner or corners belonging to its tightest eligible bishop wall. A candidate White move satisfies Rule X only when Black has at least one legal reply and, for at least one such wall corner, every legal Black reply strictly reduces the Black king's Chebyshev distance to that corner. Qualifying moves receive penalty 0 and other moves receive penalty 1. Mate and stalemate remain governed by the earlier safeguards.
+When the starting position is Phase 2, determine the corner or corners belonging to its tightest eligible bishop wall. A candidate White move satisfies Rule X only when Black has at least one legal reply and, for at least one such wall corner, every legal Black reply strictly reduces the Black king's Chebyshev distance to that corner. This all-replies condition is the primary comparison. Among moves with the same result, checking moves rank above non-checking moves. A check that fails the all-replies condition cannot outrank a non-check that satisfies it. Mate and stalemate remain governed by the earlier safeguards.
 
 ## Verification
 
 - Test the visible rule order and Rule X text.
 - Test strict all-replies behavior under rotations and reflections.
+- Test that checks break ties between qualifying Rule X moves without overriding the all-replies condition.
 - Run focused Two Bishops tests, build, lint, and diff checks.
 - Re-measure cold initialization to confirm the graph construction cost is gone.
 - Find, independently validate, and load an h1-oriented loop at `cursor=0`.
