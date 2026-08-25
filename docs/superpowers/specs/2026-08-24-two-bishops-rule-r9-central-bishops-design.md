@@ -9,7 +9,9 @@ Add Rule r9 immediately after Rule rr5 and before Rule r so restricting Black's 
 - After each White candidate, enumerate Black's legal replies.
 - A reply moves toward the center when its destination has a lower Manhattan distance to the nearest of `d4`, `e4`, `d5`, and `e5` than Black's current square.
 - Count those centerward replies and prefer the lower count.
-- Apply Rule r9 in both phases whenever the Black king exists.
+- Apply Rule r9 only when the candidate's resulting position is Phase 2.
+- Evaluate the phase after White's candidate move, consistently with the policy's other phase-sensitive rules.
+- Do not compare Rule r9 penalties for candidates whose resulting position remains Phase 1.
 - Keep Rule rr5 as the preceding priority and Rule r as the following tie-break.
 
 ## UI
