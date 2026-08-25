@@ -1,3 +1,7 @@
+export const TWO_BISHOPS_TRAINING_START_FEN =
+  '8/6B1/6B1/8/7k/8/8/1K6 w - - 0 1'
+
+/** @deprecated Retained for legacy diagrams that are no longer displayed. */
 export const TWO_BISHOPS_PHASE_TWO_START_FEN =
   '8/8/8/8/8/5K2/7k/3BB3 w - - 0 1'
 
@@ -19,13 +23,10 @@ export const TWO_BISHOPS_PHASE_TWO_CANONICAL_MOVES = [
   'Bf3#',
 ] as const
 
-export const TWO_BISHOPS_PHASE_TWO_TRAINING_FENS = [
-  '8/8/8/8/8/5K2/7k/3BB3 w - - 0 1',
-  '6k1/8/5K2/7B/7B/8/8/8 w - - 0 1',
-  '3BB3/k7/2K5/8/8/8/8/8 w - - 0 1',
-  '8/8/8/B7/B7/2K5/8/1k6 w - - 0 1',
-  '8/8/8/8/8/2K5/k7/3BB3 w - - 0 1',
-  '3BB3/7k/5K2/8/8/8/8/8 w - - 0 1',
-  '1k6/8/2K5/B7/B7/8/8/8 w - - 0 1',
-  '8/8/8/7B/7B/5K2/8/6k1 w - - 0 1',
+export const TWO_BISHOPS_TRAINING_FENS = [
+  TWO_BISHOPS_TRAINING_START_FEN,
 ] as const
+
+/** @deprecated Use TWO_BISHOPS_TRAINING_FENS. */
+export const TWO_BISHOPS_PHASE_TWO_TRAINING_FENS =
+  TWO_BISHOPS_TRAINING_FENS

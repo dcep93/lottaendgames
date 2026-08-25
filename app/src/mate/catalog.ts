@@ -1,7 +1,7 @@
 import twoKnightsPawnPositions from './data/two-knights-pawn-positions.json'
 import { parseTwoKnightsPawnManifest } from './twoKnightsPawnData'
 import type { MateId } from './types'
-import { TWO_BISHOPS_PHASE_TWO_TRAINING_FENS } from './rules/twoBishopsPhaseTwoPatternData'
+import { TWO_BISHOPS_TRAINING_FENS } from './rules/twoBishopsPhaseTwoPatternData'
 
 export const TWO_KNIGHTS_PAWN_POSITIONS =
   parseTwoKnightsPawnManifest(twoKnightsPawnPositions)
@@ -38,7 +38,7 @@ export const MATE_CATALOG: readonly MateCatalogEntry[] = [
     materialSignature: 'KBBvK',
     path: '/mate/two-bishops',
     standardFallbackFen: '4k3/8/8/8/8/8/8/2B1KB2 w - - 0 1',
-    trainSeeds: TWO_BISHOPS_PHASE_TWO_TRAINING_FENS,
+    trainSeeds: TWO_BISHOPS_TRAINING_FENS,
   },
   {
     id: 'bishop-knight',

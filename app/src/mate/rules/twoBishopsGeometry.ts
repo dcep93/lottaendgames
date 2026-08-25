@@ -7,10 +7,6 @@ import {
   squareCoordinates,
   squareFromCoordinates,
 } from '../chess'
-import {
-  TWO_BISHOPS_PHASE_TWO_MINIMUM_DIAGONAL_DISTANCE,
-  getTwoBishopsWalls,
-} from './twoBishopsWallGeometry'
 import { getWhiteBishopSquares } from './twoBishopsPieces'
 
 export { getWhiteBishopSquares } from './twoBishopsPieces'
@@ -242,15 +238,51 @@ export function areKingsAtPhaseTwoDistance(
   return kingDistance(whiteKing, blackKing) === 2
 }
 
+export function isWhiteKingInsideInnerBishopDiagonal(fen: string): boolean {
+  const whiteKing = findPiece(fen, 'w', 'k')?.square
+  const blackKing = findPiece(fen, 'b', 'k')?.square
+  const bishops = getWhiteBishopSquares(fen)
+  if (whiteKing === undefined || blackKing === undefined) return false
+
+  const white = squareCoordinates(whiteKing)
+  const black = squareCoordinates(blackKing)
+  return bishops.some((cornerBishop, cornerIndex) => {
+    const corner = squareCoordinates(cornerBishop)
+    const axes: readonly ('difference' | 'sum')[] = [
+      ...(corner.file === corner.rank ? ['difference' as const] : []),
+      ...(corner.file + corner.rank === 7 ? ['sum' as const] : []),
+    ]
+
+    return axes.some((axis) => {
+      const blackSide =
+        axis === 'difference'
+          ? black.file - black.rank
+          : black.file + black.rank - 7
+      if (Math.abs(blackSide) <= 1) return false
+      const direction = Math.sign(blackSide)
+      const hasInnerBishop = bishops.some((innerBishop, innerIndex) => {
+        if (innerIndex === cornerIndex) return false
+        const inner = squareCoordinates(innerBishop)
+        const innerIndexOnAxis =
+          axis === 'difference'
+            ? inner.file - inner.rank
+            : inner.file + inner.rank - 7
+        return innerIndexOnAxis === direction
+      })
+      if (!hasInnerBishop) return false
+      const whiteSide =
+        axis === 'difference'
+          ? white.file - white.rank
+          : white.file + white.rank - 7
+      return whiteSide * direction > 1
+    })
+  })
+}
+
 export function isTwoBishopsPhaseTwoPosition(fen: string): boolean {
-  return getTwoBishopsWalls(fen).some(
-    ({ cornerDiagonalDistance }) =>
-      cornerDiagonalDistance >=
-      TWO_BISHOPS_PHASE_TWO_MINIMUM_DIAGONAL_DISTANCE,
-  )
+  return isWhiteKingInsideInnerBishopDiagonal(fen)
 }
 
 export function getTwoBishopsPhaseLabel(fen: string): string {
-  if (getWhiteBishopSquares(fen).length < 2) return '0/2'
   return isTwoBishopsPhaseTwoPosition(fen) ? '2/2' : '1/2'
 }
