@@ -7,11 +7,11 @@ Add Rule r9 immediately after Rule rr5 and before Rule r so central bishop place
 ## Behavior
 
 - Evaluate both bishop squares after White's candidate move.
-- Sum each bishop's Manhattan distance to the nearest of `d4`, `e4`, `d5`, and `e5`.
-- Prefer the lower total.
+- Count bishops occupying `d4`, `e4`, `d5`, or `e5`.
+- Prefer the greater count.
 - Apply Rule r9 in both phases without a wall-state gate.
 - Keep Rule rr5 as the preceding priority and Rule r as the following tie-break.
-- In `8/8/4B3/8/5k2/8/1B2K3/8 w - - 2 2`, prefer `Bd5`.
+- In `8/8/4B3/8/5k2/8/1B2K3/8 w - - 2 2`, Rule r9 retains `Bd4` and `Bd5`; the later Rule x selects `Bd5`.
 
 ## UI
 
