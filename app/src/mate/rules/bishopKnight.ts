@@ -710,7 +710,6 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       id: "mate",
       shortLabel: "mate",
       helpText: "",
-      stopWhenBest: (score) => score.mateScore === 0,
       compare: (first, second) => first.mateScore - second.mateScore,
     },
     {

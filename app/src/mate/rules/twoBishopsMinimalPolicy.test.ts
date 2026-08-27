@@ -15,26 +15,30 @@ const ACTIVE_RULE_IDS = [
   'bishops safe',
   'no stalemate',
   'rule a',
+  'rule e',
   'rule b1',
   'rule b2',
   'rule b3',
+  'rule b5',
+  'rule b6',
+  'rule c01',
   'rule c03',
   'rule c05',
   'rule c07',
-  'rule c7.5',
+  'rule c07.5',
   'rule c08',
   'rule c08.5',
-  'rule c9',
+  'rule c09',
   'rule c10',
-  'rule c11',
   'rule c12',
+  'rule c14',
   'rule c15',
-  'rule d7',
-  'rule d9',
-  'rule d12',
-  'rule d16',
-  'rule d20',
-  'rule d25',
+  'rule c20',
+  'rule f4',
+  'rule f5',
+  'rule g1',
+  'rule g2',
+  'rule g5',
 ]
 
 test('Two Bishops uses only the active two-phase policy', () => {
@@ -44,7 +48,7 @@ test('Two Bishops uses only the active two-phase policy', () => {
   )
   assert.equal(twoBishopsRuleSet.phase('8/8/8/8/8/8/8/K6k w - - 0 1'), '1/2')
   assert.deepEqual(twoBishopsRuleSet.help.notes, [
-      "Phase 2: Place one bishop on a long diagonal and the other on an adjacent diagonal. Both kings must be on the long diagonal's wider side, and White's king must take fewer king steps to reach the center than Black's king.",
+      "Phase 2: Place one bishop on a long diagonal and the other on an adjacent diagonal. Both kings must be on the long diagonal's wider side. White's king must be no further by Euclidean distance to the middle square nearest the target corner: d4 for a1, d5 for a8, e4 for h1, or e5 for h8.",
     'Retreat square: the square adjacent to Black in the direction opposite its caged corner.',
   ])
   assert.deepEqual(twoBishopsRuleSet.help.noteBoards, [
@@ -69,7 +73,7 @@ test('Two Bishops uses only the active two-phase policy', () => {
       id: 'bishop-rule-b2',
       title: 'rule b2',
       caption:
-        'With the Phase 2 cage aimed at h1, White Kf5 and Black Kh4, play Kf4.',
+        'With the Phase 2 cage aimed at h1, White Kf5, Black Kh4, one bishop on e5, and the other anywhere from a2 through g8, play Kf4.',
       pieces: [
         { square: 'f5', piece: 'K' },
         { square: 'h4', piece: 'k' },
@@ -97,6 +101,34 @@ test('Two Bishops uses only the active two-phase policy', () => {
       arrows: [{ from: 'e4', to: 'd5' }],
     },
     {
+      id: 'bishop-rule-b5',
+      title: 'rule b5',
+      caption:
+        'With White Kd4, Black Kc2, and bishops on c3 and d5, play Ba2.',
+      pieces: [
+        { square: 'd4', piece: 'K' },
+        { square: 'c2', piece: 'k' },
+        { square: 'c3', piece: 'B' },
+        { square: 'd5', piece: 'B' },
+      ],
+      highlights: [{ square: 'a2', kind: 'key' }],
+      arrows: [{ from: 'd5', to: 'a2' }],
+    },
+    {
+      id: 'bishop-rule-b6',
+      title: 'rule b6',
+      caption:
+        'With White Kd5, Black Kf4, and bishops on d4 and e4, play Bc5.',
+      pieces: [
+        { square: 'd5', piece: 'K' },
+        { square: 'f4', piece: 'k' },
+        { square: 'd4', piece: 'B' },
+        { square: 'e4', piece: 'B' },
+      ],
+      highlights: [{ square: 'c5', kind: 'key' }],
+      arrows: [{ from: 'd4', to: 'c5' }],
+    },
+    {
       id: 'bishop-rule-c03',
       title: 'rule c03',
       caption:
@@ -115,8 +147,8 @@ test('Two Bishops uses only the active two-phase policy', () => {
     },
   ])
   assert.equal(
-    twoBishopsWhiteRules.find(({ id }) => id === 'rule a')?.helpText,
-    'Prefer phase 2 with a consistent target corner.',
+    twoBishopsWhiteRules.find(({ id }) => id === 'rule e')?.helpText,
+    'Prefer moves after which every Black reply is Phase 2 with a consistent target corner.',
   )
 })
 
@@ -143,10 +175,99 @@ test('mate, bishop safety, and stalemate remain mandatory', () => {
   )
 })
 
-test('rule b3 is an ordinary priority after rule a', () => {
+test("rule a prefers White's king not on the edge", () => {
+  const fen = '1k6/3K4/8/8/3B4/3B4/8/8 w - - 0 1'
+  const staysOnEdge = scoreTwoBishopsWhiteMove(fen, 'Kd8')
+  const leavesEdge = scoreTwoBishopsWhiteMove(fen, 'Kc6')
+
+  assert.equal(staysOnEdge.ruleAPenalty, 1)
+  assert.equal(leavesEdge.ruleAPenalty, 0)
+  assert.equal(
+    twoBishopsWhiteRules.find(({ id }) => id === 'rule a')?.helpText,
+    "Prefer White's king not on the edge.",
+  )
+})
+
+test('rule c01 keeps the king off the long diagonal wall in Phase 2', () => {
+  const fen = '8/8/8/8/2KB4/8/k1B5/8 w - - 0 1'
+  const occupiesWall = scoreTwoBishopsWhiteMove(fen, 'Kc3')
+  const staysClear = scoreTwoBishopsWhiteMove(fen, 'Kc5')
+
+  assert.equal(occupiesWall.ruleC01Applies, true)
+  assert.equal(occupiesWall.ruleC01Penalty, 1)
+  assert.equal(staysClear.ruleC01Penalty, 0)
+})
+
+test("rule c01 allows the king on the target square's long diagonal", () => {
+  const fen = '8/8/8/8/2KB4/8/k1B5/8 w - - 0 1'
+  const walksOnTargetDiagonal = scoreTwoBishopsWhiteMove(fen, 'Kd5')
+
+  assert.equal(walksOnTargetDiagonal.ruleC01Applies, true)
+  assert.equal(walksOnTargetDiagonal.ruleC01Penalty, 0)
+})
+
+test('rule e follows rule a and precedes the b, c, and f rules', () => {
   const ids = twoBishopsWhiteRules.map(({ id }) => id)
-  assert.equal(ids.indexOf('rule b3'), ids.indexOf('rule a') + 3)
+  assert.equal(ids.indexOf('rule e'), ids.indexOf('rule a') + 1)
+  assert.equal(ids.indexOf('rule b1'), ids.indexOf('rule e') + 1)
+  assert.equal(ids.indexOf('rule b3'), ids.indexOf('rule b1') + 2)
+  assert.equal(ids.includes('rule b4'), false)
+  assert.equal(ids.indexOf('rule b5'), ids.indexOf('rule b1') + 3)
+  assert.equal(ids.indexOf('rule b6'), ids.indexOf('rule b1') + 4)
+  assert.equal(ids.indexOf('rule f4'), ids.indexOf('rule c20') + 1)
+  assert.equal(ids.indexOf('rule f5'), ids.indexOf('rule f4') + 1)
+  assert.equal(ids.indexOf('rule g1'), ids.indexOf('rule f5') + 1)
+  assert.equal(ids.indexOf('rule g2'), ids.indexOf('rule g1') + 1)
+  assert.equal(ids.indexOf('rule g5'), ids.indexOf('rule g2') + 1)
   assert.equal(twoBishopsRuleSet.whiteMoveOverride, undefined)
+})
+
+test('rule g2 prefers White king proximity to an unoccupied center square', () => {
+  const fen = '8/8/8/2k1B3/4BK2/8/8/8 w - - 0 1'
+  const nearer = scoreTwoBishopsWhiteMove(fen, 'Ke3')
+  const farther = scoreTwoBishopsWhiteMove(fen, 'Kf5')
+
+  assert.equal(nearer.ruleG2CenterDistance, 2)
+  assert.equal(farther.ruleG2CenterDistance, 4)
+  assert.deepEqual(getIdealTwoBishopsWhiteMoves(fen), ['Ke3'])
+})
+
+test('rule g1 aligns the king with two central bishops', () => {
+  const fen = '8/8/8/3BK3/1k1B4/8/8/8 w - - 0 1'
+
+  assert.deepEqual(getIdealTwoBishopsWhiteMoves(fen), ['Kd6'])
+})
+
+test("rule g2 uses proximity to Black's king after center proximity", () => {
+  const fen = 'k7/4K3/8/8/8/8/8/B6B w - - 0 1'
+  const closer = scoreTwoBishopsWhiteMove(fen, 'Kd6')
+  const farther = scoreTwoBishopsWhiteMove(fen, 'Ke6')
+
+  assert.equal(closer.ruleG2CenterDistance, 1)
+  assert.equal(farther.ruleG2CenterDistance, 1)
+  assert.ok(
+    closer.ruleG2BlackKingDistance < farther.ruleG2BlackKingDistance,
+  )
+})
+
+test('rule f5 is inactive in Phase 2 while rule g5 remains active', () => {
+  const score = scoreTwoBishopsWhiteMove(
+    '8/2k4B/4K3/8/3B4/8/8/8 w - - 2 2',
+    'Ke7',
+  )
+
+  assert.equal(score.ruleF5Applies, false)
+  assert.equal(score.ruleG5Applies, true)
+})
+
+test('c08.5 applies when Black is on the target side of the a8 king moat', () => {
+  const fen = '8/2k4B/4K3/8/3B4/8/8/8 w - - 2 2'
+  const takesOpposition = scoreTwoBishopsWhiteMove(fen, 'Ke7')
+
+  assert.equal(takesOpposition.ruleC08Applies, false)
+  assert.equal(takesOpposition.ruleC085Applies, true)
+  assert.equal(takesOpposition.ruleC085Penalty, 0)
+  assert.deepEqual(getIdealTwoBishopsWhiteMoves(fen), ['Kd5'])
 })
 
 test('Phase 2 uses the wider side of the long diagonal and center tests', () => {
@@ -175,39 +296,68 @@ test('Training Wheels starts from the canonical Phase 2 position', () => {
   ])
 })
 
-test('rule a prefers entering phase 2 after White moves', () => {
+test('rule e does not reward entering Phase 2 when Black can leave it', () => {
   const fen = '8/8/8/6K1/8/8/B3k3/B7 w - - 0 1'
   const enters = scoreTwoBishopsWhiteMove(fen, 'Kf5')
   const remains = scoreTwoBishopsWhiteMove(fen, 'Kh5')
-  assert.equal(enters.ruleAPenalty, 0)
-  assert.equal(remains.ruleAPenalty, 1)
+  assert.equal(enters.isPhaseTwoPosition, true)
+  assert.equal(enters.ruleEPenalty, 1)
+  assert.equal(remains.ruleEPenalty, 1)
   assert.equal(
     twoBishopsRuleSet.phase('8/8/8/5K2/8/8/B3k3/B7 b - - 11 6'),
     '2/2',
   )
 })
 
-test('rule a rejects switching the Phase 2 target corner', () => {
+test('rule e rejects switching the target corner but accepts a preserved cage', () => {
   const fen = '8/8/8/3BB3/4K3/8/3k4/8 w - - 6 4'
   const switchesCorner = scoreTwoBishopsWhiteMove(fen, 'Kd4')
   const keepsCorner = scoreTwoBishopsWhiteMove(fen, 'Kf4')
 
   assert.equal(switchesCorner.isPhaseTwoPosition, true)
   assert.equal(keepsCorner.isPhaseTwoPosition, true)
-  assert.equal(switchesCorner.ruleAPenalty, 1)
-  assert.equal(keepsCorner.ruleAPenalty, 0)
-  assert.ok(!getIdealTwoBishopsWhiteMoves(fen).includes('Kd4'))
+  assert.equal(switchesCorner.ruleEPenalty, 1)
+  assert.equal(keepsCorner.ruleEPenalty, 0)
 })
 
-test('Phase 2 measures center proximity in king steps', () => {
+test('rule e rejects a move when any Black reply exits Phase 2', () => {
+  const fen = '8/3k4/8/8/5K2/8/7B/7B w - - 2 2'
+  const bg1 = scoreTwoBishopsWhiteMove(fen, 'Bg1')
+
+  assert.equal(bg1.isPhaseTwoPosition, true)
+  assert.equal(bg1.ruleEPenalty, 1)
+  assert.ok(!getIdealTwoBishopsWhiteMoves(fen).includes('Bg1'))
+})
+
+test('rule e accepts Kf3 when it and every Black reply enter Phase 2', () => {
+  const fen = '8/8/8/3B1k2/3B4/4K3/8/8 w - - 0 1'
+  const kf3 = scoreTwoBishopsWhiteMove(fen, 'Kf3')
+
+  assert.equal(kf3.isPhaseTwoPosition, true)
+  assert.equal(kf3.ruleEPenalty, 0)
+})
+
+test('Phase 2 measures center proximity by Euclidean distance', () => {
   const beforeKf3 = '8/8/4B3/4B1k1/4K3/8/8/8 w - - 16 9'
   const afterKf3 = '8/8/4B3/4B1k1/8/5K2/8/8 b - - 17 9'
 
   assert.equal(twoBishopsRuleSet.phase(afterKf3), '2/2')
-  assert.equal(scoreTwoBishopsWhiteMove(beforeKf3, 'Kf3').ruleAPenalty, 0)
+  assert.equal(scoreTwoBishopsWhiteMove(beforeKf3, 'Kf3').ruleEPenalty, 0)
 })
 
-test('rule b1 prefers Bf6 with White Kh6 and Black Kg4 or Kh4 in the h1 cage', () => {
+test('Phase 2 allows White to be equally close to the target middle square', () => {
+  const fen = '8/3K4/8/1k6/3BB3/8/8/8 w - - 2 2'
+
+  assert.equal(twoBishopsRuleSet.phase(fen), '2/2')
+})
+
+test('Bd5 enters Phase 2 using e4 for the h1 target corner', () => {
+  const fen = '8/8/8/5k2/3BB3/4K3/8/8 w - - 0 1'
+
+  assert.equal(scoreTwoBishopsWhiteMove(fen, 'Bd5').isPhaseTwoPosition, true)
+})
+
+test('rule b1 scores Bf6 with White Kh6 and Black Kg4 or Kh4 in the h1 cage', () => {
   for (const blackKing of ['6k1', '7k']) {
     const fen = `8/8/7K/4B3/${blackKing}/8/8/1B6 w - - 0 1`
     const preferred = scoreTwoBishopsWhiteMove(fen, 'Bf6')
@@ -217,9 +367,6 @@ test('rule b1 prefers Bf6 with White Kh6 and Black Kg4 or Kh4 in the h1 cage', (
     assert.equal(preferred.ruleB1Penalty, 0)
     assert.equal(waiting.ruleB1Applies, true)
     assert.equal(waiting.ruleB1Penalty, 1)
-    assert.deepEqual(getIdealTwoBishopsWhiteMoves(fen), [
-      blackKing === '6k1' ? 'Bf6' : 'Bf6+',
-    ])
   }
 })
 
@@ -252,6 +399,45 @@ test('rule b3 prefers Bd5 in the complete diagram position', () => {
   assert.equal(temporaryPhaseTwo.ruleB3Penalty, 1)
 })
 
+test('rule b2 accepts every partner-bishop square from a2 through g8', () => {
+  const partnerSquares = ['a2', 'b3', 'c4', 'd5', 'e6', 'f7', 'g8'] as const
+
+  for (const square of partnerSquares) {
+    const chess = getChess('8/8/8/4BK2/7k/8/8/8 w - - 0 1')
+    chess.put({ color: 'w', type: 'b' }, square)
+    const fen = chess.fen()
+    const preferred = scoreTwoBishopsWhiteMove(fen, 'Kf4')
+
+    assert.equal(preferred.ruleB2Applies, true, square)
+    assert.equal(preferred.ruleB2Penalty, 0, square)
+    assert.deepEqual(getIdealTwoBishopsWhiteMoves(fen), ['Kf4'], square)
+  }
+})
+
+test('rule b5 prefers Ba2 in the complete diagram position', () => {
+  const fen = '8/8/8/3B4/3K4/2B5/2k5/8 w - - 2 2'
+  const preferred = scoreTwoBishopsWhiteMove(fen, 'Ba2')
+  const loopMove = scoreTwoBishopsWhiteMove(fen, 'Ba1')
+
+  assert.equal(preferred.ruleB5Applies, true)
+  assert.equal(preferred.ruleB5Penalty, 0)
+  assert.equal(loopMove.ruleB5Applies, true)
+  assert.equal(loopMove.ruleB5Penalty, 1)
+  assert.deepEqual(getIdealTwoBishopsWhiteMoves(fen), ['Ba2'])
+})
+
+test('rule b6 prefers Bc5 in the complete diagram position', () => {
+  const fen = '8/8/8/3K4/3BBk2/8/8/8 w - - 0 1'
+  const preferred = scoreTwoBishopsWhiteMove(fen, 'Bc5')
+  const loopMove = scoreTwoBishopsWhiteMove(fen, 'Be5+')
+
+  assert.equal(preferred.ruleB6Applies, true)
+  assert.equal(preferred.ruleB6Penalty, 0)
+  assert.equal(loopMove.ruleB6Applies, true)
+  assert.equal(loopMove.ruleB6Penalty, 1)
+  assert.deepEqual(getIdealTwoBishopsWhiteMoves(fen), ['Bc5'])
+})
+
 test('rule c10 takes opposition when the edge square away from the caged corner is uncontrolled', () => {
   const fen = '6B1/6B1/8/8/7k/5K2/8/8 w - - 4 3'
   const takesOpposition = scoreTwoBishopsWhiteMove(fen, 'Kf4')
@@ -276,6 +462,16 @@ test('retreat rules are inactive when the Phase 2 kings are not tracked', () => 
   assert.deepEqual(getIdealTwoBishopsWhiteMoves(fen), ['Kf3'])
 })
 
+test('retreat rules reject Black on the wrong side of the king moat', () => {
+  const fen = '8/7B/2K5/4B3/1k6/8/8/8 w - - 0 1'
+  const score = scoreTwoBishopsWhiteMove(fen, 'Kb6')
+
+  assert.equal(score.ruleC03Applies, false)
+  assert.equal(score.ruleC08Applies, false)
+  assert.equal(score.ruleC085Applies, false)
+  assert.equal(score.ruleC12Applies, false)
+})
+
 test('double retreat stays on the tracked rank', () => {
   const fen = '8/8/4BB2/8/4K3/8/5k2/8 w - - 0 1'
 
@@ -297,111 +493,105 @@ test("rule c15 prefers the middle 16, then proximity to Black's king", () => {
   assert.equal(outside.ruleC15Middle16Distance, 1)
 })
 
-test('rule c15 uniquely breaks a rule c11 tie', () => {
+test('rule c15 uniquely selects the closer central king move', () => {
   const fen = '8/8/3K4/8/8/5B2/5B1k/8 w - - 12 7'
   const ke5 = scoreTwoBishopsWhiteMove(fen, 'Ke5')
   const ke6 = scoreTwoBishopsWhiteMove(fen, 'Ke6')
 
-  assert.equal(ke5.ruleC11Penalty, 0)
-  assert.equal(ke6.ruleC11Penalty, 0)
   assert.equal(ke5.ruleC15Middle16Distance, 0)
   assert.equal(ke6.ruleC15Middle16Distance, 0)
   assert.ok(ke5.ruleC15BlackKingDistance < ke6.ruleC15BlackKingDistance)
   assert.deepEqual(getIdealTwoBishopsWhiteMoves(fen), ['Ke5'])
 })
 
-test("rule d16 prefers the center, then proximity to Black's king", () => {
-  const fen = '8/8/4k3/8/5K2/5BB1/8/8 w - - 6 4'
-  const central = scoreTwoBishopsWhiteMove(fen, 'Ke4')
-  const farther = scoreTwoBishopsWhiteMove(fen, 'Kg4')
+test('rule c20 measures track along the target corner edges', () => {
+  const fen = '8/8/8/4B3/8/1B3K2/3k4/8 w - - 0 1'
+  const falsePerpendicularTrack = scoreTwoBishopsWhiteMove(fen, 'Bb2')
+  const kingMove = scoreTwoBishopsWhiteMove(fen, 'Ke4')
 
-  assert.equal(central.ruleD10Applies, true)
-  assert.equal(farther.ruleD10Applies, true)
-  assert.ok(central.ruleD10Penalty < farther.ruleD10Penalty)
+  assert.equal(falsePerpendicularTrack.ruleC20Applies, true)
+  assert.equal(falsePerpendicularTrack.ruleC20Penalty, 1)
+  assert.equal(kingMove.ruleC20Applies, true)
+  assert.equal(kingMove.ruleC20Penalty, 1)
+})
 
-  const tieFen = 'k7/8/8/8/4K3/8/8/1BB5 w - - 0 1'
-  const closerToBlack = scoreTwoBishopsWhiteMove(tieFen, 'Kd5')
-  const fartherFromBlack = scoreTwoBishopsWhiteMove(tieFen, 'Ke5')
-  assert.equal(closerToBlack.ruleD10Penalty, fartherFromBlack.ruleD10Penalty)
+test('rule c20 rejects replies that move too far off track after c12', () => {
+  const fen = '8/8/8/4B3/8/3K4/B7/2k5 w - - 2 2'
+  const leavesTrack = scoreTwoBishopsWhiteMove(fen, 'Ke4')
+  const keepsTrack = scoreTwoBishopsWhiteMove(fen, 'Bd4')
+
+  assert.equal(leavesTrack.ruleC12Penalty, 0)
+  assert.equal(leavesTrack.ruleC20Penalty, 1)
+  assert.equal(keepsTrack.ruleC12Penalty, 0)
+  assert.equal(keepsTrack.ruleC20Penalty, 0)
+})
+
+test('rule f5 prefers more bishops on longer diagonals, then in the center', () => {
+  const longDiagonalFen = '8/8/8/8/1B3K2/8/2B5/7k w - - 0 1'
+  const keepsLongDiagonal = scoreTwoBishopsWhiteMove(longDiagonalFen, 'Be4')
+  const leavesLongDiagonals = scoreTwoBishopsWhiteMove(longDiagonalFen, 'Bd3')
+
+  assert.equal(keepsLongDiagonal.ruleF5Applies, true)
   assert.ok(
-    closerToBlack.ruleD10BlackKingDistance <
-      fartherFromBlack.ruleD10BlackKingDistance,
+    keepsLongDiagonal.ruleF5DiagonalLengthPenalty <
+      leavesLongDiagonals.ruleF5DiagonalLengthPenalty,
   )
-})
 
-test('rule d7 prefers at least one bishop on a long diagonal', () => {
-  const fen = '8/8/8/8/1B3K2/8/2B5/7k w - - 0 1'
-  const keepsLongDiagonal = scoreTwoBishopsWhiteMove(fen, 'Be4')
-  const leavesLongDiagonals = scoreTwoBishopsWhiteMove(fen, 'Bd3')
+  const centerFen = '7k/8/8/8/2B1B3/5K2/8/8 w - - 0 1'
+  const central = scoreTwoBishopsWhiteMove(centerFen, 'Bed5')
+  const edge = scoreTwoBishopsWhiteMove(centerFen, 'Ba8')
 
-  assert.equal(keepsLongDiagonal.ruleD7Applies, true)
-  assert.equal(keepsLongDiagonal.ruleD7Penalty, 0)
-  assert.equal(leavesLongDiagonals.ruleD7Penalty, 1)
-})
-
-test('inactive Phase 2 stops do not prevent rule d7 from preserving a long diagonal', () => {
-  const fen = '8/8/8/3k1K2/3B4/3B4/8/8 w - - 6 4'
-  const abandonsLongDiagonal = scoreTwoBishopsWhiteMove(fen, 'Bb6')
-  const keepsLongDiagonal = scoreTwoBishopsWhiteMove(fen, 'Be5')
-
-  assert.equal(isTwoBishopsPhaseTwoPosition(fen), false)
-  assert.equal(abandonsLongDiagonal.ruleD7Penalty, 1)
-  assert.equal(keepsLongDiagonal.ruleD7Penalty, 0)
-  assert.ok(!getIdealTwoBishopsWhiteMoves(fen).includes('Bb6'))
-})
-
-test('rule d9 prefers the farther edge-two bishop when no long diagonal is controlled', () => {
-  const fen = '8/8/3BB3/8/4K3/8/8/4k3 w - - 0 1'
-  const farther = scoreTwoBishopsWhiteMove(fen, 'Bc8')
-  const nearer = scoreTwoBishopsWhiteMove(fen, 'Bf8')
-
-  assert.equal(farther.ruleD9Applies, true)
-  assert.equal(farther.ruleD9ShapePenalty, 0)
-  assert.equal(nearer.ruleD9ShapePenalty, 0)
-  assert.ok(
-    farther.ruleD9BlackKingDistance > nearer.ruleD9BlackKingDistance,
+  assert.equal(
+    central.ruleF5DiagonalLengthPenalty,
+    edge.ruleF5DiagonalLengthPenalty,
   )
+  assert.ok(central.ruleF5CenterPenalty < edge.ruleF5CenterPenalty)
 })
 
-test('rule d20 scores Bc5 for controlling the central Black-side square', () => {
-  const fen = '8/8/4k3/8/4K3/5B2/8/6B1 w - - 8 5'
-  const bc5 = scoreTwoBishopsWhiteMove(fen, 'Bc5')
+test('rule f4 prefers unscreening both bishops to at least three legal moves', () => {
+  const fen = 'k7/8/8/8/8/8/6K1/B6B w - - 0 1'
+  const unscreens = scoreTwoBishopsWhiteMove(fen, 'Kf2')
+  const screens = scoreTwoBishopsWhiteMove(fen, 'Kf3')
 
-  assert.equal(bc5.ruleD20Applies, true)
-  assert.equal(bc5.ruleD20Penalty, 0)
+  assert.equal(unscreens.ruleF4Penalty, 0)
+  assert.equal(screens.ruleF4Penalty, 1)
 })
 
-test("rule d12 prefers White's king off a controlled long diagonal", () => {
-  const fen = '1B6/8/8/4K1k1/8/8/6B1/8 w - - 8 5'
-  const staysClear = scoreTwoBishopsWhiteMove(fen, 'Ba7')
-  const screensLongDiagonal = scoreTwoBishopsWhiteMove(fen, 'Ke4')
+test('rule f5 uniquely selects Bd3 by total diagonal length', () => {
+  const fen = '8/8/B1k2K2/4B3/8/8/8/8 w - - 0 1'
 
-  assert.equal(staysClear.ruleD18Applies, true)
-  assert.equal(staysClear.ruleD18Penalty, 0)
-  assert.equal(screensLongDiagonal.ruleD18Penalty, 1)
+  assert.deepEqual(getIdealTwoBishopsWhiteMoves(fen), ['Bd3'])
 })
 
-test('rule d12 is inactive when both long diagonals are controlled', () => {
-  const fen = '8/3k4/8/3B4/3BK3/8/8/8 w - - 4 3'
+test("rule g5 maximizes the nearer bishop's distance from Black's king", () => {
+  const fen = '7K/8/8/8/8/2BB4/k7/8 w - - 0 1'
+  const farther = scoreTwoBishopsWhiteMove(fen, 'Bf6')
+  const nearer = scoreTwoBishopsWhiteMove(fen, 'Bb2')
 
-  assert.equal(scoreTwoBishopsWhiteMove(fen, 'Be5').ruleD18Applies, false)
+  assert.equal(farther.ruleG5Applies, true)
+  assert.equal(nearer.ruleG5Applies, true)
+  assert.equal(farther.ruleG5NearerDistance, 10)
+  assert.equal(farther.ruleG5FartherDistance, 41)
+  assert.equal(nearer.ruleG5NearerDistance, 1)
+  assert.equal(nearer.ruleG5FartherDistance, 10)
 })
 
-test('rule d25 scores the resulting long-diagonal bishop beside the central king', () => {
-  const fen = '6B1/8/3k4/8/4K3/8/1B6/8 w - - 10 6'
-  const bd4 = scoreTwoBishopsWhiteMove(fen, 'Bd4')
-  const bh7 = scoreTwoBishopsWhiteMove(fen, 'Bh7')
+test('rule g5 uses the farther bishop to break an equal-nearer tie', () => {
+  const fen = '7K/8/3B4/3B4/3k4/8/8/8 w - - 0 1'
+  const bF3 = scoreTwoBishopsWhiteMove(fen, 'Bf3')
+  const bA8 = scoreTwoBishopsWhiteMove(fen, 'Ba8')
 
-  assert.equal(bd4.ruleD25Applies, true)
-  assert.equal(bd4.ruleD25Penalty, 0)
-  assert.equal(bh7.ruleD25Penalty, 1)
+  assert.equal(bF3.ruleG5NearerDistance, 4)
+  assert.equal(bA8.ruleG5NearerDistance, 4)
+  assert.equal(bF3.ruleG5FartherDistance, 5)
+  assert.equal(bA8.ruleG5FartherDistance, 25)
+  assert.deepEqual(getIdealTwoBishopsWhiteMoves(fen), ['Ba8', 'Bh1'])
 })
 
-test('rule d25 does not require moving an already-adjacent long-diagonal bishop', () => {
-  const fen = '8/8/8/8/1B1KB1k1/8/8/8 w - - 0 1'
+test('rule g2 precedes g5 in the supplied position', () => {
+  const fen = '8/8/2K5/8/1k1B4/3B4/8/8 w - - 2 2'
 
-  assert.equal(scoreTwoBishopsWhiteMove(fen, 'Bd5').ruleD25Penalty, 0)
-  assert.equal(scoreTwoBishopsWhiteMove(fen, 'Kd3').ruleD25Penalty, 0)
+  assert.deepEqual(getIdealTwoBishopsWhiteMoves(fen), ['Kd5'])
 })
 
 test('rule c10 is ordered before the later rule c12', () => {
@@ -411,11 +601,28 @@ test('rule c10 is ordered before the later rule c12', () => {
   )
 })
 
-test('rule c12 treats the loaded b2 position as Black on track', () => {
+test('rule c14 is ordered after c12 and before c15', () => {
+  const ids = twoBishopsWhiteRules.map(({ id }) => id)
+
+  assert.equal(ids.indexOf('rule c14'), ids.indexOf('rule c12') + 1)
+  assert.equal(ids.indexOf('rule c15'), ids.indexOf('rule c14') + 1)
+})
+
+test('rule c14 prefers opposition when the retreat square is controlled', () => {
+  const fen = '7B/8/4B3/8/8/8/5K1k/8 w - - 2 2'
+  const keepsOpposition = scoreTwoBishopsWhiteMove(fen, 'Be5+')
+  const leavesOpposition = scoreTwoBishopsWhiteMove(fen, 'Kf3')
+
+  assert.equal(keepsOpposition.ruleC14Applies, true)
+  assert.equal(keepsOpposition.ruleC14Penalty, 0)
+  assert.equal(leavesOpposition.ruleC14Applies, true)
+  assert.equal(leavesOpposition.ruleC14Penalty, 1)
+})
+
+test('rule c12 does not apply when Black is one ahead on track', () => {
   const fen = '8/8/8/3BBK2/7k/8/8/8 w - - 0 1'
 
-  assert.equal(scoreTwoBishopsWhiteMove(fen, 'Bf7').ruleC12Applies, true)
-  assert.equal(scoreTwoBishopsWhiteMove(fen, 'Bf7').ruleC12Penalty, 0)
+  assert.equal(scoreTwoBishopsWhiteMove(fen, 'Bf7').ruleC12Applies, false)
   assert.deepEqual(getIdealTwoBishopsWhiteMoves(fen), ['Kf4'])
 })
 
@@ -430,23 +637,38 @@ test('rule c12 controls the retreat square when Black is on track', () => {
   assert.equal(missesD2.ruleC12Penalty, 1)
 })
 
+test('rule c12 applies when Black is one behind track', () => {
+  const fen = '6B1/6B1/8/7k/5K2/8/8/8 w - - 2 2'
+
+  assert.equal(scoreTwoBishopsWhiteMove(fen, 'Bf7+').ruleC12Applies, true)
+})
+
+test('rule c12 evaluates the retreat square after the bishop wall switches', () => {
+  const fen = '8/8/7k/3B1K2/3B4/8/8/8 w - - 0 1'
+  const controlsH7 = scoreTwoBishopsWhiteMove(fen, 'Bg8')
+  const missesH7 = scoreTwoBishopsWhiteMove(fen, 'Be5')
+
+  assert.equal(controlsH7.ruleC12Applies, true)
+  assert.equal(controlsH7.ruleC12Penalty, 0)
+  assert.equal(missesH7.ruleC12Applies, true)
+  assert.equal(missesH7.ruleC12Penalty, 1)
+  assert.deepEqual(getIdealTwoBishopsWhiteMoves(fen), ['Bg8'])
+})
+
+test('rule c12 does not let a king move redefine the retreat track', () => {
+  const fen = '8/5B2/7k/5K2/3B4/8/8/8 w - - 0 1'
+  const controlsH7 = scoreTwoBishopsWhiteMove(fen, 'Bg8')
+  const changesTheKingTrack = scoreTwoBishopsWhiteMove(fen, 'Kg4')
+
+  assert.equal(controlsH7.ruleC12Penalty, 0)
+  assert.equal(changesTheKingTrack.ruleC12Penalty, 1)
+})
+
 test('rule c12 does not invent a retreat square off the king track', () => {
   const fen = '8/8/4BB2/7k/8/4K3/8/8 w - - 18 10'
   const bg7 = scoreTwoBishopsWhiteMove(fen, 'Bg7')
 
   assert.equal(bg7.ruleC12Applies, false)
-})
-
-test('rule c11 prefers moves whose every Black reply stays on the edge', () => {
-  const fen = '8/1B6/8/5K2/7k/4B3/8/8 w - - 10 6'
-  const forcesEdge = scoreTwoBishopsWhiteMove(fen, 'Bf2+')
-  const allowsKg3 = scoreTwoBishopsWhiteMove(fen, 'Bg2')
-
-  assert.equal(forcesEdge.ruleC11Applies, true)
-  assert.equal(forcesEdge.ruleC11Penalty, 0)
-  assert.equal(allowsKg3.ruleC11Applies, true)
-  assert.equal(allowsKg3.ruleC11Penalty, 1)
-  assert.equal(getIdealTwoBishopsWhiteMoves(fen).includes('Bg2'), false)
 })
 
 test('rule c05 controls the edge square beyond Black away from the caged corner', () => {
@@ -554,16 +776,15 @@ test('rule c07 evaluates the double retreat square after the king moves', () => 
   assert.ok(!getIdealTwoBishopsWhiteMoves(fen).includes('Kf2'))
 })
 
-test('rule c08 takes opposition when the double retreat square is controlled', () => {
-  const fen = '6B1/6B1/8/5K2/7k/8/8/8 w - - 0 1'
-  const takesOpposition = scoreTwoBishopsWhiteMove(fen, 'Kf4')
-  const avoidsOpposition = scoreTwoBishopsWhiteMove(fen, 'Be5')
+test('rule c08 takes opposition when Black is even and the double retreat square is controlled', () => {
+  const fen = '8/8/8/4B3/4K3/1B6/4k3/8 w - - 0 1'
+  const keepsOpposition = scoreTwoBishopsWhiteMove(fen, 'Bd4')
+  const leavesOpposition = scoreTwoBishopsWhiteMove(fen, 'Kf4')
 
-  assert.equal(takesOpposition.ruleC08Applies, true)
-  assert.equal(takesOpposition.ruleC08Penalty, 0)
-  assert.equal(avoidsOpposition.ruleC08Applies, true)
-  assert.equal(avoidsOpposition.ruleC08Penalty, 1)
-  assert.deepEqual(getIdealTwoBishopsWhiteMoves(fen), ['Kf4'])
+  assert.equal(keepsOpposition.ruleC08Applies, true)
+  assert.equal(keepsOpposition.ruleC08Penalty, 0)
+  assert.equal(leavesOpposition.ruleC08Applies, true)
+  assert.equal(leavesOpposition.ruleC08Penalty, 1)
 })
 
 test('rule c08.5 takes opposition when Black is one ahead of track and the double retreat square is controlled', () => {
@@ -586,24 +807,46 @@ test('rule c08.5 does not apply without control of the double retreat square', (
   assert.equal(score.ruleC085Applies, false)
 })
 
-test('rule c9 controls the flank square when Black is one ahead on track', () => {
+test('rule c09 controls the flank square when Black is one ahead on track', () => {
   const fen = '6B1/6B1/8/8/5K2/7k/8/8 w - - 0 1'
   const controlsG2 = scoreTwoBishopsWhiteMove(fen, 'Bd5')
   const missesG2 = scoreTwoBishopsWhiteMove(fen, 'Kf3')
 
-  assert.equal(controlsG2.ruleC9Applies, true)
-  assert.equal(controlsG2.ruleC9Penalty, 0)
-  assert.equal(missesG2.ruleC9Penalty, 1)
+  assert.equal(controlsG2.ruleC09Applies, true)
+  assert.equal(controlsG2.ruleC09Penalty, 0)
+  assert.equal(missesG2.ruleC09Penalty, 1)
   assert.deepEqual(getIdealTwoBishopsWhiteMoves(fen), ['Bd5'])
 })
 
-test('rule c9 lets later rules refine existing flank control to Be6', () => {
-  const fen = '8/5B2/8/8/3B4/5K2/7k/8 w - - 22 12'
+test('rule c09 recognizes the flank square when both cage edges are reachable', () => {
+  const fen = '8/5B2/5B2/8/8/4K3/6k1/8 w - - 0 1'
+  const controlsF1 = scoreTwoBishopsWhiteMove(fen, 'Bc4')
 
+  assert.equal(controlsF1.ruleC09Applies, true)
+  assert.equal(controlsF1.ruleC09Penalty, 0)
+  assert.ok(getIdealTwoBishopsWhiteMoves(fen).includes('Bc4'))
+})
+
+test('rule c09 applies only in Phase 2', () => {
+  const fen = '8/8/8/8/1B3K2/8/2B5/7k w - - 0 1'
+
+  assert.equal(isTwoBishopsPhaseTwoPosition(fen), false)
+  assert.equal(scoreTwoBishopsWhiteMove(fen, 'Be4').ruleC09Applies, false)
+})
+
+test('rule c09 prefers retreat-square control after flank-square control', () => {
+  const fen = '8/5B2/8/8/3B4/5K2/7k/8 w - - 22 12'
+  const controlsBoth = scoreTwoBishopsWhiteMove(fen, 'Be6')
+  const controlsOnlyFlank = scoreTwoBishopsWhiteMove(fen, 'Bd5')
+
+  assert.equal(controlsBoth.ruleC09Penalty, 0)
+  assert.equal(controlsOnlyFlank.ruleC09Penalty, 0)
+  assert.equal(controlsBoth.ruleC09RetreatPenalty, 0)
+  assert.equal(controlsOnlyFlank.ruleC09RetreatPenalty, 1)
   assert.deepEqual(getIdealTwoBishopsWhiteMoves(fen), ['Be6'])
 })
 
-test('rule c7.5 checks with Black one behind track and four squares from the corner', () => {
+test('rule c07.5 checks with Black one behind track and four squares from the corner', () => {
   const fen = '1B6/8/8/3B4/8/3K4/8/4k3 w - - 4 3'
   const checks = scoreTwoBishopsWhiteMove(fen, 'Bg3+')
   const takesOpposition = scoreTwoBishopsWhiteMove(fen, 'Ke3')

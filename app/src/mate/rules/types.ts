@@ -46,11 +46,6 @@ export type OrderedRule<Score> = {
    */
   readonly applies?: (score: Score) => boolean
   /**
-   * Stops later priorities from breaking a best-score tie when every survivor
-   * satisfies this predicate. Use this for a decisive result such as mate.
-   */
-  readonly stopWhenBest?: (score: Score) => boolean
-  /**
    * Defines a deterministic finite total preorder within the applicable domain.
    * A negative finite result prefers left, zero ties them, and a positive finite
    * result prefers right. Implementations must never return NaN or infinity.

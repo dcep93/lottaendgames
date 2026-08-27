@@ -141,7 +141,6 @@ const decisiveRule: OrderedRule<DecisiveScore> = {
   id: 'decisive-mate',
   shortLabel: 'Mate now',
   helpText: 'Checkmate immediately when mate is available.',
-  stopWhenBest: (score) => score.matePenalty === 0,
   compare: (left, right) => left.matePenalty - right.matePenalty,
 }
 
@@ -317,18 +316,15 @@ test('pair comparisons skip priorities outside either score domain', () => {
   )
 })
 
-test('a decisive best priority preserves every tied terminal move', () => {
+test('later priorities break ties among moves surviving a decisive priority', () => {
   const decisiveRules = [decisiveRule, laterRule] as const
 
   for (const permutation of permutations(decisiveCandidates)) {
-    const expectedMates = permutation
-      .filter(({ score }) => score.matePenalty === 0)
-      .map(({ san }) => san)
     assert.deepEqual(
       selectIdealMoves(permutation, decisiveRules),
-      expectedMates,
+      ['Bb2#'],
     )
-    assert.equal(currentHint(permutation, decisiveRules), decisiveRule)
+    assert.equal(currentHint(permutation, decisiveRules), laterRule)
     assert.equal(explainMove(permutation, decisiveRules, 'Kc2'), decisiveRule)
   }
   assert.equal(
@@ -337,7 +333,7 @@ test('a decisive best priority preserves every tied terminal move', () => {
       decisiveCandidates[1]!.score,
       decisiveRules,
     ),
-    0,
+    1,
   )
   assert.equal(
     firstDifferingRule(
@@ -345,71 +341,8 @@ test('a decisive best priority preserves every tied terminal move', () => {
       decisiveCandidates[1]!.score,
       decisiveRules,
     ),
-    undefined,
+    laterRule,
   )
-})
-
-test('an inactive conditional rule cannot stop later priorities', () => {
-  type ConditionalScore = {
-    readonly active: boolean
-    readonly conditionalPenalty: number
-    readonly laterPenalty: number
-  }
-  const conditionalRule: OrderedRule<ConditionalScore> = {
-    id: 'conditional',
-    shortLabel: 'Conditional',
-    helpText: 'Only applies in its own domain.',
-    applies: (score) => score.active,
-    stopWhenBest: (score) => score.conditionalPenalty === 0,
-    compare: (left, right) =>
-      left.conditionalPenalty - right.conditionalPenalty,
-  }
-  const laterRule: OrderedRule<ConditionalScore> = {
-    id: 'later',
-    shortLabel: 'Later',
-    helpText: 'Resolves inactive conditional ties.',
-    compare: (left, right) => left.laterPenalty - right.laterPenalty,
-  }
-  const inactiveCandidates: readonly ScoredMove<ConditionalScore>[] = [
-    {
-      san: 'Ka1',
-      score: { active: false, conditionalPenalty: 0, laterPenalty: 1 },
-    },
-    {
-      san: 'Kb1',
-      score: { active: false, conditionalPenalty: 0, laterPenalty: 0 },
-    },
-  ]
-
-  assert.deepEqual(
-    selectIdealMoves(inactiveCandidates, [conditionalRule, laterRule]),
-    ['Kb1'],
-  )
-})
-
-test('registered rule operations snapshot decisive stop predicates', () => {
-  const mutableDecisiveRule = { ...decisiveRule }
-  const decisiveRuleSet: MateRuleSet<DecisiveScore> = {
-    id: 'two-knights-pawn',
-    phase: () => 'phase',
-    scoreWhite: (_fen, san) =>
-      decisiveCandidates.find((candidate) => candidate.san === san)!.score,
-    whiteRules: [mutableDecisiveRule, laterRule],
-    whiteMoves: () => decisiveCandidates.map(({ san }) => san),
-    blackCandidates: () => ({ moves: [], idealMoves: [] }),
-    help,
-  }
-  const unregister = registerMateRuleSet(decisiveRuleSet)
-
-  try {
-    mutableDecisiveRule.stopWhenBest = () => false
-    assert.deepEqual(
-      getMateRuleSet('two-knights-pawn').idealWhiteMoves('fen'),
-      ['Ba1#', 'Bb2#'],
-    )
-  } finally {
-    unregister()
-  }
 })
 
 test('registered rule sets may prepare a pure candidate score batch', () => {

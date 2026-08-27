@@ -19,12 +19,35 @@ export function centerDistance(square: Square): number {
   )
 }
 
-export function kingStepsToCenter(square: Square): number {
-  const { file, rank } = squareCoordinates(square)
-  return Math.max(
-    Math.min(Math.abs(file - 3), Math.abs(file - 4)),
-    Math.min(Math.abs(rank - 3), Math.abs(rank - 4)),
+export function squaredEuclideanDistanceToUnoccupiedCenter(
+  square: Square,
+  bishops: readonly Square[],
+): number {
+  const occupied = new Set(bishops)
+  return Math.min(
+    ...(['d4', 'e4', 'd5', 'e5'] as const)
+      .filter((centerSquare) => !occupied.has(centerSquare))
+      .map((centerSquare) => squaredEuclideanDistance(square, centerSquare)),
   )
+}
+
+function squaredEuclideanDistance(first: Square, second: Square): number {
+  const source = squareCoordinates(first)
+  const target = squareCoordinates(second)
+  return (source.file - target.file) ** 2 + (source.rank - target.rank) ** 2
+}
+
+function phaseTwoCenterSquare(
+  axis: 'difference' | 'sum',
+  direction: -1 | 1,
+): Square {
+  return axis === 'difference'
+    ? direction > 0
+      ? 'e4'
+      : 'd5'
+    : direction > 0
+      ? 'e5'
+      : 'd4'
 }
 
 export function bishopDestinationCanBeAttackedOnNextMove(
@@ -294,8 +317,7 @@ export function isTwoBishopsPhaseTwoPosition(fen: string): boolean {
   if (
     whiteKing === undefined ||
     blackKing === undefined ||
-    bishops.length !== 2 ||
-    kingStepsToCenter(whiteKing) >= kingStepsToCenter(blackKing)
+    bishops.length !== 2
   ) {
     return false
   }
@@ -324,11 +346,22 @@ export function isTwoBishopsPhaseTwoPosition(fen: string): boolean {
           axis === 'difference'
             ? white.file - white.rank
             : white.file + white.rank - 7
-        return (
+        const direction = Math.sign(blackDiagonal) as -1 | 0 | 1
+        if (
           blackDiagonal !== 0 &&
           Math.sign(whiteDiagonal) === Math.sign(blackDiagonal) &&
           adjacentDiagonal === -Math.sign(blackDiagonal)
-        )
+        ) {
+          const centerSquare = phaseTwoCenterSquare(
+            axis,
+            direction as -1 | 1,
+          )
+          return (
+            squaredEuclideanDistance(whiteKing, centerSquare) <=
+            squaredEuclideanDistance(blackKing, centerSquare)
+          )
+        }
+        return false
       }),
     )
   })

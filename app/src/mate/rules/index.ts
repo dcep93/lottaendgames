@@ -248,7 +248,6 @@ function snapshotOrderedRule<Score>(
   }
   const compare = orderedRule.compare
   const applies = orderedRule.applies
-  const stopWhenBest = orderedRule.stopWhenBest
   const subpriorities = orderedRule.subpriorities
     ? Object.freeze(
         orderedRule.subpriorities.map((subpriority) => {
@@ -298,11 +297,6 @@ function snapshotOrderedRule<Score>(
       : { presentationRole: orderedRule.presentationRole }),
     ...(applies
       ? { applies: Object.freeze((score: Score) => applies(score)) }
-      : {}),
-    ...(stopWhenBest
-      ? {
-          stopWhenBest: Object.freeze((score: Score) => stopWhenBest(score)),
-        }
       : {}),
     ...(compare
       ? {

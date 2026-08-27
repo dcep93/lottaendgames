@@ -152,7 +152,7 @@ export function selectCandidatesByRules<Score>(
   const eliminatedBy = new Map<ScoredMove<Score>, OrderedRule<Score>>()
   let lastEliminatingRule: OrderedRule<Score> | undefined
 
-  rulesLoop: for (const orderedRule of rules) {
+  for (const orderedRule of rules) {
     for (const subpriority of ruleSubpriorities(orderedRule)) {
       const applicable = remaining.filter((candidate) =>
         ruleApplies(orderedRule, candidate.score),
@@ -201,19 +201,6 @@ export function selectCandidatesByRules<Score>(
       })
     }
 
-    const stopWhenBest = orderedRule.stopWhenBest
-    if (
-      stopWhenBest &&
-      remaining.length > 0 &&
-      remaining.every(
-        (candidate) =>
-          ruleApplies(orderedRule, candidate.score) &&
-          stopWhenBest(candidate.score),
-      )
-    ) {
-      lastEliminatingRule = orderedRule
-      break rulesLoop
-    }
   }
 
   return { idealCandidates: remaining, eliminatedBy, lastEliminatingRule }
@@ -254,12 +241,6 @@ export function compareScoresByRules<Score>(
       )
       if (comparison !== 0) return comparison
     }
-    if (
-      orderedRule.stopWhenBest?.(leftScore) &&
-      orderedRule.stopWhenBest(rightScore)
-    ) {
-      return 0
-    }
   }
   return 0
 }
@@ -282,12 +263,6 @@ export function firstDifferingRule<Score>(
       if (subpriorityPairComparison(orderedRule, subpriority, scores) !== 0) {
         return orderedRule
       }
-    }
-    if (
-      orderedRule.stopWhenBest?.(leftScore) &&
-      orderedRule.stopWhenBest(rightScore)
-    ) {
-      return undefined
     }
   }
   return undefined

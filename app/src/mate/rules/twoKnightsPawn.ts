@@ -338,7 +338,6 @@ export const twoKnightsPawnWhiteRules: readonly OrderedRule<TwoKnightsPawnWhiteM
     id: 'mate',
     shortLabel: 'mate',
     helpText: '',
-    stopWhenBest: (score) => score.matePenalty === 0,
     compare: (first, second) => first.matePenalty - second.matePenalty,
   },
   {
