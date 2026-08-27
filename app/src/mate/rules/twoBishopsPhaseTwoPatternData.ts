@@ -1,5 +1,5 @@
 export const TWO_BISHOPS_TRAINING_START_FEN =
-  '8/6B1/6B1/8/7k/8/8/1K6 w - - 0 1'
+  '8/8/8/8/4K3/8/B3k3/B7 w - - 10 6'
 
 /** @deprecated Retained for legacy diagrams that are no longer displayed. */
 export const TWO_BISHOPS_PHASE_TWO_START_FEN =

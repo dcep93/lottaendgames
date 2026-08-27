@@ -205,7 +205,11 @@ export function selectCandidatesByRules<Score>(
     if (
       stopWhenBest &&
       remaining.length > 0 &&
-      remaining.every((candidate) => stopWhenBest(candidate.score))
+      remaining.every(
+        (candidate) =>
+          ruleApplies(orderedRule, candidate.score) &&
+          stopWhenBest(candidate.score),
+      )
     ) {
       lastEliminatingRule = orderedRule
       break rulesLoop

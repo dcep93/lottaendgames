@@ -32,7 +32,7 @@ const expectedCatalog = [
     materialSignature: 'KBBvK',
     path: '/mate/two-bishops',
     standardFallbackFen: '4k3/8/8/8/8/8/8/2B1KB2 w - - 0 1',
-    trainSeeds: ['8/6B1/6B1/8/7k/8/8/1K6 w - - 0 1'],
+    trainSeeds: ['8/8/8/8/4K3/8/B3k3/B7 w - - 10 6'],
   },
   {
     id: 'bishop-knight',

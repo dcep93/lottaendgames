@@ -19,6 +19,14 @@ export function centerDistance(square: Square): number {
   )
 }
 
+export function kingStepsToCenter(square: Square): number {
+  const { file, rank } = squareCoordinates(square)
+  return Math.max(
+    Math.min(Math.abs(file - 3), Math.abs(file - 4)),
+    Math.min(Math.abs(rank - 3), Math.abs(rank - 4)),
+  )
+}
+
 export function bishopDestinationCanBeAttackedOnNextMove(
   fen: string,
   san: string,
@@ -280,7 +288,79 @@ export function isWhiteKingInsideInnerBishopDiagonal(fen: string): boolean {
 }
 
 export function isTwoBishopsPhaseTwoPosition(fen: string): boolean {
-  return isWhiteKingInsideInnerBishopDiagonal(fen)
+  const whiteKing = findPiece(fen, 'w', 'k')?.square
+  const blackKing = findPiece(fen, 'b', 'k')?.square
+  const bishops = getWhiteBishopSquares(fen)
+  if (
+    whiteKing === undefined ||
+    blackKing === undefined ||
+    bishops.length !== 2 ||
+    kingStepsToCenter(whiteKing) >= kingStepsToCenter(blackKing)
+  ) {
+    return false
+  }
+
+  return bishops.some((longBishop, longIndex) => {
+    const long = squareCoordinates(longBishop)
+    const white = squareCoordinates(whiteKing)
+    const black = squareCoordinates(blackKing)
+    const longAxes: readonly ('difference' | 'sum')[] = [
+      ...(long.file === long.rank ? ['difference' as const] : []),
+      ...(long.file + long.rank === 7 ? ['sum' as const] : []),
+    ]
+    return longAxes.some((axis) =>
+      bishops.some((adjacentBishop, adjacentIndex) => {
+        if (adjacentIndex === longIndex) return false
+        const adjacent = squareCoordinates(adjacentBishop)
+        const adjacentDiagonal =
+          axis === 'difference'
+            ? adjacent.file - adjacent.rank
+            : adjacent.file + adjacent.rank - 7
+        const blackDiagonal =
+          axis === 'difference'
+            ? black.file - black.rank
+            : black.file + black.rank - 7
+        const whiteDiagonal =
+          axis === 'difference'
+            ? white.file - white.rank
+            : white.file + white.rank - 7
+        return (
+          blackDiagonal !== 0 &&
+          Math.sign(whiteDiagonal) === Math.sign(blackDiagonal) &&
+          adjacentDiagonal === -Math.sign(blackDiagonal)
+        )
+      }),
+    )
+  })
+}
+
+export function whiteBishopsFormDoubleDiagonalWall(fen: string): boolean {
+  const bishops = getWhiteBishopSquares(fen)
+  if (bishops.length !== 2) return false
+  const [first, second] = bishops.map(squareCoordinates)
+  const firstDifference = first.file - first.rank
+  const secondDifference = second.file - second.rank
+  const firstSum = first.file + first.rank
+  const secondSum = second.file + second.rank
+
+  return (
+    (Math.abs(firstDifference - secondDifference) === 1 &&
+      (firstDifference === 0 || secondDifference === 0)) ||
+    (Math.abs(firstSum - secondSum) === 1 &&
+      (firstSum === 7 || secondSum === 7))
+  )
+}
+
+export function bishopsOccupyAdjacentDiagonals(
+  bishops: readonly Square[],
+): boolean {
+  if (bishops.length !== 2) return false
+  const [first, second] = bishops.map(squareCoordinates)
+
+  return (
+    Math.abs(first.file - first.rank - (second.file - second.rank)) === 1 ||
+    Math.abs(first.file + first.rank - (second.file + second.rank)) === 1
+  )
 }
 
 export function getTwoBishopsPhaseLabel(fen: string): string {

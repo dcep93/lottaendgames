@@ -349,6 +349,44 @@ test('a decisive best priority preserves every tied terminal move', () => {
   )
 })
 
+test('an inactive conditional rule cannot stop later priorities', () => {
+  type ConditionalScore = {
+    readonly active: boolean
+    readonly conditionalPenalty: number
+    readonly laterPenalty: number
+  }
+  const conditionalRule: OrderedRule<ConditionalScore> = {
+    id: 'conditional',
+    shortLabel: 'Conditional',
+    helpText: 'Only applies in its own domain.',
+    applies: (score) => score.active,
+    stopWhenBest: (score) => score.conditionalPenalty === 0,
+    compare: (left, right) =>
+      left.conditionalPenalty - right.conditionalPenalty,
+  }
+  const laterRule: OrderedRule<ConditionalScore> = {
+    id: 'later',
+    shortLabel: 'Later',
+    helpText: 'Resolves inactive conditional ties.',
+    compare: (left, right) => left.laterPenalty - right.laterPenalty,
+  }
+  const inactiveCandidates: readonly ScoredMove<ConditionalScore>[] = [
+    {
+      san: 'Ka1',
+      score: { active: false, conditionalPenalty: 0, laterPenalty: 1 },
+    },
+    {
+      san: 'Kb1',
+      score: { active: false, conditionalPenalty: 0, laterPenalty: 0 },
+    },
+  ]
+
+  assert.deepEqual(
+    selectIdealMoves(inactiveCandidates, [conditionalRule, laterRule]),
+    ['Kb1'],
+  )
+})
+
 test('registered rule operations snapshot decisive stop predicates', () => {
   const mutableDecisiveRule = { ...decisiveRule }
   const decisiveRuleSet: MateRuleSet<DecisiveScore> = {
