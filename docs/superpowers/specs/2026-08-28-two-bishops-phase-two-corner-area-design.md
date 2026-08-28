@@ -18,11 +18,11 @@ Phase 2 accepts this formation under all eight rotations and reflections. White'
 
 Rule r11 applies when the starting bishops control any adjacent parallel diagonals with Black strictly on a corner side and at least four diagonals between the wall and that corner. White's location does not affect applicability. The starting enclosure fixes the candidate corner.
 
-## Rule r10 handoff
+## Rule r10
 
-Text: "Prefer controlling adjacent diagonals not enclosing White, leaving Black as few diagonals as possible within its corner, but at least 4. Once such a wall already encloses Black, king moves preserve it for this rule."
+Text: "Prefer controlling adjacent diagonals not enclosing White, leaving Black as few diagonals as possible within its corner, but at least 4."
 
-When the starting bishops already form an enclosing Phase 2 wall, a king move inherits that wall's valid r10 score and diagonal count even if White crosses to its corner side. Bishop moves continue to be scored from their result normally. This lets the established bishop wall hand off to r11 without allowing a bishop to abandon it.
+Score every candidate from the adjacent-diagonal wall in its resulting position. No move inherits a wall score from the starting position.
 
 ## Rule r9
 
@@ -92,4 +92,4 @@ Display the supplied canonical position `k7/2KB4/3B4/8/8/8/8/8 w - - 2 2`. Do no
 
 ## Verification
 
-Focused tests cover all four canonical Black edge squares, both bishop diagonals, arbitrary White king positions, all rotations/reflections, rejection of formation deviations, r9's Phase 1 gate plus staging, alignment, and two-step wall crossing under symmetry, r10's established-wall handoff, r11's transformed corner and knight-square distance including the `Kb6` regression, r5's candidate-result cage creation priority, generic two-square cage, nearer-edge target, legacy instance, and symmetry, r4's full supplied branch, symmetry, neutrality outside known branches, exact animated frames, r15's squared Euclidean comparison, the diagram, and exact rule order/text. Then run the exact early-exit search from UI-valid roots, orient the first valid loop so Black starts closest to `a7`, and load it at cursor 0.
+Focused tests cover all four canonical Black edge squares, both bishop diagonals, arbitrary White king positions, all rotations/reflections, rejection of formation deviations, r9's Phase 1 gate plus staging, alignment, and two-step wall crossing under symmetry, r10's result-only wall scoring, r11's transformed corner and knight-square distance including the `Kb6` regression, r5's candidate-result cage creation priority, generic two-square cage, nearer-edge target, legacy instance, and symmetry, r4's full supplied branch, symmetry, neutrality outside known branches, exact animated frames, r15's squared Euclidean comparison, the diagram, and exact rule order/text. Then run the exact early-exit search from UI-valid roots, orient the first valid loop so Black starts closest to `a7`, and load it at cursor 0.
