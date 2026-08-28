@@ -16,7 +16,7 @@ Phase 2 accepts this formation under all eight rotations and reflections. White'
 
 ## Enclosing Phase 2 diagonals
 
-Rule r7 applies when the starting bishops control any adjacent parallel diagonals with Black strictly on a corner side and at least four diagonals between the wall and that corner. White's location does not affect applicability. The starting enclosure fixes the candidate corner.
+Rule r7 applies only when the starting board matches an exact transformed Phase 2 template: the bishops occupy the two Phase 2 diagonals and Black is on the enclosed Phase 2 edge. White's location does not affect applicability. The matched template fixes the candidate corner.
 
 ## Rule r10
 
@@ -41,6 +41,12 @@ In `8/8/8/1k6/8/4B3/2K3B1/8 w - - 0 1`, the staging square is `e2`; the intended
 Text: "With bishops on enclosing phase 2 diagonals, prefer king proximity to a square a knight's move from Black's corner."
 
 For each qualifying starting corner, find its two on-board knight-move squares and score candidate results by White king's minimum king-step distance to either square. Use the best distance if more than one starting corner qualifies. Bishop placement is not a tie-break in r7.
+
+## Rule r13
+
+Text: "Prefer the White king not inside Black's smallest enclosed area."
+
+Score the resulting position. Find the smallest adjacent-diagonal enclosure or tied enclosures containing Black. Prefer White outside at least one tied smallest enclosure. If no adjacent-diagonal enclosure exists, r13 is neutral.
 
 ## Rule r5
 
@@ -86,7 +92,7 @@ Compare White-to-Black king proximity by squared Euclidean distance. Bishop move
 
 ## Rule order
 
-The policy order is: mate, bishop safety, no stalemate, r4, r5, r7, r9, r10, r12, r15.
+The policy order is: mate, bishop safety, no stalemate, r4, r5, r7, r9, r10, r12, r13, r15.
 
 ## Diagram
 
@@ -94,4 +100,4 @@ Display the supplied canonical position `k7/2KB4/3B4/8/8/8/8/8 w - - 2 2`. Do no
 
 ## Verification
 
-Focused tests cover all four canonical Black edge squares, both bishop diagonals, arbitrary White king positions, all rotations/reflections, rejection of formation deviations, r7's transformed corner and knight-square distance including the `Kb6` regression, r9's phase-independent staging, alignment, and two-step wall crossing under symmetry, r10's result-only wall scoring, r5's candidate-result cage creation priority, generic two-square cage, nearer-edge target, legacy instance, and symmetry, r4's full supplied branch, symmetry, neutrality outside known branches, exact animated frames, r15's squared Euclidean comparison, the diagram, and exact rule order/text. Then run the exact early-exit search from UI-valid roots, orient the first valid loop so Black starts closest to `a7`, and load it at cursor 0.
+Focused tests cover all four canonical Black edge squares, both bishop diagonals, arbitrary White king positions, all rotations/reflections, rejection of formation deviations, r7's exact Phase 2 gate plus transformed corner and knight-square distance, r9's phase-independent staging, alignment, and two-step wall crossing under symmetry, r10's result-only wall scoring, r13's smallest-enclosure exit preference, r5's candidate-result cage creation priority, generic two-square cage, nearer-edge target, legacy instance, and symmetry, r4's full supplied branch, symmetry, neutrality outside known branches, exact animated frames, r15's squared Euclidean comparison, the diagram, and exact rule order/text. Then run the exact early-exit search from UI-valid roots, orient the first valid loop so Black starts closest to `a7`, and load it at cursor 0.
