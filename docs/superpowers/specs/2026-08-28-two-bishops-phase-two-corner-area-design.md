@@ -60,13 +60,15 @@ The r5 cage geometry is independent of Phase 2 and is invariant under rotation a
 
 ## Rule r4
 
-Text: "Once rule r5 has been achieved, follow the mating pattern: control the escape square, then check, sometimes using a waiting move. When r4 applies, later construction rules are inactive."
+Text: "Once rule r5 has been achieved, follow the mating pattern: control the escape square, then check, sometimes using a waiting move."
 
 Rule r4 precedes r5. It is neutral until a known mating-pattern branch is reached after r5 has established the two-square cage. Every recognized r4 position must lie in a finite branch whose Black replies are forced and whose leaves are checkmate; a cycle or non-mating leaf is an implementation bug. The first branch is the supplied line from `8/8/2K5/k1B5/2B5/8/8/8 w - - 20 11`: r5 plays `Bb3`; after `Ka6`, r4 prefers `Bb4`; after `Ka7`, `Kc7`; after `Ka6`, `Bc4+`; after `Ka7`, `Bc5+`; and after `Ka8`, `Bd5#`. The ordinary mate priority remains above r4.
 
 Match each branch position and result structurally, ignoring FEN move counters, and accept every rotation and reflection. At a recognized branch position, the supplied result receives no r4 penalty and every other result receives one. At an unrecognized position, r4 is neutral so later rules decide. Future branch additions extend this same position-to-result table.
 
 At a recognized r4 position, r4 defines the complete accepted move set. Rules r5 and later are inapplicable there, so they cannot narrow an intentionally multi-move r4 result. Mate, bishop safety, and stalemate prevention remain higher priorities.
+
+The post-r5 position `2K5/2B5/k1B5/8/8/8/8/8 w - - 2 2` is a recognized waiting stage. Prefer `Ba4`, `Bd7`, `Be8`, or `Bd8`; each preserves the adjacent walls without exposing a bishop and forces `Ka7`. Then `Bb5` forces `Ka8`. Prefer every bishop wait that forces `Ka7` and admits a checking move that forces `Ka8` followed by immediate mate. Register the complete finite continuation and recognize it under every rotation and reflection.
 
 In `8/k1K5/2B5/8/1B6/8/8/8 w - - 4 3`, r4 uniquely selects `Bb5`, forcing `Ka8` and reaching the waiting stage.
 
