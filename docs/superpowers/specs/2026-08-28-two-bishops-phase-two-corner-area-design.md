@@ -62,19 +62,19 @@ The r5 cage geometry is independent of Phase 2 and is invariant under rotation a
 
 Text: "Once rule r5 has been achieved, follow the mating pattern: control the escape square, then check, sometimes using a waiting move. When r4 applies, later construction rules are inactive."
 
-Rule r4 precedes r5. It is neutral until a known mating-pattern branch is reached after r5 has established the two-square cage. The first branch is the supplied line from `8/8/2K5/k1B5/2B5/8/8/8 w - - 20 11`: r5 plays `Bb3`; after `Ka6`, r4 prefers `Bb4`; after `Ka7`, `Kc7`; after `Ka6`, `Bc4+`; after `Ka7`, `Bc5+`; and after `Ka8`, `Bd5#`. The ordinary mate priority remains above r4.
+Rule r4 precedes r5. It is neutral until a known mating-pattern branch is reached after r5 has established the two-square cage. Every recognized r4 position must lie in a finite branch whose Black replies are forced and whose leaves are checkmate; a cycle or non-mating leaf is an implementation bug. The first branch is the supplied line from `8/8/2K5/k1B5/2B5/8/8/8 w - - 20 11`: r5 plays `Bb3`; after `Ka6`, r4 prefers `Bb4`; after `Ka7`, `Kc7`; after `Ka6`, `Bc4+`; after `Ka7`, `Bc5+`; and after `Ka8`, `Bd5#`. The ordinary mate priority remains above r4.
 
 Match each branch position and result structurally, ignoring FEN move counters, and accept every rotation and reflection. At a recognized branch position, the supplied result receives no r4 penalty and every other result receives one. At an unrecognized position, r4 is neutral so later rules decide. Future branch additions extend this same position-to-result table.
 
 At a recognized r4 position, r4 defines the complete accepted move set. Rules r5 and later are inapplicable there, so they cannot narrow an intentionally multi-move r4 result. Mate, bishop safety, and stalemate prevention remain higher priorities.
 
-The first waiting branch begins from `8/k1K5/2B5/8/1B6/8/8/8 w - - 4 3`. The bishop on `b4` may wait on another square of the `a3`–`f8` diagonal while the bishop on `c6` continues to control Black's escape square. Prefer a checking move on that diagonal when one exists, so this position uniquely selects `Bc5+`; otherwise allow the legal waiting moves to tie. Generate every legal Black reply to every preferred waiting move. On the following White turn, prefer returning the waiting bishop to `b4`; the position then rejoins the known pattern where available. This generated branch is also expanded through all rotations and reflections.
+In `8/k1K5/2B5/8/1B6/8/8/8 w - - 4 3`, r4 uniquely selects `Bb5`, forcing `Ka8` and reaching the waiting stage.
 
-A second waiting trigger is `8/2K5/2B5/k1B5/8/8/8/8 w - - 0 1`. The bishop on `c6` controls Black's escape square `b5`, so r4 prefers moving the `c5` bishop to another square of its `a3`–`f8` diagonal. This request defines only the trigger move; its resulting positions remain neutral until a continuation branch is supplied.
+A preceding trigger is `8/2K5/2B5/k1B5/8/8/8/8 w - - 0 1`. The bishop on `c6` controls Black's escape square `b5`; r4 uniquely selects `Bd6`. After forced `Ka6`, the shifted continuation uniquely selects `Bb4`, forcing `Ka7`, and then `Bb5`, forcing `Ka8`.
 
 The shifted continuation `8/2K5/k1BB4/8/8/8/8/8 w - - 2 2` is an acceptable instance of the GIF's `Bb4` pattern. Rule r4 uniquely prefers `Bb4` from this position and from every rotation or reflection of it.
 
-From `8/k1K5/2B5/8/1B6/8/8/8 w - - 0 1`, `Bb5` is a second accepted r4 branch alongside the existing `Bc5+` branch. After `Bb5 Ka8`, accept `Kc8` or any legal bishop move that keeps the bishops on the diagonals `a5`–`e1` and `a6`–`f1`, except `Ba6`. The canonical accepted set is `Kc8`, `Ba5`, `Bc3`, `Bd2`, `Be1`, `Bc4`, `Bd3`, `Be2`, and `Bf1`. The supplied continuation maps `Bc3 Ka7` to `Bd4+`, then `Ka8` to `Bc6#`. Expand the entire branch through all rotations and reflections.
+After `Bb5 Ka8`, accept `Kc8` or any legal bishop move that keeps the bishops on the diagonals `a5`–`e1` and `a6`–`f1`, except `Ba6`. The canonical waiting set is `Kc8`, `Ba5`, `Bc3`, `Bd2`, `Be1`, `Bc4`, `Bd3`, `Be2`, and `Bf1`. Every waiting move forces `Ka7`. Generate the next checking move so it forces `Ka8`, then generate every immediate checkmate. For the supplied branch this yields `Bc3 Ka7 Bd4+ Ka8 Bc6#`; the other eight waiting choices receive their corresponding forced check-and-mate continuations. Expand the entire finite branch through all rotations and reflections.
 
 Display the complete supplied line as a looping animated rule diagram, including the r5 entry move and every Black reply.
 
