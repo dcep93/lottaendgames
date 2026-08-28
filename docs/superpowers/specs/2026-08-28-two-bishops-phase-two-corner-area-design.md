@@ -76,6 +76,8 @@ A preceding trigger is `8/2K5/2B5/k1B5/8/8/8/8 w - - 0 1`. The bishop on `c6` co
 
 The shifted continuation `8/2K5/k1BB4/8/8/8/8/8 w - - 2 2` is an acceptable instance of the GIF's `Bb4` pattern. Rule r4 uniquely prefers `Bb4` from this position and from every rotation or reflection of it.
 
+The predecessor `8/2K5/k1B5/2B5/8/8/8/8 w - - 0 1` also uniquely selects `Bb4`. Black's forced `Ka7` reaches the already-registered `Bb5` continuation. Recognize this predecessor under every rotation and reflection.
+
 After `Bb5 Ka8`, accept `Kc8` or any legal bishop move that keeps the bishops on the diagonals `a5`–`e1` and `a6`–`f1`, except `Ba6`. The canonical waiting set is `Kc8`, `Ba5`, `Bc3`, `Bd2`, `Be1`, `Bc4`, `Bd3`, `Be2`, and `Bf1`. Every waiting move forces `Ka7`. Generate the next checking move so it forces `Ka8`, then generate every immediate checkmate. For the supplied branch this yields `Bc3 Ka7 Bd4+ Ka8 Bc6#`; the other eight waiting choices receive their corresponding forced check-and-mate continuations. Expand the entire finite branch through all rotations and reflections.
 
 Display the complete supplied line as a looping animated rule diagram, including the r5 entry move and every Black reply.
