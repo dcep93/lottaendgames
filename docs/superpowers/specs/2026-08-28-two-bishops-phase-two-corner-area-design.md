@@ -52,9 +52,9 @@ For each qualifying starting corner, find its two on-board knight-move squares a
 
 ## Rule r5
 
-Text: "With bishops on adjacent diagonals, prefer a waiting bishop move that keeps them adjacent without allowing Black to capture either bishop. Then prefer the Black king enclosed in a 2-square cage, then king proximity to a square in line with the bishops, closer to the edge."
+Text: "With Black already in a 2-square cage formed by adjacent bishop diagonals, prefer a waiting bishop move that keeps them adjacent without allowing Black to capture either bishop. Then prefer the Black king enclosed in a 2-square cage, then king proximity to a square in line with the bishops, closer to the edge."
 
-When the starting bishops occupy adjacent diagonals, r5 first distinguishes safe waiting moves. A candidate satisfies this priority only when it moves a bishop, the result still places the bishops on adjacent diagonals, and no legal Black reply captures either bishop. When the starting bishops are not adjacent, this priority is neutral. This board-derived gate breaks king shuffles without changing r4's finite, explicitly recognized mating branches.
+When the starting position already has Black in a 2-square cage formed by adjacent bishop diagonals, r5 first distinguishes safe waiting moves. A candidate satisfies this priority only when it moves a bishop, the result still places the bishops on adjacent diagonals, and no legal Black reply captures either bishop. Before the cage exists, this priority is neutral. This board-derived gate breaks king shuffles without changing r4's finite, explicitly recognized mating branches or overriding r9 construction.
 
 Treat squares not controlled by either bishop as a king-move graph. A candidate result has a 2-square cage when the connected component containing Black has exactly two squares and the bishops occupy orthogonally adjacent squares. Score candidates lexicographically: first prefer results with such a cage, then, among caged results, extend the bishops' line one square beyond either end, retain on-board candidates, select the candidate or candidates with minimum edge distance, and minimize White king's king-step distance to those targets. Candidates without a cage receive a cage penalty and a neutral distance score.
 
