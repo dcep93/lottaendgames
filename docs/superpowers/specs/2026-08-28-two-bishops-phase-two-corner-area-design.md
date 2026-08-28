@@ -33,6 +33,18 @@ Text: "Prefer controlling adjacent diagonals not enclosing White, leaving Black 
 
 When the starting bishops already form an enclosing Phase 2 wall, a king move inherits that wall's valid r10 score and diagonal count even if White crosses to its corner side. Bishop moves continue to be scored from their result normally. This lets the established bishop wall hand off to r11 without allowing a bishop to abandon it.
 
+## Rule r9
+
+Text: "If White's king is inside the smallest adjacent diagonals that enclose Black, walk the king toward the inside square edge-adjacent to the inner bishop and farther from Black's king. Then place the outer bishop in line with the other two pieces, then walk the king through the wall to the side opposite Black's king."
+
+Rule r9 derives its stage from the board rather than stored history:
+
+1. From the smallest adjacent diagonal wall or walls that strictly enclose Black and also contain White, find the two orthogonally adjacent squares immediately inside the inner bishop's diagonal. Use the square with the greater squared Euclidean distance from Black as the staging square, and minimize White's king-step distance to it.
+2. Once White reaches a staging square, keep the inner bishop fixed and prefer moving the outer bishop to the square immediately beyond the inner bishop, producing a straight three-square line with White's king.
+3. Once that line exists, advance White's king across the same diagonal wall toward the side opposite Black. Stop applying r9 once White is strictly beyond the outer diagonal.
+
+In `8/8/8/1k6/8/4B3/2K3B1/8 w - - 0 1`, the staging square is `e2`; the intended milestones are White king `e2`, `Be4`, `Kf3`, and `Kf4`.
+
 ## Rule r11
 
 Text: "With bishops on enclosing phase 2 diagonals, prefer king proximity to a square a knight's move from Black's corner."
@@ -55,7 +67,7 @@ Compare White-to-Black king proximity by squared Euclidean distance. Bishop move
 
 ## Rule order
 
-The policy order is: mate, bishop safety, no stalemate, r5, r8, r10, r11, r12, r15.
+The policy order is: mate, bishop safety, no stalemate, r5, r8, r9, r10, r11, r12, r15.
 
 ## Diagram
 
@@ -63,4 +75,4 @@ Display the supplied canonical position `k7/2KB4/3B4/8/8/8/8/8 w - - 2 2`. Do no
 
 ## Verification
 
-Focused tests cover all four canonical Black edge squares, both bishop diagonals, all rotations/reflections, rejection of formation deviations, r8's escape-square control and check tie-break, r10's established-wall handoff, r11's transformed corner and knight-square distance including the `Kb6` regression, r5's independent cage and king target under symmetry, r15's squared Euclidean comparison, the diagram, and exact rule order/text. Then run the exact early-exit search from UI-valid roots, orient the first valid loop so Black starts closest to `a7`, and load it at cursor 0.
+Focused tests cover all four canonical Black edge squares, both bishop diagonals, all rotations/reflections, rejection of formation deviations, r8's escape-square control and check tie-break, r9's staging, alignment, and two-step wall crossing under symmetry, r10's established-wall handoff, r11's transformed corner and knight-square distance including the `Kb6` regression, r5's independent cage and king target under symmetry, r15's squared Euclidean comparison, the diagram, and exact rule order/text. Then run the exact early-exit search from UI-valid roots, orient the first valid loop so Black starts closest to `a7`, and load it at cursor 0.
