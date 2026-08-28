@@ -60,11 +60,13 @@ The r5 cage geometry is independent of Phase 2 and is invariant under rotation a
 
 ## Rule r4
 
-Text: "Once rule r5 has been achieved, follow the mating pattern."
+Text: "Once rule r5 has been achieved, follow the mating pattern: control the escape square, then check, sometimes using a waiting move."
 
 Rule r4 precedes r5. It is neutral until a known mating-pattern branch is reached after r5 has established the two-square cage. The first branch is the supplied line from `8/8/2K5/k1B5/2B5/8/8/8 w - - 20 11`: r5 plays `Bb3`; after `Ka6`, r4 prefers `Bb4`; after `Ka7`, `Kc7`; after `Ka6`, `Bc4+`; after `Ka7`, `Bc5+`; and after `Ka8`, `Bd5#`. The ordinary mate priority remains above r4.
 
 Match each branch position and result structurally, ignoring FEN move counters, and accept every rotation and reflection. At a recognized branch position, the supplied result receives no r4 penalty and every other result receives one. At an unrecognized position, r4 is neutral so later rules decide. Future branch additions extend this same position-to-result table.
+
+The first waiting branch begins from `8/k1K5/2B5/8/1B6/8/8/8 w - - 4 3`. The bishop on `b4` may wait on any other square of the `a3`–`f8` diagonal while the bishop on `c6` continues to control Black's escape square. Generate every legal Black reply to every legal waiting move. On the following White turn, prefer returning the waiting bishop to `b4`; the position then rejoins the known pattern where available. This generated branch is also expanded through all rotations and reflections.
 
 Display the complete supplied line as a looping animated rule diagram, including the r5 entry move and every Black reply.
 
