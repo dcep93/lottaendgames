@@ -74,6 +74,8 @@ After `1. Kc8 Ka7` from `8/2BK4/k1B5/8/8/8/8/8 w - - 0 1`, the position `2K5/k1B
 
 After `Bb5 Ka8`, accept `Kc8` or any legal bishop move that keeps the bishops on the diagonals `a5`–`e1` and `a6`–`f1`, except `Ba6`. The canonical waiting set is `Kc8`, `Ba5`, `Bc3`, `Bd2`, `Be1`, `Bc4`, `Bd3`, `Be2`, and `Bf1`. Every waiting move forces `Ka7`. Generate the next checking move so it forces `Ka8`, then generate every immediate checkmate. For the supplied branch this yields `Bc3 Ka7 Bd4+ Ka8 Bc6#`; the other eight waiting choices receive their corresponding forced check-and-mate continuations. Expand the entire finite branch through all rotations and reflections.
 
+The position `8/8/8/k1B5/2B5/2K5/8/8 w - - 0 1` is another r4 waiting stage. Accept exactly `Ba7`, `Bd4`, `Be3`, `Bf2`, `Bg1`, `Bd3`, `Be2`, and `Bf1`: each preserves the adjacent walls, leaves both bishops safe, and forces `Ka4`. Continue with `Bb6 Ka3 Bb5 Ka2 Kc2`. Against `Ka3`, play `Bc5+ Ka2 Bc4+ Ka1 Bd4#`; against `Ka1`, play `Bc5 Ka2 Bc4+ Ka1 Bd4#`. Register every position under all rotations and reflections.
+
 Display the complete supplied line as a looping animated rule diagram, including the r5 entry move and every Black reply.
 
 ## Rule r15
