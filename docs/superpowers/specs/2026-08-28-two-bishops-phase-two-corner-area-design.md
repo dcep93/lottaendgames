@@ -70,6 +70,8 @@ The first waiting branch begins from `8/k1K5/2B5/8/1B6/8/8/8 w - - 4 3`. The bis
 
 A second waiting trigger is `8/2K5/2B5/k1B5/8/8/8/8 w - - 0 1`. The bishop on `c6` controls Black's escape square `b5`, so r4 prefers moving the `c5` bishop to another square of its `a3`–`f8` diagonal. This request defines only the trigger move; its resulting positions remain neutral until a continuation branch is supplied.
 
+The shifted continuation `8/2K5/k1BB4/8/8/8/8/8 w - - 2 2` is an acceptable instance of the GIF's `Bb4` pattern. Rule r4 uniquely prefers `Bb4` from this position and from every rotation or reflection of it.
+
 Display the complete supplied line as a looping animated rule diagram, including the r5 entry move and every Black reply.
 
 ## Rule r15
