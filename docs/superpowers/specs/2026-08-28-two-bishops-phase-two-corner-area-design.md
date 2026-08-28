@@ -66,7 +66,7 @@ Rule r4 precedes r5. It is neutral until a known mating-pattern branch is reache
 
 Match each branch position and result structurally, ignoring FEN move counters, and accept every rotation and reflection. At a recognized branch position, the supplied result receives no r4 penalty and every other result receives one. At an unrecognized position, r4 is neutral so later rules decide. Future branch additions extend this same position-to-result table.
 
-The first waiting branch begins from `8/k1K5/2B5/8/1B6/8/8/8 w - - 4 3`. The bishop on `b4` may wait on any other square of the `a3`–`f8` diagonal while the bishop on `c6` continues to control Black's escape square. Generate every legal Black reply to every legal waiting move. On the following White turn, prefer returning the waiting bishop to `b4`; the position then rejoins the known pattern where available. This generated branch is also expanded through all rotations and reflections.
+The first waiting branch begins from `8/k1K5/2B5/8/1B6/8/8/8 w - - 4 3`. The bishop on `b4` may wait on another square of the `a3`–`f8` diagonal while the bishop on `c6` continues to control Black's escape square. Prefer a checking move on that diagonal when one exists, so this position uniquely selects `Bc5+`; otherwise allow the legal waiting moves to tie. Generate every legal Black reply to every preferred waiting move. On the following White turn, prefer returning the waiting bishop to `b4`; the position then rejoins the known pattern where available. This generated branch is also expanded through all rotations and reflections.
 
 Display the complete supplied line as a looping animated rule diagram, including the r5 entry move and every Black reply.
 
