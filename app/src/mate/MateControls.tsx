@@ -6,7 +6,7 @@ export type MateControlsProps = {
   readonly canUndo: boolean
   readonly canRedo: boolean
   readonly canPlayBest: boolean
-  readonly startedAtMs: number
+  readonly startedAtMs?: number
   readonly finishedAtMs?: number
   readonly showTimer: boolean
   readonly outcome?: MateTerminalOutcome
@@ -168,14 +168,19 @@ const MateElapsedTimer = React.memo(function MateElapsedTimer({
   readonly finishedAtMs?: number
   readonly now: () => number
   readonly showTimer: boolean
-  readonly startedAtMs: number
+  readonly startedAtMs?: number
 }) {
   const [clockNow, setClockNow] = React.useState(
-    finishedAtMs ?? startedAtMs,
+    finishedAtMs ?? startedAtMs ?? 0,
   )
 
   React.useEffect(() => {
     if (!showTimer) return
+
+    if (startedAtMs === undefined) {
+      setClockNow(0)
+      return
+    }
 
     if (finishedAtMs !== undefined) {
       setClockNow(finishedAtMs)
@@ -187,9 +192,8 @@ const MateElapsedTimer = React.memo(function MateElapsedTimer({
     return () => clearInterval(timer)
   }, [finishedAtMs, now, showTimer, startedAtMs])
 
-  const elapsedMs = Math.max(
-    0,
-    (finishedAtMs ?? clockNow) - startedAtMs,
-  )
+  const elapsedMs = startedAtMs === undefined
+    ? 0
+    : Math.max(0, (finishedAtMs ?? clockNow) - startedAtMs)
   return formatMateElapsed(elapsedMs)
 })

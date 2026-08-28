@@ -1,17 +1,14 @@
 import type {
   MateVerificationAdapter,
   MateVerificationBranch,
+  MateVerificationExpansion,
   MateVerificationFailure,
   MateVerificationOptions,
+  MateNodeProof,
   MateVerificationResult,
   MateVerificationRoot,
   MateVerificationStats,
 } from './types.mts'
-
-type NodeProof = {
-  readonly maximumMatePlies: number
-  readonly safeIncomingHalfmoveClock: number
-}
 
 type SearchPath<State> = {
   readonly moves: string[]
@@ -41,7 +38,7 @@ export function verifyMateRoots<State>(
     uniquePositions: 0,
     whiteChoices: 0,
   }
-  const proofs = new Map<string, NodeProof>()
+  const proofs = new Map<string, MateNodeProof>()
   const activeAtPly = new Map<string, number>()
   const progressEvery = Math.max(1, options.progressEvery ?? 10_000)
   let currentRoot: MateVerificationRoot<State> | undefined
@@ -52,12 +49,20 @@ export function verifyMateRoots<State>(
     }
   }
 
+  const getProof = (key: string): MateNodeProof | undefined => {
+    const memory = proofs.get(key)
+    if (memory !== undefined) return memory
+    const persisted = options.proofCache?.get(key)
+    if (persisted !== undefined) proofs.set(key, persisted)
+    return persisted
+  }
+
   const prove = (
     state: State,
     path: SearchPath<State>,
-  ): NodeProof | ProofFailure => {
+  ): MateNodeProof | ProofFailure => {
     const key = adapter.key(state)
-    const completed = proofs.get(key)
+    const completed = getProof(key)
     if (completed !== undefined) return completed
 
     const repeatedAt = activeAtPly.get(key)
@@ -86,6 +91,10 @@ export function verifyMateRoots<State>(
     maybeReportProgress()
 
     const expansion = adapter.expand(state)
+    options.onExpansion?.(
+      key,
+      expansion as MateVerificationExpansion<unknown>,
+    )
     stats.whiteChoices += expansion.whiteChoices
     stats.blackReplies += expansion.blackReplies
     if (expansion.branches.length === 0) {
@@ -143,6 +152,7 @@ export function verifyMateRoots<State>(
     activeAtPly.delete(key)
     const proof = { maximumMatePlies, safeIncomingHalfmoveClock }
     proofs.set(key, proof)
+    options.proofCache?.set(key, proof)
     return proof
   }
 
@@ -169,7 +179,7 @@ export function verifyMateRoots<State>(
         }
       }
       if (branch.kind !== 'continue') continue
-      const childProof = proofs.get(adapter.key(branch.next))
+      const childProof = getProof(adapter.key(branch.next))
       if (
         childProof !== undefined &&
         clock > childProof.safeIncomingHalfmoveClock
@@ -272,7 +282,7 @@ function safeClockForBranch<State>(
   return safeLimit
 }
 
-function isProofFailure(value: NodeProof | ProofFailure): value is ProofFailure {
+function isProofFailure(value: MateNodeProof | ProofFailure): value is ProofFailure {
   return 'kind' in value
 }
 

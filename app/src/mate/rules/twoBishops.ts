@@ -14,7 +14,10 @@ import {
   transformSquare,
   withFenTurn,
 } from '../chess'
-import { compareScoresByRules, selectIdealMoves } from './selection'
+import {
+  compareScoresByRules,
+  selectCandidatesByRules,
+} from './selection'
 import {
   applyUniversalBlackPriorities,
   BLACK_CAPTURE_PRIORITY,
@@ -42,58 +45,57 @@ export type TwoBishopsWhiteMoveScore = {
   readonly bishopSafetyPenalty: number
   readonly stalematePenalty: number
   readonly ruleAPenalty: number
-  readonly ruleC01Applies: boolean
-  readonly ruleC01Penalty: number
+  readonly ruleHApplies: boolean
+  readonly ruleHPenalty: number
+  readonly ruleBApplies: boolean
+  readonly ruleBPenalty: number
+  readonly ruleCApplies: boolean
+  readonly ruleCPenalty: number
+  readonly ruleDApplies: boolean
+  readonly ruleDPenalty: number
   readonly ruleEApplies: boolean
   readonly ruleEPenalty: number
-  readonly ruleB1Applies: boolean
-  readonly ruleB1Penalty: number
-  readonly ruleB2Applies: boolean
-  readonly ruleB2Penalty: number
-  readonly ruleB3Applies: boolean
-  readonly ruleB3Penalty: number
-  readonly ruleB5Applies: boolean
-  readonly ruleB5Penalty: number
-  readonly ruleB6Applies: boolean
-  readonly ruleB6Penalty: number
-  readonly ruleC03Applies: boolean
-  readonly ruleC03Penalty: number
-  readonly ruleC05Applies: boolean
-  readonly ruleC05Penalty: number
-  readonly ruleC07Applies: boolean
-  readonly ruleC07Penalty: number
-  readonly ruleC07DoubleRetreatPenalty: number
-  readonly ruleC075Applies: boolean
-  readonly ruleC075Penalty: number
-  readonly ruleC08Applies: boolean
-  readonly ruleC08Penalty: number
-  readonly ruleC085Applies: boolean
-  readonly ruleC085Penalty: number
-  readonly ruleC09Applies: boolean
-  readonly ruleC09Penalty: number
-  readonly ruleC09RetreatPenalty: number
-  readonly ruleC10Applies: boolean
-  readonly ruleC10Penalty: number
-  readonly ruleC12Applies: boolean
-  readonly ruleC12Penalty: number
-  readonly ruleC14Applies: boolean
-  readonly ruleC14Penalty: number
-  readonly ruleC15Applies: boolean
-  readonly ruleC15Middle16Distance: number
-  readonly ruleC15BlackKingDistance: number
-  readonly ruleC20Applies: boolean
-  readonly ruleC20Penalty: number
-  readonly ruleF4Penalty: number
-  readonly ruleF5Applies: boolean
-  readonly ruleF5DiagonalLengthPenalty: number
-  readonly ruleF5CenterPenalty: number
-  readonly ruleG1Applies: boolean
-  readonly ruleG1Penalty: number
-  readonly ruleG5Applies: boolean
-  readonly ruleG5NearerDistance: number
-  readonly ruleG5FartherDistance: number
-  readonly ruleG2CenterDistance: number
-  readonly ruleG2BlackKingDistance: number
+  readonly ruleFApplies: boolean
+  readonly ruleFPenalty: number
+  readonly ruleGApplies: boolean
+  readonly ruleGPenalty: number
+  readonly ruleIApplies: boolean
+  readonly ruleIPenalty: number
+  readonly ruleJApplies: boolean
+  readonly ruleJPenalty: number
+  readonly ruleKApplies: boolean
+  readonly ruleKPenalty: number
+  readonly ruleKDoubleRetreatPenalty: number
+  readonly ruleLApplies: boolean
+  readonly ruleLPenalty: number
+  readonly ruleMApplies: boolean
+  readonly ruleMPenalty: number
+  readonly ruleNApplies: boolean
+  readonly ruleNPenalty: number
+  readonly ruleNRetreatPenalty: number
+  readonly ruleOApplies: boolean
+  readonly ruleOPenalty: number
+  readonly rulePApplies: boolean
+  readonly rulePPenalty: number
+  readonly ruleQApplies: boolean
+  readonly ruleQPenalty: number
+  readonly ruleRApplies: boolean
+  readonly ruleRMiddle16Distance: number
+  readonly ruleRBlackKingDistance: number
+  readonly ruleSApplies: boolean
+  readonly ruleSPenalty: number
+  readonly ruleTPenalty: number
+  readonly ruleUApplies: boolean
+  readonly ruleUDiagonalLengthPenalty: number
+  readonly ruleUCenterPenalty: number
+  readonly ruleVApplies: boolean
+  readonly ruleVPenalty: number
+  readonly ruleXPenalty: number
+  readonly ruleYApplies: boolean
+  readonly ruleYNearerDistance: number
+  readonly ruleYFartherDistance: number
+  readonly ruleWCenterDistance: number
+  readonly ruleWBlackKingDistance: number
 }
 
 export type TwoBishopsBlackMoveScore = {
@@ -107,43 +109,43 @@ const WHITE_INTRO =
 const BLACK_INTRO =
   'Black uses its own priorities to put up the strongest resistance. Black is not trying to help the mate; it looks for the most stubborn legal reply.'
 
-const RULE_B1_NOTE_BOARD = {
-  id: 'bishop-rule-b1', title: 'rule b1',
-  caption: 'With the Phase 2 cage aimed at h1, White Kh6 and Black Kg4 or Kh4, play Bf6.',
-  pieces: [{ square: 'h6', piece: 'K' }, { square: 'g4', piece: 'k' }, { square: 'e5', piece: 'B' }, { square: 'b1', piece: 'B' }],
-  highlights: [{ square: 'h1', kind: 'pink' }, { square: 'f6', kind: 'key' }],
-  arrows: [{ from: 'e5', to: 'f6' }],
-} as const
-const RULE_B2_NOTE_BOARD = {
-  id: 'bishop-rule-b2', title: 'rule b2',
+const RULE_C_NOTE_BOARD = {
+  id: 'bishop-rule-c', title: 'rule c',
   caption: 'With the Phase 2 cage aimed at h1, White Kf5, Black Kh4, one bishop on e5, and the other anywhere from a2 through g8, play Kf4.',
   pieces: [{ square: 'f5', piece: 'K' }, { square: 'h4', piece: 'k' }, { square: 'd5', piece: 'B' }, { square: 'e5', piece: 'B' }],
   highlights: [{ square: 'h1', kind: 'pink' }, { square: 'f4', kind: 'key' }],
   arrows: [{ from: 'f5', to: 'f4' }],
 } as const
-const RULE_B3_NOTE_BOARD = {
-  id: 'bishop-rule-b3', title: 'rule b3',
+const RULE_D_NOTE_BOARD = {
+  id: 'bishop-rule-d', title: 'rule d',
   caption: 'With White Kf4, Black Kd7, and bishops on e4 and e5, play Bd5.',
   pieces: [{ square: 'f4', piece: 'K' }, { square: 'd7', piece: 'k' }, { square: 'e4', piece: 'B' }, { square: 'e5', piece: 'B' }],
   highlights: [{ square: 'd5', kind: 'key' }],
   arrows: [{ from: 'e4', to: 'd5' }],
 } as const
-const RULE_B5_NOTE_BOARD = {
-  id: 'bishop-rule-b5', title: 'rule b5',
+const RULE_E_NOTE_BOARD = {
+  id: 'bishop-rule-e', title: 'rule e',
   caption: 'With White Kd4, Black Kc2, and bishops on c3 and d5, play Ba2.',
   pieces: [{ square: 'd4', piece: 'K' }, { square: 'c2', piece: 'k' }, { square: 'c3', piece: 'B' }, { square: 'd5', piece: 'B' }],
   highlights: [{ square: 'a2', kind: 'key' }],
   arrows: [{ from: 'd5', to: 'a2' }],
 } as const
-const RULE_B6_NOTE_BOARD = {
-  id: 'bishop-rule-b6', title: 'rule b6',
+const RULE_F_NOTE_BOARD = {
+  id: 'bishop-rule-f', title: 'rule f',
   caption: 'With White Kd5, Black Kf4, and bishops on d4 and e4, play Bc5.',
   pieces: [{ square: 'd5', piece: 'K' }, { square: 'f4', piece: 'k' }, { square: 'd4', piece: 'B' }, { square: 'e4', piece: 'B' }],
   highlights: [{ square: 'c5', kind: 'key' }],
   arrows: [{ from: 'd4', to: 'c5' }],
 } as const
-const RULE_C03_NOTE_BOARD = {
-  id: 'bishop-rule-c03', title: 'rule c03',
+const RULE_G_NOTE_BOARD = {
+  id: 'bishop-rule-g', title: 'rule g',
+  caption: 'With White Kh5, Black Kf5, and bishops on d4 and d5, play Bc3.',
+  pieces: [{ square: 'h5', piece: 'K' }, { square: 'f5', piece: 'k' }, { square: 'd4', piece: 'B' }, { square: 'd5', piece: 'B' }],
+  highlights: [{ square: 'c3', kind: 'key' }],
+  arrows: [{ from: 'd4', to: 'c3' }],
+} as const
+const RULE_I_NOTE_BOARD = {
+  id: 'bishop-rule-i', title: 'rule i',
   caption: 'The retreat square is adjacent to Black in the direction away from its caged corner. Here h3 is the retreat square; White controls it and the kings are in opposition, so White checks.',
   pieces: [{ square: 'f2', piece: 'K' }, { square: 'h2', piece: 'k' }, { square: 'e6', piece: 'B' }, { square: 'h8', piece: 'B' }],
   highlights: [{ square: 'h1', kind: 'pink' }, { square: 'h3', kind: 'key' }],
@@ -159,7 +161,7 @@ const twoBishopsHelp: RuleHelp = {
     "Phase 2: Place one bishop on a long diagonal and the other on an adjacent diagonal. Both kings must be on the long diagonal's wider side. White's king must be no further by Euclidean distance to the middle square nearest the target corner: d4 for a1, d5 for a8, e4 for h1, or e5 for h8.",
     'Retreat square: the square adjacent to Black in the direction opposite its caged corner.',
   ],
-  noteBoards: [RULE_B1_NOTE_BOARD, RULE_B2_NOTE_BOARD, RULE_B3_NOTE_BOARD, RULE_B5_NOTE_BOARD, RULE_B6_NOTE_BOARD, RULE_C03_NOTE_BOARD],
+  noteBoards: [RULE_C_NOTE_BOARD, RULE_D_NOTE_BOARD, RULE_E_NOTE_BOARD, RULE_F_NOTE_BOARD, RULE_G_NOTE_BOARD, RULE_I_NOTE_BOARD],
 }
 
 const BOARD_CORNERS: readonly Square[] = ['a1', 'a8', 'h1', 'h8']
@@ -209,6 +211,23 @@ function bishopsBelowLegalMoveThreshold(
   return bishops.filter(
     (bishop) => whiteToMove.moves({ square: bishop }).length < threshold,
   ).length
+}
+
+function hasAdjacentKingBishopKingLine(
+  blackKing: Square,
+  bishop: Square,
+  whiteKing: Square,
+): boolean {
+  const black = squareCoordinates(blackKing)
+  const middle = squareCoordinates(bishop)
+  const white = squareCoordinates(whiteKing)
+  const fileStep = middle.file - black.file
+  const rankStep = middle.rank - black.rank
+  return (
+    Math.max(Math.abs(fileStep), Math.abs(rankStep)) === 1 &&
+    white.file - middle.file === fileStep &&
+    white.rank - middle.rank === rankStep
+  )
 }
 
 function longDiagonalAxis(square: Square): FlankDiagonalAxis | undefined {
@@ -274,152 +293,144 @@ const twoBishopsWhiteRuleCatalog: readonly OrderedRule<TwoBishopsWhiteMoveScore>
     compare: (first, second) => first.ruleAPenalty - second.ruleAPenalty,
   },
   {
-    id: 'rule e',
-    shortLabel: 'rule e',
+    id: 'rule b',
+    shortLabel: 'rule b',
     helpText:
       'Prefer moves after which every Black reply is Phase 2 with a consistent target corner.',
+    compare: (first, second) => first.ruleBPenalty - second.ruleBPenalty,
+  },
+  {
+    id: 'rule c',
+    shortLabel: 'rule c',
+    helpText: 'Play the b2 move.',
+    applies: (score) => score.ruleCApplies,
+    compare: (first, second) => first.ruleCPenalty - second.ruleCPenalty,
+  },
+  {
+    id: 'rule d',
+    shortLabel: 'rule d',
+    helpText: 'Play the b3 move.',
+    applies: (score) => score.ruleDApplies,
+    compare: (first, second) => first.ruleDPenalty - second.ruleDPenalty,
+  },
+  {
+    id: 'rule e',
+    shortLabel: 'rule e',
+    helpText: 'Play the b5 move.',
+    applies: (score) => score.ruleEApplies,
     compare: (first, second) => first.ruleEPenalty - second.ruleEPenalty,
   },
   {
-    id: 'rule b1',
-    shortLabel: 'rule b1',
-    helpText: 'Play the b1 move.',
-    applies: (score) => score.ruleB1Applies,
-    compare: (first, second) => first.ruleB1Penalty - second.ruleB1Penalty,
-  },
-  {
-    id: 'rule b2',
-    shortLabel: 'rule b2',
-    helpText: 'Play the b2 move.',
-    applies: (score) => score.ruleB2Applies,
-    compare: (first, second) => first.ruleB2Penalty - second.ruleB2Penalty,
-  },
-  {
-    id: 'rule b3',
-    shortLabel: 'rule b3',
-    helpText: 'Play the b3 move.',
-    applies: (score) => score.ruleB3Applies,
-    compare: (first, second) => first.ruleB3Penalty - second.ruleB3Penalty,
-  },
-  {
-    id: 'rule b5',
-    shortLabel: 'rule b5',
-    helpText: 'Play the b5 move.',
-    applies: (score) => score.ruleB5Applies,
-    compare: (first, second) => first.ruleB5Penalty - second.ruleB5Penalty,
-  },
-  {
-    id: 'rule b6',
-    shortLabel: 'rule b6',
+    id: 'rule f',
+    shortLabel: 'rule f',
     helpText: 'Play the b6 move.',
-    applies: (score) => score.ruleB6Applies,
-    compare: (first, second) => first.ruleB6Penalty - second.ruleB6Penalty,
+    applies: (score) => score.ruleFApplies,
+    compare: (first, second) => first.ruleFPenalty - second.ruleFPenalty,
   },
   {
-    id: 'rule c01',
-    shortLabel: 'rule c01',
+    id: 'rule g',
+    shortLabel: 'rule g',
+    helpText: 'Play the b7 move.',
+    applies: (score) => score.ruleGApplies,
+    compare: (first, second) => first.ruleGPenalty - second.ruleGPenalty,
+  },
+  {
+    id: 'rule h',
+    shortLabel: 'rule h',
     helpText:
       "Phase 2: Prefer the king off the long diagonal wall. The target square's long diagonal is not the wall.",
-    applies: (score) => score.ruleC01Applies,
-    compare: (first, second) => first.ruleC01Penalty - second.ruleC01Penalty,
+    applies: (score) => score.ruleHApplies,
+    compare: (first, second) => first.ruleHPenalty - second.ruleHPenalty,
   },
   {
-    id: 'rule c03',
-    shortLabel: 'rule c03',
+    id: 'rule i',
+    shortLabel: 'rule i',
     helpText:
       'Phase 2: When the retreat square is controlled and Black is on track or one behind track, check.',
-    applies: (score) => score.ruleC03Applies,
-    compare: (first, second) => first.ruleC03Penalty - second.ruleC03Penalty,
+    applies: (score) => score.ruleIApplies,
+    compare: (first, second) => first.ruleIPenalty - second.ruleIPenalty,
   },
   {
-    id: 'rule c05',
-    shortLabel: 'rule c05',
+    id: 'rule j',
+    shortLabel: 'rule j',
     helpText:
       'Phase 2: With the kings in opposition, prefer controlling the retreat square.',
-    applies: (score) => score.ruleC05Applies,
-    compare: (first, second) => first.ruleC05Penalty - second.ruleC05Penalty,
+    applies: (score) => score.ruleJApplies,
+    compare: (first, second) => first.ruleJPenalty - second.ruleJPenalty,
   },
   {
-    id: 'rule c07',
-    shortLabel: 'rule c07',
+    id: 'rule k',
+    shortLabel: 'rule k',
     helpText:
       "Phase 2: With the Black king in the corner, prefer the White king on a square a knight's move from that corner, then control of the double retreat square.",
-    applies: (score) => score.ruleC07Applies,
+    applies: (score) => score.ruleKApplies,
     subpriorities: [
       {
         compare: (first, second) =>
-          first.ruleC07Penalty - second.ruleC07Penalty,
+          first.ruleKPenalty - second.ruleKPenalty,
       },
       {
         compare: (first, second) =>
-          first.ruleC07DoubleRetreatPenalty -
-          second.ruleC07DoubleRetreatPenalty,
+          first.ruleKDoubleRetreatPenalty -
+          second.ruleKDoubleRetreatPenalty,
       },
     ],
   },
   {
-    id: 'rule c07.5',
-    shortLabel: 'rule c07.5',
+    id: 'rule l',
+    shortLabel: 'rule l',
     helpText:
       'Phase 2: With Black one behind track and 4 squares from the target corner, check.',
-    applies: (score) => score.ruleC075Applies,
-    compare: (first, second) => first.ruleC075Penalty - second.ruleC075Penalty,
+    applies: (score) => score.ruleLApplies,
+    compare: (first, second) => first.ruleLPenalty - second.ruleLPenalty,
   },
   {
-    id: 'rule c08',
-    shortLabel: 'rule c08',
-    helpText:
-      'Phase 2: With Black even on track and the double retreat square controlled, prefer king opposition.',
-    applies: (score) => score.ruleC08Applies,
-    compare: (first, second) => first.ruleC08Penalty - second.ruleC08Penalty,
-  },
-  {
-    id: 'rule c08.5',
-    shortLabel: 'rule c08.5',
+    id: 'rule m',
+    shortLabel: 'rule m',
     helpText:
       'Phase 2: With Black one ahead of track and control of the double retreat square, take opposition.',
-    applies: (score) => score.ruleC085Applies,
-    compare: (first, second) => first.ruleC085Penalty - second.ruleC085Penalty,
+    applies: (score) => score.ruleMApplies,
+    compare: (first, second) => first.ruleMPenalty - second.ruleMPenalty,
   },
   {
-    id: 'rule c09',
-    shortLabel: 'rule c09',
+    id: 'rule n',
+    shortLabel: 'rule n',
     helpText:
       'Phase 2: With Black ahead 1 on track and no control of retreat or double retreat squares, prefer controlling the flank square, then the retreat square.',
-    applies: (score) => score.ruleC09Applies,
+    applies: (score) => score.ruleNApplies,
     subpriorities: [
       {
         compare: (first, second) =>
-          first.ruleC09Penalty - second.ruleC09Penalty,
+          first.ruleNPenalty - second.ruleNPenalty,
       },
       {
         compare: (first, second) =>
-          first.ruleC09RetreatPenalty - second.ruleC09RetreatPenalty,
+          first.ruleNRetreatPenalty - second.ruleNRetreatPenalty,
       },
     ],
   },
   {
-    id: 'rule c10',
-    shortLabel: 'rule c10',
+    id: 'rule o',
+    shortLabel: 'rule o',
     helpText:
       'Phase 2: If the retreat square is uncontrolled, take king opposition.',
-    applies: (score) => score.ruleC10Applies,
-    compare: (first, second) => first.ruleC10Penalty - second.ruleC10Penalty,
+    applies: (score) => score.ruleOApplies,
+    compare: (first, second) => first.ruleOPenalty - second.ruleOPenalty,
   },
   {
-    id: 'rule c12',
-    shortLabel: 'rule c12',
+    id: 'rule p',
+    shortLabel: 'rule p',
     helpText:
       'Phase 2: If Black is 1 behind or even on track, prefer control of the retreat square.',
     subpriorities: [
       {
         rank: (scores) => {
           const hasControlledRetreat = scores.some(
-            (score) => score.ruleC12Applies && score.ruleC12Penalty === 0,
+            (score) => score.rulePApplies && score.rulePPenalty === 0,
           )
           return scores.map((score) =>
             hasControlledRetreat &&
-            (!score.ruleC12Applies || score.ruleC12Penalty !== 0)
+            (!score.rulePApplies || score.rulePPenalty !== 0)
               ? 1
               : 0,
           )
@@ -428,110 +439,116 @@ const twoBishopsWhiteRuleCatalog: readonly OrderedRule<TwoBishopsWhiteMoveScore>
     ],
   },
   {
-    id: 'rule c14',
-    shortLabel: 'rule c14',
+    id: 'rule q',
+    shortLabel: 'rule q',
     helpText:
       'Phase 2: If the retreat square is controlled, prefer opposition.',
-    applies: (score) => score.ruleC14Applies,
-    compare: (first, second) => first.ruleC14Penalty - second.ruleC14Penalty,
+    applies: (score) => score.ruleQApplies,
+    compare: (first, second) => first.ruleQPenalty - second.ruleQPenalty,
   },
   {
-    id: 'rule c15',
-    shortLabel: 'rule c15',
+    id: 'rule r',
+    shortLabel: 'rule r',
     helpText:
       "Phase 2: Prefer proximity to the middle 16 squares, then to Black's king.",
-    applies: (score) => score.ruleC15Applies,
+    applies: (score) => score.ruleRApplies,
     subpriorities: [
       {
         compare: (first, second) =>
-          first.ruleC15Middle16Distance - second.ruleC15Middle16Distance,
+          first.ruleRMiddle16Distance - second.ruleRMiddle16Distance,
       },
       {
         compare: (first, second) =>
-          first.ruleC15BlackKingDistance - second.ruleC15BlackKingDistance,
+          first.ruleRBlackKingDistance - second.ruleRBlackKingDistance,
       },
     ],
   },
   {
-    id: 'rule c20',
-    shortLabel: 'rule c20',
+    id: 'rule s',
+    shortLabel: 'rule s',
     helpText:
       'Phase 2: Force Black to be 1 behind, even, or 1 ahead of track.',
-    applies: (score) => score.ruleC20Applies,
-    compare: (first, second) => first.ruleC20Penalty - second.ruleC20Penalty,
+    applies: (score) => score.ruleSApplies,
+    compare: (first, second) => first.ruleSPenalty - second.ruleSPenalty,
   },
   {
-    id: 'rule f4',
-    shortLabel: 'rule f4',
-    helpText:
-      'Prefer unscreening bishops so that each has at least 3 legal moves.',
-    compare: (first, second) => first.ruleF4Penalty - second.ruleF4Penalty,
+    id: 'rule t',
+    shortLabel: 'rule t',
+    helpText: 'Prefer bishops to have at least 4 legal moves.',
+    compare: (first, second) => first.ruleTPenalty - second.ruleTPenalty,
   },
   {
-    id: 'rule f5',
-    shortLabel: 'rule f5',
+    id: 'rule u',
+    shortLabel: 'rule u',
     helpText:
       'Phase 1: Prefer more bishops on longer diagonals, then in the center.',
-    applies: (score) => score.ruleF5Applies,
+    applies: (score) => score.ruleUApplies,
     subpriorities: [
       {
         compare: (first, second) =>
-          first.ruleF5DiagonalLengthPenalty -
-          second.ruleF5DiagonalLengthPenalty,
+          first.ruleUDiagonalLengthPenalty -
+          second.ruleUDiagonalLengthPenalty,
       },
       {
         compare: (first, second) =>
-          first.ruleF5CenterPenalty - second.ruleF5CenterPenalty,
+          first.ruleUCenterPenalty - second.ruleUCenterPenalty,
       },
     ],
   },
   {
-    id: 'rule g1',
-    shortLabel: 'rule g1',
+    id: 'rule v',
+    shortLabel: 'rule v',
     helpText:
       'With two central bishops, prefer the king in line with them.',
-    applies: (score) => score.ruleG1Applies,
-    compare: (first, second) => first.ruleG1Penalty - second.ruleG1Penalty,
+    applies: (score) => score.ruleVApplies,
+    compare: (first, second) => first.ruleVPenalty - second.ruleVPenalty,
   },
   {
-    id: 'rule g2',
-    shortLabel: 'rule g2',
+    id: 'rule w',
+    shortLabel: 'rule w',
     helpText:
       "Prefer king proximity to a center square not occupied by a bishop, then to Black's king.",
     subpriorities: [
       {
         compare: (first, second) =>
-          first.ruleG2CenterDistance - second.ruleG2CenterDistance,
+          first.ruleWCenterDistance - second.ruleWCenterDistance,
       },
       {
         compare: (first, second) =>
-          first.ruleG2BlackKingDistance - second.ruleG2BlackKingDistance,
+          first.ruleWBlackKingDistance - second.ruleWBlackKingDistance,
       },
     ],
   },
   {
-    id: 'rule g5',
-    shortLabel: 'rule g5',
+    id: 'rule x',
+    shortLabel: 'rule x',
+    helpText:
+      "Prefer Black's king, a bishop, and White's king all adjacent in line.",
+    compare: (first, second) => first.ruleXPenalty - second.ruleXPenalty,
+  },
+  {
+    id: 'rule y',
+    shortLabel: 'rule y',
     helpText:
       "Maximize the bishops' minimum Euclidean distance from Black's king, then their maximum Euclidean distance.",
-    applies: (score) => score.ruleG5Applies,
+    applies: (score) => score.ruleYApplies,
     subpriorities: [
       {
         compare: (first, second) =>
-          second.ruleG5NearerDistance - first.ruleG5NearerDistance,
+          second.ruleYNearerDistance - first.ruleYNearerDistance,
       },
       {
         compare: (first, second) =>
-          second.ruleG5FartherDistance - first.ruleG5FartherDistance,
+          second.ruleYFartherDistance - first.ruleYFartherDistance,
       },
     ],
   },
 ]
 
 const ACTIVE_TWO_BISHOPS_WHITE_RULE_IDS = [
-  'mate', 'bishops safe', 'no stalemate', 'rule a', 'rule e', 'rule b1', 'rule b2', 'rule b3', 'rule b5', 'rule b6',
-  'rule c01', 'rule c03', 'rule c05', 'rule c07', 'rule c07.5', 'rule c08', 'rule c08.5',
-  'rule c09', 'rule c10', 'rule c12', 'rule c14', 'rule c15', 'rule c20', 'rule f4', 'rule f5', 'rule g1', 'rule g2', 'rule g5',
+  'mate', 'bishops safe', 'no stalemate', 'rule a', 'rule b', 'rule c', 'rule d', 'rule e', 'rule f', 'rule g',
+  'rule h', 'rule i', 'rule j', 'rule k', 'rule l', 'rule m',
+  'rule n', 'rule o', 'rule p', 'rule q', 'rule r', 'rule s', 'rule t', 'rule u', 'rule v', 'rule w', 'rule x', 'rule y',
 ] as const
 
 export const twoBishopsWhiteRules = ACTIVE_TWO_BISHOPS_WHITE_RULE_IDS.map((id) => {
@@ -548,21 +565,22 @@ function neutralTwoBishopsWhiteMoveScore(overrides: Partial<TwoBishopsWhiteMoveS
   return {
     isPhaseTwoPosition: false, matePenalty: 1, bishopSafetyPenalty: 0, stalematePenalty: 0,
     ruleAPenalty: 0,
-    ruleC01Applies: false, ruleC01Penalty: 0,
-    ruleEApplies: false, ruleEPenalty: 0,
-    ruleB1Applies: false, ruleB1Penalty: 0, ruleB2Applies: false, ruleB2Penalty: 0, ruleB3Applies: false, ruleB3Penalty: 0, ruleB5Applies: false, ruleB5Penalty: 0, ruleB6Applies: false, ruleB6Penalty: 0,
-    ruleC03Applies: false, ruleC03Penalty: 0, ruleC05Applies: false, ruleC05Penalty: 0,
-    ruleC07Applies: false, ruleC07Penalty: 0, ruleC07DoubleRetreatPenalty: 0,
-    ruleC075Applies: false, ruleC075Penalty: 0, ruleC08Applies: false, ruleC08Penalty: 0,
-    ruleC085Applies: false, ruleC085Penalty: 0, ruleC09Applies: false, ruleC09Penalty: 0, ruleC09RetreatPenalty: 0,
-    ruleC10Applies: false, ruleC10Penalty: 0,
-    ruleC12Applies: false, ruleC12Penalty: 0, ruleC14Applies: false, ruleC14Penalty: 0, ruleC15Applies: false, ruleC15Middle16Distance: 0, ruleC15BlackKingDistance: 0,
-    ruleC20Applies: false, ruleC20Penalty: 0,
-    ruleF4Penalty: 0,
-    ruleF5Applies: false, ruleF5DiagonalLengthPenalty: 0, ruleF5CenterPenalty: 0,
-    ruleG1Applies: false, ruleG1Penalty: 0,
-    ruleG5Applies: false, ruleG5NearerDistance: 0, ruleG5FartherDistance: 0,
-    ruleG2CenterDistance: 0, ruleG2BlackKingDistance: 0,
+    ruleHApplies: false, ruleHPenalty: 0,
+    ruleBApplies: false, ruleBPenalty: 0,
+    ruleCApplies: false, ruleCPenalty: 0, ruleDApplies: false, ruleDPenalty: 0, ruleEApplies: false, ruleEPenalty: 0, ruleFApplies: false, ruleFPenalty: 0, ruleGApplies: false, ruleGPenalty: 0,
+    ruleIApplies: false, ruleIPenalty: 0, ruleJApplies: false, ruleJPenalty: 0,
+    ruleKApplies: false, ruleKPenalty: 0, ruleKDoubleRetreatPenalty: 0,
+    ruleLApplies: false, ruleLPenalty: 0,
+    ruleMApplies: false, ruleMPenalty: 0, ruleNApplies: false, ruleNPenalty: 0, ruleNRetreatPenalty: 0,
+    ruleOApplies: false, ruleOPenalty: 0,
+    rulePApplies: false, rulePPenalty: 0, ruleQApplies: false, ruleQPenalty: 0, ruleRApplies: false, ruleRMiddle16Distance: 0, ruleRBlackKingDistance: 0,
+    ruleSApplies: false, ruleSPenalty: 0,
+    ruleTPenalty: 0,
+    ruleUApplies: false, ruleUDiagonalLengthPenalty: 0, ruleUCenterPenalty: 0,
+    ruleVApplies: false, ruleVPenalty: 0,
+    ruleXPenalty: 0,
+    ruleYApplies: false, ruleYNearerDistance: 0, ruleYFartherDistance: 0,
+    ruleWCenterDistance: 0, ruleWBlackKingDistance: 0,
     ...overrides,
   }
 }
@@ -600,24 +618,23 @@ interface ActiveTwoBishopsWhitePositionContext {
   readonly startingWhiteKing: Square | undefined
   readonly startingBishops: readonly Square[]
   readonly phaseTwoTargetCorners: readonly Square[]
-  readonly ruleB1Target: Square | undefined
-  readonly ruleB2Target: Square | undefined
-  readonly ruleB3Target: Square | undefined
-  readonly ruleB5Target: Square | undefined
-  readonly ruleB6Target: Square | undefined
-  readonly ruleC03Applies: boolean
-  readonly ruleC03RetreatSquare: Square | undefined
-  readonly ruleC05Target: Square | undefined
-  readonly ruleC07Applies: boolean
-  readonly ruleC08Applies: boolean
-  readonly ruleC085Applies: boolean
-  readonly ruleC09Targets: readonly Square[]
-  readonly ruleC075Applies: boolean
-  readonly ruleC10Applies: boolean
-  readonly ruleC14Applies: boolean
-  readonly ruleC15Applies: boolean
-  readonly ruleC20Applies: boolean
-  readonly ruleG1Line: CentralBishopLine | undefined
+  readonly ruleCTarget: Square | undefined
+  readonly ruleDTarget: Square | undefined
+  readonly ruleETarget: Square | undefined
+  readonly ruleFTarget: Square | undefined
+  readonly ruleGTarget: Square | undefined
+  readonly ruleIApplies: boolean
+  readonly ruleIRetreatSquare: Square | undefined
+  readonly ruleJTarget: Square | undefined
+  readonly ruleKApplies: boolean
+  readonly ruleMApplies: boolean
+  readonly ruleNTargets: readonly Square[]
+  readonly ruleLApplies: boolean
+  readonly ruleOApplies: boolean
+  readonly ruleQApplies: boolean
+  readonly ruleRApplies: boolean
+  readonly ruleSApplies: boolean
+  readonly ruleVLine: CentralBishopLine | undefined
 }
 
 function retreatSquare(
@@ -649,7 +666,7 @@ function trackedKingsFromCagedCorner(
   const isOppositionTracked = isInOpposition(whiteKing, blackKing, 1)
   if (!isKnightTracked && !isOppositionTracked) return undefined
 
-  const corner = ruleQ5CagedCorners(bishops, blackKing).reduce<
+  const corner = phaseTwoCagedCorners(bishops, blackKing).reduce<
     Square | undefined
   >((closest, candidate) => {
     if (closest === undefined) return candidate
@@ -711,7 +728,7 @@ function retreatTrackSquare(
   )
 }
 
-function ruleC10Applies(
+function ruleOApplies(
   fen: string,
   bishops: readonly Square[],
   blackKing: Square | undefined,
@@ -816,7 +833,7 @@ function trackDistancesFromCagedCorner(
   }
 }
 
-function ruleC09FlankSquares(
+function ruleNFlankSquares(
   whiteKing: Square | undefined,
   blackKing: Square | undefined,
 ): readonly Square[] {
@@ -836,7 +853,7 @@ function ruleC09FlankSquares(
   )
 }
 
-function ruleC075Applies(
+function ruleLApplies(
   fen: string,
   bishops: readonly Square[],
   whiteKing: Square | undefined,
@@ -849,14 +866,14 @@ function ruleC075Applies(
     return false
   }
   const black = squareCoordinates(blackKing)
-  return ruleQ5CagedCorners(bishops, blackKing).some((corner) => {
+  return phaseTwoCagedCorners(bishops, blackKing).some((corner) => {
     const target = squareCoordinates(corner)
     const sharesEdge = black.file === target.file || black.rank === target.rank
     return sharesEdge && kingDistance(blackKing, corner) === 4
   })
 }
 
-function ruleC03TrackApplies(
+function ruleITrackApplies(
   fen: string,
   bishops: readonly Square[],
   whiteKing: Square | undefined,
@@ -867,48 +884,7 @@ function ruleC03TrackApplies(
   return blackIsOneBehindTrack(fen, bishops, whiteKing, blackKing)
 }
 
-function ruleB1TargetSquare(
-  fen: string,
-  bishops: readonly Square[],
-  whiteKing: Square | undefined,
-  blackKing: Square | undefined,
-): Square | undefined {
-  if (
-    whiteKing === undefined ||
-    blackKing === undefined
-  ) {
-    return undefined
-  }
-  const legalBishopDestinations = new Set(
-    getChess(fen)
-      .moves({ verbose: true })
-      .filter((move) => move.piece === 'b')
-      .map((move) => move.to),
-  )
-  for (const transform of SQUARE_TRANSFORMS) {
-    const transformedBlackKings = [
-      transformSquare('g4', transform),
-      transformSquare('h4', transform),
-    ]
-    const target = transformSquare('f6', transform)
-    const requiredBishops = [
-      transformSquare('e5', transform),
-      transformSquare('b1', transform),
-    ]
-    if (
-      whiteKing === transformSquare('h6', transform) &&
-      transformedBlackKings.includes(blackKing) &&
-      bishops.length === requiredBishops.length &&
-      requiredBishops.every((bishop) => bishops.includes(bishop)) &&
-      legalBishopDestinations.has(target)
-    ) {
-      return target
-    }
-  }
-  return undefined
-}
-
-function ruleB2TargetSquare(
+function ruleCTargetSquare(
   fen: string,
   bishops: readonly Square[],
   whiteKing: Square | undefined,
@@ -921,7 +897,7 @@ function ruleB2TargetSquare(
   ) {
     return undefined
   }
-  const cagedCorners = ruleQ5CagedCorners(bishops, blackKing)
+  const cagedCorners = phaseTwoCagedCorners(bishops, blackKing)
   const legalKingDestinations = new Set(
     getChess(fen)
       .moves({ verbose: true })
@@ -949,7 +925,7 @@ function ruleB2TargetSquare(
   return undefined
 }
 
-function ruleB3TargetSquare(
+function ruleDTargetSquare(
   fen: string,
   bishops: readonly Square[],
   whiteKing: Square | undefined,
@@ -981,7 +957,7 @@ function ruleB3TargetSquare(
   return undefined
 }
 
-function ruleB5TargetSquare(
+function ruleETargetSquare(
   fen: string,
   bishops: readonly Square[],
   whiteKing: Square | undefined,
@@ -1013,7 +989,7 @@ function ruleB5TargetSquare(
   return undefined
 }
 
-function ruleB6TargetSquare(
+function ruleFTargetSquare(
   fen: string,
   bishops: readonly Square[],
   whiteKing: Square | undefined,
@@ -1035,6 +1011,38 @@ function ruleB6TargetSquare(
     if (
       whiteKing === transformSquare('d5', transform) &&
       blackKing === transformSquare('f4', transform) &&
+      bishops.length === requiredBishops.length &&
+      requiredBishops.every((bishop) => bishops.includes(bishop)) &&
+      legalBishopDestinations.has(target)
+    ) {
+      return target
+    }
+  }
+  return undefined
+}
+
+function ruleGTargetSquare(
+  fen: string,
+  bishops: readonly Square[],
+  whiteKing: Square | undefined,
+  blackKing: Square | undefined,
+): Square | undefined {
+  if (whiteKing === undefined || blackKing === undefined) return undefined
+  const legalBishopDestinations = new Set(
+    getChess(fen)
+      .moves({ verbose: true })
+      .filter((move) => move.piece === 'b')
+      .map((move) => move.to),
+  )
+  for (const transform of SQUARE_TRANSFORMS) {
+    const target = transformSquare('c3', transform)
+    const requiredBishops = [
+      transformSquare('d4', transform),
+      transformSquare('d5', transform),
+    ]
+    if (
+      whiteKing === transformSquare('h5', transform) &&
+      blackKing === transformSquare('f5', transform) &&
       bishops.length === requiredBishops.length &&
       requiredBishops.every((bishop) => bishops.includes(bishop)) &&
       legalBishopDestinations.has(target)
@@ -1081,63 +1089,55 @@ function createActiveTwoBishopsWhitePositionContext(
           blackKing,
         )
       : [],
-    ruleB1Target: ruleB1TargetSquare(
+    ruleCTarget: ruleCTargetSquare(
       fen,
       startingBishops,
       startingWhiteKing,
       blackKing,
     ),
-    ruleB2Target: ruleB2TargetSquare(
+    ruleDTarget: ruleDTargetSquare(
       fen,
       startingBishops,
       startingWhiteKing,
       blackKing,
     ),
-    ruleB3Target: ruleB3TargetSquare(
+    ruleETarget: ruleETargetSquare(
       fen,
       startingBishops,
       startingWhiteKing,
       blackKing,
     ),
-    ruleB5Target: ruleB5TargetSquare(
+    ruleFTarget: ruleFTargetSquare(
       fen,
       startingBishops,
       startingWhiteKing,
       blackKing,
     ),
-    ruleB6Target: ruleB6TargetSquare(
+    ruleGTarget: ruleGTargetSquare(
       fen,
       startingBishops,
       startingWhiteKing,
       blackKing,
     ),
-    ruleC03Applies:
+    ruleIApplies:
       isPhaseTwo &&
-      ruleC03TrackApplies(
+      ruleITrackApplies(
         fen,
         startingBishops,
         startingWhiteKing,
         blackKing,
       ) &&
       currentRetreatSquare !== undefined,
-    ruleC03RetreatSquare: currentRetreatSquare,
-    ruleC05Target:
+    ruleIRetreatSquare: currentRetreatSquare,
+    ruleJTarget:
       isPhaseTwo && kingsInOpposition
         ? currentRetreatSquare
         : undefined,
-    ruleC07Applies:
+    ruleKApplies:
       isPhaseTwo &&
       blackKing !== undefined &&
       BOARD_CORNERS.includes(blackKing),
-    ruleC08Applies:
-      doubleRetreatControlled &&
-      blackIsEvenOnTrack(
-        fen,
-        startingBishops,
-        startingWhiteKing,
-        blackKing,
-      ),
-    ruleC085Applies:
+    ruleMApplies:
       doubleRetreatControlled &&
       blackIsOneAheadOfTrack(
         fen,
@@ -1145,7 +1145,7 @@ function createActiveTwoBishopsWhitePositionContext(
         startingWhiteKing,
         blackKing,
       ),
-    ruleC09Targets:
+    ruleNTargets:
       isPhaseTwo &&
       !retreatOrDoubleRetreatControlled &&
       blackIsOneAheadOfTrack(
@@ -1154,26 +1154,26 @@ function createActiveTwoBishopsWhitePositionContext(
         startingWhiteKing,
         blackKing,
       )
-        ? ruleC09FlankSquares(startingWhiteKing, blackKing)
+        ? ruleNFlankSquares(startingWhiteKing, blackKing)
         : [],
-    ruleC075Applies: ruleC075Applies(
+    ruleLApplies: ruleLApplies(
       fen,
       startingBishops,
       startingWhiteKing,
       blackKing,
     ),
-    ruleC10Applies: ruleC10Applies(fen, startingBishops, blackKing),
-    ruleC14Applies:
+    ruleOApplies: ruleOApplies(fen, startingBishops, blackKing),
+    ruleQApplies:
       isPhaseTwo &&
       currentRetreatSquare !== undefined &&
       getChess(fen).isAttacked(currentRetreatSquare, 'w'),
-    ruleC15Applies: isPhaseTwo,
-    ruleC20Applies: isPhaseTwo,
-    ruleG1Line: centralBishopLine(startingBishops),
+    ruleRApplies: isPhaseTwo,
+    ruleSApplies: isPhaseTwo,
+    ruleVLine: centralBishopLine(startingBishops),
   }
 }
 
-function ruleQ5CagedCorners(
+function phaseTwoCagedCorners(
   bishops: readonly Square[],
   blackKing: Square | undefined,
 ): readonly Square[] {
@@ -1328,7 +1328,7 @@ function scoreActiveTwoBishopsWhiteMoveWithContext(
   const blackMoves = chess.moves({ verbose: true })
   const givesCheck = chess.inCheck()
   const resultIsPhaseTwo = isTwoBishopsPhaseTwoPosition(resultFen)
-  const resultRuleC12Applies =
+  const resultRulePApplies =
     resultIsPhaseTwo &&
     context.startingWhiteKing !== undefined &&
     context.blackKing !== undefined &&
@@ -1350,11 +1350,11 @@ function scoreActiveTwoBishopsWhiteMoveWithContext(
     context.blackKing,
     context.startingWhiteKing,
   )
-  const everyBlackReplyPreservesRuleE = blackMoves.every((reply) => {
+  const everyBlackReplyPreservesRuleB = blackMoves.every((reply) => {
     chess.move(reply.san)
     const replyFen = chess.fen()
     const replyBlackKing = findPiece(replyFen, 'b', 'k')?.square
-    const replyPreservesRuleE =
+    const replyPreservesRuleB =
       isTwoBishopsPhaseTwoPosition(replyFen) &&
       (context.phaseTwoTargetCorners.length === 0 ||
         phaseTwoTargetCorners(
@@ -1363,7 +1363,7 @@ function scoreActiveTwoBishopsWhiteMoveWithContext(
           replyBlackKing,
         ).some((corner) => context.phaseTwoTargetCorners.includes(corner)))
     chess.undo()
-    return replyPreservesRuleE
+    return replyPreservesRuleB
   })
   const everyBlackReplyStaysWithinOneTrack = blackMoves.every((reply) => {
     chess.move(reply.san)
@@ -1406,8 +1406,8 @@ function scoreActiveTwoBishopsWhiteMoveWithContext(
       resultWhiteKing !== undefined && edgeDistance(resultWhiteKing) === 0
         ? 1
         : 0,
-    ruleC01Applies: context.phaseTwoTargetCorners.length > 0,
-    ruleC01Penalty:
+    ruleHApplies: context.phaseTwoTargetCorners.length > 0,
+    ruleHPenalty:
       resultWhiteKing !== undefined &&
       context.phaseTwoTargetCorners.some(
         (corner) =>
@@ -1415,45 +1415,45 @@ function scoreActiveTwoBishopsWhiteMoveWithContext(
       )
         ? 1
         : 0,
-    ruleEApplies: true,
-    ruleEPenalty: everyBlackReplyPreservesRuleE ? 0 : 1,
-    ruleB1Applies: context.ruleB1Target !== undefined,
-    ruleB1Penalty:
-      move.piece === 'b' && move.to === context.ruleB1Target ? 0 : 1,
-    ruleB2Applies: context.ruleB2Target !== undefined,
-    ruleB2Penalty:
-      move.piece === 'k' && move.to === context.ruleB2Target ? 0 : 1,
-    ruleB3Applies: context.ruleB3Target !== undefined,
-    ruleB3Penalty:
-      move.piece === 'b' && move.to === context.ruleB3Target ? 0 : 1,
-    ruleB5Applies: context.ruleB5Target !== undefined,
-    ruleB5Penalty:
-      move.piece === 'b' && move.to === context.ruleB5Target ? 0 : 1,
-    ruleB6Applies: context.ruleB6Target !== undefined,
-    ruleB6Penalty:
-      move.piece === 'b' && move.to === context.ruleB6Target ? 0 : 1,
-    ruleC03Applies: context.ruleC03Applies,
-    ruleC03Penalty:
+    ruleBApplies: true,
+    ruleBPenalty: everyBlackReplyPreservesRuleB ? 0 : 1,
+    ruleCApplies: context.ruleCTarget !== undefined,
+    ruleCPenalty:
+      move.piece === 'k' && move.to === context.ruleCTarget ? 0 : 1,
+    ruleDApplies: context.ruleDTarget !== undefined,
+    ruleDPenalty:
+      move.piece === 'b' && move.to === context.ruleDTarget ? 0 : 1,
+    ruleEApplies: context.ruleETarget !== undefined,
+    ruleEPenalty:
+      move.piece === 'b' && move.to === context.ruleETarget ? 0 : 1,
+    ruleFApplies: context.ruleFTarget !== undefined,
+    ruleFPenalty:
+      move.piece === 'b' && move.to === context.ruleFTarget ? 0 : 1,
+    ruleGApplies: context.ruleGTarget !== undefined,
+    ruleGPenalty:
+      move.piece === 'b' && move.to === context.ruleGTarget ? 0 : 1,
+    ruleIApplies: context.ruleIApplies,
+    ruleIPenalty:
       givesCheck &&
-      context.ruleC03RetreatSquare !== undefined &&
-      chess.isAttacked(context.ruleC03RetreatSquare, 'w')
+      context.ruleIRetreatSquare !== undefined &&
+      chess.isAttacked(context.ruleIRetreatSquare, 'w')
         ? 0
         : 1,
-    ruleC05Applies: context.ruleC05Target !== undefined,
-    ruleC05Penalty:
-      context.ruleC05Target !== undefined &&
-      chess.isAttacked(context.ruleC05Target, 'w')
+    ruleJApplies: context.ruleJTarget !== undefined,
+    ruleJPenalty:
+      context.ruleJTarget !== undefined &&
+      chess.isAttacked(context.ruleJTarget, 'w')
         ? 0
         : 1,
-    ruleC07Applies: context.ruleC07Applies,
-    ruleC07Penalty:
+    ruleKApplies: context.ruleKApplies,
+    ruleKPenalty:
       resultWhiteKing !== undefined &&
       context.blackKing !== undefined &&
       isKnightMove(resultWhiteKing, context.blackKing)
         ? 0
         : 1,
-    ruleC07DoubleRetreatPenalty:
-      context.ruleC07Applies &&
+    ruleKDoubleRetreatPenalty:
+      context.ruleKApplies &&
       doubleRetreatSquaresFromCage(
         chess.fen(),
         resultBishops,
@@ -1461,85 +1461,90 @@ function scoreActiveTwoBishopsWhiteMoveWithContext(
       ).some((square) => chess.isAttacked(square, 'w'))
         ? 0
         : 1,
-    ruleC08Applies: context.ruleC08Applies,
-    ruleC08Penalty:
+    ruleMApplies: context.ruleMApplies,
+    ruleMPenalty:
       resultWhiteKing !== undefined &&
       context.blackKing !== undefined &&
       isInOpposition(resultWhiteKing, context.blackKing, 1)
         ? 0
         : 1,
-    ruleC085Applies: context.ruleC085Applies,
-    ruleC085Penalty:
-      resultWhiteKing !== undefined &&
-      context.blackKing !== undefined &&
-      isInOpposition(resultWhiteKing, context.blackKing, 1)
-        ? 0
-        : 1,
-    ruleC09Applies: context.ruleC09Targets.length > 0,
-    ruleC09Penalty: context.ruleC09Targets.some((target) =>
+    ruleNApplies: context.ruleNTargets.length > 0,
+    ruleNPenalty: context.ruleNTargets.some((target) =>
       resultBishops.some((bishop) =>
         bishopControlsSquareFrom(chess, bishop, target),
       ),
     )
       ? 0
       : 1,
-    ruleC09RetreatPenalty:
+    ruleNRetreatPenalty:
       resultRetreatSquare !== undefined &&
       chess.isAttacked(resultRetreatSquare, 'w')
         ? 0
         : 1,
-    ruleC075Applies: context.ruleC075Applies,
-    ruleC075Penalty: givesCheck ? 0 : 1,
-    ruleC10Applies: context.ruleC10Applies,
-    ruleC10Penalty:
+    ruleLApplies: context.ruleLApplies,
+    ruleLPenalty: givesCheck ? 0 : 1,
+    ruleOApplies: context.ruleOApplies,
+    ruleOPenalty:
       resultWhiteKing !== undefined &&
       context.blackKing !== undefined &&
       isInOpposition(resultWhiteKing, context.blackKing, 1)
         ? 0
         : 1,
-    ruleC12Applies: resultRuleC12Applies,
-    ruleC12Penalty:
-      resultRuleC12Applies &&
+    rulePApplies: resultRulePApplies,
+    rulePPenalty:
+      resultRulePApplies &&
       resultRetreatSquare !== undefined &&
       chess.isAttacked(resultRetreatSquare, 'w')
         ? 0
         : 1,
-    ruleC14Applies: context.ruleC14Applies,
-    ruleC14Penalty:
+    ruleQApplies: context.ruleQApplies,
+    ruleQPenalty:
       resultWhiteKing !== undefined &&
       context.blackKing !== undefined &&
       isInOpposition(resultWhiteKing, context.blackKing, 1)
         ? 0
         : 1,
-    ruleC15Applies: context.ruleC15Applies,
-    ruleC15Middle16Distance:
+    ruleRApplies: context.ruleRApplies,
+    ruleRMiddle16Distance:
       resultWhiteKing === undefined ? 99 : middle16Distance(resultWhiteKing),
-    ruleC15BlackKingDistance:
+    ruleRBlackKingDistance:
       resultWhiteKing === undefined || context.blackKing === undefined
         ? 99
         : manhattanDistance(resultWhiteKing, context.blackKing),
-    ruleC20Applies: context.ruleC20Applies,
-    ruleC20Penalty: everyBlackReplyStaysWithinOneTrack ? 0 : 1,
-    ruleF4Penalty: bishopsBelowLegalMoveThreshold(resultFen, resultBishops, 3),
-    ruleF5Applies: !context.ruleC15Applies && resultBishops.length > 0,
-    ruleF5DiagonalLengthPenalty:
+    ruleSApplies: context.ruleSApplies,
+    ruleSPenalty: everyBlackReplyStaysWithinOneTrack ? 0 : 1,
+    ruleTPenalty: bishopsBelowLegalMoveThreshold(resultFen, resultBishops, 4),
+    ruleUApplies: !context.ruleRApplies && resultBishops.length > 0,
+    ruleUDiagonalLengthPenalty:
       -resultBishops.reduce(
         (total, bishop) => total + longestDiagonalLength(bishop),
         0,
       ),
-    ruleF5CenterPenalty:
+    ruleUCenterPenalty:
       2 - resultBishops.filter((bishop) => centerDistance(bishop) === 0).length,
-    ruleG1Applies: context.ruleG1Line !== undefined,
-    ruleG1Penalty:
-      context.ruleG1Line !== undefined && resultWhiteKing !== undefined
-        ? squareCoordinates(resultWhiteKing)[context.ruleG1Line.axis] ===
-          context.ruleG1Line.index
+    ruleVApplies: context.ruleVLine !== undefined,
+    ruleVPenalty:
+      context.ruleVLine !== undefined && resultWhiteKing !== undefined
+        ? squareCoordinates(resultWhiteKing)[context.ruleVLine.axis] ===
+          context.ruleVLine.index
           ? 0
           : 1
         : 0,
-    ruleG5Applies:
+    ruleXPenalty:
+      resultWhiteKing !== undefined &&
+      context.blackKing !== undefined &&
+      resultBishops.some((bishop) =>
+        hasAdjacentKingBishopKingLine(
+          context.blackKing!,
+          bishop,
+          resultWhiteKing,
+        ),
+      )
+        ? 0
+        : 1,
+    ruleYApplies:
       context.blackKing !== undefined && resultBishops.length > 0,
-    ruleG5NearerDistance:
+    ruleYNearerDistance:
       context.blackKing === undefined || resultBishops.length === 0
         ? 0
         : Math.min(
@@ -1547,7 +1552,7 @@ function scoreActiveTwoBishopsWhiteMoveWithContext(
               squaredEuclideanDistance(bishop, context.blackKing!),
             ),
           ),
-    ruleG5FartherDistance:
+    ruleYFartherDistance:
       context.blackKing === undefined || resultBishops.length === 0
         ? 0
         : Math.max(
@@ -1555,14 +1560,14 @@ function scoreActiveTwoBishopsWhiteMoveWithContext(
               squaredEuclideanDistance(bishop, context.blackKing!),
             ),
           ),
-    ruleG2CenterDistance:
+    ruleWCenterDistance:
       resultWhiteKing === undefined
         ? 99
         : squaredEuclideanDistanceToUnoccupiedCenter(
             resultWhiteKing,
             resultBishops,
           ),
-    ruleG2BlackKingDistance:
+    ruleWBlackKingDistance:
       resultWhiteKing === undefined || context.blackKing === undefined
         ? 99
         : squaredEuclideanDistance(resultWhiteKing, context.blackKing),
@@ -1574,8 +1579,34 @@ export function scoreTwoBishopsWhiteMove(fen: string, san: string): TwoBishopsWh
 }
 
 export function getIdealTwoBishopsWhiteMoves(fen: string): string[] {
+  return [...analyzeTwoBishopsWhiteSelection(fen).idealWhiteMoves]
+}
+
+export type TwoBishopsWhiteSelectionAnalysis = {
+  readonly idealWhiteMoves: readonly string[]
+  readonly ruleFilterCounts: Readonly<Record<string, number>>
+}
+
+export function analyzeTwoBishopsWhiteSelection(
+  fen: string,
+): TwoBishopsWhiteSelectionAnalysis {
   const moves = whiteLegalMoves(fen)
-  return [...selectIdealMoves(scoreWhiteCandidates(fen, moves), twoBishopsWhiteRules)]
+  const selection = selectCandidatesByRules(
+    scoreWhiteCandidates(fen, moves),
+    twoBishopsWhiteRules,
+  )
+  const ruleFilterCounts = Object.fromEntries(
+    twoBishopsWhiteRules.map((rule) => [rule.id, 0]),
+  ) as Record<string, number>
+  for (const rule of selection.eliminatedBy.values()) {
+    ruleFilterCounts[rule.id] = (ruleFilterCounts[rule.id] ?? 0) + 1
+  }
+  return Object.freeze({
+    idealWhiteMoves: Object.freeze(
+      selection.idealCandidates.map(({ san }) => san),
+    ),
+    ruleFilterCounts: Object.freeze(ruleFilterCounts),
+  })
 }
 
 export function scoreTwoBishopsBlackMove(

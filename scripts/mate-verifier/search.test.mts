@@ -24,6 +24,7 @@ import type {
   MateVerificationAdapter,
   MateVerificationExpansion,
   MateVerificationRoot,
+  MateNodeProof,
 } from './types.mts'
 
 function root(
@@ -79,6 +80,54 @@ test('exact verifier accepts a checkmate-only graph', () => {
     uniquePositions: 1,
     whiteChoices: 1,
   })
+})
+
+test('persistent proofs resume without re-expanding completed positions', () => {
+  const persisted = new Map<string, MateNodeProof>()
+  const proofCache = {
+    get: (key: string) => persisted.get(key),
+    set: (key: string, proof: MateNodeProof) => {
+      persisted.set(key, proof)
+    },
+  }
+  let expansions = 0
+  const graph = adapter({
+    A: {
+      blackReplies: 0,
+      branches: [{
+        kind: 'mate',
+        moves: ['Qa8#'],
+        resetsHalfmoveClock: [false],
+        states: ['mate'],
+      }],
+      ruleFilterCounts: { 'rule a': 3 },
+      whiteChoices: 1,
+    },
+  })
+  const countedAdapter: MateVerificationAdapter<string> = {
+    ...graph,
+    expand: (state) => {
+      expansions += 1
+      return graph.expand(state)
+    },
+  }
+  const seenCounts: Readonly<Record<string, number>>[] = []
+
+  assert.equal(verifyMateRoots([root('A')], countedAdapter, {
+    onExpansion: (_key, expansion) => {
+      if (expansion.ruleFilterCounts) {
+        seenCounts.push(expansion.ruleFilterCounts)
+      }
+    },
+    proofCache,
+  }).status, 'verified')
+  assert.equal(expansions, 1)
+  assert.deepEqual(seenCounts, [{ 'rule a': 3 }])
+
+  assert.equal(verifyMateRoots([root('A')], countedAdapter, {
+    proofCache,
+  }).status, 'verified')
+  assert.equal(expansions, 1)
 })
 
 test('checkmate takes precedence at halfmove 100 while rule gaps fail', () => {

@@ -37,7 +37,18 @@ export type MateVerificationBranch<State> =
 export type MateVerificationExpansion<State> = {
   readonly blackReplies: number
   readonly branches: readonly MateVerificationBranch<State>[]
+  readonly ruleFilterCounts?: Readonly<Record<string, number>>
   readonly whiteChoices: number
+}
+
+export type MateNodeProof = {
+  readonly maximumMatePlies: number
+  readonly safeIncomingHalfmoveClock: number
+}
+
+export type MateVerificationProofCache = {
+  readonly get: (positionKey: string) => MateNodeProof | undefined
+  readonly set: (positionKey: string, proof: MateNodeProof) => void
 }
 
 export type MateVerificationAdapter<State> = {
@@ -91,5 +102,10 @@ export type MateVerificationOptions = {
   readonly maxNodes?: number
   readonly maxRoots?: number
   readonly onProgress?: (stats: Readonly<MateVerificationStats>) => void
+  readonly onExpansion?: (
+    positionKey: string,
+    expansion: MateVerificationExpansion<unknown>,
+  ) => void
+  readonly proofCache?: MateVerificationProofCache
   readonly progressEvery?: number
 }

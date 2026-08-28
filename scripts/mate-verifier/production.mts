@@ -32,6 +32,7 @@ import type {
   MateVerificationFailureKind,
   MateVerificationRoot,
 } from './types.mts'
+import { analyzeTwoBishopsWhiteSelection } from '../../app/src/mate/rules/twoBishops.ts'
 
 export type ProductionMateVerificationState = string
 
@@ -103,8 +104,14 @@ export function createProductionMateAdapter(
   ): import('./types.mts').MateVerificationExpansion<string> => {
     const whiteState = normalizeVerifierState(state)
     const white = getChess(whiteState)
+    const twoBishopsSelection = mateId === 'two-bishops'
+      ? analyzeTwoBishopsWhiteSelection(white.fen())
+      : undefined
     const idealWhiteMoves = [
-      ...new Set(ruleSet.idealWhiteMoves(white.fen())),
+      ...new Set(
+        twoBishopsSelection?.idealWhiteMoves ??
+          ruleSet.idealWhiteMoves(white.fen()),
+      ),
     ]
     if (idealWhiteMoves.length === 0) {
       return {
@@ -118,6 +125,9 @@ export function createProductionMateAdapter(
             [white.fen()],
           ),
         ],
+        ...(twoBishopsSelection === undefined
+          ? {}
+          : { ruleFilterCounts: twoBishopsSelection.ruleFilterCounts }),
         whiteChoices: 0,
       }
     }
@@ -221,6 +231,9 @@ export function createProductionMateAdapter(
     return {
       blackReplies,
       branches,
+      ...(twoBishopsSelection === undefined
+        ? {}
+        : { ruleFilterCounts: twoBishopsSelection.ruleFilterCounts }),
       whiteChoices: idealWhiteMoves.length,
     }
   }

@@ -1381,59 +1381,14 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
     bishopsMarkup,
     /mate progress|forced mate|proof distance/,
   )
-  assert.match(
-    bishopsMarkup,
-    />mate in 8 ish<[^]*>rule n<[^]*>rule o<[^]*>king closer<[^]*>rule w</,
-  )
-  assert.match(
-    bishopsMarkup,
-    />king closer<[^]*Bring White&#x27;s king closer to Black&#x27;s king, preferring proximity to the the middle 16 squares\./,
-  )
-  assert.match(
-    bishopsMarkup,
-    /class="leg-mate-note-board-live-animation"/,
-  )
-  assert.match(
-    bishopsMarkup,
-    /id="bishop-mate-in-eight-ish-a-animation-square-e1"[^]*<svg/,
-  )
-  assert.doesNotMatch(bishopsMarkup, /mate-in-eight-ish-[a-e]\.gif/)
-  assert.match(bishopsMarkup, /data-arrow="d3-c4"/)
-  assert.doesNotMatch(
-    bishopsMarkup,
-    />mate in 3<|>degenerate<|>force phase 2<|>shepherd<|>sequester<|>bishops off edge<|>phase 2 wall<|>unclutter bishops<|>check</,
-  )
-  assert.doesNotMatch(
-    bishopsMarkup,
-    />rule a<|>rule b<|>rule bc<|>rule c<|>rule d<|>rule e</,
-  )
-  assert.doesNotMatch(bishopsMarkup, />lazy king</)
-  assert.doesNotMatch(bishopsMarkup, />support wall</)
-  assert.doesNotMatch(
-    bishopsMarkup,
-    />king distance<|>king position</,
-  )
-  assert.doesNotMatch(bishopsMarkup, />pieces off edge</)
-  assert.doesNotMatch(bishopsMarkup, />force opposition<|>unmask</)
-  assert.doesNotMatch(bishopsMarkup, />conclave step</)
-  assert.doesNotMatch(bishopsMarkup, />reverse conclave step</)
-  assert.doesNotMatch(bishopsMarkup, />martian conclave step</)
-  assert.doesNotMatch(bishopsMarkup, />finish wall</)
-  assert.doesNotMatch(bishopsMarkup, />start wall</)
-  assert.doesNotMatch(bishopsMarkup, />knight-step control</)
-  assert.doesNotMatch(bishopsMarkup, />bishop control</)
-  assert.doesNotMatch(bishopsMarkup, />distant bishops</)
-  assert.doesNotMatch(bishopsMarkup, />adjacent bishops</)
-  assert.doesNotMatch(bishopsMarkup, />restrict area</)
-  for (const removed of [
-    'ideal cage',
-    'restricted area',
-    'prep restricted area',
-    'king pushable',
-    'bishops further',
-  ]) {
-    assert.doesNotMatch(bishopsMarkup, new RegExp(`>${removed}<`))
+  let previousRuleIndex = -1
+  for (let index = 0; index < 25; index += 1) {
+    const label = `rule ${String.fromCharCode('a'.charCodeAt(0) + index)}`
+    const ruleIndex = bishopsMarkup.indexOf(`>${label}<`, previousRuleIndex + 1)
+    assert.ok(ruleIndex > previousRuleIndex, label)
+    previousRuleIndex = ruleIndex
   }
+  assert.doesNotMatch(bishopsMarkup, />rule [a-z][0-9][0-9.]*</)
   const queenMarkup = renderToStaticMarkup(
     <MatePriorityGuideDialog
       {...MATE_TRAINING_INFO_PROPS}
@@ -3269,7 +3224,12 @@ test('Mate timers clean up across exact-route replacement and landing', async ()
       )
     })
     const mountedRenderer = renderer as ReactTestRenderer
-    assert.equal(activeTimers.size, 1)
+    assert.equal(activeTimers.size, 0, 'opening a position must not start the timer')
+
+    await act(async () => {
+      mountedRenderer.root.findByType(MateBoardProbe).props.onMove('Rh5')
+    })
+    assert.equal(activeTimers.size, 1, 'the first White move must start the timer')
 
     const rendersBeforeTick = boardRenders
     const activeHandler = [...activeTimers.values()][0]
@@ -3307,8 +3267,8 @@ test('Mate timers clean up across exact-route replacement and landing', async ()
         />,
       )
     })
-    assert.equal(activeTimers.size, 1)
-    assert.equal(nextTimerId, 3)
+    assert.equal(activeTimers.size, 0)
+    assert.equal(nextTimerId, 2)
 
     await act(async () => {
       mountedRenderer.update(mateLandingPage())

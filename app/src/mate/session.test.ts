@@ -149,10 +149,32 @@ test('initializes a fresh dependency-injected session', () => {
   assert.deepEqual(session.logs, [])
   assert.equal(session.historyIndex, 0)
   assert.equal(session.history.length, 1)
-  assert.equal(session.startedAtMs, 1_000)
+  assert.equal(session.startedAtMs, undefined)
   assert.equal(session.finishedAtMs, undefined)
   assert.equal(session.outcome, undefined)
   assertCurrentSnapshot(session)
+})
+
+test('starts timing only when the first White move is accepted', () => {
+  const deps = createDeps({
+    times: [2_500, 3_100],
+    randoms: [0, 0],
+  })
+  let session = createMateSession(
+    { mateId: 'rook', mode: 'standard' },
+    deps,
+  )
+
+  assert.equal(getMateElapsedMs(session, 2_400), 0)
+  assert.equal(playWhiteMove(session, 'not-a-move', deps), session)
+
+  session = playWhiteMove(session, 'Ra3', deps)
+  assert.equal(session.startedAtMs, 2_500)
+  assert.equal(session.logs[0]?.durationMs, 0)
+  assert.equal(getMateElapsedMs(session, 3_000), 500)
+
+  session = playWhiteMove(session, whiteMoves(session.fen)[0]!, deps)
+  assert.equal(session.logs[1]?.durationMs, 600)
 })
 
 test('reconstructs the former exact Rook loop as undoable ordinary history', () => {
@@ -258,7 +280,7 @@ test('records White and automatic Black moves as separate history steps', () => 
     correctChoices: 2,
     idealOpponentChoices: 2,
     legalOpponentChoices: 2,
-    durationMs: 600,
+    durationMs: 0,
     reasonId: 'finish-net',
   })
   assert.equal(session.fen, 'R7/6k1/8/8/8/8/8/K7 w - - 2 2')
@@ -286,14 +308,14 @@ test('an incorrect move is explained and play continues', () => {
 
   assert.equal(session.logs[0]?.isCorrect, false)
   assert.equal(session.logs[0]?.reasonId, 'shrink-box')
-  assert.equal(session.logs[0]?.durationMs, 400)
+  assert.equal(session.logs[0]?.durationMs, 0)
   assert.equal(session.logs[0]?.opponentSan, 'Kh7')
   assert.equal(session.outcome, undefined)
 
   const nextSan = whiteMoves(session.fen)[0]!
   session = playWhiteMove(session, nextSan, deps)
   assert.equal(session.logs.length, 2)
-  assert.equal(session.logs[1]?.durationMs, 650)
+  assert.equal(session.logs[1]?.durationMs, 400)
   assert.equal(session.history.length, 5)
 })
 
@@ -400,7 +422,7 @@ test('Start Over ignores an exact-start override, generates anew, and has no res
   assert.deepEqual(restarted.logs, [])
   assert.equal(restarted.historyIndex, 0)
   assert.equal(restarted.history.length, 1)
-  assert.equal(restarted.startedAtMs, 3_000)
+  assert.equal(restarted.startedAtMs, undefined)
   assert.equal('resetCount' in restarted, false)
   assertCurrentSnapshot(restarted)
 })
@@ -664,15 +686,15 @@ test('recognizes terminal outcomes and freezes the finish timestamp', () => {
   const finished = playWhiteMove(initial, 'Rh2#', deps)
 
   assert.equal(finished.outcome, 'checkmate')
-  assert.equal(finished.finishedAtMs, 1_700)
+  assert.equal(finished.finishedAtMs, 1_000)
   assert.equal(finished.logs[0]?.opponentSan, undefined)
   assert.equal(playWhiteMove(finished, 'Kh6', deps), finished)
-  assert.equal(getMateElapsedMs(finished, 99_000), 700)
+  assert.equal(getMateElapsedMs(finished, 99_000), 0)
   assertCurrentSnapshot(finished)
 
   const undone = undoMateMove(finished)
   assert.equal(undone.finishedAtMs, undefined)
-  assert.equal(redoMateMove(undone).finishedAtMs, 1_700)
+  assert.equal(redoMateMove(undone).finishedAtMs, 1_000)
 })
 
 test('classifies stalemate, lost material, fifty-move, and KNN promotion outcomes', () => {
@@ -741,7 +763,7 @@ test('terminal transitions can happen after White or the automatic Black reply',
     stalemateDeps,
   )
   assert.equal(stalemate.outcome, 'stalemate')
-  assert.equal(stalemate.finishedAtMs, 200)
+  assert.equal(stalemate.finishedAtMs, 100)
 
   const captureRules = createRuleSet({
     idealWhiteMoves: () => ['Ka4+'],
@@ -767,7 +789,7 @@ test('terminal transitions can happen after White or the automatic Black reply',
   )
   assert.equal(captured.logs[0]?.opponentSan, 'Kxa2')
   assert.equal(captured.outcome, 'lost-material')
-  assert.equal(captured.finishedAtMs, 500)
+  assert.equal(captured.finishedAtMs, 300)
 
   const fiftyFen = '7k/8/8/8/8/8/R7/K7 w - - 99 1'
   const fiftyRules = createRuleSet({
@@ -817,11 +839,11 @@ test('a terminal historical replacement uses its original move time and remains 
   )
 
   assert.equal(replaced.outcome, 'checkmate')
-  assert.equal(replaced.finishedAtMs, 1_400)
-  assert.equal(getMateElapsedMs(replaced, 50_000), 400)
+  assert.equal(replaced.finishedAtMs, 1_000)
+  assert.equal(getMateElapsedMs(replaced, 50_000), 0)
   const beginning = undoMateMove(replaced)
   assert.deepEqual(beginning.logs, [])
-  assert.equal(redoMateMove(beginning).finishedAtMs, 1_400)
+  assert.equal(redoMateMove(beginning).finishedAtMs, 1_000)
 })
 
 test('historical White replacement rejects a legal nonideal move without consuming dependencies', () => {

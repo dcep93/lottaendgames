@@ -51,7 +51,7 @@ export type MateSession = {
   logs: MateLogEntry[]
   history: MateSnapshot[]
   historyIndex: number
-  startedAtMs: number
+  startedAtMs: number | undefined
   finishedAtMs?: number
   outcome?: MateTerminalOutcome
 }
@@ -242,11 +242,12 @@ function previousWhiteTurnFen(
 function lastWhiteMoveAtMs(session: MateSession): number {
   return session.logs.reduce(
     (time, log) => time + log.durationMs,
-    session.startedAtMs,
+    session.startedAtMs ?? 0,
   )
 }
 
 function moveDurationMs(session: MateSession, now: number): number {
+  if (session.startedAtMs === undefined) return 0
   return Math.max(0, now - lastWhiteMoveAtMs(session))
 }
 
@@ -258,7 +259,7 @@ function historicalWhiteMoveAtMs(
     .slice(0, logIndex + 1)
     .reduce(
       (time, log) => time + log.durationMs,
-      session.startedAtMs,
+      session.startedAtMs ?? 0,
     )
 }
 
@@ -419,11 +420,9 @@ export function createMateSession(
     selection.startingFen ??
     deps.generatePosition(selection.mateId, selection.mode, deps.random)
   const startingFen = getChess(generatedFen).fen()
-  const startedAtMs = deps.now()
   const outcome = getMateTerminalOutcome(selection.mateId, startingFen)
-  const finishedAtMs = outcome === undefined ? undefined : startedAtMs
   const history = [
-    makeSnapshot(startingFen, [], finishedAtMs, outcome),
+    makeSnapshot(startingFen, [], undefined, outcome),
   ]
   return {
     mateId: selection.mateId,
@@ -433,8 +432,8 @@ export function createMateSession(
     logs: [],
     history,
     historyIndex: 0,
-    startedAtMs,
-    finishedAtMs,
+    startedAtMs: undefined,
+    finishedAtMs: undefined,
     outcome,
   }
 }
@@ -476,7 +475,7 @@ export function createMateReplaySession(
       session,
       completed,
       session.logs,
-      session.startedAtMs,
+      session.startedAtMs ?? 0,
     )
   }
   return selection.startAtBeginning ? applySnapshot(session, 0) : session
@@ -502,8 +501,11 @@ function playWhiteMoveWithPreferredReply(
     deps,
   })
   if (completed === undefined) return session
+  const startedSession = session.startedAtMs === undefined
+    ? { ...session, startedAtMs: transitionAtMs }
+    : session
   return commitCompletedTurn(
-    session,
+    startedSession,
     completed,
     session.logs,
     transitionAtMs,
@@ -564,6 +566,7 @@ export function getMateElapsedMs(
   session: MateSession,
   now: number,
 ): number {
+  if (session.startedAtMs === undefined) return 0
   return Math.max(0, (session.finishedAtMs ?? now) - session.startedAtMs)
 }
 

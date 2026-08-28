@@ -166,6 +166,18 @@ permanent adversarial corpus. Omit both root-limit options to traverse the
 complete legal Standard root universe for final validation; the JSON labels
 that run `complete-standard-universe`.
 
+For a resumable fail-fast proof of the current Two Bishops policy, including an
+exact D4-canonical census of how many candidate moves each ordered rule filters,
+run from `app/`:
+
+```sh
+npm run verify:two-bishops-exhaustive
+```
+
+The command has no root or node limit. It persists only completed node proofs
+and reports `certificate.completeStandardUniverse: true` only after the entire
+canonical Standard universe has been enumerated successfully.
+
 The Bishop + Knight gate uses the same exhaustive continuation semantics. Its
 fixed-seed D4-canonical roots are stratified by king edge distance, phase and
 lookup applicability, key-square status, piece geometry, and active visible
