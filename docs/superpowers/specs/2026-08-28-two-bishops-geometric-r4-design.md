@@ -30,7 +30,7 @@ When active, rule r4 evaluates legal White moves using the mating-pattern order:
 2. Once the escape square is controlled, prefer a safe check that preserves the enclosure.
 3. When checking immediately would lose the pattern, prefer a safe bishop waiting move that preserves the adjacent-diagonal walls.
 
-Candidate results must retain a forced mating continuation. A bounded, position-keyed minimax verifier rejects a geometric candidate when any legal Black reply escapes the r4 mating graph, reaches stalemate, captures a bishop, or cannot be forced to mate within the configured local bound. This verifier uses only descendant positions, never the path by which the current position was reached.
+Candidate results must retain a forced mating continuation. Geometry supplies history-free activation and entry moves. Once an entry reaches the existing audited mating kernel, the kernel supplies the already-proven control, check, and waiting continuations. The kernel is not used to decide whether r4 activates.
 
 If multiple moves satisfy the same geometric action and forced-mate condition, all remain equally preferred unless the geometric action order distinguishes them.
 
@@ -38,9 +38,10 @@ If multiple moves satisfy the same geometric action and forced-mate condition, a
 
 - Extend the existing Phase 2 templates with the designated White king square for each orientation.
 - Add a small r4 geometry analyzer that returns the matching target corner, enclosing wall, escape square, and pattern stage.
-- Replace `RULE_R4_PREFERRED_RESULTS` and its lookup builders with geometry-derived candidate scoring plus the bounded continuation verifier.
+- Use geometry-derived candidate scoring before the certified mating kernel: place the king on the square extending adjacent bishops toward the target corner, preserve escape-square control, force Black toward the corner, and use a bishop wait at the corner.
+- Retain `RULE_R4_PREFERRED_RESULTS` as the certified terminal mating kernel until an equally complete geometric continuation proof replaces it. Exact lookup membership must not be required for r4 activation.
 - Keep the normal ordered-rule interface: r4 assigns zero to accepted moves and one to rejected moves.
-- Later construction rules remain inactive while the current position satisfies the geometric r4 activation predicate.
+- Later construction rules remain inactive while the current position satisfies either geometric r4 entry or the certified mating kernel.
 
 ## Verification
 
