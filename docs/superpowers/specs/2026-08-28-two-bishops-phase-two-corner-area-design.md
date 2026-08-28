@@ -82,6 +82,8 @@ After `Bb5 Ka8`, accept `Kc8` or any legal bishop move that keeps the bishops on
 
 The position `8/8/8/k1B5/2B5/2K5/8/8 w - - 0 1` is another r4 waiting stage. Accept exactly `Ba7`, `Bd4`, `Be3`, `Bf2`, `Bg1`, `Bd3`, `Be2`, and `Bf1`: each preserves the adjacent walls, leaves both bishops safe, and forces `Ka4`. Continue with `Bb6 Ka3 Bb5 Ka2 Kc2`. Against `Ka3`, play `Bc5+ Ka2 Bc4+ Ka1 Bd4#`; against `Ka1`, play `Bc5 Ka2 Bc4+ Ka1 Bd4#`. Register every position under all rotations and reflections.
 
+The shifted corner position `k7/2K5/3B4/1B6/8/8/8/8 w - - 2 2` is also an r4 waiting stage. Keep the inner bishop on `b5` and accept exactly the safe outer-bishop waits along the `a3`–`f8` wall diagonal: `Be7`, `Bf8`, `Bb4`, and `Ba3`. `Bc5` is stalemate, while `Bd7` incorrectly moves the inner bishop. Every accepted wait forces `Ka7`, followed by `Bc5+ Ka8 Bc6#`. Register the full line under all rotations and reflections.
+
 Display the complete supplied line as a looping animated rule diagram, including the r5 entry move and every Black reply.
 
 ## Rule r15
