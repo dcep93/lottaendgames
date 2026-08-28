@@ -2,7 +2,7 @@
 
 ## Goal
 
-Define Phase 2 from the supplied corner formation, keep r11 aligned with its enclosing-wall setup, retain r5 as an independent later cage pattern, and use Euclidean king proximity for r15.
+Define Phase 2 from the supplied corner formation, keep r7 aligned with its enclosing-wall setup, retain r5 as an independent later cage pattern, and use Euclidean king proximity for r15.
 
 ## Canonical Phase 2
 
@@ -16,7 +16,7 @@ Phase 2 accepts this formation under all eight rotations and reflections. White'
 
 ## Enclosing Phase 2 diagonals
 
-Rule r11 applies when the starting bishops control any adjacent parallel diagonals with Black strictly on a corner side and at least four diagonals between the wall and that corner. White's location does not affect applicability. The starting enclosure fixes the candidate corner.
+Rule r7 applies when the starting bishops control any adjacent parallel diagonals with Black strictly on a corner side and at least four diagonals between the wall and that corner. White's location does not affect applicability. The starting enclosure fixes the candidate corner.
 
 ## Rule r10
 
@@ -36,11 +36,11 @@ Rule r9 derives its stage from the board rather than stored history and applies 
 
 In `8/8/8/1k6/8/4B3/2K3B1/8 w - - 0 1`, the staging square is `e2`; the intended milestones are White king `e2`, `Be4`, `Kf3`, and `Kf4`.
 
-## Rule r11
+## Rule r7
 
 Text: "With bishops on enclosing phase 2 diagonals, prefer king proximity to a square a knight's move from Black's corner."
 
-For each qualifying starting corner, find its two on-board knight-move squares and score candidate results by White king's minimum king-step distance to either square. Use the best distance if more than one starting corner qualifies. Bishop placement is not a tie-break in r11.
+For each qualifying starting corner, find its two on-board knight-move squares and score candidate results by White king's minimum king-step distance to either square. Use the best distance if more than one starting corner qualifies. Bishop placement is not a tie-break in r7.
 
 ## Rule r5
 
@@ -84,7 +84,7 @@ Compare White-to-Black king proximity by squared Euclidean distance. Bishop move
 
 ## Rule order
 
-The policy order is: mate, bishop safety, no stalemate, r4, r5, r9, r10, r11, r12, r15.
+The policy order is: mate, bishop safety, no stalemate, r4, r5, r7, r9, r10, r12, r15.
 
 ## Diagram
 
@@ -92,4 +92,4 @@ Display the supplied canonical position `k7/2KB4/3B4/8/8/8/8/8 w - - 2 2`. Do no
 
 ## Verification
 
-Focused tests cover all four canonical Black edge squares, both bishop diagonals, arbitrary White king positions, all rotations/reflections, rejection of formation deviations, r9's phase-independent staging, alignment, and two-step wall crossing under symmetry, r10's result-only wall scoring, r11's transformed corner and knight-square distance including the `Kb6` regression, r5's candidate-result cage creation priority, generic two-square cage, nearer-edge target, legacy instance, and symmetry, r4's full supplied branch, symmetry, neutrality outside known branches, exact animated frames, r15's squared Euclidean comparison, the diagram, and exact rule order/text. Then run the exact early-exit search from UI-valid roots, orient the first valid loop so Black starts closest to `a7`, and load it at cursor 0.
+Focused tests cover all four canonical Black edge squares, both bishop diagonals, arbitrary White king positions, all rotations/reflections, rejection of formation deviations, r7's transformed corner and knight-square distance including the `Kb6` regression, r9's phase-independent staging, alignment, and two-step wall crossing under symmetry, r10's result-only wall scoring, r5's candidate-result cage creation priority, generic two-square cage, nearer-edge target, legacy instance, and symmetry, r4's full supplied branch, symmetry, neutrality outside known branches, exact animated frames, r15's squared Euclidean comparison, the diagram, and exact rule order/text. Then run the exact early-exit search from UI-valid roots, orient the first valid loop so Black starts closest to `a7`, and load it at cursor 0.
