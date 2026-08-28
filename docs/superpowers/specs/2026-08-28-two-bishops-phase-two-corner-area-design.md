@@ -54,7 +54,7 @@ The r5 cage geometry is independent of Phase 2 and is invariant under rotation a
 
 Text: "Once rule r5 has been achieved, follow the mating pattern: control the escape square, then check, sometimes using a waiting move."
 
-Rule r4 precedes r5. It is neutral until a known mating-pattern branch is reached after r5 has established the two-square cage. Every recognized r4 position must lie in a finite branch whose Black replies are forced and whose leaves are checkmate; a cycle or non-mating leaf is an implementation bug. The first branch is the supplied line from `8/8/2K5/k1B5/2B5/8/8/8 w - - 20 11`: r5 plays `Bb3`; after `Ka6`, r4 prefers `Bb4`; after `Ka7`, `Kc7`; after `Ka6`, `Bc4+`; after `Ka7`, `Bc5+`; and after `Ka8`, `Bd5#`. The ordinary mate priority remains above r4.
+Rule r4 precedes r5. It is neutral until a known mating-pattern branch is reached. Every recognized r4 position must lie in a finite branch whose every legal Black reply reaches checkmate; a cycle or non-mating leaf is an implementation bug. The first branch is the supplied line from `8/8/2K5/k1B5/2B5/8/8/8 w - - 20 11`: r4 plays `Bb3`; after `Ka6`, r4 prefers `Bb4`; after `Ka7`, `Kc7`. Black may then play `Ka6`, met by `Bc4+`, or `Ka8`, met by `Bc4` and forced `Ka7`; both lines rejoin at `Bc5+ Ka8 Bd5#`. The ordinary mate priority remains above r4.
 
 Match each branch position and result structurally, ignoring FEN move counters, and accept every rotation and reflection. At a recognized branch position, the supplied result receives no r4 penalty and every other result receives one. At an unrecognized position, r4 is neutral so later rules decide. Future branch additions extend this same position-to-result table.
 
