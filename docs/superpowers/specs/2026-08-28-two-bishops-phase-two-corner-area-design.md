@@ -17,19 +17,13 @@ Phase 2 accepts this exact piece placement under all eight rotations and reflect
 
 ## Enclosing Phase 2 diagonals
 
-Rule r11 applies when the starting bishops control the two transformed enclosing Phase 2 diagonals. In the canonical orientation these are the adjacent diagonals containing `f5` and `g5`, with Black on their `a8` side. White's location does not affect applicability. The starting enclosure fixes the candidate target orientation.
+Rule r11 applies when the starting bishops control any adjacent parallel diagonals with Black strictly on a corner side and at least four diagonals between the wall and that corner. White's location does not affect applicability. The starting enclosure fixes the candidate corner.
 
 ## Rule r11
 
-Text: "With bishops on enclosing phase 2 diagonals, prefer king proximity to its phase 2 square, then inner bishop to its long diagonal square, then outer bishop to the square that encloses Black into a 2 square cage."
+Text: "With bishops on enclosing phase 2 diagonals, prefer king proximity to a square a knight's move from Black's corner."
 
-Score candidate results lexicographically:
-
-1. king-step distance from White's king to `d6`;
-2. whether the inner bishop occupies `f5`; and
-3. whether the outer bishop occupies `g5`.
-
-Use the lexicographically best transformed orientation if more than one starting orientation qualifies.
+For each qualifying starting corner, find its two on-board knight-move squares and score candidate results by White king's minimum king-step distance to either square. Use the best distance if more than one starting corner qualifies. Bishop placement is not a tie-break in r11.
 
 ## Rule r5
 
@@ -55,4 +49,4 @@ Display the supplied canonical position `4k3/8/3K4/5BB1/8/8/8/8 w - - 4 3`. Do n
 
 ## Verification
 
-Focused tests cover the exact canonical Phase 2 placement, all rotations/reflections, rejection of one-square deviations, r11's transformed king/inner/outer order, r5's independent cage and king target under symmetry, r15's squared Euclidean comparison in the supplied regression, the diagram, and exact rule order/text. Then run the exact early-exit search from UI-valid roots and load the first valid four-ply loop at cursor 0.
+Focused tests cover the exact canonical Phase 2 placement, all rotations/reflections, rejection of one-square deviations, r11's transformed corner and knight-square distance, r5's independent cage and king target under symmetry, r15's squared Euclidean comparison in the supplied regression, the diagram, and exact rule order/text. Then run the exact early-exit search from UI-valid roots and load the first valid four-ply loop at cursor 0.
