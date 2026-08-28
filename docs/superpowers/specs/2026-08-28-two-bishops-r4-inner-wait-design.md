@@ -9,12 +9,14 @@ forced line `Bb5 Ka7 Bc5+ Ka8 Bc6#`.
 
 At the r4 corner-wait stage, a bishop move must retain the exact adjacent
 diagonal wall, avoid check and stalemate, preserve the wall after every Black
-reply, and avoid leaving a bishop en prise.
+reply, avoid leaving a bishop en prise, and retain bishop control of the next
+edge square beyond Black after its forced reply.
 
 The inner bishop may move to a square at equal or smaller squared Euclidean
 distance from the target corner. The outer bishop must move strictly closer.
 This admits valid equal-distance inner-bishop waits such as `Bb5` while still
-rejecting the previously identified non-mating outer-bishop retreat.
+rejecting non-mating retreats such as `Be2`, which abandons control of h3 after
+the forced `Kh2`.
 
 ## Verification
 
@@ -22,4 +24,3 @@ Require `Bb5` uniquely in the supplied position and verify its forced mate
 under every board symmetry. Update the earlier corner-wait regression to accept
 all valid inner-bishop waits that force mate in three. Run the focused suite and
 the cached exhaustive early-exit loop search.
-
