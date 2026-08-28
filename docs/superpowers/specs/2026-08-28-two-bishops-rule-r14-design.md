@@ -11,8 +11,9 @@ must be uniquely preferred.
 
 ## Design
 
-Rule r14 is ordered after r13 and before r15. It applies only when the starting
-position matches an exact Phase 2 bishop formation.
+Rule r14 is ordered after r13 and before r15. It applies when the starting
+bishops occupy the exact Phase 2 diagonals. Black does not need to occupy a
+Phase 2 edge square.
 
 The scorer enumerates squares adjacent to Black's king and retains those that
 are on the same rank or file as White's king with exactly one square between
@@ -28,4 +29,3 @@ reflections require no orientation-specific lookup data.
 Add a regression requiring `Bd6` as the unique best move in the supplied FEN
 and repeat it across every board symmetry. Run the focused Two Bishops test
 suite, then the cached exhaustive early-exit loop search.
-
