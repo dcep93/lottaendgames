@@ -8,17 +8,20 @@ Make r9 choose `Kg6` from
 
 ## Design
 
-The two controlled walls are `c1–d2–e3–f4–g5–h6` and
-`d1–e2–f3–g4–h5`. White on `h5` is inside because it occupies the outer
-wall. The r9 staging square is `g6`: it is edge-adjacent to the inner bishop
-on `g5`, lies on Black's side of that inner wall, and is farther from Black
-than the other candidate `f5`.
+The bishops define two tied smallest wall orientations. The preferred
+orientation is `d8–e7–f6–g5` with `c8–d7–e6–f5–g4`: Black is inside the
+a8-side enclosure and White is outside. Therefore r9 must remain neutral,
+matching r13's existing treatment of tied smallest walls. With the wall
+already controlled, r10 ties and r15 uniquely prefers `Kg6` by squared
+Euclidean king distance (`37`, versus `50` for `Kh4` and `Kh6`).
 
-The final wall-crossing branch may activate only when White's king already
-occupies that staging square. Adjacent bishops alone are insufficient. Until
-then, r9 scores moves by king-step distance to the staging square, making
-`Kg6` unique here. Once White reaches `g6`, the existing aligned three-piece
-geometry and wall-crossing behavior remain unchanged.
+When r9 does apply, its final wall-crossing branch may activate when White's king already occupies
+that staging square, or when it occupies the outer wall of a unique smallest
+enclosure as the immediate geometric continuation of the crossing. Adjacent
+bishops alone are insufficient when multiple smallest walls are tied. Until
+then, r9 scores moves by king-step distance to the staging square. This
+preserves the existing `Kf3`, `Kf4` two-step crossing for a unique wall without
+consulting move history.
 
 ## Verification
 
