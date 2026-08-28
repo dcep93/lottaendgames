@@ -19,6 +19,12 @@ Phase 2 accepts this exact piece placement under all eight rotations and reflect
 
 Rule r11 applies when the starting bishops control any adjacent parallel diagonals with Black strictly on a corner side and at least four diagonals between the wall and that corner. White's location does not affect applicability. The starting enclosure fixes the candidate corner.
 
+## Rule r10 handoff
+
+Text: "Prefer controlling adjacent diagonals not enclosing White, leaving Black as few diagonals as possible within its corner, but at least 4. Once such a wall already encloses Black, king moves preserve it for this rule."
+
+When the starting bishops already form an enclosing Phase 2 wall, a king move inherits that wall's valid r10 score and diagonal count even if White crosses to its corner side. Bishop moves continue to be scored from their result normally. This lets the established bishop wall hand off to r11 without allowing a bishop to abandon it.
+
 ## Rule r11
 
 Text: "With bishops on enclosing phase 2 diagonals, prefer king proximity to a square a knight's move from Black's corner."
@@ -49,4 +55,4 @@ Display the supplied canonical position `4k3/8/3K4/5BB1/8/8/8/8 w - - 4 3`. Do n
 
 ## Verification
 
-Focused tests cover the exact canonical Phase 2 placement, all rotations/reflections, rejection of one-square deviations, r11's transformed corner and knight-square distance, r5's independent cage and king target under symmetry, r15's squared Euclidean comparison in the supplied regression, the diagram, and exact rule order/text. Then run the exact early-exit search from UI-valid roots and load the first valid four-ply loop at cursor 0.
+Focused tests cover the exact canonical Phase 2 placement, all rotations/reflections, rejection of one-square deviations, r10's established-wall handoff, r11's transformed corner and knight-square distance including the `Kb6` regression, r5's independent cage and king target under symmetry, r15's squared Euclidean comparison, the diagram, and exact rule order/text. Then run the exact early-exit search from UI-valid roots and load the first valid four-ply loop at cursor 0.
