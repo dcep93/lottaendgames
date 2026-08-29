@@ -2,13 +2,14 @@
 
 ## Goal
 
-Generalize the three recently added r4 entries so they depend on the kings and the requested move destination, not the bishops' starting squares.
+Generalize the recently added r4 entries so they depend on the kings and the requested move destination, not the bishops' starting squares.
 
 Canonical templates:
 
 - White king d8, Black king b7: move a bishop to c5.
 - White king d8, Black king b8: move a bishop to c6.
 - White king d8, Black king b6: move the king to c8.
+- White king a5, Black king b7: move a bishop to b5.
 
 All templates apply under rotation and reflection.
 
@@ -20,4 +21,4 @@ Cache accepted result keys by the current structural position. Rule r4 activatio
 
 ## Verification
 
-Retain all three original entry tests and add the supplied alternate-bishop-position regression for `Bc5`. Test all D4 symmetries, run the focused suite, then run the cached loop search and load a valid loop at cursor 0.
+Retain the original entry tests and add the supplied `Bb5` template. Test all D4 symmetries, run the focused suite, then run the cached loop search and load a valid loop at cursor 0.
