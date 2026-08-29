@@ -9,7 +9,6 @@ Canonical templates:
 - White king d8, Black king b7: move a bishop to c5.
 - White king d8, Black king b8: move a bishop to c6.
 - White king d8, Black king b6: move the king to c8.
-- White king a5, Black king b7: move a bishop to b5.
 
 All templates apply under rotation and reflection.
 
@@ -21,4 +20,8 @@ Cache accepted result keys by the current structural position. Rule r4 activatio
 
 ## Verification
 
-Retain the original entry tests and add the supplied `Bb5` template. Test all D4 symmetries, run the focused suite, then run the cached loop search and load a valid loop at cursor 0.
+Retain the original entry tests and add alternate bishop origins. Test all D4 symmetries, run the focused suite, then run the cached loop search and load a valid loop at cursor 0.
+
+## Symmetry collision
+
+The proposed White king a5, Black king b7, bishop-to-b5 entry is D4-equivalent to the existing White king d8, Black king b7 entry. With bishop origins ignored, both templates match both positions but prescribe different destinations. A further discriminator or an explicit symmetry exception is required before both can remain unique.
