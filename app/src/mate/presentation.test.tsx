@@ -5,10 +5,7 @@ import type { Square } from 'chess.js'
 import React from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import type { ChessboardOptions } from 'react-chessboard'
-import TestRenderer, {
-  act,
-  type ReactTestRenderer,
-} from 'react-test-renderer'
+import TestRenderer, { act, type ReactTestRenderer } from 'react-test-renderer'
 import MateBoard, { MateBoardSurface } from './MateBoard'
 import { MATE_CATALOG } from './catalog'
 import {
@@ -17,16 +14,11 @@ import {
   tryMateBoardMove,
 } from './boardInteraction'
 import MateControls from './MateControls'
-import MateLog, {
-  MatePriorityGuideDialog,
-} from './MateLog'
+import MateLog, { MatePriorityGuideDialog } from './MateLog'
 import MateSidebar from './MateSidebar'
 import { MATE_SHARE_NOTIFICATION_MS } from './MateWorkspace'
 import Mate from './index'
-import {
-  getMateRuleSet,
-  knightAndBishopWhiteRules,
-} from './rules'
+import { getMateRuleSet, knightAndBishopWhiteRules } from './rules'
 import type { MateLogEntry, MateTerminalOutcome } from './session'
 import { encodeMateFen } from './share'
 import { MATE_TIMER_PREFERENCE_KEY } from './timerPreference'
@@ -95,9 +87,7 @@ type BoardRendererProps = {
 }
 
 function buttonMarkup(markup: string, label: string): string {
-  const match = markup.match(
-    new RegExp(`<button[^>]*>${label}</button>`),
-  )
+  const match = markup.match(new RegExp(`<button[^>]*>${label}</button>`))
   assert.ok(match, `missing button named ${label}`)
   return match[0]
 }
@@ -191,12 +181,14 @@ test('Mate board replaces its terminal phase badge without changing phase data',
 })
 
 test('click and drag render White optimistically, then animate only the reply', async () => {
-  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
-    .IS_REACT_ACT_ENVIRONMENT = true
+  ;(
+    globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
+  ).IS_REACT_ACT_ENVIRONMENT = true
 
   for (const interaction of ['click', 'drag'] as const) {
     const frames: BoardFrame[] = []
-    const instanceFrames: { readonly id: number; readonly position: string }[] = []
+    const instanceFrames: { readonly id: number; readonly position: string }[] =
+      []
     let nextInstanceId = 0
     let replaceFen: React.Dispatch<React.SetStateAction<string>> | undefined
     function BoardProbe({ options }: BoardRendererProps) {
@@ -320,8 +312,9 @@ test('click and drag render White optimistically, then animate only the reply', 
 })
 
 test('pointer board interactions release only board focus', async () => {
-  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
-    .IS_REACT_ACT_ENVIRONMENT = true
+  ;(
+    globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
+  ).IS_REACT_ACT_ENVIRONMENT = true
   const originalDocument = globalThis.document
   let blurs = 0
   const focusedBoardChild = {
@@ -412,8 +405,9 @@ test('pointer board interactions release only board focus', async () => {
 })
 
 test('pending board state rolls back or unmounts safely when the parent declines', async () => {
-  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
-    .IS_REACT_ACT_ENVIRONMENT = true
+  ;(
+    globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
+  ).IS_REACT_ACT_ENVIRONMENT = true
 
   for (const parentAction of ['no-op', 'disable', 'unmount'] as const) {
     const frames: BoardFrame[] = []
@@ -471,8 +465,7 @@ test('pending board state rolls back or unmounts safely when the parent declines
     assert.ok(
       frames.some(
         (frame) =>
-          frame.position === ROOK_AFTER_WHITE &&
-          frame.showAnimations === false,
+          frame.position === ROOK_AFTER_WHITE && frame.showAnimations === false,
       ),
       `${parentAction} never rendered the optimistic move`,
     )
@@ -616,7 +609,10 @@ test('Mate controls expose preserved actions and their disabled states', () => {
     markup.indexOf('aria-label="Elapsed time"'),
   ]
   assert.ok(summaryOrder.every((index) => index >= 0))
-  assert.deepEqual(summaryOrder, [...summaryOrder].sort((left, right) => left - right))
+  assert.deepEqual(
+    summaryOrder,
+    [...summaryOrder].sort((left, right) => left - right),
+  )
   const summaryEnd = markup.indexOf(
     '</div>',
     markup.indexOf('class="leg-mate-controls-summary"'),
@@ -740,13 +736,11 @@ test('Mate log exposes every training field and semantic cycle controls', () => 
     1,
   )
   assert.equal(
-    (markup.match(/<col class="leg-mate-log-intrinsic-column"/g) ?? [])
-      .length,
+    (markup.match(/<col class="leg-mate-log-intrinsic-column"/g) ?? []).length,
     6,
   )
   assert.equal(
-    (markup.match(/<col class="leg-mate-log-flexible-column"/g) ?? [])
-      .length,
+    (markup.match(/<col class="leg-mate-log-flexible-column"/g) ?? []).length,
     1,
   )
   assert.match(
@@ -782,7 +776,10 @@ test('Mate log exposes every training field and semantic cycle controls', () => 
     markup,
     /class="leg-mate-log-status-cell leg-mate-log-status-cell--multiple"[\s\S]*aria-label="Correct"/,
   )
-  assert.doesNotMatch(markup, />Correct<|>Incorrect<|>\d+ correct choices?<\/button>/)
+  assert.doesNotMatch(
+    markup,
+    />Correct<|>Incorrect<|>\d+ correct choices?<\/button>/,
+  )
   assert.match(markup, />0:01\.234</)
   assert.match(markup, />1:01\.007</)
   assert.match(markup, />rook box</)
@@ -844,8 +841,9 @@ test('Mate log exposes every training field and semantic cycle controls', () => 
 })
 
 test('Mate log cycle controls report their historical log index', async () => {
-  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
-    .IS_REACT_ACT_ENVIRONMENT = true
+  ;(
+    globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
+  ).IS_REACT_ACT_ENVIRONMENT = true
   const calls: string[] = []
   let renderer!: ReactTestRenderer
   await act(async () => {
@@ -885,8 +883,9 @@ test('Mate log cycle controls report their historical log index', async () => {
 })
 
 test('cycling a log entry preserves its row, control instance, and focus', async () => {
-  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
-    .IS_REACT_ACT_ENVIRONMENT = true
+  ;(
+    globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
+  ).IS_REACT_ACT_ENVIRONMENT = true
   function Harness() {
     const [logs, setLogs] = React.useState(ROOK_LOGS)
     return (
@@ -946,8 +945,9 @@ test('cycling a log entry preserves its row, control instance, and focus', async
 })
 
 test('reason hint is opt-in and reveals only the current rule label', async () => {
-  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
-    .IS_REACT_ACT_ENVIRONMENT = true
+  ;(
+    globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
+  ).IS_REACT_ACT_ENVIRONMENT = true
   const ruleSet = getMateRuleSet('rook')
   let renderer!: ReactTestRenderer
   await act(async () => {
@@ -991,8 +991,9 @@ test('reason hint is opt-in and reveals only the current rule label', async () =
 })
 
 test('clicking a reason highlights its guide priority until a generic reopen', async () => {
-  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
-    .IS_REACT_ACT_ENVIRONMENT = true
+  ;(
+    globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
+  ).IS_REACT_ACT_ENVIRONMENT = true
   let renderer!: ReactTestRenderer
   await act(async () => {
     renderer = TestRenderer.create(
@@ -1040,8 +1041,9 @@ test('clicking a reason highlights its guide priority until a generic reopen', a
 })
 
 test('a refined reason label still opens its generic guide priority', async () => {
-  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
-    .IS_REACT_ACT_ENVIRONMENT = true
+  ;(
+    globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
+  ).IS_REACT_ACT_ENVIRONMENT = true
   const logs = [
     {
       ...ROOK_LOGS[0]!,
@@ -1078,8 +1080,9 @@ test('a refined reason label still opens its generic guide priority', async () =
 })
 
 test('pointer-opened guides release the opener while keyboard-opened guides restore it', async () => {
-  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
-    .IS_REACT_ACT_ENVIRONMENT = true
+  ;(
+    globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
+  ).IS_REACT_ACT_ENVIRONMENT = true
   let renderer!: ReactTestRenderer
   await act(async () => {
     renderer = TestRenderer.create(
@@ -1122,8 +1125,9 @@ test('pointer-opened guides release the opener while keyboard-opened guides rest
 })
 
 test('current hint scoring is lazy and memoized by its exact inputs', async () => {
-  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
-    .IS_REACT_ACT_ENVIRONMENT = true
+  ;(
+    globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
+  ).IS_REACT_ACT_ENVIRONMENT = true
   const baseRuleSet = getMateRuleSet('rook')
   const emptyLogs = Object.freeze([])
   let hintCalls = 0
@@ -1327,7 +1331,7 @@ test('priority guide follows registered facade order and renders typed diagrams'
   assert.doesNotMatch(markup, /<img\b|\ssrc=/)
 })
 
- test('mate guides omit empty notes and place useful notes before shortcuts', () => {
+test('mate guides omit empty notes and place useful notes before shortcuts', () => {
   for (const { id } of MATE_CATALOG) {
     const markup = renderToStaticMarkup(
       <MatePriorityGuideDialog
@@ -1377,18 +1381,12 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
     bishopsMarkup,
     /finish guarantee|leg-mate-guide-guards|rules out repetition/,
   )
-  assert.doesNotMatch(
+  assert.doesNotMatch(bishopsMarkup, /mate progress|forced mate|proof distance/)
+  assert.match(
     bishopsMarkup,
-    /mate progress|forced mate|proof distance/,
+    />rule r4<[^]*>rule r6<[^]*>rule r9<[^]*>rule r10<[^]*>rule r12<[^]*>rule r17<[^]*>rule r20<[^]*>rule r25</,
   )
-  let previousRuleIndex = -1
-  for (let index = 0; index < 25; index += 1) {
-    const label = `rule ${String.fromCharCode('a'.charCodeAt(0) + index)}`
-    const ruleIndex = bishopsMarkup.indexOf(`>${label}<`, previousRuleIndex + 1)
-    assert.ok(ruleIndex > previousRuleIndex, label)
-    previousRuleIndex = ruleIndex
-  }
-  assert.doesNotMatch(bishopsMarkup, />rule [a-z][0-9][0-9.]*</)
+  assert.doesNotMatch(bishopsMarkup, />rule [a-y]</)
   const queenMarkup = renderToStaticMarkup(
     <MatePriorityGuideDialog
       {...MATE_TRAINING_INFO_PROPS}
@@ -1408,8 +1406,8 @@ test('every Mate rule set exposes the same concise universal priorities', () => 
     'two-knights-pawn',
   ] as const) {
     assert.deepEqual(
-      getMateRuleSet(mateId).whiteRuleDescriptions
-        .slice(0, 3)
+      getMateRuleSet(mateId)
+        .whiteRuleDescriptions.slice(0, 3)
         .map(({ shortLabel, helpText }) => ({ shortLabel, helpText })),
       [
         { shortLabel: 'mate', helpText: '' },
@@ -1418,16 +1416,16 @@ test('every Mate rule set exposes the same concise universal priorities', () => 
       ],
       mateId,
     )
-    for (const { shortLabel } of getMateRuleSet(mateId)
-      .whiteRuleDescriptions) {
+    for (const { shortLabel } of getMateRuleSet(mateId).whiteRuleDescriptions) {
       assert.equal(shortLabel, shortLabel.toLowerCase(), mateId)
     }
   }
 })
 
 test('priority guide traps Tab, closes with Escape, and restores focus', async () => {
-  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
-    .IS_REACT_ACT_ENVIRONMENT = true
+  ;(
+    globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
+  ).IS_REACT_ACT_ENVIRONMENT = true
   type FakeNode = {
     readonly label: string
     readonly disabled: boolean
@@ -1483,12 +1481,7 @@ test('priority guide traps Tab, closes with Escape, and restores focus', async (
   const closeNode = makeNode('Close priority guide')
   const lastNode = makeNode('Last guide action')
   const outsideNode = makeNode('Outside dialog')
-  let queriedNodes: FakeNode[] = [
-    disabledNode,
-    hiddenNode,
-    closeNode,
-    lastNode,
-  ]
+  let queriedNodes: FakeNode[] = [disabledNode, hiddenNode, closeNode, lastNode]
   const dialogNode = {
     contains: (node: FakeNode | null) =>
       node !== null && queriedNodes.includes(node),
@@ -1647,9 +1640,7 @@ test('priority guide traps Tab, closes with Escape, and restores focus', async (
 
 function reactNodeText(node: TestRenderer.ReactTestInstance): string {
   return node.children
-    .map((child) =>
-      typeof child === 'string' ? child : reactNodeText(child),
-    )
+    .map((child) => (typeof child === 'string' ? child : reactNodeText(child)))
     .join('')
 }
 
@@ -1664,11 +1655,7 @@ function currentOptions(renderer: ReactTestRenderer): ChessboardOptions {
 
 test('Mate selector exposes material icons and horizontal mode links', () => {
   const markup = renderToStaticMarkup(
-    <MateSidebar
-      mateId="rook"
-      mateMode="train"
-      onNavigate={() => undefined}
-    />,
+    <MateSidebar mateId="rook" mateMode="train" onNavigate={() => undefined} />,
   )
 
   for (const [label, href, title] of [
@@ -1699,20 +1686,13 @@ test('Mate selector exposes material icons and horizontal mode links', () => {
     markup,
     /aria-label="Rook, selected"[^>]*class="leg-mate-set-link is-active"[^>]*href="\/mate"/,
   )
-  assert.match(
-    markup,
-    /aria-current="page"[^>]*href="\/mate\/rook\/train"/,
-  )
+  assert.match(markup, /aria-current="page"[^>]*href="\/mate\/rook\/train"/)
   assert.doesNotMatch(markup, /\/standard/)
 })
 
 test('Mate selector keeps disabled mode labels on the landing path', () => {
   const markup = renderToStaticMarkup(
-    <MateSidebar
-      mateId={null}
-      mateMode={null}
-      onNavigate={() => undefined}
-    />,
+    <MateSidebar mateId={null} mateMode={null} onNavigate={() => undefined} />,
   )
 
   assert.match(markup, /aria-label="Mate mode"/)
@@ -1729,8 +1709,9 @@ test('Mate selector keeps disabled mode labels on the landing path', () => {
 })
 
 test('Mate sidebar intercepts only unmodified primary link clicks', async () => {
-  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
-    .IS_REACT_ACT_ENVIRONMENT = true
+  ;(
+    globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
+  ).IS_REACT_ACT_ENVIRONMENT = true
   const navigations: string[] = []
   let renderer!: ReactTestRenderer
   await act(async () => {
@@ -1902,10 +1883,7 @@ test('Mate landing keeps the catalog visible without mounting a drill', () => {
   assert.ok(chooserAt > explanationAt)
   assert.ok(explanationWordCount >= 50 && explanationWordCount <= 100)
   assert.match(markup, /href="\/mate\/queen"/)
-  assert.match(
-    markup,
-    /commit bb62efe68e885f71ce9df21ea707537a51b653bf/,
-  )
+  assert.match(markup, /commit bb62efe68e885f71ce9df21ea707537a51b653bf/)
   assert.match(markup, /AuthorDate: 2026-07-25T23:41:53-04:00/)
   assert.match(markup, /CommitDate: 2026-07-25T23:41:53-04:00/)
   assert.match(
@@ -2032,10 +2010,7 @@ test('Mate exposes stable desktop and narrow-layout structure', () => {
     css,
     /\.leg-mate-workspace\s*\{[^}]*grid-template-columns:\s*minmax\(16rem, 25\.6rem\) minmax\(0, 1fr\)/s,
   )
-  assert.match(
-    css,
-    /\.leg-mate-board-shell\s*\{[^}]*max-width:\s*25\.6rem/s,
-  )
+  assert.match(css, /\.leg-mate-board-shell\s*\{[^}]*max-width:\s*25\.6rem/s)
   assert.match(
     css,
     /\.leg-mate-log-reason-button\s*\{[^}]*max-width:\s*none;[^}]*white-space:\s*normal/s,
@@ -2069,10 +2044,7 @@ test('Mate exposes stable desktop and narrow-layout structure', () => {
     css,
     /\.leg-mate-share-status\s*\{[^}]*position:\s*fixed;[^}]*right:\s*1rem;[^}]*bottom:\s*1rem/s,
   )
-  assert.match(
-    css,
-    /\.leg-mate-share-status:empty\s*\{[^}]*display:\s*none/s,
-  )
+  assert.match(css, /\.leg-mate-share-status:empty\s*\{[^}]*display:\s*none/s)
   assert.doesNotMatch(
     css,
     /\.leg-mate-guide-(?:supporting|fen|copy-row|copy-status)/,
@@ -2086,10 +2058,7 @@ test('Mate exposes stable desktop and narrow-layout structure', () => {
     css,
     /\.leg-mate-log-table\s*\{[^}]*min-width:\s*44rem;[^}]*font-family:\s*inherit;[^}]*font-size:\s*0\.9rem/s,
   )
-  assert.doesNotMatch(
-    css,
-    /\.leg-mate-log-table\s*\{[^}]*Courier New/s,
-  )
+  assert.doesNotMatch(css, /\.leg-mate-log-table\s*\{[^}]*Courier New/s)
   assert.match(
     css,
     /\.leg-mate-log-table thead th\s*\{[^}]*font-size:\s*0\.82rem/s,
@@ -2098,22 +2067,10 @@ test('Mate exposes stable desktop and narrow-layout structure', () => {
     css,
     /\.leg-mate-log-table button\s*\{[^}]*font-size:\s*inherit/s,
   )
-  assert.match(
-    css,
-    /\.leg-mate-log-choice-button\s*\{[^}]*width:\s*2\.5rem/s,
-  )
-  assert.match(
-    css,
-    /\.leg-mate-log-number-column\s*\{[^}]*width:\s*3rem/s,
-  )
-  assert.match(
-    css,
-    /\.leg-mate-log-intrinsic-column\s*\{[^}]*width:\s*1%/s,
-  )
-  assert.match(
-    css,
-    /\.leg-mate-log-flexible-column\s*\{[^}]*width:\s*auto/s,
-  )
+  assert.match(css, /\.leg-mate-log-choice-button\s*\{[^}]*width:\s*2\.5rem/s)
+  assert.match(css, /\.leg-mate-log-number-column\s*\{[^}]*width:\s*3rem/s)
+  assert.match(css, /\.leg-mate-log-intrinsic-column\s*\{[^}]*width:\s*1%/s)
+  assert.match(css, /\.leg-mate-log-flexible-column\s*\{[^}]*width:\s*auto/s)
   assert.match(
     css,
     /\.leg-mate-log-status-cell--wrong\s*\{[^}]*rgba\(210,\s*82,\s*101,\s*0\.16\)/s,
@@ -2126,7 +2083,10 @@ test('Mate exposes stable desktop and narrow-layout structure', () => {
     css,
     /\.leg-mate-log-correctness-mark\s*\{[^}]*width:\s*1em;[^}]*color:\s*var\(--leg-text\);[^}]*font-size:\s*1\.75rem;[^}]*font-weight:\s*900;[^}]*text-align:\s*center/s,
   )
-  assert.doesNotMatch(css, /\.leg-mate-log-table\s*\{[^}]*min-width:\s*(?:58|62)rem/s)
+  assert.doesNotMatch(
+    css,
+    /\.leg-mate-log-table\s*\{[^}]*min-width:\s*(?:58|62)rem/s,
+  )
   assert.match(css, /@media\s*\(max-width:\s*48rem\)/)
   assert.match(
     css,
@@ -2140,10 +2100,7 @@ test('Mate exposes stable desktop and narrow-layout structure', () => {
     css,
     /\.leg-mate-guide-priorities\s*\{[^}]*align-items:\s*start[^}]*grid-template-columns:\s*minmax\(0, 3fr\) minmax\(0, 2fr\)/s,
   )
-  assert.match(
-    css,
-    /\.leg-mate-guide\s*\{[^}]*width:\s*min\(69\.6rem, 100%\)/s,
-  )
+  assert.match(css, /\.leg-mate-guide\s*\{[^}]*width:\s*min\(69\.6rem, 100%\)/s)
   assert.match(
     css,
     /@media\s*\(max-width:\s*48rem\)[\s\S]*\.leg-mate-guide-priorities\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\)/,
@@ -2200,8 +2157,9 @@ test('Mate exposes stable desktop and narrow-layout structure', () => {
 })
 
 test('Mate recreates its drill synchronously for exact route changes', async () => {
-  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
-    .IS_REACT_ACT_ENVIRONMENT = true
+  ;(
+    globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
+  ).IS_REACT_ACT_ENVIRONMENT = true
   const originalRandom = Math.random
   Math.random = () => 0
   let renderer: ReactTestRenderer | undefined
@@ -2219,9 +2177,7 @@ test('Mate recreates its drill synchronously for exact route changes', async () 
     assert.equal(mountedRenderer.root.findByType(MateLog).props.logs.length, 1)
 
     await act(async () => {
-      mountedRenderer.update(
-        matePage('rook', 'standard', MULTI_BLACK_START),
-      )
+      mountedRenderer.update(matePage('rook', 'standard', MULTI_BLACK_START))
     })
     assert.equal(mountedRenderer.root.findByType(MateLog).props.logs.length, 0)
     assert.equal(
@@ -2238,8 +2194,7 @@ test('Mate recreates its drill synchronously for exact route changes', async () 
       QUEEN_START,
     )
     assert.equal(
-      mountedRenderer.root
-        .findByProps({ 'aria-label': 'Queen, selected' })
+      mountedRenderer.root.findByProps({ 'aria-label': 'Queen, selected' })
         .props.href,
       '/mate',
     )
@@ -2250,8 +2205,9 @@ test('Mate recreates its drill synchronously for exact route changes', async () 
 })
 
 test('Mate loads replay history at its final position for Undo and Redo', async () => {
-  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
-    .IS_REACT_ACT_ENVIRONMENT = true
+  ;(
+    globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
+  ).IS_REACT_ACT_ENVIRONMENT = true
   let renderer: ReactTestRenderer | undefined
 
   try {
@@ -2266,7 +2222,10 @@ test('Mate loads replay history at its final position for Undo and Redo', async 
       ROOK_AFTER_REPLY,
     )
     assert.equal(mountedRenderer.root.findByType(MateLog).props.logs.length, 1)
-    assert.equal(mountedRenderer.root.findByType(MateControls).props.canUndo, true)
+    assert.equal(
+      mountedRenderer.root.findByType(MateControls).props.canUndo,
+      true,
+    )
 
     await act(async () => {
       mountedRenderer.root.findByType(MateControls).props.onUndo()
@@ -2279,7 +2238,10 @@ test('Mate loads replay history at its final position for Undo and Redo', async 
       mountedRenderer.root.findByType(MateLog).props.logs[0]?.opponentSan,
       undefined,
     )
-    assert.equal(mountedRenderer.root.findByType(MateControls).props.canRedo, true)
+    assert.equal(
+      mountedRenderer.root.findByType(MateControls).props.canRedo,
+      true,
+    )
 
     await act(async () => {
       mountedRenderer.root.findByType(MateControls).props.onRedo()
@@ -2294,8 +2256,9 @@ test('Mate loads replay history at its final position for Undo and Redo', async 
 })
 
 test('Mate loads a start-cursor replay with Redo seeded', async () => {
-  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
-    .IS_REACT_ACT_ENVIRONMENT = true
+  ;(
+    globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
+  ).IS_REACT_ACT_ENVIRONMENT = true
   const hrefs: string[] = []
   let renderer: ReactTestRenderer | undefined
 
@@ -2318,8 +2281,14 @@ test('Mate loads a start-cursor replay with Redo seeded', async () => {
       ROOK_START,
     )
     assert.equal(mountedRenderer.root.findByType(MateLog).props.logs.length, 0)
-    assert.equal(mountedRenderer.root.findByType(MateControls).props.canUndo, false)
-    assert.equal(mountedRenderer.root.findByType(MateControls).props.canRedo, true)
+    assert.equal(
+      mountedRenderer.root.findByType(MateControls).props.canUndo,
+      false,
+    )
+    assert.equal(
+      mountedRenderer.root.findByType(MateControls).props.canRedo,
+      true,
+    )
     assert.deepEqual(hrefs, [])
 
     await act(async () => {
@@ -2348,20 +2317,17 @@ test('Mate loads a start-cursor replay with Redo seeded', async () => {
 })
 
 test('Mate accepts a manual Black board move from half-move history', async () => {
-  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
-    .IS_REACT_ACT_ENVIRONMENT = true
+  ;(
+    globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
+  ).IS_REACT_ACT_ENVIRONMENT = true
   const hrefs: string[] = []
   let renderer: ReactTestRenderer | undefined
 
   try {
     await act(async () => {
       renderer = TestRenderer.create(
-        matePage(
-          'rook',
-          'standard',
-          ROOK_START,
-          ['Ra8+', 'Kg7'],
-          (href) => hrefs.push(href),
+        matePage('rook', 'standard', ROOK_START, ['Ra8+', 'Kg7'], (href) =>
+          hrefs.push(href),
         ),
       )
     })
@@ -2370,24 +2336,36 @@ test('Mate accepts a manual Black board move from half-move history', async () =
       mountedRenderer.root.findByType(MateControls).props.onUndo()
     })
 
-    assert.equal(mountedRenderer.root.findByType(MateBoardProbe).props.fen, ROOK_AFTER_WHITE)
-    assert.equal(mountedRenderer.root.findByType(MateBoardProbe).props.disabled, false)
-    assert.equal(mountedRenderer.root.findByType(MateControls).props.canPlayBest, false)
     assert.equal(
-      hrefs.at(-1),
-      liveMateHref('rook', 'standard', ROOK_START),
+      mountedRenderer.root.findByType(MateBoardProbe).props.fen,
+      ROOK_AFTER_WHITE,
     )
+    assert.equal(
+      mountedRenderer.root.findByType(MateBoardProbe).props.disabled,
+      false,
+    )
+    assert.equal(
+      mountedRenderer.root.findByType(MateControls).props.canPlayBest,
+      false,
+    )
+    assert.equal(hrefs.at(-1), liveMateHref('rook', 'standard', ROOK_START))
 
     await act(async () => {
       mountedRenderer.root.findByType(MateBoardProbe).props.onMove('Kh7')
     })
 
-    assert.equal(mountedRenderer.root.findByType(MateBoardProbe).props.fen, ROOK_AFTER_ALT_REPLY)
+    assert.equal(
+      mountedRenderer.root.findByType(MateBoardProbe).props.fen,
+      ROOK_AFTER_ALT_REPLY,
+    )
     assert.equal(
       mountedRenderer.root.findByType(MateLog).props.logs[0]?.opponentSan,
       'Kh7',
     )
-    assert.equal(mountedRenderer.root.findByType(MateControls).props.canRedo, false)
+    assert.equal(
+      mountedRenderer.root.findByType(MateControls).props.canRedo,
+      false,
+    )
     assert.equal(
       hrefs.at(-1),
       liveMateHref('rook', 'standard', ROOK_AFTER_ALT_REPLY),
@@ -2398,8 +2376,9 @@ test('Mate accepts a manual Black board move from half-move history', async () =
 })
 
 test('Mate syncs the current live FEN after session transitions', async () => {
-  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
-    .IS_REACT_ACT_ENVIRONMENT = true
+  ;(
+    globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
+  ).IS_REACT_ACT_ENVIRONMENT = true
   const originalRandom = Math.random
   Math.random = () => 0
   const hrefs: string[] = []
@@ -2408,12 +2387,8 @@ test('Mate syncs the current live FEN after session transitions', async () => {
   try {
     await act(async () => {
       renderer = TestRenderer.create(
-        matePage(
-          'rook',
-          'standard',
-          MULTI_BLACK_START,
-          null,
-          (href) => hrefs.push(href),
+        matePage('rook', 'standard', MULTI_BLACK_START, null, (href) =>
+          hrefs.push(href),
         ),
       )
     })
@@ -2421,10 +2396,7 @@ test('Mate syncs the current live FEN after session transitions', async () => {
     const currentFen = () =>
       mountedRenderer.root.findByType(MateBoardProbe).props.fen as string
     const assertLatestHref = (fen = currentFen()) =>
-      assert.equal(
-        hrefs.at(-1),
-        liveMateHref('rook', 'standard', fen),
-      )
+      assert.equal(hrefs.at(-1), liveMateHref('rook', 'standard', fen))
 
     assertLatestHref()
     await act(async () => {
@@ -2465,8 +2437,9 @@ test('Mate syncs the current live FEN after session transitions', async () => {
 })
 
 test('Mate Play Best stages White before committing Black and cancels on route change', async () => {
-  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
-    .IS_REACT_ACT_ENVIRONMENT = true
+  ;(
+    globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
+  ).IS_REACT_ACT_ENVIRONMENT = true
   const originalRandom = Math.random
   Math.random = () => 0
   let renderer: ReactTestRenderer | undefined
@@ -2487,9 +2460,15 @@ test('Mate Play Best stages White before committing Black and cancels on route c
 
     const whiteFen = mountedRenderer.root.findByType(MateBoardProbe).props.fen
     assert.notEqual(whiteFen, MULTI_BLACK_START)
-    assert.equal(mountedRenderer.root.findByType(MateBoardProbe).props.disabled, true)
+    assert.equal(
+      mountedRenderer.root.findByType(MateBoardProbe).props.disabled,
+      true,
+    )
     assert.equal(mountedRenderer.root.findByType(MateControls).props.busy, true)
-    assert.equal('busy' in mountedRenderer.root.findByType(MateLog).props, false)
+    assert.equal(
+      'busy' in mountedRenderer.root.findByType(MateLog).props,
+      false,
+    )
     assert.equal(mountedRenderer.root.findByType(MateLog).props.logs.length, 0)
     assert.equal(
       mountedRenderer.root.findByType(MateControls).props.onStartOver(),
@@ -2506,15 +2485,16 @@ test('Mate Play Best stages White before committing Black and cancels on route c
       mountedRenderer.root.findByType(MateBoardProbe).props.fen,
       whiteFen,
     )
-    assert.equal(mountedRenderer.root.findByType(MateControls).props.busy, false)
+    assert.equal(
+      mountedRenderer.root.findByType(MateControls).props.busy,
+      false,
+    )
 
     await act(async () => {
       mountedRenderer.update(matePage('queen', 'standard', QUEEN_START))
     })
     await act(async () => {
-      mountedRenderer.update(
-        matePage('rook', 'standard', MULTI_BLACK_START),
-      )
+      mountedRenderer.update(matePage('rook', 'standard', MULTI_BLACK_START))
     })
     await act(async () => {
       mountedRenderer.root.findByType(MateControls).props.onPlayBest()
@@ -2525,7 +2505,10 @@ test('Mate Play Best stages White before committing Black and cancels on route c
         setTimeout(resolve, MATE_REPLY_ANIMATION_MS + 20),
       )
     })
-    assert.equal(mountedRenderer.root.findByType(MateBoardProbe).props.fen, QUEEN_START)
+    assert.equal(
+      mountedRenderer.root.findByType(MateBoardProbe).props.fen,
+      QUEEN_START,
+    )
     assert.equal(mountedRenderer.root.findByType(MateLog).props.logs.length, 0)
   } finally {
     if (renderer) await act(async () => renderer?.unmount())
@@ -2534,8 +2517,9 @@ test('Mate Play Best stages White before committing Black and cancels on route c
 })
 
 test('Mate Play Best does not flash historical log choices as disabled', async () => {
-  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
-    .IS_REACT_ACT_ENVIRONMENT = true
+  ;(
+    globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
+  ).IS_REACT_ACT_ENVIRONMENT = true
   const originalRandom = Math.random
   Math.random = () => 0
   let renderer: ReactTestRenderer | undefined
@@ -2583,8 +2567,9 @@ test('Mate Play Best does not flash historical log choices as disabled', async (
 })
 
 test('Mate restores and writes the timer visibility preference', async () => {
-  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
-    .IS_REACT_ACT_ENVIRONMENT = true
+  ;(
+    globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
+  ).IS_REACT_ACT_ENVIRONMENT = true
   const originalWindowDescriptor = Object.getOwnPropertyDescriptor(
     globalThis,
     'window',
@@ -2635,8 +2620,9 @@ test('Mate restores and writes the timer visibility preference', async () => {
 })
 
 test('Mate wires board, history, timer, and every log replacement action', async () => {
-  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
-    .IS_REACT_ACT_ENVIRONMENT = true
+  ;(
+    globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
+  ).IS_REACT_ACT_ENVIRONMENT = true
   const originalRandom = Math.random
   Math.random = () => 0
   let renderer: ReactTestRenderer | undefined
@@ -2649,7 +2635,10 @@ test('Mate wires board, history, timer, and every log replacement action', async
     })
     const mountedRenderer = renderer as ReactTestRenderer
 
-    assert.equal(mountedRenderer.root.findByType(MateControls).props.showTimer, true)
+    assert.equal(
+      mountedRenderer.root.findByType(MateControls).props.showTimer,
+      true,
+    )
     await act(async () => {
       mountedRenderer.root.findByType(MateControls).props.onToggleTimer()
     })
@@ -2704,9 +2693,7 @@ test('Mate wires board, history, timer, and every log replacement action', async
     )
 
     await act(async () => {
-      mountedRenderer.update(
-        matePage('rook', 'standard', CYCLING_WHITE_START),
-      )
+      mountedRenderer.update(matePage('rook', 'standard', CYCLING_WHITE_START))
     })
     await act(async () => {
       mountedRenderer.root.findByType(MateBoardProbe).props.onMove('Rg4')
@@ -2725,9 +2712,7 @@ test('Mate wires board, history, timer, and every log replacement action', async
     assert.ok(
       getMateRuleSet('rook')
         .idealWhiteMoves(CYCLING_WHITE_START)
-        .includes(
-          mountedRenderer.root.findByType(MateLog).props.logs[0].san,
-        ),
+        .includes(mountedRenderer.root.findByType(MateLog).props.logs[0].san),
     )
 
     await act(async () => {
@@ -2746,8 +2731,9 @@ test('Mate wires board, history, timer, and every log replacement action', async
 })
 
 test('Mate keyboard shortcuts execute only from the training surface', async () => {
-  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
-    .IS_REACT_ACT_ENVIRONMENT = true
+  ;(
+    globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
+  ).IS_REACT_ACT_ENVIRONMENT = true
   const originalDocument = globalThis.document
   const originalRandom = Math.random
   const keydownListeners = new Set<(event: KeyboardEvent) => void>()
@@ -2836,13 +2822,7 @@ test('Mate keyboard shortcuts execute only from the training surface', async () 
     assert.equal(dispatch('h'), 0)
     assert.equal(mountedRenderer.root.findByType(MateLog).props.logs.length, 0)
 
-    for (const tagName of [
-      'INPUT',
-      'SELECT',
-      'TEXTAREA',
-      'BUTTON',
-      'A',
-    ]) {
+    for (const tagName of ['INPUT', 'SELECT', 'TEXTAREA', 'BUTTON', 'A']) {
       assert.equal(
         dispatch('ArrowUp', { closest: () => null, tagName }),
         0,
@@ -2867,9 +2847,7 @@ test('Mate keyboard shortcuts execute only from the training surface', async () 
     assert.equal(
       dispatch('ArrowUp', {
         closest: (selector: string) =>
-          selector.includes('[role="button"]')
-            ? { role: 'button' }
-            : null,
+          selector.includes('[role="button"]') ? { role: 'button' } : null,
         tagName: 'DIV',
       }),
       0,
@@ -2941,8 +2919,9 @@ test('Mate keyboard shortcuts execute only from the training surface', async () 
 })
 
 test('Mate terminal sharing copies the exact starting position with status', async () => {
-  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
-    .IS_REACT_ACT_ENVIRONMENT = true
+  ;(
+    globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
+  ).IS_REACT_ACT_ENVIRONMENT = true
   const navigatorDescriptor = Object.getOwnPropertyDescriptor(
     globalThis,
     'navigator',
@@ -2971,10 +2950,7 @@ test('Mate terminal sharing copies the exact starting position with status', asy
     return originalSetTimeout(handler, timeout, ...args)
   }) as typeof setTimeout
   globalThis.clearTimeout = ((timerId: number | undefined) => {
-    if (
-      timerId !== undefined &&
-      notificationTimers.delete(Number(timerId))
-    ) {
+    if (timerId !== undefined && notificationTimers.delete(Number(timerId))) {
       return
     }
     originalClearTimeout(timerId)
@@ -3021,9 +2997,7 @@ test('Mate terminal sharing copies the exact starting position with status', asy
     assert.equal(copied.length, 1)
     assert.match(copied[0] ?? '', /^checkmate in \d{2}:\d{2}\.\d{2}\n/)
     assert.ok(
-      copied[0]?.includes(
-        `/mate/rook${encodeMateFen(ROOK_MATE_START)}`,
-      ),
+      copied[0]?.includes(`/mate/rook${encodeMateFen(ROOK_MATE_START)}`),
     )
     assert.equal(
       mountedRenderer.root.findByType(MateControls).props.shareStatus,
@@ -3084,8 +3058,9 @@ test('Mate terminal sharing copies the exact starting position with status', asy
 })
 
 test('Mate sharing ignores stale clipboard requests and session results', async () => {
-  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
-    .IS_REACT_ACT_ENVIRONMENT = true
+  ;(
+    globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
+  ).IS_REACT_ACT_ENVIRONMENT = true
   const navigatorDescriptor = Object.getOwnPropertyDescriptor(
     globalThis,
     'navigator',
@@ -3098,9 +3073,10 @@ test('Mate sharing ignores stale clipboard requests and session results', async 
     configurable: true,
     value: {
       clipboard: {
-        writeText: () => new Promise<void>((resolve, reject) => {
-          pendingCopies.push({ resolve, reject })
-        }),
+        writeText: () =>
+          new Promise<void>((resolve, reject) => {
+            pendingCopies.push({ resolve, reject })
+          }),
       },
     },
   })
@@ -3179,8 +3155,9 @@ test('Mate sharing ignores stale clipboard requests and session results', async 
 })
 
 test('Mate timers clean up across exact-route replacement and landing', async () => {
-  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
-    .IS_REACT_ACT_ENVIRONMENT = true
+  ;(
+    globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
+  ).IS_REACT_ACT_ENVIRONMENT = true
   const originalSetInterval = globalThis.setInterval
   const originalClearInterval = globalThis.clearInterval
   let nextTimerId = 0
@@ -3200,9 +3177,7 @@ test('Mate timers clean up across exact-route replacement and landing', async ()
   let renderer: ReactTestRenderer | undefined
   let boardRenders = 0
 
-  function CountingBoardProbe(
-    props: React.ComponentProps<typeof MateBoard>,
-  ) {
+  function CountingBoardProbe(props: React.ComponentProps<typeof MateBoard>) {
     boardRenders += 1
     return <MateBoardProbe {...props} />
   }
@@ -3224,12 +3199,20 @@ test('Mate timers clean up across exact-route replacement and landing', async ()
       )
     })
     const mountedRenderer = renderer as ReactTestRenderer
-    assert.equal(activeTimers.size, 0, 'opening a position must not start the timer')
+    assert.equal(
+      activeTimers.size,
+      0,
+      'opening a position must not start the timer',
+    )
 
     await act(async () => {
       mountedRenderer.root.findByType(MateBoardProbe).props.onMove('Rh5')
     })
-    assert.equal(activeTimers.size, 1, 'the first White move must start the timer')
+    assert.equal(
+      activeTimers.size,
+      1,
+      'the first White move must start the timer',
+    )
 
     const rendersBeforeTick = boardRenders
     const activeHandler = [...activeTimers.values()][0]

@@ -37,6 +37,8 @@ import {
   isViableTwoBishopsStart,
 } from './positions'
 import { parseTwoKnightsPawnManifest } from './twoKnightsPawnData'
+import { isTwoBishopsPhaseTwoPosition } from './rules/twoBishops'
+import { TWO_BISHOPS_TRAINING_FENS } from './rules/twoBishopsPhaseTwoPatternData'
 
 function sequenceRandom(values: readonly number[]): () => number {
   let index = 0
@@ -492,8 +494,25 @@ test('Train generation chooses a seed and a transform from the injected source',
       'train',
       sequenceRandom([0.75, 0.2]),
     ),
-    '8/8/8/8/8/2K5/k7/3BB3 w - - 0 1',
+    '4k3/8/6K1/5BB1/8/8/8/8 w - - 0 1',
   )
+})
+
+test('Two Bishops Training Wheels fixes White on Phase 2 and varies Black inside the cage', () => {
+  const blackSquares = new Set(['h1', 'h2', 'h3', 'h4'])
+  for (const fen of TWO_BISHOPS_TRAINING_FENS) {
+    const pieces = getEndgamePiecePlacements(fen)
+    assert.deepEqual(
+      pieces
+        .filter((piece) => piece.color === 'w')
+        .map(({ square }) => square)
+        .sort(),
+      ['e2', 'e3', 'f2'],
+    )
+    const blackKing = pieces.find((piece) => piece.color === 'b')?.square
+    assert.equal(blackSquares.has(blackKing ?? ''), true, fen)
+    assert.equal(isTwoBishopsPhaseTwoPosition(fen), true, fen)
+  }
 })
 
 test('Train generation allows repeated FENs', () => {
