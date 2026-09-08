@@ -53,3 +53,17 @@ These are independently verified example lines, not the maximum-length branches 
 ## Focused validation
 
 The completed change passed **120 policy tests with no TODOs**, **three focused guide checks**, and both app and verifier TypeScript checks. Read-only code review also passed.
+
+## Follow-up: verified loop from a fresh clock
+
+The subsequent requested search found a current four-ply loop starting at move 1 with halfmove clock zero:
+
+[Replay 1. Bc6 Kd6 2. Ba4 Ke6](http://localhost:5173/mate/two-bishops#fen=3B4/8/4k3/8/B3K3/8/8/8_w_-_-_0_1&moves=Bc6,Kd6,Ba4,Ke6&cursor=0).
+
+Starting FEN: `3B4/8/4k3/8/B3K3/8/8/8 w - - 0 1`.
+
+- **Bc6** is the unique preferred White move, decided by **r18**.
+- After **Kd6**, **Ba4** is the unique preferred White move, decided by **r30**.
+- **Ke6** restores the exact starting board and side to move. The ending FEN is `3B4/8/4k3/8/B3K3/8/8/8 w - - 4 3`.
+
+The search freshly expanded 420 historical loop-leading candidate diagrams under the current policy; old graph data supplied only the candidate positions. A separate direct replay then confirmed both unique White preferences, legal Black replies, absence of an earlier terminal outcome, exact physical recurrence, and successful app replay decoding. The engine and policy fingerprints match those above. This counterexample does not depend on an inherited draw clock. Repeating the same continuation avoids checkmate until a draw ends the game.
