@@ -120,7 +120,7 @@ const TARGET_SQUARE_NOTE_BOARD = {
   title: 'Target square',
   noteIndex: 0,
   caption:
-    "The outer wall is c1–h6. The target f4 is on the outer wall and adjacent to Black's king. If a bishop occupies f4, this wall has no target square.",
+    "The outer wall is c1–h6. The target f4 is its closest square to Black's king by king-step distance. If a bishop occupies f4, this wall has no target square.",
   pieces: [
     { square: 'e4', piece: 'K' },
     { square: 'g3', piece: 'k' },
@@ -214,7 +214,7 @@ const twoBishopsHelp: RuleHelp = {
     'Move toward an unprotected bishop.',
   ],
   notes: [
-    "The target square is an outer-wall square adjacent to Black's king. All such squares are candidates. If any candidate is occupied by a bishop, that wall has no target. White's king must be outside the wall or on the target square.",
+    "Target squares are the outer-wall squares closest to Black's king by king-step distance. All equally closest squares are candidates. If any candidate is occupied by a bishop, that wall has no target. White's king must be outside the wall or on the target square.",
     'Phase 2 is recognized when rule r4 matches an established mating-pattern geometry: either the exact Phase 2 template or a bishop move that forces Black from the edge into its associated corner, under rotation or reflection.',
   ],
   noteBoards: [TARGET_SQUARE_NOTE_BOARD, PHASE_TWO_NOTE_BOARD, RULE_R18_POINT_5_NOTE_BOARD],
@@ -1520,10 +1520,13 @@ function scoreRuleR10(
     const outerSquares = allSquares().filter(
       (square) => diagonalIndex(square, wall.axis) === outerIndex,
     )
-    const candidates = outerSquares.filter(
-      (square) => kingDistance(blackKing, square) === 1,
+    const closestDistance = Math.min(
+      ...outerSquares.map((square) => kingDistance(blackKing, square)),
     )
-    // A bishop on any adjacent candidate invalidates the wall target set.
+    const candidates = outerSquares.filter(
+      (square) => kingDistance(blackKing, square) === closestDistance,
+    )
+    // A bishop on any closest candidate invalidates the wall target set.
     const targetSquares = candidates.some((square) => bishops.includes(square))
       ? []
       : candidates.filter(

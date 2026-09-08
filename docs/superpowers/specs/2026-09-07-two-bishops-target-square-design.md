@@ -4,9 +4,9 @@ Continue the existing Find loop in lottaendgames workflow in this task. Implemen
 
 Replace r17 with r10, immediately after r8 and before r11: “Prefer fewer diagonals for Black's king, then White king's step proximity to the target square.”
 
-For each resulting eligible adjacent-diagonal wall, target candidates are all outer-wall squares adjacent to Black's king (Chebyshev distance exactly one). White's location does not affect this candidate set. If any candidate is occupied by a bishop, the entire set for that wall is invalid. No adjacent candidates means no target; never substitute a farther square.
+For each resulting eligible adjacent-diagonal wall, target candidates are all outer-wall squares minimizing king-step (Chebyshev) distance to Black's king, including every tie. White's location does not affect this candidate set. If any candidate is occupied by a bishop, the entire set for that wall is invalid. Adjacency to Black is not required; never substitute a farther square when a closest candidate is bishop-occupied.
 
-White's king must be strictly outside the wall, opposite Black across its outer diagonal, or occupy the target square itself. Apply this eligibility condition after choosing the adjacent candidate set. A king inside the wall cannot create a target, and a king on the outer wall only qualifies its own square. For target discovery, Black may occupy the inner diagonal. Preserve the minimum diagonal length, four-diagonal enclosure floor, and other rules' enclosure requirements.
+White's king must be strictly outside the wall, opposite Black across its outer diagonal, or occupy the target square itself. Apply this eligibility condition after choosing the closest candidate set. A king inside the wall cannot create a target, and a king on the outer wall only qualifies its own square. For target discovery, Black may occupy the inner diagonal. Preserve the minimum diagonal length, four-diagonal enclosure floor, and other rules' enclosure requirements.
 
 Compare complete wall profiles in the requested order: Black's diagonal count, then White's steps to a target. Remove the intermediate Black-to-inner-wall distance preference. Apply the same order both when selecting a wall profile and comparing White moves. Target existence is no longer a separate preference; a smaller enclosure wins even without a target. Only count diagonals when Black cannot legally reach the inner wall on its next move; otherwise that wall receives the no-enclosure score. Preserve target and beyond-wall geometry independently of this count eligibility. For eligible walls, count the two sides separately: start with the side containing Black, inspect every legal Black reply, and take the largest individual side count. For eligible walls, include a reachable outer-wall diagonal; an accessible inner wall invalidates the count instead. Landing on a wall is not itself a crossing into the opposite side. Do not merge the sides by flood-filling across a screened bishop. An escape to a larger side increases the count, while a crossing to a smaller side preserves it. Thus Bd8+ allowing Kf4 still counts nine rather than four diagonals; Ke6 allowing Kg8 in the h1-wall example counts eight: seven on the original side plus the reachable outer-wall diagonal.
 
@@ -14,13 +14,13 @@ Move the beyond-wall preference from r18 to r12, immediately after r10 and befor
 
 For `8/7k/8/5K2/8/8/BB6/8 w - - 0 1`, the target corner is h1, outer wall a2–g8, and beyond diagonal a3–f8. Bb3 and Ke6 both have no usable target. Bb3 counts seven diagonals; Ke6 counts eight including the reachable wall diagonal. R12 distances are two and one, respectively, but r10 takes precedence; Bb1 is now selected.
 
-The target definition and diagram precede the Phase 2 note. Use White Ke4, Black Kg3, bishops d1/d2, the outer diagonal c1–h6, and target f4; the arrow from Black to f4 illustrates target selection. Optional zero-based noteIndex associates a diagram with its note without moving unrelated diagrams.
+The target definition and diagram precede the Phase 2 note. Use White Ke4, Black Kg3, bishops d1/d2, the outer diagonal c1–h6, and target f4; the arrow from Black to f4 illustrates closest-square selection. Optional zero-based noteIndex associates a diagram with its note without moving unrelated diagrams.
 
-From `3k4/8/8/4B3/5K2/7B/8/8 w - - 0 1`, Ke4 must be uniquely preferred with target c7. Bg4 leaves White on f4, which is not a Black-adjacent candidate, and therefore has no target. Tests also cover adjacent candidates e3/f4 with Black f3, invalidation when only e3 is bishop-occupied, outside/on-target eligibility, checking escapes, smaller-side crossings, rotations/reflections, both r10 subpriorities, and r12 activation and ordering.
+From `3k4/8/8/4B3/5K2/7B/8/8 w - - 0 1`, Ke4 must be uniquely preferred with target c7. Bg4 leaves White on f4, which is not a closest candidate, and therefore has no target. Tests also cover adjacent candidates e3/f4 with Black f3, invalidation when only e3 is bishop-occupied, outside/on-target eligibility, checking escapes, smaller-side crossings, rotations/reflections, both r10 subpriorities, and r12 activation and ordering.
 
 For `8/8/7k/8/8/4K3/2BB4/8 w - - 0 1`, r10 prefers Bc3 (six diagonals) over Ke4 (nine including a reachable wall diagonal) and Kd4+ (eight diagonals). R12 would prefer Ke4 (one step) over Bc3 (two steps), but diagonal count decides first.
 
-For `8/6k1/3K4/8/8/7B/7B/8 w - - 0 1`, Ke5 and Ke6 have no target. Bg3 beats both under r18.5, but Kd5 reaches the beyond-wall diagonal and wins earlier under r12.
+For `8/6k1/3K4/8/8/7B/7B/8 w - - 0 1`, Ke5 reaches the closest target e5, two Black king steps away, and wins under r10. Ke6 has no target because White is inside the wall. Bg3 improves the bishop-edge preference but loses to Ke5 earlier under r10.
 
 After `1. Bc3 Kh5` from `8/8/7k/8/8/4K3/2BB4/8 w - - 0 1`, Bd2 allows Kh6 on the screened inner diagonal, invalidating that orientation; its other eligible orientation counts ten diagonals, losing to Kd4’s six.
 
@@ -38,9 +38,12 @@ R4 recognizes corner preparation with White already on the Phase 2 king square a
 
 Verification: focused policy suite, relevant guide ordering checks, and TypeScript compilation; then stop at the first usable non-mating witness. No full visual pass or exhaustive content suite is needed.
 
-Self-review: the latest adjacency definition supersedes closest-square selection. All requested behavior is specified, wall scores remain coherent, and unrelated book content is unaffected.
+Self-review: closest-square selection supersedes the previous adjacency requirement. All requested behavior is specified, wall scores remain coherent, and unrelated book content is unaffected.
 
 For `8/8/6B1/4K3/8/4B3/8/3k4 w - - 2 2`, r10 now prefers Kd4 over Bd3: both retain five diagonals, but Kd4 puts White two steps from target c2. Black's distance from the inner wall must not affect either wall selection or move comparison.
 
 
 Add r11 between r10 and r12: “Play the flank step.” It requires orthogonally adjacent bishops straddling ranks 4–5 on a shared file, or files d–e on a shared rank; White’s king adjacent to both; and the kings aligned perpendicular to the bishop line, exactly three king steps apart, on opposite sides of that line. Evaluate these conditions before White moves. Extend the bishop line one square past the bishop level with White’s king, away from the other bishop, and prefer the legal king move there. In `8/8/8/2B5/k1BK4/8/8/8 w - - 0 1`, this is Kc3. R11 resolves candidates retained by r10; with target proximity restored in r10, Kc3 can already win there. Preserve all eight rotations/reflections and translated placements that satisfy the central-half condition. Otherwise r11 is inactive. Validate the positive pattern, each missing precondition, rule ordering, and the next non-mating witness.
+
+
+Restore closest outer-wall targets without the Black-adjacency restriction. Keep all tied minimum king-step candidates before occupancy and White-king eligibility checks. In `8/4k3/8/3BB3/3K4/8/8/8 w - - 0 1`, c6 and d5 tie as closest squares on a8–h1. Since d5 is bishop-occupied, that wall still has no target under the existing occupied-candidate rule. Verify distant candidates and ties under all board symmetries, update notes and diagram captions, and retain r11 and r10 ordering.

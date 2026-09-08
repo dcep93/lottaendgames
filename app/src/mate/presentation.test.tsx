@@ -1365,7 +1365,7 @@ test('Two Bishops shows the target-square diagram before the Phase 2 note', () =
       ruleSet={ruleSet}
     />,
   )
-  const targetNoteAt = markup.indexOf('The target square is')
+  const targetNoteAt = markup.indexOf('Target squares are the outer-wall squares closest')
   const targetDiagramAt = markup.indexOf('The outer wall is c1')
   const phaseNoteAt = markup.indexOf('Phase 2 is recognized')
   assert.ok(targetNoteAt >= 0)
