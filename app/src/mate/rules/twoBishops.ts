@@ -651,6 +651,17 @@ function phaseTwoWallConfinesBlack(
   template: PhaseTwoTemplate,
 ): boolean {
   const chess = getChess(resultFen)
+  // The template's shorter "outer" diagonal is the wall facing Black.
+  // It must remain a complete bishop ray, even beyond Black's next move.
+  const diagonal = template.outerDiagonal
+  const bishop = diagonal.find((square) => {
+    const piece = chess.get(square)
+    return piece?.color === 'w' && piece.type === 'b'
+  })
+  if (bishop === undefined ||
+    ![diagonal[0]!, diagonal[diagonal.length - 1]!].every((square) =>
+      square === bishop || bishopControlsSquareInPosition(resultFen, bishop, square),
+    )) return false
   return chess.moves({ verbose: true }).every((reply) =>
     isInsidePhaseTwoBlackArea(reply.to, template) &&
     !template.innerDiagonal.includes(reply.to) &&

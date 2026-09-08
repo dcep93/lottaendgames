@@ -24,7 +24,7 @@ For `8/6k1/3K4/8/8/7B/7B/8 w - - 0 1`, Ke5 reaches the closest target e5, two Bl
 
 After `1. Bc3 Kh5` from `8/8/7k/8/8/4K3/2BB4/8 w - - 0 1`, Bd2 allows Kh6 on the screened inner diagonal, invalidating that orientation; its other eligible orientation counts ten diagonals, losing to Kd4’s six.
 
-R6 only credits the Phase 2 diagonals if every legal Black reply remains strictly behind the wall. A reply onto either wall diagonal invalidates confinement. In `8/8/8/8/7k/5K2/2BB4/8 w - - 0 1`, Bd1 allows Kh5 on the screened inner diagonal and must receive no Phase 2 diagonal credit. Keep the inclusive Black-area geometry used for White king path restrictions unchanged.
+R6 only credits the Phase 2 diagonals if every legal Black reply remains strictly behind the wall. A reply onto either wall diagonal invalidates confinement. The Black-facing inner wall must also have an uninterrupted bishop ray across its full extent, even when Black cannot enter the screened tail on its immediate reply. In the Phase 2 template this is the shorter `outerDiagonal`; preserve that template naming. Checking both endpoints detects an intervening king without rejecting a king at an endpoint, where no ray continues beyond it. Screening the farther wall alone does not invalidate the Black-facing barrier. In `8/8/8/8/7k/5K2/2BB4/8 w - - 0 1`, Bd1 allows Kh5 on the screened inner diagonal and must receive no Phase 2 diagonal credit. Keep the inclusive Black-area geometry used for White king path restrictions unchanged.
 
 Add the loaded r4 mating pattern from `8/8/8/k1B5/2BK4/8/8/8 w - - 0 1`: `1. Kc3 Ka4 2. Bb6 Ka3 3. Bb5 Ka2 4. Kc2 Ka3 5. Bc5+ Ka2 6. Bc4+ Ka1 7. Bd4#`. Match the exact piece geometry at each stage under all rotations/reflections. After `4...Ka1`, use `5. Bc5 Ka2` to rejoin the same finish.
 
@@ -63,3 +63,6 @@ For `8/6B1/8/8/5K1k/8/2B5/8 w - - 2 2`, Ke5 leaves White on outer wall a1–h8, 
 
 
 Add the r4 retreat `2. Bc1` with White Kc3, Black Ka2, the moving bishop on b2, and the other bishop anywhere on c2–h7 (c2, d3, e4, f5, g6, or h7). Preserve that other bishop and the king; Bc1 forces ...Ka1. Recognize every rotation/reflection, and reject missing king or diagonal geometry.
+
+
+For `8/8/6B1/8/8/5K1k/3B4/8 w - - 0 1`, Bh5 receives no r6 diagonal credit because White Kf3 screens its d1–h5 wall. This does not depend on an immediate Black escape onto that diagonal. Test all eight symmetries and verify that clearing a screened wall restores credit before bishop-square preferences.

@@ -901,6 +901,28 @@ test('rule r6 rejects Bd1 when Kh5 can enter the screened Phase 2 diagonal', () 
   }
 })
 
+test('rule r6 rejects Bh5 when White screens the wall beyond Black’s next move symmetrically', () => {
+  const fen = '8/8/6B1/8/8/5K1k/3B4/8 w - - 0 1'
+  for (const transform of SQUARE_TRANSFORMS) {
+    const transformedFen = transformFen(fen, transform)
+    const chess = getChess(transformedFen)
+    const move = chess.moves({ verbose: true }).find(
+      (candidate) => candidate.from === transformSquare('g6', transform) &&
+        candidate.to === transformSquare('h5', transform),
+    )!.san
+    const score = scoreTwoBishopsWhiteMove(transformedFen, move)
+    assert.equal(score.ruleR6DiagonalPenalty, 1, transform.name)
+    assert.equal(score.ruleR6SquarePenalty, 0, transform.name)
+    assert.equal(score.ruleR6KingPathDistance, 0, transform.name)
+    chess.move(move)
+    // Black cannot enter d1–h5 immediately, but Kf3 still screens that wall.
+    assert.ok(chess.moves({ verbose: true }).every((reply) =>
+      !(['d1', 'e2', 'f3', 'g4', 'h5'] as const)
+        .map((square) => transformSquare(square, transform)).includes(reply.to),
+    ), transform.name)
+  }
+})
+
 test('rule r6 prefers entering the Phase 2 diagonals with Be6', () => {
   const fen = '8/3K1B2/5B1k/8/8/8/8/8 w - - 0 1'
   for (const transform of SQUARE_TRANSFORMS) {
@@ -953,7 +975,7 @@ test('rule r6 always treats its Phase 2 king square as outside Black area', () =
 })
 
 test('rule r6 prefers the bishop Phase 2 squares before king proximity', () => {
-  const fen = '8/8/8/8/8/8/3BK1k1/3B4 w - - 2 2'
+  const fen = '8/8/8/8/8/3K4/3B2k1/3B4 w - - 2 2'
   for (const transform of SQUARE_TRANSFORMS) {
     const transformedFen = transformFen(fen, transform)
     const move = getChess(transformedFen)
@@ -969,6 +991,27 @@ test('rule r6 prefers the bishop Phase 2 squares before king proximity', () => {
       [move],
       transform.name,
     )
+  }
+})
+
+test('rule r6 prefers clearing the screened wall before placing a bishop on its Phase 2 square', () => {
+  const fen = '8/8/8/8/8/8/3BK1k1/3B4 w - - 2 2'
+  for (const transform of SQUARE_TRANSFORMS) {
+    const transformedFen = transformFen(fen, transform)
+    const moves = getChess(transformedFen).moves({ verbose: true })
+    const bishopMove = moves.find((move) =>
+      move.from === transformSquare('d2', transform) &&
+      move.to === transformSquare('e3', transform),
+    )!.san
+    const kingMove = moves.find((move) =>
+      move.from === transformSquare('e2', transform) &&
+      move.to === transformSquare('e1', transform),
+    )!.san
+    assert.equal(scoreTwoBishopsWhiteMove(transformedFen, bishopMove).ruleR6DiagonalPenalty,
+      1, transform.name)
+    assert.equal(scoreTwoBishopsWhiteMove(transformedFen, kingMove).ruleR6DiagonalPenalty,
+      0, transform.name)
+    assert.deepEqual(getIdealTwoBishopsWhiteMoves(transformedFen), [kingMove], transform.name)
   }
 })
 
