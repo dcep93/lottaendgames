@@ -51,7 +51,6 @@ export type TwoBishopsWhiteMoveScore = {
   readonly ruleR18Point5EdgePenalty: number
   readonly ruleR10TargetPenalty: number
   readonly ruleR10DiagonalCount: number
-  readonly ruleR10BlackInnerWallDistance: number
   readonly ruleR10TargetSquares: readonly Square[]
   readonly ruleR10KingDistance: number
   readonly ruleR11Applies: boolean
@@ -1461,7 +1460,6 @@ export function isTwoBishopsPhaseTwoPosition(fen: string): boolean {
 type RuleR10Score = {
   readonly targetPenalty: number
   readonly diagonalCount: number
-  readonly blackInnerWallDistance: number
   readonly targetSquares: readonly Square[]
   readonly kingDistance: number
   readonly beyondDistance: number
@@ -1470,7 +1468,6 @@ type RuleR10Score = {
 function compareRuleR10Scores(first: RuleR10Score, second: RuleR10Score): number {
   return (
     first.diagonalCount - second.diagonalCount ||
-    second.blackInnerWallDistance - first.blackInnerWallDistance ||
     first.kingDistance - second.kingDistance
   )
 }
@@ -1512,7 +1509,6 @@ function scoreRuleR10(
   let best: RuleR10Score = {
     targetPenalty: 1,
     diagonalCount: 99,
-    blackInnerWallDistance: 0,
     targetSquares: [],
     kingDistance: 99,
     beyondDistance: 99,
@@ -1540,11 +1536,6 @@ function scoreRuleR10(
     const score: RuleR10Score = {
       targetPenalty: targetSquares.length === 0 ? 1 : 0,
       diagonalCount: wallReplyDiagonalCount(wall, replySquares),
-      // Diagonal-index separation is perpendicular distance scaled by sqrt(2).
-      blackInnerWallDistance: Math.abs(
-        diagonalIndex(blackKing, wall.axis) -
-          (wall.side === 'minimum' ? wall.lower : wall.upper),
-      ),
       targetSquares,
       beyondDistance: beyondSquares.length === 0
         ? 99
@@ -1780,15 +1771,11 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
       id: 'rule r10',
       shortLabel: 'rule r10',
       helpText:
-        "Prefer fewer diagonals for Black's king, then Black's king further from the inner wall, then White king's step proximity to the target square.",
+        "Prefer fewer diagonals for Black's king, then White king's step proximity to the target square.",
       subpriorities: [
         {
           compare: (first, second) =>
             first.ruleR10DiagonalCount - second.ruleR10DiagonalCount,
-        },
-        {
-          compare: (first, second) =>
-            second.ruleR10BlackInnerWallDistance - first.ruleR10BlackInnerWallDistance,
         },
         {
           compare: (first, second) =>
@@ -1973,7 +1960,6 @@ export function scoreTwoBishopsWhiteMove(
     ).length,
     ruleR10TargetPenalty: ruleR10.targetPenalty,
     ruleR10DiagonalCount: ruleR10.diagonalCount,
-    ruleR10BlackInnerWallDistance: ruleR10.blackInnerWallDistance,
     ruleR10TargetSquares: ruleR10.targetSquares,
     ruleR10KingDistance: ruleR10.kingDistance,
     ruleR11Applies: ruleR11Target !== undefined,
