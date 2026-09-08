@@ -67,7 +67,7 @@ test('Two Bishops exposes only the simplified experiment policy', () => {
   )
   assert.equal(
     twoBishopsWhiteRules.find(({ id }) => id === 'rule r3')?.helpText,
-    "Prefer White's king out of the corner.",
+    "Prefer White's king out of the corner, then bishops not adjacent to a cornered White king, then bishops out of the corner.",
   )
   assert.equal(
     twoBishopsWhiteRules.find(({ id }) => id === 'rule r8')?.helpText,
@@ -1052,6 +1052,72 @@ test("rule r3 prefers White's king out of every corner", () => {
       transform.name,
     )
   }
+})
+
+test('rule r3 compares king corners, adjacent bishops, then bishop corners symmetrically', () => {
+  const fen = '7B/8/8/7k/8/8/B7/K7 w - - 0 1'
+  const rule = twoBishopsWhiteRules.find(({ id }) => id === 'rule r3')!
+  const compare = rule.compare
+  assert.ok(compare)
+  for (const transform of SQUARE_TRANSFORMS) {
+    const transformedFen = transformFen(fen, transform)
+    const scoreMove = (from: 'a1' | 'a2' | 'h8', to: 'b1' | 'b3' | 'g7' | 'b2') => {
+      const move = getChess(transformedFen).moves({ verbose: true }).find(
+        (candidate) => candidate.from === transformSquare(from, transform) &&
+          candidate.to === transformSquare(to, transform),
+      )
+      assert.ok(move, `${from}${to} ${transform.name}`)
+      return scoreTwoBishopsWhiteMove(transformedFen, move.san)
+    }
+    const leaveKingCorner = scoreMove('a1', 'b1')
+    const clearKingNeighbor = scoreMove('a2', 'b3')
+    const leaveBishopCorner = scoreMove('h8', 'g7')
+    const stayBesideKing = scoreMove('h8', 'b2')
+    const penalties = (score: typeof leaveKingCorner) => [
+      score.ruleR3CornerPenalty,
+      score.ruleR3AdjacentBishopPenalty,
+      score.ruleR3BishopCornerPenalty,
+    ]
+    assert.deepEqual(penalties(leaveKingCorner), [0, 0, 1], transform.name)
+    assert.deepEqual(penalties(clearKingNeighbor), [1, 0, 1], transform.name)
+    assert.deepEqual(penalties(leaveBishopCorner), [1, 1, 0], transform.name)
+    assert.deepEqual(penalties(stayBesideKing), [1, 2, 0], transform.name)
+    assert.ok(compare(leaveKingCorner, leaveBishopCorner) < 0, transform.name)
+    assert.ok(compare(clearKingNeighbor, leaveBishopCorner) < 0, transform.name)
+    assert.ok(compare(leaveBishopCorner, stayBesideKing) < 0, transform.name)
+
+    // Leaving the bishop on an edge is allowed; only the four corners count.
+    const edgeMove = getChess(transformedFen).moves({ verbose: true }).find(
+      (candidate) => candidate.from === transformSquare('a2', transform) &&
+        candidate.to === transformSquare('b1', transform),
+    )!
+    const remainInBishopCorner = scoreTwoBishopsWhiteMove(transformedFen, edgeMove.san)
+    assert.deepEqual(penalties(remainInBishopCorner), [1, 1, 1], transform.name)
+    assert.ok(compare(leaveBishopCorner, remainInBishopCorner) < 0, transform.name)
+  }
+})
+
+test('updated r3 guarantees mate from the second former stalemate start', () => {
+  const fen = '4B2B/8/5K1k/8/8/8/8/8 w - - 0 1'
+  assert.deepEqual(getIdealTwoBishopsWhiteMoves(fen), ['Bg7+'])
+  // Follow every selected White move and every legal Black reply, including
+  // the draw clock. A depth bound catches loops as well as a slower finish.
+  const maximumMatePlies = (position: string, remaining: number): number => {
+    const chess = getChess(position)
+    if (chess.isCheckmate()) return 0
+    assert.equal(chess.isDraw(), false, position)
+    assert.ok(remaining > 0, position)
+    const moves = chess.turn() === 'w'
+      ? getIdealTwoBishopsWhiteMoves(position)
+      : chess.moves()
+    assert.ok(moves.length > 0, position)
+    return 1 + Math.max(...moves.map((move) => {
+      const next = getChess(position)
+      next.move(move)
+      return maximumMatePlies(next.fen(), remaining - 1)
+    }))
+  }
+  assert.equal(maximumMatePlies(fen, 15), 15)
 })
 
 test("rule r8 associates each Phase 2 king square with Black's actual corner", () => {

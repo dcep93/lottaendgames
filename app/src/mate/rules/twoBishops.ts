@@ -47,6 +47,8 @@ export type TwoBishopsWhiteMoveScore = {
   readonly ruleR6KingPathDistance: number
   readonly ruleR6KingDistance: number
   readonly ruleR3CornerPenalty: number
+  readonly ruleR3AdjacentBishopPenalty: number
+  readonly ruleR3BishopCornerPenalty: number
   readonly ruleR8KingSquarePenalty: number
   readonly ruleR10EdgePenalty: number
   readonly ruleR10TargetPenalty: number
@@ -1809,9 +1811,12 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
     {
       id: 'rule r3',
       shortLabel: 'rule r3',
-      helpText: "Prefer White's king out of the corner.",
+      helpText:
+        "Prefer White's king out of the corner, then bishops not adjacent to a cornered White king, then bishops out of the corner.",
       compare: (first, second) =>
-        first.ruleR3CornerPenalty - second.ruleR3CornerPenalty,
+        first.ruleR3CornerPenalty - second.ruleR3CornerPenalty ||
+        first.ruleR3AdjacentBishopPenalty - second.ruleR3AdjacentBishopPenalty ||
+        first.ruleR3BishopCornerPenalty - second.ruleR3BishopCornerPenalty,
     },
     {
       id: 'rule r4',
@@ -2104,6 +2109,11 @@ function scoreWhiteMove(
     ruleR6KingDistance: ruleR6.kingDistance,
     ruleR3CornerPenalty:
       whiteKing === undefined || isCornerSquare(whiteKing) ? 1 : 0,
+    ruleR3AdjacentBishopPenalty:
+      whiteKing !== undefined && isCornerSquare(whiteKing)
+        ? bishops.filter((bishop) => kingDistance(bishop, whiteKing) === 1).length
+        : 0,
+    ruleR3BishopCornerPenalty: bishops.filter(isCornerSquare).length,
     ruleR8KingSquarePenalty: scoreRuleR8(resultPieces),
     ruleR10EdgePenalty: bishops.filter(
       (bishop) =>
