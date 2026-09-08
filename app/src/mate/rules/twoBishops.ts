@@ -1669,12 +1669,17 @@ function scoreRuleR22(fen: string, resultFen: string): {
           return inside && kingDistance(square, bishopSquare) === 1 &&
             squaredEuclideanDistance(blackKing, square) > bishopDistance
         })
-        return [{ behindSquares, bishopSquare, outerBishop: wall.outerBishop }]
+        return [{ behindSquares, bishopSquare, axis: wall.axis,
+          outerIndex: diagonalIndex(wall.outerBishop, wall.axis) }]
       })
   })
   if (plans.length === 0) return inactive
-  const scores = plans.map(({ behindSquares, bishopSquare, outerBishop }) => {
-    const placed = resultBishops.includes(bishopSquare) && resultBishops.includes(outerBishop)
+  const scores = plans.map(({ behindSquares, bishopSquare, axis, outerIndex }) => {
+    // Keep the inner bishop placed, but let the outer bishop make room along
+    // its wall instead of forcing the king to give up its behind-bishop square.
+    const placed = resultBishops.includes(bishopSquare) && resultBishops.some(
+      (bishop) => bishop !== bishopSquare && diagonalIndex(bishop, axis) === outerIndex,
+    )
     return {
       applies: true,
       bishopPenalty: placed ? 0 : 1,
@@ -1858,7 +1863,7 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
       id: 'rule r22',
       shortLabel: 'rule r22',
       helpText:
-        "If the White king is inside Black's diagonals, place the inner bishop on the non-edge wall diagonal square closest to White's king but not closer to Black's king. Then, walk the king behind that bishop.",
+        "If the White king is inside Black's diagonals, place the inner bishop on the non-edge wall diagonal square closest to White's king but not closer to Black's king. Then, walk the king behind that bishop, allowing the outer bishop to move along its wall to make room.",
       applies: (score) => score.ruleR22Applies,
       subpriorities: [
         { compare: (first, second) => first.ruleR22BishopPenalty - second.ruleR22BishopPenalty },

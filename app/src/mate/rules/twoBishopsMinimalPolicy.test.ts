@@ -1684,7 +1684,7 @@ test('rule r22 chooses Be5 by straight-line distance and excludes a square close
   const fen = '2k2K2/8/8/8/8/6B1/6B1/8 w - - 0 1'
   const rule = twoBishopsWhiteRules.find(({ id }) => id === 'rule r22')!
   assert.equal(rule.helpText,
-    "If the White king is inside Black's diagonals, place the inner bishop on the non-edge wall diagonal square closest to White's king but not closer to Black's king. Then, walk the king behind that bishop.")
+    "If the White king is inside Black's diagonals, place the inner bishop on the non-edge wall diagonal square closest to White's king but not closer to Black's king. Then, walk the king behind that bishop, allowing the outer bishop to move along its wall to make room.")
   for (const transform of SQUARE_TRANSFORMS) {
     const transformedFen = transformFen(fen, transform)
     const chess = getChess(transformedFen)
@@ -1725,6 +1725,49 @@ test('rule r22 walks behind Be5 to f5 inside Black area and farther from Black',
       assert.equal(other.ruleR22KingDistance, 1, transform.name)
       assert.ok(compareScoresByRules(score, other, [rule]) < 0, transform.name)
     }
+  }
+})
+
+test('rule r22 allows the outer bishop to make room along its wall symmetrically', () => {
+  const fen = '8/8/8/8/8/3k4/BB6/1K6 w - - 2 2'
+  const r22 = twoBishopsWhiteRules.find(({ id }) => id === 'rule r22')!
+  for (const transform of SQUARE_TRANSFORMS) {
+    const transformedFen = transformFen(fen, transform)
+    const moves = getChess(transformedFen).moves({ verbose: true })
+    const san = (from: 'a2' | 'b1' | 'b2', to: 'f7' | 'g8' | 'c1' | 'c3') => moves.find(
+      (move) => move.from === transformSquare(from, transform) &&
+        move.to === transformSquare(to, transform))!.san
+    const room = scoreTwoBishopsWhiteMove(transformedFen, san('a2', 'f7'))
+    const retreat = scoreTwoBishopsWhiteMove(transformedFen, san('b1', 'c1'))
+    assert.equal(room.ruleR22Applies, true, transform.name)
+    assert.equal(room.ruleR22BishopPenalty, 0, transform.name)
+    assert.equal(room.ruleR22KingDistance, 0, transform.name)
+    assert.ok(compareScoresByRules(room, retreat, [r22]) < 0, transform.name)
+    assert.equal(scoreTwoBishopsWhiteMove(transformedFen, san('b2', 'c3')).ruleR22BishopPenalty,
+      1, transform.name)
+    // Bf7 and Bg8 both satisfy r22; the existing r30 distance preference chooses Bg8.
+    assert.equal(compareScoresByRules(room,
+      scoreTwoBishopsWhiteMove(transformedFen, san('a2', 'g8')), [r22]), 0, transform.name)
+    assert.deepEqual(getIdealTwoBishopsWhiteMoves(transformedFen), [san('a2', 'g8')], transform.name)
+    const continuation = getChess(transformedFen)
+    continuation.move(san('a2', 'f7'))
+    continuation.move({ from: transformSquare('d3', transform), to: transformSquare('e4', transform) })
+    const step = continuation.moves({ verbose: true }).find((move) =>
+      move.from === transformSquare('b1', transform) &&
+      move.to === transformSquare('a2', transform))!.san
+    assert.deepEqual(getIdealTwoBishopsWhiteMoves(continuation.fen()), [step], transform.name)
+  }
+})
+
+test('rule r22 does not give placement credit when the outer bishop leaves its wall', () => {
+  const fen = '8/8/8/8/4k3/8/BB6/2K5 w - - 0 1'
+  for (const transform of SQUARE_TRANSFORMS) {
+    const transformedFen = transformFen(fen, transform)
+    const move = getChess(transformedFen).moves({ verbose: true }).find(
+      (candidate) => candidate.from === transformSquare('a2', transform) &&
+        candidate.to === transformSquare('b1', transform))!.san
+    assert.equal(scoreTwoBishopsWhiteMove(transformedFen, move).ruleR22BishopPenalty,
+      1, transform.name)
   }
 })
 
