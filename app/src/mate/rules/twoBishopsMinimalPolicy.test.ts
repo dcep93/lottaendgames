@@ -30,6 +30,7 @@ const ACTIVE_RULE_IDS = [
   'rule r6',
   'rule r8',
   'rule r10',
+  'rule r11',
   'rule r12',
   'rule r18.5',
   'rule r19',
@@ -1785,5 +1786,55 @@ test('rule r10 selects the farther inner wall before target proximity and releas
     // Bg2 shares the preferred wall and wins later under bishop safety spacing.
     assert.deepEqual(getIdealTwoBishopsWhiteMoves(transformedFen),
       [san('d5', 'g2')], transform.name)
+  }
+})
+
+
+test('rule r11 plays the flank step across both board halves under every symmetry', () => {
+  const starts = [
+    { fen: '8/8/8/2B5/k1BK4/8/8/8 w - - 0 1', from: 'd4', to: 'c3' },
+    { fen: '8/8/8/3B4/1k1BK3/8/8/8 w - - 0 1', from: 'e4', to: 'd3' },
+  ] as const
+  const r11 = twoBishopsWhiteRules.find(({ id }) => id === 'rule r11')!
+  assert.match(r11.helpText, /^Play the flank step\./)
+  for (const { fen, from, to } of starts) {
+    for (const transform of SQUARE_TRANSFORMS) {
+      const transformedFen = transformFen(fen, transform)
+      const moves = getChess(transformedFen).moves({ verbose: true })
+      const flank = moves.find((move) =>
+        move.from === transformSquare(from, transform) &&
+        move.to === transformSquare(to, transform))!.san
+      const score = scoreTwoBishopsWhiteMove(transformedFen, flank)
+      assert.equal(score.ruleR11Applies, true, transform.name)
+      assert.equal(score.ruleR11Penalty, 0, transform.name)
+      for (const move of moves.filter(({ san }) => san !== flank)) {
+        const other = scoreTwoBishopsWhiteMove(transformedFen, move.san)
+        assert.ok(compareScoresByRules(score, other, [r11]) < 0, transform.name)
+      }
+      if (from === 'd4') {
+        assert.deepEqual(getIdealTwoBishopsWhiteMoves(transformedFen), [flank], transform.name)
+      }
+    }
+  }
+})
+
+test('rule r11 stays inactive unless every flank-step condition holds', () => {
+  const cases = [
+    ['same half', '8/8/8/8/k1BK4/2B5/8/8 w - - 0 1'],
+    ['nonadjacent bishops', '8/2B5/8/8/k1BK4/8/8/8 w - - 0 1'],
+    ['king not adjacent to both bishops', '8/8/8/2B5/k1B1K3/8/8/8 w - - 0 1'],
+    ['kings not in line', '8/8/8/k1B5/2BK4/8/8/8 w - - 0 1'],
+    ['kings four steps apart', '8/8/8/3B4/k2BK3/8/8/8 w - - 0 1'],
+    ['kings on the same side', '8/8/8/2B5/2BK2k1/8/8/8 w - - 0 1'],
+  ] as const
+  for (const [name, fen] of cases) {
+    for (const transform of SQUARE_TRANSFORMS) {
+      const transformedFen = transformFen(fen, transform)
+      for (const san of getChess(transformedFen).moves()) {
+        const score = scoreTwoBishopsWhiteMove(transformedFen, san)
+        assert.equal(score.ruleR11Applies, false, `${name}: ${transform.name}`)
+        assert.equal(score.ruleR11Penalty, 0, `${name}: ${transform.name}`)
+      }
+    }
   }
 })

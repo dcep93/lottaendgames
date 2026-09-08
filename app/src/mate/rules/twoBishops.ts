@@ -54,6 +54,8 @@ export type TwoBishopsWhiteMoveScore = {
   readonly ruleR10BlackInnerWallDistance: number
   readonly ruleR10TargetSquares: readonly Square[]
   readonly ruleR10KingDistance: number
+  readonly ruleR11Applies: boolean
+  readonly ruleR11Penalty: number
   readonly ruleR12KingDistance: number
   readonly ruleR19Penalty: number
   readonly ruleR22Applies: boolean
@@ -1566,6 +1568,38 @@ function scoreRuleR10(
   return best
 }
 
+function flankStepTarget(fen: string): Square | undefined {
+  const bishops = getWhiteBishopSquares(fen)
+  const whiteKing = findPiece(fen, 'w', 'k')?.square
+  const blackKing = findPiece(fen, 'b', 'k')?.square
+  if (bishops.length !== 2 || whiteKing === undefined || blackKing === undefined ||
+    kingDistance(bishops[0]!, bishops[1]!) !== 1 ||
+    bishops.some((bishop) => kingDistance(whiteKing, bishop) !== 1) ||
+    kingDistance(whiteKing, blackKing) !== 3) return undefined
+
+  const first = squareCoordinates(bishops[0]!)
+  const second = squareCoordinates(bishops[1]!)
+  const white = squareCoordinates(whiteKing)
+  const black = squareCoordinates(blackKing)
+  for (const lineAxis of ['file', 'rank'] as const) {
+    const stepAxis = lineAxis === 'file' ? 'rank' : 'file'
+    if (first[lineAxis] !== second[lineAxis] ||
+      Math.min(first[stepAxis], second[stepAxis]) !== 3 ||
+      Math.max(first[stepAxis], second[stepAxis]) !== 4 ||
+      white[stepAxis] !== black[stepAxis] ||
+      (white[lineAxis] - first[lineAxis]) *
+        (black[lineAxis] - first[lineAxis]) >= 0) continue
+
+    // Extend the bishop line past the bishop level with White's king.
+    const other = first[stepAxis] === white[stepAxis] ? second : first
+    const step = white[stepAxis] + white[stepAxis] - other[stepAxis]
+    return (lineAxis === 'file'
+      ? squareFromCoordinates(first.file, step)
+      : squareFromCoordinates(step, first.rank)) ?? undefined
+  }
+  return undefined
+}
+
 function scoreRuleR22(fen: string, resultFen: string): {
   readonly applies: boolean
   readonly bishopPenalty: number
@@ -1763,6 +1797,14 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
       ],
     },
     {
+      id: 'rule r11',
+      shortLabel: 'rule r11',
+      helpText:
+        "Play the flank step. With adjacent bishops on different halves of the board, White's king adjacent to both, and the kings in line three steps apart on opposite sides of the bishops, move White's king into line with the bishops.",
+      applies: (score) => score.ruleR11Applies,
+      compare: (first, second) => first.ruleR11Penalty - second.ruleR11Penalty,
+    },
+    {
       id: 'rule r12',
       shortLabel: 'rule r12',
       helpText:
@@ -1880,6 +1922,7 @@ export function scoreTwoBishopsWhiteMove(
     whiteKing,
     blackReplies.map(({ to }) => to),
   )
+  const ruleR11Target = flankStepTarget(fen)
   const ruleR22 = scoreRuleR22(fen, resultFen)
   const ruleR6Applies = ruleR6Templates(fen).length > 0
   const ruleR6 = scoreRuleR6(fen, resultFen)
@@ -1933,6 +1976,8 @@ export function scoreTwoBishopsWhiteMove(
     ruleR10BlackInnerWallDistance: ruleR10.blackInnerWallDistance,
     ruleR10TargetSquares: ruleR10.targetSquares,
     ruleR10KingDistance: ruleR10.kingDistance,
+    ruleR11Applies: ruleR11Target !== undefined,
+    ruleR11Penalty: ruleR11Target === undefined || whiteKing === ruleR11Target ? 0 : 1,
     ruleR12KingDistance: ruleR10.beyondDistance,
     ruleR19Penalty: scoreRuleR19(resultFen),
     ruleR22Applies: ruleR22.applies,
