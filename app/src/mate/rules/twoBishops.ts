@@ -1901,7 +1901,7 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
       id: 'rule r10',
       shortLabel: 'rule r10',
       helpText:
-        "Prefer fewer diagonals for Black's king, then bishops off the target corner's edge, except the Phase 2 diagonals, then White king's step proximity to the target square.",
+        "Prefer fewer diagonals for Black's king, then White king's step proximity to the target square, then bishops off the target corner's edge, except the Phase 2 diagonals.",
       subpriorities: [
         {
           compare: (first, second) =>
@@ -1909,11 +1909,11 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
         },
         {
           compare: (first, second) =>
-            first.ruleR10EdgePenalty - second.ruleR10EdgePenalty,
+            first.ruleR10KingDistance - second.ruleR10KingDistance,
         },
         {
           compare: (first, second) =>
-            first.ruleR10KingDistance - second.ruleR10KingDistance,
+            first.ruleR10EdgePenalty - second.ruleR10EdgePenalty,
         },
       ],
     },
