@@ -442,8 +442,8 @@ export function createMateReplaySession(
   selection: MateReplaySessionSelection,
   deps: MateSessionDeps,
 ): MateSession {
-  if (selection.moves.length === 0 || selection.moves.length % 2 !== 0) {
-    throw new Error('Mate replay requires complete White/Black turns')
+  if (selection.moves.length === 0) {
+    throw new Error('Mate replay requires at least one move')
   }
 
   let session = createMateSession(selection, deps)
@@ -453,7 +453,7 @@ export function createMateReplaySession(
     }
     const whiteSan = selection.moves[index]
     const blackSan = selection.moves[index + 1]
-    if (whiteSan === undefined || blackSan === undefined) {
+    if (whiteSan === undefined) {
       throw new Error('Mate replay has an incomplete turn')
     }
     const completed = completeWhiteTurn({

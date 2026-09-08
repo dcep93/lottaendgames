@@ -136,8 +136,7 @@ export function decodeMateReplay(
   if (
     moves.length === 0 ||
     moves.some((move) => move === '' || /\s/.test(move)) ||
-    moves.length > MATE_REPLAY_MAX_PLIES ||
-    moves.length % 2 !== 0
+    moves.length > MATE_REPLAY_MAX_PLIES
   ) {
     return INVALID_MATE_REPLAY
   }
@@ -156,7 +155,9 @@ export function decodeMateReplay(
       return INVALID_MATE_REPLAY
     }
   }
-  if (chess.turn() !== 'w') return INVALID_MATE_REPLAY
+  if (chess.turn() !== 'w' && getMateTerminalOutcome(mateId, chess.fen()) === undefined) {
+    return INVALID_MATE_REPLAY
+  }
 
   return {
     ok: true,

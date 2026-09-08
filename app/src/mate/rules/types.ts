@@ -138,6 +138,8 @@ export type RuleNoteBoard = {
   readonly id: string
   readonly title: string
   readonly caption: string
+  /** Places this diagram immediately after the note at this zero-based index. */
+  readonly noteIndex?: number
   readonly animationSrc?: string
   readonly animationAlt?: string
   readonly animationFrames?: readonly RuleNoteBoardAnimationFrame[]

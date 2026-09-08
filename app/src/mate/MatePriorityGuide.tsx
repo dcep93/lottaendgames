@@ -1,6 +1,6 @@
 import React from 'react'
 import { MATE_CATALOG } from './catalog'
-import type { RegisteredMateRuleSet } from './rules'
+import type { RegisteredMateRuleSet, RuleNoteBoard } from './rules'
 import MateRuleNoteBoard from './MateRuleNoteBoard'
 import type { MateMode } from './types'
 
@@ -179,27 +179,23 @@ export default function MatePriorityGuideDialog({
                   <h3>Notes</h3>
                   <ul>
                     {ruleSet.help.notes.map((note, index) => (
-                      <li key={`${index}-${note}`}>{note}</li>
+                      <li key={`${index}-${note}`}>
+                        {note}
+                        <NoteBoards
+                          boards={ruleSet.help.noteBoards.filter(
+                            ({ noteIndex }) => noteIndex === index,
+                          )}
+                        />
+                      </li>
                     ))}
                   </ul>
                 </>
               )}
-              {ruleSet.help.noteBoards.length === 0 ? null : (
-                <div
-                  className={`leg-mate-guide-note-boards${
-                    ruleSet.help.noteBoards.some(
-                      ({ layout }) =>
-                        layout?.files === 8 && layout.ranks === 8,
-                    )
-                      ? ' leg-mate-guide-note-boards--full'
-                      : ''
-                  }`}
-                >
-                  {ruleSet.help.noteBoards.map((board) => (
-                    <MateRuleNoteBoard board={board} key={board.id} />
-                  ))}
-                </div>
-              )}
+              <NoteBoards
+                boards={ruleSet.help.noteBoards.filter(
+                  ({ noteIndex }) => noteIndex === undefined,
+                )}
+              />
             </section>
           )}
 
@@ -226,6 +222,24 @@ export default function MatePriorityGuideDialog({
           </section>
         </div>
       </section>
+    </div>
+  )
+}
+
+function NoteBoards({ boards }: { readonly boards: readonly RuleNoteBoard[] }) {
+  if (boards.length === 0) return null
+
+  return (
+    <div
+      className={`leg-mate-guide-note-boards${
+        boards.some(({ layout }) => layout?.files === 8 && layout.ranks === 8)
+          ? ' leg-mate-guide-note-boards--full'
+          : ''
+      }`}
+    >
+      {boards.map((board) => (
+        <MateRuleNoteBoard board={board} key={board.id} />
+      ))}
     </div>
   )
 }

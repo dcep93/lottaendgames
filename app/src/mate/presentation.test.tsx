@@ -1356,6 +1356,26 @@ test('mate guides omit empty notes and place useful notes before shortcuts', () 
   }
 })
 
+test('Two Bishops shows the target-square diagram before the Phase 2 note', () => {
+  const ruleSet = getMateRuleSet('two-bishops')
+  const markup = renderToStaticMarkup(
+    <MatePriorityGuideDialog
+      {...MATE_TRAINING_INFO_PROPS}
+      onClose={() => undefined}
+      ruleSet={ruleSet}
+    />,
+  )
+  const targetNoteAt = markup.indexOf('The target square is')
+  const targetDiagramAt = markup.indexOf('The outer wall is c1')
+  const phaseNoteAt = markup.indexOf('Phase 2 is recognized')
+  assert.ok(targetNoteAt >= 0)
+  assert.ok(targetNoteAt < targetDiagramAt)
+  assert.ok(targetDiagramAt < phaseNoteAt)
+  assert.equal(ruleSet.help.noteBoards[0]?.noteIndex, 0)
+  assert.equal(ruleSet.whiteRuleDescriptions.find(({ id }) => id === 'rule r12')?.helpText,
+    "Without a target square, prefer White’s king closer to the diagonal one beyond the outer wall.")
+})
+
 test('Rook and Two Bishops omit proof-distance teaching rules', () => {
   const rookMarkup = renderToStaticMarkup(
     <MatePriorityGuideDialog

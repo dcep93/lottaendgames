@@ -173,6 +173,7 @@ function snapshotRuleHelp(help: RuleHelp): RuleHelp {
         id: board.id,
         title: board.title,
         caption: board.caption,
+        ...(board.noteIndex === undefined ? {} : { noteIndex: board.noteIndex }),
         ...(board.animationSrc === undefined
           ? {}
           : { animationSrc: board.animationSrc }),

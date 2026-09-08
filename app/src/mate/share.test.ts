@@ -122,6 +122,17 @@ test('encodes and canonicalizes a complete legal replay line', () => {
   )
 })
 
+test('accepts a replay ending with White checkmate, including a start cursor', () => {
+  const fen = '4BB1k/5K2/8/8/8/8/8/8 w - - 0 1'
+  const moves = ['Ba4', 'Kh7', 'Bc2+', 'Kh8', 'Bg7#']
+  for (const cursor of [null, 0] as const) {
+    assert.deepEqual(decodeMateReplay(encodeMateReplay(fen, moves, cursor), 'two-bishops'),
+      { ok: true, fen, moves, ...(cursor === 0 ? { cursor: 0 } : {}) })
+  }
+  assert.deepEqual(decodeMateReplay(encodeMateReplay(fen, [...moves, 'Kh7']), 'two-bishops'),
+    { ok: false })
+})
+
 test('rejects malformed, incomplete, terminal, and oversized replays', () => {
   const mateStart = '7k/8/6K1/8/8/8/8/R7 w - - 0 1'
   const invalidHashes = [

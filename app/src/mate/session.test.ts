@@ -259,6 +259,29 @@ test('reconstructs a replay at its beginning with Redo history seeded', () => {
   assert.equal(redoMateMove(replay).historyIndex, 1)
 })
 
+test('replays the final White mate and restores it through start-cursor Redo', () => {
+  const fen = '4BB1k/5K2/8/8/8/8/8/8 w - - 0 1'
+  const moves = ['Ba4', 'Kh7', 'Bc2+', 'Kh8', 'Bg7#']
+  const deps: MateSessionDeps = {
+    now: () => 1000, random: () => 0, generatePosition: () => fen, getRuleSet: getMateRuleSet,
+  }
+  const selection = { mateId: 'two-bishops' as const, mode: 'standard' as const,
+    startingFen: fen, moves }
+  const completed = createMateReplaySession(selection, deps)
+  assert.equal(completed.outcome, 'checkmate')
+  assert.equal(completed.logs.at(-1)?.san, 'Bg7#')
+  assert.equal(completed.logs.at(-1)?.opponentSan, undefined)
+  let replay = createMateReplaySession({ ...selection, startAtBeginning: true }, deps)
+  assert.equal(replay.fen, fen)
+  assert.equal(replay.history.length, 6)
+  assert.equal(replay.outcome, undefined)
+  for (let index = 0; index < moves.length; index += 1) replay = redoMateMove(replay)
+  assert.equal(replay.fen, completed.fen)
+  assert.equal(replay.outcome, 'checkmate')
+  assert.throws(() => createMateReplaySession({ ...selection, moves: ['Ba4'] }, deps))
+  assert.throws(() => createMateReplaySession({ ...selection, moves: [...moves, 'Kh7'] }, deps))
+})
+
 test('records White and automatic Black moves as separate history steps', () => {
   const deps = createDeps({
     times: [1_000, 1_600],
