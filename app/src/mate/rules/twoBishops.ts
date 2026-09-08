@@ -56,6 +56,8 @@ export type TwoBishopsWhiteMoveScore = {
   readonly ruleR11Applies: boolean
   readonly ruleR11Penalty: number
   readonly ruleR12KingDistance: number
+  readonly ruleR18Applies: boolean
+  readonly ruleR18Penalty: number
   readonly ruleR19Penalty: number
   readonly ruleR22Applies: boolean
   readonly ruleR22BishopPenalty: number
@@ -157,6 +159,34 @@ const RULE_R10_EDGE_NOTE_BOARD = {
   ],
 } as const
 
+const RULE_R18_CHOKE_NOTE_BOARD = {
+  id: 'two-bishops-rule-r18-choke',
+  title: 'rule r18 — Play the choke move',
+  caption:
+    'The inner wall d8–h4 has five squares and touches neither edge of target corner a1. Play Bf6: the inner bishop moves from h4 to the long diagonal a1–h8.',
+  pieces: [
+    { square: 'g7', piece: 'K' },
+    { square: 'e6', piece: 'k' },
+    { square: 'e8', piece: 'B' },
+    { square: 'h4', piece: 'B' },
+  ],
+  highlights: [
+    { square: 'd8', kind: 'wall' },
+    { square: 'e7', kind: 'wall' },
+    { square: 'f6', kind: 'key' },
+    { square: 'g5', kind: 'wall' },
+    { square: 'h4', kind: 'wall' },
+    { square: 'a1', kind: 'pink' },
+    { square: 'b2', kind: 'zone' },
+    { square: 'c3', kind: 'zone' },
+    { square: 'd4', kind: 'zone' },
+    { square: 'e5', kind: 'zone' },
+    { square: 'g7', kind: 'zone' },
+    { square: 'h8', kind: 'zone' },
+  ],
+  arrows: [{ from: 'h4', to: 'f6' }],
+} as const
+
 const PHASE_TWO_NOTE_BOARD = {
   id: 'two-bishops-phase-two',
   title: 'Phase 2',
@@ -217,7 +247,7 @@ const twoBishopsHelp: RuleHelp = {
     "Target squares are the outer-wall squares closest to Black's king by king-step distance. All equally closest squares are candidates. If any candidate is occupied by a bishop, that wall has no target. White's king must be outside the wall, or on the outer wall and strictly closer to the target than Black's king by king-step distance.",
     'Phase 2 is recognized when rule r4 matches an established mating-pattern geometry: either the exact Phase 2 template or a bishop move that forces Black from the edge into its associated corner, under rotation or reflection.',
   ],
-  noteBoards: [TARGET_SQUARE_NOTE_BOARD, PHASE_TWO_NOTE_BOARD, RULE_R10_EDGE_NOTE_BOARD],
+  noteBoards: [TARGET_SQUARE_NOTE_BOARD, PHASE_TWO_NOTE_BOARD, RULE_R10_EDGE_NOTE_BOARD, RULE_R18_CHOKE_NOTE_BOARD],
 }
 
 function diagonalIndex(square: Square, axis: DiagonalAxis): number {
@@ -1693,6 +1723,24 @@ function scoreRuleR22(fen: string, resultFen: string): {
   )[0]!
 }
 
+function ruleR18Targets(fen: string): readonly Square[] {
+  const bishops = getWhiteBishopSquares(fen)
+  const blackKing = findPiece(fen, 'b', 'k')?.square
+  return smallestDiagonalWalls(getDiagonalWalls(bishops, blackKing)).flatMap((wall) => {
+    const innerIndex = diagonalIndex(wall.innerBishop, wall.axis)
+    if (diagonalLength(innerIndex, wall.axis) !== 5) return []
+    const corner = targetCorner(wall.axis, wall.side)
+    const innerSquares = allSquares().filter((square) =>
+      diagonalIndex(square, wall.axis) === innerIndex,
+    )
+    if (innerSquares.some((square) => isOnTargetCornerEdge(square, corner))) return []
+    return innerSquares.filter((square) => {
+      const { file, rank } = squareCoordinates(square)
+      return file === rank || file + rank === 7
+    })
+  })
+}
+
 function scoreRuleR19(fen: string): number {
   const bishops = getWhiteBishopSquares(fen)
   const blackKing = findPiece(fen, 'b', 'k')?.square
@@ -1854,6 +1902,14 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
       compare: (first, second) => first.ruleR12KingDistance - second.ruleR12KingDistance,
     },
     {
+      id: 'rule r18',
+      shortLabel: 'rule r18',
+      helpText:
+        "Play the choke move. When the inner wall has five squares and touches neither of the target corner's edges, prefer the inner-wall bishop on the long diagonal.",
+      applies: (score) => score.ruleR18Applies,
+      compare: (first, second) => first.ruleR18Penalty - second.ruleR18Penalty,
+    },
+    {
       id: 'rule r19',
       shortLabel: 'rule r19',
       helpText: "Prefer the outer bishop at least 3 steps away from Black's king.",
@@ -1957,6 +2013,7 @@ export function scoreTwoBishopsWhiteMove(
   )
   const ruleR11Target = flankStepTarget(fen)
   const ruleR22 = scoreRuleR22(fen, resultFen)
+  const chokeTargets = ruleR18Targets(fen)
   const ruleR6Applies = ruleR6Templates(fen).length > 0
   const ruleR6 = scoreRuleR6(fen, resultFen)
   const ruleR5 = scoreRuleR5(fen, resultFen)
@@ -2011,6 +2068,8 @@ export function scoreTwoBishopsWhiteMove(
     ruleR11Applies: ruleR11Target !== undefined,
     ruleR11Penalty: ruleR11Target === undefined || whiteKing === ruleR11Target ? 0 : 1,
     ruleR12KingDistance: ruleR10.beyondDistance,
+    ruleR18Applies: chokeTargets.length > 0,
+    ruleR18Penalty: chokeTargets.length === 0 || chokeTargets.some((square) => bishops.includes(square)) ? 0 : 1,
     ruleR19Penalty: scoreRuleR19(resultFen),
     ruleR22Applies: ruleR22.applies,
     ruleR22BishopPenalty: ruleR22.bishopPenalty,

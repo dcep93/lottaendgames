@@ -1376,6 +1376,24 @@ test('Two Bishops shows the target-square diagram before the Phase 2 note', () =
     "Without a target square, prefer White’s king closer to the diagonal one beyond the outer wall.")
 })
 
+test('Two Bishops shows the r18 choke diagram with its wall and move arrow', () => {
+  const ruleSet = getMateRuleSet('two-bishops')
+  const markup = renderToStaticMarkup(
+    <MatePriorityGuideDialog {...MATE_TRAINING_INFO_PROPS} onClose={() => undefined} ruleSet={ruleSet} />,
+  )
+  assert.match(markup, /rule r18.*Play the choke move/)
+  assert.match(markup, /inner wall d8–h4 has five squares/)
+  assert.match(markup, /long diagonal a1–h8/)
+  const diagram = ruleSet.help.noteBoards.find(({ id }) => id === 'two-bishops-rule-r18-choke')!
+  assert.deepEqual(diagram.arrows, [{ from: 'h4', to: 'f6' }])
+  assert.deepEqual(diagram.highlights.filter(({ kind }) => kind === 'wall' || kind === 'key')
+    .map(({ square }) => square), ['d8', 'e7', 'f6', 'g5', 'h4'])
+  assert.deepEqual(diagram.pieces, [
+    { square: 'g7', piece: 'K' }, { square: 'e6', piece: 'k' },
+    { square: 'e8', piece: 'B' }, { square: 'h4', piece: 'B' },
+  ])
+})
+
 test('Rook and Two Bishops omit proof-distance teaching rules', () => {
   const rookMarkup = renderToStaticMarkup(
     <MatePriorityGuideDialog

@@ -32,6 +32,7 @@ const ACTIVE_RULE_IDS = [
   'rule r10',
   'rule r11',
   'rule r12',
+  'rule r18',
   'rule r19',
   'rule r22',
   'rule r25',
@@ -49,7 +50,7 @@ test('Two Bishops exposes only the simplified experiment policy', () => {
   ])
   assert.deepEqual(
     twoBishopsRuleSet.help.noteBoards.map(({ id }) => id),
-    ['two-bishops-target-square', 'two-bishops-phase-two', 'two-bishops-rule-r10-edge'],
+    ['two-bishops-target-square', 'two-bishops-phase-two', 'two-bishops-rule-r10-edge', 'two-bishops-rule-r18-choke'],
   )
   assert.equal(twoBishopsRuleSet.help.noteBoards[0]?.noteIndex, 0)
   assert.equal(
@@ -1677,6 +1678,58 @@ test('rule r19 requires the outer bishop to remain three king steps from Black',
       1,
       `rejected ${transform.name}`,
     )
+  }
+})
+
+test('rule r18 plays Bf6 to choke the five-square inner wall symmetrically', () => {
+  const fen = '4B3/6K1/4k3/8/7B/8/8/8 w - - 0 1'
+  const rule = twoBishopsWhiteRules.find(({ id }) => id === 'rule r18')!
+  for (const transform of SQUARE_TRANSFORMS) {
+    const transformedFen = transformFen(fen, transform)
+    const moves = getChess(transformedFen).moves({ verbose: true })
+    const san = (from: 'h4' | 'e8', to: 'f6' | 'h5') => moves.find(
+      (move) => move.from === transformSquare(from, transform) &&
+        move.to === transformSquare(to, transform))!.san
+    const choke = scoreTwoBishopsWhiteMove(transformedFen, san('h4', 'f6'))
+    const loop = scoreTwoBishopsWhiteMove(transformedFen, san('e8', 'h5'))
+    assert.equal(choke.ruleR18Applies, true, transform.name)
+    assert.equal(choke.ruleR18Penalty, 0, transform.name)
+    assert.equal(loop.ruleR18Penalty, 1, transform.name)
+    assert.ok(compareScoresByRules(choke, loop, [rule]) < 0, transform.name)
+    assert.deepEqual(getIdealTwoBishopsWhiteMoves(transformedFen), [san('h4', 'f6')], transform.name)
+  }
+})
+
+test('rule r18 stays inactive for the wrong wall length or a wall touching target-corner edges', () => {
+  for (const [fen, from, to] of [
+    ['8/4B1K1/8/4k3/8/7B/8/8 w - - 0 1', 'g7', 'f8'], // Six-square inner wall.
+    ['8/8/8/8/7k/4B3/4BK2/8 w - - 0 1', 'f2', 'f1'], // Five squares, touching h1's edges.
+    ['7k/8/8/8/8/2B2B2/8/K7 w - - 0 1', 'a1', 'a2'], // No adjacent walls.
+  ] as const) {
+    for (const transform of SQUARE_TRANSFORMS) {
+      const transformedFen = transformFen(fen, transform)
+      const move = getChess(transformedFen).moves({ verbose: true }).find(
+        (candidate) => candidate.from === transformSquare(from, transform) &&
+          candidate.to === transformSquare(to, transform))!.san
+      const score = scoreTwoBishopsWhiteMove(transformedFen, move)
+      assert.equal(score.ruleR18Applies, false, `${fen} ${transform.name}`)
+      assert.equal(score.ruleR18Penalty, 0, `${fen} ${transform.name}`)
+    }
+  }
+})
+
+test('rule r18 credits retaining the inner bishop on the long diagonal symmetrically', () => {
+  const fen = '4B3/6K1/4kB2/8/8/8/8/8 w - - 0 1'
+  for (const transform of SQUARE_TRANSFORMS) {
+    const transformedFen = transformFen(fen, transform)
+    const moves = getChess(transformedFen).moves({ verbose: true })
+    for (const [from, to, penalty] of [['g7', 'h7', 0], ['f6', 'g5', 1]] as const) {
+      const move = moves.find((candidate) => candidate.from === transformSquare(from, transform) &&
+        candidate.to === transformSquare(to, transform))!.san
+      const score = scoreTwoBishopsWhiteMove(transformedFen, move)
+      assert.equal(score.ruleR18Applies, true, transform.name)
+      assert.equal(score.ruleR18Penalty, penalty, transform.name)
+    }
   }
 })
 
