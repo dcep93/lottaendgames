@@ -47,7 +47,7 @@ test('Two Bishops exposes only the simplified experiment policy', () => {
   assert.deepEqual(twoBishopsRuleSet.help.notes, [
     "Target squares are the outer-wall squares closest to Black's king by king-step distance. All equally closest squares are candidates. If any candidate is occupied by a bishop, that wall has no target. White's king must be outside the wall, or on the outer wall and no farther from the target than Black's king by king-step distance.",
     'Phase 2 is recognized when rule r4 matches an established mating-pattern geometry: either the exact Phase 2 template or a bishop move that forces Black from the edge into its associated corner, under rotation or reflection.',
-    "For r10 and r12, a bishop wall requires both adjacent diagonals to remain unscreened by White's king. A king one square from the board edge is exempt; a king at a diagonal endpoint does not screen a ray. Without a valid wall, there is no target square or one-beyond-wall diagonal.",
+    "A bishop wall remains valid only if White controls every square screened from its bishop by White's king. If any screened square is uncontrolled, that wall is invalid. Without a valid wall pair, r10 and r12 have no target square or one-beyond-wall diagonal.",
   ])
   assert.deepEqual(
     twoBishopsRuleSet.help.noteBoards.map(({ id }) => id),
@@ -996,7 +996,7 @@ test('rule r6 prefers the bishop Phase 2 squares before king proximity', () => {
   }
 })
 
-test('rule r6 exempts a White king one square from the edge from screening', () => {
+test('rule r6 rejects an uncontrolled tail even when White king is one square from the edge', () => {
   const fen = '8/8/8/8/8/8/3BK1k1/3B4 w - - 2 2'
   for (const transform of SQUARE_TRANSFORMS) {
     const transformedFen = transformFen(fen, transform)
@@ -1010,10 +1010,16 @@ test('rule r6 exempts a White king one square from the edge from screening', () 
       move.to === transformSquare('e1', transform),
     )!.san
     assert.equal(scoreTwoBishopsWhiteMove(transformedFen, bishopMove).ruleR6DiagonalPenalty,
-      0, transform.name)
+      1, transform.name)
     assert.equal(scoreTwoBishopsWhiteMove(transformedFen, kingMove).ruleR6DiagonalPenalty,
       0, transform.name)
-    assert.deepEqual(getIdealTwoBishopsWhiteMoves(transformedFen), [bishopMove], transform.name)
+    const screened = getChess(transformedFen)
+    screened.move(bishopMove)
+    assert.equal(screened.isAttacked(transformSquare('f3', transform), 'w'), true,
+      transform.name)
+    assert.equal(screened.isAttacked(transformSquare('g4', transform), 'w'), false,
+      transform.name)
+    assert.deepEqual(getIdealTwoBishopsWhiteMoves(transformedFen), [kingMove], transform.name)
   }
 })
 
@@ -1098,11 +1104,7 @@ test('rule r3 compares king corners, adjacent bishops, then bishop corners symme
   }
 })
 
-test('the second former stalemate start mates before the draw limit', {
-  // Target-first r10 reaches the verified loop recorded in
-  // docs/two-bishops-target-priority-recheck-2026-09-08.md.
-  todo: 'Target-first r10 permits a cycle; the mating-before-draw guarantee remains unresolved.',
-}, () => {
+test('the second former stalemate start mates before the draw limit', () => {
   const fen = '4B2B/8/5K1k/8/8/8/8/8 w - - 0 1'
   assert.deepEqual(getIdealTwoBishopsWhiteMoves(fen), ['Bg7+'])
   // Follow every selected White move and every legal Black reply, including
@@ -1565,9 +1567,9 @@ test('rule r10 retains every equally closest outer-wall candidate and invalidate
   }
 })
 
-test('rule r10 drops screened targets and keeps distant targets under the edge exemption', () => {
+test('rule r10 drops targets for uncontrolled tails and keeps targets for a controlled tail', () => {
   // Bg4 and Bd2 define only one wall orientation. Ke3 screens it centrally;
-  // Kg5 qualifies for the one-square edge exemption and retains its targets.
+  // Kg5 covers its only hidden square h6 and retains the wall's targets.
   const fen = '8/8/8/8/5KB1/8/3B4/7k w - - 0 1'
   const r12 = twoBishopsWhiteRules.find(({ id }) => id === 'rule r12')!
   for (const transform of SQUARE_TRANSFORMS) {
@@ -2333,7 +2335,7 @@ test('r10 rejects an inner screen even when Black reaches its hidden tail only l
   }
 })
 
-test('r10 exempts a White king one square from the edge from screening', () => {
+test('r10 retains a wall when White king controls its only hidden square', () => {
   const fen = '8/6B1/8/8/7k/8/2BK4/8 w - - 0 1'
   for (const transform of SQUARE_TRANSFORMS) {
     const transformedFen = transformFen(fen, transform)
@@ -2344,12 +2346,12 @@ test('r10 exempts a White king one square from the edge from screening', () => {
     assert.equal(scoreTwoBishopsWhiteMove(transformedFen, move).ruleR10DiagonalCount,
       5, transform.name)
     chess.move(move)
-    // Kd2 is exempt: it is one square from the edge and guards the c1 tail.
+    // Kd2 guards c1, the only square hidden from Bh6.
     assert.ok(chess.isAttacked(transformSquare('c1', transform), 'w'))
   }
 })
 
-test('one-square edge screening exemption lets r12 prefer Ke2 over Kc2 symmetrically', () => {
+test('controlled tail preserves the r12 preference for Ke2 over Kc2 symmetrically', () => {
   const fen = '8/8/8/8/1k6/3BB3/3K4/8 w - - 0 1'
   for (const transform of SQUARE_TRANSFORMS) {
     const transformedFen = transformFen(fen, transform)
@@ -2408,7 +2410,7 @@ test('r10 does not count a wall as screened when White occupies its endpoint', (
 })
 
 
-test('an exempt outer-wall White king qualifies a target when no farther than Black symmetrically', () => {
+test('an outer-wall king covering its hidden tail qualifies a target when no farther than Black', () => {
   const cases = [
     { fen: '8/6B1/8/8/8/2K5/2B5/6k1 w - - 0 1', black: 'g1', target: 'd4', distance: 2, blackDistance: 3 },
     { fen: '8/6B1/8/8/8/2K5/2B4k/8 w - - 0 1', black: 'h2', target: 'e5', distance: 3, blackDistance: 3 },

@@ -264,7 +264,7 @@ const twoBishopsHelp: RuleHelp = {
   notes: [
     "Target squares are the outer-wall squares closest to Black's king by king-step distance. All equally closest squares are candidates. If any candidate is occupied by a bishop, that wall has no target. White's king must be outside the wall, or on the outer wall and no farther from the target than Black's king by king-step distance.",
     'Phase 2 is recognized when rule r4 matches an established mating-pattern geometry: either the exact Phase 2 template or a bishop move that forces Black from the edge into its associated corner, under rotation or reflection.',
-    "For r10 and r12, a bishop wall requires both adjacent diagonals to remain unscreened by White's king. A king one square from the board edge is exempt; a king at a diagonal endpoint does not screen a ray. Without a valid wall, there is no target square or one-beyond-wall diagonal.",
+    "A bishop wall remains valid only if White controls every square screened from its bishop by White's king. If any screened square is uncontrolled, that wall is invalid. Without a valid wall pair, r10 and r12 have no target square or one-beyond-wall diagonal.",
   ],
   noteBoards: [TARGET_SQUARE_NOTE_BOARD, PHASE_TWO_NOTE_BOARD, RULE_R10_EDGE_NOTE_BOARD, RULE_R18_CHOKE_NOTE_BOARD],
 }
@@ -410,6 +410,28 @@ function wallSeparatesWhite(
   return wall.side === 'minimum'
     ? whiteIndex > wall.upper
     : whiteIndex < wall.lower
+}
+
+function bishopWallHasUncontrolledScreen(
+  chess: Chess,
+  bishop: Square,
+  whiteKing: Square | undefined,
+  axis: DiagonalAxis,
+): boolean {
+  if (whiteKing === undefined || whiteKing === bishop ||
+    diagonalIndex(whiteKing, axis) !== diagonalIndex(bishop, axis)) return false
+  const from = squareCoordinates(bishop)
+  const king = squareCoordinates(whiteKing)
+  const fileStep = Math.sign(king.file - from.file)
+  const rankStep = Math.sign(king.rank - from.rank)
+  // Walk the whole ray beyond the king, away from its bishop. The king may
+  // cover the first hidden square without covering the rest of that ray.
+  for (let file = king.file + fileStep, rank = king.rank + rankStep;
+    ; file += fileStep, rank += rankStep) {
+    const square = squareFromCoordinates(file, rank)
+    if (square === null) return false
+    if (!chess.isAttacked(square, 'w')) return true
+  }
 }
 
 function getDiagonalWalls(
@@ -699,18 +721,20 @@ function phaseTwoWallConfinesBlack(
 ): boolean {
   const chess = getChess(resultFen)
   // The template's shorter "outer" diagonal is the wall facing Black.
-  // A White king one square from the edge is exempt from screening the ray.
   const whiteKing = findPiece(resultFen, 'w', 'k')?.square
-  const exemptKing = whiteKing !== undefined && edgeDistance(whiteKing) === 1
-    ? whiteKing : undefined
   const diagonal = template.outerDiagonal
+  const axis: DiagonalAxis =
+    diagonalIndex(diagonal[0]!, 'difference') === diagonalIndex(diagonal[1]!, 'difference')
+      ? 'difference' : 'sum'
   const bishop = diagonal.find((square) => {
     const piece = chess.get(square)
     return piece?.color === 'w' && piece.type === 'b'
   })
   if (bishop === undefined ||
+    bishopWallHasUncontrolledScreen(chess, bishop, whiteKing, axis) ||
     ![diagonal[0]!, diagonal[diagonal.length - 1]!].every((square) =>
-      square === bishop || bishopControlsSquareInPosition(resultFen, bishop, square, exemptKing),
+      // A controlled king screen is allowed; other ray blockers still matter.
+      square === bishop || bishopControlsSquareInPosition(resultFen, bishop, square, whiteKing),
     )) return false
   return chess.moves({ verbose: true }).every((reply) =>
     isInsidePhaseTwoBlackArea(reply.to, template) &&
@@ -1579,12 +1603,13 @@ function wallReplyDiagonalCount(
   const countedWallIndices = new Set(
     replyIndices.filter((index) => index >= wall.lower && index <= wall.upper),
   )
-  // Screened pairs have already been excluded from wall qualification.
+  // Pairs with uncontrolled screened squares have already been excluded.
   // Count the enclosed side and any reachable outer-wall diagonal.
   return wall.diagonalCount + countedWallIndices.size
 }
 
 function scoreRuleR10(
+  chess: Chess,
   walls: readonly AdjacentDiagonalWall[],
   bishops: readonly Square[],
   blackKing: Square | undefined,
@@ -1601,14 +1626,11 @@ function scoreRuleR10(
   if (blackKing === undefined || whiteKing === undefined) return best
 
   for (const wall of walls) {
-    const innerIndex = wall.side === 'minimum' ? wall.lower : wall.upper
-    const whiteIndex = diagonalIndex(whiteKing, wall.axis)
     const outerIndex = wall.side === 'minimum' ? wall.upper : wall.lower
-    // Both rays are required to define a wall. A central king screen removes
-    // this profile's enclosure, target and one-beyond-wall geometry together.
-    // One-away kings are exempt, and endpoints have no ray continuing beyond them.
-    if (edgeDistance(whiteKing) > 1 &&
-      (whiteIndex === innerIndex || whiteIndex === outerIndex)) continue
+    // An uncontrolled hidden square on either ray invalidates the pair,
+    // including its targets and one-beyond-wall geometry.
+    if (bishops.some((bishop) =>
+      bishopWallHasUncontrolledScreen(chess, bishop, whiteKing, wall.axis))) continue
     const outerSquares = allSquares().filter(
       (square) => diagonalIndex(square, wall.axis) === outerIndex,
     )
@@ -2073,6 +2095,7 @@ function scoreWhiteMove(
     .map((wall) => wall.targetCorner)
   const targetWalls = getAdjacentDiagonalWalls(bishops, blackKing, undefined, true)
   const ruleR10 = scoreRuleR10(
+    chess,
     targetWalls,
     bishops,
     blackKing,

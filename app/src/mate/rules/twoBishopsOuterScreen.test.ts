@@ -93,7 +93,7 @@ test('the screened outer wall fails even before Black can immediately cross it',
   assert.equal(intact.isAttacked('f7', 'w'), true)
 })
 
-test('an outer-wall king one square from the edge or at its endpoint preserves the enclosure', () => {
+test('a controlled outer-wall tail or an empty endpoint tail preserves the enclosure', () => {
   const cases = [
     { fen: '5B2/8/6K1/1k6/8/1B6/8/8 w - - 0 1', from: 'g6', to: 'f7', edge: 1 },
     { fen: '5B2/5K2/8/1k6/8/1B6/8/8 w - - 0 1', from: 'f7', to: 'g8', edge: 0 },
@@ -159,7 +159,7 @@ test('screened inner and outer walls supply no enclosure, target, or r12 distanc
   }
 })
 
-test('an inner-wall king one square from the edge preserves the wall and r12 distance', () => {
+test('an inner-wall king controlling its only hidden square preserves the wall and r12 distance', () => {
   const starting = '8/6B1/8/8/7k/8/2BK4/8 w - - 0 1'
   const r12 = twoBishopsWhiteRules.find(({ id }) => id === 'rule r12')!
   for (const transform of SQUARE_TRANSFORMS) {
