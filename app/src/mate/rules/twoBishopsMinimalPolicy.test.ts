@@ -2012,7 +2012,7 @@ test('r10 counts a screened inner diagonal reachable beyond the first Black repl
   }
 })
 
-test('r10 does not add a screened inner diagonal when White guards the entire exposed tail', () => {
+test('r10 adds a screened inner diagonal even when White guards the entire exposed tail', () => {
   const fen = '8/6B1/8/8/7k/8/2BK4/8 w - - 0 1'
   for (const transform of SQUARE_TRANSFORMS) {
     const transformedFen = transformFen(fen, transform)
@@ -2021,10 +2021,45 @@ test('r10 does not add a screened inner diagonal when White guards the entire ex
       (candidate) => candidate.from === transformSquare('g7', transform) &&
         candidate.to === transformSquare('h6', transform))!.san
     assert.equal(scoreTwoBishopsWhiteMove(transformedFen, move).ruleR10DiagonalCount,
-      5, transform.name)
+      6, transform.name)
     chess.move(move)
     // Kd2 screens Bh6, but c1 is still protected by White's king.
     assert.ok(chess.isAttacked(transformSquare('c1', transform), 'w'))
+  }
+})
+
+test('r10 counts Bh5 as five diagonals and prefers Ke4 toward f5 symmetrically', () => {
+  const fen = '8/8/6B1/8/8/5K1k/3B4/8 w - - 0 1'
+  const r10 = twoBishopsWhiteRules.find(({ id }) => id === 'rule r10')!
+  for (const transform of SQUARE_TRANSFORMS) {
+    const transformedFen = transformFen(fen, transform)
+    const moves = getChess(transformedFen).moves({ verbose: true })
+    const san = (from: 'f3' | 'g6', to: 'e4' | 'h5') => moves.find(
+      (move) => move.from === transformSquare(from, transform) &&
+        move.to === transformSquare(to, transform))!.san
+    const king = scoreTwoBishopsWhiteMove(transformedFen, san('f3', 'e4'))
+    const bishop = scoreTwoBishopsWhiteMove(transformedFen, san('g6', 'h5'))
+    assert.equal(bishop.ruleR10DiagonalCount, 5, transform.name)
+    assert.equal(king.ruleR10DiagonalCount, 5, transform.name)
+    assert.equal(bishop.ruleR10EdgePenalty, king.ruleR10EdgePenalty, transform.name)
+    assert.deepEqual(king.ruleR10TargetSquares, [transformSquare('f5', transform)])
+    assert.equal(king.ruleR10KingDistance, 1, transform.name)
+    assert.deepEqual(bishop.ruleR10TargetSquares, [], transform.name)
+    assert.ok(compareScoresByRules(king, bishop, [r10]) < 0, transform.name)
+    assert.deepEqual(getIdealTwoBishopsWhiteMoves(transformedFen),
+      [san('f3', 'e4')], transform.name)
+  }
+})
+
+test('r10 does not count a wall as screened when White occupies its endpoint', () => {
+  const fen = '8/8/6B1/8/8/7k/3B4/3K4 w - - 0 1'
+  for (const transform of SQUARE_TRANSFORMS) {
+    const transformedFen = transformFen(fen, transform)
+    const move = getChess(transformedFen).moves({ verbose: true }).find(
+      (candidate) => candidate.from === transformSquare('g6', transform) &&
+        candidate.to === transformSquare('h5', transform))!.san
+    assert.equal(scoreTwoBishopsWhiteMove(transformedFen, move).ruleR10DiagonalCount,
+      4, transform.name)
   }
 })
 

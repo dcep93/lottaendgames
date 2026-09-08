@@ -1504,18 +1504,18 @@ function compareRuleR10Scores(first: RuleR10Score, second: RuleR10Score): number
 function wallReplyDiagonalCount(
   wall: AdjacentDiagonalWall,
   replySquares: readonly Square[],
-  reachableScreenedInner: boolean,
+  screenedInner: boolean,
 ): number {
   const [minimum, maximum] = diagonalIndexRange(wall.axis)
   const replyIndices = replySquares.map((square) => diagonalIndex(square, wall.axis))
   const innerIndex = wall.side === 'minimum' ? wall.lower : wall.upper
   // An inner wall reachable on the next move cannot establish an enclosure.
   if (replyIndices.includes(innerIndex)) return 99
-  const reachableWallIndices = new Set(
+  const countedWallIndices = new Set(
     replyIndices.filter((index) => index >= wall.lower && index <= wall.upper),
   )
-  if (reachableScreenedInner) reachableWallIndices.add(innerIndex)
-  // Count sides separately, plus each wall diagonal Black can legally enter.
+  if (screenedInner) countedWallIndices.add(innerIndex)
+  // Count sides separately, plus reachable walls and a king-screened inner wall.
   // A screened bishop does not exclude its diagonal from Black's territory.
   const sideCount = Math.max(
     wall.diagonalCount,
@@ -1527,39 +1527,10 @@ function wallReplyDiagonalCount(
           : 0,
     ),
   )
-  return sideCount + reachableWallIndices.size
-}
-
-function blackReachableWithWhiteFixed(
-  fen: string,
-  blackKing: Square,
-  replySquares: readonly Square[],
-): ReadonlySet<Square> {
-  const board = getChess(fen)
-  // Black must not screen a bishop from squares it would uncover by moving.
-  board.remove(blackKing)
-  const open = new Set(allSquares().filter((square) =>
-    board.get(square) === undefined && !board.isAttacked(square, 'w'),
-  ))
-  const queue = replySquares.filter((square) => open.has(square))
-  const visited = new Set(queue)
-  for (let index = 0; index < queue.length; index += 1) {
-    const from = squareCoordinates(queue[index]!)
-    for (let fileStep = -1; fileStep <= 1; fileStep += 1) {
-      for (let rankStep = -1; rankStep <= 1; rankStep += 1) {
-        const square = squareFromCoordinates(from.file + fileStep, from.rank + rankStep)
-        if (square !== null && open.has(square) && !visited.has(square)) {
-          visited.add(square)
-          queue.push(square)
-        }
-      }
-    }
-  }
-  return visited
+  return sideCount + countedWallIndices.size
 }
 
 function scoreRuleR10(
-  fen: string,
   walls: readonly AdjacentDiagonalWall[],
   bishops: readonly Square[],
   blackKing: Square | undefined,
@@ -1574,17 +1545,13 @@ function scoreRuleR10(
     beyondDistance: 99,
   }
   if (blackKing === undefined || whiteKing === undefined) return best
-  let reachableSquares: ReadonlySet<Square> | undefined
 
   for (const wall of walls) {
     const innerIndex = wall.side === 'minimum' ? wall.lower : wall.upper
-    let reachableScreenedInner = false
-    if (diagonalIndex(whiteKing, wall.axis) === innerIndex) {
-      reachableSquares ??= blackReachableWithWhiteFixed(fen, blackKing, replySquares)
-      reachableScreenedInner = [...reachableSquares].some(
-        (square) => diagonalIndex(square, wall.axis) === innerIndex,
-      )
-    }
+    // An interior king blocks the bishop ray, whether or not Black can reach
+    // the hidden tail. An endpoint king has no diagonal square beyond it.
+    const screenedInner = diagonalIndex(whiteKing, wall.axis) === innerIndex &&
+      edgeDistance(whiteKing) > 0
     const outerIndex = wall.side === 'minimum' ? wall.upper : wall.lower
     const outerSquares = allSquares().filter(
       (square) => diagonalIndex(square, wall.axis) === outerIndex,
@@ -1609,7 +1576,7 @@ function scoreRuleR10(
     )
     const score: RuleR10Score = {
       targetPenalty: targetSquares.length === 0 ? 1 : 0,
-      diagonalCount: wallReplyDiagonalCount(wall, replySquares, reachableScreenedInner),
+      diagonalCount: wallReplyDiagonalCount(wall, replySquares, screenedInner),
       targetSquares,
       beyondDistance: beyondSquares.length === 0
         ? 99
@@ -1973,7 +1940,6 @@ export function scoreTwoBishopsWhiteMove(
     .map((wall) => wall.targetCorner)
   const targetWalls = getAdjacentDiagonalWalls(bishops, blackKing, undefined, true)
   const ruleR10 = scoreRuleR10(
-    resultFen,
     targetWalls,
     bishops,
     blackKing,
