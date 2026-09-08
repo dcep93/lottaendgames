@@ -1,4 +1,4 @@
-import type { Square } from 'chess.js'
+import type { Chess, Square } from 'chess.js'
 import {
   SQUARE_TRANSFORMS,
   allSquares,
@@ -76,6 +76,22 @@ export type TwoBishopsBlackMoveScore = {
 }
 
 type DiagonalAxis = 'difference' | 'sum'
+
+type TwoBishopsPieces = {
+  readonly bishops: readonly Square[]
+  readonly blackKing: Square | undefined
+  readonly whiteKing: Square | undefined
+}
+
+function twoBishopsPieces(chess: Chess): TwoBishopsPieces {
+  const pieces = chess.board().flat().filter((piece) => piece !== null)
+  return {
+    bishops: pieces.filter((piece) => piece.color === 'w' && piece.type === 'b')
+      .map((piece) => piece.square),
+    blackKing: pieces.find((piece) => piece.color === 'b' && piece.type === 'k')?.square,
+    whiteKing: pieces.find((piece) => piece.color === 'w' && piece.type === 'k')?.square,
+  }
+}
 
 type AdjacentDiagonalWall = {
   readonly axis: DiagonalAxis
@@ -284,9 +300,7 @@ function isCornerSquare(square: Square): boolean {
   return (file === 0 || file === 7) && (rank === 0 || rank === 7)
 }
 
-function scoreRuleR8(resultFen: string): number {
-  const blackKing = findPiece(resultFen, 'b', 'k')?.square
-  const whiteKing = findPiece(resultFen, 'w', 'k')?.square
+function scoreRuleR8({ blackKing, whiteKing }: TwoBishopsPieces): number {
   if (
     blackKing === undefined ||
     whiteKing === undefined ||
@@ -572,11 +586,11 @@ function phaseTwoInlineKingTargets(
   )
 }
 
-function scoreRuleR5(startingFen: string, resultFen: string): RuleR5Score {
-  const startingBishops = getWhiteBishopSquares(startingFen)
-  const bishops = getWhiteBishopSquares(resultFen)
-  const blackKing = findPiece(resultFen, 'b', 'k')?.square
-  const whiteKing = findPiece(resultFen, 'w', 'k')?.square
+function scoreRuleR5(
+  startingBishops: readonly Square[],
+  resultFen: string,
+  { bishops, blackKing, whiteKing }: TwoBishopsPieces,
+): RuleR5Score {
   if (bishops.length !== 2 || blackKing === undefined || whiteKing === undefined) {
     return {
       bishopPenalty: 1,
@@ -761,11 +775,11 @@ function ruleR6KingPathDistance(
   return 99
 }
 
-function scoreRuleR6(fen: string, resultFen: string): RuleR6Score {
-  const templates = ruleR6Templates(fen)
-  const bishops = getWhiteBishopSquares(resultFen)
-  const blackKing = findPiece(resultFen, 'b', 'k')?.square
-  const whiteKing = findPiece(resultFen, 'w', 'k')?.square
+function scoreRuleR6(
+  templates: readonly PhaseTwoTemplate[],
+  resultFen: string,
+  { bishops, blackKing, whiteKing }: TwoBishopsPieces,
+): RuleR6Score {
   if (
     templates.length === 0 ||
     blackKing === undefined ||
@@ -1406,23 +1420,19 @@ function getRuleR4Matches(fen: string): readonly RuleR4Match[] {
           : [...forceCornerMatches, ...diagonalWaitingMatches, ...cornerPreparationMatches(fen)]
 }
 
-function scoreRuleR4(fen: string, resultFen: string): number {
-  const matches = getRuleR4Matches(fen)
+function scoreRuleR4(
+  fen: string,
+  resultFen: string,
+  context: WhiteScoringContext,
+  { bishops: resultBishops, whiteKing: resultWhiteKing }: TwoBishopsPieces,
+): number {
+  const matches = context.ruleR4Matches
   if (matches.length === 0) return 0
-  const blackKing = findPiece(fen, 'b', 'k')?.square
-  if (
-    blackKing !== undefined &&
-    (['a1', 'a8', 'h1', 'h8'] as const).some(
-      (corner) => kingDistance(blackKing, corner) === 1,
-    ) &&
-    ruleR4HasForcedMateNext(fen)
-  ) {
+  const { blackKing, bishops: startingBishops } = context.pieces
+  if (context.ruleR4ForcedMateNext) {
     return blackRepliesAllAllowMateNext(resultFen) ? 0 : 1
   }
-  const startingBishops = getWhiteBishopSquares(fen)
   const resultChess = getChess(resultFen)
-  const resultBishops = getWhiteBishopSquares(resultFen)
-  const resultWhiteKing = findPiece(resultFen, 'w', 'k')?.square
   return matches.some((match) => {
     if (match.kind === 'diagonal-wait') {
       return (
@@ -1666,19 +1676,16 @@ function flankStepTarget(fen: string): Square | undefined {
   return undefined
 }
 
-function scoreRuleR22(fen: string, resultFen: string): {
-  readonly applies: boolean
-  readonly bishopPenalty: number
-  readonly kingDistance: number
-} {
-  const whiteKing = findPiece(fen, 'w', 'k')?.square
-  const blackKing = findPiece(fen, 'b', 'k')?.square
-  const resultKing = findPiece(resultFen, 'w', 'k')?.square
-  const inactive = { applies: false, bishopPenalty: 0, kingDistance: 0 }
-  if (whiteKing === undefined || blackKing === undefined || resultKing === undefined) return inactive
-  const bishops = getWhiteBishopSquares(fen)
-  const resultBishops = getWhiteBishopSquares(resultFen)
-  const plans = smallestDiagonalWalls(getDiagonalWalls(bishops, blackKing)).flatMap((wall) => {
+type RuleR22Plan = {
+  readonly behindSquares: readonly Square[]
+  readonly bishopSquare: Square
+  readonly axis: DiagonalAxis
+  readonly outerIndex: number
+}
+
+function ruleR22Plans({ bishops, whiteKing, blackKing }: TwoBishopsPieces): readonly RuleR22Plan[] {
+  if (whiteKing === undefined || blackKing === undefined) return []
+  return smallestDiagonalWalls(getDiagonalWalls(bishops, blackKing)).flatMap((wall) => {
     const innerIndex = diagonalIndex(wall.innerBishop, wall.axis)
     const whiteIndex = diagonalIndex(whiteKing, wall.axis)
     const inside = wall.side === 'minimum' ? whiteIndex <= innerIndex : whiteIndex >= innerIndex
@@ -1703,7 +1710,19 @@ function scoreRuleR22(fen: string, resultFen: string): {
           outerIndex: diagonalIndex(wall.outerBishop, wall.axis) }]
       })
   })
-  if (plans.length === 0) return inactive
+}
+
+function scoreRuleR22(
+  plans: readonly RuleR22Plan[],
+  { bishops: resultBishops, whiteKing: resultKing }: TwoBishopsPieces,
+): {
+  readonly applies: boolean
+  readonly bishopPenalty: number
+  readonly kingDistance: number
+} {
+  if (plans.length === 0 || resultKing === undefined) {
+    return { applies: false, bishopPenalty: 0, kingDistance: 0 }
+  }
   const scores = plans.map(({ behindSquares, bishopSquare, axis, outerIndex }) => {
     // Keep the inner bishop placed, but let the outer bishop make room along
     // its wall instead of forcing the king to give up its behind-bishop square.
@@ -1741,9 +1760,7 @@ function ruleR18Targets(fen: string): readonly Square[] {
   })
 }
 
-function scoreRuleR19(fen: string): number {
-  const bishops = getWhiteBishopSquares(fen)
-  const blackKing = findPiece(fen, 'b', 'k')?.square
+function scoreRuleR19({ bishops, blackKing }: TwoBishopsPieces): number {
   if (blackKing === undefined) return 1
   return getDiagonalWalls(bishops, blackKing).some(
     (wall) => kingDistance(wall.outerBishop, blackKing) >= 3,
@@ -1970,18 +1987,54 @@ export function compareTwoBishopsWhiteScores(
   return compareScoresByRules(first, second, twoBishopsWhiteRules)
 }
 
+type WhiteScoringContext = {
+  readonly pieces: TwoBishopsPieces
+  readonly ruleR4Matches: readonly RuleR4Match[]
+  readonly ruleR4ForcedMateNext: boolean
+  readonly ruleR6Templates: readonly PhaseTwoTemplate[]
+  readonly ruleR11Target: Square | undefined
+  readonly ruleR18Targets: readonly Square[]
+  readonly ruleR22Plans: readonly RuleR22Plan[]
+}
+
+function whiteScoringContext(fen: string): WhiteScoringContext {
+  const pieces = twoBishopsPieces(getChess(fen))
+  const matches = getRuleR4Matches(fen)
+  const { blackKing } = pieces
+  return {
+    pieces,
+    ruleR4Matches: matches,
+    ruleR4ForcedMateNext: matches.length > 0 && blackKing !== undefined &&
+      (['a1', 'a8', 'h1', 'h8'] as const).some(
+        (corner) => kingDistance(blackKing, corner) === 1,
+      ) && ruleR4HasForcedMateNext(fen),
+    ruleR6Templates: ruleR6Templates(fen),
+    ruleR11Target: flankStepTarget(fen),
+    ruleR18Targets: ruleR18Targets(fen),
+    ruleR22Plans: ruleR22Plans(pieces),
+  }
+}
+
 export function scoreTwoBishopsWhiteMove(
   fen: string,
   san: string,
 ): TwoBishopsWhiteMoveScore {
+  return scoreWhiteMove(fen, san)
+}
+
+function scoreWhiteMove(
+  fen: string,
+  san: string,
+  startingContext?: WhiteScoringContext,
+): TwoBishopsWhiteMoveScore {
   const chess = getChess(fen)
   chess.move(san)
   const resultFen = chess.fen()
+  const context = startingContext ?? whiteScoringContext(fen)
   const mate = chess.isCheckmate()
   const blackReplies = chess.moves({ verbose: true })
-  const bishops = getWhiteBishopSquares(resultFen)
-  const blackKing = findPiece(resultFen, 'b', 'k')?.square
-  const whiteKing = findPiece(resultFen, 'w', 'k')?.square
+  const resultPieces = twoBishopsPieces(chess)
+  const { bishops, blackKing, whiteKing } = resultPieces
   const forcedReplySquares = blackReplies.some(
     (reply) => reply.captured === 'b',
   )
@@ -2011,13 +2064,13 @@ export function scoreTwoBishopsWhiteMove(
     whiteKing,
     blackReplies.map(({ to }) => to),
   )
-  const ruleR11Target = flankStepTarget(fen)
-  const ruleR22 = scoreRuleR22(fen, resultFen)
-  const chokeTargets = ruleR18Targets(fen)
-  const ruleR6Applies = ruleR6Templates(fen).length > 0
-  const ruleR6 = scoreRuleR6(fen, resultFen)
-  const ruleR5 = scoreRuleR5(fen, resultFen)
-  const ruleR4Matches = getRuleR4Matches(fen)
+  const ruleR11Target = context.ruleR11Target
+  const ruleR22 = scoreRuleR22(context.ruleR22Plans, resultPieces)
+  const chokeTargets = context.ruleR18Targets
+  const ruleR6Applies = context.ruleR6Templates.length > 0
+  const ruleR6 = scoreRuleR6(context.ruleR6Templates, resultFen, resultPieces)
+  const ruleR5 = scoreRuleR5(context.pieces.bishops, resultFen, resultPieces)
+  const ruleR4Matches = context.ruleR4Matches
   const bishopDistances =
     blackKing === undefined
       ? [0, 0]
@@ -2038,7 +2091,7 @@ export function scoreTwoBishopsWhiteMove(
       : 0,
     stalematePenalty: !mate && chess.isStalemate() ? 1 : 0,
     ruleR4Applies: ruleR4Matches.length > 0,
-    ruleR4Penalty: scoreRuleR4(fen, resultFen),
+    ruleR4Penalty: scoreRuleR4(fen, resultFen, context, resultPieces),
     ruleR5BishopPenalty: ruleR5.bishopPenalty,
     ruleR5OrientationPenalty: ruleR5.orientationPenalty,
     ruleR5CagePenalty: ruleR5.cagePenalty,
@@ -2051,7 +2104,7 @@ export function scoreTwoBishopsWhiteMove(
     ruleR6KingDistance: ruleR6.kingDistance,
     ruleR3CornerPenalty:
       whiteKing === undefined || isCornerSquare(whiteKing) ? 1 : 0,
-    ruleR8KingSquarePenalty: scoreRuleR8(resultFen),
+    ruleR8KingSquarePenalty: scoreRuleR8(resultPieces),
     ruleR10EdgePenalty: bishops.filter(
       (bishop) =>
         targetCorners.length > 0 &&
@@ -2070,7 +2123,7 @@ export function scoreTwoBishopsWhiteMove(
     ruleR12KingDistance: ruleR10.beyondDistance,
     ruleR18Applies: chokeTargets.length > 0,
     ruleR18Penalty: chokeTargets.length === 0 || chokeTargets.some((square) => bishops.includes(square)) ? 0 : 1,
-    ruleR19Penalty: scoreRuleR19(resultFen),
+    ruleR19Penalty: scoreRuleR19(resultPieces),
     ruleR22Applies: ruleR22.applies,
     ruleR22BishopPenalty: ruleR22.bishopPenalty,
     ruleR22KingDistance: ruleR22.kingDistance,
@@ -2094,9 +2147,13 @@ function scoreWhiteCandidates(
   fen: string,
   moves: readonly string[],
 ): readonly ScoredMove<TwoBishopsWhiteMoveScore>[] {
+  if (moves.length === 0) return []
+  // Starting geometry is shared by every candidate; result pieces are read once
+  // from each moved board. Keep this context local so no state survives a call.
+  const context = whiteScoringContext(fen)
   return moves.map((san) => ({
     san,
-    score: scoreTwoBishopsWhiteMove(fen, san),
+    score: scoreWhiteMove(fen, san, context),
   }))
 }
 

@@ -11,6 +11,7 @@ import {
   getSquareTransform,
   isKnightMove,
   kingDistance,
+  squareColor,
   squareCoords,
   squareFromCoords,
   transformFen,
@@ -435,10 +436,20 @@ function* enumerateUnrestrictedStandardRoots(
     ) {
       const square = squares[squareIndex]!
       if (used.has(square)) continue
+      // allSquares is lexicographic: every skipped Black-king orientation
+      // already has its complete equivalent family at an earlier square.
       if (
-        mateId === 'bishop-knight' &&
+        (mateId === 'bishop-knight' || mateId === 'two-bishops') &&
         pieceIndex === 0 &&
         square !== canonicalSquareOrbitRepresentative(square)
+      ) {
+        continue
+      }
+      if (
+        mateId === 'two-bishops' &&
+        template.type === 'b' &&
+        previous?.type === 'b' &&
+        squareColor(previous.square) === squareColor(square)
       ) {
         continue
       }
@@ -460,7 +471,7 @@ function* enumerateUnrestrictedStandardRoots(
   yield* visit(0)
 }
 
-function canonicalSquareOrbitRepresentative(
+export function canonicalSquareOrbitRepresentative(
   square: EndgamePiecePlacement['square'],
 ): EndgamePiecePlacement['square'] {
   return SQUARE_TRANSFORMS.map((transform) =>

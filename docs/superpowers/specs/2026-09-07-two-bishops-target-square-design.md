@@ -78,3 +78,15 @@ Extend r22 to allow the outer bishop to make room along its existing wall, while
 
 
 Add r18 between r12 and r19: ‘Play the choke move.’ For the smallest existing adjacent-diagonal wall profiles, if the inner wall has exactly five squares and none touches either edge incident to its target corner, prefer the inner-wall bishop on the board’s long diagonal. Determine eligibility and the target from the starting position, then score whether the result retains or reaches that square. In `4B3/6K1/4k3/8/7B/8/8/8 w - - 0 1`, the inner wall is d8–h4, target corner a1, and long diagonal a1–h8, so prefer h4–f6. Preserve all rotations/reflections. Other wall lengths, walls touching a target-corner edge, and absent walls leave r18 inactive. Add a native guide diagram with the exact pieces, five-square wall, target corner, long diagonal, and h4–f6 move arrow. Keep the earlier target-square note and diagram ordering. Verify rule order, positive and negative geometry, retained placement, diagram rendering, TypeScript, and the next non-mating witness.
+
+
+Exhaustive audit request (2026-09-08): supersedes the first-witness stopping rule
+for this run. Enumerate the entire app-eligible Standard KBBK universe and every
+reachable selected-policy continuation, with no root/node cutoff. Report at most
+five playable non-mating witnesses, or certify all positions terminate. Count
+moves first eliminated by every ordered rule and positions affected, once per
+D4-canonical White state. Include universal 100-ply draw checks. Fix measured
+semantics-preserving inefficiencies and verify unchanged move scores, choices,
+and census counts. Keep a resumable fingerprinted checkpoint, parallelize scoring,
+and continue the census after discovering failures. Report remaining performance
+or rule-interpretation problems without silently changing policy during the run.

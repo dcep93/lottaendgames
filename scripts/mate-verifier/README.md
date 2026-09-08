@@ -166,17 +166,36 @@ permanent adversarial corpus. Omit both root-limit options to traverse the
 complete legal Standard root universe for final validation; the JSON labels
 that run `complete-standard-universe`.
 
-For a resumable fail-fast proof of the current Two Bishops policy, including an
-exact D4-canonical census of how many candidate moves each ordered rule filters,
-run from `app/`:
+For a complete, resumable census of the current Two Bishops policy, including
+failures and exact D4-canonical rule-filter counts, run from `app/`:
 
 ```sh
 npm run verify:two-bishops-exhaustive
 ```
 
-The command has no root or node limit. It persists only completed node proofs
-and reports `certificate.completeStandardUniverse: true` only after the entire
-canonical Standard universe has been enumerated successfully.
+The default command has no root or node limit and uses six scoring workers.
+It enumerates every app-eligible opposite-colored KBBK White-to-move start
+(including train seeds), expands every tied-best White choice and every legal
+Black reply, and continues after failures. Equivalent rotations/reflections are
+counted once. Initial halfmove clocks are zero; universal maximum mating ranks
+also detect paths that reach the 100-ply draw before mate. History before the
+starting position is not assumed.
+
+Checkpointed graph rows and `progress.json` / `result.json` live in ignored
+`tmp/mate-verifier-census/<policy fingerprint>/`. One parent process owns SQLite
+writes; worker expansions and graph rows are not retained in multiple caches.
+The checkpoint rejects changes to the engine, policy, root eligibility, or census
+implementation. Restart the same command to resume. It reports at most five
+verified playable failure witnesses, while all position and rule totals remain
+complete. `positionsAffected` counts canonical White positions where a rule
+removed at least one move; `eliminatedMoves` counts moves first removed by that
+rule. Counts include all reachable White positions, even those not eligible as
+fresh starts.
+
+`--workers=4` changes concurrency. `--root-limit=100` is a diagnostic prefix only;
+it cannot set `completeStandardUniverse` or `allPositionsTerminate`. Full runs
+set `completeStandardUniverse` even when failures exist; only complete runs with
+no cycle, terminal failure, or 50-move violation set `allPositionsTerminate`.
 
 The Bishop + Knight gate uses the same exhaustive continuation semantics. Its
 fixed-seed D4-canonical roots are stratified by king edge distance, phase and
