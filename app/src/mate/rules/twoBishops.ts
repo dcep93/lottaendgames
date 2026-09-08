@@ -48,7 +48,7 @@ export type TwoBishopsWhiteMoveScore = {
   readonly ruleR6KingDistance: number
   readonly ruleR3CornerPenalty: number
   readonly ruleR8KingSquarePenalty: number
-  readonly ruleR18Point5EdgePenalty: number
+  readonly ruleR9EdgePenalty: number
   readonly ruleR10TargetPenalty: number
   readonly ruleR10DiagonalCount: number
   readonly ruleR10TargetSquares: readonly Square[]
@@ -140,9 +140,9 @@ const TARGET_SQUARE_NOTE_BOARD = {
   ],
 } as const
 
-const RULE_R18_POINT_5_NOTE_BOARD = {
-  id: 'two-bishops-rule-r18.5',
-  title: 'rule r18.5',
+const RULE_R9_NOTE_BOARD = {
+  id: 'two-bishops-rule-r9',
+  title: 'rule r9',
   caption:
     'With h1 as the target corner, the bishop on d1 may remain on the edge because it lies on the outer Phase 2 diagonal d1–h5.',
   pieces: [
@@ -217,7 +217,7 @@ const twoBishopsHelp: RuleHelp = {
     "Target squares are the outer-wall squares closest to Black's king by king-step distance. All equally closest squares are candidates. If any candidate is occupied by a bishop, that wall has no target. White's king must be outside the wall or on the target square.",
     'Phase 2 is recognized when rule r4 matches an established mating-pattern geometry: either the exact Phase 2 template or a bishop move that forces Black from the edge into its associated corner, under rotation or reflection.',
   ],
-  noteBoards: [TARGET_SQUARE_NOTE_BOARD, PHASE_TWO_NOTE_BOARD, RULE_R18_POINT_5_NOTE_BOARD],
+  noteBoards: [TARGET_SQUARE_NOTE_BOARD, PHASE_TWO_NOTE_BOARD, RULE_R9_NOTE_BOARD],
 }
 
 function diagonalIndex(square: Square, axis: DiagonalAxis): number {
@@ -1771,6 +1771,14 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
         first.ruleR8KingSquarePenalty - second.ruleR8KingSquarePenalty,
     },
     {
+      id: 'rule r9',
+      shortLabel: 'rule r9',
+      helpText:
+        "Prefer bishops off the target corner's edge, except the Phase 2 diagonals.",
+      compare: (first, second) =>
+        first.ruleR9EdgePenalty - second.ruleR9EdgePenalty,
+    },
+    {
       id: 'rule r10',
       shortLabel: 'rule r10',
       helpText:
@@ -1801,14 +1809,6 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
         "Without a target square, prefer White’s king closer to the diagonal one beyond the outer wall.",
       applies: (score) => score.ruleR10TargetPenalty === 1 && score.ruleR12KingDistance < 99,
       compare: (first, second) => first.ruleR12KingDistance - second.ruleR12KingDistance,
-    },
-    {
-      id: 'rule r18.5',
-      shortLabel: 'rule r18.5',
-      helpText:
-        "Prefer bishops off the target corner's edge, except the Phase 2 diagonals.",
-      compare: (first, second) =>
-        first.ruleR18Point5EdgePenalty - second.ruleR18Point5EdgePenalty,
     },
     {
       id: 'rule r19',
@@ -1952,7 +1952,7 @@ export function scoreTwoBishopsWhiteMove(
     ruleR3CornerPenalty:
       whiteKing === undefined || isCornerSquare(whiteKing) ? 1 : 0,
     ruleR8KingSquarePenalty: scoreRuleR8(resultFen),
-    ruleR18Point5EdgePenalty: bishops.filter(
+    ruleR9EdgePenalty: bishops.filter(
       (bishop) =>
         targetCorners.length > 0 &&
         targetCorners.every(

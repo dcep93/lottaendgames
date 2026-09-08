@@ -2,7 +2,7 @@
 
 Continue the existing Find loop in lottaendgames workflow in this task. Implement understood fixes without another design checkpoint, run focused checks, then load the first non-mating witness at cursor 0, preferably a four-ply loop. Preserve existing uncommitted policy work.
 
-Replace r17 with r10, immediately after r8 and before r11: “Prefer fewer diagonals for Black's king, then White king's step proximity to the target square.”
+Replace r17 with r10, immediately after r9 and before r11: “Prefer fewer diagonals for Black's king, then White king's step proximity to the target square.”
 
 For each resulting eligible adjacent-diagonal wall, target candidates are all outer-wall squares minimizing king-step (Chebyshev) distance to Black's king, including every tie. White's location does not affect this candidate set. If any candidate is occupied by a bishop, the entire set for that wall is invalid. Adjacency to Black is not required; never substitute a farther square when a closest candidate is bishop-occupied.
 
@@ -10,7 +10,7 @@ White's king must be strictly outside the wall, opposite Black across its outer 
 
 Compare complete wall profiles in the requested order: Black's diagonal count, then White's steps to a target. Remove the intermediate Black-to-inner-wall distance preference. Apply the same order both when selecting a wall profile and comparing White moves. Target existence is no longer a separate preference; a smaller enclosure wins even without a target. Only count diagonals when Black cannot legally reach the inner wall on its next move; otherwise that wall receives the no-enclosure score. Preserve target and beyond-wall geometry independently of this count eligibility. For eligible walls, count the two sides separately: start with the side containing Black, inspect every legal Black reply, and take the largest individual side count. For eligible walls, include a reachable outer-wall diagonal; an accessible inner wall invalidates the count instead. Landing on a wall is not itself a crossing into the opposite side. Do not merge the sides by flood-filling across a screened bishop. An escape to a larger side increases the count, while a crossing to a smaller side preserves it. Thus Bd8+ allowing Kf4 still counts nine rather than four diagonals; Ke6 allowing Kg8 in the h1-wall example counts eight: seven on the original side plus the reachable outer-wall diagonal.
 
-Move the beyond-wall preference from r18 to r12, immediately after r10 and before r18.5: “Without a target square, prefer White’s king closer to the diagonal one beyond the outer wall.” It applies only to positions with no valid target but an eligible wall. Measure White's king-step distance to the parallel diagonal one index beyond the outer wall, away from Black's target corner. Use the best resulting wall profiles retained by r10; retain tied profiles and use their minimum beyond-diagonal distance. A usable target, or absence of any eligible wall, leaves r12 inactive.
+Move the beyond-wall preference from r18 to r12, immediately after r11 and before r19: “Without a target square, prefer White’s king closer to the diagonal one beyond the outer wall.” It applies only to positions with no valid target but an eligible wall. Measure White's king-step distance to the parallel diagonal one index beyond the outer wall, away from Black's target corner. Use the best resulting wall profiles retained by r10; retain tied profiles and use their minimum beyond-diagonal distance. A usable target, or absence of any eligible wall, leaves r12 inactive.
 
 For `8/7k/8/5K2/8/8/BB6/8 w - - 0 1`, the target corner is h1, outer wall a2–g8, and beyond diagonal a3–f8. Bb3 and Ke6 both have no usable target. Bb3 counts seven diagonals; Ke6 counts eight including the reachable wall diagonal. R12 distances are two and one, respectively, but r10 takes precedence; Bb1 is now selected.
 
@@ -20,7 +20,7 @@ From `3k4/8/8/4B3/5K2/7B/8/8 w - - 0 1`, Ke4 must be uniquely preferred with tar
 
 For `8/8/7k/8/8/4K3/2BB4/8 w - - 0 1`, r10 prefers Bc3 (six diagonals) over Ke4 (nine including a reachable wall diagonal) and Kd4+ (eight diagonals). R12 would prefer Ke4 (one step) over Bc3 (two steps), but diagonal count decides first.
 
-For `8/6k1/3K4/8/8/7B/7B/8 w - - 0 1`, Ke5 reaches the closest target e5, two Black king steps away, and wins under r10. Ke6 has no target because White is inside the wall. Bg3 improves the bishop-edge preference but loses to Ke5 earlier under r10.
+For `8/6k1/3K4/8/8/7B/7B/8 w - - 0 1`, Ke5 reaches the closest target e5, two Black king steps away, and wins the r10 comparison. Ke6 has no target because White is inside the wall. Bg3 now wins overall under r9 by moving the bishop off the corner edge before r10 compares targets.
 
 After `1. Bc3 Kh5` from `8/8/7k/8/8/4K3/2BB4/8 w - - 0 1`, Bd2 allows Kh6 on the screened inner diagonal, invalidating that orientation; its other eligible orientation counts ten diagonals, losing to Kd4’s six.
 
@@ -47,3 +47,8 @@ Add r11 between r10 and r12: “Play the flank step.” It requires orthogonally
 
 
 Restore closest outer-wall targets without the Black-adjacency restriction. Keep all tied minimum king-step candidates before occupancy and White-king eligibility checks. In `8/4k3/8/3BB3/3K4/8/8/8 w - - 0 1`, c6 and d5 tie as closest squares on a8–h1. Since d5 is bishop-occupied, that wall still has no target under the existing occupied-candidate rule. Verify distant candidates and ties under all board symmetries, update notes and diagram captions, and retain r11 and r10 ordering.
+
+
+Move r18.5 to r9, immediately after r8 and before r10: “Prefer bishops off the target corner's edge, except the Phase 2 diagonals.” Rename its score field and guide diagram consistently. Preserve its existing geometry and Phase 2 exception; only priority and identifier change. Verify that leaving an eligible corner edge now wins before target-square proximity and search for the next non-mating witness.
+
+For `8/1k6/4K3/8/8/B7/B7/8 w - - 0 1`, r9 now selects Bb3 instead of Kd5: edge penalties zero versus one decide before Kd5’s better r10 target distance.
