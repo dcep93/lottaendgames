@@ -1097,12 +1097,20 @@ test('rule r3 compares king corners, adjacent bishops, then bishop corners symme
   }
 })
 
-test('updated r3 guarantees mate from the second former stalemate start', () => {
+test('the current policy guarantees mate from the second former stalemate start', () => {
   const fen = '4B2B/8/5K1k/8/8/8/8/8 w - - 0 1'
   assert.deepEqual(getIdealTwoBishopsWhiteMoves(fen), ['Bg7+'])
   // Follow every selected White move and every legal Black reply, including
   // the draw clock. A depth bound catches loops as well as a slower finish.
+  const proved = new Map<string, number>()
   const maximumMatePlies = (position: string, remaining: number): number => {
+    const key = position.split(' ').slice(0, 4).join(' ')
+    const cached = proved.get(key)
+    if (cached !== undefined) {
+      // Reusing a structural proof still requires enough moves on this path.
+      assert.ok(cached <= remaining, position)
+      return cached
+    }
     const chess = getChess(position)
     if (chess.isCheckmate()) return 0
     assert.equal(chess.isDraw(), false, position)
@@ -1111,13 +1119,15 @@ test('updated r3 guarantees mate from the second former stalemate start', () => 
       ? getIdealTwoBishopsWhiteMoves(position)
       : chess.moves()
     assert.ok(moves.length > 0, position)
-    return 1 + Math.max(...moves.map((move) => {
+    const plies = 1 + Math.max(...moves.map((move) => {
       const next = getChess(position)
       next.move(move)
       return maximumMatePlies(next.fen(), remaining - 1)
     }))
+    proved.set(key, plies)
+    return plies
   }
-  assert.equal(maximumMatePlies(fen, 15), 15)
+  assert.equal(maximumMatePlies(fen, 100), 89)
 })
 
 test("rule r8 associates each Phase 2 king square with Black's actual corner", () => {
@@ -1208,7 +1218,7 @@ test('rule r10 recognizes a checking wall that forces Black inside', () => {
   assert.equal(score.ruleR10DiagonalCount, 6)
 })
 
-test('rule r10 counts the wider escape after Bd8+ symmetrically', () => {
+test('rule r10 rejects the crossed Bd8 wall and uses its other orientation symmetrically', () => {
   const fen = '8/2BB4/8/3K2k1/8/8/8/8 w - - 0 1'
   for (const transform of SQUARE_TRANSFORMS) {
     const transformedFen = transformFen(fen, transform)
@@ -1222,8 +1232,9 @@ test('rule r10 counts the wider escape after Bd8+ symmetrically', () => {
       )?.san
     assert.ok(move, transform.name)
     const score = scoreTwoBishopsWhiteMove(transformedFen, move)
-    assert.equal(score.ruleR10TargetPenalty, 0, transform.name)
-    assert.equal(score.ruleR10DiagonalCount, 9, transform.name)
+    assert.equal(score.ruleR10TargetPenalty, 1, transform.name)
+    assert.equal(score.ruleR10DiagonalCount, 10, transform.name)
+    assert.deepEqual(score.ruleR10TargetSquares, [], transform.name)
     const preferred = chess.moves({ verbose: true }).find(
       (candidate) =>
         candidate.from === transformSquare('d5', transform) &&
@@ -1294,7 +1305,7 @@ test('rule r10 requires an unreachable inner wall and prefers Kc3 over Ba5 symme
   }
 })
 
-test('rule r10 counts reply sides separately even when White screens the bishop wall', () => {
+test('rule r10 preserves the count when White screens the outer wall without an escape', () => {
   const fen = '8/8/8/8/5K2/8/3B4/3B3k w - - 0 1'
   const rule = twoBishopsWhiteRules.find(({ id }) => id === 'rule r10')!
   for (const transform of SQUARE_TRANSFORMS) {
@@ -1316,6 +1327,31 @@ test('rule r10 counts reply sides separately even when White screens the bishop 
     assert.equal(screened.ruleR10DiagonalCount, 4, transform.name)
     assert.equal(intact.ruleR10DiagonalCount, 4, transform.name)
     assert.ok(compareScoresByRules(screened, intact, [rule]) < 0, transform.name)
+  }
+})
+
+test('rule r10 rejects Bf3 when Kc4 escapes to the smaller side symmetrically', () => {
+  const fen = '8/8/8/3k4/8/8/4B3/2K3B1 w - - 20 11'
+  const rule = twoBishopsWhiteRules.find(({ id }) => id === 'rule r10')!
+  for (const transform of SQUARE_TRANSFORMS) {
+    const transformedFen = transformFen(fen, transform)
+    const chess = getChess(transformedFen)
+    const moves = chess.moves({ verbose: true })
+    const move = (from: 'e2' | 'c1', to: 'f3' | 'c2' | 'd2') => moves.find(
+      (candidate) => candidate.from === transformSquare(from, transform) &&
+        candidate.to === transformSquare(to, transform),
+    )!.san
+    const bishopMove = move('e2', 'f3')
+    const bishop = scoreTwoBishopsWhiteMove(transformedFen, bishopMove)
+    const king = scoreTwoBishopsWhiteMove(transformedFen, move('c1', 'c2'))
+    assert.equal(bishop.ruleR10DiagonalCount, 99, transform.name)
+    assert.equal(king.ruleR10DiagonalCount, 8, transform.name)
+    assert.ok(compareScoresByRules(king, bishop, [rule]) < 0, transform.name)
+    assert.deepEqual(getIdealTwoBishopsWhiteMoves(transformedFen),
+      [move('c1', 'd2')], transform.name)
+    chess.move(bishopMove)
+    assert.ok(chess.moves({ verbose: true }).some(
+      (reply) => reply.to === transformSquare('c4', transform)), transform.name)
   }
 })
 
@@ -1453,8 +1489,9 @@ test('rule r10 has no target when the closest candidate holds a bishop', () => {
 test('rule r10 retains every equally closest outer-wall candidate and invalidates an occupied set', () => {
   for (const occupied of [false, true]) {
     const fen = occupied
-      ? '8/8/6K1/8/8/4Bk2/2B5/8 w - - 0 1'
-      : '8/8/6K1/8/8/5k2/2BB4/8 w - - 0 1'
+      ? '8/8/8/4K3/8/4Bk2/2B5/8 w - - 0 1'
+      : '8/8/8/4K3/8/5k2/2BB4/8 w - - 0 1'
+    // White guards e4 so Black cannot cross both walls after Bd1+.
     for (const transform of SQUARE_TRANSFORMS) {
       const transformedFen = transformFen(fen, transform)
       const move = getChess(transformedFen).moves({ verbose: true }).find(
@@ -1502,9 +1539,9 @@ test('rule r10 rejects a target when White is inside the wall', () => {
   assert.equal(score.ruleR10KingDistance, 99)
 })
 
-test('rule r10 requires the king to stand outside or on a closest target', () => {
-  const fen = '8/5k2/8/3K4/1B6/1B6/8/8 w - - 0 1'
-  assert.deepEqual(getIdealTwoBishopsWhiteMoves(fen), ['Kc6+'])
+test('rule r10 requires White outside or strictly closer on the outer wall', () => {
+  const fen = '8/8/5k2/3K4/1B6/1B6/8/8 w - - 0 1'
+  assert.deepEqual(getIdealTwoBishopsWhiteMoves(fen), ['Kc6'])
   for (const transform of SQUARE_TRANSFORMS) {
     const transformedFen = transformFen(fen, transform)
     const onTargetMove = getChess(transformedFen)
@@ -1517,7 +1554,7 @@ test('rule r10 requires the king to stand outside or on a closest target', () =>
     assert.ok(onTargetMove, transform.name)
     const onTarget = scoreTwoBishopsWhiteMove(transformedFen, onTargetMove)
     assert.equal(onTarget.ruleR10TargetPenalty, 1, transform.name)
-    assert.equal(onTarget.ruleR10DiagonalCount, 9, transform.name)
+    assert.equal(onTarget.ruleR10DiagonalCount, 8, transform.name)
     assert.deepEqual(
       onTarget.ruleR10TargetSquares,
       [],
@@ -1550,7 +1587,7 @@ test('rule r10 requires the king to stand outside or on a closest target', () =>
     )
     assert.deepEqual(
       [...outside.ruleR10TargetSquares].sort(),
-      (['e7', 'f8'] as const).map((square) => transformSquare(square, transform)).sort(),
+      (['e7'] as const).map((square) => transformSquare(square, transform)).sort(),
       transform.name,
     )
   }
@@ -1643,6 +1680,7 @@ test('rule r12 approaches the h1 wall but r10 counts the reachable outer diagona
     assert.equal(bishop.ruleR12KingDistance, 2, transform.name)
     assert.equal(king.ruleR12KingDistance, 1, transform.name)
     assert.ok(compareScoresByRules(king, bishop, [rule]) < 0, transform.name)
+    assert.ok(compareTwoBishopsWhiteScores(bishop, king) < 0, transform.name)
     const result = getChess(transformedFen)
     result.move(move('f5', 'e6'))
     assert.ok(result.moves({ verbose: true }).some(
@@ -1653,7 +1691,7 @@ test('rule r12 approaches the h1 wall but r10 counts the reachable outer diagona
   }
 })
 
-test('rule r10 prefers fewer diagonals before the r12 beyond-wall distance', () => {
+test('rule r10 uses the remaining orientation when Ke4 permits a wall crossing', () => {
   const fen = '8/8/7k/8/8/4K3/2BB4/8 w - - 0 1'
   const rule = twoBishopsWhiteRules.find(({ id }) => id === 'rule r12')!
   for (const transform of SQUARE_TRANSFORMS) {
@@ -1665,14 +1703,20 @@ test('rule r10 prefers fewer diagonals before the r12 beyond-wall distance', () 
     )!.san
     const king = scoreTwoBishopsWhiteMove(transformedFen, move('e3', 'e4'))
     const bishop = scoreTwoBishopsWhiteMove(transformedFen, move('d2', 'c3'))
-    assert.equal(king.ruleR12KingDistance, 1, transform.name)
+    assert.equal(king.ruleR12KingDistance, 3, transform.name)
     assert.equal(bishop.ruleR12KingDistance, 2, transform.name)
-    assert.equal(king.ruleR10DiagonalCount, 9, transform.name)
+    assert.equal(king.ruleR10DiagonalCount, 10, transform.name)
     assert.equal(bishop.ruleR10DiagonalCount, 6, transform.name)
-    assert.ok(compareScoresByRules(king, bishop, [rule]) < 0, transform.name)
+    assert.deepEqual(king.ruleR10TargetSquares, [], transform.name)
     assert.ok(compareTwoBishopsWhiteScores(bishop, king) < 0, transform.name)
     const target = scoreTwoBishopsWhiteMove(transformedFen, move('e3', 'd4'))
-    assert.equal(rule.applies?.(target), false, transform.name)
+    assert.equal(rule.applies?.(target), true, transform.name)
+    assert.equal(target.ruleR10DiagonalCount, 10, transform.name)
+    assert.deepEqual(target.ruleR10TargetSquares, [], transform.name)
+    const result = getChess(transformedFen)
+    result.move(move('e3', 'e4'))
+    assert.ok(result.moves({ verbose: true }).some(
+      (reply) => reply.to === transformSquare('g7', transform)), transform.name)
     assert.deepEqual(getIdealTwoBishopsWhiteMoves(transformedFen),
       [move('d2', 'c3')], transform.name)
   }

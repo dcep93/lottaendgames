@@ -1087,6 +1087,22 @@ function getRuleR4Matches(fen: string): readonly RuleR4Match[] {
         fixedBishop, target: transformSquare('c1', transform) }]
     },
   )
+  const edgeRetreatMatches = SQUARE_TRANSFORMS.flatMap(
+    (transform): readonly RuleR4Match[] => {
+      const movingBishop = transformSquare('e8', transform)
+      const fixedBishop = transformSquare('h8', transform)
+      if (
+        blackKing !== transformSquare('f8', transform) ||
+        whiteKing !== transformSquare('f6', transform) ||
+        !bishops.includes(movingBishop) ||
+        !bishops.includes(fixedBishop)
+      ) return []
+      // Keep e8 controlled while retreating its bishop, forcing Black to g8.
+      return [{ kind: 'diagonal-wait', whiteKing, movingBishop, fixedBishop,
+        waitingDiagonal: (['d7', 'c6', 'b5', 'a4'] as const)
+          .map((square) => transformSquare(square, transform)) }]
+    },
+  )
   const phaseTwoMatches = PHASE_TWO_TEMPLATES.flatMap(
     (template): readonly RuleR4Match[] => {
       if (
@@ -1411,6 +1427,7 @@ function getRuleR4Matches(fen: string): readonly RuleR4Match[] {
   )
   if (exactSequenceMatches.length > 0) return exactSequenceMatches
   if (cornerRetreatMatches.length > 0) return cornerRetreatMatches
+  if (edgeRetreatMatches.length > 0) return edgeRetreatMatches
   return phaseTwoMatches.length > 0
     ? phaseTwoMatches
     : maintainedControlSequenceMatches.length + cornerSequenceMatches.length > 0
@@ -1553,28 +1570,19 @@ function wallReplyDiagonalCount(
   replySquares: readonly Square[],
   screenedInner: boolean,
 ): number {
-  const [minimum, maximum] = diagonalIndexRange(wall.axis)
   const replyIndices = replySquares.map((square) => diagonalIndex(square, wall.axis))
   const innerIndex = wall.side === 'minimum' ? wall.lower : wall.upper
-  // An inner wall reachable on the next move cannot establish an enclosure.
-  if (replyIndices.includes(innerIndex)) return 99
+  // Reaching the inner wall or escaping beyond both walls defeats the enclosure,
+  // even when the opposite side has fewer diagonals than Black's current side.
+  if (replyIndices.some((index) => index === innerIndex ||
+    (wall.side === 'minimum' ? index > wall.upper : index < wall.lower))) return 99
   const countedWallIndices = new Set(
     replyIndices.filter((index) => index >= wall.lower && index <= wall.upper),
   )
   if (screenedInner) countedWallIndices.add(innerIndex)
-  // Count sides separately, plus reachable walls and a king-screened inner wall.
+  // Count the enclosed side, reachable walls and a king-screened inner wall.
   // A screened bishop does not exclude its diagonal from Black's territory.
-  const sideCount = Math.max(
-    wall.diagonalCount,
-    ...replyIndices.map((index) =>
-      index < wall.lower
-        ? wall.lower - minimum
-        : index > wall.upper
-          ? maximum - wall.upper
-          : 0,
-    ),
-  )
-  return sideCount + countedWallIndices.size
+  return wall.diagonalCount + countedWallIndices.size
 }
 
 function scoreRuleR10(
