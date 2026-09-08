@@ -262,7 +262,7 @@ const twoBishopsHelp: RuleHelp = {
     'Move toward an unprotected bishop.',
   ],
   notes: [
-    "Target squares are the outer-wall squares closest to Black's king by king-step distance. All equally closest squares are candidates. If any candidate is occupied by a bishop, that wall has no target. White's king must be outside the wall, or on the outer wall and strictly closer to the target than Black's king by king-step distance.",
+    "Target squares are the outer-wall squares closest to Black's king by king-step distance. All equally closest squares are candidates. If any candidate is occupied by a bishop, that wall has no target. White's king must be outside the wall, or on the outer wall and no farther from the target than Black's king by king-step distance.",
     'Phase 2 is recognized when rule r4 matches an established mating-pattern geometry: either the exact Phase 2 template or a bishop move that forces Black from the edge into its associated corner, under rotation or reflection.',
   ],
   noteBoards: [TARGET_SQUARE_NOTE_BOARD, PHASE_TWO_NOTE_BOARD, RULE_R10_EDGE_NOTE_BOARD, RULE_R18_CHOKE_NOTE_BOARD],
@@ -1622,7 +1622,7 @@ function scoreRuleR10(
       : candidates.filter(
           (square) => wallSeparatesWhite(wall, whiteKing) ||
             (diagonalIndex(whiteKing, wall.axis) === outerIndex &&
-              kingDistance(whiteKing, square) < kingDistance(blackKing, square)),
+              kingDistance(whiteKing, square) <= kingDistance(blackKing, square)),
         )
     const beyondIndex = outerIndex + (wall.side === 'minimum' ? 1 : -1)
     const beyondSquares = allSquares().filter(
