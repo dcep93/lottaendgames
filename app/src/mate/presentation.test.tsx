@@ -1383,6 +1383,7 @@ test('Two Bishops shows the r18 choke diagram with its wall and move arrow', () 
   )
   assert.match(markup, /rule r18.*Play the choke move/)
   assert.match(markup, /inner wall d8–h4 has five squares/)
+  assert.match(markup, /king on g7 is outside the wall/)
   assert.match(markup, /long diagonal a1–h8/)
   const diagram = ruleSet.help.noteBoards.find(({ id }) => id === 'two-bishops-rule-r18-choke')!
   assert.deepEqual(diagram.arrows, [{ from: 'h4', to: 'f6' }])

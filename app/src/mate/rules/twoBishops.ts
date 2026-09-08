@@ -181,7 +181,7 @@ const RULE_R18_CHOKE_NOTE_BOARD = {
   id: 'two-bishops-rule-r18-choke',
   title: 'rule r18 — Play the choke move',
   caption:
-    'The inner wall d8–h4 has five squares and touches neither edge of target corner a1. Play Bf6: the inner bishop moves from h4 to the long diagonal a1–h8.',
+    "The inner wall d8–h4 has five squares and touches neither edge of target corner a1. White's king on g7 is outside the wall. Play Bf6: the inner bishop moves from h4 to the long diagonal a1–h8.",
   pieces: [
     { square: 'g7', piece: 'K' },
     { square: 'e6', piece: 'k' },
@@ -402,7 +402,7 @@ function getAdjacentDiagonalWalls(
 }
 
 function wallSeparatesWhite(
-  wall: AdjacentDiagonalWall,
+  wall: Pick<AdjacentDiagonalWall, 'axis' | 'side' | 'lower' | 'upper'>,
   whiteKing: Square | undefined,
 ): boolean {
   if (whiteKing === undefined) return false
@@ -1779,7 +1779,9 @@ function scoreRuleR22(
 function ruleR18Targets(fen: string): readonly Square[] {
   const bishops = getWhiteBishopSquares(fen)
   const blackKing = findPiece(fen, 'b', 'k')?.square
+  const whiteKing = findPiece(fen, 'w', 'k')?.square
   return smallestDiagonalWalls(getDiagonalWalls(bishops, blackKing)).flatMap((wall) => {
+    if (!wallSeparatesWhite(wall, whiteKing)) return []
     const innerIndex = diagonalIndex(wall.innerBishop, wall.axis)
     if (diagonalLength(innerIndex, wall.axis) !== 5) return []
     const corner = targetCorner(wall.axis, wall.side)
@@ -1959,7 +1961,7 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
       id: 'rule r18',
       shortLabel: 'rule r18',
       helpText:
-        "Play the choke move. When the inner wall has five squares and touches neither of the target corner's edges, prefer the inner-wall bishop on the long diagonal.",
+        "Play the choke move. When the inner wall has five squares and touches neither of the target corner's edges, if White's king is outside the wall, prefer the inner-wall bishop on the long diagonal.",
       applies: (score) => score.ruleR18Applies,
       compare: (first, second) => first.ruleR18Penalty - second.ruleR18Penalty,
     },

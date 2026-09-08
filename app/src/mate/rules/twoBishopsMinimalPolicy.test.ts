@@ -1894,6 +1894,8 @@ test('rule r19 requires the outer bishop to remain three king steps from Black',
 test('rule r18 plays Bf6 to choke the five-square inner wall symmetrically', () => {
   const fen = '4B3/6K1/4k3/8/7B/8/8/8 w - - 0 1'
   const rule = twoBishopsWhiteRules.find(({ id }) => id === 'rule r18')!
+  assert.equal(rule.helpText,
+    "Play the choke move. When the inner wall has five squares and touches neither of the target corner's edges, if White's king is outside the wall, prefer the inner-wall bishop on the long diagonal.")
   for (const transform of SQUARE_TRANSFORMS) {
     const transformedFen = transformFen(fen, transform)
     const moves = getChess(transformedFen).moves({ verbose: true })
