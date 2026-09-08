@@ -264,6 +264,7 @@ const twoBishopsHelp: RuleHelp = {
   notes: [
     "Target squares are the outer-wall squares closest to Black's king by king-step distance. All equally closest squares are candidates. If any candidate is occupied by a bishop, that wall has no target. White's king must be outside the wall, or on the outer wall and no farther from the target than Black's king by king-step distance.",
     'Phase 2 is recognized when rule r4 matches an established mating-pattern geometry: either the exact Phase 2 template or a bishop move that forces Black from the edge into its associated corner, under rotation or reflection.',
+    "For r10, an outer wall screened by White's king at least two squares from the board edge does not limit Black's diagonals. A king one square from the edge is exempt. A screened inner diagonal counts as Black's while the outer wall remains intact.",
   ],
   noteBoards: [TARGET_SQUARE_NOTE_BOARD, PHASE_TWO_NOTE_BOARD, RULE_R10_EDGE_NOTE_BOARD, RULE_R18_CHOKE_NOTE_BOARD],
 }
@@ -1569,7 +1570,12 @@ function wallReplyDiagonalCount(
   wall: AdjacentDiagonalWall,
   replySquares: readonly Square[],
   screenedInner: boolean,
+  screenedOuter: boolean,
 ): number {
+  // A screened outer ray leaves no enclosing barrier, even if Black cannot
+  // reach its hidden tail on the next move. An intact outer wall can still
+  // enclose Black when the inner ray is screened; count that inner diagonal.
+  if (screenedOuter) return 99
   const replyIndices = replySquares.map((square) => diagonalIndex(square, wall.axis))
   const innerIndex = wall.side === 'minimum' ? wall.lower : wall.upper
   // Reaching the inner wall or escaping beyond both walls defeats the enclosure,
@@ -1604,9 +1610,11 @@ function scoreRuleR10(
   for (const wall of walls) {
     const innerIndex = wall.side === 'minimum' ? wall.lower : wall.upper
     // Kings on the edge or one square from it do not count as screens.
-    const screenedInner = diagonalIndex(whiteKing, wall.axis) === innerIndex &&
-      edgeDistance(whiteKing) > 1
+    const whiteIndex = diagonalIndex(whiteKing, wall.axis)
+    const screensRay = edgeDistance(whiteKing) > 1
+    const screenedInner = whiteIndex === innerIndex && screensRay
     const outerIndex = wall.side === 'minimum' ? wall.upper : wall.lower
+    const screenedOuter = whiteIndex === outerIndex && screensRay
     const outerSquares = allSquares().filter(
       (square) => diagonalIndex(square, wall.axis) === outerIndex,
     )
@@ -1630,7 +1638,7 @@ function scoreRuleR10(
     )
     const score: RuleR10Score = {
       targetPenalty: targetSquares.length === 0 ? 1 : 0,
-      diagonalCount: wallReplyDiagonalCount(wall, replySquares, screenedInner),
+      diagonalCount: wallReplyDiagonalCount(wall, replySquares, screenedInner, screenedOuter),
       targetSquares,
       beyondDistance: beyondSquares.length === 0
         ? 99
