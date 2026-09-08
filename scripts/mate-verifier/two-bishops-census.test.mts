@@ -20,6 +20,7 @@ test('parallel census resumes exactly and refuses a mismatched checkpoint', () =
     assert.equal(initial.certificate.completeStandardUniverse, false)
     assert.equal(initial.certificate.allPositionsTerminate, false)
     assert.equal(initial.certificate.allExaminedRootsTerminate, true)
+    assert.match(initial.certificate.rootScope, /^First 10 canonical/)
     assert.equal(initial.rootOutcomes.total, 10)
     assert.ok(initial.graphOutcomes.totalPositions >= 10)
 

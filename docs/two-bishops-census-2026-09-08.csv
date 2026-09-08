@@ -1,0 +1,17 @@
+rule,moves_eliminated,positions_affected
+mate,9552,458
+bishops safe,904655,229490
+no stalemate,6878,4920
+rule r3,336105,68340
+rule r4,17047,909
+rule r5,41330,2041
+rule r6,682463,35576
+rule r8,43696,2336
+rule r10,4488421,255526
+rule r11,7,4
+rule r12,82606,23736
+rule r18,38,12
+rule r19,14271,7755
+rule r22,23005,5816
+rule r25,36903,18349
+rule r30,59328,21327

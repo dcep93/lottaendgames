@@ -182,12 +182,13 @@ also detect paths that reach the 100-ply draw before mate. History before the
 starting position is not assumed.
 
 Checkpointed graph rows and `progress.json` / `result.json` live in ignored
-`tmp/mate-verifier-census/<policy fingerprint>/`. One parent process owns SQLite
+`tmp/mate-verifier-census/<policy fingerprint>-<implementation fingerprint>/`. One parent process owns SQLite
 writes; worker expansions and graph rows are not retained in multiple caches.
 The checkpoint rejects changes to the engine, policy, root eligibility, or census
 implementation. Restart the same command to resume. It reports at most five
 verified playable failure witnesses, while all position and rule totals remain
-complete. `positionsAffected` counts canonical White positions where a rule
+complete. Witness roots are selected in linear time before replay, so shared
+paths into a few loops are not repeatedly rescored. `positionsAffected` counts canonical White positions where a rule
 removed at least one move; `eliminatedMoves` counts moves first removed by that
 rule. Counts include all reachable White positions, even those not eligible as
 fresh starts.
@@ -196,6 +197,9 @@ fresh starts.
 it cannot set `completeStandardUniverse` or `allPositionsTerminate`. Full runs
 set `completeStandardUniverse` even when failures exist; only complete runs with
 no cycle, terminal failure, or 50-move violation set `allPositionsTerminate`.
+The command exits with code 1 when any examined root fails the mating guarantee;
+the complete result is still saved. A code or policy change starts a separate
+checkpoint directory automatically; an explicit mismatched output directory is rejected.
 
 The Bishop + Knight gate uses the same exhaustive continuation semantics. Its
 fixed-seed D4-canonical roots are stratified by king edge distance, phase and

@@ -5,11 +5,12 @@ import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { DatabaseSync } from 'node:sqlite'
 import { getChess } from '../../app/src/mate/chess.ts'
-import { encodeMateReplay, decodeMateReplay } from '../../app/src/mate/share.ts'
+import { encodeMateFen, encodeMateReplay, decodeMateReplay } from '../../app/src/mate/share.ts'
 import { getMateRuleSet } from '../../app/src/mate/rules/index.ts'
 import { createTwoBishopsDevelopmentFingerprints } from './development-cache.mts'
 import { createProductionMateAdapter, enumerateProductionMateRoots } from './production.mts'
 import { analyzeExhaustiveGraph, type ExhaustiveGraphNode } from './exhaustive-graph.mts'
+import { selectExhaustiveFailureSuccessor, selectExhaustiveWitnessRoots } from './exhaustive-witness-roots.mts'
 import type { CensusExpansion } from './two-bishops-census-worker.mts'
 
 type StoredNode = ExhaustiveGraphNode & Omit<CensusExpansion, 'id' | 'children'>
@@ -19,7 +20,7 @@ const startedAt = Date.now()
 const fingerprints = createTwoBishopsDevelopmentFingerprints()
 function implementationFingerprint(): string {
   const hash = createHash('sha256')
-  for (const path of ['./two-bishops-census.mts', './two-bishops-census-worker.mts', './exhaustive-graph.mts',
+  for (const path of ['./two-bishops-census.mts', './two-bishops-census-worker.mts', './exhaustive-graph.mts', './exhaustive-witness-roots.mts',
     '../../app/src/mate/positions.ts', '../../app/src/mate/catalog.ts', '../../app/src/mate/share.ts']) {
     hash.update(path).update(readFileSync(new URL(path, import.meta.url)))
   }
@@ -32,7 +33,7 @@ const workerCount = Number(option('workers') ?? 6)
 const rootLimit = option('root-limit') === undefined ? undefined : Number(option('root-limit'))
 if (!Number.isInteger(workerCount) || workerCount < 1 || workerCount > 16) throw new Error('Invalid worker count')
 if (rootLimit !== undefined && (!Number.isInteger(rootLimit) || rootLimit < 1)) throw new Error('Invalid root limit')
-const outputDir = resolve(option('output') ?? fileURLToPath(new URL(`../../tmp/mate-verifier-census/${fingerprints.policy.slice(0, 12)}${rootLimit === undefined ? '' : `-prefix-${rootLimit}`}`, import.meta.url)))
+const outputDir = resolve(option('output') ?? fileURLToPath(new URL(`../../tmp/mate-verifier-census/${fingerprints.policy.slice(0, 12)}-${implementation.slice(0, 12)}${rootLimit === undefined ? '' : `-prefix-${rootLimit}`}`, import.meta.url)))
 mkdirSync(outputDir, { recursive: true })
 const database = new DatabaseSync(resolve(outputDir, 'graph.sqlite'))
 database.exec(`PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL;
@@ -182,13 +183,12 @@ function witness(startId: number) {
     seen.set(identity, moves.length)
     const id = ids.get(adapter.key(chess.fen()))!
     const expansion = adapter.expand(chess.fen())
+    const successor = selectExhaustiveFailureSuccessor(graph, analysis, id)
     const branch = expansion.branches.find((candidate) => {
-      if (candidate.kind === 'failure') return !analysis.loopLeading[id]
+      if (candidate.kind === 'failure') return successor === undefined
       if (candidate.kind !== 'continue') return false
       const child = ids.get(adapter.key(candidate.next))!
-      if (analysis.loopLeading[id]) return Boolean(analysis.loopLeading[child])
-      if (analysis.failureLeading[id]) return Boolean(analysis.failureLeading[child])
-      return analysis.rank[child]! + 2 === analysis.rank[id]
+      return child === successor
     })
     if (!branch) throw new Error('Could not transport failing graph path')
     reasons.push(getMateRuleSet('two-bishops').currentWhiteHint(chess.fen())?.id ?? 'rule gap')
@@ -198,7 +198,7 @@ function witness(startId: number) {
     }
     if (branch.kind === 'failure') { kind = branch.failureKind; break }
   }
-  const hash = encodeMateReplay(startingFen, moves, 0)
+  const hash = moves.length === 0 ? encodeMateFen(startingFen) : encodeMateReplay(startingFen, moves, 0)
   if (!decodeMateReplay(hash, 'two-bishops').ok) throw new Error('Failure replay rejected')
   return { startingFen, moves, kind, cycleStartPly, finalFen: chess.fen(), reasons,
     url: `http://localhost:5173/mate/two-bishops${hash}` }
@@ -211,7 +211,9 @@ const result = {
     allExaminedRootsTerminate: rootOutcomes.mateBeforeDraw === rootOutcomes.total,
     stateKeyMode: 'symmetry', initialHalfmoveClock: 0,
     traversesAllTiedBestWhiteMoves: true, traversesAllLegalBlackReplies: true,
-    rootScope: 'All app-eligible opposite-colored KBBK White-to-move starts, plus train seeds; all reachable White states',
+    rootScope: rootLimit === undefined
+      ? 'All app-eligible opposite-colored KBBK White-to-move starts, plus train seeds; all reachable White states'
+      : `First ${rootLimit} canonical app-eligible KBBK starts, including the training prefix; all their reachable White states`,
     checksFiftyMoveLimit: true, historyRepetition: 'Structural loops; no supplied prehistory',
   }, fingerprints, implementation, elapsedMs: Date.now() - startedAt, workerCount,
   rootOutcomes, graphOutcomes: analysis.counts, whiteChoices, blackReplies,
@@ -222,8 +224,7 @@ const result = {
 // A malformed witness must never erase the expensive graph result.
 writeFileSync(resolve(outputDir, 'result.json'), JSON.stringify(result, null, 2))
 const witnessSignatures = new Set<string>()
-for (const id of roots) {
-  if (analysis.rank[id]! > 0 && analysis.rank[id]! <= 100) continue
+for (const id of selectExhaustiveWitnessRoots(graph, analysis, roots)) {
   try {
     const example = witness(id)
     const signature = `${example.kind}:${adapter.key(example.finalFen)}`
@@ -234,7 +235,9 @@ for (const id of roots) {
     if (witnessErrors.length < 5) witnessErrors.push({ key: keys[id]!, message: String(error) })
   }
 }
+result.elapsedMs = Date.now() - startedAt
 writeFileSync(resolve(outputDir, 'result.json'), JSON.stringify(result, null, 2))
 console.log(JSON.stringify(result, null, 2))
 database.close()
 console.error(`Result: ${resolve(outputDir, 'result.json')}`)
+process.exitCode = rootOutcomes.mateBeforeDraw === rootOutcomes.total ? 0 : 1

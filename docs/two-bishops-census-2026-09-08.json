@@ -1,0 +1,265 @@
+{
+  "certificate": {
+    "completeStandardUniverse": true,
+    "allPositionsTerminate": false,
+    "allExaminedRootsTerminate": false,
+    "stateKeyMode": "symmetry",
+    "initialHalfmoveClock": 0,
+    "traversesAllTiedBestWhiteMoves": true,
+    "traversesAllLegalBlackReplies": true,
+    "rootScope": "All app-eligible opposite-colored KBBK White-to-move starts, plus train seeds; all reachable White states",
+    "checksFiftyMoveLimit": true,
+    "historyRepetition": "Structural loops; no supplied prehistory"
+  },
+  "fingerprints": {
+    "engine": "12d2647dc3b8407c37ff489627fa99fa5fd922568b6da30e9853a58c388922eb",
+    "policy": "9572ceb427b06fb476400e8a59d106152dfc6de518309dad87aaa1f942861a97"
+  },
+  "implementation": "7f9176118c4891fabb8bec6abb49f18b73f2d8dd806b1f0552da20e11eac6322",
+  "elapsedMs": 2078798,
+  "workerCount": 6,
+  "rootOutcomes": {
+    "total": 312286,
+    "mateBeforeDraw": 311842,
+    "loopLeading": 420,
+    "otherFailureLeading": 2,
+    "fiftyMoveOnly": 22
+  },
+  "graphOutcomes": {
+    "totalPositions": 312439,
+    "mateTerminatingPositions": 312016,
+    "loopLeadingPositions": 420,
+    "directFailureLeadingPositions": 3,
+    "loopAndFailureLeadingPositions": 0,
+    "fiftyMoveLeadingPositions": 22,
+    "maximumMatePlies": 103
+  },
+  "whiteChoices": 312837,
+  "blackReplies": 1309264,
+  "ruleFilterCensus": {
+    "unit": "unique symmetry-canonical expanded White positions",
+    "positions": 312439,
+    "rules": {
+      "mate": {
+        "eliminatedMoves": 9552,
+        "positionsAffected": 458
+      },
+      "bishops safe": {
+        "eliminatedMoves": 904655,
+        "positionsAffected": 229490
+      },
+      "no stalemate": {
+        "eliminatedMoves": 6878,
+        "positionsAffected": 4920
+      },
+      "rule r3": {
+        "eliminatedMoves": 336105,
+        "positionsAffected": 68340
+      },
+      "rule r4": {
+        "eliminatedMoves": 17047,
+        "positionsAffected": 909
+      },
+      "rule r5": {
+        "eliminatedMoves": 41330,
+        "positionsAffected": 2041
+      },
+      "rule r6": {
+        "eliminatedMoves": 682463,
+        "positionsAffected": 35576
+      },
+      "rule r8": {
+        "eliminatedMoves": 43696,
+        "positionsAffected": 2336
+      },
+      "rule r10": {
+        "eliminatedMoves": 4488421,
+        "positionsAffected": 255526
+      },
+      "rule r11": {
+        "eliminatedMoves": 7,
+        "positionsAffected": 4
+      },
+      "rule r12": {
+        "eliminatedMoves": 82606,
+        "positionsAffected": 23736
+      },
+      "rule r18": {
+        "eliminatedMoves": 38,
+        "positionsAffected": 12
+      },
+      "rule r19": {
+        "eliminatedMoves": 14271,
+        "positionsAffected": 7755
+      },
+      "rule r22": {
+        "eliminatedMoves": 23005,
+        "positionsAffected": 5816
+      },
+      "rule r25": {
+        "eliminatedMoves": 36903,
+        "positionsAffected": 18349
+      },
+      "rule r30": {
+        "eliminatedMoves": 59328,
+        "positionsAffected": 21327
+      }
+    }
+  },
+  "witnesses": [
+    {
+      "signature": "1k6/8/8/8/8/4B1K1/8/7B w - -|1k6/8/8/8/8/4B3/5K2/7B w - -",
+      "startingFen": "1k6/8/8/8/8/4B1K1/8/7B w - - 0 1",
+      "moves": [
+        "Bf4+",
+        "Ka7",
+        "Be3+",
+        "Kb8"
+      ],
+      "reasons": [
+        "rule r12",
+        "rule r10"
+      ],
+      "kind": "cycle",
+      "cycleStartPly": 0,
+      "finalFen": "1k6/8/8/8/8/4B1K1/8/7B w - - 4 3",
+      "canonicalCycle": [
+        "1k6/8/8/8/8/4B1K1/8/7B w - -",
+        "1k6/8/8/8/8/4B3/5K2/7B w - -"
+      ],
+      "url": "http://localhost:5173/mate/two-bishops#fen=1k6/8/8/8/8/4B1K1/8/7B_w_-_-_0_1&moves=Bf4%2B,Ka7,Be3%2B,Kb8&cursor=0"
+    },
+    {
+      "signature": "1k6/8/8/8/8/4B3/7K/7B w - -|1k6/8/8/8/8/4B3/8/6KB w - -",
+      "startingFen": "1k6/8/8/8/8/4B3/7K/7B w - - 0 1",
+      "moves": [
+        "Bf4+",
+        "Ka7",
+        "Be3+",
+        "Kb8"
+      ],
+      "reasons": [
+        "rule r12",
+        "rule r10"
+      ],
+      "kind": "cycle",
+      "cycleStartPly": 0,
+      "finalFen": "1k6/8/8/8/8/4B3/7K/7B w - - 4 3",
+      "canonicalCycle": [
+        "1k6/8/8/8/8/4B3/7K/7B w - -",
+        "1k6/8/8/8/8/4B3/8/6KB w - -"
+      ],
+      "url": "http://localhost:5173/mate/two-bishops#fen=1k6/8/8/8/8/4B3/7K/7B_w_-_-_0_1&moves=Bf4%2B,Ka7,Be3%2B,Kb8&cursor=0"
+    },
+    {
+      "signature": "1k6/8/8/8/8/8/5B1K/7B w - -|1k6/8/8/8/8/8/5B2/6KB w - -",
+      "startingFen": "1k6/8/8/8/8/8/5B1K/7B w - - 0 1",
+      "moves": [
+        "Bg3+",
+        "Ka7",
+        "Bf2+",
+        "Kb8"
+      ],
+      "reasons": [
+        "rule r12",
+        "rule r10"
+      ],
+      "kind": "cycle",
+      "cycleStartPly": 0,
+      "finalFen": "1k6/8/8/8/8/8/5B1K/7B w - - 4 3",
+      "canonicalCycle": [
+        "1k6/8/8/8/8/8/5B1K/7B w - -",
+        "1k6/8/8/8/8/8/5B2/6KB w - -"
+      ],
+      "url": "http://localhost:5173/mate/two-bishops#fen=1k6/8/8/8/8/8/5B1K/7B_w_-_-_0_1&moves=Bg3%2B,Ka7,Bf2%2B,Kb8&cursor=0"
+    },
+    {
+      "signature": "6BK/8/6k1/8/3B4/8/8/8 w - -",
+      "startingFen": "6BK/8/6k1/8/3B4/8/8/8 w - - 0 1",
+      "moves": [
+        "Bh7+",
+        "Kf7",
+        "Bg8+",
+        "Kg6"
+      ],
+      "reasons": [
+        "rule r12",
+        "rule r12"
+      ],
+      "kind": "cycle",
+      "cycleStartPly": 0,
+      "finalFen": "6BK/8/6k1/8/3B4/8/8/8 w - - 4 3",
+      "canonicalCycle": [
+        "6BK/8/6k1/8/3B4/8/8/8 w - -"
+      ],
+      "url": "http://localhost:5173/mate/two-bishops#fen=6BK/8/6k1/8/3B4/8/8/8_w_-_-_0_1&moves=Bh7%2B,Kf7,Bg8%2B,Kg6&cursor=0"
+    },
+    {
+      "signature": "6BK/8/6k1/8/8/2B5/8/8 w - -",
+      "startingFen": "6BK/8/6k1/8/8/2B5/8/8 w - - 0 1",
+      "moves": [
+        "Bh7+",
+        "Kf7",
+        "Bg8+",
+        "Kg6"
+      ],
+      "reasons": [
+        "rule r12",
+        "rule r12"
+      ],
+      "kind": "cycle",
+      "cycleStartPly": 0,
+      "finalFen": "6BK/8/6k1/8/8/2B5/8/8 w - - 4 3",
+      "canonicalCycle": [
+        "6BK/8/6k1/8/8/2B5/8/8 w - -"
+      ],
+      "url": "http://localhost:5173/mate/two-bishops#fen=6BK/8/6k1/8/8/2B5/8/8_w_-_-_0_1&moves=Bh7%2B,Kf7,Bg8%2B,Kg6&cursor=0"
+    }
+  ],
+  "witnessErrors": [],
+  "reportValidation": {
+    "auditedCommit": "5c97f4c",
+    "allGraphRowsComplete": true,
+    "allFiveWitnessesAreEligibleRoots": true,
+    "allFiveWitnessesMatchFinalGraph": true,
+    "allFiveWitnessesReplayedLegallyWithPreferredWhiteMoves": true,
+    "allFiveReplayUrlsDecode": true,
+    "initialAndFinalPhysicalBoardsEqual": true,
+    "selection": "Five short, independently verified cycles; not a count of all cyclic components",
+    "independentFullGraphAudit": {
+      "method": "Existing policy-scc session using complete graph snapshot; rescoring disabled, except the single direct terminal-failure node",
+      "loopLeadingPositions": 420,
+      "structurallyMatingPositions": 312016,
+      "stalemateLeadingPositions": 3,
+      "cyclicComponents": 65,
+      "cyclicStates": 101,
+      "maximumCyclicComponentSize": 2,
+      "independentSqlRuleCensusMatches": true,
+      "directTerminalFailureKind": "stalemate",
+      "rootStalemateLeadingPositions": 2
+    }
+  },
+  "optimizations": {
+    "scoring": {
+      "positionsCompared": 2264,
+      "movesCompared": 51544,
+      "allScoresSelectionsAndCountsUnchanged": true,
+      "benchmarkPositions": 200,
+      "oldMedianMs": 1263,
+      "newMedianMs": 774
+    },
+    "enumeration": {
+      "rawGeometriesBefore": 3469344,
+      "rawGeometriesAfter": 541725,
+      "symmetryOrbits": 433668,
+      "orbitSetsAndFirstRepresentativesUnchanged": true
+    },
+    "parallelWorkers": 6,
+    "remainingMateLookaheadPrototype": {
+      "samplePositions": 51,
+      "oldMs": 4385,
+      "newMs": 1455,
+      "applied": false
+    }
+  }
+}
