@@ -14,6 +14,7 @@ import {
   getIdealTwoBishopsWhiteMoves,
   scoreTwoBishopsWhiteMove,
   twoBishopsWhiteRules,
+  type TwoBishopsWhiteMoveScore,
 } from './twoBishops'
 
 function transformedMove(
@@ -31,6 +32,16 @@ function transformedMove(
 
 const startingFen = '5B2/3k4/8/8/4K3/1B6/8/8 w - - 18 10'
 
+function assertNoWall(score: TwoBishopsWhiteMoveScore, label: string): void {
+  assert.equal(score.ruleR10DiagonalCount, 99, label)
+  assert.equal(score.ruleR10TargetPenalty, 1, label)
+  assert.deepEqual(score.ruleR10TargetSquares, [], label)
+  assert.equal(score.ruleR10KingDistance, 99, label)
+  assert.equal(score.ruleR12KingDistance, 99, label)
+  const r12 = twoBishopsWhiteRules.find(({ id }) => id === 'rule r12')!
+  assert.equal(r12.applies?.(score), false, label)
+}
+
 test('r10 rejects Kd5 as an outer-wall screen and selects Ke5 in every orientation', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     const fen = transformFen(startingFen, transform)
@@ -42,7 +53,7 @@ test('r10 rejects Kd5 as an outer-wall screen and selects Ke5 in every orientati
     }))
     const screened = candidates.find(({ san }) => san === screenedMove)!
     const intact = candidates.find(({ san }) => san === intactMove)!
-    assert.equal(screened.score.ruleR10DiagonalCount, 99, transform.name)
+    assertNoWall(screened.score, transform.name)
     assert.equal(intact.score.ruleR10DiagonalCount, 5, transform.name)
     assert.equal(firstDifferingRule(screened.score, intact.score,
       twoBishopsWhiteRules)?.id, 'rule r10', transform.name)
@@ -55,13 +66,10 @@ test('r10 rejects Kd5 as an outer-wall screen and selects Ke5 in every orientati
     assert.equal(selection.eliminatedBy.get(tied)?.id, 'rule r25', transform.name)
     assert.equal(selection.lastEliminatingRule?.id, 'rule r25', transform.name)
 
-    // Invalidating the enclosure does not discard its target/beyond geometry.
-    for (const candidate of [screened, intact]) {
-      assert.deepEqual(candidate.score.ruleR10TargetSquares,
-        [transformSquare('e6', transform)], transform.name)
-      assert.equal(candidate.score.ruleR10KingDistance, 1, transform.name)
-    }
-    assert.equal(screened.score.ruleR12KingDistance, 1, transform.name)
+    // Only the intact wall can supply a target or one-beyond-wall geometry.
+    assert.deepEqual(intact.score.ruleR10TargetSquares,
+      [transformSquare('e6', transform)], transform.name)
+    assert.equal(intact.score.ruleR10KingDistance, 1, transform.name)
     assert.equal(intact.score.ruleR12KingDistance, 0, transform.name)
   }
 })
@@ -110,26 +118,59 @@ test('bishop moves retain an invalid enclosure while White remains on the centra
     const fen = transformFen(fields.join(' '), transform)
     for (const to of ['a2', 'c4'] as const) {
       const move = transformedMove(fen, transform, 'b3', to)
-      assert.equal(scoreTwoBishopsWhiteMove(fen, move).ruleR10DiagonalCount,
-        99, `${transform.name}: ${to}`)
+      assertNoWall(scoreTwoBishopsWhiteMove(fen, move), `${transform.name}: ${to}`)
     }
   }
 })
 
-test('screening one outer wall leaves a valid wall in the other orientation available', () => {
-  const starting = '8/2k5/8/3B4/3B4/8/2K5/8 w - - 0 1'
+test('screening either wall leaves a valid pair in the other orientation available', () => {
+  const cases = [
+    { fen: '8/2k5/8/3B4/3B4/8/2K5/8 w - - 0 1', from: 'c2', to: 'c3' },
+    { fen: '8/2k5/8/3B4/3B4/2K5/8/8 w - - 0 1', from: 'c3', to: 'c4' },
+  ] as const
+  for (const fixture of cases) {
+    for (const transform of SQUARE_TRANSFORMS) {
+      const fen = transformFen(fixture.fen, transform)
+      const screenedMove = transformedMove(fen, transform, fixture.from, fixture.to)
+      const intactMove = transformedMove(fen, transform, fixture.from, 'd3')
+      // Kc3 screens outer a1-h8; Kc4 screens inner a2-g8. Either invalidates
+      // the six-diagonal enclosure. Pair a7-g1/a8-h1 still encloses seven.
+      const screened = scoreTwoBishopsWhiteMove(fen, screenedMove)
+      const label = `${transform.name}: ${fixture.to}`
+      assert.equal(screened.ruleR10DiagonalCount, 7, label)
+      assert.deepEqual(screened.ruleR10TargetSquares,
+        [transformSquare('b6', transform)], label)
+      assert.equal(scoreTwoBishopsWhiteMove(fen, intactMove).ruleR10DiagonalCount,
+        6, label)
+    }
+  }
+})
+
+test('screened inner and outer walls supply no enclosure, target, or r12 distance', () => {
+  const starting = '8/8/6B1/8/8/5K1k/3B4/8 w - - 0 1'
   for (const transform of SQUARE_TRANSFORMS) {
     const fen = transformFen(starting, transform)
-    const screenedMove = transformedMove(fen, transform, 'c2', 'c3')
-    const intactMove = transformedMove(fen, transform, 'c2', 'd3')
-    // Kc3 screens a1-h8, invalidating the six-diagonal enclosure. The other
-    // pair, a7-g1/a8-h1, still encloses Black on seven diagonals.
-    const screened = scoreTwoBishopsWhiteMove(fen, screenedMove)
-    assert.equal(screened.ruleR10DiagonalCount, 7, transform.name)
-    assert.deepEqual(screened.ruleR10TargetSquares,
-      [transformSquare('b6', transform)], transform.name)
-    assert.equal(scoreTwoBishopsWhiteMove(fen, intactMove).ruleR10DiagonalCount,
-      6, transform.name)
+    const innerScreen = transformedMove(fen, transform, 'g6', 'h5')
+    const outerScreen = transformedMove(fen, transform, 'f3', 'e4')
+    // Bh5 leaves Kf3 screening inner d1-h5. Ke4 screens outer b1-h7.
+    for (const move of [innerScreen, outerScreen]) {
+      assertNoWall(scoreTwoBishopsWhiteMove(fen, move), `${transform.name}: ${move}`)
+    }
+  }
+})
+
+test('an inner-wall king one square from the edge preserves the wall and r12 distance', () => {
+  const starting = '8/6B1/8/8/7k/8/2BK4/8 w - - 0 1'
+  const r12 = twoBishopsWhiteRules.find(({ id }) => id === 'rule r12')!
+  for (const transform of SQUARE_TRANSFORMS) {
+    const fen = transformFen(starting, transform)
+    const move = transformedMove(fen, transform, 'g7', 'h6')
+    const score = scoreTwoBishopsWhiteMove(fen, move)
+    assert.equal(edgeDistance(transformSquare('d2', transform)), 1)
+    assert.equal(score.ruleR10DiagonalCount, 5, transform.name)
+    assert.equal(score.ruleR10TargetPenalty, 1, transform.name)
+    assert.equal(score.ruleR12KingDistance, 1, transform.name)
+    assert.equal(r12.applies?.(score), true, transform.name)
   }
 })
 
