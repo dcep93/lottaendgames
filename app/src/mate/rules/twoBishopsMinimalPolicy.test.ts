@@ -994,7 +994,7 @@ test('rule r6 prefers the bishop Phase 2 squares before king proximity', () => {
   }
 })
 
-test('rule r6 prefers clearing the screened wall before placing a bishop on its Phase 2 square', () => {
+test('rule r6 exempts a White king one square from the edge from screening', () => {
   const fen = '8/8/8/8/8/8/3BK1k1/3B4 w - - 2 2'
   for (const transform of SQUARE_TRANSFORMS) {
     const transformedFen = transformFen(fen, transform)
@@ -1008,10 +1008,10 @@ test('rule r6 prefers clearing the screened wall before placing a bishop on its 
       move.to === transformSquare('e1', transform),
     )!.san
     assert.equal(scoreTwoBishopsWhiteMove(transformedFen, bishopMove).ruleR6DiagonalPenalty,
-      1, transform.name)
+      0, transform.name)
     assert.equal(scoreTwoBishopsWhiteMove(transformedFen, kingMove).ruleR6DiagonalPenalty,
       0, transform.name)
-    assert.deepEqual(getIdealTwoBishopsWhiteMoves(transformedFen), [kingMove], transform.name)
+    assert.deepEqual(getIdealTwoBishopsWhiteMoves(transformedFen), [bishopMove], transform.name)
   }
 })
 
@@ -2012,7 +2012,7 @@ test('r10 counts a screened inner diagonal reachable beyond the first Black repl
   }
 })
 
-test('r10 adds a screened inner diagonal even when White guards the entire exposed tail', () => {
+test('r10 exempts a White king one square from the edge from screening', () => {
   const fen = '8/6B1/8/8/7k/8/2BK4/8 w - - 0 1'
   for (const transform of SQUARE_TRANSFORMS) {
     const transformedFen = transformFen(fen, transform)
@@ -2021,10 +2021,28 @@ test('r10 adds a screened inner diagonal even when White guards the entire expos
       (candidate) => candidate.from === transformSquare('g7', transform) &&
         candidate.to === transformSquare('h6', transform))!.san
     assert.equal(scoreTwoBishopsWhiteMove(transformedFen, move).ruleR10DiagonalCount,
-      6, transform.name)
+      5, transform.name)
     chess.move(move)
-    // Kd2 screens Bh6, but c1 is still protected by White's king.
+    // Kd2 is exempt: it is one square from the edge and guards the c1 tail.
     assert.ok(chess.isAttacked(transformSquare('c1', transform), 'w'))
+  }
+})
+
+test('one-square edge screening exemption lets r12 prefer Ke2 over Kc2 symmetrically', () => {
+  const fen = '8/8/8/8/1k6/3BB3/3K4/8 w - - 0 1'
+  for (const transform of SQUARE_TRANSFORMS) {
+    const transformedFen = transformFen(fen, transform)
+    const moves = getChess(transformedFen).moves({ verbose: true })
+    const san = (to: 'e2' | 'c2') => moves.find(
+      (move) => move.from === transformSquare('d2', transform) &&
+        move.to === transformSquare(to, transform))!.san
+    const edgeKing = scoreTwoBishopsWhiteMove(transformedFen, san('e2'))
+    const otherKing = scoreTwoBishopsWhiteMove(transformedFen, san('c2'))
+    assert.equal(edgeKing.ruleR10DiagonalCount, 5, transform.name)
+    assert.equal(otherKing.ruleR10DiagonalCount, 5, transform.name)
+    assert.equal(edgeKing.ruleR12KingDistance, 1, transform.name)
+    assert.equal(otherKing.ruleR12KingDistance, 2, transform.name)
+    assert.deepEqual(getIdealTwoBishopsWhiteMoves(transformedFen), [san('e2')], transform.name)
   }
 })
 

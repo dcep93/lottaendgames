@@ -652,7 +652,10 @@ function phaseTwoWallConfinesBlack(
 ): boolean {
   const chess = getChess(resultFen)
   // The template's shorter "outer" diagonal is the wall facing Black.
-  // It must remain a complete bishop ray, even beyond Black's next move.
+  // A White king one square from the edge is exempt from screening the ray.
+  const whiteKing = findPiece(resultFen, 'w', 'k')?.square
+  const exemptKing = whiteKing !== undefined && edgeDistance(whiteKing) === 1
+    ? whiteKing : undefined
   const diagonal = template.outerDiagonal
   const bishop = diagonal.find((square) => {
     const piece = chess.get(square)
@@ -660,7 +663,7 @@ function phaseTwoWallConfinesBlack(
   })
   if (bishop === undefined ||
     ![diagonal[0]!, diagonal[diagonal.length - 1]!].every((square) =>
-      square === bishop || bishopControlsSquareInPosition(resultFen, bishop, square),
+      square === bishop || bishopControlsSquareInPosition(resultFen, bishop, square, exemptKing),
     )) return false
   return chess.moves({ verbose: true }).every((reply) =>
     isInsidePhaseTwoBlackArea(reply.to, template) &&
@@ -800,6 +803,7 @@ function bishopControlsSquareInPosition(
   fen: string,
   bishop: Square,
   target: Square,
+  ignoredBlocker?: Square,
 ): boolean {
   if (!bishopControlsSquare(bishop, target)) return false
   const chess = getChess(fen)
@@ -811,7 +815,8 @@ function bishopControlsSquareInPosition(
   let rank = from.rank + rankStep
   while (file !== to.file || rank !== to.rank) {
     const square = squareFromCoordinates(file, rank)
-    if (square === null || chess.get(square) !== undefined) return false
+    if (square === null ||
+      (square !== ignoredBlocker && chess.get(square) !== undefined)) return false
     file += fileStep
     rank += rankStep
   }
@@ -1548,10 +1553,9 @@ function scoreRuleR10(
 
   for (const wall of walls) {
     const innerIndex = wall.side === 'minimum' ? wall.lower : wall.upper
-    // An interior king blocks the bishop ray, whether or not Black can reach
-    // the hidden tail. An endpoint king has no diagonal square beyond it.
+    // Kings on the edge or one square from it do not count as screens.
     const screenedInner = diagonalIndex(whiteKing, wall.axis) === innerIndex &&
-      edgeDistance(whiteKing) > 0
+      edgeDistance(whiteKing) > 1
     const outerIndex = wall.side === 'minimum' ? wall.upper : wall.lower
     const outerSquares = allSquares().filter(
       (square) => diagonalIndex(square, wall.axis) === outerIndex,
