@@ -1008,6 +1008,23 @@ function getRuleR4Matches(fen: string): readonly RuleR4Match[] {
   const blackKing = findPiece(fen, 'b', 'k')?.square
   const whiteKing = findPiece(fen, 'w', 'k')?.square
   if (blackKing === undefined || whiteKing === undefined) return []
+  const cornerRetreatMatches = SQUARE_TRANSFORMS.flatMap(
+    (transform): readonly RuleR4Match[] => {
+      const movingBishop = transformSquare('b2', transform)
+      const fixedBishop = (['c2', 'd3', 'e4', 'f5', 'g6', 'h7'] as const)
+        .map((square) => transformSquare(square, transform))
+        .find((square) => bishops.includes(square))
+      if (
+        blackKing !== transformSquare('a2', transform) ||
+        whiteKing !== transformSquare('c3', transform) ||
+        !bishops.includes(movingBishop) ||
+        fixedBishop === undefined
+      ) return []
+      // Retreat b2–c1 while the other bishop retains the c2–h7 diagonal.
+      return [{ kind: 'exact-pattern-move', whiteKing, movingBishop,
+        fixedBishop, target: transformSquare('c1', transform) }]
+    },
+  )
   const phaseTwoMatches = PHASE_TWO_TEMPLATES.flatMap(
     (template): readonly RuleR4Match[] => {
       if (
@@ -1331,6 +1348,7 @@ function getRuleR4Matches(fen: string): readonly RuleR4Match[] {
     },
   )
   if (exactSequenceMatches.length > 0) return exactSequenceMatches
+  if (cornerRetreatMatches.length > 0) return cornerRetreatMatches
   return phaseTwoMatches.length > 0
     ? phaseTwoMatches
     : maintainedControlSequenceMatches.length + cornerSequenceMatches.length > 0

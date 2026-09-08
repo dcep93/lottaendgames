@@ -199,6 +199,48 @@ test('rule r4 accepts the b1-h7 diagonal waiting pattern symmetrically', () => {
   }
 })
 
+test('rule r4 retreats Bc1 with the other bishop anywhere on c2–h7 symmetrically', () => {
+  for (const fixedBishop of ['c2', 'd3', 'e4', 'f5', 'g6', 'h7'] as const) {
+    const original = getChess('8/8/8/8/8/2K5/kBB5/8 w - - 2 2')
+    original.remove('c2')
+    original.put({ type: 'b', color: 'w' }, fixedBishop)
+    for (const transform of SQUARE_TRANSFORMS) {
+      const chess = getChess(transformFen(original.fen(), transform))
+      const from = transformSquare('b2', transform)
+      const to = transformSquare('c1', transform)
+      const move = chess.moves({ verbose: true }).find(
+        (candidate) => candidate.from === from && candidate.to === to,
+      )!
+      const label = `${fixedBishop} ${transform.name}`
+      assert.ok(move, label)
+      const score = scoreTwoBishopsWhiteMove(chess.fen(), move.san)
+      assert.equal(score.ruleR4Applies, true, label)
+      assert.equal(score.ruleR4Penalty, 0, label)
+      assert.deepEqual(getIdealTwoBishopsWhiteMoves(chess.fen()), [move.san], label)
+      chess.move(move)
+      assert.deepEqual(chess.moves({ verbose: true }).map((reply) => reply.to),
+        [transformSquare('a1', transform)], label)
+    }
+  }
+})
+
+test('rule r4 does not apply the Bc1 retreat without its king and bishop geometry', () => {
+  for (const fen of [
+    '8/8/8/8/B7/2K5/kB6/8 w - - 0 1', // Other bishop off c2–h7.
+    '8/8/8/8/2K5/8/kBB5/8 w - - 0 1', // White king too far away.
+  ]) {
+    for (const transform of SQUARE_TRANSFORMS) {
+      const transformedFen = transformFen(fen, transform)
+      const move = getChess(transformedFen).moves({ verbose: true }).find(
+        (candidate) => candidate.from === transformSquare('b2', transform) &&
+          candidate.to === transformSquare('c1', transform),
+      )!
+      assert.equal(scoreTwoBishopsWhiteMove(transformedFen, move.san).ruleR4Applies,
+        false, `${fen} ${transform.name}`)
+    }
+  }
+})
+
 test('rule r4 executes the loaded a-file drive to mate against either corner reply symmetrically', () => {
   const fen = '8/8/8/k1B5/2BK4/8/8/8 w - - 0 1'
   for (const fourthReply of ['Ka3', 'Ka1']) {

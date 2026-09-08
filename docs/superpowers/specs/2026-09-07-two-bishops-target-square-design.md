@@ -60,3 +60,6 @@ For `8/6B1/8/8/5K1k/8/2B5/8 w - - 2 2`, Bh6 leaves White Kf4 screening h6 from c
 The Bh6 count fix alone tied r10 on six and left r12 favoring Bh6. The added outer-wall eligibility below now lets Ke5 reach toward f6 under r10 and break that loop.
 
 For `8/6B1/8/8/5K1k/8/2B5/8 w - - 2 2`, Ke5 leaves White on outer wall a1–h8, one step from target f6 versus Black’s two. This now qualifies f6 and lets r10 prefer Ke5 over Bh6. Test equality and greater White distance as rejected cases, and preserve bishop-occupied candidate invalidation before this distance comparison.
+
+
+Add the r4 retreat `2. Bc1` with White Kc3, Black Ka2, the moving bishop on b2, and the other bishop anywhere on c2–h7 (c2, d3, e4, f5, g6, or h7). Preserve that other bishop and the king; Bc1 forces ...Ka1. Recognize every rotation/reflection, and reject missing king or diagonal geometry.
