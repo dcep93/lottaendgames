@@ -1394,6 +1394,19 @@ test('Two Bishops shows the r18 choke diagram with its wall and move arrow', () 
   ])
 })
 
+test('Two Bishops shows the king-wall movement guard before its positional rules', () => {
+  const ruleSet = getMateRuleSet('two-bishops')
+  const markup = renderToStaticMarkup(
+    <MatePriorityGuideDialog {...MATE_TRAINING_INFO_PROPS} onClose={() => undefined} ruleSet={ruleSet} />,
+  )
+  const guardAt = markup.indexOf('Move White&#x27;s king onto an inner or outer wall only one square from the board edge.')
+  const r3At = markup.indexOf('>rule r3<')
+  assert.ok(guardAt >= 0)
+  assert.ok(guardAt < r3At)
+  assert.equal(ruleSet.whiteRuleDescriptions.find(({ id }) => id === 'king wall')?.presentationRole,
+    'guard')
+})
+
 test('Rook and Two Bishops omit proof-distance teaching rules', () => {
   const rookMarkup = renderToStaticMarkup(
     <MatePriorityGuideDialog
