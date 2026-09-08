@@ -34,7 +34,6 @@ export type TwoBishopsWhiteMoveScore = {
   readonly matePenalty: number
   readonly bishopSafetyPenalty: number
   readonly stalematePenalty: number
-  readonly kingWallPenalty: number
   readonly ruleR4Applies: boolean
   readonly ruleR4Penalty: number
   readonly ruleR5BishopPenalty: number
@@ -282,19 +281,6 @@ function diagonalLength(index: number, axis: DiagonalAxis): number {
   return axis === 'difference'
     ? 8 - Math.abs(index)
     : 8 - Math.abs(index - 7)
-}
-
-function bishopWallLines(
-  bishops: readonly Square[],
-): readonly Pick<AdjacentDiagonalWall, 'axis' | 'lower' | 'upper'>[] {
-  if (bishops.length !== 2) return []
-  return (['difference', 'sum'] as const).flatMap((axis) => {
-    const first = diagonalIndex(bishops[0]!, axis)
-    const second = diagonalIndex(bishops[1]!, axis)
-    return Math.abs(first - second) === 1
-      ? [{ axis, lower: Math.min(first, second), upper: Math.max(first, second) }]
-      : []
-  })
 }
 
 function targetCorner(axis: DiagonalAxis, end: 'minimum' | 'maximum'): Square {
@@ -1831,14 +1817,6 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
         first.stalematePenalty - second.stalematePenalty,
     },
     {
-      id: 'king wall',
-      shortLabel: 'king wall',
-      presentationRole: 'guard',
-      helpText:
-        "Move White's king onto an inner or outer wall only one square from the board edge.",
-      compare: (first, second) => first.kingWallPenalty - second.kingWallPenalty,
-    },
-    {
       id: 'rule r3',
       shortLabel: 'rule r3',
       helpText:
@@ -2024,7 +2002,6 @@ export function compareTwoBishopsWhiteScores(
 
 type WhiteScoringContext = {
   readonly pieces: TwoBishopsPieces
-  readonly kingWalls: ReturnType<typeof bishopWallLines>
   readonly ruleR4Matches: readonly RuleR4Match[]
   readonly ruleR4ForcedMateNext: boolean
   readonly ruleR6Templates: readonly PhaseTwoTemplate[]
@@ -2039,7 +2016,6 @@ function whiteScoringContext(fen: string): WhiteScoringContext {
   const { blackKing } = pieces
   return {
     pieces,
-    kingWalls: bishopWallLines(pieces.bishops),
     ruleR4Matches: matches,
     ruleR4ForcedMateNext: matches.length > 0 && blackKing !== undefined &&
       (['a1', 'a8', 'h1', 'h8'] as const).some(
@@ -2065,7 +2041,7 @@ function scoreWhiteMove(
   startingContext?: WhiteScoringContext,
 ): TwoBishopsWhiteMoveScore {
   const chess = getChess(fen)
-  const move = chess.move(san)
+  chess.move(san)
   const resultFen = chess.fen()
   const context = startingContext ?? whiteScoringContext(fen)
   const mate = chess.isCheckmate()
@@ -2127,11 +2103,6 @@ function scoreWhiteMove(
       ? 1
       : 0,
     stalematePenalty: !mate && chess.isStalemate() ? 1 : 0,
-    kingWallPenalty: move.piece === 'k' && edgeDistance(move.to) !== 1 &&
-      context.kingWalls.some((wall) => {
-        const index = diagonalIndex(move.to, wall.axis)
-        return index === wall.lower || index === wall.upper
-      }) ? 1 : 0,
     ruleR4Applies: ruleR4Matches.length > 0,
     ruleR4Penalty: scoreRuleR4(fen, resultFen, context, resultPieces),
     ruleR5BishopPenalty: ruleR5.bishopPenalty,
