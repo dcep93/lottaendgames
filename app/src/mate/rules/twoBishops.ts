@@ -149,7 +149,6 @@ const BLACK_INTRO =
 const TARGET_SQUARE_NOTE_BOARD = {
   id: 'two-bishops-target-square',
   title: 'Target square',
-  noteIndex: 0,
   caption:
     "Outer wall a2–g8; target d5.",
   pieces: [

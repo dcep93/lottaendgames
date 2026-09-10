@@ -215,10 +215,6 @@ export default function MateRuleNoteBoard({
         isFullBoard ? ' leg-mate-note-board--full' : ''
       }`}
     >
-      <figcaption>
-        <strong>{board.title}</strong>
-        {board.caption === '' ? null : <span>{board.caption}</span>}
-      </figcaption>
       {board.animationFrames !== undefined ? (
         <AnimatedMateRuleNoteBoard board={board} />
       ) : board.animationSrc === undefined ? (
@@ -317,6 +313,10 @@ export default function MateRuleNoteBoard({
           src={board.animationSrc}
         />
       )}
+      <figcaption>
+        <strong>{board.title}</strong>
+        {board.caption === '' ? null : <span>{board.caption}</span>}
+      </figcaption>
     </figure>
   )
 }

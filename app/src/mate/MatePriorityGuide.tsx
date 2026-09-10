@@ -232,7 +232,7 @@ function NoteBoards({ boards }: { readonly boards: readonly RuleNoteBoard[] }) {
   return (
     <div
       className={`leg-mate-guide-note-boards${
-        boards.some(({ layout }) => layout?.files === 8 && layout.ranks === 8)
+        boards.some(({ layout }) => layout === undefined || (layout.files === 8 && layout.ranks === 8))
           ? ' leg-mate-guide-note-boards--full'
           : ''
       }`}

@@ -1369,6 +1369,12 @@ test('Two Bishops keeps only the target-square note and all diagrams', () => {
   const targetDiagramAt = markup.indexOf('Outer wall a2')
   const phaseDiagramAt = markup.indexOf('Black may occupy any square from h1 to h4')
   assert.equal(ruleSet.help.notes.length, 1)
+  assert.equal((markup.match(/class="leg-mate-guide-note-boards /g) ?? []).length, 1)
+  const figures = [...markup.matchAll(/<figure\b[^]*?<\/figure>/g)].map(([figure]) => figure)
+  assert.equal(figures.length, 4)
+  for (const figure of figures) {
+    assert.ok(figure.indexOf('leg-mate-note-board-surface') < figure.indexOf('<figcaption>'))
+  }
   for (const board of ruleSet.help.noteBoards) {
     assert.ok(markup.includes(board.caption), `${board.id}: diagram caption missing`)
   }
@@ -1376,7 +1382,7 @@ test('Two Bishops keeps only the target-square note and all diagrams', () => {
   assert.match(markup, /then exclude bishop-occupied and screened squares/)
   assert.ok(targetNoteAt < targetDiagramAt)
   assert.ok(targetDiagramAt < phaseDiagramAt)
-  assert.equal(ruleSet.help.noteBoards[0]?.noteIndex, 0)
+  assert.ok(ruleSet.help.noteBoards.every(({ noteIndex }) => noteIndex === undefined))
   assert.equal(ruleSet.whiteRuleDescriptions.some(({ id }) => id === 'rule r12'), false)
 })
 
@@ -2211,7 +2217,7 @@ test('Mate exposes stable desktop and narrow-layout structure', () => {
   )
   assert.match(
     css,
-    /\.leg-mate-guide-note-boards--full\s*\{[^}]*grid-template-columns:\s*repeat\(auto-fit, minmax\(10rem, 18rem\)\)/s,
+    /\.leg-mate-guide-note-boards--full\s*\{[^}]*grid-template-columns:\s*repeat\(auto-fit, minmax\(14rem, 1fr\)\)/s,
   )
   assert.match(
     css,

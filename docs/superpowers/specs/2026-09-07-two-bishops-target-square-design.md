@@ -403,3 +403,8 @@ Removed diagonal highlights from the target-square and r9 diagrams. The target d
 The target-square diagram is shifted one rank up and two files left: White Kc5, Black Ke4, bishops b3/b2, target d5, and arrow b3–c2. The r5.5 diagram is reflected vertically, with bishop arrow c1–g5. The r9 diagram is reflected horizontally and then across a8–h1, with White Kd7, Black Kg7, bishops a2/a3, and arrow d7–e7.
 
 After r19 was restored alongside r6.2/r6.4, all 1,003 sampled starting positions terminated within 95 plies; this is not a new exhaustive certificate. Final guide checks, r19 checks, TypeScript and whitespace checks pass. The checked r6.4/r8 suites reproduce two failures already recorded in the prior audit. The user requested committing and pushing the accumulated changes.
+
+
+### Diagram layout — 2026-09-10
+
+All guide diagrams render their board before the title and caption. The four two-bishop diagrams share one grid beneath the target explanation. Full-board columns flex from 14rem so four fit at the desktop guide width; the existing narrow-screen stack remains. Default board layouts receive the same full-board grid sizing as explicit 8×8 layouts. Cards align content at the top. Eleven targeted guide/layout checks, TypeScript, and diff whitespace checks pass.

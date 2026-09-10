@@ -52,7 +52,7 @@ test('Two Bishops exposes only the simplified experiment policy', () => {
     twoBishopsRuleSet.help.noteBoards.map(({ id }) => id),
     ['two-bishops-target-square', 'two-bishops-phase-two', 'two-bishops-rule-r9-opposition', 'two-bishops-rule-r5-5-force-corner'],
   )
-  assert.equal(twoBishopsRuleSet.help.noteBoards[0]?.noteIndex, 0)
+  assert.ok(twoBishopsRuleSet.help.noteBoards.every(({ noteIndex }) => noteIndex === undefined))
   assert.equal(
     twoBishopsWhiteRules.find(({ id }) => id === 'rule r4')?.helpText,
     'Execute the mating pattern.',

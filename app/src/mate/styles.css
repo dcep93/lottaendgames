@@ -780,11 +780,12 @@
 }
 
 .leg-mate-guide-note-boards--full {
-  grid-template-columns: repeat(auto-fit, minmax(10rem, 18rem));
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
 }
 
 .leg-mate-note-board {
   display: grid;
+  align-content: start;
   gap: 0.45rem;
   width: min(100%, 14rem);
   min-width: 0;
