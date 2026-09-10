@@ -106,10 +106,11 @@ test('bishop moves recalculate the selected wall and distance uses board squares
     const endpoint = transformFen(endpointFen, transform)
     const score = scoreTwoBishopsWhiteMove(endpoint,
       transformedMove(endpoint, transform, 'a5', 'b4'))
-    // Beyond outer a4–d1 is a3–c1: c1 is closest to Kh4, 5² + 3².
+    // The smaller crossing enclosure selects outer a4–e8.
+    // Beyond it is a5–d8: endpoint d8 is closest to Kh4, 4² + 4².
     // A projection onto the infinite diagonal would run beyond the board.
-    assert.equal(score.ruleR10DiagonalCount, 10, transform.name)
-    assert.equal(score.ruleR24_5KingDistance, 34, transform.name)
+    assert.equal(score.ruleR10DiagonalCount, 9, transform.name)
+    assert.equal(score.ruleR24_5KingDistance, 32, transform.name)
   }
 })
 
@@ -125,12 +126,12 @@ test('r24.5 uses the r10-selected wall instead of a closer wall with a worse tar
     )].sort(), ['h1', 'h8'].map((square) => transformSquare(square as Square, transform)).sort(),
     transform.name)
     // Ke4 is on outer b1–h7 toward h1, but that wall has no eligible target.
-    // R10 selects the h8 wall with outer b8–h2 and targets f4/g3 instead.
+    // R10 selects the h8 wall with outer b8–h2 and target g3 instead.
     // Its beyond diagonal a8–h1 contains e4.
     assert.deepEqual([...score.ruleR10TargetSquares].sort(),
-      ['f4', 'g3'].map((square) => transformSquare(square as Square, transform)).sort(),
+      ['g3'].map((square) => transformSquare(square as Square, transform)).sort(),
       transform.name)
-    assert.equal(score.ruleR10KingDistance, 1, transform.name)
+    assert.equal(score.ruleR10KingDistance, 2, transform.name)
     assert.equal(score.ruleR24_5KingDistance, 0, transform.name)
   }
 })
@@ -151,7 +152,7 @@ test('r10 target proximity selects the nearer outer wall regardless of axis iter
     transform.name)
     assert.equal(score.ruleR10DiagonalCount, 5, transform.name)
     assert.equal(score.ruleR10OuterBishopPenalty, 0, transform.name)
-    assert.deepEqual([...score.ruleR10TargetSquares].sort(), (['f4', 'g3'] as const).map((square) => transformSquare(square, transform)).sort(), transform.name)
+    assert.deepEqual([...score.ruleR10TargetSquares].sort(), (['g3'] as const).map((square) => transformSquare(square, transform)).sort(), transform.name)
     assert.equal(score.ruleR24_5KingDistance, 2, transform.name)
   }
 })
@@ -161,7 +162,6 @@ test('outer screens preserve the beyond-diagonal score while absent or escaped w
   const invalid = [
     { fen: '8/3k4/8/4K3/8/8/B6B/8 w - - 0 1', from: 'e5', to: 'd5' },
     { fen: '8/8/8/8/8/6k1/3BK3/3B4 w - - 0 1', from: 'd2', to: 'e3' },
-    { fen: '8/8/8/3k4/8/8/4B3/2K3B1 w - - 20 11', from: 'e2', to: 'f3' },
   ] as const
   for (const transform of SQUARE_TRANSFORMS) {
     const fen = transformFen(outerFen, transform)
@@ -195,7 +195,7 @@ test('Kd7 reaches one beyond the outer wall and replaces the Bc7 loop move', () 
     // Outer b8–h2; one beyond away from a1 is c8–h3, containing d7.
     assert.equal(king.ruleR24_5KingDistance, 0, transform.name)
     assert.equal(bishop.ruleR24_5KingDistance, 1, transform.name)
-    assert.equal(firstDifferingRule(king, bishop, twoBishopsWhiteRules)?.id, 'rule r24.5', transform.name)
+    assert.equal(firstDifferingRule(king, bishop, twoBishopsWhiteRules)?.id, 'rule r10', transform.name)
     const candidates = getChess(fen).moves().map(san => ({san, score: scoreTwoBishopsWhiteMove(fen, san)}))
     assert.deepEqual(selectCandidatesByRules(candidates, twoBishopsWhiteRules).idealCandidates.map(c => c.san), [kingSan], transform.name)
   }

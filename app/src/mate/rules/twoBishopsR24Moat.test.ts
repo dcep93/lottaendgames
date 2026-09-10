@@ -223,7 +223,7 @@ test('r24 accepts the a3-f8/a4-e8 wall even when Ke6 allows Black to cross it', 
     const san = transformedMove(fen, transform, 'e7', 'e6')
     const candidates = getChess(fen).moves().map(san => ({san,score:scoreTwoBishopsWhiteMove(fen,san)}))
     const candidate = candidates.find(c => c.san === san)!
-    assert.equal(candidate.score.ruleR10DiagonalCount, 99, transform.name)
+    assert.equal(candidate.score.ruleR10DiagonalCount, 9, transform.name)
     assert.equal(candidate.score.ruleR24Applies, true, transform.name)
     assert.equal(candidate.score.ruleR24Penalty, 0, transform.name)
     assert.ok(selectCandidatesByRules(candidates,throughR24).idealCandidates.includes(candidate),transform.name)

@@ -41,7 +41,7 @@ test('Kf5 has no target when the closest candidate is screened, without a farthe
     assert.deepEqual([...inside.ruleR10TargetSquares].sort(),
       (['c2', 'd3'] as const).map((square) => transformSquare(square, transform)).sort(), transform.name)
     assert.equal(inside.ruleR10KingDistance, 2, transform.name)
-    assert.deepEqual(getIdealTwoBishopsWhiteMoves(fen), [insideMove], transform.name)
+    assert.deepEqual(getIdealTwoBishopsWhiteMoves(fen), [moveFor(fen, transform, 'g4', 'f4')], transform.name)
   }
 })
 

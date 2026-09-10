@@ -61,7 +61,7 @@ test('r6.4 does not choke with White inside the wall, breaking the Bc6 and Ba4 l
     assert.equal(king.score.ruleR10OuterBishopPenalty, 0, transform.name)
     const selection = selectCandidatesByRules(candidates, twoBishopsWhiteRules)
     assert.equal(selection.eliminatedBy.get(king)?.id, 'rule r25', transform.name)
-    assert.equal(selection.eliminatedBy.get(choke)?.id, 'rule r10', transform.name)
+    assert.equal(selection.eliminatedBy.get(choke)?.id, 'rule r24.5', transform.name)
     assert.equal(chosen.score.ruleR24_5KingDistance, 13, transform.name)
     assert.equal(selection.lastEliminatingRule?.id, 'rule r30', transform.name)
     assert.deepEqual(getIdealTwoBishopsWhiteMoves(fen), [chosenMove], transform.name)

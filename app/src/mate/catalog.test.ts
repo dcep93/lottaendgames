@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { TWO_BISHOPS_TRAINING_FENS } from './rules/twoBishopsPhaseTwoPatternData'
 import twoKnightsPawnPositions from './data/two-knights-pawn-positions.json'
 import { MATE_CATALOG, TWO_KNIGHTS_PAWN_POSITIONS } from './catalog'
 import { parseTwoKnightsPawnManifest } from './twoKnightsPawnData'
@@ -32,7 +33,7 @@ const expectedCatalog = [
     materialSignature: 'KBBvK',
     path: '/mate/two-bishops',
     standardFallbackFen: '4k3/8/8/8/8/8/8/2B1KB2 w - - 0 1',
-    trainSeeds: ['8/8/8/8/4K3/8/B3k3/B7 w - - 10 6'],
+    trainSeeds: TWO_BISHOPS_TRAINING_FENS,
   },
   {
     id: 'bishop-knight',

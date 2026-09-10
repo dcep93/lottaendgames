@@ -1,41 +1,17 @@
 import {
   edgeDistance,
   findPiece,
-  getChess,
   isKnightMove,
   kingDistance,
-  manhattanDistance,
   squareCoords,
   squaredEuclideanDistance,
 } from '../chess'
 import {
   centerDistance,
-  getSquaresInFrontOfWhiteKingBetweenKings,
   isMiddle16Square,
   middle16Distance,
-  sameDiagonal,
   sameSquareColor,
 } from './bishopKnightGeometry'
-
-export function knightAndBishopBlackEdgeEscapeScore(fen: string): number {
-  const blackKing = findPiece(fen, 'b', 'k')
-  const chess = getChess(fen)
-  if (
-    !blackKing ||
-    edgeDistance(blackKing.square) !== 0 ||
-    chess.turn() !== 'b'
-  ) {
-    return 0
-  }
-  return chess.moves().some((san) => {
-    const next = getChess(fen)
-    next.move(san)
-    const nextBlackKing = findPiece(next.fen(), 'b', 'k')
-    return Boolean(nextBlackKing && edgeDistance(nextBlackKing.square) > 0)
-  })
-    ? 1
-    : 0
-}
 
 export function knightAndBishopBishopWallScore(fen: string): number {
   const whiteKing = findPiece(fen, 'w', 'k')
@@ -57,23 +33,6 @@ export function knightAndBishopBishopWallScore(fen: string): number {
   const bishopFile = bishopCoords.file - whiteKingCoords.file
   const bishopRank = bishopCoords.rank - whiteKingCoords.rank
   return blackFile * bishopFile + blackRank * bishopRank > 0 ? 0 : 1
-}
-
-export function knightAndBishopBlackCenterAccessScore(fen: string): number {
-  const chess = getChess(fen)
-  const replies = chess.turn() === 'b' ? chess.moves() : []
-  if (replies.length === 0) {
-    const blackKing = findPiece(fen, 'b', 'k')
-    return blackKing ? -centerDistance(blackKing.square) : 0
-  }
-  return -Math.min(
-    ...replies.map((san) => {
-      const next = getChess(fen)
-      next.move(san)
-      const blackKing = findPiece(next.fen(), 'b', 'k')
-      return blackKing ? centerDistance(blackKing.square) : 0
-    }),
-  )
 }
 
 export function knightAndBishopKingCloserOppositeBishopScore(
@@ -132,7 +91,7 @@ export function knightAndBishopKingCloserOppositeBishopScore(
     : afterDistance;
 }
 
-export function knightAndBishopKingApproachesMiddle16(
+function knightAndBishopKingApproachesMiddle16(
   fen: string,
   resultFen: string,
   piece: string | undefined
@@ -177,105 +136,7 @@ export function knightAndBishopKingDistanceRegressionScore(
   return Math.max(0, afterDistance - beforeDistance);
 }
 
-export function knightAndBishopBishopFrontPreparationScore(
-  fen: string,
-  resultFen: string,
-  piece: string | undefined
-): number {
-  if (
-    piece !== "b" ||
-    isKnightAndBishopBishopOppositionLoopShape(fen)
-  ) {
-    return 99;
-  }
-  const whiteKing = findPiece(resultFen, "w", "k");
-  const blackKing = findPiece(resultFen, "b", "k");
-  const bishop = findPiece(resultFen, "w", "b");
-  if (!whiteKing || !blackKing || !bishop) {
-    return 99;
-  }
-  const frontSquares = getSquaresInFrontOfWhiteKingBetweenKings(
-    whiteKing.square,
-    blackKing.square
-  );
-  const preparedFrontSquare = frontSquares.find((frontSquare) =>
-    sameDiagonal(bishop.square, frontSquare)
-  );
-  if (!preparedFrontSquare) {
-    return 99;
-  }
-  if (bishop.square === preparedFrontSquare) {
-    return 99;
-  }
-  return 0;
-}
-
-export function knightAndBishopBishopInFrontScore(
-  fen: string,
-  resultFen: string,
-  piece: string | undefined
-): number {
-  if (
-    piece === "b" &&
-    isKnightAndBishopBishopOppositionLoopShape(fen)
-  ) {
-    return 1;
-  }
-  const whiteKing = findPiece(resultFen, "w", "k");
-  const blackKing = findPiece(resultFen, "b", "k");
-  const bishop = findPiece(resultFen, "w", "b");
-  if (!whiteKing || !blackKing || !bishop) {
-    return 0;
-  }
-
-  const frontSquares = getSquaresInFrontOfWhiteKingBetweenKings(
-    whiteKing.square,
-    blackKing.square
-  );
-  if (frontSquares.length === 0) {
-    return 0;
-  }
-  return frontSquares.includes(bishop.square) ? 0 : 1;
-}
-
-export function isKnightAndBishopBishopOppositionLoopShape(fen: string): boolean {
-  const whiteKing = findPiece(fen, "w", "k");
-  const blackKing = findPiece(fen, "b", "k");
-  const bishop = findPiece(fen, "w", "b");
-  if (!whiteKing || !blackKing || !bishop) {
-    return false;
-  }
-  const whiteKingCoords = squareCoords(whiteKing.square);
-  const blackKingCoords = squareCoords(blackKing.square);
-  const bishopCoords = squareCoords(bishop.square);
-  const kingFileDistance = Math.abs(
-    whiteKingCoords.file - blackKingCoords.file
-  );
-  const kingRankDistance = Math.abs(
-    whiteKingCoords.rank - blackKingCoords.rank
-  );
-  const bishopFileDistance = Math.abs(
-    bishopCoords.file - whiteKingCoords.file
-  );
-  const bishopRankDistance = Math.abs(
-    bishopCoords.rank - whiteKingCoords.rank
-  );
-  const kingsAreKnightMoveApart =
-    (kingFileDistance === 1 && kingRankDistance === 2) ||
-    (kingFileDistance === 2 && kingRankDistance === 1);
-  const bishopIsOrthogonallyAdjacent =
-    bishopFileDistance + bishopRankDistance === 1;
-  const bishopOpposesBlackKing =
-    bishopCoords.file === blackKingCoords.file ||
-    bishopCoords.rank === blackKingCoords.rank;
-  return (
-    kingsAreKnightMoveApart &&
-    bishopIsOrthogonallyAdjacent &&
-    bishopOpposesBlackKing
-  );
-}
-
-export function isKnightAndBishopDiagonalBishopApproachShape(fen: string): boolean {
+function isKnightAndBishopDiagonalBishopApproachShape(fen: string): boolean {
   const whiteKing = findPiece(fen, "w", "k");
   const blackKing = findPiece(fen, "b", "k");
   const bishop = findPiece(fen, "w", "b");
@@ -305,58 +166,7 @@ export function isKnightAndBishopDiagonalBishopApproachShape(fen: string): boole
   );
 }
 
-export function knightAndBishopBishopOppositionLoopScore(
-  fen: string,
-  piece: string | undefined
-): number {
-  return piece === "b" &&
-    isKnightAndBishopBishopOppositionLoopShape(fen)
-    ? 1
-    : 0;
-}
-
-export function knightAndBishopKnightBehindWhiteKingScore(fen: string): number {
-  const whiteKing = findPiece(fen, "w", "k");
-  const blackKing = findPiece(fen, "b", "k");
-  const knight = findPiece(fen, "w", "n");
-  if (!whiteKing || !blackKing || !knight) {
-    return 0;
-  }
-  const whiteKingCoords = squareCoords(whiteKing.square);
-  const blackKingCoords = squareCoords(blackKing.square);
-  const knightCoords = squareCoords(knight.square);
-  const kingVector = {
-    file: whiteKingCoords.file - blackKingCoords.file,
-    rank: whiteKingCoords.rank - blackKingCoords.rank,
-  };
-  const knightVector = {
-    file: knightCoords.file - whiteKingCoords.file,
-    rank: knightCoords.rank - whiteKingCoords.rank,
-  };
-  return kingVector.file * knightVector.file +
-    kingVector.rank * knightVector.rank >
-    0
-    ? 0
-    : 1;
-}
-
 export function knightAndBishopKnightCentralDistance(fen: string): number {
   const knight = findPiece(fen, "w", "n");
   return knight ? centerDistance(knight.square) : 99;
-}
-
-export function knightAndBishopKnightWhiteKingDistance(fen: string): number {
-  const knight = findPiece(fen, "w", "n");
-  const whiteKing = findPiece(fen, "w", "k");
-  return knight && whiteKing
-    ? kingDistance(knight.square, whiteKing.square)
-    : 99;
-}
-
-export function knightAndBishopKnightBlackKingDistance(fen: string): number {
-  const knight = findPiece(fen, "w", "n");
-  const blackKing = findPiece(fen, "b", "k");
-  return knight && blackKing
-    ? manhattanDistance(knight.square, blackKing.square)
-    : 0;
 }

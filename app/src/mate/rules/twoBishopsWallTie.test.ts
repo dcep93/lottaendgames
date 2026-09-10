@@ -64,7 +64,7 @@ test('a larger wall with White outside cannot replace a smaller wall containing 
   }
 })
 
-test('the tied outside wall retains r10 targets and r19 prefers Bc7', () => {
+test('the tied outside wall retains r10 targets and r10 prefers Bc7 with the nearer unoccupied target', () => {
   const starting = '8/8/8/5B1k/5B2/5K2/8/8 w - - 0 1'
   const r10 = twoBishopsWhiteRules.find(({ id }) => id === 'rule r10')!
   for (const transform of SQUARE_TRANSFORMS) {
@@ -79,23 +79,21 @@ test('the tied outside wall retains r10 targets and r19 prefers Bc7', () => {
     const king = candidates.find(({ san }) => san === kingMove)!
     for (const candidate of [bishop, king]) {
       assert.equal(candidate.score.ruleR10DiagonalCount, 5, transform.name)
-      assert.equal(candidate.score.ruleR10KingDistance, 1, transform.name)
+      assert.equal(candidate.score.ruleR10KingDistance, candidate === bishop ? 1 : 2, transform.name)
       assert.deepEqual([...candidate.score.ruleR10TargetSquares].sort(),
-        ['f4', 'g3'].map((square) => transformSquare(square as Square, transform)).sort(),
+        (candidate === bishop ? ['f4', 'g3'] : ['g3']).map((square) => transformSquare(square as Square, transform)).sort(),
         transform.name)
     }
-    // Both outer bishops are off the target corner's edges, so r10 ties.
-    // Only Bc7 places the outer bishop at least three king steps from Black
-    // for the later r19 preference.
+    // Bc7 vacates f4, restoring the nearer target; Ke4 leaves it occupied.
     assert.equal(bishop.score.ruleR10OuterBishopPenalty, 0, transform.name)
     assert.equal(king.score.ruleR10OuterBishopPenalty, 0, transform.name)
-    assert.equal(compareScoresByRules(bishop.score, king.score, [r10]), 0, transform.name)
+    assert.ok(compareScoresByRules(bishop.score, king.score, [r10]) < 0, transform.name)
     assert.equal(bishop.score.ruleR19Penalty, 0, transform.name)
     assert.equal(king.score.ruleR19Penalty, 1, transform.name)
     assert.equal(firstDifferingRule(bishop.score, king.score, twoBishopsWhiteRules)?.id,
-      'rule r19', transform.name)
+      'rule r10', transform.name)
     const selection = selectCandidatesByRules(candidates, twoBishopsWhiteRules)
     assert.deepEqual(selection.idealCandidates.map(({ san }) => san), [bishopMove], transform.name)
-    assert.equal(selection.eliminatedBy.get(king)?.id, 'rule r19', transform.name)
+    assert.equal(selection.eliminatedBy.get(king)?.id, 'rule r10', transform.name)
   }
 })

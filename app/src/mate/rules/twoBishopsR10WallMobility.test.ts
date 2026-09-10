@@ -32,7 +32,7 @@ test('r10 wall mobility matches legal move generation through king blockers and 
   }
 })
 
-test('mobility breaks the Bh3/Kc6 tie but cannot outweigh target proximity', () => {
+test('mobility breaks the Bh3 tie with either adjacent king move', () => {
   const bishop = scoreTwoBishopsWhiteMove(starting, 'Bh3')
   const clear = scoreTwoBishopsWhiteMove(starting, 'Kc6')
   const farther = scoreTwoBishopsWhiteMove(starting, 'Kb6')
@@ -42,14 +42,15 @@ test('mobility breaks the Bh3/Kc6 tie but cannot outweigh target proximity', () 
   assert.equal(clear.ruleR10ImmobileBishops, 0)
   assert.ok(compareScoresByRules(clear, bishop, [r10]) < 0)
   assert.equal(farther.ruleR10ImmobileBishops, 0)
-  assert.ok(compareScoresByRules(bishop, farther, [r10]) < 0)
+  assert.deepEqual(firstThree(farther), firstThree(bishop))
+  assert.ok(compareScoresByRules(farther, bishop, [r10]) < 0)
 })
 
-test('the old Bh3 loop move is replaced by Kd6 in every symmetry', () => {
+test('the old Bh3 loop move is replaced by Kc6 in every symmetry', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     const fen = transformFen(starting, transform)
-    const kd6 = getChess(fen).moves({ verbose: true }).find(m =>
-      m.from === transformSquare('c7', transform) && m.to === transformSquare('d6', transform))!
-    assert.deepEqual(analyzeTwoBishopsWhiteSelection(fen).idealWhiteMoves, [kd6.san])
+    const kc6 = getChess(fen).moves({ verbose: true }).find(m =>
+      m.from === transformSquare('c7', transform) && m.to === transformSquare('c6', transform))!
+    assert.deepEqual(analyzeTwoBishopsWhiteSelection(fen).idealWhiteMoves, [kc6.san])
   }
 })

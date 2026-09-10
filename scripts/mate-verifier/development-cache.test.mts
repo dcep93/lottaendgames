@@ -1,9 +1,11 @@
 import assert from 'node:assert/strict'
-import { mkdtempSync, rmSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
 import test from 'node:test'
 import {
+  createBishopKnightDevelopmentFingerprints,
+  createTwoBishopsDevelopmentFingerprints,
   DevelopmentVerificationCache,
   PersistentProductionTransitionCache,
 } from './development-cache.mts'
@@ -130,5 +132,34 @@ test('unchanged root results and expansions resume from disk', () => {
     repeated.close()
   } finally {
     rmSync(directory, { recursive: true })
+  }
+})
+
+
+test('shared rule dependencies invalidate cached recommendations without invalidating legal transitions', () => {
+  const directory = mkdtempSync(join(tmpdir(), 'mate-fingerprints-'))
+  try {
+    // Minimal isolated source tree: hash contents need not be executable modules.
+    const source = readFileSync(new URL('./development-cache.mts', import.meta.url), 'utf8')
+    for (const [, path] of source.matchAll(/'((?:app|scripts)\/[^']+)'/g)) {
+      const destination = join(directory, path!)
+      mkdirSync(dirname(destination), { recursive: true })
+      writeFileSync(destination, `original ${path}`)
+    }
+    for (const [factory, dependency] of [
+      [createTwoBishopsDevelopmentFingerprints, 'app/src/mate/rules/twoBishopsPieces.ts'],
+      [createBishopKnightDevelopmentFingerprints, 'app/src/mate/rules/blackPriorities.ts'],
+    ] as const) {
+      const before = factory(directory)
+      const destination = join(directory, dependency)
+      mkdirSync(dirname(destination), { recursive: true })
+      writeFileSync(destination, `changed ${dependency}`)
+      const after = factory(directory)
+      assert.equal(after.engine, before.engine, dependency)
+      assert.notEqual(after.policy, before.policy, dependency)
+      assert.deepEqual(factory(directory), after, 'unchanged sources remain reusable')
+    }
+  } finally {
+    rmSync(directory, { recursive: true, force: true })
   }
 })

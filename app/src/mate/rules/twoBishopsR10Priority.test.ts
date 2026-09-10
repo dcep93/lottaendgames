@@ -71,9 +71,9 @@ test('r10 ties orthogonal Kd5 and diagonal Ke5 ahead of distant Bg6', () => {
       twoBishopsWhiteRules)?.id, 'rule r24.5', transform.name)
     const selection = selectCandidatesByRules(candidates, twoBishopsWhiteRules)
     assert.deepEqual(selection.idealCandidates.map(({ san }) => san),
-      [diagonalKingMove], transform.name)
+      [kingMove], transform.name)
     assert.equal(selection.eliminatedBy.get(bishop)?.id, 'rule r10', transform.name)
-    assert.equal(selection.eliminatedBy.get(king)?.id, 'rule r24.5', transform.name)
+    assert.equal(selection.eliminatedBy.get(diagonalKing)?.id, 'rule r24.5', transform.name)
     assert.equal(selection.lastEliminatingRule?.id, 'rule r24.5', transform.name)
   }
 })
@@ -226,7 +226,7 @@ test('r10 rejects Bb1 on the target corner edge before r19 can reward its distan
       twoBishopsWhiteRules)?.id, 'rule r10', transform.name)
     const selection = selectCandidatesByRules(candidates, twoBishopsWhiteRules)
     assert.equal(selection.eliminatedBy.get(bishop)?.id, 'rule r10', transform.name)
-    assert.deepEqual(selection.idealCandidates.map(({ san }) => san), [kingMove],
+    assert.deepEqual(selection.idealCandidates.map(({ san }) => san), [transformedMove(fen, transform, 'e4', 'd4')],
       transform.name)
   }
 })

@@ -335,8 +335,9 @@ export class PersistentProductionTransitionCache
   }
 }
 
-export function createTwoBishopsDevelopmentFingerprints(): MateDevelopmentFingerprints {
-  const repositoryRoot = fileURLToPath(new URL('../../', import.meta.url))
+export function createTwoBishopsDevelopmentFingerprints(
+  repositoryRoot = fileURLToPath(new URL('../../', import.meta.url)),
+): MateDevelopmentFingerprints {
   const engine = hashSources(repositoryRoot, 'engine', [
     'app/package-lock.json',
     'app/src/mate/chess.ts',
@@ -356,6 +357,7 @@ export function createTwoBishopsDevelopmentFingerprints(): MateDevelopmentFinger
       'app/src/mate/rules/selection.ts',
       'app/src/mate/rules/twoBishops.ts',
       'app/src/mate/rules/twoBishopsGeometry.ts',
+      'app/src/mate/rules/twoBishopsPieces.ts',
       'app/src/mate/rules/twoBishopsPhaseTwoPatternData.ts',
       'app/src/mate/rules/types.ts',
     ],
@@ -363,8 +365,9 @@ export function createTwoBishopsDevelopmentFingerprints(): MateDevelopmentFinger
   return { engine, policy }
 }
 
-export function createBishopKnightDevelopmentFingerprints(): MateDevelopmentFingerprints {
-  const repositoryRoot = fileURLToPath(new URL('../../', import.meta.url))
+export function createBishopKnightDevelopmentFingerprints(
+  repositoryRoot = fileURLToPath(new URL('../../', import.meta.url)),
+): MateDevelopmentFingerprints {
   const engine = hashSources(repositoryRoot, 'engine', [
     'app/package-lock.json',
     'app/src/mate/chess.ts',
@@ -386,6 +389,7 @@ export function createBishopKnightDevelopmentFingerprints(): MateDevelopmentFing
       'app/src/mate/rules/bishopKnightLookup.ts',
       'app/src/mate/rules/bishopKnightStrategy.ts',
       'app/src/mate/rules/bishopKnightZoneX.ts',
+      'app/src/mate/rules/blackPriorities.ts',
       'app/src/mate/rules/index.ts',
       'app/src/mate/rules/selection.ts',
       'app/src/mate/rules/types.ts',

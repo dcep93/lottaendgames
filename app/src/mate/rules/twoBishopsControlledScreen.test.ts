@@ -64,7 +64,7 @@ test('r10 excludes the screened closest target behind Kg6 and prefers clearing t
       twoBishopsWhiteRules.filter(({ id }) => id === 'rule r10')) < 0, transform.name)
     const selection = selectCandidatesByRules(candidates, twoBishopsWhiteRules)
     assert.deepEqual(selection.idealCandidates.map(({ san }) => san),
-      [transformedMove(fen, transform, 'g6', 'f5')], transform.name)
+      [transformedMove(fen, transform, 'g6', 'f6')], transform.name)
     assert.equal(selection.eliminatedBy.get(blocked)?.id, 'rule r10', transform.name)
 
     const result = getChess(fen)

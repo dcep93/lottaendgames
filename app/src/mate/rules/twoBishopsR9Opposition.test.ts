@@ -41,7 +41,7 @@ test('opposition r9 precedes r10 and the removed r18.5 has no rule or score fiel
   }
 })
 
-test('15 Kg4 takes opposition despite screening its closest r10 target', () => {
+test('r9 favors Kg4 among king moves while r8 selects the smaller Bb7 wall', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     const fen = transformFen(loadedFen, transform)
     const oppositionMove = transformedMove(fen, transform, 'g5', 'g4')
@@ -76,9 +76,9 @@ test('15 Kg4 takes opposition despite screening its closest r10 target', () => {
     assert.ok(!selectCandidatesByRules(candidates, [r9]).idealCandidates.includes(screened),
       transform.name)
     const selection = selectCandidatesByRules(candidates, twoBishopsWhiteRules)
-    assert.deepEqual(selection.idealCandidates.map(({ san }) => san), [oppositionMove], transform.name)
-    assert.equal(selection.eliminatedBy.get(closer)?.id, 'rule r9', transform.name)
-    assert.equal(selection.eliminatedBy.get(screened)?.id, 'rule r8', transform.name)
+    assert.deepEqual(selection.idealCandidates.map(({ san }) => san), [transformedMove(fen, transform, 'c8', 'b7')], transform.name)
+    assert.equal(selection.eliminatedBy.get(closer)?.id, 'rule r8', transform.name)
+    assert.equal(selection.eliminatedBy.get(screened)?.id, 'rule r7', transform.name)
   }
 })
 
@@ -181,8 +181,8 @@ test('edge adjacency and qualified result walls are required', () => {
     // Kf4 screens the inner wall; Ba7 breaks the paired-wall geometry.
     { fen: loadedFen, from: 'g5', to: 'f4', count: 99 },
     { fen: loadedFen, from: 'b8', to: 'a7', count: 99 },
-    // Bf3 permits Kc4 to cross beyond both walls.
-    { fen: '8/8/8/3k4/8/8/4B3/2K3B1 w - - 20 11', from: 'e2', to: 'f3', count: 99 },
+    // Bf3 permits a strictly smaller crossing, but offers no opposition target.
+    { fen: '8/8/8/3k4/8/8/4B3/2K3B1 w - - 20 11', from: 'e2', to: 'f3', count: 7 },
   ] as const
   for (const fixture of cases) {
     for (const transform of SQUARE_TRANSFORMS) {
@@ -272,7 +272,7 @@ test('Kd6 benefits from an unreachable inner screen while Kd5 screens its target
   }
 })
 
-test('disagreeing bishops leave no opposition target, so r10 chooses Ke4 with an unscreened target', () => {
+test('disagreeing bishops leave no opposition target, so r7 chooses Ke4 with an unscreened target', () => {
   const starting = '8/2B5/8/3K2k1/8/7B/8/8 w - - 18 10'
   for (const transform of SQUARE_TRANSFORMS) {
     const fen = transformFen(starting, transform)
@@ -305,10 +305,10 @@ test('disagreeing bishops leave no opposition target, so r10 chooses Ke4 with an
     assert.equal(opposition.score.ruleR10KingDistance, 99, transform.name)
     assert.equal(closer.score.ruleR10KingDistance, 1, transform.name)
     assert.equal(firstDifferingRule(closer.score, opposition.score,
-      twoBishopsWhiteRules)?.id, 'rule r10', transform.name)
+      twoBishopsWhiteRules)?.id, 'rule r7', transform.name)
     const selection = selectCandidatesByRules(candidates, twoBishopsWhiteRules)
     assert.deepEqual(selection.idealCandidates.map(({ san }) => san), [closerMove], transform.name)
-    assert.equal(selection.eliminatedBy.get(opposition)?.id, 'rule r10', transform.name)
+    assert.equal(selection.eliminatedBy.get(opposition)?.id, 'rule r7', transform.name)
   }
 })
 

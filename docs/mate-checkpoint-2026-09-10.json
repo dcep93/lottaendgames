@@ -1,0 +1,373 @@
+{
+  "audit": {
+    "certificate": {
+      "completeStandardUniverse": true,
+      "allPositionsTerminate": true,
+      "allExaminedRootsTerminate": true,
+      "stateKeyMode": "symmetry",
+      "initialHalfmoveClock": 0,
+      "traversesAllTiedBestWhiteMoves": true,
+      "traversesAllLegalBlackReplies": true,
+      "rootScope": "All app-eligible opposite-colored KBBK White-to-move starts, plus train seeds; all reachable White states",
+      "checksFiftyMoveLimit": true,
+      "historyRepetition": "Structural loops; no supplied prehistory"
+    },
+    "fingerprints": {
+      "engine": "12d2647dc3b8407c37ff489627fa99fa5fd922568b6da30e9853a58c388922eb",
+      "policy": "50fbb132f4d858bd7aef49361752c126c4bb018b10bf8998b8bf076a2738fa89"
+    },
+    "implementation": "e6d5354c079e77646375b903944b4feb3acc4c9e0950f5f3bd8e1b7a7df4277b",
+    "elapsedMs": 715144,
+    "workerCount": 6,
+    "rootOutcomes": {
+      "total": 312286,
+      "mateBeforeDraw": 312286,
+      "loopLeading": 0,
+      "otherFailureLeading": 0,
+      "fiftyMoveOnly": 0
+    },
+    "graphOutcomes": {
+      "totalPositions": 312426,
+      "mateTerminatingPositions": 312426,
+      "loopLeadingPositions": 0,
+      "directFailureLeadingPositions": 0,
+      "loopAndFailureLeadingPositions": 0,
+      "fiftyMoveLeadingPositions": 0,
+      "maximumMatePlies": 95
+    },
+    "whiteChoices": 312998,
+    "blackReplies": 1314823,
+    "ruleFilterCensus": {
+      "unit": "unique symmetry-canonical expanded White positions",
+      "positions": 312426,
+      "rules": {
+        "mate": {
+          "eliminatedMoves": 9503,
+          "positionsAffected": 455
+        },
+        "bishops safe": {
+          "eliminatedMoves": 904610,
+          "positionsAffected": 229480
+        },
+        "no stalemate": {
+          "eliminatedMoves": 6777,
+          "positionsAffected": 4911
+        },
+        "rule r1": {
+          "eliminatedMoves": 54248,
+          "positionsAffected": 3047
+        },
+        "rule r3": {
+          "eliminatedMoves": 984719,
+          "positionsAffected": 166720
+        },
+        "rule r4": {
+          "eliminatedMoves": 14565,
+          "positionsAffected": 850
+        },
+        "rule r5": {
+          "eliminatedMoves": 35424,
+          "positionsAffected": 2042
+        },
+        "rule r5.5": {
+          "eliminatedMoves": 5943,
+          "positionsAffected": 362
+        },
+        "rule r6": {
+          "eliminatedMoves": 624705,
+          "positionsAffected": 33938
+        },
+        "rule r6.2": {
+          "eliminatedMoves": 95,
+          "positionsAffected": 5
+        },
+        "rule r6.4": {
+          "eliminatedMoves": 21697,
+          "positionsAffected": 1353
+        },
+        "rule r7": {
+          "eliminatedMoves": 1923159,
+          "positionsAffected": 220677
+        },
+        "rule r8": {
+          "eliminatedMoves": 1742581,
+          "positionsAffected": 218780
+        },
+        "rule r9": {
+          "eliminatedMoves": 3524,
+          "positionsAffected": 503
+        },
+        "rule r10": {
+          "eliminatedMoves": 251975,
+          "positionsAffected": 60707
+        },
+        "rule r19": {
+          "eliminatedMoves": 10946,
+          "positionsAffected": 4013
+        },
+        "rule r24": {
+          "eliminatedMoves": 8738,
+          "positionsAffected": 964
+        },
+        "rule r24.5": {
+          "eliminatedMoves": 35268,
+          "positionsAffected": 20387
+        },
+        "rule r25": {
+          "eliminatedMoves": 15722,
+          "positionsAffected": 8244
+        },
+        "rule r30": {
+          "eliminatedMoves": 91702,
+          "positionsAffected": 27217
+        }
+      }
+    },
+    "witnesses": [],
+    "witnessErrors": []
+  },
+  "independentGraphCheck": {
+    "agreesWithCensus": true,
+    "algorithm": "iterative Kosaraju SCCs plus ancestor propagation and DAG postorder ranks",
+    "rootOutcomes": {
+      "total": 312286,
+      "mateBeforeDraw": 312286,
+      "loopLeading": 0,
+      "otherFailureLeading": 0,
+      "fiftyMoveOnly": 0
+    },
+    "cyclicComponents": 0,
+    "positionsActuallyOnCycles": 0,
+    "maximumCyclicComponentSize": 0,
+    "fiftyMoveRootRanks": {},
+    "maximumMatePlies": 95,
+    "elapsedSeconds": 2.954
+  },
+  "symmetryChecks": {
+    "sampledRoots": 1000,
+    "totalRootsIncludingCorpus": 1577,
+    "comparisons": 12616,
+    "clockChecks": 200,
+    "errors": []
+  },
+  "rootEnumerationReuse": {
+    "source": "/Users/danielcepeda/repos/_codex_output/two-bishops/full-audit-r8-strict-2026-09-10/census",
+    "count": 312286,
+    "engine": "12d2647dc3b8407c37ff489627fa99fa5fd922568b6da30e9853a58c388922eb",
+    "implementation": "e6d5354c079e77646375b903944b4feb3acc4c9e0950f5f3bd8e1b7a7df4277b",
+    "validated": [
+      "complete universe",
+      "engine",
+      "enumeration/eligibility/verifier implementation"
+    ],
+    "reusedPolicyExpansions": 0
+  },
+  "behaviorComparison": {
+    "positions": 1202,
+    "differences": 0,
+    "counts": {
+      "queen": 40,
+      "rook": 65,
+      "two-bishops": 883,
+      "bishop-knight": 208,
+      "two-knights-pawn": 6
+    }
+  },
+  "bishopKnightBenchmark": {
+    "positions": 208,
+    "scope": "White move selection; same process; warmup; alternating order",
+    "samplesMs": {
+      "before": [
+        1893.872292,
+        1890.8224579999996,
+        1895.3771660000002,
+        1881.1702499999992,
+        1880.6399170000004
+      ],
+      "after": [
+        869.9436660000001,
+        865.6362920000001,
+        865.7251660000002,
+        864.0050410000003,
+        868.4775840000002
+      ]
+    },
+    "medianBeforeMs": 1890.8224579999996,
+    "medianAfterMs": 865.7251660000002,
+    "reductionPercent": 54.21435987619307,
+    "choicesUnchanged": true
+  },
+  "auditedSourceSha256": {
+    "app/src/mate/MateBoard.tsx": "9963ca0e498df098989ee2ebace887e0d5d633b5a2d9168235254c26eea013de",
+    "app/src/mate/MateControls.tsx": "0464842cb9e84919a4d50dfc584c3825ed03bb223726ac9bb83637666d1e5d5d",
+    "app/src/mate/MateLog.tsx": "0973837f59e6a62acc1e914978535311d7313a8197b68d242439ca733bcb535c",
+    "app/src/mate/MatePriorityGuide.tsx": "db745b02fea0ef66063ee3be026d28a14ba3952ec7d6ac1239e4ac7bfe48f8a2",
+    "app/src/mate/MateRuleNoteBoard.tsx": "b13bbd226874a6e1108e56628b7a06c00b4541672e4c32e65b4eb6a5fe372ce0",
+    "app/src/mate/MateSidebar.tsx": "b468e527e38194101b9cb0669619cb5c37f28cb2095edddd2154d96c0dc218f2",
+    "app/src/mate/MateWorkspace.tsx": "ed31c26e70e75906c638a5a460bc8d24fc17ab855e22f1b7d12057f0af09933a",
+    "app/src/mate/boardInteraction.ts": "f298b7db2f8b5f58bbcfa6fd971c8159b6f9fd61ed4a81f59d0e3c4fc87279f8",
+    "app/src/mate/catalog.ts": "ab5b1f450e779c95e386c593a9665784b7604311d4371a6f0f1303cd5cf6de68",
+    "app/src/mate/chess.ts": "c800c12c9a1e9b00beb5d2abff251fa625765352b7a6ebdb1451c027e3da7c3b",
+    "app/src/mate/data/two-knights-pawn-construction.json": "1ef88d42d3bfb7140ad628019cda6071825ac750fba1663f1641ba8b0d6a5156",
+    "app/src/mate/data/two-knights-pawn-positions.json": "3111b82d86e04e06225b55e095d634f48fbb88510e5211c5942a0ac9ce0ca2f1",
+    "app/src/mate/index.tsx": "d7eab26d301ea9ea80b3b0c2d77c5cf37c958ec01b60ab7317269ba4567c4a1f",
+    "app/src/mate/positions.ts": "94f2bcc0938fc2c52daf2224411ffbd38df2fd4a250e4a2ca20e37d08fef1c2c",
+    "app/src/mate/rules/bishopKnight.ts": "c9cc017cc60481d0db87be7e2708022939d52e2bee930ac3091d93532bac3d51",
+    "app/src/mate/rules/bishopKnightData.ts": "2cf171ebaf92e456121a867d0595cbb1c2fdf0d68a5d8e9a1c3b4cd45ab53c09",
+    "app/src/mate/rules/bishopKnightGeometry.ts": "af8fb8c67312ed3a50bd9057462a1eb2fd57a07a8a40648d590f041310c05bb3",
+    "app/src/mate/rules/bishopKnightKeySquare.ts": "40f750e63fd3eaecd2ada613bf900b8016837dfb42e737a0fc64cb255cb35da2",
+    "app/src/mate/rules/bishopKnightLookup.ts": "e53e8822ce75f230bb126db7f09b74d301c0b53b34088a1462707a12d0a833b1",
+    "app/src/mate/rules/bishopKnightRegressionPositions.json": "06125a513730d86f7e7ba45e8de24e015c34745ebc5d3a116713ee715e2d4dc1",
+    "app/src/mate/rules/bishopKnightStrategy.ts": "6969c8eaf67882578f286b50f8dfacba23f91fd953fe6cc4df202ffe7b805e56",
+    "app/src/mate/rules/bishopKnightZoneX.ts": "7f24ad03861f956ed8b6cbf8f84b1836ab46824a3b752e506f45517f9b2ca4b7",
+    "app/src/mate/rules/blackPriorities.ts": "e284e4e7dd2b12a561ea179d4cd3d4e51310a9f89ab4b46ff6199cd11c5a2184",
+    "app/src/mate/rules/index.ts": "ba34cab7fc6a9a8fd4b72bc015929e91fd247b520221ddb719ae63c90d662669",
+    "app/src/mate/rules/majorPieceGeometry.ts": "385f81dda390d0148214ba5c8f04e48f6b956ae8796b21d0f7c47c0c5558f5fc",
+    "app/src/mate/rules/majorPieceMateProgress.ts": "240cdf17a377137bb1c7dbe7fc2879584fc76d5f816c2352e3381be57d72d597",
+    "app/src/mate/rules/majorPieceMateProgressData.ts": "8f127ed2d446df2b1aeff886289e027a0e7e7eec55048749e0458956397422a8",
+    "app/src/mate/rules/majorPieceMateProgressEncoding.ts": "46629f4f94e519a02caaadbde5734bfc76d721b1aea6537455329723d04e869e",
+    "app/src/mate/rules/majorPieces.ts": "ccb0edc68319e267e2cf4d03bc8909228a76e68b83473a0a271e73049e1fea41",
+    "app/src/mate/rules/rookStrategy.ts": "f17815d233c4e047668c735c5ab6cee0dcdc094a943842301f837018c669fcbf",
+    "app/src/mate/rules/selection.ts": "f82addc113a61fe5fda83683afea2db5154b6b8d5ce0b5bd8c3bb109f0e2a2b7",
+    "app/src/mate/rules/twoBishops.ts": "ee494b39eda7df2456075bc03b5217d58b480138cf9283b68856e3ce1d077edd",
+    "app/src/mate/rules/twoBishopsDiagramPositions.ts": "f1712a0101fbad508cb6a971416aa097d23272cb3f04ef42fb23573ce6c4b32f",
+    "app/src/mate/rules/twoBishopsGeometry.ts": "88b1da1d196d9adfba469df315974a1a41aa88ab46244ca5d71f490afd066e0a",
+    "app/src/mate/rules/twoBishopsPhaseTwoPatternData.ts": "7206a99fc1632f5bcdaa7a671da3286e14d7b4f94f4b0184bc9a8030ca053769",
+    "app/src/mate/rules/twoBishopsPieces.ts": "67641854765acd1b1e71cd9e74a6fd4637ee38d3ecf6913b417960a8a9a51640",
+    "app/src/mate/rules/twoBishopsProof.ts": "daf6b094f04d41c06d08c98442df73d8fb9b37b52503ed4dbea88f00ab911f99",
+    "app/src/mate/rules/twoBishopsProofData.ts": "c18ef142c04cc59c46e8778ccb565cc4859e90912e4b4ec191574352159ae898",
+    "app/src/mate/rules/twoKnightsPawn.ts": "d6d8f3b73d31ae9abd41a128125de45d6673502ab3b32ee489bdef3710e72092",
+    "app/src/mate/rules/types.ts": "31e2b6f6a99979056dbfa638004b6c7adfc1c95eeba6e31e1cdbd9f12be5de00",
+    "app/src/mate/session.ts": "a6ec7e52a067853e27e5e83647fc5f1d2cb51204c52ac7e813be2873505d1872",
+    "app/src/mate/share.ts": "ac73bcd70deff06d23aae77c88debcc5ae948fb1112f67691247523e4943c2d1",
+    "app/src/mate/timerPreference.ts": "a3f06506a98fa3b39c7752e5725b1169fbf0ccae1cbafdf19c015544b2b3df2c",
+    "app/src/mate/twoKnightsPawnConstruction.ts": "1b06e65bd1772bbeeab81e9db688e37ae28680156ca7f77fd0fc1094f895b143",
+    "app/src/mate/twoKnightsPawnData.ts": "790c3d9771e7d010f4c082796a89ca5fe5ac786b7cb0413ce05378d699478c53",
+    "app/src/mate/types.ts": "c522d2e1dd77bcac405a7852f79d2ba894bea87ea05134fb0939a78a7e46b3c2",
+    "app/src/mate/workspaceSupport.ts": "af13b2c18721779359a8985feee11a05cddc95ddf5e1c84307e55fcecaeb7d87",
+    "scripts/mate-verifier/bishop-knight-adversarial-roots.json": "1c0d28e3593d05ea171723e04848e20721ce1d877e25dd0cf6a8578b4e2361fc",
+    "scripts/mate-verifier/bishop-knight-root-sampler.mts": "1f5fdd1e58b7f2a14a870393de1fdcedbc169980c12a52ad8591624f5c7ba043",
+    "scripts/mate-verifier/bishop-knight-smoke-roots.json": "57d6358b048872b1065617c794f2e52f5750c1071ce1a8b919695de34bb40db9",
+    "scripts/mate-verifier/derive-major-piece-policy-ranks.mts": "7fb03811187a98699319f9deafb3c83e320bb29f5b8f5f879bf7309d1438a48a",
+    "scripts/mate-verifier/develop-bishop-knight-policy.mts": "6c3851fa68dacdfbc2dfac7a2f533737d03c70b19e4d27bdd28d741b490cc019",
+    "scripts/mate-verifier/development-cache.mts": "beb5c0f640affe1e6e6c907b0a407b8761caa5b687014f21cbfd037bd95b1d7c",
+    "scripts/mate-verifier/diagnose-major-piece-policy-scc.mts": "680e74afbdda2565451bf48533ee7fa7c44d89614edbc2ddc7d18f4769533829",
+    "scripts/mate-verifier/exhaustive-cache.mts": "5be156cbec688ebccde070712ef8fa2c436fd946f140f570e1218664a1d73e2d",
+    "scripts/mate-verifier/exhaustive-graph.mts": "3e1c65c481d624c82ae2c3690a6c4b8514cce36a9d7da5e501c666b5b2d2268d",
+    "scripts/mate-verifier/exhaustive-witness-roots.mts": "74ebb444a434599e5b0af658f98ec3f20e0f9b53e1953d98807bc25b673f1fc7",
+    "scripts/mate-verifier/generate-major-piece-mate-progress.mts": "f74adc575f36ec8ee91ef95f19a9765482fcdb344f5db4246c3e99b1930eec08",
+    "scripts/mate-verifier/measure-two-bishops-progress.mts": "9f23b5c10fbbe9e93448051638a0103f17d8e149c0e2ac19b831cd6108973fb6",
+    "scripts/mate-verifier/policy-ranks.mts": "d48eb44faecede365167e594524487a8b08410ad799db3927b959bc8c38dfa2f",
+    "scripts/mate-verifier/policy-scc.mts": "78af9f90425a87424fcab09ef1c45909831f8fd56d07a94b092b85b535c1e319",
+    "scripts/mate-verifier/production.mts": "2161a00cdcca3c62eba01e8e5244b5a3f9831e140ad4614d46e857c44c44e0c1",
+    "scripts/mate-verifier/search.mts": "a77268b8c0112059484a179d23fd3e45f84c657cb191ee4e0a88614666095b45",
+    "scripts/mate-verifier/tsconfig.json": "363fa8bff72e2fa3f5e23a460b16a36844d873c754e9493bd5a195b20aa9ceab",
+    "scripts/mate-verifier/two-bishops-adversarial-roots.json": "0ee5959f9c318676a633714d1a934a63763cce9c236c06388ba26d46ec4dc840",
+    "scripts/mate-verifier/two-bishops-census-worker.mts": "7a23866df300281b4facc6b83680e469c180640a1745cd23926b74cbef655050",
+    "scripts/mate-verifier/two-bishops-census.mts": "d9b1330ac87c47641111bb840ab3c493879ccf8b29923a0e1a1ad89936c33821",
+    "scripts/mate-verifier/two-bishops-diagram-census.mts": "3cdf42e662cf997543ba594584e0b785ff2f4efa68fdf8246eae4483ddf963b1",
+    "scripts/mate-verifier/two-bishops-proof.mts": "344e7e66e1db161ae81815f612e5c4762453962796ecbde231568cebd8e9a261",
+    "scripts/mate-verifier/two-bishops-root-sampler.mts": "199942a5bdfd386cfccd0abb4d36c0cc715bf73692c6cf3442dfef0b5bcb594e",
+    "scripts/mate-verifier/two-bishops-smoke-roots.json": "0107bbc86e808b5a13fcd55a8596bb891d52beddfc7cccfc8f1cc08a2bd25db9",
+    "scripts/mate-verifier/types.mts": "76c4b133752c66a03f6269b1b560fb8dce740a7da490718973b9346a612619f5",
+    "scripts/mate-verifier/verify-two-bishops-development.mts": "f11da37da1ec7d7154b8293565b23fc86fc8cb5aebf02deeb77ec6fef4155dcc",
+    "scripts/mate-verifier/verify-two-bishops-exhaustive.mts": "f0e4eb5fc20414535e02fb534597246dce5223f1db51e02d4ffb5a9cdea09337"
+  },
+  "checkpointSourceSha256": {
+    "app/src/mate/MateBoard.tsx": "9963ca0e498df098989ee2ebace887e0d5d633b5a2d9168235254c26eea013de",
+    "app/src/mate/MateControls.tsx": "0464842cb9e84919a4d50dfc584c3825ed03bb223726ac9bb83637666d1e5d5d",
+    "app/src/mate/MateLog.tsx": "0973837f59e6a62acc1e914978535311d7313a8197b68d242439ca733bcb535c",
+    "app/src/mate/MatePriorityGuide.tsx": "db745b02fea0ef66063ee3be026d28a14ba3952ec7d6ac1239e4ac7bfe48f8a2",
+    "app/src/mate/MateRuleNoteBoard.tsx": "b13bbd226874a6e1108e56628b7a06c00b4541672e4c32e65b4eb6a5fe372ce0",
+    "app/src/mate/MateSidebar.tsx": "b468e527e38194101b9cb0669619cb5c37f28cb2095edddd2154d96c0dc218f2",
+    "app/src/mate/MateWorkspace.tsx": "ed31c26e70e75906c638a5a460bc8d24fc17ab855e22f1b7d12057f0af09933a",
+    "app/src/mate/boardInteraction.ts": "f298b7db2f8b5f58bbcfa6fd971c8159b6f9fd61ed4a81f59d0e3c4fc87279f8",
+    "app/src/mate/catalog.ts": "ab5b1f450e779c95e386c593a9665784b7604311d4371a6f0f1303cd5cf6de68",
+    "app/src/mate/chess.ts": "c800c12c9a1e9b00beb5d2abff251fa625765352b7a6ebdb1451c027e3da7c3b",
+    "app/src/mate/data/two-knights-pawn-construction.json": "1ef88d42d3bfb7140ad628019cda6071825ac750fba1663f1641ba8b0d6a5156",
+    "app/src/mate/data/two-knights-pawn-positions.json": "3111b82d86e04e06225b55e095d634f48fbb88510e5211c5942a0ac9ce0ca2f1",
+    "app/src/mate/index.tsx": "d7eab26d301ea9ea80b3b0c2d77c5cf37c958ec01b60ab7317269ba4567c4a1f",
+    "app/src/mate/positions.ts": "94f2bcc0938fc2c52daf2224411ffbd38df2fd4a250e4a2ca20e37d08fef1c2c",
+    "app/src/mate/rules/bishopKnight.ts": "c9cc017cc60481d0db87be7e2708022939d52e2bee930ac3091d93532bac3d51",
+    "app/src/mate/rules/bishopKnightData.ts": "2cf171ebaf92e456121a867d0595cbb1c2fdf0d68a5d8e9a1c3b4cd45ab53c09",
+    "app/src/mate/rules/bishopKnightGeometry.ts": "af8fb8c67312ed3a50bd9057462a1eb2fd57a07a8a40648d590f041310c05bb3",
+    "app/src/mate/rules/bishopKnightKeySquare.ts": "40f750e63fd3eaecd2ada613bf900b8016837dfb42e737a0fc64cb255cb35da2",
+    "app/src/mate/rules/bishopKnightLookup.ts": "e53e8822ce75f230bb126db7f09b74d301c0b53b34088a1462707a12d0a833b1",
+    "app/src/mate/rules/bishopKnightRegressionPositions.json": "06125a513730d86f7e7ba45e8de24e015c34745ebc5d3a116713ee715e2d4dc1",
+    "app/src/mate/rules/bishopKnightStrategy.ts": "6969c8eaf67882578f286b50f8dfacba23f91fd953fe6cc4df202ffe7b805e56",
+    "app/src/mate/rules/bishopKnightZoneX.ts": "7f24ad03861f956ed8b6cbf8f84b1836ab46824a3b752e506f45517f9b2ca4b7",
+    "app/src/mate/rules/blackPriorities.ts": "e284e4e7dd2b12a561ea179d4cd3d4e51310a9f89ab4b46ff6199cd11c5a2184",
+    "app/src/mate/rules/index.ts": "ba34cab7fc6a9a8fd4b72bc015929e91fd247b520221ddb719ae63c90d662669",
+    "app/src/mate/rules/majorPieceGeometry.ts": "385f81dda390d0148214ba5c8f04e48f6b956ae8796b21d0f7c47c0c5558f5fc",
+    "app/src/mate/rules/majorPieceMateProgress.ts": "240cdf17a377137bb1c7dbe7fc2879584fc76d5f816c2352e3381be57d72d597",
+    "app/src/mate/rules/majorPieceMateProgressData.ts": "8f127ed2d446df2b1aeff886289e027a0e7e7eec55048749e0458956397422a8",
+    "app/src/mate/rules/majorPieceMateProgressEncoding.ts": "46629f4f94e519a02caaadbde5734bfc76d721b1aea6537455329723d04e869e",
+    "app/src/mate/rules/majorPieces.ts": "ccb0edc68319e267e2cf4d03bc8909228a76e68b83473a0a271e73049e1fea41",
+    "app/src/mate/rules/rookStrategy.ts": "f17815d233c4e047668c735c5ab6cee0dcdc094a943842301f837018c669fcbf",
+    "app/src/mate/rules/selection.ts": "f82addc113a61fe5fda83683afea2db5154b6b8d5ce0b5bd8c3bb109f0e2a2b7",
+    "app/src/mate/rules/twoBishops.ts": "ee494b39eda7df2456075bc03b5217d58b480138cf9283b68856e3ce1d077edd",
+    "app/src/mate/rules/twoBishopsDiagramPositions.ts": "f1712a0101fbad508cb6a971416aa097d23272cb3f04ef42fb23573ce6c4b32f",
+    "app/src/mate/rules/twoBishopsGeometry.ts": "88b1da1d196d9adfba469df315974a1a41aa88ab46244ca5d71f490afd066e0a",
+    "app/src/mate/rules/twoBishopsPhaseTwoPatternData.ts": "7206a99fc1632f5bcdaa7a671da3286e14d7b4f94f4b0184bc9a8030ca053769",
+    "app/src/mate/rules/twoBishopsPieces.ts": "67641854765acd1b1e71cd9e74a6fd4637ee38d3ecf6913b417960a8a9a51640",
+    "app/src/mate/rules/twoBishopsProof.ts": "daf6b094f04d41c06d08c98442df73d8fb9b37b52503ed4dbea88f00ab911f99",
+    "app/src/mate/rules/twoBishopsProofData.ts": "c18ef142c04cc59c46e8778ccb565cc4859e90912e4b4ec191574352159ae898",
+    "app/src/mate/rules/twoKnightsPawn.ts": "d6d8f3b73d31ae9abd41a128125de45d6673502ab3b32ee489bdef3710e72092",
+    "app/src/mate/rules/types.ts": "31e2b6f6a99979056dbfa638004b6c7adfc1c95eeba6e31e1cdbd9f12be5de00",
+    "app/src/mate/session.ts": "a6ec7e52a067853e27e5e83647fc5f1d2cb51204c52ac7e813be2873505d1872",
+    "app/src/mate/share.ts": "ac73bcd70deff06d23aae77c88debcc5ae948fb1112f67691247523e4943c2d1",
+    "app/src/mate/timerPreference.ts": "a3f06506a98fa3b39c7752e5725b1169fbf0ccae1cbafdf19c015544b2b3df2c",
+    "app/src/mate/twoKnightsPawnConstruction.ts": "1b06e65bd1772bbeeab81e9db688e37ae28680156ca7f77fd0fc1094f895b143",
+    "app/src/mate/twoKnightsPawnData.ts": "790c3d9771e7d010f4c082796a89ca5fe5ac786b7cb0413ce05378d699478c53",
+    "app/src/mate/types.ts": "c522d2e1dd77bcac405a7852f79d2ba894bea87ea05134fb0939a78a7e46b3c2",
+    "app/src/mate/workspaceSupport.ts": "af13b2c18721779359a8985feee11a05cddc95ddf5e1c84307e55fcecaeb7d87",
+    "scripts/mate-verifier/bishop-knight-adversarial-roots.json": "1c0d28e3593d05ea171723e04848e20721ce1d877e25dd0cf6a8578b4e2361fc",
+    "scripts/mate-verifier/bishop-knight-root-sampler.mts": "1f5fdd1e58b7f2a14a870393de1fdcedbc169980c12a52ad8591624f5c7ba043",
+    "scripts/mate-verifier/bishop-knight-smoke-roots.json": "57d6358b048872b1065617c794f2e52f5750c1071ce1a8b919695de34bb40db9",
+    "scripts/mate-verifier/derive-major-piece-policy-ranks.mts": "7fb03811187a98699319f9deafb3c83e320bb29f5b8f5f879bf7309d1438a48a",
+    "scripts/mate-verifier/develop-bishop-knight-policy.mts": "6c3851fa68dacdfbc2dfac7a2f533737d03c70b19e4d27bdd28d741b490cc019",
+    "scripts/mate-verifier/development-cache.mts": "4ac0e9c535e4c662ae0e3636cc07ad5c1560cbcfa409c864bec4da522faf4ff1",
+    "scripts/mate-verifier/diagnose-major-piece-policy-scc.mts": "680e74afbdda2565451bf48533ee7fa7c44d89614edbc2ddc7d18f4769533829",
+    "scripts/mate-verifier/exhaustive-cache.mts": "5be156cbec688ebccde070712ef8fa2c436fd946f140f570e1218664a1d73e2d",
+    "scripts/mate-verifier/exhaustive-graph.mts": "3e1c65c481d624c82ae2c3690a6c4b8514cce36a9d7da5e501c666b5b2d2268d",
+    "scripts/mate-verifier/exhaustive-witness-roots.mts": "74ebb444a434599e5b0af658f98ec3f20e0f9b53e1953d98807bc25b673f1fc7",
+    "scripts/mate-verifier/generate-major-piece-mate-progress.mts": "f74adc575f36ec8ee91ef95f19a9765482fcdb344f5db4246c3e99b1930eec08",
+    "scripts/mate-verifier/measure-two-bishops-progress.mts": "9f23b5c10fbbe9e93448051638a0103f17d8e149c0e2ac19b831cd6108973fb6",
+    "scripts/mate-verifier/policy-ranks.mts": "d48eb44faecede365167e594524487a8b08410ad799db3927b959bc8c38dfa2f",
+    "scripts/mate-verifier/policy-scc.mts": "78af9f90425a87424fcab09ef1c45909831f8fd56d07a94b092b85b535c1e319",
+    "scripts/mate-verifier/production.mts": "2161a00cdcca3c62eba01e8e5244b5a3f9831e140ad4614d46e857c44c44e0c1",
+    "scripts/mate-verifier/search.mts": "a77268b8c0112059484a179d23fd3e45f84c657cb191ee4e0a88614666095b45",
+    "scripts/mate-verifier/tsconfig.json": "363fa8bff72e2fa3f5e23a460b16a36844d873c754e9493bd5a195b20aa9ceab",
+    "scripts/mate-verifier/two-bishops-adversarial-roots.json": "0ee5959f9c318676a633714d1a934a63763cce9c236c06388ba26d46ec4dc840",
+    "scripts/mate-verifier/two-bishops-census-worker.mts": "7a23866df300281b4facc6b83680e469c180640a1745cd23926b74cbef655050",
+    "scripts/mate-verifier/two-bishops-census.mts": "d9b1330ac87c47641111bb840ab3c493879ccf8b29923a0e1a1ad89936c33821",
+    "scripts/mate-verifier/two-bishops-diagram-census.mts": "3cdf42e662cf997543ba594584e0b785ff2f4efa68fdf8246eae4483ddf963b1",
+    "scripts/mate-verifier/two-bishops-proof.mts": "344e7e66e1db161ae81815f612e5c4762453962796ecbde231568cebd8e9a261",
+    "scripts/mate-verifier/two-bishops-root-sampler.mts": "199942a5bdfd386cfccd0abb4d36c0cc715bf73692c6cf3442dfef0b5bcb594e",
+    "scripts/mate-verifier/two-bishops-smoke-roots.json": "0107bbc86e808b5a13fcd55a8596bb891d52beddfc7cccfc8f1cc08a2bd25db9",
+    "scripts/mate-verifier/types.mts": "76c4b133752c66a03f6269b1b560fb8dce740a7da490718973b9346a612619f5",
+    "scripts/mate-verifier/verify-two-bishops-development.mts": "f11da37da1ec7d7154b8293565b23fc86fc8cb5aebf02deeb77ec6fef4155dcc",
+    "scripts/mate-verifier/verify-two-bishops-exhaustive.mts": "f0e4eb5fc20414535e02fb534597246dce5223f1db51e02d4ffb5a9cdea09337"
+  },
+  "postAuditSourceChanges": {
+    "files": [
+      "scripts/mate-verifier/development-cache.mts"
+    ],
+    "reason": "Fingerprint coverage only: add the shared bishop helper and BN Black priorities. Production rules, enumeration, graph expansion and graph analysis are unchanged."
+  },
+  "verification": {
+    "fullMateSuite": {
+      "tests": 516,
+      "pass": 516,
+      "fail": 0
+    },
+    "subsequentCacheSuite": {
+      "tests": 3,
+      "pass": 3,
+      "fail": 0
+    },
+    "build": "passed",
+    "mateAndVerifierLint": "passed",
+    "verifierTypecheck": "passed"
+  }
+}

@@ -126,12 +126,12 @@ test('Kf5 excludes occupied g6 but keeps f5 and beats the outer bishop retreat o
     assert.equal(firstDifferingRule(king.score, bishop.score, twoBishopsWhiteRules)?.id,
       'rule r10', transform.name)
     const selection = selectCandidatesByRules(candidates, twoBishopsWhiteRules)
-    assert.deepEqual(selection.idealCandidates.map(({ san }) => san), [kingMove], transform.name)
+    assert.deepEqual(selection.idealCandidates.map(({ san }) => san), [transformedMove(fen, transform, 'e4', 'e5')], transform.name)
     assert.equal(selection.eliminatedBy.get(bishop)?.id, 'rule r10', transform.name)
     // R10's minimum-one floor ties on-target Kf5 with adjacent Ke5;
     // Kf5 is one squared unit from the beyond-wall diagonal.
     assert.equal(king.score.ruleR24_5KingDistance, 1, transform.name)
-    assert.equal(selection.lastEliminatingRule?.id, 'rule r25', transform.name)
+    assert.equal(selection.lastEliminatingRule?.id, 'rule r24.5', transform.name)
   }
 })
 

@@ -33,7 +33,7 @@ function transformedMove(
 const startingFen = '5B2/3k4/8/8/4K3/1B6/8/8 w - - 18 10'
 
 
-test('r10 prefers Ke5 because Kd5 screens all its closest candidates', () => {
+test('r7 rejects the Kd5 screen, which also loses every r10 target', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     const fen = transformFen(startingFen, transform)
     const screenedMove = transformedMove(fen, transform, 'e4', 'd5')
@@ -50,7 +50,7 @@ test('r10 prefers Ke5 because Kd5 screens all its closest candidates', () => {
       [], transform.name)
     assert.equal(screened.score.ruleR10KingDistance, 99, transform.name)
     assert.equal(firstDifferingRule(screened.score, intact.score,
-      twoBishopsWhiteRules)?.id, 'rule r10', transform.name)
+      twoBishopsWhiteRules)?.id, 'rule r7', transform.name)
     assert.equal(screened.score.ruleR9Applies, false, transform.name)
     assert.equal(intact.score.ruleR9Applies, false, transform.name)
     assert.deepEqual(screened.score.ruleR9TargetSquares, [], transform.name)
@@ -60,8 +60,8 @@ test('r10 prefers Ke5 because Kd5 screens all its closest candidates', () => {
     const selection = selectCandidatesByRules(candidates, twoBishopsWhiteRules)
     assert.deepEqual(selection.idealCandidates.map(({ san }) => san),
       [intactMove], transform.name)
-    assert.equal(selection.eliminatedBy.get(screened)?.id, 'rule r10', transform.name)
-    assert.equal(selection.lastEliminatingRule?.id, 'rule r10', transform.name)
+    assert.equal(selection.eliminatedBy.get(screened)?.id, 'rule r7', transform.name)
+    assert.equal(selection.lastEliminatingRule?.id, 'rule r24.5', transform.name)
 
     // Inner Bf8 prefers f7; outer Bb3 prefers d5. Neither opposition
     // candidate is closest to both bishops, even though d5 is occupied.
@@ -213,7 +213,7 @@ test('Ke3 and Kf2 both keep the outer wall and Ke3 wins by target proximity', ()
       assert.equal(candidate.score.ruleR10DiagonalCount, 5, transform.name)
     }
     assert.deepEqual([...near.score.ruleR10TargetSquares].sort(),
-      ['c5', 'd4'].map((square) => transformSquare(square as Square, transform)).sort(),
+      ['d4'].map((square) => transformSquare(square as Square, transform)).sort(),
       transform.name)
     assert.deepEqual(farther.score.ruleR10TargetSquares, [transformSquare('d4', transform)],
       transform.name)
