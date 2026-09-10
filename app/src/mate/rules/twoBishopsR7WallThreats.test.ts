@@ -33,7 +33,7 @@ test('r7 gives no credit for destroying the wall and runs after r6 before r8',()
   assert.equal(scoreTwoBishopsWhiteMove(fen,'Ba6').ruleR7Penalty,1)
   assert.equal(scoreTwoBishopsWhiteMove(fen,'Ba6').ruleR10DiagonalCount,99)
   const ids=twoBishopsWhiteRules.map(rule=>rule.id)
-  assert.deepEqual(ids.slice(ids.indexOf('rule r6'),ids.indexOf('rule r8')+1),['rule r6','rule r7','rule r8'])
+  assert.deepEqual(ids.slice(ids.indexOf('rule r6'),ids.indexOf('rule r8')+1),['rule r6','rule r6.2','rule r6.4','rule r7','rule r8'])
 })
 
 test('r7 allows an inner-bishop attack when no outer-diagonal square is screened',()=>{

@@ -28,10 +28,10 @@ function transformedMove(
   return move.san
 }
 
-test('r19 has a conditional king-proximity gate and remains between r18 and r24', () => {
+test('r19 has a conditional king-proximity gate and remains between r10 and r24', () => {
   const index = twoBishopsWhiteRules.indexOf(r19)
   assert.deepEqual(twoBishopsWhiteRules.slice(index - 1, index + 2).map(({ id }) => id),
-    ['rule r18', 'rule r19', 'rule r24'])
+    ['rule r10', 'rule r19', 'rule r24'])
   assert.equal(r19.helpText,
     "If the white King is on or adjacent to the outer diagonal, prefer the outer bishop at least 3 steps away from Black's king.")
   assert.equal(typeof r19.applies, 'function')

@@ -65,10 +65,10 @@ export type TwoBishopsWhiteMoveScore = {
   // King-step distance, floored at one; 99 means no eligible target.
   readonly ruleR10KingDistance: number
   readonly ruleR10ImmobileBishops: number
-  readonly ruleR11Applies: boolean
-  readonly ruleR11Penalty: number
-  readonly ruleR18Applies: boolean
-  readonly ruleR18Penalty: number
+  readonly ruleR6_2Applies: boolean
+  readonly ruleR6_2Penalty: number
+  readonly ruleR6_4Applies: boolean
+  readonly ruleR6_4Penalty: number
   readonly ruleR19Applies: boolean
   readonly ruleR19Penalty: number
   readonly ruleR24Applies: boolean
@@ -151,126 +151,53 @@ const TARGET_SQUARE_NOTE_BOARD = {
   title: 'Target square',
   noteIndex: 0,
   caption:
-    "The outer wall is c1–h6. The target f4 is its closest unscreened square to Black's king by king-step distance, whether or not a bishop occupies it.",
+    "Outer wall a2–g8; target d5.",
   pieces: [
-    { square: 'e4', piece: 'K' },
-    { square: 'g3', piece: 'k' },
-    { square: 'd2', piece: 'B' },
-    { square: 'd1', piece: 'B' },
+    { square: 'c5', piece: 'K' },
+    { square: 'e4', piece: 'k' },
+    { square: 'b3', piece: 'B' },
+    { square: 'b2', piece: 'B' },
   ],
-  highlights: [
-    { square: 'c1', kind: 'wall' },
-    { square: 'd2', kind: 'wall' },
-    { square: 'e3', kind: 'wall' },
-    { square: 'f4', kind: 'key' },
-    { square: 'g5', kind: 'wall' },
-    { square: 'h6', kind: 'wall' },
-  ],
+  highlights: [{ square: 'd5', kind: 'key' }],
   arrows: [
-    { from: 'g3', to: 'f4' },
+    { from: 'b3', to: 'c2' },
   ],
 } as const
 
 const RULE_R5_5_FORCE_CORNER_NOTE_BOARD = {
   id: 'two-bishops-rule-r5-5-force-corner',
   title: 'rule r5.5 — Force Black toward the corner',
-  noteIndex: 9,
-  caption: 'Black on h6 is in opposition to White on f6. The inner bishop moves from c8 to g4, leaving only Kh7, closer to target corner h8. Bh4 also allows Kh5, so it does not force progress.',
+  caption: 'Bg5 forces Kh2 toward h1.',
   pieces: [
-    { square: 'f6', piece: 'K' },
-    { square: 'h6', piece: 'k' },
-    { square: 'c8', piece: 'B' },
-    { square: 'g3', piece: 'B' },
+    { square: 'f3', piece: 'K' },
+    { square: 'h3', piece: 'k' },
+    { square: 'c1', piece: 'B' },
+    { square: 'g6', piece: 'B' },
   ],
-  highlights: [
-    { square: 'g4', kind: 'key' },
-    { square: 'h7', kind: 'pink' },
-    { square: 'h8', kind: 'key' },
-  ],
-  arrows: [{ from: 'c8', to: 'g4' }, { from: 'h6', to: 'h7' }],
+  highlights: [],
+  arrows: [{ from: 'c1', to: 'g5' }],
 } as const
 
 const RULE_R9_OPPOSITION_NOTE_BOARD = {
   id: 'two-bishops-rule-r9-opposition',
   title: 'rule r9 — Take opposition on the outer wall',
   caption:
-    "Black on g2 is edge adjacent to inner wall b8–h2. Kg4 reaches outer wall c8–h3 in direct opposition to Black. The other opposition point in this direction is off the board, so g4 is the nearest available opposition square to both bishops.",
+    "Ke7 takes opposition on outer wall a3–f8; inner wall a2–g8.",
   pieces: [
-    { square: 'g5', piece: 'K' },
-    { square: 'g2', piece: 'k' },
-    { square: 'b8', piece: 'B' },
-    { square: 'c8', piece: 'B' },
+    { square: 'd7', piece: 'K' },
+    { square: 'g7', piece: 'k' },
+    { square: 'a2', piece: 'B' },
+    { square: 'a3', piece: 'B' },
   ],
-  highlights: [
-    { square: 'b8', kind: 'zone' },
-    { square: 'c7', kind: 'zone' },
-    { square: 'd6', kind: 'zone' },
-    { square: 'e5', kind: 'zone' },
-    { square: 'f4', kind: 'zone' },
-    { square: 'g3', kind: 'zone' },
-    { square: 'h2', kind: 'zone' },
-    { square: 'c8', kind: 'wall' },
-    { square: 'd7', kind: 'wall' },
-    { square: 'e6', kind: 'wall' },
-    { square: 'f5', kind: 'wall' },
-    { square: 'g4', kind: 'key' },
-    { square: 'h3', kind: 'wall' },
-  ],
-  arrows: [{ from: 'g5', to: 'g4' }],
-} as const
-
-const RULE_R10_EDGE_NOTE_BOARD = {
-  id: 'two-bishops-rule-r10-edge',
-  title: 'rule r10',
-  caption:
-    'With h1 as the target corner, the outer bishop on h6 is on a target-corner edge. Its Phase 2 diagonal gives no exemption. Bg5 moves it off that edge and receives r10 credit even though it is only two king steps from Black. The inner bishop on d1 is not part of this preference.',
-  pieces: [
-    { square: 'e5', piece: 'K' },
-    { square: 'g3', piece: 'k' },
-    { square: 'h6', piece: 'B' },
-    { square: 'd1', piece: 'B' },
-  ],
-  highlights: [
-    { square: 'h1', kind: 'pink' },
-    { square: 'h6', kind: 'key' },
-    { square: 'g5', kind: 'zone' },
-  ],
-  arrows: [{ from: 'h6', to: 'g5' }],
-} as const
-
-const RULE_R18_CHOKE_NOTE_BOARD = {
-  id: 'two-bishops-rule-r18-choke',
-  title: 'rule r18 — Play the choke move',
-  caption:
-    "The inner wall d8–h4 has five squares and touches neither edge of target corner a1. White's king on g7 is outside the wall. Play Bf6: the inner bishop moves from h4 to the long diagonal a1–h8.",
-  pieces: [
-    { square: 'g7', piece: 'K' },
-    { square: 'e6', piece: 'k' },
-    { square: 'e8', piece: 'B' },
-    { square: 'h4', piece: 'B' },
-  ],
-  highlights: [
-    { square: 'd8', kind: 'wall' },
-    { square: 'e7', kind: 'wall' },
-    { square: 'f6', kind: 'key' },
-    { square: 'g5', kind: 'wall' },
-    { square: 'h4', kind: 'wall' },
-    { square: 'a1', kind: 'pink' },
-    { square: 'b2', kind: 'zone' },
-    { square: 'c3', kind: 'zone' },
-    { square: 'd4', kind: 'zone' },
-    { square: 'e5', kind: 'zone' },
-    { square: 'g7', kind: 'zone' },
-    { square: 'h8', kind: 'zone' },
-  ],
-  arrows: [{ from: 'h4', to: 'f6' }],
+  highlights: [],
+  arrows: [{ from: 'd7', to: 'e7' }],
 } as const
 
 const PHASE_TWO_NOTE_BOARD = {
   id: 'two-bishops-phase-two',
   title: 'Phase 2',
   caption:
-    'For the h1 orientation, the exact Phase 2 position has White Kf2, bishops on e2/e3, and Black on h1, h2, h3, or h4.',
+    'Black may occupy any square from h1 to h4.',
   pieces: [
     { square: 'f2', piece: 'K' },
     { square: 'h4', piece: 'k' },
@@ -323,19 +250,9 @@ const twoBishopsHelp: RuleHelp = {
     'Move toward an unprotected bishop.',
   ],
   notes: [
-    "Target squares are the unscreened outer-wall squares closest to Black's king by king-step distance. All equally closest squares are candidates, but a square occupied by a bishop cannot be a target. Reject only the occupied candidates; equally close unoccupied candidates remain eligible. If none remain, there is no target; do not substitute farther squares. White's king may be inside or outside the wall. If on the outer wall, it must be no farther from the target than Black's king by king-step distance.",
-    'Phase 2 is recognized when rule r4 matches an established mating-pattern geometry: either the exact Phase 2 template or a bishop move that forces Black from the edge into its associated corner, under rotation or reflection.',
-    "White's king may screen the outer wall, but squares beyond the king away from the outer bishop cannot be targets, even if White controls them. The king's own square remains unscreened. Find the closest candidates on the full outer wall first, then reject screened candidates. If all are screened, there are no target squares; do not substitute farther squares. An inner-wall screen is allowed when Black has no legal move onto a screened inner-wall square. This applies to r8 and r10; distant screened squares need not all be controlled. R6 requires both Phase 2 diagonals to be unscreened. White's king does not count as a screen for a bishop when Black is no farther from that bishop than from White's king by Euclidean distance after White moves. Equal distances qualify for this exception; controlled or unreachable hidden squares alone give no exemption. A king at the end of a diagonal screens nothing beyond it. Black must still be unable to step onto the inner wall. A reply crossing beyond both walls is allowed only if its resulting side has strictly fewer diagonals than Black’s original side; an equal or larger escape area invalidates the wall. For an allowed crossing, r8 uses the largest count among legal replies, not the union of both sides. A reachable outer diagonal counts in addition to the original side. R24 recognizes geometric bishop walls even when Black can enter them; it does not require r8/r10’s inner-wall reachability check.",
-    "For all rules, choose the smallest bishop walls first. Among equally small walls, prefer those where White's king is outside or on the outer wall. If White is inside all tied walls, retain them all. This preference never selects a larger wall.",
-    "R8 first prefers fewer diagonals for Black, ahead of r9 opposition. R10 then prefers the outer bishop off the two edges meeting at the target corner, regardless of its distance from Black. The inner bishop is excluded, and Phase 2 diagonals give no edge exemption. White's target proximity uses king-step distance with a minimum score of one: occupying a target ties both orthogonally and diagonally adjacent squares. Target selection and eligibility also use king-step distance. Finally, prefer fewer bishops with no legal move along their own wall diagonal after White moves: two mobile bishops beat one, which beats none. A single legal move is enough; additional destinations give no extra credit. This measures chess legality, not whether Black could capture the bishop afterward, and does not look ahead to Black’s reply. R8 and r10 use the same smallest valid wall; among equally small walls, select the best remaining r10 preferences.",
-    'When the kings are two king steps apart, a king moat is the rank or file halfway between them on an axis where they are two squares apart. If both axes qualify, either moat can contain the bishop. Rule r24 first prefers a resulting geometric bishop wall, including a non-confining wall; otherwise it prefers at least one bishop in the starting king moat. A wall beats a moat bishop, which beats neither. Compare every move, including moves with neither a wall nor a starting moat. The starting moat stays fixed, and a second moat bishop gives no extra credit.',
-    "R24.5 measures White's Euclidean distance to the nearest on-board square of the parallel diagonal one beyond the resulting outer wall, away from the target corner. It uses the same valid wall profiles as r10; among profiles tied by r8 and r10, it takes the nearest of these beyond-wall diagonals. It applies on either side of the wall, even with an eligible target square. Being on the beyond-wall diagonal scores zero, without r10's minimum-one floor. No valid wall or no on-board beyond-wall diagonal leaves r24.5 inactive.",
-    'R9 uses the resulting smallest valid bishop walls. The outer bishop must be off both edges meeting at that wall’s target corner; an edge bishop leaves that wall without an r9 target, even if White already occupies its opposition square. Check this after White moves, without choosing a larger wall to avoid the condition. Edge adjacent means sharing a square edge with the inner diagonal. Opposition means two squares apart on the same rank or file. Compare the candidate outer-wall opposition squares by Euclidean distance to each bishop. A candidate must be strictly closer to each bishop than every other candidate. A tie for either bishop, or bishops favoring different squares, leaves no r9 target for that wall. A sole on-board candidate qualifies. Prefer occupying a chosen square; an accomplished r9 outweighs an exempt move. Exempt moves tie moves that have an opposition target but do not occupy it. This rule gives no approach-distance bonus and does not compare the two kings\' distances to the bishops.',
-    'R19 measures the position after White\'s move. It applies only when White\'s king is on or within one king step of the outer diagonal of a selected smallest bishop wall, including diagonal adjacency. The outer bishop must be at least three king steps from Black\'s king on that same wall. When White is farther from every selected outer diagonal, r19 gives no preference.',
-    'R5.5 checks starting edge opposition: Black is on an edge, White is off every edge, and the kings are two squares apart on the same rank or file. Select the smallest starting bishop walls, with the usual preference for White not inside tied walls. Keep each inner bishop paired with its wall’s target corner. Only a move by that inner bishop can succeed, and Black must have at least one legal reply, with every legal reply strictly reducing king-step distance to that same corner. Outer-bishop and king moves receive no credit, even if they force progress. Without a starting bishop wall there is no inner bishop and the rule is inactive. It applies in either phase. After White moves and before Black replies, the moved bishop must still be the inner bishop of a selected smallest valid wall toward the same starting target corner. Switching it to the outer wall or destroying the wall earns no credit. R10 has no position-specific exemption.',
-    'R7 checks every legal Black reply after White moves, using the smallest valid bishop walls with the usual tied-wall preference. Prefer a wall for which no reply reaches its outer diagonal. Also prevent attacks on its inner bishop when that bishop is adjacent to an outer-diagonal square screened by White’s king: beyond the king, away from the outer bishop. The king’s own square is not screened. King adjacency counts as an attack even when the bishop is defended. Both conditions must hold for the same wall; no valid wall earns no credit. R7 gives one combined preference, with no extra penalty for allowing both outcomes.',
+    "Target squares: take the outer-wall squares closest to Black's king by king steps, then exclude bishop-occupied and screened squares. If White's king is on the outer wall, it must be no farther from the target than Black.",
   ],
-  noteBoards: [TARGET_SQUARE_NOTE_BOARD, PHASE_TWO_NOTE_BOARD, RULE_R9_OPPOSITION_NOTE_BOARD, RULE_R10_EDGE_NOTE_BOARD, RULE_R18_CHOKE_NOTE_BOARD, RULE_R5_5_FORCE_CORNER_NOTE_BOARD],
+  noteBoards: [TARGET_SQUARE_NOTE_BOARD, PHASE_TWO_NOTE_BOARD, RULE_R9_OPPOSITION_NOTE_BOARD, RULE_R5_5_FORCE_CORNER_NOTE_BOARD],
 }
 
 function diagonalIndex(square: Square, axis: DiagonalAxis): number {
@@ -1877,7 +1794,7 @@ function flankStepTarget(fen: string): Square | undefined {
   return undefined
 }
 
-function ruleR18Targets(fen: string): readonly Square[] {
+function ruleR6_4Targets(fen: string): readonly Square[] {
   const bishops = getWhiteBishopSquares(fen)
   const blackKing = findPiece(fen, 'b', 'k')?.square
   const whiteKing = findPiece(fen, 'w', 'k')?.square
@@ -1992,7 +1909,7 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
       id: 'rule r4',
       shortLabel: 'rule r4',
       applies: (score) => score.ruleR4Applies,
-      helpText: 'Phase 2: Execute the mating pattern.',
+      helpText: 'Execute the mating pattern.',
       compare: (first, second) =>
         first.ruleR4Penalty - second.ruleR4Penalty,
     },
@@ -2033,7 +1950,7 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
       shortLabel: 'rule r6',
       applies: (score) => score.ruleR6Applies,
       helpText:
-        "Prefer bishops on unscreened Phase 2 diagonals, then prefer Bishops on their Phase 2 squares, then prefer the shortest king path to its Phase 2 square without entering Black's area, then Euclidean proximity.",
+        "Prefer bishops on unscreened Phase 2 diagonals, then prefer Bishops on their Phase 2 squares, then prefer the shortest king path to its Phase 2 square without entering Black's area, then Euclidean proximity to that same Phase 2 king square.",
       subpriorities: [
         {
           compare: (first, second) =>
@@ -2056,6 +1973,22 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
             first.ruleR6KingDistance - second.ruleR6KingDistance,
         },
       ],
+    },
+    {
+      id: 'rule r6.2',
+      shortLabel: 'rule r6.2',
+      helpText:
+        "Play the flank step. With adjacent bishops on different halves of the board, White's king adjacent to both, and the kings in line three steps apart on opposite sides of the bishops, move White's king into line with the bishops.",
+      applies: (score) => score.ruleR6_2Applies,
+      compare: (first, second) => first.ruleR6_2Penalty - second.ruleR6_2Penalty,
+    },
+    {
+      id: 'rule r6.4',
+      shortLabel: 'rule r6.4',
+      helpText:
+        "Play the choke move. When the inner wall has five squares and touches neither of the target corner's edges, if White's king is outside the wall, prefer the inner-wall bishop on the long diagonal.",
+      applies: (score) => score.ruleR6_4Applies,
+      compare: (first, second) => first.ruleR6_4Penalty - second.ruleR6_4Penalty,
     },
     {
       id: 'rule r7',
@@ -2095,22 +2028,6 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
             first.ruleR10ImmobileBishops - second.ruleR10ImmobileBishops,
         },
       ],
-    },
-    {
-      id: 'rule r11',
-      shortLabel: 'rule r11',
-      helpText:
-        "Play the flank step. With adjacent bishops on different halves of the board, White's king adjacent to both, and the kings in line three steps apart on opposite sides of the bishops, move White's king into line with the bishops.",
-      applies: (score) => score.ruleR11Applies,
-      compare: (first, second) => first.ruleR11Penalty - second.ruleR11Penalty,
-    },
-    {
-      id: 'rule r18',
-      shortLabel: 'rule r18',
-      helpText:
-        "Play the choke move. When the inner wall has five squares and touches neither of the target corner's edges, if White's king is outside the wall, prefer the inner-wall bishop on the long diagonal.",
-      applies: (score) => score.ruleR18Applies,
-      compare: (first, second) => first.ruleR18Penalty - second.ruleR18Penalty,
     },
     {
       id: 'rule r19',
@@ -2182,8 +2099,8 @@ type WhiteScoringContext = {
   readonly ruleR4ForcedMateNext: boolean
   readonly ruleR5_5Walls: readonly RuleR5_5Wall[]
   readonly ruleR6Templates: readonly PhaseTwoTemplate[]
-  readonly ruleR11Target: Square | undefined
-  readonly ruleR18Targets: readonly Square[]
+  readonly ruleR6_2Target: Square | undefined
+  readonly ruleR6_4Targets: readonly Square[]
   readonly ruleR24Moats: readonly KingMoat[]
 }
 
@@ -2202,8 +2119,8 @@ function whiteScoringContext(fen: string): WhiteScoringContext {
       ) && ruleR4HasForcedMateNext(fen),
     ruleR5_5Walls: ruleR5_5Walls(pieces),
     ruleR6Templates: templates,
-    ruleR11Target: flankStepTarget(fen),
-    ruleR18Targets: ruleR18Targets(fen),
+    ruleR6_2Target: flankStepTarget(fen),
+    ruleR6_4Targets: ruleR6_4Targets(fen),
     ruleR24Moats: ruleR24Moats(pieces),
   }
 }
@@ -2241,10 +2158,10 @@ function scoreWhiteMove(
     blackKing,
     whiteKing,
   )
-  const ruleR11Target = context.ruleR11Target
+  const ruleR6_2Target = context.ruleR6_2Target
   const ruleR19 = scoreRuleR19(resultPieces)
   const ruleR24Applies = geometricWalls.length > 0 || context.ruleR24Moats.length > 0
-  const chokeTargets = context.ruleR18Targets
+  const chokeTargets = context.ruleR6_4Targets
   const ruleR6Applies = context.ruleR6Templates.length > 0
   const ruleR6 = scoreRuleR6(context.ruleR6Templates, resultFen, resultPieces)
   const ruleR5 = scoreRuleR5(context.pieces.bishops, resultFen, resultPieces)
@@ -2308,10 +2225,10 @@ function scoreWhiteMove(
     ruleR10TargetSquares: ruleR10.targetSquares,
     ruleR10KingDistance: ruleR10.kingDistance,
     ruleR10ImmobileBishops: ruleR10.immobileBishops,
-    ruleR11Applies: ruleR11Target !== undefined,
-    ruleR11Penalty: ruleR11Target === undefined || whiteKing === ruleR11Target ? 0 : 1,
-    ruleR18Applies: chokeTargets.length > 0,
-    ruleR18Penalty: chokeTargets.length === 0 || chokeTargets.some((square) => bishops.includes(square)) ? 0 : 1,
+    ruleR6_2Applies: ruleR6_2Target !== undefined,
+    ruleR6_2Penalty: ruleR6_2Target === undefined || whiteKing === ruleR6_2Target ? 0 : 1,
+    ruleR6_4Applies: chokeTargets.length > 0,
+    ruleR6_4Penalty: chokeTargets.length === 0 || chokeTargets.some((square) => bishops.includes(square)) ? 0 : 1,
     ruleR19Applies: ruleR19.applies,
     ruleR19Penalty: ruleR19.penalty,
     ruleR24Applies,

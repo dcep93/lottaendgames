@@ -32,8 +32,7 @@ function transformedMove(
 test('opposition r9 precedes r10 and the removed r18.5 has no rule or score fields', () => {
   assert.deepEqual(twoBishopsWhiteRules.map(({ id }) => id), [
     'mate', 'bishops safe', 'no stalemate', 'rule r1', 'rule r3', 'rule r4', 'rule r5',
-    'rule r5.5', 'rule r6', 'rule r7', 'rule r8', 'rule r9', 'rule r10', 'rule r11', 'rule r18',
-    'rule r19', 'rule r24', 'rule r24.5', 'rule r25', 'rule r30',
+    'rule r5.5', 'rule r6', 'rule r6.2', 'rule r6.4', 'rule r7', 'rule r8', 'rule r9', 'rule r10', 'rule r19', 'rule r24', 'rule r24.5', 'rule r25', 'rule r30',
   ])
   const fen = '8/8/2k5/B7/4K3/8/8/5B2 w - - 6 4'
   for (const san of getChess(fen).moves()) {

@@ -8,8 +8,8 @@ const starting = '8/1k1K4/3BB3/8/8/8/8/8 w - - 0 1'
 
 test('r8 preserves the smaller Ke7 wall before accomplished Bh2 opposition', () => {
   const ids = twoBishopsWhiteRules.map(r => r.id)
-  assert.deepEqual(ids.slice(ids.indexOf('rule r6'), ids.indexOf('rule r11')),
-    ['rule r6', 'rule r7', 'rule r8', 'rule r9', 'rule r10'])
+  assert.deepEqual(ids.slice(ids.indexOf('rule r6'), ids.indexOf('rule r24')),
+    ['rule r6', 'rule r6.2', 'rule r6.4', 'rule r7', 'rule r8', 'rule r9', 'rule r10', 'rule r19'])
   for (const transform of SQUARE_TRANSFORMS) {
     const fen = transformFen(starting, transform)
     const moves = getChess(fen).moves({ verbose: true })

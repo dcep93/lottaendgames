@@ -359,3 +359,47 @@ All 312,286 symmetry-distinct app-eligible opposite-colored KBBK White-to-move s
 Twenty verifier checks, 12,616 sampled/adversarial symmetry comparisons and 200 clock checks pass. Focused r8 tests, presentation checks and TypeScript pass. The broad rule suite remains at 181 passed and 32 pre-existing failures; those expectations were not rewritten to obtain a clean result. The preserved universal former-stalemate mating regression passes. This certificate is scoped to app-eligible starts with no supplied repetition history, not arbitrary FENs or an already-consumed halfmove budget.
 
 Policy fingerprint: `ef0b10fe235c94e8340065a39e404b79d5177f9ee5d222d0820e7ff0dc86a0af`. Engine fingerprint: `12d2647dc3b8407c37ff489627fa99fa5fd922568b6da30e9853a58c388922eb`. Verifier implementation: `e6d5354c079e77646375b903944b4feb3acc4c9e0950f5f3bd8e1b7a7df4277b`.
+
+
+### R4 wording, r6 geometry priority, and r19 removal
+
+R4 now reads exactly “Execute the mating pattern.” Its applicability and mating-pattern behavior are unchanged. R6's final Euclidean proximity compares White's king after the candidate move with its Phase 2 king square in the selected matching template—the same destination as its preceding shortest-path score. Name that reference explicitly in the guide without changing the calculation.
+
+Move the flank step from r11 to r6.2 and the choke move from r18 to r6.4, immediately after r6 and before r7, retaining each rule's geometry and applicability. Rename the choke diagram and diagnostic score fields consistently. Remove r19 entirely, including its evaluation, applicability fields and explanatory note. Update obsolete r19 tests and rule-order/guide tests; preserve unrelated expectations and the universal former-stalemate regression. The preceding exhaustive certificate covers the prior policy and does not certify this change. Run focused checks and stop the follow-up search at its first verified counterexample. No new commit or push unless requested.
+
+
+### Restore r19 after r10
+
+Restore r19's previous geometric-wall eligibility and three-king-step outer-bishop preference, its score fields and explanatory note, immediately after r10 and before r24. Keep r4's simplified wording, r6's clarified Euclidean reference, and the flank/choke rules at r6.2/r6.4. Restore r19 regression coverage and the force-corner note's original attachment index. Search for a single counterexample under this combined policy; do not assume the older exhaustive certificate still applies. No commit or push requested.
+
+
+### Notes rewrite — 2026-09-10
+
+Rewrote the user-facing notes for accuracy, brevity, and clarity. Notes fall from 1,233 to 452 words; diagram captions from 217 to 108. Grouped shared wall and screen definitions, retained consequential rule exceptions, removed repeated priorities and obsolete comparison commentary, and corrected the target-square caption to exclude bishop-occupied targets. The r5.5 diagram now follows its relocated note. Rule implementation, order, and scoring are unchanged. Targeted guide/policy-description checks and verifier TypeScript checks pass. No new termination audit is needed for this text-only change.
+
+
+### Notes editorial correction — 2026-09-10
+
+Reviewed every note and caption against the user's request to omit reasonable assumptions. Removed inferred consequences, obvious definitions, repeated rule instructions, and redundant diagram descriptions. Notes now contain 272 words, down from 452 in the first rewrite. Kept only necessary definitions, non-obvious conditions, and measurement conventions. Rule implementation is unchanged; targeted guide checks pass.
+
+
+### Assumed chess knowledge — 2026-09-10
+
+Removed the screen definition, defended-bishop attack explanation, and reachable-diagonal counting explanation. Shortened r24.5 to its distance metric. Notes should document policy-specific choices, not explain familiar chess terms or consequences already implied by the rules. No rule behavior changed.
+
+
+### Final notes scope — 2026-09-10
+
+Retain only the target-square explanation and all six diagrams with their captions. Remove every other note. Detach the r5.5 diagram from its deleted note so it remains visible. Rule behavior is unchanged.
+
+
+### Diagram simplification — 2026-09-10
+
+Removed diagonal highlights from the target-square and r9 diagrams. The target diagram retains f4 emphasis and uses only the d2–e1 bishop arrow. Mirrored r9 horizontally, including its pieces, move arrow, and caption. Removed the r10 and r6.4 diagrams. Removed all r5.5 square highlights and its Black king arrow, retaining c8–g4. Four diagrams remain; the target-square explanation is unchanged. Targeted guide tests and TypeScript pass.
+
+
+### Final diagram orientation and validation
+
+The target-square diagram is shifted one rank up and two files left: White Kc5, Black Ke4, bishops b3/b2, target d5, and arrow b3–c2. The r5.5 diagram is reflected vertically, with bishop arrow c1–g5. The r9 diagram is reflected horizontally and then across a8–h1, with White Kd7, Black Kg7, bishops a2/a3, and arrow d7–e7.
+
+After r19 was restored alongside r6.2/r6.4, all 1,003 sampled starting positions terminated within 95 plies; this is not a new exhaustive certificate. Final guide checks, r19 checks, TypeScript and whitespace checks pass. The checked r6.4/r8 suites reproduce two failures already recorded in the prior audit. The user requested committing and pushing the accumulated changes.
