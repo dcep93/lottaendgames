@@ -24,17 +24,21 @@ const ACTIVE_RULE_IDS = [
   'mate',
   'bishops safe',
   'no stalemate',
+  'rule r1',
   'rule r3',
   'rule r4',
   'rule r5',
+  'rule r5.5',
   'rule r6',
+  'rule r7',
   'rule r8',
+  'rule r9',
   'rule r10',
   'rule r11',
-  'rule r12',
   'rule r18',
   'rule r19',
-  'rule r22',
+  'rule r24',
+  'rule r24.5',
   'rule r25',
   'rule r30',
 ]
@@ -45,13 +49,21 @@ test('Two Bishops exposes only the simplified experiment policy', () => {
     ACTIVE_RULE_IDS,
   )
   assert.deepEqual(twoBishopsRuleSet.help.notes, [
-    "Target squares are the outer-wall squares closest to Black's king by king-step distance. All equally closest squares are candidates. If any candidate is occupied by a bishop, that wall has no target. White's king must be outside the wall, or on the outer wall and no farther from the target than Black's king by king-step distance.",
+    "Target squares are the unscreened outer-wall squares closest to Black's king by king-step distance. All equally closest squares are candidates, but a square occupied by a bishop cannot be a target. Reject only the occupied candidates; equally close unoccupied candidates remain eligible. If none remain, there is no target; do not substitute farther squares. White's king may be inside or outside the wall. If on the outer wall, it must be no farther from the target than Black's king by king-step distance.",
     'Phase 2 is recognized when rule r4 matches an established mating-pattern geometry: either the exact Phase 2 template or a bishop move that forces Black from the edge into its associated corner, under rotation or reflection.',
-    "A bishop wall remains valid only if White controls every square screened from its bishop by White's king. If any screened square is uncontrolled, that wall is invalid. Without a valid wall pair, r10 and r12 have no target square or one-beyond-wall diagonal.",
+    "White's king may screen the outer wall, but squares beyond the king away from the outer bishop cannot be targets, even if White controls them. The king's own square remains unscreened. Find the closest candidates on the full outer wall first, then reject screened candidates. If all are screened, there are no target squares; do not substitute farther squares. An inner-wall screen is allowed when Black has no legal move onto a screened inner-wall square. This applies to r8 and r10; distant screened squares need not all be controlled. R6 requires both Phase 2 diagonals to be unscreened. White's king does not count as a screen for a bishop when Black is no farther from that bishop than from White's king by Euclidean distance after White moves. Equal distances qualify for this exception; controlled or unreachable hidden squares alone give no exemption. A king at the end of a diagonal screens nothing beyond it. Black must still be unable to step onto the inner wall. A reply crossing beyond both walls is allowed only if its resulting side has strictly fewer diagonals than Black’s original side; an equal or larger escape area invalidates the wall. For an allowed crossing, r8 uses the largest count among legal replies, not the union of both sides. A reachable outer diagonal counts in addition to the original side. R24 recognizes geometric bishop walls even when Black can enter them; it does not require r8/r10’s inner-wall reachability check.",
+    "For all rules, choose the smallest bishop walls first. Among equally small walls, prefer those where White's king is outside or on the outer wall. If White is inside all tied walls, retain them all. This preference never selects a larger wall.",
+    "R8 first prefers fewer diagonals for Black, ahead of r9 opposition. R10 then prefers the outer bishop off the two edges meeting at the target corner, regardless of its distance from Black. The inner bishop is excluded, and Phase 2 diagonals give no edge exemption. White's target proximity uses king-step distance with a minimum score of one: occupying a target ties both orthogonally and diagonally adjacent squares. Target selection and eligibility also use king-step distance. Finally, prefer fewer bishops with no legal move along their own wall diagonal after White moves: two mobile bishops beat one, which beats none. A single legal move is enough; additional destinations give no extra credit. This measures chess legality, not whether Black could capture the bishop afterward, and does not look ahead to Black’s reply. R8 and r10 use the same smallest valid wall; among equally small walls, select the best remaining r10 preferences.",
+    'When the kings are two king steps apart, a king moat is the rank or file halfway between them on an axis where they are two squares apart. If both axes qualify, either moat can contain the bishop. Rule r24 first prefers a resulting geometric bishop wall, including a non-confining wall; otherwise it prefers at least one bishop in the starting king moat. A wall beats a moat bishop, which beats neither. Compare every move, including moves with neither a wall nor a starting moat. The starting moat stays fixed, and a second moat bishop gives no extra credit.',
+    "R24.5 measures White's Euclidean distance to the nearest on-board square of the parallel diagonal one beyond the resulting outer wall, away from the target corner. It uses the same valid wall profiles as r10; among profiles tied by r8 and r10, it takes the nearest of these beyond-wall diagonals. It applies on either side of the wall, even with an eligible target square. Being on the beyond-wall diagonal scores zero, without r10's minimum-one floor. No valid wall or no on-board beyond-wall diagonal leaves r24.5 inactive.",
+    "R9 uses the resulting smallest valid bishop walls. The outer bishop must be off both edges meeting at that wall’s target corner; an edge bishop leaves that wall without an r9 target, even if White already occupies its opposition square. Check this after White moves, without choosing a larger wall to avoid the condition. Edge adjacent means sharing a square edge with the inner diagonal. Opposition means two squares apart on the same rank or file. Compare the candidate outer-wall opposition squares by Euclidean distance to each bishop. A candidate must be strictly closer to each bishop than every other candidate. A tie for either bishop, or bishops favoring different squares, leaves no r9 target for that wall. A sole on-board candidate qualifies. Prefer occupying a chosen square; an accomplished r9 outweighs an exempt move. Exempt moves tie moves that have an opposition target but do not occupy it. This rule gives no approach-distance bonus and does not compare the two kings' distances to the bishops.",
+    "R19 measures the position after White's move. It applies only when White's king is on or within one king step of the outer diagonal of a selected smallest bishop wall, including diagonal adjacency. The outer bishop must be at least three king steps from Black's king on that same wall. When White is farther from every selected outer diagonal, r19 gives no preference.",
+    'R5.5 checks starting edge opposition: Black is on an edge, White is off every edge, and the kings are two squares apart on the same rank or file. Select the smallest starting bishop walls, with the usual preference for White not inside tied walls. Keep each inner bishop paired with its wall’s target corner. Only a move by that inner bishop can succeed, and Black must have at least one legal reply, with every legal reply strictly reducing king-step distance to that same corner. Outer-bishop and king moves receive no credit, even if they force progress. Without a starting bishop wall there is no inner bishop and the rule is inactive. It applies in either phase. After White moves and before Black replies, the moved bishop must still be the inner bishop of a selected smallest valid wall toward the same starting target corner. Switching it to the outer wall or destroying the wall earns no credit. R10 has no position-specific exemption.',
+    'R7 checks every legal Black reply after White moves, using the smallest valid bishop walls with the usual tied-wall preference. Prefer a wall for which no reply reaches its outer diagonal. Also prevent attacks on its inner bishop when that bishop is adjacent to an outer-diagonal square screened by White’s king: beyond the king, away from the outer bishop. The king’s own square is not screened. King adjacency counts as an attack even when the bishop is defended. Both conditions must hold for the same wall; no valid wall earns no credit. R7 gives one combined preference, with no extra penalty for allowing both outcomes.',
   ])
   assert.deepEqual(
     twoBishopsRuleSet.help.noteBoards.map(({ id }) => id),
-    ['two-bishops-target-square', 'two-bishops-phase-two', 'two-bishops-rule-r10-edge', 'two-bishops-rule-r18-choke'],
+    ['two-bishops-target-square', 'two-bishops-phase-two', 'two-bishops-rule-r9-opposition', 'two-bishops-rule-r10-edge', 'two-bishops-rule-r18-choke', 'two-bishops-rule-r5-5-force-corner'],
   )
   assert.equal(twoBishopsRuleSet.help.noteBoards[0]?.noteIndex, 0)
   assert.equal(
@@ -64,27 +76,37 @@ test('Two Bishops exposes only the simplified experiment policy', () => {
   )
   assert.equal(
     twoBishopsWhiteRules.find(({ id }) => id === 'rule r6')?.helpText,
-    "Prefer bishops on their Phase 2 diagonals, then prefer Bishops on their Phase 2 squares, then prefer the shortest king path to its Phase 2 square without entering Black's area, then Euclidean proximity.",
+    "Prefer bishops on unscreened Phase 2 diagonals, then prefer Bishops on their Phase 2 squares, then prefer the shortest king path to its Phase 2 square without entering Black's area, then Euclidean proximity.",
   )
   assert.equal(
     twoBishopsWhiteRules.find(({ id }) => id === 'rule r3')?.helpText,
     "Prefer White's king out of the corner, then bishops not adjacent to a cornered White king, then bishops out of the corner.",
   )
   assert.equal(
-    twoBishopsWhiteRules.find(({ id }) => id === 'rule r8')?.helpText,
+    twoBishopsWhiteRules.find(({ id }) => id === 'rule r1')?.helpText,
     "With Black's king in the corner, prefer White's king on a Phase 2 square associated with that corner.",
   )
   assert.equal(
-    twoBishopsWhiteRules.find(({ id }) => id === 'rule r10')?.helpText,
-    "Prefer fewer diagonals for Black's king, then White king's step proximity to the target square, then bishops off the target corner's edge, except the Phase 2 diagonals.",
+    twoBishopsWhiteRules.find(({ id }) => id === 'rule r9')?.helpText,
+    "When the Black king is edge adjacent to the inner wall and the outer bishop is not on the target corner's edge, prefer White's king on the outer wall square in opposition to Black's king and closer to both bishops.",
   )
   assert.equal(
-    twoBishopsWhiteRules.find(({ id }) => id === 'rule r12')?.helpText,
-    "Without a target square, prefer White’s king closer to the diagonal one beyond the outer wall.",
+    twoBishopsWhiteRules.find(({ id }) => id === 'rule r10')?.helpText,
+    "Prefer outer bishop off target corner's edge, then White king's step proximity to the target square, then bishops to have legal moves along their wall.",
   )
+  assert.equal(twoBishopsWhiteRules.some(({ id }) => id === 'rule r12'), false)
+  assert.equal(twoBishopsWhiteRules.some(({ id }) => id === 'rule r18.5'), false)
   assert.equal(
     twoBishopsWhiteRules.find(({ id }) => id === 'rule r19')?.helpText,
-    "Prefer the outer bishop at least 3 steps away from Black's king.",
+    "If the white King is on or adjacent to the outer diagonal, prefer the outer bishop at least 3 steps away from Black's king.",
+  )
+  assert.equal(
+    twoBishopsWhiteRules.find(({ id }) => id === 'rule r24')?.helpText,
+    'Prefer a bishop wall, otherwise prefer a bishop inside a king moat.',
+  )
+  assert.equal(
+    twoBishopsWhiteRules.find(({ id }) => id === 'rule r24.5')?.helpText,
+    'Prefer the White king closer to the diagonal one beyond the outer wall.',
   )
   assert.equal(
     twoBishopsWhiteRules.find(({ id }) => id === 'rule r25')?.helpText,
@@ -458,12 +480,14 @@ test('rule r4 prepares h7 while preserving h6 with the king already on f7 symmet
   const line = ['Ba4', 'Kh7', 'Bc2+', 'Kh8', 'Bg7#'].map((san) => original.move(san))
   for (const transform of SQUARE_TRANSFORMS) {
     const chess = getChess(transformFen(fen, transform))
-    const alternative = (from: 'e8' | 'f8', to: 'd7' | 'e7') => chess.moves({ verbose: true }).find(
+    const alternative = (from: 'e8' | 'f8', to: 'a4' | 'd7' | 'e7') => chess.moves({ verbose: true }).find(
       (move) => move.from === transformSquare(from, transform) &&
         move.to === transformSquare(to, transform),
     )!.san
-    assert.equal(scoreTwoBishopsWhiteMove(chess.fen(), alternative('e8', 'd7')).ruleR4Penalty,
-      0, transform.name)
+    const bd7 = scoreTwoBishopsWhiteMove(chess.fen(), alternative('e8', 'd7'))
+    const ba4 = scoreTwoBishopsWhiteMove(chess.fen(), alternative('e8', 'a4'))
+    assert.equal(bd7.ruleR4Penalty, 0, transform.name)
+    assert.equal(ba4.ruleR4Penalty, 0, transform.name)
     assert.equal(scoreTwoBishopsWhiteMove(chess.fen(), alternative('f8', 'e7')).ruleR4Penalty,
       1, transform.name)
     for (const [index, originalMove] of line.entries()) {
@@ -740,8 +764,8 @@ test('rule r6 measures Euclidean distance to the Phase 2 king square', () => {
     },
     {
       fen: '8/8/8/8/8/3KB2k/4B3/8 w - - 0 1',
-      preferred: 'Kd2',
-      rejected: 'Ke4',
+      preferred: 'Ke4',
+      rejected: 'Kc4',
     },
     {
       fen: '8/8/8/8/7k/4B3/3KB3/8 w - - 0 1',
@@ -903,7 +927,7 @@ test('rule r6 rejects Bd1 when Kh5 can enter the screened Phase 2 diagonal', () 
   }
 })
 
-test('rule r6 rejects Bh5 when White screens the wall beyond Black’s next move symmetrically', () => {
+test('rule r6 allows Bh5 when Black is equidistant from the bishop and White king symmetrically', () => {
   const fen = '8/8/6B1/8/8/5K1k/3B4/8 w - - 0 1'
   for (const transform of SQUARE_TRANSFORMS) {
     const transformedFen = transformFen(fen, transform)
@@ -913,9 +937,9 @@ test('rule r6 rejects Bh5 when White screens the wall beyond Black’s next move
         candidate.to === transformSquare('h5', transform),
     )!.san
     const score = scoreTwoBishopsWhiteMove(transformedFen, move)
-    assert.equal(score.ruleR6DiagonalPenalty, 1, transform.name)
-    assert.equal(score.ruleR6SquarePenalty, 0, transform.name)
-    assert.equal(score.ruleR6KingPathDistance, 0, transform.name)
+    assert.equal(score.ruleR6DiagonalPenalty, 0, transform.name)
+    assert.equal(score.ruleR6SquarePenalty, 1, transform.name)
+    assert.equal(score.ruleR6KingPathDistance, 1, transform.name)
     chess.move(move)
     // Black cannot enter d1–h5 immediately, but Kf3 still screens that wall.
     assert.ok(chess.moves({ verbose: true }).every((reply) =>
@@ -996,7 +1020,7 @@ test('rule r6 prefers the bishop Phase 2 squares before king proximity', () => {
   }
 })
 
-test('rule r6 rejects an uncontrolled tail even when White king is one square from the edge', () => {
+test('rule r6 rejects an uncontrolled tail even when Black cannot immediately reach it', () => {
   const fen = '8/8/8/8/8/8/3BK1k1/3B4 w - - 2 2'
   for (const transform of SQUARE_TRANSFORMS) {
     const transformedFen = transformFen(fen, transform)
@@ -1137,7 +1161,7 @@ test('the second former stalemate start mates before the draw limit', () => {
   assert.ok(maximumMatePlies(fen, 100) <= 100)
 })
 
-test("rule r8 associates each Phase 2 king square with Black's actual corner", () => {
+test("rule r1 associates each Phase 2 king square with Black's actual corner", () => {
   const correctFen = '7k/5K2/8/8/8/8/B7/1B6 w - - 0 1'
   const wrongCornerFen = '7k/2K5/8/8/8/8/B7/1B6 w - - 0 1'
   for (const transform of SQUARE_TRANSFORMS) {
@@ -1161,13 +1185,13 @@ test("rule r8 associates each Phase 2 king square with Black's actual corner", (
     assert.ok(wrongMove, transform.name)
     assert.equal(
       scoreTwoBishopsWhiteMove(transformedCorrectFen, correctMove)
-        .ruleR8KingSquarePenalty,
+        .ruleR1KingSquarePenalty,
       0,
       transform.name,
     )
     assert.equal(
       scoreTwoBishopsWhiteMove(transformedWrongFen, wrongMove)
-        .ruleR8KingSquarePenalty,
+        .ruleR1KingSquarePenalty,
       1,
       transform.name,
     )
@@ -1225,7 +1249,7 @@ test('rule r10 recognizes a checking wall that forces Black inside', () => {
   assert.equal(score.ruleR10DiagonalCount, 6)
 })
 
-test('rule r10 rejects the crossed Bd8 wall and uses its other orientation symmetrically', () => {
+test('r9 accomplishes Ke5 opposition ahead of exempt Bh3 despite its better r10 target', () => {
   const fen = '8/2BB4/8/3K2k1/8/8/8/8 w - - 0 1'
   const rule = twoBishopsWhiteRules.find(({ id }) => id === 'rule r10')!
   for (const transform of SQUARE_TRANSFORMS) {
@@ -1240,36 +1264,53 @@ test('rule r10 rejects the crossed Bd8 wall and uses its other orientation symme
       )?.san
     assert.ok(move, transform.name)
     const score = scoreTwoBishopsWhiteMove(transformedFen, move)
-    assert.equal(score.ruleR10TargetPenalty, 1, transform.name)
+    assert.equal(score.ruleR10TargetPenalty, 0, transform.name)
     assert.equal(score.ruleR10DiagonalCount, 10, transform.name)
-    assert.deepEqual(score.ruleR10TargetSquares, [], transform.name)
-    const preferred = chess.moves({ verbose: true }).find(
+    assert.deepEqual(score.ruleR10TargetSquares, [transformSquare('d8', transform)], transform.name)
+    const closerTargetMove = chess.moves({ verbose: true }).find(
       (candidate) =>
         candidate.from === transformSquare('d5', transform) &&
         candidate.to === transformSquare('e4', transform),
     )?.san
-    assert.ok(preferred, transform.name)
+    assert.ok(closerTargetMove, transform.name)
     const screenedMove = chess.moves({ verbose: true }).find(
       (candidate) => candidate.from === transformSquare('d5', transform) &&
         candidate.to === transformSquare('e5', transform),
     )!.san
     const screened = scoreTwoBishopsWhiteMove(transformedFen, screenedMove)
-    const intact = scoreTwoBishopsWhiteMove(transformedFen, preferred)
-    // Ke5 screens the b8–h2 outer wall; only the ten-diagonal orientation remains.
-    assert.equal(screened.ruleR10DiagonalCount, 10, transform.name)
+    const intact = scoreTwoBishopsWhiteMove(transformedFen, closerTargetMove)
+    // Ke5 may screen the b8–h2 outer wall; it retains five diagonals.
+    assert.equal(screened.ruleR10DiagonalCount, 5, transform.name)
     assert.equal(intact.ruleR10DiagonalCount, 5, transform.name)
+    assert.equal(intact.ruleR10KingDistance, 1, transform.name)
+    assert.equal(screened.ruleR10KingDistance, 99, transform.name)
     assert.ok(compareScoresByRules(intact, screened, [rule]) < 0, transform.name)
+    assert.deepEqual(screened.ruleR10TargetSquares, [], transform.name)
+    assert.deepEqual(screened.ruleR9TargetSquares, [transformSquare('e5', transform)], transform.name)
+    assert.equal(screened.ruleR9Penalty, 0, transform.name)
+    assert.equal(intact.ruleR9Penalty, 1, transform.name)
+    assert.equal(twoBishopsWhiteRules.find((candidate) =>
+      compareScoresByRules(screened, intact, [candidate]) !== 0)?.id, 'rule r9', transform.name)
     const screenedPosition = getChess(transformedFen)
     screenedPosition.move(screenedMove)
     assert.equal(screenedPosition.isAttacked(transformSquare('h2', transform), 'w'),
       false, transform.name)
     const intactPosition = getChess(transformedFen)
-    intactPosition.move(preferred)
+    intactPosition.move(closerTargetMove)
     assert.equal(intactPosition.isAttacked(transformSquare('h2', transform), 'w'),
       true, transform.name)
+    const bishopMove = chess.moves({ verbose: true }).find(
+      (candidate) => candidate.from === transformSquare('d7', transform) &&
+        candidate.to === transformSquare('h3', transform),
+    )!.san
+    const bishopScore = scoreTwoBishopsWhiteMove(transformedFen, bishopMove)
+    assert.equal(bishopScore.ruleR9Applies, false, transform.name)
+    assert.equal(bishopScore.ruleR10DiagonalCount, 5, transform.name)
+    assert.deepEqual(bishopScore.ruleR10TargetSquares, [transformSquare('f4', transform)], transform.name)
+    assert.ok(compareScoresByRules(bishopScore, screened, [rule]) < 0, transform.name)
     assert.deepEqual(
       getIdealTwoBishopsWhiteMoves(transformedFen),
-      [preferred],
+      [screenedMove],
       transform.name,
     )
     chess.move(move)
@@ -1281,14 +1322,13 @@ test('rule r10 rejects the crossed Bd8 wall and uses its other orientation symme
   }
 })
 
-test('rule r10 rejects the Kh6 inner wall after Bd2 and uses the other orientation', () => {
+test('r10 preserves the screened Kd4 wall but prefers Kf4 toward an inside-wall target', () => {
   const fen = '8/8/8/7k/8/2B1K3/2B5/8 w - - 2 2'
-  const rule = twoBishopsWhiteRules.find(({ id }) => id === 'rule r10')!
   for (const transform of SQUARE_TRANSFORMS) {
     const transformedFen = transformFen(fen, transform)
     const chess = getChess(transformedFen)
     const moves = chess.moves({ verbose: true })
-    const move = (from: 'c2' | 'c3' | 'e3', to: 'd2' | 'd4' | 'e4') => moves.find(
+    const move = (from: 'c2' | 'c3' | 'e3', to: 'd2' | 'd4' | 'e4' | 'f4') => moves.find(
       (candidate) => candidate.from === transformSquare(from, transform) &&
         candidate.to === transformSquare(to, transform),
     )!.san
@@ -1298,12 +1338,19 @@ test('rule r10 rejects the Kh6 inner wall after Bd2 and uses the other orientati
     const intactMove = move('c2', 'e4')
     const intact = scoreTwoBishopsWhiteMove(transformedFen, intactMove)
     assert.equal(bishop.ruleR10DiagonalCount, 10, transform.name)
-    // Kd4 screens a1–h8, so it also falls back to the ten-diagonal orientation.
-    assert.equal(king.ruleR10DiagonalCount, 10, transform.name)
-    assert.equal(compareScoresByRules(king, bishop, [rule]), 0, transform.name)
+    // Kd4 may screen outer a1–h8 and has no unscreened closest target.
+    assert.equal(king.ruleR10DiagonalCount, 6, transform.name)
+    assert.deepEqual(king.ruleR10TargetSquares, [], transform.name)
+    assert.ok(compareScoresByRules(king, bishop, twoBishopsWhiteRules.filter(r => r.id === 'rule r8' || r.id === 'rule r10')) < 0, transform.name)
     assert.equal(intact.ruleR10DiagonalCount, 6, transform.name)
-    assert.ok(compareScoresByRules(intact, king, [rule]) < 0, transform.name)
-    assert.deepEqual(getIdealTwoBishopsWhiteMoves(transformedFen), [intactMove],
+    assert.ok(compareScoresByRules(king, intact, twoBishopsWhiteRules.filter(r => r.id === 'rule r8' || r.id === 'rule r10')) > 0, transform.name)
+    assert.ok(compareTwoBishopsWhiteScores(king, intact) > 0, transform.name)
+    const approachMove = move('e3', 'f4')
+    const approach = scoreTwoBishopsWhiteMove(transformedFen, approachMove)
+    assert.equal(approach.ruleR25KingDistance, 5, transform.name)
+    assert.equal(intact.ruleR25KingDistance, 13, transform.name)
+    assert.ok(compareTwoBishopsWhiteScores(king, approach) > 0, transform.name)
+    assert.deepEqual(getIdealTwoBishopsWhiteMoves(transformedFen), [approachMove],
       transform.name)
     const screenedPosition = getChess(transformedFen)
     screenedPosition.move(move('e3', 'd4'))
@@ -1315,9 +1362,8 @@ test('rule r10 rejects the Kh6 inner wall after Bd2 and uses the other orientati
   }
 })
 
-test('rule r10 requires an unreachable inner wall and prefers Kc3 over Ba5 symmetrically', () => {
+test('r10 requires an unreachable inner wall and permits the Kc5 outer screen symmetrically', () => {
   const fen = '8/8/BB6/8/1K6/8/8/3k4 w - - 0 1'
-  const r12 = twoBishopsWhiteRules.find(({ id }) => id === 'rule r12')!
   for (const transform of SQUARE_TRANSFORMS) {
     const transformedFen = transformFen(fen, transform)
     const chess = getChess(transformedFen)
@@ -1339,15 +1385,13 @@ test('rule r10 requires an unreachable inner wall and prefers Kc3 over Ba5 symme
       scoreTwoBishopsWhiteMove(transformedFen, king),
       scoreTwoBishopsWhiteMove(transformedFen, bishop),
     ) < 0, transform.name)
-    // Kc5 screens b6–g1, so this pair has no target or beyond-wall diagonal.
+    // Kc5 may screen outer b6–g1; the inner wall remains clear.
     const screenedMove = move('b4', 'c5')
     const screened = scoreTwoBishopsWhiteMove(transformedFen, screenedMove)
-    assert.equal(screened.ruleR10DiagonalCount, 99, transform.name)
+    assert.equal(screened.ruleR10DiagonalCount, 5, transform.name)
     assert.equal(screened.ruleR10TargetPenalty, 1, transform.name)
     assert.deepEqual(screened.ruleR10TargetSquares, [], transform.name)
     assert.equal(screened.ruleR10KingDistance, 99, transform.name)
-    assert.equal(screened.ruleR12KingDistance, 99, transform.name)
-    assert.equal(r12.applies?.(screened), false, transform.name)
     const screenedPosition = getChess(transformedFen)
     screenedPosition.move(screenedMove)
     assert.equal(screenedPosition.isAttacked(transformSquare('g1', transform), 'w'),
@@ -1355,11 +1399,11 @@ test('rule r10 requires an unreachable inner wall and prefers Kc3 over Ba5 symme
     const preferredMove = move('a6', 'c4')
     assert.equal(scoreTwoBishopsWhiteMove(transformedFen, preferredMove).ruleR10DiagonalCount,
       5, transform.name)
-    assert.deepEqual(getIdealTwoBishopsWhiteMoves(transformedFen), [preferredMove], transform.name)
+    assert.deepEqual(getIdealTwoBishopsWhiteMoves(transformedFen), [king], transform.name)
   }
 })
 
-test('rule r10 rejects enclosure credit when White screens the outer wall without an immediate escape', () => {
+test('rule r10 retains enclosure credit when White screens only the outer wall', () => {
   const fen = '8/8/8/8/5K2/8/3B4/3B3k w - - 0 1'
   const rule = twoBishopsWhiteRules.find(({ id }) => id === 'rule r10')!
   for (const transform of SQUARE_TRANSFORMS) {
@@ -1376,13 +1420,12 @@ test('rule r10 rejects enclosure credit when White screens the outer wall withou
     assert.ok(intactMove, transform.name)
     const screened = scoreTwoBishopsWhiteMove(transformedFen, screenedMove)
     const intact = scoreTwoBishopsWhiteMove(transformedFen, intactMove)
-    // The screened four-diagonal profile loses credit; the other orientation
-    // still encloses ten diagonals and has no target for this king position.
-    assert.equal(screened.ruleR10TargetPenalty, 1, transform.name)
+    // Outer screening alone does not change the four-diagonal enclosure.
+    assert.equal(screened.ruleR10TargetPenalty, 0, transform.name)
     assert.equal(intact.ruleR10TargetPenalty, 0, transform.name)
-    assert.equal(screened.ruleR10DiagonalCount, 10, transform.name)
+    assert.equal(screened.ruleR10DiagonalCount, 4, transform.name)
     assert.equal(intact.ruleR10DiagonalCount, 4, transform.name)
-    assert.ok(compareScoresByRules(intact, screened, [rule]) < 0, transform.name)
+    assert.equal(compareScoresByRules(intact, screened, [rule]), 0, transform.name)
   }
 })
 
@@ -1403,8 +1446,14 @@ test('rule r10 rejects Bf3 when Kc4 escapes to the smaller side symmetrically', 
     assert.equal(bishop.ruleR10DiagonalCount, 99, transform.name)
     assert.equal(king.ruleR10DiagonalCount, 8, transform.name)
     assert.ok(compareScoresByRules(king, bishop, [rule]) < 0, transform.name)
+    const diagonalKing = scoreTwoBishopsWhiteMove(transformedFen, move('c1', 'd2'))
+    assert.deepEqual(king.ruleR10TargetSquares, [transformSquare('c4', transform)], transform.name)
+    assert.deepEqual(diagonalKing.ruleR10TargetSquares, king.ruleR10TargetSquares, transform.name)
+    assert.equal(king.ruleR10KingDistance, 2, transform.name)
+    assert.equal(diagonalKing.ruleR10KingDistance, 2, transform.name)
+    assert.ok(compareScoresByRules(king, diagonalKing, [rule]) < 0, transform.name)
     assert.deepEqual(getIdealTwoBishopsWhiteMoves(transformedFen),
-      [move('c1', 'd2')], transform.name)
+      [move('c1', 'c2')], transform.name)
     chess.move(bishopMove)
     assert.ok(chess.moves({ verbose: true }).some(
       (reply) => reply.to === transformSquare('c4', transform)), transform.name)
@@ -1447,18 +1496,21 @@ test('rule r10 distinguishes a wall from a result with no wall', () => {
   }
 })
 
-test('rule r10 only penalizes the target corner edges outside its Phase 2 diagonals', () => {
+test('rule r10 scores only the outer bishop edge and has no Phase 2 exemption or distance requirement', () => {
+  const r10 = twoBishopsWhiteRules.find(({ id }) => id === 'rule r10')!
   assert.equal(
     scoreTwoBishopsWhiteMove('8/8/8/8/4K3/6k1/3B4/3B4 w - - 12 7', 'Kd4')
-      .ruleR10EdgePenalty,
+      .ruleR10OuterBishopPenalty,
     0,
   )
   const fen = 'K7/8/8/5B2/3B4/8/8/7k w - - 0 1'
   const interior = scoreTwoBishopsWhiteMove(fen, 'Bg6')
   const edge = scoreTwoBishopsWhiteMove(fen, 'Bb1')
-  assert.equal(interior.ruleR10EdgePenalty, 0)
-  assert.equal(edge.ruleR10EdgePenalty, 1)
-  assert.ok(compareTwoBishopsWhiteScores(interior, edge) < 0)
+  // Both moves relocate the inner bishop. Outer Bd4 stays off h1's edges,
+  // so r10 does not distinguish them.
+  assert.equal(interior.ruleR10OuterBishopPenalty, 0)
+  assert.equal(edge.ruleR10OuterBishopPenalty, 0)
+  assert.equal(compareScoresByRules(interior, edge, [r10]), 0)
 
   const phaseTwoInnerFen = '8/8/8/8/3K4/8/2BBk3/8 w - - 0 1'
   for (const transform of SQUARE_TRANSFORMS) {
@@ -1471,8 +1523,10 @@ test('rule r10 only penalizes the target corner edges outside its Phase 2 diagon
           candidate.to === transformSquare('h6', transform),
       )?.san
     assert.ok(move, transform.name)
+    // Outer Bc2 is off h1's edges even though it is only two king steps
+    // from Black on e2. Inner Bh6 does not affect the edge preference.
     assert.equal(
-      scoreTwoBishopsWhiteMove(transformedFen, move).ruleR10EdgePenalty,
+      scoreTwoBishopsWhiteMove(transformedFen, move).ruleR10OuterBishopPenalty,
       0,
       transform.name,
     )
@@ -1487,6 +1541,14 @@ test('rule r10 only penalizes the target corner edges outside its Phase 2 diagon
     {
       fen: '8/6BB/8/4K3/8/8/8/7k w - - 0 1',
       move: 'Kd5',
+      // Inner Bh7 is on h1's edge; outer Bg7 is distant and off that edge.
+      penalty: 0,
+    },
+    {
+      fen: '8/8/8/8/7k/4B3/4BK2/8 w - - 0 1',
+      move: 'Bc1',
+      // Outer Bc1 remains on its Phase 2 diagonal and five steps away,
+      // but h1's first-rank edge is no longer exempt.
       penalty: 1,
     },
   ] as const
@@ -1506,7 +1568,7 @@ test('rule r10 only penalizes the target corner edges outside its Phase 2 diagon
       assert.ok(transformedMove, transform.name)
       assert.equal(
         scoreTwoBishopsWhiteMove(transformedFen, transformedMove)
-          .ruleR10EdgePenalty,
+          .ruleR10OuterBishopPenalty,
         penalty,
         transform.name,
       )
@@ -1514,7 +1576,7 @@ test('rule r10 only penalizes the target corner edges outside its Phase 2 diagon
   }
 })
 
-test('rule r10 uses the intact resulting wall when a bishop move creates an outer screen', () => {
+test('rule r10 retains the smaller resulting wall when a bishop move creates an outer screen', () => {
   const fen = '8/8/8/8/4K3/6k1/3B4/3B4 w - - 0 1'
   const unchangedWall = scoreTwoBishopsWhiteMove(fen, 'Be3')
   const changedWall = scoreTwoBishopsWhiteMove(fen, 'Bc2')
@@ -1522,28 +1584,27 @@ test('rule r10 uses the intact resulting wall when a bishop move creates an oute
   assert.equal(unchangedWall.ruleR10DiagonalCount, 4)
   assert.deepEqual(unchangedWall.ruleR10TargetSquares, ['f4'])
   assert.equal(unchangedWall.ruleR10KingDistance, 1)
-  // Bc2 leaves the stationary king screening c2–h7. The alternate
-  // orientation remains intact, enclosing ten diagonals without a target.
-  assert.equal(changedWall.ruleR10TargetPenalty, 1)
-  assert.equal(changedWall.ruleR10DiagonalCount, 10)
-  assert.deepEqual(changedWall.ruleR10TargetSquares, [])
-  assert.equal(changedWall.ruleR10KingDistance, 99)
+  // Bc2 leaves the stationary king on outer c2–h7, retaining five diagonals.
+  assert.equal(changedWall.ruleR10TargetPenalty, 0)
+  assert.equal(changedWall.ruleR10DiagonalCount, 5)
+  assert.deepEqual(changedWall.ruleR10TargetSquares, ['e4'])
+  assert.equal(changedWall.ruleR10KingDistance, 1)
 })
 
-test('rule r10 has no target when the closest candidate holds a bishop', () => {
+test('rule r10 excludes an occupied sole candidate without invalidating the wall', () => {
   const fen = '8/8/8/8/4K3/6k1/3B4/3B4 w - - 0 1'
-  const blocked = scoreTwoBishopsWhiteMove(fen, 'Bf4+')
-  assert.equal(blocked.ruleR10TargetPenalty, 1)
-  assert.equal(blocked.ruleR10DiagonalCount, 4)
-  assert.deepEqual(blocked.ruleR10TargetSquares, [])
-  assert.equal(blocked.ruleR10KingDistance, 99)
+  const occupied = scoreTwoBishopsWhiteMove(fen, 'Bf4+')
+  assert.equal(occupied.ruleR10TargetPenalty, 1)
+  assert.equal(occupied.ruleR10DiagonalCount, 4)
+  assert.deepEqual(occupied.ruleR10TargetSquares, [])
+  assert.equal(occupied.ruleR10KingDistance, 99)
   assert.equal(
     scoreTwoBishopsWhiteMove(fen, 'Bg5').ruleR10TargetPenalty,
     0,
   )
 })
 
-test('rule r10 retains every equally closest outer-wall candidate and invalidates an occupied set', () => {
+test('rule r10 retains unoccupied peers when an equally closest candidate is occupied', () => {
   for (const occupied of [false, true]) {
     const fen = occupied
       ? '8/8/8/4K3/8/4Bk2/2B5/8 w - - 0 1'
@@ -1556,9 +1617,14 @@ test('rule r10 retains every equally closest outer-wall candidate and invalidate
           candidate.to === transformSquare('d1', transform),
       )!.san
       const score = scoreTwoBishopsWhiteMove(transformedFen, move)
-      assert.equal(score.ruleR10TargetPenalty, occupied ? 1 : 0, transform.name)
-      assert.deepEqual([...score.ruleR10TargetSquares].sort(), occupied ? [] :
-        (['e3', 'f4'] as const).map((square) => transformSquare(square, transform)).sort(),
+      assert.equal(score.ruleR10TargetPenalty, 0, transform.name)
+      assert.deepEqual([...score.ruleR10TargetSquares].sort(),
+        (occupied ? ['f4'] as const : ['e3', 'f4'] as const).map((square) => transformSquare(square, transform)).sort(),
+        transform.name)
+      assert.equal(score.ruleR10KingDistance, 1, transform.name)
+      const result = getChess(transformedFen)
+      result.move(move)
+      assert.equal(result.get(transformSquare('e3', transform))?.type === 'b', occupied,
         transform.name)
       for (const target of score.ruleR10TargetSquares) {
         assert.equal(kingDistance(transformSquare('f3', transform), target), 1)
@@ -1567,11 +1633,9 @@ test('rule r10 retains every equally closest outer-wall candidate and invalidate
   }
 })
 
-test('rule r10 drops targets for uncontrolled tails and keeps targets for a controlled tail', () => {
-  // Bg4 and Bd2 define only one wall orientation. Ke3 screens it centrally;
-  // Kg5 covers its only hidden square h6 and retains the wall's targets.
+test('rule r10 excludes screened targets even when the king controls them', () => {
+  // Bg4 and Bd2 define one orientation. Both outer screens are permitted.
   const fen = '8/8/8/8/5KB1/8/3B4/7k w - - 0 1'
-  const r12 = twoBishopsWhiteRules.find(({ id }) => id === 'rule r12')!
   for (const transform of SQUARE_TRANSFORMS) {
     const transformedFen = transformFen(fen, transform)
     for (const to of ['e3', 'g5'] as const) {
@@ -1581,35 +1645,29 @@ test('rule r10 drops targets for uncontrolled tails and keeps targets for a cont
       )?.san
       assert.ok(move, transform.name)
       const score = scoreTwoBishopsWhiteMove(transformedFen, move)
-      const screened = to === 'e3'
-      assert.equal(score.ruleR10TargetPenalty, screened ? 1 : 0, transform.name)
-      assert.equal(score.ruleR10DiagonalCount, screened ? 99 : 4, transform.name)
+      assert.equal(score.ruleR10TargetPenalty, 0, transform.name)
+      assert.equal(score.ruleR10DiagonalCount, 4, transform.name)
       assert.deepEqual([...score.ruleR10TargetSquares].sort(),
-        screened ? [] :
-          (['e3', 'f4'] as const).map((square) => transformSquare(square, transform)).sort(),
+        (to === 'e3' ? ['e3'] as const : ['e3', 'f4'] as const).map((square) => transformSquare(square, transform)).sort(),
         transform.name)
-      assert.equal(score.ruleR10KingDistance, screened ? 99 : 1, transform.name)
-      assert.equal(score.ruleR12KingDistance, screened ? 99 : 1, transform.name)
-      // R12 is inactive with no eligible wall or with a retained target.
-      assert.equal(r12.applies?.(score), false, transform.name)
+      assert.equal(score.ruleR10KingDistance, 1, transform.name)
     }
   }
 })
 
-test('rule r10 rejects a target when White is inside the wall', () => {
+test('rule r10 allows a target when White is inside the wall', () => {
   const score = scoreTwoBishopsWhiteMove(
     '8/8/8/8/5K2/7k/3BB3/8 w - - 0 1',
     'Kf3',
   )
-  assert.equal(score.ruleR10TargetPenalty, 1)
-  assert.deepEqual(score.ruleR10TargetSquares, [])
-  assert.equal(score.ruleR10KingDistance, 99)
+  assert.equal(score.ruleR10TargetPenalty, 0)
+  assert.deepEqual(score.ruleR10TargetSquares, ['f4', 'g5'])
+  assert.equal(score.ruleR10KingDistance, 1)
 })
 
-test('rule r10 keeps outside targets but rejects a centrally screened outer wall', () => {
+test('r9 prefers Kd6 opposition despite its screened r10 target candidates', () => {
   const fen = '8/8/5k2/3K4/1B6/1B6/8/8 w - - 0 1'
-  const rule = twoBishopsWhiteRules.find(({ id }) => id === 'rule r10')!
-  assert.deepEqual(getIdealTwoBishopsWhiteMoves(fen), ['Kc6'])
+  assert.deepEqual(getIdealTwoBishopsWhiteMoves(fen), ['Kd6'])
   for (const transform of SQUARE_TRANSFORMS) {
     const transformedFen = transformFen(fen, transform)
     const onTargetMove = getChess(transformedFen)
@@ -1621,10 +1679,9 @@ test('rule r10 keeps outside targets but rejects a centrally screened outer wall
       )?.san
     assert.ok(onTargetMove, transform.name)
     const onTarget = scoreTwoBishopsWhiteMove(transformedFen, onTargetMove)
-    // Kd6 screens a3–f8. Its eight-diagonal wall loses credit, so the
-    // a5–e1/a4–d1 orientation with ten diagonals supplies the selected score.
+    // Kd6 may screen outer a3–f8 and retains the eight-diagonal profile.
     assert.equal(onTarget.ruleR10TargetPenalty, 1, transform.name)
-    assert.equal(onTarget.ruleR10DiagonalCount, 10, transform.name)
+    assert.equal(onTarget.ruleR10DiagonalCount, 8, transform.name)
     assert.deepEqual(onTarget.ruleR10TargetSquares, [], transform.name)
     const screenedPosition = getChess(transformedFen)
     screenedPosition.move(onTargetMove)
@@ -1641,7 +1698,7 @@ test('rule r10 keeps outside targets but rejects a centrally screened outer wall
     const outside = scoreTwoBishopsWhiteMove(transformedFen, outsideMove)
     assert.equal(outside.ruleR10TargetPenalty, 0, transform.name)
     assert.equal(outside.ruleR10DiagonalCount, 8, transform.name)
-    assert.ok(compareScoresByRules(outside, onTarget, [rule]) < 0, transform.name)
+    assert.ok(compareScoresByRules(onTarget, outside, twoBishopsWhiteRules.filter(r => r.id === 'rule r8' || r.id === 'rule r10')) > 0, transform.name)
     const intactPosition = getChess(transformedFen)
     intactPosition.move(outsideMove)
     assert.equal(intactPosition.isAttacked(transformSquare('f8', transform), 'w'),
@@ -1653,13 +1710,21 @@ test('rule r10 keeps outside targets but rejects a centrally screened outer wall
         candidate.to === transformSquare('c3', transform),
       )!.san
     const narrower = scoreTwoBishopsWhiteMove(transformedFen, narrowerMove)
-    assert.equal(narrower.ruleR10TargetPenalty, 1, transform.name)
+    assert.equal(narrower.ruleR10TargetPenalty, 0, transform.name)
     assert.equal(narrower.ruleR10DiagonalCount, 10, transform.name)
-    assert.deepEqual(
-      getIdealTwoBishopsWhiteMoves(transformedFen),
-      [outsideMove],
-      transform.name,
-    )
+    const approachMove = getChess(transformedFen).moves({ verbose: true }).find(
+      (candidate) => candidate.from === transformSquare('d5', transform) &&
+        candidate.to === transformSquare('c4', transform),
+    )!.san
+    const approach = scoreTwoBishopsWhiteMove(transformedFen, approachMove)
+    // Both Kd6 on the screened outer wall and Kc6 outside it retain the
+    // wall. Kd6 screens every closest candidate, while Kc6 targets e7.
+    // R9 still prefers Kd6's opposition before r10 compares those targets.
+    assert.equal(onTarget.ruleR10KingDistance, 99, transform.name)
+    assert.equal(outside.ruleR10KingDistance, 2, transform.name)
+    assert.ok(compareScoresByRules(outside, approach, twoBishopsWhiteRules.filter(r => r.id === 'rule r8' || r.id === 'rule r10')) < 0, transform.name)
+    assert.deepEqual(getIdealTwoBishopsWhiteMoves(transformedFen), [onTargetMove],
+      transform.name)
     assert.deepEqual(
       [...outside.ruleR10TargetSquares].sort(),
       (['e7'] as const).map((square) => transformSquare(square, transform)).sort(),
@@ -1693,31 +1758,30 @@ test('rule r10 has no target without adjacent inner and outer walls', () => {
   assert.equal(score.ruleR10DiagonalCount, 99)
 })
 
-test('rule r10 orders fewer diagonals before White king steps even without a target', () => {
-  const rule = twoBishopsWhiteRules.find(({ id }) => id === 'rule r10')!
+test('r8 orders fewer diagonals before White king-step proximity with inside-wall targets', () => {
   const cases = [
     {
       fen: '8/8/8/8/4K3/6k1/3B4/3B4 w - - 0 1',
       preferred: 'Bf4+',
       rejected: 'Bc2',
-      preferredScore: [1, 4, 99],
-      // Ke4 screens Bc2's outer wall; its other orientation counts ten.
-      rejectedScore: [1, 10, 99],
+      preferredScore: [0, 4, 1],
+      // Ke4 may screen Bc2's outer wall, retaining five diagonals and a target.
+      rejectedScore: [0, 5, 1],
     },
     {
       fen: '8/8/8/8/4K3/6k1/3B4/3B4 w - - 0 1',
       preferred: 'Be3',
       rejected: 'Bc2',
       preferredScore: [0, 4, 1],
-      rejectedScore: [1, 10, 99],
+      rejectedScore: [0, 5, 1],
     },
     {
-      // With White on e5, both walls are intact. Four diagonals still beat
-      // five even though only the larger enclosure has a usable target.
-      fen: '8/8/8/4K3/8/6k1/3B4/3B4 w - - 0 1',
-      preferred: 'Bf4+',
+      // From d5, target f4 is two king steps away; the larger enclosure's
+      // e4 target is one king step away, but diagonal count takes precedence.
+      fen: '8/8/8/3K4/8/6k1/3B4/3B4 w - - 0 1',
+      preferred: 'Bg5',
       rejected: 'Bc2',
-      preferredScore: [1, 4, 99],
+      preferredScore: [0, 4, 2],
       rejectedScore: [0, 5, 1],
     },
     {
@@ -1726,6 +1790,15 @@ test('rule r10 orders fewer diagonals before White king steps even without a tar
       rejected: 'Kd5',
       preferredScore: [0, 4, 1],
       rejectedScore: [0, 4, 2],
+    },
+    {
+      // Kc2 keeps the smaller wall with target c5 despite White being inside.
+      // Ke2 screens that inner wall legally and ties at three king steps from c5.
+      fen: '8/8/8/8/1k6/3BB3/3K4/8 w - - 0 1',
+      preferred: 'Kc2',
+      rejected: 'Ke2',
+      preferredScore: [0, 5, 3],
+      rejectedScore: [0, 5, 3],
     },
   ] as const
   for (const { fen, preferred, rejected, preferredScore, rejectedScore } of cases) {
@@ -1741,14 +1814,15 @@ test('rule r10 orders fewer diagonals before White king steps even without a tar
       rejectedScore,
       rejected,
     )
-    assert.ok(compareScoresByRules(first, second, [rule]) < 0, preferred)
-    assert.ok(compareScoresByRules(second, first, [rule]) > 0, rejected)
+    const comparison = compareScoresByRules(first, second,
+      twoBishopsWhiteRules.filter(r => r.id === 'rule r8' || r.id === 'rule r10'))
+    if (preferred === 'Kc2') assert.equal(comparison, 0, preferred)
+    else assert.ok(comparison < 0, preferred)
   }
 })
 
-test('rule r12 approaches the h1 wall and is inactive when its outer diagonal is screened', () => {
+test('r10 prefers the smaller Bb3 wall over Ke6 reaching the outer wall', () => {
   const fen = '8/7k/8/5K2/8/8/BB6/8 w - - 0 1'
-  const rule = twoBishopsWhiteRules.find(({ id }) => id === 'rule r12')!
   for (const transform of SQUARE_TRANSFORMS) {
     const transformedFen = transformFen(fen, transform)
     const moves = getChess(transformedFen).moves({ verbose: true })
@@ -1758,61 +1832,54 @@ test('rule r12 approaches the h1 wall and is inactive when its outer diagonal is
     )!.san
     const bishop = scoreTwoBishopsWhiteMove(transformedFen, move('a2', 'b3'))
     const king = scoreTwoBishopsWhiteMove(transformedFen, move('f5', 'e6'))
-    assert.equal(bishop.ruleR10TargetPenalty, 1, transform.name)
+    assert.equal(bishop.ruleR10TargetPenalty, 0, transform.name)
     assert.equal(king.ruleR10TargetPenalty, 1, transform.name)
     assert.equal(bishop.ruleR10DiagonalCount, 7, transform.name)
-    assert.equal(king.ruleR10DiagonalCount, 99, transform.name)
-    assert.equal(bishop.ruleR12KingDistance, 2, transform.name)
-    assert.equal(king.ruleR12KingDistance, 99, transform.name)
+    assert.equal(king.ruleR10DiagonalCount, 8, transform.name)
     assert.deepEqual(king.ruleR10TargetSquares, [], transform.name)
-    assert.equal(rule.applies?.(bishop), true, transform.name)
-    assert.equal(rule.applies?.(king), false, transform.name)
-    assert.equal(compareScoresByRules(king, bishop, [rule]), 0, transform.name)
     assert.ok(compareTwoBishopsWhiteScores(bishop, king) < 0, transform.name)
     const result = getChess(transformedFen)
     result.move(move('f5', 'e6'))
     assert.ok(result.moves({ verbose: true }).some(
       (reply) => reply.to === transformSquare('g8', transform)), transform.name)
     assert.deepEqual(getIdealTwoBishopsWhiteMoves(transformedFen),
-      [move('b2', 'f6')], transform.name)
-
+      [move('a2', 'b3')], transform.name)
   }
 })
 
-test('rule r10 uses the remaining orientation when Ke4 permits a wall crossing', () => {
+test('rule r10 prefers the smaller Bc3 wall over the Kd3 king move', () => {
   const fen = '8/8/7k/8/8/4K3/2BB4/8 w - - 0 1'
-  const rule = twoBishopsWhiteRules.find(({ id }) => id === 'rule r12')!
   for (const transform of SQUARE_TRANSFORMS) {
     const transformedFen = transformFen(fen, transform)
     const moves = getChess(transformedFen).moves({ verbose: true })
-    const move = (from: 'e3' | 'd2', to: 'e4' | 'd4' | 'c3') => moves.find(
+    const move = (from: 'e3' | 'd2', to: 'e4' | 'd4' | 'c3' | 'd3') => moves.find(
       (candidate) => candidate.from === transformSquare(from, transform) &&
         candidate.to === transformSquare(to, transform),
     )!.san
     const king = scoreTwoBishopsWhiteMove(transformedFen, move('e3', 'e4'))
     const bishop = scoreTwoBishopsWhiteMove(transformedFen, move('d2', 'c3'))
-    assert.equal(king.ruleR12KingDistance, 3, transform.name)
-    assert.equal(bishop.ruleR12KingDistance, 2, transform.name)
     assert.equal(king.ruleR10DiagonalCount, 10, transform.name)
     assert.equal(bishop.ruleR10DiagonalCount, 6, transform.name)
-    assert.deepEqual(king.ruleR10TargetSquares, [], transform.name)
+    assert.deepEqual([...king.ruleR10TargetSquares].sort(), (['c2', 'd1'] as const).map((square) => transformSquare(square, transform)).sort(), transform.name)
     assert.ok(compareTwoBishopsWhiteScores(bishop, king) < 0, transform.name)
     const target = scoreTwoBishopsWhiteMove(transformedFen, move('e3', 'd4'))
-    assert.equal(rule.applies?.(target), true, transform.name)
+    assert.equal(target.ruleR10TargetPenalty, 0, transform.name)
     assert.equal(target.ruleR10DiagonalCount, 10, transform.name)
-    assert.deepEqual(target.ruleR10TargetSquares, [], transform.name)
+    assert.deepEqual([...target.ruleR10TargetSquares].sort(), (['c2', 'd1'] as const).map((square) => transformSquare(square, transform)).sort(), transform.name)
     const result = getChess(transformedFen)
     result.move(move('e3', 'e4'))
     assert.ok(result.moves({ verbose: true }).some(
       (reply) => reply.to === transformSquare('g7', transform)), transform.name)
-    assert.deepEqual(getIdealTwoBishopsWhiteMoves(transformedFen),
-      [move('d2', 'c3')], transform.name)
+    const approachMove = move('e3', 'd3')
+    const approach = scoreTwoBishopsWhiteMove(transformedFen, approachMove)
+    assert.ok(compareTwoBishopsWhiteScores(bishop, approach) < 0, transform.name)
+    assert.deepEqual(getIdealTwoBishopsWhiteMoves(transformedFen), [move('d2', 'c3')],
+      transform.name)
   }
 })
 
-test('rule r10 prefers intact Kd5 enclosure over Bg3 edge credit and either screened wall', () => {
+test('r10 permits unreachable inner and outer screens, and prefers Bg3 off the corner edge', () => {
   const fen = '8/6k1/3K4/8/8/7B/7B/8 w - - 0 1'
-  const r12 = twoBishopsWhiteRules.find(({ id }) => id === 'rule r12')!
   for (const transform of SQUARE_TRANSFORMS) {
     const transformedFen = transformFen(fen, transform)
     const moves = getChess(transformedFen).moves({ verbose: true })
@@ -1821,45 +1888,36 @@ test('rule r10 prefers intact Kd5 enclosure over Bg3 edge credit and either scre
         candidate.to === transformSquare(to, transform),
     )!.san
     const bishop = scoreTwoBishopsWhiteMove(transformedFen, move('h2', 'g3'))
-    assert.equal(bishop.ruleR10EdgePenalty, 0, transform.name)
-    assert.equal(bishop.ruleR10DiagonalCount, 99, transform.name)
-    assert.equal(bishop.ruleR12KingDistance, 99, transform.name)
-    assert.equal(r12.applies?.(bishop), false, transform.name)
+    assert.equal(bishop.ruleR10OuterBishopPenalty, 0, transform.name)
+    assert.equal(bishop.ruleR10DiagonalCount, 5, transform.name)
+    assert.deepEqual(bishop.ruleR10TargetSquares, [transformSquare('e5', transform)], transform.name)
     const clearKing = scoreTwoBishopsWhiteMove(transformedFen, move('d6', 'd5'))
     assert.equal(clearKing.ruleR10DiagonalCount, 5, transform.name)
     assert.deepEqual(clearKing.ruleR10TargetSquares, [transformSquare('e5', transform)],
       transform.name)
     assert.equal(clearKing.ruleR10KingDistance, 1, transform.name)
-    assert.ok(compareTwoBishopsWhiteScores(clearKing, bishop) < 0, transform.name)
+    assert.ok(compareTwoBishopsWhiteScores(bishop, clearKing) < 0, transform.name)
     for (const to of ['e5', 'e6'] as const) {
       const king = scoreTwoBishopsWhiteMove(transformedFen, move('d6', to))
-      assert.deepEqual(king.ruleR10TargetSquares, [], transform.name)
-      assert.equal(king.ruleR10TargetPenalty, 1, transform.name)
-      assert.equal(king.ruleR10KingDistance, 99, transform.name)
-      assert.equal(king.ruleR12KingDistance, 99, transform.name)
-      assert.equal(r12.applies?.(king), false, transform.name)
-      // Ke5 screens the outer wall and Ke6 the inner; either rejects the pair.
-      assert.equal(king.ruleR10DiagonalCount, 99, transform.name)
-      assert.equal(king.ruleR10EdgePenalty, 1, transform.name)
-      assert.ok(compareTwoBishopsWhiteScores(clearKing, king) < 0, transform.name)
+      assert.deepEqual(king.ruleR10TargetSquares,
+        [transformSquare('e5', transform)], transform.name)
+      assert.equal(king.ruleR10TargetPenalty, 0, transform.name)
+      assert.equal(king.ruleR10KingDistance, 1, transform.name)
+      // Both screens retain the pair because Black cannot enter the inner wall.
+      assert.equal(king.ruleR10DiagonalCount, 5, transform.name)
+      assert.equal(king.ruleR10OuterBishopPenalty, 1, transform.name)
+      assert.ok(compareTwoBishopsWhiteScores(bishop, king) < 0, transform.name)
     }
-    const best = move('d6', 'd5')
-    assert.equal(scoreTwoBishopsWhiteMove(transformedFen, best).ruleR10EdgePenalty, 1,
+    const best = move('h2', 'g3')
+    assert.equal(scoreTwoBishopsWhiteMove(transformedFen, best).ruleR10OuterBishopPenalty, 0,
       transform.name)
     assert.deepEqual(getIdealTwoBishopsWhiteMoves(transformedFen), [best], transform.name)
   }
 })
 
-test('rule r12 is inactive with a target or without an eligible outer wall', () => {
-  const rule = twoBishopsWhiteRules.find(({ id }) => id === 'rule r12')!
-  const withTarget = scoreTwoBishopsWhiteMove('3k4/8/8/4B3/5K2/7B/8/8 w - - 0 1', 'Ke4')
-  const noWall = scoreTwoBishopsWhiteMove('8/8/8/8/5K2/7k/3B1B2/8 w - - 0 1', 'Kf5')
-  assert.equal(rule.applies?.(withTarget), false)
-  assert.equal(rule.applies?.(noWall), false)
-})
-
-test('rule r19 requires the outer bishop to remain three king steps from Black', () => {
+test('rule r19 requires three king steps from Black when White is adjacent to the outer wall', () => {
   const fen = '8/8/8/3k4/8/8/3KBB2/8 w - - 2 2'
+  const r19 = twoBishopsWhiteRules.find(({ id }) => id === 'rule r19')!
   for (const transform of SQUARE_TRANSFORMS) {
     const transformedFen = transformFen(fen, transform)
     const qualifying = getChess(transformedFen)
@@ -1878,20 +1936,25 @@ test('rule r19 requires the outer bishop to remain three king steps from Black',
       )?.san
     assert.ok(qualifying, `qualifying ${transform.name}`)
     assert.ok(rejected, `rejected ${transform.name}`)
+    const qualifyingScore = scoreTwoBishopsWhiteMove(transformedFen, qualifying)
+    const rejectedScore = scoreTwoBishopsWhiteMove(transformedFen, rejected)
+    assert.equal(qualifyingScore.ruleR19Applies, true, transform.name)
+    assert.equal(rejectedScore.ruleR19Applies, true, transform.name)
     assert.equal(
-      scoreTwoBishopsWhiteMove(transformedFen, qualifying).ruleR19Penalty,
+      qualifyingScore.ruleR19Penalty,
       0,
       `qualifying ${transform.name}`,
     )
     assert.equal(
-      scoreTwoBishopsWhiteMove(transformedFen, rejected).ruleR19Penalty,
+      rejectedScore.ruleR19Penalty,
       1,
       `rejected ${transform.name}`,
     )
+    assert.ok(compareScoresByRules(qualifyingScore, rejectedScore, [r19]) < 0, transform.name)
   }
 })
 
-test('rule r18 plays Bf6 to choke the five-square inner wall symmetrically', () => {
+test('rule r18 selects the Bf6 choke after r10 ties the outer bishops off the corner edges', () => {
   const fen = '4B3/6K1/4k3/8/7B/8/8/8 w - - 0 1'
   const rule = twoBishopsWhiteRules.find(({ id }) => id === 'rule r18')!
   assert.equal(rule.helpText,
@@ -1903,11 +1966,16 @@ test('rule r18 plays Bf6 to choke the five-square inner wall symmetrically', () 
       (move) => move.from === transformSquare(from, transform) &&
         move.to === transformSquare(to, transform))!.san
     const choke = scoreTwoBishopsWhiteMove(transformedFen, san('h4', 'f6'))
-    const loop = scoreTwoBishopsWhiteMove(transformedFen, san('e8', 'h5'))
+    const outer = scoreTwoBishopsWhiteMove(transformedFen, san('e8', 'h5'))
     assert.equal(choke.ruleR18Applies, true, transform.name)
     assert.equal(choke.ruleR18Penalty, 0, transform.name)
-    assert.equal(loop.ruleR18Penalty, 1, transform.name)
-    assert.ok(compareScoresByRules(choke, loop, [rule]) < 0, transform.name)
+    assert.equal(outer.ruleR18Penalty, 1, transform.name)
+    assert.ok(compareScoresByRules(choke, outer, [rule]) < 0, transform.name)
+    assert.equal(choke.ruleR10DiagonalCount, 10, transform.name)
+    assert.equal(outer.ruleR10DiagonalCount, 10, transform.name)
+    assert.equal(choke.ruleR10OuterBishopPenalty, 0, transform.name)
+    assert.equal(outer.ruleR10OuterBishopPenalty, 0, transform.name)
+    assert.ok(compareTwoBishopsWhiteScores(choke, outer) < 0, transform.name)
     assert.deepEqual(getIdealTwoBishopsWhiteMoves(transformedFen), [san('h4', 'f6')], transform.name)
   }
 })
@@ -1942,109 +2010,6 @@ test('rule r18 credits retaining the inner bishop on the long diagonal symmetric
       assert.equal(score.ruleR18Applies, true, transform.name)
       assert.equal(score.ruleR18Penalty, penalty, transform.name)
     }
-  }
-})
-
-test('rule r22 chooses Be5 by straight-line distance and excludes a square closer to Black', () => {
-  const fen = '2k2K2/8/8/8/8/6B1/6B1/8 w - - 0 1'
-  const rule = twoBishopsWhiteRules.find(({ id }) => id === 'rule r22')!
-  assert.equal(rule.helpText,
-    "If the White king is inside Black's diagonals, place the inner bishop on the non-edge wall diagonal square closest to White's king but not closer to Black's king. Then, walk the king behind that bishop, allowing the outer bishop to move along its wall to make room.")
-  for (const transform of SQUARE_TRANSFORMS) {
-    const transformedFen = transformFen(fen, transform)
-    const chess = getChess(transformedFen)
-    const move = (from: 'g3' | 'f8', to: 'e5' | 'd6' | 'f4' | 'f7') =>
-      chess.moves({ verbose: true }).find(
-        (candidate) => candidate.from === transformSquare(from, transform) &&
-          candidate.to === transformSquare(to, transform),
-      )!.san
-    const preferred = move('g3', 'e5')
-    const score = scoreTwoBishopsWhiteMove(transformedFen, preferred)
-    assert.equal(score.ruleR22Applies, true, transform.name)
-    assert.equal(score.ruleR22BishopPenalty, 0, transform.name)
-    assert.deepEqual(getIdealTwoBishopsWhiteMoves(transformedFen), [preferred], transform.name)
-    for (const [from, to] of [['g3', 'd6'], ['g3', 'f4'], ['f8', 'f7']] as const) {
-      const other = scoreTwoBishopsWhiteMove(transformedFen, move(from, to))
-      assert.equal(other.ruleR22BishopPenalty, 1, transform.name)
-      assert.ok(compareScoresByRules(score, other, [rule]) < 0, transform.name)
-    }
-  }
-})
-
-test('rule r22 walks behind Be5 to f5 inside Black area and farther from Black', () => {
-  const fen = '8/4k3/8/4B3/5K2/8/6B1/8 w - - 0 1'
-  const rule = twoBishopsWhiteRules.find(({ id }) => id === 'rule r22')!
-  for (const transform of SQUARE_TRANSFORMS) {
-    const transformedFen = transformFen(fen, transform)
-    const chess = getChess(transformedFen)
-    const move = (to: 'f5' | 'e4' | 'g4') => chess.moves({ verbose: true }).find(
-      (candidate) => candidate.from === transformSquare('f4', transform) &&
-        candidate.to === transformSquare(to, transform),
-    )!.san
-    const score = scoreTwoBishopsWhiteMove(transformedFen, move('f5'))
-    assert.equal(score.ruleR22Applies, true, transform.name)
-    assert.equal(score.ruleR22BishopPenalty, 0, transform.name)
-    assert.equal(score.ruleR22KingDistance, 0, transform.name)
-    for (const to of ['e4', 'g4'] as const) {
-      const other = scoreTwoBishopsWhiteMove(transformedFen, move(to))
-      assert.equal(other.ruleR22KingDistance, 1, transform.name)
-      assert.ok(compareScoresByRules(score, other, [rule]) < 0, transform.name)
-    }
-  }
-})
-
-test('rule r22 allows the outer bishop to make room along its wall symmetrically', () => {
-  const fen = '8/8/8/8/8/3k4/BB6/1K6 w - - 2 2'
-  const r22 = twoBishopsWhiteRules.find(({ id }) => id === 'rule r22')!
-  for (const transform of SQUARE_TRANSFORMS) {
-    const transformedFen = transformFen(fen, transform)
-    const moves = getChess(transformedFen).moves({ verbose: true })
-    const san = (from: 'a2' | 'b1' | 'b2', to: 'f7' | 'g8' | 'c1' | 'c3') => moves.find(
-      (move) => move.from === transformSquare(from, transform) &&
-        move.to === transformSquare(to, transform))!.san
-    const room = scoreTwoBishopsWhiteMove(transformedFen, san('a2', 'f7'))
-    const retreat = scoreTwoBishopsWhiteMove(transformedFen, san('b1', 'c1'))
-    assert.equal(room.ruleR22Applies, true, transform.name)
-    assert.equal(room.ruleR22BishopPenalty, 0, transform.name)
-    assert.equal(room.ruleR22KingDistance, 0, transform.name)
-    assert.ok(compareScoresByRules(room, retreat, [r22]) < 0, transform.name)
-    assert.equal(scoreTwoBishopsWhiteMove(transformedFen, san('b2', 'c3')).ruleR22BishopPenalty,
-      1, transform.name)
-    // Bf7 and Bg8 both satisfy r22; the existing r30 distance preference chooses Bg8.
-    assert.equal(compareScoresByRules(room,
-      scoreTwoBishopsWhiteMove(transformedFen, san('a2', 'g8')), [r22]), 0, transform.name)
-    assert.deepEqual(getIdealTwoBishopsWhiteMoves(transformedFen), [san('a2', 'g8')], transform.name)
-    const continuation = getChess(transformedFen)
-    continuation.move(san('a2', 'f7'))
-    continuation.move({ from: transformSquare('d3', transform), to: transformSquare('e4', transform) })
-    const step = continuation.moves({ verbose: true }).find((move) =>
-      move.from === transformSquare('b1', transform) &&
-      move.to === transformSquare('a2', transform))!.san
-    assert.deepEqual(getIdealTwoBishopsWhiteMoves(continuation.fen()), [step], transform.name)
-  }
-})
-
-test('rule r22 does not give placement credit when the outer bishop leaves its wall', () => {
-  const fen = '8/8/8/8/4k3/8/BB6/2K5 w - - 0 1'
-  for (const transform of SQUARE_TRANSFORMS) {
-    const transformedFen = transformFen(fen, transform)
-    const move = getChess(transformedFen).moves({ verbose: true }).find(
-      (candidate) => candidate.from === transformSquare('a2', transform) &&
-        candidate.to === transformSquare('b1', transform))!.san
-    assert.equal(scoreTwoBishopsWhiteMove(transformedFen, move).ruleR22BishopPenalty,
-      1, transform.name)
-  }
-})
-
-test('rule r22 is inactive outside the smallest wall or without adjacent walls', () => {
-  for (const [fen, move] of [
-    ['2B5/2B5/5k2/8/1K6/8/8/8 w - - 0 1', 'Ka4'],
-    ['7k/8/8/8/8/2B2B2/8/K7 w - - 0 1', 'Ka2'],
-  ]) {
-    const score = scoreTwoBishopsWhiteMove(fen!, move!)
-    assert.equal(score.ruleR22Applies, false)
-    assert.equal(score.ruleR22BishopPenalty, 0)
-    assert.equal(score.ruleR22KingDistance, 0)
   }
 })
 
@@ -2148,9 +2113,10 @@ test('selection reports which retained rule filtered each move', () => {
 })
 
 
-test('rule r10 prefers Kd4 target proximity over Bd3 inner-wall distance symmetrically', () => {
+test('rule r10 retains the occupied target and prefers Bd3 by Euclidean proximity before r19', () => {
   const fen = '8/8/6B1/4K3/8/4B3/8/3k4 w - - 2 2'
   const r10 = twoBishopsWhiteRules.find(({ id }) => id === 'rule r10')!
+  const r19 = twoBishopsWhiteRules.find(({ id }) => id === 'rule r19')!
   assert.equal(r10.subpriorities?.length, 3)
   for (const transform of SQUARE_TRANSFORMS) {
     const transformedFen = transformFen(fen, transform)
@@ -2165,14 +2131,22 @@ test('rule r10 prefers Kd4 target proximity over Bd3 inner-wall distance symmetr
     assert.equal(bishop.ruleR10DiagonalCount, 5, transform.name)
     assert.deepEqual(king.ruleR10TargetSquares, [transformSquare('c2', transform)])
     assert.equal(king.ruleR10KingDistance, 2, transform.name)
-    assert.ok(king.ruleR10KingDistance < bishop.ruleR10KingDistance, transform.name)
-    assert.ok(compareScoresByRules(king, bishop, [r10]) < 0, transform.name)
+    assert.deepEqual([...bishop.ruleR10TargetSquares].sort(),
+      (['e3', 'f2'] as const).map((square) => transformSquare(square, transform)).sort(),
+      transform.name)
+    assert.equal(bishop.ruleR10KingDistance, 2, transform.name)
+    assert.equal(king.ruleR10OuterBishopPenalty, 0, transform.name)
+    assert.equal(bishop.ruleR10OuterBishopPenalty, 0, transform.name)
+    assert.ok(compareScoresByRules(bishop, king, [r10]) < 0, transform.name)
+    assert.equal(king.ruleR19Penalty, 0, transform.name)
+    assert.equal(bishop.ruleR19Penalty, 1, transform.name)
+    assert.ok(compareScoresByRules(king, bishop, [r19]) < 0, transform.name)
     assert.deepEqual(getIdealTwoBishopsWhiteMoves(transformedFen),
-      [san('e5', 'd4')], transform.name)
+      [san('g6', 'd3')], transform.name)
   }
 })
 
-test('rule r11 plays the flank step across both board halves under every symmetry', () => {
+test('rule r11 recognizes the flank step symmetrically and r10 selects Kc3 by target proximity', () => {
   const starts = [
     { fen: '8/8/8/2B5/k1BK4/8/8/8 w - - 0 1', from: 'd4', to: 'c3' },
     { fen: '8/8/8/3B4/1k1BK3/8/8/8 w - - 0 1', from: 'e4', to: 'd3' },
@@ -2194,6 +2168,27 @@ test('rule r11 plays the flank step across both board halves under every symmetr
         assert.ok(compareScoresByRules(score, other, [r11]) < 0, transform.name)
       }
       if (from === 'd4') {
+        const bishopMove = moves.find((move) =>
+          move.from === transformSquare('c4', transform) &&
+          move.to === transformSquare('f7', transform))!.san
+        const bishop = scoreTwoBishopsWhiteMove(transformedFen, bishopMove)
+        // Both moves retain five diagonals, target b3, and an off-edge
+        // outer bishop. Distance from that bishop to Black no longer
+        // matters in r10, so target proximity selects Kc3 over Bf7.
+        assert.equal(score.ruleR10DiagonalCount, 5, transform.name)
+        assert.equal(bishop.ruleR10DiagonalCount, 5, transform.name)
+        assert.deepEqual(score.ruleR10TargetSquares, [transformSquare('b3', transform)],
+          transform.name)
+        assert.deepEqual(bishop.ruleR10TargetSquares, score.ruleR10TargetSquares,
+          transform.name)
+        assert.equal(score.ruleR10KingDistance, 1, transform.name)
+        assert.equal(bishop.ruleR10KingDistance, 2, transform.name)
+        assert.equal(score.ruleR10OuterBishopPenalty, 0, transform.name)
+        assert.equal(bishop.ruleR10OuterBishopPenalty, 0, transform.name)
+        assert.equal(twoBishopsWhiteRules.find((rule) =>
+          compareScoresByRules(bishop, score, [rule]) !== 0)?.id,
+        'rule r10', transform.name)
+        assert.ok(compareTwoBishopsWhiteScores(score, bishop) < 0, transform.name)
         assert.deepEqual(getIdealTwoBishopsWhiteMoves(transformedFen), [flank], transform.name)
       }
     }
@@ -2222,7 +2217,7 @@ test('rule r11 stays inactive unless every flank-step condition holds', () => {
 })
 
 
-test('closest distant targets retain ties and an occupied tie invalidates the wall symmetrically', () => {
+test('closest distant targets exclude occupied candidates and restore them when vacated', () => {
   const fen = '8/4k3/8/3BB3/3K4/8/8/8 w - - 0 1'
   for (const transform of SQUARE_TRANSFORMS) {
     const transformedFen = transformFen(fen, transform)
@@ -2230,8 +2225,11 @@ test('closest distant targets retain ties and an occupied tie invalidates the wa
     const san = (from: 'd4' | 'd5', to: 'c5' | 'g2') => moves.find(
       (move) => move.from === transformSquare(from, transform) &&
         move.to === transformSquare(to, transform))!.san
-    const blocked = scoreTwoBishopsWhiteMove(transformedFen, san('d4', 'c5'))
-    assert.deepEqual(blocked.ruleR10TargetSquares, [], transform.name)
+    const occupied = scoreTwoBishopsWhiteMove(transformedFen, san('d4', 'c5'))
+    assert.deepEqual([...occupied.ruleR10TargetSquares].sort(),
+      (['c6'] as const).map((square) => transformSquare(square, transform)).sort(),
+      transform.name)
+    assert.equal(occupied.ruleR10KingDistance, 1, transform.name)
     const opened = scoreTwoBishopsWhiteMove(transformedFen, san('d5', 'g2'))
     assert.deepEqual([...opened.ruleR10TargetSquares].sort(),
       (['c6', 'd5'] as const).map((square) => transformSquare(square, transform)).sort(),
@@ -2246,10 +2244,9 @@ test('closest distant targets retain ties and an occupied tie invalidates the wa
 })
 
 
-test('rule r10 breaks the loaded Kd5 loop by clearing the outer screen symmetrically', () => {
+test('r10 retains screened outer-wall targets and puts bishop edge placement before Euclidean proximity', () => {
   const fen = '8/1k6/4K3/8/8/B7/B7/8 w - - 0 1'
   const r10 = twoBishopsWhiteRules.find(({ id }) => id === 'rule r10')!
-  const r12 = twoBishopsWhiteRules.find(({ id }) => id === 'rule r12')!
   for (const transform of SQUARE_TRANSFORMS) {
     const transformedFen = transformFen(fen, transform)
     const moves = getChess(transformedFen).moves({ verbose: true })
@@ -2258,34 +2255,34 @@ test('rule r10 breaks the loaded Kd5 loop by clearing the outer screen symmetric
         move.to === transformSquare(to, transform))!.san
     const bishop = scoreTwoBishopsWhiteMove(transformedFen, san('a2', 'b3'))
     const king = scoreTwoBishopsWhiteMove(transformedFen, san('e6', 'd5'))
-    assert.equal(bishop.ruleR10EdgePenalty, 0, transform.name)
-    assert.equal(king.ruleR10EdgePenalty, 1, transform.name)
+    assert.equal(bishop.ruleR10OuterBishopPenalty, 0, transform.name)
+    assert.equal(king.ruleR10OuterBishopPenalty, 1, transform.name)
     assert.equal(bishop.ruleR10DiagonalCount, king.ruleR10DiagonalCount, transform.name)
-    assert.equal(king.ruleR10DiagonalCount, 99, transform.name)
+    assert.equal(king.ruleR10DiagonalCount, 5, transform.name)
     for (const screened of [bishop, king]) {
-      assert.equal(screened.ruleR10TargetPenalty, 1, transform.name)
-      assert.deepEqual(screened.ruleR10TargetSquares, [], transform.name)
-      assert.equal(screened.ruleR10KingDistance, 99, transform.name)
-      assert.equal(screened.ruleR12KingDistance, 99, transform.name)
-      assert.equal(r12.applies?.(screened), false, transform.name)
+      assert.equal(screened.ruleR10TargetPenalty, 0, transform.name)
+      assert.deepEqual(screened.ruleR10TargetSquares,
+        [transformSquare('d5', transform)], transform.name)
     }
-    // The existing corner-edge subpriority still breaks this no-wall tie.
+    assert.equal(bishop.ruleR10KingDistance, 1, transform.name)
+    assert.equal(king.ruleR10KingDistance, 1, transform.name)
+    // The a2–g8 outer wall remains valid through either king screen. Bb3
+    // places its outer bishop off the edge before target proximity is compared.
     assert.ok(compareScoresByRules(bishop, king, [r10]) < 0, transform.name)
     const clearKing = scoreTwoBishopsWhiteMove(transformedFen, san('e6', 'e5'))
     assert.equal(clearKing.ruleR10DiagonalCount, 5, transform.name)
     assert.deepEqual(clearKing.ruleR10TargetSquares, [transformSquare('d5', transform)],
       transform.name)
     assert.equal(clearKing.ruleR10KingDistance, 1, transform.name)
-    assert.ok(compareScoresByRules(clearKing, bishop, [r10]) < 0, transform.name)
+    assert.ok(compareScoresByRules(bishop, clearKing, [r10]) < 0, transform.name)
     assert.deepEqual(getIdealTwoBishopsWhiteMoves(transformedFen),
-      [san('e6', 'e5')], transform.name)
+      [san('a2', 'b3')], transform.name)
   }
 })
 
 
-test('combined r10 prefers fewer diagonals before moving bishops off the edge symmetrically', () => {
+test('r8 prefers fewer diagonals before moving bishops off the edge symmetrically', () => {
   const fen = '8/4k3/6K1/8/8/8/BB6/8 w - - 2 2'
-  const r10 = twoBishopsWhiteRules.find(({ id }) => id === 'rule r10')!
   for (const transform of SQUARE_TRANSFORMS) {
     const transformedFen = transformFen(fen, transform)
     const moves = getChess(transformedFen).moves({ verbose: true })
@@ -2296,16 +2293,16 @@ test('combined r10 prefers fewer diagonals before moving bishops off the edge sy
     const interior = scoreTwoBishopsWhiteMove(transformedFen, san('a2', 'b3'))
     assert.equal(narrower.ruleR10DiagonalCount, 5, transform.name)
     assert.equal(interior.ruleR10DiagonalCount, 6, transform.name)
-    assert.equal(narrower.ruleR10EdgePenalty, 1, transform.name)
-    assert.equal(interior.ruleR10EdgePenalty, 0, transform.name)
-    assert.ok(compareScoresByRules(narrower, interior, [r10]) < 0, transform.name)
+    assert.equal(narrower.ruleR10OuterBishopPenalty, 1, transform.name)
+    assert.equal(interior.ruleR10OuterBishopPenalty, 0, transform.name)
+    assert.ok(compareScoresByRules(narrower, interior, twoBishopsWhiteRules.filter(r => r.id === 'rule r8' || r.id === 'rule r10')) < 0, transform.name)
     assert.deepEqual(getIdealTwoBishopsWhiteMoves(transformedFen),
       [san('b2', 'a3')], transform.name)
   }
 })
 
 
-test('r10 rejects an inner screen even when Black reaches its hidden tail only later', () => {
+test('r10 again counts the unreachable inner-screen wall in the former exemption', () => {
   const fen = '8/6B1/8/8/5K1k/8/2B5/8 w - - 2 2'
   const r10 = twoBishopsWhiteRules.find(({ id }) => id === 'rule r10')!
   for (const transform of SQUARE_TRANSFORMS) {
@@ -2317,11 +2314,11 @@ test('r10 rejects an inner screen even when Black reaches its hidden tail only l
     const bishopMove = move('g7', 'h6')
     const screened = scoreTwoBishopsWhiteMove(transformedFen, bishopMove)
     const unchanged = scoreTwoBishopsWhiteMove(transformedFen, move('c2', 'd3'))
-    assert.equal(screened.ruleR10DiagonalCount, 99, transform.name)
-    assert.deepEqual(screened.ruleR10TargetSquares, [], transform.name)
-    assert.equal(screened.ruleR12KingDistance, 99, transform.name)
+    assert.equal(screened.ruleR10DiagonalCount, 5, transform.name)
+    assert.deepEqual([...screened.ruleR10TargetSquares].sort(), (['f5', 'g6'] as const).map((square) => transformSquare(square, transform)).sort(), transform.name)
     assert.equal(unchanged.ruleR10DiagonalCount, 6, transform.name)
-    assert.ok(compareScoresByRules(unchanged, screened, [r10]) < 0, transform.name)
+    assert.equal(r10.applies, undefined)
+    assert.ok(compareScoresByRules(unchanged, screened, [r10]) > 0, transform.name)
     chess.move(bishopMove)
     assert.ok(!chess.moves({ verbose: true }).some(
       (reply) => reply.to === transformSquare('c1', transform)))
@@ -2337,7 +2334,7 @@ test('r10 rejects an inner screen even when Black reaches its hidden tail only l
   }
 })
 
-test('r10 retains a wall when White king controls its only hidden square', () => {
+test('r10 allows an inner screen when White controls its only hidden square', () => {
   const fen = '8/6B1/8/8/7k/8/2BK4/8 w - - 0 1'
   for (const transform of SQUARE_TRANSFORMS) {
     const transformedFen = transformFen(fen, transform)
@@ -2345,15 +2342,16 @@ test('r10 retains a wall when White king controls its only hidden square', () =>
     const move = chess.moves({ verbose: true }).find(
       (candidate) => candidate.from === transformSquare('g7', transform) &&
         candidate.to === transformSquare('h6', transform))!.san
-    assert.equal(scoreTwoBishopsWhiteMove(transformedFen, move).ruleR10DiagonalCount,
-      5, transform.name)
+    const score = scoreTwoBishopsWhiteMove(transformedFen, move)
+    assert.equal(score.ruleR10DiagonalCount, 5, transform.name)
+    assert.deepEqual([...score.ruleR10TargetSquares].sort(), (['f5', 'g6'] as const).map((square) => transformSquare(square, transform)).sort(), transform.name)
     chess.move(move)
-    // Kd2 guards c1, the only square hidden from Bh6.
+    // Kd2 guards the only hidden square c1, so Black cannot enter it.
     assert.ok(chess.isAttacked(transformSquare('c1', transform), 'w'))
   }
 })
 
-test('controlled tail preserves the r12 preference for Ke2 over Kc2 symmetrically', () => {
+test('r10 allows the guarded Ke2 inner screen and prefers Kc2 toward the inside-wall target', () => {
   const fen = '8/8/8/8/1k6/3BB3/3K4/8 w - - 0 1'
   for (const transform of SQUARE_TRANSFORMS) {
     const transformedFen = transformFen(fen, transform)
@@ -2363,15 +2361,43 @@ test('controlled tail preserves the r12 preference for Ke2 over Kc2 symmetricall
         move.to === transformSquare(to, transform))!.san
     const edgeKing = scoreTwoBishopsWhiteMove(transformedFen, san('e2'))
     const otherKing = scoreTwoBishopsWhiteMove(transformedFen, san('c2'))
+    // Ke2 hides f1 from Bd3 on the a6–f1 inner wall despite guarding f1.
+    // The original five-diagonal enclosure remains valid.
     assert.equal(edgeKing.ruleR10DiagonalCount, 5, transform.name)
     assert.equal(otherKing.ruleR10DiagonalCount, 5, transform.name)
-    assert.equal(edgeKing.ruleR12KingDistance, 1, transform.name)
-    assert.equal(otherKing.ruleR12KingDistance, 2, transform.name)
-    assert.deepEqual(getIdealTwoBishopsWhiteMoves(transformedFen), [san('e2')], transform.name)
+    assert.deepEqual(edgeKing.ruleR10TargetSquares, [transformSquare('c5', transform)],
+      transform.name)
+    assert.ok(compareTwoBishopsWhiteScores(otherKing, edgeKing) < 0, transform.name)
+    const bishopMove = moves.find(
+      (move) => move.from === transformSquare('d3', transform) &&
+        move.to === transformSquare('h7', transform))!.san
+    const bishop = scoreTwoBishopsWhiteMove(transformedFen, bishopMove)
+    assert.equal(bishop.ruleR10DiagonalCount, 8, transform.name)
+    assert.deepEqual(bishop.ruleR10TargetSquares, [transformSquare('d2', transform)],
+      transform.name)
+    assert.ok(compareTwoBishopsWhiteScores(bishop, edgeKing) > 0, transform.name)
+    assert.ok(compareTwoBishopsWhiteScores(otherKing, bishop) < 0, transform.name)
+    const retreatMove = moves.find(
+      (move) => move.from === transformSquare('d3', transform) &&
+        move.to === transformSquare('f1', transform))!.san
+    const retreat = scoreTwoBishopsWhiteMove(transformedFen, retreatMove)
+    assert.equal(retreat.ruleR10DiagonalCount, 5, transform.name)
+    assert.deepEqual(retreat.ruleR10TargetSquares, [transformSquare('c5', transform)], transform.name)
+    assert.deepEqual(otherKing.ruleR10TargetSquares, [transformSquare('c5', transform)], transform.name)
+    // Both retain outer a7–g1 and beyond diagonal a8–h1.
+    // Kd2 is five squared units from that diagonal; Kc2 is eight.
+    assert.equal(retreat.ruleR24_5KingDistance, 5, transform.name)
+    assert.equal(otherKing.ruleR24_5KingDistance, 8, transform.name)
+    assert.equal(bishop.ruleR24_5KingDistance, 1, transform.name)
+    assert.equal(twoBishopsWhiteRules.find((rule) =>
+      compareScoresByRules(retreat, otherKing, [rule]) !== 0)?.id,
+    'rule r10', transform.name)
+    assert.ok(compareTwoBishopsWhiteScores(retreat, otherKing) > 0, transform.name)
+    assert.deepEqual(getIdealTwoBishopsWhiteMoves(transformedFen), [san('c2')], transform.name)
   }
 })
 
-test('r10 rejects Bh5 and Ke4 wall screens and retains the Be3 wall symmetrically', () => {
+test('r10 allows the unreachable Bh5 inner screen and prefers its smaller wall', () => {
   const fen = '8/8/6B1/8/8/5K1k/3B4/8 w - - 0 1'
   const r10 = twoBishopsWhiteRules.find(({ id }) => id === 'rule r10')!
   for (const transform of SQUARE_TRANSFORMS) {
@@ -2382,20 +2408,22 @@ test('r10 rejects Bh5 and Ke4 wall screens and retains the Be3 wall symmetricall
         move.to === transformSquare(to, transform))!.san
     const king = scoreTwoBishopsWhiteMove(transformedFen, san('f3', 'e4'))
     const bishop = scoreTwoBishopsWhiteMove(transformedFen, san('g6', 'h5'))
-    assert.equal(bishop.ruleR10DiagonalCount, 99, transform.name)
-    assert.equal(king.ruleR10DiagonalCount, 99, transform.name)
-    assert.equal(bishop.ruleR10EdgePenalty, king.ruleR10EdgePenalty, transform.name)
-    assert.deepEqual(king.ruleR10TargetSquares, [], transform.name)
-    assert.equal(king.ruleR10KingDistance, 99, transform.name)
-    assert.deepEqual(bishop.ruleR10TargetSquares, [], transform.name)
-    assert.equal(king.ruleR12KingDistance, 99, transform.name)
-    assert.equal(bishop.ruleR12KingDistance, 99, transform.name)
-    assert.equal(compareScoresByRules(bishop, king, [r10]), 0, transform.name)
+    assert.equal(bishop.ruleR10DiagonalCount, 4, transform.name)
+    assert.equal(king.ruleR10DiagonalCount, 5, transform.name)
+    assert.equal(bishop.ruleR10OuterBishopPenalty, 0, transform.name)
+    assert.equal(king.ruleR10OuterBishopPenalty, 0, transform.name)
+    assert.deepEqual(king.ruleR10TargetSquares, [transformSquare('f5', transform)],
+      transform.name)
+    assert.equal(king.ruleR10KingDistance, 1, transform.name)
+    assert.deepEqual([...bishop.ruleR10TargetSquares].sort(), (['f4', 'g5'] as const).map((square) => transformSquare(square, transform)).sort(), transform.name)
+    assert.ok(compareScoresByRules(king, bishop, [r10]) > 0, transform.name)
     const intact = scoreTwoBishopsWhiteMove(transformedFen, san('d2', 'e3'))
     assert.equal(intact.ruleR10DiagonalCount, 5, transform.name)
-    assert.ok(compareScoresByRules(intact, bishop, [r10]) < 0, transform.name)
+    assert.ok(compareScoresByRules(intact, bishop, [r10]) > 0, transform.name)
+    assert.ok(compareScoresByRules(king, intact, [r10]) < 0, transform.name)
+    assert.ok(compareTwoBishopsWhiteScores(king, intact) < 0, transform.name)
     assert.deepEqual(getIdealTwoBishopsWhiteMoves(transformedFen),
-      [san('d2', 'e3')], transform.name)
+      [san('g6', 'h5')], transform.name)
   }
 })
 
@@ -2412,7 +2440,7 @@ test('r10 does not count a wall as screened when White occupies its endpoint', (
 })
 
 
-test('an outer-wall king covering its hidden tail qualifies a target when no farther than Black', () => {
+test('an outer-wall king qualifies a target when no farther than Black', () => {
   const cases = [
     { fen: '8/6B1/8/8/8/2K5/2B5/6k1 w - - 0 1', black: 'g1', target: 'd4', distance: 2, blackDistance: 3 },
     { fen: '8/6B1/8/8/8/2K5/2B4k/8 w - - 0 1', black: 'h2', target: 'e5', distance: 3, blackDistance: 3 },
@@ -2435,13 +2463,13 @@ test('an outer-wall king covering its hidden tail qualifies a target when no far
   }
 })
 
-test('central outer-wall screening removes targets even when White would be closer', () => {
+test('central outer-wall eligibility and target proximity use king steps', () => {
   const cases = [
-    { fen: '8/6B1/8/8/4K2k/8/2B5/8 w - - 0 1', from: 'e4', to: 'e5', distance: 1 },
-    { fen: '8/6B1/8/8/4K2k/8/2B5/8 w - - 0 1', from: 'e4', to: 'd4', distance: 2 },
-    { fen: '8/6B1/8/8/7k/3K4/2B5/8 w - - 0 1', from: 'd3', to: 'c3', distance: 3 },
+    { fen: '8/6B1/8/8/4K2k/8/2B5/8 w - - 0 1', from: 'e4', to: 'e5', distance: 1, proximity: 1 },
+    { fen: '8/6B1/8/8/4K2k/8/2B5/8 w - - 0 1', from: 'e4', to: 'd4', distance: 2, proximity: 2 },
+    { fen: '8/6B1/8/8/7k/3K4/2B5/8 w - - 0 1', from: 'd3', to: 'c3', distance: 3, proximity: 99 },
   ] as const
-  for (const { fen, from, to, distance } of cases) {
+  for (const { fen, from, to, distance, proximity } of cases) {
     for (const transform of SQUARE_TRANSFORMS) {
       const transformedFen = transformFen(fen, transform)
       const move = getChess(transformedFen).moves({ verbose: true }).find(
@@ -2451,36 +2479,45 @@ test('central outer-wall screening removes targets even when White would be clos
       assert.equal(kingDistance(transformSquare('h4', transform), target), 2)
       assert.equal(kingDistance(transformSquare(to, transform), target), distance)
       const score = scoreTwoBishopsWhiteMove(transformedFen, move)
-      assert.equal(score.ruleR10DiagonalCount, 99, `${transform.name}: ${to}`)
-      assert.deepEqual(score.ruleR10TargetSquares, [], `${transform.name}: ${to}`)
-      assert.equal(score.ruleR12KingDistance, 99, `${transform.name}: ${to}`)
+      assert.equal(score.ruleR10DiagonalCount, 6, `${transform.name}: ${to}`)
+      assert.deepEqual(score.ruleR10TargetSquares,
+        distance <= 2 ? [target] : [], `${transform.name}: ${to}`)
+      assert.equal(score.ruleR10KingDistance,
+        proximity, `${transform.name}: ${to}`)
+      const result = getChess(transformedFen)
+      result.move(move)
+      // The a1–h8 outer wall remains eligible even with uncontrolled a1 hidden.
+      assert.equal(result.isAttacked(transformSquare('a1', transform), 'w'), false,
+        `${transform.name}: ${to}`)
     }
   }
 })
 
-test('rule r10 rejects both Ke5 and Bh6 screens and prefers Be4 symmetrically', () => {
+test('r10 selects Bh6 in the former rotated exemption', () => {
   const fen = '8/6B1/8/8/5K1k/8/2B5/8 w - - 2 2'
   const r10 = twoBishopsWhiteRules.find(({ id }) => id === 'rule r10')!
   for (const transform of SQUARE_TRANSFORMS) {
     const transformedFen = transformFen(fen, transform)
     const moves = getChess(transformedFen).moves({ verbose: true })
-    const san = (from: 'c2' | 'f4' | 'g7', to: 'e4' | 'e5' | 'h6') => moves.find(
+    const san = (from: 'c2' | 'f4' | 'g7', to: 'e4' | 'e5' | 'h6' | 'a4') => moves.find(
       (move) => move.from === transformSquare(from, transform) &&
         move.to === transformSquare(to, transform))!.san
     const king = scoreTwoBishopsWhiteMove(transformedFen, san('f4', 'e5'))
     const bishop = scoreTwoBishopsWhiteMove(transformedFen, san('g7', 'h6'))
-    assert.deepEqual(king.ruleR10TargetSquares, [], transform.name)
-    assert.equal(king.ruleR10KingDistance, 99, transform.name)
-    assert.equal(king.ruleR10DiagonalCount, 99, transform.name)
-    assert.equal(bishop.ruleR10DiagonalCount, 99, transform.name)
-    assert.equal(king.ruleR12KingDistance, 99, transform.name)
-    assert.equal(bishop.ruleR12KingDistance, 99, transform.name)
-    assert.equal(compareScoresByRules(bishop, king, [r10]), 0, transform.name)
+    assert.deepEqual(king.ruleR10TargetSquares, [transformSquare('f6', transform)],
+      transform.name)
+    assert.equal(king.ruleR10KingDistance, 1, transform.name)
+    assert.equal(king.ruleR10DiagonalCount, 6, transform.name)
+    assert.equal(bishop.ruleR10DiagonalCount, 5, transform.name)
+    assert.ok(compareTwoBishopsWhiteScores(king, bishop) > 0, transform.name)
+    assert.equal(r10.applies, undefined)
+    assert.ok(compareScoresByRules(king, bishop, [r10]) > 0, transform.name)
     const intact = scoreTwoBishopsWhiteMove(transformedFen, san('c2', 'e4'))
     assert.equal(intact.ruleR10DiagonalCount, 6, transform.name)
-    assert.ok(compareScoresByRules(intact, king, [r10]) < 0, transform.name)
+    assert.ok(compareScoresByRules(king, intact, [r10]) < 0, transform.name)
+    assert.ok(compareTwoBishopsWhiteScores(king, intact) < 0, transform.name)
     assert.deepEqual(getIdealTwoBishopsWhiteMoves(transformedFen),
-      [san('c2', 'e4')], transform.name)
+      [san('g7', 'h6')], transform.name)
   }
 })
 
@@ -2505,7 +2542,7 @@ test('outer-wall eligibility compares White distance separately for tied target 
   }
 })
 
-test('equal target distance lets Kb4 win the later king-proximity preference symmetrically', () => {
+test('r9 selects Kb4 opposition despite losing its screened r10 target', () => {
   const fen = '5BB1/8/8/1K6/8/8/1k6/8 w - - 24 13'
   const r10 = twoBishopsWhiteRules.find(({ id }) => id === 'rule r10')!
   const r25 = twoBishopsWhiteRules.find(({ id }) => id === 'rule r25')!
@@ -2519,11 +2556,17 @@ test('equal target distance lets Kb4 win the later king-proximity preference sym
     const outside = scoreTwoBishopsWhiteMove(transformedFen, move('a4'))
     for (const score of [onWall, outside]) {
       assert.equal(score.ruleR10DiagonalCount, 8, transform.name)
-      assert.deepEqual(score.ruleR10TargetSquares, [transformSquare('a3', transform)])
-      assert.equal(score.ruleR10KingDistance, 1, transform.name)
+      assert.deepEqual(score.ruleR10TargetSquares, score === onWall ? [] : [transformSquare('a3', transform)])
     }
-    assert.equal(compareScoresByRules(onWall, outside, [r10]), 0, transform.name)
+    assert.equal(onWall.ruleR10KingDistance, 99, transform.name)
+    assert.equal(outside.ruleR10KingDistance, 1, transform.name)
+    assert.ok(compareScoresByRules(outside, onWall, [r10]) < 0, transform.name)
     assert.ok(compareScoresByRules(onWall, outside, [r25]) < 0, transform.name)
+    assert.deepEqual(onWall.ruleR9TargetSquares, [transformSquare('b4', transform)], transform.name)
+    assert.equal(onWall.ruleR9Penalty, 0, transform.name)
+    assert.equal(outside.ruleR9Penalty, 1, transform.name)
+    assert.equal(twoBishopsWhiteRules.find((rule) =>
+      compareScoresByRules(onWall, outside, [rule]) !== 0)?.id, 'rule r9', transform.name)
     assert.deepEqual(getIdealTwoBishopsWhiteMoves(transformedFen), [move('b4')], transform.name)
   }
 })

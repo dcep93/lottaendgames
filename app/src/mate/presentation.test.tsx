@@ -1365,15 +1365,90 @@ test('Two Bishops shows the target-square diagram before the Phase 2 note', () =
       ruleSet={ruleSet}
     />,
   )
-  const targetNoteAt = markup.indexOf('Target squares are the outer-wall squares closest')
+  const targetNoteAt = markup.indexOf('Target squares are the unscreened outer-wall squares closest')
   const targetDiagramAt = markup.indexOf('The outer wall is c1')
   const phaseNoteAt = markup.indexOf('Phase 2 is recognized')
   assert.ok(targetNoteAt >= 0)
+  assert.match(markup, /Find the closest candidates on the full outer wall first, then reject screened candidates/)
+  assert.match(markup, /If all are screened, there are no target squares; do not substitute farther squares/)
   assert.ok(targetNoteAt < targetDiagramAt)
   assert.ok(targetDiagramAt < phaseNoteAt)
   assert.equal(ruleSet.help.noteBoards[0]?.noteIndex, 0)
-  assert.equal(ruleSet.whiteRuleDescriptions.find(({ id }) => id === 'rule r12')?.helpText,
-    "Without a target square, prefer White’s king closer to the diagonal one beyond the outer wall.")
+  assert.equal(ruleSet.whiteRuleDescriptions.some(({ id }) => id === 'rule r12'), false)
+})
+
+test('Two Bishops shows the opposition r9 between r1 and r10', () => {
+  const markup = renderToStaticMarkup(
+    <MatePriorityGuideDialog {...MATE_TRAINING_INFO_PROPS} onClose={() => undefined} ruleSet={getMateRuleSet('two-bishops')} />,
+  )
+  assert.match(markup, />rule r1<[^]*>rule r8<[^]*>rule r9<[^]*>rule r10</)
+  assert.match(markup, /When the Black king is edge adjacent to the inner wall and the outer bishop is not on the target corner[^]*edge, prefer White[^]*king on the outer wall square in opposition to Black[^]*king and closer to both bishops/)
+  assert.match(markup, /R9 uses the resulting smallest valid bishop walls/)
+  assert.match(markup, /then bishops to have legal moves along their wall/)
+  assert.match(markup, /two mobile bishops beat one, which beats none/)
+  assert.match(markup, /Edge adjacent means sharing a square edge with the inner diagonal/)
+  assert.match(markup, /Opposition means two squares apart on the same rank or file/)
+  assert.match(markup, /Compare the candidate outer-wall opposition squares by Euclidean distance to each bishop/)
+  assert.match(markup, /A candidate must be strictly closer to each bishop than every other candidate/)
+  assert.match(markup, /Prefer occupying a chosen square; an accomplished r9 outweighs an exempt move/)
+  assert.match(markup, /does not compare the two kings[^]*distances to the bishops/)
+  assert.doesNotMatch(markup, /unless Black[^]*king is closer to the inner bishop than White[^]*king/)
+  assert.doesNotMatch(markup, /unless the inner wall bishop could be attacked/)
+  assert.doesNotMatch(markup, /Black already attacks its inner bishop or has a legal next move that attacks it/)
+  assert.doesNotMatch(markup, /inside the smallest bishop wall, prefer proximity to the outer wall/)
+  assert.doesNotMatch(markup, />rule r12</)
+  assert.match(markup, /Among equally small walls, prefer those where White[^]*king is outside or on the outer wall/)
+  assert.match(markup, /This preference never selects a larger wall/)
+})
+
+test('Two Bishops shows r10 outer-bishop conditions and its changed exceptions', () => {
+  const ruleSet = getMateRuleSet('two-bishops')
+  const markup = renderToStaticMarkup(
+    <MatePriorityGuideDialog {...MATE_TRAINING_INFO_PROPS} onClose={() => undefined} ruleSet={ruleSet} />,
+  )
+  assert.match(markup, /outer bishop off target corner[^]*edge, then White king/)
+  assert.match(markup, /regardless of its distance from Black/)
+  assert.match(markup, /The inner bishop is excluded, and Phase 2 diagonals give no edge exemption/)
+  assert.match(markup, /White king[^]*step proximity to the target square/)
+  assert.match(markup, /target proximity uses king-step distance with a minimum score of one/)
+  assert.match(markup, /occupying a target ties both orthogonally and diagonally adjacent squares/)
+  assert.match(markup, /Target selection and eligibility also use king-step distance/)
+  assert.match(markup, /Its Phase 2 diagonal gives no exemption. Bg5 moves it off that edge/)
+  assert.match(markup, /even though it is only two king steps from Black/)
+  assert.doesNotMatch(markup, /except the Phase 2 diagonals/)
+  const diagram = ruleSet.help.noteBoards.find(({ id }) => id === 'two-bishops-rule-r10-edge')!
+  assert.deepEqual(diagram.arrows, [{ from: 'h6', to: 'g5' }])
+  assert.deepEqual(diagram.pieces, [
+    { square: 'e5', piece: 'K' }, { square: 'g3', piece: 'k' },
+    { square: 'h6', piece: 'B' }, { square: 'd1', piece: 'B' },
+  ])
+})
+
+test('Two Bishops explains the r19 outer-diagonal proximity condition', () => {
+  const markup = renderToStaticMarkup(
+    <MatePriorityGuideDialog {...MATE_TRAINING_INFO_PROPS} onClose={() => undefined} ruleSet={getMateRuleSet('two-bishops')} />,
+  )
+  assert.match(markup, /If the white King is on or adjacent to the outer diagonal, prefer the outer bishop at least 3 steps away from Black[^]*king/)
+  assert.match(markup, /R19 measures the position after White[^]*move/)
+  assert.match(markup, /on or within one king step of the outer diagonal of a selected smallest bishop wall, including diagonal adjacency/)
+  assert.match(markup, /The outer bishop must be at least three king steps from Black[^]*king on that same wall/)
+  assert.match(markup, /When White is farther from every selected outer diagonal, r19 gives no preference/)
+})
+
+test('Two Bishops shows r24.5 after the king moat rule and before king proximity', () => {
+  const markup = renderToStaticMarkup(
+    <MatePriorityGuideDialog {...MATE_TRAINING_INFO_PROPS} onClose={() => undefined} ruleSet={getMateRuleSet('two-bishops')} />,
+  )
+  assert.match(markup, />rule r19<[^]*>rule r24<[^]*>rule r24\.5<[^]*>rule r25</)
+  assert.doesNotMatch(markup, />rule r22</)
+  assert.match(markup, /prefer a bishop inside a king moat/)
+  assert.match(markup, /two king steps apart/)
+  assert.match(markup, /Prefer the White king closer to the diagonal one beyond the outer wall/)
+  assert.match(markup, /R24\.5 measures White[^]*Euclidean distance to the nearest on-board square of the parallel diagonal one beyond the resulting outer wall/)
+  assert.match(markup, /among profiles tied by r8 and r10, it takes the nearest of these beyond-wall diagonals/)
+  assert.match(markup, /Being on the beyond-wall diagonal scores zero/)
+  assert.match(markup, /may screen the outer wall[^]*An inner-wall screen is allowed when Black has no legal move onto a screened inner-wall square/)
+  assert.match(markup, /This applies to r8 and r10; distant screened squares need not all be controlled/)
 })
 
 test('Two Bishops shows the r18 choke diagram with its wall and move arrow', () => {
@@ -1392,6 +1467,29 @@ test('Two Bishops shows the r18 choke diagram with its wall and move arrow', () 
   assert.deepEqual(diagram.pieces, [
     { square: 'g7', piece: 'K' }, { square: 'e6', piece: 'k' },
     { square: 'e8', piece: 'B' }, { square: 'h4', piece: 'B' },
+  ])
+})
+
+test('Two Bishops shows the r9 opposition diagram and removes the r18.5 construction', () => {
+  const ruleSet = getMateRuleSet('two-bishops')
+  const markup = renderToStaticMarkup(
+    <MatePriorityGuideDialog {...MATE_TRAINING_INFO_PROPS} onClose={() => undefined} ruleSet={ruleSet} />,
+  )
+  assert.doesNotMatch(markup, />rule r18\.5</)
+  assert.doesNotMatch(markup, /reduce diagonals to the target corner by at least 3/)
+  assert.equal(ruleSet.help.noteBoards.some(({ id }) => id === 'two-bishops-rule-r18-5-new-wall'), false)
+  assert.match(markup, /Black on g2 is edge adjacent to inner wall b8–h2/)
+  assert.match(markup, /Kg4 reaches outer wall c8–h3 in direct opposition to Black/)
+  assert.match(markup, /The other opposition point in this direction is off the board, so g4 is the nearest available opposition square to both bishops/)
+  const diagram = ruleSet.help.noteBoards.find(({ id }) => id === 'two-bishops-rule-r9-opposition')!
+  assert.deepEqual(diagram.arrows, [{ from: 'g5', to: 'g4' }])
+  assert.deepEqual(diagram.highlights.filter(({ kind }) => kind === 'zone')
+    .map(({ square }) => square), ['b8', 'c7', 'd6', 'e5', 'f4', 'g3', 'h2'])
+  assert.deepEqual(diagram.highlights.filter(({ kind }) => kind === 'wall' || kind === 'key')
+    .map(({ square }) => square), ['c8', 'd7', 'e6', 'f5', 'g4', 'h3'])
+  assert.deepEqual(diagram.pieces, [
+    { square: 'g5', piece: 'K' }, { square: 'g2', piece: 'k' },
+    { square: 'b8', piece: 'B' }, { square: 'c8', piece: 'B' },
   ])
 })
 
@@ -1423,7 +1521,7 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
   assert.doesNotMatch(bishopsMarkup, /mate progress|forced mate|proof distance/)
   assert.match(
     bishopsMarkup,
-    />rule r4<[^]*>rule r6<[^]*>rule r9<[^]*>rule r10<[^]*>rule r12<[^]*>rule r17<[^]*>rule r20<[^]*>rule r25</,
+    />rule r4<[^]*>rule r6<[^]*>rule r8<[^]*>rule r9<[^]*>rule r10<[^]*>rule r11<[^]*>rule r18<[^]*>rule r19<[^]*>rule r24<[^]*>rule r24\.5<[^]*>rule r25</,
   )
   assert.doesNotMatch(bishopsMarkup, />rule [a-y]</)
   const queenMarkup = renderToStaticMarkup(
@@ -3359,3 +3457,19 @@ function MateBoardProbe(props: React.ComponentProps<typeof MateBoard>) {
     />
   )
 }
+
+test('Two Bishops restores the r5.5 force-corner rule and diagram', () => {
+  const ruleSet = getMateRuleSet('two-bishops')
+  const board = ruleSet.help.noteBoards.find(({ id }) => id === 'two-bishops-rule-r5-5-force-corner')!
+  assert.ok(board)
+  assert.equal(board.noteIndex, 9)
+  assert.deepEqual(board.pieces, [
+    { square: 'f6', piece: 'K' }, { square: 'h6', piece: 'k' },
+    { square: 'c8', piece: 'B' }, { square: 'g3', piece: 'B' },
+  ])
+  assert.deepEqual(board.arrows, [{ from: 'c8', to: 'g4' }, { from: 'h6', to: 'h7' }])
+  const markup = renderToStaticMarkup(<MatePriorityGuideDialog {...MATE_TRAINING_INFO_PROPS} onClose={() => undefined} ruleSet={ruleSet} />)
+  assert.match(markup, />rule r5<[^]*>rule r5\.5<[^]*>rule r6</)
+  assert.match(markup, /R5\.5 checks starting edge opposition/)
+  assert.match(markup, /rule r5\.5 — Force Black toward the corner/)
+})

@@ -46,24 +46,35 @@ export type TwoBishopsWhiteMoveScore = {
   readonly ruleR6KingAreaPenalty: number
   readonly ruleR6KingPathDistance: number
   readonly ruleR6KingDistance: number
+  readonly ruleR7Penalty: number
   readonly ruleR3CornerPenalty: number
   readonly ruleR3AdjacentBishopPenalty: number
   readonly ruleR3BishopCornerPenalty: number
-  readonly ruleR8KingSquarePenalty: number
-  readonly ruleR10EdgePenalty: number
+  readonly ruleR1KingSquarePenalty: number
+  readonly ruleR9Applies: boolean
+  readonly ruleR9Penalty: number
+  readonly ruleR9TargetSquares: readonly Square[]
+  readonly ruleR5_5Applies: boolean
+  readonly ruleR5_5Penalty: number
+  readonly ruleR5_5TargetCorners: readonly Square[]
+  readonly ruleR5_5InnerBishops: readonly Square[]
+  readonly ruleR10OuterBishopPenalty: number
   readonly ruleR10TargetPenalty: number
   readonly ruleR10DiagonalCount: number
   readonly ruleR10TargetSquares: readonly Square[]
+  // King-step distance, floored at one; 99 means no eligible target.
   readonly ruleR10KingDistance: number
+  readonly ruleR10ImmobileBishops: number
   readonly ruleR11Applies: boolean
   readonly ruleR11Penalty: number
-  readonly ruleR12KingDistance: number
   readonly ruleR18Applies: boolean
   readonly ruleR18Penalty: number
+  readonly ruleR19Applies: boolean
   readonly ruleR19Penalty: number
-  readonly ruleR22Applies: boolean
-  readonly ruleR22BishopPenalty: number
-  readonly ruleR22KingDistance: number
+  readonly ruleR24Applies: boolean
+  readonly ruleR24Penalty: number
+  // Squared Euclidean distance to the diagonal beyond the outer wall; 99 means none.
+  readonly ruleR24_5KingDistance: number
   readonly ruleR25KingDistance: number
   readonly ruleR30NearerBishopDistance: number
   readonly ruleR30FartherBishopDistance: number
@@ -140,7 +151,7 @@ const TARGET_SQUARE_NOTE_BOARD = {
   title: 'Target square',
   noteIndex: 0,
   caption:
-    "The outer wall is c1–h6. The target f4 is its closest square to Black's king by king-step distance. If a bishop occupies f4, this wall has no target square.",
+    "The outer wall is c1–h6. The target f4 is its closest unscreened square to Black's king by king-step distance, whether or not a bishop occupies it.",
   pieces: [
     { square: 'e4', piece: 'K' },
     { square: 'g3', piece: 'k' },
@@ -160,21 +171,71 @@ const TARGET_SQUARE_NOTE_BOARD = {
   ],
 } as const
 
+const RULE_R5_5_FORCE_CORNER_NOTE_BOARD = {
+  id: 'two-bishops-rule-r5-5-force-corner',
+  title: 'rule r5.5 — Force Black toward the corner',
+  noteIndex: 9,
+  caption: 'Black on h6 is in opposition to White on f6. The inner bishop moves from c8 to g4, leaving only Kh7, closer to target corner h8. Bh4 also allows Kh5, so it does not force progress.',
+  pieces: [
+    { square: 'f6', piece: 'K' },
+    { square: 'h6', piece: 'k' },
+    { square: 'c8', piece: 'B' },
+    { square: 'g3', piece: 'B' },
+  ],
+  highlights: [
+    { square: 'g4', kind: 'key' },
+    { square: 'h7', kind: 'pink' },
+    { square: 'h8', kind: 'key' },
+  ],
+  arrows: [{ from: 'c8', to: 'g4' }, { from: 'h6', to: 'h7' }],
+} as const
+
+const RULE_R9_OPPOSITION_NOTE_BOARD = {
+  id: 'two-bishops-rule-r9-opposition',
+  title: 'rule r9 — Take opposition on the outer wall',
+  caption:
+    "Black on g2 is edge adjacent to inner wall b8–h2. Kg4 reaches outer wall c8–h3 in direct opposition to Black. The other opposition point in this direction is off the board, so g4 is the nearest available opposition square to both bishops.",
+  pieces: [
+    { square: 'g5', piece: 'K' },
+    { square: 'g2', piece: 'k' },
+    { square: 'b8', piece: 'B' },
+    { square: 'c8', piece: 'B' },
+  ],
+  highlights: [
+    { square: 'b8', kind: 'zone' },
+    { square: 'c7', kind: 'zone' },
+    { square: 'd6', kind: 'zone' },
+    { square: 'e5', kind: 'zone' },
+    { square: 'f4', kind: 'zone' },
+    { square: 'g3', kind: 'zone' },
+    { square: 'h2', kind: 'zone' },
+    { square: 'c8', kind: 'wall' },
+    { square: 'd7', kind: 'wall' },
+    { square: 'e6', kind: 'wall' },
+    { square: 'f5', kind: 'wall' },
+    { square: 'g4', kind: 'key' },
+    { square: 'h3', kind: 'wall' },
+  ],
+  arrows: [{ from: 'g5', to: 'g4' }],
+} as const
+
 const RULE_R10_EDGE_NOTE_BOARD = {
   id: 'two-bishops-rule-r10-edge',
   title: 'rule r10',
   caption:
-    'With h1 as the target corner, the bishop on d1 may remain on the edge because it lies on the outer Phase 2 diagonal d1–h5.',
+    'With h1 as the target corner, the outer bishop on h6 is on a target-corner edge. Its Phase 2 diagonal gives no exemption. Bg5 moves it off that edge and receives r10 credit even though it is only two king steps from Black. The inner bishop on d1 is not part of this preference.',
   pieces: [
-    { square: 'e4', piece: 'K' },
+    { square: 'e5', piece: 'K' },
     { square: 'g3', piece: 'k' },
-    { square: 'd2', piece: 'B' },
+    { square: 'h6', piece: 'B' },
     { square: 'd1', piece: 'B' },
   ],
   highlights: [
     { square: 'h1', kind: 'pink' },
-    { square: 'd1', kind: 'key' },
+    { square: 'h6', kind: 'key' },
+    { square: 'g5', kind: 'zone' },
   ],
+  arrows: [{ from: 'h6', to: 'g5' }],
 } as const
 
 const RULE_R18_CHOKE_NOTE_BOARD = {
@@ -262,11 +323,19 @@ const twoBishopsHelp: RuleHelp = {
     'Move toward an unprotected bishop.',
   ],
   notes: [
-    "Target squares are the outer-wall squares closest to Black's king by king-step distance. All equally closest squares are candidates. If any candidate is occupied by a bishop, that wall has no target. White's king must be outside the wall, or on the outer wall and no farther from the target than Black's king by king-step distance.",
+    "Target squares are the unscreened outer-wall squares closest to Black's king by king-step distance. All equally closest squares are candidates, but a square occupied by a bishop cannot be a target. Reject only the occupied candidates; equally close unoccupied candidates remain eligible. If none remain, there is no target; do not substitute farther squares. White's king may be inside or outside the wall. If on the outer wall, it must be no farther from the target than Black's king by king-step distance.",
     'Phase 2 is recognized when rule r4 matches an established mating-pattern geometry: either the exact Phase 2 template or a bishop move that forces Black from the edge into its associated corner, under rotation or reflection.',
-    "A bishop wall remains valid only if White controls every square screened from its bishop by White's king. If any screened square is uncontrolled, that wall is invalid. Without a valid wall pair, r10 and r12 have no target square or one-beyond-wall diagonal.",
+    "White's king may screen the outer wall, but squares beyond the king away from the outer bishop cannot be targets, even if White controls them. The king's own square remains unscreened. Find the closest candidates on the full outer wall first, then reject screened candidates. If all are screened, there are no target squares; do not substitute farther squares. An inner-wall screen is allowed when Black has no legal move onto a screened inner-wall square. This applies to r8 and r10; distant screened squares need not all be controlled. R6 requires both Phase 2 diagonals to be unscreened. White's king does not count as a screen for a bishop when Black is no farther from that bishop than from White's king by Euclidean distance after White moves. Equal distances qualify for this exception; controlled or unreachable hidden squares alone give no exemption. A king at the end of a diagonal screens nothing beyond it. Black must still be unable to step onto the inner wall. A reply crossing beyond both walls is allowed only if its resulting side has strictly fewer diagonals than Black’s original side; an equal or larger escape area invalidates the wall. For an allowed crossing, r8 uses the largest count among legal replies, not the union of both sides. A reachable outer diagonal counts in addition to the original side. R24 recognizes geometric bishop walls even when Black can enter them; it does not require r8/r10’s inner-wall reachability check.",
+    "For all rules, choose the smallest bishop walls first. Among equally small walls, prefer those where White's king is outside or on the outer wall. If White is inside all tied walls, retain them all. This preference never selects a larger wall.",
+    "R8 first prefers fewer diagonals for Black, ahead of r9 opposition. R10 then prefers the outer bishop off the two edges meeting at the target corner, regardless of its distance from Black. The inner bishop is excluded, and Phase 2 diagonals give no edge exemption. White's target proximity uses king-step distance with a minimum score of one: occupying a target ties both orthogonally and diagonally adjacent squares. Target selection and eligibility also use king-step distance. Finally, prefer fewer bishops with no legal move along their own wall diagonal after White moves: two mobile bishops beat one, which beats none. A single legal move is enough; additional destinations give no extra credit. This measures chess legality, not whether Black could capture the bishop afterward, and does not look ahead to Black’s reply. R8 and r10 use the same smallest valid wall; among equally small walls, select the best remaining r10 preferences.",
+    'When the kings are two king steps apart, a king moat is the rank or file halfway between them on an axis where they are two squares apart. If both axes qualify, either moat can contain the bishop. Rule r24 first prefers a resulting geometric bishop wall, including a non-confining wall; otherwise it prefers at least one bishop in the starting king moat. A wall beats a moat bishop, which beats neither. Compare every move, including moves with neither a wall nor a starting moat. The starting moat stays fixed, and a second moat bishop gives no extra credit.',
+    "R24.5 measures White's Euclidean distance to the nearest on-board square of the parallel diagonal one beyond the resulting outer wall, away from the target corner. It uses the same valid wall profiles as r10; among profiles tied by r8 and r10, it takes the nearest of these beyond-wall diagonals. It applies on either side of the wall, even with an eligible target square. Being on the beyond-wall diagonal scores zero, without r10's minimum-one floor. No valid wall or no on-board beyond-wall diagonal leaves r24.5 inactive.",
+    'R9 uses the resulting smallest valid bishop walls. The outer bishop must be off both edges meeting at that wall’s target corner; an edge bishop leaves that wall without an r9 target, even if White already occupies its opposition square. Check this after White moves, without choosing a larger wall to avoid the condition. Edge adjacent means sharing a square edge with the inner diagonal. Opposition means two squares apart on the same rank or file. Compare the candidate outer-wall opposition squares by Euclidean distance to each bishop. A candidate must be strictly closer to each bishop than every other candidate. A tie for either bishop, or bishops favoring different squares, leaves no r9 target for that wall. A sole on-board candidate qualifies. Prefer occupying a chosen square; an accomplished r9 outweighs an exempt move. Exempt moves tie moves that have an opposition target but do not occupy it. This rule gives no approach-distance bonus and does not compare the two kings\' distances to the bishops.',
+    'R19 measures the position after White\'s move. It applies only when White\'s king is on or within one king step of the outer diagonal of a selected smallest bishop wall, including diagonal adjacency. The outer bishop must be at least three king steps from Black\'s king on that same wall. When White is farther from every selected outer diagonal, r19 gives no preference.',
+    'R5.5 checks starting edge opposition: Black is on an edge, White is off every edge, and the kings are two squares apart on the same rank or file. Select the smallest starting bishop walls, with the usual preference for White not inside tied walls. Keep each inner bishop paired with its wall’s target corner. Only a move by that inner bishop can succeed, and Black must have at least one legal reply, with every legal reply strictly reducing king-step distance to that same corner. Outer-bishop and king moves receive no credit, even if they force progress. Without a starting bishop wall there is no inner bishop and the rule is inactive. It applies in either phase. After White moves and before Black replies, the moved bishop must still be the inner bishop of a selected smallest valid wall toward the same starting target corner. Switching it to the outer wall or destroying the wall earns no credit. R10 has no position-specific exemption.',
+    'R7 checks every legal Black reply after White moves, using the smallest valid bishop walls with the usual tied-wall preference. Prefer a wall for which no reply reaches its outer diagonal. Also prevent attacks on its inner bishop when that bishop is adjacent to an outer-diagonal square screened by White’s king: beyond the king, away from the outer bishop. The king’s own square is not screened. King adjacency counts as an attack even when the bishop is defended. Both conditions must hold for the same wall; no valid wall earns no credit. R7 gives one combined preference, with no extra penalty for allowing both outcomes.',
   ],
-  noteBoards: [TARGET_SQUARE_NOTE_BOARD, PHASE_TWO_NOTE_BOARD, RULE_R10_EDGE_NOTE_BOARD, RULE_R18_CHOKE_NOTE_BOARD],
+  noteBoards: [TARGET_SQUARE_NOTE_BOARD, PHASE_TWO_NOTE_BOARD, RULE_R9_OPPOSITION_NOTE_BOARD, RULE_R10_EDGE_NOTE_BOARD, RULE_R18_CHOKE_NOTE_BOARD, RULE_R5_5_FORCE_CORNER_NOTE_BOARD],
 }
 
 function diagonalIndex(square: Square, axis: DiagonalAxis): number {
@@ -303,7 +372,7 @@ function isCornerSquare(square: Square): boolean {
   return (file === 0 || file === 7) && (rank === 0 || rank === 7)
 }
 
-function scoreRuleR8({ blackKing, whiteKing }: TwoBishopsPieces): number {
+function scoreRuleR1({ blackKing, whiteKing }: TwoBishopsPieces): number {
   if (
     blackKing === undefined ||
     whiteKing === undefined ||
@@ -318,15 +387,6 @@ function scoreRuleR8({ blackKing, whiteKing }: TwoBishopsPieces): number {
   )
     ? 0
     : 1
-}
-
-function isOnPhaseTwoDiagonal(square: Square, corner: Square): boolean {
-  return PHASE_TWO_TEMPLATES.some(
-    (template) =>
-      template.targetCorner === corner &&
-      (template.innerDiagonal.includes(square) ||
-        template.outerDiagonal.includes(square)),
-  )
 }
 
 function getAdjacentDiagonalWalls(
@@ -412,26 +472,15 @@ function wallSeparatesWhite(
     : whiteIndex < wall.lower
 }
 
-function bishopWallHasUncontrolledScreen(
-  chess: Chess,
-  bishop: Square,
+function whiteKingInsideWall(
+  wall: Pick<AdjacentDiagonalWall, 'axis' | 'side' | 'lower' | 'upper'>,
   whiteKing: Square | undefined,
-  axis: DiagonalAxis,
 ): boolean {
-  if (whiteKing === undefined || whiteKing === bishop ||
-    diagonalIndex(whiteKing, axis) !== diagonalIndex(bishop, axis)) return false
-  const from = squareCoordinates(bishop)
-  const king = squareCoordinates(whiteKing)
-  const fileStep = Math.sign(king.file - from.file)
-  const rankStep = Math.sign(king.rank - from.rank)
-  // Walk the whole ray beyond the king, away from its bishop. The king may
-  // cover the first hidden square without covering the rest of that ray.
-  for (let file = king.file + fileStep, rank = king.rank + rankStep;
-    ; file += fileStep, rank += rankStep) {
-    const square = squareFromCoordinates(file, rank)
-    if (square === null) return false
-    if (!chess.isAttacked(square, 'w')) return true
-  }
+  if (whiteKing === undefined) return false
+  const whiteIndex = diagonalIndex(whiteKing, wall.axis)
+  return wall.side === 'minimum'
+    ? whiteIndex < wall.upper
+    : whiteIndex > wall.lower
 }
 
 function getDiagonalWalls(
@@ -481,11 +530,15 @@ function getDiagonalWalls(
   return walls
 }
 
-function smallestDiagonalWalls(
-  walls: readonly DiagonalWall[],
-): readonly DiagonalWall[] {
+function smallestDiagonalWalls<Wall extends Pick<AdjacentDiagonalWall,
+  'axis' | 'side' | 'lower' | 'upper' | 'diagonalCount'>>(
+  walls: readonly Wall[],
+  whiteKing: Square | undefined,
+): readonly Wall[] {
   const smallestCount = Math.min(...walls.map((wall) => wall.diagonalCount))
-  return walls.filter((wall) => wall.diagonalCount === smallestCount)
+  const smallest = walls.filter((wall) => wall.diagonalCount === smallestCount)
+  const notInside = smallest.filter((wall) => !whiteKingInsideWall(wall, whiteKing))
+  return notInside.length > 0 ? notInside : smallest
 }
 
 type RuleR6Score = {
@@ -676,9 +729,11 @@ function scoreRuleR5(
 function ruleR6Templates(fen: string): readonly PhaseTwoTemplate[] {
   const bishops = getWhiteBishopSquares(fen)
   const blackKing = findPiece(fen, 'b', 'k')?.square
+  const whiteKing = findPiece(fen, 'w', 'k')?.square
   if (blackKing === undefined) return []
   const wallCorners = smallestDiagonalWalls(
     getDiagonalWalls(bishops, blackKing),
+    whiteKing,
   ).map((wall) => targetCorner(wall.axis, wall.side))
   if (wallCorners.length > 0) {
     return PHASE_TWO_TEMPLATES.filter((template) =>
@@ -720,22 +775,23 @@ function phaseTwoWallConfinesBlack(
   template: PhaseTwoTemplate,
 ): boolean {
   const chess = getChess(resultFen)
-  // The template's shorter "outer" diagonal is the wall facing Black.
   const whiteKing = findPiece(resultFen, 'w', 'k')?.square
-  const diagonal = template.outerDiagonal
-  const axis: DiagonalAxis =
-    diagonalIndex(diagonal[0]!, 'difference') === diagonalIndex(diagonal[1]!, 'difference')
-      ? 'difference' : 'sum'
-  const bishop = diagonal.find((square) => {
-    const piece = chess.get(square)
-    return piece?.color === 'w' && piece.type === 'b'
-  })
-  if (bishop === undefined ||
-    bishopWallHasUncontrolledScreen(chess, bishop, whiteKing, axis) ||
-    ![diagonal[0]!, diagonal[diagonal.length - 1]!].every((square) =>
-      // A controlled king screen is allowed; other ray blockers still matter.
-      square === bishop || bishopControlsSquareInPosition(resultFen, bishop, square, whiteKing),
+  const blackKing = findPiece(resultFen, 'b', 'k')?.square
+  // A king behind the bishop relative to Black does not count as a screen.
+  // A king at an endpoint has no hidden squares beyond it.
+  for (const diagonal of [template.innerDiagonal, template.outerDiagonal]) {
+    const bishop = diagonal.find((square) => {
+      const piece = chess.get(square)
+      return piece?.color === 'w' && piece.type === 'b'
+    })
+    if (bishop === undefined) return false
+    const ignoredKing = whiteKing !== undefined && blackKing !== undefined &&
+      squaredEuclideanDistance(blackKing, bishop) <= squaredEuclideanDistance(blackKing, whiteKing)
+      ? whiteKing : undefined
+    if (![diagonal[0]!, diagonal[diagonal.length - 1]!].every((square) =>
+      square === bishop || bishopControlsSquareInPosition(resultFen, bishop, square, ignoredKing),
     )) return false
+  }
   return chess.moves({ verbose: true }).every((reply) =>
     isInsidePhaseTwoBlackArea(reply.to, template) &&
     !template.innerDiagonal.includes(reply.to) &&
@@ -1578,15 +1634,19 @@ export function isTwoBishopsPhaseTwoPosition(fen: string): boolean {
 type RuleR10Score = {
   readonly targetPenalty: number
   readonly diagonalCount: number
+  readonly outerBishopPenalty: number
   readonly targetSquares: readonly Square[]
   readonly kingDistance: number
-  readonly beyondDistance: number
+  readonly beyondOuterWallDistance: number
+  readonly immobileBishops: number
 }
 
 function compareRuleR10Scores(first: RuleR10Score, second: RuleR10Score): number {
   return (
     first.diagonalCount - second.diagonalCount ||
-    first.kingDistance - second.kingDistance
+    first.outerBishopPenalty - second.outerBishopPenalty ||
+    first.kingDistance - second.kingDistance ||
+    first.immobileBishops - second.immobileBishops
   )
 }
 
@@ -1596,73 +1656,180 @@ function wallReplyDiagonalCount(
 ): number {
   const replyIndices = replySquares.map((square) => diagonalIndex(square, wall.axis))
   const innerIndex = wall.side === 'minimum' ? wall.lower : wall.upper
-  // Reaching the inner wall or escaping beyond both walls defeats the enclosure,
-  // even when the opposite side has fewer diagonals than Black's current side.
-  if (replyIndices.some((index) => index === innerIndex ||
-    (wall.side === 'minimum' ? index > wall.upper : index < wall.lower))) return 99
-  const countedWallIndices = new Set(
-    replyIndices.filter((index) => index >= wall.lower && index <= wall.upper),
-  )
-  // Pairs with uncontrolled screened squares have already been excluded.
-  // Count the enclosed side and any reachable outer-wall diagonal.
-  return wall.diagonalCount + countedWallIndices.size
+  // An accessible inner-wall square still defeats the bishop barrier.
+  if (replyIndices.includes(innerIndex)) return 99
+  const [minimum, maximum] = diagonalIndexRange(wall.axis)
+  // A crossing preserves the wall only if Black gets strictly fewer diagonals
+  // than on its original side. Equal or larger escape areas invalidate it.
+  const crossingCount = wall.side === 'minimum' ? maximum - wall.upper : wall.lower - minimum
+  const crosses = replyIndices.some((index) => wall.side === 'minimum' ? index > wall.upper : index < wall.lower)
+  if (crosses && crossingCount >= wall.diagonalCount) return 99
+  // Black chooses one resulting side, not the union of both sides.
+  return replyIndices.length === 0 ? wall.diagonalCount : Math.max(...replyIndices.map((index) => {
+    if (index < wall.lower) return wall.lower - minimum
+    if (index > wall.upper) return maximum - wall.upper
+    // The only remaining wall index is the reachable outer diagonal.
+    return wall.diagonalCount + 1
+  }))
 }
 
-function scoreRuleR10(
-  chess: Chess,
+function qualifiedDiagonalWalls(
+  walls: readonly AdjacentDiagonalWall[],
+  replySquares: readonly Square[],
+): readonly AdjacentDiagonalWall[] {
+  return walls
+    .map((wall) => ({ ...wall, diagonalCount: wallReplyDiagonalCount(wall, replySquares) }))
+    .filter((wall) => wall.diagonalCount < 99)
+}
+
+type RuleR5_5Wall = { readonly innerBishop: Square; readonly targetCorner: Square }
+
+function ruleR5_5Walls(pieces: TwoBishopsPieces): readonly RuleR5_5Wall[] {
+  const { bishops, blackKing, whiteKing } = pieces
+  if (blackKing === undefined || whiteKing === undefined ||
+    edgeDistance(blackKing) !== 0 || edgeDistance(whiteKing) === 0 ||
+    kingDistance(blackKing, whiteKing) !== 2) return []
+  const black = squareCoordinates(blackKing)
+  const white = squareCoordinates(whiteKing)
+  if (black.file !== white.file && black.rank !== white.rank) return []
+  return smallestDiagonalWalls(getDiagonalWalls(bishops, blackKing), whiteKing)
+    .map((wall) => ({ innerBishop: wall.innerBishop, targetCorner: targetCorner(wall.axis, wall.side) }))
+}
+
+function ruleR7Penalty(
+  walls: readonly AdjacentDiagonalWall[],
+  bishops: readonly Square[],
+  whiteKing: Square | undefined,
+  replySquares: readonly Square[],
+): number {
+  // One wall must prevent both threats; never combine different wall profiles.
+  return smallestDiagonalWalls(walls, whiteKing).some((wall) => {
+    const innerIndex = wall.side === 'minimum' ? wall.lower : wall.upper
+    const outerIndex = wall.side === 'minimum' ? wall.upper : wall.lower
+    const innerBishop = bishops.find((square) => diagonalIndex(square, wall.axis) === innerIndex)
+    const outerBishop = bishops.find((square) => diagonalIndex(square, wall.axis) === outerIndex)
+    if (innerBishop === undefined || outerBishop === undefined || whiteKing === undefined) return false
+    const kingFile = squareCoordinates(whiteKing).file
+    const screenDirection = diagonalIndex(whiteKing, wall.axis) === outerIndex
+      ? Math.sign(kingFile - squareCoordinates(outerBishop).file)
+      : 0
+    const innerBishopBesideScreen = screenDirection !== 0 && allSquares().some((square) =>
+      diagonalIndex(square, wall.axis) === outerIndex &&
+      screenDirection * (squareCoordinates(square).file - kingFile) > 0 &&
+      kingDistance(square, innerBishop) === 1)
+    return replySquares.length > 0 &&
+      replySquares.every((square) => diagonalIndex(square, wall.axis) !== outerIndex &&
+        (!innerBishopBesideScreen || kingDistance(square, innerBishop) > 1))
+  }) ? 0 : 1
+}
+
+function ruleR9TargetSquares(
   walls: readonly AdjacentDiagonalWall[],
   bishops: readonly Square[],
   blackKing: Square | undefined,
   whiteKing: Square | undefined,
-  replySquares: readonly Square[],
+): readonly Square[] {
+  if (blackKing === undefined || whiteKing === undefined) return []
+  const black = squareCoordinates(blackKing)
+  const oppositionSquares = [[0, 2], [0, -2], [2, 0], [-2, 0]].flatMap(([file, rank]) => {
+    const square = squareFromCoordinates(black.file + file!, black.rank + rank!)
+    return square === null ? [] : [square]
+  })
+  const targets = smallestDiagonalWalls(walls.filter((wall) => wall.diagonalCount < 99), whiteKing)
+    .flatMap((wall) => {
+      const innerIndex = wall.side === 'minimum' ? wall.lower : wall.upper
+      if (Math.abs(diagonalIndex(blackKing, wall.axis) - innerIndex) !== 1) return []
+      const innerBishop = bishops.find((square) => diagonalIndex(square, wall.axis) === innerIndex)
+      if (innerBishop === undefined) return []
+      const outerIndex = wall.side === 'minimum' ? wall.upper : wall.lower
+      const outerBishop = bishops.find((square) => diagonalIndex(square, wall.axis) === outerIndex)
+      if (outerBishop === undefined || isOnTargetCornerEdge(outerBishop, wall.targetCorner)) return []
+      const candidates = oppositionSquares.filter((square) => diagonalIndex(square, wall.axis) === outerIndex)
+      // “Closer to both” is strict: a tie for either bishop gives no target.
+      // With only one on-board candidate there is no competing square.
+      return candidates.filter((square) => candidates.every((other) =>
+        other === square || (
+          squaredEuclideanDistance(innerBishop, square) < squaredEuclideanDistance(innerBishop, other) &&
+          squaredEuclideanDistance(outerBishop, square) < squaredEuclideanDistance(outerBishop, other)
+        )))
+    })
+  return [...new Set(targets)]
+}
+
+function immobileWallBishopCount(bishops: readonly Square[], whiteKing: Square, blackKing: Square, axis: DiagonalAxis): number {
+  const occupied = new Set([...bishops, whiteKing, blackKing])
+  return bishops.filter((bishop) => {
+    const { file, rank } = squareCoordinates(bishop)
+    // In KBB versus K, bishop moves cannot expose White to a sliding check.
+    // An empty adjacent square on either wall ray therefore gives a legal move;
+    // any occupied square (including Black's king) blocks that entire direction.
+    return ![-1, 1].some((step) => {
+      const square = squareFromCoordinates(file + step, rank + (axis === 'difference' ? step : -step))
+      return square !== null && !occupied.has(square)
+    })
+  }).length
+}
+
+function scoreRuleR10(
+  walls: readonly AdjacentDiagonalWall[],
+  bishops: readonly Square[],
+  blackKing: Square | undefined,
+  whiteKing: Square | undefined,
 ): RuleR10Score {
   let best: RuleR10Score = {
     targetPenalty: 1,
     diagonalCount: 99,
+    outerBishopPenalty: 1,
     targetSquares: [],
     kingDistance: 99,
-    beyondDistance: 99,
+    beyondOuterWallDistance: 99,
+    immobileBishops: 2,
   }
   if (blackKing === undefined || whiteKing === undefined) return best
 
-  for (const wall of walls) {
+  for (const wall of smallestDiagonalWalls(walls, whiteKing)) {
     const outerIndex = wall.side === 'minimum' ? wall.upper : wall.lower
-    // An uncontrolled hidden square on either ray invalidates the pair,
-    // including its targets and one-beyond-wall geometry.
-    if (bishops.some((bishop) =>
-      bishopWallHasUncontrolledScreen(chess, bishop, whiteKing, wall.axis))) continue
+    const outerBishop = bishops.find((square) => diagonalIndex(square, wall.axis) === outerIndex)
     const outerSquares = allSquares().filter(
       (square) => diagonalIndex(square, wall.axis) === outerIndex,
     )
+    const kingFile = squareCoordinates(whiteKing).file
+    const screenDirection = outerBishop !== undefined &&
+      diagonalIndex(whiteKing, wall.axis) === outerIndex
+      ? Math.sign(kingFile - squareCoordinates(outerBishop).file)
+      : 0
+    // Select closest candidates before rejecting screens or bishops: no farther fallback.
+    // A screen changes target eligibility, not wall validity.
     const closestDistance = Math.min(
       ...outerSquares.map((square) => kingDistance(blackKing, square)),
     )
     const candidates = outerSquares.filter(
       (square) => kingDistance(blackKing, square) === closestDistance,
     )
-    // A bishop on any closest candidate invalidates the wall target set.
-    const targetSquares = candidates.some((square) => bishops.includes(square))
-      ? []
-      : candidates.filter(
-          (square) => wallSeparatesWhite(wall, whiteKing) ||
-            (diagonalIndex(whiteKing, wall.axis) === outerIndex &&
-              kingDistance(whiteKing, square) <= kingDistance(blackKing, square)),
-        )
-    const beyondIndex = outerIndex + (wall.side === 'minimum' ? 1 : -1)
-    const beyondSquares = allSquares().filter(
-      (square) => diagonalIndex(square, wall.axis) === beyondIndex,
+    const targetSquares = candidates.filter(
+      (square) => !bishops.includes(square) &&
+        screenDirection * (squareCoordinates(square).file - kingFile) <= 0 &&
+        (diagonalIndex(whiteKing, wall.axis) !== outerIndex ||
+          kingDistance(whiteKing, square) <= kingDistance(blackKing, square)),
     )
     const score: RuleR10Score = {
       targetPenalty: targetSquares.length === 0 ? 1 : 0,
-      diagonalCount: wallReplyDiagonalCount(wall, replySquares),
+      diagonalCount: wall.diagonalCount,
+      outerBishopPenalty: wall.diagonalCount < 99 && outerBishop !== undefined &&
+        !isOnTargetCornerEdge(outerBishop, wall.targetCorner) ? 0 : 1,
       targetSquares,
-      beyondDistance: beyondSquares.length === 0
-        ? 99
-        : Math.min(...beyondSquares.map((square) => kingDistance(whiteKing, square))),
       kingDistance:
         targetSquares.length === 0
           ? 99
-          : Math.min(...targetSquares.map((square) => kingDistance(whiteKing, square))),
+          : Math.max(1, Math.min(...targetSquares.map((square) => kingDistance(whiteKing, square)))),
+      immobileBishops: immobileWallBishopCount(bishops, whiteKing, blackKing, wall.axis),
+      // R24.5 reuses r10's wall selection without changing r10's priorities.
+      beyondOuterWallDistance: wall.diagonalCount < 99
+        ? Math.min(99, ...allSquares()
+          .filter((square) => diagonalIndex(square, wall.axis) ===
+            outerIndex + (wall.side === 'minimum' ? 1 : -1))
+          .map((square) => squaredEuclideanDistance(whiteKing, square)))
+        : 99,
     }
     const comparison = compareRuleR10Scores(score, best)
     if (comparison < 0) {
@@ -1670,8 +1837,8 @@ function scoreRuleR10(
     } else if (comparison === 0) {
       best = {
         ...best,
-        beyondDistance: Math.min(best.beyondDistance, score.beyondDistance),
         targetSquares: [...new Set([...best.targetSquares, ...score.targetSquares])],
+        beyondOuterWallDistance: Math.min(best.beyondOuterWallDistance, score.beyondOuterWallDistance),
       }
     }
   }
@@ -1710,77 +1877,11 @@ function flankStepTarget(fen: string): Square | undefined {
   return undefined
 }
 
-type RuleR22Plan = {
-  readonly behindSquares: readonly Square[]
-  readonly bishopSquare: Square
-  readonly axis: DiagonalAxis
-  readonly outerIndex: number
-}
-
-function ruleR22Plans({ bishops, whiteKing, blackKing }: TwoBishopsPieces): readonly RuleR22Plan[] {
-  if (whiteKing === undefined || blackKing === undefined) return []
-  return smallestDiagonalWalls(getDiagonalWalls(bishops, blackKing)).flatMap((wall) => {
-    const innerIndex = diagonalIndex(wall.innerBishop, wall.axis)
-    const whiteIndex = diagonalIndex(whiteKing, wall.axis)
-    const inside = wall.side === 'minimum' ? whiteIndex <= innerIndex : whiteIndex >= innerIndex
-    if (!inside) return []
-    const candidates = allSquares().filter((square) =>
-      diagonalIndex(square, wall.axis) === innerIndex &&
-      square !== whiteKing &&
-      edgeDistance(square) > 0 &&
-      squaredEuclideanDistance(whiteKing, square) <= squaredEuclideanDistance(blackKing, square),
-    )
-    const closest = Math.min(...candidates.map((square) => squaredEuclideanDistance(whiteKing, square)))
-    return candidates.filter((square) => squaredEuclideanDistance(whiteKing, square) === closest)
-      .flatMap((bishopSquare) => {
-        const bishopDistance = squaredEuclideanDistance(blackKing, bishopSquare)
-        const behindSquares = allSquares().filter((square) => {
-          const index = diagonalIndex(square, wall.axis)
-          const inside = wall.side === 'minimum' ? index < innerIndex : index > innerIndex
-          return inside && kingDistance(square, bishopSquare) === 1 &&
-            squaredEuclideanDistance(blackKing, square) > bishopDistance
-        })
-        return [{ behindSquares, bishopSquare, axis: wall.axis,
-          outerIndex: diagonalIndex(wall.outerBishop, wall.axis) }]
-      })
-  })
-}
-
-function scoreRuleR22(
-  plans: readonly RuleR22Plan[],
-  { bishops: resultBishops, whiteKing: resultKing }: TwoBishopsPieces,
-): {
-  readonly applies: boolean
-  readonly bishopPenalty: number
-  readonly kingDistance: number
-} {
-  if (plans.length === 0 || resultKing === undefined) {
-    return { applies: false, bishopPenalty: 0, kingDistance: 0 }
-  }
-  const scores = plans.map(({ behindSquares, bishopSquare, axis, outerIndex }) => {
-    // Keep the inner bishop placed, but let the outer bishop make room along
-    // its wall instead of forcing the king to give up its behind-bishop square.
-    const placed = resultBishops.includes(bishopSquare) && resultBishops.some(
-      (bishop) => bishop !== bishopSquare && diagonalIndex(bishop, axis) === outerIndex,
-    )
-    return {
-      applies: true,
-      bishopPenalty: placed ? 0 : 1,
-      kingDistance: placed
-        ? Math.min(99, ...behindSquares.map((square) => kingDistance(resultKing, square)))
-        : 0,
-    }
-  })
-  return scores.sort((first, second) =>
-    first.bishopPenalty - second.bishopPenalty || first.kingDistance - second.kingDistance,
-  )[0]!
-}
-
 function ruleR18Targets(fen: string): readonly Square[] {
   const bishops = getWhiteBishopSquares(fen)
   const blackKing = findPiece(fen, 'b', 'k')?.square
   const whiteKing = findPiece(fen, 'w', 'k')?.square
-  return smallestDiagonalWalls(getDiagonalWalls(bishops, blackKing)).flatMap((wall) => {
+  return smallestDiagonalWalls(getDiagonalWalls(bishops, blackKing), whiteKing).flatMap((wall) => {
     if (!wallSeparatesWhite(wall, whiteKing)) return []
     const innerIndex = diagonalIndex(wall.innerBishop, wall.axis)
     if (diagonalLength(innerIndex, wall.axis) !== 5) return []
@@ -1796,13 +1897,42 @@ function ruleR18Targets(fen: string): readonly Square[] {
   })
 }
 
-function scoreRuleR19({ bishops, blackKing }: TwoBishopsPieces): number {
-  if (blackKing === undefined) return 1
-  return getDiagonalWalls(bishops, blackKing).some(
-    (wall) => kingDistance(wall.outerBishop, blackKing) >= 3,
+function scoreRuleR19({ bishops, blackKing, whiteKing }: TwoBishopsPieces) {
+  if (blackKing === undefined || whiteKing === undefined) return { applies: false, penalty: 1 }
+  const king = squareCoordinates(whiteKing)
+  const walls = smallestDiagonalWalls(getDiagonalWalls(bishops, blackKing), whiteKing)
+    .filter((wall) => {
+      const outerIndex = diagonalIndex(wall.outerBishop, wall.axis)
+      // Check the king's on-board neighborhood, without generating legal moves
+      // or treating the diagonal as an infinite line beyond its endpoints.
+      return [-1, 0, 1].some((file) => [-1, 0, 1].some((rank) => {
+        const square = squareFromCoordinates(king.file + file, king.rank + rank)
+        return square !== null && diagonalIndex(square, wall.axis) === outerIndex
+      }))
+    })
+  return {
+    applies: walls.length > 0,
+    penalty: walls.some((wall) => kingDistance(wall.outerBishop, blackKing) >= 3) ? 0 : 1,
+  }
+}
+
+type KingMoat = {
+  readonly axis: 'file' | 'rank'
+  readonly index: number
+}
+
+function ruleR24Moats(
+  { blackKing, whiteKing }: TwoBishopsPieces,
+): readonly KingMoat[] {
+  if (blackKing === undefined || whiteKing === undefined) return []
+  if (kingDistance(whiteKing, blackKing) !== 2) return []
+  const black = squareCoordinates(blackKing)
+  const white = squareCoordinates(whiteKing)
+  return (['file', 'rank'] as const).flatMap((axis) =>
+    Math.abs(black[axis] - white[axis]) === 2
+      ? [{ axis, index: (black[axis] + white[axis]) / 2 }]
+      : [],
   )
-    ? 0
-    : 1
 }
 
 export function getTwoBishopsPhaseLabel(fen: string): string {
@@ -1812,11 +1942,9 @@ export function getTwoBishopsPhaseLabel(fen: string): string {
 export function getAdjacentDiagonalWallTargetCorners(
   bishops: readonly Square[],
   blackKing: Square | undefined,
+  whiteKing?: Square,
 ): readonly Square[] {
-  const walls = getAdjacentDiagonalWalls(bishops, blackKing)
-  const bestCount = Math.min(...walls.map(({ diagonalCount }) => diagonalCount))
-  return walls
-    .filter(({ diagonalCount }) => diagonalCount === bestCount)
+  return smallestDiagonalWalls(getAdjacentDiagonalWalls(bishops, blackKing), whiteKing)
     .map(({ targetCorner: corner }) => corner)
 }
 
@@ -1841,6 +1969,14 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
       helpText: '',
       compare: (first, second) =>
         first.stalematePenalty - second.stalematePenalty,
+    },
+    {
+      id: 'rule r1',
+      shortLabel: 'rule r1',
+      helpText:
+        "With Black's king in the corner, prefer White's king on a Phase 2 square associated with that corner.",
+      compare: (first, second) =>
+        first.ruleR1KingSquarePenalty - second.ruleR1KingSquarePenalty,
     },
     {
       id: 'rule r3',
@@ -1885,11 +2021,19 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
       ],
     },
     {
+      id: 'rule r5.5',
+      shortLabel: 'rule r5.5',
+      helpText:
+        'With the black king on the edge and in opposition to the non-edge White king, use the inner bishop to force the black king towards the target corner.',
+      applies: (score) => score.ruleR5_5Applies,
+      compare: (first, second) => first.ruleR5_5Penalty - second.ruleR5_5Penalty,
+    },
+    {
       id: 'rule r6',
       shortLabel: 'rule r6',
       applies: (score) => score.ruleR6Applies,
       helpText:
-        "Prefer bishops on their Phase 2 diagonals, then prefer Bishops on their Phase 2 squares, then prefer the shortest king path to its Phase 2 square without entering Black's area, then Euclidean proximity.",
+        "Prefer bishops on unscreened Phase 2 diagonals, then prefer Bishops on their Phase 2 squares, then prefer the shortest king path to its Phase 2 square without entering Black's area, then Euclidean proximity.",
       subpriorities: [
         {
           compare: (first, second) =>
@@ -1914,22 +2058,33 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
       ],
     },
     {
+      id: 'rule r7',
+      shortLabel: 'rule r7',
+      helpText: 'Prefer not allowing Black onto the outer diagonal or attacking the inner bishop if that bishop is adjacent to a screened outer diagonal square.',
+      compare: (first, second) => first.ruleR7Penalty - second.ruleR7Penalty,
+    },
+    {
       id: 'rule r8',
       shortLabel: 'rule r8',
+      helpText: "Prefer fewer diagonals for Black's king.",
+      compare: (first, second) => first.ruleR10DiagonalCount - second.ruleR10DiagonalCount,
+    },
+    {
+      id: 'rule r9',
+      shortLabel: 'rule r9',
       helpText:
-        "With Black's king in the corner, prefer White's king on a Phase 2 square associated with that corner.",
-      compare: (first, second) =>
-        first.ruleR8KingSquarePenalty - second.ruleR8KingSquarePenalty,
+        "When the Black king is edge adjacent to the inner wall and the outer bishop is not on the target corner's edge, prefer White's king on the outer wall square in opposition to Black's king and closer to both bishops.",
+      compare: (first, second) => first.ruleR9Penalty - second.ruleR9Penalty,
     },
     {
       id: 'rule r10',
       shortLabel: 'rule r10',
       helpText:
-        "Prefer fewer diagonals for Black's king, then White king's step proximity to the target square, then bishops off the target corner's edge, except the Phase 2 diagonals.",
+        "Prefer outer bishop off target corner's edge, then White king's step proximity to the target square, then bishops to have legal moves along their wall.",
       subpriorities: [
         {
           compare: (first, second) =>
-            first.ruleR10DiagonalCount - second.ruleR10DiagonalCount,
+            first.ruleR10OuterBishopPenalty - second.ruleR10OuterBishopPenalty,
         },
         {
           compare: (first, second) =>
@@ -1937,7 +2092,7 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
         },
         {
           compare: (first, second) =>
-            first.ruleR10EdgePenalty - second.ruleR10EdgePenalty,
+            first.ruleR10ImmobileBishops - second.ruleR10ImmobileBishops,
         },
       ],
     },
@@ -1950,14 +2105,6 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
       compare: (first, second) => first.ruleR11Penalty - second.ruleR11Penalty,
     },
     {
-      id: 'rule r12',
-      shortLabel: 'rule r12',
-      helpText:
-        "Without a target square, prefer White’s king closer to the diagonal one beyond the outer wall.",
-      applies: (score) => score.ruleR10TargetPenalty === 1 && score.ruleR12KingDistance < 99,
-      compare: (first, second) => first.ruleR12KingDistance - second.ruleR12KingDistance,
-    },
-    {
       id: 'rule r18',
       shortLabel: 'rule r18',
       helpText:
@@ -1968,19 +2115,22 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
     {
       id: 'rule r19',
       shortLabel: 'rule r19',
-      helpText: "Prefer the outer bishop at least 3 steps away from Black's king.",
+      helpText: "If the white King is on or adjacent to the outer diagonal, prefer the outer bishop at least 3 steps away from Black's king.",
+      applies: (score) => score.ruleR19Applies,
       compare: (first, second) => first.ruleR19Penalty - second.ruleR19Penalty,
     },
     {
-      id: 'rule r22',
-      shortLabel: 'rule r22',
-      helpText:
-        "If the White king is inside Black's diagonals, place the inner bishop on the non-edge wall diagonal square closest to White's king but not closer to Black's king. Then, walk the king behind that bishop, allowing the outer bishop to move along its wall to make room.",
-      applies: (score) => score.ruleR22Applies,
-      subpriorities: [
-        { compare: (first, second) => first.ruleR22BishopPenalty - second.ruleR22BishopPenalty },
-        { compare: (first, second) => first.ruleR22KingDistance - second.ruleR22KingDistance },
-      ],
+      id: 'rule r24',
+      shortLabel: 'rule r24',
+      helpText: 'Prefer a bishop wall, otherwise prefer a bishop inside a king moat.',
+      compare: (first, second) => first.ruleR24Penalty - second.ruleR24Penalty,
+    },
+    {
+      id: 'rule r24.5',
+      shortLabel: 'rule r24.5',
+      helpText: 'Prefer the White king closer to the diagonal one beyond the outer wall.',
+      applies: (score) => score.ruleR24_5KingDistance < 99,
+      compare: (first, second) => first.ruleR24_5KingDistance - second.ruleR24_5KingDistance,
     },
     {
       id: 'rule r25',
@@ -2030,16 +2180,19 @@ type WhiteScoringContext = {
   readonly pieces: TwoBishopsPieces
   readonly ruleR4Matches: readonly RuleR4Match[]
   readonly ruleR4ForcedMateNext: boolean
+  readonly ruleR5_5Walls: readonly RuleR5_5Wall[]
   readonly ruleR6Templates: readonly PhaseTwoTemplate[]
   readonly ruleR11Target: Square | undefined
   readonly ruleR18Targets: readonly Square[]
-  readonly ruleR22Plans: readonly RuleR22Plan[]
+  readonly ruleR24Moats: readonly KingMoat[]
 }
 
 function whiteScoringContext(fen: string): WhiteScoringContext {
-  const pieces = twoBishopsPieces(getChess(fen))
+  const chess = getChess(fen)
+  const pieces = twoBishopsPieces(chess)
   const matches = getRuleR4Matches(fen)
   const { blackKing } = pieces
+  const templates = ruleR6Templates(fen)
   return {
     pieces,
     ruleR4Matches: matches,
@@ -2047,10 +2200,11 @@ function whiteScoringContext(fen: string): WhiteScoringContext {
       (['a1', 'a8', 'h1', 'h8'] as const).some(
         (corner) => kingDistance(blackKing, corner) === 1,
       ) && ruleR4HasForcedMateNext(fen),
-    ruleR6Templates: ruleR6Templates(fen),
+    ruleR5_5Walls: ruleR5_5Walls(pieces),
+    ruleR6Templates: templates,
     ruleR11Target: flankStepTarget(fen),
     ruleR18Targets: ruleR18Targets(fen),
-    ruleR22Plans: ruleR22Plans(pieces),
+    ruleR24Moats: ruleR24Moats(pieces),
   }
 }
 
@@ -2067,45 +2221,29 @@ function scoreWhiteMove(
   startingContext?: WhiteScoringContext,
 ): TwoBishopsWhiteMoveScore {
   const chess = getChess(fen)
-  chess.move(san)
+  const playedMove = chess.move(san)
   const resultFen = chess.fen()
   const context = startingContext ?? whiteScoringContext(fen)
   const mate = chess.isCheckmate()
   const blackReplies = chess.moves({ verbose: true })
+  const blackReplySquares = blackReplies.map(({ to }) => to)
   const resultPieces = twoBishopsPieces(chess)
   const { bishops, blackKing, whiteKing } = resultPieces
-  const forcedReplySquares = blackReplies.some(
-    (reply) => reply.captured === 'b',
-  )
-    ? undefined
-    : blackReplies.map((reply) => reply.to)
-  const allWalls = getAdjacentDiagonalWalls(
-    bishops,
-    blackKing,
-    forcedReplySquares,
-  )
-  const separatingWalls = allWalls.filter((wall) =>
-    wallSeparatesWhite(wall, whiteKing),
-  )
-  const preferredWalls =
-    separatingWalls.length > 0 ? separatingWalls : allWalls
-  const diagonalCount = Math.min(
-    ...preferredWalls.map((wall) => wall.diagonalCount),
-  )
-  const targetCorners = preferredWalls
-    .filter((wall) => wall.diagonalCount === diagonalCount)
-    .map((wall) => wall.targetCorner)
-  const targetWalls = getAdjacentDiagonalWalls(bishops, blackKing, undefined, true)
+  const geometricWalls = getAdjacentDiagonalWalls(bishops, blackKing, undefined, true)
+  const targetWalls = qualifiedDiagonalWalls(geometricWalls, blackReplySquares)
+  const ruleR5_5ResultWalls = context.ruleR5_5Walls.length > 0
+    ? smallestDiagonalWalls(targetWalls, whiteKing)
+    : []
+  const oppositionTargets = ruleR9TargetSquares(targetWalls, bishops, blackKing, whiteKing)
   const ruleR10 = scoreRuleR10(
-    chess,
     targetWalls,
     bishops,
     blackKing,
     whiteKing,
-    blackReplies.map(({ to }) => to),
   )
   const ruleR11Target = context.ruleR11Target
-  const ruleR22 = scoreRuleR22(context.ruleR22Plans, resultPieces)
+  const ruleR19 = scoreRuleR19(resultPieces)
+  const ruleR24Applies = geometricWalls.length > 0 || context.ruleR24Moats.length > 0
   const chokeTargets = context.ruleR18Targets
   const ruleR6Applies = context.ruleR6Templates.length > 0
   const ruleR6 = scoreRuleR6(context.ruleR6Templates, resultFen, resultPieces)
@@ -2142,6 +2280,7 @@ function scoreWhiteMove(
     ruleR6KingAreaPenalty: ruleR6.kingAreaPenalty,
     ruleR6KingPathDistance: ruleR6.kingPathDistance,
     ruleR6KingDistance: ruleR6.kingDistance,
+    ruleR7Penalty: ruleR7Penalty(targetWalls, bishops, whiteKing, blackReplySquares),
     ruleR3CornerPenalty:
       whiteKing === undefined || isCornerSquare(whiteKing) ? 1 : 0,
     ruleR3AdjacentBishopPenalty:
@@ -2149,29 +2288,38 @@ function scoreWhiteMove(
         ? bishops.filter((bishop) => kingDistance(bishop, whiteKing) === 1).length
         : 0,
     ruleR3BishopCornerPenalty: bishops.filter(isCornerSquare).length,
-    ruleR8KingSquarePenalty: scoreRuleR8(resultPieces),
-    ruleR10EdgePenalty: bishops.filter(
-      (bishop) =>
-        targetCorners.length > 0 &&
-        targetCorners.every(
-          (corner) =>
-            isOnTargetCornerEdge(bishop, corner) &&
-            !isOnPhaseTwoDiagonal(bishop, corner),
-        ),
-    ).length,
+    ruleR1KingSquarePenalty: scoreRuleR1(resultPieces),
+    ruleR9Applies: oppositionTargets.length > 0,
+    ruleR9Penalty: whiteKing !== undefined && oppositionTargets.includes(whiteKing) ? 0 : 1,
+    ruleR9TargetSquares: oppositionTargets,
+    ruleR5_5Applies: context.ruleR5_5Walls.length > 0,
+    ruleR5_5Penalty: playedMove.piece === 'b' && blackKing !== undefined && blackReplySquares.length > 0 &&
+      context.ruleR5_5Walls.some(({ innerBishop, targetCorner: corner }) =>
+        playedMove.from === innerBishop && ruleR5_5ResultWalls.some((wall) =>
+          wall.targetCorner === corner && diagonalIndex(playedMove.to, wall.axis) ===
+            (wall.side === 'minimum' ? wall.lower : wall.upper)) &&
+        blackReplySquares.every((square) =>
+          kingDistance(square, corner) < kingDistance(blackKing, corner))) ? 0 : 1,
+    ruleR5_5TargetCorners: [...new Set(context.ruleR5_5Walls.map(({ targetCorner }) => targetCorner))],
+    ruleR5_5InnerBishops: [...new Set(context.ruleR5_5Walls.map(({ innerBishop }) => innerBishop))],
+    ruleR10OuterBishopPenalty: ruleR10.outerBishopPenalty,
     ruleR10TargetPenalty: ruleR10.targetPenalty,
     ruleR10DiagonalCount: ruleR10.diagonalCount,
     ruleR10TargetSquares: ruleR10.targetSquares,
     ruleR10KingDistance: ruleR10.kingDistance,
+    ruleR10ImmobileBishops: ruleR10.immobileBishops,
     ruleR11Applies: ruleR11Target !== undefined,
     ruleR11Penalty: ruleR11Target === undefined || whiteKing === ruleR11Target ? 0 : 1,
-    ruleR12KingDistance: ruleR10.beyondDistance,
     ruleR18Applies: chokeTargets.length > 0,
     ruleR18Penalty: chokeTargets.length === 0 || chokeTargets.some((square) => bishops.includes(square)) ? 0 : 1,
-    ruleR19Penalty: scoreRuleR19(resultPieces),
-    ruleR22Applies: ruleR22.applies,
-    ruleR22BishopPenalty: ruleR22.bishopPenalty,
-    ruleR22KingDistance: ruleR22.kingDistance,
+    ruleR19Applies: ruleR19.applies,
+    ruleR19Penalty: ruleR19.penalty,
+    ruleR24Applies,
+    ruleR24Penalty: geometricWalls.length > 0 ? 0 : bishops.some((bishop) => {
+      const position = squareCoordinates(bishop)
+      return context.ruleR24Moats.some(({ axis, index }) => position[axis] === index)
+    }) ? 1 : 2,
+    ruleR24_5KingDistance: ruleR10.beyondOuterWallDistance,
     ruleR25KingDistance:
       whiteKing === undefined || blackKing === undefined
         ? 99

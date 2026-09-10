@@ -52,11 +52,29 @@ test('r18 does not choke with White inside the wall, breaking the Bc6 and Ba4 lo
     const chokeMove = transformedMove(fen, transform, 'a4', 'c6')
     const chosenMove = transformedMove(fen, transform, 'd8', 'a5')
     assert.notEqual(chosenMove, chokeMove)
+    const chosen = candidates.find(({ san }) => san === chosenMove)!
+    const choke = candidates.find(({ san }) => san === chokeMove)!
+    // Ba5 creates tied outer walls a5–d8/a4–d1. White is too far
+    // from the outer diagonal for r19 to prefer the bishop retreat.
+    const kingMove = transformedMove(fen, transform, 'e4', 'd4')
+    const king = candidates.find(({ san }) => san === kingMove)!
+    assert.equal(chosen.score.ruleR19Applies, false, transform.name)
+    assert.equal(king.score.ruleR19Applies, false, transform.name)
+    assert.equal(choke.score.ruleR19Applies, false, transform.name)
+    assert.equal(chosen.score.ruleR19Penalty, 1, transform.name)
+    assert.equal(king.score.ruleR19Penalty, 1, transform.name)
+    assert.equal(chosen.score.ruleR10OuterBishopPenalty, 0, transform.name)
+    assert.equal(king.score.ruleR10OuterBishopPenalty, 0, transform.name)
+    const selection = selectCandidatesByRules(candidates, twoBishopsWhiteRules)
+    assert.equal(selection.eliminatedBy.get(king)?.id, 'rule r25', transform.name)
+    assert.equal(selection.eliminatedBy.get(choke)?.id, 'rule r10', transform.name)
+    assert.equal(chosen.score.ruleR24_5KingDistance, 13, transform.name)
+    assert.equal(selection.lastEliminatingRule?.id, 'rule r30', transform.name)
     assert.deepEqual(getIdealTwoBishopsWhiteMoves(fen), [chosenMove], transform.name)
   }
 })
 
-test('r18 keeps the original Bf6 choke when White starts strictly outside the wall', () => {
+test('r18 keeps the original Bf6 choke after r10 ties Be8 and Bh5 off the target edges', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     const fen = transformFen(outsideFen, transform)
     // Kg7 is beyond e8-h5, opposite Black on the other side of d8-h4.
@@ -69,6 +87,9 @@ test('r18 keeps the original Bf6 choke when White starts strictly outside the wa
     assert.equal(choke.ruleR18Penalty, 0, transform.name)
     assert.equal(retreat.ruleR18Penalty, 1, transform.name)
     assert.ok(compareScoresByRules(choke, retreat, [r18]) < 0, transform.name)
+    assert.equal(choke.ruleR10OuterBishopPenalty, 0, transform.name)
+    assert.equal(retreat.ruleR10OuterBishopPenalty, 0, transform.name)
+    assert.ok(compareScoresByRules(choke, retreat, twoBishopsWhiteRules) < 0, transform.name)
     assert.deepEqual(getIdealTwoBishopsWhiteMoves(fen), [chokeMove], transform.name)
 
     // Eligibility belongs to the starting position even when a candidate
