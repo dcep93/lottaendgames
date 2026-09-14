@@ -1321,14 +1321,16 @@ test('priority guide follows registered facade order and renders typed diagrams'
         decodedMarkup.indexOf('>Keyboard shortcuts<'),
     )
   }
-  assert.match(markup, />edge cage</)
-  assert.match(markup, />knight key square</)
-  assert.match(markup, /aria-label="edge cage\. Black king on f8/)
-  assert.match(markup, /aria-label="knight key square\. Black king on d8/)
-  assert.match(markup, /data-highlight-kind="zone"/)
-  assert.match(markup, /data-highlight-kind="key"/)
-  assert.match(markup, /data-arrow="e5-f6"/)
-  assert.doesNotMatch(markup, /<img\b|\ssrc=/)
+  assert.doesNotMatch(markup, />edge cage</)
+  assert.doesNotMatch(markup, />knight key square</)
+  for (const size of [3, 5, 7]) assert.ok(!decodedMarkup.includes(`${size}-diagonal support`))
+  assert.doesNotMatch(decodedMarkup, /rule r3 —/)
+  assert.ok(decodedMarkup.includes("Prefer king Euclidean proximity to the center, then bishop proximity to the center, then non-central bishop proximity to Black's king, then knight move proximity to the central square diagonally adjacent to the central bishop, then knight distance from Black, then white piece proximity to White's king."))
+  assert.doesNotMatch(decodedMarkup, /rule (?:r5|r6|r9|r15|r18|r20|s10)\b|king closer|mating net/)
+  assert.match(markup, /src="\/mate\/bishop-knight\/solidify-seven-diagonal\.gif"/)
+  const animation = [...markup.matchAll(/<figure\b[^]*?<\/figure>/g)].map(match => match[0]).find(figure => figure.includes('solidify-seven-diagonal.gif'))
+  assert.ok(animation)
+  assert.ok(animation.indexOf('<img') < animation.indexOf('<figcaption>'))
 })
 
 test('mate guides omit empty notes and place useful notes before shortcuts', () => {

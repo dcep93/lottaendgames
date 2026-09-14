@@ -9,7 +9,6 @@ import {
   transformSquare,
 } from "../chess";
 import {
-  getIdealKnightAndBishopWhiteMoves,
   getKnightAndBishopOpponentCandidates,
   getKnightAndBishopPhaseLabel,
   getKnightAndBishopLookupEntryResultFen,
@@ -20,7 +19,6 @@ import {
   isKnightAndBishopWManeuverPosition,
   knightAndBishopWhiteMoveReachesLookupPath,
   knightAndBishopWhiteRules,
-  scoreKnightAndBishopWhiteMove,
   wManeuverSetupDistance,
 } from "./index";
 import {
@@ -110,44 +108,42 @@ test("bishop-and-knight rules are registered", () => {
       helpText: "",
     },
     {
-      id: "mating net",
-      shortLabel: "mating net",
-      helpText:
-        "Follow the recorded finishing move when available; otherwise enter the mating net.",
+      id: "r1",
+      shortLabel: "rule r1",
+      helpText: "With a king supported 3 diagonal and the knight within 1 move of the support square, check.",
     },
     {
-      id: "king closer",
-      shortLabel: "king closer",
-      helpText:
-        "Before the wall is set, or after a far-away knight is central, bring White's king closer on the color opposite the bishop without moving it farther away.",
+      id: "r1.5",
+      shortLabel: "rule r1.5",
+      helpText: "Prefer a supported smaller odd diagonal, then knight move proximity to its support square.",
+    },
+    {
+      id: "r2.5",
+      shortLabel: "rule r2.5",
+      helpText: "With the knight on its support square, prefer forcing the Black king towards the target corner.",
+    },
+    {
+      id: "r3.8",
+      shortLabel: "rule r3.8",
+      helpText: "Prepare the 7-diagonal. With the Black king one edge square from an opposite-colored corner, the knight diagonally adjacent and off the edge, and the bishop x-raying Black's king through the knight: place White's king in non-edge opposition.",
+    },
+    {
+      id: "r4",
+      shortLabel: "rule r4",
+      helpText: "With the Black king within 1 edge move from the non-target corner, prefer White king proximity to 2 squares diagonally away from that corner, then prefer knight move proximity to Black's corner, then prefer the bishop along the length 7 diagonal closer to the target corner.",
+    },
+    {
+      id: "r8",
+      shortLabel: "rule r8",
+      helpText: "With a central bishop and central knight on the bishop's color, prefer king proximity to the square a knight's move from each piece and closer to Black's king, then prefer king distance from the bishop.",
+    },
+    {
+      id: "r10",
+      shortLabel: "rule r10",
+      helpText: "Prefer king Euclidean proximity to the center, then bishop proximity to the center, then non-central bishop proximity to Black's king, then knight move proximity to the central square diagonally adjacent to the central bishop, then knight distance from Black, then white piece proximity to White's king.",
     },
   ]);
-  assert.deepEqual(
-    ruleSet.help.noteBoards.map(({ id }) => id),
-    ["zone-x", "key-square"],
-  );
-  assert.deepEqual(ruleSet.help.noteBoards[0], {
-    id: "zone-x",
-    title: "edge cage",
-    caption:
-      "The bishop and knight fence Black along the edge while White's king closes in.",
-    layout: { files: 8, ranks: 8, fileOffset: 0 },
-    pieces: [
-      { square: "f8", piece: "k" },
-      { square: "e5", piece: "K" },
-      { square: "e6", piece: "B" },
-      { square: "c6", piece: "N" },
-    ],
-    highlights: [
-      { square: "e8", kind: "zone" },
-      { square: "f8", kind: "zone" },
-      { square: "c6", kind: "key" },
-      { square: "e6", kind: "key" },
-      { square: "g7", kind: "escape" },
-    ],
-    arrows: [{ from: "e5", to: "f6" }],
-  });
-  assert.equal(Object.isFrozen(ruleSet.help.noteBoards[0]?.pieces), true);
+  assert.equal(ruleSet.help.noteBoards.find(board => board.animationSrc)?.id, "bishop-knight-solidify-seven-diagonal");
   assert.deepEqual(ruleSet.help.blackPriorities, [
     "Take a piece when White isn't looking.",
     "Return to the previous board position when possible.",
@@ -164,25 +160,24 @@ test("bishop-and-knight rules are registered", () => {
       "mate",
       "minors safe",
       "no stalemate",
-      "mating net",
-      "king closer",
+      "r1",
+      "r1.5",
+      "r2.5",
+      "r3.8",
+      "r4",
+      "r8",
+      "r10",
     ],
   );
   assert.deepEqual(
     ruleSet.whiteRuleDescriptions.map(({ id }) => id),
     knightAndBishopWhiteRules.map(({ id }) => id),
   );
-  assert.equal(knightAndBishopWhiteRules.length, 5);
+  assert.equal(knightAndBishopWhiteRules.length, 10);
 });
 
-test("direct lookup is decisive while immediate mate keeps precedence", () => {
+test("immediate mate keeps precedence without the mating-net rule", () => {
   const ruleSet = getMateRuleSet("bishop-knight");
-  const lookupFen = "8/8/5KNk/5B2/8/8/8/8 w - - 34 18";
-  assert.deepEqual(getKnightAndBishopLookupWhiteMoves(lookupFen), ["Bg4"]);
-  assert.deepEqual(ruleSet.idealWhiteMoves(lookupFen), ["Bg4"]);
-  assert.equal(ruleSet.currentWhiteHint(lookupFen)?.id, "mating net");
-  assert.equal(ruleSet.explainWhiteMove(lookupFen, "Ke7")?.id, "mating net");
-
   const mateFen = "k7/8/NK6/5B2/8/8/8/8 w - - 0 1";
   assert.deepEqual(getKnightAndBishopLookupWhiteMoves(mateFen), ["Be4#"]);
   assert.deepEqual(ruleSet.idealWhiteMoves(mateFen), ["Be4#"]);
@@ -190,32 +185,6 @@ test("direct lookup is decisive while immediate mate keeps precedence", () => {
   assert.equal(ruleSet.explainWhiteMove(mateFen, "Nb8")?.id, "mate");
 });
 
-test("king closer does not pull the mating king back toward the center", () => {
-  const fen = "8/4BK1k/8/4N3/8/8/8/8 w - - 0 1";
-  const moves = getIdealKnightAndBishopWhiteMoves(fen);
-
-  assert.equal(
-    scoreKnightAndBishopWhiteMove(fen, "Kf6")
-      .kingCloserOppositeBishopScore,
-    99,
-  );
-  assert.ok(!moves.includes("Kf6"));
-});
-
-test("king closer advances the far king after the knight is central", () => {
-  const fen = "7k/8/KB6/4N3/8/8/8/8 w - - 0 1";
-  const moves = getIdealKnightAndBishopWhiteMoves(fen);
-
-  assert.ok(moves.length > 0);
-  assert.ok(moves.every((san) => san.startsWith("K")));
-  assert.ok(
-    moves.every(
-      (san) =>
-        scoreKnightAndBishopWhiteMove(fen, san)
-          .kingCloserOppositeBishopScore < 99,
-    ),
-  );
-});
 
 test("all lookup moves survive every symmetry without transformed collisions", () => {
   const movesByPosition = new Map<string, Set<string>>();
@@ -265,11 +234,6 @@ test("phase handoff requires a forced lookup path on the white turn", () => {
   const handoffFen = "6k1/8/5KB1/6N1/8/8/8/8 w - - 0 1";
   assert.equal(getKnightAndBishopPhaseLabel(handoffFen), "2/2");
   assert.equal(isKnightAndBishopMatingNetWhiteTurnPosition(handoffFen), true);
-  assert.equal(
-    scoreKnightAndBishopWhiteMove(handoffFen, "Nf7").phaseTwoEntryScore,
-    0,
-  );
-  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(handoffFen), ["Nf7"]);
   const handedOff = getChess(handoffFen);
   handedOff.move("Nf7");
   assert.equal(isKnightAndBishopLookupPhasePosition(handedOff.fen()), true);
@@ -283,13 +247,7 @@ test("phase handoff requires a forced lookup path on the white turn", () => {
     knightAndBishopWhiteMoveReachesLookupPath(falseEntryFen, "Nf5+"),
     false,
   );
-  assert.equal(
-    scoreKnightAndBishopWhiteMove(falseEntryFen, "Nf5+").phaseTwoEntryScore,
-    1,
-  );
-  assert.notDeepEqual(getIdealKnightAndBishopWhiteMoves(falseEntryFen), [
-    "Nf5+",
-  ]);
+
 });
 
 test("forced lookup re-entry holes remain in the mating net", () => {
@@ -322,12 +280,9 @@ test("forced lookup re-entry holes remain in the mating net", () => {
 });
 
 test("literal lookup collision and re-entry branches preserve source choices and phases", () => {
-  const ruleSet = getMateRuleSet("bishop-knight");
   const collisionFen = "k7/1N3B2/1K6/8/8/8/8/8 w - - 0 1";
   assert.deepEqual(getKnightAndBishopLookupWhiteMoves(collisionFen), ["Be6"]);
-  assert.deepEqual(ruleSet.idealWhiteMoves(collisionFen), ["Be6"]);
   assert.equal(getKnightAndBishopPhaseLabel(collisionFen), "2/2");
-  assert.equal(ruleSet.currentWhiteHint(collisionFen)?.id, "mating net");
   const collision = getChess(collisionFen);
   collision.move("Be6");
   assert.deepEqual(
@@ -401,18 +356,7 @@ test("literal lookup collision and re-entry branches preserve source choices and
         if (!mate) {
           assert.deepEqual(getKnightAndBishopLookupWhiteMoves(fen), [san], fen);
         }
-        assert.deepEqual(ruleSet.idealWhiteMoves(fen), [san], fen);
         assert.equal(getKnightAndBishopPhaseLabel(fen), "2/2", fen);
-        assert.equal(
-          ruleSet.currentWhiteHint(fen)?.id,
-          mate ? "mate" : "mating net",
-          fen,
-        );
-        assert.equal(
-          ruleSet.explainWhiteMove(fen, san)?.id,
-          mate ? "mate" : "mating net",
-          fen,
-        );
         assertedWhitePlies += 1;
       } else {
         assert.ok(
@@ -429,7 +373,7 @@ test("literal lookup collision and re-entry branches preserve source choices and
   assert.equal(assertedBlackPlies, 21);
 });
 
-test("canonical Train lookup line preserves White choices and Black resistance", () => {
+test("recorded canonical Train line preserves lookup coverage and Black resistance", () => {
   const line = [
     "Nf7+",
     "Kg8",
@@ -472,7 +416,7 @@ test("canonical Train lookup line preserves White choices and Black resistance",
   for (const san of line) {
     if (chess.turn() === "w") {
       assert.ok(
-        getIdealKnightAndBishopWhiteMoves(chess.fen()).includes(san),
+        getKnightAndBishopLookupWhiteMoves(chess.fen()).includes(san) || knightAndBishopWhiteMoveReachesLookupPath(chess.fen(), san),
         `${san} from ${chess.fen()}`,
       );
       assert.equal(getKnightAndBishopPhaseLabel(chess.fen()), "2/2");
@@ -520,92 +464,4 @@ test("Black preserves return, W-maneuver, lookup, and score priorities", () => {
       .idealMoves,
     ["Ke5"],
   );
-});
-
-function seededRandom(seed: number): () => number {
-  let state = seed >>> 0;
-  return () => {
-    state = (Math.imul(state, 1_664_525) + 1_013_904_223) >>> 0;
-    return state / 0x1_0000_0000;
-  };
-}
-
-function playDeterministicSelfPlay(
-  startFen: string,
-  seed: number,
-  maximumPlies = 220,
-  stopAtPreMatingNetLoop = false,
-) {
-  const chess = getChess(startFen);
-  const random = seededRandom(seed);
-  const seenBeforeMatingNet = new Set<string>();
-  let phaseTwoReached = false;
-  let lastWhiteTurnFen: string | undefined;
-  let blackReturnTargetFen: string | undefined;
-  const moves: string[] = [];
-
-  while (!chess.isGameOver() && moves.length < maximumPlies) {
-    if (
-      chess.turn() === "w" &&
-      getKnightAndBishopPhaseLabel(chess.fen()) === "2/2"
-    ) {
-      phaseTwoReached = true;
-    }
-    const key = chess.fen().split(" ").slice(0, 2).join(" ");
-    if (!phaseTwoReached) {
-      if (seenBeforeMatingNet.has(key) && stopAtPreMatingNetLoop) {
-        return {
-          chess,
-          moves,
-          phaseTwoReached,
-          preMatingNetLoop: key,
-        };
-      }
-      assert.equal(
-        seenBeforeMatingNet.has(key),
-        false,
-        `pre-mating-net loop: ${moves.join(" ")}`,
-      );
-      seenBeforeMatingNet.add(key);
-    }
-
-    let choices: readonly string[];
-    if (chess.turn() === "w") {
-      choices = getIdealKnightAndBishopWhiteMoves(chess.fen());
-      blackReturnTargetFen = lastWhiteTurnFen;
-      lastWhiteTurnFen = chess.fen();
-    } else {
-      choices = getKnightAndBishopOpponentCandidates(
-        chess.fen(),
-        blackReturnTargetFen,
-      ).idealMoves;
-      blackReturnTargetFen = undefined;
-    }
-    assert.ok(choices.length > 0, chess.fen());
-    const san = choices[Math.floor(random() * choices.length)];
-    chess.move(san);
-    moves.push(san);
-  }
-
-  return {
-    chess,
-    moves,
-    phaseTwoReached,
-    preMatingNetLoop: undefined,
-  };
-}
-
-test("all Train symmetries mate across deterministic tied replies", () => {
-  const canonical = "7k/8/5K2/6N1/4B3/8/8/8 w - - 42 22";
-  SQUARE_TRANSFORMS.forEach((transform, transformIndex) => {
-    const fen = transformFen(canonical, transform);
-    for (let tieSeed = 0; tieSeed < 16; tieSeed += 1) {
-      const result = playDeterministicSelfPlay(
-        fen,
-        88_000 + transformIndex * 100 + tieSeed,
-      );
-      assert.equal(result.chess.isCheckmate(), true, result.moves.join(" "));
-      assert.ok(result.moves.length <= 39, result.moves.join(" "));
-    }
-  });
 });

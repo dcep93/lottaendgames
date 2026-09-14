@@ -1,172 +1,210 @@
-import {
-  edgeDistance,
-  findPiece,
-  isKnightMove,
-  kingDistance,
-  squareCoords,
-  squaredEuclideanDistance,
-} from '../chess'
-import {
-  centerDistance,
-  isMiddle16Square,
-  middle16Distance,
-  sameSquareColor,
-} from './bishopKnightGeometry'
+import type { Square } from 'chess.js'
+import { allSquares, edgeDistance, kingDistance, findPiece, getChess, isKnightMove, squareColor, squareCoords, squaredEuclideanDistance, SQUARE_TRANSFORMS, transformSquare } from '../chess'
 
-export function knightAndBishopBishopWallScore(fen: string): number {
-  const whiteKing = findPiece(fen, 'w', 'k')
-  const blackKing = findPiece(fen, 'b', 'k')
+const matingBishopDiagonal = ['a7', 'b6', 'c5', 'd4', 'e3', 'f2', 'g1'] as const
+const bishopApproachDiagonal = ['b6', 'c5', 'd4', 'e3', 'f2', 'g1'] as const
+const finishingBishopDiagonal = ['d7', 'e6', 'f5', 'g4', 'h3'] as const
+
+const bishopSetupDiagonal = ['a3', 'b4', 'c5', 'd6', 'e7', 'f8'] as const
+const bishopSetupPatterns = SQUARE_TRANSFORMS.flatMap(transform =>
+  ([
+    { knight: 'b7', blackKing: 'a6', sourceDiagonal: ['c8', ...finishingBishopDiagonal], destinations: finishingBishopDiagonal, reply: 'a7' },
+    { knight: 'c7', blackKing: 'b8', sourceDiagonal: matingBishopDiagonal, destinations: matingBishopDiagonal, reply: 'c8' },
+    { knight: 'c7', blackKing: 'c8', sourceDiagonal: bishopApproachDiagonal, destinations: ['a7'], reply: 'd8' },
+    { knight: 'c7', blackKing: 'd8', sourceDiagonal: bishopApproachDiagonal, destinations: bishopSetupDiagonal, reply: 'c8' },
+    { knight: 'c7', blackKing: 'c8', sourceDiagonal: ['a3', 'b4', 'd6', 'e7', 'f8'], destinations: ['e7'], reply: 'b8' },
+    { knight: 'c7', blackKing: 'b8', sourceDiagonal: bishopSetupDiagonal, destinations: ['c5'], reply: 'c8' },
+  ] as const).map(pattern => ({
+    whiteKing: transformSquare('c6', transform),
+    knight: transformSquare(pattern.knight, transform),
+    blackKing: transformSquare(pattern.blackKing, transform),
+    sourceDiagonal: pattern.sourceDiagonal.map(square => transformSquare(square, transform)),
+    destinations: pattern.destinations.map(square => transformSquare(square, transform)),
+    reply: transformSquare(pattern.reply, transform),
+  })))
+
+const matingContinuationPatterns = SQUARE_TRANSFORMS.flatMap(transform =>
+  ([
+    { whiteKing: 'f6', knight: 'e4', blackKing: 'h6', bishopSquares: ['d5'], from: 'f6', to: 'f5' },
+    { whiteKing: 'f5', knight: 'e4', blackKing: 'h5', bishopSquares: ['d5'], from: 'e4', to: 'f2' },
+    { whiteKing: 'f5', knight: 'f2', blackKing: 'h6', bishopSquares: ['d5'], from: 'f2', to: 'g4' },
+    { whiteKing: 'f5', knight: 'g4', blackKing: 'g7', bishopSquares: ['d5'], from: 'g4', to: 'e5' },
+    { whiteKing: 'f5', knight: 'e5', blackKing: 'f8', bishopSquares: ['d5'], from: 'f5', to: 'f6' },
+    { whiteKing: 'f6', knight: 'e5', blackKing: 'e8', bishopSquares: ['d5'], from: 'f6', to: 'e6' },
+    { whiteKing: 'e6', knight: 'e5', blackKing: 'd8', bishopSquares: ['d5'], from: 'e5', to: 'd7' },
+    { whiteKing: 'e5', knight: 'e4', blackKing: 'h7', bishopSquares: ['d5'], from: 'e5', to: 'f6' },
+    { whiteKing: 'f6', knight: 'e4', blackKing: 'h8', bishopSquares: ['d5'], from: 'e4', to: 'd6' },
+    { whiteKing: 'f6', knight: 'd6', blackKing: 'h7', bishopSquares: ['d5'], from: 'd6', to: 'f7' },
+    { whiteKing: 'f6', knight: 'f7', blackKing: 'g8', bishopSquares: ['d5'], from: 'd5', to: 'e4' },
+    { whiteKing: 'e6', knight: 'e4', blackKing: 'f8', bishopSquares: ['d5'], from: 'e4', to: 'd6' },
+    { whiteKing: 'e6', knight: 'd6', blackKing: 'g7', bishopSquares: ['d5'], from: 'd6', to: 'f7' },
+    { whiteKing: 'e6', knight: 'f7', blackKing: 'g6', bishopSquares: ['d5'], from: 'd5', to: 'f3' },
+    { whiteKing: 'e6', knight: 'f7', blackKing: 'g7', bishopSquares: ['f3'], from: 'f3', to: 'e4' },
+    { whiteKing: 'f6', knight: 'e4', blackKing: 'e8', bishopSquares: ['d5'], from: 'f6', to: 'e6' },
+    { whiteKing: 'e6', knight: 'e4', blackKing: 'd8', bishopSquares: ['d5'], from: 'e4', to: 'c5' },
+    { whiteKing: 'e6', knight: 'c5', blackKing: 'c8', bishopSquares: ['d5'], from: 'c5', to: 'd7' },
+    { whiteKing: 'c6', knight: 'b7', blackKing: 'a7', bishopSquares: finishingBishopDiagonal, from: 'b7', to: 'c5' },
+    { whiteKing: 'c6', knight: 'c5', blackKing: 'a8', bishopSquares: finishingBishopDiagonal, from: 'c6', to: 'b6' },
+    { whiteKing: 'b6', knight: 'c5', blackKing: 'b8', bishopSquares: finishingBishopDiagonal, from: 'c5', to: 'a6' },
+    { whiteKing: 'c6', knight: 'b7', blackKing: 'a8', bishopSquares: ['c8', 'd7', 'e6', 'f5', 'g4', 'h3'], from: 'c6', to: 'b6' },
+    { whiteKing: 'c6', knight: 'c7', blackKing: 'd8', bishopSquares: ['a7'], from: 'c7', to: 'd5' },
+    { whiteKing: 'c6', knight: 'd5', blackKing: 'e8', bishopSquares: matingBishopDiagonal, from: 'c6', to: 'd6' },
+    { whiteKing: 'd6', knight: 'd5', blackKing: 'f7', bishopSquares: matingBishopDiagonal, from: 'd5', to: 'e7' },
+    { whiteKing: 'd6', knight: 'd5', blackKing: 'd8', bishopSquares: matingBishopDiagonal, from: 'd5', to: 'e7' },
+    { whiteKing: 'd6', knight: 'e7', blackKing: 'e8', bishopSquares: matingBishopDiagonal, from: 'd6', to: 'e6' },
+  ] as const).map(pattern => ({
+    whiteKing: transformSquare(pattern.whiteKing, transform),
+    knight: transformSquare(pattern.knight, transform),
+    blackKing: transformSquare(pattern.blackKing, transform),
+    from: transformSquare(pattern.from, transform),
+    to: transformSquare(pattern.to, transform),
+    diagonal: pattern.bishopSquares.map(square => transformSquare(square, transform)),
+  })))
+
+export function getKnightAndBishopMatingContinuationMoves(fen: string): readonly string[] {
+  const white = findPiece(fen, 'w', 'k')
+  const black = findPiece(fen, 'b', 'k')
+  const knight = findPiece(fen, 'w', 'n')
   const bishop = findPiece(fen, 'w', 'b')
-  if (!whiteKing || !blackKing || !bishop) return 2
-
-  const whiteKingCoords = squareCoords(whiteKing.square)
-  const blackKingCoords = squareCoords(blackKing.square)
-  const bishopCoords = squareCoords(bishop.square)
-  const edgeAdjacent =
-    Math.abs(bishopCoords.file - whiteKingCoords.file) +
-      Math.abs(bishopCoords.rank - whiteKingCoords.rank) ===
-    1
-  if (!edgeAdjacent) return 2
-
-  const blackFile = blackKingCoords.file - whiteKingCoords.file
-  const blackRank = blackKingCoords.rank - whiteKingCoords.rank
-  const bishopFile = bishopCoords.file - whiteKingCoords.file
-  const bishopRank = bishopCoords.rank - whiteKingCoords.rank
-  return blackFile * bishopFile + blackRank * bishopRank > 0 ? 0 : 1
+  if (!bishop) return []
+  const patterns = matingContinuationPatterns.filter(pattern =>
+    pattern.whiteKing === white?.square && pattern.blackKing === black?.square &&
+    pattern.knight === knight?.square && pattern.diagonal.includes(bishop.square))
+  const bishopPatterns = bishopSetupPatterns.filter(pattern =>
+    pattern.whiteKing === white?.square && pattern.blackKing === black?.square &&
+    pattern.knight === knight?.square && pattern.sourceDiagonal.includes(bishop.square))
+  if (patterns.length === 0 && bishopPatterns.length === 0) return []
+  const chess = getChess(fen)
+  if (chess.turn() !== 'w') return []
+  return chess.moves({ verbose: true }).filter(move => {
+    if (patterns.some(pattern => move.from === pattern.from && move.to === pattern.to)) return true
+    if (move.piece !== 'b') return false
+    const matching = bishopPatterns.filter(pattern => pattern.destinations.includes(move.to))
+    if (matching.length === 0) return false
+    const after = getChess(fen)
+    after.move(move.san)
+    const replies = after.moves({ verbose: true })
+    return replies.length === 1 && matching.some(pattern => replies[0]!.to === pattern.reply)
+  }).map(move => move.san)
 }
 
-export function knightAndBishopKingCloserOppositeBishopScore(
-  fen: string,
-  resultFen: string,
-  piece: string | undefined
-): number {
-  if (piece !== "k") {
-    return 99;
-  }
-  const beforeWhiteKing = findPiece(fen, "w", "k");
-  const beforeBlackKing = findPiece(fen, "b", "k");
-  const afterWhiteKing = findPiece(resultFen, "w", "k");
-  const afterBlackKing = findPiece(resultFen, "b", "k");
-  const bishop = findPiece(resultFen, "w", "b");
-  if (
-    !beforeWhiteKing ||
-    !beforeBlackKing ||
-    !afterWhiteKing ||
-    !afterBlackKing ||
-    !bishop
-  ) {
-    return 99;
-  }
-  if (
-    isMiddle16Square(beforeWhiteKing.square) &&
-    !isMiddle16Square(afterWhiteKing.square)
-  ) {
-    return 99;
-  }
-  if (
-    edgeDistance(beforeBlackKing.square) > 0 &&
-    knightAndBishopKingApproachesMiddle16(fen, resultFen, piece)
-  ) {
-    return 50 + middle16Distance(afterWhiteKing.square);
-  }
-
-  const afterDistance = squaredEuclideanDistance(
-    afterWhiteKing.square,
-    afterBlackKing.square
-  );
-  if (
-    kingDistance(afterWhiteKing.square, afterBlackKing.square) >=
-      kingDistance(beforeWhiteKing.square, beforeBlackKing.square) ||
-    afterDistance >=
-    squaredEuclideanDistance(
-      beforeWhiteKing.square,
-      beforeBlackKing.square
-    )
-  ) {
-    return 99;
-  }
-  return sameSquareColor(afterWhiteKing.square, bishop.square) &&
-    !isKnightAndBishopDiagonalBishopApproachShape(fen)
-    ? 99
-    : afterDistance;
+function centerProximity(square: Square): number {
+  const { file, rank } = squareCoords(square)
+  // Four times squared distance to the board's midpoint keeps scores integral.
+  return (2 * file - 7) ** 2 + (2 * rank - 7) ** 2
 }
 
-function knightAndBishopKingApproachesMiddle16(
-  fen: string,
-  resultFen: string,
-  piece: string | undefined
-): boolean {
-  if (piece !== "k") {
-    return false;
-  }
-  const beforeWhiteKing = findPiece(fen, "w", "k");
-  const afterWhiteKing = findPiece(resultFen, "w", "k");
-  return Boolean(
-    beforeWhiteKing &&
-    afterWhiteKing &&
-    !isMiddle16Square(beforeWhiteKing.square) &&
-    middle16Distance(afterWhiteKing.square) <
-    middle16Distance(beforeWhiteKing.square)
-  );
+export function knightAndBishopKingCenterProximityScore(fen: string): number {
+  const king = findPiece(fen, 'w', 'k')
+  return king ? centerProximity(king.square) : 99
 }
 
-export function knightAndBishopKingDistanceRegressionScore(
-  fen: string,
-  resultFen: string,
-  piece: string | undefined
-): number {
-  if (piece !== "k") {
-    return 0;
-  }
-  const beforeWhiteKing = findPiece(fen, "w", "k");
-  const beforeBlackKing = findPiece(fen, "b", "k");
-  const afterWhiteKing = findPiece(resultFen, "w", "k");
-  const afterBlackKing = findPiece(resultFen, "b", "k");
-  if (!beforeWhiteKing || !beforeBlackKing || !afterWhiteKing || !afterBlackKing) {
-    return 0;
-  }
-  const beforeDistance = squaredEuclideanDistance(
-    beforeWhiteKing.square,
-    beforeBlackKing.square
-  );
-  const afterDistance = squaredEuclideanDistance(
-    afterWhiteKing.square,
-    afterBlackKing.square
-  );
-  return Math.max(0, afterDistance - beforeDistance);
+export function knightAndBishopBishopCenterProximityScore(fen: string): number {
+  const bishop = findPiece(fen, 'w', 'b')
+  return bishop ? centerProximity(bishop.square) : 99
 }
 
-function isKnightAndBishopDiagonalBishopApproachShape(fen: string): boolean {
-  const whiteKing = findPiece(fen, "w", "k");
-  const blackKing = findPiece(fen, "b", "k");
-  const bishop = findPiece(fen, "w", "b");
-  if (!whiteKing || !blackKing || !bishop) {
-    return false;
+const CENTRAL_SQUARES: readonly Square[] = ['d4', 'e4', 'd5', 'e5']
+const squares = allSquares()
+const knightNeighbors = new Map(squares.map(square =>
+  [square, squares.filter(other => isKnightMove(square, other))]))
+// Knight-move distances depend only on board geometry, so compute them once.
+const knightDistances = new Map(squares.map(start => {
+  const distances = new Map<Square, number>([[start, 0]])
+  const queue = [start]
+  for (let i = 0; i < queue.length; i++) {
+    const square = queue[i]!
+    for (const next of knightNeighbors.get(square)!) {
+      if (distances.has(next)) continue
+      distances.set(next, distances.get(square)! + 1)
+      queue.push(next)
+    }
   }
-  const whiteKingCoords = squareCoords(whiteKing.square);
-  const blackKingCoords = squareCoords(blackKing.square);
-  const bishopCoords = squareCoords(bishop.square);
-  const kingFileDistance = Math.abs(
-    whiteKingCoords.file - blackKingCoords.file
-  );
-  const kingRankDistance = Math.abs(
-    whiteKingCoords.rank - blackKingCoords.rank
-  );
-  const bishopFileDistance = Math.abs(
-    bishopCoords.file - whiteKingCoords.file
-  );
-  const bishopRankDistance = Math.abs(
-    bishopCoords.rank - whiteKingCoords.rank
-  );
-  return (
-    kingFileDistance === 2 &&
-    kingRankDistance === 2 &&
-    bishopFileDistance + bishopRankDistance === 1 &&
-    isKnightMove(bishop.square, blackKing.square)
-  );
+  return [start, distances]
+}))
+
+export function knightAndBishopKnightTargetSquares(fen: string): Square[] {
+  const bishop = findPiece(fen, 'w', 'b')
+  if (!bishop || !CENTRAL_SQUARES.includes(bishop.square)) return []
+  return CENTRAL_SQUARES.filter(square => squaredEuclideanDistance(square, bishop.square) === 2)
 }
 
-export function knightAndBishopKnightCentralDistance(fen: string): number {
-  const knight = findPiece(fen, "w", "n");
-  return knight ? centerDistance(knight.square) : 99;
+export function knightAndBishopKnightTargetProximityScore(fen: string): number {
+  const knight = findPiece(fen, 'w', 'n')
+  const targets = knightAndBishopKnightTargetSquares(fen)
+  return knight && targets.length > 0
+    ? Math.min(...targets.map(target => knightDistances.get(knight.square)!.get(target)!)) : 99
+}
+
+export function knightAndBishopCentralKingTargets(fen: string): Square[] {
+  const bishop = findPiece(fen, 'w', 'b')
+  const knight = findPiece(fen, 'w', 'n')
+  const black = findPiece(fen, 'b', 'k')
+  if (!bishop || !knight || !black ||
+    !CENTRAL_SQUARES.includes(bishop.square) || !CENTRAL_SQUARES.includes(knight.square) ||
+    squareColor(bishop.square) !== squareColor(knight.square)) return []
+  const candidates = squares.filter(square =>
+    isKnightMove(square, bishop.square) && isKnightMove(square, knight.square))
+  const closest = Math.min(...candidates.map(square => squaredEuclideanDistance(square, black.square)))
+  return candidates.filter(square => squaredEuclideanDistance(square, black.square) === closest)
+}
+
+export function knightAndBishopCornerKnightTarget(fen: string): Square | undefined {
+  const black = findPiece(fen, 'b', 'k')
+  const bishop = findPiece(fen, 'w', 'b')
+  const corners: readonly Square[] = ['a1', 'a8', 'h1', 'h8']
+  return black && bishop && edgeDistance(black.square) === 0
+    ? corners.find(corner => squareColor(corner) !== squareColor(bishop.square) && kingDistance(black.square, corner) <= 1) : undefined
+}
+
+export function knightAndBishopKnightProximityToSquare(fen: string, target: Square): number {
+  const knight = findPiece(fen, 'w', 'n')
+  return knight ? knightDistances.get(knight.square)!.get(target)! : 99
+}
+
+export function knightAndBishopKingCornerProximity(fen: string, corner: Square): number {
+  const setups: Partial<Record<Square, Square>> = { a1: 'c3', a8: 'c6', h1: 'f3', h8: 'f6' }
+  const target = setups[corner]
+  const king = findPiece(fen, 'w', 'k')
+  return king && target ? squaredEuclideanDistance(king.square, target) : 99
+}
+
+export const SEVEN_SQUARE_DIAGONALS: readonly (readonly Square[])[] = [
+  ['a2', 'b3', 'c4', 'd5', 'e6', 'f7', 'g8'],
+  ['b1', 'c2', 'd3', 'e4', 'f5', 'g6', 'h7'],
+  ['a7', 'b6', 'c5', 'd4', 'e3', 'f2', 'g1'],
+  ['b8', 'c7', 'd6', 'e5', 'f4', 'g3', 'h2'],
+]
+
+const TARGET_CORNER_EXCEPTIONS = SQUARE_TRANSFORMS.map(transform => ({
+  whiteKing: transformSquare('f6', transform),
+  knight: transformSquare('f7', transform),
+  blackKing: transformSquare('h7', transform),
+  target: transformSquare('a8', transform),
+}))
+
+export function knightAndBishopTargetCorners(fen: string): Square[] {
+  const black = findPiece(fen, 'b', 'k')
+  const bishop = findPiece(fen, 'w', 'b')
+  if (!black || !bishop) return []
+  const white = findPiece(fen, 'w', 'k')
+  const knight = findPiece(fen, 'w', 'n')
+  const exception = TARGET_CORNER_EXCEPTIONS.find(pattern =>
+    pattern.whiteKing === white?.square && pattern.knight === knight?.square &&
+    pattern.blackKing === black.square)
+  if (exception) return [exception.target]
+  const corners: Square[] = ['a1', 'a8', 'h1', 'h8']
+  const matching = corners.filter(corner => squareColor(corner) === squareColor(bishop.square))
+  const closest = Math.min(...matching.map(corner => squaredEuclideanDistance(corner, black.square)))
+  return matching.filter(corner => squaredEuclideanDistance(corner, black.square) === closest)
+}
+
+export function knightAndBishopTargetCornerDiagonals(fen: string): readonly (readonly Square[])[] {
+  const targets = knightAndBishopTargetCorners(fen)
+  const diagonals = SEVEN_SQUARE_DIAGONALS.filter(diagonal => targets.some(corner =>
+    squareColor(diagonal[0]!) === squareColor(corner)))
+  return diagonals.filter(diagonal => targets.some(corner => {
+    const distance = (line: readonly Square[]) => Math.min(...line.map(square => squaredEuclideanDistance(square, corner)))
+    return distance(diagonal) === Math.min(...diagonals.map(distance))
+  }))
 }

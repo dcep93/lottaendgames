@@ -1,4 +1,5 @@
 import type { Square } from 'chess.js'
+import { getKnightAndBishopMatingContinuationMoves } from './bishopKnightStrategy'
 import {
   SQUARE_TRANSFORMS,
   edgeDistance,
@@ -235,7 +236,8 @@ export function isKnightAndBishopMatingNetWhiteTurnPosition(
   return (
     chess.turn() === 'w' &&
     knightAndBishopPiecesPresent(fen) &&
-    (getKnightAndBishopLookupWhiteMoves(fen).length > 0 ||
+    (getKnightAndBishopMatingContinuationMoves(fen).length > 0 ||
+      getKnightAndBishopLookupWhiteMoves(fen).length > 0 ||
       chess
         .moves()
         .some((san) => knightAndBishopWhiteMoveReachesLookupPath(fen, san)))

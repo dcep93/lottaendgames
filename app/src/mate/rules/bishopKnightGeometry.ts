@@ -32,6 +32,20 @@ export function isMiddle16Square(square: Square): boolean {
   return file >= 2 && file <= 5 && rank >= 2 && rank <= 5
 }
 
+/** Strictly inside the smaller corner triangle bounded by a full 3-, 5- or 7-diagonal. */
+export function isInsideBishopDiagonal(square: Square, diagonal: readonly Square[]): boolean {
+  if (diagonal.length !== 3 && diagonal.length !== 5 && diagonal.length !== 7) return false
+  const first = squareCoords(diagonal[0]!)
+  const last = squareCoords(diagonal.at(-1)!)
+  const point = squareCoords(square)
+  if (first.file - first.rank === last.file - last.rank) {
+    const boundary = first.file - first.rank
+    return (point.file - point.rank - boundary) * Math.sign(boundary) > 0
+  }
+  const boundary = first.file + first.rank
+  return (point.file + point.rank - boundary) * Math.sign(boundary - 7) > 0
+}
+
 function distanceToRange(value: number, minimum: number, maximum: number) {
   if (value < minimum) return minimum - value
   if (value > maximum) return value - maximum
