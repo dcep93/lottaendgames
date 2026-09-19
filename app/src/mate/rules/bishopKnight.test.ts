@@ -137,9 +137,14 @@ test("bishop-and-knight rules are registered", () => {
       helpText: "Before White moves, if a central bishop is edge-adjacent to Black's king and diagonally adjacent to White's king, and the knight is edge-adjacent to White's king but not adjacent to the bishop, prefer a king move that becomes edge-adjacent to the bishop while remaining adjacent to the knight.",
     },
     {
-      id: "r9",
-      shortLabel: "rule r9",
-      helpText: "If a piece is within 2 steps of Black's king, maximize its distance from Black's king, unless it's defended by White's central king.",
+      id: "r9.1",
+      shortLabel: "rule r9.1",
+      helpText: "If a bishop is attacked, maximize its distance from Black's king, unless it's defended by White's central king.",
+    },
+    {
+      id: "r9.2",
+      shortLabel: "rule r9.2",
+      helpText: "If a knight is attacked, defend it or otherwise maximize its distance from Black's king.",
     },
     {
       id: "r10",
@@ -170,7 +175,8 @@ test("bishop-and-knight rules are registered", () => {
       "r4",
       "r5",
       "r8",
-      "r9",
+      "r9.1",
+      "r9.2",
       "r10",
     ],
   );
@@ -178,7 +184,7 @@ test("bishop-and-knight rules are registered", () => {
     ruleSet.whiteRuleDescriptions.map(({ id }) => id),
     knightAndBishopWhiteRules.map(({ id }) => id),
   );
-  assert.equal(knightAndBishopWhiteRules.length, 11);
+  assert.equal(knightAndBishopWhiteRules.length, 12);
 });
 
 test("immediate mate keeps precedence without the mating-net rule", () => {
