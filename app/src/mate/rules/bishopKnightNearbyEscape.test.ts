@@ -5,12 +5,13 @@ import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../c
 import { getIdealKnightAndBishopWhiteMoves, knightAndBishopWhiteRules, scoreKnightAndBishopWhiteMove } from './bishopKnight';
 import { compareScoresByRules } from './selection';
 
-test('r9.1 escapes an attacked bishop, with only the central-king exemption, across reflections', () => {
+test('r9.1 escapes an attacked undefended bishop, exempting any existing defense', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const [source, from, to, expected] of [
       ['8/8/8/3Bk3/8/8/1K6/N7 w - - 0 1', 'd5', 'a8', -5],
       ['8/8/8/8/2kBK3/8/8/N7 w - - 0 1', 'e4', 'e3', 0],
-      ['8/8/8/3Bk3/2K5/8/8/N7 w - - 0 1', 'd5', 'a8', -5],
+      ['8/8/8/3Bk3/2K5/8/8/N7 w - - 0 1', 'd5', 'a8', 0],
+      ['8/8/8/3Bk3/8/2N5/1K6/8 w - - 0 1', 'd5', 'a8', 0],
       // Two steps away is no longer enough to activate the rule.
       ['8/8/4k3/8/2B5/8/1K6/N7 w - - 0 1', 'c4', 'a6', 0],
     ] as const) {
@@ -144,5 +145,29 @@ test('r9.3 prefers establishing central-king defense over bishop escape in every
     const knightDefense = scoreKnightAndBishopWhiteMove(knightFen, kingMove);
     assert.equal(knightDefense.nearbyPairCentralDefensePenalty, 0);
     assert.equal(knightDefense.nearbyPairBishopEscapeScore, 0);
+  }
+});
+
+
+test('r9.2 is neutral for knights already defended by any White piece, across symmetries', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    for (const [source, from, to] of [
+      // Loaded Nd5 is defended by central Kd4 before Nf4.
+      ['8/8/3k4/3N4/3KB3/8/8/8 w - - 0 1', 'd5', 'f4'],
+      // Noncentral Kc5 also exempts Nd6.
+      ['B7/8/3N4/2K1k3/8/8/8/8 w - - 0 1', 'd6', 'b7'],
+      // Bishop f5 defends Ne6 even with a remote king.
+      ['8/8/3kN3/5B2/8/8/8/K7 w - - 0 1', 'e6', 'g7'],
+    ] as const) {
+      const fen = transformFen(source, transform);
+      const san = getChess(fen).move({from: transformSquare(from, transform), to: transformSquare(to, transform)}).san;
+      const result = scoreKnightAndBishopWhiteMove(fen, san);
+      assert.equal(result.attackedKnightDefensePenalty, 0);
+      assert.equal(result.attackedKnightEscapeScore, 0);
+      assert.equal(result.attackedKnightCenterProximityScore, 0);
+    }
+    const fen = transformFen('8/8/3k4/3N4/3KB3/8/8/8 w - - 0 1', transform);
+    const san = getChess(fen).move({from: transformSquare('d5', transform), to: transformSquare('f4', transform)}).san;
+    assert.ok(getIdealKnightAndBishopWhiteMoves(fen).includes(san));
   }
 });

@@ -139,12 +139,12 @@ test("bishop-and-knight rules are registered", () => {
     {
       id: "r9.1",
       shortLabel: "rule r9.1",
-      helpText: "If a bishop is attacked, maximize its distance from Black's king, unless it's defended by White's central king.",
+      helpText: "If a bishop is attacked and undefended, maximize its distance from Black's king.",
     },
     {
       id: "r9.2",
       shortLabel: "rule r9.2",
-      helpText: "If a knight is attacked, defend it with the king or otherwise maximize its distance from Black's king, then minimize its distance to the center.",
+      helpText: "If a knight is attacked and undefended, defend it with the king or otherwise maximize its distance from Black's king, then minimize its distance to the center.",
     },
     {
       id: "r9.3",
