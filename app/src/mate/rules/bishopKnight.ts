@@ -1,7 +1,6 @@
 import { knightAndBishopShouldCheckThreeDiagonal, knightAndBishopSupportedDiagonal } from "./bishopKnightDiagonalSupport";
 import type { Square } from "chess.js";
 import {
-  edgeDistance,
   findPiece,
   getChess,
   getEndgamePiecePlacements,
@@ -24,7 +23,7 @@ import {
   isKnightAndBishopWManeuverPosition,
   knightAndBishopPiecesPresent,
 } from "./bishopKnightLookup";
-import { knightAndBishopKingCenterProximityScore, knightAndBishopKnightTargetSquares, knightAndBishopKnightTargetProximityScore, knightAndBishopKnightBehindKingProximityScore } from "./bishopKnightStrategy";
+import { knightAndBishopKingCenterProximityScore, knightAndBishopKnightTargetProximityScore, knightAndBishopMinorPiecesBehindKingProximityScore } from "./bishopKnightStrategy";
 import { knightAndBishopDeclaredCornerFlushMove } from "./bishopKnightCornerFlush";
 import { knightAndBishopDeclaredPreparationMove } from "./bishopKnightPreparation";
 import { knightAndBishopShouldCoordinateKing, knightAndBishopKingCoordinatesMinors } from "./bishopKnightCoordination";
@@ -39,10 +38,7 @@ import type {
 
 export type KnightAndBishopWhiteMoveScore = {
   readonly kingCoordinationPenalty: number;
-  readonly precageKnightPlacementPenalty: number;
-  readonly precageKingEdgePenalty: number;
-  readonly precageKingProximityScore: number;
-  readonly precageKingNonTargetCornerScore: number;
+  readonly minorPiecesBehindKingProximityScore: number;
   readonly declaredCornerFlushPenalty: number;
   readonly declaredPreparationPenalty: number;
   readonly attackedBishopDefendedKnightPenalty: number;
@@ -56,13 +52,9 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly pieceSafetyScore: number;
   readonly kingCenterProximityScore: number;
   readonly kingBishopColorPenalty: number;
-  readonly kingBlackProximityScore: number;
   readonly bishopLongDiagonalPenalty: number;
   readonly bishopProtectedCenterPenalty: number;
   readonly knightTargetProximityScore: number;
-  readonly knightBehindKingProximityScore: number;
-  readonly minorPiecesBlackKingDistanceScore: number;
-  readonly minorPiecesCenterProximityScore: number;
 };
 
 export type KnightAndBishopBlackMoveScore = {
@@ -157,17 +149,7 @@ function scoreKnightAndBishopWhiteMoveCore(
   const protectedCentralBishop = !!bishop && centerDistance(bishop.square) === 0 && chess.isAttacked(bishop.square, "w");
   let kingCenterProximity: number | undefined;
   let knightTargetProximity: number | undefined;
-  let knightBehindKingProximity: number | undefined;
-  let minorPiecesBlackKingDistance: number | undefined;
-  let minorPiecesCenterProximity: number | undefined;
-  let knightOnPrecageSquare: boolean | undefined;
-  const hasPrecageKnight = () => {
-    if (knightOnPrecageSquare === undefined) {
-      const knight = findPiece(resultFen, "w", "n");
-      knightOnPrecageSquare = !!knight && knightAndBishopKnightTargetSquares(resultFen).includes(knight.square);
-    }
-    return knightOnPrecageSquare;
-  };
+  let minorPiecesBehindKingProximity: number | undefined;
   let supportedDiagonal: ReturnType<typeof knightAndBishopSupportedDiagonal> | undefined;
   return {
     get kingCoordinationPenalty() {
@@ -178,24 +160,6 @@ function scoreKnightAndBishopWhiteMoveCore(
       const knight = findPiece(resultFen, "w", "n");
       return knight && bishop && chess.isAttacked(knight.square, "b")
         && chess.attackers(knight.square, "w").includes(bishop.square) ? 1 : 0;
-    },
-    get precageKnightPlacementPenalty() {
-      return hasPrecageKnight() ? 0 : 1;
-    },
-    get precageKingEdgePenalty() {
-      return hasPrecageKnight() && whiteKing && edgeDistance(whiteKing.square) === 0 ? 1 : 0;
-    },
-    get precageKingProximityScore() {
-      if (!hasPrecageKnight()) return 0;
-      const blackKing = findPiece(resultFen, "b", "k");
-      return whiteKing && blackKing ? squaredEuclideanDistance(whiteKing.square, blackKing.square) : 99;
-    },
-    get precageKingNonTargetCornerScore() {
-      if (!hasPrecageKnight()) return 0;
-      if (!whiteKing || !bishop) return 99;
-      return Math.min(...CORNERS
-        .filter(corner => squareColor(corner) !== squareColor(bishop.square))
-        .map(corner => squaredEuclideanDistance(whiteKing.square, corner)));
     },
     get supportedThreeCheckScore() {
       if (!context.shouldCheckThreeDiagonal) return 0;
@@ -215,10 +179,6 @@ function scoreKnightAndBishopWhiteMoveCore(
       const blackKing = findPiece(resultFen, "b", "k");
       return bishop && blackKing ? -squaredEuclideanDistance(bishop.square, blackKing.square) : 0;
     },
-    get kingBlackProximityScore() {
-      const blackKing = findPiece(resultFen, "b", "k");
-      return whiteKing && blackKing ? squaredEuclideanDistance(whiteKing.square, blackKing.square) : 99;
-    },
     get bishopLongDiagonalPenalty() {
       if (!bishop) return 1;
       const { file, rank } = squareCoordinates(bishop.square);
@@ -232,25 +192,8 @@ function scoreKnightAndBishopWhiteMoveCore(
     get kingCenterProximityScore() {
       return kingCenterProximity ??= knightAndBishopKingCenterProximityScore(resultFen);
     },
-    get knightBehindKingProximityScore() {
-      return knightBehindKingProximity ??= knightAndBishopKnightBehindKingProximityScore(resultFen);
-    },
-    get minorPiecesCenterProximityScore() {
-      if (minorPiecesCenterProximity !== undefined) return minorPiecesCenterProximity;
-      const knight = findPiece(resultFen, "w", "n");
-      return minorPiecesCenterProximity = bishop && knight
-        ? [bishop.square, knight.square].reduce((sum, square) => {
-          const { file, rank } = squareCoordinates(square);
-          return sum + Math.sqrt((file - 3.5) ** 2 + (rank - 3.5) ** 2);
-        }, 0) : 99;
-    },
-    get minorPiecesBlackKingDistanceScore() {
-      if (minorPiecesBlackKingDistance !== undefined) return minorPiecesBlackKingDistance;
-      const knight = findPiece(resultFen, "w", "n");
-      const blackKing = findPiece(resultFen, "b", "k");
-      return minorPiecesBlackKingDistance = blackKing && bishop && knight
-        ? -(Math.sqrt(squaredEuclideanDistance(bishop.square, blackKing.square))
-          + Math.sqrt(squaredEuclideanDistance(knight.square, blackKing.square))) : 0;
+    get minorPiecesBehindKingProximityScore() {
+      return minorPiecesBehindKingProximity ??= knightAndBishopMinorPiecesBehindKingProximityScore(resultFen);
     },
   };
 }
@@ -335,13 +278,8 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     {
       id: "r9",
       shortLabel: "rule r9",
-      helpText: "Prefer the knight on a precage square, then if satisfied, prefer White king off the edge, then king proximity to Black's king, then king proximity to the closest non target corner.",
-      subpriorities: [
-        { compare: (first, second) => first.precageKnightPlacementPenalty - second.precageKnightPlacementPenalty },
-        { compare: (first, second) => first.precageKingEdgePenalty - second.precageKingEdgePenalty },
-        { compare: (first, second) => first.precageKingProximityScore - second.precageKingProximityScore },
-        { compare: (first, second) => first.precageKingNonTargetCornerScore - second.precageKingNonTargetCornerScore },
-      ],
+      helpText: "Prefer piece proximity to behind White's king from Black's king's perspective, unless that piece is protected by a central king.",
+      compare: (first, second) => first.minorPiecesBehindKingProximityScore - second.minorPiecesBehindKingProximityScore,
     },
     {
       id: "r9.5",
@@ -352,29 +290,18 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     {
       id: "r10",
       shortLabel: "rule r10",
-      helpText: "Prefer king Euclidean proximity to the center, then king off bishop's color, then bishop on the long diagonal, then a protected central bishop, then knight move proximity to a precage square only when the knight is behind White's king from Black's king's perspective.",
+      helpText: "Prefer king Euclidean proximity to the center, then king off bishop's color, then bishop on the long diagonal, then a protected central bishop, then knight move proximity to a precage square.",
       subpriorities: [
         { compare: (first, second) => first.kingCenterProximityScore - second.kingCenterProximityScore },
         { compare: (first, second) => first.kingBishopColorPenalty - second.kingBishopColorPenalty },
         { compare: (first, second) => first.bishopLongDiagonalPenalty - second.bishopLongDiagonalPenalty },
         { compare: (first, second) => first.bishopProtectedCenterPenalty - second.bishopProtectedCenterPenalty },
         { rank: scores => {
-          const distances = scores.map(score => score.knightBehindKingProximityScore === 0 ? score.knightTargetProximityScore : 99);
+          const distances = scores.map(score => score.knightTargetProximityScore);
           const best = Math.min(99, ...distances);
-          // An absent target or a knight not behind White is neutral.
+          // An absent precage target is neutral.
           return distances.map(distance => distance === 99 ? best : distance);
         } },
-      ],
-    },
-    {
-      id: "r15",
-      shortLabel: "rule r15",
-      helpText: "Prefer knight Euclidean proximity to behind White's king from Black's king's perspective, then maximize piece Euclidean distance from Black's king, then minimize piece Euclidean distances from the center, then minimize the king's Euclidean distance to Black's king.",
-      subpriorities: [
-        { compare: (first, second) => first.knightBehindKingProximityScore - second.knightBehindKingProximityScore },
-        { compare: (first, second) => first.minorPiecesBlackKingDistanceScore - second.minorPiecesBlackKingDistanceScore },
-        { compare: (first, second) => first.minorPiecesCenterProximityScore - second.minorPiecesCenterProximityScore },
-        { compare: (first, second) => first.kingBlackProximityScore - second.kingBlackProximityScore },
       ],
     },
   ];
@@ -511,9 +438,8 @@ const bishopKnightHelp: RuleHelp = {
   ],
   notes: [
     "A precage square is diagonally adjacent to a central bishop, off the long diagonal, and strictly behind the bishop from Black's king's perspective.",
-    "For r15, measure the knight's Euclidean distance to the nearest board square strictly behind White's king from Black's king's perspective. These squares need not be adjacent to White's king. With White Kd4 and Black Kg4, the region is files a–c; a knight already in that region has distance zero. Evaluate after White moves.",
-    "For r10, precage proximity applies only when the knight is strictly behind White's king from Black's king's perspective after White moves. Candidates without a precage square or without a knight behind White remain neutral, tied with the best applicable distance. Among eligible candidates, fewer knight moves wins.",
-    "For r9, evaluate after White moves: prefer the knight on a precage square. Only when that is satisfied, prefer White's king off the edge, then its Euclidean proximity to Black's king, then to whichever corner of the opposite color to the bishop is closest to White's king.",
+    "For r9, minimize the sum of the bishop's and knight's Euclidean distances to the nearest board square strictly behind White's king from Black's king's perspective. Exclude each piece protected by White's king when that king is on d4, e4, d5 or e5. Evaluate after White moves. These squares need not be adjacent to White's king; with White Kd4 and Black Kg4, the region is files a–c. A piece already behind White contributes zero.",
+    "For r10, candidates without a precage square remain neutral, tied with the best available distance. Among candidates with precage squares, fewer knight moves wins.",
     "The target corner is the bishop-colored corner closest to Black's king.",
     "Support squares, with reflections: for a2–g8, d3; for a4–e8, d5, with d3 as the previous-stage support square. With Nd3, a five-diagonal additionally requires Ba4, Bb5 or Bd7, or White’s king within the c5–d8 rectangle (files c–d, ranks 5–8). For a6–c8, Kc7 selects b5/c6 and Kb6 selects c6/d7; d5 is the previous-stage support square. Three-diagonal support also requires White’s king adjacent to a6 or c8, or on c6 with Ba6 (including reflections).",
     "An n-diagonal is supported when the knight occupies its previous-stage support square or is within one knight move of its own support square, and Black has no legal move onto the (n+1)-diagonal. Evaluate after White moves. White’s king must be on or inside the (n+2)-diagonal. A diagonal is unsupported if Black can legally step onto it.",

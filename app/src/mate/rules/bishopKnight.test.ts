@@ -144,7 +144,7 @@ test("bishop-and-knight rules are registered", () => {
     {
       id: "r9",
       shortLabel: "rule r9",
-      helpText: "Prefer the knight on a precage square, then if satisfied, prefer White king off the edge, then king proximity to Black's king, then king proximity to the closest non target corner.",
+      helpText: "Prefer piece proximity to behind White's king from Black's king's perspective, unless that piece is protected by a central king.",
     },
     {
       id: "r9.5",
@@ -154,12 +154,7 @@ test("bishop-and-knight rules are registered", () => {
     {
       id: "r10",
       shortLabel: "rule r10",
-      helpText: "Prefer king Euclidean proximity to the center, then king off bishop's color, then bishop on the long diagonal, then a protected central bishop, then knight move proximity to a precage square only when the knight is behind White's king from Black's king's perspective.",
-    },
-    {
-      id: "r15",
-      shortLabel: "rule r15",
-      helpText: "Prefer knight Euclidean proximity to behind White's king from Black's king's perspective, then maximize piece Euclidean distance from Black's king, then minimize piece Euclidean distances from the center, then minimize the king's Euclidean distance to Black's king.",
+      helpText: "Prefer king Euclidean proximity to the center, then king off bishop's color, then bishop on the long diagonal, then a protected central bishop, then knight move proximity to a precage square.",
     },
   ]);
   assert.equal(ruleSet.help.noteBoards.find(board => board.animationSrc)?.id, "bishop-knight-rule-r4-flush");
@@ -189,14 +184,13 @@ test("bishop-and-knight rules are registered", () => {
       "r9",
       "r9.5",
       "r10",
-      "r15",
     ],
   );
   assert.deepEqual(
     ruleSet.whiteRuleDescriptions.map(({ id }) => id),
     knightAndBishopWhiteRules.map(({ id }) => id),
   );
-  assert.equal(knightAndBishopWhiteRules.length, 14);
+  assert.equal(knightAndBishopWhiteRules.length, 13);
 });
 
 test("immediate mate keeps precedence without the mating-net rule", () => {
