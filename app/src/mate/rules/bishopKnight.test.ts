@@ -147,6 +147,11 @@ test("bishop-and-knight rules are registered", () => {
       helpText: "If a knight is attacked, defend it or otherwise maximize its distance from Black's king.",
     },
     {
+      id: "r9.3",
+      shortLabel: "rule r9.3",
+      helpText: "If a bishop and knight are both within 2 steps of Black's king, unless they're defended by a central king, maximize the Bishop's distance from Black's king.",
+    },
+    {
       id: "r10",
       shortLabel: "rule r10",
       helpText: "Prefer king Euclidean proximity to the center, then king off bishop's color, then bishop on the long diagonal, then a protected central bishop, then knight move proximity to a precage square.",
@@ -177,6 +182,7 @@ test("bishop-and-knight rules are registered", () => {
       "r8",
       "r9.1",
       "r9.2",
+      "r9.3",
       "r10",
     ],
   );
@@ -184,7 +190,7 @@ test("bishop-and-knight rules are registered", () => {
     ruleSet.whiteRuleDescriptions.map(({ id }) => id),
     knightAndBishopWhiteRules.map(({ id }) => id),
   );
-  assert.equal(knightAndBishopWhiteRules.length, 12);
+  assert.equal(knightAndBishopWhiteRules.length, 13);
 });
 
 test("immediate mate keeps precedence without the mating-net rule", () => {
