@@ -1,5 +1,5 @@
 import type { Square } from 'chess.js'
-import { allSquares, findPiece, getChess, isKnightMove, kingDistance, squareColor, squareCoords, squaredEuclideanDistance, SQUARE_TRANSFORMS, transformSquare } from '../chess'
+import { allSquares, findPiece, getChess, isKnightMove, squareColor, squareCoords, squaredEuclideanDistance, SQUARE_TRANSFORMS, transformSquare } from '../chess'
 
 const matingBishopDiagonal = ['a7', 'b6', 'c5', 'd4', 'e3', 'f2', 'g1'] as const
 const bishopApproachDiagonal = ['b6', 'c5', 'd4', 'e3', 'f2', 'g1'] as const
@@ -145,33 +145,6 @@ export function knightAndBishopKnightTargetProximityScore(fen: string): number {
 export function knightAndBishopKnightProximityToSquare(fen: string, target: Square): number {
   const knight = findPiece(fen, 'w', 'n')
   return knight ? knightDistances.get(knight.square)!.get(target)! : 99
-}
-
-export function knightAndBishopSquaresBehindWhiteKing(fen: string): Square[] {
-  const whiteKing = findPiece(fen, 'w', 'k')
-  const blackKing = findPiece(fen, 'b', 'k')
-  if (!whiteKing || !blackKing) return []
-  const white = squareCoords(whiteKing.square)
-  const black = squareCoords(blackKing.square)
-  return squares.filter(square => {
-    const target = squareCoords(square)
-    return (target.file - white.file) * (black.file - white.file)
-      + (target.rank - white.rank) * (black.rank - white.rank) < 0
-  })
-}
-
-export function knightAndBishopMinorPiecesBehindKingProximityScore(fen: string): number {
-  const whiteKing = findPiece(fen, 'w', 'k')
-  const targets = knightAndBishopSquaresBehindWhiteKing(fen)
-  const centralKing = !!whiteKing && CENTRAL_SQUARES.includes(whiteKing.square)
-  return (['b', 'n'] as const).reduce((sum, type) => {
-    const piece = findPiece(fen, 'w', type)
-    if (!piece) return sum + 99
-    if (centralKing && kingDistance(whiteKing.square, piece.square) === 1) return sum
-    return sum + (targets.length > 0
-      ? Math.sqrt(Math.min(...targets.map(target => squaredEuclideanDistance(piece.square, target))))
-      : 99)
-  }, 0)
 }
 
 export const SEVEN_SQUARE_DIAGONALS: readonly (readonly Square[])[] = [

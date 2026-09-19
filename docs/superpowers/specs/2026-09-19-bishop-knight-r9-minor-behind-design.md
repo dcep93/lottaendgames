@@ -1,5 +1,7 @@
 # Replace r9 with minor-piece coordination behind White
 
+Follow-up: the user subsequently requested removing r9 entirely. Its rule, scoring helper and modal note are now removed. The r10 and r15 changes below remain in effect.
+
 The user requests removal of r15, replacement of r9, and restoration of the five stated r10 priorities.
 
 - r9 minimizes the sum of the bishop’s and knight’s Euclidean distances to the nearest board square strictly behind White’s king relative to Black’s king. Reuse the negative-dot-product region; pieces already behind contribute zero. No adjacency requirement applies to that region.

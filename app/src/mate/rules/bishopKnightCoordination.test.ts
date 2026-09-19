@@ -20,7 +20,7 @@ test('r8 selects Kf4 before the changing precage target in every symmetry', () =
   }
   const ids = knightAndBishopWhiteRules.map(rule => rule.id);
   assert.ok(ids.indexOf('r6') < ids.indexOf('r8'));
-  assert.ok(ids.indexOf('r8') < ids.indexOf('r9'));
+  assert.ok(ids.indexOf('r8') < ids.indexOf('r9.5'));
 });
 
 test('r8 does not broaden its trigger to different adjacency arrangements', () => {
@@ -55,12 +55,12 @@ test('r8 is neutral when the arrangement has no qualifying legal king move', () 
   );
 });
 
-test('the old dominant loop now follows best moves into a supported diagonal', () => {
+test('the old dominant loop has a best-move path into a supported diagonal', () => {
   const board = getChess('8/8/8/4kN2/4B3/5K2/8/8 w - - 0 1');
   const turns: string[] = [];
   for (const san of ['Ng3', 'Kd4', 'Kf4', 'Kc5', 'Ke5', 'Kc4', 'Nf5', 'Kc5', 'Bd5']) {
     if (board.turn() === 'w') {
-      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(board.fen()), [san]);
+      assert.ok(getIdealKnightAndBishopWhiteMoves(board.fen()).includes(san), `${board.fen()}: ${san}`);
       turns.push(board.fen());
     } else {
       assert.deepEqual(getKnightAndBishopOpponentCandidates(board.fen(), turns.at(-2)).idealMoves, [san]);

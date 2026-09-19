@@ -120,8 +120,7 @@ test('r10 routes diagonally beside a central bishop off the long diagonal after 
     assert.equal(scoreKnightAndBishopWhiteMove(fen, routes[1]!).supportedDiagonalSizeScore, 99)
     const behind = getChess(fen).move({from: transformSquare('c7', transform), to: transformSquare('a6', transform)}).san
     assert.equal(scoreKnightAndBishopWhiteMove(fen, behind).supportedDiagonalSizeScore, 7)
-    assert.equal(scoreKnightAndBishopWhiteMove(fen, behind).minorPiecesBehindKingProximityScore, scoreKnightAndBishopWhiteMove(fen, routes[0]!).minorPiecesBehindKingProximityScore)
-    // Ne6 is protected by the central king, so it ties the already-behind Na6.
+    // Both supported knight moves tie the remaining priorities.
     assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen).sort(), [routes[0]!, behind].sort())
   }
 })
@@ -343,7 +342,7 @@ test('r9.5 avoids an attacked bishop-defended knight after White moves, in every
     assert.equal(getIdealKnightAndBishopWhiteMoves(fen).includes(bishopMove), false)
   }
   const ids = knightAndBishopWhiteRules.map(rule => rule.id)
-  assert.ok(ids.indexOf('r9') < ids.indexOf('r9.5'))
+  assert.ok(ids.indexOf('r8') < ids.indexOf('r9.5'))
   assert.ok(ids.indexOf('r9.5') < ids.indexOf('r10'))
 })
 
@@ -352,4 +351,17 @@ test('r9.5 requires both an attack and an unobstructed bishop defense', () => {
   // White king blocks the a6-c8 bishop ray after Kb7; king defense alone does not count.
   assert.equal(scoreKnightAndBishopWhiteMove('2N5/3k4/BK6/8/8/8/8/8 w - - 0 1', 'Kb7').attackedBishopDefendedKnightPenalty, 0)
   assert.equal(scoreKnightAndBishopWhiteMove('2N5/3k4/BK6/8/8/8/8/8 w - - 0 1', 'Ka5').attackedBishopDefendedKnightPenalty, 1)
+})
+
+test('r10 ranks precage distances without checking whether the knight is behind White', () => {
+  const rank = knightAndBishopWhiteRules.find(rule => rule.id === 'r10')!.subpriorities![4]!.rank!;
+  const fen = '8/8/8/3B4/3K2k1/8/8/6N1 w - - 0 1';
+  const knight = scoreKnightAndBishopWhiteMove(fen, 'Ne2');
+  const king = scoreKnightAndBishopWhiteMove(fen, 'Ke5');
+  assert.deepEqual(rank([knight, king]), [4, 3]);
+});
+
+test('r9 and its behind-White score are removed', () => {
+  assert.equal(knightAndBishopWhiteRules.some(rule => rule.id === 'r9'), false)
+  assert.equal('minorPiecesBehindKingProximityScore' in scoreKnightAndBishopWhiteMove('8/8/8/3B4/3K2k1/8/8/6N1 w - - 0 1', 'Ne2'), false)
 })

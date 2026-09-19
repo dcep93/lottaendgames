@@ -23,7 +23,7 @@ import {
   isKnightAndBishopWManeuverPosition,
   knightAndBishopPiecesPresent,
 } from "./bishopKnightLookup";
-import { knightAndBishopKingCenterProximityScore, knightAndBishopKnightTargetProximityScore, knightAndBishopMinorPiecesBehindKingProximityScore } from "./bishopKnightStrategy";
+import { knightAndBishopKingCenterProximityScore, knightAndBishopKnightTargetProximityScore } from "./bishopKnightStrategy";
 import { knightAndBishopDeclaredCornerFlushMove } from "./bishopKnightCornerFlush";
 import { knightAndBishopDeclaredPreparationMove } from "./bishopKnightPreparation";
 import { knightAndBishopShouldCoordinateKing, knightAndBishopKingCoordinatesMinors } from "./bishopKnightCoordination";
@@ -38,7 +38,6 @@ import type {
 
 export type KnightAndBishopWhiteMoveScore = {
   readonly kingCoordinationPenalty: number;
-  readonly minorPiecesBehindKingProximityScore: number;
   readonly declaredCornerFlushPenalty: number;
   readonly declaredPreparationPenalty: number;
   readonly attackedBishopDefendedKnightPenalty: number;
@@ -149,7 +148,6 @@ function scoreKnightAndBishopWhiteMoveCore(
   const protectedCentralBishop = !!bishop && centerDistance(bishop.square) === 0 && chess.isAttacked(bishop.square, "w");
   let kingCenterProximity: number | undefined;
   let knightTargetProximity: number | undefined;
-  let minorPiecesBehindKingProximity: number | undefined;
   let supportedDiagonal: ReturnType<typeof knightAndBishopSupportedDiagonal> | undefined;
   return {
     get kingCoordinationPenalty() {
@@ -191,9 +189,6 @@ function scoreKnightAndBishopWhiteMoveCore(
     kingBishopColorPenalty: whiteKing && bishop && squareColor(whiteKing.square) === squareColor(bishop.square) ? 1 : 0,
     get kingCenterProximityScore() {
       return kingCenterProximity ??= knightAndBishopKingCenterProximityScore(resultFen);
-    },
-    get minorPiecesBehindKingProximityScore() {
-      return minorPiecesBehindKingProximity ??= knightAndBishopMinorPiecesBehindKingProximityScore(resultFen);
     },
   };
 }
@@ -274,12 +269,6 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       shortLabel: "rule r8",
       helpText: "Before White moves, if a central bishop is edge-adjacent to Black's king and diagonally adjacent to White's king, and the knight is edge-adjacent to White's king but not adjacent to the bishop, prefer a king move that becomes edge-adjacent to the bishop while remaining adjacent to the knight.",
       compare: (first, second) => first.kingCoordinationPenalty - second.kingCoordinationPenalty,
-    },
-    {
-      id: "r9",
-      shortLabel: "rule r9",
-      helpText: "Prefer piece proximity to behind White's king from Black's king's perspective, unless that piece is protected by a central king.",
-      compare: (first, second) => first.minorPiecesBehindKingProximityScore - second.minorPiecesBehindKingProximityScore,
     },
     {
       id: "r9.5",
@@ -438,7 +427,6 @@ const bishopKnightHelp: RuleHelp = {
   ],
   notes: [
     "A precage square is diagonally adjacent to a central bishop, off the long diagonal, and strictly behind the bishop from Black's king's perspective.",
-    "For r9, minimize the sum of the bishop's and knight's Euclidean distances to the nearest board square strictly behind White's king from Black's king's perspective. Exclude each piece protected by White's king when that king is on d4, e4, d5 or e5. Evaluate after White moves. These squares need not be adjacent to White's king; with White Kd4 and Black Kg4, the region is files a–c. A piece already behind White contributes zero.",
     "For r10, candidates without a precage square remain neutral, tied with the best available distance. Among candidates with precage squares, fewer knight moves wins.",
     "The target corner is the bishop-colored corner closest to Black's king.",
     "Support squares, with reflections: for a2–g8, d3; for a4–e8, d5, with d3 as the previous-stage support square. With Nd3, a five-diagonal additionally requires Ba4, Bb5 or Bd7, or White’s king within the c5–d8 rectangle (files c–d, ranks 5–8). For a6–c8, Kc7 selects b5/c6 and Kb6 selects c6/d7; d5 is the previous-stage support square. Three-diagonal support also requires White’s king adjacent to a6 or c8, or on c6 with Ba6 (including reflections).",
