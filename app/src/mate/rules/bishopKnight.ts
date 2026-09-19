@@ -27,6 +27,7 @@ import {
 import { knightAndBishopKingCenterProximityScore, knightAndBishopKnightTargetSquares, knightAndBishopKnightTargetProximityScore } from "./bishopKnightStrategy";
 import { knightAndBishopDeclaredCornerFlushMove } from "./bishopKnightCornerFlush";
 import { knightAndBishopDeclaredPreparationMove } from "./bishopKnightPreparation";
+import { knightAndBishopShouldCoordinateKing, knightAndBishopKingCoordinatesMinors } from "./bishopKnightCoordination";
 import { compareScoresByRules, selectIdealMoves } from "./selection";
 import type {
   MateRuleSet,
@@ -37,6 +38,7 @@ import type {
 } from "./types";
 
 export type KnightAndBishopWhiteMoveScore = {
+  readonly kingCoordinationPenalty: number;
   readonly precageKnightPlacementPenalty: number;
   readonly precageKingEdgePenalty: number;
   readonly precageKingProximityScore: number;
@@ -119,6 +121,7 @@ function distanceToNearestUnprotectedKnightOrBishop(fen: string): number {
 }
 
 type KnightAndBishopPositionScoreContext = {
+  readonly shouldCoordinateKing: boolean;
   readonly declaredCornerFlushMove: string | undefined;
   readonly declaredPreparationMove: string | undefined;
   readonly shouldCheckThreeDiagonal: boolean;
@@ -130,6 +133,7 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
   const bishop = findPiece(fen, "w", "b");
   const blackKing = findPiece(fen, "b", "k");
   return {
+    shouldCoordinateKing: knightAndBishopShouldCoordinateKing(fen),
     declaredCornerFlushMove: knightAndBishopDeclaredCornerFlushMove(fen),
     declaredPreparationMove: knightAndBishopDeclaredPreparationMove(fen),
     get shouldCheckThreeDiagonal() { return shouldCheckThreeDiagonal ??= knightAndBishopShouldCheckThreeDiagonal(fen); },
@@ -165,6 +169,10 @@ function scoreKnightAndBishopWhiteMoveCore(
   };
   let supportedDiagonal: ReturnType<typeof knightAndBishopSupportedDiagonal> | undefined;
   return {
+    get kingCoordinationPenalty() {
+      return context.shouldCoordinateKing
+        && !(move.piece === "k" && knightAndBishopKingCoordinatesMinors(resultFen)) ? 1 : 0;
+    },
     get attackedBishopDefendedKnightPenalty() {
       const knight = findPiece(resultFen, "w", "n");
       return knight && bishop && chess.isAttacked(knight.square, "b")
@@ -317,6 +325,12 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
         { compare: (first, second) => first.bishopEscapeProtectedCenterPenalty - second.bishopEscapeProtectedCenterPenalty },
         { compare: (first, second) => first.bishopEscapeDistanceScore - second.bishopEscapeDistanceScore },
       ],
+    },
+    {
+      id: "r8",
+      shortLabel: "rule r8",
+      helpText: "Before White moves, if a central bishop is edge-adjacent to Black's king and diagonally adjacent to White's king, and the knight is edge-adjacent to White's king but not adjacent to the bishop, prefer a king move that becomes edge-adjacent to the bishop while remaining adjacent to the knight.",
+      compare: (first, second) => first.kingCoordinationPenalty - second.kingCoordinationPenalty,
     },
     {
       id: "r9",

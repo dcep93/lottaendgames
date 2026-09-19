@@ -137,6 +137,11 @@ test("bishop-and-knight rules are registered", () => {
       helpText: "With Black's king adjacent to a non-central bishop before White moves, place it on a protected central square, or otherwise maximize the bishop's Euclidean distance from Black's king.",
     },
     {
+      id: "r8",
+      shortLabel: "rule r8",
+      helpText: "Before White moves, if a central bishop is edge-adjacent to Black's king and diagonally adjacent to White's king, and the knight is edge-adjacent to White's king but not adjacent to the bishop, prefer a king move that becomes edge-adjacent to the bishop while remaining adjacent to the knight.",
+    },
+    {
       id: "r9",
       shortLabel: "rule r9",
       helpText: "Prefer the knight on a precage square, then if satisfied, prefer White king off the edge, then king proximity to Black's king, then king proximity to the closest non target corner.",
@@ -180,6 +185,7 @@ test("bishop-and-knight rules are registered", () => {
       "r4",
       "r5",
       "r6",
+      "r8",
       "r9",
       "r9.5",
       "r10",
@@ -190,7 +196,7 @@ test("bishop-and-knight rules are registered", () => {
     ruleSet.whiteRuleDescriptions.map(({ id }) => id),
     knightAndBishopWhiteRules.map(({ id }) => id),
   );
-  assert.equal(knightAndBishopWhiteRules.length, 13);
+  assert.equal(knightAndBishopWhiteRules.length, 14);
 });
 
 test("immediate mate keeps precedence without the mating-net rule", () => {
