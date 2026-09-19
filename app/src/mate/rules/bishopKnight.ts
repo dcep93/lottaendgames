@@ -40,6 +40,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly kingCoordinationPenalty: number;
   readonly attackedBishopEscapeScore: number;
   readonly nearbyPairBishopEscapeScore: number;
+  readonly nearbyPairCentralDefensePenalty: number;
   readonly attackedKnightDefensePenalty: number;
   readonly attackedKnightEscapeScore: number;
   readonly attackedKnightCenterProximityScore: number;
@@ -165,6 +166,9 @@ function scoreKnightAndBishopWhiteMoveCore(
   let knightTargetProximity: number | undefined;
   const knight = findPiece(resultFen, "w", "n");
   const blackKing = findPiece(resultFen, "b", "k");
+  const nearbyPairCentrallyDefended = !!whiteKing && centerDistance(whiteKing.square) === 0
+    && ((!!bishop && kingDistance(bishop.square, whiteKing.square) === 1)
+      || (!!knight && kingDistance(knight.square, whiteKing.square) === 1));
   const knightKingDefended = !!knight && !!whiteKing && kingDistance(knight.square, whiteKing.square) === 1;
   let supportedDiagonal: ReturnType<typeof knightAndBishopSupportedDiagonal> | undefined;
   return {
@@ -176,8 +180,9 @@ function scoreKnightAndBishopWhiteMoveCore(
       return context.shouldEscapeBishop && bishop && blackKing
         ? -Math.sqrt(squaredEuclideanDistance(bishop.square, blackKing.square)) : 0;
     },
+    nearbyPairCentralDefensePenalty: context.shouldEscapeNearbyPairBishop && !nearbyPairCentrallyDefended ? 1 : 0,
     get nearbyPairBishopEscapeScore() {
-      return context.shouldEscapeNearbyPairBishop && bishop && blackKing
+      return context.shouldEscapeNearbyPairBishop && !nearbyPairCentrallyDefended && bishop && blackKing
         ? -Math.sqrt(squaredEuclideanDistance(bishop.square, blackKing.square)) : 0;
     },
     attackedKnightDefensePenalty: context.shouldDefendKnight && !knightKingDefended ? 1 : 0,
@@ -305,7 +310,10 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       id: "r9.3",
       shortLabel: "rule r9.3",
       helpText: "If a bishop and knight are both within 2 steps of Black's king, unless they're defended by a central king, maximize the Bishop's distance from Black's king.",
-      compare: (first, second) => first.nearbyPairBishopEscapeScore - second.nearbyPairBishopEscapeScore,
+      subpriorities: [
+        { compare: (first, second) => first.nearbyPairCentralDefensePenalty - second.nearbyPairCentralDefensePenalty },
+        { compare: (first, second) => first.nearbyPairBishopEscapeScore - second.nearbyPairBishopEscapeScore },
+      ],
     },
     {
       id: "r10",
@@ -457,7 +465,7 @@ const bishopKnightHelp: RuleHelp = {
     "Stay away from a bishop-colored corner.",
   ],
   notes: [
-    "For r9.3, check before White moves: both the bishop and knight must be within two king steps of Black, and neither may be defended by White's king on d4, e4, d5 or e5. Maximize only the bishop's Euclidean distance after the move, including moves beyond the two-step range.",
+    "For r9.3, check before White moves: both the bishop and knight must be within two king steps of Black, and neither may be defended by White's king on d4, e4, d5 or e5. When this rule activates, first prefer a resulting central king defending either piece. Those defended outcomes tie; otherwise maximize only the bishop's Euclidean distance after the move, including moves beyond the two-step range.",
     "For r9.1 and r9.2, check whether Black's king attacks the piece before White moves. A bishop defended by White's king on d4, e4, d5 or e5 is exempt from r9.1. For r9.2, prefer a knight defended by White's king after the move. Bishop defense does not satisfy this preference. Otherwise maximize the affected piece's Euclidean distance from Black after White moves. Finally, r9.2 minimizes the knight's Euclidean distance to the board's midpoint.",
     "A precage square is diagonally adjacent to a central bishop, off the long diagonal, and strictly behind the bishop from Black's king's perspective.",
     "For r10, candidates without a precage square remain neutral, tied with the best available distance. Among candidates with precage squares, fewer knight moves wins.",

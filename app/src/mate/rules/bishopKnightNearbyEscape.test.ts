@@ -123,3 +123,26 @@ test('r9.2 selects loaded 2. Nd2 over Nh2 even though Nh2 is nearer White king',
     assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [move('d2')]);
   }
 });
+
+
+test('r9.3 prefers establishing central-king defense over bishop escape in every symmetry', () => {
+  const rule = knightAndBishopWhiteRules.find(rule => rule.id === 'r9.3')!;
+  for (const transform of SQUARE_TRANSFORMS) {
+    // Loaded move 2: Kd4 newly defends Bd5, while Nd6 remains undefended.
+    const fen = transformFen('8/8/3N4/2KB4/5k2/8/8/8 w - - 2 2', transform);
+    const move = (from: Square, to: Square) => getChess(fen).move({from: transformSquare(from, transform), to: transformSquare(to, transform)}).san;
+    const defend = scoreKnightAndBishopWhiteMove(fen, move('c5', 'd4'));
+    const escape = scoreKnightAndBishopWhiteMove(fen, move('d5', 'a8'));
+    assert.equal(defend.nearbyPairCentralDefensePenalty, 0);
+    assert.equal(defend.nearbyPairBishopEscapeScore, 0);
+    assert.equal(escape.nearbyPairCentralDefensePenalty, 1);
+    assert.ok(compareScoresByRules(defend, escape, [rule]) < 0);
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [move('c5', 'd4')]);
+    // Defending the knight alone also satisfies the confirmed either-piece exemption.
+    const knightFen = transformFen('8/8/4k1B1/5N2/3K4/8/8/8 w - - 0 1', transform);
+    const kingMove = getChess(knightFen).move({from: transformSquare('d4', transform), to: transformSquare('e4', transform)}).san;
+    const knightDefense = scoreKnightAndBishopWhiteMove(knightFen, kingMove);
+    assert.equal(knightDefense.nearbyPairCentralDefensePenalty, 0);
+    assert.equal(knightDefense.nearbyPairBishopEscapeScore, 0);
+  }
+});
