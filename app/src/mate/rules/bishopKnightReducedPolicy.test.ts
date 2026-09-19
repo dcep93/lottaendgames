@@ -43,7 +43,7 @@ test('r10 ranks king center, opposite color, long diagonal, then protected centr
   }
 })
 
-test('r10 advances the knight before bringing the king closer to Black in every reflection', () => {
+test('r10 leaves precage distances neutral ahead of White while r15 advances the knight', () => {
   const rule = knightAndBishopWhiteRules.find(({ id }) => id === 'r10')!
   for (const transform of SQUARE_TRANSFORMS) {
     const fen = transformFen('8/8/8/4K3/k3B3/1N6/8/8 w - - 0 1', transform)
@@ -56,8 +56,11 @@ test('r10 advances the knight before bringing the king closer to Black in every 
     }
     assert.deepEqual([knight.knightTargetProximityScore, king.knightTargetProximityScore], [1, 2])
     assert.ok(king.kingBlackProximityScore < knight.kingBlackProximityScore)
-    assert.ok(compareScoresByRules(knight, king, [rule]) < 0)
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [knightMove])
+    assert.ok(knight.knightBehindKingProximityScore > 0)
+    assert.ok(king.knightBehindKingProximityScore > 0)
+    assert.equal(compareScoresByRules(knight, king, [rule]), 0)
+    const behindRoute = getChess(fen).move({from: transformSquare('b3', transform), to: transformSquare('d2', transform)}).san
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [behindRoute])
   }
 })
 
@@ -314,7 +317,7 @@ test('r15 breaks equal Black distances by bringing minor pieces closer to the bo
 })
 
 
-test('r10 ranks Ke5 over Be4 with the safer diagonal knight target', () => {
+test('r10 does not credit Ke5 over Be4 when the knight is ahead of White', () => {
   const rule = knightAndBishopWhiteRules.find(({id}) => id === 'r10')!
   for (const transform of SQUARE_TRANSFORMS) {
     const fen = transformFen('8/3k4/8/1N1B4/3K4/8/8/8 w - - 0 1', transform)
@@ -325,7 +328,9 @@ test('r10 ranks Ke5 over Be4 with the safer diagonal knight target', () => {
     for (const priority of rule.subpriorities!.slice(0, 4)) assert.equal(priority.compare!(kingScore, bishopScore), 0)
     assert.ok(kingScore.knightTargetProximityScore < bishopScore.knightTargetProximityScore)
     assert.ok(kingScore.kingBlackProximityScore < bishopScore.kingBlackProximityScore)
-    assert.ok(compareScoresByRules(kingScore, bishopScore, [rule]) < 0)
+    assert.ok(kingScore.knightBehindKingProximityScore > 0)
+    assert.ok(bishopScore.knightBehindKingProximityScore > 0)
+    assert.equal(compareScoresByRules(kingScore, bishopScore, [rule]), 0)
   }
 })
 
@@ -360,7 +365,7 @@ test('r10 keeps absent precage targets neutral while ranking available distances
   const rank = knightAndBishopWhiteRules.find(({id}) => id === 'r10')!.subpriorities![4]!.rank!
   const base = scoreKnightAndBishopWhiteMove('BN1K4/8/3k4/8/8/8/8/8 w - - 0 1', 'Be4')
   for (const distances of [[99, 3, 1], [1, 99, 3], [3, 1, 99], [99, 99]]) {
-    const ranked = rank(distances.map(distance => ({...base, knightTargetProximityScore: distance})))
+    const ranked = rank(distances.map(distance => ({...base, knightBehindKingProximityScore: 0, knightTargetProximityScore: distance})))
     const best = Math.min(...distances)
     assert.deepEqual(ranked, distances.map(distance => distance === 99 ? best : distance))
   }

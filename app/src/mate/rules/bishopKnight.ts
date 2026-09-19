@@ -157,6 +157,7 @@ function scoreKnightAndBishopWhiteMoveCore(
   const protectedCentralBishop = !!bishop && centerDistance(bishop.square) === 0 && chess.isAttacked(bishop.square, "w");
   let kingCenterProximity: number | undefined;
   let knightTargetProximity: number | undefined;
+  let knightBehindKingProximity: number | undefined;
   let minorPiecesBlackKingDistance: number | undefined;
   let minorPiecesCenterProximity: number | undefined;
   let knightOnPrecageSquare: boolean | undefined;
@@ -232,7 +233,7 @@ function scoreKnightAndBishopWhiteMoveCore(
       return kingCenterProximity ??= knightAndBishopKingCenterProximityScore(resultFen);
     },
     get knightBehindKingProximityScore() {
-      return knightAndBishopKnightBehindKingProximityScore(resultFen);
+      return knightBehindKingProximity ??= knightAndBishopKnightBehindKingProximityScore(resultFen);
     },
     get minorPiecesCenterProximityScore() {
       if (minorPiecesCenterProximity !== undefined) return minorPiecesCenterProximity;
@@ -351,16 +352,16 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     {
       id: "r10",
       shortLabel: "rule r10",
-      helpText: "Prefer king Euclidean proximity to the center, then king off bishop's color, then bishop on the long diagonal, then a protected central bishop, then knight move proximity to a precage square.",
+      helpText: "Prefer king Euclidean proximity to the center, then king off bishop's color, then bishop on the long diagonal, then a protected central bishop, then knight move proximity to a precage square only when the knight is behind White's king from Black's king's perspective.",
       subpriorities: [
         { compare: (first, second) => first.kingCenterProximityScore - second.kingCenterProximityScore },
         { compare: (first, second) => first.kingBishopColorPenalty - second.kingBishopColorPenalty },
         { compare: (first, second) => first.bishopLongDiagonalPenalty - second.bishopLongDiagonalPenalty },
         { compare: (first, second) => first.bishopProtectedCenterPenalty - second.bishopProtectedCenterPenalty },
         { rank: scores => {
-          const distances = scores.map(score => score.knightTargetProximityScore);
+          const distances = scores.map(score => score.knightBehindKingProximityScore === 0 ? score.knightTargetProximityScore : 99);
           const best = Math.min(99, ...distances);
-          // No target is neutral: retain it alongside the nearest applicable candidates.
+          // An absent target or a knight not behind White is neutral.
           return distances.map(distance => distance === 99 ? best : distance);
         } },
       ],
@@ -511,7 +512,7 @@ const bishopKnightHelp: RuleHelp = {
   notes: [
     "A precage square is diagonally adjacent to a central bishop, off the long diagonal, and strictly behind the bishop from Black's king's perspective.",
     "For r15, measure the knight's Euclidean distance to the nearest board square strictly behind White's king from Black's king's perspective. These squares need not be adjacent to White's king. With White Kd4 and Black Kg4, the region is files a–c; a knight already in that region has distance zero. Evaluate after White moves.",
-    "For r10, precage proximity does not prefer creating or removing a precage square. Candidates without one stay tied with the best available precage distance; among candidates with one, fewer knight moves wins.",
+    "For r10, precage proximity applies only when the knight is strictly behind White's king from Black's king's perspective after White moves. Candidates without a precage square or without a knight behind White remain neutral, tied with the best applicable distance. Among eligible candidates, fewer knight moves wins.",
     "For r9, evaluate after White moves: prefer the knight on a precage square. Only when that is satisfied, prefer White's king off the edge, then its Euclidean proximity to Black's king, then to whichever corner of the opposite color to the bishop is closest to White's king.",
     "The target corner is the bishop-colored corner closest to Black's king.",
     "Support squares, with reflections: for a2–g8, d3; for a4–e8, d5, with d3 as the previous-stage support square. With Nd3, a five-diagonal additionally requires Ba4, Bb5 or Bd7, or White’s king within the c5–d8 rectangle (files c–d, ranks 5–8). For a6–c8, Kc7 selects b5/c6 and Kb6 selects c6/d7; d5 is the previous-stage support square. Three-diagonal support also requires White’s king adjacent to a6 or c8, or on c6 with Ba6 (including reflections).",
