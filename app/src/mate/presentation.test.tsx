@@ -1327,7 +1327,7 @@ test('priority guide follows registered facade order and renders typed diagrams'
   assert.doesNotMatch(decodedMarkup, /rule r3 —/)
   assert.ok(decodedMarkup.includes("Prefer king Euclidean proximity to the center, then king off bishop's color, then bishop on the long diagonal, then a protected central bishop, then knight move proximity to a precage square."))
   assert.doesNotMatch(decodedMarkup, /rule (?:r3\.8|r4\.5|r15|r18|r20|s10)\b|king closer|mating net/)
-  assert.ok(!decodedMarkup.includes("rule r9</strong>"))
+  assert.ok(decodedMarkup.includes("rule r9</strong> — If a piece is within 2 steps of Black's king, maximize its distance from Black's king, unless it's defended by White's central king."))
   assert.ok(decodedMarkup.includes("A precage square is diagonally adjacent to a central bishop, off the long diagonal, and strictly behind the bishop from Black's king's perspective."))
   assert.ok(!decodedMarkup.includes("rule r9.5</strong>"))
   assert.doesNotMatch(markup, /flush-non-target-corner\.gif/)

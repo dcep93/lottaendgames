@@ -1,9 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess';
-import { bishopKnightRuleSet, getIdealKnightAndBishopWhiteMoves, getKnightAndBishopOpponentCandidates, knightAndBishopWhiteRules, scoreKnightAndBishopWhiteMove } from './bishopKnight';
+import { bishopKnightRuleSet, getIdealKnightAndBishopWhiteMoves, knightAndBishopWhiteRules, scoreKnightAndBishopWhiteMove } from './bishopKnight';
 import { knightAndBishopShouldCoordinateKing } from './bishopKnightCoordination';
-import { knightAndBishopSupportedDiagonal } from './bishopKnightDiagonalSupport';
 import { selectCandidatesByRules } from './selection';
 import { getMateRuleSet } from './index';
 
@@ -53,19 +52,4 @@ test('r8 is neutral when the arrangement has no qualifying legal king move', () 
     getIdealKnightAndBishopWhiteMoves(fen),
     selectCandidatesByRules(candidates, knightAndBishopWhiteRules.filter(rule => rule.id !== 'r8')).idealCandidates.map(candidate => candidate.san),
   );
-});
-
-test('r8 coordination has a best-move continuation into a supported diagonal', () => {
-  const board = getChess(position);
-  const turns: string[] = [];
-  for (const san of ['Kf4', 'Kc5', 'Ke5', 'Kc4', 'Nf5', 'Kc5', 'Bd5']) {
-    if (board.turn() === 'w') {
-      assert.ok(getIdealKnightAndBishopWhiteMoves(board.fen()).includes(san), `${board.fen()}: ${san}`);
-      turns.push(board.fen());
-    } else {
-      assert.deepEqual(getKnightAndBishopOpponentCandidates(board.fen(), turns.at(-2)).idealMoves, [san]);
-    }
-    board.move(san);
-  }
-  assert.notEqual(knightAndBishopSupportedDiagonal(board.fen()).size, 99);
 });

@@ -296,7 +296,6 @@ test('r10 ranks precage distances without checking whether the knight is behind 
   assert.deepEqual(rank([knight, king]), [4, 3]);
 });
 
-test('r9 and its behind-White score are removed', () => {
-  assert.equal(knightAndBishopWhiteRules.some(rule => rule.id === 'r9'), false)
+test('the old behind-White score remains removed', () => {
   assert.equal('minorPiecesBehindKingProximityScore' in scoreKnightAndBishopWhiteMove('8/8/8/3B4/3K2k1/8/8/6N1 w - - 0 1', 'Ne2'), false)
 })
