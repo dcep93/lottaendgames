@@ -159,7 +159,7 @@ test("bishop-and-knight rules are registered", () => {
     {
       id: "r15",
       shortLabel: "rule r15",
-      helpText: "Prefer the knight adjacent to White's king, then maximize piece Euclidean distance from Black's king, then minimize piece Euclidean distances from the center, then minimize the king's Euclidean distance to Black's king.",
+      helpText: "Prefer knight Euclidean proximity to behind White's king from Black's king's perspective, then maximize piece Euclidean distance from Black's king, then minimize piece Euclidean distances from the center, then minimize the king's Euclidean distance to Black's king.",
     },
   ]);
   assert.equal(ruleSet.help.noteBoards.find(board => board.animationSrc)?.id, "bishop-knight-rule-r4-flush");

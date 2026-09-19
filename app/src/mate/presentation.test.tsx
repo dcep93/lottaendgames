@@ -1326,7 +1326,7 @@ test('priority guide follows registered facade order and renders typed diagrams'
   for (const size of [3, 5, 7]) assert.ok(!decodedMarkup.includes(`${size}-diagonal support`))
   assert.doesNotMatch(decodedMarkup, /rule r3 —/)
   assert.ok(decodedMarkup.includes("Prefer king Euclidean proximity to the center, then king off bishop's color, then bishop on the long diagonal, then a protected central bishop, then knight move proximity to a precage square."))
-  assert.ok(decodedMarkup.includes("Prefer the knight adjacent to White's king, then maximize piece Euclidean distance from Black's king, then minimize piece Euclidean distances from the center, then minimize the king's Euclidean distance to Black's king."))
+  assert.ok(decodedMarkup.includes("Prefer knight Euclidean proximity to behind White's king from Black's king's perspective, then maximize piece Euclidean distance from Black's king, then minimize piece Euclidean distances from the center, then minimize the king's Euclidean distance to Black's king."))
   assert.doesNotMatch(decodedMarkup, /rule (?:r3\.8|r4\.5|r18|r20|s10)\b|king closer|mating net/)
   assert.ok(decodedMarkup.includes("rule r9</strong> — Prefer the knight on a precage square, then if satisfied, prefer White king off the edge, then king proximity to Black's king, then king proximity to the closest non target corner."))
   assert.ok(decodedMarkup.includes("A precage square is diagonally adjacent to a central bishop, off the long diagonal, and strictly behind the bishop from Black's king's perspective."))

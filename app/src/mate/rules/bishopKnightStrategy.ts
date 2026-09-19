@@ -147,6 +147,27 @@ export function knightAndBishopKnightProximityToSquare(fen: string, target: Squa
   return knight ? knightDistances.get(knight.square)!.get(target)! : 99
 }
 
+export function knightAndBishopSquaresBehindWhiteKing(fen: string): Square[] {
+  const whiteKing = findPiece(fen, 'w', 'k')
+  const blackKing = findPiece(fen, 'b', 'k')
+  if (!whiteKing || !blackKing) return []
+  const white = squareCoords(whiteKing.square)
+  const black = squareCoords(blackKing.square)
+  return squares.filter(square => {
+    const target = squareCoords(square)
+    return (target.file - white.file) * (black.file - white.file)
+      + (target.rank - white.rank) * (black.rank - white.rank) < 0
+  })
+}
+
+export function knightAndBishopKnightBehindKingProximityScore(fen: string): number {
+  const knight = findPiece(fen, 'w', 'n')
+  const targets = knightAndBishopSquaresBehindWhiteKing(fen)
+  return knight && targets.length > 0
+    ? Math.sqrt(Math.min(...targets.map(target => squaredEuclideanDistance(knight.square, target))))
+    : 99
+}
+
 export const SEVEN_SQUARE_DIAGONALS: readonly (readonly Square[])[] = [
   ['a2', 'b3', 'c4', 'd5', 'e6', 'f7', 'g8'],
   ['b1', 'c2', 'd3', 'e4', 'f5', 'g6', 'h7'],

@@ -24,7 +24,7 @@ import {
   isKnightAndBishopWManeuverPosition,
   knightAndBishopPiecesPresent,
 } from "./bishopKnightLookup";
-import { knightAndBishopKingCenterProximityScore, knightAndBishopKnightTargetSquares, knightAndBishopKnightTargetProximityScore } from "./bishopKnightStrategy";
+import { knightAndBishopKingCenterProximityScore, knightAndBishopKnightTargetSquares, knightAndBishopKnightTargetProximityScore, knightAndBishopKnightBehindKingProximityScore } from "./bishopKnightStrategy";
 import { knightAndBishopDeclaredCornerFlushMove } from "./bishopKnightCornerFlush";
 import { knightAndBishopDeclaredPreparationMove } from "./bishopKnightPreparation";
 import { knightAndBishopShouldCoordinateKing, knightAndBishopKingCoordinatesMinors } from "./bishopKnightCoordination";
@@ -60,7 +60,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly bishopLongDiagonalPenalty: number;
   readonly bishopProtectedCenterPenalty: number;
   readonly knightTargetProximityScore: number;
-  readonly knightKingAdjacencyPenalty: number;
+  readonly knightBehindKingProximityScore: number;
   readonly minorPiecesBlackKingDistanceScore: number;
   readonly minorPiecesCenterProximityScore: number;
 };
@@ -231,9 +231,8 @@ function scoreKnightAndBishopWhiteMoveCore(
     get kingCenterProximityScore() {
       return kingCenterProximity ??= knightAndBishopKingCenterProximityScore(resultFen);
     },
-    get knightKingAdjacencyPenalty() {
-      const knight = findPiece(resultFen, "w", "n");
-      return whiteKing && knight && kingDistance(whiteKing.square, knight.square) === 1 ? 0 : 1;
+    get knightBehindKingProximityScore() {
+      return knightAndBishopKnightBehindKingProximityScore(resultFen);
     },
     get minorPiecesCenterProximityScore() {
       if (minorPiecesCenterProximity !== undefined) return minorPiecesCenterProximity;
@@ -369,9 +368,9 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     {
       id: "r15",
       shortLabel: "rule r15",
-      helpText: "Prefer the knight adjacent to White's king, then maximize piece Euclidean distance from Black's king, then minimize piece Euclidean distances from the center, then minimize the king's Euclidean distance to Black's king.",
+      helpText: "Prefer knight Euclidean proximity to behind White's king from Black's king's perspective, then maximize piece Euclidean distance from Black's king, then minimize piece Euclidean distances from the center, then minimize the king's Euclidean distance to Black's king.",
       subpriorities: [
-        { compare: (first, second) => first.knightKingAdjacencyPenalty - second.knightKingAdjacencyPenalty },
+        { compare: (first, second) => first.knightBehindKingProximityScore - second.knightBehindKingProximityScore },
         { compare: (first, second) => first.minorPiecesBlackKingDistanceScore - second.minorPiecesBlackKingDistanceScore },
         { compare: (first, second) => first.minorPiecesCenterProximityScore - second.minorPiecesCenterProximityScore },
         { compare: (first, second) => first.kingBlackProximityScore - second.kingBlackProximityScore },
@@ -511,6 +510,7 @@ const bishopKnightHelp: RuleHelp = {
   ],
   notes: [
     "A precage square is diagonally adjacent to a central bishop, off the long diagonal, and strictly behind the bishop from Black's king's perspective.",
+    "For r15, measure the knight's Euclidean distance to the nearest board square strictly behind White's king from Black's king's perspective. These squares need not be adjacent to White's king. With White Kd4 and Black Kg4, the region is files a–c; a knight already in that region has distance zero. Evaluate after White moves.",
     "For r10, precage proximity does not prefer creating or removing a precage square. Candidates without one stay tied with the best available precage distance; among candidates with one, fewer knight moves wins.",
     "For r9, evaluate after White moves: prefer the knight on a precage square. Only when that is satisfied, prefer White's king off the edge, then its Euclidean proximity to Black's king, then to whichever corner of the opposite color to the bishop is closest to White's king.",
     "The target corner is the bishop-colored corner closest to Black's king.",
