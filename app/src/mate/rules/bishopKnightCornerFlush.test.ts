@@ -24,12 +24,12 @@ test('r4 prefers every White move in the loaded flushing line and all reflection
   }
 })
 
-test('r4 is inactive outside its declared placements and precedes r5 and r6', () => {
+test('r4 is inactive outside its declared placements and precedes r5 and r8', () => {
   assert.equal(knightAndBishopDeclaredCornerFlushMove('8/4k3/2K5/8/4B3/3N4/8/8 w - - 0 1'), undefined)
   const ids = knightAndBishopWhiteRules.map(rule => rule.id)
   assert.equal(ids.includes('r3.5'), false)
   assert.ok(ids.indexOf('r4') < ids.indexOf('r5'))
-  assert.ok(ids.indexOf('r5') < ids.indexOf('r6'))
+  assert.ok(ids.indexOf('r5') < ids.indexOf('r8'))
 })
 
 test('r4 prescribes Ne5 and Kg6 from the newly loaded line in every reflection', () => {

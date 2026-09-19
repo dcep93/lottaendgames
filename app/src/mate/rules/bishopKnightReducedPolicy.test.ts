@@ -2,7 +2,6 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess'
 import { bishopKnightRuleSet, getIdealKnightAndBishopWhiteMoves, knightAndBishopWhiteRules, scoreKnightAndBishopWhiteMove } from './bishopKnight'
-import { getMateRuleSet } from './index'
 import { compareScoresByRules } from './selection'
 import { knightAndBishopTargetCornerDiagonals, knightAndBishopTargetCorners, knightAndBishopKnightTargetSquares, knightAndBishopKnightTargetProximityScore } from './bishopKnightStrategy'
 import positions from './bishopKnightRegressionPositions.json'
@@ -231,30 +230,6 @@ test('r10 prefers the loaded Kd7 toward the center even on the bishop color', ()
   }
 })
 
-test('r6 moves an adjacent non-central bishop away before center preferences, in every orientation', () => {
-  for (const transform of SQUARE_TRANSFORMS) {
-    const fen = transformFen('2Bk4/8/1N6/2K5/8/8/8/8 w - - 0 1', transform)
-    const move = (to: 'h3' | 'g4' | 'e6') => getChess(fen).move({from: transformSquare('c8', transform), to: transformSquare(to, transform)}).san
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [move('h3')])
-    assert.equal(getMateRuleSet('bishop-knight').currentWhiteHint(fen)?.id, 'r6')
-    assert.deepEqual((['h3', 'g4', 'e6'] as const).map(to => scoreKnightAndBishopWhiteMove(fen, move(to)).bishopEscapeDistanceScore), [-41, -25, -5])
-    const king = getChess(fen).move({from: transformSquare('c5', transform), to: transformSquare('d5', transform)}).san
-    assert.equal(scoreKnightAndBishopWhiteMove(fen, king).bishopEscapeDistanceScore, -1)
-  }
-})
-
-test('r6 stays inactive for a central bishop or a Black king not adjacent before White moves', () => {
-  for (const fen of [
-    '8/8/8/3Bk3/8/1K6/8/N7 w - - 0 1',
-    '2B5/4k3/1N6/2K5/8/8/8/8 w - - 0 1',
-  ]) {
-    for (const san of getChess(fen).moves()) {
-      assert.equal(scoreKnightAndBishopWhiteMove(fen, san).bishopEscapeDistanceScore, 0, `${fen}: ${san}`)
-      assert.equal(scoreKnightAndBishopWhiteMove(fen, san).bishopEscapeProtectedCenterPenalty, 0, `${fen}: ${san}`)
-    }
-  }
-})
-
 
 test('r10 credits Ke5 over Be4 for precage proximity even ahead of White', () => {
   const rule = knightAndBishopWhiteRules.find(({id}) => id === 'r10')!
@@ -305,22 +280,6 @@ test('r10 keeps absent precage targets neutral while ranking available distances
   }
 })
 
-test('r6 prefers the protected central Bd5 over escaping to Ba4 in every reflection', () => {
-  const line = getChess('3k4/8/8/4K3/B3N3/8/8/8 w - - 0 1')
-  line.move('Bc6')
-  line.move('Kc7')
-  for (const transform of SQUARE_TRANSFORMS) {
-    const fen = transformFen(line.fen(), transform)
-    const move = (to: 'd5' | 'a4') => getChess(fen).move({from: transformSquare('c6', transform), to: transformSquare(to, transform)}).san
-    const central = scoreKnightAndBishopWhiteMove(fen, move('d5'))
-    const edge = scoreKnightAndBishopWhiteMove(fen, move('a4'))
-    assert.equal(central.bishopEscapeProtectedCenterPenalty, 0)
-    assert.equal(central.bishopEscapeDistanceScore, 0)
-    assert.equal(edge.bishopEscapeProtectedCenterPenalty, 1)
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [move('d5')])
-    assert.equal(getMateRuleSet('bishop-knight').currentWhiteHint(fen)?.id, 'r6')
-  }
-})
 
 test('r15 is removed and r10 ends after its five priorities', () => {
   assert.equal(knightAndBishopWhiteRules.some(rule => rule.id === 'r15'), false)
@@ -328,30 +287,6 @@ test('r15 is removed and r10 ends after its five priorities', () => {
   assert.equal(knightAndBishopWhiteRules.at(-1)!.subpriorities!.length, 5)
 })
 
-test('r9.5 avoids an attacked bishop-defended knight after White moves, in every reflection', () => {
-  const rule = knightAndBishopWhiteRules.find(({id}) => id === 'r9.5')!
-  for (const transform of SQUARE_TRANSFORMS) {
-    const fen = transformFen('2N5/3k4/B7/8/3K4/8/8/8 w - - 0 1', transform)
-    const bishopMove = getChess(fen).move({from: transformSquare('a6', transform), to: transformSquare('b7', transform)}).san
-    const knightMove = getChess(fen).move({from: transformSquare('c8', transform), to: transformSquare('a7', transform)}).san
-    const attacked = scoreKnightAndBishopWhiteMove(fen, bishopMove)
-    const safe = scoreKnightAndBishopWhiteMove(fen, knightMove)
-    assert.equal(attacked.attackedBishopDefendedKnightPenalty, 1)
-    assert.equal(safe.attackedBishopDefendedKnightPenalty, 0)
-    assert.ok(compareScoresByRules(safe, attacked, [rule]) < 0)
-    assert.equal(getIdealKnightAndBishopWhiteMoves(fen).includes(bishopMove), false)
-  }
-  const ids = knightAndBishopWhiteRules.map(rule => rule.id)
-  assert.ok(ids.indexOf('r8') < ids.indexOf('r9.5'))
-  assert.ok(ids.indexOf('r9.5') < ids.indexOf('r10'))
-})
-
-test('r9.5 requires both an attack and an unobstructed bishop defense', () => {
-  assert.equal(scoreKnightAndBishopWhiteMove('2N5/7k/B7/8/3K4/8/8/8 w - - 0 1', 'Bb7').attackedBishopDefendedKnightPenalty, 0)
-  // White king blocks the a6-c8 bishop ray after Kb7; king defense alone does not count.
-  assert.equal(scoreKnightAndBishopWhiteMove('2N5/3k4/BK6/8/8/8/8/8 w - - 0 1', 'Kb7').attackedBishopDefendedKnightPenalty, 0)
-  assert.equal(scoreKnightAndBishopWhiteMove('2N5/3k4/BK6/8/8/8/8/8 w - - 0 1', 'Ka5').attackedBishopDefendedKnightPenalty, 1)
-})
 
 test('r10 ranks precage distances without checking whether the knight is behind White', () => {
   const rank = knightAndBishopWhiteRules.find(rule => rule.id === 'r10')!.subpriorities![4]!.rank!;

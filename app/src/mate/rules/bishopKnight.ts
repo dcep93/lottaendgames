@@ -4,11 +4,9 @@ import {
   findPiece,
   getChess,
   getEndgamePiecePlacements,
-  kingDistance,
   manhattanDistance,
   squareColor,
   squareCoordinates,
-  squaredEuclideanDistance,
 } from "../chess";
 import {
   applyUniversalBlackPriorities,
@@ -40,9 +38,6 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly kingCoordinationPenalty: number;
   readonly declaredCornerFlushPenalty: number;
   readonly declaredPreparationPenalty: number;
-  readonly attackedBishopDefendedKnightPenalty: number;
-  readonly bishopEscapeProtectedCenterPenalty: number;
-  readonly bishopEscapeDistanceScore: number;
   readonly supportedThreeCheckScore: number;
   readonly supportedDiagonalSizeScore: number;
   readonly supportedDiagonalKnightScore: number;
@@ -116,19 +111,15 @@ type KnightAndBishopPositionScoreContext = {
   readonly declaredCornerFlushMove: string | undefined;
   readonly declaredPreparationMove: string | undefined;
   readonly shouldCheckThreeDiagonal: boolean;
-  readonly shouldEscapeBishop: boolean;
 };
 
 function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
   let shouldCheckThreeDiagonal: boolean | undefined;
-  const bishop = findPiece(fen, "w", "b");
-  const blackKing = findPiece(fen, "b", "k");
   return {
     shouldCoordinateKing: knightAndBishopShouldCoordinateKing(fen),
     declaredCornerFlushMove: knightAndBishopDeclaredCornerFlushMove(fen),
     declaredPreparationMove: knightAndBishopDeclaredPreparationMove(fen),
     get shouldCheckThreeDiagonal() { return shouldCheckThreeDiagonal ??= knightAndBishopShouldCheckThreeDiagonal(fen); },
-    shouldEscapeBishop: !!bishop && !!blackKing && centerDistance(bishop.square) !== 0 && kingDistance(bishop.square, blackKing.square) === 1,
   };
 }
 
@@ -154,11 +145,6 @@ function scoreKnightAndBishopWhiteMoveCore(
       return context.shouldCoordinateKing
         && !(move.piece === "k" && knightAndBishopKingCoordinatesMinors(resultFen)) ? 1 : 0;
     },
-    get attackedBishopDefendedKnightPenalty() {
-      const knight = findPiece(resultFen, "w", "n");
-      return knight && bishop && chess.isAttacked(knight.square, "b")
-        && chess.attackers(knight.square, "w").includes(bishop.square) ? 1 : 0;
-    },
     get supportedThreeCheckScore() {
       if (!context.shouldCheckThreeDiagonal) return 0;
       const support = supportedDiagonal ??= knightAndBishopSupportedDiagonal(resultFen, blackReplies.map(move => move.to));
@@ -171,12 +157,6 @@ function scoreKnightAndBishopWhiteMoveCore(
     mateScore: checkmate ? 0 : 1,
     stalemateScore: !checkmate && blackReplies.length === 0 ? 1 : 0,
     pieceSafetyScore: !knightAndBishopPiecesPresent(resultFen) || blackReplies.some(({ captured }) => captured === "b" || captured === "n") ? 1 : 0,
-    bishopEscapeProtectedCenterPenalty: context.shouldEscapeBishop && !protectedCentralBishop ? 1 : 0,
-    get bishopEscapeDistanceScore() {
-      if (!context.shouldEscapeBishop || protectedCentralBishop) return 0;
-      const blackKing = findPiece(resultFen, "b", "k");
-      return bishop && blackKing ? -squaredEuclideanDistance(bishop.square, blackKing.square) : 0;
-    },
     get bishopLongDiagonalPenalty() {
       if (!bishop) return 1;
       const { file, rank } = squareCoordinates(bishop.square);
@@ -256,25 +236,10 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       compare: (first, second) => first.declaredPreparationPenalty - second.declaredPreparationPenalty,
     },
     {
-      id: "r6",
-      shortLabel: "rule r6",
-      helpText: "With Black's king adjacent to a non-central bishop before White moves, place it on a protected central square, or otherwise maximize the bishop's Euclidean distance from Black's king.",
-      subpriorities: [
-        { compare: (first, second) => first.bishopEscapeProtectedCenterPenalty - second.bishopEscapeProtectedCenterPenalty },
-        { compare: (first, second) => first.bishopEscapeDistanceScore - second.bishopEscapeDistanceScore },
-      ],
-    },
-    {
       id: "r8",
       shortLabel: "rule r8",
       helpText: "Before White moves, if a central bishop is edge-adjacent to Black's king and diagonally adjacent to White's king, and the knight is edge-adjacent to White's king but not adjacent to the bishop, prefer a king move that becomes edge-adjacent to the bishop while remaining adjacent to the knight.",
       compare: (first, second) => first.kingCoordinationPenalty - second.kingCoordinationPenalty,
-    },
-    {
-      id: "r9.5",
-      shortLabel: "rule r9.5",
-      helpText: "Prefer to not have an attacked knight defended by a bishop.",
-      compare: (first, second) => first.attackedBishopDefendedKnightPenalty - second.attackedBishopDefendedKnightPenalty,
     },
     {
       id: "r10",
