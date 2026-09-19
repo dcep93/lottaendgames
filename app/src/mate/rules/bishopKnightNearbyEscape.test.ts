@@ -47,6 +47,7 @@ test('r9.2 only activates for a knight attacked before White moves', () => {
   const result = scoreKnightAndBishopWhiteMove('7k/8/3N4/8/8/8/8/KB6 w - - 0 1', 'Nf7+');
   assert.equal(result.attackedKnightDefensePenalty, 0);
   assert.equal(result.attackedKnightEscapeScore, 0);
+  assert.equal(result.attackedKnightKingProximityScore, 0);
 });
 
 test('r9.3 scores only the bishop when both minors start within two king steps', () => {
@@ -87,5 +88,22 @@ test('r9.3 requires both nearby pieces and exempts either central-king defense b
       const san = getChess(fen).move({from: transformSquare(from, transform), to: transformSquare(to, transform)}).san;
       assert.equal(scoreKnightAndBishopWhiteMove(fen, san).nearbyPairBishopEscapeScore, expected, source);
     }
+  }
+});
+
+
+test('r9.2 breaks equal escape distances by knight proximity to White king in every symmetry', () => {
+  const rule = knightAndBishopWhiteRules.find(rule => rule.id === 'r9.2')!;
+  for (const transform of SQUARE_TRANSFORMS) {
+    const fen = transformFen('4N3/4k3/K7/8/8/8/B7/8 w - - 0 1', transform);
+    const move = (to: Square) => getChess(fen).move({from: transformSquare('e8', transform), to: transformSquare(to, transform)}).san;
+    const closer = scoreKnightAndBishopWhiteMove(fen, move('c7'));
+    const farther = scoreKnightAndBishopWhiteMove(fen, move('g7'));
+    assert.equal(closer.attackedKnightEscapeScore, -2);
+    assert.equal(farther.attackedKnightEscapeScore, -2);
+    assert.equal(closer.attackedKnightKingProximityScore, Math.sqrt(5));
+    assert.equal(farther.attackedKnightKingProximityScore, Math.sqrt(37));
+    assert.ok(compareScoresByRules(closer, farther, [rule]) < 0);
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [move('c7')]);
   }
 });
