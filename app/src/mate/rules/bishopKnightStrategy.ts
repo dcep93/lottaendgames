@@ -88,7 +88,7 @@ export function getKnightAndBishopMatingContinuationMoves(fen: string): readonly
   }).map(move => move.san)
 }
 
-function centerProximity(square: Square): number {
+export function knightAndBishopCenterProximityScore(square: Square): number {
   const { file, rank } = squareCoords(square)
   // Four times squared distance to the board's midpoint keeps scores integral.
   return (2 * file - 7) ** 2 + (2 * rank - 7) ** 2
@@ -96,7 +96,7 @@ function centerProximity(square: Square): number {
 
 export function knightAndBishopKingCenterProximityScore(fen: string): number {
   const king = findPiece(fen, 'w', 'k')
-  return king ? centerProximity(king.square) : 99
+  return king ? knightAndBishopCenterProximityScore(king.square) : 99
 }
 
 const CENTRAL_SQUARES: readonly Square[] = ['d4', 'e4', 'd5', 'e5']

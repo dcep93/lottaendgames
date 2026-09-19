@@ -47,7 +47,7 @@ test('r9.2 only activates for a knight attacked before White moves', () => {
   const result = scoreKnightAndBishopWhiteMove('7k/8/3N4/8/8/8/8/KB6 w - - 0 1', 'Nf7+');
   assert.equal(result.attackedKnightDefensePenalty, 0);
   assert.equal(result.attackedKnightEscapeScore, 0);
-  assert.equal(result.attackedKnightKingProximityScore, 0);
+  assert.equal(result.attackedKnightCenterProximityScore, 0);
 });
 
 test('r9.3 scores only the bishop when both minors start within two king steps', () => {
@@ -92,7 +92,7 @@ test('r9.3 requires both nearby pieces and exempts either central-king defense b
 });
 
 
-test('r9.2 breaks equal escape distances by knight proximity to White king in every symmetry', () => {
+test('r9.2 breaks equal escape distances by knight proximity to the center in every symmetry', () => {
   const rule = knightAndBishopWhiteRules.find(rule => rule.id === 'r9.2')!;
   for (const transform of SQUARE_TRANSFORMS) {
     const fen = transformFen('4N3/4k3/K7/8/8/8/B7/8 w - - 0 1', transform);
@@ -101,9 +101,25 @@ test('r9.2 breaks equal escape distances by knight proximity to White king in ev
     const farther = scoreKnightAndBishopWhiteMove(fen, move('g7'));
     assert.equal(closer.attackedKnightEscapeScore, -2);
     assert.equal(farther.attackedKnightEscapeScore, -2);
-    assert.equal(closer.attackedKnightKingProximityScore, Math.sqrt(5));
-    assert.equal(farther.attackedKnightKingProximityScore, Math.sqrt(37));
+    assert.equal(closer.attackedKnightCenterProximityScore, 34);
+    assert.equal(farther.attackedKnightCenterProximityScore, 50);
     assert.ok(compareScoresByRules(closer, farther, [rule]) < 0);
     assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [move('c7')]);
+  }
+});
+
+
+test('r9.2 selects loaded 2. Nd2 over Nh2 even though Nh2 is nearer White king', () => {
+  const rule = knightAndBishopWhiteRules.find(rule => rule.id === 'r9.2')!;
+  for (const transform of SQUARE_TRANSFORMS) {
+    const fen = transformFen('B7/6K1/8/8/8/8/5k2/5N2 w - - 2 2', transform);
+    const move = (to: Square) => getChess(fen).move({from: transformSquare('f1', transform), to: transformSquare(to, transform)}).san;
+    const central = scoreKnightAndBishopWhiteMove(fen, move('d2'));
+    const edge = scoreKnightAndBishopWhiteMove(fen, move('h2'));
+    assert.equal(central.attackedKnightEscapeScore, edge.attackedKnightEscapeScore);
+    assert.equal(central.attackedKnightCenterProximityScore, 26);
+    assert.equal(edge.attackedKnightCenterProximityScore, 74);
+    assert.ok(compareScoresByRules(central, edge, [rule]) < 0);
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [move('d2')]);
   }
 });
