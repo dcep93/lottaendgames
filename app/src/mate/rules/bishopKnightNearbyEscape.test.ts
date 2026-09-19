@@ -21,7 +21,7 @@ test('r9.1 escapes an attacked bishop, with only the central-king exemption, acr
   }
 });
 
-test('r9.2 prefers king or bishop defense, then distance only among undefended outcomes', () => {
+test('r9.2 prefers king defense only, otherwise distance even when bishop-defended', () => {
   const rule = knightAndBishopWhiteRules.find(rule => rule.id === 'r9.2')!;
   for (const transform of SQUARE_TRANSFORMS) {
     const fen = transformFen('8/8/3kN3/6K1/8/8/8/1B6 w - - 0 1', transform);
@@ -32,8 +32,10 @@ test('r9.2 prefers king or bishop defense, then distance only among undefended o
     const farEscape = score('e6', 'g7');
     const nearEscape = score('e6', 'c7');
     assert.equal(kingDefense.attackedKnightDefensePenalty, 0);
-    assert.equal(bishopDefense.attackedKnightDefensePenalty, 0);
-    assert.equal(compareScoresByRules(kingDefense, bishopDefense, [rule]), 0);
+    assert.equal(bishopDefense.attackedKnightDefensePenalty, 1);
+    assert.equal(bishopDefense.attackedKnightEscapeScore, -1);
+    assert.ok(compareScoresByRules(kingDefense, bishopDefense, [rule]) < 0);
+    assert.ok(compareScoresByRules(farEscape, bishopDefense, [rule]) < 0);
     assert.ok(compareScoresByRules(kingDefense, farEscape, [rule]) < 0);
     assert.equal(farEscape.attackedKnightEscapeScore, -Math.sqrt(10));
     assert.equal(nearEscape.attackedKnightEscapeScore, -Math.sqrt(2));
