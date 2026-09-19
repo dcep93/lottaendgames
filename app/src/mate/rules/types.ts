@@ -169,6 +169,8 @@ export type WhitePositionAnalysis = {
 export type RegisteredMateRuleSet = {
   readonly id: MateId
   readonly phase: (fen: string) => string
+  /** Classify the last White result and retain it through Black’s reply. */
+  readonly phaseAfterWhiteMove?: (fen: string, beforeWhiteFen?: string) => string
   readonly whiteMoves: (fen: string) => readonly string[]
   readonly blackCandidates: (
     fen: string,
@@ -188,6 +190,8 @@ export type RegisteredMateRuleSet = {
 export type MateRuleSet<Score> = {
   readonly id: MateId
   readonly phase: (fen: string) => string
+  /** Classify the last White result and retain it through Black’s reply. */
+  readonly phaseAfterWhiteMove?: (fen: string, beforeWhiteFen?: string) => string
   readonly scoreWhite: (fen: string, san: string) => Score
   /**
    * Optionally prepares and scores the full legal-move batch. This keeps

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import { findPiece, getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess'
 import { getKnightAndBishopMatingContinuationMoves } from './bishopKnightStrategy'
-import { getKnightAndBishopLookupWhiteMoves, getKnightAndBishopPhaseLabel, knightAndBishopWhiteMoveReachesLookupPath } from './index'
+import { getKnightAndBishopLookupWhiteMoves, isKnightAndBishopMatingNetWhiteTurnPosition, knightAndBishopWhiteMoveReachesLookupPath } from './index'
 
 function storedMatingMoves(fen: string): readonly string[] {
   const mate = getChess(fen).moves().filter(move => move.endsWith('#'))
@@ -36,7 +36,7 @@ test('every bishop placement on d7–h3 shares the recorded finishing continuati
         ] as const) {
           const move = getChess(chess.fen()).move({from: transformSquare(from, transform), to: transformSquare(to, transform)}).san
           assert.deepEqual(storedMatingMoves(chess.fen()), [move])
-          assert.equal(getKnightAndBishopPhaseLabel(chess.fen()), '2/2')
+          assert.equal(isKnightAndBishopMatingNetWhiteTurnPosition(chess.fen()), true)
           chess.move(move)
           chess.move({from: transformSquare(blackFrom, transform), to: transformSquare(blackTo, transform)})
         }
@@ -59,7 +59,7 @@ test('Kb6 enters the mating net with the bishop anywhere on c8–h3 in all orien
       const move = getChess(fen).move({from: transformSquare('c6', transform), to: transformSquare('b6', transform)}).san
       assert.deepEqual(getKnightAndBishopMatingContinuationMoves(fen), [move])
       assert.deepEqual(storedMatingMoves(fen), [move])
-      assert.equal(getKnightAndBishopPhaseLabel(fen), '2/2')
+      assert.equal(isKnightAndBishopMatingNetWhiteTurnPosition(fen), true)
     }
   }
   for (const fen of [
@@ -96,7 +96,7 @@ test('Nd5 follows Ba7 without moving the bishop back off a7 in all orientations'
     const move = getChess(fen).move({from: transformSquare('c7', transform), to: transformSquare('d5', transform)}).san
     assert.deepEqual(getKnightAndBishopMatingContinuationMoves(fen), [move])
     assert.deepEqual(storedMatingMoves(fen), [move])
-    assert.equal(getKnightAndBishopPhaseLabel(fen), '2/2')
+    assert.equal(isKnightAndBishopMatingNetWhiteTurnPosition(fen), true)
   }
 })
 
@@ -160,7 +160,7 @@ test('the mating continuations accept every legal bishop placement on the diagon
         const san = getChess(fen).move({from: transformSquare(from, transform), to: transformSquare(to, transform)}).san
         assert.deepEqual(getKnightAndBishopMatingContinuationMoves(fen), [san])
         assert.deepEqual(storedMatingMoves(fen), [san])
-        assert.equal(getKnightAndBishopPhaseLabel(fen), '2/2')
+        assert.equal(isKnightAndBishopMatingNetWhiteTurnPosition(fen), true)
       }
     }
   }
@@ -205,7 +205,7 @@ test('the loaded Ke6, Nc5, Nd7 sequence is retained in the pattern data in every
       }
       chess.move(move)
     }
-    assert.equal(getKnightAndBishopPhaseLabel(chess.fen()), '2/2')
+    assert.equal(isKnightAndBishopMatingNetWhiteTurnPosition(chess.fen()), true)
   }
 })
 
@@ -245,7 +245,7 @@ test('the loaded Kf6, Nd6, Nf7, Be4 sequence is retained in the pattern data in 
       }
       chess.move(move)
     }
-    assert.equal(getKnightAndBishopPhaseLabel(chess.fen()), '2/2')
+    assert.equal(isKnightAndBishopMatingNetWhiteTurnPosition(chess.fen()), true)
   }
 })
 

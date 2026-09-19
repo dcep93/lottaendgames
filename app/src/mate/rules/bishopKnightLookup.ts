@@ -1,3 +1,4 @@
+import { knightAndBishopSupportedDiagonal } from './bishopKnightDiagonalSupport'
 import type { Square } from 'chess.js'
 import { getKnightAndBishopMatingContinuationMoves } from './bishopKnightStrategy'
 import {
@@ -245,7 +246,13 @@ export function isKnightAndBishopMatingNetWhiteTurnPosition(
 }
 
 export function getKnightAndBishopPhaseLabel(fen: string): string {
-  return isKnightAndBishopMatingNetWhiteTurnPosition(fen) ? '2/2' : '1/2'
+  // A standalone White-turn FEN has no preceding White result to classify.
+  return getChess(fen).turn() === 'b' ? getKnightAndBishopPhaseAfterWhiteMove(fen) : '1/2'
+}
+
+export function getKnightAndBishopPhaseAfterWhiteMove(fen: string): string {
+  if (getChess(fen).turn() !== 'b') throw new Error('Expected a position after White moves')
+  return knightAndBishopSupportedDiagonal(fen).size < 99 ? '2/2' : '1/2'
 }
 
 export function isKnightAndBishopWManeuverPosition(fen: string): boolean {

@@ -367,7 +367,7 @@ function completeWhiteTurn(options: {
   const whiteLog: MateLogEntry = {
     fen: preMoveFen,
     san: canonicalSan,
-    phase: ruleSet.phase(preMoveFen),
+    phase: ruleSet.phaseAfterWhiteMove?.(whiteFen, preMoveFen) ?? ruleSet.phase(preMoveFen),
     isCorrect,
     correctChoices: idealWhiteMoves.length,
     ...(idealOpponentChoices === undefined

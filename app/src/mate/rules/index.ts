@@ -336,6 +336,7 @@ function createRegisteredMateRuleSet<Score>(
   const {
     id,
     phase,
+    phaseAfterWhiteMove,
     scoreWhite,
     scoreWhiteCandidates,
     whiteRuleReasonLabel: sourceWhiteRuleReasonLabel,
@@ -513,6 +514,7 @@ function createRegisteredMateRuleSet<Score>(
   return Object.freeze({
     id,
     phase,
+    ...(phaseAfterWhiteMove === undefined ? {} : { phaseAfterWhiteMove }),
     whiteMoves,
     blackCandidates,
     help: snapshotRuleHelp(help),

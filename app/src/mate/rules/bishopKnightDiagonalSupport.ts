@@ -1,220 +1,300 @@
 import type { Square } from 'chess.js'
 import { isInsideBishopDiagonal } from './bishopKnightGeometry'
+import { isRecordedSupportedCornerPosition, isRecordedSupportedFiveKingDefense, recordedCornerKnightTarget } from './bishopKnightDeclaredSupport'
 import { knightAndBishopKnightProximityToSquare } from './bishopKnightStrategy'
-import { getChess, findPiece, getSquareTransform, kingDistance, squareCoordinates, squaredEuclideanDistance, SQUARE_TRANSFORMS, transformSquare } from '../chess'
+import { allSquares, getChess, findPiece, kingDistance, squaredEuclideanDistance, squareCoords, SQUARE_TRANSFORMS, transformSquare } from '../chess'
 
-const SEVEN_DIAGONAL_SUPPORT = SQUARE_TRANSFORMS.map(transform => ({
-  inverse: getSquareTransform(transform.inverseName),
-  kingTarget: transformSquare('f7', transform),
-  wall: (['a2', 'b3', 'c4', 'd5', 'e6', 'f7', 'g8'] as const).map(square => transformSquare(square, transform)),
-  knightTarget: transformSquare('d3', transform),
-  approachBlackGate: transformSquare('c5', transform),
-  approachKingGates: (['f6', 'g7'] as const).map(square => transformSquare(square, transform)),
-  edgeRouteBlack: (['a3', 'a4'] as const).map(square => transformSquare(square, transform)),
-  edgeRouteKing: (['d4', 'c3', 'c2', 'b2'] as const).map(square => transformSquare(square, transform)),
-  edgeRouteReturnBlack: transformSquare('a5', transform),
-  edgeRouteReturnBishop: transformSquare('b3', transform),
-  edgeRouteReturnKing: transformSquare('d4', transform),
-  approachEscapes: (['a3', 'b4', 'c5', 'd6'] as const).map(square => transformSquare(square, transform)),
+const CANONICAL_DIAGONALS: readonly {
+  wall: readonly Square[];
+  boundary: readonly Square[];
+  previousSupport?: Square;
+  previousSupportBishops?: readonly Square[];
+  previousSupportKingRegion?: readonly Square[];
+  support: readonly Square[];
+  kingSupportTargets?: readonly {king: Square; targets: readonly Square[]}[];
+  kingGuard?: Square;
+  bishopAttackRaceTarget?: Square;
+  kingRaceSquares?: readonly Square[];
+}[] = [
+  {
+    wall: ['a6', 'b7', 'c8'],
+    boundary: ['a5', 'b6', 'c7', 'd8'],
+    previousSupport: 'd5',
+    support: ['b5', 'c6'],
+    kingSupportTargets: [
+      {king: 'c7', targets: ['b5', 'c6']},
+      {king: 'd7', targets: ['c3']}, // Reflected Kb5 targets f6.
+    ],
+  },
+  {
+    wall: ['a4', 'b5', 'c6', 'd7', 'e8'],
+    boundary: ['a3', 'b4', 'c5', 'd6', 'e7', 'f8'],
+    previousSupport: 'd3',
+    previousSupportBishops: ['a4', 'b5', 'd7'],
+    previousSupportKingRegion: ['c5', 'd5', 'c6', 'd6', 'c7', 'd7', 'c8', 'd8'],
+    support: ['d5'],
+    kingGuard: 'd6',
+    bishopAttackRaceTarget: 'e7',
+  },
+  {
+    wall: ['a2', 'b3', 'c4', 'd5', 'e6', 'f7', 'g8'],
+    boundary: ['a1', 'b2', 'c3', 'd4', 'e5', 'f6', 'g7', 'h8'],
+    support: ['d3'],
+    kingRaceSquares: ['f6', 'g7'],
+  },
+]
+
+const DIAGONALS = CANONICAL_DIAGONALS.flatMap(pattern => SQUARE_TRANSFORMS.map(transform => ({
+  corner: squareCoords(transformSquare('a8', transform)),
+  wall: pattern.wall.map(square => transformSquare(square, transform)),
+  boundary: pattern.boundary.map(square => transformSquare(square, transform)),
+  previousSupport: pattern.previousSupport && transformSquare(pattern.previousSupport, transform),
+  previousSupportBishops: pattern.previousSupportBishops?.map(square => transformSquare(square, transform)),
+  previousSupportKingRegion: pattern.previousSupportKingRegion?.map(square => transformSquare(square, transform)),
+  support: pattern.support.map(square => transformSquare(square, transform)),
+  kingSupportTargets: pattern.kingSupportTargets?.map(entry => ({
+    king: transformSquare(entry.king, transform),
+    targets: entry.targets.map(square => transformSquare(square, transform)),
+  })),
+  kingGuard: pattern.kingGuard && transformSquare(pattern.kingGuard, transform),
+  bishopAttackRaceTarget: pattern.bishopAttackRaceTarget && transformSquare(pattern.bishopAttackRaceTarget, transform),
+  kingRaceSquares: pattern.kingRaceSquares?.map(square => transformSquare(square, transform)),
+})))
+
+const UNSUPPORTED_FIVE_ARRANGEMENTS = SQUARE_TRANSFORMS.map(transform => ({
+  king: transformSquare('c6', transform),
+  bishop: transformSquare('e8', transform),
+  black: transformSquare('c8', transform),
 }))
 
-const FIVE_DIAGONAL_SUPPORT = SQUARE_TRANSFORMS.map(transform => ({
-  inverse: getSquareTransform(transform.inverseName),
-  bishop: transformSquare('a4', transform),
-  sevenSupportBishops: (['a4', 'b5'] as const).map(square => transformSquare(square, transform)),
-  oppositeKingSquares: (['d6', 'e7', 'f8'] as const).map(square => transformSquare(square, transform)),
-  edgeBishopAttackSquare: transformSquare('a5', transform),
-  edgeBishopEscapeSquare: transformSquare('b6', transform),
-  checkingKingSquare: transformSquare('e7', transform),
-  sevenDiagonal: (['a2', 'b3', 'c4', 'd5', 'e6', 'f7', 'g8'] as const).map(square => transformSquare(square, transform)),
+const UNSUPPORTED_THREE_ENDPOINTS = SQUARE_TRANSFORMS.map(transform => ({
+  bishop: transformSquare('a6', transform),
+  king: transformSquare('c8', transform),
+}))
+
+const UNSUPPORTED_THREE_PLACEMENTS = SQUARE_TRANSFORMS.map(transform => ({
+  bishop: transformSquare('c8', transform),
+  king: transformSquare('b5', transform),
+  knight: transformSquare('c6', transform),
+  black: transformSquare('a7', transform),
+}))
+
+const UNSUPPORTED_THREE_KNIGHTS = SQUARE_TRANSFORMS.map(transform => ({
+  bishop: transformSquare('c8', transform),
+  knights: (['b6', 'c7'] as const).map(square => transformSquare(square, transform)),
+}))
+
+const THREE_BISHOP_RACES = SQUARE_TRANSFORMS.map(transform => ({
+  bishop: transformSquare('a6', transform),
+  target: transformSquare('b6', transform),
+}))
+
+const DECLARED_FIVE_SUPPORT = [
+  {king: 'e7', bishop: 'c6', knight: 'b4', black: 'c7'},
+  {king: 'd4', bishop: 'c6', knight: 'b4', black: 'b6'},
+  {king: 'd4', bishop: 'c6', knight: 'd5', black: 'a5'},
+] as const
+const DECLARED_FIVE_PLACEMENTS = DECLARED_FIVE_SUPPORT.flatMap(placement => SQUARE_TRANSFORMS.map(transform => ({
+  king: transformSquare(placement.king, transform),
+  bishop: transformSquare(placement.bishop, transform),
+  knight: transformSquare(placement.knight, transform),
+  black: transformSquare(placement.black, transform),
+  support: transformSquare('d5', transform),
+})))
+
+const FIVE_BISHOP_APPROACHES = SQUARE_TRANSFORMS.map(transform => ({
   wall: (['a4', 'b5', 'c6', 'd7', 'e8'] as const).map(square => transformSquare(square, transform)),
-  destination: transformSquare('d5', transform),
-  kingSupportSquare: transformSquare('d6', transform),
-  edgeKingSupportSquare: transformSquare('c5', transform),
-  blackEdge: (['a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'a8'] as const).map(square => transformSquare(square, transform)),
-  nearEdgeKingTarget: transformSquare('d7', transform),
-  midpoint: transformSquare('c6', transform),
-  midpointEscape: transformSquare('b4', transform),
-  // Include the reflected b4/c5 escape squares so reflecting the same wall cannot bypass the check.
-  defendedBishopEscapes: (['c5', 'b4', 'd6', 'e7'] as const).map(square => transformSquare(square, transform)),
-  approachEscapes: (['e7', 'c7', 'b6', 'a5'] as const).map(square => transformSquare(square, transform)),
-  kingApproachBlackGates: (['b6', 'e7'] as const).map(square => transformSquare(square, transform)),
-  sixDiagonal: (['a3', 'b4', 'c5', 'd6', 'e7', 'f8'] as const).map(square => transformSquare(square, transform)),
-  knight: transformSquare('d3', transform),
-  knightSupportedBlackGate: transformSquare('c7', transform),
-  knightSupportedWhiteGate: transformSquare('e7', transform),
-  edgeBishopExcludedBlack: (['d8', 'e8', 'e7', 'f8'] as const).map(square => transformSquare(square, transform)),
-  whiteSquares: (['d6', 'd7', 'e6', 'e7'] as const).map(square => transformSquare(square, transform)),
+  bishops: (['a4', 'b5', 'c6'] as const).map(square => transformSquare(square, transform)),
+  approach: transformSquare('b6', transform),
+  escape: transformSquare('c5', transform),
 }))
 
-const THREE_DIAGONAL_SUPPORT = SQUARE_TRANSFORMS.map(transform => ({
-  bishopEdges: (['a6', 'c8'] as const).map(square => transformSquare(square, transform)),
-  kingSupport: transformSquare('c7', transform),
-  approachBishop: transformSquare('a6', transform),
-  approachKing: transformSquare('d8', transform),
-  bishopAttackSquares: (['a5', 'b5', 'b6', 'b7', 'a7'] as const).map(square => transformSquare(square, transform)),
-  knightTargets: (['b5', 'c6'] as const).map(square => transformSquare(square, transform)),
-  knight: transformSquare('d5', transform),
-  wall: (['a6', 'b7', 'c8'] as const).map(square => transformSquare(square, transform)),
-}))
+const BISHOP_ATTACK_SQUARES = new Map(allSquares().map(bishop => [
+  bishop, allSquares().filter(square => kingDistance(bishop, square) === 1),
+]))
 
-function blackReachability(fen: string, blackDestinations?: readonly Square[]) {
+/** A bishop attack along a shortest king-step route costs White one tempo in the race. */
+function losesBishopAttackRace(fen: string, white: Square, black: Square, bishop: Square, target: Square, allowKingDefense = false): boolean {
+  const whiteDistance = kingDistance(white, target)
+  const blackDistance = kingDistance(black, target)
+  if (whiteDistance > blackDistance) return true
+  if (whiteDistance < blackDistance || kingDistance(black, bishop) >= kingDistance(white, bishop)) return false
+  const board = getChess(fen)
+  return BISHOP_ATTACK_SQUARES.get(bishop)!.some(square =>
+    kingDistance(black, square) + kingDistance(square, target) === blackDistance &&
+    (!allowKingDefense || kingDistance(white, bishop) - 1 > kingDistance(black, square)) &&
+    !board.isAttacked(square, 'w'))
+}
+
+function hasExposedFiveBishopApproach(fen: string, bishop: Square, black: Square, blackDestinations?: readonly Square[]): boolean {
+  const patterns = FIVE_BISHOP_APPROACHES.filter(pattern => pattern.bishops.includes(bishop) &&
+    isInsideBishopDiagonal(black, pattern.wall))
+  if (!patterns.length) return false
+  const board = getChess(fen)
+  if (board.isAttacked(bishop, 'w')) return false
   let replies = blackDestinations
-  return (squares: readonly Square[]) => {
-    replies ??= getChess(fen.replace(/ [wb] /, ' b ')).moves({verbose: true}).filter(move => move.piece === 'k').map(move => move.to)
-    return replies.some(square => squares.includes(square))
-  }
+  return patterns.some(pattern => {
+    if (board.isAttacked(pattern.escape, 'w')) return false
+    replies ??= board.moves({verbose: true}).filter(move => move.piece === 'k').map(move => move.to)
+    if (!replies.includes(pattern.approach)) return false
+    board.move({from: black, to: pattern.approach})
+    // One legal king response can defend the bishop and close this escape.
+    const canAnswer = board.moves({verbose: true}).some(move => move.piece === 'k' &&
+      kingDistance(move.to, bishop) === 1 && kingDistance(move.to, pattern.escape) <= 1)
+    board.undo()
+    return !canAnswer
+  })
 }
 
-/** Three-diagonal pressure, evaluated after White moves. */
-export function knightAndBishopThreeDiagonalKingProximity(fen: string): number {
-  const white = findPiece(fen, 'w', 'k')
-  const black = findPiece(fen, 'b', 'k')
-  const bishop = findPiece(fen, 'w', 'b')
-  const knight = findPiece(fen, 'w', 'n')
-  if (!white || !black || !bishop || !knight) return 0
-  for (const pattern of THREE_DIAGONAL_SUPPORT) {
-    if (!pattern.bishopEdges.includes(bishop.square) || !isInsideBishopDiagonal(black.square, pattern.wall)) continue
-    if (knight.square !== pattern.knight && !pattern.knightTargets.includes(knight.square)) continue
-    return squaredEuclideanDistance(white.square, bishop.square)
-  }
-  return 0
+function supportTargets(fen: string, whiteKing: Square, pattern: typeof DIAGONALS[number]): readonly Square[] {
+  const recordedTarget = pattern.wall.length === 3 ? recordedCornerKnightTarget(fen) : undefined
+  if (recordedTarget) return [recordedTarget]
+  return pattern.kingSupportTargets
+    ? pattern.kingSupportTargets.find(entry => entry.king === whiteKing)?.targets ?? []
+    : pattern.support
 }
 
-/** r1's trigger belongs to the position before White gives check. */
-export function knightAndBishopShouldCheckThreeDiagonal(fen: string): boolean {
-  const white = findPiece(fen, 'w', 'k')
-  const bishop = findPiece(fen, 'w', 'b')
-  const black = findPiece(fen, 'b', 'k')
-  if (!white || !bishop || !black || !findPiece(fen, 'w', 'n')) return false
-  let distance = 99
-  const canReach = blackReachability(fen)
-  for (const pattern of THREE_DIAGONAL_SUPPORT) {
-    if (!isInsideBishopDiagonal(black.square, pattern.wall) || white.square !== pattern.kingSupport || !pattern.bishopEdges.includes(bishop.square)) continue
-    if (canReach(pattern.wall)) continue
-    for (const target of pattern.knightTargets) distance = Math.min(distance, knightAndBishopKnightProximityToSquare(fen, target))
+function supportDistance(fen: string, whiteKing: Square, pattern: typeof DIAGONALS[number]): number {
+  const targets = supportTargets(fen, whiteKing, pattern)
+  return targets.length ? Math.min(...targets.map(square => knightAndBishopKnightProximityToSquare(fen, square))) : 99
+}
+
+/** A one-move destination must be empty; the knight already occupying it still qualifies. */
+function knightWithinOneOfAvailableSupport(fen: string, whiteKing: Square, pattern: typeof DIAGONALS[number]): boolean {
+  const board = getChess(fen)
+  return supportTargets(fen, whiteKing, pattern).some(square => {
+    const distance = knightAndBishopKnightProximityToSquare(fen, square)
+    return distance === 0 || (distance === 1 && !board.get(square))
+  })
+}
+
+/** Test only the immediate bishop attacks and a single White response, without recursive support evaluation. */
+function canAnswerBishopAttacks(fen: string, bishop: Square, boundary: readonly Square[], allowResponse = true): boolean {
+  const board = getChess(fen.replace(/ [wb] /, ' b '))
+  for (const attack of board.moves({verbose: true})) {
+    if (attack.piece !== 'k') continue
+    if (attack.to === bishop) return false
+    if (kingDistance(attack.to, bishop) !== 1) continue
+    board.move(attack)
+    if (board.isAttacked(bishop, 'w')) {
+      board.undo()
+      continue
+    }
+    if (!allowResponse) return false
+    let answer = false
+    for (const response of board.moves({verbose: true})) {
+      board.move(response)
+      const defendedBishop = findPiece(board.fen(), 'w', 'b')
+      answer = Boolean(defendedBishop) && !board.moves({verbose: true}).some(reply =>
+        reply.piece === 'k' && (boundary.includes(reply.to) || reply.to === defendedBishop!.square))
+      board.undo()
+      if (answer) break
+    }
+    board.undo()
+    if (!answer) return false
   }
-  return distance <= 1
+  return true
 }
 
 /** Evaluate the resulting position, before Black replies. */
 export function knightAndBishopSupportedDiagonal(fen: string, blackDestinations?: readonly Square[]): { size: number; knight: number } {
+  if (fen.split(' ')[1] !== 'b') throw new Error('Diagonal support must be evaluated after White moves, with Black to move')
   const white = findPiece(fen, 'w', 'k')
   const black = findPiece(fen, 'b', 'k')
   const bishop = findPiece(fen, 'w', 'b')
   const knight = findPiece(fen, 'w', 'n')
   if (!white || !black || !bishop || !knight) return {size: 99, knight: 99}
-  const canReach = blackReachability(fen, blackDestinations)
-  let threeSupported = false
-  let threeKnightDistance = 99
-  for (const pattern of THREE_DIAGONAL_SUPPORT) {
-    if (!pattern.bishopEdges.includes(bishop.square)) continue
-    const inside = isInsideBishopDiagonal(black.square, pattern.wall)
-    if (!inside && !pattern.wall.includes(black.square)) continue
-    if (canReach(pattern.wall)) continue
-    const kingSupported = inside && white.square === pattern.kingSupport
-    const fiveKnightSupported = inside && knight.square === pattern.knight && pattern.wall.some(square => kingDistance(white.square, square) === 1)
-    const approachingKingSupported = bishop.square === pattern.approachBishop && knight.square === pattern.knight &&
-      kingDistance(white.square, pattern.approachKing) <= 1 && !canReach(pattern.bishopAttackSquares)
-    if (kingSupported || fiveKnightSupported || approachingKingSupported) threeSupported = true
-    if (kingSupported) threeKnightDistance = Math.min(threeKnightDistance,
-      ...pattern.knightTargets.map(square => knightAndBishopKnightProximityToSquare(fen, square)))
+  if (UNSUPPORTED_THREE_PLACEMENTS.some(pattern =>
+    pattern.king === white.square && pattern.bishop === bishop.square &&
+    pattern.knight === knight.square && pattern.black === black.square)) return {size: 99, knight: 99}
+  if (isRecordedSupportedFiveKingDefense(fen)) return {size: 5, knight: 1}
+  const declaredFive = DECLARED_FIVE_PLACEMENTS.find(pattern =>
+    pattern.king === white.square && pattern.bishop === bishop.square &&
+    pattern.knight === knight.square && pattern.black === black.square)
+  if (declaredFive) return {
+    size: 5,
+    knight: knightAndBishopKnightProximityToSquare(fen, declaredFive.support),
   }
-  if (threeSupported) return {size: 3, knight: threeKnightDistance}
-  let fiveKnightDistance = 99
-  // This race constrains the wall itself, including a king-support interpretation from its other end.
-  const fiveSupportRaceLost = FIVE_DIAGONAL_SUPPORT.some(pattern => knight.square === pattern.knight &&
+  // A king on the other endpoint does not support this edge bishop.
+  if (UNSUPPORTED_THREE_ENDPOINTS.some(pattern =>
+    pattern.bishop === bishop.square && pattern.king === white.square)) return {size: 99, knight: 99}
+  if (isRecordedSupportedCornerPosition(fen)) return {
+    size: 3,
+    knight: Math.min(...DIAGONALS.filter(pattern => pattern.wall.length === 3 && pattern.wall.includes(bishop.square))
+      .map(pattern => supportDistance(fen, white.square, pattern))),
+  }
+  if (kingDistance(black.square, bishop.square) === 1 &&
+    kingDistance(white.square, bishop.square) > 1 &&
+    squaredEuclideanDistance(knight.square, bishop.square) === 5) return {size: 99, knight: 99}
+  const excludedFive = UNSUPPORTED_FIVE_ARRANGEMENTS.some(pattern =>
+    pattern.king === white.square && pattern.bishop === bishop.square && pattern.black === black.square) ||
+    hasExposedFiveBishopApproach(fen, bishop.square, black.square, blackDestinations)
+  const excludedThree = UNSUPPORTED_THREE_KNIGHTS.some(pattern =>
+    pattern.bishop === bishop.square && pattern.knights.includes(knight.square)) ||
+    THREE_BISHOP_RACES.some(pattern => pattern.bishop === bishop.square &&
+      squaredEuclideanDistance(knight.square, pattern.target) !== 5 &&
+      losesBishopAttackRace(fen, white.square, black.square, bishop.square, pattern.target, true))
+  // The king need not win a race to a square the knight already controls.
+  const losesFiveKingRace = DIAGONALS.some(pattern => pattern.kingGuard &&
     pattern.wall.includes(bishop.square) && isInsideBishopDiagonal(black.square, pattern.wall) &&
-    kingDistance(black.square, pattern.knightSupportedBlackGate) < kingDistance(white.square, pattern.knightSupportedWhiteGate))
-  const fiveEdgeBishopAttack = FIVE_DIAGONAL_SUPPORT.some(pattern => bishop.square === pattern.bishop &&
-    isInsideBishopDiagonal(black.square, pattern.wall) && knight.square !== pattern.knight &&
-    !(knight.square === pattern.destination &&
-      kingDistance(white.square, pattern.edgeKingSupportSquare) <= kingDistance(black.square, pattern.edgeKingSupportSquare)) &&
-    canReach([pattern.edgeBishopAttackSquare]))
-  // A knight on the seven-diagonal support square fixes the end of this wall.
-  // Other reflected interpretations must not restore a disallowed bishop placement.
-  const sevenSupportPattern = FIVE_DIAGONAL_SUPPORT.find(pattern =>
-    pattern.knight === knight.square && pattern.wall.includes(bishop.square))
-  for (const pattern of FIVE_DIAGONAL_SUPPORT) {
-    if (sevenSupportPattern) {
-      if (pattern !== sevenSupportPattern) continue
-      const bishopPlacementSupported = pattern.sevenSupportBishops.includes(bishop.square) ||
-        kingDistance(white.square, bishop.square) === 1 || kingDistance(black.square, bishop.square) >= 3
-      if (!bishopPlacementSupported) continue
+    !pattern.support.includes(knight.square) &&
+    squaredEuclideanDistance(knight.square, pattern.kingGuard) !== 5 &&
+    losesBishopAttackRace(fen, white.square, black.square, bishop.square, pattern.kingGuard, true))
+  const losesFiveBishopTempoRace = DIAGONALS.some(pattern => pattern.bishopAttackRaceTarget &&
+    pattern.wall.includes(bishop.square) && isInsideBishopDiagonal(black.square, pattern.wall) &&
+    !pattern.support.includes(knight.square) &&
+    squaredEuclideanDistance(knight.square, pattern.bishopAttackRaceTarget) !== 5 &&
+    kingDistance(white.square, pattern.bishopAttackRaceTarget) === kingDistance(black.square, pattern.bishopAttackRaceTarget) &&
+    losesBishopAttackRace(fen, white.square, black.square, bishop.square, pattern.bishopAttackRaceTarget, true))
+  const king = squareCoords(white.square)
+  let replies = blackDestinations
+  const attackChecks = new Map<string, boolean>()
+  let best = {size: 99, knight: 99}
+  for (const pattern of DIAGONALS) {
+    if (pattern.wall.length > best.size || !pattern.wall.includes(bishop.square) ||
+      !isInsideBishopDiagonal(black.square, pattern.wall)) continue
+    if (pattern.wall.length === 5 && (excludedFive || losesFiveKingRace || losesFiveBishopTempoRace)) continue
+    if (pattern.wall.length === 3 && excludedThree) continue
+    // The n-diagonal is n−1 orthogonal steps from its corner; n+2 is n+1 steps.
+    if (Math.abs(king.file - pattern.corner.file) + Math.abs(king.rank - pattern.corner.rank) > pattern.wall.length + 1) continue
+    const kingSupportsThree = pattern.wall.length === 3 && pattern.wall
+      .some(square => square !== knight.square && kingDistance(white.square, square) === 1)
+    if (pattern.wall.length === 3 && !kingSupportsThree) continue
+    if (knight.square === pattern.previousSupport && pattern.previousSupportBishops &&
+      !pattern.previousSupportBishops.includes(bishop.square) &&
+      !pattern.previousSupportKingRegion?.includes(white.square)) continue
+    if (knight.square === pattern.previousSupport && pattern.bishopAttackRaceTarget &&
+      losesBishopAttackRace(fen, white.square, black.square, bishop.square, pattern.bishopAttackRaceTarget)) continue
+    const distance = supportDistance(fen, white.square, pattern)
+    if (!kingSupportsThree && knight.square !== pattern.previousSupport && !knightWithinOneOfAvailableSupport(fen, white.square, pattern)) continue
+    // The king must cover the escape side opposite this knight support square.
+    if (pattern.kingRaceSquares?.some(square =>
+      kingDistance(white.square, square) > kingDistance(black.square, square))) continue
+    replies ??= getChess(fen.replace(/ [wb] /, ' b ')).moves({verbose: true})
+      .filter(move => move.piece === 'k').map(move => move.to)
+    if (replies.some(square => pattern.boundary.includes(square))) continue
+    if (replies.some(square => pattern.wall.includes(square))) continue
+    const allowAttackResponse = pattern.wall.length !== 7 || pattern.support.includes(knight.square)
+    const key = [...pattern.boundary].sort().join(',') + ':' + allowAttackResponse
+    let canAnswer = attackChecks.get(key)
+    if (canAnswer === undefined) {
+      canAnswer = !replies.some(square => kingDistance(square, bishop.square) <= 1) ||
+        canAnswerBishopAttacks(fen, bishop.square, pattern.boundary, allowAttackResponse)
+      attackChecks.set(key, canAnswer)
     }
-    const oppositeSideKingSupport = knight.square === pattern.knight &&
-      (pattern.sevenSupportBishops.includes(bishop.square) ||
-        kingDistance(white.square, pattern.checkingKingSquare) < kingDistance(black.square, pattern.checkingKingSquare)) &&
-      pattern.oppositeKingSquares.every(square => kingDistance(white.square, square) <= kingDistance(black.square, square))
-    const checkingKingSupport = knight.square === pattern.knight &&
-      kingDistance(white.square, pattern.checkingKingSquare) <= 1 &&
-      !canReach(pattern.sixDiagonal) && !canReach(pattern.sevenDiagonal)
-    const whiteCoordinates = squareCoordinates(transformSquare(white.square, pattern.inverse))
-    const blackCoordinates = squareCoordinates(transformSquare(black.square, pattern.inverse))
-    const relativeKingSupport = knight.square === pattern.knight &&
-      whiteCoordinates.rank >= blackCoordinates.rank - 1 && whiteCoordinates.file >= blackCoordinates.file
-    if (fiveEdgeBishopAttack && !checkingKingSupport && !relativeKingSupport && !oppositeSideKingSupport) continue
-    if (!pattern.wall.includes(bishop.square) ||
-      (!isInsideBishopDiagonal(black.square, pattern.wall) && !(checkingKingSupport && pattern.wall.includes(black.square)))) continue
-    if (white.square === pattern.midpoint && kingDistance(black.square, bishop.square) === 1) continue
-    if (canReach(pattern.wall) || canReach(pattern.sixDiagonal)) continue
-    const edgeBishopKingSupport = bishop.square === pattern.bishop && knight.square === pattern.knight &&
-      kingDistance(white.square, pattern.kingSupportSquare) <= 1 && !pattern.edgeBishopExcludedBlack.includes(black.square)
-    const edgeBishopEscapeSupport = bishop.square === pattern.bishop && !canReach(pattern.sixDiagonal) &&
-      (knight.square === pattern.knight || knight.square === pattern.destination ||
-        (pattern.sixDiagonal.includes(white.square) &&
-          (!canReach([pattern.edgeBishopEscapeSquare]) || kingDistance(white.square, pattern.edgeKingSupportSquare) <= 1)))
-    if (fiveSupportRaceLost && !edgeBishopKingSupport && !edgeBishopEscapeSupport && !checkingKingSupport && !relativeKingSupport && !oppositeSideKingSupport) continue
-    const distance = knightAndBishopKnightProximityToSquare(fen, pattern.destination)
-    const originalSupport = pattern.bishop === bishop.square && pattern.knight === knight.square && pattern.whiteSquares.includes(white.square)
-    const pairedSupport = knight.square === pattern.knight && white.square === pattern.kingSupportSquare
-    const edgeKingSupport = knight.square === pattern.knight && white.square === pattern.edgeKingSupportSquare &&
-      pattern.blackEdge.includes(black.square)
-    const nearEdgeSupport = knight.square === pattern.knight &&
-      kingDistance(white.square, pattern.nearEdgeKingTarget) <= 1
-    const approachingSupport = pattern.bishop === bishop.square && distance <= 1 && !canReach(pattern.approachEscapes)
-    const kingSupported = pattern.bishop === bishop.square &&
-      white.square === pattern.kingSupportSquare && kingDistance(black.square, bishop.square) >= 3
-    const midpointSupport = distance <= 1 && bishop.square === pattern.midpoint && white.square === pattern.kingSupportSquare &&
-      !canReach([pattern.midpointEscape])
-    // After ...b6, White can occupy d6; only the two minor pieces can block that reply.
-    const canOccupyKingSupport = kingDistance(white.square, pattern.kingSupportSquare) <= 1 &&
-      bishop.square !== pattern.kingSupportSquare && knight.square !== pattern.kingSupportSquare
-    const defendedBishopSupport = distance <= 1 && kingDistance(white.square, bishop.square) === 1 &&
-      canOccupyKingSupport && !canReach(pattern.defendedBishopEscapes)
-    const kingApproachSupport = distance <= 1 && kingDistance(white.square, pattern.kingSupportSquare) <= 1 &&
-      pattern.kingApproachBlackGates.every(square => kingDistance(black.square, square) >= 2)
-    const sixDiagonalKingSupport = distance <= 1 &&
-      pattern.sixDiagonal.every(square => kingDistance(white.square, square) <= kingDistance(black.square, square))
-    const arrivedSupport = distance === 0 && !canReach(pattern.sixDiagonal)
-    if (oppositeSideKingSupport || relativeKingSupport || checkingKingSupport || edgeBishopEscapeSupport || edgeBishopKingSupport || originalSupport || pairedSupport || edgeKingSupport || nearEdgeSupport || approachingSupport || kingSupported || midpointSupport || defendedBishopSupport || kingApproachSupport || sixDiagonalKingSupport || arrivedSupport) fiveKnightDistance = Math.min(fiveKnightDistance, distance)
+    if (!canAnswer) continue
+    if (pattern.wall.length < best.size || distance < best.knight) best = {size: pattern.wall.length, knight: distance}
   }
-  if (fiveKnightDistance < 99) return {size: 5, knight: fiveKnightDistance}
-  let sevenKnightDistance = 99
-  for (const pattern of SEVEN_DIAGONAL_SUPPORT) {
-    if (!isInsideBishopDiagonal(black.square, pattern.wall) || !pattern.wall.includes(bishop.square)) continue
-    if (canReach(pattern.wall)) continue
-    const distance = knightAndBishopKnightProximityToSquare(fen, pattern.knightTarget)
-    const kingRaceSupport = distance <= 1 && kingDistance(black.square, pattern.approachBlackGate) >= 2 &&
-      kingDistance(white.square, bishop.square) < kingDistance(black.square, bishop.square) &&
-      pattern.approachKingGates.every(square => kingDistance(white.square, square) < kingDistance(black.square, square))
-    if (kingRaceSupport) {
-      sevenKnightDistance = Math.min(sevenKnightDistance, distance)
-      continue
-    }
-    const nearTarget = kingDistance(white.square, pattern.kingTarget) <= 1
-    const onEdgeRoute = distance === 0 && pattern.edgeRouteBlack.includes(black.square) && pattern.edgeRouteKing.includes(white.square)
-    const edgeRouteReturn = distance === 0 && black.square === pattern.edgeRouteReturnBlack &&
-      bishop.square === pattern.edgeRouteReturnBishop && white.square === pattern.edgeRouteReturnKing
-    if (!nearTarget && !onEdgeRoute && !edgeRouteReturn) {
-      if (distance !== 0) continue
-      const whiteCoordinates = squareCoordinates(transformSquare(white.square, pattern.inverse))
-      const blackCoordinates = squareCoordinates(transformSquare(black.square, pattern.inverse))
-      if (whiteCoordinates.rank < 4 || whiteCoordinates.file <= blackCoordinates.file) continue
-    }
-    if (distance === 0 || (distance <= 1 && !canReach(pattern.approachEscapes))) {
-      sevenKnightDistance = Math.min(sevenKnightDistance, distance)
-    }
-  }
-  return sevenKnightDistance < 99 ? {size: 7, knight: sevenKnightDistance} : {size: 99, knight: 99}
+  return best
+}
+
+/** Detect r1's starting geometry; support itself is evaluated after the candidate White move. */
+export function knightAndBishopShouldCheckThreeDiagonal(fen: string): boolean {
+  const white = findPiece(fen, 'w', 'k')
+  const bishop = findPiece(fen, 'w', 'b')
+  const black = findPiece(fen, 'b', 'k')
+  return Boolean(white && bishop && black && DIAGONALS.some(pattern => pattern.wall.length === 3 &&
+    pattern.wall.includes(bishop.square) &&
+    isInsideBishopDiagonal(black.square, pattern.wall) &&
+    knightWithinOneOfAvailableSupport(fen, white.square, pattern)))
 }

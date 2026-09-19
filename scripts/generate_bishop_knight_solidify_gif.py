@@ -1,24 +1,37 @@
 #!/usr/bin/env python3
-"""Render the r3.8 maneuver from its tested example, keeping a2–g8 highlighted."""
+"""Render the tested bishop-and-knight examples with the live board's SVG pieces.
+
+Requires Pillow and the app's npm dev dependencies (including sharp).
+"""
 import argparse
+import base64
 import io
 import json
+import subprocess
+from functools import cache
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 
 ROOT = Path(__file__).resolve().parents[1]
-EXAMPLE = ROOT / 'app/src/mate/rules/bishopKnightSolidifyExample.json'
-OUTPUT = ROOT / 'app/public/mate/bishop-knight/solidify-seven-diagonal.gif'
-SIZE, CELL = 512, 64
+EXAMPLE = ROOT / 'app/src/mate/rules/bishopKnightCornerFlushExample.json'
+OUTPUT = ROOT / 'app/public/mate/bishop-knight/rule-r4-flush.gif'
+SIZE, CELL = 1024, 128
 LIGHT, DARK, INK = '#e8cfad', '#a87353', '#211711'
-GLYPHS = {'K': '♚', 'k': '♚', 'B': '♝', 'N': '♞'}
+MOVE_STEPS, FRAME_MS, HOLD_MS = 12, 20, 950
 
 
-def font_path():
-    for path in ['/System/Library/Fonts/Apple Symbols.ttf', '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf']:
-        if Path(path).exists():
-            return path
-    raise RuntimeError('A chess-symbol font (Apple Symbols or DejaVu Sans) is required')
+@cache
+def piece_sprites():
+    result = subprocess.run(
+        ['node', str(ROOT / 'app/scripts/render_chessboard_pieces.mjs'), str(CELL * 2)],
+        check=True, capture_output=True, text=True,
+    )
+    return {
+        symbol: Image.open(io.BytesIO(base64.b64decode(data))).convert('RGBA').resize(
+            (CELL, CELL), Image.Resampling.LANCZOS,
+        )
+        for symbol, data in json.loads(result.stdout).items()
+    }
 
 
 def xy(square):
@@ -38,7 +51,7 @@ def pieces_from_fen(fen):
     return result
 
 
-def render(pieces, diagonal, label, font, last_move=None):
+def render(pieces, diagonal, label, last_move=None):
     image = Image.new('RGB', (SIZE, SIZE), LIGHT)
     draw = ImageDraw.Draw(image)
     for row in range(8):
@@ -55,62 +68,70 @@ def render(pieces, diagonal, label, font, last_move=None):
     if last_move:
         for square in last_move:
             col, row = xy(square)
-            draw.rectangle((col*CELL+2, row*CELL+2, (col+1)*CELL-3, (row+1)*CELL-3), outline='#e950a0', width=3)
+            draw.rectangle((col*CELL+4, row*CELL+4, (col+1)*CELL-6, (row+1)*CELL-6), outline='#e950a0', width=6)
     for piece, (col, row) in pieces.items():
-        glyph = GLYPHS[piece]
-        bounds = draw.textbbox((0, 0), glyph, font=font, stroke_width=1)
-        x = (col+.5)*CELL - (bounds[2]+bounds[0])/2
-        y = (row+.5)*CELL - (bounds[3]+bounds[1])/2
-        draw.text((x, y), glyph, font=font, fill=INK if piece == 'k' else '#fff8e9',
-                  stroke_width=1, stroke_fill='#fff8e9' if piece == 'k' else INK)
-    small = ImageFont.load_default(size=13)
+        sprite = piece_sprites()[piece]
+        image.paste(sprite, (round(col*CELL), round(row*CELL)), sprite)
+    small = ImageFont.load_default(size=26)
     for i in range(8):
-        draw.text((i*CELL+3, SIZE-17), chr(ord('a')+i), font=small, fill=INK)
-        draw.text((3, i*CELL+2), str(8-i), font=small, fill=INK)
-    caption = ImageFont.load_default(size=23)
+        draw.text((i*CELL+6, SIZE-34), chr(ord('a')+i), font=small, fill=INK)
+        draw.text((6, i*CELL+4), str(8-i), font=small, fill=INK)
+    caption = ImageFont.load_default(size=46)
     bounds = draw.textbbox((0, 0), label, font=caption)
     width = bounds[2] - bounds[0]
-    draw.rounded_rectangle((SIZE-width-25, SIZE-53, SIZE-8, SIZE-22), radius=5, fill=INK)
-    draw.text((SIZE-width-17, SIZE-51), label, font=caption, fill='#fff8e9')
+    draw.rounded_rectangle((SIZE-width-50, SIZE-106, SIZE-16, SIZE-44), radius=10, fill=INK)
+    draw.text((SIZE-width-34, SIZE-102), label, font=caption, fill='#fff8e9')
     return image
 
 
-def generated_frames():
-    example = json.loads(EXAMPLE.read_text())
+def generated_frames(example_path=EXAMPLE):
+    example = json.loads(example_path.read_text())
     pieces = pieces_from_fen(example['fen'])
-    font = ImageFont.truetype(font_path(), 76)
-    frames = [render(pieces, example['highlightedDiagonal'], 'Start', font)]
-    durations = [1400]
+    frames = [render(pieces, example['highlightedDiagonal'], 'Start')]
+    durations = [1000]
     for index, move in enumerate(example['moves']):
         start, end = xy(move['from']), xy(move['to'])
         piece = next(piece for piece, position in pieces.items() if position == start)
         label = f"{index//2+1}. {'…' if index%2 else ''}{move['san']}"
-        for step in range(1, 11):
-            fraction = step/10
+        for step in range(1, MOVE_STEPS + 1):
+            progress = step / MOVE_STEPS
+            fraction = progress * progress * (3 - 2 * progress)
             position = dict(pieces)
             position[piece] = (start[0]+(end[0]-start[0])*fraction, start[1]+(end[1]-start[1])*fraction)
-            frames.append(render(position, example['highlightedDiagonal'], label, font, (move['from'], move['to'])))
-            durations.append(40 if step < 10 else 1300)
+            frames.append(render(position, example['highlightedDiagonal'], label, (move['from'], move['to'])))
+            durations.append(FRAME_MS if step < MOVE_STEPS else HOLD_MS)
         pieces[piece] = end
-    durations[-1] = 3500
+    durations[-1] = 2400
     return frames, durations
+
+
+def shared_palette(frames):
+    # One palette keeps the board and antialiased piece edges stable between frames.
+    samples = Image.new('RGB', (256, 256 * len(frames)))
+    for index, frame in enumerate(frames):
+        samples.paste(frame.resize((256, 256), Image.Resampling.LANCZOS), (0, index * 256))
+    palette = samples.quantize(colors=256, method=Image.Quantize.MEDIANCUT)
+    return [frame.quantize(palette=palette, dither=Image.Dither.NONE) for frame in frames]
 
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--check', action='store_true')
+    parser.add_argument('--example', type=Path, default=EXAMPLE)
+    parser.add_argument('--output', type=Path, default=OUTPUT)
     args = parser.parse_args()
-    frames, durations = generated_frames()
+    frames, durations = generated_frames(args.example)
+    frames = shared_palette(frames)
     buffer = io.BytesIO()
-    frames[0].save(buffer, format='GIF', save_all=True, append_images=frames[1:], duration=durations, loop=0, disposal=2)
+    frames[0].save(buffer, format='GIF', save_all=True, append_images=frames[1:], duration=durations, loop=0, disposal=1)
     content = buffer.getvalue()
     if args.check:
-        if not OUTPUT.exists() or OUTPUT.read_bytes() != content:
-            raise SystemExit(f'Out of date: {OUTPUT}')
+        if not args.output.exists() or args.output.read_bytes() != content:
+            raise SystemExit(f'Out of date: {args.output}')
     else:
-        OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-        OUTPUT.write_bytes(content)
-    print(OUTPUT)
+        args.output.parent.mkdir(parents=True, exist_ok=True)
+        args.output.write_bytes(content)
+    print(args.output)
 
 
 if __name__ == '__main__':

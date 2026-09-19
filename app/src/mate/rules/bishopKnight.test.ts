@@ -10,7 +10,6 @@ import {
 } from "../chess";
 import {
   getKnightAndBishopOpponentCandidates,
-  getKnightAndBishopPhaseLabel,
   getKnightAndBishopLookupEntryResultFen,
   getKnightAndBishopLookupWhiteMoves,
   getMateRuleSet,
@@ -120,30 +119,45 @@ test("bishop-and-knight rules are registered", () => {
     {
       id: "r2.5",
       shortLabel: "rule r2.5",
-      helpText: "With the knight on its support square, prefer forcing the Black king towards the target corner.",
-    },
-    {
-      id: "r3.8",
-      shortLabel: "rule r3.8",
-      helpText: "Prepare the 7-diagonal. With the Black king one edge square from an opposite-colored corner, the knight diagonally adjacent and off the edge, and the bishop x-raying Black's king through the knight: place White's king in non-edge opposition.",
+      helpText: "With a supported diagonal, prefer forcing the Black king towards the target corner.",
     },
     {
       id: "r4",
       shortLabel: "rule r4",
-      helpText: "With the Black king within 1 edge move from the non-target corner, prefer White king proximity to 2 squares diagonally away from that corner, then prefer knight move proximity to Black's corner, then prefer the bishop along the length 7 diagonal closer to the target corner.",
+      helpText: "Flush the king from the non target corner.",
     },
     {
-      id: "r8",
-      shortLabel: "rule r8",
-      helpText: "With a central bishop and central knight on the bishop's color, prefer king proximity to the square a knight's move from each piece and closer to Black's king, then prefer king distance from the bishop.",
+      id: "r5",
+      shortLabel: "rule r5",
+      helpText: "Prepare the 7 diagonal.",
+    },
+    {
+      id: "r6",
+      shortLabel: "rule r6",
+      helpText: "With Black's king adjacent to a non-central bishop before White moves, place it on a protected central square, or otherwise maximize the bishop's Euclidean distance from Black's king.",
+    },
+    {
+      id: "r9",
+      shortLabel: "rule r9",
+      helpText: "Prefer the knight on a precage square, then if satisfied, prefer White king off the edge, then king proximity to Black's king, then king proximity to the closest non target corner.",
+    },
+    {
+      id: "r9.5",
+      shortLabel: "rule r9.5",
+      helpText: "Prefer to not have an attacked knight defended by a bishop.",
     },
     {
       id: "r10",
       shortLabel: "rule r10",
-      helpText: "Prefer king Euclidean proximity to the center, then bishop proximity to the center, then non-central bishop proximity to Black's king, then knight move proximity to the central square diagonally adjacent to the central bishop, then knight distance from Black, then white piece proximity to White's king.",
+      helpText: "Prefer king Euclidean proximity to the center, then king off bishop's color, then bishop on the long diagonal, then a protected central bishop, then knight move proximity to a precage square.",
+    },
+    {
+      id: "r15",
+      shortLabel: "rule r15",
+      helpText: "Prefer the knight adjacent to White's king, then maximize piece Euclidean distance from Black's king, then minimize piece Euclidean distances from the center, then minimize the king's Euclidean distance to Black's king.",
     },
   ]);
-  assert.equal(ruleSet.help.noteBoards.find(board => board.animationSrc)?.id, "bishop-knight-solidify-seven-diagonal");
+  assert.equal(ruleSet.help.noteBoards.find(board => board.animationSrc)?.id, "bishop-knight-rule-r4-flush");
   assert.deepEqual(ruleSet.help.blackPriorities, [
     "Take a piece when White isn't looking.",
     "Return to the previous board position when possible.",
@@ -163,17 +177,20 @@ test("bishop-and-knight rules are registered", () => {
       "r1",
       "r1.5",
       "r2.5",
-      "r3.8",
       "r4",
-      "r8",
+      "r5",
+      "r6",
+      "r9",
+      "r9.5",
       "r10",
+      "r15",
     ],
   );
   assert.deepEqual(
     ruleSet.whiteRuleDescriptions.map(({ id }) => id),
     knightAndBishopWhiteRules.map(({ id }) => id),
   );
-  assert.equal(knightAndBishopWhiteRules.length, 10);
+  assert.equal(knightAndBishopWhiteRules.length, 13);
 });
 
 test("immediate mate keeps precedence without the mating-net rule", () => {
@@ -207,7 +224,7 @@ test("all lookup moves survive every symmetry without transformed collisions", (
         getKnightAndBishopLookupWhiteMoves(fen).includes(move.san),
         `${entry.key} via ${transform.name}: ${move.san}`,
       );
-      assert.equal(getKnightAndBishopPhaseLabel(fen), "2/2");
+      assert.equal(isKnightAndBishopMatingNetWhiteTurnPosition(fen), true);
       const key = fen.split(" ").slice(0, 2).join(" ");
       const moves = movesByPosition.get(key) ?? new Set<string>();
       moves.add(move.san);
@@ -230,14 +247,14 @@ test("all lookup moves survive every symmetry without transformed collisions", (
   );
 });
 
-test("phase handoff requires a forced lookup path on the white turn", () => {
+test("mating lookup entry requires a forced lookup path on the white turn", () => {
   const handoffFen = "6k1/8/5KB1/6N1/8/8/8/8 w - - 0 1";
-  assert.equal(getKnightAndBishopPhaseLabel(handoffFen), "2/2");
+  assert.equal(isKnightAndBishopMatingNetWhiteTurnPosition(handoffFen), true);
   assert.equal(isKnightAndBishopMatingNetWhiteTurnPosition(handoffFen), true);
   const handedOff = getChess(handoffFen);
   handedOff.move("Nf7");
   assert.equal(isKnightAndBishopLookupPhasePosition(handedOff.fen()), true);
-  assert.equal(getKnightAndBishopPhaseLabel(handedOff.fen()), "1/2");
+  assert.equal(isKnightAndBishopMatingNetWhiteTurnPosition(handedOff.fen()), false);
 
   const falseEntryFen = "8/6k1/3BK3/8/3N4/8/8/8 w - - 118 60";
   const falseEntry = getChess(falseEntryFen);
@@ -282,7 +299,7 @@ test("forced lookup re-entry holes remain in the mating net", () => {
 test("literal lookup collision and re-entry branches preserve source choices and phases", () => {
   const collisionFen = "k7/1N3B2/1K6/8/8/8/8/8 w - - 0 1";
   assert.deepEqual(getKnightAndBishopLookupWhiteMoves(collisionFen), ["Be6"]);
-  assert.equal(getKnightAndBishopPhaseLabel(collisionFen), "2/2");
+  assert.equal(isKnightAndBishopMatingNetWhiteTurnPosition(collisionFen), true);
   const collision = getChess(collisionFen);
   collision.move("Be6");
   assert.deepEqual(
@@ -356,14 +373,14 @@ test("literal lookup collision and re-entry branches preserve source choices and
         if (!mate) {
           assert.deepEqual(getKnightAndBishopLookupWhiteMoves(fen), [san], fen);
         }
-        assert.equal(getKnightAndBishopPhaseLabel(fen), "2/2", fen);
+        assert.equal(isKnightAndBishopMatingNetWhiteTurnPosition(fen), true, fen);
         assertedWhitePlies += 1;
       } else {
         assert.ok(
           getKnightAndBishopOpponentCandidates(fen).idealMoves.includes(san),
           `${san} from ${fen}`,
         );
-        assert.equal(getKnightAndBishopPhaseLabel(fen), "1/2", fen);
+        assert.equal(isKnightAndBishopMatingNetWhiteTurnPosition(fen), false, fen);
         assertedBlackPlies += 1;
       }
       chess.move(san);
@@ -419,7 +436,7 @@ test("recorded canonical Train line preserves lookup coverage and Black resistan
         getKnightAndBishopLookupWhiteMoves(chess.fen()).includes(san) || knightAndBishopWhiteMoveReachesLookupPath(chess.fen(), san),
         `${san} from ${chess.fen()}`,
       );
-      assert.equal(getKnightAndBishopPhaseLabel(chess.fen()), "2/2");
+      assert.equal(isKnightAndBishopMatingNetWhiteTurnPosition(chess.fen()), true);
     } else {
       assert.ok(
         getKnightAndBishopOpponentCandidates(chess.fen()).idealMoves.includes(
@@ -427,7 +444,7 @@ test("recorded canonical Train line preserves lookup coverage and Black resistan
         ),
         `${san} from ${chess.fen()}`,
       );
-      assert.equal(getKnightAndBishopPhaseLabel(chess.fen()), "1/2");
+      assert.equal(isKnightAndBishopMatingNetWhiteTurnPosition(chess.fen()), false);
     }
     chess.move(san);
   }
