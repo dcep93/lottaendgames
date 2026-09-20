@@ -144,7 +144,7 @@ test("bishop-and-knight rules are registered", () => {
     {
       id: "r9.2",
       shortLabel: "rule r9.2",
-      helpText: "If a knight is attacked and undefended, defend it with the king or otherwise maximize its distance from Black's king, then minimize its distance to the center.",
+      helpText: "If a knight is attacked and undefended, defend it with the king or otherwise minimize its distance to the center.",
     },
     {
       id: "r9.3",

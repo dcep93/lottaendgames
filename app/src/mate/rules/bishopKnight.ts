@@ -42,7 +42,6 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly nearbyPairBishopEscapeScore: number;
   readonly nearbyPairCentralDefensePenalty: number;
   readonly attackedKnightDefensePenalty: number;
-  readonly attackedKnightEscapeScore: number;
   readonly attackedKnightCenterProximityScore: number;
   readonly declaredCornerFlushPenalty: number;
   readonly declaredPreparationPenalty: number;
@@ -193,12 +192,8 @@ function scoreKnightAndBishopWhiteMoveCore(
         ? -Math.sqrt(squaredEuclideanDistance(bishop.square, blackKing.square)) : 0;
     },
     attackedKnightDefensePenalty: context.shouldDefendKnight && !knightKingDefended ? 1 : 0,
-    get attackedKnightEscapeScore() {
-      return context.shouldDefendKnight && !knightKingDefended && knight && blackKing
-        ? -Math.sqrt(squaredEuclideanDistance(knight.square, blackKing.square)) : 0;
-    },
     get attackedKnightCenterProximityScore() {
-      return context.shouldDefendKnight && knight
+      return context.shouldDefendKnight && !knightKingDefended && knight
         ? knightAndBishopCenterProximityScore(knight.square) : 0;
     },
     get supportedThreeCheckScore() {
@@ -317,10 +312,9 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     {
       id: "r9.2",
       shortLabel: "rule r9.2",
-      helpText: "If a knight is attacked and undefended, defend it with the king or otherwise maximize its distance from Black's king, then minimize its distance to the center.",
+      helpText: "If a knight is attacked and undefended, defend it with the king or otherwise minimize its distance to the center.",
       subpriorities: [
         { compare: (first, second) => first.attackedKnightDefensePenalty - second.attackedKnightDefensePenalty },
-        { compare: (first, second) => first.attackedKnightEscapeScore - second.attackedKnightEscapeScore },
         { compare: (first, second) => first.attackedKnightCenterProximityScore - second.attackedKnightCenterProximityScore },
       ],
     },
@@ -492,7 +486,7 @@ const bishopKnightHelp: RuleHelp = {
   ],
   notes: [
     "For r9.3, check before White moves: the bishop and knight must be adjacent (by edge or diagonal), both must be within two king steps of Black, and neither may be defended by White's king on d4, e4, d5 or e5. When this rule activates, first prefer a resulting central king defending either piece. Those defended outcomes tie; otherwise maximize only the bishop's Euclidean distance after the move, including moves beyond the two-step range.",
-    "For r9.1 and r9.2, the piece must be attacked by Black's king and undefended before White moves. Existing defense by White's king or other minor piece exempts it, regardless of king location. For r9.2, prefer a knight defended by White's king after the move. Bishop defense does not satisfy this preference. Otherwise maximize the affected piece's Euclidean distance from Black after White moves. Finally, r9.2 minimizes the knight's Euclidean distance to the board's midpoint.",
+    "For r9.1 and r9.2, the piece must be attacked by Black's king and undefended before White moves. Existing defense by White's king or other minor piece exempts it, regardless of king location. For r9.2, prefer a knight defended by White's king after the move. Bishop defense does not satisfy this preference. Otherwise r9.2 minimizes the knight's Euclidean distance to the board's midpoint. r9.1 maximizes the bishop's Euclidean distance from Black after White moves.",
     "A precage square is diagonally adjacent to a central bishop, off the long diagonal, and strictly behind the bishop from Black's king's perspective.",
     "For r10, candidates without a precage square remain neutral, tied with the best available distance. Among candidates with precage squares, fewer knight moves wins.",
     "The target corner is the bishop-colored corner closest to Black's king.",
