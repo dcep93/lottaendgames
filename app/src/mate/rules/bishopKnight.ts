@@ -57,6 +57,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly bishopLongDiagonalPenalty: number;
   readonly bishopProtectedCenterPenalty: number;
   readonly knightTargetProximityScore: number;
+  readonly knightProtectionPenalty: number;
 };
 
 export type KnightAndBishopBlackMoveScore = {
@@ -214,6 +215,7 @@ function scoreKnightAndBishopWhiteMoveCore(
       return file === rank || file + rank === 7 ? 0 : 1;
     },
     bishopProtectedCenterPenalty: protectedCentralBishop ? 0 : 1,
+    knightProtectionPenalty: knight && chess.isAttacked(knight.square, "w") ? 0 : 1,
     get knightTargetProximityScore() {
       return knightTargetProximity ??= knightAndBishopKnightTargetProximityScore(resultFen);
     },
@@ -320,7 +322,7 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     {
       id: "r10",
       shortLabel: "rule r10",
-      helpText: "Prefer king Euclidean proximity to the center, then king off bishop's color, then bishop on the long diagonal, then a protected central bishop, then knight move proximity to a precage square.",
+      helpText: "Prefer king Euclidean proximity to the center, then king off bishop's color, then bishop on the long diagonal, then a protected central bishop, then knight move proximity to a precage square, then knight protection.",
       subpriorities: [
         { compare: (first, second) => first.kingCenterProximityScore - second.kingCenterProximityScore },
         { compare: (first, second) => first.kingBishopColorPenalty - second.kingBishopColorPenalty },
@@ -332,6 +334,7 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
           // An absent precage target is neutral.
           return distances.map(distance => distance === 99 ? best : distance);
         } },
+        { compare: (first, second) => first.knightProtectionPenalty - second.knightProtectionPenalty },
       ],
     },
   ];
