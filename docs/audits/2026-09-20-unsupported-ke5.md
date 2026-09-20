@@ -136,3 +136,47 @@ The application build passed. The full 646-test mate suite had one obsolete
 reset expectation for the newly restored Ke5 placement; after removing that
 expectation, all 17 focused preparation/reset tests passed. The new declaration
 is checked in all eight board symmetries.
+
+## Direct-cycle classification
+
+Reclassified the stored graph without rerunning the policy audit. Collect the
+canonical post-White boards on edges internal to cyclic components, union them,
+and restore root orbit weights. This reproduces exactly **885 canonical boards
+/ 7,080 physical placements**. Broad piece classes do not overlap.
+
+| Direct-cycle archetype | Placements | Share |
+|---|---:|---:|
+| Knight shuttles involving r9.2 knight-center selection | 6,440 | 90.96% |
+| Other knight shuttles | 168 | 2.37% |
+| Bishop shuttles | 272 | 3.84% |
+| King shuffles | 200 | 2.82% |
+| Total | 7,080 | 100% |
+
+The first row unions boards from 405 components whose verified witness includes
+knight-center distance as a deciding priority; other knight shuttles exclude
+that union. This is a descriptive grouping, not a prediction that changing r9.2
+will remove exactly 6,440 positions. Finer mechanism groups overlap by 152
+placements and must not be added directly.
+
+Across all 6,608 knight-shuttle placements, White's king is on an edge in 5,592
+(84.62%); the bishop is central in only 104 (1.57%). Neither condition is universal.
+
+**Recommended next target: repeated pursuit of the undefended knight under
+r9.2.** Centralizing an escaping knight can let Black attack it again immediately,
+leaving White's king and bishop stationary. Prefer a square Black cannot attack
+on its next legal move before applying the center-distance preference, while
+retaining king defense as the first choice. This proposal needs validation;
+eliminating existing witnesses alone does not prove the revised graph acyclic.
+
+Representative closed component, now loaded in the sidebar:
+[1. Nc6+ Kd6 2. Nd4 Ke5](http://localhost:5173/mate/bishop-knight#fen=8/8/8/4k3/3N4/8/8/K4B2_w_-_-_0_1&moves=Nc6%2B,Kd6,Nd4,Ke5&cursor=0).
+White's king is a1, bishop f1. On move 1, Ne2 is legal and puts the knight three
+king steps from Black, preventing an immediate renewed attack; r9.2 currently
+prefers the more central Nc6+ or Nf3+. The four-ply loop is fresh-load verified
+for three repetitions with every post-White position unsupported.
+
+For reducing direct membership, this class takes priority over the central-bishop
+precage examples ranked highest by reachable-start exposure. After changing it,
+recompute cycle membership and target the largest remaining class. Zero means
+no cyclic component remains across any best-move tie, not merely an available
+path to support.
