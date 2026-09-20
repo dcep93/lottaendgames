@@ -28,11 +28,21 @@ const knightPreparationByPlacement = new Map(SQUARE_TRANSFORMS.map(transform => 
   transformSquare('h6', transform) + transformSquare('f5', transform),
 ]))
 
+const kingPreparationByWhitePlacement = new Map(SQUARE_TRANSFORMS.map(transform => [
+  (['c5', 'd5', 'd4'] as const).map(square => transformSquare(square, transform)).join('/'),
+  transformSquare('c5', transform) + transformSquare('d6', transform),
+]))
+
 export function knightAndBishopDeclaredPreparationMove(fen: string): string | undefined {
   const exact = declaredMoves.get(fen.split(' ').slice(0, 2).join(' '))
   if (exact || fen.split(' ')[1] !== 'w') return exact
   const bishop = findPiece(fen, 'w', 'b')
   const knight = findPiece(fen, 'w', 'n')
+  const whiteKing = findPiece(fen, 'w', 'k')
+  const kingPreparation = whiteKing && bishop && knight
+    ? kingPreparationByWhitePlacement.get(`${whiteKing.square}/${bishop.square}/${knight.square}`)
+    : undefined
+  if (kingPreparation) return kingPreparation
   const blackKing = findPiece(fen, 'b', 'k')
   return bishop && knight && blackKing
     ? knightPreparationByPlacement.get(`${bishop.square}/${knight.square}/${blackKing.square}`)

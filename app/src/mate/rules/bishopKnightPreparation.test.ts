@@ -171,3 +171,31 @@ test('r5 prescribes loaded moves 2–5 in every rotation and reflection', () => 
     line.move(black!)
   }
 })
+
+
+test('r5 prescribes Kd6 with Kc5/Bd5/Nd4 regardless of Black king, including reflections', () => {
+  for (const square of SQUARES) {
+    if (['c5', 'd5', 'd4'].includes(square)) continue
+    const board = getChess('8/8/8/2KB4/3N1k2/8/8/8 w - - 2 2')
+    board.remove('f4')
+    board.put({type: 'k', color: 'b'}, square)
+    if (board.isAttacked('c5', 'b') || board.isAttacked(square, 'w')) continue
+    for (const transform of SQUARE_TRANSFORMS) {
+      const fen = transformFen(board.fen(), transform)
+      assert.equal(knightAndBishopDeclaredPreparationMove(fen),
+        transformSquare('c5', transform) + transformSquare('d6', transform), fen)
+    }
+  }
+  for (const transform of SQUARE_TRANSFORMS) {
+    const fen = transformFen('8/8/8/2KB4/3N1k2/8/8/8 w - - 2 2', transform)
+    const san = getChess(fen).move({from: transformSquare('c5', transform), to: transformSquare('d6', transform)}).san
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [san])
+    assert.equal(getMateRuleSet('bishop-knight').currentWhiteHint(fen)?.id, 'r5')
+  }
+  for (const fen of [
+    '8/8/8/2KB4/4Nk2/8/8/8 w - - 2 2',
+    'B7/8/8/2K5/3N1k2/8/8/8 w - - 2 2',
+    '8/8/8/3B4/2KN1k2/8/8/8 w - - 2 2',
+    '8/8/8/2KB4/3N1k2/8/8/8 b - - 2 2',
+  ]) assert.equal(knightAndBishopDeclaredPreparationMove(fen), undefined, fen)
+})
