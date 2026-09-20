@@ -280,9 +280,8 @@ test('r10 keeps absent precage targets neutral while ranking available distances
 
 
 test('r15 follows r10 and r10 ends with knight color as its eighth priority', () => {
-  assert.equal(knightAndBishopWhiteRules.at(-1)!.id, 'r15')
-  assert.equal(knightAndBishopWhiteRules.at(-2)!.id, 'r10')
-  assert.equal(knightAndBishopWhiteRules.at(-2)!.subpriorities!.length, 8)
+  assert.deepEqual(knightAndBishopWhiteRules.slice(-3).map(rule => rule.id), ['r10', 'r15', 'r20'])
+  assert.equal(knightAndBishopWhiteRules.find(rule => rule.id === 'r10')!.subpriorities!.length, 8)
 })
 
 

@@ -23,8 +23,7 @@ test('every bishop intersection is on its same-color long diagonal and preserves
 })
 
 test('r15 compares resulting intersection distances and follows r10', () => {
-  assert.equal(knightAndBishopWhiteRules.at(-2)!.id, 'r10')
-  assert.equal(knightAndBishopWhiteRules.at(-1)!.id, 'r15')
+  assert.deepEqual(knightAndBishopWhiteRules.slice(-3).map(rule => rule.id), ['r10', 'r15', 'r20'])
   const fen = '8/8/3k4/8/B2K4/2N5/8/8 w - - 2 2'
   assert.equal(scoreKnightAndBishopWhiteMove(fen, 'Nd1').bishopLongDiagonalIntersectionScore, -1)
   assert.equal(scoreKnightAndBishopWhiteMove(fen, 'Bc2').bishopLongDiagonalIntersectionScore, -Math.sqrt(5))

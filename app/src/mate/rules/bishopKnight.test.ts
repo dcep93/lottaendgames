@@ -144,7 +144,7 @@ test("bishop-and-knight rules are registered", () => {
     {
       id: "r9.2",
       shortLabel: "rule r9.2",
-      helpText: "If a knight is attacked and undefended, prefer king defense; otherwise prefer a square Black cannot attack on its next move, then proximity to the center.",
+      helpText: "If a knight is attacked and undefended, prefer king defense.",
     },
     {
       id: "r9.3",
@@ -160,6 +160,11 @@ test("bishop-and-knight rules are registered", () => {
       id: "r15",
       shortLabel: "rule r15",
       helpText: "For a bishop off the long diagonal, maximize the distance of its long diagonal intersection from Black's king.",
+    },
+    {
+      id: "r20",
+      shortLabel: "rule r20",
+      helpText: "Prefer a knight that cannot be attacked on Black’s next move.",
     },
   ]);
   assert.equal(ruleSet.help.noteBoards.find(board => board.animationSrc)?.id, "bishop-knight-rule-r4-flush");
@@ -190,13 +195,14 @@ test("bishop-and-knight rules are registered", () => {
       "r9.3",
       "r10",
       "r15",
+      "r20",
     ],
   );
   assert.deepEqual(
     ruleSet.whiteRuleDescriptions.map(({ id }) => id),
     knightAndBishopWhiteRules.map(({ id }) => id),
   );
-  assert.equal(knightAndBishopWhiteRules.length, 14);
+  assert.equal(knightAndBishopWhiteRules.length, 15);
 });
 
 test("immediate mate keeps precedence without the mating-net rule", () => {
