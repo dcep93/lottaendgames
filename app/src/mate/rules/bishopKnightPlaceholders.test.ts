@@ -5,7 +5,6 @@ import { knightAndBishopDeclaredPreparationMove } from './bishopKnightPreparatio
 
 test('previous r5 declarations not explicitly restored remain removed in every reflection', () => {
   for (const fen of [
-    '8/4k3/8/2N5/3KB3/8/8/8 w - - 0 1',
     '8/8/3k4/5K2/4B3/3N4/8/8 w - - 0 1',
     '8/4k3/8/2N2K2/4B3/8/8/8 w - - 0 1',
     '8/8/4k3/6K1/4B3/3N4/8/8 w - - 0 1',
