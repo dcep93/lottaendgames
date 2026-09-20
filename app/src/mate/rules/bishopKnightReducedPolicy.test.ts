@@ -279,10 +279,10 @@ test('r10 keeps absent precage targets neutral while ranking available distances
 })
 
 
-test('r15 follows r10 and r10 ends with king knight protection as its sixth priority', () => {
+test('r15 follows r10 and r10 ends with noncentral bishop distance as its seventh priority', () => {
   assert.equal(knightAndBishopWhiteRules.at(-1)!.id, 'r15')
   assert.equal(knightAndBishopWhiteRules.at(-2)!.id, 'r10')
-  assert.equal(knightAndBishopWhiteRules.at(-2)!.subpriorities!.length, 6)
+  assert.equal(knightAndBishopWhiteRules.at(-2)!.subpriorities!.length, 7)
 })
 
 
@@ -317,5 +317,23 @@ test('r10 finally prefers only king protected knights', () => {
       const san = getChess(bishopFen).move({from: transformSquare('c1', transform), to: transformSquare(to, transform)}).san
       assert.equal(scoreKnightAndBishopWhiteMove(bishopFen, san).knightProtectionPenalty, expected)
     }
+  }
+})
+
+
+test('r10 finally maximizes noncentral bishop distance from Black in every symmetry', () => {
+  const rule = knightAndBishopWhiteRules.find(({id}) => id === 'r10')!
+  for (const transform of SQUARE_TRANSFORMS) {
+    const fen = transformFen('8/2N5/1K1k4/8/8/8/6B1/8 w - - 2 2', transform)
+    const score = (to: 'h1' | 'a8' | 'e4') => {
+      const san = getChess(fen).move({from: transformSquare('g2', transform), to: transformSquare(to, transform)}).san
+      return scoreKnightAndBishopWhiteMove(fen, san)
+    }
+    const far = score('h1'), near = score('a8'), central = score('e4')
+    assert.equal(far.nonCentralBishopDistanceScore, -Math.sqrt(41))
+    assert.equal(near.nonCentralBishopDistanceScore, -Math.sqrt(13))
+    assert.equal(central.nonCentralBishopDistanceScore, 0)
+    assert.equal(compareScoresByRules(far, near, [{...rule, subpriorities: rule.subpriorities!.slice(0, 6)}]), 0)
+    assert.ok(compareScoresByRules(far, near, [rule]) < 0)
   }
 })
