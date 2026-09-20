@@ -1,0 +1,1717 @@
+{
+  "fingerprint": "d5a19011bb0b1fff6d070ae596cb0b436799d33b8b9ae8bea318cf0848966ac0",
+  "total": 488,
+  "groups": [
+    {
+      "name": "Central king separated from both minors",
+      "positions": 128,
+      "percent": 26.229508196721312,
+      "boards": [
+        {
+          "key": 7081418,
+          "weight": 8,
+          "families": [
+            21
+          ],
+          "geometry": {
+            "K": "d4",
+            "B": "a1",
+            "N": "h7",
+            "black": "c2",
+            "Kcentral": true,
+            "Kedge": false,
+            "Bcentral": false,
+            "Blong": true,
+            "Ncentral": false,
+            "Nedge": true,
+            "KB": 3,
+            "KN": 4,
+            "BN": 7,
+            "blackB": 2,
+            "blackN": 5,
+            "kingSteps": 2,
+            "NdefB": false,
+            "precage": false
+          }
+        },
+        {
+          "key": 7081425,
+          "weight": 8,
+          "families": [
+            22
+          ],
+          "geometry": {
+            "K": "d4",
+            "B": "a1",
+            "N": "h7",
+            "black": "b3",
+            "Kcentral": true,
+            "Kedge": false,
+            "Bcentral": false,
+            "Blong": true,
+            "Ncentral": false,
+            "Nedge": true,
+            "KB": 3,
+            "KN": 4,
+            "BN": 7,
+            "blackB": 2,
+            "blackN": 6,
+            "kingSteps": 2,
+            "NdefB": false,
+            "precage": false
+          }
+        },
+        {
+          "key": 7081930,
+          "weight": 8,
+          "families": [
+            23
+          ],
+          "geometry": {
+            "K": "d4",
+            "B": "a1",
+            "N": "h8",
+            "black": "c2",
+            "Kcentral": true,
+            "Kedge": false,
+            "Bcentral": false,
+            "Blong": true,
+            "Ncentral": false,
+            "Nedge": true,
+            "KB": 3,
+            "KN": 4,
+            "BN": 7,
+            "blackB": 2,
+            "blackN": 6,
+            "kingSteps": 2,
+            "NdefB": false,
+            "precage": false
+          }
+        },
+        {
+          "key": 7165862,
+          "weight": 8,
+          "families": [
+            24
+          ],
+          "geometry": {
+            "K": "d4",
+            "B": "f3",
+            "N": "g4",
+            "black": "g5",
+            "Kcentral": true,
+            "Kedge": false,
+            "Bcentral": false,
+            "Blong": true,
+            "Ncentral": false,
+            "Nedge": false,
+            "KB": 2,
+            "KN": 3,
+            "BN": 1,
+            "blackB": 2,
+            "blackN": 1,
+            "kingSteps": 3,
+            "NdefB": false,
+            "precage": false
+          }
+        },
+        {
+          "key": 7092125,
+          "weight": 8,
+          "families": [
+            24,
+            25
+          ],
+          "geometry": {
+            "K": "d4",
+            "B": "d1",
+            "N": "g4",
+            "black": "f4",
+            "Kcentral": true,
+            "Kedge": false,
+            "Bcentral": false,
+            "Blong": false,
+            "Ncentral": false,
+            "Nedge": false,
+            "KB": 3,
+            "KN": 3,
+            "BN": 3,
+            "blackB": 3,
+            "blackN": 1,
+            "kingSteps": 2,
+            "NdefB": false,
+            "precage": false
+          }
+        },
+        {
+          "key": 7165861,
+          "weight": 8,
+          "families": [
+            25
+          ],
+          "geometry": {
+            "K": "d4",
+            "B": "f3",
+            "N": "g4",
+            "black": "f5",
+            "Kcentral": true,
+            "Kedge": false,
+            "Bcentral": false,
+            "Blong": true,
+            "Ncentral": false,
+            "Nedge": false,
+            "KB": 2,
+            "KN": 3,
+            "BN": 1,
+            "blackB": 2,
+            "blackN": 1,
+            "kingSteps": 2,
+            "NdefB": false,
+            "precage": false
+          }
+        },
+        {
+          "key": 7099862,
+          "weight": 8,
+          "families": [
+            26
+          ],
+          "geometry": {
+            "K": "d4",
+            "B": "f1",
+            "N": "h3",
+            "black": "g3",
+            "Kcentral": true,
+            "Kedge": false,
+            "Bcentral": false,
+            "Blong": false,
+            "Ncentral": false,
+            "Nedge": true,
+            "KB": 3,
+            "KN": 4,
+            "BN": 2,
+            "blackB": 2,
+            "blackN": 1,
+            "kingSteps": 3,
+            "NdefB": false,
+            "precage": false
+          }
+        },
+        {
+          "key": 7136734,
+          "weight": 8,
+          "families": [
+            26
+          ],
+          "geometry": {
+            "K": "d4",
+            "B": "g2",
+            "N": "h3",
+            "black": "g4",
+            "Kcentral": true,
+            "Kedge": false,
+            "Bcentral": false,
+            "Blong": true,
+            "Ncentral": false,
+            "Nedge": true,
+            "KB": 3,
+            "KN": 4,
+            "BN": 1,
+            "blackB": 2,
+            "blackN": 1,
+            "kingSteps": 3,
+            "NdefB": false,
+            "precage": false
+          }
+        },
+        {
+          "key": 7136741,
+          "weight": 8,
+          "families": [
+            27
+          ],
+          "geometry": {
+            "K": "d4",
+            "B": "g2",
+            "N": "h3",
+            "black": "f5",
+            "Kcentral": true,
+            "Kedge": false,
+            "Bcentral": false,
+            "Blong": true,
+            "Ncentral": false,
+            "Nedge": true,
+            "KB": 3,
+            "KN": 4,
+            "BN": 1,
+            "blackB": 3,
+            "blackN": 2,
+            "kingSteps": 2,
+            "NdefB": false,
+            "precage": false
+          }
+        },
+        {
+          "key": 7099870,
+          "weight": 8,
+          "families": [
+            27
+          ],
+          "geometry": {
+            "K": "d4",
+            "B": "f1",
+            "N": "h3",
+            "black": "g4",
+            "Kcentral": true,
+            "Kedge": false,
+            "Bcentral": false,
+            "Blong": false,
+            "Ncentral": false,
+            "Nedge": true,
+            "KB": 3,
+            "KN": 4,
+            "BN": 2,
+            "blackB": 3,
+            "blackN": 1,
+            "kingSteps": 3,
+            "NdefB": false,
+            "precage": false
+          }
+        },
+        {
+          "key": 7078353,
+          "weight": 8,
+          "families": [
+            28
+          ],
+          "geometry": {
+            "K": "d4",
+            "B": "a1",
+            "N": "h1",
+            "black": "b3",
+            "Kcentral": true,
+            "Kedge": false,
+            "Bcentral": false,
+            "Blong": true,
+            "Ncentral": false,
+            "Nedge": true,
+            "KB": 3,
+            "KN": 4,
+            "BN": 7,
+            "blackB": 2,
+            "blackN": 6,
+            "kingSteps": 2,
+            "NdefB": false,
+            "precage": false
+          }
+        },
+        {
+          "key": 7078346,
+          "weight": 8,
+          "families": [
+            29
+          ],
+          "geometry": {
+            "K": "d4",
+            "B": "a1",
+            "N": "h1",
+            "black": "c2",
+            "Kcentral": true,
+            "Kedge": false,
+            "Bcentral": false,
+            "Blong": true,
+            "Ncentral": false,
+            "Nedge": true,
+            "KB": 3,
+            "KN": 4,
+            "BN": 7,
+            "blackB": 2,
+            "blackN": 5,
+            "kingSteps": 2,
+            "NdefB": false,
+            "precage": false
+          }
+        },
+        {
+          "key": 7172429,
+          "weight": 8,
+          "families": [
+            30
+          ],
+          "geometry": {
+            "K": "d4",
+            "B": "h3",
+            "N": "f1",
+            "black": "f2",
+            "Kcentral": true,
+            "Kedge": false,
+            "Bcentral": false,
+            "Blong": false,
+            "Ncentral": false,
+            "Nedge": true,
+            "KB": 4,
+            "KN": 3,
+            "BN": 2,
+            "blackB": 2,
+            "blackN": 1,
+            "kingSteps": 2,
+            "NdefB": false,
+            "precage": false
+          }
+        },
+        {
+          "key": 7135564,
+          "weight": 8,
+          "families": [
+            30
+          ],
+          "geometry": {
+            "K": "d4",
+            "B": "g2",
+            "N": "f1",
+            "black": "e2",
+            "Kcentral": true,
+            "Kedge": false,
+            "Bcentral": false,
+            "Blong": true,
+            "Ncentral": false,
+            "Nedge": true,
+            "KB": 3,
+            "KN": 3,
+            "BN": 1,
+            "blackB": 2,
+            "blackN": 1,
+            "kingSteps": 2,
+            "NdefB": false,
+            "precage": false
+          }
+        },
+        {
+          "key": 7238413,
+          "weight": 8,
+          "families": [
+            34
+          ],
+          "geometry": {
+            "K": "d4",
+            "B": "h5",
+            "N": "e2",
+            "black": "f2",
+            "Kcentral": true,
+            "Kedge": false,
+            "Bcentral": false,
+            "Blong": false,
+            "Ncentral": false,
+            "Nedge": false,
+            "KB": 4,
+            "KN": 2,
+            "BN": 3,
+            "blackB": 3,
+            "blackN": 1,
+            "kingSteps": 2,
+            "NdefB": false,
+            "precage": false
+          }
+        },
+        {
+          "key": 7164676,
+          "weight": 8,
+          "families": [
+            34
+          ],
+          "geometry": {
+            "K": "d4",
+            "B": "f3",
+            "N": "e2",
+            "black": "e1",
+            "Kcentral": true,
+            "Kedge": false,
+            "Bcentral": false,
+            "Blong": true,
+            "Ncentral": false,
+            "Nedge": false,
+            "KB": 2,
+            "KN": 2,
+            "BN": 1,
+            "blackB": 2,
+            "blackN": 1,
+            "kingSteps": 3,
+            "NdefB": false,
+            "precage": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "Non-central bishop defended by knight",
+      "positions": 96,
+      "percent": 19.672131147540984,
+      "boards": [
+        {
+          "key": 2957393,
+          "weight": 8,
+          "families": [
+            1
+          ],
+          "geometry": {
+            "K": "d2",
+            "B": "c3",
+            "N": "b1",
+            "black": "b3",
+            "Kcentral": false,
+            "Kedge": false,
+            "Bcentral": false,
+            "Blong": true,
+            "Ncentral": false,
+            "Nedge": true,
+            "KB": 1,
+            "KN": 2,
+            "BN": 2,
+            "blackB": 1,
+            "blackN": 2,
+            "kingSteps": 2,
+            "NdefB": true,
+            "precage": false
+          }
+        },
+        {
+          "key": 598088,
+          "weight": 8,
+          "families": [
+            1
+          ],
+          "geometry": {
+            "K": "c1",
+            "B": "c3",
+            "N": "b1",
+            "black": "a2",
+            "Kcentral": false,
+            "Kedge": true,
+            "Bcentral": false,
+            "Blong": true,
+            "Ncentral": false,
+            "Nedge": true,
+            "KB": 2,
+            "KN": 1,
+            "BN": 2,
+            "blackB": 2,
+            "blackN": 1,
+            "kingSteps": 2,
+            "NdefB": true,
+            "precage": false
+          }
+        },
+        {
+          "key": 2916489,
+          "weight": 8,
+          "families": [
+            7
+          ],
+          "geometry": {
+            "K": "d2",
+            "B": "a2",
+            "N": "c1",
+            "black": "b2",
+            "Kcentral": false,
+            "Kedge": false,
+            "Bcentral": false,
+            "Blong": false,
+            "Ncentral": false,
+            "Nedge": true,
+            "KB": 3,
+            "KN": 1,
+            "BN": 2,
+            "blackB": 1,
+            "blackN": 1,
+            "kingSteps": 2,
+            "NdefB": true,
+            "precage": false
+          }
+        },
+        {
+          "key": 5042519,
+          "weight": 8,
+          "families": [
+            7
+          ],
+          "geometry": {
+            "K": "d3",
+            "B": "h2",
+            "N": "f1",
+            "black": "h3",
+            "Kcentral": false,
+            "Kedge": false,
+            "Bcentral": false,
+            "Blong": false,
+            "Ncentral": false,
+            "Nedge": true,
+            "KB": 4,
+            "KN": 2,
+            "BN": 2,
+            "blackB": 1,
+            "blackN": 2,
+            "kingSteps": 4,
+            "NdefB": true,
+            "precage": false
+          }
+        },
+        {
+          "key": 4801155,
+          "weight": 8,
+          "families": [
+            10
+          ],
+          "geometry": {
+            "K": "c3",
+            "B": "e3",
+            "N": "c2",
+            "black": "d1",
+            "Kcentral": false,
+            "Kedge": false,
+            "Bcentral": false,
+            "Blong": false,
+            "Ncentral": false,
+            "Nedge": false,
+            "KB": 2,
+            "KN": 1,
+            "BN": 2,
+            "blackB": 2,
+            "blackN": 1,
+            "kingSteps": 2,
+            "NdefB": true,
+            "precage": false
+          }
+        },
+        {
+          "key": 7160460,
+          "weight": 8,
+          "families": [
+            10
+          ],
+          "geometry": {
+            "K": "d4",
+            "B": "e3",
+            "N": "c2",
+            "black": "e2",
+            "Kcentral": true,
+            "Kedge": false,
+            "Bcentral": false,
+            "Blong": false,
+            "Ncentral": false,
+            "Nedge": false,
+            "KB": 1,
+            "KN": 2,
+            "BN": 2,
+            "blackB": 1,
+            "blackN": 2,
+            "kingSteps": 2,
+            "NdefB": true,
+            "precage": false
+          }
+        },
+        {
+          "key": 5006085,
+          "weight": 8,
+          "families": [
+            11
+          ],
+          "geometry": {
+            "K": "d3",
+            "B": "g1",
+            "N": "e2",
+            "black": "f1",
+            "Kcentral": false,
+            "Kedge": false,
+            "Bcentral": false,
+            "Blong": false,
+            "Ncentral": false,
+            "Nedge": false,
+            "KB": 3,
+            "KN": 1,
+            "BN": 2,
+            "blackB": 1,
+            "blackN": 1,
+            "kingSteps": 2,
+            "NdefB": true,
+            "precage": false
+          }
+        },
+        {
+          "key": 7082697,
+          "weight": 8,
+          "families": [
+            11
+          ],
+          "geometry": {
+            "K": "d4",
+            "B": "b1",
+            "N": "d2",
+            "black": "b2",
+            "Kcentral": true,
+            "Kedge": false,
+            "Bcentral": false,
+            "Blong": false,
+            "Ncentral": false,
+            "Nedge": false,
+            "KB": 3,
+            "KN": 2,
+            "BN": 2,
+            "blackB": 1,
+            "blackN": 2,
+            "kingSteps": 2,
+            "NdefB": true,
+            "precage": false
+          }
+        },
+        {
+          "key": 7172959,
+          "weight": 8,
+          "families": [
+            14
+          ],
+          "geometry": {
+            "K": "d4",
+            "B": "h3",
+            "N": "f2",
+            "black": "h4",
+            "Kcentral": true,
+            "Kedge": false,
+            "Bcentral": false,
+            "Blong": false,
+            "Ncentral": false,
+            "Nedge": false,
+            "KB": 4,
+            "KN": 2,
+            "BN": 2,
+            "blackB": 1,
+            "blackN": 2,
+            "kingSteps": 4,
+            "NdefB": true,
+            "precage": false
+          }
+        },
+        {
+          "key": 5046929,
+          "weight": 8,
+          "families": [
+            14
+          ],
+          "geometry": {
+            "K": "d3",
+            "B": "a3",
+            "N": "c2",
+            "black": "b3",
+            "Kcentral": false,
+            "Kedge": false,
+            "Bcentral": false,
+            "Blong": false,
+            "Ncentral": false,
+            "Nedge": false,
+            "KB": 3,
+            "KN": 1,
+            "BN": 2,
+            "blackB": 1,
+            "blackN": 1,
+            "kingSteps": 2,
+            "NdefB": true,
+            "precage": false
+          }
+        },
+        {
+          "key": 7201631,
+          "weight": 8,
+          "families": [
+            15
+          ],
+          "geometry": {
+            "K": "d4",
+            "B": "g4",
+            "N": "f2",
+            "black": "h4",
+            "Kcentral": true,
+            "Kedge": false,
+            "Bcentral": false,
+            "Blong": false,
+            "Ncentral": false,
+            "Nedge": false,
+            "KB": 3,
+            "KN": 2,
+            "BN": 2,
+            "blackB": 1,
+            "blackN": 2,
+            "kingSteps": 4,
+            "NdefB": true,
+            "precage": false
+          }
+        },
+        {
+          "key": 5083793,
+          "weight": 8,
+          "families": [
+            15
+          ],
+          "geometry": {
+            "K": "d3",
+            "B": "b4",
+            "N": "c2",
+            "black": "b3",
+            "Kcentral": false,
+            "Kedge": false,
+            "Bcentral": false,
+            "Blong": false,
+            "Ncentral": false,
+            "Nedge": false,
+            "KB": 2,
+            "KN": 1,
+            "BN": 2,
+            "blackB": 1,
+            "blackN": 1,
+            "kingSteps": 2,
+            "NdefB": true,
+            "precage": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "Central bishop, king-defended; knight on precage",
+      "positions": 72,
+      "percent": 14.754098360655737,
+      "boards": [
+        {
+          "key": 7193845,
+          "weight": 8,
+          "families": [
+            16,
+            31
+          ],
+          "geometry": {
+            "K": "d4",
+            "B": "e4",
+            "N": "d3",
+            "black": "f7",
+            "Kcentral": true,
+            "Kedge": false,
+            "Bcentral": true,
+            "Blong": true,
+            "Ncentral": false,
+            "Nedge": false,
+            "KB": 1,
+            "KN": 1,
+            "BN": 1,
+            "blackB": 3,
+            "blackN": 4,
+            "kingSteps": 3,
+            "NdefB": false,
+            "precage": true
+          }
+        },
+        {
+          "key": 5092651,
+          "weight": 8,
+          "families": [
+            16,
+            17,
+            18,
+            19
+          ],
+          "geometry": {
+            "K": "d3",
+            "B": "d4",
+            "N": "e3",
+            "black": "d6",
+            "Kcentral": false,
+            "Kedge": false,
+            "Bcentral": true,
+            "Blong": true,
+            "Ncentral": false,
+            "Nedge": false,
+            "KB": 1,
+            "KN": 1,
+            "BN": 1,
+            "blackB": 2,
+            "blackN": 3,
+            "kingSteps": 3,
+            "NdefB": false,
+            "precage": true
+          }
+        },
+        {
+          "key": 7193844,
+          "weight": 8,
+          "families": [
+            17
+          ],
+          "geometry": {
+            "K": "d4",
+            "B": "e4",
+            "N": "d3",
+            "black": "e7",
+            "Kcentral": true,
+            "Kedge": false,
+            "Bcentral": true,
+            "Blong": true,
+            "Ncentral": false,
+            "Nedge": false,
+            "KB": 1,
+            "KN": 1,
+            "BN": 1,
+            "blackB": 3,
+            "blackN": 4,
+            "kingSteps": 3,
+            "NdefB": false,
+            "precage": true
+          }
+        },
+        {
+          "key": 7193843,
+          "weight": 8,
+          "families": [
+            18
+          ],
+          "geometry": {
+            "K": "d4",
+            "B": "e4",
+            "N": "d3",
+            "black": "d7",
+            "Kcentral": true,
+            "Kedge": false,
+            "Bcentral": true,
+            "Blong": true,
+            "Ncentral": false,
+            "Nedge": false,
+            "KB": 1,
+            "KN": 1,
+            "BN": 1,
+            "blackB": 3,
+            "blackN": 4,
+            "kingSteps": 3,
+            "NdefB": false,
+            "precage": true
+          }
+        },
+        {
+          "key": 7193837,
+          "weight": 8,
+          "families": [
+            19
+          ],
+          "geometry": {
+            "K": "d4",
+            "B": "e4",
+            "N": "d3",
+            "black": "f6",
+            "Kcentral": true,
+            "Kedge": false,
+            "Bcentral": true,
+            "Blong": true,
+            "Ncentral": false,
+            "Nedge": false,
+            "KB": 1,
+            "KN": 1,
+            "BN": 1,
+            "blackB": 2,
+            "blackN": 3,
+            "kingSteps": 2,
+            "NdefB": false,
+            "precage": true
+          }
+        },
+        {
+          "key": 7194953,
+          "weight": 8,
+          "families": [
+            31
+          ],
+          "geometry": {
+            "K": "d4",
+            "B": "e4",
+            "N": "f5",
+            "black": "b2",
+            "Kcentral": true,
+            "Kedge": false,
+            "Bcentral": true,
+            "Blong": true,
+            "Ncentral": false,
+            "Nedge": false,
+            "KB": 1,
+            "KN": 2,
+            "BN": 1,
+            "blackB": 3,
+            "blackN": 4,
+            "kingSteps": 2,
+            "NdefB": false,
+            "precage": true
+          }
+        },
+        {
+          "key": 7194955,
+          "weight": 8,
+          "families": [
+            32
+          ],
+          "geometry": {
+            "K": "d4",
+            "B": "e4",
+            "N": "f5",
+            "black": "d2",
+            "Kcentral": true,
+            "Kedge": false,
+            "Bcentral": true,
+            "Blong": true,
+            "Ncentral": false,
+            "Nedge": false,
+            "KB": 1,
+            "KN": 2,
+            "BN": 1,
+            "blackB": 2,
+            "blackN": 3,
+            "kingSteps": 2,
+            "NdefB": false,
+            "precage": true
+          }
+        },
+        {
+          "key": 7193839,
+          "weight": 8,
+          "families": [
+            32
+          ],
+          "geometry": {
+            "K": "d4",
+            "B": "e4",
+            "N": "d3",
+            "black": "h6",
+            "Kcentral": true,
+            "Kedge": false,
+            "Bcentral": true,
+            "Blong": true,
+            "Ncentral": false,
+            "Nedge": false,
+            "KB": 1,
+            "KN": 1,
+            "BN": 1,
+            "blackB": 3,
+            "blackN": 4,
+            "kingSteps": 4,
+            "NdefB": false,
+            "precage": true
+          }
+        },
+        {
+          "key": 7193846,
+          "weight": 8,
+          "families": [
+            33
+          ],
+          "geometry": {
+            "K": "d4",
+            "B": "e4",
+            "N": "d3",
+            "black": "g7",
+            "Kcentral": true,
+            "Kedge": false,
+            "Bcentral": true,
+            "Blong": true,
+            "Ncentral": false,
+            "Nedge": false,
+            "KB": 1,
+            "KN": 1,
+            "BN": 1,
+            "blackB": 3,
+            "blackN": 4,
+            "kingSteps": 3,
+            "NdefB": false,
+            "precage": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "Non-central bishop defended only by king",
+      "positions": 56,
+      "percent": 11.475409836065573,
+      "boards": [
+        {
+          "key": 2696794,
+          "weight": 8,
+          "families": [
+            3,
+            4
+          ],
+          "geometry": {
+            "K": "c2",
+            "B": "c3",
+            "N": "b4",
+            "black": "c4",
+            "Kcentral": false,
+            "Kedge": false,
+            "Bcentral": false,
+            "Blong": true,
+            "Ncentral": false,
+            "Nedge": false,
+            "KB": 1,
+            "KN": 2,
+            "BN": 1,
+            "blackB": 1,
+            "blackN": 1,
+            "kingSteps": 2,
+            "NdefB": false,
+            "precage": false
+          }
+        },
+        {
+          "key": 2900805,
+          "weight": 8,
+          "families": [
+            5
+          ],
+          "geometry": {
+            "K": "d2",
+            "B": "e1",
+            "N": "f2",
+            "black": "f1",
+            "Kcentral": false,
+            "Kedge": false,
+            "Bcentral": false,
+            "Blong": false,
+            "Ncentral": false,
+            "Nedge": false,
+            "KB": 1,
+            "KN": 2,
+            "BN": 1,
+            "blackB": 1,
+            "blackN": 1,
+            "kingSteps": 2,
+            "NdefB": false,
+            "precage": false
+          }
+        },
+        {
+          "key": 7155137,
+          "weight": 8,
+          "families": [
+            21
+          ],
+          "geometry": {
+            "K": "d4",
+            "B": "c3",
+            "N": "h7",
+            "black": "b1",
+            "Kcentral": true,
+            "Kedge": false,
+            "Bcentral": false,
+            "Blong": true,
+            "Ncentral": false,
+            "Nedge": true,
+            "KB": 1,
+            "KN": 4,
+            "BN": 5,
+            "blackB": 2,
+            "blackN": 6,
+            "kingSteps": 3,
+            "NdefB": false,
+            "precage": false
+          }
+        },
+        {
+          "key": 7155144,
+          "weight": 8,
+          "families": [
+            22
+          ],
+          "geometry": {
+            "K": "d4",
+            "B": "c3",
+            "N": "h7",
+            "black": "a2",
+            "Kcentral": true,
+            "Kedge": false,
+            "Bcentral": false,
+            "Blong": true,
+            "Ncentral": false,
+            "Nedge": true,
+            "KB": 1,
+            "KN": 4,
+            "BN": 5,
+            "blackB": 2,
+            "blackN": 7,
+            "kingSteps": 3,
+            "NdefB": false,
+            "precage": false
+          }
+        },
+        {
+          "key": 7155649,
+          "weight": 8,
+          "families": [
+            23
+          ],
+          "geometry": {
+            "K": "d4",
+            "B": "c3",
+            "N": "h8",
+            "black": "b1",
+            "Kcentral": true,
+            "Kedge": false,
+            "Bcentral": false,
+            "Blong": true,
+            "Ncentral": false,
+            "Nedge": true,
+            "KB": 1,
+            "KN": 4,
+            "BN": 5,
+            "blackB": 2,
+            "blackN": 7,
+            "kingSteps": 3,
+            "NdefB": false,
+            "precage": false
+          }
+        },
+        {
+          "key": 7152072,
+          "weight": 8,
+          "families": [
+            28
+          ],
+          "geometry": {
+            "K": "d4",
+            "B": "c3",
+            "N": "h1",
+            "black": "a2",
+            "Kcentral": true,
+            "Kedge": false,
+            "Bcentral": false,
+            "Blong": true,
+            "Ncentral": false,
+            "Nedge": true,
+            "KB": 1,
+            "KN": 4,
+            "BN": 5,
+            "blackB": 2,
+            "blackN": 7,
+            "kingSteps": 3,
+            "NdefB": false,
+            "precage": false
+          }
+        },
+        {
+          "key": 7152065,
+          "weight": 8,
+          "families": [
+            29
+          ],
+          "geometry": {
+            "K": "d4",
+            "B": "c3",
+            "N": "h1",
+            "black": "b1",
+            "Kcentral": true,
+            "Kedge": false,
+            "Bcentral": false,
+            "Blong": true,
+            "Ncentral": false,
+            "Nedge": true,
+            "KB": 1,
+            "KN": 4,
+            "BN": 5,
+            "blackB": 2,
+            "blackN": 6,
+            "kingSteps": 3,
+            "NdefB": false,
+            "precage": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "Undefended non-central bishop; king protects knight",
+      "positions": 56,
+      "percent": 11.475409836065573,
+      "boards": [
+        {
+          "key": 3113089,
+          "weight": 8,
+          "families": [
+            6
+          ],
+          "geometry": {
+            "K": "d2",
+            "B": "a8",
+            "N": "c1",
+            "black": "b1",
+            "Kcentral": false,
+            "Kedge": false,
+            "Bcentral": false,
+            "Blong": true,
+            "Ncentral": false,
+            "Nedge": true,
+            "KB": 6,
+            "KN": 1,
+            "BN": 7,
+            "blackB": 7,
+            "blackN": 1,
+            "kingSteps": 2,
+            "NdefB": false,
+            "precage": false
+          }
+        },
+        {
+          "key": 2912393,
+          "weight": 8,
+          "families": [
+            6
+          ],
+          "geometry": {
+            "K": "d2",
+            "B": "h1",
+            "N": "c1",
+            "black": "b2",
+            "Kcentral": false,
+            "Kedge": false,
+            "Bcentral": false,
+            "Blong": true,
+            "Ncentral": false,
+            "Nedge": true,
+            "KB": 4,
+            "KN": 1,
+            "BN": 5,
+            "blackB": 6,
+            "blackN": 1,
+            "kingSteps": 2,
+            "NdefB": false,
+            "precage": false
+          }
+        },
+        {
+          "key": 4747848,
+          "weight": 8,
+          "families": [
+            9
+          ],
+          "geometry": {
+            "K": "c3",
+            "B": "h1",
+            "N": "b2",
+            "black": "a2",
+            "Kcentral": false,
+            "Kedge": false,
+            "Bcentral": false,
+            "Blong": true,
+            "Ncentral": false,
+            "Nedge": false,
+            "KB": 5,
+            "KN": 1,
+            "BN": 6,
+            "blackB": 7,
+            "blackN": 1,
+            "kingSteps": 2,
+            "NdefB": false,
+            "precage": false
+          }
+        },
+        {
+          "key": 5011172,
+          "weight": 8,
+          "families": [
+            13
+          ],
+          "geometry": {
+            "K": "d3",
+            "B": "h1",
+            "N": "d4",
+            "black": "e5",
+            "Kcentral": false,
+            "Kedge": false,
+            "Bcentral": false,
+            "Blong": true,
+            "Ncentral": true,
+            "Nedge": false,
+            "KB": 4,
+            "KN": 1,
+            "BN": 4,
+            "blackB": 4,
+            "blackN": 1,
+            "kingSteps": 2,
+            "NdefB": false,
+            "precage": false
+          }
+        },
+        {
+          "key": 5211876,
+          "weight": 8,
+          "families": [
+            20
+          ],
+          "geometry": {
+            "K": "d3",
+            "B": "a8",
+            "N": "d4",
+            "black": "e5",
+            "Kcentral": false,
+            "Kedge": false,
+            "Bcentral": false,
+            "Blong": true,
+            "Ncentral": true,
+            "Nedge": false,
+            "KB": 5,
+            "KN": 1,
+            "BN": 4,
+            "blackB": 4,
+            "blackN": 1,
+            "kingSteps": 2,
+            "NdefB": false,
+            "precage": false
+          }
+        },
+        {
+          "key": 7166148,
+          "weight": 8,
+          "families": [
+            35
+          ],
+          "geometry": {
+            "K": "d4",
+            "B": "f3",
+            "N": "d5",
+            "black": "e1",
+            "Kcentral": true,
+            "Kedge": false,
+            "Bcentral": false,
+            "Blong": true,
+            "Ncentral": true,
+            "Nedge": false,
+            "KB": 2,
+            "KN": 1,
+            "BN": 2,
+            "blackB": 2,
+            "blackN": 4,
+            "kingSteps": 3,
+            "NdefB": false,
+            "precage": false
+          }
+        },
+        {
+          "key": 7239885,
+          "weight": 8,
+          "families": [
+            35
+          ],
+          "geometry": {
+            "K": "d4",
+            "B": "h5",
+            "N": "d5",
+            "black": "f2",
+            "Kcentral": true,
+            "Kedge": false,
+            "Bcentral": false,
+            "Blong": false,
+            "Ncentral": true,
+            "Nedge": false,
+            "KB": 4,
+            "KN": 1,
+            "BN": 4,
+            "blackB": 3,
+            "blackN": 3,
+            "kingSteps": 2,
+            "NdefB": false,
+            "precage": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "Non-central king separated from both minors",
+      "positions": 32,
+      "percent": 6.557377049180328,
+      "boards": [
+        {
+          "key": 2639458,
+          "weight": 8,
+          "families": [
+            3
+          ],
+          "geometry": {
+            "K": "c2",
+            "B": "e1",
+            "N": "b4",
+            "black": "c5",
+            "Kcentral": false,
+            "Kedge": false,
+            "Bcentral": false,
+            "Blong": false,
+            "Ncentral": false,
+            "Nedge": false,
+            "KB": 2,
+            "KN": 2,
+            "BN": 3,
+            "blackB": 4,
+            "blackN": 1,
+            "kingSteps": 3,
+            "NdefB": false,
+            "precage": false
+          }
+        },
+        {
+          "key": 2639457,
+          "weight": 8,
+          "families": [
+            4
+          ],
+          "geometry": {
+            "K": "c2",
+            "B": "e1",
+            "N": "b4",
+            "black": "b5",
+            "Kcentral": false,
+            "Kedge": false,
+            "Bcentral": false,
+            "Blong": false,
+            "Ncentral": false,
+            "Nedge": false,
+            "KB": 2,
+            "KN": 2,
+            "BN": 3,
+            "blackB": 4,
+            "blackN": 1,
+            "kingSteps": 3,
+            "NdefB": false,
+            "precage": false
+          }
+        },
+        {
+          "key": 4997966,
+          "weight": 8,
+          "families": [
+            5
+          ],
+          "geometry": {
+            "K": "d3",
+            "B": "e1",
+            "N": "f2",
+            "black": "g2",
+            "Kcentral": false,
+            "Kedge": false,
+            "Bcentral": false,
+            "Blong": false,
+            "Ncentral": false,
+            "Nedge": false,
+            "KB": 2,
+            "KN": 2,
+            "BN": 1,
+            "blackB": 2,
+            "blackN": 1,
+            "kingSteps": 3,
+            "NdefB": false,
+            "precage": false
+          }
+        },
+        {
+          "key": 5007523,
+          "weight": 8,
+          "families": [
+            12
+          ],
+          "geometry": {
+            "K": "d3",
+            "B": "g1",
+            "N": "c5",
+            "black": "d5",
+            "Kcentral": false,
+            "Kedge": false,
+            "Bcentral": false,
+            "Blong": false,
+            "Ncentral": false,
+            "Nedge": false,
+            "KB": 3,
+            "KN": 2,
+            "BN": 4,
+            "blackB": 4,
+            "blackN": 1,
+            "kingSteps": 2,
+            "NdefB": false,
+            "precage": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "Central bishop without king protection",
+      "positions": 24,
+      "percent": 4.918032786885246,
+      "boards": [
+        {
+          "key": 3000648,
+          "weight": 8,
+          "families": [
+            2
+          ],
+          "geometry": {
+            "K": "d2",
+            "B": "e4",
+            "N": "f5",
+            "black": "a2",
+            "Kcentral": false,
+            "Kedge": false,
+            "Bcentral": true,
+            "Blong": true,
+            "Ncentral": false,
+            "Nedge": false,
+            "KB": 2,
+            "KN": 3,
+            "BN": 1,
+            "blackB": 4,
+            "blackN": 5,
+            "kingSteps": 3,
+            "NdefB": false,
+            "precage": true
+          }
+        },
+        {
+          "key": 641361,
+          "weight": 8,
+          "families": [
+            2,
+            8
+          ],
+          "geometry": {
+            "K": "c1",
+            "B": "e4",
+            "N": "f5",
+            "black": "b3",
+            "Kcentral": false,
+            "Kedge": true,
+            "Bcentral": true,
+            "Blong": true,
+            "Ncentral": false,
+            "Nedge": false,
+            "KB": 3,
+            "KN": 4,
+            "BN": 1,
+            "blackB": 3,
+            "blackN": 4,
+            "kingSteps": 2,
+            "NdefB": false,
+            "precage": true
+          }
+        },
+        {
+          "key": 3000666,
+          "weight": 8,
+          "families": [
+            8
+          ],
+          "geometry": {
+            "K": "d2",
+            "B": "e4",
+            "N": "f5",
+            "black": "c4",
+            "Kcentral": false,
+            "Kedge": false,
+            "Bcentral": true,
+            "Blong": true,
+            "Ncentral": false,
+            "Nedge": false,
+            "KB": 2,
+            "KN": 3,
+            "BN": 1,
+            "blackB": 2,
+            "blackN": 3,
+            "kingSteps": 2,
+            "NdefB": false,
+            "precage": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "Central bishop, king-defended; knight off precage",
+      "positions": 24,
+      "percent": 4.918032786885246,
+      "boards": [
+        {
+          "key": 5093540,
+          "weight": 8,
+          "families": [
+            12
+          ],
+          "geometry": {
+            "K": "d3",
+            "B": "d4",
+            "N": "c5",
+            "black": "e5",
+            "Kcentral": false,
+            "Kedge": false,
+            "Bcentral": true,
+            "Blong": true,
+            "Ncentral": false,
+            "Nedge": false,
+            "KB": 1,
+            "KN": 2,
+            "BN": 1,
+            "blackB": 1,
+            "blackN": 2,
+            "kingSteps": 2,
+            "NdefB": false,
+            "precage": false
+          }
+        },
+        {
+          "key": 5097181,
+          "weight": 8,
+          "families": [
+            13,
+            20
+          ],
+          "geometry": {
+            "K": "d3",
+            "B": "e4",
+            "N": "d4",
+            "black": "f4",
+            "Kcentral": false,
+            "Kedge": false,
+            "Bcentral": true,
+            "Blong": true,
+            "Ncentral": true,
+            "Nedge": false,
+            "KB": 1,
+            "KN": 1,
+            "BN": 1,
+            "blackB": 1,
+            "blackN": 2,
+            "kingSteps": 2,
+            "NdefB": false,
+            "precage": false
+          }
+        },
+        {
+          "key": 7194797,
+          "weight": 8,
+          "families": [
+            33
+          ],
+          "geometry": {
+            "K": "d4",
+            "B": "e4",
+            "N": "c5",
+            "black": "f6",
+            "Kcentral": true,
+            "Kedge": false,
+            "Bcentral": true,
+            "Blong": true,
+            "Ncentral": false,
+            "Nedge": false,
+            "KB": 1,
+            "KN": 1,
+            "BN": 2,
+            "blackB": 2,
+            "blackN": 3,
+            "kingSteps": 2,
+            "NdefB": true,
+            "precage": false
+          }
+        }
+      ]
+    }
+  ]
+}
