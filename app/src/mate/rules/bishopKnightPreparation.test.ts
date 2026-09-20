@@ -199,3 +199,12 @@ test('r5 prescribes Kd6 with Kc5/Bd5/Nd4 regardless of Black king, including ref
     '8/8/8/2KB4/3N1k2/8/8/8 b - - 2 2',
   ]) assert.equal(knightAndBishopDeclaredPreparationMove(fen), undefined, fen)
 })
+
+test('r5 prescribes Nc4+ from Kc5/Bd5/Nd6 against Ke5 in every symmetry', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    const fen = transformFen('8/8/3N4/2KBk3/8/8/8/8 w - - 0 1', transform)
+    const move = getChess(fen).move({from: transformSquare('d6', transform), to: transformSquare('c4', transform)}).san
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [move])
+    assert.equal(getMateRuleSet('bishop-knight').currentWhiteHint(fen)?.id, 'r5')
+  }
+})
