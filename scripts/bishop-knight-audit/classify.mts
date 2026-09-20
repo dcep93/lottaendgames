@@ -12,7 +12,8 @@ const labels: Record<string, string[]> = {
     'r9.3': ['central king defense of minor', 'bishop distance from Black'],
     'r10': ['king center distance', 'king off bishop color', 'bishop on long diagonal', 'king-protected central bishop', 'knight distance to precage', 'king protection of knight', 'noncentral bishop distance from Black', 'knight off bishop color'],
     'r15': ['long-diagonal intersection distance from Black'],
-    'r20': ['avoid next knight attack']
+    'r20': ['avoid next knight attack'],
+    'r25': ['knight center distance']
 };
 const frequencies: Record<string, number> = {};
 for (const family of result.families) {

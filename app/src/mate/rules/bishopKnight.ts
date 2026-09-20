@@ -23,7 +23,7 @@ import {
   isKnightAndBishopWManeuverPosition,
   knightAndBishopPiecesPresent,
 } from "./bishopKnightLookup";
-import { knightAndBishopKingCenterProximityScore, knightAndBishopKnightTargetProximityScore } from "./bishopKnightStrategy";
+import { knightAndBishopCenterProximityScore, knightAndBishopKingCenterProximityScore, knightAndBishopKnightTargetProximityScore } from "./bishopKnightStrategy";
 import { knightAndBishopDeclaredCornerFlushMove } from "./bishopKnightCornerFlush";
 import { knightAndBishopDeclaredPreparationMove } from "./bishopKnightPreparation";
 import { knightAndBishopShouldCoordinateKing, knightAndBishopKingCoordinatesMinors } from "./bishopKnightCoordination";
@@ -43,6 +43,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly nearbyPairCentralDefensePenalty: number;
   readonly attackedKnightDefensePenalty: number;
   readonly knightNextAttackPenalty: number;
+  readonly knightCenterProximityScore: number;
   readonly declaredCornerFlushPenalty: number;
   readonly declaredPreparationPenalty: number;
   readonly supportedThreeCheckScore: number;
@@ -193,6 +194,9 @@ function scoreKnightAndBishopWhiteMoveCore(
         ? -Math.sqrt(squaredEuclideanDistance(bishop.square, blackKing.square)) : 0;
     },
     attackedKnightDefensePenalty: context.shouldDefendKnight && !knightKingDefended ? 1 : 0,
+    get knightCenterProximityScore() {
+      return knight ? knightAndBishopCenterProximityScore(knight.square) : 0;
+    },
     get knightNextAttackPenalty() {
       return knight
         && blackReplies.some(reply => reply.piece === "k" && kingDistance(reply.to, knight.square) <= 1) ? 1 : 0;
@@ -357,6 +361,12 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       shortLabel: "rule r20",
       helpText: "Prefer a knight that cannot be attacked on Black’s next move.",
       compare: (first, second) => first.knightNextAttackPenalty - second.knightNextAttackPenalty,
+    },
+    {
+      id: "r25",
+      shortLabel: "rule r25",
+      helpText: "Prefer the knight’s Euclidean proximity to the center.",
+      compare: (first, second) => first.knightCenterProximityScore - second.knightCenterProximityScore,
     },
   ];
 

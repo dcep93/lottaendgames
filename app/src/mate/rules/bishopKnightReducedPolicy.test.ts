@@ -280,7 +280,7 @@ test('r10 keeps absent precage targets neutral while ranking available distances
 
 
 test('r15 follows r10 and r10 ends with knight color as its eighth priority', () => {
-  assert.deepEqual(knightAndBishopWhiteRules.slice(-3).map(rule => rule.id), ['r10', 'r15', 'r20'])
+  assert.deepEqual(knightAndBishopWhiteRules.slice(-4).map(rule => rule.id), ['r10', 'r15', 'r20', 'r25'])
   assert.equal(knightAndBishopWhiteRules.find(rule => rule.id === 'r10')!.subpriorities!.length, 8)
 })
 
@@ -350,7 +350,8 @@ test('r10 breaks the central king shuffle tie by preferring knight off bishop co
     assert.equal(king!.knightBishopColorPenalty, 1)
     assert.ok(compareScoresByRules(knight!, king!, [rule]) < 0)
     const ideal = getIdealKnightAndBishopWhiteMoves(fen)
-    assert.ok(ideal.includes(moves[0]!))
+    const centralKnight = getChess(fen).move({ from: transformSquare("d5", transform), to: transformSquare("e3", transform) }).san
+    assert.deepEqual(ideal, [centralKnight])
     assert.ok(!ideal.includes(moves[1]!))
   }
 })
