@@ -5,13 +5,13 @@ import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../c
 import { getIdealKnightAndBishopWhiteMoves, knightAndBishopWhiteRules, scoreKnightAndBishopWhiteMove } from './bishopKnight';
 import { compareScoresByRules } from './selection';
 
-test('r9.1 escapes an attacked undefended bishop, exempting any existing defense', () => {
+test('r9.1 escapes an attacked bishop unless king-adjacent, including knight-defended bishops', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const [source, from, to, expected] of [
       ['8/8/8/3Bk3/8/8/1K6/N7 w - - 0 1', 'd5', 'a8', -5],
       ['8/8/8/8/2kBK3/8/8/N7 w - - 0 1', 'e4', 'e3', 0],
       ['8/8/8/3Bk3/2K5/8/8/N7 w - - 0 1', 'd5', 'a8', 0],
-      ['8/8/8/3Bk3/8/2N5/1K6/8 w - - 0 1', 'd5', 'a8', 0],
+      ['8/8/8/3Bk3/8/2N5/1K6/8 w - - 0 1', 'd5', 'a8', -5],
       // Two steps away is no longer enough to activate the rule.
       ['8/8/4k3/8/2B5/8/1K6/N7 w - - 0 1', 'c4', 'a6', 0],
     ] as const) {
