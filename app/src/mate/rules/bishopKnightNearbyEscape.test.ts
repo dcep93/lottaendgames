@@ -46,6 +46,15 @@ test('r9.2 only activates for a knight attacked before White moves', () => {
   assert.equal(result.attackedKnightDefensePenalty, 0);
 });
 
+test('r9.2 brings the loaded bishop-defended knight into king protection', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    const fen = transformFen('8/8/8/5k2/3K2N1/8/8/3B4 w - - 0 1', transform);
+    const san = getChess(fen).move({from: transformSquare('g4', transform), to: transformSquare('e5', transform)}).san;
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [san], transform.name);
+    assert.equal(scoreKnightAndBishopWhiteMove(fen, san).attackedKnightDefensePenalty, 0);
+  }
+});
+
 test('r9.3 scores only the bishop when both minors start within two king steps', () => {
   const rule = knightAndBishopWhiteRules.find(rule => rule.id === 'r9.3')!;
   for (const transform of SQUARE_TRANSFORMS) {
@@ -109,24 +118,24 @@ test('r9.3 prefers establishing central-king defense over bishop escape in every
   }
 });
 
-test('r9.2 is neutral for knights already defended by any White piece, across symmetries', () => {
+test('r9.2 retains its king-defense preference for already defended knights, across symmetries', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const [source, from, to] of [
-      // Loaded Nd5 is defended by central Kd4 before Nf4.
+      // Nf4 abandons the central king defense of attacked Nd5.
       ['8/8/3k4/3N4/3KB3/8/8/8 w - - 0 1', 'd5', 'f4'],
-      // Noncentral Kc5 also exempts Nd6.
+      // Nb7 abandons the noncentral king defense of attacked Nd6.
       ['B7/8/3N4/2K1k3/8/8/8/8 w - - 0 1', 'd6', 'b7'],
-      // Bishop f5 defends Ne6 even with a remote king.
+      // Bishop defense of Ne6 no longer exempts it.
       ['8/8/3kN3/5B2/8/8/8/K7 w - - 0 1', 'e6', 'g7'],
     ] as const) {
       const fen = transformFen(source, transform);
       const san = getChess(fen).move({from: transformSquare(from, transform), to: transformSquare(to, transform)}).san;
       const result = scoreKnightAndBishopWhiteMove(fen, san);
-      assert.equal(result.attackedKnightDefensePenalty, 0);
+      assert.equal(result.attackedKnightDefensePenalty, 1);
     }
     const fen = transformFen('8/8/3k4/3N4/3KB3/8/8/8 w - - 0 1', transform);
     const san = getChess(fen).move({from: transformSquare('d5', transform), to: transformSquare('f4', transform)}).san;
-    assert.ok(getIdealKnightAndBishopWhiteMoves(fen).includes(san));
+    assert.ok(!getIdealKnightAndBishopWhiteMoves(fen).includes(san));
   }
 });
 

@@ -131,7 +131,6 @@ type KnightAndBishopPositionScoreContext = {
 };
 
 function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
-  const chess = getChess(fen);
   let shouldCheckThreeDiagonal: boolean | undefined;
   const whiteKing = findPiece(fen, "w", "k");
   const blackKing = findPiece(fen, "b", "k");
@@ -158,8 +157,7 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
       && !bishopCentrallyDefended && !knightCentrallyDefended,
     shouldEscapeBishop: !!bishop && !!blackKing && kingDistance(bishop.square, blackKing.square) === 1
       && !(whiteKing && kingDistance(bishop.square, whiteKing.square) === 1),
-    shouldDefendKnight: !!knight && !!blackKing && kingDistance(knight.square, blackKing.square) === 1
-      && !chess.isAttacked(knight.square, "w"),
+    shouldDefendKnight: !!knight && !!blackKing && kingDistance(knight.square, blackKing.square) === 1,
     shouldCoordinateKing: knightAndBishopShouldCoordinateKing(fen),
     declaredCornerFlushMove: knightAndBishopDeclaredCornerFlushMove(fen),
     declaredPreparationMove: knightAndBishopDeclaredPreparationMove(fen),
@@ -332,7 +330,7 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     {
       id: "r9.2",
       shortLabel: "rule r9.2",
-      helpText: "If a knight is attacked and undefended, prefer king defense.",
+      helpText: "If a knight is attacked, prefer king defense.",
       compare: (first, second) => first.attackedKnightDefensePenalty - second.attackedKnightDefensePenalty,
     },
     {
@@ -524,7 +522,7 @@ const bishopKnightHelp: RuleHelp = {
     "For r9.5, check the king's color and bishop–Black king edge adjacency before White moves. Prefer moving White's king to the square immediately behind the bishop, directly opposite Black's king, so the bishop sits between the kings. For Bf3 and Black Kg3, the target is Ke3. If no surviving legal king move reaches that square, this rule does not distinguish moves. Rotations and reflections use the same geometry.",
     "For r9.3, check before White moves: the bishop and knight must be adjacent (by edge or diagonal), both must be within two king steps of Black, and neither may be defended by White's king on d4, e4, d5 or e5. When this rule activates, first prefer a resulting central king defending either piece. Those defended outcomes tie; otherwise maximize only the bishop's Euclidean distance after the move, including moves beyond the two-step range.",
     "For r20, prefer a knight that no legal Black reply can attack or capture, including replies outside Black’s preferred moves. This preference applies whether or not the knight is defended, after all earlier rules.",
-    "For r9.1, check before White moves: Black's king must attack the bishop and White's king must not be adjacent to it. Knight defense does not exempt the bishop. Maximize the bishop's Euclidean distance from Black after White moves. For r9.2, the knight must be attacked and undefended before White moves; existing king or bishop defense exempts it. Then prefer king defense after the move, not bishop defense.",
+    "For r9.1, check before White moves: Black's king must attack the bishop and White's king must not be adjacent to it. Knight defense does not exempt the bishop. Maximize the bishop's Euclidean distance from Black after White moves. For r9.2, the knight must be attacked before White moves, whether or not it is already defended. Prefer king defense after the move; bishop defense alone does not satisfy this preference.",
     "A precage square is diagonally adjacent to a central bishop, off the long diagonal, and strictly behind the bishop from Black's king's perspective.",
     "For r10, candidates without a precage square remain neutral, tied with the best available distance. Among candidates with precage squares, fewer knight moves wins.",
     "The target corner is the bishop-colored corner closest to Black's king.",
