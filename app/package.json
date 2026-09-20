@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "audit:unsupported": "node ../scripts/bishop-knight-audit/run.mjs",
+    "test:audit:unsupported": "tsc -p ../scripts/bishop-knight-audit/tsconfig.json && tsx --test ../scripts/bishop-knight-audit/*.test.mts",
     "build": "tsc -b && vite build",
     "check:mate-progress": "tsx ../scripts/mate-verifier/generate-major-piece-mate-progress.mts --check",
     "diagnose:mate-cycles": "tsx ../scripts/mate-verifier/diagnose-major-piece-policy-scc.mts",
@@ -38,6 +40,7 @@
     "@types/react-dom": "^19.2.3",
     "@types/react-test-renderer": "^19.1.0",
     "@vitejs/plugin-react": "^6.0.3",
+    "esbuild": "^0.28.1",
     "oxlint": "^1.71.0",
     "react-test-renderer": "^19.2.7",
     "sharp": "^0.35.4",

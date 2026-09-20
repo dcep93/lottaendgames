@@ -11,3 +11,6 @@ __pycache__/
 .superpowers/
 .worktrees/
 tmp/
+
+# Resumable local policy audits
+.audit/
