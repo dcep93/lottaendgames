@@ -223,7 +223,7 @@ function scoreKnightAndBishopWhiteMoveCore(
         : -Math.sqrt(squaredEuclideanDistance(intersection, blackKing.square));
     },
     bishopProtectedCenterPenalty: protectedCentralBishop ? 0 : 1,
-    knightProtectionPenalty: knight && chess.isAttacked(knight.square, "w") ? 0 : 1,
+    knightProtectionPenalty: knightKingDefended ? 0 : 1,
     get knightTargetProximityScore() {
       return knightTargetProximity ??= knightAndBishopKnightTargetProximityScore(resultFen);
     },
@@ -330,7 +330,7 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     {
       id: "r10",
       shortLabel: "rule r10",
-      helpText: "Prefer king Euclidean proximity to the center, then king off bishop's color, then bishop on the long diagonal, then a king protected central bishop, then knight move proximity to a precage square, then knight protection.",
+      helpText: "Prefer king Euclidean proximity to the center, then king off bishop's color, then bishop on the long diagonal, then a king protected central bishop, then knight move proximity to a precage square, then king knight protection.",
       subpriorities: [
         { compare: (first, second) => first.kingCenterProximityScore - second.kingCenterProximityScore },
         { compare: (first, second) => first.kingBishopColorPenalty - second.kingBishopColorPenalty },

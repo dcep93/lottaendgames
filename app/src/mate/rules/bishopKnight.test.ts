@@ -154,7 +154,7 @@ test("bishop-and-knight rules are registered", () => {
     {
       id: "r10",
       shortLabel: "rule r10",
-      helpText: "Prefer king Euclidean proximity to the center, then king off bishop's color, then bishop on the long diagonal, then a king protected central bishop, then knight move proximity to a precage square, then knight protection.",
+      helpText: "Prefer king Euclidean proximity to the center, then king off bishop's color, then bishop on the long diagonal, then a king protected central bishop, then knight move proximity to a precage square, then king knight protection.",
     },
     {
       id: "r15",

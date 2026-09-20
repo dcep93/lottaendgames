@@ -279,7 +279,7 @@ test('r10 keeps absent precage targets neutral while ranking available distances
 })
 
 
-test('r15 follows r10 and r10 ends with knight protection as its sixth priority', () => {
+test('r15 follows r10 and r10 ends with king knight protection as its sixth priority', () => {
   assert.equal(knightAndBishopWhiteRules.at(-1)!.id, 'r15')
   assert.equal(knightAndBishopWhiteRules.at(-2)!.id, 'r10')
   assert.equal(knightAndBishopWhiteRules.at(-2)!.subpriorities!.length, 6)
@@ -299,7 +299,7 @@ test('the old behind-White score remains removed', () => {
 })
 
 
-test('r10 finally prefers knights protected by either the king or bishop', () => {
+test('r10 finally prefers only king protected knights', () => {
   const rule = knightAndBishopWhiteRules.find(({ id }) => id === 'r10')!
   for (const transform of SQUARE_TRANSFORMS) {
     const fen = transformFen('8/1N6/K1k5/8/8/8/B7/8 w - - 2 2', transform)
@@ -313,7 +313,7 @@ test('r10 finally prefers knights protected by either the king or bishop', () =>
     assert.ok(!ideal.includes(moves[1]!))
 
     const bishopFen = transformFen('7k/8/8/8/K7/4N3/8/2B5 w - - 0 1', transform)
-    for (const [to, expected] of [['d2', 0], ['a3', 1]] as const) {
+    for (const [to, expected] of [['d2', 1], ['a3', 1]] as const) {
       const san = getChess(bishopFen).move({from: transformSquare('c1', transform), to: transformSquare(to, transform)}).san
       assert.equal(scoreKnightAndBishopWhiteMove(bishopFen, san).knightProtectionPenalty, expected)
     }
