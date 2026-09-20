@@ -1,0 +1,1423 @@
+{
+  "baselinePolicyCommit": "d47d2ac039b944151e36bd191b9107f3124fd6d1",
+  "baselineCounts": {
+    "legal": 13660584,
+    "supported": 199412,
+    "unsupported": 13461172,
+    "canLoop": 26572,
+    "noLoop": 13434600,
+    "directOnReachableLoop": 200,
+    "directOnAnyDiscoveredLoop": 488,
+    "onlyLoopOutcomes": 22036,
+    "loopAndSupport": 4536,
+    "canReachSupport": 10838456,
+    "canMate": 1608,
+    "canFail": 2616624
+  },
+  "archetypes": [
+    {
+      "kind": "King shuffle",
+      "families": 15,
+      "closedFamilies": 15,
+      "canReachFromUnsupportedPlacements": 5488,
+      "cyclePlies": [
+        4
+      ],
+      "rules": [
+        "minors safe",
+        "no stalemate",
+        "r10",
+        "r5",
+        "r9.2"
+      ],
+      "directLoopPlacements": 200,
+      "shareOfDirectLoopPlacements": 0.4098360655737705
+    },
+    {
+      "kind": "Bishop shuttle",
+      "families": 19,
+      "closedFamilies": 17,
+      "canReachFromUnsupportedPlacements": 21052,
+      "cyclePlies": [
+        4
+      ],
+      "rules": [
+        "minors safe",
+        "r10",
+        "r9.1",
+        "r9.3"
+      ],
+      "directLoopPlacements": 272,
+      "shareOfDirectLoopPlacements": 0.5573770491803278
+    },
+    {
+      "kind": "Knight shuttle",
+      "families": 1,
+      "closedFamilies": 1,
+      "canReachFromUnsupportedPlacements": 32,
+      "cyclePlies": [
+        4
+      ],
+      "rules": [
+        "r10",
+        "r20"
+      ],
+      "directLoopPlacements": 16,
+      "shareOfDirectLoopPlacements": 0.03278688524590164
+    }
+  ],
+  "counterfactuals": [
+    {
+      "variant": "baseline",
+      "remainingOldDirect": 488,
+      "removedPercent": 0,
+      "brokenComponents": 0,
+      "retained": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35
+      ]
+    },
+    {
+      "variant": "no-r93",
+      "remainingOldDirect": 408,
+      "removedPercent": 16.393442622950815,
+      "brokenComponents": 6,
+      "retained": [
+        1,
+        2,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35
+      ]
+    },
+    {
+      "variant": "r93-any-king-defense",
+      "remainingOldDirect": 424,
+      "removedPercent": 13.11475409836066,
+      "brokenComponents": 5,
+      "retained": [
+        1,
+        2,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35
+      ]
+    },
+    {
+      "variant": "king-defense-before-r9",
+      "remainingOldDirect": 96,
+      "removedPercent": 80.32786885245902,
+      "brokenComponents": 27,
+      "retained": [
+        6,
+        9,
+        16,
+        17,
+        18,
+        19,
+        26,
+        33
+      ]
+    },
+    {
+      "variant": "king-defense-before-r5",
+      "remainingOldDirect": 96,
+      "removedPercent": 80.32786885245902,
+      "brokenComponents": 27,
+      "retained": [
+        6,
+        9,
+        16,
+        17,
+        18,
+        19,
+        26,
+        33
+      ]
+    },
+    {
+      "variant": "minor-distance-king-before-r9",
+      "remainingOldDirect": 64,
+      "removedPercent": 86.88524590163934,
+      "brokenComponents": 29,
+      "retained": [
+        2,
+        8,
+        16,
+        17,
+        18,
+        19
+      ]
+    },
+    {
+      "variant": "minor-distance-king-before-r5",
+      "remainingOldDirect": 40,
+      "removedPercent": 91.80327868852459,
+      "brokenComponents": 31,
+      "retained": [
+        16,
+        17,
+        18,
+        19
+      ]
+    },
+    {
+      "variant": "bishop-safe-before-r10",
+      "remainingOldDirect": 240,
+      "removedPercent": 50.81967213114754,
+      "brokenComponents": 16,
+      "retained": [
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        9,
+        10,
+        12,
+        13,
+        16,
+        17,
+        18,
+        19,
+        20,
+        27,
+        31,
+        32,
+        33
+      ]
+    },
+    {
+      "variant": "bishop-safe-before-r9",
+      "remainingOldDirect": 224,
+      "removedPercent": 54.0983606557377,
+      "brokenComponents": 17,
+      "retained": [
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        9,
+        12,
+        13,
+        16,
+        17,
+        18,
+        19,
+        20,
+        27,
+        31,
+        32,
+        33
+      ]
+    },
+    {
+      "variant": "no-r5",
+      "remainingOldDirect": 432,
+      "removedPercent": 11.475409836065575,
+      "brokenComponents": 6,
+      "retained": [
+        1,
+        3,
+        4,
+        5,
+        6,
+        7,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35
+      ]
+    },
+    {
+      "variant": "no-color",
+      "remainingOldDirect": 456,
+      "removedPercent": 6.5573770491803245,
+      "brokenComponents": 2,
+      "retained": [
+        1,
+        2,
+        3,
+        4,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        34,
+        35
+      ]
+    },
+    {
+      "variant": "no-bishop-distance",
+      "remainingOldDirect": 456,
+      "removedPercent": 6.5573770491803245,
+      "brokenComponents": 2,
+      "retained": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35
+      ]
+    },
+    {
+      "variant": "defense-and-cull",
+      "remainingOldDirect": 56,
+      "removedPercent": 88.52459016393442,
+      "brokenComponents": 31,
+      "retained": [
+        6,
+        9,
+        26,
+        33
+      ]
+    },
+    {
+      "variant": "coord-and-cull",
+      "remainingOldDirect": 0,
+      "removedPercent": 100,
+      "brokenComponents": 35,
+      "retained": []
+    },
+    {
+      "variant": "narrow",
+      "remainingOldDirect": 176,
+      "removedPercent": 63.934426229508205,
+      "brokenComponents": 21,
+      "retained": [
+        1,
+        2,
+        6,
+        8,
+        9,
+        10,
+        16,
+        17,
+        18,
+        19,
+        27,
+        31,
+        32,
+        33
+      ]
+    },
+    {
+      "variant": "narrow-targeted-r5",
+      "remainingOldDirect": 120,
+      "removedPercent": 75.40983606557377,
+      "brokenComponents": 27,
+      "retained": [
+        1,
+        6,
+        9,
+        10,
+        27,
+        31,
+        32,
+        33
+      ]
+    },
+    {
+      "variant": "narrow-targeted-r5-early-r20",
+      "remainingOldDirect": 80,
+      "removedPercent": 83.60655737704919,
+      "brokenComponents": 30,
+      "retained": [
+        1,
+        10,
+        31,
+        32,
+        33
+      ]
+    },
+    {
+      "variant": "precage-approach",
+      "remainingOldDirect": 432,
+      "removedPercent": 11.475409836065575,
+      "brokenComponents": 5,
+      "retained": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        17,
+        18,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        34,
+        35
+      ]
+    },
+    {
+      "variant": "narrow-targeted-r5-precage",
+      "remainingOldDirect": 72,
+      "removedPercent": 85.24590163934427,
+      "brokenComponents": 30,
+      "retained": [
+        1,
+        6,
+        9,
+        10,
+        27
+      ]
+    },
+    {
+      "variant": "narrow-targeted-r5-early-r20-precage",
+      "remainingOldDirect": 32,
+      "removedPercent": 93.44262295081968,
+      "brokenComponents": 33,
+      "retained": [
+        1,
+        10
+      ]
+    }
+  ],
+  "narrowR93Exposure": 8416,
+  "recommendedPackageFollowThrough": {
+    "variant": "narrow-targeted-r5-early-r20-precage",
+    "direct": 80,
+    "expanded": 252,
+    "nodes": 252,
+    "complete": true,
+    "cyclicComponents": 5,
+    "cyclicNodes": 10,
+    "rootOutcomes": [
+      {
+        "id": 1,
+        "type": "fresh-witness",
+        "node": 0,
+        "oldReach": 24,
+        "mask": 8
+      },
+      {
+        "id": 1,
+        "type": "cycle-history",
+        "node": 1,
+        "oldReach": 24,
+        "mask": 8
+      },
+      {
+        "id": 1,
+        "type": "cycle-history",
+        "node": 2,
+        "oldReach": 24,
+        "mask": 8
+      },
+      {
+        "id": 2,
+        "type": "fresh-witness",
+        "node": 3,
+        "oldReach": 8,
+        "mask": 8
+      },
+      {
+        "id": 2,
+        "type": "cycle-history",
+        "node": 4,
+        "oldReach": 8,
+        "mask": 8
+      },
+      {
+        "id": 2,
+        "type": "cycle-history",
+        "node": 5,
+        "oldReach": 8,
+        "mask": 8
+      },
+      {
+        "id": 3,
+        "type": "fresh-witness",
+        "node": 6,
+        "oldReach": 40,
+        "mask": 1
+      },
+      {
+        "id": 3,
+        "type": "cycle-history",
+        "node": 7,
+        "oldReach": 40,
+        "mask": 1
+      },
+      {
+        "id": 3,
+        "type": "cycle-history",
+        "node": 8,
+        "oldReach": 40,
+        "mask": 1
+      },
+      {
+        "id": 4,
+        "type": "fresh-witness",
+        "node": 9,
+        "oldReach": 24,
+        "mask": 1
+      },
+      {
+        "id": 4,
+        "type": "cycle-history",
+        "node": 10,
+        "oldReach": 24,
+        "mask": 1
+      },
+      {
+        "id": 4,
+        "type": "cycle-history",
+        "node": 11,
+        "oldReach": 24,
+        "mask": 1
+      },
+      {
+        "id": 5,
+        "type": "fresh-witness",
+        "node": 12,
+        "oldReach": 256,
+        "mask": 8
+      },
+      {
+        "id": 5,
+        "type": "cycle-history",
+        "node": 13,
+        "oldReach": 256,
+        "mask": 8
+      },
+      {
+        "id": 5,
+        "type": "cycle-history",
+        "node": 14,
+        "oldReach": 256,
+        "mask": 8
+      },
+      {
+        "id": 6,
+        "type": "fresh-witness",
+        "node": 15,
+        "oldReach": 728,
+        "mask": 1
+      },
+      {
+        "id": 6,
+        "type": "cycle-history",
+        "node": 16,
+        "oldReach": 728,
+        "mask": 1
+      },
+      {
+        "id": 6,
+        "type": "cycle-history",
+        "node": 17,
+        "oldReach": 728,
+        "mask": 1
+      },
+      {
+        "id": 7,
+        "type": "fresh-witness",
+        "node": 18,
+        "oldReach": 568,
+        "mask": 1
+      },
+      {
+        "id": 7,
+        "type": "cycle-history",
+        "node": 19,
+        "oldReach": 568,
+        "mask": 1
+      },
+      {
+        "id": 7,
+        "type": "cycle-history",
+        "node": 20,
+        "oldReach": 568,
+        "mask": 1
+      },
+      {
+        "id": 8,
+        "type": "fresh-witness",
+        "node": 21,
+        "oldReach": 128,
+        "mask": 8
+      },
+      {
+        "id": 8,
+        "type": "cycle-history",
+        "node": 22,
+        "oldReach": 128,
+        "mask": 8
+      },
+      {
+        "id": 8,
+        "type": "cycle-history",
+        "node": 23,
+        "oldReach": 128,
+        "mask": 8
+      },
+      {
+        "id": 9,
+        "type": "fresh-witness",
+        "node": 24,
+        "oldReach": 504,
+        "mask": 1
+      },
+      {
+        "id": 9,
+        "type": "cycle-history",
+        "node": 25,
+        "oldReach": 504,
+        "mask": 1
+      },
+      {
+        "id": 10,
+        "type": "fresh-witness",
+        "node": 26,
+        "oldReach": 56,
+        "mask": 8
+      },
+      {
+        "id": 10,
+        "type": "cycle-history",
+        "node": 27,
+        "oldReach": 56,
+        "mask": 8
+      },
+      {
+        "id": 10,
+        "type": "cycle-history",
+        "node": 28,
+        "oldReach": 56,
+        "mask": 8
+      },
+      {
+        "id": 11,
+        "type": "fresh-witness",
+        "node": 29,
+        "oldReach": 16,
+        "mask": 1
+      },
+      {
+        "id": 11,
+        "type": "cycle-history",
+        "node": 30,
+        "oldReach": 16,
+        "mask": 1
+      },
+      {
+        "id": 11,
+        "type": "cycle-history",
+        "node": 31,
+        "oldReach": 16,
+        "mask": 1
+      },
+      {
+        "id": 12,
+        "type": "fresh-witness",
+        "node": 32,
+        "oldReach": 6096,
+        "mask": 1
+      },
+      {
+        "id": 12,
+        "type": "cycle-history",
+        "node": 33,
+        "oldReach": 6096,
+        "mask": 1
+      },
+      {
+        "id": 12,
+        "type": "cycle-history",
+        "node": 34,
+        "oldReach": 6096,
+        "mask": 1
+      },
+      {
+        "id": 13,
+        "type": "fresh-witness",
+        "node": 35,
+        "oldReach": 2256,
+        "mask": 1
+      },
+      {
+        "id": 13,
+        "type": "cycle-history",
+        "node": 36,
+        "oldReach": 2256,
+        "mask": 1
+      },
+      {
+        "id": 13,
+        "type": "cycle-history",
+        "node": 37,
+        "oldReach": 2256,
+        "mask": 1
+      },
+      {
+        "id": 14,
+        "type": "fresh-witness",
+        "node": 38,
+        "oldReach": 1480,
+        "mask": 1
+      },
+      {
+        "id": 14,
+        "type": "cycle-history",
+        "node": 39,
+        "oldReach": 1480,
+        "mask": 1
+      },
+      {
+        "id": 14,
+        "type": "cycle-history",
+        "node": 40,
+        "oldReach": 1480,
+        "mask": 1
+      },
+      {
+        "id": 15,
+        "type": "fresh-witness",
+        "node": 41,
+        "oldReach": 1896,
+        "mask": 1
+      },
+      {
+        "id": 15,
+        "type": "cycle-history",
+        "node": 42,
+        "oldReach": 1896,
+        "mask": 1
+      },
+      {
+        "id": 15,
+        "type": "cycle-history",
+        "node": 43,
+        "oldReach": 1896,
+        "mask": 1
+      },
+      {
+        "id": 16,
+        "type": "fresh-witness",
+        "node": 44,
+        "oldReach": 8,
+        "mask": 1
+      },
+      {
+        "id": 16,
+        "type": "cycle-history",
+        "node": 45,
+        "oldReach": 8,
+        "mask": 8
+      },
+      {
+        "id": 16,
+        "type": "cycle-history",
+        "node": 46,
+        "oldReach": 8,
+        "mask": 1
+      },
+      {
+        "id": 17,
+        "type": "fresh-witness",
+        "node": 47,
+        "oldReach": 8,
+        "mask": 8
+      },
+      {
+        "id": 17,
+        "type": "cycle-history",
+        "node": 48,
+        "oldReach": 8,
+        "mask": 8
+      },
+      {
+        "id": 17,
+        "type": "cycle-history",
+        "node": 49,
+        "oldReach": 8,
+        "mask": 8
+      },
+      {
+        "id": 18,
+        "type": "fresh-witness",
+        "node": 50,
+        "oldReach": 24,
+        "mask": 8
+      },
+      {
+        "id": 18,
+        "type": "cycle-history",
+        "node": 51,
+        "oldReach": 24,
+        "mask": 8
+      },
+      {
+        "id": 18,
+        "type": "cycle-history",
+        "node": 52,
+        "oldReach": 24,
+        "mask": 8
+      },
+      {
+        "id": 19,
+        "type": "fresh-witness",
+        "node": 53,
+        "oldReach": 968,
+        "mask": 1
+      },
+      {
+        "id": 19,
+        "type": "cycle-history",
+        "node": 54,
+        "oldReach": 968,
+        "mask": 8
+      },
+      {
+        "id": 19,
+        "type": "cycle-history",
+        "node": 55,
+        "oldReach": 968,
+        "mask": 1
+      },
+      {
+        "id": 20,
+        "type": "fresh-witness",
+        "node": 56,
+        "oldReach": 88,
+        "mask": 8
+      },
+      {
+        "id": 20,
+        "type": "cycle-history",
+        "node": 57,
+        "oldReach": 88,
+        "mask": 1
+      },
+      {
+        "id": 20,
+        "type": "cycle-history",
+        "node": 58,
+        "oldReach": 88,
+        "mask": 8
+      },
+      {
+        "id": 21,
+        "type": "fresh-witness",
+        "node": 59,
+        "oldReach": 64,
+        "mask": 9
+      },
+      {
+        "id": 21,
+        "type": "cycle-history",
+        "node": 60,
+        "oldReach": 64,
+        "mask": 9
+      },
+      {
+        "id": 21,
+        "type": "cycle-history",
+        "node": 61,
+        "oldReach": 64,
+        "mask": 9
+      },
+      {
+        "id": 22,
+        "type": "fresh-witness",
+        "node": 62,
+        "oldReach": 64,
+        "mask": 9
+      },
+      {
+        "id": 22,
+        "type": "cycle-history",
+        "node": 63,
+        "oldReach": 64,
+        "mask": 9
+      },
+      {
+        "id": 22,
+        "type": "cycle-history",
+        "node": 64,
+        "oldReach": 64,
+        "mask": 9
+      },
+      {
+        "id": 23,
+        "type": "fresh-witness",
+        "node": 65,
+        "oldReach": 60,
+        "mask": 9
+      },
+      {
+        "id": 23,
+        "type": "cycle-history",
+        "node": 66,
+        "oldReach": 60,
+        "mask": 9
+      },
+      {
+        "id": 23,
+        "type": "cycle-history",
+        "node": 67,
+        "oldReach": 60,
+        "mask": 9
+      },
+      {
+        "id": 24,
+        "type": "fresh-witness",
+        "node": 68,
+        "oldReach": 16,
+        "mask": 8
+      },
+      {
+        "id": 24,
+        "type": "cycle-history",
+        "node": 69,
+        "oldReach": 16,
+        "mask": 8
+      },
+      {
+        "id": 24,
+        "type": "cycle-history",
+        "node": 70,
+        "oldReach": 16,
+        "mask": 8
+      },
+      {
+        "id": 25,
+        "type": "fresh-witness",
+        "node": 71,
+        "oldReach": 5504,
+        "mask": 8
+      },
+      {
+        "id": 25,
+        "type": "cycle-history",
+        "node": 72,
+        "oldReach": 5504,
+        "mask": 8
+      },
+      {
+        "id": 25,
+        "type": "cycle-history",
+        "node": 73,
+        "oldReach": 5504,
+        "mask": 8
+      },
+      {
+        "id": 26,
+        "type": "fresh-witness",
+        "node": 74,
+        "oldReach": 3144,
+        "mask": 8
+      },
+      {
+        "id": 26,
+        "type": "cycle-history",
+        "node": 75,
+        "oldReach": 3144,
+        "mask": 8
+      },
+      {
+        "id": 26,
+        "type": "cycle-history",
+        "node": 76,
+        "oldReach": 3144,
+        "mask": 8
+      },
+      {
+        "id": 27,
+        "type": "fresh-witness",
+        "node": 77,
+        "oldReach": 1648,
+        "mask": 1
+      },
+      {
+        "id": 27,
+        "type": "cycle-history",
+        "node": 78,
+        "oldReach": 1648,
+        "mask": 1
+      },
+      {
+        "id": 27,
+        "type": "cycle-history",
+        "node": 79,
+        "oldReach": 1648,
+        "mask": 1
+      },
+      {
+        "id": 28,
+        "type": "fresh-witness",
+        "node": 80,
+        "oldReach": 24,
+        "mask": 9
+      },
+      {
+        "id": 28,
+        "type": "cycle-history",
+        "node": 81,
+        "oldReach": 24,
+        "mask": 9
+      },
+      {
+        "id": 28,
+        "type": "cycle-history",
+        "node": 82,
+        "oldReach": 24,
+        "mask": 9
+      },
+      {
+        "id": 29,
+        "type": "fresh-witness",
+        "node": 83,
+        "oldReach": 48,
+        "mask": 8
+      },
+      {
+        "id": 29,
+        "type": "cycle-history",
+        "node": 84,
+        "oldReach": 48,
+        "mask": 8
+      },
+      {
+        "id": 29,
+        "type": "cycle-history",
+        "node": 85,
+        "oldReach": 48,
+        "mask": 8
+      },
+      {
+        "id": 30,
+        "type": "fresh-witness",
+        "node": 86,
+        "oldReach": 96,
+        "mask": 8
+      },
+      {
+        "id": 30,
+        "type": "cycle-history",
+        "node": 87,
+        "oldReach": 96,
+        "mask": 8
+      },
+      {
+        "id": 30,
+        "type": "cycle-history",
+        "node": 88,
+        "oldReach": 96,
+        "mask": 8
+      },
+      {
+        "id": 31,
+        "type": "fresh-witness",
+        "node": 89,
+        "oldReach": 32,
+        "mask": 1
+      },
+      {
+        "id": 31,
+        "type": "cycle-history",
+        "node": 90,
+        "oldReach": 32,
+        "mask": 1
+      },
+      {
+        "id": 31,
+        "type": "cycle-history",
+        "node": 91,
+        "oldReach": 32,
+        "mask": 1
+      },
+      {
+        "id": 32,
+        "type": "fresh-witness",
+        "node": 92,
+        "oldReach": 16,
+        "mask": 1
+      },
+      {
+        "id": 32,
+        "type": "cycle-history",
+        "node": 93,
+        "oldReach": 16,
+        "mask": 1
+      },
+      {
+        "id": 32,
+        "type": "cycle-history",
+        "node": 94,
+        "oldReach": 16,
+        "mask": 1
+      },
+      {
+        "id": 33,
+        "type": "fresh-witness",
+        "node": 95,
+        "oldReach": 32,
+        "mask": 1
+      },
+      {
+        "id": 33,
+        "type": "cycle-history",
+        "node": 96,
+        "oldReach": 32,
+        "mask": 1
+      },
+      {
+        "id": 33,
+        "type": "cycle-history",
+        "node": 97,
+        "oldReach": 32,
+        "mask": 1
+      },
+      {
+        "id": 34,
+        "type": "fresh-witness",
+        "node": 98,
+        "oldReach": 136,
+        "mask": 1
+      },
+      {
+        "id": 34,
+        "type": "cycle-history",
+        "node": 99,
+        "oldReach": 136,
+        "mask": 1
+      },
+      {
+        "id": 34,
+        "type": "cycle-history",
+        "node": 100,
+        "oldReach": 136,
+        "mask": 1
+      },
+      {
+        "id": 35,
+        "type": "fresh-witness",
+        "node": 101,
+        "oldReach": 616,
+        "mask": 1
+      },
+      {
+        "id": 35,
+        "type": "cycle-history",
+        "node": 102,
+        "oldReach": 616,
+        "mask": 1
+      },
+      {
+        "id": 35,
+        "type": "cycle-history",
+        "node": 103,
+        "oldReach": 616,
+        "mask": 1
+      }
+    ],
+    "witnesses": [
+      [
+        {
+          "fen": "8/8/8/8/3KN3/8/8/B1k5 w - - 0 1",
+          "previous": "8/8/8/8/3KN3/2B5/8/3k4 w - - 0 1",
+          "edges": [
+            {
+              "to": 215,
+              "white": "Bc3",
+              "black": "Kd1",
+              "post": "8/8/8/8/3KN3/2B5/8/2k5 b - - 1 1"
+            }
+          ]
+        },
+        {
+          "fen": "8/8/8/8/3KN3/2B5/8/3k4 w - - 0 1",
+          "previous": "8/8/8/8/3KN3/8/8/B1k5 w - - 0 1",
+          "edges": [
+            {
+              "to": 195,
+              "white": "Ba1",
+              "black": "Kc1",
+              "post": "8/8/8/8/3KN3/8/8/B2k4 b - - 1 1"
+            }
+          ]
+        }
+      ],
+      [
+        {
+          "fen": "8/8/8/8/8/2K1B3/2N1k3/8 w - - 0 1",
+          "previous": "8/8/8/8/3K4/4B3/2N5/3k4 w - - 0 1",
+          "edges": [
+            {
+              "to": 27,
+              "white": "Kd4",
+              "black": "Kd1",
+              "post": "8/8/8/8/3K4/4B3/2N1k3/8 b - - 1 1"
+            }
+          ]
+        },
+        {
+          "fen": "8/8/8/8/3K4/4B3/2N5/3k4 w - - 0 1",
+          "previous": "8/8/8/8/8/2K1B3/2N1k3/8 w - - 0 1",
+          "edges": [
+            {
+              "to": 28,
+              "white": "Kc3",
+              "black": "Ke2",
+              "post": "8/8/8/8/8/2K1B3/2N5/3k4 b - - 1 1"
+            }
+          ]
+        }
+      ],
+      [
+        {
+          "fen": "8/8/2k5/4B3/5N2/3K4/8/8 w - - 0 1",
+          "previous": "8/8/8/2k1B3/4KN2/8/8/8 w - - 0 1",
+          "edges": [
+            {
+              "to": 159,
+              "white": "Ke4",
+              "black": "Kc5",
+              "post": "8/8/2k5/4B3/4KN2/8/8/8 b - - 1 1"
+            }
+          ]
+        },
+        {
+          "fen": "8/8/4k3/8/3KB3/3N4/8/8 w - - 0 1",
+          "previous": "8/8/5k2/2K5/4B3/3N4/8/8 w - - 0 1",
+          "edges": [
+            {
+              "to": 123,
+              "white": "Kc5",
+              "black": "Kf6",
+              "post": "8/8/4k3/2K5/4B3/3N4/8/8 b - - 1 1"
+            }
+          ]
+        }
+      ],
+      [
+        {
+          "fen": "8/8/8/2N5/3B1k2/3K4/8/8 w - - 0 1",
+          "previous": "8/8/8/2N5/3B4/6k1/4K3/8 w - - 0 1",
+          "edges": [
+            {
+              "to": 144,
+              "white": "Ke2",
+              "black": "Kg3",
+              "post": "8/8/8/2N5/3B1k2/8/4K3/8 b - - 1 1"
+            }
+          ]
+        },
+        {
+          "fen": "8/8/8/5N2/4B3/1k6/3K4/8 w - - 0 1",
+          "previous": "8/8/8/5N2/2k1B3/4K3/8/8 w - - 0 1",
+          "edges": [
+            {
+              "to": 104,
+              "white": "Ke3",
+              "black": "Kc4",
+              "post": "8/8/8/5N2/4B3/1k2K3/8/8 b - - 1 1"
+            }
+          ]
+        }
+      ],
+      [
+        {
+          "fen": "8/8/8/8/8/1kB5/8/1NK5 w - - 0 1",
+          "previous": "8/8/8/8/8/2B5/k2K4/1N6 w - - 0 1",
+          "edges": [
+            {
+              "to": 1,
+              "white": "Kd2",
+              "black": "Ka2",
+              "post": "8/8/8/8/8/1kB5/3K4/1N6 b - - 1 1"
+            }
+          ]
+        },
+        {
+          "fen": "8/8/8/8/8/2B5/k2K4/1N6 w - - 0 1",
+          "previous": "8/8/8/8/8/1kB5/8/1NK5 w - - 0 1",
+          "edges": [
+            {
+              "to": 2,
+              "white": "Kc1",
+              "black": "Kb3",
+              "post": "8/8/8/8/8/2B5/k7/1NK5 b - - 1 1"
+            }
+          ]
+        }
+      ]
+    ]
+  },
+  "scope": "Counterfactual analysis only; production policy unchanged. Follow-through seeds every current cyclic history state plus all 35 fresh witnesses; all ties and Black return history retained. Not a new exhaustive global census."
+}
