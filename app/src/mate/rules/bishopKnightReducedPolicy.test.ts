@@ -6,7 +6,7 @@ import { compareScoresByRules } from './selection'
 import { knightAndBishopTargetCornerDiagonals, knightAndBishopTargetCorners, knightAndBishopKnightTargetSquares, knightAndBishopKnightTargetProximityScore } from './bishopKnightStrategy'
 import positions from './bishopKnightRegressionPositions.json'
 
-test('r10 ranks king center, opposite color, long diagonal, then protected central bishop', () => {
+test('r10 ranks king center, opposite color, long diagonal, then king protected central bishop', () => {
   const rule = knightAndBishopWhiteRules.find(({ id }) => id === 'r10')!
   for (const fen of positions) {
     const scored = getChess(fen).moves().map(san => {
@@ -19,11 +19,9 @@ test('r10 ranks king center, opposite color, long diagonal, then protected centr
       const center = (2 * king.row - 7) ** 2 + (2 * king.col - 7) ** 2
       const colorPenalty = Number((king.row + king.col) % 2 === (bishop.row + bishop.col) % 2)
       const longDiagonalPenalty = Number(bishop.row !== bishop.col && bishop.row + bishop.col !== 7)
-      const knight = pieces.find(p => p.color === 'w' && p.type === 'n')!
       const centralBishop = [3, 4].includes(bishop.row) && [3, 4].includes(bishop.col)
       const kingDefends = Math.max(Math.abs(king.row - bishop.row), Math.abs(king.col - bishop.col)) === 1
-      const knightDefends = Math.abs(knight.row - bishop.row) * Math.abs(knight.col - bishop.col) === 2
-      const centerPenalty = Number(!centralBishop || !(kingDefends || knightDefends))
+      const centerPenalty = Number(!centralBishop || !kingDefends)
       const score = scoreKnightAndBishopWhiteMove(fen, san)
       assert.equal(score.kingCenterProximityScore, center, `${fen}: ${san}`)
       assert.equal(score.kingBishopColorPenalty, colorPenalty, `${fen}: ${san}`)
@@ -177,11 +175,11 @@ test('the target-corner exception needs all three specified pieces', () => {
 })
 
 
-test('r10 rewards central bishops protected by either king or knight in every reflection', () => {
+test('r10 rewards only king protected central bishops in every reflection', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const [base, from, to, expected] of [
       ['8/7k/8/8/4B3/5K2/8/N7 w - - 0 1', 'a1', 'b3', 0], // Non-central king protects Be4.
-      ['8/7k/8/2N5/4B3/8/8/1K6 w - - 0 1', 'b1', 'b2', 0], // Nc5 protects Be4, king is remote.
+      ['8/7k/8/2N5/4B3/8/8/1K6 w - - 0 1', 'b1', 'b2', 1], // Knight protection alone does not qualify.
       ['8/7k/8/8/4BN2/8/8/1K6 w - - 0 1', 'b1', 'b2', 1], // Central bishop without protection.
       ['8/7k/8/2N5/8/2B5/8/1K6 w - - 0 1', 'b1', 'b2', 1], // Protected bishop outside the center.
     ] as const) {

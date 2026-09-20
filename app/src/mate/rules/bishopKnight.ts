@@ -165,7 +165,8 @@ function scoreKnightAndBishopWhiteMoveCore(
   const checkmate = givesCheck && blackReplies.length === 0;
   const whiteKing = findPiece(resultFen, "w", "k");
   const bishop = findPiece(resultFen, "w", "b");
-  const protectedCentralBishop = !!bishop && centerDistance(bishop.square) === 0 && chess.isAttacked(bishop.square, "w");
+  const protectedCentralBishop = !!bishop && !!whiteKing && centerDistance(bishop.square) === 0
+    && kingDistance(bishop.square, whiteKing.square) === 1;
   let kingCenterProximity: number | undefined;
   let knightTargetProximity: number | undefined;
   const knight = findPiece(resultFen, "w", "n");
@@ -329,7 +330,7 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     {
       id: "r10",
       shortLabel: "rule r10",
-      helpText: "Prefer king Euclidean proximity to the center, then king off bishop's color, then bishop on the long diagonal, then a protected central bishop, then knight move proximity to a precage square, then knight protection.",
+      helpText: "Prefer king Euclidean proximity to the center, then king off bishop's color, then bishop on the long diagonal, then a king protected central bishop, then knight move proximity to a precage square, then knight protection.",
       subpriorities: [
         { compare: (first, second) => first.kingCenterProximityScore - second.kingCenterProximityScore },
         { compare: (first, second) => first.kingBishopColorPenalty - second.kingBishopColorPenalty },
