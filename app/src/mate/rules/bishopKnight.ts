@@ -42,6 +42,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly nearbyPairBishopEscapeScore: number;
   readonly nearbyPairCentralDefensePenalty: number;
   readonly attackedKnightDefensePenalty: number;
+  readonly bishopOppositionPenalty: number;
   readonly knightNextAttackPenalty: number;
   readonly knightCenterProximityScore: number;
   readonly declaredCornerFlushPenalty: number;
@@ -119,6 +120,7 @@ function distanceToNearestUnprotectedKnightOrBishop(fen: string): number {
 }
 
 type KnightAndBishopPositionScoreContext = {
+  readonly bishopOppositionTarget: Square | undefined;
   readonly shouldCoordinateKing: boolean;
   readonly shouldEscapeBishop: boolean;
   readonly shouldEscapeNearbyPairBishop: boolean;
@@ -138,7 +140,17 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
   const knight = findPiece(fen, "w", "n");
   const bishopCentrallyDefended = !!bishop && centralKing && kingDistance(whiteKing.square, bishop.square) === 1;
   const knightCentrallyDefended = !!knight && centralKing && kingDistance(whiteKing.square, knight.square) === 1;
+  let bishopOppositionTarget: Square | undefined;
+  if (whiteKing && bishop && blackKing
+    && squareColor(whiteKing.square) === squareColor(bishop.square)
+    && manhattanDistance(bishop.square, blackKing.square) === 1) {
+    const b = squareCoordinates(bishop.square), k = squareCoordinates(blackKing.square);
+    const file = 2 * b.file - k.file, rank = 2 * b.rank - k.rank;
+    if (file >= 0 && file < 8 && rank >= 0 && rank < 8)
+      bishopOppositionTarget = `${"abcdefgh"[file]}${rank + 1}` as Square;
+  }
   return {
+    bishopOppositionTarget,
     shouldEscapeNearbyPairBishop: !!bishop && !!knight && !!blackKing
       && kingDistance(bishop.square, knight.square) === 1
       && kingDistance(bishop.square, blackKing.square) <= 2
@@ -194,6 +206,8 @@ function scoreKnightAndBishopWhiteMoveCore(
         ? -Math.sqrt(squaredEuclideanDistance(bishop.square, blackKing.square)) : 0;
     },
     attackedKnightDefensePenalty: context.shouldDefendKnight && !knightKingDefended ? 1 : 0,
+    bishopOppositionPenalty: context.bishopOppositionTarget
+      && !(move.piece === "k" && move.to === context.bishopOppositionTarget) ? 1 : 0,
     get knightCenterProximityScore() {
       return knight ? knightAndBishopCenterProximityScore(knight.square) : 0;
     },
@@ -329,6 +343,12 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
         { compare: (first, second) => first.nearbyPairCentralDefensePenalty - second.nearbyPairCentralDefensePenalty },
         { compare: (first, second) => first.nearbyPairBishopEscapeScore - second.nearbyPairBishopEscapeScore },
       ],
+    },
+    {
+      id: "r9.5",
+      shortLabel: "rule r9.5",
+      helpText: "With White's king on the same color as the bishop, which is edge-adjacent to Black's king, take king opposition from behind the bishop.",
+      compare: (first, second) => first.bishopOppositionPenalty - second.bishopOppositionPenalty,
     },
     {
       id: "r10",
@@ -501,6 +521,7 @@ const bishopKnightHelp: RuleHelp = {
     "Stay away from a bishop-colored corner.",
   ],
   notes: [
+    "For r9.5, check the king's color and bishop–Black king edge adjacency before White moves. Prefer moving White's king to the square immediately behind the bishop, directly opposite Black's king, so the bishop sits between the kings. For Bf3 and Black Kg3, the target is Ke3. If no surviving legal king move reaches that square, this rule does not distinguish moves. Rotations and reflections use the same geometry.",
     "For r9.3, check before White moves: the bishop and knight must be adjacent (by edge or diagonal), both must be within two king steps of Black, and neither may be defended by White's king on d4, e4, d5 or e5. When this rule activates, first prefer a resulting central king defending either piece. Those defended outcomes tie; otherwise maximize only the bishop's Euclidean distance after the move, including moves beyond the two-step range.",
     "For r20, prefer a knight that no legal Black reply can attack or capture, including replies outside Black’s preferred moves. This preference applies whether or not the knight is defended, after all earlier rules.",
     "For r9.1 and r9.2, the piece must be attacked by Black's king and undefended before White moves. Existing defense by White's king or other minor piece exempts it, regardless of king location. For r9.2, prefer a knight defended by White's king after the move. Bishop defense does not satisfy this preference. r9.1 maximizes the bishop's Euclidean distance from Black after White moves.",

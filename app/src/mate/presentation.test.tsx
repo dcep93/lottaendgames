@@ -1335,7 +1335,7 @@ test('priority guide follows registered facade order and renders typed diagrams'
   assert.ok(decodedMarkup.includes("rule r15</strong> — For a bishop off the long diagonal, maximize the distance of its long diagonal intersection from Black's king."))
   assert.ok(decodedMarkup.includes("rule r9.3</strong> — If an adjacent bishop and knight are both within 2 steps of Black's king, unless they're defended by a central king, maximize the Bishop's distance from Black's king."))
   assert.ok(!decodedMarkup.includes("rule r9</strong>"))
-  assert.ok(!decodedMarkup.includes("rule r9.5</strong>"))
+  assert.ok(decodedMarkup.includes("rule r9.5</strong> — With White's king on the same color as the bishop, which is edge-adjacent to Black's king, take king opposition from behind the bishop."))
   assert.doesNotMatch(markup, /flush-non-target-corner\.gif/)
   assert.ok(decodedMarkup.includes('rule r5</strong> — Prepare the 7 diagonal.'))
   assert.ok(decodedMarkup.includes('rule r4</strong> — Flush the king from the non target corner.'))
