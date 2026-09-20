@@ -22,7 +22,7 @@ test('r9.1 escapes an attacked undefended bishop, exempting any existing defense
   }
 });
 
-test('r9.2 prefers king defense only, otherwise center proximity even when bishop-defended', () => {
+test('r9.2 ranks king defense before safe escape and does not count bishop defense as king defense', () => {
   const rule = knightAndBishopWhiteRules.find(rule => rule.id === 'r9.2')!;
   for (const transform of SQUARE_TRANSFORMS) {
     const fen = transformFen('8/8/3kN3/6K1/8/8/8/1B6 w - - 0 1', transform);
@@ -35,15 +35,16 @@ test('r9.2 prefers king defense only, otherwise center proximity even when bisho
     assert.equal(kingDefense.attackedKnightDefensePenalty, 0);
     assert.equal(bishopDefense.attackedKnightDefensePenalty, 1);
     assert.ok(compareScoresByRules(kingDefense, bishopDefense, [rule]) < 0);
-    assert.ok(compareScoresByRules(bishopDefense, farEscape, [rule]) < 0);
+    assert.ok(compareScoresByRules(farEscape, bishopDefense, [rule]) < 0);
     assert.ok(compareScoresByRules(kingDefense, farEscape, [rule]) < 0);
-    assert.ok(compareScoresByRules(nearEscape, farEscape, [rule]) < 0);
+    assert.ok(compareScoresByRules(farEscape, nearEscape, [rule]) < 0);
   }
 });
 
 test('r9.2 only activates for a knight attacked before White moves', () => {
   const result = scoreKnightAndBishopWhiteMove('7k/8/3N4/8/8/8/8/KB6 w - - 0 1', 'Nf7+');
   assert.equal(result.attackedKnightDefensePenalty, 0);
+  assert.equal(result.attackedKnightRenewedAttackPenalty, 0);
   assert.equal(result.attackedKnightCenterProximityScore, 0);
 });
 
@@ -156,6 +157,7 @@ test('r9.2 is neutral for knights already defended by any White piece, across sy
       const san = getChess(fen).move({from: transformSquare(from, transform), to: transformSquare(to, transform)}).san;
       const result = scoreKnightAndBishopWhiteMove(fen, san);
       assert.equal(result.attackedKnightDefensePenalty, 0);
+      assert.equal(result.attackedKnightRenewedAttackPenalty, 0);
       assert.equal(result.attackedKnightCenterProximityScore, 0);
     }
     const fen = transformFen('8/8/3k4/3N4/3KB3/8/8/8 w - - 0 1', transform);
@@ -183,16 +185,43 @@ test('r9.3 requires minor adjacency before the move and includes diagonal adjace
 });
 
 
-test('r9.2 sends the loaded attacked Nf8 toward the center rather than back to h7', () => {
+test('r9.2 uses center proximity among escapes that avoid another attack', () => {
   const rule = knightAndBishopWhiteRules.find(rule => rule.id === 'r9.2')!;
-  assert.equal(rule.subpriorities!.length, 2);
+  assert.equal(rule.subpriorities!.length, 3);
   for (const transform of SQUARE_TRANSFORMS) {
     const fen = transformFen('4kN2/8/8/3B4/3K4/8/8/8 w - - 2 2', transform);
     const move = (to: Square) => getChess(fen).move({from: transformSquare('f8', transform), to: transformSquare(to, transform)}).san;
     const central = scoreKnightAndBishopWhiteMove(fen, move('e6'));
     const retreat = scoreKnightAndBishopWhiteMove(fen, move('h7'));
     assert.equal('attackedKnightEscapeScore' in central, false);
-    assert.ok(compareScoresByRules(central, retreat, [rule]) < 0);
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [move('e6')]);
+    assert.equal(central.attackedKnightRenewedAttackPenalty, 1);
+    assert.equal(retreat.attackedKnightRenewedAttackPenalty, 0);
+    assert.ok(compareScoresByRules(retreat, central, [rule]) < 0);
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [move('g6')]);
+  }
+});
+
+
+test('r9.2 breaks the attacked-knight loop before using center proximity, in every symmetry', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    const fen = transformFen('8/8/8/4k3/3N4/8/8/K4B2 w - - 0 1', transform);
+    const move = (to: Square) => getChess(fen).move({from: transformSquare('d4', transform), to: transformSquare(to, transform)}).san;
+    const escape = scoreKnightAndBishopWhiteMove(fen, move('e2'));
+    const shuttle = scoreKnightAndBishopWhiteMove(fen, move('c6'));
+    assert.equal(escape.attackedKnightRenewedAttackPenalty, 0);
+    assert.equal(shuttle.attackedKnightRenewedAttackPenalty, 1);
+    assert.ok(shuttle.attackedKnightCenterProximityScore < escape.attackedKnightCenterProximityScore);
+    assert.deepEqual(new Set(getIdealKnightAndBishopWhiteMoves(fen)), new Set([move('b5'), move('e2')]));
+  }
+});
+
+test('r9.2 uses legal replies rather than geometric distance for renewed attacks', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    // Black e7 is two steps from Nc5, but d6 is controlled by White's king.
+    const fen = transformFen('8/3Nk3/8/4K3/8/8/8/3B4 w - - 0 1', transform);
+    const san = getChess(fen).move({from: transformSquare('d7', transform), to: transformSquare('c5', transform)}).san;
+    const score = scoreKnightAndBishopWhiteMove(fen, san);
+    assert.equal(score.attackedKnightDefensePenalty, 1);
+    assert.equal(score.attackedKnightRenewedAttackPenalty, 0);
   }
 });

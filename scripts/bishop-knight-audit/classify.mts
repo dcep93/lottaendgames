@@ -8,7 +8,7 @@ const result = JSON.parse(readFileSync(dir + '/result.json', 'utf8'));
 const labels: Record<string, string[]> = {
     'r1.5': ['supported diagonal size', 'knight distance to support'],
     'r9.1': ['bishop distance from Black'],
-    'r9.2': ['king defense of knight', 'knight center distance'],
+    'r9.2': ['king defense of knight', 'avoid renewed knight attack', 'knight center distance'],
     'r9.3': ['central king defense of minor', 'bishop distance from Black'],
     'r10': ['king center distance', 'king off bishop color', 'bishop on long diagonal', 'king-protected central bishop', 'knight distance to precage', 'king protection of knight', 'noncentral bishop distance from Black', 'knight off bishop color'],
     'r15': ['long-diagonal intersection distance from Black']
