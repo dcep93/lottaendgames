@@ -57,7 +57,6 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly bishopLongDiagonalPenalty: number;
   readonly bishopProtectedCenterPenalty: number;
   readonly knightTargetProximityScore: number;
-  readonly minorCenterProximityScore: number;
 };
 
 export type KnightAndBishopBlackMoveScore = {
@@ -215,10 +214,6 @@ function scoreKnightAndBishopWhiteMoveCore(
       return file === rank || file + rank === 7 ? 0 : 1;
     },
     bishopProtectedCenterPenalty: protectedCentralBishop ? 0 : 1,
-    get minorCenterProximityScore() {
-      return (bishop ? Math.sqrt(knightAndBishopCenterProximityScore(bishop.square)) / 2 : 0)
-        + (knight ? Math.sqrt(knightAndBishopCenterProximityScore(knight.square)) / 2 : 0);
-    },
     get knightTargetProximityScore() {
       return knightTargetProximity ??= knightAndBishopKnightTargetProximityScore(resultFen);
     },
@@ -325,7 +320,7 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     {
       id: "r10",
       shortLabel: "rule r10",
-      helpText: "Prefer king Euclidean proximity to the center, then king off bishop's color, then bishop on the long diagonal, then a protected central bishop, then knight move proximity to a precage square, then piece proximity to the center.",
+      helpText: "Prefer king Euclidean proximity to the center, then king off bishop's color, then bishop on the long diagonal, then a protected central bishop, then knight move proximity to a precage square.",
       subpriorities: [
         { compare: (first, second) => first.kingCenterProximityScore - second.kingCenterProximityScore },
         { compare: (first, second) => first.kingBishopColorPenalty - second.kingBishopColorPenalty },
@@ -337,7 +332,6 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
           // An absent precage target is neutral.
           return distances.map(distance => distance === 99 ? best : distance);
         } },
-        { compare: (first, second) => first.minorCenterProximityScore - second.minorCenterProximityScore },
       ],
     },
   ];
@@ -473,7 +467,6 @@ const bishopKnightHelp: RuleHelp = {
     "Stay away from a bishop-colored corner.",
   ],
   notes: [
-    "The final r10 tie-break minimizes the sum of the bishop's and knight's Euclidean distances to the board's midpoint.",
     "For r9.3, check before White moves: both the bishop and knight must be within two king steps of Black, and neither may be defended by White's king on d4, e4, d5 or e5. When this rule activates, first prefer a resulting central king defending either piece. Those defended outcomes tie; otherwise maximize only the bishop's Euclidean distance after the move, including moves beyond the two-step range.",
     "For r9.1 and r9.2, the piece must be attacked by Black's king and undefended before White moves. Existing defense by White's king or other minor piece exempts it, regardless of king location. For r9.2, prefer a knight defended by White's king after the move. Bishop defense does not satisfy this preference. Otherwise maximize the affected piece's Euclidean distance from Black after White moves. Finally, r9.2 minimizes the knight's Euclidean distance to the board's midpoint.",
     "A precage square is diagonally adjacent to a central bishop, off the long diagonal, and strictly behind the bishop from Black's king's perspective.",

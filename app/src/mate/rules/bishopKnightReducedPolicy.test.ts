@@ -119,8 +119,8 @@ test('r10 routes diagonally beside a central bishop off the long diagonal after 
     assert.equal(scoreKnightAndBishopWhiteMove(fen, routes[1]!).supportedDiagonalSizeScore, 99)
     const behind = getChess(fen).move({from: transformSquare('c7', transform), to: transformSquare('a6', transform)}).san
     assert.equal(scoreKnightAndBishopWhiteMove(fen, behind).supportedDiagonalSizeScore, 7)
-    // Both moves preserve support; the final center tie-break favors Ne6 over Na6.
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [routes[0]!])
+    // Both supported knight moves tie the remaining priorities.
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen).sort(), [routes[0]!, behind].sort())
   }
 })
 
@@ -281,10 +281,10 @@ test('r10 keeps absent precage targets neutral while ranking available distances
 })
 
 
-test('r15 is removed and r10 ends with its sixth center-distance priority', () => {
+test('r15 is removed and r10 ends after its five priorities', () => {
   assert.equal(knightAndBishopWhiteRules.some(rule => rule.id === 'r15'), false)
   assert.equal(knightAndBishopWhiteRules.at(-1)!.id, 'r10')
-  assert.equal(knightAndBishopWhiteRules.at(-1)!.subpriorities!.length, 6)
+  assert.equal(knightAndBishopWhiteRules.at(-1)!.subpriorities!.length, 5)
 })
 
 
@@ -299,19 +299,3 @@ test('r10 ranks precage distances without checking whether the knight is behind 
 test('the old behind-White score remains removed', () => {
   assert.equal('minorPiecesBehindKingProximityScore' in scoreKnightAndBishopWhiteMove('8/8/8/3B4/3K2k1/8/8/6N1 w - - 0 1', 'Ne2'), false)
 })
-
-
-test('r10 final center tie-break prefers loaded 2. Bc4 or Be6 over Nd8 in every symmetry', () => {
-  const rule = knightAndBishopWhiteRules.find(rule => rule.id === 'r10')!;
-  for (const transform of SQUARE_TRANSFORMS) {
-    const fen = transformFen('8/1N6/K1k5/8/8/8/B7/8 w - - 2 2', transform);
-    const move = (from: 'a2' | 'b7', to: 'c4' | 'e6' | 'd8') => getChess(fen).move({from: transformSquare(from, transform), to: transformSquare(to, transform)}).san;
-    const central = scoreKnightAndBishopWhiteMove(fen, move('a2', 'c4'));
-    const edge = scoreKnightAndBishopWhiteMove(fen, move('b7', 'd8'));
-    assert.equal(compareScoresByRules(central, edge, [{...rule, subpriorities: rule.subpriorities!.slice(0, 5)}]), 0);
-    assert.equal(central.minorCenterProximityScore, Math.sqrt(2.5) + Math.sqrt(12.5));
-    assert.equal(edge.minorCenterProximityScore, Math.sqrt(18.5) + Math.sqrt(12.5));
-    assert.ok(compareScoresByRules(central, edge, [rule]) < 0);
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen).sort(), [move('a2', 'c4'), move('a2', 'e6')].sort());
-  }
-});
