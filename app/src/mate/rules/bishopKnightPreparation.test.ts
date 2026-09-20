@@ -208,3 +208,13 @@ test('r5 prescribes Nc4+ from Kc5/Bd5/Nd6 against Ke5 in every symmetry', () => 
     assert.equal(getMateRuleSet('bishop-knight').currentWhiteHint(fen)?.id, 'r5')
   }
 })
+
+
+test('r5 prescribes Ke5 from Kd4/Be4/Nc5 against Ke7 in every symmetry', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    const fen = transformFen('8/4k3/8/2N5/3KB3/8/8/8 w - - 2 2', transform)
+    const move = getChess(fen).move({from: transformSquare('d4', transform), to: transformSquare('e5', transform)}).san
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [move])
+    assert.equal(getMateRuleSet('bishop-knight').currentWhiteHint(fen)?.id, 'r5')
+  }
+})
