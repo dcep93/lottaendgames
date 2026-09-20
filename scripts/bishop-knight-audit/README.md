@@ -110,3 +110,19 @@ Run focused scaffold tests:
 ```sh
 npm run test:audit:unsupported
 ```
+
+## Classifying positions directly on cycles
+
+After an audit completes, run from `app/`:
+
+```sh
+npx tsx ../scripts/bishop-knight-audit/direct-membership.mts /completed/audit
+```
+
+This reads only the saved graph and results, without importing the current app
+policy or rerunning enumeration. `direct-membership.json` reports distinct
+post-White placements by moved piece, selection mechanism, and component closure,
+plus counts per component. It deduplicates boards before restoring symmetry
+weights, asserts the total matches the exhaustive analysis, and reports overlaps
+between groups. Use these counts when targeting positions directly on cycles;
+use the main report's reach counts when targeting all starts leading to cycles.

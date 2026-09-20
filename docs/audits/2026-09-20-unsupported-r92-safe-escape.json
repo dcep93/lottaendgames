@@ -1,0 +1,1322 @@
+{
+  "manifest": {
+    "fingerprint": "afa27c3f0819acf848060bbba909c36c0ddd7422ae759c5b578dafc4860776fb",
+    "referenceWorkerFingerprint": "77762948a3b403efc5c2da1525a093f714657e057d989b53b7c3cf360bb1f85f",
+    "rootFingerprint": "2221c557556948b03555f2fab1bbeafc006e67621dedb7079b324e9ab2d5e776",
+    "rootCacheSource": "/Users/danielcepeda/repos/_codex_output/bn-audit-2026-09-20-ke5",
+    "commit": "c6a5dde3cdd381b186dacd6331238c0de49c56ca",
+    "startedAt": "2026-09-20T18:03:58.025Z",
+    "node": "v25.8.1",
+    "workers": 8,
+    "scope": "All 13,660,584 post-White KBNvK placements; stop at support/mate/capture/stalemate; all best-move ties; retain Black return history."
+  },
+  "counts": {
+    "legal": 13660584,
+    "supported": 199412,
+    "unsupported": 13461172,
+    "canLoop": 155420,
+    "noLoop": 13305752,
+    "directOnReachableLoop": 216,
+    "directOnAnyDiscoveredLoop": 824,
+    "onlyLoopOutcomes": 23132,
+    "loopAndSupport": 132288,
+    "canReachSupport": 10843096,
+    "canMate": 1616,
+    "canFail": 2630024
+  },
+  "graph": {
+    "nodes": 1463120,
+    "edges": 1464555,
+    "cyclicNodes": 119,
+    "cyclicFamilies": 60
+  },
+  "archetypes": [
+    {
+      "kind": "King shuffle",
+      "families": 15,
+      "closedFamilies": 15,
+      "canReachFromUnsupportedPlacements": 5496,
+      "cyclePlies": [
+        4
+      ],
+      "rules": [
+        "minors safe",
+        "no stalemate",
+        "r10",
+        "r5",
+        "r9.2"
+      ]
+    },
+    {
+      "kind": "Knight shuttle",
+      "families": 26,
+      "closedFamilies": 0,
+      "canReachFromUnsupportedPlacements": 126192,
+      "cyclePlies": [
+        4
+      ],
+      "rules": [
+        "minors safe",
+        "r10",
+        "r9.2"
+      ]
+    },
+    {
+      "kind": "Bishop shuttle",
+      "families": 19,
+      "closedFamilies": 17,
+      "canReachFromUnsupportedPlacements": 23732,
+      "cyclePlies": [
+        4
+      ],
+      "rules": [
+        "minors safe",
+        "r10",
+        "r9.1",
+        "r9.3"
+      ]
+    }
+  ],
+  "directMembership": {
+    "policyFingerprint": "afa27c3f0819acf848060bbba909c36c0ddd7422ae759c5b578dafc4860776fb",
+    "method": "Union canonical post-White boards on internal cyclic-component edges, then restore root orbit weights. Group totals may overlap.",
+    "total": 824,
+    "canonicalBoards": 103,
+    "byKind": {
+      "rows": [
+        {
+          "name": "Knight shuttle",
+          "positions": 352,
+          "percent": 42.71844660194175,
+          "families": 26,
+          "familyIds": [
+            3,
+            8,
+            9,
+            10,
+            13,
+            14,
+            15,
+            21,
+            28,
+            29,
+            31,
+            42,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            54,
+            55,
+            56,
+            57,
+            60
+          ]
+        },
+        {
+          "name": "Bishop shuttle",
+          "positions": 272,
+          "percent": 33.00970873786408,
+          "families": 19,
+          "familyIds": [
+            4,
+            5,
+            7,
+            16,
+            19,
+            20,
+            30,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            58,
+            59
+          ]
+        },
+        {
+          "name": "King shuffle",
+          "positions": 200,
+          "percent": 24.271844660194176,
+          "families": 15,
+          "familyIds": [
+            1,
+            2,
+            6,
+            11,
+            12,
+            17,
+            18,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            43,
+            53
+          ]
+        }
+      ],
+      "positionsInMultipleGroups": 0
+    },
+    "byMechanism": {
+      "rows": [
+        {
+          "name": "Bishop shuttle / bishop distance from Black + bishop on long diagonal",
+          "positions": 128,
+          "percent": 15.533980582524272,
+          "families": 9,
+          "familyIds": [
+            4,
+            5,
+            19,
+            35,
+            36,
+            38,
+            41,
+            58,
+            59
+          ]
+        },
+        {
+          "name": "Bishop shuttle / minors safe + noncentral bishop distance from Black",
+          "positions": 80,
+          "percent": 9.70873786407767,
+          "families": 5,
+          "familyIds": [
+            32,
+            33,
+            34,
+            39,
+            40
+          ]
+        },
+        {
+          "name": "Knight shuttle / avoid renewed knight attack + knight distance to precage",
+          "positions": 72,
+          "percent": 8.737864077669903,
+          "families": 5,
+          "familyIds": [
+            48,
+            54,
+            55,
+            56,
+            57
+          ]
+        },
+        {
+          "name": "King shuffle / king center distance + r5",
+          "positions": 64,
+          "percent": 7.766990291262136,
+          "families": 6,
+          "familyIds": [
+            2,
+            12,
+            24,
+            25,
+            26,
+            27
+          ]
+        },
+        {
+          "name": "King shuffle / king off bishop color + minors safe",
+          "positions": 64,
+          "percent": 7.766990291262136,
+          "families": 4,
+          "familyIds": [
+            6,
+            11,
+            22,
+            23
+          ]
+        },
+        {
+          "name": "Knight shuttle / knight center distance + knight off bishop color",
+          "positions": 64,
+          "percent": 7.766990291262136,
+          "families": 5,
+          "familyIds": [
+            9,
+            10,
+            13,
+            14,
+            21
+          ]
+        },
+        {
+          "name": "Knight shuttle / king protection of knight + knight off bishop color",
+          "positions": 56,
+          "percent": 6.796116504854369,
+          "families": 5,
+          "familyIds": [
+            44,
+            45,
+            46,
+            50,
+            51
+          ]
+        },
+        {
+          "name": "Knight shuttle / noncentral bishop distance from Black",
+          "positions": 48,
+          "percent": 5.825242718446602,
+          "families": 3,
+          "familyIds": [
+            3,
+            15,
+            31
+          ]
+        },
+        {
+          "name": "Knight shuttle / knight center distance + knight distance to precage",
+          "positions": 48,
+          "percent": 5.825242718446602,
+          "families": 3,
+          "familyIds": [
+            28,
+            29,
+            47
+          ]
+        },
+        {
+          "name": "Knight shuttle / king protection of knight + knight distance to precage",
+          "positions": 32,
+          "percent": 3.883495145631068,
+          "families": 3,
+          "familyIds": [
+            42,
+            49,
+            52
+          ]
+        },
+        {
+          "name": "King shuffle / knight distance to precage",
+          "positions": 32,
+          "percent": 3.883495145631068,
+          "families": 2,
+          "familyIds": [
+            43,
+            53
+          ]
+        },
+        {
+          "name": "Bishop shuttle / bishop distance from Black + king-protected central bishop",
+          "positions": 24,
+          "percent": 2.912621359223301,
+          "families": 2,
+          "familyIds": [
+            20,
+            30
+          ]
+        },
+        {
+          "name": "King shuffle / king center distance + no stalemate",
+          "positions": 16,
+          "percent": 1.941747572815534,
+          "families": 1,
+          "familyIds": [
+            1
+          ]
+        },
+        {
+          "name": "Bishop shuttle / knight off bishop color + noncentral bishop distance from Black",
+          "positions": 16,
+          "percent": 1.941747572815534,
+          "families": 1,
+          "familyIds": [
+            7
+          ]
+        },
+        {
+          "name": "Knight shuttle / knight off bishop color + noncentral bishop distance from Black",
+          "positions": 16,
+          "percent": 1.941747572815534,
+          "families": 1,
+          "familyIds": [
+            8
+          ]
+        },
+        {
+          "name": "King shuffle / king center distance + king defense of knight",
+          "positions": 16,
+          "percent": 1.941747572815534,
+          "families": 1,
+          "familyIds": [
+            17
+          ]
+        },
+        {
+          "name": "King shuffle / king off bishop color",
+          "positions": 16,
+          "percent": 1.941747572815534,
+          "families": 1,
+          "familyIds": [
+            18
+          ]
+        },
+        {
+          "name": "Bishop shuttle / bishop on long diagonal + minors safe",
+          "positions": 16,
+          "percent": 1.941747572815534,
+          "families": 1,
+          "familyIds": [
+            37
+          ]
+        },
+        {
+          "name": "Knight shuttle / knight off bishop color + minors safe",
+          "positions": 16,
+          "percent": 1.941747572815534,
+          "families": 1,
+          "familyIds": [
+            60
+          ]
+        },
+        {
+          "name": "Bishop shuttle / noncentral bishop distance from Black",
+          "positions": 8,
+          "percent": 0.970873786407767,
+          "families": 1,
+          "familyIds": [
+            16
+          ]
+        }
+      ],
+      "positionsInMultipleGroups": 8
+    },
+    "byClosure": {
+      "rows": [
+        {
+          "name": "Closed component",
+          "positions": 448,
+          "percent": 54.36893203883495,
+          "families": 32,
+          "familyIds": [
+            1,
+            2,
+            4,
+            5,
+            6,
+            7,
+            11,
+            12,
+            16,
+            17,
+            18,
+            19,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            43,
+            53,
+            58,
+            59
+          ]
+        },
+        {
+          "name": "Component with exits",
+          "positions": 376,
+          "percent": 45.63106796116505,
+          "families": 28,
+          "familyIds": [
+            3,
+            8,
+            9,
+            10,
+            13,
+            14,
+            15,
+            20,
+            21,
+            28,
+            29,
+            30,
+            31,
+            42,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            54,
+            55,
+            56,
+            57,
+            60
+          ]
+        }
+      ],
+      "positionsInMultipleGroups": 0
+    },
+    "families": [
+      {
+        "id": 1,
+        "positions": 16
+      },
+      {
+        "id": 2,
+        "positions": 16
+      },
+      {
+        "id": 3,
+        "positions": 16
+      },
+      {
+        "id": 4,
+        "positions": 16
+      },
+      {
+        "id": 5,
+        "positions": 16
+      },
+      {
+        "id": 6,
+        "positions": 16
+      },
+      {
+        "id": 7,
+        "positions": 16
+      },
+      {
+        "id": 8,
+        "positions": 16
+      },
+      {
+        "id": 9,
+        "positions": 16
+      },
+      {
+        "id": 10,
+        "positions": 16
+      },
+      {
+        "id": 11,
+        "positions": 16
+      },
+      {
+        "id": 12,
+        "positions": 16
+      },
+      {
+        "id": 13,
+        "positions": 16
+      },
+      {
+        "id": 14,
+        "positions": 16
+      },
+      {
+        "id": 15,
+        "positions": 16
+      },
+      {
+        "id": 17,
+        "positions": 16
+      },
+      {
+        "id": 18,
+        "positions": 16
+      },
+      {
+        "id": 19,
+        "positions": 16
+      },
+      {
+        "id": 20,
+        "positions": 16
+      },
+      {
+        "id": 21,
+        "positions": 16
+      },
+      {
+        "id": 22,
+        "positions": 16
+      },
+      {
+        "id": 23,
+        "positions": 16
+      },
+      {
+        "id": 24,
+        "positions": 16
+      },
+      {
+        "id": 25,
+        "positions": 16
+      },
+      {
+        "id": 26,
+        "positions": 16
+      },
+      {
+        "id": 27,
+        "positions": 16
+      },
+      {
+        "id": 28,
+        "positions": 16
+      },
+      {
+        "id": 29,
+        "positions": 16
+      },
+      {
+        "id": 30,
+        "positions": 16
+      },
+      {
+        "id": 31,
+        "positions": 16
+      },
+      {
+        "id": 32,
+        "positions": 16
+      },
+      {
+        "id": 33,
+        "positions": 16
+      },
+      {
+        "id": 34,
+        "positions": 16
+      },
+      {
+        "id": 35,
+        "positions": 16
+      },
+      {
+        "id": 36,
+        "positions": 16
+      },
+      {
+        "id": 37,
+        "positions": 16
+      },
+      {
+        "id": 38,
+        "positions": 16
+      },
+      {
+        "id": 39,
+        "positions": 16
+      },
+      {
+        "id": 40,
+        "positions": 16
+      },
+      {
+        "id": 41,
+        "positions": 16
+      },
+      {
+        "id": 42,
+        "positions": 16
+      },
+      {
+        "id": 43,
+        "positions": 16
+      },
+      {
+        "id": 44,
+        "positions": 16
+      },
+      {
+        "id": 45,
+        "positions": 16
+      },
+      {
+        "id": 46,
+        "positions": 16
+      },
+      {
+        "id": 47,
+        "positions": 16
+      },
+      {
+        "id": 48,
+        "positions": 16
+      },
+      {
+        "id": 49,
+        "positions": 16
+      },
+      {
+        "id": 50,
+        "positions": 16
+      },
+      {
+        "id": 51,
+        "positions": 16
+      },
+      {
+        "id": 52,
+        "positions": 16
+      },
+      {
+        "id": 53,
+        "positions": 16
+      },
+      {
+        "id": 54,
+        "positions": 16
+      },
+      {
+        "id": 55,
+        "positions": 16
+      },
+      {
+        "id": 56,
+        "positions": 16
+      },
+      {
+        "id": 57,
+        "positions": 16
+      },
+      {
+        "id": 58,
+        "positions": 16
+      },
+      {
+        "id": 59,
+        "positions": 16
+      },
+      {
+        "id": 60,
+        "positions": 16
+      },
+      {
+        "id": 16,
+        "positions": 8
+      }
+    ]
+  },
+  "proposedFinalTiebreak": {
+    "method": "Counterfactual final tiebreak only; prune internal cyclic-component edges. Remaining board count is an upper bound because root reachability is not recomputed.",
+    "oldDirect": 824,
+    "remainingDirectUpperBound": 656,
+    "oldComponents": 60,
+    "fullyBrokenComponents": 12,
+    "components": [
+      {
+        "id": 1,
+        "kind": "King shuffle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 2,
+        "keptBoards": 2
+      },
+      {
+        "id": 2,
+        "kind": "King shuffle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 2,
+        "keptBoards": 2
+      },
+      {
+        "id": 3,
+        "kind": "Knight shuttle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 2,
+        "keptBoards": 2
+      },
+      {
+        "id": 4,
+        "kind": "Bishop shuttle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 2,
+        "keptBoards": 2
+      },
+      {
+        "id": 5,
+        "kind": "Bishop shuttle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 2,
+        "keptBoards": 2
+      },
+      {
+        "id": 6,
+        "kind": "King shuffle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 2,
+        "keptBoards": 2
+      },
+      {
+        "id": 7,
+        "kind": "Bishop shuttle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 2,
+        "keptBoards": 2
+      },
+      {
+        "id": 8,
+        "kind": "Knight shuttle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 2,
+        "keptBoards": 2
+      },
+      {
+        "id": 9,
+        "kind": "Knight shuttle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 0,
+        "keptBoards": 0
+      },
+      {
+        "id": 10,
+        "kind": "Knight shuttle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 0,
+        "keptBoards": 0
+      },
+      {
+        "id": 11,
+        "kind": "King shuffle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 2,
+        "keptBoards": 2
+      },
+      {
+        "id": 12,
+        "kind": "King shuffle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 2,
+        "keptBoards": 2
+      },
+      {
+        "id": 13,
+        "kind": "Knight shuttle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 0,
+        "keptBoards": 0
+      },
+      {
+        "id": 14,
+        "kind": "Knight shuttle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 0,
+        "keptBoards": 0
+      },
+      {
+        "id": 15,
+        "kind": "Knight shuttle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 2,
+        "keptBoards": 2
+      },
+      {
+        "id": 16,
+        "kind": "Bishop shuttle",
+        "oldInternalEdges": 1,
+        "keptInternalEdges": 1,
+        "keptBoards": 1
+      },
+      {
+        "id": 17,
+        "kind": "King shuffle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 2,
+        "keptBoards": 2
+      },
+      {
+        "id": 18,
+        "kind": "King shuffle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 2,
+        "keptBoards": 2
+      },
+      {
+        "id": 19,
+        "kind": "Bishop shuttle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 2,
+        "keptBoards": 2
+      },
+      {
+        "id": 20,
+        "kind": "Bishop shuttle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 2,
+        "keptBoards": 2
+      },
+      {
+        "id": 21,
+        "kind": "Knight shuttle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 0,
+        "keptBoards": 0
+      },
+      {
+        "id": 22,
+        "kind": "King shuffle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 2,
+        "keptBoards": 2
+      },
+      {
+        "id": 23,
+        "kind": "King shuffle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 2,
+        "keptBoards": 2
+      },
+      {
+        "id": 24,
+        "kind": "King shuffle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 2,
+        "keptBoards": 2
+      },
+      {
+        "id": 25,
+        "kind": "King shuffle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 2,
+        "keptBoards": 2
+      },
+      {
+        "id": 26,
+        "kind": "King shuffle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 2,
+        "keptBoards": 2
+      },
+      {
+        "id": 27,
+        "kind": "King shuffle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 2,
+        "keptBoards": 2
+      },
+      {
+        "id": 28,
+        "kind": "Knight shuttle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 0,
+        "keptBoards": 0
+      },
+      {
+        "id": 29,
+        "kind": "Knight shuttle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 0,
+        "keptBoards": 0
+      },
+      {
+        "id": 30,
+        "kind": "Bishop shuttle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 2,
+        "keptBoards": 2
+      },
+      {
+        "id": 31,
+        "kind": "Knight shuttle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 2,
+        "keptBoards": 2
+      },
+      {
+        "id": 32,
+        "kind": "Bishop shuttle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 2,
+        "keptBoards": 2
+      },
+      {
+        "id": 33,
+        "kind": "Bishop shuttle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 2,
+        "keptBoards": 2
+      },
+      {
+        "id": 34,
+        "kind": "Bishop shuttle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 2,
+        "keptBoards": 2
+      },
+      {
+        "id": 35,
+        "kind": "Bishop shuttle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 2,
+        "keptBoards": 2
+      },
+      {
+        "id": 36,
+        "kind": "Bishop shuttle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 2,
+        "keptBoards": 2
+      },
+      {
+        "id": 37,
+        "kind": "Bishop shuttle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 2,
+        "keptBoards": 2
+      },
+      {
+        "id": 38,
+        "kind": "Bishop shuttle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 2,
+        "keptBoards": 2
+      },
+      {
+        "id": 39,
+        "kind": "Bishop shuttle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 2,
+        "keptBoards": 2
+      },
+      {
+        "id": 40,
+        "kind": "Bishop shuttle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 2,
+        "keptBoards": 2
+      },
+      {
+        "id": 41,
+        "kind": "Bishop shuttle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 2,
+        "keptBoards": 2
+      },
+      {
+        "id": 42,
+        "kind": "Knight shuttle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 2,
+        "keptBoards": 2
+      },
+      {
+        "id": 43,
+        "kind": "King shuffle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 2,
+        "keptBoards": 2
+      },
+      {
+        "id": 44,
+        "kind": "Knight shuttle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 2,
+        "keptBoards": 2
+      },
+      {
+        "id": 45,
+        "kind": "Knight shuttle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 2,
+        "keptBoards": 2
+      },
+      {
+        "id": 46,
+        "kind": "Knight shuttle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 2,
+        "keptBoards": 2
+      },
+      {
+        "id": 47,
+        "kind": "Knight shuttle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 0,
+        "keptBoards": 0
+      },
+      {
+        "id": 48,
+        "kind": "Knight shuttle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 0,
+        "keptBoards": 0
+      },
+      {
+        "id": 49,
+        "kind": "Knight shuttle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 2,
+        "keptBoards": 2
+      },
+      {
+        "id": 50,
+        "kind": "Knight shuttle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 2,
+        "keptBoards": 2
+      },
+      {
+        "id": 51,
+        "kind": "Knight shuttle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 2,
+        "keptBoards": 2
+      },
+      {
+        "id": 52,
+        "kind": "Knight shuttle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 2,
+        "keptBoards": 2
+      },
+      {
+        "id": 53,
+        "kind": "King shuffle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 2,
+        "keptBoards": 2
+      },
+      {
+        "id": 54,
+        "kind": "Knight shuttle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 0,
+        "keptBoards": 0
+      },
+      {
+        "id": 55,
+        "kind": "Knight shuttle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 0,
+        "keptBoards": 0
+      },
+      {
+        "id": 56,
+        "kind": "Knight shuttle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 0,
+        "keptBoards": 0
+      },
+      {
+        "id": 57,
+        "kind": "Knight shuttle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 2,
+        "keptBoards": 2
+      },
+      {
+        "id": 58,
+        "kind": "Bishop shuttle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 2,
+        "keptBoards": 2
+      },
+      {
+        "id": 59,
+        "kind": "Bishop shuttle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 2,
+        "keptBoards": 2
+      },
+      {
+        "id": 60,
+        "kind": "Knight shuttle",
+        "oldInternalEdges": 2,
+        "keptInternalEdges": 2,
+        "keptBoards": 2
+      }
+    ],
+    "loopReachUpperBound": 69660
+  },
+  "displayLoop": {
+    "id": 55,
+    "component": 1457918,
+    "nodeIds": [
+      1445746,
+      1463114
+    ],
+    "kind": "Knight shuttle",
+    "whitePieces": [
+      "N"
+    ],
+    "states": 2,
+    "internalEdges": 2,
+    "exitEdges": 2,
+    "closed": false,
+    "canReachSupport": true,
+    "canMate": false,
+    "canFail": false,
+    "rules": [
+      "r10",
+      "r9.2"
+    ],
+    "precageTargetsSwitch": false,
+    "stationaryCentralBishop": true,
+    "frames": [
+      {
+        "fen": "8/7N/3k4/8/3KB3/8/8/8 w - - 0 1",
+        "move": "Nf8",
+        "rule": "r10",
+        "precageTargets": [
+          "d3"
+        ],
+        "selectionTrace": [
+          {
+            "rule": "minors safe",
+            "priority": 1,
+            "meaning": "minors safe",
+            "survivors": [
+              "Nf8",
+              "Ng5",
+              "Nf6",
+              "Ke3",
+              "Kd3",
+              "Kc3",
+              "Kc4",
+              "Bd5",
+              "Bb7",
+              "Ba8",
+              "Bf5",
+              "Bg6",
+              "Bf3",
+              "Bg2",
+              "Bh1",
+              "Bd3",
+              "Bc2",
+              "Bb1"
+            ]
+          },
+          {
+            "rule": "r10",
+            "priority": 1,
+            "meaning": "king center distance",
+            "survivors": [
+              "Nf8",
+              "Ng5",
+              "Nf6",
+              "Bd5",
+              "Bb7",
+              "Ba8",
+              "Bf5",
+              "Bg6",
+              "Bf3",
+              "Bg2",
+              "Bh1",
+              "Bd3",
+              "Bc2",
+              "Bb1"
+            ]
+          },
+          {
+            "rule": "r10",
+            "priority": 3,
+            "meaning": "bishop on long diagonal",
+            "survivors": [
+              "Nf8",
+              "Ng5",
+              "Nf6",
+              "Bd5",
+              "Bb7",
+              "Ba8",
+              "Bf3",
+              "Bg2",
+              "Bh1"
+            ]
+          },
+          {
+            "rule": "r10",
+            "priority": 4,
+            "meaning": "king-protected central bishop",
+            "survivors": [
+              "Nf8",
+              "Ng5",
+              "Nf6",
+              "Bd5"
+            ]
+          },
+          {
+            "rule": "r10",
+            "priority": 5,
+            "meaning": "knight distance to precage",
+            "survivors": [
+              "Nf8",
+              "Ng5",
+              "Nf6"
+            ]
+          }
+        ],
+        "decidingPriority": "knight distance to precage"
+      },
+      {
+        "fen": "5N2/4k3/8/8/3KB3/8/8/8 w - - 2 2",
+        "move": "Nh7",
+        "rule": "r9.2",
+        "precageTargets": [
+          "d3"
+        ],
+        "selectionTrace": [
+          {
+            "rule": "minors safe",
+            "priority": 1,
+            "meaning": "minors safe",
+            "survivors": [
+              "Nh7",
+              "Ng6+"
+            ]
+          },
+          {
+            "rule": "r9.2",
+            "priority": 2,
+            "meaning": "avoid renewed knight attack",
+            "survivors": [
+              "Nh7"
+            ]
+          }
+        ],
+        "decidingPriority": "avoid renewed knight attack"
+      }
+    ],
+    "witness": {
+      "fen": "8/7N/3k4/8/3KB3/8/8/8 w - - 0 1",
+      "moves": [
+        "Nf8",
+        "Ke7",
+        "Nh7",
+        "Kd6"
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/7N/3k4/8/3KB3/8/8/8_w_-_-_0_1&moves=Nf8,Ke7,Nh7,Kd6&cursor=0",
+      "freshLoadVerified": true,
+      "displayConvention": true
+    },
+    "cyclePlies": 4,
+    "decidingPriorities": [
+      "knight distance to precage",
+      "avoid renewed knight attack"
+    ],
+    "mechanism": "Knight shuttle / avoid renewed knight attack + knight distance to precage",
+    "reachablePlacements": 34864,
+    "exclusivePlacements": 34856
+  }
+}
