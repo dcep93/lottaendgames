@@ -1,0 +1,1617 @@
+{
+  "counts": {
+    "legal": 13660584,
+    "supported": 199412,
+    "unsupported": 13461172,
+    "canLoop": 98672,
+    "noLoop": 13362500,
+    "directOnReachableLoop": 216,
+    "directOnAnyDiscoveredLoop": 7080,
+    "onlyLoopOutcomes": 25324,
+    "loopAndSupport": 72940,
+    "canReachSupport": 10848648,
+    "canMate": 1616,
+    "canFail": 2623760
+  },
+  "graph": {
+    "nodes": 1465464,
+    "edges": 1474034,
+    "cyclicNodes": 933,
+    "cyclicFamilies": 452
+  },
+  "archetypes": [
+    {
+      "kind": "Knight shuttle",
+      "families": 418,
+      "closedFamilies": 133,
+      "canReachFromUnsupportedPlacements": 66460,
+      "cyclePlies": [
+        4
+      ],
+      "rules": [
+        "minors safe",
+        "r10",
+        "r9.2"
+      ]
+    },
+    {
+      "kind": "King shuffle",
+      "families": 15,
+      "closedFamilies": 15,
+      "canReachFromUnsupportedPlacements": 6936,
+      "cyclePlies": [
+        4
+      ],
+      "rules": [
+        "minors safe",
+        "no stalemate",
+        "r10",
+        "r5",
+        "r9.2"
+      ]
+    },
+    {
+      "kind": "Bishop shuttle",
+      "families": 19,
+      "closedFamilies": 17,
+      "canReachFromUnsupportedPlacements": 25604,
+      "cyclePlies": [
+        4
+      ],
+      "rules": [
+        "minors safe",
+        "r10",
+        "r9.1",
+        "r9.3"
+      ]
+    }
+  ],
+  "mechanisms": [
+    {
+      "name": "Knight shuttle / knight center distance",
+      "families": 256,
+      "closedFamilies": 63,
+      "reachablePlacements": 9640,
+      "familyIds": [
+        1,
+        2,
+        3,
+        6,
+        7,
+        8,
+        10,
+        11,
+        12,
+        14,
+        15,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        28,
+        29,
+        31,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        47,
+        48,
+        49,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        67,
+        68,
+        70,
+        72,
+        73,
+        74,
+        76,
+        79,
+        80,
+        82,
+        83,
+        84,
+        86,
+        89,
+        90,
+        91,
+        92,
+        93,
+        95,
+        96,
+        97,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        106,
+        107,
+        108,
+        109,
+        111,
+        112,
+        114,
+        115,
+        116,
+        117,
+        118,
+        119,
+        120,
+        121,
+        126,
+        127,
+        128,
+        129,
+        130,
+        131,
+        132,
+        133,
+        134,
+        135,
+        136,
+        138,
+        139,
+        140,
+        141,
+        142,
+        143,
+        145,
+        146,
+        147,
+        148,
+        151,
+        152,
+        153,
+        154,
+        155,
+        156,
+        159,
+        160,
+        161,
+        162,
+        164,
+        165,
+        166,
+        167,
+        168,
+        170,
+        172,
+        175,
+        176,
+        178,
+        180,
+        182,
+        185,
+        189,
+        190,
+        191,
+        192,
+        193,
+        195,
+        197,
+        198,
+        199,
+        200,
+        201,
+        202,
+        204,
+        205,
+        206,
+        209,
+        212,
+        215,
+        216,
+        217,
+        218,
+        220,
+        221,
+        222,
+        224,
+        227,
+        228,
+        230,
+        234,
+        235,
+        236,
+        237,
+        238,
+        239,
+        240,
+        242,
+        244,
+        245,
+        248,
+        249,
+        250,
+        253,
+        254,
+        257,
+        258,
+        259,
+        261,
+        263,
+        266,
+        269,
+        270,
+        273,
+        277,
+        280,
+        284,
+        285,
+        288,
+        289,
+        291,
+        298,
+        299,
+        301,
+        305,
+        307,
+        309,
+        312,
+        313,
+        314,
+        316,
+        318,
+        319,
+        324,
+        325,
+        326,
+        329,
+        330,
+        331,
+        336,
+        337,
+        343,
+        345,
+        348,
+        351,
+        352,
+        357,
+        358,
+        359,
+        360,
+        362,
+        364,
+        365,
+        367,
+        370,
+        373,
+        379,
+        381,
+        382,
+        383,
+        385,
+        386,
+        388,
+        389,
+        391,
+        393,
+        394,
+        396,
+        397,
+        398,
+        400,
+        401,
+        402,
+        404,
+        405,
+        409,
+        411,
+        412,
+        413,
+        414
+      ]
+    },
+    {
+      "name": "Knight shuttle / knight center distance + noncentral bishop distance from Black",
+      "families": 111,
+      "closedFamilies": 70,
+      "reachablePlacements": 2888,
+      "familyIds": [
+        4,
+        9,
+        13,
+        16,
+        26,
+        27,
+        30,
+        46,
+        66,
+        69,
+        71,
+        75,
+        77,
+        81,
+        85,
+        87,
+        88,
+        98,
+        110,
+        113,
+        122,
+        123,
+        144,
+        149,
+        150,
+        157,
+        158,
+        163,
+        169,
+        171,
+        173,
+        179,
+        181,
+        183,
+        184,
+        187,
+        196,
+        203,
+        207,
+        208,
+        210,
+        211,
+        213,
+        214,
+        219,
+        223,
+        225,
+        226,
+        229,
+        232,
+        243,
+        246,
+        251,
+        255,
+        256,
+        262,
+        264,
+        265,
+        267,
+        268,
+        271,
+        275,
+        276,
+        278,
+        279,
+        281,
+        287,
+        290,
+        292,
+        293,
+        294,
+        295,
+        296,
+        297,
+        300,
+        302,
+        304,
+        306,
+        308,
+        310,
+        317,
+        321,
+        327,
+        328,
+        332,
+        333,
+        334,
+        335,
+        339,
+        341,
+        342,
+        344,
+        346,
+        349,
+        353,
+        354,
+        355,
+        356,
+        361,
+        363,
+        366,
+        374,
+        375,
+        376,
+        377,
+        378,
+        380,
+        384,
+        390,
+        395,
+        399
+      ]
+    },
+    {
+      "name": "Knight shuttle / knight center distance + knight off bishop color",
+      "families": 37,
+      "closedFamilies": 0,
+      "reachablePlacements": 296,
+      "familyIds": [
+        5,
+        32,
+        33,
+        50,
+        78,
+        94,
+        105,
+        124,
+        125,
+        137,
+        174,
+        177,
+        186,
+        188,
+        194,
+        231,
+        233,
+        241,
+        247,
+        272,
+        274,
+        282,
+        283,
+        286,
+        303,
+        311,
+        315,
+        320,
+        322,
+        323,
+        338,
+        340,
+        347,
+        350,
+        368,
+        369,
+        372
+      ]
+    },
+    {
+      "name": "King shuffle / king center distance + no stalemate",
+      "families": 1,
+      "closedFamilies": 1,
+      "reachablePlacements": 24,
+      "familyIds": [
+        252
+      ]
+    },
+    {
+      "name": "King shuffle / king center distance + r5",
+      "families": 6,
+      "closedFamilies": 6,
+      "reachablePlacements": 2840,
+      "familyIds": [
+        260,
+        410,
+        423,
+        424,
+        425,
+        426
+      ]
+    },
+    {
+      "name": "Knight shuttle / noncentral bishop distance from Black",
+      "families": 3,
+      "closedFamilies": 0,
+      "reachablePlacements": 596,
+      "familyIds": [
+        371,
+        415,
+        428
+      ]
+    },
+    {
+      "name": "Bishop shuttle / bishop distance from Black + bishop on long diagonal",
+      "families": 9,
+      "closedFamilies": 9,
+      "reachablePlacements": 15808,
+      "familyIds": [
+        387,
+        392,
+        419,
+        432,
+        433,
+        435,
+        438,
+        450,
+        451
+      ]
+    },
+    {
+      "name": "King shuffle / king off bishop color + minors safe",
+      "families": 4,
+      "closedFamilies": 4,
+      "reachablePlacements": 3952,
+      "familyIds": [
+        403,
+        408,
+        421,
+        422
+      ]
+    },
+    {
+      "name": "Bishop shuttle / knight off bishop color + noncentral bishop distance from Black",
+      "families": 1,
+      "closedFamilies": 1,
+      "reachablePlacements": 1008,
+      "familyIds": [
+        406
+      ]
+    },
+    {
+      "name": "Knight shuttle / knight off bishop color + noncentral bishop distance from Black",
+      "families": 1,
+      "closedFamilies": 0,
+      "reachablePlacements": 528,
+      "familyIds": [
+        407
+      ]
+    },
+    {
+      "name": "Bishop shuttle / noncentral bishop distance from Black",
+      "families": 1,
+      "closedFamilies": 1,
+      "reachablePlacements": 520,
+      "familyIds": [
+        416
+      ]
+    },
+    {
+      "name": "King shuffle / king center distance + king defense of knight",
+      "families": 1,
+      "closedFamilies": 1,
+      "reachablePlacements": 56,
+      "familyIds": [
+        417
+      ]
+    },
+    {
+      "name": "King shuffle / king off bishop color",
+      "families": 1,
+      "closedFamilies": 1,
+      "reachablePlacements": 16,
+      "familyIds": [
+        418
+      ]
+    },
+    {
+      "name": "Bishop shuttle / bishop distance from Black + king-protected central bishop",
+      "families": 2,
+      "closedFamilies": 0,
+      "reachablePlacements": 4784,
+      "familyIds": [
+        420,
+        427
+      ]
+    },
+    {
+      "name": "Bishop shuttle / minors safe + noncentral bishop distance from Black",
+      "families": 5,
+      "closedFamilies": 5,
+      "reachablePlacements": 252,
+      "familyIds": [
+        429,
+        430,
+        431,
+        436,
+        437
+      ]
+    },
+    {
+      "name": "Bishop shuttle / bishop on long diagonal + minors safe",
+      "families": 1,
+      "closedFamilies": 1,
+      "reachablePlacements": 3240,
+      "familyIds": [
+        434
+      ]
+    },
+    {
+      "name": "Knight shuttle / king protection of knight + knight distance to precage",
+      "families": 3,
+      "closedFamilies": 0,
+      "reachablePlacements": 10896,
+      "familyIds": [
+        439,
+        445,
+        448
+      ]
+    },
+    {
+      "name": "King shuffle / knight distance to precage",
+      "families": 2,
+      "closedFamilies": 2,
+      "reachablePlacements": 48,
+      "familyIds": [
+        440,
+        449
+      ]
+    },
+    {
+      "name": "Knight shuttle / king protection of knight + knight off bishop color",
+      "families": 5,
+      "closedFamilies": 0,
+      "reachablePlacements": 31456,
+      "familyIds": [
+        441,
+        442,
+        443,
+        446,
+        447
+      ]
+    },
+    {
+      "name": "Knight shuttle / knight center distance + knight distance to precage",
+      "families": 1,
+      "closedFamilies": 0,
+      "reachablePlacements": 10208,
+      "familyIds": [
+        444
+      ]
+    },
+    {
+      "name": "Knight shuttle / knight off bishop color + minors safe",
+      "families": 1,
+      "closedFamilies": 0,
+      "reachablePlacements": 8,
+      "familyIds": [
+        452
+      ]
+    }
+  ],
+  "topCoverage": [
+    {
+      "families": 1,
+      "placements": 31320
+    },
+    {
+      "families": 2,
+      "placements": 42176
+    },
+    {
+      "families": 3,
+      "placements": 52384
+    },
+    {
+      "families": 4,
+      "placements": 62488
+    },
+    {
+      "families": 5,
+      "placements": 67272
+    },
+    {
+      "families": 6,
+      "placements": 70512
+    },
+    {
+      "families": 7,
+      "placements": 73592
+    },
+    {
+      "families": 8,
+      "placements": 76256
+    },
+    {
+      "families": 9,
+      "placements": 78264
+    },
+    {
+      "families": 10,
+      "placements": 79912
+    }
+  ],
+  "policyFingerprint": "ede656ebe9cad411115a935dc7a123adc2d2ec509332713abfde0ab775b5f3f0",
+  "policyCommit": "75316a5220d24f62c99f7781e6bf9a60d8ec9375",
+  "topComponents": [
+    {
+      "id": 446,
+      "component": 1461692,
+      "kind": "Knight shuttle",
+      "whitePieces": [
+        "N"
+      ],
+      "states": 2,
+      "internalEdges": 2,
+      "exitEdges": 1,
+      "closed": false,
+      "canReachSupport": true,
+      "canMate": false,
+      "canFail": false,
+      "rules": [
+        "r10"
+      ],
+      "precageTargetsSwitch": true,
+      "stationaryCentralBishop": true,
+      "frames": [
+        {
+          "fen": "8/8/2k5/3N4/3KB3/8/8/8 w - - 0 1",
+          "move": "Nc3+",
+          "rule": "r10",
+          "precageTargets": [],
+          "decidingPriority": "knight off bishop color"
+        },
+        {
+          "fen": "8/8/3k4/8/3KB3/2N5/8/8 w - - 2 2",
+          "move": "Nd5",
+          "rule": "r10",
+          "precageTargets": [
+            "d3"
+          ],
+          "decidingPriority": "king protection of knight"
+        }
+      ],
+      "witness": {
+        "fen": "8/8/2k5/3N4/3KB3/8/8/8 w - - 0 1",
+        "moves": [
+          "Nc3+",
+          "Kd6",
+          "Nd5",
+          "Kc6"
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/2k5/3N4/3KB3/8/8/8_w_-_-_0_1&moves=Nc3%2B,Kd6,Nd5,Kc6&cursor=0",
+        "freshLoadVerified": true,
+        "displayConvention": false
+      },
+      "cyclePlies": 4,
+      "decidingPriorities": [
+        "knight off bishop color",
+        "king protection of knight"
+      ],
+      "mechanism": "Knight shuttle / king protection of knight + knight off bishop color",
+      "reachablePlacements": 31320,
+      "exclusivePlacements": 31320
+    },
+    {
+      "id": 439,
+      "component": 1461342,
+      "kind": "Knight shuttle",
+      "whitePieces": [
+        "N"
+      ],
+      "states": 2,
+      "internalEdges": 2,
+      "exitEdges": 2,
+      "closed": false,
+      "canReachSupport": true,
+      "canMate": false,
+      "canFail": false,
+      "rules": [
+        "r10"
+      ],
+      "precageTargetsSwitch": false,
+      "stationaryCentralBishop": true,
+      "frames": [
+        {
+          "fen": "8/8/5k2/8/3KB3/3N4/8/8 w - - 0 1",
+          "move": "Ne5",
+          "rule": "r10",
+          "precageTargets": [
+            "d3"
+          ],
+          "decidingPriority": "king protection of knight"
+        },
+        {
+          "fen": "8/8/4k3/4N3/3KB3/8/8/8 w - - 2 2",
+          "move": "Nd3",
+          "rule": "r10",
+          "precageTargets": [
+            "d3"
+          ],
+          "decidingPriority": "knight distance to precage"
+        }
+      ],
+      "witness": {
+        "fen": "8/8/5k2/8/3KB3/3N4/8/8 w - - 0 1",
+        "moves": [
+          "Ne5",
+          "Ke6",
+          "Nd3",
+          "Kf6"
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/5k2/8/3KB3/3N4/8/8_w_-_-_0_1&moves=Ne5,Ke6,Nd3,Kf6&cursor=0",
+        "freshLoadVerified": true,
+        "displayConvention": true
+      },
+      "cyclePlies": 4,
+      "decidingPriorities": [
+        "king protection of knight",
+        "knight distance to precage"
+      ],
+      "mechanism": "Knight shuttle / king protection of knight + knight distance to precage",
+      "reachablePlacements": 10856,
+      "exclusivePlacements": 10784
+    },
+    {
+      "id": 444,
+      "component": 1432304,
+      "kind": "Knight shuttle",
+      "whitePieces": [
+        "N"
+      ],
+      "states": 2,
+      "internalEdges": 2,
+      "exitEdges": 2,
+      "closed": false,
+      "canReachSupport": true,
+      "canMate": false,
+      "canFail": false,
+      "rules": [
+        "r10",
+        "r9.2"
+      ],
+      "precageTargetsSwitch": false,
+      "stationaryCentralBishop": true,
+      "frames": [
+        {
+          "fen": "8/8/5k2/8/3KB3/6N1/8/8 w - - 0 1",
+          "move": "Nh5+",
+          "rule": "r10",
+          "precageTargets": [
+            "d3"
+          ],
+          "decidingPriority": "knight distance to precage"
+        },
+        {
+          "fen": "8/8/8/6kN/3KB3/8/8/8 w - - 2 2",
+          "move": "Ng3",
+          "rule": "r9.2",
+          "precageTargets": [
+            "d3"
+          ],
+          "decidingPriority": "knight center distance"
+        }
+      ],
+      "witness": {
+        "fen": "8/8/5k2/8/3KB3/6N1/8/8 w - - 0 1",
+        "moves": [
+          "Nh5+",
+          "Kg5",
+          "Ng3",
+          "Kf6"
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/5k2/8/3KB3/6N1/8/8_w_-_-_0_1&moves=Nh5%2B,Kg5,Ng3,Kf6&cursor=0",
+        "freshLoadVerified": true,
+        "displayConvention": true
+      },
+      "cyclePlies": 4,
+      "decidingPriorities": [
+        "knight distance to precage",
+        "knight center distance"
+      ],
+      "mechanism": "Knight shuttle / knight center distance + knight distance to precage",
+      "reachablePlacements": 10208,
+      "exclusivePlacements": 10192
+    },
+    {
+      "id": 419,
+      "component": 1432591,
+      "kind": "Bishop shuttle",
+      "whitePieces": [
+        "B"
+      ],
+      "states": 2,
+      "internalEdges": 2,
+      "exitEdges": 0,
+      "closed": true,
+      "canReachSupport": false,
+      "canMate": false,
+      "canFail": false,
+      "rules": [
+        "r10",
+        "r9.3"
+      ],
+      "precageTargetsSwitch": true,
+      "stationaryCentralBishop": false,
+      "frames": [
+        {
+          "fen": "8/8/4N3/2KBk3/8/8/8/8 w - - 0 1",
+          "move": "Ba2",
+          "rule": "r9.3",
+          "precageTargets": [
+            "c4"
+          ],
+          "decidingPriority": "bishop distance from Black"
+        },
+        {
+          "fen": "8/8/4N3/2K5/4k3/8/B7/8 w - - 2 2",
+          "move": "Bd5+",
+          "rule": "r10",
+          "precageTargets": [],
+          "decidingPriority": "bishop on long diagonal"
+        }
+      ],
+      "witness": {
+        "fen": "8/8/4N3/2KBk3/8/8/8/8 w - - 0 1",
+        "moves": [
+          "Ba2",
+          "Ke4",
+          "Bd5+",
+          "Ke5"
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/4N3/2KBk3/8/8/8/8_w_-_-_0_1&moves=Ba2,Ke4,Bd5%2B,Ke5&cursor=0",
+        "freshLoadVerified": true,
+        "displayConvention": true
+      },
+      "cyclePlies": 4,
+      "decidingPriorities": [
+        "bishop distance from Black",
+        "bishop on long diagonal"
+      ],
+      "mechanism": "Bishop shuttle / bishop distance from Black + bishop on long diagonal",
+      "reachablePlacements": 10104,
+      "exclusivePlacements": 9968
+    },
+    {
+      "id": 420,
+      "component": 1424877,
+      "kind": "Bishop shuttle",
+      "whitePieces": [
+        "B"
+      ],
+      "states": 2,
+      "internalEdges": 2,
+      "exitEdges": 1,
+      "closed": false,
+      "canReachSupport": true,
+      "canMate": false,
+      "canFail": false,
+      "rules": [
+        "r10",
+        "r9.3"
+      ],
+      "precageTargetsSwitch": true,
+      "stationaryCentralBishop": false,
+      "frames": [
+        {
+          "fen": "8/8/8/4k3/3NB3/3K4/8/8 w - - 0 1",
+          "move": "Bh1",
+          "rule": "r9.3",
+          "precageTargets": [
+            "d3"
+          ],
+          "decidingPriority": "bishop distance from Black"
+        },
+        {
+          "fen": "8/8/8/8/3N1k2/3K4/8/7B w - - 2 2",
+          "move": "Be4",
+          "rule": "r10",
+          "precageTargets": [],
+          "decidingPriority": "king-protected central bishop"
+        }
+      ],
+      "witness": {
+        "fen": "8/8/8/4k3/3NB3/3K4/8/8 w - - 0 1",
+        "moves": [
+          "Bh1",
+          "Kf4",
+          "Be4",
+          "Ke5"
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/4k3/3NB3/3K4/8/8_w_-_-_0_1&moves=Bh1,Kf4,Be4,Ke5&cursor=0",
+        "freshLoadVerified": true,
+        "displayConvention": true
+      },
+      "cyclePlies": 4,
+      "decidingPriorities": [
+        "bishop distance from Black",
+        "king-protected central bishop"
+      ],
+      "mechanism": "Bishop shuttle / bishop distance from Black + king-protected central bishop",
+      "reachablePlacements": 4784,
+      "exclusivePlacements": 4696
+    },
+    {
+      "id": 434,
+      "component": 1457307,
+      "kind": "Bishop shuttle",
+      "whitePieces": [
+        "B"
+      ],
+      "states": 2,
+      "internalEdges": 2,
+      "exitEdges": 0,
+      "closed": true,
+      "canReachSupport": false,
+      "canMate": false,
+      "canFail": false,
+      "rules": [
+        "minors safe",
+        "r10"
+      ],
+      "precageTargetsSwitch": false,
+      "stationaryCentralBishop": false,
+      "frames": [
+        {
+          "fen": "8/8/8/8/3K2k1/7N/8/5B2 w - - 0 1",
+          "move": "Bg2",
+          "rule": "r10",
+          "precageTargets": [],
+          "decidingPriority": "bishop on long diagonal"
+        },
+        {
+          "fen": "8/8/8/8/3K4/6kN/6B1/8 w - - 2 2",
+          "move": "Bf1",
+          "rule": "minors safe",
+          "precageTargets": [],
+          "decidingPriority": "minors safe"
+        }
+      ],
+      "witness": {
+        "fen": "8/8/8/8/3K2k1/7N/8/5B2 w - - 0 1",
+        "moves": [
+          "Bg2",
+          "Kg3",
+          "Bf1",
+          "Kg4"
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/8/3K2k1/7N/8/5B2_w_-_-_0_1&moves=Bg2,Kg3,Bf1,Kg4&cursor=0",
+        "freshLoadVerified": true,
+        "displayConvention": true
+      },
+      "cyclePlies": 4,
+      "decidingPriorities": [
+        "bishop on long diagonal",
+        "minors safe"
+      ],
+      "mechanism": "Bishop shuttle / bishop on long diagonal + minors safe",
+      "reachablePlacements": 3240,
+      "exclusivePlacements": 3232
+    },
+    {
+      "id": 433,
+      "component": 1451284,
+      "kind": "Bishop shuttle",
+      "whitePieces": [
+        "B"
+      ],
+      "states": 2,
+      "internalEdges": 2,
+      "exitEdges": 0,
+      "closed": true,
+      "canReachSupport": false,
+      "canMate": false,
+      "canFail": false,
+      "rules": [
+        "r10",
+        "r9.1"
+      ],
+      "precageTargetsSwitch": false,
+      "stationaryCentralBishop": false,
+      "frames": [
+        {
+          "fen": "8/8/8/5k2/3K2N1/8/8/3B4 w - - 0 1",
+          "move": "Bf3",
+          "rule": "r10",
+          "precageTargets": [],
+          "decidingPriority": "bishop on long diagonal"
+        },
+        {
+          "fen": "8/8/8/8/3K1kN1/5B2/8/8 w - - 2 2",
+          "move": "Bd1",
+          "rule": "r9.1",
+          "precageTargets": [],
+          "decidingPriority": "bishop distance from Black"
+        }
+      ],
+      "witness": {
+        "fen": "8/8/8/5k2/3K2N1/8/8/3B4 w - - 0 1",
+        "moves": [
+          "Bf3",
+          "Kf4",
+          "Bd1",
+          "Kf5"
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/5k2/3K2N1/8/8/3B4_w_-_-_0_1&moves=Bf3,Kf4,Bd1,Kf5&cursor=0",
+        "freshLoadVerified": true,
+        "displayConvention": true
+      },
+      "cyclePlies": 4,
+      "decidingPriorities": [
+        "bishop on long diagonal",
+        "bishop distance from Black"
+      ],
+      "mechanism": "Bishop shuttle / bishop distance from Black + bishop on long diagonal",
+      "reachablePlacements": 3080,
+      "exclusivePlacements": 3080
+    },
+    {
+      "id": 426,
+      "component": 1429995,
+      "kind": "King shuffle",
+      "whitePieces": [
+        "K"
+      ],
+      "states": 2,
+      "internalEdges": 2,
+      "exitEdges": 0,
+      "closed": true,
+      "canReachSupport": false,
+      "canMate": false,
+      "canFail": false,
+      "rules": [
+        "r10",
+        "r5"
+      ],
+      "precageTargetsSwitch": false,
+      "stationaryCentralBishop": true,
+      "frames": [
+        {
+          "fen": "8/8/5k2/8/4B3/3NK3/8/8 w - - 0 1",
+          "move": "Kd4",
+          "rule": "r10",
+          "precageTargets": [
+            "d3"
+          ],
+          "decidingPriority": "king center distance"
+        },
+        {
+          "fen": "8/8/4k3/8/3KB3/3N4/8/8 w - - 2 2",
+          "move": "Ke3",
+          "rule": "r5",
+          "precageTargets": [
+            "d3"
+          ],
+          "decidingPriority": "r5"
+        }
+      ],
+      "witness": {
+        "fen": "8/8/5k2/8/4B3/3NK3/8/8 w - - 0 1",
+        "moves": [
+          "Kd4",
+          "Ke6",
+          "Ke3",
+          "Kf6"
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/5k2/8/4B3/3NK3/8/8_w_-_-_0_1&moves=Kd4,Ke6,Ke3,Kf6&cursor=0",
+        "freshLoadVerified": true,
+        "displayConvention": true
+      },
+      "cyclePlies": 4,
+      "decidingPriorities": [
+        "king center distance",
+        "r5"
+      ],
+      "mechanism": "King shuffle / king center distance + r5",
+      "reachablePlacements": 2664,
+      "exclusivePlacements": 2472
+    },
+    {
+      "id": 422,
+      "component": 1347656,
+      "kind": "King shuffle",
+      "whitePieces": [
+        "K"
+      ],
+      "states": 2,
+      "internalEdges": 2,
+      "exitEdges": 0,
+      "closed": true,
+      "canReachSupport": false,
+      "canMate": false,
+      "canFail": false,
+      "rules": [
+        "minors safe",
+        "r10"
+      ],
+      "precageTargetsSwitch": false,
+      "stationaryCentralBishop": false,
+      "frames": [
+        {
+          "fen": "8/8/8/8/3K2B1/6k1/5N2/8 w - - 0 1",
+          "move": "Ke3",
+          "rule": "minors safe",
+          "precageTargets": [],
+          "decidingPriority": "minors safe"
+        },
+        {
+          "fen": "8/8/8/8/6Bk/4K3/5N2/8 w - - 2 2",
+          "move": "Kd4",
+          "rule": "r10",
+          "precageTargets": [],
+          "decidingPriority": "king off bishop color"
+        }
+      ],
+      "witness": {
+        "fen": "8/8/8/8/3K2B1/6k1/5N2/8 w - - 0 1",
+        "moves": [
+          "Ke3",
+          "Kh4",
+          "Kd4",
+          "Kg3"
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/8/3K2B1/6k1/5N2/8_w_-_-_0_1&moves=Ke3,Kh4,Kd4,Kg3&cursor=0",
+        "freshLoadVerified": true,
+        "displayConvention": true
+      },
+      "cyclePlies": 4,
+      "decidingPriorities": [
+        "minors safe",
+        "king off bishop color"
+      ],
+      "mechanism": "King shuffle / king off bishop color + minors safe",
+      "reachablePlacements": 2008,
+      "exclusivePlacements": 2008
+    },
+    {
+      "id": 435,
+      "component": 1240855,
+      "kind": "Bishop shuttle",
+      "whitePieces": [
+        "B"
+      ],
+      "states": 2,
+      "internalEdges": 2,
+      "exitEdges": 0,
+      "closed": true,
+      "canReachSupport": false,
+      "canMate": false,
+      "canFail": false,
+      "rules": [
+        "r10",
+        "r9.3"
+      ],
+      "precageTargetsSwitch": false,
+      "stationaryCentralBishop": false,
+      "frames": [
+        {
+          "fen": "8/8/8/5k2/3K4/7N/8/5B2 w - - 0 1",
+          "move": "Bg2",
+          "rule": "r10",
+          "precageTargets": [],
+          "decidingPriority": "bishop on long diagonal"
+        },
+        {
+          "fen": "8/8/8/8/3K2k1/7N/6B1/8 w - - 2 2",
+          "move": "Bf1",
+          "rule": "r9.3",
+          "precageTargets": [],
+          "decidingPriority": "bishop distance from Black"
+        }
+      ],
+      "witness": {
+        "fen": "8/8/8/5k2/3K4/7N/8/5B2 w - - 0 1",
+        "moves": [
+          "Bg2",
+          "Kg4",
+          "Bf1",
+          "Kf5"
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/5k2/3K4/7N/8/5B2_w_-_-_0_1&moves=Bg2,Kg4,Bf1,Kf5&cursor=0",
+        "freshLoadVerified": true,
+        "displayConvention": true
+      },
+      "cyclePlies": 4,
+      "decidingPriorities": [
+        "bishop on long diagonal",
+        "bishop distance from Black"
+      ],
+      "mechanism": "Bishop shuttle / bishop distance from Black + bishop on long diagonal",
+      "reachablePlacements": 1648,
+      "exclusivePlacements": 1648
+    },
+    {
+      "id": 421,
+      "component": 1362023,
+      "kind": "King shuffle",
+      "whitePieces": [
+        "K"
+      ],
+      "states": 2,
+      "internalEdges": 2,
+      "exitEdges": 0,
+      "closed": true,
+      "canReachSupport": false,
+      "canMate": false,
+      "canFail": false,
+      "rules": [
+        "minors safe",
+        "r10"
+      ],
+      "precageTargetsSwitch": false,
+      "stationaryCentralBishop": false,
+      "frames": [
+        {
+          "fen": "8/8/8/8/3K4/6kB/5N2/8 w - - 0 1",
+          "move": "Ke3",
+          "rule": "minors safe",
+          "precageTargets": [],
+          "decidingPriority": "minors safe"
+        },
+        {
+          "fen": "8/8/8/8/7k/4K2B/5N2/8 w - - 2 2",
+          "move": "Kd4",
+          "rule": "r10",
+          "precageTargets": [],
+          "decidingPriority": "king off bishop color"
+        }
+      ],
+      "witness": {
+        "fen": "8/8/8/8/3K4/6kB/5N2/8 w - - 0 1",
+        "moves": [
+          "Ke3",
+          "Kh4",
+          "Kd4",
+          "Kg3"
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/8/3K4/6kB/5N2/8_w_-_-_0_1&moves=Ke3,Kh4,Kd4,Kg3&cursor=0",
+        "freshLoadVerified": true,
+        "displayConvention": true
+      },
+      "cyclePlies": 4,
+      "decidingPriorities": [
+        "minors safe",
+        "king off bishop color"
+      ],
+      "mechanism": "King shuffle / king off bishop color + minors safe",
+      "reachablePlacements": 1240,
+      "exclusivePlacements": 1240
+    },
+    {
+      "id": 406,
+      "component": 1249048,
+      "kind": "Bishop shuttle",
+      "whitePieces": [
+        "B"
+      ],
+      "states": 2,
+      "internalEdges": 2,
+      "exitEdges": 0,
+      "closed": true,
+      "canReachSupport": false,
+      "canMate": false,
+      "canFail": false,
+      "rules": [
+        "r10"
+      ],
+      "precageTargetsSwitch": false,
+      "stationaryCentralBishop": false,
+      "frames": [
+        {
+          "fen": "5N2/4K1k1/8/8/8/8/8/7B w - - 0 1",
+          "move": "Ba8",
+          "rule": "r10",
+          "precageTargets": [],
+          "decidingPriority": "knight off bishop color"
+        },
+        {
+          "fen": "B4Nk1/4K3/8/8/8/8/8/8 w - - 2 2",
+          "move": "Bh1",
+          "rule": "r10",
+          "precageTargets": [],
+          "decidingPriority": "noncentral bishop distance from Black"
+        }
+      ],
+      "witness": {
+        "fen": "5N2/4K1k1/8/8/8/8/8/7B w - - 0 1",
+        "moves": [
+          "Ba8",
+          "Kg8",
+          "Bh1",
+          "Kg7"
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=5N2/4K1k1/8/8/8/8/8/7B_w_-_-_0_1&moves=Ba8,Kg8,Bh1,Kg7&cursor=0",
+        "freshLoadVerified": true,
+        "displayConvention": true
+      },
+      "cyclePlies": 4,
+      "decidingPriorities": [
+        "knight off bishop color",
+        "noncentral bishop distance from Black"
+      ],
+      "mechanism": "Bishop shuttle / knight off bishop color + noncentral bishop distance from Black",
+      "reachablePlacements": 1008,
+      "exclusivePlacements": 1008
+    },
+    {
+      "id": 451,
+      "component": 1021095,
+      "kind": "Bishop shuttle",
+      "whitePieces": [
+        "B"
+      ],
+      "states": 2,
+      "internalEdges": 2,
+      "exitEdges": 0,
+      "closed": true,
+      "canReachSupport": false,
+      "canMate": false,
+      "canFail": false,
+      "rules": [
+        "r10",
+        "r9.1"
+      ],
+      "precageTargetsSwitch": false,
+      "stationaryCentralBishop": false,
+      "frames": [
+        {
+          "fen": "3k4/8/8/4K3/B3N3/8/8/8 w - - 0 1",
+          "move": "Bc6",
+          "rule": "r10",
+          "precageTargets": [],
+          "decidingPriority": "bishop on long diagonal"
+        },
+        {
+          "fen": "8/2k5/2B5/4K3/4N3/8/8/8 w - - 2 2",
+          "move": "Ba4",
+          "rule": "r9.1",
+          "precageTargets": [],
+          "decidingPriority": "bishop distance from Black"
+        }
+      ],
+      "witness": {
+        "fen": "3k4/8/8/4K3/B3N3/8/8/8 w - - 0 1",
+        "moves": [
+          "Bc6",
+          "Kc7",
+          "Ba4",
+          "Kd8"
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=3k4/8/8/4K3/B3N3/8/8/8_w_-_-_0_1&moves=Bc6,Kc7,Ba4,Kd8&cursor=0",
+        "freshLoadVerified": true,
+        "displayConvention": true
+      },
+      "cyclePlies": 4,
+      "decidingPriorities": [
+        "bishop on long diagonal",
+        "bishop distance from Black"
+      ],
+      "mechanism": "Bishop shuttle / bishop distance from Black + bishop on long diagonal",
+      "reachablePlacements": 616,
+      "exclusivePlacements": 616
+    },
+    {
+      "id": 407,
+      "component": 1275473,
+      "kind": "Knight shuttle",
+      "whitePieces": [
+        "N"
+      ],
+      "states": 2,
+      "internalEdges": 2,
+      "exitEdges": 2,
+      "closed": false,
+      "canReachSupport": true,
+      "canMate": false,
+      "canFail": false,
+      "rules": [
+        "r10"
+      ],
+      "precageTargetsSwitch": false,
+      "stationaryCentralBishop": false,
+      "frames": [
+        {
+          "fen": "B7/4K3/5N2/5k2/8/8/8/8 w - - 0 1",
+          "move": "Ne8",
+          "rule": "r10",
+          "precageTargets": [],
+          "decidingPriority": "noncentral bishop distance from Black"
+        },
+        {
+          "fen": "B3N3/4K3/8/4k3/8/8/8/8 w - - 2 2",
+          "move": "Nf6",
+          "rule": "r10",
+          "precageTargets": [],
+          "decidingPriority": "knight off bishop color"
+        }
+      ],
+      "witness": {
+        "fen": "B7/4K3/5N2/5k2/8/8/8/8 w - - 0 1",
+        "moves": [
+          "Ne8",
+          "Ke5",
+          "Nf6",
+          "Kf5"
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=B7/4K3/5N2/5k2/8/8/8/8_w_-_-_0_1&moves=Ne8,Ke5,Nf6,Kf5&cursor=0",
+        "freshLoadVerified": true,
+        "displayConvention": true
+      },
+      "cyclePlies": 4,
+      "decidingPriorities": [
+        "noncentral bishop distance from Black",
+        "knight off bishop color"
+      ],
+      "mechanism": "Knight shuttle / knight off bishop color + noncentral bishop distance from Black",
+      "reachablePlacements": 528,
+      "exclusivePlacements": 528
+    },
+    {
+      "id": 416,
+      "component": 1033823,
+      "kind": "Bishop shuttle",
+      "whitePieces": [
+        "B"
+      ],
+      "states": 1,
+      "internalEdges": 1,
+      "exitEdges": 0,
+      "closed": true,
+      "canReachSupport": false,
+      "canMate": false,
+      "canFail": false,
+      "rules": [
+        "r10"
+      ],
+      "precageTargetsSwitch": false,
+      "stationaryCentralBishop": false,
+      "frames": [
+        {
+          "fen": "B5k1/6N1/5K2/8/8/8/8/8 w - - 0 1",
+          "move": "Bh1",
+          "rule": "r10",
+          "precageTargets": [],
+          "decidingPriority": "noncentral bishop distance from Black"
+        },
+        {
+          "fen": "8/6Nk/5K2/8/8/8/8/7B w - - 2 2",
+          "move": "Ba8",
+          "rule": "r10",
+          "precageTargets": [],
+          "decidingPriority": "noncentral bishop distance from Black"
+        }
+      ],
+      "witness": {
+        "fen": "B5k1/6N1/5K2/8/8/8/8/8 w - - 0 1",
+        "moves": [
+          "Bh1",
+          "Kh7",
+          "Ba8",
+          "Kg8"
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=B5k1/6N1/5K2/8/8/8/8/8_w_-_-_0_1&moves=Bh1,Kh7,Ba8,Kg8&cursor=0",
+        "freshLoadVerified": true,
+        "displayConvention": true
+      },
+      "cyclePlies": 4,
+      "decidingPriorities": [
+        "noncentral bishop distance from Black"
+      ],
+      "mechanism": "Bishop shuttle / noncentral bishop distance from Black",
+      "reachablePlacements": 520,
+      "exclusivePlacements": 520
+    }
+  ],
+  "displayLoop": {
+    "fen": "8/8/5k2/8/3KB3/3N4/8/8 w - - 0 1",
+    "moves": [
+      "Ne5",
+      "Ke6",
+      "Nd3",
+      "Kf6"
+    ],
+    "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/5k2/8/3KB3/3N4/8/8_w_-_-_0_1&moves=Ne5,Ke6,Nd3,Kf6&cursor=0",
+    "freshLoadVerified": true,
+    "displayConvention": true
+  },
+  "comparisonPolicyCommit": "1f96a049f2a3f877c5921fe636d541467e7a9051"
+}
