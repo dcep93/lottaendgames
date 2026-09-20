@@ -171,3 +171,21 @@ test('r9.2 is neutral for knights already defended by any White piece, across sy
     assert.ok(getIdealKnightAndBishopWhiteMoves(fen).includes(san));
   }
 });
+
+
+test('r9.3 requires minor adjacency before the move and includes diagonal adjacency', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    for (const [source, from, to, expected] of [
+      // Both minors are close to Black, but not to each other.
+      ['8/4K3/5N2/3B1k2/8/8/8/8 w - - 0 1', 'd5', 'a8', 0],
+      // Becoming adjacent after moving the bishop does not activate the rule.
+      ['8/8/5kB1/8/7N/8/8/K7 w - - 0 1', 'g6', 'h5', 0],
+      // Diagonal neighbors qualify as well as the existing edge-adjacent case.
+      ['8/8/4k1B1/5N2/8/8/8/K7 w - - 0 1', 'g6', 'h7', -Math.sqrt(10)],
+    ] as const) {
+      const fen = transformFen(source, transform);
+      const san = getChess(fen).move({from: transformSquare(from, transform), to: transformSquare(to, transform)}).san;
+      assert.equal(scoreKnightAndBishopWhiteMove(fen, san).nearbyPairBishopEscapeScore, expected, source);
+    }
+  }
+});

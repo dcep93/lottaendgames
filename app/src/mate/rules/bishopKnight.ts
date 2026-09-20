@@ -138,6 +138,7 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
   const knightCentrallyDefended = !!knight && centralKing && kingDistance(whiteKing.square, knight.square) === 1;
   return {
     shouldEscapeNearbyPairBishop: !!bishop && !!knight && !!blackKing
+      && kingDistance(bishop.square, knight.square) === 1
       && kingDistance(bishop.square, blackKing.square) <= 2
       && kingDistance(knight.square, blackKing.square) <= 2
       && !bishopCentrallyDefended && !knightCentrallyDefended,
@@ -321,7 +322,7 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     {
       id: "r9.3",
       shortLabel: "rule r9.3",
-      helpText: "If a bishop and knight are both within 2 steps of Black's king, unless they're defended by a central king, maximize the Bishop's distance from Black's king.",
+      helpText: "If an adjacent bishop and knight are both within 2 steps of Black's king, unless they're defended by a central king, maximize the Bishop's distance from Black's king.",
       subpriorities: [
         { compare: (first, second) => first.nearbyPairCentralDefensePenalty - second.nearbyPairCentralDefensePenalty },
         { compare: (first, second) => first.nearbyPairBishopEscapeScore - second.nearbyPairBishopEscapeScore },
@@ -484,7 +485,7 @@ const bishopKnightHelp: RuleHelp = {
     "Stay away from a bishop-colored corner.",
   ],
   notes: [
-    "For r9.3, check before White moves: both the bishop and knight must be within two king steps of Black, and neither may be defended by White's king on d4, e4, d5 or e5. When this rule activates, first prefer a resulting central king defending either piece. Those defended outcomes tie; otherwise maximize only the bishop's Euclidean distance after the move, including moves beyond the two-step range.",
+    "For r9.3, check before White moves: the bishop and knight must be adjacent (by edge or diagonal), both must be within two king steps of Black, and neither may be defended by White's king on d4, e4, d5 or e5. When this rule activates, first prefer a resulting central king defending either piece. Those defended outcomes tie; otherwise maximize only the bishop's Euclidean distance after the move, including moves beyond the two-step range.",
     "For r9.1 and r9.2, the piece must be attacked by Black's king and undefended before White moves. Existing defense by White's king or other minor piece exempts it, regardless of king location. For r9.2, prefer a knight defended by White's king after the move. Bishop defense does not satisfy this preference. Otherwise maximize the affected piece's Euclidean distance from Black after White moves. Finally, r9.2 minimizes the knight's Euclidean distance to the board's midpoint.",
     "A precage square is diagonally adjacent to a central bishop, off the long diagonal, and strictly behind the bishop from Black's king's perspective.",
     "For r10, candidates without a precage square remain neutral, tied with the best available distance. Among candidates with precage squares, fewer knight moves wins.",

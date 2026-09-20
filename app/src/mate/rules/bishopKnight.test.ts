@@ -149,7 +149,7 @@ test("bishop-and-knight rules are registered", () => {
     {
       id: "r9.3",
       shortLabel: "rule r9.3",
-      helpText: "If a bishop and knight are both within 2 steps of Black's king, unless they're defended by a central king, maximize the Bishop's distance from Black's king.",
+      helpText: "If an adjacent bishop and knight are both within 2 steps of Black's king, unless they're defended by a central king, maximize the Bishop's distance from Black's king.",
     },
     {
       id: "r10",
