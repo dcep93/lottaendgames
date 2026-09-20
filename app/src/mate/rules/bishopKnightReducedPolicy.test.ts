@@ -281,10 +281,10 @@ test('r10 keeps absent precage targets neutral while ranking available distances
 })
 
 
-test('r15 is removed and r10 ends with knight protection as its sixth priority', () => {
-  assert.equal(knightAndBishopWhiteRules.some(rule => rule.id === 'r15'), false)
-  assert.equal(knightAndBishopWhiteRules.at(-1)!.id, 'r10')
-  assert.equal(knightAndBishopWhiteRules.at(-1)!.subpriorities!.length, 6)
+test('r15 follows r10 and r10 ends with knight protection as its sixth priority', () => {
+  assert.equal(knightAndBishopWhiteRules.at(-1)!.id, 'r15')
+  assert.equal(knightAndBishopWhiteRules.at(-2)!.id, 'r10')
+  assert.equal(knightAndBishopWhiteRules.at(-2)!.subpriorities!.length, 6)
 })
 
 
@@ -311,7 +311,7 @@ test('r10 finally prefers knights protected by either the king or bishop', () =>
     assert.equal(compareScoresByRules(protectedKnight!, unprotectedKnight!, [{...rule, subpriorities: rule.subpriorities!.slice(0, 5)}]), 0)
     assert.ok(compareScoresByRules(protectedKnight!, unprotectedKnight!, [rule]) < 0)
     const ideal = getIdealKnightAndBishopWhiteMoves(fen)
-    assert.ok(ideal.includes(moves[0]!))
+    assert.ok(ideal.every(san => scoreKnightAndBishopWhiteMove(fen, san).knightProtectionPenalty === 0))
     assert.ok(!ideal.includes(moves[1]!))
 
     const bishopFen = transformFen('7k/8/8/8/K7/4N3/8/2B5 w - - 0 1', transform)

@@ -15,7 +15,7 @@ import {
   BLACK_CAPTURE_PRIORITY,
   BLACK_RETURN_PRIORITY,
 } from "./blackPriorities";
-import { centerDistance } from "./bishopKnightGeometry";
+import { bishopLongDiagonalIntersection, centerDistance } from "./bishopKnightGeometry";
 import {
   getKnightAndBishopLookupWhiteMoves,
   getKnightAndBishopPhaseLabel,
@@ -58,6 +58,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly bishopProtectedCenterPenalty: number;
   readonly knightTargetProximityScore: number;
   readonly knightProtectionPenalty: number;
+  readonly bishopLongDiagonalIntersectionScore: number;
 };
 
 export type KnightAndBishopBlackMoveScore = {
@@ -214,6 +215,12 @@ function scoreKnightAndBishopWhiteMoveCore(
       const { file, rank } = squareCoordinates(bishop.square);
       return file === rank || file + rank === 7 ? 0 : 1;
     },
+    get bishopLongDiagonalIntersectionScore() {
+      if (!bishop || !blackKing) return 0;
+      const intersection = bishopLongDiagonalIntersection(bishop.square);
+      return intersection === bishop.square ? 0
+        : -Math.sqrt(squaredEuclideanDistance(intersection, blackKing.square));
+    },
     bishopProtectedCenterPenalty: protectedCentralBishop ? 0 : 1,
     knightProtectionPenalty: knight && chess.isAttacked(knight.square, "w") ? 0 : 1,
     get knightTargetProximityScore() {
@@ -336,6 +343,12 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
         } },
         { compare: (first, second) => first.knightProtectionPenalty - second.knightProtectionPenalty },
       ],
+    },
+    {
+      id: "r15",
+      shortLabel: "rule r15",
+      helpText: "For a bishop off the long diagonal, maximize the distance of its long diagonal intersection from Black's king.",
+      compare: (first, second) => first.bishopLongDiagonalIntersectionScore - second.bishopLongDiagonalIntersectionScore,
     },
   ];
 

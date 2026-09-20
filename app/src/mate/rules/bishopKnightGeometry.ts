@@ -27,6 +27,16 @@ export function centerDistance(square: Square): number {
   )
 }
 
+/** The bishop's diagonal meets its same-color corner-to-corner diagonal here. */
+export function bishopLongDiagonalIntersection(square: Square): Square {
+  const { file, rank } = squareCoords(square)
+  if ((file + rank) % 2 === 0) {
+    const midpoint = (file + rank) / 2
+    return squareFromCoords(midpoint, midpoint)!
+  }
+  return squareFromCoords((7 + file - rank) / 2, (7 - file + rank) / 2)!
+}
+
 export function isMiddle16Square(square: Square): boolean {
   const { file, rank } = squareCoords(square)
   return file >= 2 && file <= 5 && rank >= 2 && rank <= 5
