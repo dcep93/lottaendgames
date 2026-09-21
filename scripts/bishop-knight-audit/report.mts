@@ -23,5 +23,5 @@ for (const m of r.mechanisms.sort((a: any, b: any) => b.reachablePlacements - a.
 text += '\n## Validation and artifacts\n\nDeterministic samples compare the optimized worker to the unmodified production bundle and direct production calls. One thousand random placements are checked in all eight symmetries. Enumeration totals are asserted. Independent SCC analysis and sink removal must agree on loop reachability. Witnesses replay three times against production rules.\n\n`manifest.json` identifies the exact bundled policy; `progress.json` reports progress; `census.sqlite` contains resumable roots, policies and transitions; `result.json` includes components, frames, selection traces and loop links; `root-family-membership.json` supports overlap analysis.\n';
 writeFileSync(dir + '/report.md', text);
 const top = ranked.find((f: any) => f.witness.freshLoadVerified && f.witness.displayConvention && f.cyclePlies === 4) ?? ranked.find((f: any) => f.witness.freshLoadVerified);
-writeFileSync(dir + '/display-loop.json', JSON.stringify(top, null, 2));
+writeFileSync(dir + '/display-loop.json', JSON.stringify(top ?? null, null, 2));
 console.log(JSON.stringify({ counts, archetypes: r.archetypes, top: top ? { kind: top.kind, reach: top.reachablePlacements, ...top.witness } : null }, null, 2));
