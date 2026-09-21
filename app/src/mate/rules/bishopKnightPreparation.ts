@@ -3,6 +3,11 @@ import { findPiece, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../
 // Only declarations added after the latest reset belong to r5.
 const declaredMoves = new Map<string, string>()
 for (const [position, from, to] of [
+  // First five surviving-loop links; Kh6 for the third is already declared below.
+  ['6k1/8/7K/8/4B3/3N4/8/8 w - - 0 1', 'h6', 'g6'],
+  ['8/8/8/8/1K6/N7/1k6/7B w - - 0 1', 'a3', 'b5'],
+  ['8/8/8/8/8/2K5/1N6/1k5B w - - 0 1', 'b2', 'c4'],
+  ['8/8/8/4k3/3NB3/3K4/8/8 w - - 0 1', 'd3', 'e3'],
   // Aligned precage-loop prescriptions: Be4/Nd3, plus the Nc5 entry move.
   ['8/5k2/8/8/4B3/3NK3/8/8 w - - 0 1', 'e3', 'f4'],
   ['8/8/4k3/8/4B3/3NK3/8/8 w - - 0 1', 'e3', 'f4'],
