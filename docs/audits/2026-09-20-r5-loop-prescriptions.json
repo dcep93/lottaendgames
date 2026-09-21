@@ -1,0 +1,1470 @@
+{
+  "manifest": {
+    "fingerprint": "edb5dccff70bfcac1d6ab40c7c8c0803b6aeefbfcfbe701d59e6d327bdcca68c",
+    "referenceWorkerFingerprint": "82c1bfeb8dd0a233cb28b4f70e076f78c99a07a77b3bb4dbbf286ce05df79fe4",
+    "rootFingerprint": "717e3aba66ae4302338b5cdbf7541e8ad6cd4c4243941bc7993832e56526edfa",
+    "rootCacheSource": null,
+    "commit": "d21e05b11809f54c837b912a4eda4c161e98d0f9",
+    "startedAt": "2026-09-21T01:40:54.088Z",
+    "node": "v25.8.1",
+    "workers": 8,
+    "scope": "All 13,660,584 post-White KBNvK placements; stop at support/mate/capture/stalemate; all best-move ties; retain Black return history."
+  },
+  "counts": {
+    "legal": 13660584,
+    "supported": 199412,
+    "unsupported": 13461172,
+    "canLoop": 11936,
+    "noLoop": 13449236,
+    "directOnReachableLoop": 16,
+    "directOnAnyDiscoveredLoop": 56,
+    "onlyLoopOutcomes": 9600,
+    "loopAndSupport": 2336,
+    "canReachSupport": 10944572,
+    "canMate": 1608,
+    "canFail": 2522112
+  },
+  "graph": {
+    "nodes": 1456735,
+    "edges": 1441340,
+    "cyclicNodes": 10,
+    "cyclicFamilies": 5
+  },
+  "previousCounts": {
+    "legal": 13660584,
+    "supported": 199412,
+    "unsupported": 13461172,
+    "canLoop": 17776,
+    "noLoop": 13443396,
+    "directOnReachableLoop": 40,
+    "directOnAnyDiscoveredLoop": 240,
+    "onlyLoopOutcomes": 8136,
+    "loopAndSupport": 9640,
+    "canReachSupport": 10946036,
+    "canMate": 1608,
+    "canFail": 2522112
+  },
+  "changes": {
+    "retained": 8,
+    "removed": 232,
+    "new": 48
+  },
+  "placementArchetypes": {
+    "policyFingerprint": "edb5dccff70bfcac1d6ab40c7c8c0803b6aeefbfcfbe701d59e6d327bdcca68c",
+    "total": 56,
+    "canonicalBoards": 7,
+    "unsupported": 13461172,
+    "directPercent": 0.00041601132501687077,
+    "method": "Union canonical post-White boards on internal SCC edges; verify unsupported; deduplicate across history and components; restore physical orbit weights; exclusive geometry hierarchy matching r25 placement report.",
+    "groups": [
+      {
+        "name": "Central bishop, king-defended; knight on precage",
+        "positions": 56,
+        "percent": 100,
+        "families": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "boards": [
+          {
+            "key": 5092652,
+            "weight": 8,
+            "families": [
+              1,
+              2,
+              3
+            ],
+            "geometry": {
+              "K": "d3",
+              "B": "d4",
+              "N": "e3",
+              "black": "e6",
+              "Kcentral": false,
+              "Kedge": false,
+              "Bcentral": true,
+              "Blong": true,
+              "Ncentral": false,
+              "Nedge": false,
+              "KB": 1,
+              "KN": 1,
+              "BN": 1,
+              "blackB": 2,
+              "blackN": 3,
+              "kingSteps": 3,
+              "NdefB": false,
+              "precage": true
+            },
+            "group": "Central bishop, king-defended; knight on precage"
+          },
+          {
+            "key": 5093534,
+            "weight": 8,
+            "families": [
+              1
+            ],
+            "geometry": {
+              "K": "d3",
+              "B": "d4",
+              "N": "c5",
+              "black": "g4",
+              "Kcentral": false,
+              "Kedge": false,
+              "Bcentral": true,
+              "Blong": true,
+              "Ncentral": false,
+              "Nedge": false,
+              "KB": 1,
+              "KN": 2,
+              "BN": 1,
+              "blackB": 3,
+              "blackN": 4,
+              "kingSteps": 3,
+              "NdefB": false,
+              "precage": true
+            },
+            "group": "Central bishop, king-defended; knight on precage"
+          },
+          {
+            "key": 5093542,
+            "weight": 8,
+            "families": [
+              2
+            ],
+            "geometry": {
+              "K": "d3",
+              "B": "d4",
+              "N": "c5",
+              "black": "g5",
+              "Kcentral": false,
+              "Kedge": false,
+              "Bcentral": true,
+              "Blong": true,
+              "Ncentral": false,
+              "Nedge": false,
+              "KB": 1,
+              "KN": 2,
+              "BN": 1,
+              "blackB": 3,
+              "blackN": 4,
+              "kingSteps": 3,
+              "NdefB": false,
+              "precage": true
+            },
+            "group": "Central bishop, king-defended; knight on precage"
+          },
+          {
+            "key": 5093533,
+            "weight": 8,
+            "families": [
+              3,
+              4
+            ],
+            "geometry": {
+              "K": "d3",
+              "B": "d4",
+              "N": "c5",
+              "black": "f4",
+              "Kcentral": false,
+              "Kedge": false,
+              "Bcentral": true,
+              "Blong": true,
+              "Ncentral": false,
+              "Nedge": false,
+              "KB": 1,
+              "KN": 2,
+              "BN": 1,
+              "blackB": 2,
+              "blackN": 3,
+              "kingSteps": 2,
+              "NdefB": false,
+              "precage": true
+            },
+            "group": "Central bishop, king-defended; knight on precage"
+          },
+          {
+            "key": 5092650,
+            "weight": 8,
+            "families": [
+              4
+            ],
+            "geometry": {
+              "K": "d3",
+              "B": "d4",
+              "N": "e3",
+              "black": "c6",
+              "Kcentral": false,
+              "Kedge": false,
+              "Bcentral": true,
+              "Blong": true,
+              "Ncentral": false,
+              "Nedge": false,
+              "KB": 1,
+              "KN": 1,
+              "BN": 1,
+              "blackB": 2,
+              "blackN": 3,
+              "kingSteps": 3,
+              "NdefB": false,
+              "precage": true
+            },
+            "group": "Central bishop, king-defended; knight on precage"
+          },
+          {
+            "key": 7194953,
+            "weight": 8,
+            "families": [
+              5
+            ],
+            "geometry": {
+              "K": "d4",
+              "B": "e4",
+              "N": "f5",
+              "black": "b2",
+              "Kcentral": true,
+              "Kedge": false,
+              "Bcentral": true,
+              "Blong": true,
+              "Ncentral": false,
+              "Nedge": false,
+              "KB": 1,
+              "KN": 2,
+              "BN": 1,
+              "blackB": 3,
+              "blackN": 4,
+              "kingSteps": 2,
+              "NdefB": false,
+              "precage": true
+            },
+            "group": "Central bishop, king-defended; knight on precage"
+          },
+          {
+            "key": 5097809,
+            "weight": 8,
+            "families": [
+              5
+            ],
+            "geometry": {
+              "K": "d3",
+              "B": "e4",
+              "N": "f5",
+              "black": "b3",
+              "Kcentral": false,
+              "Kedge": false,
+              "Bcentral": true,
+              "Blong": true,
+              "Ncentral": false,
+              "Nedge": false,
+              "KB": 1,
+              "KN": 2,
+              "BN": 1,
+              "blackB": 3,
+              "blackN": 4,
+              "kingSteps": 2,
+              "NdefB": false,
+              "precage": true
+            },
+            "group": "Central bishop, king-defended; knight on precage"
+          }
+        ],
+        "examples": [
+          {
+            "family": 1,
+            "ply": 1,
+            "url": "http://localhost:5173/mate/bishop-knight#fen=8/4k3/8/8/4B3/3NK3/8/8_w_-_-_0_1&moves=Kf4,Kd6,Ke3,Ke7&cursor=0",
+            "fen": "8/4k3/8/8/4B3/3NK3/8/8 w - - 0 1",
+            "moves": [
+              "Kf4",
+              "Kd6",
+              "Ke3",
+              "Ke7"
+            ],
+            "placement": "8/4k3/8/8/4BK2/3N4/8/8 b - - 1 1",
+            "cyclePlies": 4
+          },
+          {
+            "family": 2,
+            "ply": 1,
+            "url": "http://localhost:5173/mate/bishop-knight#fen=8/3k4/8/8/4B3/3NK3/8/8_w_-_-_0_1&moves=Kf4,Kd6,Ke3,Kd7&cursor=0",
+            "fen": "8/3k4/8/8/4B3/3NK3/8/8 w - - 0 1",
+            "moves": [
+              "Kf4",
+              "Kd6",
+              "Ke3",
+              "Kd7"
+            ],
+            "placement": "8/3k4/8/8/4BK2/3N4/8/8 b - - 1 1",
+            "cyclePlies": 4
+          },
+          {
+            "family": 3,
+            "ply": 1,
+            "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/3k4/8/4BK2/3N4/8/8_w_-_-_0_1&moves=Ke3,Ke6,Kf4,Kd6&cursor=0",
+            "fen": "8/8/3k4/8/4BK2/3N4/8/8 w - - 0 1",
+            "moves": [
+              "Ke3",
+              "Ke6",
+              "Kf4",
+              "Kd6"
+            ],
+            "placement": "8/8/3k4/8/4B3/3NK3/8/8 b - - 1 1",
+            "cyclePlies": 4
+          },
+          {
+            "family": 4,
+            "ply": 1,
+            "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/3K1k2/3B4/2N5/8/8/8_w_-_-_0_1&moves=Kc5,Kf5,Kd6,Kf6&cursor=0",
+            "fen": "8/8/3K1k2/3B4/2N5/8/8/8 w - - 0 1",
+            "moves": [
+              "Kc5",
+              "Kf5",
+              "Kd6",
+              "Kf6"
+            ],
+            "placement": "8/8/5k2/2KB4/2N5/8/8/8 b - - 1 1",
+            "cyclePlies": 4
+          },
+          {
+            "family": 5,
+            "ply": 1,
+            "url": "http://localhost:5173/mate/bishop-knight#fen=8/6k1/4K3/3B4/2N5/8/8/8_w_-_-_0_1&moves=Ke5,Kg6,Ke6,Kg7&cursor=0",
+            "fen": "8/6k1/4K3/3B4/2N5/8/8/8 w - - 0 1",
+            "moves": [
+              "Ke5",
+              "Kg6",
+              "Ke6",
+              "Kg7"
+            ],
+            "placement": "8/6k1/8/3BK3/2N5/8/8/8 b - - 1 1",
+            "cyclePlies": 4
+          }
+        ]
+      }
+    ],
+    "secondary": {
+      "White king on edge": 0,
+      "Central White king": 8,
+      "Central bishop": 56,
+      "Black adjacent to bishop": 0,
+      "Black adjacent to knight": 0,
+      "Knight-defended non-central bishop attacked by Black without king defense": 0
+    },
+    "allDirectPlacementsCoveredByMinimalWitnesses": true,
+    "witnessCyclePlies": [
+      4
+    ]
+  },
+  "families": [
+    {
+      "id": 1,
+      "component": 138566,
+      "nodeIds": [
+        1361968,
+        1456731
+      ],
+      "kind": "King shuffle",
+      "whitePieces": [
+        "K"
+      ],
+      "states": 2,
+      "internalEdges": 2,
+      "exitEdges": 0,
+      "closed": true,
+      "canReachSupport": false,
+      "canMate": false,
+      "canFail": false,
+      "rules": [
+        "r10",
+        "r5"
+      ],
+      "precageTargetsSwitch": false,
+      "stationaryCentralBishop": true,
+      "frames": [
+        {
+          "fen": "8/4k3/8/8/4B3/3NK3/8/8 w - - 0 1",
+          "move": "Kf4",
+          "rule": "r5",
+          "precageTargets": [
+            "d3"
+          ],
+          "selectionTrace": [
+            {
+              "rule": "r5",
+              "priority": 1,
+              "meaning": "r5",
+              "survivors": [
+                "Kf4"
+              ]
+            }
+          ],
+          "decidingPriority": "r5"
+        },
+        {
+          "fen": "8/8/3k4/8/4BK2/3N4/8/8 w - - 2 2",
+          "move": "Ke3",
+          "rule": "r10",
+          "precageTargets": [
+            "d3"
+          ],
+          "selectionTrace": [
+            {
+              "rule": "minors safe",
+              "priority": 1,
+              "meaning": "minors safe",
+              "survivors": [
+                "Bb7",
+                "Ba8",
+                "Bf5",
+                "Bg6",
+                "Bh7",
+                "Bf3",
+                "Bg2",
+                "Bh1",
+                "Kf5",
+                "Kg5",
+                "Kg4",
+                "Kg3",
+                "Kf3",
+                "Ke3",
+                "Nb4",
+                "Ne5",
+                "Nf2",
+                "Ne1",
+                "Nc1",
+                "Nb2"
+              ]
+            },
+            {
+              "rule": "r10",
+              "priority": 1,
+              "meaning": "king center distance",
+              "survivors": [
+                "Bb7",
+                "Ba8",
+                "Bf5",
+                "Bg6",
+                "Bh7",
+                "Bf3",
+                "Bg2",
+                "Bh1",
+                "Kf5",
+                "Ke3",
+                "Nb4",
+                "Ne5",
+                "Nf2",
+                "Ne1",
+                "Nc1",
+                "Nb2"
+              ]
+            },
+            {
+              "rule": "r10",
+              "priority": 2,
+              "meaning": "king off bishop color",
+              "survivors": [
+                "Bb7",
+                "Ba8",
+                "Bf5",
+                "Bg6",
+                "Bh7",
+                "Bf3",
+                "Bg2",
+                "Bh1",
+                "Ke3",
+                "Nb4",
+                "Ne5",
+                "Nf2",
+                "Ne1",
+                "Nc1",
+                "Nb2"
+              ]
+            },
+            {
+              "rule": "r10",
+              "priority": 3,
+              "meaning": "bishop on long diagonal",
+              "survivors": [
+                "Bb7",
+                "Ba8",
+                "Bf3",
+                "Bg2",
+                "Bh1",
+                "Ke3",
+                "Nb4",
+                "Ne5",
+                "Nf2",
+                "Ne1",
+                "Nc1",
+                "Nb2"
+              ]
+            },
+            {
+              "rule": "r10",
+              "priority": 4,
+              "meaning": "king-protected central bishop",
+              "survivors": [
+                "Ke3",
+                "Nb4",
+                "Ne5",
+                "Nf2",
+                "Ne1",
+                "Nc1",
+                "Nb2"
+              ]
+            },
+            {
+              "rule": "r10",
+              "priority": 5,
+              "meaning": "knight distance to precage",
+              "survivors": [
+                "Ke3"
+              ]
+            }
+          ],
+          "decidingPriority": "knight distance to precage"
+        }
+      ],
+      "witness": {
+        "fen": "8/4k3/8/8/4B3/3NK3/8/8 w - - 0 1",
+        "moves": [
+          "Kf4",
+          "Kd6",
+          "Ke3",
+          "Ke7"
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/4k3/8/8/4B3/3NK3/8/8_w_-_-_0_1&moves=Kf4,Kd6,Ke3,Ke7&cursor=0",
+        "freshLoadVerified": true,
+        "displayConvention": true
+      },
+      "cyclePlies": 4,
+      "decidingPriorities": [
+        "r5",
+        "knight distance to precage"
+      ],
+      "mechanism": "King shuffle / knight distance to precage + r5",
+      "reachablePlacements": 8,
+      "exclusivePlacements": 8
+    },
+    {
+      "id": 2,
+      "component": 138564,
+      "nodeIds": [
+        1361969,
+        1456732
+      ],
+      "kind": "King shuffle",
+      "whitePieces": [
+        "K"
+      ],
+      "states": 2,
+      "internalEdges": 2,
+      "exitEdges": 0,
+      "closed": true,
+      "canReachSupport": false,
+      "canMate": false,
+      "canFail": false,
+      "rules": [
+        "r10",
+        "r5"
+      ],
+      "precageTargetsSwitch": false,
+      "stationaryCentralBishop": true,
+      "frames": [
+        {
+          "fen": "8/3k4/8/8/4B3/3NK3/8/8 w - - 0 1",
+          "move": "Kf4",
+          "rule": "r5",
+          "precageTargets": [
+            "d3"
+          ],
+          "selectionTrace": [
+            {
+              "rule": "minors safe",
+              "priority": 1,
+              "meaning": "minors safe",
+              "survivors": [
+                "Bd5",
+                "Bb7",
+                "Ba8",
+                "Bf5+",
+                "Bg6",
+                "Bh7",
+                "Bf3",
+                "Bg2",
+                "Bh1",
+                "Nb4",
+                "Nc5+",
+                "Ne5+",
+                "Nf4",
+                "Nf2",
+                "Ne1",
+                "Nc1",
+                "Nb2",
+                "Kd4",
+                "Kf4",
+                "Kf3",
+                "Kf2",
+                "Ke2",
+                "Kd2"
+              ]
+            },
+            {
+              "rule": "r5",
+              "priority": 1,
+              "meaning": "r5",
+              "survivors": [
+                "Kf4"
+              ]
+            }
+          ],
+          "decidingPriority": "r5"
+        },
+        {
+          "fen": "8/8/3k4/8/4BK2/3N4/8/8 w - - 2 2",
+          "move": "Ke3",
+          "rule": "r10",
+          "precageTargets": [
+            "d3"
+          ],
+          "selectionTrace": [
+            {
+              "rule": "minors safe",
+              "priority": 1,
+              "meaning": "minors safe",
+              "survivors": [
+                "Bb7",
+                "Ba8",
+                "Bf5",
+                "Bg6",
+                "Bh7",
+                "Bf3",
+                "Bg2",
+                "Bh1",
+                "Kf5",
+                "Kg5",
+                "Kg4",
+                "Kg3",
+                "Kf3",
+                "Ke3",
+                "Nb4",
+                "Ne5",
+                "Nf2",
+                "Ne1",
+                "Nc1",
+                "Nb2"
+              ]
+            },
+            {
+              "rule": "r10",
+              "priority": 1,
+              "meaning": "king center distance",
+              "survivors": [
+                "Bb7",
+                "Ba8",
+                "Bf5",
+                "Bg6",
+                "Bh7",
+                "Bf3",
+                "Bg2",
+                "Bh1",
+                "Kf5",
+                "Ke3",
+                "Nb4",
+                "Ne5",
+                "Nf2",
+                "Ne1",
+                "Nc1",
+                "Nb2"
+              ]
+            },
+            {
+              "rule": "r10",
+              "priority": 2,
+              "meaning": "king off bishop color",
+              "survivors": [
+                "Bb7",
+                "Ba8",
+                "Bf5",
+                "Bg6",
+                "Bh7",
+                "Bf3",
+                "Bg2",
+                "Bh1",
+                "Ke3",
+                "Nb4",
+                "Ne5",
+                "Nf2",
+                "Ne1",
+                "Nc1",
+                "Nb2"
+              ]
+            },
+            {
+              "rule": "r10",
+              "priority": 3,
+              "meaning": "bishop on long diagonal",
+              "survivors": [
+                "Bb7",
+                "Ba8",
+                "Bf3",
+                "Bg2",
+                "Bh1",
+                "Ke3",
+                "Nb4",
+                "Ne5",
+                "Nf2",
+                "Ne1",
+                "Nc1",
+                "Nb2"
+              ]
+            },
+            {
+              "rule": "r10",
+              "priority": 4,
+              "meaning": "king-protected central bishop",
+              "survivors": [
+                "Ke3",
+                "Nb4",
+                "Ne5",
+                "Nf2",
+                "Ne1",
+                "Nc1",
+                "Nb2"
+              ]
+            },
+            {
+              "rule": "r10",
+              "priority": 5,
+              "meaning": "knight distance to precage",
+              "survivors": [
+                "Ke3"
+              ]
+            }
+          ],
+          "decidingPriority": "knight distance to precage"
+        }
+      ],
+      "witness": {
+        "fen": "8/3k4/8/8/4B3/3NK3/8/8 w - - 0 1",
+        "moves": [
+          "Kf4",
+          "Kd6",
+          "Ke3",
+          "Kd7"
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/3k4/8/8/4B3/3NK3/8/8_w_-_-_0_1&moves=Kf4,Kd6,Ke3,Kd7&cursor=0",
+        "freshLoadVerified": true,
+        "displayConvention": true
+      },
+      "cyclePlies": 4,
+      "decidingPriorities": [
+        "r5",
+        "knight distance to precage"
+      ],
+      "mechanism": "King shuffle / knight distance to precage + r5",
+      "reachablePlacements": 24,
+      "exclusivePlacements": 24
+    },
+    {
+      "id": 3,
+      "component": 1422982,
+      "nodeIds": [
+        1362058,
+        1362210
+      ],
+      "kind": "King shuffle",
+      "whitePieces": [
+        "K"
+      ],
+      "states": 2,
+      "internalEdges": 2,
+      "exitEdges": 0,
+      "closed": true,
+      "canReachSupport": false,
+      "canMate": false,
+      "canFail": false,
+      "rules": [
+        "r10",
+        "r5"
+      ],
+      "precageTargetsSwitch": false,
+      "stationaryCentralBishop": true,
+      "frames": [
+        {
+          "fen": "8/8/3k4/8/4BK2/3N4/8/8 w - - 0 1",
+          "move": "Ke3",
+          "rule": "r10",
+          "precageTargets": [
+            "d3"
+          ],
+          "selectionTrace": [
+            {
+              "rule": "minors safe",
+              "priority": 1,
+              "meaning": "minors safe",
+              "survivors": [
+                "Bb7",
+                "Ba8",
+                "Bf5",
+                "Bg6",
+                "Bh7",
+                "Bf3",
+                "Bg2",
+                "Bh1",
+                "Kf5",
+                "Kg5",
+                "Kg4",
+                "Kg3",
+                "Kf3",
+                "Ke3",
+                "Nb4",
+                "Ne5",
+                "Nf2",
+                "Ne1",
+                "Nc1",
+                "Nb2"
+              ]
+            },
+            {
+              "rule": "r10",
+              "priority": 1,
+              "meaning": "king center distance",
+              "survivors": [
+                "Bb7",
+                "Ba8",
+                "Bf5",
+                "Bg6",
+                "Bh7",
+                "Bf3",
+                "Bg2",
+                "Bh1",
+                "Kf5",
+                "Ke3",
+                "Nb4",
+                "Ne5",
+                "Nf2",
+                "Ne1",
+                "Nc1",
+                "Nb2"
+              ]
+            },
+            {
+              "rule": "r10",
+              "priority": 2,
+              "meaning": "king off bishop color",
+              "survivors": [
+                "Bb7",
+                "Ba8",
+                "Bf5",
+                "Bg6",
+                "Bh7",
+                "Bf3",
+                "Bg2",
+                "Bh1",
+                "Ke3",
+                "Nb4",
+                "Ne5",
+                "Nf2",
+                "Ne1",
+                "Nc1",
+                "Nb2"
+              ]
+            },
+            {
+              "rule": "r10",
+              "priority": 3,
+              "meaning": "bishop on long diagonal",
+              "survivors": [
+                "Bb7",
+                "Ba8",
+                "Bf3",
+                "Bg2",
+                "Bh1",
+                "Ke3",
+                "Nb4",
+                "Ne5",
+                "Nf2",
+                "Ne1",
+                "Nc1",
+                "Nb2"
+              ]
+            },
+            {
+              "rule": "r10",
+              "priority": 4,
+              "meaning": "king-protected central bishop",
+              "survivors": [
+                "Ke3",
+                "Nb4",
+                "Ne5",
+                "Nf2",
+                "Ne1",
+                "Nc1",
+                "Nb2"
+              ]
+            },
+            {
+              "rule": "r10",
+              "priority": 5,
+              "meaning": "knight distance to precage",
+              "survivors": [
+                "Ke3"
+              ]
+            }
+          ],
+          "decidingPriority": "knight distance to precage"
+        },
+        {
+          "fen": "8/8/4k3/8/4B3/3NK3/8/8 w - - 2 2",
+          "move": "Kf4",
+          "rule": "r5",
+          "precageTargets": [
+            "d3"
+          ],
+          "selectionTrace": [
+            {
+              "rule": "minors safe",
+              "priority": 1,
+              "meaning": "minors safe",
+              "survivors": [
+                "Bc6",
+                "Bb7",
+                "Ba8",
+                "Bg6",
+                "Bh7",
+                "Bf3",
+                "Bg2",
+                "Bh1",
+                "Nb4",
+                "Nc5+",
+                "Nf4+",
+                "Nf2",
+                "Ne1",
+                "Nc1",
+                "Nb2",
+                "Kd4",
+                "Kf4",
+                "Kf3",
+                "Kf2",
+                "Ke2",
+                "Kd2"
+              ]
+            },
+            {
+              "rule": "r5",
+              "priority": 1,
+              "meaning": "r5",
+              "survivors": [
+                "Kf4"
+              ]
+            }
+          ],
+          "decidingPriority": "r5"
+        }
+      ],
+      "witness": {
+        "fen": "8/8/3k4/8/4BK2/3N4/8/8 w - - 0 1",
+        "moves": [
+          "Ke3",
+          "Ke6",
+          "Kf4",
+          "Kd6"
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/3k4/8/4BK2/3N4/8/8_w_-_-_0_1&moves=Ke3,Ke6,Kf4,Kd6&cursor=0",
+        "freshLoadVerified": true,
+        "displayConvention": true
+      },
+      "cyclePlies": 4,
+      "decidingPriorities": [
+        "knight distance to precage",
+        "r5"
+      ],
+      "mechanism": "King shuffle / knight distance to precage + r5",
+      "reachablePlacements": 11416,
+      "exclusivePlacements": 11416
+    },
+    {
+      "id": 4,
+      "component": 1274478,
+      "nodeIds": [
+        1362205,
+        1456733
+      ],
+      "kind": "King shuffle",
+      "whitePieces": [
+        "K"
+      ],
+      "states": 2,
+      "internalEdges": 2,
+      "exitEdges": 0,
+      "closed": true,
+      "canReachSupport": false,
+      "canMate": false,
+      "canFail": false,
+      "rules": [
+        "r10",
+        "r5"
+      ],
+      "precageTargetsSwitch": false,
+      "stationaryCentralBishop": true,
+      "frames": [
+        {
+          "fen": "8/8/3K1k2/3B4/2N5/8/8/8 w - - 0 1",
+          "move": "Kc5",
+          "rule": "r10",
+          "precageTargets": [
+            "c4"
+          ],
+          "selectionTrace": [
+            {
+              "rule": "minors safe",
+              "priority": 1,
+              "meaning": "minors safe",
+              "survivors": [
+                "Kc7",
+                "Kd7",
+                "Kc5",
+                "Kc6",
+                "Bc6",
+                "Bb7",
+                "Ba8",
+                "Be6",
+                "Bg8",
+                "Be4",
+                "Bf3",
+                "Bg2",
+                "Bh1",
+                "Na5",
+                "Nb6",
+                "Ne5",
+                "Ne3",
+                "Nd2",
+                "Nb2",
+                "Na3"
+              ]
+            },
+            {
+              "rule": "r10",
+              "priority": 1,
+              "meaning": "king center distance",
+              "survivors": [
+                "Kc5",
+                "Bc6",
+                "Bb7",
+                "Ba8",
+                "Be6",
+                "Bg8",
+                "Be4",
+                "Bf3",
+                "Bg2",
+                "Bh1",
+                "Na5",
+                "Nb6",
+                "Ne5",
+                "Ne3",
+                "Nd2",
+                "Nb2",
+                "Na3"
+              ]
+            },
+            {
+              "rule": "r10",
+              "priority": 3,
+              "meaning": "bishop on long diagonal",
+              "survivors": [
+                "Kc5",
+                "Bc6",
+                "Bb7",
+                "Ba8",
+                "Be4",
+                "Bf3",
+                "Bg2",
+                "Bh1",
+                "Na5",
+                "Nb6",
+                "Ne5",
+                "Ne3",
+                "Nd2",
+                "Nb2",
+                "Na3"
+              ]
+            },
+            {
+              "rule": "r10",
+              "priority": 4,
+              "meaning": "king-protected central bishop",
+              "survivors": [
+                "Kc5",
+                "Na5",
+                "Nb6",
+                "Ne5",
+                "Ne3",
+                "Nd2",
+                "Nb2",
+                "Na3"
+              ]
+            },
+            {
+              "rule": "r10",
+              "priority": 5,
+              "meaning": "knight distance to precage",
+              "survivors": [
+                "Kc5"
+              ]
+            }
+          ],
+          "decidingPriority": "knight distance to precage"
+        },
+        {
+          "fen": "8/8/8/2KB1k2/2N5/8/8/8 w - - 2 2",
+          "move": "Kd6",
+          "rule": "r5",
+          "precageTargets": [
+            "c4"
+          ],
+          "selectionTrace": [
+            {
+              "rule": "minors safe",
+              "priority": 1,
+              "meaning": "minors safe",
+              "survivors": [
+                "Kb6",
+                "Kc6",
+                "Kd6",
+                "Kd4",
+                "Kb4",
+                "Kb5",
+                "Bc6",
+                "Bb7",
+                "Ba8",
+                "Bf7",
+                "Bg8",
+                "Bf3",
+                "Bg2",
+                "Bh1",
+                "Na5",
+                "Nb6",
+                "Nd6+",
+                "Ne3+",
+                "Nd2",
+                "Nb2",
+                "Na3"
+              ]
+            },
+            {
+              "rule": "r5",
+              "priority": 1,
+              "meaning": "r5",
+              "survivors": [
+                "Kd6"
+              ]
+            }
+          ],
+          "decidingPriority": "r5"
+        }
+      ],
+      "witness": {
+        "fen": "8/8/3K1k2/3B4/2N5/8/8/8 w - - 0 1",
+        "moves": [
+          "Kc5",
+          "Kf5",
+          "Kd6",
+          "Kf6"
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/3K1k2/3B4/2N5/8/8/8_w_-_-_0_1&moves=Kc5,Kf5,Kd6,Kf6&cursor=0",
+        "freshLoadVerified": true,
+        "displayConvention": true
+      },
+      "cyclePlies": 4,
+      "decidingPriorities": [
+        "knight distance to precage",
+        "r5"
+      ],
+      "mechanism": "King shuffle / knight distance to precage + r5",
+      "reachablePlacements": 472,
+      "exclusivePlacements": 472
+    },
+    {
+      "id": 5,
+      "component": 135868,
+      "nodeIds": [
+        1363630,
+        1456734
+      ],
+      "kind": "King shuffle",
+      "whitePieces": [
+        "K"
+      ],
+      "states": 2,
+      "internalEdges": 2,
+      "exitEdges": 0,
+      "closed": true,
+      "canReachSupport": false,
+      "canMate": false,
+      "canFail": false,
+      "rules": [
+        "r10",
+        "r5"
+      ],
+      "precageTargetsSwitch": false,
+      "stationaryCentralBishop": true,
+      "frames": [
+        {
+          "fen": "8/6k1/4K3/3B4/2N5/8/8/8 w - - 0 1",
+          "move": "Ke5",
+          "rule": "r10",
+          "precageTargets": [
+            "c4"
+          ],
+          "selectionTrace": [
+            {
+              "rule": "r10",
+              "priority": 1,
+              "meaning": "king center distance",
+              "survivors": [
+                "Ke5"
+              ]
+            }
+          ],
+          "decidingPriority": "king center distance"
+        },
+        {
+          "fen": "8/8/6k1/3BK3/2N5/8/8/8 w - - 2 2",
+          "move": "Ke6",
+          "rule": "r5",
+          "precageTargets": [
+            "c4"
+          ],
+          "selectionTrace": [
+            {
+              "rule": "minors safe",
+              "priority": 1,
+              "meaning": "minors safe",
+              "survivors": [
+                "Bc6",
+                "Bb7",
+                "Ba8",
+                "Be6",
+                "Bg8",
+                "Be4+",
+                "Bf3",
+                "Bg2",
+                "Bh1",
+                "Kd6",
+                "Ke6",
+                "Kf4",
+                "Ke4",
+                "Kd4",
+                "Na5",
+                "Nb6",
+                "Nd6",
+                "Ne3",
+                "Nd2",
+                "Nb2",
+                "Na3"
+              ]
+            },
+            {
+              "rule": "r5",
+              "priority": 1,
+              "meaning": "r5",
+              "survivors": [
+                "Ke6"
+              ]
+            }
+          ],
+          "decidingPriority": "r5"
+        }
+      ],
+      "witness": {
+        "fen": "8/6k1/4K3/3B4/2N5/8/8/8 w - - 0 1",
+        "moves": [
+          "Ke5",
+          "Kg6",
+          "Ke6",
+          "Kg7"
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/6k1/4K3/3B4/2N5/8/8/8_w_-_-_0_1&moves=Ke5,Kg6,Ke6,Kg7&cursor=0",
+        "freshLoadVerified": true,
+        "displayConvention": true
+      },
+      "cyclePlies": 4,
+      "decidingPriorities": [
+        "king center distance",
+        "r5"
+      ],
+      "mechanism": "King shuffle / king center distance + r5",
+      "reachablePlacements": 16,
+      "exclusivePlacements": 16
+    }
+  ],
+  "alignedLoops": [
+    {
+      "oldId": 1,
+      "fen": "8/4k3/8/8/4B3/3NK3/8/8 w - - 0 1",
+      "moves": [
+        "Kf4",
+        "Kd6",
+        "Ke3",
+        "Ke7"
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/4k3/8/8/4B3/3NK3/8/8_w_-_-_0_1&moves=Kf4,Kd6,Ke3,Ke7&cursor=0",
+      "K": "e3",
+      "B": "e4",
+      "N": "d3",
+      "black": "e7"
+    },
+    {
+      "oldId": 2,
+      "fen": "8/3k4/8/8/4B3/3NK3/8/8 w - - 0 1",
+      "moves": [
+        "Kf4",
+        "Kd6",
+        "Ke3",
+        "Kd7"
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/3k4/8/8/4B3/3NK3/8/8_w_-_-_0_1&moves=Kf4,Kd6,Ke3,Kd7&cursor=0",
+      "K": "e3",
+      "B": "e4",
+      "N": "d3",
+      "black": "d7"
+    },
+    {
+      "oldId": 3,
+      "fen": "8/8/3k4/8/4BK2/3N4/8/8 w - - 0 1",
+      "moves": [
+        "Ke3",
+        "Ke6",
+        "Kf4",
+        "Kd6"
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/3k4/8/4BK2/3N4/8/8_w_-_-_0_1&moves=Ke3,Ke6,Kf4,Kd6&cursor=0",
+      "K": "f4",
+      "B": "e4",
+      "N": "d3",
+      "black": "d6"
+    },
+    {
+      "oldId": 4,
+      "fen": "8/8/5k2/8/4BK2/3N4/8/8 w - - 0 1",
+      "moves": [
+        "Ke3",
+        "Ke6",
+        "Kf4",
+        "Kf6"
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/5k2/8/4BK2/3N4/8/8_w_-_-_0_1&moves=Ke3,Ke6,Kf4,Kf6&cursor=0",
+      "K": "f4",
+      "B": "e4",
+      "N": "d3",
+      "black": "f6"
+    },
+    {
+      "oldId": 5,
+      "fen": "8/6k1/8/5K2/4B3/3N4/8/8 w - - 0 1",
+      "moves": [
+        "Ke5",
+        "Kf7",
+        "Kf5",
+        "Kg7"
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/6k1/8/5K2/4B3/3N4/8/8_w_-_-_0_1&moves=Ke5,Kf7,Kf5,Kg7&cursor=0",
+      "K": "f5",
+      "B": "e4",
+      "N": "d3",
+      "black": "g7"
+    }
+  ],
+  "directMembership": {
+    "policyFingerprint": "edb5dccff70bfcac1d6ab40c7c8c0803b6aeefbfcfbe701d59e6d327bdcca68c",
+    "method": "Union canonical post-White boards on internal cyclic-component edges, then restore root orbit weights. Group totals may overlap.",
+    "total": 56,
+    "canonicalBoards": 7,
+    "byKind": {
+      "rows": [
+        {
+          "name": "King shuffle",
+          "positions": 56,
+          "percent": 100,
+          "families": 5,
+          "familyIds": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        }
+      ],
+      "positionsInMultipleGroups": 0
+    },
+    "byMechanism": {
+      "rows": [
+        {
+          "name": "King shuffle / knight distance to precage + r5",
+          "positions": 40,
+          "percent": 71.42857142857143,
+          "families": 4,
+          "familyIds": [
+            1,
+            2,
+            3,
+            4
+          ]
+        },
+        {
+          "name": "King shuffle / king center distance + r5",
+          "positions": 16,
+          "percent": 28.571428571428573,
+          "families": 1,
+          "familyIds": [
+            5
+          ]
+        }
+      ],
+      "positionsInMultipleGroups": 0
+    },
+    "byClosure": {
+      "rows": [
+        {
+          "name": "Closed component",
+          "positions": 56,
+          "percent": 100,
+          "families": 5,
+          "familyIds": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        }
+      ],
+      "positionsInMultipleGroups": 0
+    },
+    "families": [
+      {
+        "id": 1,
+        "positions": 16
+      },
+      {
+        "id": 2,
+        "positions": 16
+      },
+      {
+        "id": 3,
+        "positions": 16
+      },
+      {
+        "id": 4,
+        "positions": 16
+      },
+      {
+        "id": 5,
+        "positions": 16
+      }
+    ]
+  }
+}
