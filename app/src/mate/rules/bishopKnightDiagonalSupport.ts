@@ -2,7 +2,7 @@ import type { Square } from 'chess.js'
 import { isInsideBishopDiagonal } from './bishopKnightGeometry'
 import { isRecordedSupportedCornerPosition, isRecordedSupportedFiveKingDefense, recordedCornerKnightTarget } from './bishopKnightDeclaredSupport'
 import { knightAndBishopKnightProximityToSquare } from './bishopKnightStrategy'
-import { allSquares, getChess, findPiece, kingDistance, squaredEuclideanDistance, squareCoords, squareFromCoordinates, SQUARE_TRANSFORMS, transformSquare } from '../chess'
+import { allSquares, getChess, findPiece, kingDistance, squaredEuclideanDistance, squareColor, squareCoords, squareFromCoordinates, SQUARE_TRANSFORMS, transformSquare } from '../chess'
 
 const CANONICAL_DIAGONALS: readonly {
   wall: readonly Square[];
@@ -47,6 +47,8 @@ const CANONICAL_DIAGONALS: readonly {
 const DIAGONALS = CANONICAL_DIAGONALS.flatMap(pattern => SQUARE_TRANSFORMS.map(transform => ({
   preferredSevenBishop: pattern.wall.length === 7 ? transformSquare('b3', transform) : undefined,
   sevenKingTieTarget: transformSquare('e8', transform),
+  sevenFlushTrigger: transformSquare('a3', transform),
+  sevenFlushTarget: transformSquare('b2', transform),
   rightOffset: {file: transform.map(2, 0).file - transform.map(0, 0).file,
     rank: transform.map(2, 0).rank - transform.map(0, 0).rank},
   corner: squareCoords(transformSquare('a8', transform)),
@@ -210,8 +212,29 @@ export function knightAndBishopSupportedDiagonal(fen: string, blackDestinations?
   return {size, knight}
 }
 
+type SupportedDiagonalEvaluation = {
+  size: number;
+  knight: number;
+  sevenFlushColorPenalty?: number;
+  sevenFlushDistance?: number;
+  sevenBishopPenalty?: number;
+  sevenKingTargetDistance?: number;
+  sevenKingTieDistance?: number;
+}
+
+const SEVEN_PREFERENCE_KEYS = ['sevenFlushColorPenalty', 'sevenFlushDistance', 'sevenBishopPenalty',
+  'sevenKingTargetDistance', 'sevenKingTieDistance'] as const
+
+function compareSevenPreferences(a: SupportedDiagonalEvaluation, b: SupportedDiagonalEvaluation): number {
+  for (const key of SEVEN_PREFERENCE_KEYS) {
+    const delta = (a[key] ?? 0) - (b[key] ?? 0)
+    if (delta) return delta
+  }
+  return 0
+}
+
 /** Includes placement preferences only for orientations that pass the support checks. */
-export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDestinations?: readonly Square[]): { size: number; knight: number; sevenBishopPenalty?: number; sevenKingTargetDistance?: number; sevenKingTieDistance?: number } {
+export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDestinations?: readonly Square[]): SupportedDiagonalEvaluation {
   if (fen.split(' ')[1] !== 'b') throw new Error('Diagonal support must be evaluated after White moves, with Black to move')
   const white = findPiece(fen, 'w', 'k')
   const black = findPiece(fen, 'b', 'k')
@@ -263,7 +286,7 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
   const king = squareCoords(white.square)
   let replies = blackDestinations
   const attackChecks = new Map<string, boolean>()
-  let best: {size: number; knight: number; sevenBishopPenalty?: number; sevenKingTargetDistance?: number; sevenKingTieDistance?: number} = {size: 99, knight: 99}
+  let best: SupportedDiagonalEvaluation = {size: 99, knight: 99}
   for (const pattern of DIAGONALS) {
     if (pattern.wall.length > best.size || !pattern.wall.includes(bishop.square) ||
       !isInsideBishopDiagonal(black.square, pattern.wall)) continue
@@ -304,18 +327,16 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
     // An off-board target supplies no preference; it is not clamped to an edge.
     const sevenKingTargetDistance = kingTarget ? kingDistance(white.square, kingTarget) : 0
     const sevenKingTieDistance = pattern.wall.length === 7 ? kingDistance(white.square, pattern.sevenKingTieTarget) : 0
-    if (pattern.wall.length < best.size || distance < best.knight) {
-      best = {size: pattern.wall.length, knight: distance, sevenBishopPenalty, sevenKingTargetDistance, sevenKingTieDistance}
-    } else if (pattern.wall.length === best.size && distance === best.knight) {
-      if (sevenBishopPenalty < (best.sevenBishopPenalty ?? 1) ||
-        (sevenBishopPenalty === best.sevenBishopPenalty && sevenKingTargetDistance < (best.sevenKingTargetDistance ?? 0))) {
-        best.sevenBishopPenalty = sevenBishopPenalty
-        best.sevenKingTargetDistance = sevenKingTargetDistance
-        best.sevenKingTieDistance = sevenKingTieDistance
-      } else if (sevenBishopPenalty === best.sevenBishopPenalty && sevenKingTargetDistance === best.sevenKingTargetDistance) {
-        best.sevenKingTieDistance = Math.min(best.sevenKingTieDistance ?? 0, sevenKingTieDistance)
-      }
+    const flush = pattern.wall.length === 7 && kingDistance(black.square, pattern.sevenFlushTrigger) <= 1
+    const candidate: SupportedDiagonalEvaluation = {
+      size: pattern.wall.length, knight: distance,
+      sevenFlushColorPenalty: flush && squareColor(white.square) === squareColor(bishop.square) ? 1 : 0,
+      sevenFlushDistance: flush ? kingDistance(white.square, pattern.sevenFlushTarget) : 0,
+      sevenBishopPenalty, sevenKingTargetDistance, sevenKingTieDistance,
     }
+    // Keep every preference in one qualifying support orientation, in rule order.
+    if (candidate.size < best.size || distance < best.knight ||
+      (candidate.size === best.size && distance === best.knight && compareSevenPreferences(candidate, best) < 0)) best = candidate
   }
   return best
 }

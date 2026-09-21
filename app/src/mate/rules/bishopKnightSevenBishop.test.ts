@@ -99,3 +99,32 @@ test('r2.5 also prescribes Ke8 from Kf8 after Kf8 Kd6, including reflections', (
     for (const move of getChess(nearby).moves()) assert.equal(scoreKnightAndBishopWhiteMove(nearby,move).declaredSupportedSevenPenalty,0)
   }
 })
+
+test('a3 flush walks toward b2 on the opposite color with any seven bishop placement', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    for (const start of [
+      '4K3/8/8/3B4/k7/3N4/8/8 w - - 0 1',
+      '4K3/8/8/3B4/8/k2N4/8/8 w - - 0 1',
+      '4K1B1/8/8/8/k7/3N4/8/8 w - - 0 1',
+    ]) {
+      const reflected = transformFen(start,transform)
+      const san = (to: 'e7' | 'd7' | 'd8') => getChess(reflected).move({from:transformSquare('e8',transform),to:transformSquare(to,transform)}).san
+      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(reflected),[san('e7')])
+      const e7 = scoreKnightAndBishopWhiteMove(reflected,san('e7'))
+      const d7 = scoreKnightAndBishopWhiteMove(reflected,san('d7'))
+      const d8 = scoreKnightAndBishopWhiteMove(reflected,san('d8'))
+      assert.equal(e7.supportedDiagonalSizeScore,7)
+      assert.equal(e7.supportedSevenFlushColorPenalty,0)
+      assert.equal(d7.supportedSevenFlushColorPenalty,1)
+      assert.equal(e7.supportedSevenFlushDistance,5)
+      assert.equal(d7.supportedSevenFlushDistance,5)
+      assert.equal(d8.supportedSevenFlushDistance,6)
+    }
+    const outside = transformFen('4K3/8/8/k2B4/8/3N4/8/8 w - - 0 1',transform)
+    for (const san of getChess(outside).moves()) {
+      const score = scoreKnightAndBishopWhiteMove(outside,san)
+      assert.equal(score.supportedSevenFlushColorPenalty,0)
+      assert.equal(score.supportedSevenFlushDistance,0)
+    }
+  }
+})

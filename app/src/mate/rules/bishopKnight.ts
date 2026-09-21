@@ -52,6 +52,8 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly supportedDiagonalSizeScore: number;
   readonly supportedDiagonalKnightScore: number;
   readonly declaredSupportedSevenPenalty: number;
+  readonly supportedSevenFlushColorPenalty: number;
+  readonly supportedSevenFlushDistance: number;
   readonly supportedSevenBishopPenalty: number;
   readonly supportedSevenKingTargetDistance: number;
   readonly supportedSevenKingTieDistance: number;
@@ -227,6 +229,14 @@ function scoreKnightAndBishopWhiteMoveCore(
     },
     get supportedDiagonalSizeScore() { return (supportedDiagonal ??= evaluateKnightAndBishopSupportedDiagonal(resultFen, blackReplies.map(move => move.to))).size; },
     get supportedDiagonalKnightScore() { return (supportedDiagonal ??= evaluateKnightAndBishopSupportedDiagonal(resultFen, blackReplies.map(move => move.to))).knight; },
+    get supportedSevenFlushColorPenalty() {
+      const support = supportedDiagonal ??= evaluateKnightAndBishopSupportedDiagonal(resultFen, blackReplies.map(move => move.to));
+      return support.size === 7 ? support.sevenFlushColorPenalty ?? 0 : 0;
+    },
+    get supportedSevenFlushDistance() {
+      const support = supportedDiagonal ??= evaluateKnightAndBishopSupportedDiagonal(resultFen, blackReplies.map(move => move.to));
+      return support.size === 7 ? support.sevenFlushDistance ?? 0 : 0;
+    },
     get supportedSevenBishopPenalty() {
       const support = supportedDiagonal ??= evaluateKnightAndBishopSupportedDiagonal(resultFen, blackReplies.map(move => move.to));
       return support.size === 7 ? support.sevenBishopPenalty ?? 1 : 0;
@@ -319,10 +329,12 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     {
       id: "r2.5",
       shortLabel: "rule r2.5",
-      helpText: "With a supported 7 diagonal, prefer the bishop on b3, then king step proximity to the square two files to the right of Black’s king, then king step proximity to e8 (including reflections).",
+      helpText: "With a supported 7 diagonal and Black on or adjacent to a3, prefer the king off the bishop’s color, then king step proximity to b2. Then prefer the bishop on b3, king step proximity to the square two files to the right of Black’s king, and king step proximity to e8. Include reflections.",
       applies: score => score.supportedDiagonalSizeScore === 7,
       subpriorities: [
         { compare: (first, second) => first.declaredSupportedSevenPenalty - second.declaredSupportedSevenPenalty },
+        { compare: (first, second) => first.supportedSevenFlushColorPenalty - second.supportedSevenFlushColorPenalty },
+        { compare: (first, second) => first.supportedSevenFlushDistance - second.supportedSevenFlushDistance },
         { compare: (first, second) => first.supportedSevenBishopPenalty - second.supportedSevenBishopPenalty },
         { compare: (first, second) => first.supportedSevenKingTargetDistance - second.supportedSevenKingTargetDistance },
         { compare: (first, second) => first.supportedSevenKingTieDistance - second.supportedSevenKingTieDistance },
