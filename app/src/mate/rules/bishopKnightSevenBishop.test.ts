@@ -148,3 +148,23 @@ test('r2.5 prescribes loaded 2. Kc7 after Kd6 Kb5, including reflections', () =>
     for (const move of getChess(nearby).moves()) assert.equal(scoreKnightAndBishopWhiteMove(nearby, move).declaredSupportedSevenPenalty, 0)
   }
 })
+
+
+test('r2.5 prescribes loaded Kc6 then Kc5 while preserving seven support', () => {
+  const line = getChess('8/8/3K4/1k6/8/1B1N4/8/8 w - - 0 1')
+  line.move('Kc7'); line.move('Ka5')
+  for (const [from, to, reply] of [['c7', 'c6', 'Ka6'], ['c6', 'c5', 'Ka5']] as const) {
+    for (const transform of SQUARE_TRANSFORMS) {
+      for (const counters of ['2 2', '40 22']) {
+        const fen = transformFen(line.fen().replace(/\d+ \d+$/, counters), transform)
+        const san = getChess(fen).move({from: transformSquare(from, transform), to: transformSquare(to, transform)}).san
+        assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [san])
+        const score = scoreKnightAndBishopWhiteMove(fen, san)
+        assert.equal(score.supportedDiagonalSizeScore, 7)
+        assert.equal(score.supportedDiagonalKnightScore, 0)
+        assert.equal(score.declaredSupportedSevenPenalty, 0)
+      }
+    }
+    line.move({from, to}); line.move(reply)
+  }
+})
