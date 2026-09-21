@@ -3,6 +3,8 @@ import { findPiece, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../
 // Only declarations added after the latest reset belong to r5.
 const declaredMoves = new Map<string, string>()
 for (const [position, from, to] of [
+  // Continue the loaded Kh6 Ke6 line with Kg7.
+  ['8/8/4k2K/8/4B3/3N4/8/8 w - - 2 2', 'h6', 'g7'],
   // First five surviving-loop links; Kh6 for the third is already declared below.
   ['6k1/8/7K/8/4B3/3N4/8/8 w - - 0 1', 'h6', 'g6'],
   ['8/8/8/8/1K6/N7/1k6/7B w - - 0 1', 'a3', 'b5'],

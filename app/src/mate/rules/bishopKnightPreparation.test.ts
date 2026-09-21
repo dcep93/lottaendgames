@@ -7,6 +7,21 @@ import { getMateRuleSet } from './index'
 import { knightAndBishopDeclaredPreparationMove } from './bishopKnightPreparation'
 import example from './bishopKnightFlushExample.json'
 
+test('r5 selects loaded 2. Kg7 after Kh6 Ke6 in every symmetry', () => {
+  const line = getChess('8/5k2/8/6K1/4B3/3N4/8/8 w - - 0 1')
+  line.move('Kh6')
+  line.move('Ke6')
+  for (const transform of SQUARE_TRANSFORMS) {
+    const fen = transformFen(line.fen(), transform)
+    const expected = getChess(fen).move({
+      from: transformSquare('h6', transform),
+      to: transformSquare('g7', transform),
+    }).san
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [expected], fen)
+    assert.equal(getMateRuleSet('bishop-knight').currentWhiteHint(fen)?.id, 'r5', fen)
+  }
+})
+
 test('r5 selects the first five surviving-loop prescriptions in every symmetry', () => {
   const cases = [
     ['6k1/8/7K/8/4B3/3N4/8/8 w - - 0 1', 'Kg6'],
