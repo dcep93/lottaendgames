@@ -6,6 +6,18 @@ import { getIdealKnightAndBishopWhiteMoves, scoreKnightAndBishopWhiteMove } from
 
 const sixDiagonal = ['a3', 'b4', 'c5', 'd6', 'e7', 'f8'] as const
 
+test('an approaching seven knight must leave c3 and d4 covered by the king races', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    const before = transformFen('8/5B2/4K3/1k2N3/8/8/8/8 w - - 0 1', transform)
+    const move = getChess(before).move({from: transformSquare('e6', transform), to: transformSquare('e7', transform)}).san
+    assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 99)
+    assert.ok(!getIdealKnightAndBishopWhiteMoves(before).includes(move))
+    // The established support knight closes that side even with the king farther away.
+    assert.equal(knightAndBishopSupportedDiagonal(transformFen(
+      '8/4KB2/8/1k6/8/3N4/8/8 b - - 1 1', transform)).size, 7)
+  }
+})
+
 test('Be8 with Nb4 loses the tied e7 race to a bishop attack, including reflections', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     const before = transformFen('8/5B2/8/k7/1N6/1K6/8/8 w - - 0 1', transform)
