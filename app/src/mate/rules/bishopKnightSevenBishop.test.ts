@@ -130,19 +130,19 @@ test('a3 flush walks toward b2 on the opposite color with any seven bishop place
 })
 
 
-test('r2.5 prescribes loaded 2. Kc7 after Kd6 Kb5, including reflections', () => {
+test('r2.5 prescribes Kd5 instead of Kc7 from Kd6 against Kb5, including reflections', () => {
   const line = getChess('8/8/1k6/3K4/8/1B1N4/8/8 w - - 0 1')
   line.move('Kd6'); line.move('Kb5')
   for (const transform of SQUARE_TRANSFORMS) {
     for (const counters of ['2 2', '41 23']) {
       const fen = transformFen(line.fen().replace(/\d+ \d+$/, counters), transform)
-      const kc7 = getChess(fen).move({from: transformSquare('d6', transform), to: transformSquare('c7', transform)}).san
-      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [kc7])
-      const score = scoreKnightAndBishopWhiteMove(fen, kc7)
+      const preferred = getChess(fen).move({from: transformSquare('d6', transform), to: transformSquare('d5', transform)}).san
+      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [preferred])
+      const score = scoreKnightAndBishopWhiteMove(fen, preferred)
       assert.equal(score.supportedDiagonalSizeScore, 7)
       assert.equal(score.declaredSupportedSevenPenalty, 0)
-      const kd5 = getChess(fen).move({from: transformSquare('d6', transform), to: transformSquare('d5', transform)}).san
-      assert.equal(scoreKnightAndBishopWhiteMove(fen, kd5).declaredSupportedSevenPenalty, 1)
+      const previous = getChess(fen).move({from: transformSquare('d6', transform), to: transformSquare('c7', transform)}).san
+      assert.equal(scoreKnightAndBishopWhiteMove(fen, previous).declaredSupportedSevenPenalty, 1)
     }
     const nearby = transformFen(line.fen().replace('1k6', 'k7'), transform)
     for (const move of getChess(nearby).moves()) assert.equal(scoreKnightAndBishopWhiteMove(nearby, move).declaredSupportedSevenPenalty, 0)

@@ -4,7 +4,7 @@ import { SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess'
 const declarations = new Map(([
   ['8/2K5/8/k7/8/1B1N4/8/8 w - - 0 1', 'c7', 'c6'],
   ['8/8/k1K5/8/8/1B1N4/8/8 w - - 0 1', 'c6', 'c5'],
-  ['8/8/3K4/1k6/8/1B1N4/8/8 w - - 0 1', 'd6', 'c7'],
+  ['8/8/3K4/1k6/8/1B1N4/8/8 w - - 0 1', 'd6', 'd5'],
   ['8/5K2/3k4/8/8/1B1N4/8/8 w - - 0 1', 'f7', 'e8'],
   ['5K2/8/3k4/8/8/1B1N4/8/8 w - - 0 1', 'f8', 'e8'],
 ] as const).flatMap(([fen, from, to]) => SQUARE_TRANSFORMS.map(transform => [
