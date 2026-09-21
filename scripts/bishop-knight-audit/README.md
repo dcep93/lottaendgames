@@ -23,6 +23,39 @@ Scope is included in the checkpoint fingerprint; cross-scope root reuse is
 rejected. Default `--scope unsupported` retains the original support-terminal
 behavior. Do not run the unsupported-only `direct-membership.mts` postprocessor
 on a supported audit.
+## Staged work: seven, then five, then three
+
+```sh
+npm run audit:diagonal -- --diagonal 7 --out /absolute/seven-baseline --workers 8
+npm run audit:diagonal -- --diagonal 7 --out /absolute/seven-after-fix --workers 8 \
+  --compare /absolute/seven-baseline/result.json --gate loops
+```
+
+`--diagonal` filters **starting post-White placements only**. Every tied best
+continuation is followed through smaller diagonals and unsupported positions;
+reaching a five- or three-diagonal does not complete a seven-start path. The
+starting filter is part of the immutable snapshot fingerprint. Later use `5`
+and `3` with separate directories. A comparison must use the same stage.
+
+`--gate loops` exits nonzero while any selected start can reach a cycle.
+`--gate mate` additionally requires every branch to end in mate: no captures or
+stalemates, and mate reachable from every selected start. An empty population
+fails either gate. Reports and `gate.json` are written even on a failed gate.
+Gates rerun when resuming; a previous successful stamp never bypasses them.
+Zero-loop success must not be called mate success.
+
+`placement-archetypes.json` groups **actual positions**, not played moves. It
+counts every downstream cyclic board by its support size, the king/bishop's
+central/edge/interior placement, and king protection of each minor. It also
+records all component memberships and deduplicates shared boards. Consequently,
+a seven-stage run can show three-diagonal or unsupported cycle motifs. The
+report distinguishes these downstream totals from selected-start denominators.
+
+For each fix: inspect the rule trace, change the application preference,
+regress its reflections, run a new full stage, and compare against the previous
+snapshot. Never treat breaking a recorded witness as an exhaustive improvement.
+Do not change the support definition or bypass r1.5 solely to satisfy the gate.
+
 Omit `--out` to use the gitignored `.audit/bishop-knight` directory. For a new
 policy, use a new directory. Optionally add `--compare /previous/result.json`
 to put the previous audit counts next to the current report.

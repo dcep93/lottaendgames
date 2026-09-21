@@ -4,7 +4,16 @@ const dir = process.env.AUDIT_DIR!;
 const r = JSON.parse(readFileSync(dir + '/result.json', 'utf8'));
 const manifest = JSON.parse(readFileSync(dir + '/manifest.json', 'utf8'));
 if (r.population === 'supported') {
-    writeFileSync(dir + '/report.md', supportedReport(r, manifest));
+    let text = supportedReport(r, manifest);
+    if (process.env.AUDIT_COMPARE) {
+        const previous = JSON.parse(readFileSync(process.env.AUDIT_COMPARE, 'utf8'));
+        if (previous.population !== r.population || (previous.diagonal ?? null) !== (r.diagonal ?? null))
+            throw new Error('Comparison must use the same starting population and diagonal');
+        text += '\n## Same-stage comparison\n\n| Metric | Before | After |\n|---|---:|---:|\n';
+        for (const key of ['audited', 'canLoop', 'directOnAnyDiscoveredLoop', 'canMate', 'canFail'])
+            text += `| ${key} | ${previous.counts[key]} | ${r.counts[key]} |\n`;
+    }
+    writeFileSync(dir + '/report.md', text);
     const top = [...r.families].sort((a: any, b: any) => b.reachablePlacements - a.reachablePlacements)
         .find((f: any) => f.witness.freshLoadVerified);
     writeFileSync(dir + '/display-loop.json', JSON.stringify(top ?? null, null, 2));

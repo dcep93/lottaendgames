@@ -11,12 +11,15 @@ const require=createRequire(join(repo,'app/package.json'));
 const {build}=require('esbuild');
 const args=process.argv.slice(2);
 if(args.includes('--help')) {
- console.log('npm run audit:unsupported -- --out /absolute/output [--workers 8] [--compare /previous/result.json] [--roots-from /previous/audit] [--scope unsupported|supported]\nResumes identical policy checkpoints; rejects stale ones. Node >=22.13 required.');process.exit(0);
+ console.log('npm run audit:unsupported -- --out /absolute/output [--workers 8] [--compare /previous/result.json] [--roots-from /previous/audit] [--scope unsupported|supported] [--diagonal 7|5|3] [--gate loops|mate]\nResumes identical policy checkpoints; rejects stale ones. Node >=22.13 required.');process.exit(0);
 }
 const options={};
-for(let i=0;i<args.length;i+=2){if(!['--out','--workers','--compare','--roots-from','--scope'].includes(args[i])||!args[i+1])throw new Error('Unknown or incomplete option: '+args[i]);options[args[i].slice(2)]=args[i+1];}
+for(let i=0;i<args.length;i+=2){if(!['--out','--workers','--compare','--roots-from','--scope','--diagonal','--gate'].includes(args[i])||!args[i+1])throw new Error('Unknown or incomplete option: '+args[i]);options[args[i].slice(2)]=args[i+1];}
 const scope=options.scope??'unsupported';
 if(!['unsupported','supported'].includes(scope))throw new Error('scope must be unsupported or supported');
+const diagonal=options.diagonal?Number(options.diagonal):0;
+if(options.diagonal&&(![3,5,7].includes(diagonal)||scope!=='supported'))throw new Error('diagonal must be 7, 5, or 3 with supported scope');
+if(options.gate&&!['loops','mate'].includes(options.gate))throw new Error('gate must be loops or mate');
 if(scope==='supported'&&options['roots-from'])throw new Error('Supported audits require a fresh root census');
 const dir=resolve(options.out??join(repo,'.audit','bishop-knight'));
 const workers=Number(options.workers??Math.min(8,availableParallelism()));
@@ -36,7 +39,7 @@ const memoPlugin={name:'audit-pure-placement-cache',setup(build){build.onLoad({f
  return {contents,loader:'ts'};
 });}};
 const bundles={};
-for(const stage of ['worker','reference-worker','validate','validate-symmetry','census','analyze','classify','report','reuse-roots']) {
+for(const stage of ['worker','reference-worker','validate','validate-symmetry','census','analyze','classify','positions','report','gate','reuse-roots']) {
  const result=await build({entryPoints:[join(here,(stage==='reference-worker'?'worker':stage)+'.mts')],bundle:true,platform:'node',format:'esm',write:false,plugins:stage==='worker'?[memoPlugin]:[]});
  bundles[stage]=result.outputFiles[0].contents;
 }
@@ -52,18 +55,18 @@ if(rootsFrom) {
  if(previousRootHash!==rootHash)throw new Error('Support or Black root policy changed; omit --roots-from and run a full census.');
 }
 const fingerprint=createHash('sha256');
-fingerprint.update(scope);
+fingerprint.update(scope).update(String(diagonal));
 fingerprint.update(readFileSync(fileURLToPath(import.meta.url)));
 fingerprint.update(readFileSync(join(here,'root-fingerprint.mjs')));
 for(const [name,bytes] of Object.entries(bundles))fingerprint.update(name).update(bytes);
 const hash=fingerprint.digest('hex'),manifestPath=join(dir,'manifest.json');
 if(existsSync(manifestPath)&&JSON.parse(readFileSync(manifestPath,'utf8')).fingerprint!==hash)throw new Error('Policy or audit implementation changed. Choose a new --out directory; stale checkpoints cannot be reused.');
 let commit='unknown';try{commit=execFileSync('git',['rev-parse','HEAD'],{cwd:repo,encoding:'utf8'}).trim();}catch{}
-if(!existsSync(manifestPath))writeFileSync(manifestPath,JSON.stringify({fingerprint:hash,referenceWorkerFingerprint:referenceHash,rootFingerprint:rootHash,rootCacheSource:rootsFrom||null,commit,startedAt:new Date().toISOString(),node:process.version,workers,population:scope,scope:scope==='supported'?'All supported post-White KBNvK placements; continue through support changes; stop at mate/capture/stalemate; all best-move ties; retain Black return history.':'All 13,660,584 post-White KBNvK placements; stop at support/mate/capture/stalemate; all best-move ties; retain Black return history.'},null,2));
+if(!existsSync(manifestPath))writeFileSync(manifestPath,JSON.stringify({fingerprint:hash,referenceWorkerFingerprint:referenceHash,rootFingerprint:rootHash,rootCacheSource:rootsFrom||null,commit,startedAt:new Date().toISOString(),node:process.version,workers,population:scope,diagonal:diagonal||null,scope:scope==='supported'?`All supported ${diagonal ? diagonal+'-diagonal ' : ''}post-White KBNvK placements; continue through support changes; stop at mate/capture/stalemate; all best-move ties; retain Black return history.`:'All 13,660,584 post-White KBNvK placements; stop at support/mate/capture/stalemate; all best-move ties; retain Black return history.'},null,2));
 for(const [name,bytes] of Object.entries(bundles))writeFileSync(join(dir,name+'.mjs'),bytes);
-const env={...process.env,AUDIT_SCOPE:scope,AUDIT_DIR:dir,AUDIT_HASH:hash,WORKERS:String(workers),AUDIT_COMPARE:options.compare?resolve(options.compare):'',AUDIT_ROOTS_FROM:rootsFrom,AUDIT_ROOT_HASH:rootHash};
-for(const stage of ['validate','validate-symmetry',...(rootsFrom?['reuse-roots']:[]),'census','analyze','classify','report']) {
- const stamp=join(dir,stage+'.complete');if(stage!=='report'&&existsSync(stamp)){console.log('Already complete:',stage);continue;}
+const env={...process.env,AUDIT_SCOPE:scope,AUDIT_DIAGONAL:String(diagonal),AUDIT_GATE:options.gate??'',AUDIT_DIR:dir,AUDIT_HASH:hash,WORKERS:String(workers),AUDIT_COMPARE:options.compare?resolve(options.compare):'',AUDIT_ROOTS_FROM:rootsFrom,AUDIT_ROOT_HASH:rootHash};
+for(const stage of ['validate','validate-symmetry',...(rootsFrom?['reuse-roots']:[]),'census','analyze','classify','positions','report',...(options.gate?['gate']:[])]) {
+ const stamp=join(dir,stage+'.complete');if(stage!=='report'&&stage!=='gate'&&existsSync(stamp)){console.log('Already complete:',stage);continue;}
  console.log('Starting:',stage);
  await new Promise((done,fail)=>{const child=spawn(process.execPath,[join(dir,stage+'.mjs')],{env,stdio:'inherit'});child.once('error',fail);child.once('exit',code=>code===0?done():fail(new Error(stage+' failed: '+code)));});
  writeFileSync(stamp,new Date().toISOString());

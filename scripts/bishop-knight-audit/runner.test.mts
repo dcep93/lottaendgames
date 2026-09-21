@@ -47,3 +47,12 @@ test('root reuse rejects a modified reference snapshot before importing data',()
   assert.doesNotMatch(result.stdout,/Starting:/);
  } finally {rmSync(dir,{recursive:true,force:true});}
 });
+
+test('stage and gate options fail closed for invalid or unsupported combinations',()=>{
+ for(const args of [['--diagonal','7'],['--scope','supported','--diagonal','4'],['--scope','supported','--gate','win']]) {
+  const result=spawnSync(process.execPath,[runner,...args],{encoding:'utf8'});
+  assert.notEqual(result.status,0);
+  assert.doesNotMatch(result.stdout,/Starting:/);
+  assert.match(result.stderr,/diagonal must be|gate must be/);
+ }
+});

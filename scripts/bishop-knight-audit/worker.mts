@@ -1,3 +1,4 @@
+import { includesRoot } from './population.mts';
 import { getChess } from '../../app/src/mate/chess.ts';
 import { getIdealKnightAndBishopWhiteMoves as white, getKnightAndBishopOpponentCandidates as black } from '../../app/src/mate/rules/bishopKnight.ts';
 import { knightAndBishopSupportedDiagonal as support } from '../../app/src/mate/rules/bishopKnightDiagonalSupport.ts';
@@ -19,7 +20,7 @@ const moveCode = (m: any) => sqIndex(m.from) * 64 + sqIndex(m.to);
 function root(key: number) {
     const f = fen(key, 'b'), ch = getChess(f), legal = ch.moves({ verbose: true });
     const supported = support(f, legal.map(m => m.to)).size;
-    if (continueSupport ? supported === 99 : supported !== 99)
+    if (!includesRoot(supported, process.env.AUDIT_SCOPE ?? 'unsupported', Number(process.env.AUDIT_DIAGONAL ?? 0)))
         return { key, supported, flags: 0, children: [] };
     if (!legal.length)
         return { key, supported, flags: ch.isCheckmate() ? 2 : 4, children: [] };

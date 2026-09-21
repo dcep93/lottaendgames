@@ -56,7 +56,9 @@ for (const [kind, batch] of [['root', roots], ['node', nodes]] as const) {
         const ch = getChess(fen(r.key, 'b'));
         const supported = support(ch.fen()).size;
         assert.equal(r.supported, supported);
-        const selected = process.env.AUDIT_SCOPE === 'supported' ? supported !== 99 : supported === 99;
+        const diagonal = Number(process.env.AUDIT_DIAGONAL ?? 0);
+        const selected = process.env.AUDIT_SCOPE === 'supported'
+            ? supported !== 99 && (!diagonal || supported === diagonal) : supported === 99;
         let flags = 0;
         const children = new Set<number>();
         if (selected) {

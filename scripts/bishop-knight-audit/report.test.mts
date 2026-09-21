@@ -36,3 +36,13 @@ test('an audit with no cycles writes a report and a null display loop', () => {
     rmSync(dir, { recursive: true, force: true });
   }
 });
+
+test('seven-stage percentages exclude five- and three-diagonal starting positions', () => {
+  const text=supportedReport({diagonal:7,counts:{legal:1000,supported:200,audited:40,
+    directOnAnyDiscoveredLoop:8,canLoop:24,noLoop:16,canMate:12,canFail:4},
+    graph:{cyclicFamilies:1,nodes:40,edges:42},families:[],
+    placements:{motifs:[{motif:'3-diagonal; edge bishop',positions:8}]}},{commit:'test',fingerprint:'test'});
+  assert.match(text,/40 7-diagonal post-White/);
+  assert.match(text,/Directly on a loop \| 8 \| 20\.0000%/);
+  assert.match(text,/3-diagonal; edge bishop \| 8/);
+});

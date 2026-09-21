@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "audit:diagonal": "node ../scripts/bishop-knight-audit/run.mjs --scope supported",
     "audit:unsupported": "node ../scripts/bishop-knight-audit/run.mjs",
     "test:audit:unsupported": "tsc -p ../scripts/bishop-knight-audit/tsconfig.json && tsx --test ../scripts/bishop-knight-audit/*.test.mts",
     "build": "tsc -b && vite build",

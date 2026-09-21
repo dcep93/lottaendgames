@@ -1,3 +1,4 @@
+import { includesRoot } from './population.mts';
 import { DatabaseSync } from 'node:sqlite';
 import { writeFileSync } from 'node:fs';
 import assert from 'node:assert/strict';
@@ -162,7 +163,7 @@ for (const r of db.prepare('SELECT * FROM roots').iterate() as any) {
     counts.legal += r.weight;
     if (r.supported !== 99) counts.supported += r.weight;
     else counts.unsupported += r.weight;
-    if (supportedScope ? r.supported === 99 : r.supported !== 99) continue;
+    if (!includesRoot(r.supported, process.env.AUDIT_SCOPE ?? 'unsupported', Number(process.env.AUDIT_DIAGONAL ?? 0))) continue;
     counts.audited += r.weight;
     const c: number[] = JSON.parse(r.children), l = c.some(i => loop[i]), s = c.some(i => hasSupport[i]), m = !!(r.flags & 2) || c.some(i => hasMate[i]), f = !!(r.flags & 4) || c.some(i => hasFailure[i]);
     if (l)
@@ -305,7 +306,7 @@ for (const kind of [...new Set(families.map(f => f.kind))]) {
     const fs = families.filter(f => f.kind === kind);
     archetypes.push({ kind, families: fs.length, closedFamilies: fs.filter(f => f.closed).length, canReachFromUnsupportedPlacements: roots, cyclePlies: [...new Set(fs.map(f => f.cyclePlies))].sort((a, b) => a - b), rules: [...new Set(fs.flatMap(f => f.rules))].sort() });
 }
-const result = { population: supportedScope ? 'supported' : 'unsupported', counts, graph: { nodes: n, edges, cyclicNodes: cyclic.reduce((s, v) => s + v, 0), cyclicFamilies: families.length }, archetypes, families, policyFingerprint: (db.prepare("SELECT value FROM meta WHERE key='hash'").get() as any).value };
+const result = { diagonal: Number(process.env.AUDIT_DIAGONAL ?? 0) || null, population: supportedScope ? 'supported' : 'unsupported', counts, graph: { nodes: n, edges, cyclicNodes: cyclic.reduce((s, v) => s + v, 0), cyclicFamilies: families.length }, archetypes, families, policyFingerprint: (db.prepare("SELECT value FROM meta WHERE key='hash'").get() as any).value };
 writeFileSync(dir + '/node-outcomes.bin', Uint8Array.from({ length: n }, (_, i) => Number(!!loop[i]) | Number(!!hasSupport[i]) << 1 | Number(!!hasMate[i]) << 2 | Number(!!hasFailure[i]) << 3));
 writeFileSync(dir + '/result.json', JSON.stringify(result, null, 2));
 writeFileSync(dir + '/loop-leading-roots.json', JSON.stringify(rootLoops));
