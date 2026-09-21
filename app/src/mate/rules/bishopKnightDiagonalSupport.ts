@@ -8,8 +8,7 @@ const CANONICAL_DIAGONALS: readonly {
   wall: readonly Square[];
   boundary: readonly Square[];
   previousSupport?: Square;
-  previousSupportKings?: readonly Square[];
-  previousSupportBishops?: readonly Square[];
+  previousSupportPlacements?: readonly {king: Square; bishops: readonly Square[]}[];
   support: readonly Square[];
   kingSupportTargets?: readonly {king: Square; targets: readonly Square[]}[];
   kingGuard?: Square;
@@ -31,8 +30,12 @@ const CANONICAL_DIAGONALS: readonly {
     wall: ['a4', 'b5', 'c6', 'd7', 'e8'],
     boundary: ['a3', 'b4', 'c5', 'd6', 'e7', 'f8'],
     previousSupport: 'd3',
-    previousSupportKings: ['c5', 'c6', 'c7'],
-    previousSupportBishops: ['a4', 'c6', 'd7'],
+    previousSupportPlacements: [
+      {king: 'c5', bishops: ['a4', 'c6', 'd7']},
+      {king: 'c6', bishops: ['a4', 'c6', 'd7']},
+      {king: 'c7', bishops: ['a4', 'c6', 'd7']},
+      {king: 'd6', bishops: ['a4']},
+    ],
     support: ['d5'],
     kingGuard: 'd6',
     bishopAttackRaceTarget: 'e7',
@@ -57,8 +60,10 @@ const DIAGONALS = CANONICAL_DIAGONALS.flatMap(pattern => SQUARE_TRANSFORMS.map(t
   wall: pattern.wall.map(square => transformSquare(square, transform)),
   boundary: pattern.boundary.map(square => transformSquare(square, transform)),
   previousSupport: pattern.previousSupport && transformSquare(pattern.previousSupport, transform),
-  previousSupportKings: pattern.previousSupportKings?.map(square => transformSquare(square, transform)),
-  previousSupportBishops: pattern.previousSupportBishops?.map(square => transformSquare(square, transform)),
+  previousSupportPlacements: pattern.previousSupportPlacements?.map(entry => ({
+    king: transformSquare(entry.king, transform),
+    bishops: entry.bishops.map(square => transformSquare(square, transform)),
+  })),
   support: pattern.support.map(square => transformSquare(square, transform)),
   kingSupportTargets: pattern.kingSupportTargets?.map(entry => ({
     king: transformSquare(entry.king, transform),
@@ -104,7 +109,6 @@ const THREE_BISHOP_RACES = SQUARE_TRANSFORMS.map(transform => ({
 }))
 
 const DECLARED_FIVE_SUPPORT = [
-  {king: 'd6', bishop: 'a4', knight: 'd3', black: 'b7'},
   {king: 'e7', bishop: 'c6', knight: 'b4', black: 'c7'},
   {king: 'd4', bishop: 'c6', knight: 'b4', black: 'b6'},
   {king: 'd4', bishop: 'c6', knight: 'd5', black: 'a5'},
@@ -302,8 +306,8 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
     const kingSupportsThree = pattern.wall.length === 3 && pattern.wall
       .some(square => square !== knight.square && kingDistance(white.square, square) === 1)
     if (pattern.wall.length === 3 && !kingSupportsThree) continue
-    if (knight.square === pattern.previousSupport && pattern.previousSupportKings &&
-      (!pattern.previousSupportKings.includes(white.square) || !pattern.previousSupportBishops?.includes(bishop.square))) continue
+    if (knight.square === pattern.previousSupport && pattern.previousSupportPlacements &&
+      !pattern.previousSupportPlacements.some(entry => entry.king === white.square && entry.bishops.includes(bishop.square))) continue
     if (knight.square === pattern.previousSupport && pattern.bishopAttackRaceTarget &&
       losesBishopAttackRace(fen, white.square, black.square, bishop.square, pattern.bishopAttackRaceTarget)) continue
     const distance = supportDistance(fen, white.square, pattern)
