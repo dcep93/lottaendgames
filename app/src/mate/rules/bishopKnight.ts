@@ -571,7 +571,7 @@ const bishopKnightHelp: RuleHelp = {
     "r2.5 exact preferences: With Bb3 and Nd3, White Kc7 against Black Ka5 prefers Kc6, and White Kc6 against Black Ka6 prefers Kc5. White Kd6, Bb3 and Nd3 against Black Kb5 prefers Kd5. White Kf7 or Kf8, Bb3 and Nd3 against Black Kd6 prefers Ke8, before its general bishop and king-target preferences. Include reflections; move counters do not matter. r1.5 remains higher priority.",
     "Exact unsupported placement: White Kg4, Bf1 and Ne2 against Black Kh2 is not a supported three-diagonal. Include reflections; move counters do not matter.",
     "Exact unsupported placement: White Kb5, Bc8 and Nc6 against Black Ka7 is not a supported three-diagonal. Include reflections; move counters do not matter.",
-    "Exact supported five-diagonal placement: White Kd5, Ba4 and Nd3 against Black Kb6. Include reflections; move counters do not matter.",
+    "Exact supported five-diagonal placement: White Kd5, Ba4 and Nd3 against Black Kb6; White Kd5, Bd7 and Nd3 against Black Ka5. Include reflections; move counters do not matter.",
     "Exact supported placement: White Kb6, Bc8 and Nd6 against Black Kb8 is a supported three-diagonal despite the knight-only bishop defense. Include reflections; move counters do not matter.",
     "Exact placement exception: White Kd4, Bc6 and Nd5 against Black Ka5 is a supported five-diagonal despite the king boundary restriction. Include reflections; move counters do not matter.",
     "Narrow king-defense exception: Kd5/Bc6 versus Black Kc7 is a supported five-diagonal when the knight is one move from d5, despite the occupied knight target. Include reflections; move counters do not matter.",

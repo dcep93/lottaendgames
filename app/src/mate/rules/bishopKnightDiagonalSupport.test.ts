@@ -6,6 +6,25 @@ import { getIdealKnightAndBishopWhiteMoves, scoreKnightAndBishopWhiteMove } from
 
 const sixDiagonal = ['a3', 'b4', 'c5', 'd6', 'e7', 'f8'] as const
 
+test('declared second-move Bd7 with Kd5 Nd3 against Ka5 is supported and preferred', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    for (const counters of ['0 1', '42 22']) {
+      const board = getChess(transformFen(`8/8/1k6/3K4/8/1B1N4/8/8 w - - ${counters}`, transform))
+      board.move({from: transformSquare('b3', transform), to: transformSquare('a4', transform)})
+      board.move({from: transformSquare('b6', transform), to: transformSquare('a5', transform)})
+      const before = board.fen()
+      const move = board.move({from: transformSquare('a4', transform), to: transformSquare('d7', transform)}).san
+      assert.equal(knightAndBishopSupportedDiagonal(board.fen()).size, 5)
+      assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 5)
+      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(before), [move])
+    }
+    for (const nearby of [
+      '8/3B4/1k6/3K4/8/3N4/8/8 b - - 0 1',
+      '8/3B4/8/k7/3K4/3N4/8/8 b - - 0 1',
+    ]) assert.notEqual(knightAndBishopSupportedDiagonal(transformFen(nearby, transform)).size, 5)
+  }
+})
+
 test('declared Ba4 with Kd5 Nd3 against Kb6 is supported and preferred', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const counters of ['0 1', '42 22']) {
