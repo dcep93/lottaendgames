@@ -6,6 +6,24 @@ import { getIdealKnightAndBishopWhiteMoves, scoreKnightAndBishopWhiteMove } from
 
 const sixDiagonal = ['a3', 'b4', 'c5', 'd6', 'e7', 'f8'] as const
 
+test('declared Ba4 with Kd6 Nd3 against Kb7 is supported and preferred only in that placement', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    for (const counters of ['0 1', '42 22']) {
+      const before = transformFen(`8/1k6/3K4/8/8/1B1N4/8/8 w - - ${counters}`, transform)
+      const board = getChess(before)
+      const ba4 = board.move({from: transformSquare('b3', transform), to: transformSquare('a4', transform)}).san
+      assert.equal(knightAndBishopSupportedDiagonal(board.fen()).size, 5)
+      assert.equal(scoreKnightAndBishopWhiteMove(before, ba4).supportedDiagonalSizeScore, 5)
+      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(before), [ba4])
+    }
+    for (const fen of [
+      '8/k7/3K4/8/B7/3N4/8/8 b - - 0 1',
+      '8/8/1k1K4/8/B7/3N4/8/8 b - - 0 1',
+      '8/1k6/8/3K4/B7/3N4/8/8 b - - 0 1',
+    ]) assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 99)
+  }
+})
+
 test('Nd3 five support requires Ba4/Bc6/Bd7 and Kc5/c6/c7 across king placements, bishop squares and reflections', () => {
   for (const bishop of ['a4', 'b5', 'c6', 'd7', 'e8'] as const) {
     for (const king of allSquares()) {
