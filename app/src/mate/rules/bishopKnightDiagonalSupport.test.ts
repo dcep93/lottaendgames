@@ -6,6 +6,22 @@ import { getIdealKnightAndBishopWhiteMoves, scoreKnightAndBishopWhiteMove } from
 
 const sixDiagonal = ['a3', 'b4', 'c5', 'd6', 'e7', 'f8'] as const
 
+test('declared Bb1 with Kd3 Nc4 against Kd1 is unsupported only in its exact placement', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    for (const counters of ['0 1', '43 27']) {
+      const before = transformFen(`8/8/8/8/2N5/3K4/B7/3k4 w - - ${counters}`, transform)
+      const board = getChess(before)
+      const move = board.move({from: transformSquare('a2', transform), to: transformSquare('b1', transform)}).san
+      assert.deepEqual(knightAndBishopSupportedDiagonal(board.fen()), {size: 99, knight: 99})
+      assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 99)
+    }
+    for (const nearby of [
+      '8/8/8/8/2N5/3K4/8/1B2k3 b - - 1 1',
+      '8/8/8/8/2N5/4K3/8/1B1k4 b - - 1 1',
+    ]) assert.equal(knightAndBishopSupportedDiagonal(transformFen(nearby, transform)).size, 7)
+  }
+})
+
 test('an approaching seven knight must leave c3 and d4 covered by the king races', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     const before = transformFen('8/5B2/4K3/1k2N3/8/8/8/8 w - - 0 1', transform)
