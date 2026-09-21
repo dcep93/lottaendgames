@@ -3,7 +3,6 @@ import { findPiece, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../
 // Only declarations added after the latest reset belong to r5.
 const declaredMoves = new Map<string, string>()
 for (const [position, from, to] of [
-  ['8/8/8/8/8/4NK2/6Bk/8 w - - 0 1', 'g2', 'f1'],
   ['8/8/8/8/6K1/7B/4N2k/8 w - - 0 1', 'e2', 'd4'],
   ['8/8/3k4/8/4BK2/3N4/8/8 w - - 0 1', 'f4', 'f5'],
   ['8/8/5k2/8/4BK2/3N4/8/8 w - - 0 1', 'e4', 'f5'],
@@ -58,6 +57,11 @@ const knightPreparationByPlacement = new Map(SQUARE_TRANSFORMS.map(transform => 
   transformSquare('h6', transform) + transformSquare('f5', transform),
 ]))
 
+const bishopPreparationByKings = new Map(SQUARE_TRANSFORMS.map(transform => [
+  (['f3', 'g2', 'h2'] as const).map(square => transformSquare(square, transform)).join('/'),
+  transformSquare('g2', transform) + transformSquare('f1', transform),
+]))
+
 const kingPreparationByWhitePlacement = new Map(SQUARE_TRANSFORMS.map(transform => [
   (['c5', 'd5', 'd4'] as const).map(square => transformSquare(square, transform)).join('/'),
   transformSquare('c5', transform) + transformSquare('d6', transform),
@@ -74,6 +78,10 @@ export function knightAndBishopDeclaredPreparationMove(fen: string): string | un
     : undefined
   if (kingPreparation) return kingPreparation
   const blackKing = findPiece(fen, 'b', 'k')
+  const bishopPreparation = whiteKing && bishop && blackKing
+    ? bishopPreparationByKings.get(`${whiteKing.square}/${bishop.square}/${blackKing.square}`)
+    : undefined
+  if (bishopPreparation) return bishopPreparation
   return bishop && knight && blackKing
     ? knightPreparationByPlacement.get(`${bishop.square}/${knight.square}/${blackKing.square}`)
     : undefined

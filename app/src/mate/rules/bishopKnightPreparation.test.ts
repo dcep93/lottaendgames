@@ -446,3 +446,30 @@ test('the declared Bf1 line reaches mate using best moves', () => {
   }
   assert.ok(board.isCheckmate())
 })
+
+
+test('r5 prescribes Bf1 with Kf3 Bg2 against Kh2 independently of the knight, including reflections', () => {
+  for (const square of SQUARES) {
+    if (['f3', 'g2', 'h2'].includes(square)) continue
+    const board = getChess('8/8/8/8/8/5K2/6Bk/8 w - - 0 1')
+    board.put({type: 'n', color: 'w'}, square)
+    for (const transform of SQUARE_TRANSFORMS) {
+      const fen = transformFen(board.fen(), transform)
+      assert.equal(knightAndBishopDeclaredPreparationMove(fen),
+        transformSquare('g2', transform) + transformSquare('f1', transform), fen)
+    }
+  }
+  // These different knight placements previously produced distinct shuttle loops.
+  for (const position of [
+    '8/8/8/8/4N3/5K2/6Bk/8 w - - 0 1',
+    '8/8/8/3N4/8/5K2/6Bk/8 w - - 0 1',
+  ]) {
+    for (const transform of SQUARE_TRANSFORMS) {
+      const fen = transformFen(position, transform)
+      const expected = getChess(fen).move({from: transformSquare('g2', transform), to: transformSquare('f1', transform)}).san
+      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [expected])
+    }
+  }
+  assert.equal(knightAndBishopDeclaredPreparationMove('8/8/8/8/4N3/5K2/6Bk/8 b - - 1 1'), undefined)
+  assert.equal(knightAndBishopDeclaredPreparationMove('8/8/8/8/4N3/5K2/6B1/7k w - - 0 1'), undefined)
+})
