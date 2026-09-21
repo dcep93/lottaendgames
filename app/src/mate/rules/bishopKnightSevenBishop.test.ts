@@ -3,6 +3,7 @@ import test from 'node:test'
 import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess'
 import { bishopKnightRuleSet, getIdealKnightAndBishopWhiteMoves, knightAndBishopWhiteRules, scoreKnightAndBishopWhiteMove } from './bishopKnight'
 import { selectIdealMoves } from './selection'
+import { getMateRuleSet } from './index'
 
 const fen = '8/8/8/1k1B4/3K4/3N4/8/8 w - - 0 1'
 test('supported seven prefers b3 in the knight support orientation, including every reflection', () => {
@@ -166,5 +167,36 @@ test('r2.5 prescribes loaded Kc6 then Kc5 while preserving seven support', () =>
       }
     }
     line.move({from, to}); line.move(reply)
+  }
+})
+
+
+test('r2.5 prescribes second-move Kc5 on the supported five diagonal without overriding r1.5', () => {
+  const line = getChess('8/3B4/1k6/3K4/8/3N4/8/8 w - - 0 1')
+  line.move('Kd6'); line.move('Ka5')
+  for (const transform of SQUARE_TRANSFORMS) {
+    for (const counters of ['2 2', '41 23']) {
+      const position = transformFen(line.fen().replace(/\d+ \d+$/, counters), transform)
+      const san = (to: 'c5' | 'd5') => getChess(position).move({from: transformSquare('d6', transform), to: transformSquare(to, transform)}).san
+      const preferred = scoreKnightAndBishopWhiteMove(position, san('c5'))
+      const former = scoreKnightAndBishopWhiteMove(position, san('d5'))
+      assert.equal(preferred.supportedDiagonalSizeScore, 5)
+      assert.equal(former.supportedDiagonalSizeScore, 5)
+      assert.equal(preferred.declaredSupportedFivePenalty, 0)
+      assert.equal(former.declaredSupportedFivePenalty, 1)
+      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(position), [san('c5')])
+      assert.equal(getMateRuleSet('bishop-knight').currentWhiteHint(position)?.id, 'r2.5')
+      const candidates = bishopKnightRuleSet.scoreWhiteCandidates!(position, bishopKnightRuleSet.whiteMoves(position))
+      const earlierRules = knightAndBishopWhiteRules.slice(0, knightAndBishopWhiteRules.findIndex(r => r.id === 'r2.5'))
+      assert.ok(selectIdealMoves(candidates, earlierRules).includes(san('c5')))
+    }
+    const nearby = transformFen('8/3B4/k2K4/8/8/3N4/8/8 w - - 0 1', transform)
+    for (const move of getChess(nearby).moves()) {
+      const score = scoreKnightAndBishopWhiteMove(nearby, move)
+      assert.equal(score.declaredSupportedFivePenalty, undefined)
+      if (score.supportedDiagonalSizeScore === 5) {
+        assert.equal(knightAndBishopWhiteRules.find(r => r.id === 'r2.5')!.applies!(score), false)
+      }
+    }
   }
 })
