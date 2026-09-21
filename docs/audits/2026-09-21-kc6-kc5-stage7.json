@@ -1,0 +1,1211 @@
+{
+  "diagonal": 7,
+  "population": "supported",
+  "counts": {
+    "legal": 13660584,
+    "supported": 154468,
+    "unsupported": 13506116,
+    "canLoop": 130584,
+    "noLoop": 3560,
+    "directOnReachableLoop": 32,
+    "directOnAnyDiscoveredLoop": 32,
+    "onlyLoopOutcomes": 130512,
+    "loopAndSupport": 0,
+    "canReachSupport": 0,
+    "canMate": 848,
+    "canFail": 2784,
+    "audited": 134144
+  },
+  "graph": {
+    "nodes": 21985,
+    "edges": 22515,
+    "cyclicNodes": 10,
+    "cyclicFamilies": 4
+  },
+  "archetypes": [
+    {
+      "kind": "King shuffle",
+      "families": 4,
+      "closedFamilies": 4,
+      "canReachFromUnsupportedPlacements": 130584,
+      "cyclePlies": [
+        4,
+        8
+      ],
+      "rules": [
+        "r1.5",
+        "r10",
+        "r2.5"
+      ]
+    }
+  ],
+  "families": [
+    {
+      "id": 1,
+      "component": 21891,
+      "nodeIds": [
+        14161,
+        15862,
+        17258,
+        18132
+      ],
+      "kind": "King shuffle",
+      "whitePieces": [
+        "K"
+      ],
+      "states": 4,
+      "internalEdges": 4,
+      "exitEdges": 0,
+      "closed": true,
+      "canReachSupport": false,
+      "canMate": false,
+      "canFail": false,
+      "rules": [
+        "r10",
+        "r2.5"
+      ],
+      "precageTargetsSwitch": false,
+      "stationaryCentralBishop": false,
+      "frames": [
+        {
+          "fen": "8/8/4N1B1/8/8/5K1k/8/8 w - - 0 1",
+          "move": "Kf4",
+          "rule": "r2.5",
+          "precageTargets": [],
+          "selectionTrace": [
+            {
+              "rule": "r1.5",
+              "priority": 1,
+              "meaning": "supported diagonal size",
+              "survivors": [
+                "Nc7",
+                "Nd8",
+                "Nf8",
+                "Ng7",
+                "Ng5+",
+                "Nf4+",
+                "Nd4",
+                "Nc5",
+                "Bh7",
+                "Bf5+",
+                "Be4",
+                "Bd3",
+                "Bc2",
+                "Bb1",
+                "Ke4",
+                "Kf4",
+                "Kf2",
+                "Ke2",
+                "Ke3"
+              ]
+            },
+            {
+              "rule": "r1.5",
+              "priority": 2,
+              "meaning": "knight distance to support",
+              "survivors": [
+                "Bh7",
+                "Bf5+",
+                "Be4",
+                "Bd3",
+                "Bc2",
+                "Bb1",
+                "Ke4",
+                "Kf4",
+                "Kf2",
+                "Ke2",
+                "Ke3"
+              ]
+            },
+            {
+              "rule": "r2.5",
+              "priority": 1,
+              "meaning": "r2.5",
+              "survivors": [
+                "Kf4"
+              ]
+            }
+          ],
+          "decidingPriority": "r2.5"
+        },
+        {
+          "fen": "8/8/4N1B1/8/5K1k/8/8/8 w - - 2 2",
+          "move": "Ke3",
+          "rule": "r10",
+          "precageTargets": [],
+          "selectionTrace": [
+            {
+              "rule": "minors safe",
+              "priority": 1,
+              "meaning": "minors safe",
+              "survivors": [
+                "Nc7",
+                "Nd8",
+                "Nf8",
+                "Ng7",
+                "Ng5",
+                "Nd4",
+                "Nc5",
+                "Bf7",
+                "Be8",
+                "Bh7",
+                "Bf5",
+                "Be4",
+                "Bd3",
+                "Bc2",
+                "Bb1",
+                "Ke5",
+                "Kf5",
+                "Kf3",
+                "Ke3",
+                "Ke4"
+              ]
+            },
+            {
+              "rule": "no stalemate",
+              "priority": 1,
+              "meaning": "no stalemate",
+              "survivors": [
+                "Nc7",
+                "Nd8",
+                "Nf8",
+                "Ng7",
+                "Nd4",
+                "Nc5",
+                "Bf7",
+                "Be8",
+                "Bh7",
+                "Bf5",
+                "Be4",
+                "Bd3",
+                "Bc2",
+                "Bb1",
+                "Ke5",
+                "Kf5",
+                "Kf3",
+                "Ke3",
+                "Ke4"
+              ]
+            },
+            {
+              "rule": "r1.5",
+              "priority": 1,
+              "meaning": "supported diagonal size",
+              "survivors": [
+                "Nc7",
+                "Nd8",
+                "Nf8",
+                "Ng7",
+                "Nd4",
+                "Nc5",
+                "Bh7",
+                "Bf5",
+                "Be4",
+                "Bd3",
+                "Bc2",
+                "Bb1",
+                "Ke5",
+                "Kf5",
+                "Kf3",
+                "Ke3",
+                "Ke4"
+              ]
+            },
+            {
+              "rule": "r1.5",
+              "priority": 2,
+              "meaning": "knight distance to support",
+              "survivors": [
+                "Bh7",
+                "Bf5",
+                "Be4",
+                "Bd3",
+                "Bc2",
+                "Bb1",
+                "Ke5",
+                "Kf5",
+                "Kf3",
+                "Ke3",
+                "Ke4"
+              ]
+            },
+            {
+              "rule": "r2.5",
+              "priority": 4,
+              "meaning": "r2.5",
+              "survivors": [
+                "Ke5",
+                "Kf5",
+                "Kf3",
+                "Ke3",
+                "Ke4"
+              ]
+            },
+            {
+              "rule": "r2.5",
+              "priority": 6,
+              "meaning": "r2.5",
+              "survivors": [
+                "Kf3",
+                "Ke3"
+              ]
+            },
+            {
+              "rule": "r10",
+              "priority": 1,
+              "meaning": "king center distance",
+              "survivors": [
+                "Ke3"
+              ]
+            }
+          ],
+          "decidingPriority": "king center distance"
+        },
+        {
+          "fen": "8/8/4N1B1/8/6k1/4K3/8/8 w - - 4 3",
+          "move": "Kf2",
+          "rule": "r2.5",
+          "precageTargets": [],
+          "selectionTrace": [
+            {
+              "rule": "minors safe",
+              "priority": 1,
+              "meaning": "minors safe",
+              "survivors": [
+                "Nc7",
+                "Nd8",
+                "Nf8",
+                "Ng7",
+                "Nf4",
+                "Nd4",
+                "Nc5",
+                "Bf7",
+                "Be8",
+                "Bh7",
+                "Be4",
+                "Bd3",
+                "Bc2",
+                "Bb1",
+                "Kd4",
+                "Ke4",
+                "Kf2",
+                "Ke2",
+                "Kd2",
+                "Kd3"
+              ]
+            },
+            {
+              "rule": "r1.5",
+              "priority": 1,
+              "meaning": "supported diagonal size",
+              "survivors": [
+                "Bh7",
+                "Be4",
+                "Bd3",
+                "Bc2",
+                "Bb1",
+                "Kd4",
+                "Ke4",
+                "Kf2",
+                "Ke2",
+                "Kd2",
+                "Kd3"
+              ]
+            },
+            {
+              "rule": "r2.5",
+              "priority": 1,
+              "meaning": "r2.5",
+              "survivors": [
+                "Kf2"
+              ]
+            }
+          ],
+          "decidingPriority": "r2.5"
+        },
+        {
+          "fen": "8/8/4N1B1/8/7k/8/5K2/8 w - - 6 4",
+          "move": "Kf3",
+          "rule": "r2.5",
+          "precageTargets": [],
+          "selectionTrace": [
+            {
+              "rule": "minors safe",
+              "priority": 1,
+              "meaning": "minors safe",
+              "survivors": [
+                "Nc7",
+                "Nd8",
+                "Nf8",
+                "Ng7",
+                "Nf4",
+                "Nd4",
+                "Nc5",
+                "Bf7",
+                "Be8",
+                "Bh7",
+                "Bf5",
+                "Be4",
+                "Bd3",
+                "Bc2",
+                "Bb1",
+                "Ke3",
+                "Kf3",
+                "Kg2",
+                "Kg1",
+                "Kf1",
+                "Ke1",
+                "Ke2"
+              ]
+            },
+            {
+              "rule": "r1.5",
+              "priority": 1,
+              "meaning": "supported diagonal size",
+              "survivors": [
+                "Bh7",
+                "Bf5",
+                "Be4",
+                "Bd3",
+                "Bc2",
+                "Bb1",
+                "Ke3",
+                "Kf3",
+                "Kg2",
+                "Kg1",
+                "Kf1",
+                "Ke1",
+                "Ke2"
+              ]
+            },
+            {
+              "rule": "r2.5",
+              "priority": 1,
+              "meaning": "r2.5",
+              "survivors": [
+                "Kf3"
+              ]
+            }
+          ],
+          "decidingPriority": "r2.5"
+        }
+      ],
+      "witness": {
+        "fen": "8/8/4N1B1/8/8/5K1k/8/8 w - - 0 1",
+        "moves": [
+          "Kf4",
+          "Kh4",
+          "Ke3",
+          "Kg4",
+          "Kf2",
+          "Kh4",
+          "Kf3",
+          "Kh3"
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/4N1B1/8/8/5K1k/8/8_w_-_-_0_1&moves=Kf4,Kh4,Ke3,Kg4,Kf2,Kh4,Kf3,Kh3&cursor=0",
+        "freshLoadVerified": true,
+        "displayConvention": true
+      },
+      "cyclePlies": 8,
+      "decidingPriorities": [
+        "r2.5",
+        "king center distance"
+      ],
+      "mechanism": "King shuffle / king center distance + r2.5",
+      "reachablePlacements": 32120,
+      "exclusivePlacements": 27776
+    },
+    {
+      "id": 2,
+      "component": 17042,
+      "nodeIds": [
+        21126,
+        21162
+      ],
+      "kind": "King shuffle",
+      "whitePieces": [
+        "K"
+      ],
+      "states": 2,
+      "internalEdges": 2,
+      "exitEdges": 0,
+      "closed": true,
+      "canReachSupport": false,
+      "canMate": false,
+      "canFail": false,
+      "rules": [
+        "r10"
+      ],
+      "precageTargetsSwitch": false,
+      "stationaryCentralBishop": false,
+      "frames": [
+        {
+          "fen": "8/8/8/8/4NK2/5B1k/8/8 w - - 0 1",
+          "move": "Ke3",
+          "rule": "r10",
+          "precageTargets": [],
+          "selectionTrace": [
+            {
+              "rule": "minors safe",
+              "priority": 1,
+              "meaning": "minors safe",
+              "survivors": [
+                "Nc5",
+                "Nd6",
+                "Nf6",
+                "Ng5+",
+                "Ng3",
+                "Nf2+",
+                "Nd2",
+                "Nc3",
+                "Ke5",
+                "Kf5",
+                "Kg5",
+                "Ke3",
+                "Bg4+",
+                "Bh5",
+                "Bh1",
+                "Be2",
+                "Bd1"
+              ]
+            },
+            {
+              "rule": "r1.5",
+              "priority": 1,
+              "meaning": "supported diagonal size",
+              "survivors": [
+                "Nc5",
+                "Nd6",
+                "Nf6",
+                "Ng5+",
+                "Ng3",
+                "Nf2+",
+                "Nd2",
+                "Nc3",
+                "Kf5",
+                "Kg5",
+                "Ke3",
+                "Bg4+",
+                "Bh5",
+                "Be2",
+                "Bd1"
+              ]
+            },
+            {
+              "rule": "r1.5",
+              "priority": 2,
+              "meaning": "knight distance to support",
+              "survivors": [
+                "Kf5",
+                "Kg5",
+                "Ke3",
+                "Bg4+",
+                "Bh5",
+                "Be2",
+                "Bd1"
+              ]
+            },
+            {
+              "rule": "r10",
+              "priority": 1,
+              "meaning": "king center distance",
+              "survivors": [
+                "Kf5",
+                "Ke3",
+                "Bg4+",
+                "Bh5",
+                "Be2",
+                "Bd1"
+              ]
+            },
+            {
+              "rule": "r10",
+              "priority": 2,
+              "meaning": "king off bishop color",
+              "survivors": [
+                "Ke3",
+                "Bg4+",
+                "Bh5",
+                "Be2",
+                "Bd1"
+              ]
+            },
+            {
+              "rule": "r10",
+              "priority": 3,
+              "meaning": "bishop on long diagonal",
+              "survivors": [
+                "Ke3"
+              ]
+            }
+          ],
+          "decidingPriority": "bishop on long diagonal"
+        },
+        {
+          "fen": "8/8/8/8/4N2k/4KB2/8/8 w - - 2 2",
+          "move": "Kf4",
+          "rule": "r10",
+          "precageTargets": [],
+          "selectionTrace": [
+            {
+              "rule": "minors safe",
+              "priority": 1,
+              "meaning": "minors safe",
+              "survivors": [
+                "Nc5",
+                "Nd6",
+                "Nf6",
+                "Nf2",
+                "Nd2",
+                "Nc3",
+                "Kd4",
+                "Kf4",
+                "Kf2",
+                "Ke2",
+                "Kd2",
+                "Kd3",
+                "Bg2",
+                "Bh1",
+                "Be2",
+                "Bd1"
+              ]
+            },
+            {
+              "rule": "r1.5",
+              "priority": 1,
+              "meaning": "supported diagonal size",
+              "survivors": [
+                "Kf4",
+                "Kf2",
+                "Ke2",
+                "Kd2",
+                "Kd3",
+                "Be2",
+                "Bd1"
+              ]
+            },
+            {
+              "rule": "r10",
+              "priority": 1,
+              "meaning": "king center distance",
+              "survivors": [
+                "Kf4",
+                "Kd3",
+                "Be2",
+                "Bd1"
+              ]
+            },
+            {
+              "rule": "r10",
+              "priority": 2,
+              "meaning": "king off bishop color",
+              "survivors": [
+                "Kf4",
+                "Be2",
+                "Bd1"
+              ]
+            },
+            {
+              "rule": "r10",
+              "priority": 3,
+              "meaning": "bishop on long diagonal",
+              "survivors": [
+                "Kf4"
+              ]
+            }
+          ],
+          "decidingPriority": "bishop on long diagonal"
+        }
+      ],
+      "witness": {
+        "fen": "8/8/8/8/4NK2/5B1k/8/8 w - - 0 1",
+        "moves": [
+          "Ke3",
+          "Kh4",
+          "Kf4",
+          "Kh3"
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/8/4NK2/5B1k/8/8_w_-_-_0_1&moves=Ke3,Kh4,Kf4,Kh3&cursor=0",
+        "freshLoadVerified": true,
+        "displayConvention": true
+      },
+      "cyclePlies": 4,
+      "decidingPriorities": [
+        "bishop on long diagonal"
+      ],
+      "mechanism": "King shuffle / bishop on long diagonal",
+      "reachablePlacements": 1680,
+      "exclusivePlacements": 1080
+    },
+    {
+      "id": 3,
+      "component": 21978,
+      "nodeIds": [
+        21164,
+        21332
+      ],
+      "kind": "King shuffle",
+      "whitePieces": [
+        "K"
+      ],
+      "states": 2,
+      "internalEdges": 2,
+      "exitEdges": 0,
+      "closed": true,
+      "canReachSupport": false,
+      "canMate": false,
+      "canFail": false,
+      "rules": [
+        "r10"
+      ],
+      "precageTargetsSwitch": false,
+      "stationaryCentralBishop": false,
+      "frames": [
+        {
+          "fen": "2k5/8/2B5/3NK3/8/8/8/8 w - - 0 1",
+          "move": "Kd6",
+          "rule": "r10",
+          "precageTargets": [],
+          "selectionTrace": [
+            {
+              "rule": "minors safe",
+              "priority": 1,
+              "meaning": "minors safe",
+              "survivors": [
+                "Ba8",
+                "Be8",
+                "Bb5",
+                "Ba4",
+                "Nb6+",
+                "Ne7+",
+                "Nf6",
+                "Nf4",
+                "Ne3",
+                "Nc3",
+                "Nb4",
+                "Kd6",
+                "Ke6",
+                "Kf6",
+                "Kf5",
+                "Kf4",
+                "Ke4",
+                "Kd4"
+              ]
+            },
+            {
+              "rule": "r1.5",
+              "priority": 1,
+              "meaning": "supported diagonal size",
+              "survivors": [
+                "Kd6",
+                "Ke6"
+              ]
+            },
+            {
+              "rule": "r10",
+              "priority": 2,
+              "meaning": "king off bishop color",
+              "survivors": [
+                "Kd6"
+              ]
+            }
+          ],
+          "decidingPriority": "king off bishop color"
+        },
+        {
+          "fen": "3k4/8/2BK4/3N4/8/8/8/8 w - - 2 2",
+          "move": "Ke5",
+          "rule": "r10",
+          "precageTargets": [],
+          "selectionTrace": [
+            {
+              "rule": "minors safe",
+              "priority": 1,
+              "meaning": "minors safe",
+              "survivors": [
+                "Bb7",
+                "Ba8",
+                "Bd7",
+                "Bb5",
+                "Ba4",
+                "Ke6",
+                "Ke5",
+                "Kc5",
+                "Nb6",
+                "Nc7",
+                "Ne7",
+                "Nf6",
+                "Nf4",
+                "Ne3",
+                "Nc3",
+                "Nb4"
+              ]
+            },
+            {
+              "rule": "no stalemate",
+              "priority": 1,
+              "meaning": "no stalemate",
+              "survivors": [
+                "Bb7",
+                "Ba8",
+                "Bb5",
+                "Ba4",
+                "Ke6",
+                "Ke5",
+                "Kc5",
+                "Nc7",
+                "Nf6",
+                "Nf4",
+                "Ne3",
+                "Nc3",
+                "Nb4"
+              ]
+            },
+            {
+              "rule": "r1.5",
+              "priority": 1,
+              "meaning": "supported diagonal size",
+              "survivors": [
+                "Bb5",
+                "Ba4",
+                "Ke6",
+                "Ke5",
+                "Kc5",
+                "Nc7",
+                "Nf6",
+                "Nf4",
+                "Ne3",
+                "Nc3",
+                "Nb4"
+              ]
+            },
+            {
+              "rule": "r1.5",
+              "priority": 2,
+              "meaning": "knight distance to support",
+              "survivors": [
+                "Bb5",
+                "Ba4",
+                "Ke6",
+                "Ke5",
+                "Kc5"
+              ]
+            },
+            {
+              "rule": "r10",
+              "priority": 1,
+              "meaning": "king center distance",
+              "survivors": [
+                "Ke5"
+              ]
+            }
+          ],
+          "decidingPriority": "king center distance"
+        }
+      ],
+      "witness": {
+        "fen": "2k5/8/2B5/3NK3/8/8/8/8 w - - 0 1",
+        "moves": [
+          "Kd6",
+          "Kd8",
+          "Ke5",
+          "Kc8"
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=2k5/8/2B5/3NK3/8/8/8/8_w_-_-_0_1&moves=Kd6,Kd8,Ke5,Kc8&cursor=0",
+        "freshLoadVerified": true,
+        "displayConvention": true
+      },
+      "cyclePlies": 4,
+      "decidingPriorities": [
+        "king off bishop color",
+        "king center distance"
+      ],
+      "mechanism": "King shuffle / king center distance + king off bishop color",
+      "reachablePlacements": 101504,
+      "exclusivePlacements": 96728
+    },
+    {
+      "id": 4,
+      "component": 16787,
+      "nodeIds": [
+        21185,
+        21472
+      ],
+      "kind": "King shuffle",
+      "whitePieces": [
+        "K"
+      ],
+      "states": 2,
+      "internalEdges": 2,
+      "exitEdges": 0,
+      "closed": true,
+      "canReachSupport": false,
+      "canMate": false,
+      "canFail": false,
+      "rules": [
+        "r1.5",
+        "r10"
+      ],
+      "precageTargetsSwitch": false,
+      "stationaryCentralBishop": false,
+      "frames": [
+        {
+          "fen": "8/8/8/8/2NK4/5Bk1/8/8 w - - 0 1",
+          "move": "Ke3",
+          "rule": "r1.5",
+          "precageTargets": [],
+          "selectionTrace": [
+            {
+              "rule": "minors safe",
+              "priority": 1,
+              "meaning": "minors safe",
+              "survivors": [
+                "Ne5",
+                "Nd2",
+                "Ke4",
+                "Ke3",
+                "Be4",
+                "Bd5",
+                "Bc6",
+                "Bb7",
+                "Ba8",
+                "Bh5",
+                "Bh1",
+                "Be2",
+                "Bd1"
+              ]
+            },
+            {
+              "rule": "r1.5",
+              "priority": 1,
+              "meaning": "supported diagonal size",
+              "survivors": [
+                "Ke3"
+              ]
+            }
+          ],
+          "decidingPriority": "supported diagonal size"
+        },
+        {
+          "fen": "8/8/8/8/2N4k/4KB2/8/8 w - - 2 2",
+          "move": "Kd4",
+          "rule": "r10",
+          "precageTargets": [],
+          "selectionTrace": [
+            {
+              "rule": "minors safe",
+              "priority": 1,
+              "meaning": "minors safe",
+              "survivors": [
+                "Na5",
+                "Nb6",
+                "Nd6",
+                "Ne5",
+                "Nd2",
+                "Nb2",
+                "Na3",
+                "Kd4",
+                "Ke4",
+                "Kf4",
+                "Kf2",
+                "Ke2",
+                "Kd2",
+                "Kd3",
+                "Be4",
+                "Bd5",
+                "Bc6",
+                "Bb7",
+                "Ba8",
+                "Bg2",
+                "Bh1",
+                "Be2",
+                "Bd1"
+              ]
+            },
+            {
+              "rule": "r10",
+              "priority": 1,
+              "meaning": "king center distance",
+              "survivors": [
+                "Kd4",
+                "Ke4"
+              ]
+            },
+            {
+              "rule": "r10",
+              "priority": 2,
+              "meaning": "king off bishop color",
+              "survivors": [
+                "Kd4"
+              ]
+            }
+          ],
+          "decidingPriority": "king off bishop color"
+        }
+      ],
+      "witness": {
+        "fen": "8/8/8/8/2NK4/5Bk1/8/8 w - - 0 1",
+        "moves": [
+          "Ke3",
+          "Kh4",
+          "Kd4",
+          "Kg3"
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/8/2NK4/5Bk1/8/8_w_-_-_0_1&moves=Ke3,Kh4,Kd4,Kg3&cursor=0",
+        "freshLoadVerified": true,
+        "displayConvention": true
+      },
+      "cyclePlies": 4,
+      "decidingPriorities": [
+        "supported diagonal size",
+        "king off bishop color"
+      ],
+      "mechanism": "King shuffle / king off bishop color + supported diagonal size",
+      "reachablePlacements": 176,
+      "exclusivePlacements": 168
+    }
+  ],
+  "policyFingerprint": "64592b1ad01346ad96988e2313caa8b6ac6d991897c6f781016438acd32eb7bb",
+  "decidingPriorityFamilies": {
+    "r2.5": 1,
+    "king center distance": 2,
+    "bishop on long diagonal": 1,
+    "king off bishop color": 2,
+    "supported diagonal size": 1
+  },
+  "topCoverage": [
+    {
+      "families": 1,
+      "placements": 101504
+    },
+    {
+      "families": 2,
+      "placements": 129336
+    },
+    {
+      "families": 3,
+      "placements": 130416
+    },
+    {
+      "families": 4,
+      "placements": 130584
+    }
+  ],
+  "mechanisms": [
+    {
+      "name": "King shuffle / king center distance + r2.5",
+      "families": 1,
+      "closedFamilies": 1,
+      "reachablePlacements": 32120,
+      "familyIds": [
+        1
+      ]
+    },
+    {
+      "name": "King shuffle / bishop on long diagonal",
+      "families": 1,
+      "closedFamilies": 1,
+      "reachablePlacements": 1680,
+      "familyIds": [
+        2
+      ]
+    },
+    {
+      "name": "King shuffle / king center distance + king off bishop color",
+      "families": 1,
+      "closedFamilies": 1,
+      "reachablePlacements": 101504,
+      "familyIds": [
+        3
+      ]
+    },
+    {
+      "name": "King shuffle / king off bishop color + supported diagonal size",
+      "families": 1,
+      "closedFamilies": 1,
+      "reachablePlacements": 176,
+      "familyIds": [
+        4
+      ]
+    }
+  ],
+  "placements": {
+    "directBySize": {
+      "5": 40,
+      "7": 32,
+      "99": 8
+    },
+    "allCyclePlacements": 80,
+    "selectedCyclePlacements": 32,
+    "motifs": [
+      {
+        "motif": "7-diagonal; interior king; interior bishop; bishop not king-protected; knight not king-protected",
+        "positions": 32,
+        "families": [
+          1
+        ]
+      },
+      {
+        "motif": "5-diagonal; interior king; interior bishop; bishop king-protected; knight king-protected",
+        "positions": 24,
+        "families": [
+          2,
+          3
+        ]
+      },
+      {
+        "motif": "5-diagonal; central king; interior bishop; bishop not king-protected; knight king-protected",
+        "positions": 8,
+        "families": [
+          3
+        ]
+      },
+      {
+        "motif": "5-diagonal; interior king; interior bishop; bishop king-protected; knight not king-protected",
+        "positions": 8,
+        "families": [
+          4
+        ]
+      },
+      {
+        "motif": "unsupported; central king; interior bishop; bishop not king-protected; knight king-protected",
+        "positions": 8,
+        "families": [
+          4
+        ]
+      }
+    ],
+    "boards": [
+      {
+        "key": 5035842,
+        "weight": 8,
+        "size": 7,
+        "families": [
+          1
+        ],
+        "motif": "7-diagonal; interior king; interior bishop; bishop not king-protected; knight not king-protected",
+        "K": "d3",
+        "B": "f2",
+        "N": "f4",
+        "black": "c1"
+      },
+      {
+        "key": 5151448,
+        "weight": 8,
+        "size": 7,
+        "families": [
+          1
+        ],
+        "motif": "7-diagonal; interior king; interior bishop; bishop not king-protected; knight not king-protected",
+        "K": "d3",
+        "B": "b6",
+        "N": "d6",
+        "black": "a4"
+      },
+      {
+        "key": 2792153,
+        "weight": 8,
+        "size": 7,
+        "families": [
+          1
+        ],
+        "motif": "7-diagonal; interior king; interior bishop; bishop not king-protected; knight not king-protected",
+        "K": "c2",
+        "B": "b6",
+        "N": "d6",
+        "black": "b4"
+      },
+      {
+        "key": 4773699,
+        "weight": 8,
+        "size": 7,
+        "families": [
+          1
+        ],
+        "motif": "7-diagonal; interior king; interior bishop; bishop not king-protected; knight not king-protected",
+        "K": "c3",
+        "B": "f2",
+        "N": "f4",
+        "black": "d1"
+      },
+      {
+        "key": 5056208,
+        "weight": 8,
+        "size": 5,
+        "families": [
+          2
+        ],
+        "motif": "5-diagonal; interior king; interior bishop; bishop king-protected; knight king-protected",
+        "K": "d3",
+        "B": "c3",
+        "N": "d4",
+        "black": "a3"
+      },
+      {
+        "key": 5056195,
+        "weight": 8,
+        "size": 5,
+        "families": [
+          2
+        ],
+        "motif": "5-diagonal; interior king; interior bishop; bishop king-protected; knight king-protected",
+        "K": "d3",
+        "B": "c3",
+        "N": "d4",
+        "black": "d1"
+      },
+      {
+        "key": 5056194,
+        "weight": 8,
+        "size": 5,
+        "families": [
+          3
+        ],
+        "motif": "5-diagonal; interior king; interior bishop; bishop king-protected; knight king-protected",
+        "K": "d3",
+        "B": "c3",
+        "N": "d4",
+        "black": "c1"
+      },
+      {
+        "key": 7165700,
+        "weight": 8,
+        "size": 5,
+        "families": [
+          3
+        ],
+        "motif": "5-diagonal; central king; interior bishop; bishop not king-protected; knight king-protected",
+        "K": "d4",
+        "B": "f3",
+        "N": "e4",
+        "black": "e1"
+      },
+      {
+        "key": 5056337,
+        "weight": 8,
+        "size": 5,
+        "families": [
+          4
+        ],
+        "motif": "5-diagonal; interior king; interior bishop; bishop king-protected; knight not king-protected",
+        "K": "d3",
+        "B": "c3",
+        "N": "f4",
+        "black": "b3"
+      },
+      {
+        "key": 7165599,
+        "weight": 8,
+        "size": 99,
+        "families": [
+          4
+        ],
+        "motif": "unsupported; central king; interior bishop; bishop not king-protected; knight king-protected",
+        "K": "d4",
+        "B": "f3",
+        "N": "c4",
+        "black": "h4"
+      }
+    ]
+  }
+}
