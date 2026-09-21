@@ -119,7 +119,7 @@ test("bishop-and-knight rules are registered", () => {
     {
       id: "r2.5",
       shortLabel: "rule r2.5",
-      helpText: "With a supported 7 diagonal, prefer the bishop on b3, then king step proximity to the square two files to the right of Black’s king (including reflections).",
+      helpText: "With a supported 7 diagonal, prefer the bishop on b3, then king step proximity to the square two files to the right of Black’s king, then king step proximity to e8 (including reflections).",
     },
     {
       id: "r4",

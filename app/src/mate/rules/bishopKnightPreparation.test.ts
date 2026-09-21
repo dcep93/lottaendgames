@@ -188,11 +188,11 @@ test('the #8 Ke6 declaration retains the earlier supported-diagonal priority', (
     assert.equal(knightAndBishopDeclaredPreparationMove(fen),
       transformSquare('e5', transform) + transformSquare('e6', transform))
     const supportedMove = getChess(fen).move({
-      from: transformSquare('d3', transform), to: transformSquare('f4', transform),
+      from: transformSquare('d3', transform), to: transformSquare('b2', transform),
     }).san
     assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [supportedMove])
-    // r1.5 removes Ke6; r10 breaks the tie between the supported knight moves.
-    assert.equal(getMateRuleSet('bishop-knight').currentWhiteHint(fen)?.id, 'r10')
+    // r1.5 still removes Ke6; r2.5's e8 tie-break now selects the support orientation.
+    assert.equal(getMateRuleSet('bishop-knight').currentWhiteHint(fen)?.id, 'r2.5')
   }
 })
 

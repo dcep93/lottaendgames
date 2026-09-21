@@ -54,6 +54,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly declaredSupportedSevenPenalty: number;
   readonly supportedSevenBishopPenalty: number;
   readonly supportedSevenKingTargetDistance: number;
+  readonly supportedSevenKingTieDistance: number;
   readonly mateScore: number;
   readonly stalemateScore: number;
   readonly pieceSafetyScore: number;
@@ -234,6 +235,10 @@ function scoreKnightAndBishopWhiteMoveCore(
       const support = supportedDiagonal ??= evaluateKnightAndBishopSupportedDiagonal(resultFen, blackReplies.map(move => move.to));
       return support.size === 7 && support.sevenBishopPenalty === 0 ? support.sevenKingTargetDistance ?? 0 : 0;
     },
+    get supportedSevenKingTieDistance() {
+      const support = supportedDiagonal ??= evaluateKnightAndBishopSupportedDiagonal(resultFen, blackReplies.map(move => move.to));
+      return support.size === 7 ? support.sevenKingTieDistance ?? 0 : 0;
+    },
     declaredSupportedSevenPenalty: context.declaredSupportedSevenMove && context.declaredSupportedSevenMove !== move.from + move.to ? 1 : 0,
     declaredCornerFlushPenalty: context.declaredCornerFlushMove && context.declaredCornerFlushMove !== move.from + move.to ? 1 : 0,
     declaredPreparationPenalty: context.declaredPreparationMove && context.declaredPreparationMove !== move.from + move.to ? 1 : 0,
@@ -314,12 +319,13 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     {
       id: "r2.5",
       shortLabel: "rule r2.5",
-      helpText: "With a supported 7 diagonal, prefer the bishop on b3, then king step proximity to the square two files to the right of Black’s king (including reflections).",
+      helpText: "With a supported 7 diagonal, prefer the bishop on b3, then king step proximity to the square two files to the right of Black’s king, then king step proximity to e8 (including reflections).",
       applies: score => score.supportedDiagonalSizeScore === 7,
       subpriorities: [
         { compare: (first, second) => first.declaredSupportedSevenPenalty - second.declaredSupportedSevenPenalty },
         { compare: (first, second) => first.supportedSevenBishopPenalty - second.supportedSevenBishopPenalty },
         { compare: (first, second) => first.supportedSevenKingTargetDistance - second.supportedSevenKingTargetDistance },
+        { compare: (first, second) => first.supportedSevenKingTieDistance - second.supportedSevenKingTieDistance },
       ],
     },
     {

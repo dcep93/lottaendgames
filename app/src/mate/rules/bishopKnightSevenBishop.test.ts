@@ -66,3 +66,19 @@ test('exact r2.5 Ke8 overrides the general target only for its declared placemen
     for(const move of getChess(nearby).moves()) assert.equal(scoreKnightAndBishopWhiteMove(nearby,move).declaredSupportedSevenPenalty,0)
   }
 })
+
+test('r2.5 breaks equal moving-target distances by approaching e8 in every reflection', () => {
+  const start = '8/8/3k1K2/8/8/1B1N4/8/8 w - - 2 2'
+  for (const transform of SQUARE_TRANSFORMS) {
+    const reflected = transformFen(start,transform)
+    const san = (to: 'f7' | 'f5' | 'g6') => getChess(reflected).move({from:transformSquare('f6',transform),to:transformSquare(to,transform)}).san
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(reflected),[san('f7')])
+    for (const [to,distance] of [['f7',1],['f5',3],['g6',2]] as const) {
+      const score = scoreKnightAndBishopWhiteMove(reflected,san(to))
+      assert.equal(score.supportedDiagonalSizeScore,7)
+      assert.equal(score.supportedSevenBishopPenalty,0)
+      assert.equal(score.supportedSevenKingTargetDistance,1)
+      assert.equal(score.supportedSevenKingTieDistance,distance)
+    }
+  }
+})
