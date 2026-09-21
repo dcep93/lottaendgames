@@ -82,3 +82,20 @@ test('r2.5 breaks equal moving-target distances by approaching e8 in every refle
     }
   }
 })
+
+test('r2.5 also prescribes Ke8 from Kf8 after Kf8 Kd6, including reflections', () => {
+  const line = getChess('8/3k1K2/8/8/8/1B1N4/8/8 w - - 0 1')
+  line.move('Kf8'); line.move('Kd6')
+  for (const transform of SQUARE_TRANSFORMS) {
+    for (const counters of ['2 2','41 23']) {
+      const reflected = transformFen(line.fen().replace(/\d+ \d+$/,counters),transform)
+      const expected = getChess(reflected).move({from:transformSquare('f8',transform),to:transformSquare('e8',transform)}).san
+      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(reflected),[expected])
+      const score = scoreKnightAndBishopWhiteMove(reflected,expected)
+      assert.equal(score.supportedDiagonalSizeScore,7)
+      assert.equal(score.supportedDiagonalKnightScore,0)
+    }
+    const nearby = transformFen(line.fen().replace('3k4','2k5'),transform)
+    for (const move of getChess(nearby).moves()) assert.equal(scoreKnightAndBishopWhiteMove(nearby,move).declaredSupportedSevenPenalty,0)
+  }
+})
