@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import { SQUARES } from 'chess.js'
 import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess'
-import { getIdealKnightAndBishopWhiteMoves } from './bishopKnight'
+import { getIdealKnightAndBishopWhiteMoves, getKnightAndBishopOpponentCandidates } from './bishopKnight'
 import { getMateRuleSet } from './index'
 import { knightAndBishopDeclaredPreparationMove } from './bishopKnightPreparation'
 import example from './bishopKnightFlushExample.json'
@@ -418,4 +418,31 @@ test('r5 selects Nd4 after the unsupported Bf1 placement is excluded, without ov
     assert.equal(getMateRuleSet('bishop-knight').currentWhiteHint(fen)?.id, 'r5')
     assert.equal(getMateRuleSet('bishop-knight').explainWhiteMove(fen, rejected)?.id, 'r1.5')
   }
+})
+
+
+test('r5 selects loaded 1. Bf1 from Kf3 Bg2 Ne3 against Kh2 in every reflection', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    const fen = transformFen('8/8/8/8/8/4NK2/6Bk/8 w - - 0 1', transform)
+    const expected = getChess(fen).move({from: transformSquare('g2', transform), to: transformSquare('f1', transform)}).san
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [expected])
+    assert.equal(getMateRuleSet('bishop-knight').currentWhiteHint(fen)?.id, 'r5')
+  }
+})
+
+
+test('the declared Bf1 line reaches mate using best moves', () => {
+  const board = getChess('8/8/8/8/8/4NK2/6Bk/8 w - - 0 1')
+  const history: string[] = []
+  for (const san of ['Bf1', 'Kg1', 'Ke2', 'Kh2', 'Kf2', 'Kh1', 'Bg2+', 'Kh2', 'Ng4#']) {
+    const before = board.fen()
+    if (board.turn() === 'w') {
+      assert.ok(getIdealKnightAndBishopWhiteMoves(before).includes(san))
+      history.push(before)
+    } else {
+      assert.ok(getKnightAndBishopOpponentCandidates(before, history.at(-2)).idealMoves.includes(san))
+    }
+    board.move(san)
+  }
+  assert.ok(board.isCheckmate())
 })
