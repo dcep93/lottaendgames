@@ -72,12 +72,16 @@ const UNSUPPORTED_THREE_ENDPOINTS = SQUARE_TRANSFORMS.map(transform => ({
   king: transformSquare('c8', transform),
 }))
 
-const UNSUPPORTED_THREE_PLACEMENTS = SQUARE_TRANSFORMS.map(transform => ({
-  bishop: transformSquare('c8', transform),
-  king: transformSquare('b5', transform),
-  knight: transformSquare('c6', transform),
-  black: transformSquare('a7', transform),
-}))
+const UNSUPPORTED_THREE_PLACEMENTS = [
+  {bishop: 'c8', king: 'b5', knight: 'c6', black: 'a7'},
+  {bishop: 'f1', king: 'g4', knight: 'e2', black: 'h2'},
+] as const
+const UNSUPPORTED_THREE_REFLECTIONS = UNSUPPORTED_THREE_PLACEMENTS.flatMap(placement => SQUARE_TRANSFORMS.map(transform => ({
+  bishop: transformSquare(placement.bishop, transform),
+  king: transformSquare(placement.king, transform),
+  knight: transformSquare(placement.knight, transform),
+  black: transformSquare(placement.black, transform),
+})))
 
 const UNSUPPORTED_THREE_KNIGHTS = SQUARE_TRANSFORMS.map(transform => ({
   bishop: transformSquare('c8', transform),
@@ -204,7 +208,7 @@ export function knightAndBishopSupportedDiagonal(fen: string, blackDestinations?
   const bishop = findPiece(fen, 'w', 'b')
   const knight = findPiece(fen, 'w', 'n')
   if (!white || !black || !bishop || !knight) return {size: 99, knight: 99}
-  if (UNSUPPORTED_THREE_PLACEMENTS.some(pattern =>
+  if (UNSUPPORTED_THREE_REFLECTIONS.some(pattern =>
     pattern.king === white.square && pattern.bishop === bishop.square &&
     pattern.knight === knight.square && pattern.black === black.square)) return {size: 99, knight: 99}
   if (isRecordedSupportedFiveKingDefense(fen)) return {size: 5, knight: 1}

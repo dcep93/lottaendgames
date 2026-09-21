@@ -646,3 +646,19 @@ test('Ba6 with Kc8 is unsupported in every reflection, regardless of knight plac
     }
   }
 })
+
+
+test('Kg4 Bf1 Ne2 against Kh2 is unsupported by exact placement, including reflections', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    const before = transformFen('8/8/8/8/6K1/7B/4N2k/8 w - - 0 1', transform)
+    const bf1 = getChess(before).move({from: transformSquare('h3', transform), to: transformSquare('f1', transform)}).san
+    assert.equal(scoreKnightAndBishopWhiteMove(before, bf1).supportedDiagonalSizeScore, 99)
+    const after = transformFen('8/8/8/8/6K1/8/4N2k/5B2 b - - 73 42', transform)
+    assert.deepEqual(knightAndBishopSupportedDiagonal(after), {size: 99, knight: 99})
+    for (const supported of [
+      '8/8/8/8/6K1/7B/4N2k/8 b - - 1 1',
+      '8/8/8/8/3N2K1/7B/7k/8 b - - 1 1',
+      '8/8/8/8/6K1/8/4N3/5B1k b - - 1 1',
+    ]) assert.equal(knightAndBishopSupportedDiagonal(transformFen(supported, transform)).size, 3)
+  }
+})
