@@ -1,7 +1,16 @@
 import { readFileSync, writeFileSync } from 'node:fs';
+import { supportedReport } from './supported-report.mts';
 const dir = process.env.AUDIT_DIR!;
 const r = JSON.parse(readFileSync(dir + '/result.json', 'utf8'));
 const manifest = JSON.parse(readFileSync(dir + '/manifest.json', 'utf8'));
+if (r.population === 'supported') {
+    writeFileSync(dir + '/report.md', supportedReport(r, manifest));
+    const top = [...r.families].sort((a: any, b: any) => b.reachablePlacements - a.reachablePlacements)
+        .find((f: any) => f.witness.freshLoadVerified);
+    writeFileSync(dir + '/display-loop.json', JSON.stringify(top ?? null, null, 2));
+    console.log(JSON.stringify({ counts: r.counts, graph: r.graph, top: top?.id ?? null }, null, 2));
+    process.exit(0);
+}
 const counts = r.counts, pct = (n: number) => ((100 * n) / counts.unsupported).toFixed(4) + '%', num = (n: number) => n.toLocaleString('en-US');
 const ranked = [...r.families].sort((a: any, b: any) => b.reachablePlacements - a.reachablePlacements);
 const previous = process.env.AUDIT_COMPARE ? JSON.parse(readFileSync(process.env.AUDIT_COMPARE, 'utf8')) : null;

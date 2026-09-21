@@ -12,6 +12,10 @@ test('audit command explains usage and rejects invalid worker counts',()=>{
  assert.equal(help.status,0);assert.match(help.stdout,/Resumes identical policy checkpoints/);
  const bad=spawnSync(process.execPath,[runner,'--workers','0'],{encoding:'utf8'});
  assert.notEqual(bad.status,0);assert.match(bad.stderr,/workers must be 1..32/);
+ const scope=spawnSync(process.execPath,[runner,'--scope','unknown'],{encoding:'utf8'});
+ assert.notEqual(scope.status,0);assert.match(scope.stderr,/scope must be unsupported or supported/);
+ const reuse=spawnSync(process.execPath,[runner,'--scope','supported','--roots-from','/unused'],{encoding:'utf8'});
+ assert.notEqual(reuse.status,0);assert.match(reuse.stderr,/Supported audits require a fresh root census/);
 });
 
 test('a stale fingerprint cannot overwrite a checkpoint or start workers',()=>{

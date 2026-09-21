@@ -13,12 +13,13 @@ type Policy = {
     flags: number;
     branches: Branch[];
 };
+const continueSupport = process.env.AUDIT_SCOPE === 'supported';
 const policies = new Map<number, Policy>();
 const moveCode = (m: any) => sqIndex(m.from) * 64 + sqIndex(m.to);
 function root(key: number) {
     const f = fen(key, 'b'), ch = getChess(f), legal = ch.moves({ verbose: true });
     const supported = support(f, legal.map(m => m.to)).size;
-    if (supported !== 99)
+    if (continueSupport ? supported === 99 : supported !== 99)
         return { key, supported, flags: 0, children: [] };
     if (!legal.length)
         return { key, supported, flags: ch.isCheckmate() ? 2 : 4, children: [] };
@@ -54,7 +55,7 @@ function policy(k: number) {
                 ch.undo();
                 continue;
             }
-            if (support(pf, legal.map(m => m.to)).size !== 99) {
+            if (!continueSupport && support(pf, legal.map(m => m.to)).size !== 99) {
                 out.flags |= 1;
                 ch.undo();
                 continue;

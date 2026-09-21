@@ -1,7 +1,7 @@
 import { fork } from 'node:child_process';
 import { writeFileSync } from 'node:fs';
 import assert from 'node:assert/strict';
-import { BASE, NONE, code, fen, pair, pack, distance } from './encoding.mts';
+import { BASE, NONE, code, fen, pair, pack, distance, canonical } from './encoding.mts';
 import { getChess } from '../../app/src/mate/chess.ts';
 import { getIdealKnightAndBishopWhiteMoves as white, getKnightAndBishopOpponentCandidates as black } from '../../app/src/mate/rules/bishopKnight.ts';
 import { knightAndBishopSupportedDiagonal as support } from '../../app/src/mate/rules/bishopKnightDiagonalSupport.ts';
@@ -52,6 +52,26 @@ for (const [kind, batch] of [['root', roots], ['node', nodes]] as const) {
     const optimized = await call('worker.mjs', kind, batch);
     const reference = await call('reference-worker.mjs', kind, batch);
     assert.deepEqual(optimized, reference, 'Optimized worker differs from production bundle');
+    if (kind === 'root') for (const r of optimized.result) {
+        const ch = getChess(fen(r.key, 'b'));
+        const supported = support(ch.fen()).size;
+        assert.equal(r.supported, supported);
+        const selected = process.env.AUDIT_SCOPE === 'supported' ? supported !== 99 : supported === 99;
+        let flags = 0;
+        const children = new Set<number>();
+        if (selected) {
+            if (ch.isCheckmate()) flags |= 2;
+            else if (ch.isStalemate()) flags |= 4;
+            else for (const san of black(ch.fen()).idealMoves) {
+                const move = ch.move(san);
+                if (move.captured) flags |= 4;
+                else children.add(canonical(code(ch.fen())));
+                ch.undo();
+            }
+        }
+        assert.equal(r.flags, flags);
+        assert.deepEqual([...r.children].sort((a: number, b: number) => a - b), [...children].sort((a, b) => a - b));
+    }
     if (kind === 'node')
         for (const r of optimized.result) {
             const key = nodes[r.id].key, k = Math.floor(key / BASE), p = key % BASE, ch = getChess(fen(k));
@@ -68,7 +88,7 @@ for (const [kind, batch] of [['root', roots], ['node', nodes]] as const) {
                         flags |= 2;
                     else if (ch.isStalemate())
                         flags |= 4;
-                    else if (support(ch.fen()).size !== 99)
+                    else if (process.env.AUDIT_SCOPE !== 'supported' && support(ch.fen()).size !== 99)
                         flags |= 1;
                     else
                         for (const reply of black(ch.fen(), p === NONE ? undefined : fen(p)).idealMoves) {

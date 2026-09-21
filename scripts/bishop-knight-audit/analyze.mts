@@ -9,6 +9,7 @@ import { knightAndBishopKnightTargetSquares } from '../../app/src/mate/rules/bis
 import { getMateRuleSet } from '../../app/src/mate/rules/index.ts';
 import { encodeMateReplay } from '../../app/src/mate/share.ts';
 const dir = process.env.AUDIT_DIR!;
+const supportedScope = process.env.AUDIT_SCOPE === 'supported';
 if (!dir)
     throw new Error('Run via npm run audit:unsupported');
 const db = new DatabaseSync(dir + '/census.sqlite', { readOnly: true });
@@ -155,15 +156,14 @@ function reachesComponent(starts: number[], targets: Set<number>) { const todo =
         }
     }
 } return false; }
-const counts = { legal: 0, supported: 0, unsupported: 0, canLoop: 0, noLoop: 0, directOnReachableLoop: 0, directOnAnyDiscoveredLoop: 0, onlyLoopOutcomes: 0, loopAndSupport: 0, canReachSupport: 0, canMate: 0, canFail: 0 };
+const counts = { legal: 0, supported: 0, unsupported: 0, canLoop: 0, noLoop: 0, directOnReachableLoop: 0, directOnAnyDiscoveredLoop: 0, onlyLoopOutcomes: 0, loopAndSupport: 0, canReachSupport: 0, canMate: 0, canFail: 0, audited: 0 };
 const rootLoops: any[] = [];
 for (const r of db.prepare('SELECT * FROM roots').iterate() as any) {
     counts.legal += r.weight;
-    if (r.supported !== 99) {
-        counts.supported += r.weight;
-        continue;
-    }
-    counts.unsupported += r.weight;
+    if (r.supported !== 99) counts.supported += r.weight;
+    else counts.unsupported += r.weight;
+    if (supportedScope ? r.supported === 99 : r.supported !== 99) continue;
+    counts.audited += r.weight;
     const c: number[] = JSON.parse(r.children), l = c.some(i => loop[i]), s = c.some(i => hasSupport[i]), m = !!(r.flags & 2) || c.some(i => hasMate[i]), f = !!(r.flags & 4) || c.some(i => hasFailure[i]);
     if (l)
         counts.canLoop += r.weight;
@@ -189,7 +189,7 @@ for (const r of db.prepare('SELECT * FROM roots').iterate() as any) {
         rootLoops.push({ key: r.key, weight: r.weight, children: c, support: s, mate: m, failure: f });
 }
 assert.equal(counts.legal, 13660584);
-assert.equal(counts.canLoop + counts.noLoop, counts.unsupported);
+assert.equal(counts.canLoop + counts.noLoop, counts.audited);
 console.log({ phase: 'classify', counts, components: cycleComps.size });
 const rules = getMateRuleSet('bishop-knight'), families: any[] = [];
 function coordMove(encoded: number, t: number) { const from = transforms[t]![encoded >>> 6]!, to = transforms[t]![encoded & 63]!; return { from: square(from), to: square(to) }; }
@@ -203,7 +203,7 @@ function verifyWitness(f: string, moves: string[]) { const ch = getChess(f), tur
     else if (!black(before, turns.at(-2)).idealMoves.includes(san))
         return false;
     ch.move(san);
-    if (ch.turn() === 'b' && support(ch.fen()).size !== 99)
+    if (!supportedScope && ch.turn() === 'b' && support(ch.fen()).size !== 99)
         return false;
 } return code(ch.fen()) === code(f); }
 function witness(start: number, chosen: number[]) {
@@ -305,7 +305,7 @@ for (const kind of [...new Set(families.map(f => f.kind))]) {
     const fs = families.filter(f => f.kind === kind);
     archetypes.push({ kind, families: fs.length, closedFamilies: fs.filter(f => f.closed).length, canReachFromUnsupportedPlacements: roots, cyclePlies: [...new Set(fs.map(f => f.cyclePlies))].sort((a, b) => a - b), rules: [...new Set(fs.flatMap(f => f.rules))].sort() });
 }
-const result = { counts, graph: { nodes: n, edges, cyclicNodes: cyclic.reduce((s, v) => s + v, 0), cyclicFamilies: families.length }, archetypes, families, policyFingerprint: (db.prepare("SELECT value FROM meta WHERE key='hash'").get() as any).value };
+const result = { population: supportedScope ? 'supported' : 'unsupported', counts, graph: { nodes: n, edges, cyclicNodes: cyclic.reduce((s, v) => s + v, 0), cyclicFamilies: families.length }, archetypes, families, policyFingerprint: (db.prepare("SELECT value FROM meta WHERE key='hash'").get() as any).value };
 writeFileSync(dir + '/node-outcomes.bin', Uint8Array.from({ length: n }, (_, i) => Number(!!loop[i]) | Number(!!hasSupport[i]) << 1 | Number(!!hasMate[i]) << 2 | Number(!!hasFailure[i]) << 3));
 writeFileSync(dir + '/result.json', JSON.stringify(result, null, 2));
 writeFileSync(dir + '/loop-leading-roots.json', JSON.stringify(rootLoops));

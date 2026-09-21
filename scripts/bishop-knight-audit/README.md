@@ -7,6 +7,22 @@ npm run audit:unsupported -- --out /absolute/path/to/audit --workers 8
 ```
 
 Requires Node 22.13 or newer (built-in `node:sqlite`) and `npm ci` in `app/`.
+
+For supported-position continuations, use a separate output directory:
+
+```sh
+npm run audit:unsupported -- --scope supported --out /absolute/supported-audit --workers 8
+```
+
+This mode selects every supported post-White placement as a root, continues
+through both supported and unsupported positions, and stops only at mate,
+capture, or stalemate. Its percentages use supported starting placements as the
+denominator. Direct membership counts supported boards on a cycle; the cycle
+can also contain unsupported boards. The full root census is still performed.
+Scope is included in the checkpoint fingerprint; cross-scope root reuse is
+rejected. Default `--scope unsupported` retains the original support-terminal
+behavior. Do not run the unsupported-only `direct-membership.mts` postprocessor
+on a supported audit.
 Omit `--out` to use the gitignored `.audit/bishop-knight` directory. For a new
 policy, use a new directory. Optionally add `--compare /previous/result.json`
 to put the previous audit counts next to the current report.

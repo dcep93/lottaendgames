@@ -11,10 +11,13 @@ const require=createRequire(join(repo,'app/package.json'));
 const {build}=require('esbuild');
 const args=process.argv.slice(2);
 if(args.includes('--help')) {
- console.log('npm run audit:unsupported -- --out /absolute/output [--workers 8] [--compare /previous/result.json] [--roots-from /previous/audit]\nResumes identical policy checkpoints; rejects stale ones. Node >=22.13 required.');process.exit(0);
+ console.log('npm run audit:unsupported -- --out /absolute/output [--workers 8] [--compare /previous/result.json] [--roots-from /previous/audit] [--scope unsupported|supported]\nResumes identical policy checkpoints; rejects stale ones. Node >=22.13 required.');process.exit(0);
 }
 const options={};
-for(let i=0;i<args.length;i+=2){if(!['--out','--workers','--compare','--roots-from'].includes(args[i])||!args[i+1])throw new Error('Unknown or incomplete option: '+args[i]);options[args[i].slice(2)]=args[i+1];}
+for(let i=0;i<args.length;i+=2){if(!['--out','--workers','--compare','--roots-from','--scope'].includes(args[i])||!args[i+1])throw new Error('Unknown or incomplete option: '+args[i]);options[args[i].slice(2)]=args[i+1];}
+const scope=options.scope??'unsupported';
+if(!['unsupported','supported'].includes(scope))throw new Error('scope must be unsupported or supported');
+if(scope==='supported'&&options['roots-from'])throw new Error('Supported audits require a fresh root census');
 const dir=resolve(options.out??join(repo,'.audit','bishop-knight'));
 const workers=Number(options.workers??Math.min(8,availableParallelism()));
 if(!Number.isInteger(workers)||workers<1||workers>32)throw new Error('workers must be 1..32');
@@ -42,21 +45,23 @@ const referenceHash=createHash('sha256').update(bundles['reference-worker']).dig
 const rootsFrom=options['roots-from']?resolve(options['roots-from']):'';
 if(rootsFrom) {
  const previousManifest=JSON.parse(readFileSync(join(rootsFrom,'manifest.json'),'utf8'));
+ if((previousManifest.population??'unsupported')!==scope)throw new Error('Cannot reuse roots across audit scopes');
  const reference=readFileSync(join(rootsFrom,'reference-worker.mjs'));
  if(previousManifest.referenceWorkerFingerprint!==createHash('sha256').update(reference).digest('hex'))throw new Error('Source root cache has no matching reference-worker fingerprint; run a full census.');
  const previousRootHash=await rootFingerprint(reference.toString('utf8'));
  if(previousRootHash!==rootHash)throw new Error('Support or Black root policy changed; omit --roots-from and run a full census.');
 }
 const fingerprint=createHash('sha256');
+fingerprint.update(scope);
 fingerprint.update(readFileSync(fileURLToPath(import.meta.url)));
 fingerprint.update(readFileSync(join(here,'root-fingerprint.mjs')));
 for(const [name,bytes] of Object.entries(bundles))fingerprint.update(name).update(bytes);
 const hash=fingerprint.digest('hex'),manifestPath=join(dir,'manifest.json');
 if(existsSync(manifestPath)&&JSON.parse(readFileSync(manifestPath,'utf8')).fingerprint!==hash)throw new Error('Policy or audit implementation changed. Choose a new --out directory; stale checkpoints cannot be reused.');
 let commit='unknown';try{commit=execFileSync('git',['rev-parse','HEAD'],{cwd:repo,encoding:'utf8'}).trim();}catch{}
-if(!existsSync(manifestPath))writeFileSync(manifestPath,JSON.stringify({fingerprint:hash,referenceWorkerFingerprint:referenceHash,rootFingerprint:rootHash,rootCacheSource:rootsFrom||null,commit,startedAt:new Date().toISOString(),node:process.version,workers,scope:'All 13,660,584 post-White KBNvK placements; stop at support/mate/capture/stalemate; all best-move ties; retain Black return history.'},null,2));
+if(!existsSync(manifestPath))writeFileSync(manifestPath,JSON.stringify({fingerprint:hash,referenceWorkerFingerprint:referenceHash,rootFingerprint:rootHash,rootCacheSource:rootsFrom||null,commit,startedAt:new Date().toISOString(),node:process.version,workers,population:scope,scope:scope==='supported'?'All supported post-White KBNvK placements; continue through support changes; stop at mate/capture/stalemate; all best-move ties; retain Black return history.':'All 13,660,584 post-White KBNvK placements; stop at support/mate/capture/stalemate; all best-move ties; retain Black return history.'},null,2));
 for(const [name,bytes] of Object.entries(bundles))writeFileSync(join(dir,name+'.mjs'),bytes);
-const env={...process.env,AUDIT_DIR:dir,AUDIT_HASH:hash,WORKERS:String(workers),AUDIT_COMPARE:options.compare?resolve(options.compare):'',AUDIT_ROOTS_FROM:rootsFrom,AUDIT_ROOT_HASH:rootHash};
+const env={...process.env,AUDIT_SCOPE:scope,AUDIT_DIR:dir,AUDIT_HASH:hash,WORKERS:String(workers),AUDIT_COMPARE:options.compare?resolve(options.compare):'',AUDIT_ROOTS_FROM:rootsFrom,AUDIT_ROOT_HASH:rootHash};
 for(const stage of ['validate','validate-symmetry',...(rootsFrom?['reuse-roots']:[]),'census','analyze','classify','report']) {
  const stamp=join(dir,stage+'.complete');if(stage!=='report'&&existsSync(stamp)){console.log('Already complete:',stage);continue;}
  console.log('Starting:',stage);
