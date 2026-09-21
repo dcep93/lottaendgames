@@ -2,7 +2,7 @@ import type { Square } from 'chess.js'
 import { isInsideBishopDiagonal } from './bishopKnightGeometry'
 import { isRecordedSupportedCornerPosition, isRecordedSupportedFiveKingDefense, recordedCornerKnightTarget } from './bishopKnightDeclaredSupport'
 import { knightAndBishopKnightProximityToSquare } from './bishopKnightStrategy'
-import { allSquares, getChess, findPiece, kingDistance, squaredEuclideanDistance, squareCoords, SQUARE_TRANSFORMS, transformSquare } from '../chess'
+import { allSquares, getChess, findPiece, kingDistance, squaredEuclideanDistance, squareCoords, squareFromCoordinates, SQUARE_TRANSFORMS, transformSquare } from '../chess'
 
 const CANONICAL_DIAGONALS: readonly {
   wall: readonly Square[];
@@ -46,6 +46,8 @@ const CANONICAL_DIAGONALS: readonly {
 
 const DIAGONALS = CANONICAL_DIAGONALS.flatMap(pattern => SQUARE_TRANSFORMS.map(transform => ({
   preferredSevenBishop: pattern.wall.length === 7 ? transformSquare('b3', transform) : undefined,
+  rightOffset: {file: transform.map(2, 0).file - transform.map(0, 0).file,
+    rank: transform.map(2, 0).rank - transform.map(0, 0).rank},
   corner: squareCoords(transformSquare('a8', transform)),
   wall: pattern.wall.map(square => transformSquare(square, transform)),
   boundary: pattern.boundary.map(square => transformSquare(square, transform)),
@@ -208,7 +210,7 @@ export function knightAndBishopSupportedDiagonal(fen: string, blackDestinations?
 }
 
 /** Includes placement preferences only for orientations that pass the support checks. */
-export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDestinations?: readonly Square[]): { size: number; knight: number; sevenBishopPenalty?: number } {
+export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDestinations?: readonly Square[]): { size: number; knight: number; sevenBishopPenalty?: number; sevenKingTargetDistance?: number } {
   if (fen.split(' ')[1] !== 'b') throw new Error('Diagonal support must be evaluated after White moves, with Black to move')
   const white = findPiece(fen, 'w', 'k')
   const black = findPiece(fen, 'b', 'k')
@@ -260,7 +262,7 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
   const king = squareCoords(white.square)
   let replies = blackDestinations
   const attackChecks = new Map<string, boolean>()
-  let best: {size: number; knight: number; sevenBishopPenalty?: number} = {size: 99, knight: 99}
+  let best: {size: number; knight: number; sevenBishopPenalty?: number; sevenKingTargetDistance?: number} = {size: 99, knight: 99}
   for (const pattern of DIAGONALS) {
     if (pattern.wall.length > best.size || !pattern.wall.includes(bishop.square) ||
       !isInsideBishopDiagonal(black.square, pattern.wall)) continue
@@ -295,10 +297,20 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
     }
     if (!canAnswer) continue
     const sevenBishopPenalty = pattern.preferredSevenBishop === bishop.square ? 0 : 1
+    const blackCoordinates = squareCoords(black.square)
+    const kingTarget = sevenBishopPenalty === 0 ? squareFromCoordinates(
+      blackCoordinates.file + pattern.rightOffset.file, blackCoordinates.rank + pattern.rightOffset.rank) : null
+    // An off-board target supplies no preference; it is not clamped to an edge.
+    const sevenKingTargetDistance = kingTarget ? kingDistance(white.square, kingTarget) : 0
     if (pattern.wall.length < best.size || distance < best.knight) {
-      best = {size: pattern.wall.length, knight: distance, sevenBishopPenalty}
+      best = {size: pattern.wall.length, knight: distance, sevenBishopPenalty, sevenKingTargetDistance}
     } else if (pattern.wall.length === best.size && distance === best.knight) {
-      best.sevenBishopPenalty = Math.min(best.sevenBishopPenalty ?? 1, sevenBishopPenalty)
+      if (sevenBishopPenalty < (best.sevenBishopPenalty ?? 1)) {
+        best.sevenBishopPenalty = sevenBishopPenalty
+        best.sevenKingTargetDistance = sevenKingTargetDistance
+      } else if (sevenBishopPenalty === best.sevenBishopPenalty) {
+        best.sevenKingTargetDistance = Math.min(best.sevenKingTargetDistance ?? 0, sevenKingTargetDistance)
+      }
     }
   }
   return best

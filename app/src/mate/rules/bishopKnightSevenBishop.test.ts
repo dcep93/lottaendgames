@@ -29,3 +29,21 @@ test('the seven bishop preference cannot override r1.5 support size or knight di
     for (const move of getIdealKnightAndBishopWhiteMoves(start)) assert.ok(allowed.includes(move))
   }
 })
+
+test('with b3 seven bishop, king approaches two files right of Black in all reflections', () => {
+  const start = '8/8/1k6/4K3/8/1B1N4/8/8 w - - 0 1'
+  for (const transform of SQUARE_TRANSFORMS) {
+    const reflected = transformFen(start,transform)
+    const san = (to: 'd6' | 'd5' | 'd4') => getChess(reflected).move({from:transformSquare('e5',transform),to:transformSquare(to,transform)}).san
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(reflected),[san('d6')])
+    for (const [to,distance] of [['d6',0],['d5',1],['d4',2]] as const) {
+      const score = scoreKnightAndBishopWhiteMove(reflected,san(to))
+      assert.equal(score.supportedDiagonalSizeScore,7)
+      assert.equal(score.supportedSevenBishopPenalty,0)
+      assert.equal(score.supportedSevenKingTargetDistance,distance)
+    }
+    const otherBishop = scoreKnightAndBishopWhiteMove(transformFen(fen,transform),
+      getChess(transformFen(fen,transform)).move({from:transformSquare('d5',transform),to:transformSquare('f7',transform)}).san)
+    assert.equal(otherBishop.supportedSevenKingTargetDistance,0)
+  }
+})
