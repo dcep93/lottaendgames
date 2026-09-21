@@ -3,6 +3,16 @@ import { findPiece, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../
 // Only declarations added after the latest reset belong to r5.
 const declaredMoves = new Map<string, string>()
 for (const [position, from, to] of [
+  // Aligned precage-loop prescriptions: Be4/Nd3, plus the Nc5 entry move.
+  ['8/5k2/8/8/4B3/3NK3/8/8 w - - 0 1', 'e3', 'f4'],
+  ['8/8/4k3/8/4B3/3NK3/8/8 w - - 0 1', 'e3', 'f4'],
+  ['8/4k3/8/8/4B3/3NK3/8/8 w - - 0 1', 'e3', 'f4'],
+  ['8/3k4/8/8/4B3/3NK3/8/8 w - - 0 1', 'e3', 'f4'],
+  ['8/8/5k2/8/4B3/3NK3/8/8 w - - 0 1', 'e3', 'f4'],
+  ['8/6k1/8/8/3KB3/3N4/8/8 w - - 0 1', 'd4', 'e5'],
+  ['8/8/7k/4K3/4B3/3N4/8/8 w - - 0 1', 'e5', 'f6'],
+  ['8/8/8/4K1k1/4B3/3N4/8/8 w - - 0 1', 'e5', 'e6'],
+  ['8/6k1/8/2N5/3KB3/8/8/8 w - - 0 1', 'd4', 'e5'],
   ['8/4k3/8/2N5/3KB3/8/8/8 w - - 2 2', 'd4', 'e5'],
   ['8/8/3N4/2KBk3/8/8/8/8 w - - 0 1', 'd6', 'c4'],
   ['8/8/4k3/8/3KB3/3N4/8/8 w - - 2 2', 'd4', 'e3'],

@@ -7,6 +7,45 @@ import { getMateRuleSet } from './index'
 import { knightAndBishopDeclaredPreparationMove } from './bishopKnightPreparation'
 import example from './bishopKnightFlushExample.json'
 
+test('r5 selects the aligned precage-loop king prescriptions in every symmetry', () => {
+  const cases = [
+    ['8/5k2/8/8/4B3/3NK3/8/8 w - - 0 1', 'Kf4'],
+    ['8/8/4k3/8/4B3/3NK3/8/8 w - - 0 1', 'Kf4'],
+    ['8/4k3/8/8/4B3/3NK3/8/8 w - - 0 1', 'Kf4'],
+    ['8/3k4/8/8/4B3/3NK3/8/8 w - - 0 1', 'Kf4'],
+    ['8/8/5k2/8/4B3/3NK3/8/8 w - - 0 1', 'Kf4'],
+    ['8/6k1/8/8/3KB3/3N4/8/8 w - - 0 1', 'Ke5'],
+    ['8/8/7k/4K3/4B3/3N4/8/8 w - - 0 1', 'Kf6'],
+    ['8/6k1/8/2N5/3KB3/8/8/8 w - - 0 1', 'Ke5'],
+  ] as const
+  for (const [position, san] of cases) {
+    const move = getChess(position).move(san)
+    for (const transform of SQUARE_TRANSFORMS) {
+      const fen = transformFen(position, transform)
+      const expected = getChess(fen).move({
+        from: transformSquare(move.from, transform),
+        to: transformSquare(move.to, transform),
+      }).san
+      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [expected], fen)
+      assert.equal(getMateRuleSet('bishop-knight').currentWhiteHint(fen)?.id, 'r5', fen)
+    }
+  }
+})
+
+test('the #8 Ke6 declaration retains the earlier supported-diagonal priority', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    const fen = transformFen('8/8/8/4K1k1/4B3/3N4/8/8 w - - 0 1', transform)
+    assert.equal(knightAndBishopDeclaredPreparationMove(fen),
+      transformSquare('e5', transform) + transformSquare('e6', transform))
+    const supportedMove = getChess(fen).move({
+      from: transformSquare('d3', transform), to: transformSquare('f4', transform),
+    }).san
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [supportedMove])
+    // r1.5 removes Ke6; r10 breaks the tie between the supported knight moves.
+    assert.equal(getMateRuleSet('bishop-knight').currentWhiteHint(fen)?.id, 'r10')
+  }
+})
+
 test('r5 reset removes the GIF and manual move preferences in every reflection', () => {
   const positions = [
     '8/8/5k2/8/4BN2/5K2/8/8 w - - 0 1',
