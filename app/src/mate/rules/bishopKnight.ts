@@ -25,6 +25,7 @@ import {
 } from "./bishopKnightLookup";
 import { knightAndBishopCenterProximityScore, knightAndBishopKingCenterProximityScore, knightAndBishopKnightTargetProximityScore } from "./bishopKnightStrategy";
 import { knightAndBishopDeclaredCornerFlushMove } from "./bishopKnightCornerFlush";
+import { declaredSupportedSevenMove } from "./bishopKnightSupportedPreferences";
 import { knightAndBishopDeclaredPreparationMove } from "./bishopKnightPreparation";
 import { knightAndBishopShouldCoordinateKing, knightAndBishopKingCoordinatesMinors } from "./bishopKnightCoordination";
 import { compareScoresByRules, selectIdealMoves } from "./selection";
@@ -50,6 +51,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly supportedThreeCheckScore: number;
   readonly supportedDiagonalSizeScore: number;
   readonly supportedDiagonalKnightScore: number;
+  readonly declaredSupportedSevenPenalty: number;
   readonly supportedSevenBishopPenalty: number;
   readonly supportedSevenKingTargetDistance: number;
   readonly mateScore: number;
@@ -129,6 +131,7 @@ type KnightAndBishopPositionScoreContext = {
   readonly shouldDefendKnight: boolean;
   readonly declaredCornerFlushMove: string | undefined;
   readonly declaredPreparationMove: string | undefined;
+  readonly declaredSupportedSevenMove: string | undefined;
   readonly shouldCheckThreeDiagonal: boolean;
 };
 
@@ -163,6 +166,7 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
     shouldCoordinateKing: knightAndBishopShouldCoordinateKing(fen),
     declaredCornerFlushMove: knightAndBishopDeclaredCornerFlushMove(fen),
     declaredPreparationMove: knightAndBishopDeclaredPreparationMove(fen),
+    declaredSupportedSevenMove: declaredSupportedSevenMove(fen),
     get shouldCheckThreeDiagonal() { return shouldCheckThreeDiagonal ??= knightAndBishopShouldCheckThreeDiagonal(fen); },
   };
 }
@@ -230,6 +234,7 @@ function scoreKnightAndBishopWhiteMoveCore(
       const support = supportedDiagonal ??= evaluateKnightAndBishopSupportedDiagonal(resultFen, blackReplies.map(move => move.to));
       return support.size === 7 && support.sevenBishopPenalty === 0 ? support.sevenKingTargetDistance ?? 0 : 0;
     },
+    declaredSupportedSevenPenalty: context.declaredSupportedSevenMove && context.declaredSupportedSevenMove !== move.from + move.to ? 1 : 0,
     declaredCornerFlushPenalty: context.declaredCornerFlushMove && context.declaredCornerFlushMove !== move.from + move.to ? 1 : 0,
     declaredPreparationPenalty: context.declaredPreparationMove && context.declaredPreparationMove !== move.from + move.to ? 1 : 0,
     mateScore: checkmate ? 0 : 1,
@@ -312,6 +317,7 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       helpText: "With a supported 7 diagonal, prefer the bishop on b3, then king step proximity to the square two files to the right of Black’s king (including reflections).",
       applies: score => score.supportedDiagonalSizeScore === 7,
       subpriorities: [
+        { compare: (first, second) => first.declaredSupportedSevenPenalty - second.declaredSupportedSevenPenalty },
         { compare: (first, second) => first.supportedSevenBishopPenalty - second.supportedSevenBishopPenalty },
         { compare: (first, second) => first.supportedSevenKingTargetDistance - second.supportedSevenKingTargetDistance },
       ],
@@ -544,6 +550,7 @@ const bishopKnightHelp: RuleHelp = {
     "For every immediate Black move attacking an undefended bishop, White must have a legal response that leaves Black unable to step onto the (n+1)-diagonal.",
     "Exact placement exception: White Ke7, Bc6 and Nb4 against Black Kc7 is a supported five-diagonal, overriding the attacked-bishop restriction. Include reflections; move counters do not matter.",
     "Exact placement exception: White Kd4, Bc6 and Nb4 against Black Kb6 is a supported five-diagonal, overriding the knight-only bishop defense and king boundary restrictions. Include reflections; move counters do not matter.",
+    "r2.5 exact preference: White Kf7, Bb3 and Nd3 against Black Kd6 prefers Ke8, before its general bishop and king-target preferences. Include reflections; move counters do not matter. r1.5 remains higher priority.",
     "Exact unsupported placement: White Kg4, Bf1 and Ne2 against Black Kh2 is not a supported three-diagonal. Include reflections; move counters do not matter.",
     "Exact unsupported placement: White Kb5, Bc8 and Nc6 against Black Ka7 is not a supported three-diagonal. Include reflections; move counters do not matter.",
     "Exact supported placement: White Kb6, Bc8 and Nd6 against Black Kb8 is a supported three-diagonal despite the knight-only bishop defense. Include reflections; move counters do not matter.",

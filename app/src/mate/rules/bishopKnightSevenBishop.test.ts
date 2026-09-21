@@ -47,3 +47,22 @@ test('with b3 seven bishop, king approaches two files right of Black in all refl
     assert.equal(otherBishop.supportedSevenKingTargetDistance,0)
   }
 })
+
+test('exact r2.5 Ke8 overrides the general target only for its declared placement', () => {
+  const start = '8/5K2/3k4/8/8/1B1N4/8/8 w - - 2 2'
+  for (const transform of SQUARE_TRANSFORMS) {
+    for (const counters of ['2 2','87 51']) {
+      const reflected = transformFen(start.replace('2 2',counters),transform)
+      const move = getChess(reflected).move({from:transformSquare('f7',transform),to:transformSquare('e8',transform)}).san
+      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(reflected),[move])
+      const score = scoreKnightAndBishopWhiteMove(reflected,move)
+      assert.equal(score.supportedDiagonalSizeScore,7)
+      assert.equal(score.supportedDiagonalKnightScore,0)
+      assert.equal(score.declaredSupportedSevenPenalty,0)
+      const previous = getChess(reflected).move({from:transformSquare('f7',transform),to:transformSquare('f6',transform)}).san
+      assert.equal(scoreKnightAndBishopWhiteMove(reflected,previous).declaredSupportedSevenPenalty,1)
+    }
+    const nearby = transformFen(start.replace('3k4','2k5'),transform)
+    for(const move of getChess(nearby).moves()) assert.equal(scoreKnightAndBishopWhiteMove(nearby,move).declaredSupportedSevenPenalty,0)
+  }
+})
