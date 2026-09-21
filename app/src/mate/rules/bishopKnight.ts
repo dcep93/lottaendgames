@@ -1,4 +1,4 @@
-import { knightAndBishopShouldCheckThreeDiagonal, knightAndBishopSupportedDiagonal } from "./bishopKnightDiagonalSupport";
+import { knightAndBishopShouldCheckThreeDiagonal, evaluateKnightAndBishopSupportedDiagonal } from "./bishopKnightDiagonalSupport";
 import type { Square } from "chess.js";
 import {
   findPiece,
@@ -50,6 +50,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly supportedThreeCheckScore: number;
   readonly supportedDiagonalSizeScore: number;
   readonly supportedDiagonalKnightScore: number;
+  readonly supportedSevenBishopPenalty: number;
   readonly mateScore: number;
   readonly stalemateScore: number;
   readonly pieceSafetyScore: number;
@@ -188,7 +189,7 @@ function scoreKnightAndBishopWhiteMoveCore(
     && ((!!bishop && kingDistance(bishop.square, whiteKing.square) === 1)
       || (!!knight && kingDistance(knight.square, whiteKing.square) === 1));
   const knightKingDefended = !!knight && !!whiteKing && kingDistance(knight.square, whiteKing.square) === 1;
-  let supportedDiagonal: ReturnType<typeof knightAndBishopSupportedDiagonal> | undefined;
+  let supportedDiagonal: ReturnType<typeof evaluateKnightAndBishopSupportedDiagonal> | undefined;
   return {
     get kingCoordinationPenalty() {
       return context.shouldCoordinateKing
@@ -215,11 +216,15 @@ function scoreKnightAndBishopWhiteMoveCore(
     },
     get supportedThreeCheckScore() {
       if (!context.shouldCheckThreeDiagonal) return 0;
-      const support = supportedDiagonal ??= knightAndBishopSupportedDiagonal(resultFen, blackReplies.map(move => move.to));
+      const support = supportedDiagonal ??= evaluateKnightAndBishopSupportedDiagonal(resultFen, blackReplies.map(move => move.to));
       return givesCheck && support.size === 3 && support.knight <= 1 ? 0 : 1;
     },
-    get supportedDiagonalSizeScore() { return (supportedDiagonal ??= knightAndBishopSupportedDiagonal(resultFen, blackReplies.map(move => move.to))).size; },
-    get supportedDiagonalKnightScore() { return (supportedDiagonal ??= knightAndBishopSupportedDiagonal(resultFen, blackReplies.map(move => move.to))).knight; },
+    get supportedDiagonalSizeScore() { return (supportedDiagonal ??= evaluateKnightAndBishopSupportedDiagonal(resultFen, blackReplies.map(move => move.to))).size; },
+    get supportedDiagonalKnightScore() { return (supportedDiagonal ??= evaluateKnightAndBishopSupportedDiagonal(resultFen, blackReplies.map(move => move.to))).knight; },
+    get supportedSevenBishopPenalty() {
+      const support = supportedDiagonal ??= evaluateKnightAndBishopSupportedDiagonal(resultFen, blackReplies.map(move => move.to));
+      return support.size === 7 ? support.sevenBishopPenalty ?? 1 : 0;
+    },
     declaredCornerFlushPenalty: context.declaredCornerFlushMove && context.declaredCornerFlushMove !== move.from + move.to ? 1 : 0,
     declaredPreparationPenalty: context.declaredPreparationMove && context.declaredPreparationMove !== move.from + move.to ? 1 : 0,
     mateScore: checkmate ? 0 : 1,
@@ -299,9 +304,9 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     {
       id: "r2.5",
       shortLabel: "rule r2.5",
-      helpText: "With a supported diagonal, prefer forcing the Black king towards the target corner.",
-      applies: score => score.supportedDiagonalSizeScore < 99,
-      compare: () => 0,
+      helpText: "With a supported 7 diagonal, prefer the bishop on b3 (or its reflection).",
+      applies: score => score.supportedDiagonalSizeScore === 7,
+      compare: (first, second) => first.supportedSevenBishopPenalty - second.supportedSevenBishopPenalty,
     },
     {
       id: "r4",

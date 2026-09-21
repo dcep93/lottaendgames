@@ -45,6 +45,7 @@ const CANONICAL_DIAGONALS: readonly {
 ]
 
 const DIAGONALS = CANONICAL_DIAGONALS.flatMap(pattern => SQUARE_TRANSFORMS.map(transform => ({
+  preferredSevenBishop: pattern.wall.length === 7 ? transformSquare('b3', transform) : undefined,
   corner: squareCoords(transformSquare('a8', transform)),
   wall: pattern.wall.map(square => transformSquare(square, transform)),
   boundary: pattern.boundary.map(square => transformSquare(square, transform)),
@@ -202,6 +203,12 @@ function canAnswerBishopAttacks(fen: string, bishop: Square, boundary: readonly 
 
 /** Evaluate the resulting position, before Black replies. */
 export function knightAndBishopSupportedDiagonal(fen: string, blackDestinations?: readonly Square[]): { size: number; knight: number } {
+  const {size, knight} = evaluateKnightAndBishopSupportedDiagonal(fen, blackDestinations)
+  return {size, knight}
+}
+
+/** Includes placement preferences only for orientations that pass the support checks. */
+export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDestinations?: readonly Square[]): { size: number; knight: number; sevenBishopPenalty?: number } {
   if (fen.split(' ')[1] !== 'b') throw new Error('Diagonal support must be evaluated after White moves, with Black to move')
   const white = findPiece(fen, 'w', 'k')
   const black = findPiece(fen, 'b', 'k')
@@ -253,7 +260,7 @@ export function knightAndBishopSupportedDiagonal(fen: string, blackDestinations?
   const king = squareCoords(white.square)
   let replies = blackDestinations
   const attackChecks = new Map<string, boolean>()
-  let best = {size: 99, knight: 99}
+  let best: {size: number; knight: number; sevenBishopPenalty?: number} = {size: 99, knight: 99}
   for (const pattern of DIAGONALS) {
     if (pattern.wall.length > best.size || !pattern.wall.includes(bishop.square) ||
       !isInsideBishopDiagonal(black.square, pattern.wall)) continue
@@ -287,7 +294,12 @@ export function knightAndBishopSupportedDiagonal(fen: string, blackDestinations?
       attackChecks.set(key, canAnswer)
     }
     if (!canAnswer) continue
-    if (pattern.wall.length < best.size || distance < best.knight) best = {size: pattern.wall.length, knight: distance}
+    const sevenBishopPenalty = pattern.preferredSevenBishop === bishop.square ? 0 : 1
+    if (pattern.wall.length < best.size || distance < best.knight) {
+      best = {size: pattern.wall.length, knight: distance, sevenBishopPenalty}
+    } else if (pattern.wall.length === best.size && distance === best.knight) {
+      best.sevenBishopPenalty = Math.min(best.sevenBishopPenalty ?? 1, sevenBishopPenalty)
+    }
   }
   return best
 }

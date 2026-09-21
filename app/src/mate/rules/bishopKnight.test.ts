@@ -119,7 +119,7 @@ test("bishop-and-knight rules are registered", () => {
     {
       id: "r2.5",
       shortLabel: "rule r2.5",
-      helpText: "With a supported diagonal, prefer forcing the Black king towards the target corner.",
+      helpText: "With a supported 7 diagonal, prefer the bishop on b3 (or its reflection).",
     },
     {
       id: "r4",
