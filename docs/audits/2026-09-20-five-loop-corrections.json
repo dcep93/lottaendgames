@@ -1,0 +1,101 @@
+{
+  "manifest": {
+    "fingerprint": "52e35fa5bb8cc30a6609c359fcc2b7068e612aca7897d53a90f9d4770b624c61",
+    "referenceWorkerFingerprint": "b0244a2734f3e2c7f6e7789089104b0c48cbeefdb85d89fcb62a76b098751a9d",
+    "rootFingerprint": "4e9462f3e2331820dc6f56c0694db05ae892b8c240385efe45ab8397075c897d",
+    "rootCacheSource": null,
+    "commit": "827d487823787bb8a3f0d7c14a65cc6edb1733fd",
+    "startedAt": "2026-09-21T02:20:20.740Z",
+    "node": "v25.8.1",
+    "workers": 8,
+    "scope": "All 13,660,584 post-White KBNvK placements; stop at support/mate/capture/stalemate; all best-move ties; retain Black return history."
+  },
+  "counts": {
+    "legal": 13660584,
+    "supported": 199412,
+    "unsupported": 13461172,
+    "canLoop": 0,
+    "noLoop": 13461172,
+    "directOnReachableLoop": 0,
+    "directOnAnyDiscoveredLoop": 0,
+    "onlyLoopOutcomes": 0,
+    "loopAndSupport": 0,
+    "canReachSupport": 10954172,
+    "canMate": 1608,
+    "canFail": 2522112
+  },
+  "graph": {
+    "nodes": 1456731,
+    "edges": 1441335,
+    "cyclicNodes": 0,
+    "cyclicFamilies": 0
+  },
+  "previousCounts": {
+    "legal": 13660584,
+    "supported": 199412,
+    "unsupported": 13461172,
+    "canLoop": 11936,
+    "noLoop": 13449236,
+    "directOnReachableLoop": 16,
+    "directOnAnyDiscoveredLoop": 56,
+    "onlyLoopOutcomes": 9600,
+    "loopAndSupport": 2336,
+    "canReachSupport": 10944572,
+    "canMate": 1608,
+    "canFail": 2522112
+  },
+  "changes": {
+    "retained": 0,
+    "removed": 56,
+    "new": 0
+  },
+  "placementArchetypes": {
+    "policyFingerprint": "52e35fa5bb8cc30a6609c359fcc2b7068e612aca7897d53a90f9d4770b624c61",
+    "total": 0,
+    "canonicalBoards": 0,
+    "unsupported": 13461172,
+    "directPercent": 0,
+    "method": "Union canonical post-White boards on internal SCC edges; verify unsupported; deduplicate across history and components; restore physical orbit weights; exclusive geometry hierarchy matching r25 placement report.",
+    "groups": [],
+    "secondary": {
+      "White king on edge": 0,
+      "Central White king": 0,
+      "Central bishop": 0,
+      "Black adjacent to bishop": 0,
+      "Black adjacent to knight": 0,
+      "Knight-defended non-central bishop attacked by Black without king defense": 0
+    },
+    "allDirectPlacementsCoveredByMinimalWitnesses": true,
+    "witnessCyclePlies": []
+  },
+  "families": [],
+  "directMembership": {
+    "policyFingerprint": "52e35fa5bb8cc30a6609c359fcc2b7068e612aca7897d53a90f9d4770b624c61",
+    "method": "Union canonical post-White boards on internal cyclic-component edges, then restore root orbit weights. Group totals may overlap.",
+    "total": 0,
+    "canonicalBoards": 0,
+    "byKind": {
+      "rows": [],
+      "positionsInMultipleGroups": 0
+    },
+    "byMechanism": {
+      "rows": [],
+      "positionsInMultipleGroups": 0
+    },
+    "byClosure": {
+      "rows": [],
+      "positionsInMultipleGroups": 0
+    },
+    "families": []
+  },
+  "alignedLoops": [],
+  "auditReportingFixCommit": "717d02e",
+  "completedStages": {
+    "validate": "2026-09-21T02:20:50.192Z",
+    "validate-symmetry": "2026-09-21T02:21:25.052Z",
+    "census": "2026-09-21T02:58:49.747Z",
+    "analyze": "2026-09-21T02:58:54.360Z",
+    "classify": "2026-09-21T02:58:55.860Z",
+    "report": "2026-09-21T02:58:55.923Z"
+  }
+}
