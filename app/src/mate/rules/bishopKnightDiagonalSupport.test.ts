@@ -6,6 +6,29 @@ import { getIdealKnightAndBishopWhiteMoves, scoreKnightAndBishopWhiteMove } from
 
 const sixDiagonal = ['a3', 'b4', 'c5', 'd6', 'e7', 'f8'] as const
 
+test('Bd7 Nd3 nearby-king eligibility keeps other support checks and prefers loaded Kd6', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    for (const counters of ['0 1', '42 22']) {
+      const before = transformFen(`8/3B4/1k6/3K4/8/3N4/8/8 w - - ${counters}`, transform)
+      const board = getChess(before)
+      const move = board.move({from: transformSquare('d5', transform), to: transformSquare('d6', transform)}).san
+      assert.equal(knightAndBishopSupportedDiagonal(board.fen()).size, 5)
+      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(before), [move])
+    }
+    // Newly eligible king placements; classification uses the post-White board.
+    for (const fen of [
+      '8/k2B4/8/1K6/8/3N4/8/8 b - - 0 1',
+      '8/2kB4/4K3/8/8/3N4/8/8 b - - 0 1',
+    ]) assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 5)
+    for (const fen of [
+      // Three steps apart, outside the prior king-placement list.
+      '8/k2B4/8/8/1K6/3N4/8/8 b - - 0 1',
+      // Two steps apart cannot rescue a bishop Black can capture immediately.
+      '8/2kB4/8/4K3/8/3N4/8/8 b - - 0 1',
+    ]) assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 99)
+  }
+})
+
 test('declared second-move Bd7 with Kd5 Nd3 against Ka5 is supported and preferred', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const counters of ['0 1', '42 22']) {
@@ -19,7 +42,7 @@ test('declared second-move Bd7 with Kd5 Nd3 against Ka5 is supported and preferr
       assert.deepEqual(getIdealKnightAndBishopWhiteMoves(before), [move])
     }
     for (const nearby of [
-      '8/3B4/1k6/3K4/8/3N4/8/8 b - - 0 1',
+      '8/3B4/8/3K4/8/3N4/8/k7 b - - 0 1',
       '8/3B4/8/k7/3K4/3N4/8/8 b - - 0 1',
     ]) assert.notEqual(knightAndBishopSupportedDiagonal(transformFen(nearby, transform)).size, 5)
   }
@@ -77,7 +100,7 @@ test('Kd6 supports Bd7 with Nd3 and breaks the loaded Ba4–Bb3 shuttle', () => 
   }
 })
 
-test('Nd3 five support requires Ba4/Bc6/Bd7 and Kc5/c6/c7 across king placements, bishop squares and reflections', () => {
+test('Nd3 five support uses declared king placements or nearby kings with Bd7, including reflections', () => {
   for (const bishop of ['a4', 'b5', 'c6', 'd7', 'e8'] as const) {
     for (const king of allSquares()) {
       if (king === bishop || king === 'd3' || kingDistance(king, 'a7') <= 1) continue
@@ -87,7 +110,7 @@ test('Nd3 five support requires Ba4/Bc6/Bd7 and Kc5/c6/c7 across king placements
       board.put({type: 'b', color: 'w'}, bishop)
       for (const transform of SQUARE_TRANSFORMS) {
         assert.equal(knightAndBishopSupportedDiagonal(transformFen(board.fen(), transform)).size,
-          (['a4', 'c6', 'd7'].includes(bishop) && ['c5', 'c6', 'c7'].includes(king)) || (['a4', 'd7'].includes(bishop) && king === 'd6') ? 5 : 99, `${king}, ${bishop}, ${transform.name}`)
+          (['a4', 'c6', 'd7'].includes(bishop) && ['c5', 'c6', 'c7'].includes(king)) || (['a4', 'd7'].includes(bishop) && king === 'd6') || (bishop === 'd7' && kingDistance(king, 'a7') <= 2) ? 5 : 99, `${king}, ${bishop}, ${transform.name}`)
       }
     }
   }
@@ -608,7 +631,8 @@ test('an undefended near-side five-bishop needs a king response to Kb6 with c5 u
     const nf4 = getChess(before).move({from: transformSquare('d3', transform), to: transformSquare('f4', transform)}).san
     const bd7 = getChess(before).move({from: transformSquare('a4', transform), to: transformSquare('d7', transform)}).san
     assert.equal(scoreKnightAndBishopWhiteMove(before, nf4).supportedDiagonalSizeScore, 99)
-    assert.equal(scoreKnightAndBishopWhiteMove(before, bd7).supportedDiagonalSizeScore, 99)
+    // Bd7/Nd3 with kings two steps apart is now eligible; the remaining checks pass.
+    assert.equal(scoreKnightAndBishopWhiteMove(before, bd7).supportedDiagonalSizeScore, 5)
     for (const allowed of [
       // After Kb6, Kd6 can defend Bc6 and control c5.
       '8/k7/2B1K3/8/5N2/8/8/8 b - - 0 1',

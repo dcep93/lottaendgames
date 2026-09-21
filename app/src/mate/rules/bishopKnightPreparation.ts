@@ -3,6 +3,7 @@ import { findPiece, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../
 // Only declarations added after the latest reset belong to r5.
 const declaredMoves = new Map<string, string>()
 for (const [position, from, to] of [
+  ['8/3B4/1k6/3K4/8/3N4/8/8 w - - 0 1', 'd5', 'd6'],
   ['8/8/8/8/6K1/7B/4N2k/8 w - - 0 1', 'e2', 'd4'],
   ['8/8/3k4/8/4BK2/3N4/8/8 w - - 0 1', 'f4', 'f5'],
   ['8/8/5k2/8/4BK2/3N4/8/8 w - - 0 1', 'e4', 'f5'],
