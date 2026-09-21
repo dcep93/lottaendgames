@@ -28,6 +28,19 @@ test('Ba4 with Kd6 Nd3 is supported across Black placements and breaks the loade
   }
 })
 
+test('Kd6 supports Bd7 with Nd3 and breaks the loaded Ba4–Bb3 shuttle', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    for (const counters of ['0 1', '38 20']) {
+      const fen = transformFen(`8/8/3K4/k7/B7/3N4/8/8 w - - ${counters}`, transform)
+      const board = getChess(fen)
+      const bd7 = board.move({from: transformSquare('a4', transform), to: transformSquare('d7', transform)}).san
+      assert.equal(knightAndBishopSupportedDiagonal(board.fen()).size, 5)
+      assert.equal(scoreKnightAndBishopWhiteMove(fen, bd7).supportedDiagonalSizeScore, 5)
+      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [bd7])
+    }
+  }
+})
+
 test('Nd3 five support requires Ba4/Bc6/Bd7 and Kc5/c6/c7 across king placements, bishop squares and reflections', () => {
   for (const bishop of ['a4', 'b5', 'c6', 'd7', 'e8'] as const) {
     for (const king of allSquares()) {
@@ -38,7 +51,7 @@ test('Nd3 five support requires Ba4/Bc6/Bd7 and Kc5/c6/c7 across king placements
       board.put({type: 'b', color: 'w'}, bishop)
       for (const transform of SQUARE_TRANSFORMS) {
         assert.equal(knightAndBishopSupportedDiagonal(transformFen(board.fen(), transform)).size,
-          (['a4', 'c6', 'd7'].includes(bishop) && ['c5', 'c6', 'c7'].includes(king)) || (bishop === 'a4' && king === 'd6') ? 5 : 99, `${king}, ${bishop}, ${transform.name}`)
+          (['a4', 'c6', 'd7'].includes(bishop) && ['c5', 'c6', 'c7'].includes(king)) || (['a4', 'd7'].includes(bishop) && king === 'd6') ? 5 : 99, `${king}, ${bishop}, ${transform.name}`)
       }
     }
   }
@@ -400,11 +413,10 @@ test('a seven-diagonal is unsupported when Black can step onto a square screened
 })
 
 
-test('Kd6 with Nd3 does not support five-bishops outside a4, including reflections', () => {
+test('Kd6 with Nd3 does not support five-bishops outside a4/d7, including reflections', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const fen of [
       'k7/8/3K4/1B6/8/3N4/8/8 b - - 0 1',
-      'k7/3B4/3K4/8/8/3N4/8/8 b - - 0 1',
       'k7/8/2BK4/8/8/3N4/8/8 b - - 0 1',
       'k3B3/8/3K4/8/8/3N4/8/8 b - - 0 1',
     ]) assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 99)

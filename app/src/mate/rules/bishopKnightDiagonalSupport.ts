@@ -34,7 +34,7 @@ const CANONICAL_DIAGONALS: readonly {
       {king: 'c5', bishops: ['a4', 'c6', 'd7']},
       {king: 'c6', bishops: ['a4', 'c6', 'd7']},
       {king: 'c7', bishops: ['a4', 'c6', 'd7']},
-      {king: 'd6', bishops: ['a4']},
+      {king: 'd6', bishops: ['a4', 'd7']},
     ],
     support: ['d5'],
     kingGuard: 'd6',
