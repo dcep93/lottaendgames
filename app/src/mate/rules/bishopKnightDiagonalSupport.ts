@@ -106,7 +106,6 @@ const THREE_BISHOP_RACES = SQUARE_TRANSFORMS.map(transform => ({
 const DECLARED_FIVE_SUPPORT = [
   {king: 'e7', bishop: 'c6', knight: 'b4', black: 'c7'},
   {king: 'd4', bishop: 'c6', knight: 'b4', black: 'b6'},
-  {king: 'd4', bishop: 'c6', knight: 'd5', black: 'a5'},
 ] as const
 const DECLARED_FIVE_PLACEMENTS = DECLARED_FIVE_SUPPORT.flatMap(placement => SQUARE_TRANSFORMS.map(transform => ({
   king: transformSquare(placement.king, transform),
@@ -248,11 +247,12 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
   if (DECLARED_UNSUPPORTED_REFLECTIONS.some(pattern =>
     pattern.king === white.square && pattern.bishop === bishop.square &&
     pattern.knight === knight.square && pattern.black === black.square)) return {size: 99, knight: 99}
-  if (isRecordedSupportedFiveKingDefense(fen)) return {size: 5, knight: 1}
+  const fiveKingsClose = kingDistance(white.square, black.square) <= 2
+  if (fiveKingsClose && isRecordedSupportedFiveKingDefense(fen)) return {size: 5, knight: 1}
   const declaredFive = DECLARED_FIVE_PLACEMENTS.find(pattern =>
     pattern.king === white.square && pattern.bishop === bishop.square &&
     pattern.knight === knight.square && pattern.black === black.square)
-  if (declaredFive) return {
+  if (fiveKingsClose && declaredFive) return {
     size: 5,
     knight: knightAndBishopKnightProximityToSquare(fen, declaredFive.support),
   }
@@ -294,7 +294,7 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
   for (const pattern of DIAGONALS) {
     if (pattern.wall.length > best.size || !pattern.wall.includes(bishop.square) ||
       !isInsideBishopDiagonal(black.square, pattern.wall)) continue
-    if (pattern.wall.length === 5 && (excludedFive || losesFiveKingRace || losesFiveBishopTempoRace)) continue
+    if (pattern.wall.length === 5 && (!fiveKingsClose || excludedFive || losesFiveKingRace || losesFiveBishopTempoRace)) continue
     if (pattern.wall.length === 3 && excludedThree) continue
     // The n-diagonal is n−1 orthogonal steps from its corner; n+2 is n+1 steps.
     if (Math.abs(king.file - pattern.corner.file) + Math.abs(king.rank - pattern.corner.rank) > pattern.wall.length + 1) continue
