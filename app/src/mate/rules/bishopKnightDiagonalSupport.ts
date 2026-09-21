@@ -9,7 +9,7 @@ const CANONICAL_DIAGONALS: readonly {
   boundary: readonly Square[];
   previousSupport?: Square;
   previousSupportKings?: readonly Square[];
-  previousSupportBishop?: Square;
+  previousSupportBishops?: readonly Square[];
   support: readonly Square[];
   kingSupportTargets?: readonly {king: Square; targets: readonly Square[]}[];
   kingGuard?: Square;
@@ -32,7 +32,7 @@ const CANONICAL_DIAGONALS: readonly {
     boundary: ['a3', 'b4', 'c5', 'd6', 'e7', 'f8'],
     previousSupport: 'd3',
     previousSupportKings: ['c5', 'c6', 'c7'],
-    previousSupportBishop: 'a4',
+    previousSupportBishops: ['a4', 'd7'],
     support: ['d5'],
     kingGuard: 'd6',
     bishopAttackRaceTarget: 'e7',
@@ -58,7 +58,7 @@ const DIAGONALS = CANONICAL_DIAGONALS.flatMap(pattern => SQUARE_TRANSFORMS.map(t
   boundary: pattern.boundary.map(square => transformSquare(square, transform)),
   previousSupport: pattern.previousSupport && transformSquare(pattern.previousSupport, transform),
   previousSupportKings: pattern.previousSupportKings?.map(square => transformSquare(square, transform)),
-  previousSupportBishop: pattern.previousSupportBishop && transformSquare(pattern.previousSupportBishop, transform),
+  previousSupportBishops: pattern.previousSupportBishops?.map(square => transformSquare(square, transform)),
   support: pattern.support.map(square => transformSquare(square, transform)),
   kingSupportTargets: pattern.kingSupportTargets?.map(entry => ({
     king: transformSquare(entry.king, transform),
@@ -302,7 +302,7 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
       .some(square => square !== knight.square && kingDistance(white.square, square) === 1)
     if (pattern.wall.length === 3 && !kingSupportsThree) continue
     if (knight.square === pattern.previousSupport && pattern.previousSupportKings &&
-      (!pattern.previousSupportKings.includes(white.square) || bishop.square !== pattern.previousSupportBishop)) continue
+      (!pattern.previousSupportKings.includes(white.square) || !pattern.previousSupportBishops?.includes(bishop.square))) continue
     if (knight.square === pattern.previousSupport && pattern.bishopAttackRaceTarget &&
       losesBishopAttackRace(fen, white.square, black.square, bishop.square, pattern.bishopAttackRaceTarget)) continue
     const distance = supportDistance(fen, white.square, pattern)
