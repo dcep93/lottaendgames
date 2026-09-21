@@ -56,3 +56,23 @@ test('stage and gate options fail closed for invalid or unsupported combinations
   assert.match(result.stderr,/diagonal must be|gate must be/);
  }
 });
+
+test('gate writes evidence and exits two for loops or non-mating terminal outcomes',()=>{
+ const base=join(repo,'.audit');mkdirSync(base,{recursive:true});
+ const dir=mkdtempSync(join(base,'gate-test-'));
+ try {
+  for(const [gate,canLoop,canFail,canMate,status] of [
+   ['loops',8,0,0,2],['loops',0,8,0,0],['mate',0,8,0,2],['mate',0,0,8,0],
+  ] as const) {
+   writeFileSync(join(dir,'result.json'),JSON.stringify({diagonal:7,policyFingerprint:'fixture',counts:{audited:8,canLoop,canFail,canMate}}));
+   const result=spawnSync(process.execPath,[join(repo,'scripts/bishop-knight-audit/gate.mts')],{
+    encoding:'utf8',env:{...process.env,AUDIT_DIR:dir,AUDIT_GATE:gate},
+   });
+   assert.equal(result.status,status,result.stderr);
+   const evidence=JSON.parse(readFileSync(join(dir,'gate.json'),'utf8'));
+   assert.equal(evidence.passed,status===0);
+   assert.equal(evidence.diagonal,7);
+   assert.equal(evidence.policyFingerprint,'fixture');
+  }
+ } finally {rmSync(dir,{recursive:true,force:true});}
+});

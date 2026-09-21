@@ -68,7 +68,9 @@ const env={...process.env,AUDIT_SCOPE:scope,AUDIT_DIAGONAL:String(diagonal),AUDI
 for(const stage of ['validate','validate-symmetry',...(rootsFrom?['reuse-roots']:[]),'census','analyze','classify','positions','report',...(options.gate?['gate']:[])]) {
  const stamp=join(dir,stage+'.complete');if(stage!=='report'&&stage!=='gate'&&existsSync(stamp)){console.log('Already complete:',stage);continue;}
  console.log('Starting:',stage);
- await new Promise((done,fail)=>{const child=spawn(process.execPath,[join(dir,stage+'.mjs')],{env,stdio:'inherit'});child.once('error',fail);child.once('exit',code=>code===0?done():fail(new Error(stage+' failed: '+code)));});
+ const code=await new Promise((done,fail)=>{const child=spawn(process.execPath,[join(dir,stage+'.mjs')],{env,stdio:'inherit'});child.once('error',fail);child.once('exit',done);});
+ if(stage==='gate'&&code===2){console.log('Report:',join(dir,'report.md'));process.exit(2);}
+ if(code!==0)throw new Error(stage+' failed: '+code);
  writeFileSync(stamp,new Date().toISOString());
 }
 console.log('Report:',join(dir,'report.md'));
