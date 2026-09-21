@@ -32,7 +32,7 @@ const CANONICAL_DIAGONALS: readonly {
     boundary: ['a3', 'b4', 'c5', 'd6', 'e7', 'f8'],
     previousSupport: 'd3',
     previousSupportKings: ['c5', 'c6', 'c7'],
-    previousSupportBishops: ['a4', 'd7'],
+    previousSupportBishops: ['a4', 'c6', 'd7'],
     support: ['d5'],
     kingGuard: 'd6',
     bishopAttackRaceTarget: 'e7',
