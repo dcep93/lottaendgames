@@ -23,7 +23,7 @@ const CANONICAL_DIAGONALS: readonly {
     support: ['b5', 'c6'],
     kingSupportTargets: [
       {king: 'c7', targets: ['b5', 'c6']},
-      {king: 'd7', targets: ['c3']}, // Reflected Kb5 targets f6.
+      {king: 'd7', targets: ['b5', 'c6']},
     ],
   },
   {

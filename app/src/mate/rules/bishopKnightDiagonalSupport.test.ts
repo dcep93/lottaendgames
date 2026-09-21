@@ -193,7 +193,7 @@ test('a bishop-attack response must preserve the bishop as well as close the esc
 test('support uses the previous stage or at most one knight move to the existing target, in every reflection', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const [fen, size, distance] of [
-      ['k1B5/3K4/8/3N4/8/8/8/8 b - - 0 1', 3, 1], // Kd7 selects c3, one knight move from d5.
+      ['k1B5/3K4/8/3N4/8/8/8/8 b - - 0 1', 3, 2], // Kd7 retains b5/c6; d5 still provides previous-stage support.
       ['k1B5/2K5/8/1N6/8/8/8/8 b - - 0 1', 3, 0],
       ['k1B5/2K5/8/8/3N4/8/8/8 b - - 0 1', 3, 1],
       ['k7/5K2/8/1B6/8/3N4/8/8 b - - 0 1', 5, 2],
@@ -573,28 +573,27 @@ test('an already attacked bishop defended only by the knight cannot support a di
   }
 })
 
-test('Kb5 targets f6 and reflected Kd7 targets c3 in every orientation', () => {
+test('three-diagonal targets remain e2/f3 when the king moves from g3 to g4, in every orientation', () => {
   for (const transform of SQUARE_TRANSFORMS) {
-    const fen = transformFen('1kB5/3K4/8/8/N7/8/8/8 w - - 0 1', transform)
-    const bishopMove = getChess(fen).move({from: transformSquare('c8', transform), to: transformSquare('a6', transform)}).san
-    assert.equal(scoreKnightAndBishopWhiteMove(fen, bishopMove).supportedDiagonalKnightScore, 1)
-    for (const to of ['b6', 'c5', 'c3', 'b2'] as const) {
-      const san = getChess(fen).move({from: transformSquare('a4', transform), to: transformSquare(to, transform)}).san
-      const score = scoreKnightAndBishopWhiteMove(fen, san)
-      if (to === 'b6') {
-        assert.equal(score.supportedDiagonalSizeScore, 99)
-        continue
+    for (const king of ['g3', 'g4'] as const) {
+      for (const [knight, distance] of [['e4', 2], ['c3', 1], ['d2', 1], ['e2', 0], ['f3', 0]] as const) {
+        const board = getChess('8/8/8/8/8/6KB/8/7k b - - 0 1')
+        board.remove('g3')
+        board.put({type: 'k', color: 'w'}, king)
+        board.put({type: 'n', color: 'w'}, knight)
+        assert.deepEqual(knightAndBishopSupportedDiagonal(transformFen(board.fen(), transform)),
+          {size: 3, knight: distance}, `${king}, ${knight}: ${transform.name}`)
       }
-      assert.equal(score.supportedDiagonalSizeScore, 3)
-      assert.equal(score.supportedDiagonalKnightScore, to === 'c3' ? 0 : 2)
     }
-    const nc3 = getChess(fen).move({from: transformSquare('a4', transform), to: transformSquare('c3', transform)}).san
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [nc3])
-    assert.equal(knightAndBishopSupportedDiagonal(transformFen('k1B5/3K4/8/8/8/2N5/8/8 b - - 0 1', transform)).knight, 0)
-    assert.equal(knightAndBishopSupportedDiagonal(transformFen('k7/8/B4N2/1K6/8/8/8/8 b - - 0 1', transform)).knight, 0)
-    const loaded = transformFen('k7/8/BK6/3N4/8/8/8/8 w - - 0 1', transform)
-    const nf6 = getChess(loaded).move({from: transformSquare('d5', transform), to: transformSquare('f6', transform)}).san
-    assert.equal(scoreKnightAndBishopWhiteMove(loaded, nf6).supportedDiagonalKnightScore, 1)
+    const fen = transformFen('8/8/8/8/4N3/6KB/8/7k w - - 2 2', transform)
+    const move = (from: 'g3' | 'e4', to: 'g4' | 'c3' | 'd2') =>
+      getChess(fen).move({from: transformSquare(from, transform), to: transformSquare(to, transform)}).san
+    const kg4 = move('g3', 'g4')
+    assert.equal(scoreKnightAndBishopWhiteMove(fen, kg4).supportedDiagonalKnightScore, 2)
+    for (const to of ['c3', 'd2'] as const) {
+      assert.equal(scoreKnightAndBishopWhiteMove(fen, move('e4', to)).supportedDiagonalKnightScore, 1)
+    }
+    assert.ok(!getIdealKnightAndBishopWhiteMoves(fen).includes(kg4))
   }
 })
 
