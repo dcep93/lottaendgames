@@ -30,6 +30,15 @@ test('Nd3 five support requires Ba4 and Kc5/c6/c7 across king placements, bishop
   }
 })
 
+test('Ba4 ends the loaded seven-diagonal shuttle through supported five-diagonal progress', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    const fen = transformFen('8/8/k7/2K5/8/1B1N4/8/8 w - - 0 1', transform)
+    const ba4 = getChess(fen).move({from: transformSquare('b3', transform), to: transformSquare('a4', transform)}).san
+    assert.equal(scoreKnightAndBishopWhiteMove(fen, ba4).supportedDiagonalSizeScore, 5)
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [ba4])
+  }
+})
+
 test('declared Bb1 with Kd3 Nc4 against Kd1 is unsupported only in its exact placement', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const counters of ['0 1', '43 27']) {
