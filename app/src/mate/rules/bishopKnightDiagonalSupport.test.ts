@@ -6,7 +6,7 @@ import { getIdealKnightAndBishopWhiteMoves, scoreKnightAndBishopWhiteMove } from
 
 const sixDiagonal = ['a3', 'b4', 'c5', 'd6', 'e7', 'f8'] as const
 
-test('Nd3 five support permits only Kc7 across king placements, bishop squares and reflections', () => {
+test('Nd3 five support requires Ba4 and Kc5/c6/c7 across king placements, bishop squares and reflections', () => {
   for (const bishop of ['a4', 'b5', 'c6', 'd7', 'e8'] as const) {
     for (const king of allSquares()) {
       if (king === bishop || king === 'd3' || kingDistance(king, 'a7') <= 1) continue
@@ -16,12 +16,12 @@ test('Nd3 five support permits only Kc7 across king placements, bishop squares a
       board.put({type: 'b', color: 'w'}, bishop)
       for (const transform of SQUARE_TRANSFORMS) {
         assert.equal(knightAndBishopSupportedDiagonal(transformFen(board.fen(), transform)).size,
-          king === 'c7' ? 5 : 99, `${king}, ${bishop}, ${transform.name}`)
+          bishop === 'a4' && ['c5', 'c6', 'c7'].includes(king) ? 5 : 99, `${king}, ${bishop}, ${transform.name}`)
       }
     }
   }
   for (const transform of SQUARE_TRANSFORMS) {
-    const before = transformFen('2K5/3B4/8/k7/8/3N4/8/8 w - - 0 1', transform)
+    const before = transformFen('2K5/k7/8/8/B7/3N4/8/8 w - - 0 1', transform)
     const move = getChess(before).move({from: transformSquare('c8', transform), to: transformSquare('c7', transform)}).san
     assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 5)
     const loaded = transformFen('3K4/8/8/k7/B7/3N4/8/8 w - - 0 1', transform)
@@ -161,9 +161,9 @@ test('a shortest-route bishop attack breaks a tied d6 race if the king cannot de
     assert.equal(scoreKnightAndBishopWhiteMove(before, bb5).supportedDiagonalSizeScore, 99)
     assert.ok(!getIdealKnightAndBishopWhiteMoves(before).includes(bb5))
     for (const [position, expected] of [
-      // A better race no longer suffices with Nd3 and a king off c7.
+      // A better race no longer suffices with Nd3 and a king outside c5/c6/c7.
       ['8/k4K2/8/1B6/8/3N4/8/8 b - - 0 1', 99],
-      // Being able to defend Bb5 also does not waive the c7 requirement.
+      // Being able to defend Bb5 also does not waive the Ba4 and c5/c6/c7 requirement.
       ['8/k7/8/1B6/8/1K1N4/8/8 b - - 0 1', 99],
       // A five-knight retains its separate support conditions.
       ['6K1/k7/8/1B1N4/8/8/8/8 b - - 0 1', 5],
@@ -178,9 +178,9 @@ test('a bishop attack on Black’s shortest e7 route adds one step to the Nd3 ki
     assert.equal(scoreKnightAndBishopWhiteMove(before, bd7).supportedDiagonalSizeScore, 99)
     assert.ok(!getIdealKnightAndBishopWhiteMoves(before).includes(bd7))
     for (const [position, expected] of [
-      // Paying the e7 attack tempo no longer suffices with Nd3 and a king off c7.
+      // Paying the e7 attack tempo no longer suffices with Nd3 and a king outside c5/c6/c7.
       ['k7/3B4/8/8/1K6/3N4/8/8 b - - 0 1', 99],
-      // Being closer to Bb5 does not waive the c7 requirement either.
+      // Being closer to Bb5 does not waive the Ba4 and c5/c6/c7 requirement either.
       ['k7/8/8/1B6/8/1K1N4/8/8 b - - 0 1', 99],
       // A five-knight has its own support conditions.
       ['k7/3B4/8/3N4/8/1K6/8/8 b - - 0 1', 5],
@@ -248,7 +248,7 @@ test('support uses the previous stage or at most one knight move to the existing
       ['k1B5/3K4/8/3N4/8/8/8/8 b - - 0 1', 3, 2], // Kd7 retains b5/c6; d5 still provides previous-stage support.
       ['k1B5/2K5/8/1N6/8/8/8/8 b - - 0 1', 3, 0],
       ['k1B5/2K5/8/8/3N4/8/8/8 b - - 0 1', 3, 1],
-      ['k7/2K5/8/1B6/8/3N4/8/8 b - - 0 1', 5, 2],
+      ['k7/2K5/8/8/B7/3N4/8/8 b - - 0 1', 5, 2],
       ['k5K1/8/2B5/3N4/8/8/8/8 b - - 0 1', 5, 0],
       ['k7/5K2/2B5/8/5N2/8/8/8 b - - 0 1', 5, 1],
       ['k5K1/8/8/3B4/8/3N4/8/8 b - - 0 1', 7, 0],
@@ -369,7 +369,7 @@ test('a seven-diagonal is unsupported when Black can step onto a square screened
 })
 
 
-test('a five-bishop with Nd3 rejects every old bishop allowance when the king is off c7, including reflections', () => {
+test('a five-bishop with Nd3 rejects every old bishop allowance with Kd6, including reflections', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const fen of [
       'k7/8/3K4/8/B7/3N4/8/8 b - - 0 1',
@@ -386,7 +386,7 @@ test('a five-bishop with Nd3 rejects every old bishop allowance when the king is
   }
 })
 
-test('a five-bishop with Nd3 requires c7 rather than the former c5–d8 region', () => {
+test('a five-bishop with Nd3 rejects Bc6 and Be8 even with an eligible king', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     const before = transformFen('8/3K4/8/k7/B7/3N4/8/8 w - - 2 2', transform)
     const bc6 = getChess(before).move({from: transformSquare('a4', transform), to: transformSquare('c6', transform)}).san
@@ -398,17 +398,16 @@ test('a five-bishop with Nd3 requires c7 rather than the former c5–d8 region',
       // Pick an unoccupied five-diagonal square previously excluded with Nd3.
       board.put({color: 'w', type: 'b'}, king === 'c6' ? 'e8' : 'c6')
       const size = knightAndBishopSupportedDiagonal(transformFen(board.fen(), transform)).size
-      if (king === 'c7') assert.equal(size, 5, king)
-      else assert.notEqual(size, 5, king)
+      assert.notEqual(size, 5, king)
     }
   }
 })
 
-test('Bd7 can maintain a supported five-diagonal', () => {
+test('Bd7 cannot maintain five-diagonal support with Nd3 even with Kc7', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     const fen = transformFen('8/2K5/8/k7/B7/3N4/8/8 w - - 2 2', transform)
     const bd7 = getChess(fen).move({from: transformSquare('a4', transform), to: transformSquare('d7', transform)}).san
-    assert.equal(scoreKnightAndBishopWhiteMove(fen, bd7).supportedDiagonalSizeScore, 5)
+    assert.equal(scoreKnightAndBishopWhiteMove(fen, bd7).supportedDiagonalSizeScore, 99)
   }
 })
 
@@ -496,7 +495,7 @@ test('a five-diagonal without a five-knight requires White to match the d6 king 
   }
 })
 
-test('knight control of c5 does not waive the Nd3 king-on-c7 requirement, including reflections', () => {
+test('knight control of c5 does not waive the Nd3 Ba4 and c5/c6/c7 requirement, including reflections', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     const before = transformFen('8/8/1k2K3/1B6/8/3N4/8/8 w - - 2 2', transform)
     const bd7 = getChess(before).move({from: transformSquare('b5', transform), to: transformSquare('d7', transform)}).san
