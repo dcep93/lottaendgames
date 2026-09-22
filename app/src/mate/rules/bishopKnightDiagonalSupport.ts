@@ -279,7 +279,7 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
   const previousFivePlacementRejected = DIAGONALS.some(pattern => pattern.wall.length === 5 &&
     pattern.previousSupport === knight.square && pattern.wall.includes(bishop.square) &&
     ((whiteCoordinates.file - blackCoordinatesForSupport.file) * pattern.rightOffset.file +
-      (whiteCoordinates.rank - blackCoordinatesForSupport.rank) * pattern.rightOffset.rank < 0 ||
+      (whiteCoordinates.rank - blackCoordinatesForSupport.rank) * pattern.rightOffset.rank <= 0 ||
       (bishop.square !== pattern.fiveRemoteBishop && bishop.square !== pattern.previousSupportNearbyBishop &&
         kingDistance(white.square, bishop.square) !== 1)))
   // A five-knight requires kings within three steps, opposite king/bishop colors, and no a4 bishop.

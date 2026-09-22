@@ -110,7 +110,7 @@ test('Nd3 five support combines right-side kings with declared placements or nea
       board.put({type: 'b', color: 'w'}, bishop)
       for (const transform of SQUARE_TRANSFORMS) {
         assert.equal(knightAndBishopSupportedDiagonal(transformFen(board.fen(), transform)).size,
-          king[0] >= 'a' && (bishop === 'a4' || bishop === 'd7' || kingDistance(king, bishop) === 1) && ((['a4', 'd7'].includes(bishop) && ['c5', 'c6', 'c7'].includes(king)) || (['a4', 'd7'].includes(bishop) && king === 'd6') || (bishop === 'd7' && kingDistance(king, 'a7') <= 2)) ? 5 : 99, `${king}, ${bishop}, ${transform.name}`)
+          king[0] > 'a' && (bishop === 'a4' || bishop === 'd7' || kingDistance(king, bishop) === 1) && ((['a4', 'd7'].includes(bishop) && ['c5', 'c6', 'c7'].includes(king)) || (['a4', 'd7'].includes(bishop) && king === 'd6') || (bishop === 'd7' && kingDistance(king, 'a7') <= 2)) ? 5 : 99, `${king}, ${bishop}, ${transform.name}`)
       }
     }
   }

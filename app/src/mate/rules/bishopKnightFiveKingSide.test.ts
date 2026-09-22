@@ -4,16 +4,16 @@ import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../c
 import { evaluateKnightAndBishopSupportedDiagonal } from './bishopKnightDiagonalSupport'
 import { getIdealKnightAndBishopWhiteMoves } from './bishopKnight'
 
-test('Nd3 five-diagonal support allows same-file kings but rejects White left of Black after White moves', () => {
+test('Nd3 five-diagonal support requires White strictly right of Black after White moves', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const fen of [
       // White to Black's left stays excluded.
-      '3k4/8/2B5/2K5/8/3N4/8/8 b - - 3 2',
+      '3k4/3B4/8/2K5/8/3N4/8/8 b - - 3 2',
+      '8/2k5/8/2K5/B7/3N4/8/8 b - - 1 1',
+      '3k4/3B4/3K4/8/8/3N4/8/8 b - - 0 1',
     ]) assert.notEqual(evaluateKnightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 5)
     for (const fen of [
       '8/3B4/1k1K4/8/8/3N4/8/8 b - - 0 1',
-      '8/2k5/8/2K5/B7/3N4/8/8 b - - 1 1',
-      '3k4/3B4/3K4/8/8/3N4/8/8 b - - 0 1',
       // An earlier remote-a4 placement still qualifies when White is to the right.
       '8/8/1k6/3K4/B7/3N4/8/8 b - - 0 1',
       // A five knight is not subject to the previous-stage-knight restriction.
@@ -59,13 +59,13 @@ test('the former second-move Bc6 support declaration is superseded in every refl
 })
 
 
-test('same-file kings permit loaded Ba4 while Bb5 still fails other support requirements', () => {
+test('same-file kings reject loaded Ba4 and Bb5 before bishop preferences', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     const before = transformFen('8/2kB4/8/2K5/8/3N4/8/8 w - - 2 2', transform)
     const board = getChess(before)
     const move = board.move({from: transformSquare('d7', transform), to: transformSquare('a4', transform)}).san
-    assert.equal(evaluateKnightAndBishopSupportedDiagonal(board.fen()).size, 5)
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(before), [move])
+    assert.equal(evaluateKnightAndBishopSupportedDiagonal(board.fen()).size, 99)
+    assert.ok(!getIdealKnightAndBishopWhiteMoves(before).includes(move))
     const rejected = getChess(before)
     rejected.move({from: transformSquare('d7', transform), to: transformSquare('b5', transform)})
     assert.equal(evaluateKnightAndBishopSupportedDiagonal(rejected.fen()).size, 99)
