@@ -16,10 +16,13 @@ export function declaredSupportedSevenMove(fen: string): string | undefined {
   return declarations.get(fen.split(' ').slice(0,2).join(' '))
 }
 
-const fiveDeclarations = new Map(SQUARE_TRANSFORMS.map(transform => [
-  transformFen('8/3B4/3K4/k7/8/3N4/8/8 w - - 0 1', transform).split(' ').slice(0, 2).join(' '),
-  transformSquare('d6', transform) + transformSquare('c5', transform),
-] as const))
+const fiveDeclarations = new Map(([
+  ['8/3B4/3K4/k7/8/3N4/8/8 w - - 0 1', 'd6', 'c5'],
+  ['8/8/k1K5/3N4/B7/8/8/8 w - - 0 1', 'c6', 'c5'],
+] as const).flatMap(([fen, from, to]) => SQUARE_TRANSFORMS.map(transform => [
+  transformFen(fen, transform).split(' ').slice(0, 2).join(' '),
+  transformSquare(from, transform) + transformSquare(to, transform),
+] as const)))
 
 export function declaredSupportedFiveMove(fen: string): string | undefined {
   return fiveDeclarations.get(fen.split(' ').slice(0, 2).join(' '))

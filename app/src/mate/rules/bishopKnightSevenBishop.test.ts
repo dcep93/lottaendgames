@@ -283,3 +283,16 @@ test('Bb5 and Nd5 aim the king two files right of Black, including second-move K
     assert.equal(getMateRuleSet('bishop-knight').currentWhiteHint(position)?.id, 'r2.5')
   }
 })
+
+
+test('r2.5 prefers Kc5 with Ba4 Nd5 against Ka6 without bypassing support', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    const position = transformFen('8/8/k1K5/3N4/B7/8/8/8 w - - 41 23', transform)
+    const san = getChess(position).move({from: transformSquare('c6', transform), to: transformSquare('c5', transform)}).san
+    assert.equal(scoreKnightAndBishopWhiteMove(position, san).supportedDiagonalSizeScore, 5)
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(position), [san])
+    const candidates = bishopKnightRuleSet.scoreWhiteCandidates!(position, bishopKnightRuleSet.whiteMoves(position))
+    const earlier = knightAndBishopWhiteRules.slice(0, knightAndBishopWhiteRules.findIndex(r => r.id === 'r2.5'))
+    assert.ok(selectIdealMoves(candidates, earlier).includes(san))
+  }
+})
