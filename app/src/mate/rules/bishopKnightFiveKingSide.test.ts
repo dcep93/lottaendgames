@@ -22,7 +22,7 @@ test('Nd3 five-diagonal support requires the White king strictly right of Black 
 })
 
 
-test('Nd3 requires a4 or king adjacency except the renewed exact Bd7 declaration', () => {
+test('Nd3 requires a4 or king adjacency unless Bd7 faces an a-file Black king', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const fen of [
       // Loaded 1. Bd7: the king on c5 is two steps from the bishop.
@@ -89,8 +89,29 @@ test('declared second-move Bd7 with Kd5 Nd3 versus Ka5 is supported and preferre
     }
     for (const nearby of [
       '8/3B4/1k6/3K4/8/3N4/8/8 b - - 4 3', // Black's later b6 square is not the declaration.
-      '8/3B4/8/k1K5/8/3N4/8/8 b - - 0 1',
       '8/3B4/8/k2K4/5N2/8/8/8 b - - 0 1',
     ]) assert.equal(evaluateKnightAndBishopSupportedDiagonal(transformFen(nearby, transform)).size, 99)
+  }
+})
+
+
+test('Bd7 with Nd3 waives king adjacency when Black is on the a-file, including reflections', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    for (const black of ['a5', 'a6', 'a7', 'a8'] as const) {
+      const board = getChess('8/3B4/8/2K5/8/3N4/8/7k b - - 42 23')
+      board.remove('h1')
+      board.put({type: 'k', color: 'b'}, black)
+      assert.equal(evaluateKnightAndBishopSupportedDiagonal(transformFen(board.fen(), transform)).size, 5, black)
+    }
+    const before = transformFen('8/3B4/3K4/k7/8/3N4/8/8 w - - 2 2', transform)
+    const board = getChess(before)
+    const move = board.move({from: transformSquare('d6', transform), to: transformSquare('c5', transform)}).san
+    assert.equal(evaluateKnightAndBishopSupportedDiagonal(board.fen()).size, 5)
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(before), [move])
+    for (const fen of [
+      '8/3B4/1k6/2K5/8/3N4/8/8 b - - 0 1', // Off the a-file, no king adjacency.
+      '8/3B4/k7/8/2K5/3N4/8/8 b - - 0 1', // Same-color king and knight off current support.
+      'k7/3B4/8/8/2K5/3N4/8/8 b - - 0 1', // Kings more than three steps apart.
+    ]) assert.equal(evaluateKnightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 99, fen)
   }
 })

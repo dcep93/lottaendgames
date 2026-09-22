@@ -282,7 +282,8 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
     ((whiteCoordinates.file - blackCoordinatesForSupport.file) * pattern.rightOffset.file +
       (whiteCoordinates.rank - blackCoordinatesForSupport.rank) * pattern.rightOffset.rank <= 0 ||
       (!declaredFive?.allowRemoteBishop && bishop.square !== pattern.fiveRemoteBishop && kingDistance(white.square, bishop.square) !== 1 &&
-        !(bishop.square === pattern.fiveOppositeEdgeBishop && pattern.fiveBlackEdge.includes(black.square)))))
+        !((bishop.square === pattern.fiveOppositeEdgeBishop || bishop.square === pattern.previousSupportNearbyBishop) &&
+          pattern.fiveBlackEdge.includes(black.square)))))
   if (declaredFive && !previousFivePlacementRejected) return {
     size: 5,
     knight: knightAndBishopKnightProximityToSquare(fen, declaredFive.support),
