@@ -120,11 +120,12 @@ const THREE_BISHOP_RACES = SQUARE_TRANSFORMS.map(transform => ({
 
 const DECLARED_FIVE_SUPPORT = [
   {king: 'd7', bishop: 'b5', knight: 'd5', black: 'b7', allowSameColorKing: true},
-  {king: 'd5', bishop: 'd7', knight: 'd3', black: 'a5'},
+  {king: 'd5', bishop: 'd7', knight: 'd3', black: 'a5', allowRemoteBishop: true},
   {king: 'd5', bishop: 'a4', knight: 'd3', black: 'b6'},
 ] as const
 const DECLARED_FIVE_PLACEMENTS = DECLARED_FIVE_SUPPORT.flatMap(placement => SQUARE_TRANSFORMS.map(transform => ({
   allowSameColorKing: 'allowSameColorKing' in placement && placement.allowSameColorKing,
+  allowRemoteBishop: 'allowRemoteBishop' in placement && placement.allowRemoteBishop,
   king: transformSquare(placement.king, transform),
   bishop: transformSquare(placement.bishop, transform),
   knight: transformSquare(placement.knight, transform),
@@ -280,7 +281,7 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
     pattern.previousSupport === knight.square && pattern.wall.includes(bishop.square) &&
     ((whiteCoordinates.file - blackCoordinatesForSupport.file) * pattern.rightOffset.file +
       (whiteCoordinates.rank - blackCoordinatesForSupport.rank) * pattern.rightOffset.rank <= 0 ||
-      (bishop.square !== pattern.fiveRemoteBishop && kingDistance(white.square, bishop.square) !== 1 &&
+      (!declaredFive?.allowRemoteBishop && bishop.square !== pattern.fiveRemoteBishop && kingDistance(white.square, bishop.square) !== 1 &&
         !(bishop.square === pattern.fiveOppositeEdgeBishop && pattern.fiveBlackEdge.includes(black.square)))))
   if (declaredFive && !previousFivePlacementRejected) return {
     size: 5,

@@ -22,14 +22,13 @@ test('Nd3 five-diagonal support requires the White king strictly right of Black 
 })
 
 
-test('Nd3 requires the five bishop on a4 or adjacent to White, even for older declarations', () => {
+test('Nd3 requires a4 or king adjacency except the renewed exact Bd7 declaration', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const fen of [
       // Loaded 1. Bd7: the king on c5 is two steps from the bishop.
       '8/1k1B4/8/2K5/8/3N4/8/8 b - - 1 1',
       '8/1k1B4/2K5/8/8/3N4/8/8 b - - 0 1', // Same-color Kc6, knight off support.
-      // The earlier exact Kd5/Bd7 placement cannot bypass the new condition.
-      '8/3B4/8/k2K4/8/3N4/8/8 b - - 0 1',
+
     ]) assert.notEqual(evaluateKnightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 5)
     for (const fen of [
       '8/1k6/8/2K5/B7/3N4/8/8 b - - 0 1',
@@ -75,5 +74,23 @@ test('Be8 with Nd3 and Black on the a-file supports the loaded placement, includ
       '4B3/k7/8/8/8/3N4/6K1/8 b - - 0 1', // Universal king-distance limit.
       '8/8/k1B5/2K5/8/3N4/8/8 b - - 0 1', // Bc6 remains forbidden.
     ]) assert.equal(evaluateKnightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 99, fen)
+  }
+})
+
+
+test('declared second-move Bd7 with Kd5 Nd3 versus Ka5 is supported and preferred', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    for (const counters of ['2 2', '73 42']) {
+      const before = transformFen(`8/8/8/k2K4/B7/3N4/8/8 w - - ${counters}`, transform)
+      const board = getChess(before)
+      const move = board.move({from: transformSquare('a4', transform), to: transformSquare('d7', transform)}).san
+      assert.deepEqual(evaluateKnightAndBishopSupportedDiagonal(board.fen()), {size: 5, knight: 2})
+      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(before), [move])
+    }
+    for (const nearby of [
+      '8/3B4/1k6/3K4/8/3N4/8/8 b - - 4 3', // Black's later b6 square is not the declaration.
+      '8/3B4/8/k1K5/8/3N4/8/8 b - - 0 1',
+      '8/3B4/8/k2K4/5N2/8/8/8 b - - 0 1',
+    ]) assert.equal(evaluateKnightAndBishopSupportedDiagonal(transformFen(nearby, transform)).size, 99)
   }
 })

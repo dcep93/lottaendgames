@@ -30,7 +30,7 @@ test('Bd7 Nd3 nearby-king eligibility keeps other support checks and prefers loa
   }
 })
 
-test('declared second-move Bd7 with Kd5 Nd3 against Ka5 is superseded by the bishop-adjacency requirement', () => {
+test('declared second-move Bd7 with Kd5 Nd3 against Ka5 bypasses bishop adjacency as explicitly redeclared', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const counters of ['0 1', '42 22']) {
       const board = getChess(transformFen(`8/8/1k6/3K4/8/1B1N4/8/8 w - - ${counters}`, transform))
@@ -38,9 +38,9 @@ test('declared second-move Bd7 with Kd5 Nd3 against Ka5 is superseded by the bis
       board.move({from: transformSquare('b6', transform), to: transformSquare('a5', transform)})
       const before = board.fen()
       const move = board.move({from: transformSquare('a4', transform), to: transformSquare('d7', transform)}).san
-      assert.equal(knightAndBishopSupportedDiagonal(board.fen()).size, 99)
-      assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 99)
-      assert.ok(!getIdealKnightAndBishopWhiteMoves(before).includes(move))
+      assert.equal(knightAndBishopSupportedDiagonal(board.fen()).size, 5)
+      assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 5)
+      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(before), [move])
     }
     for (const nearby of [
       '8/3B4/8/3K4/8/3N4/8/k7 b - - 0 1',

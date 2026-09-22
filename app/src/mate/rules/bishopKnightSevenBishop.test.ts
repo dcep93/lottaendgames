@@ -175,7 +175,7 @@ test('r2.5 prescribes loaded Kc6 then Kc5 while preserving seven support', () =>
 })
 
 
-test('the older r2.5 Kc5 declaration cannot override stricter bishop-adjacency support', () => {
+test('the renewed Kd5 support placement still leaves the older Kc5 preference unsupported', () => {
   const line = getChess('8/3B4/1k6/3K4/8/3N4/8/8 w - - 0 1')
   line.move('Kd6'); line.move('Ka5')
   for (const transform of SQUARE_TRANSFORMS) {
@@ -185,7 +185,7 @@ test('the older r2.5 Kc5 declaration cannot override stricter bishop-adjacency s
       const preferred = scoreKnightAndBishopWhiteMove(position, san('c5'))
       const former = scoreKnightAndBishopWhiteMove(position, san('d5'))
       assert.equal(preferred.supportedDiagonalSizeScore, 99)
-      assert.equal(former.supportedDiagonalSizeScore, 99)
+      assert.equal(former.supportedDiagonalSizeScore, 5)
       assert.equal(preferred.declaredSupportedFivePenalty, 0)
       assert.equal(former.declaredSupportedFivePenalty, 1)
       assert.ok(!getIdealKnightAndBishopWhiteMoves(position).includes(san('c5')))
