@@ -172,7 +172,7 @@ test('r2.5 prescribes loaded Kc6 then Kc5 while preserving seven support', () =>
 })
 
 
-test('the older r2.5 Kc5 declaration cannot override stricter bishop-adjacency support', () => {
+test('the older r2.5 Kc5 declaration is eligible again after removing Bd7 adjacency', () => {
   const line = getChess('8/3B4/1k6/3K4/8/3N4/8/8 w - - 0 1')
   line.move('Kd6'); line.move('Ka5')
   for (const transform of SQUARE_TRANSFORMS) {
@@ -181,14 +181,14 @@ test('the older r2.5 Kc5 declaration cannot override stricter bishop-adjacency s
       const san = (to: 'c5' | 'd5') => getChess(position).move({from: transformSquare('d6', transform), to: transformSquare(to, transform)}).san
       const preferred = scoreKnightAndBishopWhiteMove(position, san('c5'))
       const former = scoreKnightAndBishopWhiteMove(position, san('d5'))
-      assert.equal(preferred.supportedDiagonalSizeScore, 99)
-      assert.equal(former.supportedDiagonalSizeScore, 99)
+      assert.equal(preferred.supportedDiagonalSizeScore, 5)
+      assert.equal(former.supportedDiagonalSizeScore, 5)
       assert.equal(preferred.declaredSupportedFivePenalty, 0)
       assert.equal(former.declaredSupportedFivePenalty, 1)
-      assert.ok(!getIdealKnightAndBishopWhiteMoves(position).includes(san('c5')))
+      assert.ok(getIdealKnightAndBishopWhiteMoves(position).includes(san('c5')))
       const candidates = bishopKnightRuleSet.scoreWhiteCandidates!(position, bishopKnightRuleSet.whiteMoves(position))
       const earlierRules = knightAndBishopWhiteRules.slice(0, knightAndBishopWhiteRules.findIndex(r => r.id === 'r2.5'))
-      assert.ok(!selectIdealMoves(candidates, earlierRules).includes(san('c5')))
+      assert.ok(selectIdealMoves(candidates, earlierRules).includes(san('c5')))
     }
     const nearby = transformFen('8/3B4/k2K4/8/8/3N4/8/8 w - - 0 1', transform)
     for (const move of getChess(nearby).moves()) {
@@ -267,9 +267,12 @@ test('supported five bishop and five knight prefer the bishop square farther fro
     const candidates = bishopKnightRuleSet.scoreWhiteCandidates!(position, bishopKnightRuleSet.whiteMoves(position))
     const earlier = knightAndBishopWhiteRules.slice(0, knightAndBishopWhiteRules.findIndex(r => r.id === 'r2.5'))
     assert.ok(selectIdealMoves(candidates, earlier).includes(move('a4', 'b5')))
-    // The previous-stage d3 knight keeps its separate king-target preference.
+    // The previous-stage d3 knight has its own ordered bishop preference.
     const previous = transformFen('8/3B4/k3K3/8/8/3N4/8/8 w - - 0 1', transform)
-    for (const san of getChess(previous).moves()) assert.equal(scoreKnightAndBishopWhiteMove(previous, san).supportedFiveBishopPenalty, 0)
+    for (const san of getChess(previous).moves()) {
+      const score = scoreKnightAndBishopWhiteMove(previous, san)
+      if (score.supportedDiagonalSizeScore === 5) assert.ok(score.supportedFiveBishopPenalty >= 0 && score.supportedFiveBishopPenalty <= 2)
+    }
   }
 })
 

@@ -277,7 +277,8 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
     pattern.previousSupport === knight.square && pattern.wall.includes(bishop.square) &&
     ((whiteCoordinates.file - blackCoordinatesForSupport.file) * pattern.rightOffset.file +
       (whiteCoordinates.rank - blackCoordinatesForSupport.rank) * pattern.rightOffset.rank <= 0 ||
-      (bishop.square !== pattern.fiveRemoteBishop && kingDistance(white.square, bishop.square) !== 1)))
+      (bishop.square !== pattern.fiveRemoteBishop && bishop.square !== pattern.previousSupportNearbyBishop &&
+        kingDistance(white.square, bishop.square) !== 1)))
   // A five-knight requires kings within three steps, opposite king/bishop colors, and no a4 bishop.
   // These requirements also constrain older declared five-diagonal placements.
   const fiveKingColorException = FIVE_KING_COLOR_EXCEPTIONS.some(pattern =>
@@ -416,13 +417,19 @@ export function knightAndBishopThreeKingPlacementPenalty(fen: string): number {
   return patterns.length && !patterns.some(pattern => pattern.preferredThreeKings.includes(white.square)) ? 1 : 0
 }
 
-/** Prefer the five-knight bishop square farther from White's king. */
+/** Nd3 prefers b5 then d7; Nd5 prefers the bishop square farther from White's king. */
 export function knightAndBishopFiveBishopPenalty(fen: string): number {
   const white = findPiece(fen, 'w', 'k')
   const black = findPiece(fen, 'b', 'k')
   const bishop = findPiece(fen, 'w', 'b')
   const knight = findPiece(fen, 'w', 'n')
   if (!white || !black || !bishop || !knight) return 0
+  // Nd3 fixes the orientation: prefer b5, then d7, among supported outcomes.
+  const previousPatterns = DIAGONALS.filter(pattern => pattern.wall.length === 5 &&
+    pattern.previousSupport === knight.square && pattern.wall.includes(bishop.square) &&
+    isInsideBishopDiagonal(black.square, pattern.wall))
+  if (previousPatterns.length) return Math.min(...previousPatterns.map(pattern =>
+    bishop.square === pattern.fiveRightTargetBishop ? 0 : bishop.square === pattern.previousSupportNearbyBishop ? 1 : 2))
   const patterns = DIAGONALS.filter(pattern => pattern.wall.length === 5 &&
     pattern.support.includes(knight.square) && pattern.wall.includes(bishop.square) &&
     isInsideBishopDiagonal(black.square, pattern.wall))

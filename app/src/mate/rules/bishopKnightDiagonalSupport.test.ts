@@ -18,10 +18,9 @@ test('Bd7 Nd3 nearby-king eligibility keeps other support checks and prefers loa
     // Newly eligible king placements; classification uses the post-White board.
     for (const fen of [
       '8/2kB4/4K3/8/8/3N4/8/8 b - - 0 1',
+      '8/k2B4/8/1K6/8/3N4/8/8 b - - 0 1',
     ]) assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 5)
     for (const fen of [
-      // Nearby kings no longer suffice when the bishop is remote.
-      '8/k2B4/8/1K6/8/3N4/8/8 b - - 0 1',
       // Three steps apart, outside the prior king-placement list.
       '8/k2B4/8/8/1K6/3N4/8/8 b - - 0 1',
       // Two steps apart cannot rescue a bishop Black can capture immediately.
@@ -30,7 +29,7 @@ test('Bd7 Nd3 nearby-king eligibility keeps other support checks and prefers loa
   }
 })
 
-test('declared second-move Bd7 with Kd5 Nd3 against Ka5 is superseded by the bishop-adjacency requirement', () => {
+test('declared second-move Bd7 with Kd5 Nd3 against Ka5 is supported without bishop adjacency', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const counters of ['0 1', '42 22']) {
       const board = getChess(transformFen(`8/8/1k6/3K4/8/1B1N4/8/8 w - - ${counters}`, transform))
@@ -38,9 +37,9 @@ test('declared second-move Bd7 with Kd5 Nd3 against Ka5 is superseded by the bis
       board.move({from: transformSquare('b6', transform), to: transformSquare('a5', transform)})
       const before = board.fen()
       const move = board.move({from: transformSquare('a4', transform), to: transformSquare('d7', transform)}).san
-      assert.equal(knightAndBishopSupportedDiagonal(board.fen()).size, 99)
-      assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 99)
-      assert.ok(!getIdealKnightAndBishopWhiteMoves(before).includes(move))
+      assert.equal(knightAndBishopSupportedDiagonal(board.fen()).size, 5)
+      assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 5)
+      assert.ok(getIdealKnightAndBishopWhiteMoves(before).includes(move))
     }
     for (const nearby of [
       '8/3B4/8/3K4/8/3N4/8/k7 b - - 0 1',
@@ -111,7 +110,7 @@ test('Nd3 five support combines right-side kings with declared placements or nea
       board.put({type: 'b', color: 'w'}, bishop)
       for (const transform of SQUARE_TRANSFORMS) {
         assert.equal(knightAndBishopSupportedDiagonal(transformFen(board.fen(), transform)).size,
-          king[0] > 'a' && (bishop === 'a4' || kingDistance(king, bishop) === 1) && ((['a4', 'c6', 'd7'].includes(bishop) && ['c5', 'c6', 'c7'].includes(king)) || (['a4', 'd7'].includes(bishop) && king === 'd6') || (bishop === 'd7' && kingDistance(king, 'a7') <= 2)) ? 5 : 99, `${king}, ${bishop}, ${transform.name}`)
+          king[0] > 'a' && (bishop === 'a4' || bishop === 'd7' || kingDistance(king, bishop) === 1) && ((['a4', 'c6', 'd7'].includes(bishop) && ['c5', 'c6', 'c7'].includes(king)) || (['a4', 'd7'].includes(bishop) && king === 'd6') || (bishop === 'd7' && kingDistance(king, 'a7') <= 2)) ? 5 : 99, `${king}, ${bishop}, ${transform.name}`)
       }
     }
   }
@@ -502,7 +501,7 @@ test('a five-bishop with Nd3 rejects Bb5 and Be8 even with an eligible king', ()
   }
 })
 
-test('Bd7 and Bc6 remain supported while Kd6 is preferred with Ba4 and Nd3', () => {
+test('Bd7 and Bc6 remain supported while Bd7 is preferred with Ba4 and Nd3', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     const fen = transformFen('8/2K5/8/k7/B7/3N4/8/8 w - - 2 2', transform)
     const bd7 = getChess(fen).move({from: transformSquare('a4', transform), to: transformSquare('d7', transform)}).san
@@ -510,7 +509,7 @@ test('Bd7 and Bc6 remain supported while Kd6 is preferred with Ba4 and Nd3', () 
     const loaded = transformFen('8/2K5/k7/8/B7/3N4/8/8 w - - 2 2', transform)
     const bc6 = getChess(loaded).move({from: transformSquare('a4', transform), to: transformSquare('c6', transform)}).san
     assert.equal(scoreKnightAndBishopWhiteMove(loaded, bc6).supportedDiagonalSizeScore, 5)
-    const preferred = getChess(loaded).move({from: transformSquare('c7', transform), to: transformSquare('d6', transform)}).san
+    const preferred = getChess(loaded).move({from: transformSquare('a4', transform), to: transformSquare('d7', transform)}).san
     assert.deepEqual(getIdealKnightAndBishopWhiteMoves(loaded), [preferred])
   }
 })

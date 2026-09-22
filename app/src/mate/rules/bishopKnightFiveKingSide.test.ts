@@ -24,14 +24,14 @@ test('Nd3 five-diagonal support requires the White king strictly right of Black 
 })
 
 
-test('Nd3 requires the five bishop on a4 or adjacent to White, even for older declarations', () => {
+test('Nd3 permits a4 and d7 without adjacency, including older declarations', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const fen of [
       // Loaded 1. Bd7: the king on c5 is two steps from the bishop.
       '8/1k1B4/8/2K5/8/3N4/8/8 b - - 1 1',
-      // The earlier exact Kd5/Bd7 placement cannot bypass the new condition.
+      // The earlier exact Kd5/Bd7 placement is eligible again.
       '8/3B4/8/k2K4/8/3N4/8/8 b - - 0 1',
-    ]) assert.notEqual(evaluateKnightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 5)
+    ]) assert.equal(evaluateKnightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 5)
     for (const fen of [
       '8/1k6/8/2K5/B7/3N4/8/8 b - - 0 1',
       '8/1k1B4/2K5/8/8/3N4/8/8 b - - 0 1',
@@ -50,7 +50,8 @@ test('the declared position immediately after second-move Bc6 is supported in ev
       const board = getChess(before)
       const move = board.move({from: transformSquare('a4', transform), to: transformSquare('c6', transform)}).san
       assert.equal(evaluateKnightAndBishopSupportedDiagonal(board.fen()).size, 5)
-      assert.ok(getIdealKnightAndBishopWhiteMoves(before).includes(move))
+      const bd7 = getChess(before).move({from: transformSquare('a4', transform), to: transformSquare('d7', transform)}).san
+      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(before), [bd7])
     }
     // This is an exact declaration, not a new general Kd5/Bc6 allowance.
     const nearby = transformFen('8/8/1kB5/3K4/8/3N4/8/8 b - - 0 1', transform)
