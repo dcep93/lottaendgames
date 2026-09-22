@@ -64,10 +64,10 @@ test('Bb5 and Nd5 require bishop adjacency when White king is left of Black', ()
   for (const transform of SQUARE_TRANSFORMS) {
     for (const counters of ['2 2', '72 42']) {
       const before = transformFen(`2k5/8/1K6/1B1N4/8/8/8/8 w - - ${counters}`, transform)
-      for (const to of ['a7', 'c5'] as const) {
+      for (const to of ['a7'] as const) {
         const board = getChess(before)
         const move = board.move({from: transformSquare('b6', transform), to: transformSquare(to, transform)}).san
-        // Ka7 is left and remote from Bb5; Kc5 instead fails the three-step king gap.
+        // Ka7 is left and remote from Bb5.
         assert.equal(knightAndBishopSupportedDiagonal(board.fen()).size, 99)
         assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 99)
       }

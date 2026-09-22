@@ -140,6 +140,14 @@ const FIVE_KING_COLOR_EXCEPTIONS = SQUARE_TRANSFORMS.map(transform => ({
   black: transformSquare('b7', transform),
 }))
 
+// Narrow declaration allowing Kc5 to begin the opposite-color approach to e7.
+const FIVE_KING_DISTANCE_EXCEPTIONS = SQUARE_TRANSFORMS.map(transform => ({
+  king: transformSquare('c5', transform),
+  bishop: transformSquare('b5', transform),
+  knight: transformSquare('d5', transform),
+  black: transformSquare('c8', transform),
+}))
+
 const FIVE_BISHOP_APPROACHES = SQUARE_TRANSFORMS.map(transform => ({
   wall: (['a4', 'b5', 'c6', 'd7', 'e8'] as const).map(square => transformSquare(square, transform)),
   bishops: (['a4', 'b5', 'c6'] as const).map(square => transformSquare(square, transform)),
@@ -283,9 +291,12 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
   const fiveKingColorException = FIVE_KING_COLOR_EXCEPTIONS.some(pattern =>
     pattern.king === white.square && pattern.bishop === bishop.square &&
     pattern.knight === knight.square && pattern.black === black.square)
+  const fiveKingDistanceException = FIVE_KING_DISTANCE_EXCEPTIONS.some(pattern =>
+    pattern.king === white.square && pattern.bishop === bishop.square &&
+    pattern.knight === knight.square && pattern.black === black.square)
   const currentFivePlacementRejected = DIAGONALS.some(pattern => pattern.wall.length === 5 &&
     pattern.support.includes(knight.square) && pattern.wall.includes(bishop.square) &&
-    (kingDistance(white.square, black.square) > 2 ||
+    ((kingDistance(white.square, black.square) > 2 && !fiveKingDistanceException) ||
       (squareColor(white.square) === squareColor(bishop.square) && !fiveKingColorException) ||
       bishop.square === pattern.fiveRemoteBishop ||
       (bishop.square === pattern.fiveRightTargetBishop && kingDistance(white.square, bishop.square) > 1 &&
@@ -420,6 +431,23 @@ export function knightAndBishopFiveBishopPenalty(fen: string): number {
     pattern.support.includes(knight.square) && pattern.wall.includes(bishop.square) &&
     isInsideBishopDiagonal(black.square, pattern.wall))
   return patterns.length && !patterns.some(pattern => pattern.preferredFiveBishops.includes(bishop.square)) ? 1 : 0
+}
+
+/** Approach e7 from Black near d8; its reflection approaches b4 from Black near a5. */
+export function knightAndBishopFiveKingApproach(fen: string): {color: number, distance: number} {
+  const white = findPiece(fen, 'w', 'k')
+  const black = findPiece(fen, 'b', 'k')
+  const bishop = findPiece(fen, 'w', 'b')
+  const knight = findPiece(fen, 'w', 'n')
+  if (!white || !black || !bishop || !knight) return {color: 0, distance: 0}
+  const patterns = DIAGONALS.filter(pattern => pattern.wall.length === 5 &&
+    pattern.support.includes(knight.square) && pattern.wall.includes(bishop.square) &&
+    isInsideBishopDiagonal(black.square, pattern.wall) &&
+    kingDistance(black.square, pattern.fiveFlushTrigger) <= 1)
+  return patterns.length ? {
+    color: squareColor(white.square) === squareColor(bishop.square) ? 1 : 0,
+    distance: Math.min(...patterns.map(pattern => kingDistance(white.square, pattern.fiveFlushTarget))),
+  } : {color: 0, distance: 0}
 }
 
 /** Five-diagonal king targets in the orientation fixed by the knight. */

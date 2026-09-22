@@ -1,4 +1,4 @@
-import { knightAndBishopThreeKingPlacementPenalty, knightAndBishopFiveBishopPenalty, knightAndBishopFiveKingTargetDistance, knightAndBishopShouldCheckThreeDiagonal, evaluateKnightAndBishopSupportedDiagonal } from "./bishopKnightDiagonalSupport";
+import { knightAndBishopFiveKingApproach, knightAndBishopThreeKingPlacementPenalty, knightAndBishopFiveBishopPenalty, knightAndBishopFiveKingTargetDistance, knightAndBishopShouldCheckThreeDiagonal, evaluateKnightAndBishopSupportedDiagonal } from "./bishopKnightDiagonalSupport";
 import type { Square } from "chess.js";
 import {
   findPiece,
@@ -58,6 +58,8 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly supportedSevenFlushDistance: number;
   readonly supportedSevenBishopPenalty: number;
   readonly supportedThreeKingPlacementPenalty: number;
+  readonly supportedFiveApproachColorPenalty: number;
+  readonly supportedFiveApproachDistance: number;
   readonly supportedFiveBishopPenalty: number;
   readonly supportedFiveKingTargetDistance: number;
   readonly supportedSevenKingTargetDistance: number;
@@ -206,6 +208,7 @@ function scoreKnightAndBishopWhiteMoveCore(
     && ((!!bishop && kingDistance(bishop.square, whiteKing.square) === 1)
       || (!!knight && kingDistance(knight.square, whiteKing.square) === 1));
   const knightKingDefended = !!knight && !!whiteKing && kingDistance(knight.square, whiteKing.square) === 1;
+  let fiveApproach: ReturnType<typeof knightAndBishopFiveKingApproach> | undefined;
   let supportedDiagonal: ReturnType<typeof evaluateKnightAndBishopSupportedDiagonal> | undefined;
   return {
     get kingCoordinationPenalty() {
@@ -253,6 +256,14 @@ function scoreKnightAndBishopWhiteMoveCore(
     get supportedThreeKingPlacementPenalty() {
       const support = supportedDiagonal ??= evaluateKnightAndBishopSupportedDiagonal(resultFen, blackReplies.map(move => move.to));
       return support.size === 3 ? knightAndBishopThreeKingPlacementPenalty(resultFen) : 0;
+    },
+    get supportedFiveApproachColorPenalty() {
+      const support = supportedDiagonal ??= evaluateKnightAndBishopSupportedDiagonal(resultFen, blackReplies.map(move => move.to));
+      return support.size === 5 ? (fiveApproach ??= knightAndBishopFiveKingApproach(resultFen)).color : 0;
+    },
+    get supportedFiveApproachDistance() {
+      const support = supportedDiagonal ??= evaluateKnightAndBishopSupportedDiagonal(resultFen, blackReplies.map(move => move.to));
+      return support.size === 5 ? (fiveApproach ??= knightAndBishopFiveKingApproach(resultFen)).distance : 0;
     },
     get supportedFiveBishopPenalty() {
       const support = supportedDiagonal ??= evaluateKnightAndBishopSupportedDiagonal(resultFen, blackReplies.map(move => move.to));
@@ -361,6 +372,8 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
         { compare: (first, second) => (first.declaredSupportedFivePenalty ?? 0) - (second.declaredSupportedFivePenalty ?? 0) },
         { compare: (first, second) => (first.supportedDiagonalSizeScore === 7 ? first.declaredSupportedSevenPenalty : 0) - (second.supportedDiagonalSizeScore === 7 ? second.declaredSupportedSevenPenalty : 0) },
         { compare: (first, second) => first.supportedThreeKingPlacementPenalty - second.supportedThreeKingPlacementPenalty },
+        { compare: (first, second) => first.supportedFiveApproachColorPenalty - second.supportedFiveApproachColorPenalty },
+        { compare: (first, second) => first.supportedFiveApproachDistance - second.supportedFiveApproachDistance },
         { compare: (first, second) => first.supportedFiveBishopPenalty - second.supportedFiveBishopPenalty },
         { compare: (first, second) => first.supportedFiveKingTargetDistance - second.supportedFiveKingTargetDistance },
         { compare: (first, second) => first.supportedSevenFlushColorPenalty - second.supportedSevenFlushColorPenalty },
@@ -595,7 +608,8 @@ const bishopKnightHelp: RuleHelp = {
     "A precage square is diagonally adjacent to a central bishop, off the long diagonal, and strictly behind the bishop from Black's king's perspective.",
     "For r10, candidates without a precage square remain neutral, tied with the best available distance. Among candidates with precage squares, fewer knight moves wins.",
     "The target corner is the bishop-colored corner closest to Black's king.",
-    "Support squares, with reflections: with a five-diagonal bishop and a five-knight (Nd5), support is automatically rejected if the kings are more than two king steps apart, White’s king is on the bishop’s color, or the bishop is on a4. These restrictions also apply to older declared placements. With Bb5 and Nd5, White’s king must also be adjacent to the bishop if it is to the left of Black’s king. The exact Kd7/Bb5/Nd5 versus Kb7 placement is an exception to the king-color restriction. With Nd3, five-diagonal support requires White’s king strictly to the right of Black’s king (same-file kings do not qualify), including declared placement exceptions. The bishop must also be on a4 or adjacent to White’s king by edge or diagonal. Evaluate after White moves. For a2–g8, d3; for a4–e8, d5, with d3 as the previous-stage support square. Except for declared placement exceptions, with Nd3 a five-diagonal is supported only with the bishop on a4, c6 or d7 and White’s king on c5, c6 or c7 after White moves; Ba4 and Bd7 also permit Kd6. Bd7 with Nd3 is additionally eligible whenever the kings are within two king steps after White moves. All other support checks still apply. For a6–c8, only Kc7 selects b5/c6 and Kb6 selects c6/d7. There is no three-diagonal knight support square with White’s king elsewhere; then the knight must occupy d5, the previous-stage support square. This supersedes older Kd7, Kb5 and exact Kc6 target declarations. Three-diagonal support also requires White’s king adjacent to a6 or c8, or on c6 with Ba6 (including reflections).",
+    "With a supported five-diagonal and its five-knight, when Black is on or adjacent to d8, prefer White’s king on the opposite color to the bishop, then minimize its king-step distance to e7. This precedes bishop-placement preferences. Include reflections: Black near a5 uses b4.",
+    "Support squares, with reflections: with a five-diagonal bishop and a five-knight (Nd5), support is automatically rejected if the kings are more than two king steps apart, White’s king is on the bishop’s color, or the bishop is on a4. These restrictions also apply to older declared placements. With Bb5 and Nd5, White’s king must also be adjacent to the bishop if it is to the left of Black’s king. The exact Kd7/Bb5/Nd5 versus Kb7 placement is an exception to the king-color restriction. Kc5/Bb5/Nd5 versus Kc8 is an exception to the two-step king-distance limit. With Nd3, five-diagonal support requires White’s king strictly to the right of Black’s king (same-file kings do not qualify), including declared placement exceptions. The bishop must also be on a4 or adjacent to White’s king by edge or diagonal. Evaluate after White moves. For a2–g8, d3; for a4–e8, d5, with d3 as the previous-stage support square. Except for declared placement exceptions, with Nd3 a five-diagonal is supported only with the bishop on a4, c6 or d7 and White’s king on c5, c6 or c7 after White moves; Ba4 and Bd7 also permit Kd6. Bd7 with Nd3 is additionally eligible whenever the kings are within two king steps after White moves. All other support checks still apply. For a6–c8, only Kc7 selects b5/c6 and Kb6 selects c6/d7. There is no three-diagonal knight support square with White’s king elsewhere; then the knight must occupy d5, the previous-stage support square. This supersedes older Kd7, Kb5 and exact Kc6 target declarations. Three-diagonal support also requires White’s king adjacent to a6 or c8, or on c6 with Ba6 (including reflections).",
     "An n-diagonal is supported when the knight occupies its previous-stage support square or is within one knight move of its own support square, and Black has no legal move onto the (n+1)-diagonal. Evaluate after White moves. White’s king must be on or inside the (n+2)-diagonal. A diagonal is unsupported if Black can legally step onto it.",
     "For every immediate Black move attacking an undefended bishop, White must have a legal response that leaves Black unable to step onto the (n+1)-diagonal.",
     "Exact placement exception: White Ke7, Bc6 and Nb4 against Black Kc7 is a supported five-diagonal, overriding the attacked-bishop restriction. Include reflections; move counters do not matter.",
