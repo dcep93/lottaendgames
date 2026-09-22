@@ -16,6 +16,6 @@ test('Nd3 permits remote Bd7 and prefers it when Bb5 fails other support require
     }
     assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [moves.d7])
     // Removing adjacency does not waive the king-side requirement.
-    assert.equal(knightAndBishopSupportedDiagonal(transformFen('8/2kB4/8/2K5/8/3N4/8/8 b - - 1 1', transform)).size, 99)
+    assert.equal(knightAndBishopSupportedDiagonal(transformFen('3k4/3B4/8/2K5/8/3N4/8/8 b - - 1 1', transform)).size, 99)
   }
 })
