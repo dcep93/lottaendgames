@@ -4,7 +4,7 @@ import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../c
 import { getIdealKnightAndBishopWhiteMoves, knightAndBishopWhiteRules, scoreKnightAndBishopWhiteMove } from './bishopKnight';
 import { firstDifferingRule } from './selection';
 
-test('r9.5 selects opposition behind the bishop in all eight orientations', () => {
+test('r9.5 favors opposition behind the bishop, with r9.1 already preferring its king defense', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     const fen = transformFen('1N6/8/8/8/4K3/5Bk1/8/8 w - - 0 1', transform);
     const san = getChess(fen).move({ from: transformSquare('e4', transform), to: transformSquare('e3', transform) }).san;
@@ -13,7 +13,7 @@ test('r9.5 selects opposition behind the bishop in all eight orientations', () =
     const king = scoreKnightAndBishopWhiteMove(fen, san), bishop = scoreKnightAndBishopWhiteMove(fen, escape);
     assert.equal(king.bishopOppositionPenalty, 0);
     assert.equal(bishop.bishopOppositionPenalty, 1);
-    assert.equal(firstDifferingRule(king, bishop, knightAndBishopWhiteRules)?.id, 'r9.5');
+    assert.equal(firstDifferingRule(king, bishop, knightAndBishopWhiteRules)?.id, 'r9.1');
   }
 });
 

@@ -5,12 +5,12 @@ import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../c
 import { getIdealKnightAndBishopWhiteMoves, knightAndBishopWhiteRules, scoreKnightAndBishopWhiteMove } from './bishopKnight';
 import { compareScoresByRules } from './selection';
 
-test('r9.1 escapes an attacked bishop unless king-adjacent, including knight-defended bishops', () => {
+test('r9.1 scores escape only when an attacked bishop remains without king defense', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const [source, from, to, expected] of [
       ['8/8/8/3Bk3/8/8/1K6/N7 w - - 0 1', 'd5', 'a8', -5],
       ['8/8/8/8/2kBK3/8/8/N7 w - - 0 1', 'e4', 'e3', 0],
-      ['8/8/8/3Bk3/2K5/8/8/N7 w - - 0 1', 'd5', 'a8', 0],
+      ['8/8/8/3Bk3/2K5/8/8/N7 w - - 0 1', 'd5', 'a8', -5],
       ['8/8/8/3Bk3/8/2N5/1K6/8 w - - 0 1', 'd5', 'a8', -5],
       // Two steps away is no longer enough to activate the rule.
       ['8/8/4k3/8/2B5/8/1K6/N7 w - - 0 1', 'c4', 'a6', 0],
@@ -188,5 +188,33 @@ test('r20 still counts an attack when the knight has king defense', () => {
     const score = scoreKnightAndBishopWhiteMove(fen, san);
     assert.equal(score.attackedKnightDefensePenalty, 0);
     assert.equal(score.knightNextAttackPenalty, 1);
+  }
+});
+
+
+test('r9.1 prefers loaded Kd3 king defense to bishop escape, including reflections', () => {
+  const rule = knightAndBishopWhiteRules.find(rule => rule.id === 'r9.1')!;
+  for (const transform of SQUARE_TRANSFORMS) {
+    const fen = transformFen('8/8/8/4k3/4B3/8/2KN4/8 w - - 2 2', transform);
+    const move = (from: Square, to: Square) => getChess(fen).move({from: transformSquare(from, transform), to: transformSquare(to, transform)}).san;
+    const defend = scoreKnightAndBishopWhiteMove(fen, move('c2', 'd3'));
+    const far = scoreKnightAndBishopWhiteMove(fen, move('e4', 'a8'));
+    const near = scoreKnightAndBishopWhiteMove(fen, move('e4', 'c6'));
+    assert.equal(defend.attackedBishopDefensePenalty, 0);
+    assert.equal(defend.attackedBishopEscapeScore, 0);
+    assert.equal(far.attackedBishopDefensePenalty, 1);
+    assert.ok(compareScoresByRules(defend, far, [rule]) < 0);
+    assert.ok(compareScoresByRules(far, near, [rule]) < 0);
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [move('c2', 'd3')]);
+    // Already defended before White moves: preserve king defense rather than exempting it.
+    const defendedFen = transformFen('8/8/8/3Bk3/2K5/8/8/N7 w - - 0 1', transform);
+    const escape = getChess(defendedFen).move({from: transformSquare('d5', transform), to: transformSquare('a8', transform)}).san;
+    assert.equal(scoreKnightAndBishopWhiteMove(defendedFen, escape).attackedBishopDefensePenalty, 1);
+    // If there is no attack before White moves, neither subpriority is active.
+    const quiet = transformFen('8/8/4k3/8/2B5/8/1K6/N7 w - - 0 1', transform);
+    const quietMove = getChess(quiet).move({from: transformSquare('c4', transform), to: transformSquare('a6', transform)}).san;
+    const neutral = scoreKnightAndBishopWhiteMove(quiet, quietMove);
+    assert.equal(neutral.attackedBishopDefensePenalty, 0);
+    assert.equal(neutral.attackedBishopEscapeScore, 0);
   }
 });
