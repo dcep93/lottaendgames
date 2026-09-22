@@ -1,6 +1,6 @@
 import type { Square } from 'chess.js'
 import { isInsideBishopDiagonal } from './bishopKnightGeometry'
-import { isDeclaredCornerSupportWithoutKnightTarget, isRecordedSupportedCornerPosition } from './bishopKnightDeclaredSupport'
+import { isDeclaredCornerSupportWithoutKnightTarget, isDeclaredUnconditionalThreeSupport, isRecordedSupportedCornerPosition } from './bishopKnightDeclaredSupport'
 import { knightAndBishopKnightProximityToSquare } from './bishopKnightStrategy'
 import { allSquares, edgeDistance, getChess, findPiece, kingDistance, squaredEuclideanDistance, squareColor, squareCoords, squareFromCoordinates, SQUARE_TRANSFORMS, transformSquare } from '../chess'
 
@@ -260,6 +260,12 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
   const bishop = findPiece(fen, 'w', 'b')
   const knight = findPiece(fen, 'w', 'n')
   if (!white || !black || !bishop || !knight) return {size: 99, knight: 99}
+  // The Ba6/Kb6 declaration bypasses all placement restrictions, retaining real knight targets.
+  if (isDeclaredUnconditionalThreeSupport(white.square, bishop.square)) return {
+    size: 3,
+    knight: Math.min(...DIAGONALS.filter(pattern => pattern.wall.length === 3 && pattern.wall.includes(bishop.square))
+      .map(pattern => supportDistance(fen, white.square, pattern))),
+  }
   // Explicit Kb5 placements waive the otherwise absent target, without creating one.
   // No three-diagonal target exists at Kb5, so do not invent a knight-distance preference.
   if (isDeclaredCornerSupportWithoutKnightTarget(white.square, bishop.square, black.square, knight.square)) return {size: 3, knight: 99}

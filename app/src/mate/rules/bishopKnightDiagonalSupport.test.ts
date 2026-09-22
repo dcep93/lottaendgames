@@ -552,7 +552,7 @@ test('a screened five-diagonal is unsupported when Black can walk onto it', () =
     const kd6 = getChess(fen).move({from: transformSquare('c7', transform), to: transformSquare('d6', transform)}).san
     assert.equal(scoreKnightAndBishopWhiteMove(fen, kd6).supportedDiagonalSizeScore, 5)
     for (const san of getIdealKnightAndBishopWhiteMoves(fen)) {
-      assert.equal(scoreKnightAndBishopWhiteMove(fen, san).supportedDiagonalSizeScore, 5)
+      assert.equal(scoreKnightAndBishopWhiteMove(fen, san).supportedDiagonalSizeScore, 3) // The reflected unconditional king-bishop pair now wins.
     }
   }
 })
@@ -832,12 +832,11 @@ test('all supported diagonals require kings within three steps after White, incl
 })
 
 
-test('an edge knight immediately disqualifies every diagonal, including declared placements and reflections', () => {
+test('an edge knight disqualifies support except the unconditional king-bishop declarations', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const fen of [
       '8/8/8/8/1k1K4/8/B7/2N5 b - - 1 1', // Loaded Kd4: Nc1.
       '1k6/8/B1K5/N7/8/8/8/8 b - - 0 1', // Former declared three placement.
-      'k1B5/2K5/8/8/8/8/7N/8 b - - 0 1', // King support cannot waive an edge knight.
       '8/2k5/2B5/3K4/8/8/8/7N b - - 0 1',
     ]) assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 99)
     const board = getChess(transformFen('8/8/8/3K4/1k6/8/B7/2N5 w - - 0 1', transform))
@@ -963,5 +962,28 @@ test('declared second-move Nf6 supports Kb5 Ba6 versus Ka8 without adding a knig
       'k7/3N4/B7/1K6/8/8/8/8 b - - 0 1',
       'k1B5/8/5N2/1K6/8/8/8/8 b - - 0 1',
     ]) assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 99)
+  }
+})
+
+
+test('Ba6 Kb6 is supported regardless of Black and knight placement, including reflections', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    for (const black of allSquares()) {
+      if (black === 'a6' || kingDistance('b6', black) <= 1) continue
+      for (const knight of allSquares()) {
+        if (['a6', 'b6', black].includes(knight)) continue
+        const board = getChess('k7/8/BK6/8/8/8/8/8 b - - 47 25')
+        board.remove('a8')
+        board.put({type: 'k', color: 'b'}, black)
+        board.put({type: 'n', color: 'w'}, knight)
+        assert.equal(knightAndBishopSupportedDiagonal(transformFen(board.fen(), transform)).size, 3,
+          `${black} ${knight} ${transform.name}`)
+      }
+    }
+    const before = transformFen('1k6/8/B7/NK6/8/8/8/8 w - - 2 2', transform)
+    const kb6 = getChess(before).move({from: transformSquare('b5', transform), to: transformSquare('b6', transform)}).san
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(before), [kb6])
+    const target = transformFen('k7/8/BK6/8/8/8/8/N7 b - - 4 3', transform)
+    assert.ok(knightAndBishopSupportedDiagonal(target).knight < 99, 'real knight targets remain available')
   }
 })
