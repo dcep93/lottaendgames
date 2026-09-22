@@ -1,4 +1,5 @@
-import { SQUARE_TRANSFORMS, transformFen } from '../chess'
+import type { Square } from 'chess.js'
+import { SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess'
 
 // These declared resulting placements establish support; they do not prefer a move.
 const SUPPORTED_RESULTS = new Set([
@@ -11,4 +12,17 @@ const SUPPORTED_RESULTS = new Set([
 
 export function isRecordedSupportedCornerPosition(fen: string): boolean {
   return SUPPORTED_RESULTS.has(fen.split(' ').slice(0, 2).join(' '))
+}
+
+
+const KING_BISHOP_SUPPORT_WITH_ANY_KNIGHT = SQUARE_TRANSFORMS.map(transform => ({
+  king: transformSquare('b5', transform),
+  bishop: transformSquare('a6', transform),
+  black: transformSquare('a7', transform),
+}))
+
+/** The explicit Kb5 declaration is independent of every knight-placement restriction. */
+export function isDeclaredCornerSupportWithAnyKnight(king: Square, bishop: Square, black: Square): boolean {
+  return KING_BISHOP_SUPPORT_WITH_ANY_KNIGHT.some(placement =>
+    placement.king === king && placement.bishop === bishop && placement.black === black)
 }

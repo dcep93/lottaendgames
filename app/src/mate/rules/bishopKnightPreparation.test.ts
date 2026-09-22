@@ -408,14 +408,14 @@ test('r5 prescribes Ke5 from Kd4/Be4/Nc5 against Ke7 in every symmetry', () => {
 })
 
 
-test('r5 selects Nd4 after the unsupported Bf1 placement is excluded, without overriding r1.5', () => {
+test('Nd4 retains selection while the Kb5 support declaration makes r1.5 reject Bf1', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     const fen = transformFen('8/8/8/8/6K1/7B/4N2k/8 w - - 0 1', transform)
     const expected = getChess(fen).move({from: transformSquare('e2', transform), to: transformSquare('d4', transform)}).san
     const rejected = getChess(fen).move({from: transformSquare('h3', transform), to: transformSquare('f1', transform)}).san
     assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [expected])
     assert.equal(getMateRuleSet('bishop-knight').currentWhiteHint(fen)?.id, 'r5')
-    assert.equal(getMateRuleSet('bishop-knight').explainWhiteMove(fen, rejected)?.id, 'r5')
+    assert.equal(getMateRuleSet('bishop-knight').explainWhiteMove(fen, rejected)?.id, 'r1.5')
   }
 })
 

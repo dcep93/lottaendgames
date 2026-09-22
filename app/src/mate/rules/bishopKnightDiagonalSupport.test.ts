@@ -807,11 +807,11 @@ test('Kg4 Bf1 Ne2 against Kh2 is unsupported by exact placement, including refle
     assert.equal(scoreKnightAndBishopWhiteMove(before, bf1).supportedDiagonalSizeScore, 99)
     const after = transformFen('8/8/8/8/6K1/8/4N2k/5B2 b - - 73 42', transform)
     assert.deepEqual(knightAndBishopSupportedDiagonal(after), {size: 99, knight: 99})
-    for (const unsupported of [
-      '8/8/8/8/6K1/7B/4N2k/8 b - - 1 1',
-      '8/8/8/8/3N2K1/7B/7k/8 b - - 1 1',
-      '8/8/8/8/6K1/8/4N3/5B1k b - - 1 1',
-    ]) assert.equal(knightAndBishopSupportedDiagonal(transformFen(unsupported, transform)).size, 99)
+    for (const [position, expected] of [
+      ['8/8/8/8/6K1/7B/4N2k/8 b - - 1 1', 3], // Reflected Kb5/Ba6/Ka7 declaration.
+      ['8/8/8/8/3N2K1/7B/7k/8 b - - 1 1', 3],
+      ['8/8/8/8/6K1/8/4N3/5B1k b - - 1 1', 99],
+    ] as const) assert.equal(knightAndBishopSupportedDiagonal(transformFen(position, transform)).size, expected)
   }
 })
 
@@ -923,5 +923,26 @@ test('same-color kings with knights off current support are unsupported except d
       ['1kB5/8/1K1N4/8/8/8/8/8 b - - 0 1', 3], // Exact Nd6 declaration.
       ['8/8/8/8/1k1K4/3N4/B7/8 b - - 1 1', 7], // Actual seven support remains eligible.
     ] as const) assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, size, fen)
+  }
+})
+
+
+test('declared Kb5 Ba6 versus Ka7 supports every knight location including the edge', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    for (const knight of allSquares()) {
+      if (['b5', 'a6', 'a7'].includes(knight)) continue
+      const board = getChess('8/k7/B7/1K6/8/8/8/8 b - - 73 42')
+      board.put({type: 'n', color: 'w'}, knight)
+      assert.deepEqual(knightAndBishopSupportedDiagonal(transformFen(board.fen(), transform)),
+        {size: 3, knight: 99}, knight + transform.name)
+    }
+    const before = transformFen('8/k7/B7/K2N4/8/8/8/8 w - - 2 2', transform)
+    const move = getChess(before).move({from: transformSquare('a5', transform), to: transformSquare('b5', transform)}).san
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(before), [move])
+    for (const fen of [
+      'k7/8/B7/1K6/8/8/8/4N3 b - - 0 1', // Different Black square.
+      '8/k7/B1K5/8/8/8/8/4N3 b - - 0 1', // Different White king.
+      '2B5/k7/8/1K6/8/8/8/4N3 b - - 0 1', // Different bishop.
+    ]) assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 99)
   }
 })
