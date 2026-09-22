@@ -41,8 +41,6 @@ test('same-file seven kings reject support only when Black is closer to the bish
       '8/8/8/1k6/8/1B1N4/1K6/8 b - - 3 2',
       '8/8/3k4/3B4/3K4/3N4/8/8 b - - 1 1',
       '6B1/3k4/8/8/4K3/3N4/8/8 b - - 1 1',
-      // Approaching the seven-square is outside this new anchored-knight restriction.
-      '6B1/3k4/8/8/3K4/8/5N2/8 b - - 1 1',
     ] as const
     for (const fen of cases) {
       const f = transformFen(fen, transform)
@@ -73,5 +71,23 @@ test('same-file seven support uses Euclidean bishop distance even when king-step
     // away and White is sqrt(13) units away.
     assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 99)
     assert.equal(bishopKnightRuleSet.phaseAfterWhiteMove!(board.fen()), '1/2')
+  }
+})
+
+
+test('seven support rejects a king not to Black’s right when Black is closer, including an approaching knight', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    const before = transformFen('3k2B1/8/8/3KN3/8/8/8/8 w - - 0 1', transform)
+    const board = getChess(before)
+    const move = board.move({from: transformSquare('d5', transform), to: transformSquare('d6', transform)}).san
+    assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 99)
+    assert.equal(bishopKnightRuleSet.phaseAfterWhiteMove!(board.fen()), '1/2')
+    const preferred = getChess(before).move({from: transformSquare('d5', transform), to: transformSquare('e6', transform)}).san
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(before), [preferred])
+    for (const fen of [
+      '6B1/3k4/8/8/3K4/8/5N2/8 b - - 1 1',
+      // Strictly left, with the knight already on d3.
+      '6B1/4k3/8/8/3K4/3N4/8/8 b - - 1 1',
+    ]) assert.equal(bishopKnightRuleSet.phaseAfterWhiteMove!(transformFen(fen, transform)), '1/2')
   }
 })

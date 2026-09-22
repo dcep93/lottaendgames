@@ -324,10 +324,11 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
       !isInsideBishopDiagonal(black.square, pattern.wall)) continue
     if (pattern.wall.length === 5 && (excludedFive || losesFiveKingRace || losesFiveBishopTempoRace)) continue
     if (pattern.wall.length === 3 && excludedThree) continue
-    // The seven-knight fixes which reflected axis represents a file.
-    if (pattern.wall.length === 7 && pattern.support.includes(knight.square) &&
+    // Apply the king-side requirement in each candidate seven-support orientation,
+    // including a knight approaching its support square.
+    if (pattern.wall.length === 7 &&
       (king.file - blackCoordinatesForSupport.file) * pattern.rightOffset.file +
-      (king.rank - blackCoordinatesForSupport.rank) * pattern.rightOffset.rank === 0 &&
+      (king.rank - blackCoordinatesForSupport.rank) * pattern.rightOffset.rank <= 0 &&
       squaredEuclideanDistance(black.square, bishop.square) < squaredEuclideanDistance(white.square, bishop.square)) continue
     // The n-diagonal is n−1 orthogonal steps from its corner; n+2 is n+1 steps.
     if (Math.abs(king.file - pattern.corner.file) + Math.abs(king.rank - pattern.corner.rank) > pattern.wall.length + 1) continue
