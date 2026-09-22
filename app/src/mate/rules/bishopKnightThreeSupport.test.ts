@@ -4,13 +4,13 @@ import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../c
 import { knightAndBishopSupportedDiagonal } from './bishopKnightDiagonalSupport'
 import { scoreKnightAndBishopWhiteMove } from './bishopKnight'
 
-test('three-diagonal support accepts adjacent kings and rejects remote kings', () => {
+test('three-diagonal king adjacency does not waive same-color off-support restriction', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const fen of ['k1B5/8/8/3N4/8/8/8/7K b - - 0 1']) {
       assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 99)
     }
     for (const fen of ['k1B5/3K4/8/3N4/8/8/8/8 b - - 0 1', 'k1B5/8/8/1K1N4/8/8/8/8 b - - 0 1']) {
-      assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 3)
+      assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 99)
     }
   }
 })
@@ -25,13 +25,13 @@ test('three-diagonal support is evaluated after White moves and bishop safety st
 })
 
 
-test('Ba6 accepts Kc6 but rejects Kc5 beyond the five-diagonal, including reflections', () => {
+test('Ba6 with same-color Kc6 is rejected with previous-stage Nd5, including reflections', () => {
   for (const transform of SQUARE_TRANSFORMS) {
-    assert.equal(knightAndBishopSupportedDiagonal(transformFen('k7/8/B1K5/3N4/8/8/8/8 b - - 0 1', transform)).size, 3)
+    assert.equal(knightAndBishopSupportedDiagonal(transformFen('k7/8/B1K5/3N4/8/8/8/8 b - - 0 1', transform)).size, 99)
     assert.equal(knightAndBishopSupportedDiagonal(transformFen('k7/8/B7/2KN4/8/8/8/8 b - - 0 1', transform)).size, 99)
     const fen = transformFen('k7/8/2K5/1B1N4/8/8/8/8 w - - 2 2', transform)
     const san = getChess(fen).move({from: transformSquare('b5', transform), to: transformSquare('a6', transform)}).san
-    assert.equal(scoreKnightAndBishopWhiteMove(fen, san).supportedDiagonalSizeScore, 3)
+    assert.equal(scoreKnightAndBishopWhiteMove(fen, san).supportedDiagonalSizeScore, 99)
     // A remote knight cannot qualify while Kc6 has no target.
     assert.equal(knightAndBishopSupportedDiagonal(transformFen('k7/8/B1K5/8/8/8/7N/8 b - - 0 1', transform)).size, 99)
   }

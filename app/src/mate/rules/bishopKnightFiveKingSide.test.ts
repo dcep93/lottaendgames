@@ -27,12 +27,13 @@ test('Nd3 requires the five bishop on a4 or adjacent to White, even for older de
     for (const fen of [
       // Loaded 1. Bd7: the king on c5 is two steps from the bishop.
       '8/1k1B4/8/2K5/8/3N4/8/8 b - - 1 1',
+      '8/1k1B4/2K5/8/8/3N4/8/8 b - - 0 1', // Same-color Kc6, knight off support.
       // The earlier exact Kd5/Bd7 placement cannot bypass the new condition.
       '8/3B4/8/k2K4/8/3N4/8/8 b - - 0 1',
     ]) assert.notEqual(evaluateKnightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 5)
     for (const fen of [
       '8/1k6/8/2K5/B7/3N4/8/8 b - - 0 1',
-      '8/1k1B4/2K5/8/8/3N4/8/8 b - - 0 1',
+
       '8/3B4/1k1K4/8/8/3N4/8/8 b - - 0 1',
       // Actual five knights retain their existing support classification.
       '8/1k1B4/8/2KN4/8/8/8/8 b - - 0 1',

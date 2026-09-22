@@ -334,6 +334,9 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
     if (pattern.wall.length === 3 && excludedThree) continue
     // Seven-diagonal support requires the knight on its actual support square.
     if (pattern.wall.length === 7 && !pattern.support.includes(knight.square)) continue
+    // Exact declared placements return above; ordinary same-color kings need an occupied current-stage target.
+    if (squareColor(white.square) === squareColor(bishop.square) &&
+      !supportTargets(white.square, pattern).includes(knight.square)) continue
     // Apply the king-side requirement in each qualifying seven-support orientation.
     if (pattern.wall.length === 7 &&
       (king.file - blackCoordinatesForSupport.file) * pattern.rightOffset.file +
