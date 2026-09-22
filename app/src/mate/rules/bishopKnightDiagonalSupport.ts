@@ -1,6 +1,6 @@
 import type { Square } from 'chess.js'
 import { isInsideBishopDiagonal } from './bishopKnightGeometry'
-import { isRecordedSupportedCornerPosition, isRecordedSupportedFiveKingDefense } from './bishopKnightDeclaredSupport'
+import { isRecordedSupportedCornerPosition } from './bishopKnightDeclaredSupport'
 import { knightAndBishopKnightProximityToSquare } from './bishopKnightStrategy'
 import { allSquares, edgeDistance, getChess, findPiece, kingDistance, squaredEuclideanDistance, squareColor, squareCoords, squareFromCoordinates, SQUARE_TRANSFORMS, transformSquare } from '../chess'
 
@@ -31,9 +31,9 @@ const CANONICAL_DIAGONALS: readonly {
     previousSupport: 'd3',
     previousSupportNearbyBishop: 'd7',
     previousSupportPlacements: [
-      {king: 'c5', bishops: ['a4', 'c6', 'd7']},
-      {king: 'c6', bishops: ['a4', 'c6', 'd7']},
-      {king: 'c7', bishops: ['a4', 'c6', 'd7']},
+      {king: 'c5', bishops: ['a4', 'd7']},
+      {king: 'c6', bishops: ['a4', 'd7']},
+      {king: 'c7', bishops: ['a4', 'd7']},
       {king: 'd6', bishops: ['a4', 'd7']},
     ],
     support: ['d5'],
@@ -80,6 +80,9 @@ const DIAGONALS = CANONICAL_DIAGONALS.flatMap(pattern => SQUARE_TRANSFORMS.map(t
   kingRaceSquares: pattern.kingRaceSquares?.map(square => transformSquare(square, transform)),
 })))
 
+// Bc6 and its reflected squares are unsupported regardless of other pieces.
+const UNSUPPORTED_BISHOP_SQUARES = new Set(SQUARE_TRANSFORMS.map(transform => transformSquare('c6', transform)))
+
 const UNSUPPORTED_FIVE_ARRANGEMENTS = SQUARE_TRANSFORMS.map(transform => ({
   king: transformSquare('c6', transform),
   bishop: transformSquare('e8', transform),
@@ -114,12 +117,8 @@ const THREE_BISHOP_RACES = SQUARE_TRANSFORMS.map(transform => ({
 }))
 
 const DECLARED_FIVE_SUPPORT = [
-  {king: 'd5', bishop: 'c6', knight: 'd3', black: 'a5'},
   {king: 'd5', bishop: 'd7', knight: 'd3', black: 'a5'},
   {king: 'd5', bishop: 'a4', knight: 'd3', black: 'b6'},
-  {king: 'e7', bishop: 'c6', knight: 'b4', black: 'c7'},
-  {king: 'd4', bishop: 'c6', knight: 'b4', black: 'b6'},
-  {king: 'd4', bishop: 'c6', knight: 'd5', black: 'a5'},
 ] as const
 const DECLARED_FIVE_PLACEMENTS = DECLARED_FIVE_SUPPORT.flatMap(placement => SQUARE_TRANSFORMS.map(transform => ({
   king: transformSquare(placement.king, transform),
@@ -257,6 +256,7 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
   const knight = findPiece(fen, 'w', 'n')
   if (!white || !black || !bishop || !knight) return {size: 99, knight: 99}
   // Universal post-White limits, including declared support placements.
+  if (UNSUPPORTED_BISHOP_SQUARES.has(bishop.square)) return {size: 99, knight: 99}
   if (edgeDistance(knight.square) === 0) return {size: 99, knight: 99}
   if (kingDistance(white.square, black.square) > 3) return {size: 99, knight: 99}
   if (DECLARED_UNSUPPORTED_REFLECTIONS.some(pattern =>
@@ -270,7 +270,6 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
     ((whiteCoordinates.file - blackCoordinatesForSupport.file) * pattern.rightOffset.file +
       (whiteCoordinates.rank - blackCoordinatesForSupport.rank) * pattern.rightOffset.rank <= 0 ||
       (bishop.square !== pattern.fiveRemoteBishop && kingDistance(white.square, bishop.square) !== 1)))
-  if (!previousFivePlacementRejected && isRecordedSupportedFiveKingDefense(fen)) return {size: 5, knight: 1}
   const declaredFive = DECLARED_FIVE_PLACEMENTS.find(pattern =>
     pattern.king === white.square && pattern.bishop === bishop.square &&
     pattern.knight === knight.square && pattern.black === black.square)
