@@ -307,7 +307,7 @@ test('Bc8 cannot support a three-diagonal with Nb6 or Nc7, including reflections
 
 test('seven-diagonal support requires the king to match both opposite-side escape races', () => {
   for (const transform of SQUARE_TRANSFORMS) {
-    const fen = transformFen('8/8/1k6/8/8/1B1N4/1K6/8 w - - 4 3', transform)
+    const fen = transformFen('8/8/2k5/8/8/1B1N4/1K6/8 w - - 4 3', transform)
     const san = (to: 'a3' | 'c3') => getChess(fen).move({
       from: transformSquare('b2', transform), to: transformSquare(to, transform),
     }).san

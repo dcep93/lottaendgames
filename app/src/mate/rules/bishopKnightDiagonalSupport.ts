@@ -327,7 +327,8 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
     // The seven-knight fixes which reflected axis represents a file.
     if (pattern.wall.length === 7 && pattern.support.includes(knight.square) &&
       (king.file - blackCoordinatesForSupport.file) * pattern.rightOffset.file +
-      (king.rank - blackCoordinatesForSupport.rank) * pattern.rightOffset.rank === 0) continue
+      (king.rank - blackCoordinatesForSupport.rank) * pattern.rightOffset.rank === 0 &&
+      kingDistance(black.square, bishop.square) < kingDistance(white.square, bishop.square)) continue
     // The n-diagonal is n−1 orthogonal steps from its corner; n+2 is n+1 steps.
     if (Math.abs(king.file - pattern.corner.file) + Math.abs(king.rank - pattern.corner.rank) > pattern.wall.length + 1) continue
     const kingSupportsThree = pattern.wall.length === 3 && pattern.wall
