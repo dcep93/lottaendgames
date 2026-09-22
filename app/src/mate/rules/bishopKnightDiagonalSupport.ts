@@ -132,6 +132,14 @@ const DECLARED_FIVE_PLACEMENTS = DECLARED_FIVE_SUPPORT.flatMap(placement => SQUA
   support: transformSquare('d5', transform),
 })))
 
+// Narrow declaration: Kd7 with Bb5/Nd5 against Kb7 may share the bishop's color.
+const FIVE_KING_COLOR_EXCEPTIONS = SQUARE_TRANSFORMS.map(transform => ({
+  king: transformSquare('d7', transform),
+  bishop: transformSquare('b5', transform),
+  knight: transformSquare('d5', transform),
+  black: transformSquare('b7', transform),
+}))
+
 const FIVE_BISHOP_APPROACHES = SQUARE_TRANSFORMS.map(transform => ({
   wall: (['a4', 'b5', 'c6', 'd7', 'e8'] as const).map(square => transformSquare(square, transform)),
   bishops: (['a4', 'b5', 'c6'] as const).map(square => transformSquare(square, transform)),
@@ -272,10 +280,14 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
       (bishop.square !== pattern.fiveRemoteBishop && kingDistance(white.square, bishop.square) !== 1)))
   // A five-knight requires kings within two steps, opposite king/bishop colors, and no a4 bishop.
   // These requirements also constrain older declared five-diagonal placements.
+  const fiveKingColorException = FIVE_KING_COLOR_EXCEPTIONS.some(pattern =>
+    pattern.king === white.square && pattern.bishop === bishop.square &&
+    pattern.knight === knight.square && pattern.black === black.square)
   const currentFivePlacementRejected = DIAGONALS.some(pattern => pattern.wall.length === 5 &&
     pattern.support.includes(knight.square) && pattern.wall.includes(bishop.square) &&
     (kingDistance(white.square, black.square) > 2 ||
-      squareColor(white.square) === squareColor(bishop.square) || bishop.square === pattern.fiveRemoteBishop))
+      (squareColor(white.square) === squareColor(bishop.square) && !fiveKingColorException) ||
+      bishop.square === pattern.fiveRemoteBishop))
   const fivePlacementRejected = previousFivePlacementRejected || currentFivePlacementRejected
   if (!fivePlacementRejected && isRecordedSupportedFiveKingDefense(fen)) return {size: 5, knight: 1}
   const declaredFive = DECLARED_FIVE_PLACEMENTS.find(pattern =>

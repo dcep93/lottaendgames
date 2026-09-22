@@ -274,14 +274,14 @@ test('supported five bishop and five knight prefer b5 or d7 equally before king 
 })
 
 
-test('Bb5 and Nd5 king targeting cannot override the same-color support exclusion', () => {
+test('the declared Kd7 exception lets Bb5 and Nd5 target two files right of Black', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     const position = transformFen('8/1k6/3K4/1B1N4/8/8/8/8 w - - 2 2', transform)
     const san = (to: 'd7' | 'e7' | 'c5') => getChess(position).move({from: transformSquare('d6', transform), to: transformSquare(to, transform)}).san
-    assert.equal(scoreKnightAndBishopWhiteMove(position, san('d7')).supportedDiagonalSizeScore, 99)
+    assert.equal(scoreKnightAndBishopWhiteMove(position, san('d7')).supportedDiagonalSizeScore, 5)
     assert.equal(scoreKnightAndBishopWhiteMove(position, san('d7')).supportedFiveKingTargetDistance, 0)
     assert.equal(scoreKnightAndBishopWhiteMove(position, san('e7')).supportedDiagonalSizeScore, 99) // Three king steps.
-    assert.ok(!getIdealKnightAndBishopWhiteMoves(position).includes(san('d7')))
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(position), [san('d7')])
     for (const move of getIdealKnightAndBishopWhiteMoves(position)) assert.equal(scoreKnightAndBishopWhiteMove(position, move).supportedDiagonalSizeScore, 5)
     assert.equal(getMateRuleSet('bishop-knight').currentWhiteHint(position)?.id, 'r2.5')
   }
