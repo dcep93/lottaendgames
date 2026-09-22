@@ -15,14 +15,21 @@ export function isRecordedSupportedCornerPosition(fen: string): boolean {
 }
 
 
-const KING_BISHOP_SUPPORT_WITH_ANY_KNIGHT = SQUARE_TRANSFORMS.map(transform => ({
-  king: transformSquare('b5', transform),
-  bishop: transformSquare('a6', transform),
-  black: transformSquare('a7', transform),
-}))
+const SUPPORT_WITHOUT_KNIGHT_TARGET = [
+  {king: 'b5', bishop: 'a6', black: 'a7'}, // Any knight location, explicitly declared.
+  {king: 'b5', bishop: 'a6', black: 'a8', knight: 'f6'}, // Result after 2. Nf6.
+] as const
+const SUPPORT_WITHOUT_KNIGHT_TARGET_REFLECTIONS = SUPPORT_WITHOUT_KNIGHT_TARGET.flatMap(placement =>
+  SQUARE_TRANSFORMS.map(transform => ({
+    king: transformSquare(placement.king, transform),
+    bishop: transformSquare(placement.bishop, transform),
+    black: transformSquare(placement.black, transform),
+    knight: 'knight' in placement ? transformSquare(placement.knight, transform) : undefined,
+  })))
 
-/** The explicit Kb5 declaration is independent of every knight-placement restriction. */
-export function isDeclaredCornerSupportWithAnyKnight(king: Square, bishop: Square, black: Square): boolean {
-  return KING_BISHOP_SUPPORT_WITH_ANY_KNIGHT.some(placement =>
-    placement.king === king && placement.bishop === bishop && placement.black === black)
+/** Explicit support declarations do not create a knight target at Kb5. */
+export function isDeclaredCornerSupportWithoutKnightTarget(king: Square, bishop: Square, black: Square, knight: Square): boolean {
+  return SUPPORT_WITHOUT_KNIGHT_TARGET_REFLECTIONS.some(placement =>
+    placement.king === king && placement.bishop === bishop && placement.black === black &&
+    (placement.knight === undefined || placement.knight === knight))
 }

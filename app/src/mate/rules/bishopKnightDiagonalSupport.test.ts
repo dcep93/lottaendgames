@@ -734,7 +734,7 @@ test('three-diagonal targets exist at g3 but disappear at g4, in every orientati
         board.put({type: 'k', color: 'w'}, king)
         board.put({type: 'n', color: 'w'}, knight)
         assert.deepEqual(knightAndBishopSupportedDiagonal(transformFen(board.fen(), transform)),
-          king === 'g3' ? {size: 3, knight: distance} : {size: 99, knight: 99}, `${king}, ${knight}: ${transform.name}`)
+          king === 'g3' ? {size: 3, knight: distance} : knight === 'c3' ? {size: 3, knight: 99} : {size: 99, knight: 99}, `${king}, ${knight}: ${transform.name}`)
       }
     }
     const fen = transformFen('8/8/8/8/4N3/6KB/8/7k w - - 2 2', transform)
@@ -943,6 +943,25 @@ test('declared Kb5 Ba6 versus Ka7 supports every knight location including the e
       'k7/8/B7/1K6/8/8/8/4N3 b - - 0 1', // Different Black square.
       '8/k7/B1K5/8/8/8/8/4N3 b - - 0 1', // Different White king.
       '2B5/k7/8/1K6/8/8/8/4N3 b - - 0 1', // Different bishop.
+    ]) assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 99)
+  }
+})
+
+
+test('declared second-move Nf6 supports Kb5 Ba6 versus Ka8 without adding a knight target', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    for (const counters of ['2 2', '41 23']) {
+      const before = transformFen(`k7/3N4/B7/1K6/8/8/8/8 w - - ${counters}`, transform)
+      const board = getChess(before)
+      const move = board.move({from: transformSquare('d7', transform), to: transformSquare('f6', transform)}).san
+      assert.deepEqual(knightAndBishopSupportedDiagonal(board.fen()), {size: 3, knight: 99})
+      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(before), [move])
+    }
+    for (const fen of [
+      '1k6/8/B4N2/1K6/8/8/8/8 b - - 0 1', // Black's later reply is not the declaration.
+      'k7/8/B4N2/2K5/8/8/8/8 b - - 0 1',
+      'k7/3N4/B7/1K6/8/8/8/8 b - - 0 1',
+      'k1B5/8/5N2/1K6/8/8/8/8 b - - 0 1',
     ]) assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 99)
   }
 })
