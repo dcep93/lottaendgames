@@ -291,7 +291,13 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
       (bishop.square === pattern.fiveRightTargetBishop && kingDistance(white.square, bishop.square) > 1 &&
         (whiteCoordinates.file - blackCoordinatesForSupport.file) * pattern.rightOffset.file +
         (whiteCoordinates.rank - blackCoordinatesForSupport.rank) * pattern.rightOffset.rank < 0)))
-  const fivePlacementRejected = previousFivePlacementRejected || currentFivePlacementRejected
+  // An approaching five-knight needs the b5 bishop placement (or its reflection).
+  const fivePatterns = DIAGONALS.filter(pattern => pattern.wall.length === 5 &&
+    pattern.wall.includes(bishop.square) && isInsideBishopDiagonal(black.square, pattern.wall))
+  const approachingFivePlacementRejected = fivePatterns.length > 0 && !fivePatterns.some(pattern =>
+    knight.square === pattern.previousSupport || pattern.support.includes(knight.square) ||
+    bishop.square === pattern.fiveRightTargetBishop)
+  const fivePlacementRejected = previousFivePlacementRejected || currentFivePlacementRejected || approachingFivePlacementRejected
   if (!fivePlacementRejected && isRecordedSupportedFiveKingDefense(fen)) return {size: 5, knight: 1}
   const declaredFive = DECLARED_FIVE_PLACEMENTS.find(pattern =>
     pattern.king === white.square && pattern.bishop === bishop.square &&

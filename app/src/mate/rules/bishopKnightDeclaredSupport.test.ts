@@ -22,7 +22,7 @@ test('older exact three support requires the newly eligible king placements, inc
   }
 })
 
-test('declared Kd5 Bc6 versus Kc7 support retains the occupied knight-target exception', () => {
+test('approaching-knight bishop restriction supersedes the occupied knight-target exception', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const knight of ['b4', 'b6', 'c3', 'e3', 'e7', 'f4', 'f6', 'd3'] as const) {
       const board = getChess('8/2k5/2B5/3K4/8/8/8/8 b - - 42 23')
@@ -30,7 +30,7 @@ test('declared Kd5 Bc6 versus Kc7 support retains the occupied knight-target exc
       const reflected = transformFen(board.fen(), transform)
       assert.equal(isRecordedSupportedFiveKingDefense(reflected), knight !== 'd3')
       assert.equal(isRecordedSupportedFiveKingDefense(reflected.replace(' b ', ' w ')), false)
-      if (knight !== 'd3') assert.equal(knightAndBishopSupportedDiagonal(reflected).size, 5)
+      if (knight !== 'd3') assert.equal(knightAndBishopSupportedDiagonal(reflected).size, 99)
     }
     for (const fen of [
       '8/2k5/2BK4/8/8/2N5/8/8 b - - 0 1',
