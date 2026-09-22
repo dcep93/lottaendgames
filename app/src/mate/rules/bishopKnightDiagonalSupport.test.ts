@@ -172,7 +172,7 @@ test('Be8 with Nb4 loses the tied e7 race to a bishop attack, including reflecti
       // White reaches e7 one step sooner, covering the attack tempo.
       '4B3/8/8/k7/1NK5/8/8/8 b - - 0 1',
       // A knight already on d5 retains its own support conditions.
-      '4B3/8/8/k2N4/8/1K6/8/8 b - - 0 1',
+      '4B3/8/8/k2N4/1K6/8/8/8 b - - 0 1',
     ]) assert.equal(knightAndBishopSupportedDiagonal(transformFen(allowed, transform)).size, 5, allowed)
   }
 })
@@ -283,7 +283,7 @@ test('a bishop attack on Black’s shortest e7 route adds one step to the Nd3 ki
       // Being closer to Bb5 does not waive the Ba4/Bd7 and c5/c6/c7 requirement either.
       ['k7/8/8/1B6/8/1K1N4/8/8 b - - 0 1', 99],
       // A five-knight has its own support conditions.
-      ['k7/3B4/8/1K1N4/8/8/8/8 b - - 0 1', 5],
+      ['k7/3B4/8/1K1N4/8/8/8/8 b - - 0 1', 99],
     ] as const) assert.equal(knightAndBishopSupportedDiagonal(transformFen(position, transform)).size, expected)
   }
 })
@@ -574,10 +574,12 @@ test('Be8 with Kc6 and Black Kc8 never supports a five-diagonal, regardless of t
     const before = transformFen('2k5/5B2/2K5/3N4/8/8/8/8 w - - 2 2', transform)
     const be8 = getChess(before).move({from: transformSquare('f7', transform), to: transformSquare('e8', transform)}).san
     assert.equal(scoreKnightAndBishopWhiteMove(before, be8).supportedDiagonalSizeScore, 99)
-    for (const nearby of [
+    for (const sameColor of [
       '1k2B3/8/2K5/3N4/8/8/8/8 b - - 0 1',
-      '2k1B3/8/3K4/3N4/8/8/8/8 b - - 0 1',
       '2k5/3B4/2K5/3N4/8/8/8/8 b - - 0 1',
+    ]) assert.equal(knightAndBishopSupportedDiagonal(transformFen(sameColor, transform)).size, 99)
+    for (const nearby of [
+      '2k1B3/8/3K4/3N4/8/8/8/8 b - - 0 1',
     ]) assert.equal(knightAndBishopSupportedDiagonal(transformFen(nearby, transform)).size, 5)
   }
 })
@@ -590,7 +592,7 @@ test('a five-diagonal without a five-knight requires White to match the d6 king 
     assert.ok(!getIdealKnightAndBishopWhiteMoves(fen).includes(ba4))
     for (const [position, expected] of [
       ['1k6/8/K7/8/B4N2/8/8/8 b - - 0 1', 99],
-      ['1k6/8/K7/3N4/B7/8/8/8 b - - 0 1', 5],
+      ['1k6/8/K7/3N4/B7/8/8/8 b - - 0 1', 99],
       ['1k6/8/1K6/8/B4N2/8/8/8 b - - 0 1', 5],
     ] as const) {
       assert.equal(knightAndBishopSupportedDiagonal(transformFen(position, transform)).size, expected)
@@ -869,5 +871,24 @@ test('seven support requires the matching occupied knight square in all reflecti
       '8/8/8/8/1k1K4/3N4/B7/8 b - - 1 1',
       '8/8/2k5/5N2/8/3K4/B7/8 b - - 3 2',
     ]) assert.deepEqual(knightAndBishopSupportedDiagonal(transformFen(fen, transform)), {size: 7, knight: 0})
+  }
+})
+
+test('a five-bishop with its five-knight is unsupported when White king shares the bishop color', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    const before = transformFen('2k5/8/2B5/1K1N4/8/8/8/8 w - - 0 1', transform)
+    const board = getChess(before)
+    const be8 = board.move({from: transformSquare('c6', transform), to: transformSquare('e8', transform)}).san
+    assert.deepEqual(knightAndBishopSupportedDiagonal(board.fen()), {size: 99, knight: 99})
+    assert.equal(scoreKnightAndBishopWhiteMove(before, be8).supportedDiagonalSizeScore, 99)
+    for (const bishop of ['a4', 'b5', 'd7', 'e8'] as const) {
+      const position = getChess('2k5/8/8/3N4/2K5/8/8/8 b - - 42 23')
+      position.put({color: 'w', type: 'b'}, bishop)
+      assert.equal(knightAndBishopSupportedDiagonal(transformFen(position.fen(), transform)).size, 99)
+    }
+    // An opposite-colored king can still support Be8/Nd5.
+    assert.equal(knightAndBishopSupportedDiagonal(transformFen('2k1B3/8/8/2KN4/8/8/8/8 b - - 0 1', transform)).size, 5)
+    // This restores the five-knight condition; the separate Nd3 allowance remains.
+    assert.equal(knightAndBishopSupportedDiagonal(transformFen('4B3/8/k7/2K5/8/3N4/8/8 b - - 0 1', transform)).size, 5)
   }
 })
