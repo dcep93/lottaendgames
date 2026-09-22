@@ -189,16 +189,15 @@ test('Kb5 Bc8 Nc6 against Ka7 is unsupported by exact placement, including refle
   }
 })
 
-test('Nd5 with Kd4 Bc6 against Ka5 is supported by exact placement, including reflections', () => {
+test('Nd5 with Kd4 Bc6 against Ka5 loses its exact support when kings are three steps apart, including reflections', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     const before = transformFen('8/8/2B5/k7/1N1K4/8/8/8 w - - 0 1', transform)
     const nd5 = getChess(before).move({from: transformSquare('b4', transform), to: transformSquare('d5', transform)}).san
     const score = scoreKnightAndBishopWhiteMove(before, nd5)
-    assert.equal(score.supportedDiagonalSizeScore, 5)
-    assert.equal(score.supportedDiagonalKnightScore, 0)
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(before), [nd5])
+    assert.equal(score.supportedDiagonalSizeScore, 99)
+    assert.equal(score.supportedDiagonalKnightScore, 99)
     const after = transformFen('8/8/2B5/k2N4/3K4/8/8/8 b - - 73 42', transform)
-    assert.deepEqual(knightAndBishopSupportedDiagonal(after), {size: 5, knight: 0})
+    assert.deepEqual(knightAndBishopSupportedDiagonal(after), {size: 99, knight: 99})
     assert.throws(() => knightAndBishopSupportedDiagonal(after.replace(' b ', ' w ')))
     for (const nearby of [
       '8/8/2B5/k2N4/4K3/8/8/8 b - - 0 1',
@@ -266,7 +265,7 @@ test('a shortest-route bishop attack breaks a tied d6 race if the king cannot de
       // Being able to defend Bb5 also does not waive the Ba4/Bc6/Bd7 and c5/c6/c7 requirement.
       ['8/k7/8/1B6/8/1K1N4/8/8 b - - 0 1', 99],
       // A five-knight retains its separate support conditions.
-      ['5K2/k7/8/1B1N4/8/8/8/8 b - - 0 1', 5],
+      ['8/k7/8/1BKN4/8/8/8/8 b - - 0 1', 5],
     ] as const) assert.equal(knightAndBishopSupportedDiagonal(transformFen(position, transform)).size, expected, position)
   }
 })
@@ -349,7 +348,7 @@ test('support uses the previous stage or at most one knight move to the existing
       ['k1B5/2K5/8/1N6/8/8/8/8 b - - 0 1', 3, 0],
       ['k1B5/2K5/8/8/3N4/8/8/8 b - - 0 1', 3, 1],
       ['k7/2K5/8/8/B7/3N4/8/8 b - - 0 1', 5, 2],
-      ['k4K2/8/2B5/3N4/8/8/8/8 b - - 0 1', 5, 0],
+      ['k7/2K5/2B5/3N4/8/8/8/8 b - - 0 1', 5, 0],
       ['k7/5K2/2B5/8/5N2/8/8/8 b - - 0 1', 5, 1],
       ['k5K1/8/8/3B4/8/3N4/8/8 b - - 0 1', 7, 0],
       ['k5K1/8/8/3B4/8/8/5N2/8 b - - 0 1', 7, 1],
@@ -480,7 +479,7 @@ test('Kd6 with Nd3 does not support five-bishops outside a4/d7, including reflec
     const move = getChess(fen).move({from: transformSquare('d5', transform), to: transformSquare('c6', transform)}).san
     assert.equal(scoreKnightAndBishopWhiteMove(fen, move).supportedDiagonalSizeScore, 99)
     // A knight already on d5 retains the ordinary five-diagonal support conditions.
-    assert.equal(knightAndBishopSupportedDiagonal(transformFen('k7/3B4/3K4/3N4/8/8/8/8 b - - 0 1', transform)).size, 5)
+    assert.equal(knightAndBishopSupportedDiagonal(transformFen('1k6/3B4/3K4/3N4/8/8/8/8 b - - 0 1', transform)).size, 5)
   }
 })
 
@@ -554,7 +553,7 @@ test('a screened five-diagonal is unsupported when Black can walk onto it', () =
     assert.ok(screened.moves({verbose: true}).some(move => move.to === transformSquare('a4', transform)))
     assert.equal(scoreKnightAndBishopWhiteMove(fen, kc6).supportedDiagonalSizeScore, 99)
     const kd6 = getChess(fen).move({from: transformSquare('c7', transform), to: transformSquare('d6', transform)}).san
-    assert.equal(scoreKnightAndBishopWhiteMove(fen, kd6).supportedDiagonalSizeScore, 5)
+    assert.equal(scoreKnightAndBishopWhiteMove(fen, kd6).supportedDiagonalSizeScore, 99) // Kings are three steps apart.
     for (const san of getIdealKnightAndBishopWhiteMoves(fen)) {
       assert.equal(scoreKnightAndBishopWhiteMove(fen, san).supportedDiagonalSizeScore, 5)
     }
@@ -781,7 +780,7 @@ test('one-move knight support requires an empty destination in every orientation
       ['k7/8/8/1B1K4/5N2/8/8/8 b - - 1 1', 99],
       ['k7/8/8/1BK5/5N2/8/8/8 b - - 1 1', 5],
       // Occupation by the supporting knight itself remains valid.
-      ['k7/8/8/1BKN4/8/8/8/8 b - - 1 1', 5],
+      ['8/k7/8/1BKN4/8/8/8/8 b - - 1 1', 5],
     ] as const) assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, expected, fen)
   }
 })

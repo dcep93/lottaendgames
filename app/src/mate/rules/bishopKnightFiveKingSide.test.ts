@@ -18,7 +18,7 @@ test('Nd3 five-diagonal support requires the White king strictly right of Black 
       // An earlier remote-a4 placement still qualifies when White is to the right.
       '8/8/1k6/3K4/B7/3N4/8/8 b - - 0 1',
       // A five knight is not subject to the previous-stage-knight restriction.
-      '3k4/8/2B5/2KN4/8/8/8/8 b - - 0 1',
+      '3k4/8/1KB5/3N4/8/8/8/8 b - - 0 1',
     ]) assert.equal(evaluateKnightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 5)
   }
 })
