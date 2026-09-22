@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import { allSquares, getChess, kingDistance, squareColor, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess'
+import { isInsideBishopDiagonal } from './bishopKnightGeometry'
 import { knightAndBishopSupportedDiagonal } from './bishopKnightDiagonalSupport'
 import { getIdealKnightAndBishopWhiteMoves, scoreKnightAndBishopWhiteMove } from './bishopKnight'
 
@@ -552,7 +553,7 @@ test('a screened five-diagonal is unsupported when Black can walk onto it', () =
     const kd6 = getChess(fen).move({from: transformSquare('c7', transform), to: transformSquare('d6', transform)}).san
     assert.equal(scoreKnightAndBishopWhiteMove(fen, kd6).supportedDiagonalSizeScore, 5)
     for (const san of getIdealKnightAndBishopWhiteMoves(fen)) {
-      assert.equal(scoreKnightAndBishopWhiteMove(fen, san).supportedDiagonalSizeScore, 3) // The reflected unconditional king-bishop pair now wins.
+      assert.equal(scoreKnightAndBishopWhiteMove(fen, san).supportedDiagonalSizeScore, 5)
     }
   }
 })
@@ -832,11 +833,12 @@ test('all supported diagonals require kings within three steps after White, incl
 })
 
 
-test('an edge knight disqualifies support except the unconditional king-bishop declarations', () => {
+test('an edge knight disqualifies support except the applicable king-bishop declarations', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const fen of [
       '8/8/8/8/1k1K4/8/B7/2N5 b - - 1 1', // Loaded Kd4: Nc1.
       '1k6/8/B1K5/N7/8/8/8/8 b - - 0 1', // Former declared three placement.
+      '2B1k3/2K5/8/8/8/8/7N/8 b - - 0 1', // Black is outside the declared pair's diagonal.
       '8/2k5/2B5/3K4/8/8/8/7N b - - 0 1',
     ]) assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 99)
     const board = getChess(transformFen('8/8/8/3K4/1k6/8/B7/2N5 w - - 0 1', transform))
@@ -966,7 +968,7 @@ test('declared second-move Nf6 supports Kb5 Ba6 versus Ka8 without adding a knig
 })
 
 
-test('Ba6 Kb6 is supported regardless of Black and knight placement, including reflections', () => {
+test('Ba6 Kb6 supports every knight only with Black inside the three-diagonal, including reflections', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const black of allSquares()) {
       if (black === 'a6' || kingDistance('b6', black) <= 1) continue
@@ -976,8 +978,9 @@ test('Ba6 Kb6 is supported regardless of Black and knight placement, including r
         board.remove('a8')
         board.put({type: 'k', color: 'b'}, black)
         board.put({type: 'n', color: 'w'}, knight)
-        assert.equal(knightAndBishopSupportedDiagonal(transformFen(board.fen(), transform)).size, 3,
-          `${black} ${knight} ${transform.name}`)
+        const size = knightAndBishopSupportedDiagonal(transformFen(board.fen(), transform)).size
+        const inside = isInsideBishopDiagonal(black, ['a6', 'b7', 'c8'])
+        assert.equal(size === 3, inside, `${black} ${knight} ${transform.name}`)
       }
     }
     const before = transformFen('1k6/8/B7/NK6/8/8/8/8 w - - 2 2', transform)

@@ -1,4 +1,5 @@
 import type { Square } from 'chess.js'
+import { isInsideBishopDiagonal } from './bishopKnightGeometry'
 import { SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess'
 
 // These declared resulting placements establish support; they do not prefer a move.
@@ -37,9 +38,11 @@ export function isDeclaredCornerSupportWithoutKnightTarget(king: Square, bishop:
 const KING_PROTECTED_EDGE_BISHOP = SQUARE_TRANSFORMS.map(transform => ({
   king: transformSquare('b6', transform),
   bishop: transformSquare('a6', transform),
+  wall: (['a6', 'b7', 'c8'] as const).map(square => transformSquare(square, transform)),
 }))
 
-/** Ba6/Kb6 is explicitly supported regardless of Black and the knight. */
-export function isDeclaredUnconditionalThreeSupport(king: Square, bishop: Square): boolean {
-  return KING_PROTECTED_EDGE_BISHOP.some(placement => placement.king === king && placement.bishop === bishop)
+/** Ba6/Kb6 is supported with Black inside its diagonal, regardless of the knight. */
+export function isDeclaredInsideThreeSupport(king: Square, bishop: Square, black: Square): boolean {
+  return KING_PROTECTED_EDGE_BISHOP.some(placement => placement.king === king && placement.bishop === bishop &&
+    isInsideBishopDiagonal(black, placement.wall))
 }
