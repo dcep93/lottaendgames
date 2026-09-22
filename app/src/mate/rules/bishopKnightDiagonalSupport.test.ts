@@ -344,7 +344,7 @@ test('a bishop-attack response must preserve the bishop as well as close the esc
   }
 })
 
-test('support uses the previous stage or at most one knight move to the existing target, in every reflection', () => {
+test('support requires the seven knight in place while smaller diagonals may use previous-stage or approaching knights', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const [fen, size, distance] of [
       ['k1B5/3K4/8/3N4/8/8/8/8 b - - 0 1', 3, 99], // Kd7 has no target; d5 still provides previous-stage support.
@@ -354,7 +354,7 @@ test('support uses the previous stage or at most one knight move to the existing
       ['3k2K1/8/2B5/3N4/8/8/8/8 b - - 0 1', 5, 0],
       ['8/8/k7/2K5/B4N2/8/8/8 b - - 0 1', 5, 1],
       ['3k2K1/8/8/3B4/8/3N4/8/8 b - - 0 1', 7, 0],
-      ['3k2K1/8/8/3B4/8/8/5N2/8 b - - 0 1', 7, 1],
+      ['3k2K1/8/8/3B4/8/8/5N2/8 b - - 0 1', 99, 99],
     ] as const) assert.deepEqual(knightAndBishopSupportedDiagonal(transformFen(fen, transform)), {size, knight: distance}, `${fen}: ${transform.name}`)
     for (const fen of [
       'k7/8/2B5/8/8/8/7N/7K b - - 0 1',
@@ -754,7 +754,7 @@ test('three-diagonal targets exist at g3 but disappear at g4, in every orientati
 })
 
 
-test('a seven-knight off its support square cannot rely on answering an attack on an undefended bishop', () => {
+test('a seven-knight must occupy support even when the bishop is defended or cannot be attacked', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const [fen, expected] of [
       // Kf5 permits ...Kd6; the possible Ke4 response no longer rescues support.
@@ -762,9 +762,9 @@ test('a seven-knight off its support square cannot rely on answering an attack o
       // On d3, the knight retains the existing response allowance.
       ['8/4k3/8/3B1K2/8/3N4/8/8 b - - 3 2', 7],
       // With Ke4 already defending Bd5, ...Kc5 attacks a defended bishop.
-      ['8/8/3k4/3BN3/4K3/8/8/8 b - - 5 3', 7],
+      ['8/8/3k4/3BN3/4K3/8/8/8 b - - 5 3', 99],
       // A remote Black king cannot attack the bishop next move.
-      ['2k5/8/8/3BNK2/8/8/8/8 b - - 3 2', 7],
+      ['2k5/8/8/3BNK2/8/8/8/8 b - - 3 2', 99],
     ] as const) assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, expected, fen)
   }
 })
@@ -775,8 +775,8 @@ test('one-move knight support requires an empty destination in every orientation
     for (const [fen, expected] of [
       // Kd3 blocks Nb2 from reaching its seven-diagonal support square.
       ['8/8/8/8/1kB5/3K4/1N6/8 b - - 1 1', 99],
-      // The same knight can qualify when d3 is vacant.
-      ['8/8/8/8/2B5/k7/1NK5/8 b - - 3 2', 7],
+      // A vacant d3 no longer suffices: the seven knight must occupy it.
+      ['8/8/8/8/2B5/k7/1NK5/8 b - - 3 2', 99],
       // Kd5 blocks Nf4 from reaching the five-diagonal support square.
       ['k7/8/8/1B1K4/5N2/8/8/8 b - - 1 1', 99],
       ['k7/8/8/1BK5/5N2/8/8/8 b - - 1 1', 5],
@@ -856,7 +856,20 @@ test('a seven bishop and Black adjacent to a3 require Nd3 independently of the e
     assert.equal(knightAndBishopSupportedDiagonal(transformFen('8/8/8/8/k7/8/BN6/K7 b - - 0 1', transform)).size, 99)
     // Occupying d3 preserves eligibility even with both bishop and Black beside a3.
     assert.equal(knightAndBishopSupportedDiagonal(transformFen('8/8/8/8/1k1K4/3N4/B7/8 b - - 0 1', transform)).size, 7)
-    // Off d3 is still eligible away from this a3 arrangement.
-    assert.equal(knightAndBishopSupportedDiagonal(transformFen('3k2K1/8/8/3B4/8/8/5N2/8 b - - 0 1', transform)).size, 7)
+    // The universal seven-knight requirement also applies away from a3.
+    assert.equal(knightAndBishopSupportedDiagonal(transformFen('3k2K1/8/8/3B4/8/8/5N2/8 b - - 0 1', transform)).size, 99)
+  }
+})
+
+
+test('seven support requires the matching occupied knight square in all reflections', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    // Former Ne7+ loop: one move from reflected f5 is insufficient.
+    assert.equal(knightAndBishopSupportedDiagonal(transformFen('8/4N3/2k5/8/8/3K4/B7/8 b - - 3 2', transform)).size, 99)
+    // Canonical d3 and its alternate f5 orientation both retain support when occupied.
+    for (const fen of [
+      '8/8/8/8/1k1K4/3N4/B7/8 b - - 1 1',
+      '8/8/2k5/5N2/8/3K4/B7/8 b - - 3 2',
+    ]) assert.deepEqual(knightAndBishopSupportedDiagonal(transformFen(fen, transform)), {size: 7, knight: 0})
   }
 })

@@ -182,17 +182,16 @@ test('r5 selects the aligned precage-loop king prescriptions in every symmetry',
   }
 })
 
-test('the #8 Ke6 declaration retains the earlier supported-diagonal priority', () => {
+test('the #8 Ke6 declaration applies when an approaching knight no longer establishes support', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     const fen = transformFen('8/8/8/4K1k1/4B3/3N4/8/8 w - - 0 1', transform)
     assert.equal(knightAndBishopDeclaredPreparationMove(fen),
       transformSquare('e5', transform) + transformSquare('e6', transform))
-    const supportedMove = getChess(fen).move({
-      from: transformSquare('d3', transform), to: transformSquare('b2', transform),
+    const prescribed = getChess(fen).move({
+      from: transformSquare('e5', transform), to: transformSquare('e6', transform),
     }).san
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [supportedMove])
-    // r1.5 still removes Ke6; r2.5's e8 tie-break now selects the support orientation.
-    assert.equal(getMateRuleSet('bishop-knight').currentWhiteHint(fen)?.id, 'r2.5')
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [prescribed])
+    assert.equal(getMateRuleSet('bishop-knight').currentWhiteHint(fen)?.id, 'r5')
   }
 })
 

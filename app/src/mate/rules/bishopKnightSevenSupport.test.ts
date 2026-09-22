@@ -82,8 +82,8 @@ test('seven support rejects a king not to Black’s right when Black is closer, 
     const move = board.move({from: transformSquare('d5', transform), to: transformSquare('d6', transform)}).san
     assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 99)
     assert.equal(bishopKnightRuleSet.phaseAfterWhiteMove!(board.fen()), '1/2')
-    const preferred = getChess(before).move({from: transformSquare('d5', transform), to: transformSquare('e6', transform)}).san
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(before), [preferred])
+    const ke6 = getChess(before).move({from: transformSquare('d5', transform), to: transformSquare('e6', transform)}).san
+    assert.equal(scoreKnightAndBishopWhiteMove(before, ke6).supportedDiagonalSizeScore, 99)
     for (const fen of [
       '6B1/3k4/8/8/3K4/8/5N2/8 b - - 1 1',
       // Strictly left, with the knight already on d3.

@@ -15,7 +15,6 @@ const CANONICAL_DIAGONALS: readonly {
   kingGuard?: Square;
   bishopAttackRaceTarget?: Square;
   kingRaceSquares?: readonly Square[];
-  approachingKnightRaceSquares?: readonly Square[];
 }[] = [
   {
     wall: ['a6', 'b7', 'c8'],
@@ -46,7 +45,6 @@ const CANONICAL_DIAGONALS: readonly {
     boundary: ['a1', 'b2', 'c3', 'd4', 'e5', 'f6', 'g7', 'h8'],
     support: ['d3'],
     kingRaceSquares: ['f6', 'g7'],
-    approachingKnightRaceSquares: ['c3', 'd4'],
   },
 ]
 
@@ -80,7 +78,6 @@ const DIAGONALS = CANONICAL_DIAGONALS.flatMap(pattern => SQUARE_TRANSFORMS.map(t
   kingGuard: pattern.kingGuard && transformSquare(pattern.kingGuard, transform),
   bishopAttackRaceTarget: pattern.bishopAttackRaceTarget && transformSquare(pattern.bishopAttackRaceTarget, transform),
   kingRaceSquares: pattern.kingRaceSquares?.map(square => transformSquare(square, transform)),
-  approachingKnightRaceSquares: pattern.approachingKnightRaceSquares?.map(square => transformSquare(square, transform)),
 })))
 
 const UNSUPPORTED_FIVE_ARRANGEMENTS = SQUARE_TRANSFORMS.map(transform => ({
@@ -327,12 +324,9 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
       !isInsideBishopDiagonal(black.square, pattern.wall)) continue
     if (pattern.wall.length === 5 && (excludedFive || losesFiveKingRace || losesFiveBishopTempoRace)) continue
     if (pattern.wall.length === 3 && excludedThree) continue
-    // Near a3, the bishop cannot establish this wall without its d3 knight.
-    if (pattern.wall.length === 7 && !pattern.support.includes(knight.square) &&
-      kingDistance(black.square, pattern.sevenFlushTrigger) === 1 &&
-      kingDistance(bishop.square, pattern.sevenFlushTrigger) === 1) continue
-    // Apply the king-side requirement in each candidate seven-support orientation,
-    // including a knight approaching its support square.
+    // Seven-diagonal support requires the knight on its actual support square.
+    if (pattern.wall.length === 7 && !pattern.support.includes(knight.square)) continue
+    // Apply the king-side requirement in each qualifying seven-support orientation.
     if (pattern.wall.length === 7 &&
       (king.file - blackCoordinatesForSupport.file) * pattern.rightOffset.file +
       (king.rank - blackCoordinatesForSupport.rank) * pattern.rightOffset.rank <= 0 &&
@@ -351,10 +345,6 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
     if (!kingSupportsThree && knight.square !== pattern.previousSupport && !knightWithinOneOfAvailableSupport(fen, white.square, pattern)) continue
     // The king must cover the escape side opposite this knight support square.
     if (pattern.kingRaceSquares?.some(square =>
-      kingDistance(white.square, square) > kingDistance(black.square, square))) continue
-    // A knight approaching d3 has not yet closed its side of the seven diagonal.
-    if (!pattern.support.includes(knight.square) && pattern.approachingKnightRaceSquares?.some(square =>
-      squaredEuclideanDistance(knight.square, square) !== 5 &&
       kingDistance(white.square, square) > kingDistance(black.square, square))) continue
     replies ??= getChess(fen.replace(/ [wb] /, ' b ')).moves({verbose: true})
       .filter(move => move.piece === 'k').map(move => move.to)

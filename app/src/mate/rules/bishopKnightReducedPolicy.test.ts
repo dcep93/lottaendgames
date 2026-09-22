@@ -112,13 +112,13 @@ test('r10 routes diagonally beside a central bishop off the long diagonal after 
     const routes = (['e6', 'b5'] as const).map(to => getChess(fen).move({from: transformSquare('c7', transform), to: transformSquare(to, transform)}).san)
     const kingMove = getChess(fen).move({from: transformSquare('d5', transform), to: transformSquare('e6', transform)}).san
     assert.equal(scoreKnightAndBishopWhiteMove(fen, kingMove).supportedDiagonalSizeScore, 99)
-    // Ne6 establishes seven-diagonal support before r10's distance tie-break.
-    assert.equal(scoreKnightAndBishopWhiteMove(fen, routes[0]!).supportedDiagonalSizeScore, 7)
+    // Neither approaching knight establishes support; r10 can still route toward its target.
+    assert.equal(scoreKnightAndBishopWhiteMove(fen, routes[0]!).supportedDiagonalSizeScore, 99)
     assert.equal(scoreKnightAndBishopWhiteMove(fen, routes[1]!).supportedDiagonalSizeScore, 99)
     const behind = getChess(fen).move({from: transformSquare('c7', transform), to: transformSquare('a6', transform)}).san
     assert.equal(scoreKnightAndBishopWhiteMove(fen, behind).supportedDiagonalSizeScore, 99)
-    // Na6 is on the edge; Ne6 is the remaining supported knight move.
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen).sort(), [routes[0]!].sort())
+    // With support tied, r20 prefers Nb5, which Black cannot attack next move.
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen).sort(), [routes[1]!].sort())
   }
 })
 
