@@ -421,16 +421,20 @@ export function knightAndBishopThreeKingPlacementPenalty(fen: string): number {
   return patterns.length && !patterns.some(pattern => pattern.preferredThreeKings.includes(white.square)) ? 1 : 0
 }
 
-/** Equivalent preferred bishop squares, in the five-knight orientation. */
+/** Prefer the five-knight bishop square farther from White's king. */
 export function knightAndBishopFiveBishopPenalty(fen: string): number {
+  const white = findPiece(fen, 'w', 'k')
   const black = findPiece(fen, 'b', 'k')
   const bishop = findPiece(fen, 'w', 'b')
   const knight = findPiece(fen, 'w', 'n')
-  if (!black || !bishop || !knight) return 0
+  if (!white || !black || !bishop || !knight) return 0
   const patterns = DIAGONALS.filter(pattern => pattern.wall.length === 5 &&
     pattern.support.includes(knight.square) && pattern.wall.includes(bishop.square) &&
     isInsideBishopDiagonal(black.square, pattern.wall))
-  return patterns.length && !patterns.some(pattern => pattern.preferredFiveBishops.includes(bishop.square)) ? 1 : 0
+  const targets = [...new Set(patterns.flatMap(pattern => pattern.preferredFiveBishops))]
+  if (!targets.length) return 0
+  const farthest = Math.max(...targets.map(square => squaredEuclideanDistance(white.square, square)))
+  return targets.includes(bishop.square) && squaredEuclideanDistance(white.square, bishop.square) === farthest ? 0 : 1
 }
 
 /** Approach e7 from Black near d8; its reflection approaches b4 from Black near a5. */
