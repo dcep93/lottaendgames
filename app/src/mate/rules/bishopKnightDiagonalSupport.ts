@@ -57,6 +57,7 @@ const DIAGONALS = CANONICAL_DIAGONALS.flatMap(pattern => SQUARE_TRANSFORMS.map(t
   sevenFlushTrigger: transformSquare('a3', transform),
   sevenFlushTarget: transformSquare('b2', transform),
   preferredFiveBishops: ['b5', 'd7'].map(square => transformSquare(square as Square, transform)),
+  fiveRemoteBishop: transformSquare('a4', transform),
   fiveRightTargetBishop: transformSquare('b5', transform),
   fiveFlushTrigger: transformSquare('a5', transform),
   fiveFlushTarget: transformSquare('b4', transform),
@@ -262,18 +263,19 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
   if (DECLARED_UNSUPPORTED_REFLECTIONS.some(pattern =>
     pattern.king === white.square && pattern.bishop === bishop.square &&
     pattern.knight === knight.square && pattern.black === black.square)) return {size: 99, knight: 99}
-  // The previous-stage knight fixes the orientation of this strict five-diagonal condition.
+  // The previous-stage knight fixes the orientation of these strict five-diagonal conditions.
   const whiteCoordinates = squareCoords(white.square)
   const blackCoordinatesForSupport = squareCoords(black.square)
-  const previousFiveKingWrongSide = DIAGONALS.some(pattern => pattern.wall.length === 5 &&
+  const previousFivePlacementRejected = DIAGONALS.some(pattern => pattern.wall.length === 5 &&
     pattern.previousSupport === knight.square && pattern.wall.includes(bishop.square) &&
-    (whiteCoordinates.file - blackCoordinatesForSupport.file) * pattern.rightOffset.file +
-      (whiteCoordinates.rank - blackCoordinatesForSupport.rank) * pattern.rightOffset.rank <= 0)
-  if (!previousFiveKingWrongSide && isRecordedSupportedFiveKingDefense(fen)) return {size: 5, knight: 1}
+    ((whiteCoordinates.file - blackCoordinatesForSupport.file) * pattern.rightOffset.file +
+      (whiteCoordinates.rank - blackCoordinatesForSupport.rank) * pattern.rightOffset.rank <= 0 ||
+      (bishop.square !== pattern.fiveRemoteBishop && kingDistance(white.square, bishop.square) !== 1)))
+  if (!previousFivePlacementRejected && isRecordedSupportedFiveKingDefense(fen)) return {size: 5, knight: 1}
   const declaredFive = DECLARED_FIVE_PLACEMENTS.find(pattern =>
     pattern.king === white.square && pattern.bishop === bishop.square &&
     pattern.knight === knight.square && pattern.black === black.square)
-  if (declaredFive && !previousFiveKingWrongSide) return {
+  if (declaredFive && !previousFivePlacementRejected) return {
     size: 5,
     knight: knightAndBishopKnightProximityToSquare(fen, declaredFive.support),
   }
@@ -288,7 +290,7 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
   if (kingDistance(black.square, bishop.square) === 1 &&
     kingDistance(white.square, bishop.square) > 1 &&
     squaredEuclideanDistance(knight.square, bishop.square) === 5) return {size: 99, knight: 99}
-  const excludedFive = previousFiveKingWrongSide || UNSUPPORTED_FIVE_ARRANGEMENTS.some(pattern =>
+  const excludedFive = previousFivePlacementRejected || UNSUPPORTED_FIVE_ARRANGEMENTS.some(pattern =>
     pattern.king === white.square && pattern.bishop === bishop.square && pattern.black === black.square) ||
     hasExposedFiveBishopApproach(fen, bishop.square, black.square, blackDestinations)
   const excludedThree = UNSUPPORTED_THREE_KNIGHTS.some(pattern =>

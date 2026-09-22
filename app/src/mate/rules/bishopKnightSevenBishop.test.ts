@@ -172,7 +172,7 @@ test('r2.5 prescribes loaded Kc6 then Kc5 while preserving seven support', () =>
 })
 
 
-test('r2.5 prescribes second-move Kc5 on the supported five diagonal without overriding r1.5', () => {
+test('the older r2.5 Kc5 declaration cannot override stricter bishop-adjacency support', () => {
   const line = getChess('8/3B4/1k6/3K4/8/3N4/8/8 w - - 0 1')
   line.move('Kd6'); line.move('Ka5')
   for (const transform of SQUARE_TRANSFORMS) {
@@ -181,15 +181,14 @@ test('r2.5 prescribes second-move Kc5 on the supported five diagonal without ove
       const san = (to: 'c5' | 'd5') => getChess(position).move({from: transformSquare('d6', transform), to: transformSquare(to, transform)}).san
       const preferred = scoreKnightAndBishopWhiteMove(position, san('c5'))
       const former = scoreKnightAndBishopWhiteMove(position, san('d5'))
-      assert.equal(preferred.supportedDiagonalSizeScore, 5)
-      assert.equal(former.supportedDiagonalSizeScore, 5)
+      assert.equal(preferred.supportedDiagonalSizeScore, 99)
+      assert.equal(former.supportedDiagonalSizeScore, 99)
       assert.equal(preferred.declaredSupportedFivePenalty, 0)
       assert.equal(former.declaredSupportedFivePenalty, 1)
-      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(position), [san('c5')])
-      assert.equal(getMateRuleSet('bishop-knight').currentWhiteHint(position)?.id, 'r2.5')
+      assert.ok(!getIdealKnightAndBishopWhiteMoves(position).includes(san('c5')))
       const candidates = bishopKnightRuleSet.scoreWhiteCandidates!(position, bishopKnightRuleSet.whiteMoves(position))
       const earlierRules = knightAndBishopWhiteRules.slice(0, knightAndBishopWhiteRules.findIndex(r => r.id === 'r2.5'))
-      assert.ok(selectIdealMoves(candidates, earlierRules).includes(san('c5')))
+      assert.ok(!selectIdealMoves(candidates, earlierRules).includes(san('c5')))
     }
     const nearby = transformFen('8/3B4/k2K4/8/8/3N4/8/8 w - - 0 1', transform)
     for (const move of getChess(nearby).moves()) {
@@ -205,7 +204,7 @@ test('r2.5 prescribes second-move Kc5 on the supported five diagonal without ove
 
 test('supported five with previous-stage Nd3 approaches two files right of Black', () => {
   for (const transform of SQUARE_TRANSFORMS) {
-    const position = transformFen('8/3B4/1k2K3/8/8/3N4/8/8 w - - 0 1', transform)
+    const position = transformFen('8/8/1k2K3/8/B7/3N4/8/8 w - - 0 1', transform)
     const san = (to: 'd6' | 'd5') => getChess(position).move({from: transformSquare('e6', transform), to: transformSquare(to, transform)}).san
     for (const [to, distance] of [['d6', 0], ['d5', 1]] as const) {
       const score = scoreKnightAndBishopWhiteMove(position, san(to))
