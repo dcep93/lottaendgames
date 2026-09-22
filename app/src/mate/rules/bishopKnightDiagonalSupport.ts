@@ -2,7 +2,7 @@ import type { Square } from 'chess.js'
 import { isInsideBishopDiagonal } from './bishopKnightGeometry'
 import { isRecordedSupportedCornerPosition, isRecordedSupportedFiveKingDefense } from './bishopKnightDeclaredSupport'
 import { knightAndBishopKnightProximityToSquare } from './bishopKnightStrategy'
-import { allSquares, getChess, findPiece, kingDistance, squaredEuclideanDistance, squareColor, squareCoords, squareFromCoordinates, SQUARE_TRANSFORMS, transformSquare } from '../chess'
+import { allSquares, edgeDistance, getChess, findPiece, kingDistance, squaredEuclideanDistance, squareColor, squareCoords, squareFromCoordinates, SQUARE_TRANSFORMS, transformSquare } from '../chess'
 
 const CANONICAL_DIAGONALS: readonly {
   wall: readonly Square[];
@@ -259,7 +259,8 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
   const bishop = findPiece(fen, 'w', 'b')
   const knight = findPiece(fen, 'w', 'n')
   if (!white || !black || !bishop || !knight) return {size: 99, knight: 99}
-  // Universal post-White limit, including declared support placements.
+  // Universal post-White limits, including declared support placements.
+  if (edgeDistance(knight.square) === 0) return {size: 99, knight: 99}
   if (kingDistance(white.square, black.square) > 3) return {size: 99, knight: 99}
   if (DECLARED_UNSUPPORTED_REFLECTIONS.some(pattern =>
     pattern.king === white.square && pattern.bishop === bishop.square &&
@@ -326,6 +327,10 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
       !isInsideBishopDiagonal(black.square, pattern.wall)) continue
     if (pattern.wall.length === 5 && (excludedFive || losesFiveKingRace || losesFiveBishopTempoRace)) continue
     if (pattern.wall.length === 3 && excludedThree) continue
+    // Near a3, the bishop cannot establish this wall without its d3 knight.
+    if (pattern.wall.length === 7 && !pattern.support.includes(knight.square) &&
+      kingDistance(black.square, pattern.sevenFlushTrigger) === 1 &&
+      kingDistance(bishop.square, pattern.sevenFlushTrigger) === 1) continue
     // Apply the king-side requirement in each candidate seven-support orientation,
     // including a knight approaching its support square.
     if (pattern.wall.length === 7 &&

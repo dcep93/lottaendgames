@@ -7,7 +7,7 @@ import { selectIdealMoves } from './selection'
 
 test('supported three prefers 2. Kb6, with support filtering intact in all reflections', () => {
   for (const transform of SQUARE_TRANSFORMS) {
-    const fen = transformFen('1k6/8/B7/NK6/8/8/8/8 w - - 2 2', transform)
+    const fen = transformFen('1k6/8/B7/1K6/3N4/8/8/8 w - - 2 2', transform)
     const san = (to: 'b6' | 'c6') => getChess(fen).move({from: transformSquare('b5', transform), to: transformSquare(to, transform)}).san
     for (const to of ['b6', 'c6'] as const) {
       const score = scoreKnightAndBishopWhiteMove(fen, san(to))

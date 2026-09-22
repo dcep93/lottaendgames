@@ -322,8 +322,8 @@ test('the knight cannot occupy the only three-diagonal square adjacent to White 
     const fen = transformFen('k1B5/8/N7/K7/8/8/8/8 w - - 0 1', transform)
     const kb5 = getChess(fen).move({from: transformSquare('a5', transform), to: transformSquare('b5', transform)}).san
     assert.equal(scoreKnightAndBishopWhiteMove(fen, kb5).supportedDiagonalSizeScore, 99)
-    // A different adjacent square remains usable, even with the knight on the diagonal.
-    assert.equal(knightAndBishopSupportedDiagonal(transformFen('k1B5/8/NK6/8/8/8/8/8 b - - 0 1', transform)).size, 3)
+    // An edge knight now disqualifies even this otherwise usable adjacent square.
+    assert.equal(knightAndBishopSupportedDiagonal(transformFen('k1B5/8/NK6/8/8/8/8/8 b - - 0 1', transform)).size, 99)
     assert.equal(knightAndBishopSupportedDiagonal(transformFen('k1B5/8/8/1K1N4/8/8/8/8 b - - 0 1', transform)).size, 3)
   }
 })
@@ -361,7 +361,7 @@ test('support uses the previous stage or at most one knight move to the existing
       'k7/8/8/3B4/8/8/7N/7K b - - 0 1',
     ]) assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 99)
     // The three-diagonal king-support exception allows even a remote knight.
-    assert.equal(knightAndBishopSupportedDiagonal(transformFen('k1B5/2K5/8/8/8/8/7N/8 b - - 0 1', transform)).size, 3)
+    assert.equal(knightAndBishopSupportedDiagonal(transformFen('k1B5/2K5/8/8/8/8/6N1/8 b - - 0 1', transform)).size, 3)
   }
 })
 
@@ -708,7 +708,7 @@ test('Bb7 with Kc6 needs the previous-stage knight when no target exists', () =>
       }
     }
     // The eligible b6/c7 king placements retain their king-support allowance.
-    for (const fen of ['k7/1BK5/8/8/8/8/8/4N3 b - - 0 1', 'k7/1B6/1K6/8/8/8/8/4N3 b - - 0 1']) {
+    for (const fen of ['k7/1BK5/8/8/8/8/4N3/8 b - - 0 1', 'k7/1B6/1K6/8/8/8/4N3/8 b - - 0 1']) {
       assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 3)
     }
   }
@@ -832,5 +832,31 @@ test('all supported diagonals require kings within three steps after White, incl
       ['k7/8/3K4/8/B7/3N4/8/8 b - - 1 1', 5],
       ['1k6/8/B7/1K1N4/8/8/8/8 b - - 1 1', 3],
     ] as const) assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, size)
+  }
+})
+
+
+test('an edge knight immediately disqualifies every diagonal, including declared placements and reflections', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    for (const fen of [
+      '8/8/8/8/1k1K4/8/B7/2N5 b - - 1 1', // Loaded Kd4: Nc1.
+      '1k6/8/B1K5/N7/8/8/8/8 b - - 0 1', // Former declared three placement.
+      'k1B5/2K5/8/8/8/8/7N/8 b - - 0 1', // King support cannot waive an edge knight.
+      '8/2k5/2B5/3K4/8/8/8/7N b - - 0 1',
+    ]) assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 99)
+    const board = getChess(transformFen('8/8/8/3K4/1k6/8/B7/2N5 w - - 0 1', transform))
+    board.move({from: transformSquare('d5', transform), to: transformSquare('d4', transform)})
+    assert.equal(knightAndBishopSupportedDiagonal(board.fen()).size, 99)
+  }
+})
+
+test('a seven bishop and Black adjacent to a3 require Nd3 independently of the edge restriction', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    // Nb2 is interior and this placement passed all earlier seven-support checks.
+    assert.equal(knightAndBishopSupportedDiagonal(transformFen('8/8/8/8/k7/8/BN6/K7 b - - 0 1', transform)).size, 99)
+    // Occupying d3 preserves eligibility even with both bishop and Black beside a3.
+    assert.equal(knightAndBishopSupportedDiagonal(transformFen('8/8/8/8/1k1K4/3N4/B7/8 b - - 0 1', transform)).size, 7)
+    // Off d3 is still eligible away from this a3 arrangement.
+    assert.equal(knightAndBishopSupportedDiagonal(transformFen('3k2K1/8/8/3B4/8/8/5N2/8 b - - 0 1', transform)).size, 7)
   }
 })

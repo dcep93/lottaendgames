@@ -116,8 +116,8 @@ test('r10 routes diagonally beside a central bishop off the long diagonal after 
     assert.equal(scoreKnightAndBishopWhiteMove(fen, routes[0]!).supportedDiagonalSizeScore, 7)
     assert.equal(scoreKnightAndBishopWhiteMove(fen, routes[1]!).supportedDiagonalSizeScore, 99)
     const behind = getChess(fen).move({from: transformSquare('c7', transform), to: transformSquare('a6', transform)}).san
-    assert.equal(scoreKnightAndBishopWhiteMove(fen, behind).supportedDiagonalSizeScore, 7)
-    // King protection breaks the tie between the supported knight moves.
+    assert.equal(scoreKnightAndBishopWhiteMove(fen, behind).supportedDiagonalSizeScore, 99)
+    // Na6 is on the edge; Ne6 is the remaining supported knight move.
     assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen).sort(), [routes[0]!].sort())
   }
 })
