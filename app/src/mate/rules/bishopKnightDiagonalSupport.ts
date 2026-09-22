@@ -56,6 +56,8 @@ const DIAGONALS = CANONICAL_DIAGONALS.flatMap(pattern => SQUARE_TRANSFORMS.map(t
   sevenKingTieTarget: transformSquare('e8', transform),
   sevenFlushTrigger: transformSquare('a3', transform),
   sevenFlushTarget: transformSquare('b2', transform),
+  fiveFlushTrigger: transformSquare('a5', transform),
+  fiveFlushTarget: transformSquare('b4', transform),
   rightOffset: {file: transform.map(2, 0).file - transform.map(0, 0).file,
     rank: transform.map(2, 0).rank - transform.map(0, 0).rank},
   corner: squareCoords(transformSquare('a8', transform)),
@@ -359,7 +361,7 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
   return best
 }
 
-/** Five-diagonal preference in the orientation fixed by the previous-stage knight. */
+/** Five-diagonal king targets in the orientation fixed by the knight. */
 export function knightAndBishopFiveKingTargetDistance(fen: string): number {
   const white = findPiece(fen, 'w', 'k')
   const black = findPiece(fen, 'b', 'k')
@@ -368,8 +370,12 @@ export function knightAndBishopFiveKingTargetDistance(fen: string): number {
   if (!white || !black || !bishop || !knight) return 0
   const blackCoordinates = squareCoords(black.square)
   const distances = DIAGONALS.filter(pattern => pattern.wall.length === 5 &&
-    pattern.previousSupport === knight.square && pattern.wall.includes(bishop.square) &&
+    (pattern.previousSupport === knight.square || pattern.support.includes(knight.square)) && pattern.wall.includes(bishop.square) &&
     isInsideBishopDiagonal(black.square, pattern.wall)).flatMap(pattern => {
+      if (pattern.support.includes(knight.square)) {
+        return kingDistance(black.square, pattern.fiveFlushTrigger) <= 1
+          ? [kingDistance(white.square, pattern.fiveFlushTarget)] : []
+      }
       const target = squareFromCoordinates(blackCoordinates.file + pattern.rightOffset.file,
         blackCoordinates.rank + pattern.rightOffset.rank)
       return target ? [kingDistance(white.square, target)] : []

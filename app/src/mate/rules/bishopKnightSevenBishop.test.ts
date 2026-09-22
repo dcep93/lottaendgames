@@ -4,6 +4,7 @@ import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../c
 import { bishopKnightRuleSet, getIdealKnightAndBishopWhiteMoves, knightAndBishopWhiteRules, scoreKnightAndBishopWhiteMove } from './bishopKnight'
 import { selectIdealMoves } from './selection'
 import { getMateRuleSet } from './index'
+import { knightAndBishopFiveKingTargetDistance } from './bishopKnightDiagonalSupport'
 
 const fen = '8/8/8/1k1B4/3K4/3N4/8/8 w - - 0 1'
 test('supported seven prefers b3 in the knight support orientation, including every reflection', () => {
@@ -214,9 +215,36 @@ test('supported five with previous-stage Nd3 approaches two files right of Black
     assert.deepEqual(getIdealKnightAndBishopWhiteMoves(position), [san('d6')])
     assert.equal(getMateRuleSet('bishop-knight').currentWhiteHint(position)?.id, 'r2.5')
     // An ordinary five knight does not inherit the previous-stage knight preference.
-    const nextStage = transformFen('8/3B4/k3K3/3N4/8/8/8/8 w - - 0 1', transform)
+    const nextStage = transformFen('k7/3B4/4K3/3N4/8/8/8/8 w - - 0 1', transform)
     for (const move of getChess(nextStage).moves()) {
       assert.equal(scoreKnightAndBishopWhiteMove(nextStage, move).supportedFiveKingTargetDistance, 0)
     }
+  }
+})
+
+
+test('supported five with Nd5 and Black near a5 approaches b4, including reflections', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    const position = transformFen('8/8/k1B5/2KN4/8/8/8/8 w - - 0 1', transform)
+    const san = (to: 'b4' | 'c4' | 'd6') => getChess(position).move({from: transformSquare('c5', transform), to: transformSquare(to, transform)}).san
+    for (const [to, distance] of [['b4', 0], ['c4', 1], ['d6', 2]] as const) {
+      const score = scoreKnightAndBishopWhiteMove(position, san(to))
+      assert.equal(score.supportedDiagonalSizeScore, 5)
+      assert.equal(score.supportedFiveKingTargetDistance, distance)
+    }
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(position), [san('b4')])
+    assert.ok(!getIdealKnightAndBishopWhiteMoves(position).includes(san('d6')))
+    const rule = knightAndBishopWhiteRules.find(r => r.id === 'r2.5')!
+    for (const black of ['a5', 'a6', 'b6'] as const) {
+      // Black must also remain inside the five-diagonal; test its eligible trigger squares.
+      const board = getChess('8/3B4/8/3N4/8/2K5/8/k7 b - - 0 1')
+      board.remove('a1'); board.put({type: 'k', color: 'b'}, black)
+      assert.equal(knightAndBishopFiveKingTargetDistance(transformFen(board.fen(), transform)), 1)
+    }
+    const outside = transformFen('k7/3B4/4K3/3N4/8/8/8/8 w - - 0 1', transform)
+    for (const move of getChess(outside).moves()) assert.equal(scoreKnightAndBishopWhiteMove(outside, move).supportedFiveKingTargetDistance, 0)
+    const candidates = bishopKnightRuleSet.scoreWhiteCandidates!(position, bishopKnightRuleSet.whiteMoves(position))
+    const earlier = knightAndBishopWhiteRules.slice(0, knightAndBishopWhiteRules.indexOf(rule))
+    for (const move of getIdealKnightAndBishopWhiteMoves(position)) assert.ok(selectIdealMoves(candidates, earlier).includes(move))
   }
 })
