@@ -4,6 +4,7 @@ import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../c
 import { getIdealKnightAndBishopWhiteMoves, knightAndBishopWhiteRules } from './bishopKnight'
 import { knightAndBishopDeclaredCornerFlushMove } from './bishopKnightCornerFlush'
 import example from './bishopKnightCornerFlushExample.json'
+import { getMateRuleSet } from './index'
 
 test('r4 prefers every White move in the loaded flushing line and all reflections', () => {
   const line = getChess(example.fen)
@@ -64,4 +65,22 @@ test('r4 prescribes loaded moves 1–3: Ne5, Nf7, Bh7 in every reflection', () =
       assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [expected], fen)
     }
   }
+})
+
+
+test('r4 prescribes Kf6 in the loaded king-shuffle position, including reflections and move counters', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    for (const counters of ['0 1', '28 15']) {
+      const fen = transformFen(`8/3k4/8/3B1K2/2N5/8/8/8 w - - ${counters}`, transform)
+      const from = transformSquare('f5', transform), to = transformSquare('f6', transform)
+      const san = getChess(fen).move({from, to}).san
+      assert.equal(knightAndBishopDeclaredCornerFlushMove(fen), from + to)
+      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [san])
+      assert.equal(getMateRuleSet('bishop-knight').currentWhiteHint(fen)?.id, 'r4')
+    }
+    // The declaration is exact; changing Black's square does not extend it.
+    assert.equal(knightAndBishopDeclaredCornerFlushMove(transformFen('8/2k5/8/3B1K2/2N5/8/8/8 w - - 0 1', transform)), undefined)
+  }
+  const ids = knightAndBishopWhiteRules.map(rule => rule.id)
+  assert.ok(ids.indexOf('r1.5') < ids.indexOf('r4'))
 })
