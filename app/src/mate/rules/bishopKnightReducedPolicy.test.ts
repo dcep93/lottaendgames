@@ -207,7 +207,7 @@ test('r10 keeps a knight diagonally beside the bishop off the long diagonal', ()
 test('r1.5 compares only supported diagonal size and knight route', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     const fen = transformFen('k3B3/2K5/8/3N4/8/8/8/8 w - - 0 1', transform)
-    const scores = (['a4', 'b5', 'c6', 'd7'] as const).map(to =>
+    const scores = (['b5', 'c6', 'd7'] as const).map(to =>
       scoreKnightAndBishopWhiteMove(fen, getChess(fen).move({from: transformSquare('e8', transform), to: transformSquare(to, transform)}).san))
     const rule = knightAndBishopWhiteRules.find(({id}) => id === 'r1.5')!
     for (const score of scores) assert.equal(compareScoresByRules(scores[0], score, [rule]), 0)

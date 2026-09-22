@@ -171,8 +171,6 @@ test('Be8 with Nb4 loses the tied e7 race to a bishop attack, including reflecti
     for (const allowed of [
       // White reaches e7 one step sooner, covering the attack tempo.
       '4B3/8/8/k7/1NK5/8/8/8 b - - 0 1',
-      // A knight already on d5 retains its own support conditions.
-      '4B3/8/8/k2N4/8/1K6/8/8 b - - 0 1',
     ]) assert.equal(knightAndBishopSupportedDiagonal(transformFen(allowed, transform)).size, 5, allowed)
   }
 })
@@ -268,7 +266,7 @@ test('a shortest-route bishop attack breaks a tied d6 race if the king cannot de
       // Being able to defend Bb5 also does not waive the Ba4/Bc6/Bd7 and c5/c6/c7 requirement.
       ['8/k7/8/1B6/8/1K1N4/8/8 b - - 0 1', 99],
       // A five-knight retains its separate support conditions.
-      ['6K1/k7/8/1B1N4/8/8/8/8 b - - 0 1', 5],
+      ['5K2/k7/8/1B1N4/8/8/8/8 b - - 0 1', 5],
     ] as const) assert.equal(knightAndBishopSupportedDiagonal(transformFen(position, transform)).size, expected, position)
   }
 })
@@ -285,7 +283,7 @@ test('a bishop attack on Black’s shortest e7 route adds one step to the Nd3 ki
       // Being closer to Bb5 does not waive the Ba4/Bc6/Bd7 and c5/c6/c7 requirement either.
       ['k7/8/8/1B6/8/1K1N4/8/8 b - - 0 1', 99],
       // A five-knight has its own support conditions.
-      ['k7/3B4/8/3N4/8/1K6/8/8 b - - 0 1', 5],
+      ['k7/2KB4/8/3N4/8/8/8/8 b - - 0 1', 5],
     ] as const) assert.equal(knightAndBishopSupportedDiagonal(transformFen(position, transform)).size, expected)
   }
 })
@@ -351,7 +349,7 @@ test('support uses the previous stage or at most one knight move to the existing
       ['k1B5/2K5/8/1N6/8/8/8/8 b - - 0 1', 3, 0],
       ['k1B5/2K5/8/8/3N4/8/8/8 b - - 0 1', 3, 1],
       ['k7/2K5/8/8/B7/3N4/8/8 b - - 0 1', 5, 2],
-      ['k5K1/8/2B5/3N4/8/8/8/8 b - - 0 1', 5, 0],
+      ['k4K2/8/2B5/3N4/8/8/8/8 b - - 0 1', 5, 0],
       ['k7/5K2/2B5/8/5N2/8/8/8 b - - 0 1', 5, 1],
       ['k5K1/8/8/3B4/8/3N4/8/8 b - - 0 1', 7, 0],
       ['k5K1/8/8/3B4/8/8/5N2/8 b - - 0 1', 7, 1],
@@ -520,7 +518,7 @@ test('Bd7 and Bc6 remain supported while Kd6 is preferred with Ba4 and Nd3', () 
 test('the white king must be on or inside the n+2 diagonal, including reflections', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const [king, expected] of [['c5', 5], ['e5', 99], ['d4', 99]] as const) {
-      const board = getChess('8/8/k7/3N4/B7/8/8/7K b - - 0 1')
+      const board = getChess('8/8/k7/1B1N4/8/8/8/7K b - - 0 1')
       board.remove('h1')
       board.put({type: 'k', color: 'w'}, king)
       assert.equal(knightAndBishopSupportedDiagonal(transformFen(board.fen(), transform)).size, expected)
@@ -576,11 +574,13 @@ test('Be8 with Kc6 and Black Kc8 never supports a five-diagonal, regardless of t
     const before = transformFen('2k5/5B2/2K5/3N4/8/8/8/8 w - - 2 2', transform)
     const be8 = getChess(before).move({from: transformSquare('f7', transform), to: transformSquare('e8', transform)}).san
     assert.equal(scoreKnightAndBishopWhiteMove(before, be8).supportedDiagonalSizeScore, 99)
+    // Nearby Nd5 placements now fail the endpoint-bishop or same-color-king restrictions.
     for (const nearby of [
       '1k2B3/8/2K5/3N4/8/8/8/8 b - - 0 1',
       '2k1B3/8/3K4/3N4/8/8/8/8 b - - 0 1',
       '2k5/3B4/2K5/3N4/8/8/8/8 b - - 0 1',
-    ]) assert.equal(knightAndBishopSupportedDiagonal(transformFen(nearby, transform)).size, 5)
+    ]) assert.equal(knightAndBishopSupportedDiagonal(transformFen(nearby, transform)).size, 99)
+    assert.equal(knightAndBishopSupportedDiagonal(transformFen('2k5/3B4/3K4/3N4/8/8/8/8 b - - 0 1', transform)).size, 5)
   }
 })
 
@@ -592,7 +592,7 @@ test('a five-diagonal without a five-knight requires White to match the d6 king 
     assert.ok(!getIdealKnightAndBishopWhiteMoves(fen).includes(ba4))
     for (const [position, expected] of [
       ['1k6/8/K7/8/B4N2/8/8/8 b - - 0 1', 99],
-      ['1k6/8/K7/3N4/B7/8/8/8 b - - 0 1', 5],
+      ['1k6/8/K7/3N4/B7/8/8/8 b - - 0 1', 99],
       ['1k6/8/1K6/8/B4N2/8/8/8 b - - 0 1', 5],
     ] as const) {
       assert.equal(knightAndBishopSupportedDiagonal(transformFen(position, transform)).size, expected)

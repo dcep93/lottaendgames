@@ -222,14 +222,15 @@ test('supported five with Nd5 and Black near a5 approaches b4, including reflect
   for (const transform of SQUARE_TRANSFORMS) {
     const position = transformFen('8/8/k1B5/2KN4/8/8/8/8 w - - 0 1', transform)
     const san = (to: 'b4' | 'c4' | 'd6') => getChess(position).move({from: transformSquare('c5', transform), to: transformSquare(to, transform)}).san
-    for (const [to, distance] of [['b4', 0], ['c4', 1], ['d6', 2]] as const) {
+    for (const [to, distance] of [['b4', 0], ['d6', 2]] as const) {
       const score = scoreKnightAndBishopWhiteMove(position, san(to))
       assert.equal(score.supportedDiagonalSizeScore, 5)
       assert.equal(score.supportedFiveKingTargetDistance, distance)
     }
-    // Bishop placement now precedes this king target; compare king moves in isolation.
+    // Support eligibility precedes the target: c4 is bishop-colored.
+    assert.equal(scoreKnightAndBishopWhiteMove(position, san('c4')).supportedDiagonalSizeScore, 99)
     const kingCandidates = ['b4', 'c4', 'd6'].map(to => ({san: san(to as 'b4' | 'c4' | 'd6'), score: scoreKnightAndBishopWhiteMove(position, san(to as 'b4' | 'c4' | 'd6'))}))
-    assert.deepEqual(selectIdealMoves(kingCandidates, [knightAndBishopWhiteRules.find(r => r.id === 'r2.5')!]), [san('b4')])
+    assert.deepEqual(selectIdealMoves(kingCandidates, knightAndBishopWhiteRules.filter(r => ['r1.5', 'r2.5'].includes(r.id))), [san('b4')])
     assert.ok(!getIdealKnightAndBishopWhiteMoves(position).includes(san('d6')))
     const rule = knightAndBishopWhiteRules.find(r => r.id === 'r2.5')!
     for (const black of ['a5', 'a6', 'b6'] as const) {
@@ -257,7 +258,7 @@ test('supported five bishop and five knight prefer b5 or d7 equally before king 
       assert.equal(score.supportedDiagonalSizeScore, 5)
       assert.equal(score.supportedFiveBishopPenalty, to === 'c6' ? 1 : 0)
     }
-    assert.equal(scoreKnightAndBishopWhiteMove(position, move('d6', 'e7')).supportedFiveBishopPenalty, 1)
+    assert.equal(scoreKnightAndBishopWhiteMove(position, move('d6', 'e7')).supportedDiagonalSizeScore, 99)
     assert.deepEqual(getIdealKnightAndBishopWhiteMoves(position), [move('a4', 'b5')])
     // r2.5 retains both placements; the later r10 tie-break chooses Bb5.
     const bishopCandidates = ['b5', 'd7', 'c6'].map(to => ({san: move('a4', to as 'b5' | 'd7' | 'c6'), score: scoreKnightAndBishopWhiteMove(position, move('a4', to as 'b5' | 'd7' | 'c6'))}))
@@ -272,14 +273,15 @@ test('supported five bishop and five knight prefer b5 or d7 equally before king 
 })
 
 
-test('Bb5 and Nd5 aim the king two files right of Black, including second-move Kd7', () => {
+test('Bb5 and Nd5 king targeting cannot override the same-color support exclusion', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     const position = transformFen('8/1k6/3K4/1B1N4/8/8/8/8 w - - 2 2', transform)
     const san = (to: 'd7' | 'e7' | 'c5') => getChess(position).move({from: transformSquare('d6', transform), to: transformSquare(to, transform)}).san
-    assert.equal(scoreKnightAndBishopWhiteMove(position, san('d7')).supportedDiagonalSizeScore, 5)
+    assert.equal(scoreKnightAndBishopWhiteMove(position, san('d7')).supportedDiagonalSizeScore, 99)
     assert.equal(scoreKnightAndBishopWhiteMove(position, san('d7')).supportedFiveKingTargetDistance, 0)
     assert.equal(scoreKnightAndBishopWhiteMove(position, san('e7')).supportedFiveKingTargetDistance, 1)
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(position), [san('d7')])
+    assert.ok(!getIdealKnightAndBishopWhiteMoves(position).includes(san('d7')))
+    for (const move of getIdealKnightAndBishopWhiteMoves(position)) assert.equal(scoreKnightAndBishopWhiteMove(position, move).supportedDiagonalSizeScore, 5)
     assert.equal(getMateRuleSet('bishop-knight').currentWhiteHint(position)?.id, 'r2.5')
   }
 })

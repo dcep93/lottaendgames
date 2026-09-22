@@ -270,11 +270,17 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
     ((whiteCoordinates.file - blackCoordinatesForSupport.file) * pattern.rightOffset.file +
       (whiteCoordinates.rank - blackCoordinatesForSupport.rank) * pattern.rightOffset.rank <= 0 ||
       (bishop.square !== pattern.fiveRemoteBishop && kingDistance(white.square, bishop.square) !== 1)))
-  if (!previousFivePlacementRejected && isRecordedSupportedFiveKingDefense(fen)) return {size: 5, knight: 1}
+  // A five-knight cannot support a same-color king or the a4 endpoint bishop.
+  // These requirements also constrain older declared five-diagonal placements.
+  const currentFivePlacementRejected = DIAGONALS.some(pattern => pattern.wall.length === 5 &&
+    pattern.support.includes(knight.square) && pattern.wall.includes(bishop.square) &&
+    (squareColor(white.square) === squareColor(bishop.square) || bishop.square === pattern.fiveRemoteBishop))
+  const fivePlacementRejected = previousFivePlacementRejected || currentFivePlacementRejected
+  if (!fivePlacementRejected && isRecordedSupportedFiveKingDefense(fen)) return {size: 5, knight: 1}
   const declaredFive = DECLARED_FIVE_PLACEMENTS.find(pattern =>
     pattern.king === white.square && pattern.bishop === bishop.square &&
     pattern.knight === knight.square && pattern.black === black.square)
-  if (declaredFive && !previousFivePlacementRejected) return {
+  if (declaredFive && !fivePlacementRejected) return {
     size: 5,
     knight: knightAndBishopKnightProximityToSquare(fen, declaredFive.support),
   }
@@ -295,7 +301,7 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
   if (kingDistance(black.square, bishop.square) === 1 &&
     kingDistance(white.square, bishop.square) > 1 &&
     squaredEuclideanDistance(knight.square, bishop.square) === 5) return {size: 99, knight: 99}
-  const excludedFive = previousFivePlacementRejected || UNSUPPORTED_FIVE_ARRANGEMENTS.some(pattern =>
+  const excludedFive = fivePlacementRejected || UNSUPPORTED_FIVE_ARRANGEMENTS.some(pattern =>
     pattern.king === white.square && pattern.bishop === bishop.square && pattern.black === black.square) ||
     hasExposedFiveBishopApproach(fen, bishop.square, black.square, blackDestinations)
   const excludedThree = unavailableThreeTarget || UNSUPPORTED_THREE_KNIGHTS.some(pattern =>
