@@ -307,7 +307,7 @@ test('Bc8 cannot support a three-diagonal with Nb6 or Nc7, including reflections
 
 test('seven-diagonal support requires the king to match both opposite-side escape races', () => {
   for (const transform of SQUARE_TRANSFORMS) {
-    const fen = transformFen('8/8/2k5/8/8/1B1N4/1K6/8 w - - 4 3', transform)
+    const fen = transformFen('8/8/1k6/8/8/1B1N4/1K6/8 w - - 4 3', transform)
     const san = (to: 'a3' | 'c3') => getChess(fen).move({
       from: transformSquare('b2', transform), to: transformSquare(to, transform),
     }).san
@@ -540,9 +540,9 @@ test('the same outer limit applies to three- and seven-diagonals', () => {
       ['k2K4/8/B7/3N4/8/8/8/8 b - - 0 1', 3],
       ['k7/8/B1K5/3N4/8/8/8/8 b - - 0 1', 3],
       ['k7/8/B7/2KN4/8/8/8/8 b - - 0 1', 99],
-      ['k7/8/8/3B4/8/3N4/8/K7 b - - 0 1', 7],
-      ['k7/8/8/3B4/8/3N4/8/1K6 b - - 0 1', 7],
-      ['k7/8/8/3B4/8/3N4/8/2K5 b - - 0 1', 99],
+      ['k7/8/8/3B1N2/8/8/8/K7 b - - 0 1', 7],
+      ['k7/8/8/3B1N2/8/8/8/1K6 b - - 0 1', 7],
+      ['k7/8/8/3B1N2/8/8/8/2K5 b - - 0 1', 99],
     ] as const) assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, size, fen)
   }
 })

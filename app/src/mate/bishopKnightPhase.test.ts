@@ -19,7 +19,7 @@ test('supported three, five and seven diagonals enter phase 2 after White in eve
   for (const [fen, size] of [
     ['k7/8/BK6/3N4/8/8/8/8 b - - 1 1', 3],
     ['2k5/3B4/3K4/3N4/8/8/8/8 b - - 1 1', 5],
-    ['8/8/8/1k6/8/1B1N4/1K6/8 b - - 1 1', 7],
+    ['8/8/8/1k6/8/1B1N4/2K5/8 b - - 1 1', 7],
   ] as const) {
     for (const transform of SQUARE_TRANSFORMS) {
       const reflected = transformFen(fen, transform)
