@@ -23,7 +23,7 @@ import {
   isKnightAndBishopWManeuverPosition,
   knightAndBishopPiecesPresent,
 } from "./bishopKnightLookup";
-import { knightAndBishopCenterProximityScore, knightAndBishopKingCenterProximityScore, knightAndBishopKnightTargetProximityScore } from "./bishopKnightStrategy";
+import { knightAndBishopCenterProximityScore, knightAndBishopKingCenterProximityScore, knightAndBishopKnightTargetProximityScore, knightAndBishopTargetCorners } from "./bishopKnightStrategy";
 import { knightAndBishopDeclaredCornerFlushMove } from "./bishopKnightCornerFlush";
 import { declaredSupportedThreeMove, declaredSupportedFiveMove, declaredSupportedSevenMove } from "./bishopKnightSupportedPreferences";
 import { knightAndBishopDeclaredPreparationMove } from "./bishopKnightPreparation";
@@ -69,6 +69,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly kingBishopColorPenalty: number;
   readonly bishopLongDiagonalPenalty: number;
   readonly bishopProtectedCenterPenalty: number;
+  readonly bishopTargetCornerDistanceScore: number;
   readonly knightTargetProximityScore: number;
   readonly knightProtectionPenalty: number;
   readonly nonCentralBishopDistanceScore: number;
@@ -291,6 +292,11 @@ function scoreKnightAndBishopWhiteMoveCore(
         : -Math.sqrt(squaredEuclideanDistance(intersection, blackKing.square));
     },
     bishopProtectedCenterPenalty: protectedCentralBishop ? 0 : 1,
+    get bishopTargetCornerDistanceScore() {
+      const targets = knightAndBishopTargetCorners(resultFen);
+      return bishop && targets.length
+        ? -Math.sqrt(Math.min(...targets.map(target => squaredEuclideanDistance(bishop.square, target)))) : 0;
+    },
     knightProtectionPenalty: knightKingDefended ? 0 : 1,
     knightBishopColorPenalty: knight && bishop && squareColor(knight.square) === squareColor(bishop.square) ? 1 : 0,
     get nonCentralBishopDistanceScore() {
@@ -418,12 +424,13 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     {
       id: "r10",
       shortLabel: "rule r10",
-      helpText: "Prefer king Euclidean proximity to the center, then king off bishop's color, then bishop on the long diagonal, then a king protected central bishop, then knight move proximity to a precage square, then king knight protection, then maximize non central bishop distance from Black's king, then prefer knight off bishop's color.",
+      helpText: "Prefer king Euclidean proximity to the center, then king off bishop's color, then bishop on the long diagonal, then a king protected central bishop, then maximize bishop Euclidean distance from the target corner, then knight move proximity to a precage square, then king knight protection, then maximize non central bishop distance from Black's king, then prefer knight off bishop's color.",
       subpriorities: [
         { compare: (first, second) => first.kingCenterProximityScore - second.kingCenterProximityScore },
         { compare: (first, second) => first.kingBishopColorPenalty - second.kingBishopColorPenalty },
         { compare: (first, second) => first.bishopLongDiagonalPenalty - second.bishopLongDiagonalPenalty },
         { compare: (first, second) => first.bishopProtectedCenterPenalty - second.bishopProtectedCenterPenalty },
+        { compare: (first, second) => first.bishopTargetCornerDistanceScore - second.bishopTargetCornerDistanceScore },
         { rank: scores => {
           const distances = scores.map(score => score.knightTargetProximityScore);
           const best = Math.min(99, ...distances);
@@ -594,7 +601,7 @@ const bishopKnightHelp: RuleHelp = {
     "For r9.1, check before White moves: Black's king must attack the bishop and White's king must not be adjacent to it. Knight defense does not exempt the bishop. Maximize the bishop's Euclidean distance from Black after White moves. For r9.2, the knight must be attacked before White moves, whether or not it is already defended. Prefer king defense after the move; bishop defense alone does not satisfy this preference.",
     "A precage square is diagonally adjacent to a central bishop, off the long diagonal, and strictly behind the bishop from Black's king's perspective.",
     "For r10, candidates without a precage square remain neutral, tied with the best available distance. Among candidates with precage squares, fewer knight moves wins.",
-    "The target corner is the bishop-colored corner closest to Black's king.",
+    "The target corner is the bishop-colored corner closest to Black's king. In r10, maximize the bishop’s Euclidean distance from that corner; if target corners are tied, maximize its distance from the nearer of those corners.",
     "Support squares, with reflections: a knight on the board edge immediately disqualifies support, including declared placement exceptions. A seven-diagonal bishop is supported only when the knight occupies its seven-diagonal support square: d3 for a2–g8, including reflections. Being one knight move away does not qualify. All supported diagonals require the kings to be at most three king steps apart after White moves, including declared placement exceptions. With a seven-diagonal bishop, if Black is strictly closer to the bishop by Euclidean distance than White, White’s king must be strictly to the right of Black’s king in the qualifying support orientation. Distance ties remain eligible. With Nd3, five-diagonal support requires White’s king strictly to the right of Black’s king (same-file kings do not qualify), including declared placement exceptions. The bishop must also be on a4 or adjacent to White’s king by edge or diagonal. Evaluate after White moves. For a2–g8, d3; for a4–e8, d5, with d3 as the previous-stage support square. Except for declared placement exceptions, with Nd3 a five-diagonal is supported only with the bishop on a4, c6 or d7 and White’s king on c5, c6 or c7 after White moves; Ba4 and Bd7 also permit Kd6. Bd7 with Nd3 is additionally eligible whenever the kings are within two king steps after White moves. All other support checks still apply. For a6–c8, only Kc7 selects b5/c6 and Kb6 selects c6/d7. There is no three-diagonal knight support square with White’s king elsewhere; then the knight must occupy d5, the previous-stage support square. This supersedes older Kd7, Kb5 and exact Kc6 target declarations. Three-diagonal support also requires White’s king adjacent to a6 or c8, or on c6 with Ba6 (including reflections).",
     "An n-diagonal is supported when the knight occupies its previous-stage support square or is within one knight move of its own support square, and Black has no legal move onto the (n+1)-diagonal. Evaluate after White moves. White’s king must be on or inside the (n+2)-diagonal. A diagonal is unsupported if Black can legally step onto it.",
     "For every immediate Black move attacking an undefended bishop, White must have a legal response that leaves Black unable to step onto the (n+1)-diagonal.",
