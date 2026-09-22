@@ -48,7 +48,7 @@ test('the declared position immediately after second-move Bc6 is supported in ev
     for (const counters of ['2 2', '46 24']) {
       const before = transformFen(`8/8/8/k2K4/B7/3N4/8/8 w - - ${counters}`, transform)
       const board = getChess(before)
-      const move = board.move({from: transformSquare('a4', transform), to: transformSquare('c6', transform)}).san
+      board.move({from: transformSquare('a4', transform), to: transformSquare('c6', transform)})
       assert.equal(evaluateKnightAndBishopSupportedDiagonal(board.fen()).size, 5)
       const bd7 = getChess(before).move({from: transformSquare('a4', transform), to: transformSquare('d7', transform)}).san
       assert.deepEqual(getIdealKnightAndBishopWhiteMoves(before), [bd7])
