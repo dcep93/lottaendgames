@@ -5,7 +5,7 @@ import { knightAndBishopFiveKingApproach, knightAndBishopSupportedDiagonal } fro
 import { getIdealKnightAndBishopWhiteMoves, knightAndBishopWhiteRules, scoreKnightAndBishopWhiteMove } from './bishopKnight'
 import { compareScoresByRules } from './selection'
 
-test('the declared Kc5 placement is supported and preferred on the approach to e7', () => {
+test('Kc5 is supported under the three-step limit and preferred on the approach to e7', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const counters of ['2 2', '72 42']) {
       const before = transformFen(`2k5/8/1K6/1B1N4/8/8/8/8 w - - ${counters}`, transform)
@@ -18,9 +18,9 @@ test('the declared Kc5 placement is supported and preferred on the approach to e
       assert.deepEqual(getIdealKnightAndBishopWhiteMoves(before), [move])
     }
     for (const fen of [
-      '3k4/8/8/1BKN4/8/8/8/8 b - - 1 1', // A different Black placement does not receive the distance exception.
-      '2k5/8/2B5/2KN4/8/8/8/8 b - - 1 1', // Nor a different bishop placement.
-    ]) assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 99)
+      '3k4/8/8/1BKN4/8/8/8/8 b - - 1 1', // Other three-step placements now qualify without an exception.
+      '2k5/8/2B5/2KN4/8/8/8/8 b - - 1 1', // The same limit applies with Bc6.
+    ]) assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 5)
   }
 })
 

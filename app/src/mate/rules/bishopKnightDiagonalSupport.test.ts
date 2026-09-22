@@ -189,15 +189,15 @@ test('Kb5 Bc8 Nc6 against Ka7 is unsupported by exact placement, including refle
   }
 })
 
-test('Nd5 with Kd4 Bc6 against Ka5 loses its exact support when kings are three steps apart, including reflections', () => {
+test('Nd5 with Kd4 Bc6 against Ka5 retains its exact support when kings are three steps apart, including reflections', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     const before = transformFen('8/8/2B5/k7/1N1K4/8/8/8 w - - 0 1', transform)
     const nd5 = getChess(before).move({from: transformSquare('b4', transform), to: transformSquare('d5', transform)}).san
     const score = scoreKnightAndBishopWhiteMove(before, nd5)
-    assert.equal(score.supportedDiagonalSizeScore, 99)
-    assert.equal(score.supportedDiagonalKnightScore, 99)
+    assert.equal(score.supportedDiagonalSizeScore, 5)
+    assert.equal(score.supportedDiagonalKnightScore, 0)
     const after = transformFen('8/8/2B5/k2N4/3K4/8/8/8 b - - 73 42', transform)
-    assert.deepEqual(knightAndBishopSupportedDiagonal(after), {size: 99, knight: 99})
+    assert.deepEqual(knightAndBishopSupportedDiagonal(after), {size: 5, knight: 0})
     assert.throws(() => knightAndBishopSupportedDiagonal(after.replace(' b ', ' w ')))
     for (const nearby of [
       '8/8/2B5/k2N4/4K3/8/8/8 b - - 0 1',
@@ -553,7 +553,7 @@ test('a screened five-diagonal is unsupported when Black can walk onto it', () =
     assert.ok(screened.moves({verbose: true}).some(move => move.to === transformSquare('a4', transform)))
     assert.equal(scoreKnightAndBishopWhiteMove(fen, kc6).supportedDiagonalSizeScore, 99)
     const kd6 = getChess(fen).move({from: transformSquare('c7', transform), to: transformSquare('d6', transform)}).san
-    assert.equal(scoreKnightAndBishopWhiteMove(fen, kd6).supportedDiagonalSizeScore, 99) // Kings are three steps apart.
+    assert.equal(scoreKnightAndBishopWhiteMove(fen, kd6).supportedDiagonalSizeScore, 5) // Three steps is now allowed.
     for (const san of getIdealKnightAndBishopWhiteMoves(fen)) {
       assert.equal(scoreKnightAndBishopWhiteMove(fen, san).supportedDiagonalSizeScore, 5)
     }

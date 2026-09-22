@@ -24,17 +24,18 @@ test('five-knight support rejects same-color kings and a4 bishops, including all
 })
 
 
-test('five-knight support requires kings within two steps after White moves', () => {
+test('five-knight support permits three steps and rejects four after White moves', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const counters of ['0 1', '72 42']) {
       const before = transformFen(`8/k3K3/8/1B1N4/8/8/8/8 w - - ${counters}`, transform)
       const move = getChess(before).move({from: transformSquare('e7', transform), to: transformSquare('d6', transform)}).san
-      assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 99)
+      assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 5)
     }
     for (const [fen, expected] of [
-      ['8/k7/3K4/1B1N4/8/8/8/8 b - - 1 1', 99], // Three steps, even though king is opposite-colored.
+      ['8/k7/3K4/1B1N4/8/8/8/8 b - - 1 1', 5], // Exactly three steps is eligible.
       ['8/1k6/3K4/1B1N4/8/8/8/8 b - - 1 1', 5], // Exactly two steps remains eligible.
-      ['8/8/2B5/k2N4/3K4/8/8/8 b - - 1 1', 99], // Older declared placement also loses support at three steps.
+      ['8/8/2B5/k2N4/3K4/8/8/8 b - - 1 1', 5], // Older declared placement is eligible again at three steps.
+      ['8/k3K3/8/1B1N4/8/8/8/8 b - - 1 1', 99], // Four steps still fails.
     ] as const) assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, expected, fen)
   }
 })
@@ -77,5 +78,18 @@ test('Bb5 and Nd5 require bishop adjacency when White king is left of Black', ()
       '2k5/4K3/8/1B1N4/8/8/8/8 b - - 1 1', // Right and within two king steps; no adjacency required.
       '8/1k1K4/8/1B1N4/8/8/8/8 b - - 1 1', // The declared Kd7 exception still works.
     ]) assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 5, fen)
+  }
+})
+
+
+test('loaded Nd5 is supported and preferred with the kings three steps apart', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    for (const counters of ['0 1', '72 42']) {
+      const before = transformFen(`1k6/8/2B5/2K5/1N6/8/8/8 w - - ${counters}`, transform)
+      const board = getChess(before)
+      const move = board.move({from: transformSquare('b4', transform), to: transformSquare('d5', transform)}).san
+      assert.deepEqual(knightAndBishopSupportedDiagonal(board.fen()), {size: 5, knight: 0})
+      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(before), [move])
+    }
   }
 })

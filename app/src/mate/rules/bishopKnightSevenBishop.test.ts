@@ -227,8 +227,8 @@ test('supported five with Nd5 and Black near a5 approaches b4, including reflect
       assert.equal(score.supportedDiagonalSizeScore, 5)
       assert.equal(score.supportedFiveKingTargetDistance, distance)
     }
-    // Support eligibility precedes the target: c4 is bishop-colored; d6 is too far from Black.
-    assert.equal(scoreKnightAndBishopWhiteMove(position, san('d6')).supportedDiagonalSizeScore, 99)
+    // Support eligibility precedes the target: c4 is bishop-colored; d6 is supported at three steps.
+    assert.equal(scoreKnightAndBishopWhiteMove(position, san('d6')).supportedDiagonalSizeScore, 5)
     assert.equal(scoreKnightAndBishopWhiteMove(position, san('c4')).supportedDiagonalSizeScore, 99)
     const kingCandidates = ['b4', 'c4', 'd6'].map(to => ({san: san(to as 'b4' | 'c4' | 'd6'), score: scoreKnightAndBishopWhiteMove(position, san(to as 'b4' | 'c4' | 'd6'))}))
     assert.deepEqual(selectIdealMoves(kingCandidates, knightAndBishopWhiteRules.filter(r => ['r1.5', 'r2.5'].includes(r.id))), [san('b4')])
@@ -280,7 +280,7 @@ test('the declared Kd7 exception lets Bb5 and Nd5 target two files right of Blac
     const san = (to: 'd7' | 'e7' | 'c5') => getChess(position).move({from: transformSquare('d6', transform), to: transformSquare(to, transform)}).san
     assert.equal(scoreKnightAndBishopWhiteMove(position, san('d7')).supportedDiagonalSizeScore, 5)
     assert.equal(scoreKnightAndBishopWhiteMove(position, san('d7')).supportedFiveKingTargetDistance, 0)
-    assert.equal(scoreKnightAndBishopWhiteMove(position, san('e7')).supportedDiagonalSizeScore, 99) // Three king steps.
+    assert.equal(scoreKnightAndBishopWhiteMove(position, san('e7')).supportedDiagonalSizeScore, 5) // Three king steps now qualifies.
     assert.deepEqual(getIdealKnightAndBishopWhiteMoves(position), [san('d7')])
     for (const move of getIdealKnightAndBishopWhiteMoves(position)) assert.equal(scoreKnightAndBishopWhiteMove(position, move).supportedDiagonalSizeScore, 5)
     assert.equal(getMateRuleSet('bishop-knight').currentWhiteHint(position)?.id, 'r2.5')

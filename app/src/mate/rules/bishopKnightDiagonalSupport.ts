@@ -140,14 +140,6 @@ const FIVE_KING_COLOR_EXCEPTIONS = SQUARE_TRANSFORMS.map(transform => ({
   black: transformSquare('b7', transform),
 }))
 
-// Narrow declaration allowing Kc5 to begin the opposite-color approach to e7.
-const FIVE_KING_DISTANCE_EXCEPTIONS = SQUARE_TRANSFORMS.map(transform => ({
-  king: transformSquare('c5', transform),
-  bishop: transformSquare('b5', transform),
-  knight: transformSquare('d5', transform),
-  black: transformSquare('c8', transform),
-}))
-
 const FIVE_BISHOP_APPROACHES = SQUARE_TRANSFORMS.map(transform => ({
   wall: (['a4', 'b5', 'c6', 'd7', 'e8'] as const).map(square => transformSquare(square, transform)),
   bishops: (['a4', 'b5', 'c6'] as const).map(square => transformSquare(square, transform)),
@@ -286,17 +278,14 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
     ((whiteCoordinates.file - blackCoordinatesForSupport.file) * pattern.rightOffset.file +
       (whiteCoordinates.rank - blackCoordinatesForSupport.rank) * pattern.rightOffset.rank <= 0 ||
       (bishop.square !== pattern.fiveRemoteBishop && kingDistance(white.square, bishop.square) !== 1)))
-  // A five-knight requires kings within two steps, opposite king/bishop colors, and no a4 bishop.
+  // A five-knight requires kings within three steps, opposite king/bishop colors, and no a4 bishop.
   // These requirements also constrain older declared five-diagonal placements.
   const fiveKingColorException = FIVE_KING_COLOR_EXCEPTIONS.some(pattern =>
     pattern.king === white.square && pattern.bishop === bishop.square &&
     pattern.knight === knight.square && pattern.black === black.square)
-  const fiveKingDistanceException = FIVE_KING_DISTANCE_EXCEPTIONS.some(pattern =>
-    pattern.king === white.square && pattern.bishop === bishop.square &&
-    pattern.knight === knight.square && pattern.black === black.square)
   const currentFivePlacementRejected = DIAGONALS.some(pattern => pattern.wall.length === 5 &&
     pattern.support.includes(knight.square) && pattern.wall.includes(bishop.square) &&
-    ((kingDistance(white.square, black.square) > 2 && !fiveKingDistanceException) ||
+    (kingDistance(white.square, black.square) > 3 ||
       (squareColor(white.square) === squareColor(bishop.square) && !fiveKingColorException) ||
       bishop.square === pattern.fiveRemoteBishop ||
       (bishop.square === pattern.fiveRightTargetBishop && kingDistance(white.square, bishop.square) > 1 &&
