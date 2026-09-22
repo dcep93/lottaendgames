@@ -102,7 +102,7 @@ test('Kd6 supports Bd7 with Nd3 and breaks the loaded Ba4–Bb3 shuttle', () => 
 })
 
 test('Nd3 five support combines right-side kings with declared placements or nearby Bd7 kings', () => {
-  for (const bishop of ['a4', 'b5', 'c6', 'd7', 'e8'] as const) {
+  for (const bishop of ['a4', 'b5', 'c6', 'd7'] as const) {
     for (const king of allSquares()) {
       if (king === bishop || king === 'd3' || kingDistance(king, 'a7') <= 1) continue
       const board = getChess('8/k7/8/8/8/3N4/8/7K b - - 0 1')
@@ -121,7 +121,7 @@ test('Nd3 five support combines right-side kings with declared placements or nea
     assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 5)
     const loaded = transformFen('3K4/8/8/k7/B7/3N4/8/8 w - - 0 1', transform)
     const be8 = getChess(loaded).move({from: transformSquare('a4', transform), to: transformSquare('e8', transform)}).san
-    assert.equal(scoreKnightAndBishopWhiteMove(loaded, be8).supportedDiagonalSizeScore, 99)
+    assert.equal(scoreKnightAndBishopWhiteMove(loaded, be8).supportedDiagonalSizeScore, 5)
   }
 })
 
@@ -469,13 +469,13 @@ test('a seven-diagonal is unsupported when Black can step onto a square screened
 })
 
 
-test('Kd6 with Nd3 does not support five-bishops outside a4/d7, including reflections', () => {
+test('Kd6 with Nd3 rejects Bb5 and Bc6 but permits Be8 against the a-file', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const fen of [
       'k7/8/3K4/1B6/8/3N4/8/8 b - - 0 1',
       'k7/8/2BK4/8/8/3N4/8/8 b - - 0 1',
-      'k3B3/8/3K4/8/8/3N4/8/8 b - - 0 1',
     ]) assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 99)
+    assert.equal(knightAndBishopSupportedDiagonal(transformFen('k3B3/8/3K4/8/8/3N4/8/8 b - - 0 1', transform)).size, 5)
     const fen = transformFen('8/8/8/k2B4/8/3N4/1K6/8 w - - 20 11', transform)
     const move = getChess(fen).move({from: transformSquare('d5', transform), to: transformSquare('c6', transform)}).san
     assert.equal(scoreKnightAndBishopWhiteMove(fen, move).supportedDiagonalSizeScore, 99)
@@ -484,7 +484,7 @@ test('Kd6 with Nd3 does not support five-bishops outside a4/d7, including reflec
   }
 })
 
-test('a five-bishop with Nd3 rejects Bb5 and Be8 even with an eligible king', () => {
+test('a five-bishop with Nd3 still rejects Bb5 even with an eligible king', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     const before = transformFen('8/3K4/8/k7/B7/3N4/8/8 w - - 2 2', transform)
     const bc6 = getChess(before).move({from: transformSquare('a4', transform), to: transformSquare('c6', transform)}).san
@@ -493,8 +493,8 @@ test('a five-bishop with Nd3 rejects Bb5 and Be8 even with an eligible king', ()
       const board = getChess('k7/8/8/8/8/3N4/8/7K b - - 0 1')
       board.remove('h1')
       board.put({color: 'w', type: 'k'}, king)
-      // Both remaining excluded bishop squares stay unsupported with Nd3.
-      board.put({color: 'w', type: 'b'}, king === 'b5' ? 'e8' : 'b5')
+      if (king === 'b5') continue
+      board.put({color: 'w', type: 'b'}, 'b5')
       const size = knightAndBishopSupportedDiagonal(transformFen(board.fen(), transform)).size
       assert.notEqual(size, 5, king)
     }

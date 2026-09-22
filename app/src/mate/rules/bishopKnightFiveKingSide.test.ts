@@ -55,3 +55,24 @@ test('the former second-move Bc6 declaration is now unsupported in every reflect
     assert.notEqual(evaluateKnightAndBishopSupportedDiagonal(nearby).size, 5)
   }
 })
+
+test('Be8 with Nd3 and Black on the a-file supports the loaded placement, including reflections', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    for (const black of ['a5', 'a6', 'a7'] as const) {
+      const board = getChess('4B3/8/8/2K5/8/3N4/8/7k b - - 42 23')
+      board.remove('h1')
+      board.put({type: 'k', color: 'b'}, black)
+      assert.equal(evaluateKnightAndBishopSupportedDiagonal(transformFen(board.fen(), transform)).size, 5)
+    }
+    const before = transformFen('8/8/k7/2K5/B7/3N4/8/8 w - - 2 2', transform)
+    const board = getChess(before)
+    board.move({from: transformSquare('a4', transform), to: transformSquare('e8', transform)})
+    assert.equal(evaluateKnightAndBishopSupportedDiagonal(board.fen()).size, 5)
+    for (const fen of [
+      '4B3/8/1k6/2K5/8/3N4/8/8 b - - 0 1', // Off the a-file.
+      '4B3/8/k7/2K5/2N5/8/8/8 b - - 0 1', // Knight off d3.
+      '4B3/k7/8/8/8/3N4/6K1/8 b - - 0 1', // Universal king-distance limit.
+      '8/8/k1B5/2K5/8/3N4/8/8 b - - 0 1', // Bc6 remains forbidden.
+    ]) assert.equal(evaluateKnightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 99, fen)
+  }
+})

@@ -56,6 +56,8 @@ const DIAGONALS = CANONICAL_DIAGONALS.flatMap(pattern => SQUARE_TRANSFORMS.map(t
   preferredThreeKings: ['b6', 'c7'].map(square => transformSquare(square as Square, transform)),
   preferredFiveBishops: ['b5', 'd7'].map(square => transformSquare(square as Square, transform)),
   fiveRemoteBishop: transformSquare('a4', transform),
+  fiveOppositeEdgeBishop: transformSquare('e8', transform),
+  fiveBlackEdge: allSquares().filter(square => square[0] === 'a').map(square => transformSquare(square, transform)),
   fiveRightTargetBishop: transformSquare('b5', transform),
   fiveFlushTrigger: transformSquare('a5', transform),
   fiveFlushTarget: transformSquare('b4', transform),
@@ -269,7 +271,8 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
     pattern.previousSupport === knight.square && pattern.wall.includes(bishop.square) &&
     ((whiteCoordinates.file - blackCoordinatesForSupport.file) * pattern.rightOffset.file +
       (whiteCoordinates.rank - blackCoordinatesForSupport.rank) * pattern.rightOffset.rank <= 0 ||
-      (bishop.square !== pattern.fiveRemoteBishop && kingDistance(white.square, bishop.square) !== 1)))
+      (bishop.square !== pattern.fiveRemoteBishop && kingDistance(white.square, bishop.square) !== 1 &&
+        !(bishop.square === pattern.fiveOppositeEdgeBishop && pattern.fiveBlackEdge.includes(black.square)))))
   const declaredFive = DECLARED_FIVE_PLACEMENTS.find(pattern =>
     pattern.king === white.square && pattern.bishop === bishop.square &&
     pattern.knight === knight.square && pattern.black === black.square)
@@ -337,6 +340,7 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
     if (pattern.wall.length === 3 && !kingSupportsThree) continue
     if (knight.square === pattern.previousSupport && pattern.previousSupportPlacements &&
       !pattern.previousSupportPlacements.some(entry => entry.king === white.square && entry.bishops.includes(bishop.square)) &&
+      !(bishop.square === pattern.fiveOppositeEdgeBishop && pattern.fiveBlackEdge.includes(black.square)) &&
       !(bishop.square === pattern.previousSupportNearbyBishop && kingDistance(white.square, black.square) <= 2)) continue
     if (knight.square === pattern.previousSupport && pattern.bishopAttackRaceTarget &&
       losesBishopAttackRace(fen, white.square, black.square, bishop.square, pattern.bishopAttackRaceTarget)) continue
