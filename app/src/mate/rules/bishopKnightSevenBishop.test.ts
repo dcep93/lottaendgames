@@ -276,14 +276,14 @@ test('supported five bishop and five knight prefer b5 or d7 equally before king 
 })
 
 
-test('the five-knight color restriction rejects the former second-move Kd7 preference', () => {
+test('declared Kd7 support restores the two-files-right preference against Kb7', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     const position = transformFen('8/1k6/3K4/1B1N4/8/8/8/8 w - - 2 2', transform)
     const san = (to: 'd7' | 'e7' | 'c5') => getChess(position).move({from: transformSquare('d6', transform), to: transformSquare(to, transform)}).san
-    assert.equal(scoreKnightAndBishopWhiteMove(position, san('d7')).supportedDiagonalSizeScore, 99)
+    assert.equal(scoreKnightAndBishopWhiteMove(position, san('d7')).supportedDiagonalSizeScore, 5)
     assert.equal(scoreKnightAndBishopWhiteMove(position, san('d7')).supportedFiveKingTargetDistance, 0)
     assert.equal(scoreKnightAndBishopWhiteMove(position, san('e7')).supportedFiveKingTargetDistance, 1)
-    assert.ok(!getIdealKnightAndBishopWhiteMoves(position).includes(san('d7')))
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(position), [san('d7')])
   }
 })
 

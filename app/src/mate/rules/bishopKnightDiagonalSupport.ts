@@ -119,10 +119,12 @@ const THREE_BISHOP_RACES = SQUARE_TRANSFORMS.map(transform => ({
 }))
 
 const DECLARED_FIVE_SUPPORT = [
+  {king: 'd7', bishop: 'b5', knight: 'd5', black: 'b7', allowSameColorKing: true},
   {king: 'd5', bishop: 'd7', knight: 'd3', black: 'a5'},
   {king: 'd5', bishop: 'a4', knight: 'd3', black: 'b6'},
 ] as const
 const DECLARED_FIVE_PLACEMENTS = DECLARED_FIVE_SUPPORT.flatMap(placement => SQUARE_TRANSFORMS.map(transform => ({
+  allowSameColorKing: 'allowSameColorKing' in placement && placement.allowSameColorKing,
   king: transformSquare(placement.king, transform),
   bishop: transformSquare(placement.bishop, transform),
   knight: transformSquare(placement.knight, transform),
@@ -257,10 +259,13 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
   const bishop = findPiece(fen, 'w', 'b')
   const knight = findPiece(fen, 'w', 'n')
   if (!white || !black || !bishop || !knight) return {size: 99, knight: 99}
+  const declaredFive = DECLARED_FIVE_PLACEMENTS.find(pattern =>
+    pattern.king === white.square && pattern.bishop === bishop.square &&
+    pattern.knight === knight.square && pattern.black === black.square)
   // Universal post-White limits, including declared support placements.
   if (UNSUPPORTED_BISHOP_SQUARES.has(bishop.square)) return {size: 99, knight: 99}
   // A five-bishop with its five-knight requires the king off the bishop's color.
-  if (squareColor(white.square) === squareColor(bishop.square) && DIAGONALS.some(pattern =>
+  if (!declaredFive?.allowSameColorKing && squareColor(white.square) === squareColor(bishop.square) && DIAGONALS.some(pattern =>
     pattern.wall.length === 5 && pattern.wall.includes(bishop.square) &&
     pattern.support.includes(knight.square))) return {size: 99, knight: 99}
   if (edgeDistance(knight.square) === 0) return {size: 99, knight: 99}
@@ -277,9 +282,6 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
       (whiteCoordinates.rank - blackCoordinatesForSupport.rank) * pattern.rightOffset.rank <= 0 ||
       (bishop.square !== pattern.fiveRemoteBishop && kingDistance(white.square, bishop.square) !== 1 &&
         !(bishop.square === pattern.fiveOppositeEdgeBishop && pattern.fiveBlackEdge.includes(black.square)))))
-  const declaredFive = DECLARED_FIVE_PLACEMENTS.find(pattern =>
-    pattern.king === white.square && pattern.bishop === bishop.square &&
-    pattern.knight === knight.square && pattern.black === black.square)
   if (declaredFive && !previousFivePlacementRejected) return {
     size: 5,
     knight: knightAndBishopKnightProximityToSquare(fen, declaredFive.support),

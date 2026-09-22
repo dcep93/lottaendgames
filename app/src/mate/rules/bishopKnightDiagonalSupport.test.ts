@@ -892,3 +892,23 @@ test('a five-bishop with its five-knight is unsupported when White king shares t
     assert.equal(knightAndBishopSupportedDiagonal(transformFen('4B3/8/k7/2K5/8/3N4/8/8 b - - 0 1', transform)).size, 5)
   }
 })
+
+test('declared second-move Kd7 with Bb5 Nd5 against Kb7 overrides only its king-color restriction', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    for (const counters of ['2 2', '41 23']) {
+      const fen = transformFen(`3K4/1k6/8/1B1N4/8/8/8/8 w - - ${counters}`, transform)
+      const board = getChess(fen)
+      const move = board.move({from: transformSquare('d8', transform), to: transformSquare('d7', transform)}).san
+      assert.deepEqual(knightAndBishopSupportedDiagonal(board.fen()), {size: 5, knight: 0})
+      assert.equal(scoreKnightAndBishopWhiteMove(fen, move).supportedDiagonalSizeScore, 5)
+      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [move])
+    }
+    // Classification is after White's move. Black's later Ka7 is not the declared placement.
+    for (const fen of [
+      '8/k2K4/8/1B1N4/8/8/8/8 b - - 0 1',
+      '1k6/3K4/8/1B1N4/8/8/8/8 b - - 0 1',
+      '8/1k1K4/8/1B6/8/3N4/8/8 b - - 0 1',
+      '8/1k1K4/2B5/3N4/8/8/8/8 b - - 0 1',
+    ]) assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 99, fen)
+  }
+})
