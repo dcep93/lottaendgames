@@ -1,4 +1,4 @@
-import { knightAndBishopFiveKingTargetDistance, knightAndBishopShouldCheckThreeDiagonal, evaluateKnightAndBishopSupportedDiagonal } from "./bishopKnightDiagonalSupport";
+import { knightAndBishopFiveBishopPenalty, knightAndBishopFiveKingTargetDistance, knightAndBishopShouldCheckThreeDiagonal, evaluateKnightAndBishopSupportedDiagonal } from "./bishopKnightDiagonalSupport";
 import type { Square } from "chess.js";
 import {
   findPiece,
@@ -56,6 +56,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly supportedSevenFlushColorPenalty: number;
   readonly supportedSevenFlushDistance: number;
   readonly supportedSevenBishopPenalty: number;
+  readonly supportedFiveBishopPenalty: number;
   readonly supportedFiveKingTargetDistance: number;
   readonly supportedSevenKingTargetDistance: number;
   readonly supportedSevenKingTieDistance: number;
@@ -245,6 +246,10 @@ function scoreKnightAndBishopWhiteMoveCore(
       const support = supportedDiagonal ??= evaluateKnightAndBishopSupportedDiagonal(resultFen, blackReplies.map(move => move.to));
       return support.size === 7 ? support.sevenBishopPenalty ?? 1 : 0;
     },
+    get supportedFiveBishopPenalty() {
+      const support = supportedDiagonal ??= evaluateKnightAndBishopSupportedDiagonal(resultFen, blackReplies.map(move => move.to));
+      return support.size === 5 ? knightAndBishopFiveBishopPenalty(resultFen) : 0;
+    },
     get supportedFiveKingTargetDistance() {
       const support = supportedDiagonal ??= evaluateKnightAndBishopSupportedDiagonal(resultFen, blackReplies.map(move => move.to));
       return support.size === 5 ? knightAndBishopFiveKingTargetDistance(resultFen) : 0;
@@ -339,12 +344,13 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     {
       id: "r2.5",
       shortLabel: "rule r2.5",
-      helpText: "Prefer declared supported-diagonal moves. With a supported 5 diagonal, Nd5 and Black on or adjacent to a5, prefer king step proximity to b4. With a supported 5 diagonal and Nd3, prefer king step proximity to the square two files to the right of Black’s king. With a supported 7 diagonal and Black on or adjacent to a3, prefer the king off the bishop’s color, then king step proximity to b2. Then prefer the bishop on b3, king step proximity to the square two files to the right of Black’s king, and king step proximity to e8. Include reflections.",
+      helpText: "Prefer declared supported-diagonal moves. With a supported 5 diagonal and Nd5, prefer the bishop on b5 or d7. With a supported 5 diagonal, Nd5 and Black on or adjacent to a5, prefer king step proximity to b4. With a supported 5 diagonal and Nd3, prefer king step proximity to the square two files to the right of Black’s king. With a supported 7 diagonal and Black on or adjacent to a3, prefer the king off the bishop’s color, then king step proximity to b2. Then prefer the bishop on b3, king step proximity to the square two files to the right of Black’s king, and king step proximity to e8. Include reflections.",
       applies: score => score.supportedDiagonalSizeScore === 7 ||
         score.supportedDiagonalSizeScore === 5,
       subpriorities: [
         { compare: (first, second) => (first.declaredSupportedFivePenalty ?? 0) - (second.declaredSupportedFivePenalty ?? 0) },
         { compare: (first, second) => (first.supportedDiagonalSizeScore === 7 ? first.declaredSupportedSevenPenalty : 0) - (second.supportedDiagonalSizeScore === 7 ? second.declaredSupportedSevenPenalty : 0) },
+        { compare: (first, second) => first.supportedFiveBishopPenalty - second.supportedFiveBishopPenalty },
         { compare: (first, second) => first.supportedFiveKingTargetDistance - second.supportedFiveKingTargetDistance },
         { compare: (first, second) => first.supportedSevenFlushColorPenalty - second.supportedSevenFlushColorPenalty },
         { compare: (first, second) => first.supportedSevenFlushDistance - second.supportedSevenFlushDistance },

@@ -15,8 +15,6 @@ test('r2.5 leaves culled placements unchanged outside the declared five-diagonal
       '8/8/1kB5/8/1NK5/8/8/8 w - - 0 1',
       '1k6/1N6/B7/1K6/8/8/8/8 w - - 0 1',
       '8/8/8/3B4/3K4/k2N4/8/8 w - - 0 1',
-      '8/k2B4/8/3N4/8/8/K7/8 w - - 0 1',
-      '8/k2B4/8/3N4/8/K7/8/8 w - - 0 1',
       '3k4/5K2/8/8/8/3N4/B7/8 w - - 0 1',
     ]) {
       const reflected = transformFen(fen, transform)

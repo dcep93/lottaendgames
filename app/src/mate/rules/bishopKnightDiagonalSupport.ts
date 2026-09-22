@@ -56,6 +56,7 @@ const DIAGONALS = CANONICAL_DIAGONALS.flatMap(pattern => SQUARE_TRANSFORMS.map(t
   sevenKingTieTarget: transformSquare('e8', transform),
   sevenFlushTrigger: transformSquare('a3', transform),
   sevenFlushTarget: transformSquare('b2', transform),
+  preferredFiveBishops: ['b5', 'd7'].map(square => transformSquare(square as Square, transform)),
   fiveFlushTrigger: transformSquare('a5', transform),
   fiveFlushTarget: transformSquare('b4', transform),
   rightOffset: {file: transform.map(2, 0).file - transform.map(0, 0).file,
@@ -359,6 +360,18 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
       (candidate.size === best.size && distance === best.knight && compareSevenPreferences(candidate, best) < 0)) best = candidate
   }
   return best
+}
+
+/** Equivalent preferred bishop squares, in the five-knight orientation. */
+export function knightAndBishopFiveBishopPenalty(fen: string): number {
+  const black = findPiece(fen, 'b', 'k')
+  const bishop = findPiece(fen, 'w', 'b')
+  const knight = findPiece(fen, 'w', 'n')
+  if (!black || !bishop || !knight) return 0
+  const patterns = DIAGONALS.filter(pattern => pattern.wall.length === 5 &&
+    pattern.support.includes(knight.square) && pattern.wall.includes(bishop.square) &&
+    isInsideBishopDiagonal(black.square, pattern.wall))
+  return patterns.length && !patterns.some(pattern => pattern.preferredFiveBishops.includes(bishop.square)) ? 1 : 0
 }
 
 /** Five-diagonal king targets in the orientation fixed by the knight. */
