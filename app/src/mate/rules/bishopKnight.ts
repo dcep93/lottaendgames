@@ -1,4 +1,4 @@
-import { knightAndBishopFiveBishopPenalty, knightAndBishopFiveKingTargetDistance, knightAndBishopShouldCheckThreeDiagonal, evaluateKnightAndBishopSupportedDiagonal } from "./bishopKnightDiagonalSupport";
+import { knightAndBishopThreeKingPlacementPenalty, knightAndBishopFiveBishopPenalty, knightAndBishopFiveKingTargetDistance, knightAndBishopShouldCheckThreeDiagonal, evaluateKnightAndBishopSupportedDiagonal } from "./bishopKnightDiagonalSupport";
 import type { Square } from "chess.js";
 import {
   findPiece,
@@ -56,6 +56,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly supportedSevenFlushColorPenalty: number;
   readonly supportedSevenFlushDistance: number;
   readonly supportedSevenBishopPenalty: number;
+  readonly supportedThreeKingPlacementPenalty: number;
   readonly supportedFiveBishopPenalty: number;
   readonly supportedFiveKingTargetDistance: number;
   readonly supportedSevenKingTargetDistance: number;
@@ -246,6 +247,10 @@ function scoreKnightAndBishopWhiteMoveCore(
       const support = supportedDiagonal ??= evaluateKnightAndBishopSupportedDiagonal(resultFen, blackReplies.map(move => move.to));
       return support.size === 7 ? support.sevenBishopPenalty ?? 1 : 0;
     },
+    get supportedThreeKingPlacementPenalty() {
+      const support = supportedDiagonal ??= evaluateKnightAndBishopSupportedDiagonal(resultFen, blackReplies.map(move => move.to));
+      return support.size === 3 ? knightAndBishopThreeKingPlacementPenalty(resultFen) : 0;
+    },
     get supportedFiveBishopPenalty() {
       const support = supportedDiagonal ??= evaluateKnightAndBishopSupportedDiagonal(resultFen, blackReplies.map(move => move.to));
       return support.size === 5 ? knightAndBishopFiveBishopPenalty(resultFen) : 0;
@@ -346,10 +351,11 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       shortLabel: "rule r2.5",
       helpText: "With a supported diagonal, prefer forcing Black’s king towards the target corner.",
       applies: score => score.supportedDiagonalSizeScore === 7 ||
-        score.supportedDiagonalSizeScore === 5,
+        score.supportedDiagonalSizeScore === 5 || score.supportedDiagonalSizeScore === 3,
       subpriorities: [
         { compare: (first, second) => (first.declaredSupportedFivePenalty ?? 0) - (second.declaredSupportedFivePenalty ?? 0) },
         { compare: (first, second) => (first.supportedDiagonalSizeScore === 7 ? first.declaredSupportedSevenPenalty : 0) - (second.supportedDiagonalSizeScore === 7 ? second.declaredSupportedSevenPenalty : 0) },
+        { compare: (first, second) => first.supportedThreeKingPlacementPenalty - second.supportedThreeKingPlacementPenalty },
         { compare: (first, second) => first.supportedFiveBishopPenalty - second.supportedFiveBishopPenalty },
         { compare: (first, second) => first.supportedFiveKingTargetDistance - second.supportedFiveKingTargetDistance },
         { compare: (first, second) => first.supportedSevenFlushColorPenalty - second.supportedSevenFlushColorPenalty },
@@ -576,7 +582,7 @@ const bishopKnightHelp: RuleHelp = {
   ],
   notes: [
     "Declared five-diagonal support after Bc6: White Kd5, Bc6 and Nd3 against Black Ka5. Include reflections; move counters do not matter. The strict Nd3 king-side and bishop-adjacency requirements still apply.",
-    "r2.5 general preferences, after exact declarations: With a supported 5 diagonal and Nd5, prefer the bishop on b5 or d7. With Bb5 and Nd5, prefer king step proximity to the square two files to the right of Black’s king. Otherwise, with a supported 5 diagonal, Nd5 and Black on or adjacent to a5, prefer king step proximity to b4. With a supported 5 diagonal and Nd3, prefer king step proximity to the square two files to the right of Black’s king. With a supported 7 diagonal and Black on or adjacent to a3, prefer the king off the bishop’s color, then king step proximity to b2. Then prefer the bishop on b3, king step proximity to the square two files to the right of Black’s king, and king step proximity to e8. Include reflections.",
+    "r2.5 general preferences, after exact declarations: With a supported 3 diagonal, equally prefer the king on b6 or c7. With a supported 5 diagonal and Nd5, prefer the bishop on b5 or d7. With Bb5 and Nd5, prefer king step proximity to the square two files to the right of Black’s king. Otherwise, with a supported 5 diagonal, Nd5 and Black on or adjacent to a5, prefer king step proximity to b4. With a supported 5 diagonal and Nd3, prefer king step proximity to the square two files to the right of Black’s king. With a supported 7 diagonal and Black on or adjacent to a3, prefer the king off the bishop’s color, then king step proximity to b2. Then prefer the bishop on b3, king step proximity to the square two files to the right of Black’s king, and king step proximity to e8. Include reflections.",
     "For r9.5, check the king's color and bishop–Black king edge adjacency before White moves. Prefer moving White's king to the square immediately behind the bishop, directly opposite Black's king, so the bishop sits between the kings. For Bf3 and Black Kg3, the target is Ke3. If no surviving legal king move reaches that square, this rule does not distinguish moves. Rotations and reflections use the same geometry.",
     "For r9.3, check before White moves: the bishop and knight must be adjacent (by edge or diagonal), both must be within two king steps of Black, and neither may be defended by White's king on d4, e4, d5 or e5. When this rule activates, first prefer a resulting central king defending either piece. Those defended outcomes tie; otherwise maximize only the bishop's Euclidean distance after the move, including moves beyond the two-step range.",
     "For r20, prefer a knight that no legal Black reply can attack or capture, including replies outside Black’s preferred moves. This preference applies whether or not the knight is defended, after all earlier rules.",

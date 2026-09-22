@@ -56,6 +56,7 @@ const DIAGONALS = CANONICAL_DIAGONALS.flatMap(pattern => SQUARE_TRANSFORMS.map(t
   sevenKingTieTarget: transformSquare('e8', transform),
   sevenFlushTrigger: transformSquare('a3', transform),
   sevenFlushTarget: transformSquare('b2', transform),
+  preferredThreeKings: ['b6', 'c7'].map(square => transformSquare(square as Square, transform)),
   preferredFiveBishops: ['b5', 'd7'].map(square => transformSquare(square as Square, transform)),
   fiveRemoteBishop: transformSquare('a4', transform),
   fiveRightTargetBishop: transformSquare('b5', transform),
@@ -371,6 +372,17 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
       (candidate.size === best.size && distance === best.knight && compareSevenPreferences(candidate, best) < 0)) best = candidate
   }
   return best
+}
+
+/** Equal king placements on the three-diagonal boundary, including reflections. */
+export function knightAndBishopThreeKingPlacementPenalty(fen: string): number {
+  const white = findPiece(fen, 'w', 'k')
+  const black = findPiece(fen, 'b', 'k')
+  const bishop = findPiece(fen, 'w', 'b')
+  if (!white || !black || !bishop) return 0
+  const patterns = DIAGONALS.filter(pattern => pattern.wall.length === 3 &&
+    pattern.wall.includes(bishop.square) && isInsideBishopDiagonal(black.square, pattern.wall))
+  return patterns.length && !patterns.some(pattern => pattern.preferredThreeKings.includes(white.square)) ? 1 : 0
 }
 
 /** Equivalent preferred bishop squares, in the five-knight orientation. */

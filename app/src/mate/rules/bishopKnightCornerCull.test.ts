@@ -6,7 +6,7 @@ import { selectIdealMoves } from './selection'
 
 const cornerRule = knightAndBishopWhiteRules.find(rule => rule.id === 'r2.5')!
 
-test('r2.5 leaves culled placements unchanged outside the declared five-diagonal preferences', () => {
+test('r2.5 leaves culled placements unchanged outside the current supported-diagonal preferences', () => {
   // Former exact maneuvers, bishop placements, king targets, and far-apart five-diagonals.
   for (const transform of SQUARE_TRANSFORMS) {
     for (const fen of [
@@ -18,10 +18,10 @@ test('r2.5 leaves culled placements unchanged outside the declared five-diagonal
       '3k4/5K2/8/8/8/3N4/B7/8 w - - 0 1',
     ]) {
       const reflected = transformFen(fen, transform)
-      const candidates = getChess(reflected).moves().map(san => ({san, score: scoreKnightAndBishopWhiteMove(reflected, san)})).filter(candidate => candidate.score.supportedDiagonalSizeScore !== 7)
+      const candidates = getChess(reflected).moves().map(san => ({san, score: scoreKnightAndBishopWhiteMove(reflected, san)})).filter(candidate => ![3, 7].includes(candidate.score.supportedDiagonalSizeScore))
       assert.deepEqual(selectIdealMoves(candidates, [cornerRule]), candidates.map(candidate => candidate.san))
       for (const {score} of candidates) {
-        assert.equal(cornerRule.applies!(score), [5, 7].includes(score.supportedDiagonalSizeScore))
+        assert.equal(cornerRule.applies!(score), [3, 5, 7].includes(score.supportedDiagonalSizeScore))
         assert.equal(score.supportedFiveKingTargetDistance, 0)
         assert.ok(!Object.keys(score).some(key => /Maneuver|^three|^five|^seven|^diagonalKing/.test(key)))
       }
