@@ -220,7 +220,7 @@ test('supported five with previous-stage Nd3 approaches two files right of Black
 
 test('supported five with Nd5 and Black near a5 approaches b4, including reflections', () => {
   for (const transform of SQUARE_TRANSFORMS) {
-    const position = transformFen('8/8/k1B5/2KN4/8/8/8/8 w - - 0 1', transform)
+    const position = transformFen('8/3B4/k7/2KN4/8/8/8/8 w - - 0 1', transform)
     const san = (to: 'b4' | 'c4' | 'd6') => getChess(position).move({from: transformSquare('c5', transform), to: transformSquare(to, transform)}).san
     for (const [to, distance] of [['b4', 0]] as const) {
       const score = scoreKnightAndBishopWhiteMove(position, san(to))
@@ -254,7 +254,7 @@ test('supported five bishop and five knight prefer the bishop square farther fro
   for (const transform of SQUARE_TRANSFORMS) {
     const position = transformFen('2k5/8/3K4/3N4/B7/8/8/8 w - - 0 1', transform)
     const move = (from: 'a4' | 'd6', to: 'b5' | 'd7' | 'c6' | 'e7') => getChess(position).move({from: transformSquare(from, transform), to: transformSquare(to, transform)}).san
-    for (const to of ['b5', 'd7', 'c6'] as const) {
+    for (const to of ['b5', 'd7'] as const) {
       const score = scoreKnightAndBishopWhiteMove(position, move('a4', to))
       assert.equal(score.supportedDiagonalSizeScore, 5)
       assert.equal(score.supportedFiveBishopPenalty, to === 'b5' ? 0 : 1)
@@ -262,7 +262,7 @@ test('supported five bishop and five knight prefer the bishop square farther fro
     assert.equal(scoreKnightAndBishopWhiteMove(position, move('d6', 'e7')).supportedDiagonalSizeScore, 99)
     assert.deepEqual(getIdealKnightAndBishopWhiteMoves(position), [move('a4', 'b5')])
     // r2.5 prefers b5, farther from Kd6 than d7 is.
-    const bishopCandidates = ['b5', 'd7', 'c6'].map(to => ({san: move('a4', to as 'b5' | 'd7' | 'c6'), score: scoreKnightAndBishopWhiteMove(position, move('a4', to as 'b5' | 'd7' | 'c6'))}))
+    const bishopCandidates = ['b5', 'd7'].map(to => ({san: move('a4', to as 'b5' | 'd7' | 'c6'), score: scoreKnightAndBishopWhiteMove(position, move('a4', to as 'b5' | 'd7' | 'c6'))}))
     assert.deepEqual(selectIdealMoves(bishopCandidates, [knightAndBishopWhiteRules.find(r => r.id === 'r2.5')!]), [move('a4', 'b5')])
     const candidates = bishopKnightRuleSet.scoreWhiteCandidates!(position, bishopKnightRuleSet.whiteMoves(position))
     const earlier = knightAndBishopWhiteRules.slice(0, knightAndBishopWhiteRules.findIndex(r => r.id === 'r2.5'))

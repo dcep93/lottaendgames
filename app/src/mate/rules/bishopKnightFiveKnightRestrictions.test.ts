@@ -34,7 +34,7 @@ test('five-knight support permits three steps and rejects four after White moves
     for (const [fen, expected] of [
       ['8/k7/3K4/1B1N4/8/8/8/8 b - - 1 1', 5], // Exactly three steps is eligible.
       ['8/1k6/3K4/1B1N4/8/8/8/8 b - - 1 1', 5], // Exactly two steps remains eligible.
-      ['8/8/2B5/k2N4/3K4/8/8/8 b - - 1 1', 5], // Older declared placement is eligible again at three steps.
+      ['8/8/2B5/k2N4/3K4/8/8/8 b - - 1 1', 99], // Bc6 overrides the older declared placement.
       ['8/k3K3/8/1B1N4/8/8/8/8 b - - 1 1', 99], // Four steps still fails.
     ] as const) assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, expected, fen)
   }
@@ -82,14 +82,14 @@ test('Bb5 and Nd5 require bishop adjacency when White king is left of Black', ()
 })
 
 
-test('loaded Nd5 is supported and preferred with the kings three steps apart', () => {
+test('loaded Nd5 cannot restore support while the bishop remains on c6', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const counters of ['0 1', '72 42']) {
       const before = transformFen(`1k6/8/2B5/2K5/1N6/8/8/8 w - - ${counters}`, transform)
       const board = getChess(before)
       const move = board.move({from: transformSquare('b4', transform), to: transformSquare('d5', transform)}).san
-      assert.deepEqual(knightAndBishopSupportedDiagonal(board.fen()), {size: 5, knight: 0})
-      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(before), [move])
+      assert.deepEqual(knightAndBishopSupportedDiagonal(board.fen()), {size: 99, knight: 99})
+      assert.ok(!getIdealKnightAndBishopWhiteMoves(before).includes(move))
     }
   }
 })

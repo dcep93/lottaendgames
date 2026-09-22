@@ -19,7 +19,6 @@ test('Kc5 is supported under the three-step limit and preferred on the approach 
     }
     for (const fen of [
       '3k4/8/8/1BKN4/8/8/8/8 b - - 1 1', // Other three-step placements now qualify without an exception.
-      '2k5/8/2B5/2KN4/8/8/8/8 b - - 1 1', // The same limit applies with Bc6.
     ]) assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 5)
   }
 })

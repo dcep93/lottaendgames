@@ -14,7 +14,7 @@ test('loaded Be8 fails support while the approaching knight requires b5 or its r
       assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [move('d7')])
     }
     for (const fen of [
-      '1k6/8/2B5/2KN4/8/8/8/8 b - - 1 1', // Established five-knight remains eligible with Bc6.
+      '1k6/8/8/1BKN4/8/8/8/8 b - - 1 1', // Established five-knight remains eligible with Bb5.
       '8/1k6/3K4/8/B7/3N4/8/8 b - - 1 1', // Previous-stage Nd3 remains eligible with Ba4.
       '3k4/8/4K3/1B6/5N2/8/8/8 b - - 1 1', // Bb5 permits the approaching Nf4.
     ]) assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 5)

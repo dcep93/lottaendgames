@@ -12,12 +12,12 @@ test('Nd3 five-diagonal support allows same-file kings but rejects White left of
     ]) assert.notEqual(evaluateKnightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 5)
     for (const fen of [
       '8/3B4/1k1K4/8/8/3N4/8/8 b - - 0 1',
-      '8/2k5/2B5/2K5/8/3N4/8/8 b - - 1 1',
+      '8/2k5/8/2K5/B7/3N4/8/8 b - - 1 1',
       '3k4/3B4/3K4/8/8/3N4/8/8 b - - 0 1',
       // An earlier remote-a4 placement still qualifies when White is to the right.
       '8/8/1k6/3K4/B7/3N4/8/8 b - - 0 1',
       // A five knight is not subject to the previous-stage-knight restriction.
-      '3k4/8/1KB5/3N4/8/8/8/8 b - - 0 1',
+      '3k4/8/1K6/1B1N4/8/8/8/8 b - - 0 1',
     ]) assert.equal(evaluateKnightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 5)
   }
 })
@@ -42,17 +42,17 @@ test('Nd3 permits a4 and d7 without adjacency, including older declarations', ()
 })
 
 
-test('the declared position immediately after second-move Bc6 is supported in every reflection', () => {
+test('the former second-move Bc6 support declaration is superseded in every reflection', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const counters of ['2 2', '46 24']) {
       const before = transformFen(`8/8/8/k2K4/B7/3N4/8/8 w - - ${counters}`, transform)
       const board = getChess(before)
       board.move({from: transformSquare('a4', transform), to: transformSquare('c6', transform)})
-      assert.equal(evaluateKnightAndBishopSupportedDiagonal(board.fen()).size, 5)
+      assert.equal(evaluateKnightAndBishopSupportedDiagonal(board.fen()).size, 99)
       const bd7 = getChess(before).move({from: transformSquare('a4', transform), to: transformSquare('d7', transform)}).san
       assert.deepEqual(getIdealKnightAndBishopWhiteMoves(before), [bd7])
     }
-    // This is an exact declaration, not a new general Kd5/Bc6 allowance.
+    // Nearby Bc6 placements are also unsupported.
     const nearby = transformFen('8/8/1kB5/3K4/8/3N4/8/8 b - - 0 1', transform)
     assert.notEqual(evaluateKnightAndBishopSupportedDiagonal(nearby).size, 5)
   }
