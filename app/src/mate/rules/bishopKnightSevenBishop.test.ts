@@ -304,3 +304,13 @@ test('five-bishop distance preference ties symmetrically and follows the farther
     }
   }
 })
+
+
+test('the loaded second Bb5 takes priority over the e7 king approach', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    const fen = transformFen('2k5/8/2BK4/3N4/8/8/8/8 w - - 2 2', transform)
+    const move = getChess(fen).move({from: transformSquare('c6', transform), to: transformSquare('b5', transform)}).san
+    assert.equal(scoreKnightAndBishopWhiteMove(fen, move).supportedDiagonalSizeScore, 5)
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [move])
+  }
+})

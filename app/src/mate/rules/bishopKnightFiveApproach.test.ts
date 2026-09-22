@@ -24,7 +24,7 @@ test('the declared Kc5 placement is supported and preferred on the approach to e
   }
 })
 
-test('five-knight approach uses opposite bishop color then king steps before bishop placement', () => {
+test('five-knight approach uses opposite bishop color then king steps after bishop placement', () => {
   const rule = knightAndBishopWhiteRules.find(rule => rule.id === 'r2.5')!
   for (const transform of SQUARE_TRANSFORMS) {
     for (const black of ['c8', 'd8', 'c7'] as const) {
@@ -40,7 +40,7 @@ test('five-knight approach uses opposite bishop color then king steps before bis
     assert.ok(compareScoresByRules({...score, supportedFiveApproachColorPenalty: 0, supportedFiveApproachDistance: 3},
       {...score, supportedFiveApproachColorPenalty: 1, supportedFiveApproachDistance: 1}, [rule]) < 0)
     assert.ok(compareScoresByRules({...score, supportedFiveApproachDistance: 2, supportedFiveBishopPenalty: 1},
-      {...score, supportedFiveApproachDistance: 3, supportedFiveBishopPenalty: 0}, [rule]) < 0)
+      {...score, supportedFiveApproachDistance: 3, supportedFiveBishopPenalty: 0}, [rule]) > 0)
     assert.deepEqual(knightAndBishopFiveKingApproach(transformFen('k7/8/1K6/1B1N4/8/8/8/8 b - - 1 1', transform)), {color: 0, distance: 0})
   }
 })
