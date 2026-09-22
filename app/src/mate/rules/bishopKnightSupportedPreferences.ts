@@ -24,3 +24,12 @@ const fiveDeclarations = new Map(SQUARE_TRANSFORMS.map(transform => [
 export function declaredSupportedFiveMove(fen: string): string | undefined {
   return fiveDeclarations.get(fen.split(' ').slice(0, 2).join(' '))
 }
+
+const threeDeclarations = new Map(SQUARE_TRANSFORMS.map(transform => [
+  transformFen('8/k7/B1K5/3N4/8/8/8/8 w - - 0 1', transform).split(' ').slice(0, 2).join(' '),
+  transformSquare('c6', transform) + transformSquare('b5', transform),
+] as const))
+
+export function declaredSupportedThreeMove(fen: string): string | undefined {
+  return threeDeclarations.get(fen.split(' ').slice(0, 2).join(' '))
+}

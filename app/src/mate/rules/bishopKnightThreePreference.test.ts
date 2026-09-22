@@ -32,3 +32,25 @@ test('b6 and c7 are equal placements, without a proximity preference for other k
     ] as const) assert.equal(knightAndBishopThreeKingPlacementPenalty(transformFen(fen, transform)), expected)
   }
 })
+
+test('r2.5 declares Kb5 for Kc6 Ba6 Nd5 against Ka7 without bypassing support, including reflections', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    for (const counters of ['0 1', '73 42']) {
+      const fen = transformFen('8/k7/B1K5/3N4/8/8/8/8 w - - ' + counters, transform)
+      const san = (from: 'c6' | 'a6', to: 'b5' | 'c8') => getChess(fen).move({from: transformSquare(from, transform), to: transformSquare(to, transform)}).san
+      const kb5 = san('c6', 'b5'), bc8 = san('a6', 'c8')
+      for (const move of [kb5, bc8]) {
+        const score = scoreKnightAndBishopWhiteMove(fen, move)
+        assert.equal(score.supportedDiagonalSizeScore, 3)
+        assert.equal(score.supportedDiagonalKnightScore, 99)
+        assert.equal(score.declaredSupportedThreePenalty, move === kb5 ? 0 : 1)
+      }
+      const candidates = getChess(fen).moves().map(san => ({san, score: scoreKnightAndBishopWhiteMove(fen, san)}))
+      const earlier = knightAndBishopWhiteRules.slice(0, knightAndBishopWhiteRules.findIndex(rule => rule.id === 'r2.5'))
+      assert.ok(selectIdealMoves(candidates, earlier).includes(kb5))
+      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [kb5])
+    }
+    const nearby = transformFen('k7/8/B1K5/3N4/8/8/8/8 w - - 0 1', transform)
+    for (const san of getChess(nearby).moves()) assert.equal(scoreKnightAndBishopWhiteMove(nearby, san).declaredSupportedThreePenalty, 0)
+  }
+})

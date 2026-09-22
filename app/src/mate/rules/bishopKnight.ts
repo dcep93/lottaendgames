@@ -25,7 +25,7 @@ import {
 } from "./bishopKnightLookup";
 import { knightAndBishopCenterProximityScore, knightAndBishopKingCenterProximityScore, knightAndBishopKnightTargetProximityScore } from "./bishopKnightStrategy";
 import { knightAndBishopDeclaredCornerFlushMove } from "./bishopKnightCornerFlush";
-import { declaredSupportedFiveMove, declaredSupportedSevenMove } from "./bishopKnightSupportedPreferences";
+import { declaredSupportedThreeMove, declaredSupportedFiveMove, declaredSupportedSevenMove } from "./bishopKnightSupportedPreferences";
 import { knightAndBishopDeclaredPreparationMove } from "./bishopKnightPreparation";
 import { knightAndBishopShouldCoordinateKing, knightAndBishopKingCoordinatesMinors } from "./bishopKnightCoordination";
 import { compareScoresByRules, selectIdealMoves } from "./selection";
@@ -51,6 +51,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly supportedThreeCheckScore: number;
   readonly supportedDiagonalSizeScore: number;
   readonly supportedDiagonalKnightScore: number;
+  readonly declaredSupportedThreePenalty: number;
   readonly declaredSupportedFivePenalty: number | undefined;
   readonly declaredSupportedSevenPenalty: number;
   readonly supportedSevenFlushColorPenalty: number;
@@ -138,6 +139,7 @@ type KnightAndBishopPositionScoreContext = {
   readonly shouldDefendKnight: boolean;
   readonly declaredCornerFlushMove: string | undefined;
   readonly declaredPreparationMove: string | undefined;
+  readonly declaredSupportedThreeMove: string | undefined;
   readonly declaredSupportedFiveMove: string | undefined;
   readonly declaredSupportedSevenMove: string | undefined;
   readonly shouldCheckThreeDiagonal: boolean;
@@ -174,6 +176,7 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
     shouldCoordinateKing: knightAndBishopShouldCoordinateKing(fen),
     declaredCornerFlushMove: knightAndBishopDeclaredCornerFlushMove(fen),
     declaredPreparationMove: knightAndBishopDeclaredPreparationMove(fen),
+    declaredSupportedThreeMove: declaredSupportedThreeMove(fen),
     declaredSupportedFiveMove: declaredSupportedFiveMove(fen),
     declaredSupportedSevenMove: declaredSupportedSevenMove(fen),
     get shouldCheckThreeDiagonal() { return shouldCheckThreeDiagonal ??= knightAndBishopShouldCheckThreeDiagonal(fen); },
@@ -267,6 +270,7 @@ function scoreKnightAndBishopWhiteMoveCore(
       const support = supportedDiagonal ??= evaluateKnightAndBishopSupportedDiagonal(resultFen, blackReplies.map(move => move.to));
       return support.size === 7 ? support.sevenKingTieDistance ?? 0 : 0;
     },
+    declaredSupportedThreePenalty: context.declaredSupportedThreeMove && context.declaredSupportedThreeMove !== move.from + move.to ? 1 : 0,
     declaredSupportedFivePenalty: context.declaredSupportedFiveMove === undefined ? undefined
       : context.declaredSupportedFiveMove === move.from + move.to ? 0 : 1,
     declaredSupportedSevenPenalty: context.declaredSupportedSevenMove && context.declaredSupportedSevenMove !== move.from + move.to ? 1 : 0,
@@ -353,6 +357,7 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       applies: score => score.supportedDiagonalSizeScore === 7 ||
         score.supportedDiagonalSizeScore === 5 || score.supportedDiagonalSizeScore === 3,
       subpriorities: [
+        { compare: (first, second) => (first.supportedDiagonalSizeScore === 3 ? first.declaredSupportedThreePenalty : 0) - (second.supportedDiagonalSizeScore === 3 ? second.declaredSupportedThreePenalty : 0) },
         { compare: (first, second) => (first.declaredSupportedFivePenalty ?? 0) - (second.declaredSupportedFivePenalty ?? 0) },
         { compare: (first, second) => (first.supportedDiagonalSizeScore === 7 ? first.declaredSupportedSevenPenalty : 0) - (second.supportedDiagonalSizeScore === 7 ? second.declaredSupportedSevenPenalty : 0) },
         { compare: (first, second) => first.supportedThreeKingPlacementPenalty - second.supportedThreeKingPlacementPenalty },
@@ -596,7 +601,7 @@ const bishopKnightHelp: RuleHelp = {
     "Exact placement exception: White Ke7, Bc6 and Nb4 against Black Kc7 is a supported five-diagonal, overriding the attacked-bishop restriction. Include reflections; move counters do not matter.",
     "Exact placement exception: White Kd4, Bc6 and Nb4 against Black Kb6 is a supported five-diagonal, overriding the knight-only bishop defense and king boundary restrictions. Include reflections; move counters do not matter.",
     "r5 exact preference: White Kd5, Bd7 and Nd3 against Black Kb6 prefers Kd6. Include reflections; r1.5 remains higher priority.",
-    "r2.5 exact preferences: White Kd6, Bd7 and Nd3 against Black Ka5 prefers Kc5. With Bb3 and Nd3, White Kc7 against Black Ka5 prefers Kc6, and White Kc6 against Black Ka6 prefers Kc5. White Kd6, Bb3 and Nd3 against Black Kb5 prefers Kd5. White Kf7 or Kf8, Bb3 and Nd3 against Black Kd6 prefers Ke8, before its general bishop and king-target preferences. Include reflections; move counters do not matter. r1.5 remains higher priority.",
+    "r2.5 exact preferences: White Kc6, Ba6 and Nd5 against Black Ka7 prefers Kb5. White Kd6, Bd7 and Nd3 against Black Ka5 prefers Kc5. With Bb3 and Nd3, White Kc7 against Black Ka5 prefers Kc6, and White Kc6 against Black Ka6 prefers Kc5. White Kd6, Bb3 and Nd3 against Black Kb5 prefers Kd5. White Kf7 or Kf8, Bb3 and Nd3 against Black Kd6 prefers Ke8, before its general bishop and king-target preferences. Include reflections; move counters do not matter. r1.5 remains higher priority.",
     "Exact unsupported placement: White Kg4, Bf1 and Ne2 against Black Kh2 is not a supported three-diagonal. Include reflections; move counters do not matter.",
     "Exact unsupported placement: White Kb5, Bc8 and Nc6 against Black Ka7 is not a supported three-diagonal. Include reflections; move counters do not matter.",
     "Exact supported five-diagonal placement: White Kd5, Ba4 and Nd3 against Black Kb6; White Kd5, Bd7 and Nd3 against Black Ka5. Include reflections; move counters do not matter.",
