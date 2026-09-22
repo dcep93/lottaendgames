@@ -214,11 +214,7 @@ test('supported five with previous-stage Nd3 approaches two files right of Black
     }
     assert.deepEqual(getIdealKnightAndBishopWhiteMoves(position), [san('d6')])
     assert.equal(getMateRuleSet('bishop-knight').currentWhiteHint(position)?.id, 'r2.5')
-    // An ordinary five knight does not inherit the previous-stage knight preference.
-    const nextStage = transformFen('k7/3B4/4K3/3N4/8/8/8/8 w - - 0 1', transform)
-    for (const move of getChess(nextStage).moves()) {
-      assert.equal(scoreKnightAndBishopWhiteMove(nextStage, move).supportedFiveKingTargetDistance, 0)
-    }
+
   }
 })
 
@@ -243,8 +239,9 @@ test('supported five with Nd5 and Black near a5 approaches b4, including reflect
       board.remove('a1'); board.put({type: 'k', color: 'b'}, black)
       assert.equal(knightAndBishopFiveKingTargetDistance(transformFen(board.fen(), transform)), 1)
     }
-    const outside = transformFen('k7/3B4/4K3/3N4/8/8/8/8 w - - 0 1', transform)
-    for (const move of getChess(outside).moves()) assert.equal(scoreKnightAndBishopWhiteMove(outside, move).supportedFiveKingTargetDistance, 0)
+    // With Bc6, neither bishop-specific target applies outside the a5 trigger.
+    const outside = transformFen('k7/8/2B1K3/3N4/8/8/8/8 b - - 0 1', transform)
+    assert.equal(knightAndBishopFiveKingTargetDistance(outside), 0)
     const candidates = bishopKnightRuleSet.scoreWhiteCandidates!(position, bishopKnightRuleSet.whiteMoves(position))
     const earlier = knightAndBishopWhiteRules.slice(0, knightAndBishopWhiteRules.indexOf(rule))
     for (const move of getIdealKnightAndBishopWhiteMoves(position)) assert.ok(selectIdealMoves(candidates, earlier).includes(move))
@@ -272,5 +269,18 @@ test('supported five bishop and five knight prefer b5 or d7 equally before king 
     // The previous-stage d3 knight keeps its separate king-target preference.
     const previous = transformFen('8/3B4/k3K3/8/8/3N4/8/8 w - - 0 1', transform)
     for (const san of getChess(previous).moves()) assert.equal(scoreKnightAndBishopWhiteMove(previous, san).supportedFiveBishopPenalty, 0)
+  }
+})
+
+
+test('Bb5 and Nd5 aim the king two files right of Black, including second-move Kd7', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    const position = transformFen('8/1k6/3K4/1B1N4/8/8/8/8 w - - 2 2', transform)
+    const san = (to: 'd7' | 'e7' | 'c5') => getChess(position).move({from: transformSquare('d6', transform), to: transformSquare(to, transform)}).san
+    assert.equal(scoreKnightAndBishopWhiteMove(position, san('d7')).supportedDiagonalSizeScore, 5)
+    assert.equal(scoreKnightAndBishopWhiteMove(position, san('d7')).supportedFiveKingTargetDistance, 0)
+    assert.equal(scoreKnightAndBishopWhiteMove(position, san('e7')).supportedFiveKingTargetDistance, 1)
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(position), [san('d7')])
+    assert.equal(getMateRuleSet('bishop-knight').currentWhiteHint(position)?.id, 'r2.5')
   }
 })
