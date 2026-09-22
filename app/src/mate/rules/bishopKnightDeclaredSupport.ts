@@ -46,3 +46,15 @@ export function isDeclaredInsideThreeSupport(king: Square, bishop: Square, black
   return KING_PROTECTED_EDGE_BISHOP.some(placement => placement.king === king && placement.bishop === bishop &&
     isInsideBishopDiagonal(black, placement.wall))
 }
+
+const KING_PROTECTED_CHECKING_BISHOP = SQUARE_TRANSFORMS.map(transform => ({
+  king: transformSquare('b6', transform),
+  bishop: transformSquare('b7', transform),
+  black: transformSquare('a8', transform),
+}))
+
+/** The checking placement qualifies when the knight is within one move of current support. */
+export function isDeclaredCheckingThreePlacement(king: Square, bishop: Square, black: Square): boolean {
+  return KING_PROTECTED_CHECKING_BISHOP.some(placement =>
+    placement.king === king && placement.bishop === bishop && placement.black === black)
+}

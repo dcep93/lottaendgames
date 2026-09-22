@@ -1,6 +1,6 @@
 import type { Square } from 'chess.js'
 import { isInsideBishopDiagonal } from './bishopKnightGeometry'
-import { isDeclaredCornerSupportWithoutKnightTarget, isDeclaredInsideThreeSupport, isRecordedSupportedCornerPosition } from './bishopKnightDeclaredSupport'
+import { isDeclaredCheckingThreePlacement, isDeclaredCornerSupportWithoutKnightTarget, isDeclaredInsideThreeSupport, isRecordedSupportedCornerPosition } from './bishopKnightDeclaredSupport'
 import { knightAndBishopKnightProximityToSquare } from './bishopKnightStrategy'
 import { allSquares, edgeDistance, getChess, findPiece, kingDistance, squaredEuclideanDistance, squareColor, squareCoords, squareFromCoordinates, SQUARE_TRANSFORMS, transformSquare } from '../chess'
 
@@ -265,6 +265,16 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
     size: 3,
     knight: Math.min(...DIAGONALS.filter(pattern => pattern.wall.length === 3 && pattern.wall.includes(bishop.square))
       .map(pattern => supportDistance(fen, white.square, pattern))),
+  }
+  // A king-protected Bb7+ remains supported even with an edge knight approaching c6/d7.
+  if (isDeclaredCheckingThreePlacement(white.square, bishop.square, black.square)) {
+    const checkingPatterns = DIAGONALS.filter(pattern => pattern.wall.length === 3 &&
+      pattern.wall.includes(bishop.square) && isInsideBishopDiagonal(black.square, pattern.wall) &&
+      knightWithinOneOfAvailableSupport(fen, white.square, pattern))
+    if (checkingPatterns.length) return {
+      size: 3,
+      knight: Math.min(...checkingPatterns.map(pattern => supportDistance(fen, white.square, pattern))),
+    }
   }
   // Explicit Kb5 placements waive the otherwise absent target, without creating one.
   // No three-diagonal target exists at Kb5, so do not invent a knight-distance preference.

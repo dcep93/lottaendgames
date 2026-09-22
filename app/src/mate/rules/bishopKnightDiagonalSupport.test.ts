@@ -990,3 +990,26 @@ test('Ba6 Kb6 supports every knight only with Black inside the three-diagonal, i
     assert.ok(knightAndBishopSupportedDiagonal(target).knight < 99, 'real knight targets remain available')
   }
 })
+
+
+test('Bb7+ with Kb6 is supported and preferred by r1 with Na7 one move from c6', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    for (const counters of ['2 2', '51 28']) {
+      const before = transformFen(`k7/N7/BK6/8/8/8/8/8 w - - ${counters}`, transform)
+      const board = getChess(before)
+      const move = board.move({from: transformSquare('a6', transform), to: transformSquare('b7', transform)}).san
+      assert.ok(board.isCheck())
+      assert.deepEqual(knightAndBishopSupportedDiagonal(board.fen()), {size: 3, knight: 1})
+      assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedThreeCheckScore, 0)
+      assert.equal(scoreKnightAndBishopWhiteMove(before, getChess(before).move({
+        from: transformSquare('a7', transform), to: transformSquare('b5', transform),
+      }).san).supportedThreeCheckScore, 1)
+      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(before), [move])
+    }
+    for (const position of [
+      'k7/1B6/1K6/8/8/8/8/N7 b - - 3 2', // Knight too far from current support.
+      '1k6/NB6/1K6/8/8/8/8/8 b - - 3 2', // Bishop does not check.
+      'k7/NB6/8/2K5/8/8/8/8 b - - 3 2', // King is not on the declared square.
+    ]) assert.equal(knightAndBishopSupportedDiagonal(transformFen(position, transform)).size, 99)
+  }
+})
