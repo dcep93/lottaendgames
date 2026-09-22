@@ -106,7 +106,7 @@ test('r10 routes diagonally beside a central bishop off the long diagonal after 
       assert.deepEqual(knightAndBishopKnightTargetSquares(fen).sort(), (['d6'] as const).map(square => transformSquare(square, transform)).sort())
       assert.equal(knightAndBishopKnightTargetProximityScore(fen), distance)
     }
-    const fen = transformFen('8/2N5/7k/3KB3/8/8/8/8 w - - 0 1', transform)
+    const fen = transformFen('8/2N5/6k1/3KB3/8/8/8/8 w - - 0 1', transform)
     const wall = getChess(fen).move({from: transformSquare('e5', transform), to: transformSquare('f6', transform)}).san
     assert.equal(scoreKnightAndBishopWhiteMove(fen, wall).supportedDiagonalSizeScore, 99)
     const routes = (['e6', 'b5'] as const).map(to => getChess(fen).move({from: transformSquare('c7', transform), to: transformSquare(to, transform)}).san)
