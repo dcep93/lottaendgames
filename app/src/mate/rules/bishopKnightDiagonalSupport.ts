@@ -1,6 +1,6 @@
 import type { Square } from 'chess.js'
 import { isInsideBishopDiagonal } from './bishopKnightGeometry'
-import { isRecordedSupportedCornerPosition, isRecordedSupportedFiveKingDefense, recordedCornerKnightTarget } from './bishopKnightDeclaredSupport'
+import { isRecordedSupportedCornerPosition, isRecordedSupportedFiveKingDefense } from './bishopKnightDeclaredSupport'
 import { knightAndBishopKnightProximityToSquare } from './bishopKnightStrategy'
 import { allSquares, getChess, findPiece, kingDistance, squaredEuclideanDistance, squareColor, squareCoords, squareFromCoordinates, SQUARE_TRANSFORMS, transformSquare } from '../chess'
 
@@ -24,7 +24,6 @@ const CANONICAL_DIAGONALS: readonly {
     support: ['b5', 'c6'],
     kingSupportTargets: [
       {king: 'c7', targets: ['b5', 'c6']},
-      {king: 'd7', targets: ['b5', 'c6']},
     ],
   },
   {
@@ -177,23 +176,21 @@ function hasExposedFiveBishopApproach(fen: string, bishop: Square, black: Square
   })
 }
 
-function supportTargets(fen: string, whiteKing: Square, pattern: typeof DIAGONALS[number]): readonly Square[] {
-  const recordedTarget = pattern.wall.length === 3 ? recordedCornerKnightTarget(fen) : undefined
-  if (recordedTarget) return [recordedTarget]
+function supportTargets(whiteKing: Square, pattern: typeof DIAGONALS[number]): readonly Square[] {
   return pattern.kingSupportTargets
     ? pattern.kingSupportTargets.find(entry => entry.king === whiteKing)?.targets ?? []
     : pattern.support
 }
 
 function supportDistance(fen: string, whiteKing: Square, pattern: typeof DIAGONALS[number]): number {
-  const targets = supportTargets(fen, whiteKing, pattern)
+  const targets = supportTargets(whiteKing, pattern)
   return targets.length ? Math.min(...targets.map(square => knightAndBishopKnightProximityToSquare(fen, square))) : 99
 }
 
 /** A one-move destination must be empty; the knight already occupying it still qualifies. */
 function knightWithinOneOfAvailableSupport(fen: string, whiteKing: Square, pattern: typeof DIAGONALS[number]): boolean {
   const board = getChess(fen)
-  return supportTargets(fen, whiteKing, pattern).some(square => {
+  return supportTargets(whiteKing, pattern).some(square => {
     const distance = knightAndBishopKnightProximityToSquare(fen, square)
     return distance === 0 || (distance === 1 && !board.get(square))
   })
@@ -284,7 +281,13 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
   // A king on the other endpoint does not support this edge bishop.
   if (UNSUPPORTED_THREE_ENDPOINTS.some(pattern =>
     pattern.bishop === bishop.square && pattern.king === white.square)) return {size: 99, knight: 99}
-  if (isRecordedSupportedCornerPosition(fen)) return {
+  // Without a three-diagonal target, only its previous-stage knight can establish support.
+  // Apply this before older exact placements, which cannot restore a removed target.
+  const threePatterns = DIAGONALS.filter(pattern => pattern.wall.length === 3 &&
+    pattern.wall.includes(bishop.square))
+  const unavailableThreeTarget = threePatterns.length > 0 && !threePatterns.some(pattern =>
+    knight.square === pattern.previousSupport || supportTargets(white.square, pattern).length > 0)
+  if (!unavailableThreeTarget && isRecordedSupportedCornerPosition(fen)) return {
     size: 3,
     knight: Math.min(...DIAGONALS.filter(pattern => pattern.wall.length === 3 && pattern.wall.includes(bishop.square))
       .map(pattern => supportDistance(fen, white.square, pattern))),
@@ -295,7 +298,7 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
   const excludedFive = previousFivePlacementRejected || UNSUPPORTED_FIVE_ARRANGEMENTS.some(pattern =>
     pattern.king === white.square && pattern.bishop === bishop.square && pattern.black === black.square) ||
     hasExposedFiveBishopApproach(fen, bishop.square, black.square, blackDestinations)
-  const excludedThree = UNSUPPORTED_THREE_KNIGHTS.some(pattern =>
+  const excludedThree = unavailableThreeTarget || UNSUPPORTED_THREE_KNIGHTS.some(pattern =>
     pattern.bishop === bishop.square && pattern.knights.includes(knight.square)) ||
     THREE_BISHOP_RACES.some(pattern => pattern.bishop === bishop.square &&
       squaredEuclideanDistance(knight.square, pattern.target) !== 5 &&

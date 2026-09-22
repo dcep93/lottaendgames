@@ -32,7 +32,7 @@ test('Ba6 accepts Kc6 but rejects Kc5 beyond the five-diagonal, including reflec
     const fen = transformFen('k7/8/2K5/1B1N4/8/8/8/8 w - - 2 2', transform)
     const san = getChess(fen).move({from: transformSquare('b5', transform), to: transformSquare('a6', transform)}).san
     assert.equal(scoreKnightAndBishopWhiteMove(fen, san).supportedDiagonalSizeScore, 3)
-    // Adjacency supplies king support even with a remote knight.
-    assert.equal(knightAndBishopSupportedDiagonal(transformFen('k7/8/B1K5/8/8/8/7N/8 b - - 0 1', transform)).size, 3)
+    // A remote knight cannot qualify while Kc6 has no target.
+    assert.equal(knightAndBishopSupportedDiagonal(transformFen('k7/8/B1K5/8/8/8/7N/8 b - - 0 1', transform)).size, 99)
   }
 })

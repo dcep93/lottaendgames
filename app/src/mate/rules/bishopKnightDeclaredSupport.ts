@@ -13,18 +13,6 @@ export function isRecordedSupportedCornerPosition(fen: string): boolean {
   return SUPPORTED_RESULTS.has(fen.split(' ').slice(0, 2).join(' '))
 }
 
-// Keep c6 as the target through the recorded Nb7–a5 move, without changing other setups.
-const KNIGHT_TARGETS = new Map([
-  '1k6/1N6/B1K5/8/8/8/8/8 w - - 0 1',
-  '1k6/8/B1K5/N7/8/8/8/8 b - - 0 1',
-].flatMap(fen => SQUARE_TRANSFORMS.map(transform => [
-  transformFen(fen, transform).split(' ')[0], transformSquare('c6', transform),
-] as const)))
-
-export function recordedCornerKnightTarget(fen: string) {
-  return KNIGHT_TARGETS.get(fen.split(' ')[0])
-}
-
 const FIVE_KING_DEFENSE = SQUARE_TRANSFORMS.map(transform => ({
   bishop: transformSquare('c6', transform),
   black: transformSquare('c7', transform),

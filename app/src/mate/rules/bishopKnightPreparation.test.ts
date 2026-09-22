@@ -416,7 +416,7 @@ test('r5 selects Nd4 after the unsupported Bf1 placement is excluded, without ov
     const rejected = getChess(fen).move({from: transformSquare('h3', transform), to: transformSquare('f1', transform)}).san
     assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [expected])
     assert.equal(getMateRuleSet('bishop-knight').currentWhiteHint(fen)?.id, 'r5')
-    assert.equal(getMateRuleSet('bishop-knight').explainWhiteMove(fen, rejected)?.id, 'r1.5')
+    assert.equal(getMateRuleSet('bishop-knight').explainWhiteMove(fen, rejected)?.id, 'r5')
   }
 })
 
@@ -434,10 +434,10 @@ test('r5 selects loaded 1. Bf1 from Kf3 Bg2 Ne3 against Kh2 in every reflection'
 test('the declared Bf1 line reaches mate using best moves', () => {
   const board = getChess('8/8/8/8/8/4NK2/6Bk/8 w - - 0 1')
   const history: string[] = []
-  for (const san of ['Bf1', 'Kg1', 'Ke2', 'Kh2', 'Kf2', 'Kh1', 'Bg2+', 'Kh2', 'Ng4#']) {
+  for (const san of ['Bf1', 'Kg1', 'Kg3', 'Kh1', 'Kf2', 'Kh2', 'Ng4+', 'Kh1', 'Bg2#']) {
     const before = board.fen()
     if (board.turn() === 'w') {
-      assert.ok(getIdealKnightAndBishopWhiteMoves(before).includes(san))
+      assert.ok(getIdealKnightAndBishopWhiteMoves(before).includes(san), san + ': ' + getIdealKnightAndBishopWhiteMoves(before).join(','))
       history.push(before)
     } else {
       assert.ok(getKnightAndBishopOpponentCandidates(before, history.at(-2)).idealMoves.includes(san))

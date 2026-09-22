@@ -26,7 +26,7 @@ test('r1 checks from king-supported three-diagonals one knight move from the tar
     }
     const d7Target = transformFen('k1B5/3K4/8/3N4/8/8/8/8 w - - 0 1', transform)
     const d7Waiting = getChess(d7Target).move({from: transformSquare('c8', transform), to: transformSquare('a6', transform)}).san
-    // Kd7 keeps b5/c6 as targets: Nd5 is two moves away, so r1 does not trigger.
+    // Kd7 has no three-diagonal target, so r1 does not trigger.
     assert.equal(scoreKnightAndBishopWhiteMove(d7Target, d7Waiting).supportedThreeCheckScore, 0)
     const onTarget = transformFen('k1B5/2K5/8/1N6/8/8/8/8 w - - 0 1', transform)
     for (const san of getChess(onTarget).moves()) {

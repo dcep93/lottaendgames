@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess'
+import { getChess, SQUARE_TRANSFORMS, transformFen } from '../chess'
 import { knightAndBishopSupportedDiagonal } from './bishopKnightDiagonalSupport'
-import { isRecordedSupportedCornerPosition, isRecordedSupportedFiveKingDefense, recordedCornerKnightTarget } from './bishopKnightDeclaredSupport'
+import { isRecordedSupportedCornerPosition, isRecordedSupportedFiveKingDefense } from './bishopKnightDeclaredSupport'
 
-test('declared three-diagonal support survives the preference cull, including reflections', () => {
+test('older exact three support requires the newly eligible king placements, including reflections', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const fen of [
       '1kB5/8/1K1N4/8/8/8/8/8 b - - 42 23',
@@ -15,20 +15,10 @@ test('declared three-diagonal support survives the preference cull, including re
       const reflected = transformFen(fen, transform)
       assert.equal(isRecordedSupportedCornerPosition(reflected), true)
       assert.equal(isRecordedSupportedCornerPosition(reflected.replace(' b ', ' w ')), false)
-      assert.equal(knightAndBishopSupportedDiagonal(reflected).size, 3)
+      assert.equal(knightAndBishopSupportedDiagonal(reflected).size, fen.includes('B1K5') ? 99 : 3)
     }
     assert.equal(isRecordedSupportedCornerPosition(transformFen('1k6/1N6/B1K5/8/8/8/8/8 b - - 0 1', transform)), false)
     assert.equal(knightAndBishopSupportedDiagonal(transformFen('1kB5/8/3N4/1K6/8/8/8/8 b - - 0 1', transform)).size, 99)
-  }
-})
-
-test('the recorded Nb7-a5 support target remains c6 without preferring the move', () => {
-  for (const transform of SQUARE_TRANSFORMS) {
-    for (const fen of [
-      '1k6/1N6/B1K5/8/8/8/8/8 w - - 0 1',
-      '1k6/8/B1K5/N7/8/8/8/8 b - - 0 1',
-    ]) assert.equal(recordedCornerKnightTarget(transformFen(fen, transform)), transformSquare('c6', transform))
-    assert.equal(recordedCornerKnightTarget(transformFen('k7/1N6/B1K5/8/8/8/8/8 w - - 0 1', transform)), undefined)
   }
 })
 

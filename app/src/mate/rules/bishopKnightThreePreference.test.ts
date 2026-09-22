@@ -11,9 +11,9 @@ test('supported three prefers 2. Kb6, with support filtering intact in all refle
     const san = (to: 'b6' | 'c6') => getChess(fen).move({from: transformSquare('b5', transform), to: transformSquare(to, transform)}).san
     for (const to of ['b6', 'c6'] as const) {
       const score = scoreKnightAndBishopWhiteMove(fen, san(to))
-      assert.equal(score.supportedDiagonalSizeScore, 3)
-      assert.equal(score.supportedDiagonalKnightScore, 1)
-      assert.equal(score.supportedThreeKingPlacementPenalty, to === 'b6' ? 0 : 1)
+      assert.equal(score.supportedDiagonalSizeScore, to === 'b6' ? 3 : 99)
+      assert.equal(score.supportedDiagonalKnightScore, to === 'b6' ? 1 : 99)
+      assert.equal(score.supportedThreeKingPlacementPenalty, 0)
     }
     const candidates = getChess(fen).moves().map(san => ({san, score: scoreKnightAndBishopWhiteMove(fen, san)}))
     const earlier = knightAndBishopWhiteRules.slice(0, knightAndBishopWhiteRules.findIndex(rule => rule.id === 'r2.5'))
