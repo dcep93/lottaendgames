@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { SQUARE_TRANSFORMS, transformFen } from '../chess'
+import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess'
 import { evaluateKnightAndBishopSupportedDiagonal } from './bishopKnightDiagonalSupport'
+import { getIdealKnightAndBishopWhiteMoves } from './bishopKnight'
 
 test('Nd3 five-diagonal support requires the White king strictly right of Black after White moves', () => {
   for (const transform of SQUARE_TRANSFORMS) {
@@ -38,5 +39,21 @@ test('Nd3 requires the five bishop on a4 or adjacent to White, even for older de
       // Actual five knights retain their existing support classification.
       '8/1k1B4/8/2KN4/8/8/8/8 b - - 0 1',
     ]) assert.equal(evaluateKnightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 5)
+  }
+})
+
+
+test('the declared position immediately after second-move Bc6 is supported in every reflection', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    for (const counters of ['2 2', '46 24']) {
+      const before = transformFen(`8/8/8/k2K4/B7/3N4/8/8 w - - ${counters}`, transform)
+      const board = getChess(before)
+      const move = board.move({from: transformSquare('a4', transform), to: transformSquare('c6', transform)}).san
+      assert.equal(evaluateKnightAndBishopSupportedDiagonal(board.fen()).size, 5)
+      assert.ok(getIdealKnightAndBishopWhiteMoves(before).includes(move))
+    }
+    // This is an exact declaration, not a new general Kd5/Bc6 allowance.
+    const nearby = transformFen('8/8/1kB5/3K4/8/3N4/8/8 b - - 0 1', transform)
+    assert.notEqual(evaluateKnightAndBishopSupportedDiagonal(nearby).size, 5)
   }
 })

@@ -117,6 +117,7 @@ const THREE_BISHOP_RACES = SQUARE_TRANSFORMS.map(transform => ({
 }))
 
 const DECLARED_FIVE_SUPPORT = [
+  {king: 'd5', bishop: 'c6', knight: 'd3', black: 'a5'},
   {king: 'd5', bishop: 'd7', knight: 'd3', black: 'a5'},
   {king: 'd5', bishop: 'a4', knight: 'd3', black: 'b6'},
   {king: 'e7', bishop: 'c6', knight: 'b4', black: 'c7'},
