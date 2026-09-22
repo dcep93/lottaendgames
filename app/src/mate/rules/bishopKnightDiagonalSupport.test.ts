@@ -100,7 +100,7 @@ test('Kd6 supports Bd7 with Nd3 and breaks the loaded Ba4–Bb3 shuttle', () => 
   }
 })
 
-test('Nd3 five support uses declared king placements or nearby kings with Bd7, including reflections', () => {
+test('Nd3 five support combines right-side kings with declared placements or nearby Bd7 kings', () => {
   for (const bishop of ['a4', 'b5', 'c6', 'd7', 'e8'] as const) {
     for (const king of allSquares()) {
       if (king === bishop || king === 'd3' || kingDistance(king, 'a7') <= 1) continue
@@ -110,7 +110,7 @@ test('Nd3 five support uses declared king placements or nearby kings with Bd7, i
       board.put({type: 'b', color: 'w'}, bishop)
       for (const transform of SQUARE_TRANSFORMS) {
         assert.equal(knightAndBishopSupportedDiagonal(transformFen(board.fen(), transform)).size,
-          (['a4', 'c6', 'd7'].includes(bishop) && ['c5', 'c6', 'c7'].includes(king)) || (['a4', 'd7'].includes(bishop) && king === 'd6') || (bishop === 'd7' && kingDistance(king, 'a7') <= 2) ? 5 : 99, `${king}, ${bishop}, ${transform.name}`)
+          king[0] > 'a' && ((['a4', 'c6', 'd7'].includes(bishop) && ['c5', 'c6', 'c7'].includes(king)) || (['a4', 'd7'].includes(bishop) && king === 'd6') || (bishop === 'd7' && kingDistance(king, 'a7') <= 2)) ? 5 : 99, `${king}, ${bishop}, ${transform.name}`)
       }
     }
   }

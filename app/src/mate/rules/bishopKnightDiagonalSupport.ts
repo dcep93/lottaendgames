@@ -262,11 +262,18 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
   if (DECLARED_UNSUPPORTED_REFLECTIONS.some(pattern =>
     pattern.king === white.square && pattern.bishop === bishop.square &&
     pattern.knight === knight.square && pattern.black === black.square)) return {size: 99, knight: 99}
-  if (isRecordedSupportedFiveKingDefense(fen)) return {size: 5, knight: 1}
+  // The previous-stage knight fixes the orientation of this strict five-diagonal condition.
+  const whiteCoordinates = squareCoords(white.square)
+  const blackCoordinatesForSupport = squareCoords(black.square)
+  const previousFiveKingWrongSide = DIAGONALS.some(pattern => pattern.wall.length === 5 &&
+    pattern.previousSupport === knight.square && pattern.wall.includes(bishop.square) &&
+    (whiteCoordinates.file - blackCoordinatesForSupport.file) * pattern.rightOffset.file +
+      (whiteCoordinates.rank - blackCoordinatesForSupport.rank) * pattern.rightOffset.rank <= 0)
+  if (!previousFiveKingWrongSide && isRecordedSupportedFiveKingDefense(fen)) return {size: 5, knight: 1}
   const declaredFive = DECLARED_FIVE_PLACEMENTS.find(pattern =>
     pattern.king === white.square && pattern.bishop === bishop.square &&
     pattern.knight === knight.square && pattern.black === black.square)
-  if (declaredFive) return {
+  if (declaredFive && !previousFiveKingWrongSide) return {
     size: 5,
     knight: knightAndBishopKnightProximityToSquare(fen, declaredFive.support),
   }
@@ -281,7 +288,7 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
   if (kingDistance(black.square, bishop.square) === 1 &&
     kingDistance(white.square, bishop.square) > 1 &&
     squaredEuclideanDistance(knight.square, bishop.square) === 5) return {size: 99, knight: 99}
-  const excludedFive = UNSUPPORTED_FIVE_ARRANGEMENTS.some(pattern =>
+  const excludedFive = previousFiveKingWrongSide || UNSUPPORTED_FIVE_ARRANGEMENTS.some(pattern =>
     pattern.king === white.square && pattern.bishop === bishop.square && pattern.black === black.square) ||
     hasExposedFiveBishopApproach(fen, bishop.square, black.square, blackDestinations)
   const excludedThree = UNSUPPORTED_THREE_KNIGHTS.some(pattern =>
