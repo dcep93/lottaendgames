@@ -287,7 +287,10 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
     pattern.support.includes(knight.square) && pattern.wall.includes(bishop.square) &&
     (kingDistance(white.square, black.square) > 2 ||
       (squareColor(white.square) === squareColor(bishop.square) && !fiveKingColorException) ||
-      bishop.square === pattern.fiveRemoteBishop))
+      bishop.square === pattern.fiveRemoteBishop ||
+      (bishop.square === pattern.fiveRightTargetBishop && kingDistance(white.square, bishop.square) > 1 &&
+        (whiteCoordinates.file - blackCoordinatesForSupport.file) * pattern.rightOffset.file +
+        (whiteCoordinates.rank - blackCoordinatesForSupport.rank) * pattern.rightOffset.rank < 0)))
   const fivePlacementRejected = previousFivePlacementRejected || currentFivePlacementRejected
   if (!fivePlacementRejected && isRecordedSupportedFiveKingDefense(fen)) return {size: 5, knight: 1}
   const declaredFive = DECLARED_FIVE_PLACEMENTS.find(pattern =>

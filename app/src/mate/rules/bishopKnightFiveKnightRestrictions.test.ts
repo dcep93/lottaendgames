@@ -58,3 +58,24 @@ test('declared Kd7 with Bb5 Nd5 against Kb7 supports five despite the king color
     ]) assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 99, fen)
   }
 })
+
+
+test('Bb5 and Nd5 require bishop adjacency when White king is left of Black', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    for (const counters of ['2 2', '72 42']) {
+      const before = transformFen(`2k5/8/1K6/1B1N4/8/8/8/8 w - - ${counters}`, transform)
+      for (const to of ['a7', 'c5'] as const) {
+        const board = getChess(before)
+        const move = board.move({from: transformSquare('b6', transform), to: transformSquare(to, transform)}).san
+        // Ka7 is left and remote from Bb5; Kc5 instead fails the three-step king gap.
+        assert.equal(knightAndBishopSupportedDiagonal(board.fen()).size, 99)
+        assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 99)
+      }
+    }
+    for (const fen of [
+      '2k5/8/1K6/1B1N4/8/8/8/8 b - - 1 1', // Left but bishop-adjacent.
+      '2k5/4K3/8/1B1N4/8/8/8/8 b - - 1 1', // Right and within two king steps; no adjacency required.
+      '8/1k1K4/8/1B1N4/8/8/8/8 b - - 1 1', // The declared Kd7 exception still works.
+    ]) assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 5, fen)
+  }
+})
