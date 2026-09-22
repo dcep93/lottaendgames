@@ -195,8 +195,28 @@ test('r2.5 prescribes second-move Kc5 on the supported five diagonal without ove
       const score = scoreKnightAndBishopWhiteMove(nearby, move)
       assert.equal(score.declaredSupportedFivePenalty, undefined)
       if (score.supportedDiagonalSizeScore === 5) {
-        assert.equal(knightAndBishopWhiteRules.find(r => r.id === 'r2.5')!.applies!(score), false)
+        assert.equal(knightAndBishopWhiteRules.find(r => r.id === 'r2.5')!.applies!(score), true)
       }
+    }
+  }
+})
+
+
+test('supported five with previous-stage Nd3 approaches two files right of Black', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    const position = transformFen('8/3B4/1k2K3/8/8/3N4/8/8 w - - 0 1', transform)
+    const san = (to: 'd6' | 'd5') => getChess(position).move({from: transformSquare('e6', transform), to: transformSquare(to, transform)}).san
+    for (const [to, distance] of [['d6', 0], ['d5', 1]] as const) {
+      const score = scoreKnightAndBishopWhiteMove(position, san(to))
+      assert.equal(score.supportedDiagonalSizeScore, 5)
+      assert.equal(score.supportedFiveKingTargetDistance, distance)
+    }
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(position), [san('d6')])
+    assert.equal(getMateRuleSet('bishop-knight').currentWhiteHint(position)?.id, 'r2.5')
+    // An ordinary five knight does not inherit the previous-stage knight preference.
+    const nextStage = transformFen('8/3B4/k3K3/3N4/8/8/8/8 w - - 0 1', transform)
+    for (const move of getChess(nextStage).moves()) {
+      assert.equal(scoreKnightAndBishopWhiteMove(nextStage, move).supportedFiveKingTargetDistance, 0)
     }
   }
 })

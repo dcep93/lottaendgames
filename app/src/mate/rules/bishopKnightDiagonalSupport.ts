@@ -359,6 +359,24 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
   return best
 }
 
+/** Five-diagonal preference in the orientation fixed by the previous-stage knight. */
+export function knightAndBishopFiveKingTargetDistance(fen: string): number {
+  const white = findPiece(fen, 'w', 'k')
+  const black = findPiece(fen, 'b', 'k')
+  const bishop = findPiece(fen, 'w', 'b')
+  const knight = findPiece(fen, 'w', 'n')
+  if (!white || !black || !bishop || !knight) return 0
+  const blackCoordinates = squareCoords(black.square)
+  const distances = DIAGONALS.filter(pattern => pattern.wall.length === 5 &&
+    pattern.previousSupport === knight.square && pattern.wall.includes(bishop.square) &&
+    isInsideBishopDiagonal(black.square, pattern.wall)).flatMap(pattern => {
+      const target = squareFromCoordinates(blackCoordinates.file + pattern.rightOffset.file,
+        blackCoordinates.rank + pattern.rightOffset.rank)
+      return target ? [kingDistance(white.square, target)] : []
+    })
+  return distances.length ? Math.min(...distances) : 0
+}
+
 /** Detect r1's starting geometry; support itself is evaluated after the candidate White move. */
 export function knightAndBishopShouldCheckThreeDiagonal(fen: string): boolean {
   const white = findPiece(fen, 'w', 'k')
