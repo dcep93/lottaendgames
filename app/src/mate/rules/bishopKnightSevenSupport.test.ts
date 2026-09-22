@@ -62,3 +62,16 @@ test('loaded second-move Bb3 is supported and preferred before Kc6 replies', () 
     assert.deepEqual(getIdealKnightAndBishopWhiteMoves(before), [san])
   }
 })
+
+
+test('same-file seven support uses Euclidean bishop distance even when king-step distances tie', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    const before = transformFen('3k2B1/8/2K5/8/8/3N4/8/8 w - - 0 1', transform)
+    const board = getChess(before)
+    const move = board.move({from: transformSquare('c6', transform), to: transformSquare('d6', transform)}).san
+    // Both kings are three king steps from Bg8, but Black is 3 Euclidean units
+    // away and White is sqrt(13) units away.
+    assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 99)
+    assert.equal(bishopKnightRuleSet.phaseAfterWhiteMove!(board.fen()), '1/2')
+  }
+})
