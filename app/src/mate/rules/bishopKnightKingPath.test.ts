@@ -3,6 +3,26 @@ import test from 'node:test';
 import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess';
 import { getIdealKnightAndBishopWhiteMoves, knightAndBishopWhiteRules, scoreKnightAndBishopWhiteMove } from './bishopKnight';
 
+test('r9.95 gates on source king distance while r9.96 remains independent, across D4', () => {
+  const path = knightAndBishopWhiteRules.find(rule => rule.id === 'r9.95')!;
+  const diagonal = knightAndBishopWhiteRules.find(rule => rule.id === 'r9.96')!;
+  for (const t of SQUARE_TRANSFORMS) {
+    const score = (source: string, from: 'h8' | 'c6', to: 'g8' | 'd5' | 'e8') => {
+      const fen = transformFen(source, t);
+      return scoreKnightAndBishopWhiteMove(fen, getChess(fen).move({from: transformSquare(from, t), to: transformSquare(to, t)}).san);
+    };
+    // Moving closer does not activate the rule mid-move.
+    assert.equal(path.applies!(score('7K/8/N2k4/8/8/8/8/7B w - - 0 1', 'h8', 'g8')), false);
+    assert.equal(path.applies!(score('7K/8/N3k3/8/8/8/8/7B w - - 0 1', 'h8', 'g8')), true);
+    const distant = '7K/8/N1B5/8/8/4k3/8/8 w - - 0 1';
+    const long = score(distant, 'c6', 'd5');
+    const off = score(distant, 'c6', 'e8');
+    assert.equal(path.applies!(long), false);
+    assert.equal(diagonal.applies, undefined);
+    assert.ok(diagonal.compare!(long, off) < 0);
+  }
+});
+
 test('r9.95 prefers control across a shortest Manhattan path in every symmetry', () => {
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen('8/N7/8/2K5/B3k3/8/8/8 w - - 0 1', t);
@@ -51,7 +71,7 @@ test('r9.95 includes orthogonal detours on Manhattan paths and rejects the loade
 });
 
 
-test('r9.95 prefers long-diagonal occupation after path qualification across D4', () => {
+test('r9.96 prefers long-diagonal occupation after r9.95 path qualification across D4', () => {
   const compare = knightAndBishopWhiteRules.find(rule => rule.id === 'r9.95')!.compare!;
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen('8/8/8/2K5/N1B1k3/8/8/8 w - - 2 2', t);
@@ -62,7 +82,8 @@ test('r9.95 prefers long-diagonal occupation after path qualification across D4'
     assert.equal(knight.bishopKingPathPenalty, 0, t.name);
     assert.equal(bishop.bishopLongDiagonalPenalty, 0, t.name);
     assert.equal(knight.bishopLongDiagonalPenalty, 1, t.name);
-    assert.ok(compare(bishop, knight) < 0, t.name);
+    assert.equal(compare(bishop, knight), 0, t.name);
+    assert.ok(knightAndBishopWhiteRules.find(rule => rule.id === 'r9.96')!.compare!(bishop, knight) < 0, t.name);
     assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [move('c4', 'd5')], t.name);
 
     // Occupation still outranks a long-diagonal bishop that only controls the path.

@@ -164,7 +164,12 @@ test("bishop-and-knight rules are registered", () => {
     {
       id: "r9.95",
       shortLabel: "rule r9.95",
-      helpText: "Prefer bishop occupation else control of a square on a shortest Manhattan path between the kings, then prefer occupying the long diagonal.",
+      helpText: "If the kings are within 3 steps apart, prefer bishop occupation else control of a square on a shortest Manhattan path between the kings.",
+    },
+    {
+      id: "r9.96",
+      shortLabel: "rule r9.96",
+      helpText: "Prefer the bishop occupying the long diagonal.",
     },
     {
       id: "r10",
@@ -216,6 +221,7 @@ test("bishop-and-knight rules are registered", () => {
       "r9.8",
       "r9.9",
       "r9.95",
+      "r9.96",
       "r10",
       "r15",
       "r18",
@@ -226,7 +232,7 @@ test("bishop-and-knight rules are registered", () => {
     ruleSet.whiteRuleDescriptions.map(({ id }) => id),
     knightAndBishopWhiteRules.map(({ id }) => id),
   );
-  assert.equal(knightAndBishopWhiteRules.length, 19);
+  assert.equal(knightAndBishopWhiteRules.length, 20);
 });
 
 test("immediate mate keeps precedence without the mating-net rule", () => {
