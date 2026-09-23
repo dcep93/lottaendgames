@@ -2,6 +2,7 @@ import { knightAndBishopThreeKingPlacementPenalty, knightAndBishopFiveBishopPena
 import type { Square } from "chess.js";
 import {
   allSquares,
+  edgeDistance,
   findPiece,
   getChess,
   getEndgamePiecePlacements,
@@ -259,7 +260,9 @@ function scoreKnightAndBishopWhiteMoveCore(
         && bishopControlsOrOccupiesSquare(resultFen, bishop.square, square)) ? 1 : 2;
     },
     get bothMinorsNextAttackPenalty() {
-      return bishop && knight && !bishopKingDefended && !knightKingDefended && blackReplies.some(reply => reply.piece === "k"
+      const bishopDefendsKnight = bishop && knight && edgeDistance(bishop.square) > 0
+        && bishopControlsOrOccupiesSquare(resultFen, bishop.square, knight.square);
+      return bishop && knight && !bishopKingDefended && !knightKingDefended && !bishopDefendsKnight && blackReplies.some(reply => reply.piece === "k"
         && kingDistance(reply.to, bishop.square) === 1
         && kingDistance(reply.to, knight.square) === 1) ? 1 : 0;
     },
@@ -684,7 +687,7 @@ const bishopKnightHelp: RuleHelp = {
   notes: [
     "For r9.95, the kings must be within two king steps before White moves. Evaluate bishop occupation and control after White moves. r9.96 independently prefers the bishop on its long diagonal, regardless of king distance.",
     "For r9.95, evaluate after White moves. A qualifying square is strictly between the kings on at least one shortest Manhattan path (horizontal and vertical steps only): its Manhattan distances to the two kings sum to the Manhattan distance between the kings. Prefer the bishop occupying such a square, then controlling one along an unblocked diagonal, then neither.",
-    "For r9.8, evaluate after White moves: penalize a position if any single legal Black king move would attack both the bishop and knight at once. A bishop or knight defended by White’s king after White moves is not considered attackable for this rule.",
+    "For r9.8, evaluate after White moves: penalize a position if any single legal Black king move would attack both the bishop and knight at once. A bishop or knight defended by White’s king, or a knight defended by a bishop off the board edge, is not considered attackable for this rule.",
     "For r8, White’s king must be on d4, e4, d5 or e5 before moving. Evaluate the bishop and knight preferences after White moves. A precage square is diagonally adjacent to a central bishop, off the long diagonals, and behind the bishop from Black’s king’s perspective.",
     "For r6, prefer White’s king on the opposite color to the bishop, but waive the color penalty for a king move from a1, a8, h1, or h8. For r9.9, minimize White’s king Euclidean distance to the board’s midpoint. For r20, maximize the sum of the bishop’s and knight’s Euclidean distances from Black’s king, then minimize their summed Euclidean distances from White’s king. Evaluate after White moves.",
     "For r17, require at least two king steps between bishop and knight (adjacent diagonals do not qualify). Count bishop protection through Black’s king, which must leave the checking diagonal. Other intervening pieces still block protection. Evaluate after White moves.",

@@ -3,6 +3,22 @@ import test from 'node:test';
 import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess';
 import { getIdealKnightAndBishopWhiteMoves, scoreKnightAndBishopWhiteMove } from './bishopKnight';
 
+test('r9.8 allows Nc4 defended by an off-edge bishop, across D4', () => {
+  for (const t of SQUARE_TRANSFORMS) {
+    const source = transformFen('8/8/8/Nk6/8/1B6/8/K7 w - - 2 2', t);
+    const move = {from: transformSquare('a5', t), to: transformSquare('c4', t)};
+    const san = getChess(source).move(move).san;
+    assert.equal(scoreKnightAndBishopWhiteMove(source, san).bothMinorsNextAttackPenalty, 0, t.name);
+    // An edge bishop's defense does not qualify for this exception.
+    const edge = transformFen('8/8/8/8/k2N4/8/B7/7K w - - 2 2', t);
+    const edgeMove = getChess(edge).move({from: transformSquare('d4', t), to: transformSquare('b3', t)}).san;
+    assert.equal(scoreKnightAndBishopWhiteMove(edge, edgeMove).bothMinorsNextAttackPenalty, 1, t.name);
+    // Merely being off the edge is insufficient without defending the knight.
+    const noDefense = transformFen('8/8/8/N7/1k6/8/1B6/7K w - - 2 2', t);
+    assert.equal(scoreKnightAndBishopWhiteMove(noDefense, getChess(noDefense).move(move).san).bothMinorsNextAttackPenalty, 1, t.name);
+  }
+});
+
 test('r9.8 allows Nc5 when White’s king defends the knight, across D4', () => {
   for (const t of SQUARE_TRANSFORMS) {
     const source = '8/1N6/B1k5/8/3K4/8/8/8 w - - 0 1';
