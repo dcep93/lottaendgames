@@ -3,6 +3,21 @@ import test from 'node:test';
 import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess';
 import { getIdealKnightAndBishopWhiteMoves, scoreKnightAndBishopWhiteMove } from './bishopKnight';
 
+test('r9.8 allows Nc5 when White’s king defends the knight, across D4', () => {
+  for (const t of SQUARE_TRANSFORMS) {
+    const source = '8/1N6/B1k5/8/3K4/8/8/8 w - - 0 1';
+    const fen = transformFen(source, t);
+    const move = {from: transformSquare('b7', t), to: transformSquare('c5', t)};
+    const san = getChess(fen).move(move).san;
+    // Kb5 approaches both minors, but Kd4 protects Nc5.
+    assert.equal(scoreKnightAndBishopWhiteMove(fen, san).bothMinorsNextAttackPenalty, 0, t.name);
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [san], t.name);
+    // Without king defense, the same double attack is penalized.
+    const undefended = transformFen('8/1N6/B1k5/8/8/3K4/8/8 w - - 0 1', t);
+    assert.equal(scoreKnightAndBishopWhiteMove(undefended, getChess(undefended).move(move).san).bothMinorsNextAttackPenalty, 1, t.name);
+  }
+});
+
 test('r9.8 rejects the loop return allowing Kb6 to attack both minors, across D4', () => {
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen('8/2N5/2BK4/k7/8/8/8/8 w - - 0 1', t);
