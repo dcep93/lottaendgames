@@ -127,7 +127,7 @@ test('Nd3 five support combines right-side kings with declared placements or nea
       board.put({type: 'b', color: 'w'}, bishop)
       for (const transform of SQUARE_TRANSFORMS) {
         assert.equal(knightAndBishopSupportedDiagonal(transformFen(board.fen(), transform)).size,
-          (edgeDistance(king) === 0 || squareColor(king) !== squareColor(bishop)) && king[0] > 'a' && (['a4', 'd7'].includes(bishop) || kingDistance(king, bishop) === 1) && ((['a4', 'd7'].includes(bishop) && ['c5', 'c6', 'c7'].includes(king)) || (['a4', 'd7'].includes(bishop) && king === 'd6') || (bishop === 'd7' && kingDistance(king, 'a7') <= 2)) ? 5 : 99, `${king}, ${bishop}, ${transform.name}`)
+          (edgeDistance(king) === 0 || squareColor(king) !== squareColor(bishop)) && king[0] >= 'c' && (['a4', 'd7'].includes(bishop) || kingDistance(king, bishop) === 1) && ((['a4', 'd7'].includes(bishop) && ['c5', 'c6', 'c7'].includes(king)) || (['a4', 'd7'].includes(bishop) && king === 'd6') || (bishop === 'd7' && kingDistance(king, 'a7') <= 2)) ? 5 : 99, `${king}, ${bishop}, ${transform.name}`)
       }
     }
   }
@@ -1047,15 +1047,17 @@ test('Bb7+ with Kb6 is supported and preferred by r1 with Na7 one move from c6',
 })
 
 
-test('same-color edge kings retain support with previous-stage or current-stage knights', () => {
+test('same-color edge kings retain support only when independent placement requirements hold', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const counters of ['2 2', '43 25']) {
-      const before = transformFen(`3K4/3B4/1k6/8/8/3N4/8/8 w - - ${counters}`, transform)
+      const before = transformFen(`3K4/3B4/k7/8/8/3N4/8/8 w - - ${counters}`, transform)
       const board = getChess(before)
       const move = board.move({from: transformSquare('d8', transform), to: transformSquare('c8', transform)}).san
       assert.equal(knightAndBishopSupportedDiagonal(board.fen()).size, 5)
-      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(before), [move])
+      assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 5)
     }
+    // An edge king still needs two files of separation with Nd3.
+    assert.equal(knightAndBishopSupportedDiagonal(transformFen('2K5/3B4/1k6/8/8/3N4/8/8 b - - 3 2', transform)).size, 99)
     assert.equal(knightAndBishopSupportedDiagonal(transformFen('1k6/8/K7/3N4/B7/8/8/8 b - - 0 1', transform)).size, 5)
     // The edge exemption does not waive the independent knight-on-edge restriction.
     assert.equal(knightAndBishopSupportedDiagonal(transformFen('2KB4/8/1k6/8/8/8/8/N7 b - - 0 1', transform)).size, 99)

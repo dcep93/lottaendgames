@@ -4,18 +4,23 @@ import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../c
 import { evaluateKnightAndBishopSupportedDiagonal } from './bishopKnightDiagonalSupport'
 import { getIdealKnightAndBishopWhiteMoves } from './bishopKnight'
 
-test('Nd3 five-diagonal support requires the White king strictly right of Black after White moves', () => {
+test('Nd3 five-diagonal support requires the White king at least two files right of Black after White moves', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const fen of [
       // The loaded loop: same file, then White to Black's left.
       '8/2k5/2B5/2K5/8/3N4/8/8 b - - 1 1',
       '3k4/8/2B5/2K5/8/3N4/8/8 b - - 3 2',
+      // One file to the right is insufficient, including the loaded Kb4 result.
+      '8/3B4/k7/8/1K6/3N4/8/8 b - - 1 1',
+      '8/8/1k6/2K5/B7/3N4/8/8 b - - 0 1',
       // The older nearby-kings Bd7 allowance cannot bypass the strict condition.
       '3k4/3B4/3K4/8/8/3N4/8/8 b - - 0 1',
     ]) assert.notEqual(evaluateKnightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 5)
     for (const fen of [
       '8/3B4/1k1K4/8/8/3N4/8/8 b - - 0 1',
-      // An earlier remote-a4 placement still qualifies when White is to the right.
+      // More than two files also qualifies.
+      '8/3B4/8/k2K4/8/3N4/8/8 b - - 0 1',
+      // An earlier remote-a4 placement still qualifies two files to the right.
       '8/8/1k6/3K4/B7/3N4/8/8 b - - 0 1',
     ]) assert.equal(evaluateKnightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 5)
   }
@@ -31,7 +36,7 @@ test('Nd3 requires a4 or king adjacency unless Bd7 faces an a-file Black king', 
 
     ]) assert.notEqual(evaluateKnightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 5)
     for (const fen of [
-      '8/1k6/8/2K5/B7/3N4/8/8 b - - 0 1',
+      '8/8/k7/2K5/B7/3N4/8/8 b - - 0 1',
 
       '8/3B4/1k1K4/8/8/3N4/8/8 b - - 0 1',
       // Actual five knights retain their existing support classification.

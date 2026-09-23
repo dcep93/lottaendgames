@@ -302,12 +302,13 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
     pattern.king === white.square && pattern.bishop === bishop.square &&
     pattern.knight === knight.square && pattern.black === black.square)) return {size: 99, knight: 99}
   // The previous-stage knight fixes the orientation of these strict five-diagonal conditions.
+  // rightOffset is two files long, so a projection of four means two files to the right.
   const whiteCoordinates = squareCoords(white.square)
   const blackCoordinatesForSupport = squareCoords(black.square)
   const previousFivePlacementRejected = DIAGONALS.some(pattern => pattern.wall.length === 5 &&
     pattern.previousSupport === knight.square && pattern.wall.includes(bishop.square) &&
     ((whiteCoordinates.file - blackCoordinatesForSupport.file) * pattern.rightOffset.file +
-      (whiteCoordinates.rank - blackCoordinatesForSupport.rank) * pattern.rightOffset.rank <= 0 ||
+      (whiteCoordinates.rank - blackCoordinatesForSupport.rank) * pattern.rightOffset.rank < 4 ||
       (!declaredFive?.allowRemoteBishop && bishop.square !== pattern.fiveRemoteBishop && kingDistance(white.square, bishop.square) !== 1 &&
         !((bishop.square === pattern.fiveOppositeEdgeBishop || bishop.square === pattern.previousSupportNearbyBishop) &&
           pattern.fiveBlackEdge.includes(black.square)))))
