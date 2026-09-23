@@ -154,7 +154,7 @@ test("bishop-and-knight rules are registered", () => {
     {
       id: "r9.5",
       shortLabel: "rule r9.5",
-      helpText: "With White's king on the same color as the bishop, which is edge-adjacent to Black's king, take king opposition from behind the bishop.",
+      helpText: "With Black's king edge-adjacent to the bishop, prefer king opposition from behind the bishop.",
     },
     {
       id: "r10",

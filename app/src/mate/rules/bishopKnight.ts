@@ -158,7 +158,6 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
   const knightCentrallyDefended = !!knight && centralKing && kingDistance(whiteKing.square, knight.square) === 1;
   let bishopOppositionTarget: Square | undefined;
   if (whiteKing && bishop && blackKing
-    && squareColor(whiteKing.square) === squareColor(bishop.square)
     && manhattanDistance(bishop.square, blackKing.square) === 1) {
     const b = squareCoordinates(bishop.square), k = squareCoordinates(blackKing.square);
     const file = 2 * b.file - k.file, rank = 2 * b.rank - k.rank;
@@ -424,7 +423,7 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     {
       id: "r9.5",
       shortLabel: "rule r9.5",
-      helpText: "With White's king on the same color as the bishop, which is edge-adjacent to Black's king, take king opposition from behind the bishop.",
+      helpText: "With Black's king edge-adjacent to the bishop, prefer king opposition from behind the bishop.",
       compare: (first, second) => first.bishopOppositionPenalty - second.bishopOppositionPenalty,
     },
     {
@@ -600,7 +599,7 @@ const bishopKnightHelp: RuleHelp = {
   ],
   notes: [
     "r2.5 general preferences, after exact declarations: With a supported 3 diagonal, equally prefer the king on b6 or c7. With a supported 5 diagonal and Nd5, prefer the bishop on b5 or d7. With Bb5 and Nd5, prefer king step proximity to the square two files to the right of Black’s king. Otherwise, with a supported 5 diagonal, Nd5 and Black on or adjacent to a5, prefer king step proximity to b4. With a supported 5 diagonal and Nd3, prefer king step proximity to the square two files to the right of Black’s king. With a supported 7 diagonal and Black on or adjacent to a3, prefer the king off the bishop’s color, then king step proximity to b2. Then prefer the bishop on b3, king step proximity to the square two files to the right of Black’s king, and king step proximity to e8. Include reflections.",
-    "For r9.5, check the king's color and bishop–Black king edge adjacency before White moves. Prefer moving White's king to the square immediately behind the bishop, directly opposite Black's king, so the bishop sits between the kings. For Bf3 and Black Kg3, the target is Ke3. If no surviving legal king move reaches that square, this rule does not distinguish moves. Rotations and reflections use the same geometry.",
+    "For r9.5, check bishop–Black king edge adjacency before White moves, regardless of White's king's square color. Prefer moving White's king to the square immediately behind the bishop, directly opposite Black's king, so the bishop sits between the kings. For Bf3 and Black Kg3, the target is Ke3. If no surviving legal king move reaches that square, this rule does not distinguish moves. Rotations and reflections use the same geometry.",
     "For r9.3, check before White moves: the bishop and knight must be adjacent (by edge or diagonal), both must be within two king steps of Black, and neither may be defended by White's king on d4, e4, d5 or e5. When this rule activates, first prefer a resulting central king defending either piece. Those defended outcomes tie; otherwise maximize only the bishop's Euclidean distance after the move, including moves beyond the two-step range.",
     "For r20, prefer a knight that no legal Black reply can attack or capture, including replies outside Black’s preferred moves. This preference applies whether or not the knight is defended, after all earlier rules.",
     "For r9.1, check before White moves whether Black's king attacks the bishop, even if it is already defended. Only a king move ending adjacent to the bishop satisfies the defense preference; those king moves tie. Moving the bishop next to the king or preserving defense with a knight move does not count. Otherwise maximize the bishop's Euclidean distance from Black, even if its destination is king-defended. For r9.2, the knight must be attacked before White moves, whether or not it is already defended. Prefer king defense after the move; bishop defense alone does not satisfy this preference.",

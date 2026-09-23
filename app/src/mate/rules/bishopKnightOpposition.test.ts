@@ -17,9 +17,8 @@ test('r9.5 favors opposition behind the bishop, with r9.1 already preferring its
   }
 });
 
-test('r9.5 requires the source color and edge adjacency, with an on-board target', () => {
+test('r9.5 requires edge adjacency and an on-board target', () => {
   for (const source of [
-    '1N6/8/8/8/8/4KBk1/8/8 w - - 0 1',
     '1N6/8/8/6k1/4K3/5B2/8/8 w - - 0 1',
     '1N6/8/8/8/4K3/6kB/8/8 w - - 0 1',
   ]) {
@@ -39,5 +38,21 @@ test('r9.5 ties candidates when opposition cannot be taken in one legal king mov
     const penalties = getChess(source).moves().map(san => scoreKnightAndBishopWhiteMove(source, san).bishopOppositionPenalty);
     assert.ok(penalties.length > 1);
     assert.equal(new Set(penalties).size, 1);
+  }
+});
+
+
+test('r9.5 prefers opposition from an opposite-colored king square in every symmetry', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    const fen = transformFen('1N6/8/8/8/8/3K1Bk1/8/8 w - - 0 1', transform);
+    const move = (to: 'e3' | 'e4') => getChess(fen).move({from: transformSquare('d3', transform), to: transformSquare(to, transform)}).san;
+    const opposition = scoreKnightAndBishopWhiteMove(fen, move('e3'));
+    const otherDefense = scoreKnightAndBishopWhiteMove(fen, move('e4'));
+    assert.equal(opposition.attackedBishopDefensePenalty, 0);
+    assert.equal(otherDefense.attackedBishopDefensePenalty, 0);
+    assert.equal(opposition.bishopOppositionPenalty, 0);
+    assert.equal(otherDefense.bishopOppositionPenalty, 1);
+    assert.equal(firstDifferingRule(opposition, otherDefense, knightAndBishopWhiteRules)?.id, 'r9.5');
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [move('e3')], transform.name);
   }
 });
