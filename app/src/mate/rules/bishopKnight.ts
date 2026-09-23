@@ -189,7 +189,7 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
   return {
     fivePointFiveMove: knightAndBishopFivePointFiveMove(fen),
     relativeKnightMove: knightAndBishopRelativeKnightMove(fen),
-    startsWithNearbyKings: !!whiteKing && !!blackKing && kingDistance(whiteKing.square, blackKing.square) <= 3,
+    startsWithNearbyKings: !!whiteKing && !!blackKing && kingDistance(whiteKing.square, blackKing.square) <= 2,
     startsWithCentralKing: centralKing,
     bishopOppositionTarget,
     knightMoatSides: whiteKing && blackKing && knight && kingDistance(knight.square, blackKing.square) <= 2
@@ -501,7 +501,7 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     {
       id: "r9.95",
       shortLabel: "rule r9.95",
-      helpText: "If the kings are within 3 steps apart, prefer bishop occupation else control of a square on a shortest Manhattan path between the kings.",
+      helpText: "If the kings are within 2 steps apart, prefer bishop occupation else control of a square on a shortest Manhattan path between the kings.",
       applies: score => score.startsWithNearbyKings,
       compare: (first, second) => first.bishopKingPathPenalty - second.bishopKingPathPenalty,
     },
@@ -675,7 +675,7 @@ const bishopKnightHelp: RuleHelp = {
     "Stay away from a bishop-colored corner.",
   ],
   notes: [
-    "For r9.95, the kings must be within three king steps before White moves. Evaluate bishop occupation and control after White moves. r9.96 independently prefers the bishop on its long diagonal, regardless of king distance.",
+    "For r9.95, the kings must be within two king steps before White moves. Evaluate bishop occupation and control after White moves. r9.96 independently prefers the bishop on its long diagonal, regardless of king distance.",
     "For r9.95, evaluate after White moves. A qualifying square is strictly between the kings on at least one shortest Manhattan path (horizontal and vertical steps only): its Manhattan distances to the two kings sum to the Manhattan distance between the kings. Prefer the bishop occupying such a square, then controlling one along an unblocked diagonal, then neither.",
     "For r9.8, evaluate after White moves: penalize a position if any single legal Black king move would attack both the bishop and knight at once. A bishop or knight defended by White’s king after White moves is not considered attackable for this rule.",
     "For r8, White’s king must be on d4, e4, d5 or e5 before moving. Evaluate the bishop and knight preferences after White moves. A precage square is diagonally adjacent to a central bishop, off the long diagonals, and behind the bishop from Black’s king’s perspective.",

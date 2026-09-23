@@ -12,8 +12,8 @@ test('r9.95 gates on source king distance while r9.96 remains independent, acros
       return scoreKnightAndBishopWhiteMove(fen, getChess(fen).move({from: transformSquare(from, t), to: transformSquare(to, t)}).san);
     };
     // Moving closer does not activate the rule mid-move.
-    assert.equal(path.applies!(score('7K/8/N2k4/8/8/8/8/7B w - - 0 1', 'h8', 'g8')), false);
-    assert.equal(path.applies!(score('7K/8/N3k3/8/8/8/8/7B w - - 0 1', 'h8', 'g8')), true);
+    assert.equal(path.applies!(score('7K/8/N3k3/8/8/8/8/7B w - - 0 1', 'h8', 'g8')), false);
+    assert.equal(path.applies!(score('7K/8/N4k2/8/8/8/8/7B w - - 0 1', 'h8', 'g8')), true);
     const distant = '7K/8/N1B5/8/8/4k3/8/8 w - - 0 1';
     const long = score(distant, 'c6', 'd5');
     const off = score(distant, 'c6', 'e8');
