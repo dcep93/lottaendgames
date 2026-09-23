@@ -132,6 +132,11 @@ test("bishop-and-knight rules are registered", () => {
       helpText: "Prepare the 7 diagonal.",
     },
     {
+      id: "r5.5",
+      shortLabel: "rule r5.5",
+      helpText: "Play the 5.5 step.",
+    },
+    {
       id: "r6",
       shortLabel: "rule r6",
       helpText: "Prefer king off bishop's color.",
@@ -204,6 +209,7 @@ test("bishop-and-knight rules are registered", () => {
       "r2.5",
       "r4",
       "r5",
+      "r5.5",
       "r6",
       "r8",
       "r9.1",
@@ -220,7 +226,7 @@ test("bishop-and-knight rules are registered", () => {
     ruleSet.whiteRuleDescriptions.map(({ id }) => id),
     knightAndBishopWhiteRules.map(({ id }) => id),
   );
-  assert.equal(knightAndBishopWhiteRules.length, 18);
+  assert.equal(knightAndBishopWhiteRules.length, 19);
 });
 
 test("immediate mate keeps precedence without the mating-net rule", () => {

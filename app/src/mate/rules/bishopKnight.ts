@@ -30,6 +30,7 @@ import { declaredSupportedThreeMove, declaredSupportedFiveMove, declaredSupporte
 import { knightAndBishopDeclaredPreparationMove } from "./bishopKnightPreparation";
 import { knightAndBishopShouldCoordinateKing, knightAndBishopKingCoordinatesMinors } from "./bishopKnightCoordination";
 import { blackKingMoatSides, knightDistanceFromBlackMoatSide, type KingMoatSide } from "./bishopKnightKingMoat";
+import { knightAndBishopFivePointFiveMove } from "./bishopKnightFivePointFive";
 import { knightAndBishopRelativeKnightMove } from "./bishopKnightRelativeKnight";
 import { compareScoresByRules, selectIdealMoves } from "./selection";
 import type {
@@ -43,6 +44,7 @@ import type {
 export type KnightAndBishopWhiteMoveScore = {
   readonly bishopKingPathPenalty: number;
   readonly bothMinorsNextAttackPenalty: number;
+  readonly declaredStepPenalty: number;
   readonly relativeKnightPenalty: number;
   readonly startsWithCentralKing: boolean;
   readonly bishopCenterPenalty: number;
@@ -146,6 +148,7 @@ function distanceToNearestUnprotectedKnightOrBishop(fen: string): number {
 }
 
 type KnightAndBishopPositionScoreContext = {
+  readonly fivePointFiveMove: string | undefined;
   readonly relativeKnightMove: string | undefined;
   readonly startsWithCentralKing: boolean;
   readonly bishopOppositionTarget: Square | undefined;
@@ -181,6 +184,7 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
       bishopOppositionTarget = `${"abcdefgh"[file]}${rank + 1}` as Square;
   }
   return {
+    fivePointFiveMove: knightAndBishopFivePointFiveMove(fen),
     relativeKnightMove: knightAndBishopRelativeKnightMove(fen),
     startsWithCentralKing: centralKing,
     bishopOppositionTarget,
@@ -254,6 +258,7 @@ function scoreKnightAndBishopWhiteMoveCore(
         && kingDistance(reply.to, bishop.square) === 1
         && kingDistance(reply.to, knight.square) === 1) ? 1 : 0;
     },
+    declaredStepPenalty: context.fivePointFiveMove && context.fivePointFiveMove !== move.from + move.to ? 1 : 0,
     relativeKnightPenalty: context.relativeKnightMove && context.relativeKnightMove !== move.from + move.to ? 1 : 0,
     startsWithCentralKing: context.startsWithCentralKing,
     bishopCenterPenalty: bishop && centerDistance(bishop.square) === 0 ? 0 : 1,
@@ -445,6 +450,12 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       shortLabel: "rule r5",
       helpText: "Prepare the 7 diagonal.",
       compare: (first, second) => first.declaredPreparationPenalty - second.declaredPreparationPenalty,
+    },
+    {
+      id: "r5.5",
+      shortLabel: "rule r5.5",
+      helpText: "Play the 5.5 step.",
+      compare: (first, second) => first.declaredStepPenalty - second.declaredStepPenalty,
     },
     {
       id: "r6",
@@ -670,6 +681,13 @@ const bishopKnightHelp: RuleHelp = {
     "For an undefended five-bishop on a4 or b5, Black’s immediate approach to b6 with c5 uncontrolled rejects support unless White has a legal king response that both defends the bishop and controls or occupies c5. Apply reflections.",
   ],
   noteBoards: [{
+    id: "bishop-knight-rule-r5-5",
+    title: "rule r5.5 — Play the 5.5 step",
+    caption: "1. Kd3. Match White Kc3 and Bc4 against Black Ke5, regardless of the knight’s location. Include rotations and reflections, but no translations. The move must be legal and earlier rules retain priority.",
+    pieces: [{square: "c3", piece: "K"}, {square: "c4", piece: "B"}, {square: "e5", piece: "k"}],
+    highlights: [{square: "d3", kind: "key"}],
+    arrows: [{from: "c3", to: "d3"}],
+  }, {
     id: "bishop-knight-rule-r9-1",
     title: "rule r9.1 — Play the 9.1 move",
     caption: "1. Nd2. Match the relative positions of White’s king, Black’s king and the knight, regardless of the bishop’s location. Include translations, rotations and reflections; the move must be legal and earlier rules retain priority.",
