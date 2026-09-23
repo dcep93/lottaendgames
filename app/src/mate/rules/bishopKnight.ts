@@ -501,6 +501,12 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       compare: (first, second) => first.knightBlackMoatDistanceScore - second.knightBlackMoatDistanceScore,
     },
     {
+      id: "r18",
+      shortLabel: "rule r18",
+      helpText: "Prefer the knight off the bishop's color.",
+      compare: (first, second) => first.knightBishopColorPenalty - second.knightBishopColorPenalty,
+    },
+    {
       id: "r20",
       shortLabel: "rule r20",
       helpText: "Maximize piece distance from Black's king, then minimize distance from White's king.",
