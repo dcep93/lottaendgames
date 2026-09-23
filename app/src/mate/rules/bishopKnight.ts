@@ -42,7 +42,6 @@ import type {
 
 export type KnightAndBishopWhiteMoveScore = {
   readonly bishopKingPathPenalty: number;
-  readonly bishopBlackProximityScore: number;
   readonly bothMinorsNextAttackPenalty: number;
   readonly relativeKnightPenalty: number;
   readonly startsWithCentralKing: boolean;
@@ -248,9 +247,6 @@ function scoreKnightAndBishopWhiteMoveCore(
       if (onPath(bishop.square)) return 0;
       return allSquares().some(square => onPath(square)
         && bishopControlsOrOccupiesSquare(resultFen, bishop.square, square)) ? 1 : 2;
-    },
-    get bishopBlackProximityScore() {
-      return bishop && blackKing ? Math.sqrt(squaredEuclideanDistance(bishop.square, blackKing.square)) : 0;
     },
     get bothMinorsNextAttackPenalty() {
       return bishop && knight && blackReplies.some(reply => reply.piece === "k"
@@ -483,9 +479,8 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     {
       id: "r9.95",
       shortLabel: "rule r9.95",
-      helpText: "Prefer bishop occupation else control of a square on a shortest Manhattan path between the kings, if so, prefer proximity to Black's king.",
-      compare: (first, second) => first.bishopKingPathPenalty - second.bishopKingPathPenalty
-        || (first.bishopKingPathPenalty < 2 ? first.bishopBlackProximityScore - second.bishopBlackProximityScore : 0),
+      helpText: "Prefer bishop occupation else control of a square on a shortest Manhattan path between the kings.",
+      compare: (first, second) => first.bishopKingPathPenalty - second.bishopKingPathPenalty,
     },
     {
       id: "r10",
@@ -638,7 +633,7 @@ const bishopKnightHelp: RuleHelp = {
     "Stay away from a bishop-colored corner.",
   ],
   notes: [
-    "For r9.95, evaluate after White moves. A qualifying square is strictly between the kings on at least one shortest Manhattan path (horizontal and vertical steps only): its Manhattan distances to the two kings sum to the Manhattan distance between the kings. Prefer the bishop occupying such a square, then controlling one along an unblocked diagonal, then neither. Among equally qualifying occupation or control placements, minimize the bishop’s Euclidean distance to Black’s king; do not apply this tie-breaker when neither qualifies.",
+    "For r9.95, evaluate after White moves. A qualifying square is strictly between the kings on at least one shortest Manhattan path (horizontal and vertical steps only): its Manhattan distances to the two kings sum to the Manhattan distance between the kings. Prefer the bishop occupying such a square, then controlling one along an unblocked diagonal, then neither.",
     "For r9.8, evaluate after White moves: penalize a position if any single legal Black king move would attack both the bishop and knight at once, even if they are defended.",
     "For r8, White’s king must be on d4, e4, d5 or e5 before moving. Evaluate the bishop and knight preferences after White moves. A precage square is diagonally adjacent to a central bishop, off the long diagonals, and behind the bishop from Black’s king’s perspective.",
     "For r6, prefer White’s king on the opposite color to the bishop. For r9.9, minimize White’s king Euclidean distance to the board’s midpoint. For r20, maximize the sum of the bishop’s and knight’s Euclidean distances from Black’s king. Evaluate after White moves.",
