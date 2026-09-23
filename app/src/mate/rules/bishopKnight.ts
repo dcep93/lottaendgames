@@ -29,6 +29,7 @@ import { declaredSupportedThreeMove, declaredSupportedFiveMove, declaredSupporte
 import { knightAndBishopDeclaredPreparationMove } from "./bishopKnightPreparation";
 import { knightAndBishopShouldCoordinateKing, knightAndBishopKingCoordinatesMinors } from "./bishopKnightCoordination";
 import { blackKingMoatSides, knightDistanceFromBlackMoatSide, type KingMoatSide } from "./bishopKnightKingMoat";
+import { knightAndBishopRelativeKnightMove } from "./bishopKnightRelativeKnight";
 import { compareScoresByRules, selectIdealMoves } from "./selection";
 import type {
   MateRuleSet,
@@ -39,6 +40,7 @@ import type {
 } from "./types";
 
 export type KnightAndBishopWhiteMoveScore = {
+  readonly relativeKnightPenalty: number;
   readonly startsWithCentralKing: boolean;
   readonly bishopCenterPenalty: number;
   readonly minorBlackDistanceScore: number;
@@ -140,6 +142,7 @@ function distanceToNearestUnprotectedKnightOrBishop(fen: string): number {
 }
 
 type KnightAndBishopPositionScoreContext = {
+  readonly relativeKnightMove: string | undefined;
   readonly startsWithCentralKing: boolean;
   readonly bishopOppositionTarget: Square | undefined;
   readonly shouldCoordinateKing: boolean;
@@ -174,6 +177,7 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
       bishopOppositionTarget = `${"abcdefgh"[file]}${rank + 1}` as Square;
   }
   return {
+    relativeKnightMove: knightAndBishopRelativeKnightMove(fen),
     startsWithCentralKing: centralKing,
     bishopOppositionTarget,
     knightMoatSides: whiteKing && blackKing && knight && kingDistance(knight.square, blackKing.square) <= 2
@@ -232,6 +236,7 @@ function scoreKnightAndBishopWhiteMoveCore(
       const distance = knight ? knightDistanceFromBlackMoatSide(knight.square, context.knightMoatSides) : 0;
       return distance ? -distance : 0;
     },
+    relativeKnightPenalty: context.relativeKnightMove && context.relativeKnightMove !== move.from + move.to ? 1 : 0,
     startsWithCentralKing: context.startsWithCentralKing,
     bishopCenterPenalty: bishop && centerDistance(bishop.square) === 0 ? 0 : 1,
     get minorBlackDistanceScore() {
@@ -430,6 +435,12 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       ],
     },
     {
+      id: "r9.1",
+      shortLabel: "rule r9.1",
+      helpText: "Play the 9.1 move.",
+      compare: (first, second) => first.relativeKnightPenalty - second.relativeKnightPenalty,
+    },
+    {
       id: "r10",
       shortLabel: "rule r10",
       helpText: "If the bishop is within 2 steps of Black's king, maximize its distance from Black's king.",
@@ -603,6 +614,13 @@ const bishopKnightHelp: RuleHelp = {
     "For an undefended five-bishop on a4 or b5, Black’s immediate approach to b6 with c5 uncontrolled rejects support unless White has a legal king response that both defends the bishop and controls or occupies c5. Apply reflections.",
   ],
   noteBoards: [{
+    id: "bishop-knight-rule-r9-1",
+    title: "rule r9.1 — Play the 9.1 move",
+    caption: "1. Nd2. Match the relative positions of White’s king, Black’s king and the knight, regardless of the bishop’s location. Include translations, rotations and reflections; the move must be legal and earlier rules retain priority.",
+    pieces: [{square: "e2", piece: "K"}, {square: "f4", piece: "k"}, {square: "f3", piece: "N"}, {square: "a8", piece: "B"}],
+    highlights: [{square: "d2", kind: "key"}],
+    arrows: [{from: "f3", to: "d2"}],
+  }, {
     id: "bishop-knight-rule-r4-flush",
     title: "rule r4 — Flush the king from the non target corner",
     caption: "1. Ne5 Kg8 2. Nf7 Kf8 3. Kf6 Kg8 4. Bf5 Kf8 5. Bh7 Ke8 6. Ne5 Kf8 7. Nd3 Ke8 8. Bg8 Kf8 9. Bb3 Ke8",
