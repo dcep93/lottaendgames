@@ -540,6 +540,12 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       compare: (first, second) => first.knightBishopProtectionPenalty - second.knightBishopProtectionPenalty,
     },
     {
+      id: "r17.5",
+      shortLabel: "rule r17.5",
+      helpText: "Prefer the knight adjacent to White's king.",
+      compare: (first, second) => first.knightProtectionPenalty - second.knightProtectionPenalty,
+    },
+    {
       id: "r18",
       shortLabel: "rule r18",
       helpText: "Prefer the knight off the edge of the board.",

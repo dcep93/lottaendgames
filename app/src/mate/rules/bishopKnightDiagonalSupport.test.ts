@@ -990,7 +990,9 @@ test('declared second-move Nf6 supports Kb5 Ba6 versus Ka8 without adding a knig
       const board = getChess(before)
       const move = board.move({from: transformSquare('d7', transform), to: transformSquare('f6', transform)}).san
       assert.deepEqual(knightAndBishopSupportedDiagonal(board.fen()), {size: 3, knight: 99})
-      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(before), [move])
+      // Both remain supported, but r17.5 now prefers the king-adjacent knight.
+      const nc5 = getChess(before).move({from: transformSquare('d7', transform), to: transformSquare('c5', transform)}).san
+      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(before), [nc5])
     }
     for (const fen of [
       'k7/8/B4N2/2K5/8/8/8/8 b - - 0 1',
