@@ -3,55 +3,8 @@ import test from 'node:test'
 import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess'
 import { bishopKnightRuleSet, getIdealKnightAndBishopWhiteMoves, knightAndBishopWhiteRules, scoreKnightAndBishopWhiteMove } from './bishopKnight'
 import { compareScoresByRules } from './selection'
-import { knightAndBishopTargetCornerDiagonals, knightAndBishopTargetCorners, knightAndBishopKnightTargetSquares, knightAndBishopKnightTargetProximityScore } from './bishopKnightStrategy'
+import { knightAndBishopTargetCornerDiagonals, knightAndBishopTargetCorners } from './bishopKnightStrategy'
 import positions from './bishopKnightRegressionPositions.json'
-
-test('r10 ranks king center, opposite color, long diagonal, then king protected central bishop', () => {
-  const rule = knightAndBishopWhiteRules.find(({ id }) => id === 'r10')!
-  for (const fen of positions) {
-    const scored = getChess(fen).moves().map(san => {
-      const chess = getChess(fen)
-      chess.move(san)
-      const pieces = chess.board().flatMap((rank, row) => rank.flatMap((piece, col) =>
-        piece ? [{ ...piece, row, col }] : []))
-      const king = pieces.find(p => p.color === 'w' && p.type === 'k')!
-      const bishop = pieces.find(p => p.color === 'w' && p.type === 'b')!
-      const center = (2 * king.row - 7) ** 2 + (2 * king.col - 7) ** 2
-      const colorPenalty = Number((king.row + king.col) % 2 === (bishop.row + bishop.col) % 2)
-      const longDiagonalPenalty = Number(bishop.row !== bishop.col && bishop.row + bishop.col !== 7)
-      const centralBishop = [3, 4].includes(bishop.row) && [3, 4].includes(bishop.col)
-      const kingDefends = Math.max(Math.abs(king.row - bishop.row), Math.abs(king.col - bishop.col)) === 1
-      const centerPenalty = Number(!centralBishop || !kingDefends)
-      const score = scoreKnightAndBishopWhiteMove(fen, san)
-      assert.equal(score.kingCenterProximityScore, center, `${fen}: ${san}`)
-      assert.equal(score.kingBishopColorPenalty, colorPenalty, `${fen}: ${san}`)
-      assert.equal(score.bishopLongDiagonalPenalty, longDiagonalPenalty, `${fen}: ${san}`)
-      assert.equal(score.bishopProtectedCenterPenalty, centerPenalty, `${fen}: ${san}`)
-      return {score, center, colorPenalty, longDiagonalPenalty, centerPenalty}
-    })
-    for (const candidate of scored) {
-      const first = scored[0]!
-      assert.equal(Math.sign(compareScoresByRules(candidate.score, first.score, [{ ...rule, subpriorities: rule.subpriorities!.slice(0, 4) }])),
-        Math.sign(candidate.center - first.center || candidate.colorPenalty - first.colorPenalty || candidate.longDiagonalPenalty - first.longDiagonalPenalty || candidate.centerPenalty - first.centerPenalty), fen)
-    }
-  }
-})
-
-test('r10 ranks precage distances even ahead of White', () => {
-  const rule = knightAndBishopWhiteRules.find(({ id }) => id === 'r10')!
-  for (const transform of SQUARE_TRANSFORMS) {
-    const fen = transformFen('8/8/8/4K3/k3B3/1N6/8/8 w - - 0 1', transform)
-    const knightMove = getChess(fen).move({from: transformSquare('b3', transform), to: transformSquare('d4', transform)}).san
-    const kingMove = getChess(fen).move({from: transformSquare('e5', transform), to: transformSquare('d4', transform)}).san
-    const knight = scoreKnightAndBishopWhiteMove(fen, knightMove)
-    const king = scoreKnightAndBishopWhiteMove(fen, kingMove)
-    for (const priority of rule.subpriorities!.slice(0, 4)) {
-      assert.equal(priority.compare!(knight, king), 0)
-    }
-    assert.deepEqual([knight.knightTargetProximityScore, king.knightTargetProximityScore], [1, 2])
-    assert.ok(compareScoresByRules(knight, king, [rule]) < 0)
-  }
-})
 
 
 test('reduced policy preserves mate, piece safety, and stalemate precedence across the regression corpus', () => {
@@ -97,44 +50,6 @@ test('shared scoring context and lazy scores are independent of candidate evalua
 })
 
 
-test('r10 routes diagonally beside a central bishop off the long diagonal after higher priorities', () => {
-  for (const transform of SQUARE_TRANSFORMS) {
-    for (const [knight, distance] of [['d6', 0], ['c4', 1], ['e4', 1]] as const) {
-      const board = getChess('8/8/8/3KB2k/8/8/8/8 w - - 0 1')
-      board.put({type: 'n', color: 'w'}, knight)
-      const fen = transformFen(board.fen(), transform)
-      assert.deepEqual(knightAndBishopKnightTargetSquares(fen).sort(), (['d6'] as const).map(square => transformSquare(square, transform)).sort())
-      assert.equal(knightAndBishopKnightTargetProximityScore(fen), distance)
-    }
-    const fen = transformFen('8/2N5/6k1/3KB3/8/8/8/8 w - - 0 1', transform)
-    const wall = getChess(fen).move({from: transformSquare('e5', transform), to: transformSquare('f6', transform)}).san
-    assert.equal(scoreKnightAndBishopWhiteMove(fen, wall).supportedDiagonalSizeScore, 99)
-    const routes = (['e6', 'b5'] as const).map(to => getChess(fen).move({from: transformSquare('c7', transform), to: transformSquare(to, transform)}).san)
-    const kingMove = getChess(fen).move({from: transformSquare('d5', transform), to: transformSquare('e6', transform)}).san
-    assert.equal(scoreKnightAndBishopWhiteMove(fen, kingMove).supportedDiagonalSizeScore, 99)
-    // Neither approaching knight establishes support; r10 can still route toward its target.
-    assert.equal(scoreKnightAndBishopWhiteMove(fen, routes[0]!).supportedDiagonalSizeScore, 99)
-    assert.equal(scoreKnightAndBishopWhiteMove(fen, routes[1]!).supportedDiagonalSizeScore, 99)
-    const behind = getChess(fen).move({from: transformSquare('c7', transform), to: transformSquare('a6', transform)}).san
-    assert.equal(scoreKnightAndBishopWhiteMove(fen, behind).supportedDiagonalSizeScore, 99)
-    // Knight routing now takes precedence over bishop target-corner distance.
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [routes[1]])
-  }
-})
-
-test('r10 only defines knight targets beside a central bishop', () => {
-  const fen = '8/8/8/3K3k/8/2B5/8/1N6 w - - 0 1'
-  assert.deepEqual(knightAndBishopKnightTargetSquares(fen), [])
-  assert.equal(knightAndBishopKnightTargetProximityScore(fen), 99)
-  const central = scoreKnightAndBishopWhiteMove(fen, 'Be5')
-  const outside = scoreKnightAndBishopWhiteMove(fen, 'Bf6')
-  assert.equal(central.bishopProtectedCenterPenalty, 0)
-  assert.equal(outside.bishopProtectedCenterPenalty, 1)
-  assert.equal(central.knightTargetProximityScore, 3)
-  assert.equal(outside.knightTargetProximityScore, 99)
-})
-
-
 test('old central king placement scoring fields remain removed', () => {
   const score = scoreKnightAndBishopWhiteMove('8/6k1/8/3BK3/4N3/8/8/8 w - - 0 1', 'Kf5')
   assert.equal('centralKingTargetScore' in score, false)
@@ -174,36 +89,6 @@ test('the target-corner exception needs all three specified pieces', () => {
 
 })
 
-
-test('r10 rewards only king protected central bishops in every reflection', () => {
-  for (const transform of SQUARE_TRANSFORMS) {
-    for (const [base, from, to, expected] of [
-      ['8/7k/8/8/4B3/5K2/8/N7 w - - 0 1', 'a1', 'b3', 0], // Non-central king protects Be4.
-      ['8/7k/8/2N5/4B3/8/8/1K6 w - - 0 1', 'b1', 'b2', 1], // Knight protection alone does not qualify.
-      ['8/7k/8/8/4BN2/8/8/1K6 w - - 0 1', 'b1', 'b2', 1], // Central bishop without protection.
-      ['8/7k/8/2N5/8/2B5/8/1K6 w - - 0 1', 'b1', 'b2', 1], // Protected bishop outside the center.
-    ] as const) {
-      const fen = transformFen(base, transform)
-      const move = getChess(fen).move({from: transformSquare(from, transform), to: transformSquare(to, transform)}).san
-      assert.equal(scoreKnightAndBishopWhiteMove(fen, move).bishopProtectedCenterPenalty, expected)
-    }
-  }
-})
-
-test('r10 keeps a knight diagonally beside the bishop off the long diagonal', () => {
-  const rule = knightAndBishopWhiteRules.find(({id}) => id === 'r10')!
-  for (const transform of SQUARE_TRANSFORMS) {
-    const fen = transformFen('8/7k/8/4K3/4B3/3N4/8/8 w - - 0 1', transform)
-    const move = (from: 'd3' | 'e5', to: 'c5' | 'd4') => getChess(fen).move({from: transformSquare(from, transform), to: transformSquare(to, transform)}).san
-    const leaving = scoreKnightAndBishopWhiteMove(fen, move('d3', 'c5'))
-    const staying = scoreKnightAndBishopWhiteMove(fen, move('e5', 'd4'))
-    assert.equal(staying.knightTargetProximityScore, 0)
-    assert.equal(leaving.knightTargetProximityScore, 1)
-    for (const priority of rule.subpriorities!.slice(0, 4)) assert.equal(priority.compare!(staying, leaving), 0)
-    assert.ok(compareScoresByRules(staying, leaving, [rule]) < 0)
-  }
-})
-
 test('r1.5 compares only supported diagonal size and knight route', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     const fen = transformFen('k3B3/2K5/8/3N4/8/8/8/8 w - - 0 1', transform)
@@ -216,180 +101,18 @@ test('r1.5 compares only supported diagonal size and knight route', () => {
   }
 })
 
-test('r10 prefers the loaded Kd7 toward the center even on the bishop color', () => {
-  for (const transform of SQUARE_TRANSFORMS) {
-    const fen = transformFen('8/2K5/8/2kN4/8/8/8/7B w - - 2 2', transform)
-    const move = getChess(fen).move({from: transformSquare('c7', transform), to: transformSquare('d7', transform)}).san
-    const rule = knightAndBishopWhiteRules.find(({id}) => id === 'r10')!
-    const score = scoreKnightAndBishopWhiteMove(fen, move)
-    for (const san of getChess(fen).moves()) {
-      assert.ok(compareScoresByRules(score, scoreKnightAndBishopWhiteMove(fen, san), [rule]) <= 0)
-    }
-  }
-})
-
-
-test('r10 ranks precage proximity before bishop target distance', () => {
-  const rule = knightAndBishopWhiteRules.find(({id}) => id === 'r10')!
-  for (const transform of SQUARE_TRANSFORMS) {
-    const fen = transformFen('8/3k4/8/1N1B4/3K4/8/8/8 w - - 0 1', transform)
-    const king = getChess(fen).move({from: transformSquare('d4', transform), to: transformSquare('e5', transform)}).san
-    const bishop = getChess(fen).move({from: transformSquare('d5', transform), to: transformSquare('e4', transform)}).san
-    const kingScore = scoreKnightAndBishopWhiteMove(fen, king)
-    const bishopScore = scoreKnightAndBishopWhiteMove(fen, bishop)
-    for (const priority of rule.subpriorities!.slice(0, 4)) assert.equal(priority.compare!(kingScore, bishopScore), 0)
-    assert.ok(kingScore.knightTargetProximityScore < bishopScore.knightTargetProximityScore)
-    assert.ok(compareScoresByRules(kingScore, bishopScore, [{...rule, subpriorities: [rule.subpriorities![4]!]}]) < 0)
-    assert.ok(compareScoresByRules(kingScore, bishopScore, [rule]) < 0)
-  }
-})
-
-
-test('r10 targets only diagonal neighbors strictly behind the bishop from Black in every reflection', () => {
-  for (const [black, target] of [['f5', 'c4'], ['f4', 'c4'], ['b5', 'e6']] as const) {
-    const board = getChess('7k/8/4N3/3B4/3K4/8/8/8 w - - 0 1')
-    board.remove('h8')
-    board.put({type: 'k', color: 'b'}, black)
-    for (const transform of SQUARE_TRANSFORMS) {
-      const fen = transformFen(board.fen(), transform)
-      assert.deepEqual(knightAndBishopKnightTargetSquares(fen), [transformSquare(target, transform)])
-    }
-  }
-})
-
-test('r10 does not reward precage existence in the loaded Be4 loop, including reflections', () => {
-  const rule = knightAndBishopWhiteRules.find(({id}) => id === 'r10')!
-  for (const transform of SQUARE_TRANSFORMS) {
-    const fen = transformFen('BN1K4/8/3k4/8/8/8/8/8 w - - 0 1', transform)
-    const move = (to: 'e4' | 'h1') => getChess(fen).move({from: transformSquare('a8', transform), to: transformSquare(to, transform)}).san
-    const central = scoreKnightAndBishopWhiteMove(fen, move('e4'))
-    const edge = scoreKnightAndBishopWhiteMove(fen, move('h1'))
-    assert.deepEqual([central.knightTargetProximityScore, edge.knightTargetProximityScore], [3, 99])
-    assert.equal(compareScoresByRules(central, edge, [{...rule, subpriorities: [rule.subpriorities![4]!]}]), 0)
-  }
-})
-
-test('r10 keeps absent precage targets neutral while ranking available distances in any order', () => {
-  const rank = knightAndBishopWhiteRules.find(({id}) => id === 'r10')!.subpriorities![4]!.rank!
-  const base = scoreKnightAndBishopWhiteMove('BN1K4/8/3k4/8/8/8/8/8 w - - 0 1', 'Be4')
-  for (const distances of [[99, 3, 1], [1, 99, 3], [3, 1, 99], [99, 99]]) {
-    const ranked = rank(distances.map(distance => ({...base, knightTargetProximityScore: distance})))
-    const best = Math.min(...distances)
-    assert.deepEqual(ranked, distances.map(distance => distance === 99 ? best : distance))
-  }
-})
-
-
-test('r15 follows the nine r10 priorities', () => {
-  assert.deepEqual(knightAndBishopWhiteRules.slice(-4).map(rule => rule.id), ['r10', 'r15', 'r20', 'r25'])
-  assert.equal(knightAndBishopWhiteRules.find(rule => rule.id === 'r10')!.subpriorities!.length, 9)
-})
-
-
-test('r10 ranks precage distances without checking whether the knight is behind White', () => {
-  const rank = knightAndBishopWhiteRules.find(rule => rule.id === 'r10')!.subpriorities![4]!.rank!;
-  const fen = '8/8/8/3B4/3K2k1/8/8/6N1 w - - 0 1';
-  const knight = scoreKnightAndBishopWhiteMove(fen, 'Ne2');
-  const king = scoreKnightAndBishopWhiteMove(fen, 'Ke5');
-  assert.deepEqual(rank([knight, king]), [4, 3]);
-});
-
 test('the old behind-White score remains removed', () => {
   assert.equal('minorPiecesBehindKingProximityScore' in scoreKnightAndBishopWhiteMove('8/8/8/3B4/3K2k1/8/8/6N1 w - - 0 1', 'Ne2'), false)
 })
 
 
-test('r10 finally prefers only king protected knights', () => {
-  const rule = knightAndBishopWhiteRules.find(({ id }) => id === 'r10')!
+test('the experiment leaves former late-rule distinctions tied in all symmetries', () => {
   for (const transform of SQUARE_TRANSFORMS) {
-    const fen = transformFen('8/1N6/K1k5/8/8/8/B7/8 w - - 2 2', transform)
-    const moves = (['a5', 'd8'] as const).map(to => getChess(fen).move({from: transformSquare('b7', transform), to: transformSquare(to, transform)}).san)
-    const [protectedKnight, unprotectedKnight] = moves.map(san => scoreKnightAndBishopWhiteMove(fen, san))
-    assert.deepEqual([protectedKnight!.knightProtectionPenalty, unprotectedKnight!.knightProtectionPenalty], [0, 1])
-    assert.equal(compareScoresByRules(protectedKnight!, unprotectedKnight!, [{...rule, subpriorities: rule.subpriorities!.slice(0, 5)}]), 0)
-    assert.ok(compareScoresByRules(protectedKnight!, unprotectedKnight!, [rule]) < 0)
+    const fen = transformFen('1NK5/8/1kB5/8/8/8/8/8 w - - 0 1', transform)
+    const moves = (['d7', 'd8'] as const).map(to => getChess(fen).move({from: transformSquare('c8', transform), to: transformSquare(to, transform)}).san)
+    const scores = moves.map(san => scoreKnightAndBishopWhiteMove(fen, san))
+    assert.equal(compareScoresByRules(scores[0]!, scores[1]!, knightAndBishopWhiteRules), 0)
     const ideal = getIdealKnightAndBishopWhiteMoves(fen)
-    assert.ok(ideal.every(san => scoreKnightAndBishopWhiteMove(fen, san).knightProtectionPenalty === 0))
-    assert.ok(!ideal.includes(moves[1]!))
-
-    const bishopFen = transformFen('7k/8/8/8/K7/4N3/8/2B5 w - - 0 1', transform)
-    for (const [to, expected] of [['d2', 1], ['a3', 1]] as const) {
-      const san = getChess(bishopFen).move({from: transformSquare('c1', transform), to: transformSquare(to, transform)}).san
-      assert.equal(scoreKnightAndBishopWhiteMove(bishopFen, san).knightProtectionPenalty, expected)
-    }
-  }
-})
-
-
-test('r10 finally maximizes noncentral bishop distance from Black in every symmetry', () => {
-  const rule = knightAndBishopWhiteRules.find(({id}) => id === 'r10')!
-  for (const transform of SQUARE_TRANSFORMS) {
-    const fen = transformFen('8/2N5/1K1k4/8/8/8/6B1/8 w - - 2 2', transform)
-    const score = (to: 'h1' | 'a8' | 'e4') => {
-      const san = getChess(fen).move({from: transformSquare('g2', transform), to: transformSquare(to, transform)}).san
-      return scoreKnightAndBishopWhiteMove(fen, san)
-    }
-    const far = score('h1'), near = score('a8'), central = score('e4')
-    assert.equal(far.nonCentralBishopDistanceScore, -Math.sqrt(41))
-    assert.equal(near.nonCentralBishopDistanceScore, -Math.sqrt(13))
-    assert.equal(central.nonCentralBishopDistanceScore, 0)
-    assert.ok(compareScoresByRules(far, near, [{...rule, subpriorities: [rule.subpriorities![7]!]}]) < 0)
-    assert.ok(compareScoresByRules(far, near, [rule]) < 0)
-  }
-})
-
-
-test('r10 breaks the central king shuffle tie by preferring knight off bishop color', () => {
-  const rule = knightAndBishopWhiteRules.find(({ id }) => id === 'r10')!
-  for (const transform of SQUARE_TRANSFORMS) {
-    const fen = transformFen('B7/3k4/8/3N4/3K4/8/8/8 w - - 0 1', transform)
-    const moves = ([['d5', 'c3'], ['d4', 'e5']] as const).map(([from, to]) =>
-      getChess(fen).move({ from: transformSquare(from, transform), to: transformSquare(to, transform) }).san)
-    const [knight, king] = moves.map(san => scoreKnightAndBishopWhiteMove(fen, san))
-    assert.equal(compareScoresByRules(knight!, king!, [{ ...rule, subpriorities: rule.subpriorities!.slice(0, 6) }]), 0)
-    assert.equal(knight!.knightBishopColorPenalty, 0)
-    assert.equal(king!.knightBishopColorPenalty, 1)
-    assert.ok(compareScoresByRules(knight!, king!, [rule]) < 0)
-    const ideal = getIdealKnightAndBishopWhiteMoves(fen)
-    assert.ok(ideal.every(san => scoreKnightAndBishopWhiteMove(fen, san).knightBishopColorPenalty === 0))
-    assert.ok(!ideal.includes(moves[1]!))
-  }
-})
-
-
-test('r10 prefers precage proximity over Be4 farther from a8 in every reflection', () => {
-  const rule = knightAndBishopWhiteRules.find(({id}) => id === 'r10')!
-  for (const transform of SQUARE_TRANSFORMS) {
-    const fen = transformFen('8/3k4/8/3BK3/2N5/8/8/8 w - - 0 1', transform)
-    assert.deepEqual(knightAndBishopTargetCorners(fen), [transformSquare('a8', transform)])
-    const be4 = getChess(fen).move({from: transformSquare('d5', transform), to: transformSquare('e4', transform)}).san
-    const kd4 = getChess(fen).move({from: transformSquare('e5', transform), to: transformSquare('d4', transform)}).san
-    const farther = scoreKnightAndBishopWhiteMove(fen, be4), closer = scoreKnightAndBishopWhiteMove(fen, kd4)
-    assert.equal(compareScoresByRules(farther, closer, [{...rule, subpriorities: rule.subpriorities!.slice(0, 4)}]), 0)
-    assert.equal(farther.bishopTargetCornerDistanceScore, -Math.sqrt(32))
-    assert.equal(closer.bishopTargetCornerDistanceScore, -Math.sqrt(18))
-    assert.ok(compareScoresByRules(closer, farther, [{...rule, subpriorities: rule.subpriorities!.slice(0, 5)}]) < 0)
-    // r10 still prefers Kd4, but this exact position now has a higher-priority r4 Kf6 declaration.
-    const kf6 = getChess(fen).move({from: transformSquare('e5', transform), to: transformSquare('f6', transform)}).san
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [kf6])
-  }
-})
-
-
-test('r10 treats tied target corners symmetrically using distance to the nearer target', () => {
-  for (const transform of SQUARE_TRANSFORMS) {
-    const fen = transformFen('8/5B2/5K2/8/3k4/8/1N6/8 w - - 0 1', transform)
-    assert.deepEqual(knightAndBishopTargetCorners(fen).sort(), (['a8', 'h1'] as const).map(square => transformSquare(square, transform)).sort())
-    const san = getChess(fen).move({from: transformSquare('f7', transform), to: transformSquare('g8', transform)}).san
-    assert.equal(scoreKnightAndBishopWhiteMove(fen, san).bishopTargetCornerDistanceScore, -6)
-  }
-})
-
-
-test('r10 routes the loaded Ne6 to c5 before moving its central bishop farther away', () => {
-  for (const transform of SQUARE_TRANSFORMS) {
-    const fen = transformFen('8/8/4N3/3B1k2/3K4/8/8/8 w - - 2 2', transform)
-    const nc5 = getChess(fen).move({from: transformSquare('e6', transform), to: transformSquare('c5', transform)}).san
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [nc5])
+    for (const move of moves) assert.ok(ideal.includes(move), transform.name + ': ' + move)
   }
 })

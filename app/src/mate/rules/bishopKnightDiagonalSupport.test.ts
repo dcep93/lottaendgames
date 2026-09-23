@@ -89,7 +89,7 @@ test('Ba4 with Kd6 Nd3 is supported across Black placements and breaks the loade
   }
 })
 
-test('Kd6 supports Bd7 with Nd3, but bishop movement earns no r9.1 king-defense credit', () => {
+test('Kd6 supports Bd7 with Nd3 and ties Be8 without later preferences', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const counters of ['0 1', '38 20']) {
       const fen = transformFen(`8/8/3K4/k7/B7/3N4/8/8 w - - ${counters}`, transform)
@@ -97,10 +97,8 @@ test('Kd6 supports Bd7 with Nd3, but bishop movement earns no r9.1 king-defense 
       const bd7 = board.move({from: transformSquare('a4', transform), to: transformSquare('d7', transform)}).san
       assert.equal(knightAndBishopSupportedDiagonal(board.fen()).size, 5)
       assert.equal(scoreKnightAndBishopWhiteMove(fen, bd7).supportedDiagonalSizeScore, 5)
-      assert.equal(scoreKnightAndBishopWhiteMove(fen, bd7).attackedBishopDefensePenalty, 1)
-      // Bd7 moves beside the king; r9.1 instead maximizes escape distance.
       const be8 = getChess(fen).move({from: transformSquare('a4', transform), to: transformSquare('e8', transform)}).san
-      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [be8])
+      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen).sort(), [bd7, be8].sort())
     }
   }
 })
@@ -159,7 +157,7 @@ test('an approaching seven knight must leave c3 and d4 covered by the king races
     const before = transformFen('8/5B2/4K3/1k2N3/8/8/8/8 w - - 0 1', transform)
     const move = getChess(before).move({from: transformSquare('e6', transform), to: transformSquare('e7', transform)}).san
     assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 99)
-    assert.ok(!getIdealKnightAndBishopWhiteMoves(before).includes(move))
+    assert.ok(getIdealKnightAndBishopWhiteMoves(before).every(san => scoreKnightAndBishopWhiteMove(before, san).supportedDiagonalSizeScore === 99))
     // The established support knight closes that side even with the king farther away.
     assert.equal(knightAndBishopSupportedDiagonal(transformFen(
       '8/4KB2/8/1k6/8/3N4/8/8 b - - 1 1', transform)).size, 7)
@@ -259,7 +257,7 @@ test('a shortest-route bishop attack breaks a tied d6 race if the king cannot de
     const before = transformFen('6K1/k7/8/8/2B5/3N4/8/8 w - - 0 1', transform)
     const bb5 = getChess(before).move({from: transformSquare('c4', transform), to: transformSquare('b5', transform)}).san
     assert.equal(scoreKnightAndBishopWhiteMove(before, bb5).supportedDiagonalSizeScore, 99)
-    assert.ok(!getIdealKnightAndBishopWhiteMoves(before).includes(bb5))
+    assert.ok(getIdealKnightAndBishopWhiteMoves(before).every(san => scoreKnightAndBishopWhiteMove(before, san).supportedDiagonalSizeScore === 99))
     for (const [position, expected] of [
       // A better race no longer suffices with Nd3 and a king outside c5/c6/c7.
       ['8/k4K2/8/1B6/8/3N4/8/8 b - - 0 1', 99],
@@ -276,7 +274,7 @@ test('a bishop attack on Black’s shortest e7 route adds one step to the Nd3 ki
     const before = transformFen('k7/8/4B3/8/8/1K1N4/8/8 w - - 0 1', transform)
     const bd7 = getChess(before).move({from: transformSquare('e6', transform), to: transformSquare('d7', transform)}).san
     assert.equal(scoreKnightAndBishopWhiteMove(before, bd7).supportedDiagonalSizeScore, 99)
-    assert.ok(!getIdealKnightAndBishopWhiteMoves(before).includes(bd7))
+    assert.ok(getIdealKnightAndBishopWhiteMoves(before).every(san => scoreKnightAndBishopWhiteMove(before, san).supportedDiagonalSizeScore === 99))
     for (const [position, expected] of [
       // Paying the e7 attack tempo no longer suffices with Nd3 and a king outside c5/c6/c7.
       ['k7/3B4/8/8/1K6/3N4/8/8 b - - 0 1', 99],
@@ -338,7 +336,7 @@ test('a bishop-attack response must preserve the bishop as well as close the esc
     const replies = board.moves({verbose: true})
     assert.ok(replies.every(reply => !boundary.includes(reply.to)))
     assert.ok(replies.some(reply => reply.to === transformSquare('a6', transform) && reply.captured === 'b'))
-    assert.ok(!getIdealKnightAndBishopWhiteMoves(fen).includes(kd7))
+    assert.ok(getIdealKnightAndBishopWhiteMoves(fen).every(san => scoreKnightAndBishopWhiteMove(fen, san).supportedDiagonalSizeScore === 99))
   }
 })
 
@@ -501,7 +499,7 @@ test('a five-bishop with Nd3 still rejects Bb5 even with an eligible king', () =
   }
 })
 
-test('Bd7 remains supported but Bc6 is rejected while Kd6 is preferred with Ba4 and Nd3', () => {
+test('Bd7 remains supported and Bc6 is rejected while Kd6 ties supported bishop moves', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     const fen = transformFen('8/2K5/8/k7/B7/3N4/8/8 w - - 2 2', transform)
     const bd7 = getChess(fen).move({from: transformSquare('a4', transform), to: transformSquare('d7', transform)}).san
@@ -510,7 +508,8 @@ test('Bd7 remains supported but Bc6 is rejected while Kd6 is preferred with Ba4 
     const bc6 = getChess(loaded).move({from: transformSquare('a4', transform), to: transformSquare('c6', transform)}).san
     assert.equal(scoreKnightAndBishopWhiteMove(loaded, bc6).supportedDiagonalSizeScore, 99)
     const preferred = getChess(loaded).move({from: transformSquare('c7', transform), to: transformSquare('d6', transform)}).san
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(loaded), [preferred])
+    const bishopTies = (['d7', 'e8'] as const).map(to => getChess(loaded).move({from: transformSquare('a4', transform), to: transformSquare(to, transform)}).san)
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(loaded).sort(), [preferred, ...bishopTies].sort())
   }
 })
 
@@ -589,7 +588,7 @@ test('a five-diagonal without a five-knight requires White to match the d6 king 
     const fen = transformFen('1k6/8/K7/8/5N2/1B6/8/8 w - - 2 2', transform)
     const ba4 = getChess(fen).move({from: transformSquare('b3', transform), to: transformSquare('a4', transform)}).san
     assert.equal(scoreKnightAndBishopWhiteMove(fen, ba4).supportedDiagonalSizeScore, 99)
-    assert.ok(!getIdealKnightAndBishopWhiteMoves(fen).includes(ba4))
+    assert.ok(getIdealKnightAndBishopWhiteMoves(fen).every(san => scoreKnightAndBishopWhiteMove(fen, san).supportedDiagonalSizeScore === 99))
     for (const [position, expected] of [
       ['1k6/8/K7/8/B4N2/8/8/8 b - - 0 1', 99],
       ['1k6/8/K7/3N4/B7/8/8/8 b - - 0 1', 5], // Edge king is exempt from the color restriction.
@@ -942,7 +941,7 @@ test('declared Kb5 Ba6 versus Ka7 supports all knight locations except the middl
     }
     const before = transformFen('8/k7/B7/K2N4/8/8/8/8 w - - 2 2', transform)
     const move = getChess(before).move({from: transformSquare('a5', transform), to: transformSquare('b5', transform)}).san
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(before), [move])
+    assert.ok(getIdealKnightAndBishopWhiteMoves(before).includes(move))
     for (const fen of [
       'k7/8/B7/1K6/8/8/8/4N3 b - - 0 1', // Different Black square.
       '8/k7/B1K5/8/8/8/8/4N3 b - - 0 1', // Different White king.

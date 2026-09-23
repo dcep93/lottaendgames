@@ -131,51 +131,6 @@ test("bishop-and-knight rules are registered", () => {
       shortLabel: "rule r5",
       helpText: "Prepare the 7 diagonal.",
     },
-    {
-      id: "r8",
-      shortLabel: "rule r8",
-      helpText: "Before White moves, if a central bishop is edge-adjacent to Black's king and diagonally adjacent to White's king, and the knight is edge-adjacent to White's king but not adjacent to the bishop, prefer a king move that becomes edge-adjacent to the bishop while remaining adjacent to the knight.",
-    },
-    {
-      id: "r9.1",
-      shortLabel: "rule r9.1",
-      helpText: "If a bishop is attacked, prefer moving the king to defend it, otherwise maximize its distance from Black's king.",
-    },
-    {
-      id: "r9.2",
-      shortLabel: "rule r9.2",
-      helpText: "If a knight is attacked, prefer king defense.",
-    },
-    {
-      id: "r9.3",
-      shortLabel: "rule r9.3",
-      helpText: "If an adjacent bishop and knight are both within 2 steps of Black's king, unless they're defended by a central king, maximize the Bishop's distance from Black's king.",
-    },
-    {
-      id: "r9.5",
-      shortLabel: "rule r9.5",
-      helpText: "With Black's king edge-adjacent to the bishop, prefer king opposition from behind the bishop.",
-    },
-    {
-      id: "r10",
-      shortLabel: "rule r10",
-      helpText: "Prefer king Euclidean proximity to the center, then king off bishop's color, then bishop on the long diagonal, then a king protected central bishop, then knight move proximity to a precage square, then king knight protection, then prefer knight off bishop's color, then maximize bishop Euclidean distance from the target corner, then maximize non central bishop distance from Black's king.",
-    },
-    {
-      id: "r15",
-      shortLabel: "rule r15",
-      helpText: "For a bishop off the long diagonal, maximize the distance of its long diagonal intersection from Black's king.",
-    },
-    {
-      id: "r20",
-      shortLabel: "rule r20",
-      helpText: "Prefer a knight that cannot be attacked on Black’s next move.",
-    },
-    {
-      id: "r25",
-      shortLabel: "rule r25",
-      helpText: "Prefer the knight’s Euclidean proximity to the center.",
-    },
   ]);
   assert.equal(ruleSet.help.noteBoards.find(board => board.animationSrc)?.id, "bishop-knight-rule-r4-flush");
   assert.deepEqual(ruleSet.help.blackPriorities, [
@@ -199,22 +154,13 @@ test("bishop-and-knight rules are registered", () => {
       "r2.5",
       "r4",
       "r5",
-      "r8",
-      "r9.1",
-      "r9.2",
-      "r9.3",
-      "r9.5",
-      "r10",
-      "r15",
-      "r20",
-      "r25",
     ],
   );
   assert.deepEqual(
     ruleSet.whiteRuleDescriptions.map(({ id }) => id),
     knightAndBishopWhiteRules.map(({ id }) => id),
   );
-  assert.equal(knightAndBishopWhiteRules.length, 17);
+  assert.equal(knightAndBishopWhiteRules.length, 8);
 });
 
 test("immediate mate keeps precedence without the mating-net rule", () => {
