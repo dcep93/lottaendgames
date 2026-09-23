@@ -174,7 +174,7 @@ test("bishop-and-knight rules are registered", () => {
     {
       id: "r20",
       shortLabel: "rule r20",
-      helpText: "Maximize piece distance from Black's king.",
+      helpText: "Maximize piece distance from Black's king, then minimize distance from White's king.",
     },
   ]);
   assert.equal(ruleSet.help.noteBoards.find(board => board.animationSrc)?.id, "bishop-knight-rule-r4-flush");

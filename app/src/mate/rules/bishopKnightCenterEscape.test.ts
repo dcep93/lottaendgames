@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess';
-import { knightAndBishopWhiteRules, scoreKnightAndBishopWhiteMove } from './bishopKnight';
+import { getIdealKnightAndBishopWhiteMoves, knightAndBishopWhiteRules, scoreKnightAndBishopWhiteMove } from './bishopKnight';
 
-test('r6 prefers opposite color; r9.9 only scores center distance; r20 only scores minor distance', () => {
+test('r6 prefers opposite color; r9.9 only scores center distance; r20 scores minor distances to both kings', () => {
   const r6 = knightAndBishopWhiteRules.find(rule => rule.id === 'r6')!;
   assert.ok(r6.compare);
   assert.ok(knightAndBishopWhiteRules.indexOf(r6) < knightAndBishopWhiteRules.findIndex(rule => rule.id === 'r8'));
@@ -23,7 +23,24 @@ test('r6 prefers opposite color; r9.9 only scores center distance; r20 only scor
     assert.equal(r99.compare(far, sameColorCentral), 0, transform.name);
     assert.ok(r6.compare(offColorFar, sameColorCentral) < 0, transform.name);
     assert.ok(r20.compare(far, near) < 0, transform.name);
-    assert.equal(r20.compare(offColorFar, sameColorCentral), 0, transform.name);
+    assert.ok(r20.compare(offColorFar, sameColorCentral) < 0, transform.name);
     assert.equal(far.minorBlackDistanceScore, -Math.sqrt(29) - Math.sqrt(41));
+  }
+});
+
+
+test('r20 breaks equal Black-distance ties toward White’s king across D4', () => {
+  const r20 = knightAndBishopWhiteRules.find(rule => rule.id === 'r20')!;
+  assert.ok(r20.compare);
+  for (const t of SQUARE_TRANSFORMS) {
+    const fen = transformFen('8/8/4K3/3B4/Nk6/8/8/8 w - - 2 2', t);
+    const move = (to: 'b6' | 'b2') => getChess(fen).move({from: transformSquare('a4', t), to: transformSquare(to, t)}).san;
+    const near = scoreKnightAndBishopWhiteMove(fen, move('b6'));
+    const far = scoreKnightAndBishopWhiteMove(fen, move('b2'));
+    assert.equal(near.minorBlackDistanceScore, far.minorBlackDistanceScore, t.name);
+    assert.equal(near.minorWhiteDistanceScore, Math.sqrt(2) + 3, t.name);
+    assert.equal(far.minorWhiteDistanceScore, Math.sqrt(2) + 5, t.name);
+    assert.ok(r20.compare(near, far) < 0, t.name);
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [move('b6')], t.name);
   }
 });
