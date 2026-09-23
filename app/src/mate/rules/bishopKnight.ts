@@ -429,13 +429,12 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     {
       id: "r10",
       shortLabel: "rule r10",
-      helpText: "Prefer king Euclidean proximity to the center, then king off bishop's color, then bishop on the long diagonal, then a king protected central bishop, then maximize bishop Euclidean distance from the target corner, then knight move proximity to a precage square, then king knight protection, then maximize non central bishop distance from Black's king, then prefer knight off bishop's color.",
+      helpText: "Prefer king Euclidean proximity to the center, then king off bishop's color, then bishop on the long diagonal, then a king protected central bishop, then knight move proximity to a precage square, then king knight protection, then prefer knight off bishop's color, then maximize bishop Euclidean distance from the target corner, then maximize non central bishop distance from Black's king.",
       subpriorities: [
         { compare: (first, second) => first.kingCenterProximityScore - second.kingCenterProximityScore },
         { compare: (first, second) => first.kingBishopColorPenalty - second.kingBishopColorPenalty },
         { compare: (first, second) => first.bishopLongDiagonalPenalty - second.bishopLongDiagonalPenalty },
         { compare: (first, second) => first.bishopProtectedCenterPenalty - second.bishopProtectedCenterPenalty },
-        { compare: (first, second) => first.bishopTargetCornerDistanceScore - second.bishopTargetCornerDistanceScore },
         { rank: scores => {
           const distances = scores.map(score => score.knightTargetProximityScore);
           const best = Math.min(99, ...distances);
@@ -443,8 +442,9 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
           return distances.map(distance => distance === 99 ? best : distance);
         } },
         { compare: (first, second) => first.knightProtectionPenalty - second.knightProtectionPenalty },
-        { compare: (first, second) => first.nonCentralBishopDistanceScore - second.nonCentralBishopDistanceScore },
         { compare: (first, second) => first.knightBishopColorPenalty - second.knightBishopColorPenalty },
+        { compare: (first, second) => first.bishopTargetCornerDistanceScore - second.bishopTargetCornerDistanceScore },
+        { compare: (first, second) => first.nonCentralBishopDistanceScore - second.nonCentralBishopDistanceScore },
       ],
     },
     {
