@@ -142,6 +142,11 @@ test("bishop-and-knight rules are registered", () => {
       helpText: "Play the 9.1 move.",
     },
     {
+      id: "r9.8",
+      shortLabel: "rule r9.8",
+      helpText: "Prefer Black to be unable to attack both minor pieces next move.",
+    },
+    {
       id: "r9.9",
       shortLabel: "rule r9.9",
       helpText: "Prefer king on opposite color to bishop, then minimize distance to the center.",
@@ -186,6 +191,7 @@ test("bishop-and-knight rules are registered", () => {
       "r5",
       "r8",
       "r9.1",
+      "r9.8",
       "r9.9",
       "r10",
       "r15",
@@ -196,7 +202,7 @@ test("bishop-and-knight rules are registered", () => {
     ruleSet.whiteRuleDescriptions.map(({ id }) => id),
     knightAndBishopWhiteRules.map(({ id }) => id),
   );
-  assert.equal(knightAndBishopWhiteRules.length, 14);
+  assert.equal(knightAndBishopWhiteRules.length, 15);
 });
 
 test("immediate mate keeps precedence without the mating-net rule", () => {
