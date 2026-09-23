@@ -369,7 +369,9 @@ test('r10 prefers precage proximity over Be4 farther from a8 in every reflection
     assert.equal(farther.bishopTargetCornerDistanceScore, -Math.sqrt(32))
     assert.equal(closer.bishopTargetCornerDistanceScore, -Math.sqrt(18))
     assert.ok(compareScoresByRules(closer, farther, [{...rule, subpriorities: rule.subpriorities!.slice(0, 5)}]) < 0)
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [kd4])
+    // r10 still prefers Kd4, but this exact position now has a higher-priority r4 Kf6 declaration.
+    const kf6 = getChess(fen).move({from: transformSquare('e5', transform), to: transformSquare('f6', transform)}).san
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [kf6])
   }
 })
 

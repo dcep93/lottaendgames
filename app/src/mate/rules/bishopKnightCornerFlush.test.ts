@@ -6,6 +6,28 @@ import { knightAndBishopDeclaredCornerFlushMove } from './bishopKnightCornerFlus
 import example from './bishopKnightCornerFlushExample.json'
 import { getMateRuleSet } from './index'
 
+test('r4 prescribes Kf6 from all three central-bishop shuffles and then Kg7, across D4', () => {
+  for (const declaration of [
+    {fen: '5k2/8/8/3BK3/2N5/8/8/8 w - - 41 23', moves: ['Kf6', 'Ke8', 'Kg7']},
+    {fen: '5k2/8/8/3B1K2/2N5/8/8/8 w - - 0 1', moves: ['Kf6']},
+    {fen: '8/3k4/8/3BK3/2N5/8/8/8 w - - 0 1', moves: ['Kf6']},
+  ]) {
+    const line = getChess(declaration.fen)
+    for (const san of declaration.moves) {
+      const before = line.fen(), move = line.move(san)
+      if (move.color !== 'w') continue
+      for (const transform of SQUARE_TRANSFORMS) {
+        const fen = transformFen(before, transform)
+        const from = transformSquare(move.from, transform), to = transformSquare(move.to, transform)
+        const expected = getChess(fen).move({from, to}).san
+        assert.equal(knightAndBishopDeclaredCornerFlushMove(fen), from + to)
+        assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [expected])
+        assert.equal(getMateRuleSet('bishop-knight').currentWhiteHint(fen)?.id, 'r4')
+      }
+    }
+  }
+})
+
 test('r4 prefers every White move in the loaded flushing line and all reflections', () => {
   const line = getChess(example.fen)
   for (const step of example.moves) {

@@ -3,6 +3,9 @@ import example from './bishopKnightCornerFlushExample.json'
 
 const declaredMoves = new Map<string, string>()
 const lines = [
+  { fen: '5k2/8/8/3BK3/2N5/8/8/8 w - - 0 1', moves: ['Kf6', 'Ke8', 'Kg7'] },
+  { fen: '5k2/8/8/3B1K2/2N5/8/8/8 w - - 0 1', moves: ['Kf6'] },
+  { fen: '8/3k4/8/3BK3/2N5/8/8/8 w - - 0 1', moves: ['Kf6'] },
   { fen: '8/3k4/8/3B1K2/2N5/8/8/8 w - - 0 1', moves: ['Kf6'] },
   { fen: example.fen, moves: example.moves.map(step => step.san) },
   { fen: '7k/8/5K2/8/4B3/3N4/8/8 w - - 0 1', moves: ['Ne5', 'Kg8', 'Nf7', 'Kf8', 'Bh7'] },
