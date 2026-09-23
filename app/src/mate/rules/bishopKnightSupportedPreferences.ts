@@ -17,6 +17,8 @@ export function declaredSupportedSevenMove(fen: string): string | undefined {
 }
 
 const fiveDeclarations = new Map(([
+  ['8/3B4/8/k1KN4/8/8/8/8 w - - 0 1', 'd7', 'e8'],
+  ['4B3/8/k7/2KN4/8/8/8/8 w - - 0 1', 'c5', 'b4'],
   ['8/1k2K3/8/1B1N4/8/8/8/8 w - - 0 1', 'e7', 'd8'],
   ['8/3B4/3K4/k7/8/3N4/8/8 w - - 0 1', 'd6', 'c5'],
   ['8/8/k1K5/3N4/B7/8/8/8 w - - 0 1', 'c6', 'c5'],
