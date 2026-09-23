@@ -499,7 +499,7 @@ test('a five-bishop with Nd3 still rejects Bb5 even with an eligible king', () =
   }
 })
 
-test('Bd7 remains supported and Bc6 is rejected while r10 breaks the supported tie', () => {
+test('Bd7 remains supported and Bc6 is rejected while r9.9 breaks the supported tie', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     const fen = transformFen('8/2K5/8/k7/B7/3N4/8/8 w - - 2 2', transform)
     const bd7 = getChess(fen).move({from: transformSquare('a4', transform), to: transformSquare('d7', transform)}).san
@@ -509,8 +509,7 @@ test('Bd7 remains supported and Bc6 is rejected while r10 breaks the supported t
     assert.equal(scoreKnightAndBishopWhiteMove(loaded, bc6).supportedDiagonalSizeScore, 99)
     const preferred = getChess(loaded).move({from: transformSquare('c7', transform), to: transformSquare('d6', transform)}).san
     assert.equal(scoreKnightAndBishopWhiteMove(loaded, preferred).supportedDiagonalSizeScore, 5)
-    const escape = getChess(loaded).move({from: transformSquare('a4', transform), to: transformSquare('e8', transform)}).san
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(loaded), [escape])
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(loaded), [preferred])
   }
 })
 
