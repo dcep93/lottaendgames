@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess';
-import { getIdealKnightAndBishopWhiteMoves, scoreKnightAndBishopWhiteMove } from './bishopKnight';
+import { getIdealKnightAndBishopWhiteMoves, knightAndBishopWhiteRules, scoreKnightAndBishopWhiteMove } from './bishopKnight';
 
 test('r9.95 prefers control across a shortest Manhattan path in every symmetry', () => {
   for (const t of SQUARE_TRANSFORMS) {
@@ -47,5 +47,30 @@ test('r9.95 includes orthogonal detours on Manhattan paths and rejects the loade
     assert.equal(scoreKnightAndBishopWhiteMove(fen, move('a2', 'b4')).bishopKingPathPenalty, 1, t.name);
     assert.equal(scoreKnightAndBishopWhiteMove(fen, move('b3', 'a4')).bishopKingPathPenalty, 2, t.name);
     assert.ok(!getIdealKnightAndBishopWhiteMoves(fen).includes(move('b3', 'a4')), t.name);
+  }
+});
+
+
+test('r9.95 prefers long-diagonal occupation after path qualification across D4', () => {
+  const compare = knightAndBishopWhiteRules.find(rule => rule.id === 'r9.95')!.compare!;
+  for (const t of SQUARE_TRANSFORMS) {
+    const fen = transformFen('8/8/8/2K5/N1B1k3/8/8/8 w - - 2 2', t);
+    const move = (from: 'c4' | 'a4', to: 'd5' | 'b2') => getChess(fen).move({from: transformSquare(from, t), to: transformSquare(to, t)}).san;
+    const bishop = scoreKnightAndBishopWhiteMove(fen, move('c4', 'd5'));
+    const knight = scoreKnightAndBishopWhiteMove(fen, move('a4', 'b2'));
+    assert.equal(bishop.bishopKingPathPenalty, 0, t.name);
+    assert.equal(knight.bishopKingPathPenalty, 0, t.name);
+    assert.equal(bishop.bishopLongDiagonalPenalty, 0, t.name);
+    assert.equal(knight.bishopLongDiagonalPenalty, 1, t.name);
+    assert.ok(compare(bishop, knight) < 0, t.name);
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [move('c4', 'd5')], t.name);
+
+    // Occupation still outranks a long-diagonal bishop that only controls the path.
+    const priorityFen = transformFen('7N/4k3/4B3/5K2/8/8/8/8 w - - 4 3', t);
+    const score = (from: 'h8' | 'e6', to: 'f7' | 'd5') => {
+      const san = getChess(priorityFen).move({from: transformSquare(from, t), to: transformSquare(to, t)}).san;
+      return scoreKnightAndBishopWhiteMove(priorityFen, san);
+    };
+    assert.ok(compare(score('h8', 'f7'), score('e6', 'd5')) < 0, t.name);
   }
 });

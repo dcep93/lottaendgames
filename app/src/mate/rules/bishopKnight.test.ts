@@ -159,7 +159,7 @@ test("bishop-and-knight rules are registered", () => {
     {
       id: "r9.95",
       shortLabel: "rule r9.95",
-      helpText: "Prefer bishop occupation else control of a square on a shortest Manhattan path between the kings.",
+      helpText: "Prefer bishop occupation else control of a square on a shortest Manhattan path between the kings, then prefer occupying the long diagonal.",
     },
     {
       id: "r10",
