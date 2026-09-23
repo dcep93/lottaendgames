@@ -89,6 +89,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly knightTargetProximityScore: number;
   readonly knightProtectionPenalty: number;
   readonly nonCentralBishopDistanceScore: number;
+  readonly knightBishopProtectionPenalty: number;
   readonly knightEdgePenalty: number;
   readonly knightBishopColorPenalty: number;
   readonly bishopLongDiagonalIntersectionScore: number;
@@ -366,6 +367,9 @@ function scoreKnightAndBishopWhiteMoveCore(
         ? -Math.sqrt(Math.min(...targets.map(target => squaredEuclideanDistance(bishop.square, target)))) : 0;
     },
     knightProtectionPenalty: knightKingDefended ? 0 : 1,
+    get knightBishopProtectionPenalty() {
+      return bishop && knight && bishopControlsOrOccupiesSquare(resultFen, bishop.square, knight.square) ? 0 : 1;
+    },
     knightEdgePenalty: knight && /^[ah]|[18]$/.test(knight.square) ? 1 : 0,
     knightBishopColorPenalty: knight && bishop && squareColor(knight.square) === squareColor(bishop.square) ? 1 : 0,
     get nonCentralBishopDistanceScore() {
@@ -530,6 +534,12 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       compare: (first, second) => first.knightBlackMoatDistanceScore - second.knightBlackMoatDistanceScore,
     },
     {
+      id: "r17",
+      shortLabel: "rule r17",
+      helpText: "Protect the knight using the bishop.",
+      compare: (first, second) => first.knightBishopProtectionPenalty - second.knightBishopProtectionPenalty,
+    },
+    {
       id: "r18",
       shortLabel: "rule r18",
       helpText: "Prefer the knight off the edge of the board.",
@@ -688,7 +698,7 @@ const bishopKnightHelp: RuleHelp = {
     "An n-diagonal is supported when the knight occupies its previous-stage support square or is within one knight move of its own support square, and Black has no legal move onto the (n+1)-diagonal. Evaluate after White moves. White’s king must be on or inside the (n+2)-diagonal. A diagonal is unsupported if Black can legally step onto it.",
     "For every immediate Black move attacking an undefended bishop, White must have a legal response that leaves Black unable to step onto the (n+1)-diagonal.",
     "r5 exact preference: White Kd5, Bd7 and Nd3 against Black Kb6 prefers Kd6. Include reflections; r1.5 remains higher priority.",
-    "r2.5 exact preferences: White Kb5, Ba6 and Nb6 against Black Kb8 prefers Nd5. White Ke7, Bb5 and Nd5 against Black Kb7 prefers Kd8. White Kc6, Ba4 and Nd5 against Black Ka6 prefers Kc5. White Kc6, Ba6 and Nd5 against Black Ka7 prefers Kb5. White Kd6, Bd7 and Nd3 against Black Ka5 prefers Kc5. With Bb3 and Nd3, White Kc7 against Black Ka5 prefers Kc6, and White Kc6 against Black Ka6 prefers Kc5. White Kd6, Bb3 and Nd3 against Black Kb5 prefers Kd5. White Kf7 or Kf8, Bb3 and Nd3 against Black Kd6 prefers Ke8, before its general bishop and king-target preferences. Include reflections; move counters do not matter. r1.5 remains higher priority.",
+    "r2.5 exact preferences: White Ka5, Ba6 and Nd5 against Black Ka7 prefers Kb5. White Kb5, Ba6 and Nb6 against Black Kb8 prefers Nd5. White Ke7, Bb5 and Nd5 against Black Kb7 prefers Kd8. White Kc6, Ba4 and Nd5 against Black Ka6 prefers Kc5. White Kc6, Ba6 and Nd5 against Black Ka7 prefers Kb5. White Kd6, Bd7 and Nd3 against Black Ka5 prefers Kc5. With Bb3 and Nd3, White Kc7 against Black Ka5 prefers Kc6, and White Kc6 against Black Ka6 prefers Kc5. White Kd6, Bb3 and Nd3 against Black Kb5 prefers Kd5. White Kf7 or Kf8, Bb3 and Nd3 against Black Kd6 prefers Ke8, before its general bishop and king-target preferences. Include reflections; move counters do not matter. r1.5 remains higher priority.",
     "Exact unsupported placement: White Kg4, Bf1 and Ne2 against Black Kh2 is not a supported three-diagonal. Include reflections; move counters do not matter.",
     "Exact unsupported placement: White Kb5, Bc8 and Nc6 against Black Ka7 is not a supported three-diagonal. Include reflections; move counters do not matter.",
     "Exact supported five-diagonal placement: White Kd5, Ba4 and Nd3 against Black Kb6; White Kd5, Bd7 and Nd3 against Black Ka5. Include reflections; move counters do not matter.",

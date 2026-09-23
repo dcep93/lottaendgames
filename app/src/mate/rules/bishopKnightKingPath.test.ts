@@ -52,8 +52,9 @@ test('r9.95 prefers occupation over control in the loaded placement across D4', 
 test('r9.95 keeps the bishop between the kings before r10 can force its escape', () => {
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen('7N/8/5K2/5B2/5k2/8/8/8 w - - 2 2', t);
-    const nf7 = getChess(fen).move({from: transformSquare('h8', t), to: transformSquare('f7', t)}).san;
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [nf7], t.name);
+    // r17 breaks the knight tie in favor of bishop protection on g6.
+    const ng6 = getChess(fen).move({from: transformSquare('h8', t), to: transformSquare('g6', t)}).san;
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [ng6], t.name);
   }
 });
 

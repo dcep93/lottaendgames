@@ -32,6 +32,7 @@ export function declaredSupportedFiveMove(fen: string): string | undefined {
 }
 
 const threeDeclarations = new Map(([
+  ['8/k7/B7/K2N4/8/8/8/8 w - - 0 1', 'a5', 'b5'],
   ['8/k7/B1K5/3N4/8/8/8/8 w - - 0 1', 'c6', 'b5'],
   ['1k6/8/BN6/1K6/8/8/8/8 w - - 0 1', 'b6', 'd5'],
 ] as const).flatMap(([fen, from, to]) => SQUARE_TRANSFORMS.map(transform => [
