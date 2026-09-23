@@ -47,12 +47,31 @@ test('r17 credits Be6+ through Black’s king while earlier r9.95 prefers path c
 });
 
 
-test('r17 excludes adjacent protection but accepts exactly two squares and longer across D4', () => {
+test('r17 allows adjacent protection with retreat room and longer protection across D4', () => {
   for (const t of SQUARE_TRANSFORMS) {
     const fen=transformFen('2k1B2K/8/2N5/8/8/8/8/8 w - - 6 4',t);
-    for (const [from,to,penalty] of [['e8','d7',1],['h8','h7',0],['e8','f7',1]] as const) {
+    for (const [from,to,penalty] of [['e8','d7',0],['h8','h7',0],['e8','f7',1]] as const) {
       const san=getChess(fen).move({from:transformSquare(from,t),to:transformSquare(to,t)}).san;
       assert.equal(scoreKnightAndBishopWhiteMove(fen,san).knightBishopProtectionPenalty,penalty,`${t.name} ${san}`);
     }
+  }
+});
+
+
+test('r17 rejects bishops trapped between the knight and the wall across D4', () => {
+  for (const t of SQUARE_TRANSFORMS) {
+    for (const [source, penalty] of [
+      ['B7/1N6/8/8/7k/8/8/7K w - - 0 1', 1],
+      ['2B5/1N6/8/8/7k/8/8/7K w - - 0 1', 1],
+      ['B7/8/2N5/8/7k/8/8/7K w - - 0 1', 0],
+      ['8/1B6/2N5/8/7k/8/8/7K w - - 0 1', 0],
+    ] as const) {
+      const fen = transformFen(source, t);
+      const san = getChess(fen).move({from: transformSquare('h1', t), to: transformSquare('g1', t)}).san;
+      assert.equal(scoreKnightAndBishopWhiteMove(fen, san).knightBishopProtectionPenalty, penalty, `${t.name} ${source}`);
+    }
+    const blocked = transformFen('1K6/1B6/2N5/8/7k/8/8/8 w - - 0 1', t);
+    const san = getChess(blocked).move({from: transformSquare('b8', t), to: transformSquare('a8', t)}).san;
+    assert.equal(scoreKnightAndBishopWhiteMove(blocked, san).knightBishopProtectionPenalty, 1, t.name);
   }
 });
