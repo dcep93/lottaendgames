@@ -3,6 +3,22 @@ import test from 'node:test'
 import { findPiece, getChess, kingDistance, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess'
 import { getIdealKnightAndBishopWhiteMoves, bishopKnightRuleSet, scoreKnightAndBishopWhiteMove } from './bishopKnight'
 
+test('a bishop attack along the f6 escape race rejects tied Kc2 support across D4', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    const before = transformFen('8/5B2/8/1k6/8/3N4/8/1K6 w - - 0 1', transform)
+    const board = getChess(before)
+    const move = board.move({from: transformSquare('b1', transform), to: transformSquare('c2', transform)}).san
+    assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 99)
+    assert.equal(bishopKnightRuleSet.phaseAfterWhiteMove!(board.fen()), '1/2')
+    // White wins the escape race from c3; proximity to the bishop alone is not a veto.
+    const ahead = transformFen('8/5B2/8/1k6/8/2KN4/8/8 b - - 1 1', transform)
+    assert.equal(bishopKnightRuleSet.phaseAfterWhiteMove!(ahead), '2/2')
+    // The tied escape race is also allowed when White is closer to the bishop.
+    const defended = transformFen('8/8/8/1k6/8/1B1N4/2K5/8 b - - 1 1', transform)
+    assert.equal(bishopKnightRuleSet.phaseAfterWhiteMove!(defended), '2/2')
+  }
+})
+
 test('recorded seven-diagonal positions retain support when White is at least as close to the bishop', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const blackReply of ['Kb5', 'Ka5']) {
@@ -38,13 +54,14 @@ test('same-file seven kings reject support only when Black is closer to the bish
     assert.ok(getIdealKnightAndBishopWhiteMoves(before).includes(san))
     const cases = [
       // Same-file kings: White is closer, then an equal-distance tie.
-      '8/8/8/1k6/8/1B1N4/1K6/8 b - - 3 2',
-      '8/8/3k4/3B4/3K4/3N4/8/8 b - - 1 1',
-      '6B1/3k4/8/8/4K3/3N4/8/8 b - - 1 1',
+      ['8/8/8/1k6/8/1B1N4/1K6/8 b - - 3 2', '2/2'],
+      ['8/8/3k4/3B4/3K4/3N4/8/8 b - - 1 1', '2/2'],
+      // White is to the right, but Black can attack Bg8 on its tied g7 race.
+      ['6B1/3k4/8/8/4K3/3N4/8/8 b - - 1 1', '1/2'],
     ] as const
-    for (const fen of cases) {
+    for (const [fen, phase] of cases) {
       const f = transformFen(fen, transform)
-      assert.equal(bishopKnightRuleSet.phaseAfterWhiteMove!(f), '2/2')
+      assert.equal(bishopKnightRuleSet.phaseAfterWhiteMove!(f), phase)
     }
   }
 })

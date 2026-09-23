@@ -145,11 +145,12 @@ const BISHOP_ATTACK_SQUARES = new Map(allSquares().map(bishop => [
 ]))
 
 /** A bishop attack along a shortest king-step route costs White one tempo in the race. */
-function losesBishopAttackRace(fen: string, white: Square, black: Square, bishop: Square, target: Square, allowKingDefense = false): boolean {
+function losesBishopAttackRace(fen: string, white: Square, black: Square, bishop: Square, target: Square,
+  allowKingDefense = false, bishopDistance = kingDistance): boolean {
   const whiteDistance = kingDistance(white, target)
   const blackDistance = kingDistance(black, target)
   if (whiteDistance > blackDistance) return true
-  if (whiteDistance < blackDistance || kingDistance(black, bishop) >= kingDistance(white, bishop)) return false
+  if (whiteDistance < blackDistance || bishopDistance(black, bishop) >= bishopDistance(white, bishop)) return false
   const board = getChess(fen)
   return BISHOP_ATTACK_SQUARES.get(bishop)!.some(square =>
     kingDistance(black, square) + kingDistance(square, target) === blackDistance &&
@@ -394,9 +395,10 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
       losesBishopAttackRace(fen, white.square, black.square, bishop.square, pattern.bishopAttackRaceTarget)) continue
     const distance = supportDistance(fen, white.square, pattern)
     if (!kingSupportsThree && knight.square !== pattern.previousSupport && !knightWithinOneOfAvailableSupport(fen, white.square, pattern)) continue
-    // The king must cover the escape side opposite this knight support square.
+    // A shortest-route attack on the bishop breaks an otherwise tied escape race.
     if (pattern.kingRaceSquares?.some(square =>
-      kingDistance(white.square, square) > kingDistance(black.square, square))) continue
+      losesBishopAttackRace(fen, white.square, black.square, bishop.square, square, true,
+        squaredEuclideanDistance))) continue
     replies ??= getChess(fen.replace(/ [wb] /, ' b ')).moves({verbose: true})
       .filter(move => move.piece === 'k').map(move => move.to)
     if (replies.some(square => pattern.boundary.includes(square))) continue
