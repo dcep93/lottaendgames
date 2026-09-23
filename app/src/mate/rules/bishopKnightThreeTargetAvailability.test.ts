@@ -9,7 +9,7 @@ test('three targets remain absent at Kd7 and Kb5 even when an exact declaration 
     for (const [fen, size, knight] of [
       ['1kB5/3K4/8/1N6/8/8/8/8 b - - 1 1', 3, 99],
       ['k7/3K4/B7/1N6/8/8/8/8 b - - 3 2', 99, 99],
-      ['k1B5/3K4/8/3N4/8/8/8/8 b - - 1 1', 99, 99],
+      ['k1B5/3K4/8/3N4/8/8/8/8 b - - 1 1', 3, 99],
       ['k1B5/8/8/1K1N4/8/8/8/8 b - - 1 1', 99, 99],
       ['k1B5/2K5/8/1N6/8/8/8/8 b - - 1 1', 3, 0],
       ['k7/8/BK6/8/3N4/8/8/8 b - - 1 1', 3, 1],

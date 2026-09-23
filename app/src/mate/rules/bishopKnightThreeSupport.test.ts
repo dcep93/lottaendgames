@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess'
+import { allSquares, getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess'
 import { knightAndBishopSupportedDiagonal } from './bishopKnightDiagonalSupport'
 import { scoreKnightAndBishopWhiteMove } from './bishopKnight'
 
@@ -24,7 +24,7 @@ test('three-diagonal king adjacency does not waive same-color off-support restri
     for (const fen of ['k1B5/8/8/3N4/8/8/8/7K b - - 0 1']) {
       assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 99)
     }
-    for (const fen of ['k1B5/3K4/8/3N4/8/8/8/8 b - - 0 1', 'k1B5/8/8/1K1N4/8/8/8/8 b - - 0 1']) {
+    for (const fen of ['k1B5/8/8/1K1N4/8/8/8/8 b - - 0 1']) {
       assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 99)
     }
   }
@@ -49,5 +49,29 @@ test('Ba6 with same-color Kc6 is rejected with previous-stage Nd5, including ref
     assert.equal(scoreKnightAndBishopWhiteMove(fen, san).supportedDiagonalSizeScore, 99)
     // A remote knight cannot qualify while Kc6 has no target.
     assert.equal(knightAndBishopSupportedDiagonal(transformFen('k7/8/B1K5/8/8/8/7N/8 b - - 0 1', transform)).size, 99)
+  }
+})
+
+
+test('Ba6 Kb5 supports every knight with Black inside, including the loaded Nd4 line, across D4', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    for (const black of ['a7', 'a8', 'b8'] as const) {
+      for (const knight of allSquares()) {
+        if (['a6', 'b5', black].includes(knight)) continue
+        const board = getChess('k7/8/B7/1K6/8/8/8/8 b - - 0 1')
+        board.remove('a8')
+        board.put({type: 'k', color: 'b'}, black)
+        board.put({type: 'n', color: 'w'}, knight)
+        assert.deepEqual(knightAndBishopSupportedDiagonal(transformFen(board.fen(), transform)),
+          {size: 3, knight: 99}, `${black}, ${knight}, ${transform.name}`)
+      }
+    }
+    const board = getChess(transformFen('1N6/k7/B7/1K6/8/8/8/8 w - - 0 1', transform))
+    for (const [from, to] of [['b8', 'c6'], ['a7', 'a8'], ['c6', 'd4']] as const) {
+      board.move({from: transformSquare(from, transform), to: transformSquare(to, transform)})
+      if (board.turn() === 'b') assert.equal(knightAndBishopSupportedDiagonal(board.fen()).size, 3)
+    }
+    // The king/bishop placement alone cannot support an escaped Black king.
+    assert.equal(knightAndBishopSupportedDiagonal(transformFen('8/8/B7/1K2k3/3N4/8/8/8 b - - 0 1', transform)).size, 99)
   }
 })

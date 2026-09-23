@@ -261,6 +261,9 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
   const bishop = findPiece(fen, 'w', 'b')
   const knight = findPiece(fen, 'w', 'n')
   if (!white || !black || !bishop || !knight) return {size: 99, knight: 99}
+  // The Ba6/Kb5 declaration allows every knight square while Black stays inside.
+  // It does not create a knight target and supersedes the middle-square exclusion.
+  if (isDeclaredCornerSupportWithoutKnightTarget(white.square, bishop.square, black.square)) return {size: 3, knight: 99}
   // A knight on the three-diagonal's middle square (Ng2 with Bf1/ Bh3)
   // disqualifies support, including older king-and-bishop placement declarations.
   if (DIAGONALS.some(pattern => pattern.wall.length === 3 &&
@@ -281,9 +284,6 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
       knight: Math.min(...checkingPatterns.map(pattern => supportDistance(fen, white.square, pattern))),
     }
   }
-  // Explicit Kb5 placements waive the otherwise absent target, without creating one.
-  // No three-diagonal target exists at Kb5, so do not invent a knight-distance preference.
-  if (isDeclaredCornerSupportWithoutKnightTarget(white.square, bishop.square, black.square, knight.square)) return {size: 3, knight: 99}
   const declaredFive = DECLARED_FIVE_PLACEMENTS.find(pattern =>
     pattern.king === white.square && pattern.bishop === bishop.square &&
     pattern.knight === knight.square && pattern.black === black.square)
