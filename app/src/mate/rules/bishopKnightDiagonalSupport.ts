@@ -328,7 +328,17 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
   if (kingDistance(black.square, bishop.square) === 1 &&
     kingDistance(white.square, bishop.square) > 1 &&
     squaredEuclideanDistance(knight.square, bishop.square) === 5) return {size: 99, knight: 99}
-  const excludedFive = previousFivePlacementRejected || UNSUPPORTED_FIVE_ARRANGEMENTS.some(pattern =>
+  // An approaching knight does not waive the king-side requirement, even for an
+  // edge king. Check both reflected orientations so one cannot rescue the other.
+  // Previous-stage knights already fix their orientation in the check above.
+  const hasPreviousFiveKnight = DIAGONALS.some(pattern => pattern.wall.length === 5 &&
+    pattern.wall.includes(bishop.square) && pattern.previousSupport === knight.square)
+  const approachingFiveWrongSide = !hasPreviousFiveKnight && DIAGONALS.some(pattern => pattern.wall.length === 5 &&
+    pattern.wall.includes(bishop.square) && isInsideBishopDiagonal(black.square, pattern.wall) &&
+    !pattern.support.includes(knight.square) && pattern.previousSupport !== knight.square &&
+    ((whiteCoordinates.file - blackCoordinatesForSupport.file) * pattern.rightOffset.file +
+      (whiteCoordinates.rank - blackCoordinatesForSupport.rank) * pattern.rightOffset.rank <= 0))
+  const excludedFive = previousFivePlacementRejected || approachingFiveWrongSide || UNSUPPORTED_FIVE_ARRANGEMENTS.some(pattern =>
     pattern.king === white.square && pattern.bishop === bishop.square && pattern.black === black.square) ||
     hasExposedFiveBishopApproach(fen, bishop.square, black.square, blackDestinations)
   const excludedThree = unavailableThreeTarget || UNSUPPORTED_THREE_KNIGHTS.some(pattern =>

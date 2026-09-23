@@ -7,6 +7,20 @@ import { getIdealKnightAndBishopWhiteMoves, scoreKnightAndBishopWhiteMove } from
 
 const sixDiagonal = ['a3', 'b4', 'c5', 'd6', 'e7', 'f8'] as const
 
+test('an off-support knight cannot support five with White level with or left of Black, even on the edge', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    const before = transformFen('8/8/8/k7/BN6/8/K7/8 w - - 0 1', transform)
+    const board = getChess(before)
+    const move = board.move({from: transformSquare('a2', transform), to: transformSquare('a3', transform)}).san
+    assert.equal(knightAndBishopSupportedDiagonal(board.fen()).size, 99)
+    assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 99)
+    for (const fen of [
+      '8/8/k7/8/BN6/K7/8/8 b - - 0 1',
+      '8/8/1k6/8/BN6/K7/8/8 b - - 0 1',
+    ]) assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 99)
+  }
+})
+
 test('Bd7 Nd3 nearby-king eligibility keeps other support checks and prefers loaded Kd6', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const counters of ['0 1', '42 22']) {
@@ -592,7 +606,7 @@ test('a five-diagonal without a five-knight requires White to match the d6 king 
     for (const [position, expected] of [
       ['1k6/8/K7/8/B4N2/8/8/8 b - - 0 1', 99],
       ['1k6/8/K7/3N4/B7/8/8/8 b - - 0 1', 5], // Edge king is exempt from the color restriction.
-      ['1k6/8/1K6/8/B4N2/8/8/8 b - - 0 1', 5],
+      ['1k6/8/1K6/8/B4N2/8/8/8 b - - 0 1', 99], // Same file with an off-support knight.
     ] as const) {
       assert.equal(knightAndBishopSupportedDiagonal(transformFen(position, transform)).size, expected)
     }

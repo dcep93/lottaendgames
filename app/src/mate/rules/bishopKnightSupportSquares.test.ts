@@ -10,7 +10,8 @@ test('the former special arrangement keeps d5 as the five-diagonal support squar
     const afterWhite = transformFen('1k6/3B4/1K6/3N4/8/8/8/8 b - - 0 1', transform)
     assert.deepEqual(knightAndBishopSupportedDiagonal(afterWhite), {size: 5, knight: 0})
     const nf6 = getChess(fen).move({from: transformSquare('d5', transform), to: transformSquare('f6', transform)}).san
-    assert.equal(scoreKnightAndBishopWhiteMove(fen, nf6).supportedDiagonalKnightScore, 1)
+    // Leaving d5 loses support because the kings share a file.
+    assert.equal(scoreKnightAndBishopWhiteMove(fen, nf6).supportedDiagonalSizeScore, 99)
     assert.ok(!getIdealKnightAndBishopWhiteMoves(fen).includes(nf6))
     const entry = transformFen('3K4/k7/8/1B1N4/8/8/8/8 w - - 2 2', transform)
     const after = getChess(entry)
