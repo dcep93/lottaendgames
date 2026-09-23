@@ -13,7 +13,7 @@ test('r2.5 prescribes Kb5 in the supported bishop shuttle across D4', () => {
   }
 });
 
-test('r17 recognizes bishop defense via either minor and respects blockers across D4', () => {
+test('r9.98 recognizes bishop defense via either minor and respects blockers across D4', () => {
   for (const t of SQUARE_TRANSFORMS) {
     for (const [fen,from,to,penalty] of [
       ['2B5/6K1/8/4k3/1N6/8/8/8 w - - 0 1','b4','a6',0],
@@ -28,11 +28,11 @@ test('r17 recognizes bishop defense via either minor and respects blockers acros
     }
   }
   const ids=knightAndBishopWhiteRules.map(r=>r.id);
-  assert.ok(ids.indexOf('r15')<ids.indexOf('r17') && ids.indexOf('r17')<ids.indexOf('r18'));
+  assert.ok(ids.indexOf('r9.96')<ids.indexOf('r9.98') && ids.indexOf('r9.98')<ids.indexOf('r10'));
 });
 
 
-test('r17 credits Be6+ through Black’s king while earlier r9.95 prefers path control, across D4', () => {
+test('r9.98 credits Be6+ through Black’s king while earlier r9.95 prefers path control, across D4', () => {
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen('K1B5/8/8/8/2k5/1N6/8/8 w - - 0 1', t);
     const chess = getChess(fen);
@@ -47,7 +47,7 @@ test('r17 credits Be6+ through Black’s king while earlier r9.95 prefers path c
 });
 
 
-test('r17 allows adjacent protection with retreat room and longer protection across D4', () => {
+test('r9.98 allows adjacent protection with retreat room and longer protection across D4', () => {
   for (const t of SQUARE_TRANSFORMS) {
     const fen=transformFen('2k1B2K/8/2N5/8/8/8/8/8 w - - 6 4',t);
     for (const [from,to,penalty] of [['e8','d7',0],['h8','h7',0],['e8','f7',1]] as const) {
@@ -58,7 +58,7 @@ test('r17 allows adjacent protection with retreat room and longer protection acr
 });
 
 
-test('r17 rejects bishops trapped between the knight and the wall across D4', () => {
+test('r9.98 rejects bishops trapped between the knight and the wall across D4', () => {
   for (const t of SQUARE_TRANSFORMS) {
     for (const [source, penalty] of [
       ['B7/1N6/8/8/7k/8/8/7K w - - 0 1', 1],

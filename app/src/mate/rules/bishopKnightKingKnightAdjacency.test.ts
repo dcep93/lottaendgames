@@ -6,7 +6,7 @@ import {knightAndBishopWhiteRules, scoreKnightAndBishopWhiteMove} from './bishop
 test('r17.5 prefers edge or diagonal king-knight adjacency after either piece moves, across D4', () => {
   const rule = knightAndBishopWhiteRules.find(rule => rule.id === 'r17.5')!;
   const ids = knightAndBishopWhiteRules.map(rule => rule.id);
-  assert.ok(ids.indexOf('r17') < ids.indexOf('r17.5') && ids.indexOf('r17.5') < ids.indexOf('r18'));
+  assert.ok(ids.indexOf('r9.98') < ids.indexOf('r17.5') && ids.indexOf('r17.5') < ids.indexOf('r18'));
   for (const transform of SQUARE_TRANSFORMS) {
     for (const whiteKing of ['e1', 'f1'] as const) {
       const board = getChess('B7/8/8/8/3k4/8/8/3NK3 w - - 0 1');
