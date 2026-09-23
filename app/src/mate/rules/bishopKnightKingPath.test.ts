@@ -3,7 +3,7 @@ import test from 'node:test';
 import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess';
 import { getIdealKnightAndBishopWhiteMoves, scoreKnightAndBishopWhiteMove } from './bishopKnight';
 
-test('r18 prefers control across a shortest king path in every symmetry', () => {
+test('r9.95 prefers control across a shortest king path in every symmetry', () => {
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen('8/N7/8/2K5/B3k3/8/8/8 w - - 0 1', t);
     const move = (to: 'b3' | 'e8') => getChess(fen).move({from: transformSquare('a4', t), to: transformSquare(to, t)}).san;
@@ -18,12 +18,21 @@ test('r18 prefers control across a shortest king path in every symmetry', () => 
 });
 
 
-test('r18 prefers occupation over control in the loaded placement across D4', () => {
+test('r9.95 prefers occupation over control in the loaded placement across D4', () => {
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen('7N/4k3/4B3/5K2/8/8/8/8 w - - 4 3', t);
     const knight = getChess(fen).move({from: transformSquare('h8', t), to: transformSquare('f7', t)}).san;
     const bishop = getChess(fen).move({from: transformSquare('e6', t), to: transformSquare('d5', t)}).san;
     assert.equal(scoreKnightAndBishopWhiteMove(fen, knight).bishopKingPathPenalty, 0, t.name);
     assert.equal(scoreKnightAndBishopWhiteMove(fen, bishop).bishopKingPathPenalty, 1, t.name);
+  }
+});
+
+
+test('r9.95 keeps the bishop between the kings before r10 can force its escape', () => {
+  for (const t of SQUARE_TRANSFORMS) {
+    const fen = transformFen('7N/8/5K2/5B2/5k2/8/8/8 w - - 2 2', t);
+    const nf7 = getChess(fen).move({from: transformSquare('h8', t), to: transformSquare('f7', t)}).san;
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [nf7], t.name);
   }
 });

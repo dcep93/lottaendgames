@@ -157,6 +157,11 @@ test("bishop-and-knight rules are registered", () => {
       helpText: "Minimize king distance to the center.",
     },
     {
+      id: "r9.95",
+      shortLabel: "rule r9.95",
+      helpText: "Prefer bishop occupation else control of a square on a shortest path between the kings.",
+    },
+    {
       id: "r10",
       shortLabel: "rule r10",
       helpText: "If the bishop is within 2 steps of Black's king, maximize its distance from Black's king to at least 3 steps away.",
@@ -165,11 +170,6 @@ test("bishop-and-knight rules are registered", () => {
       id: "r15",
       shortLabel: "rule r15",
       helpText: "If the knight is within 2 steps of Black's king, maximize its distance from Black's side of the king moat.",
-    },
-    {
-      id: "r18",
-      shortLabel: "rule r18",
-      helpText: "Prefer bishop occupation else control of a square on a shortest path between the kings.",
     },
     {
       id: "r20",
@@ -204,9 +204,9 @@ test("bishop-and-knight rules are registered", () => {
       "r9.1",
       "r9.8",
       "r9.9",
+      "r9.95",
       "r10",
       "r15",
-      "r18",
       "r20",
     ],
   );

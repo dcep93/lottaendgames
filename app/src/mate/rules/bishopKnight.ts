@@ -477,6 +477,12 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       compare: (first, second) => first.kingCenterProximityScore - second.kingCenterProximityScore,
     },
     {
+      id: "r9.95",
+      shortLabel: "rule r9.95",
+      helpText: "Prefer bishop occupation else control of a square on a shortest path between the kings.",
+      compare: (first, second) => first.bishopKingPathPenalty - second.bishopKingPathPenalty,
+    },
+    {
       id: "r10",
       shortLabel: "rule r10",
       helpText: "If the bishop is within 2 steps of Black's king, maximize its distance from Black's king to at least 3 steps away.",
@@ -487,12 +493,6 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       shortLabel: "rule r15",
       helpText: "If the knight is within 2 steps of Black's king, maximize its distance from Black's side of the king moat.",
       compare: (first, second) => first.knightBlackMoatDistanceScore - second.knightBlackMoatDistanceScore,
-    },
-    {
-      id: "r18",
-      shortLabel: "rule r18",
-      helpText: "Prefer bishop occupation else control of a square on a shortest path between the kings.",
-      compare: (first, second) => first.bishopKingPathPenalty - second.bishopKingPathPenalty,
     },
     {
       id: "r20",
@@ -633,7 +633,7 @@ const bishopKnightHelp: RuleHelp = {
     "Stay away from a bishop-colored corner.",
   ],
   notes: [
-    "For r18, evaluate after White moves. A qualifying square is strictly between the kings on at least one shortest geometric king-step path: its two king distances sum to the distance between the kings. Prefer the bishop occupying such a square, then controlling one along an unblocked diagonal, then neither.",
+    "For r9.95, evaluate after White moves. A qualifying square is strictly between the kings on at least one shortest geometric king-step path: its two king distances sum to the distance between the kings. Prefer the bishop occupying such a square, then controlling one along an unblocked diagonal, then neither.",
     "For r9.8, evaluate after White moves: penalize a position if any single legal Black king move would attack both the bishop and knight at once, even if they are defended.",
     "For r8, White’s king must be on d4, e4, d5 or e5 before moving. Evaluate the bishop and knight preferences after White moves. A precage square is diagonally adjacent to a central bishop, off the long diagonals, and behind the bishop from Black’s king’s perspective.",
     "For r6, prefer White’s king on the opposite color to the bishop. For r9.9, minimize White’s king Euclidean distance to the board’s midpoint. For r20, maximize the sum of the bishop’s and knight’s Euclidean distances from Black’s king. Evaluate after White moves.",

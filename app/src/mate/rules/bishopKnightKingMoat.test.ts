@@ -19,12 +19,13 @@ test('Black-side moat distance uses a region beyond White and extends to distant
   }
 });
 
-test('r15 sends the nearby Ng7 behind the starting moat with Ne8 in every symmetry', () => {
+test('r15 scores Ne8 but yields to r9.95 bishop path control in every symmetry', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     const fen = transformFen('B4K2/6N1/5k2/8/8/8/8/8 w - - 0 1', transform);
     const ne8 = getChess(fen).move({from: transformSquare('g7', transform), to: transformSquare('e8', transform)}).san;
     assert.equal(scoreKnightAndBishopWhiteMove(fen, ne8).knightBlackMoatDistanceScore, -2);
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [ne8], transform.name);
+    const bd5 = getChess(fen).move({from: transformSquare('a8', transform), to: transformSquare('d5', transform)}).san;
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [bd5], transform.name);
   }
 });
 
