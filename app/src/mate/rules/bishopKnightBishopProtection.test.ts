@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { bishopControlsOrOccupiesSquare } from './bishopKnightGeometry';
 import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess';
 import { getIdealKnightAndBishopWhiteMoves, scoreKnightAndBishopWhiteMove, knightAndBishopWhiteRules } from './bishopKnight';
 
@@ -28,4 +29,16 @@ test('r17 recognizes bishop defense via either minor and respects blockers acros
   }
   const ids=knightAndBishopWhiteRules.map(r=>r.id);
   assert.ok(ids.indexOf('r15')<ids.indexOf('r17') && ids.indexOf('r17')<ids.indexOf('r18'));
+});
+
+
+test('r17 prefers Be6+ through Black’s king across D4 without changing actual bishop control', () => {
+  for (const t of SQUARE_TRANSFORMS) {
+    const fen = transformFen('K1B5/8/8/8/2k5/1N6/8/8 w - - 0 1', t);
+    const chess = getChess(fen);
+    const move = chess.move({from: transformSquare('c8',t), to: transformSquare('e6',t)}).san;
+    assert.equal(scoreKnightAndBishopWhiteMove(fen,move).knightBishopProtectionPenalty,0,t.name);
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[move],t.name);
+    assert.equal(bishopControlsOrOccupiesSquare(chess.fen(),transformSquare('e6',t),transformSquare('b3',t)),false,t.name);
+  }
 });

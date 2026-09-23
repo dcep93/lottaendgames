@@ -81,6 +81,7 @@ export function bishopControlsOrOccupiesSquare(
   fen: string,
   bishop: Square,
   target: Square,
+  transparentSquare?: Square,
 ): boolean {
   if (bishop === target) return true
   if (!sameDiagonal(bishop, target)) return false
@@ -93,7 +94,7 @@ export function bishopControlsOrOccupiesSquare(
   const chess = getChess(fen)
   while (file !== targetCoords.file || rank !== targetCoords.rank) {
     const square = squareFromCoords(file, rank)
-    if (!square || chess.get(square)) return false
+    if (!square || (square !== transparentSquare && chess.get(square))) return false
     file += fileStep
     rank += rankStep
   }
