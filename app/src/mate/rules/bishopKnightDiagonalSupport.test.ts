@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { allSquares, getChess, kingDistance, squareColor, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess'
+import { allSquares, edgeDistance, getChess, kingDistance, squareColor, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess'
 import { isInsideBishopDiagonal } from './bishopKnightGeometry'
 import { knightAndBishopSupportedDiagonal } from './bishopKnightDiagonalSupport'
 import { getIdealKnightAndBishopWhiteMoves, scoreKnightAndBishopWhiteMove } from './bishopKnight'
@@ -112,7 +112,7 @@ test('Nd3 five support combines right-side kings with declared placements or nea
       board.put({type: 'b', color: 'w'}, bishop)
       for (const transform of SQUARE_TRANSFORMS) {
         assert.equal(knightAndBishopSupportedDiagonal(transformFen(board.fen(), transform)).size,
-          squareColor(king) !== squareColor(bishop) && king[0] > 'a' && (['a4', 'd7'].includes(bishop) || kingDistance(king, bishop) === 1) && ((['a4', 'd7'].includes(bishop) && ['c5', 'c6', 'c7'].includes(king)) || (['a4', 'd7'].includes(bishop) && king === 'd6') || (bishop === 'd7' && kingDistance(king, 'a7') <= 2)) ? 5 : 99, `${king}, ${bishop}, ${transform.name}`)
+          (edgeDistance(king) === 0 || squareColor(king) !== squareColor(bishop)) && king[0] > 'a' && (['a4', 'd7'].includes(bishop) || kingDistance(king, bishop) === 1) && ((['a4', 'd7'].includes(bishop) && ['c5', 'c6', 'c7'].includes(king)) || (['a4', 'd7'].includes(bishop) && king === 'd6') || (bishop === 'd7' && kingDistance(king, 'a7') <= 2)) ? 5 : 99, `${king}, ${bishop}, ${transform.name}`)
       }
     }
   }
@@ -589,7 +589,7 @@ test('a five-diagonal without a five-knight requires White to match the d6 king 
     assert.ok(!getIdealKnightAndBishopWhiteMoves(fen).includes(ba4))
     for (const [position, expected] of [
       ['1k6/8/K7/8/B4N2/8/8/8 b - - 0 1', 99],
-      ['1k6/8/K7/3N4/B7/8/8/8 b - - 0 1', 99],
+      ['1k6/8/K7/3N4/B7/8/8/8 b - - 0 1', 5], // Edge king is exempt from the color restriction.
       ['1k6/8/1K6/8/B4N2/8/8/8 b - - 0 1', 5],
     ] as const) {
       assert.equal(knightAndBishopSupportedDiagonal(transformFen(position, transform)).size, expected)
@@ -1011,5 +1011,21 @@ test('Bb7+ with Kb6 is supported and preferred by r1 with Na7 one move from c6',
       '1k6/NB6/1K6/8/8/8/8/8 b - - 3 2', // Bishop does not check.
       'k7/NB6/8/2K5/8/8/8/8 b - - 3 2', // King is not on the declared square.
     ]) assert.equal(knightAndBishopSupportedDiagonal(transformFen(position, transform)).size, 99)
+  }
+})
+
+
+test('same-color edge kings retain support with previous-stage or current-stage knights', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    for (const counters of ['2 2', '43 25']) {
+      const before = transformFen(`3K4/3B4/1k6/8/8/3N4/8/8 w - - ${counters}`, transform)
+      const board = getChess(before)
+      const move = board.move({from: transformSquare('d8', transform), to: transformSquare('c8', transform)}).san
+      assert.equal(knightAndBishopSupportedDiagonal(board.fen()).size, 5)
+      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(before), [move])
+    }
+    assert.equal(knightAndBishopSupportedDiagonal(transformFen('1k6/8/K7/3N4/B7/8/8/8 b - - 0 1', transform)).size, 5)
+    // The edge exemption does not waive the independent knight-on-edge restriction.
+    assert.equal(knightAndBishopSupportedDiagonal(transformFen('2KB4/8/1k6/8/8/8/8/N7 b - - 0 1', transform)).size, 99)
   }
 })

@@ -284,8 +284,8 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
     pattern.knight === knight.square && pattern.black === black.square)
   // Universal post-White limits, including declared support placements.
   if (UNSUPPORTED_BISHOP_SQUARES.has(bishop.square)) return {size: 99, knight: 99}
-  // A five-bishop with its five-knight requires the king off the bishop's color.
-  if (!declaredFive?.allowSameColorKing && squareColor(white.square) === squareColor(bishop.square) && DIAGONALS.some(pattern =>
+  // Away from the edge, a five-bishop with its five-knight requires the king off the bishop's color.
+  if (edgeDistance(white.square) > 0 && !declaredFive?.allowSameColorKing && squareColor(white.square) === squareColor(bishop.square) && DIAGONALS.some(pattern =>
     pattern.wall.length === 5 && pattern.wall.includes(bishop.square) &&
     pattern.support.includes(knight.square))) return {size: 99, knight: 99}
   if (edgeDistance(knight.square) === 0) return {size: 99, knight: 99}
@@ -355,8 +355,8 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
     if (pattern.wall.length === 3 && excludedThree) continue
     // Seven-diagonal support requires the knight on its actual support square.
     if (pattern.wall.length === 7 && !pattern.support.includes(knight.square)) continue
-    // Exact declared placements return above; ordinary same-color kings need an occupied current-stage target.
-    if (squareColor(white.square) === squareColor(bishop.square) &&
+    // Exact declarations and edge kings are exempt; other same-color kings need an occupied current-stage target.
+    if (edgeDistance(white.square) > 0 && squareColor(white.square) === squareColor(bishop.square) &&
       !supportTargets(white.square, pattern).includes(knight.square)) continue
     // Apply the king-side requirement in each qualifying seven-support orientation.
     if (pattern.wall.length === 7 &&
