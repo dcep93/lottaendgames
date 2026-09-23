@@ -144,7 +144,7 @@ test("bishop-and-knight rules are registered", () => {
     {
       id: "r8",
       shortLabel: "rule r8",
-      helpText: "With a central king, prefer bishop on the long diagonal, then a central bishop, then knight move proximity to a precage square.",
+      helpText: "With a central king, prefer bishop on the long diagonal, then a central bishop, then knight move proximity to a precage square, then knight off the bishop's color.",
     },
     {
       id: "r9.1",

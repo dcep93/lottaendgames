@@ -62,6 +62,43 @@ AUDIT_DIR=/absolute/full-audit npx tsx ../scripts/bishop-knight-audit/full-detai
 AUDIT_DIR=/absolute/full-audit npx tsx ../scripts/bishop-knight-audit/full-report.mts
 ```
 
+## Fixed cycle-position cohort (current progress metric)
+
+The user wants **positions on loops**, not positions that can reach loops.
+Keep the 641 D4-distinct post-White positions in `cohort-2026-09-23.json` fixed
+until explicitly asked to replace the baseline. It comes from the exhaustive
+`0205bf4` audit. After each preference change, report remaining positions out of
+641, counting each board once, even if it lies on multiple cycles.
+
+From the repository root:
+
+```sh
+app/node_modules/.bin/tsx scripts/bishop-knight-audit/cohort.mts \
+  --baseline scripts/bishop-knight-audit/cohort-2026-09-23.json \
+  --out /absolute/path/to/cohort-check
+```
+
+This is an exhaustive cycle-membership check for this fixed cohort, not a new
+all-position census. It also catches changed loops through the original boards;
+breaking an old witness alone is not sufficient. Newly cyclic boards outside
+the cohort are deliberately excluded from the progress count.
+
+For each cohort post-White board P, enumerate all reversible legal White moves
+to cover each possible preceding White board F. Seed every noncapturing legal
+Black reply Q with the jointly D4-canonical history (Q,F). Capturable-minor and
+mate/stalemate branches terminate just as in the full audit. Any policy cycle
+containing P must pass through one of these seeds. Expand the current production
+worker through all best-move ties and support changes, preserving return history.
+Count a cohort board only when its post-White label occurs on an edge internal
+to a cyclic strongly connected component. Initial seeds may overapproximate
+histories, but only complete cycles made of current-policy edges are counted;
+this does not impose or measure fresh-start reachability.
+
+Validation: the baseline policy recovers all 641 boards; SCC tests exclude
+incoming paths and exits. With the r8 knight-color tie-breaker, 557 remain.
+One worker checks this cohort in roughly 40 seconds on the current machine.
+`result.json` records the policy bundle fingerprint and exact surviving keys.
+
 ## Staged work: seven, then five, then three
 
 ```sh

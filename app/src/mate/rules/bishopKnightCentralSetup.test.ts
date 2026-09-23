@@ -26,3 +26,19 @@ test('r8 uses starting king centrality and advances the knight toward a precage 
     assert.ok(compareScoresByRules(score(fen, 'f1', 'd2'), score(fen, 'f1', 'h2'), [rule]) < 0, transform.name);
   }
 });
+
+
+test('r8 finally prefers the knight off bishop color, only with a starting central king, across D4', () => {
+  const rule=knightAndBishopWhiteRules.find(r=>r.id==='r8')!;
+  for(const t of SQUARE_TRANSFORMS){
+    const f=transformFen('8/2k5/2B5/8/3K4/2N5/8/8 w - - 2 2',t);
+    const san=(from:'c3'|'c6',to:'d5'|'a8')=>getChess(f).move({from:transformSquare(from,t),to:transformSquare(to,t)}).san;
+    const off=scoreKnightAndBishopWhiteMove(f,san('c6','a8'));
+    const same=scoreKnightAndBishopWhiteMove(f,san('c3','d5'));
+    assert.equal(off.knightBishopColorPenalty,0,t.name);
+    assert.equal(same.knightBishopColorPenalty,1,t.name);
+    // Isolate the last tie-break after the earlier r8 criteria tie.
+    assert.ok(compareScoresByRules(off,same,[rule])<0,t.name);
+    assert.equal(compareScoresByRules({...off,startsWithCentralKing:false},{...same,startsWithCentralKing:false},[rule]),0,t.name);
+  }
+});
