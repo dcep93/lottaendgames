@@ -942,7 +942,8 @@ test('declared Kb5 Ba6 versus Ka7 supports all knight locations except the middl
     const before = transformFen('8/k7/B7/K2N4/8/8/8/8 w - - 2 2', transform)
     const move = getChess(before).move({from: transformSquare('a5', transform), to: transformSquare('b5', transform)}).san
     assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 3)
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(before), [move])
+    const escape = getChess(before).move({from: transformSquare('a6', transform), to: transformSquare('c8', transform)}).san
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(before), [escape])
     for (const fen of [
       'k7/8/B7/1K6/8/8/8/4N3 b - - 0 1', // Different Black square.
       '8/k7/B1K5/8/8/8/8/4N3 b - - 0 1', // Different White king.

@@ -132,6 +132,11 @@ test("bishop-and-knight rules are registered", () => {
       helpText: "Prepare the 7 diagonal.",
     },
     {
+      id: "r6",
+      shortLabel: "rule r6",
+      helpText: "Prefer king off bishop's color.",
+    },
+    {
       id: "r8",
       shortLabel: "rule r8",
       helpText: "With a central king, prefer bishop on the long diagonal, then a central bishop, then knight move proximity to a precage square.",
@@ -149,7 +154,7 @@ test("bishop-and-knight rules are registered", () => {
     {
       id: "r9.9",
       shortLabel: "rule r9.9",
-      helpText: "Minimize king distance to the center, then prefer king off bishop's color.",
+      helpText: "Minimize king distance to the center.",
     },
     {
       id: "r10",
@@ -194,6 +199,7 @@ test("bishop-and-knight rules are registered", () => {
       "r2.5",
       "r4",
       "r5",
+      "r6",
       "r8",
       "r9.1",
       "r9.8",
@@ -208,7 +214,7 @@ test("bishop-and-knight rules are registered", () => {
     ruleSet.whiteRuleDescriptions.map(({ id }) => id),
     knightAndBishopWhiteRules.map(({ id }) => id),
   );
-  assert.equal(knightAndBishopWhiteRules.length, 16);
+  assert.equal(knightAndBishopWhiteRules.length, 17);
 });
 
 test("immediate mate keeps precedence without the mating-net rule", () => {

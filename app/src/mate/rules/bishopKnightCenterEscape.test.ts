@@ -3,7 +3,10 @@ import test from 'node:test';
 import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess';
 import { knightAndBishopWhiteRules, scoreKnightAndBishopWhiteMove } from './bishopKnight';
 
-test('r9.9 prioritizes center distance and breaks ties by opposite color; r20 only scores minor distance', () => {
+test('r6 prefers opposite color; r9.9 only scores center distance; r20 only scores minor distance', () => {
+  const r6 = knightAndBishopWhiteRules.find(rule => rule.id === 'r6')!;
+  assert.ok(r6.compare);
+  assert.ok(knightAndBishopWhiteRules.indexOf(r6) < knightAndBishopWhiteRules.findIndex(rule => rule.id === 'r8'));
   const r99 = knightAndBishopWhiteRules.find(rule => rule.id === 'r9.9')!;
   const r20 = knightAndBishopWhiteRules.find(rule => rule.id === 'r20')!;
   assert.ok(r99.compare); assert.ok(r20.compare);
@@ -17,7 +20,8 @@ test('r9.9 prioritizes center distance and breaks ties by opposite color; r20 on
     const offColorFar = score('d4', 'c3'), offColorNear = score('d4', 'e3'), sameColorCentral = score('d4', 'd5');
     assert.ok(r99.compare(offColorFar, sameColorCentral) > 0, transform.name);
     assert.ok(r99.compare(offColorNear, offColorFar) < 0, transform.name);
-    assert.ok(r99.compare(far, sameColorCentral) < 0, transform.name);
+    assert.equal(r99.compare(far, sameColorCentral), 0, transform.name);
+    assert.ok(r6.compare(offColorFar, sameColorCentral) < 0, transform.name);
     assert.ok(r20.compare(far, near) < 0, transform.name);
     assert.equal(r20.compare(offColorFar, sameColorCentral), 0, transform.name);
     assert.equal(far.minorBlackDistanceScore, -Math.sqrt(29) - Math.sqrt(41));
