@@ -39,6 +39,8 @@ import type {
 } from "./types";
 
 export type KnightAndBishopWhiteMoveScore = {
+  readonly startsWithCentralKing: boolean;
+  readonly bishopCenterPenalty: number;
   readonly minorBlackDistanceScore: number;
   readonly nearbyBishopEscapeScore: number;
   readonly knightBlackMoatDistanceScore: number;
@@ -138,6 +140,7 @@ function distanceToNearestUnprotectedKnightOrBishop(fen: string): number {
 }
 
 type KnightAndBishopPositionScoreContext = {
+  readonly startsWithCentralKing: boolean;
   readonly bishopOppositionTarget: Square | undefined;
   readonly shouldCoordinateKing: boolean;
   readonly shouldEscapeBishop: boolean;
@@ -171,6 +174,7 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
       bishopOppositionTarget = `${"abcdefgh"[file]}${rank + 1}` as Square;
   }
   return {
+    startsWithCentralKing: centralKing,
     bishopOppositionTarget,
     knightMoatSides: whiteKing && blackKing && knight && kingDistance(knight.square, blackKing.square) <= 2
       ? blackKingMoatSides(whiteKing.square, blackKing.square) : [],
@@ -228,6 +232,8 @@ function scoreKnightAndBishopWhiteMoveCore(
       const distance = knight ? knightDistanceFromBlackMoatSide(knight.square, context.knightMoatSides) : 0;
       return distance ? -distance : 0;
     },
+    startsWithCentralKing: context.startsWithCentralKing,
+    bishopCenterPenalty: bishop && centerDistance(bishop.square) === 0 ? 0 : 1,
     get minorBlackDistanceScore() {
       return blackKing ? -[bishop, knight].reduce((sum, piece) => sum + (piece
         ? Math.sqrt(squaredEuclideanDistance(piece.square, blackKing.square)) : 0), 0) : 0;
@@ -413,6 +419,17 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       compare: (first, second) => first.declaredPreparationPenalty - second.declaredPreparationPenalty,
     },
     {
+      id: "r8",
+      shortLabel: "rule r8",
+      helpText: "With a central king, prefer bishop on the long diagonal, then a central bishop, then knight move proximity to a precage square.",
+      applies: score => score.startsWithCentralKing,
+      subpriorities: [
+        { compare: (first, second) => first.bishopLongDiagonalPenalty - second.bishopLongDiagonalPenalty },
+        { compare: (first, second) => first.bishopCenterPenalty - second.bishopCenterPenalty },
+        { compare: (first, second) => first.knightTargetProximityScore - second.knightTargetProximityScore },
+      ],
+    },
+    {
       id: "r10",
       shortLabel: "rule r10",
       helpText: "If the bishop is within 2 steps of Black's king, maximize its distance from Black's king.",
@@ -564,6 +581,7 @@ const bishopKnightHelp: RuleHelp = {
     "Stay away from a bishop-colored corner.",
   ],
   notes: [
+    "For r8, White’s king must be on d4, e4, d5 or e5 before moving. Evaluate the bishop and knight preferences after White moves. A precage square is diagonally adjacent to a central bishop, off the long diagonals, and behind the bishop from Black’s king’s perspective.",
     "For r20, minimize White’s king Euclidean distance to the board’s midpoint, then maximize the sum of the bishop’s and knight’s Euclidean distances from Black’s king. Evaluate after White moves.",
     "For r15, check the knight’s two-king-step range before White moves. Fix the moat one file or rank from White’s starting king toward Black along their greater separation; use both axes when tied. Black’s side is the region beyond that line. Maximize the knight’s Euclidean distance from the nearest Black-side region after White moves; squares inside either region score zero. The moat also exists when the kings are farther than two steps apart.",
     "For r10, check before White moves: the bishop must be within two king steps of Black’s king. Maximize the bishop’s Euclidean distance from Black after the move, including destinations beyond two steps.",
