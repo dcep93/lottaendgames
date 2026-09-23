@@ -3,25 +3,8 @@ import test from 'node:test';
 import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess';
 import { getIdealKnightAndBishopWhiteMoves, knightAndBishopWhiteRules, scoreKnightAndBishopWhiteMove } from './bishopKnight';
 
-test('r6 waives color only for king moves leaving a corner, across D4', () => {
-  for (const t of SQUARE_TRANSFORMS) {
-    const fen = transformFen('B7/8/1k6/8/8/8/1N6/K7 w - - 0 1', t);
-    const san = getChess(fen).move({from: transformSquare('a1', t), to: transformSquare('b1', t)}).san;
-    assert.equal(scoreKnightAndBishopWhiteMove(fen, san).kingBishopColorPenalty, 0);
-    const escape = getChess(fen).move({from: transformSquare('a1', t), to: transformSquare('a2', t)}).san;
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [escape]);
-    const next = transformFen('B7/8/1k6/8/8/8/1N6/1K6 w - - 0 1', t);
-    const minor = getChess(next).move({from: transformSquare('b2', t), to: transformSquare('d3', t)}).san;
-    assert.equal(scoreKnightAndBishopWhiteMove(next, minor).kingBishopColorPenalty, 1);
-    const edge = getChess(next).move({from: transformSquare('b1', t), to: transformSquare('a2', t)}).san;
-    assert.equal(scoreKnightAndBishopWhiteMove(next, edge).kingBishopColorPenalty, 1);
-  }
-});
-
-test('r6 prefers opposite color; r9.9 only scores center distance; r20 scores minor distances to both kings', () => {
-  const r6 = knightAndBishopWhiteRules.find(rule => rule.id === 'r6')!;
-  assert.ok(r6.compare);
-  assert.ok(knightAndBishopWhiteRules.indexOf(r6) < knightAndBishopWhiteRules.findIndex(rule => rule.id === 'r8'));
+test('r9.9 scores center distance without r6; r20 scores minor distances to both kings', () => {
+  assert.ok(!knightAndBishopWhiteRules.some(rule => rule.id === 'r6'));
   const r99 = knightAndBishopWhiteRules.find(rule => rule.id === 'r9.9')!;
   const r20 = knightAndBishopWhiteRules.find(rule => rule.id === 'r20')!;
   assert.ok(r99.compare); assert.ok(r20.compare);
@@ -36,7 +19,7 @@ test('r6 prefers opposite color; r9.9 only scores center distance; r20 scores mi
     assert.ok(r99.compare(offColorFar, sameColorCentral) > 0, transform.name);
     assert.ok(r99.compare(offColorNear, offColorFar) < 0, transform.name);
     assert.equal(r99.compare(far, sameColorCentral), 0, transform.name);
-    assert.ok(r6.compare(offColorFar, sameColorCentral) < 0, transform.name);
+    assert.equal('kingBishopColorPenalty' in sameColorCentral, false);
     assert.ok(r20.compare(far, near) < 0, transform.name);
     assert.ok(r20.compare(offColorFar, sameColorCentral) < 0, transform.name);
     assert.equal(far.minorBlackDistanceScore, -Math.sqrt(29) - Math.sqrt(41));

@@ -1,0 +1,553 @@
+{
+  "baselinePolicy": "0205bf45031c0133c0f82a5b59b1c4f169d88469",
+  "policyFingerprint": "896b2e9495b3d407d35a65753943500d0040c7d387a0dfe90268910df3b70bf8",
+  "baselinePositions": 641,
+  "remainingPositions": 135,
+  "removedPositions": 506,
+  "remainingPhysicalPositions": 1080,
+  "seeds": 54633,
+  "expanded": 65109,
+  "seconds": 48,
+  "survivors": [
+    {
+      "key": 21406,
+      "weight": 8
+    },
+    {
+      "key": 22485,
+      "weight": 8
+    },
+    {
+      "key": 41868,
+      "weight": 8
+    },
+    {
+      "key": 41237,
+      "weight": 8
+    },
+    {
+      "key": 75156,
+      "weight": 8
+    },
+    {
+      "key": 74525,
+      "weight": 8
+    },
+    {
+      "key": 89445,
+      "weight": 8
+    },
+    {
+      "key": 88492,
+      "weight": 8
+    },
+    {
+      "key": 93606,
+      "weight": 8
+    },
+    {
+      "key": 92653,
+      "weight": 8
+    },
+    {
+      "key": 185181,
+      "weight": 8
+    },
+    {
+      "key": 186260,
+      "weight": 8
+    },
+    {
+      "key": 279389,
+      "weight": 8
+    },
+    {
+      "key": 280468,
+      "weight": 8
+    },
+    {
+      "key": 304012,
+      "weight": 8
+    },
+    {
+      "key": 303381,
+      "weight": 8
+    },
+    {
+      "key": 334945,
+      "weight": 8
+    },
+    {
+      "key": 333866,
+      "weight": 8
+    },
+    {
+      "key": 339106,
+      "weight": 8
+    },
+    {
+      "key": 338027,
+      "weight": 8
+    },
+    {
+      "key": 351589,
+      "weight": 8
+    },
+    {
+      "key": 350636,
+      "weight": 8
+    },
+    {
+      "key": 355750,
+      "weight": 8
+    },
+    {
+      "key": 354797,
+      "weight": 8
+    },
+    {
+      "key": 395883,
+      "weight": 8
+    },
+    {
+      "key": 396514,
+      "weight": 8
+    },
+    {
+      "key": 437164,
+      "weight": 8
+    },
+    {
+      "key": 437541,
+      "weight": 8
+    },
+    {
+      "key": 447325,
+      "weight": 8
+    },
+    {
+      "key": 448404,
+      "weight": 8
+    },
+    {
+      "key": 449131,
+      "weight": 8
+    },
+    {
+      "key": 449762,
+      "weight": 8
+    },
+    {
+      "key": 545694,
+      "weight": 8
+    },
+    {
+      "key": 546773,
+      "weight": 8
+    },
+    {
+      "key": 597089,
+      "weight": 8
+    },
+    {
+      "key": 596010,
+      "weight": 8
+    },
+    {
+      "key": 598097,
+      "weight": 8
+    },
+    {
+      "key": 561224,
+      "weight": 8
+    },
+    {
+      "key": 601250,
+      "weight": 8
+    },
+    {
+      "key": 600171,
+      "weight": 8
+    },
+    {
+      "key": 613733,
+      "weight": 8
+    },
+    {
+      "key": 612780,
+      "weight": 8
+    },
+    {
+      "key": 617894,
+      "weight": 8
+    },
+    {
+      "key": 616941,
+      "weight": 8
+    },
+    {
+      "key": 691315,
+      "weight": 8
+    },
+    {
+      "key": 691946,
+      "weight": 8
+    },
+    {
+      "key": 699308,
+      "weight": 8
+    },
+    {
+      "key": 699685,
+      "weight": 8
+    },
+    {
+      "key": 711275,
+      "weight": 8
+    },
+    {
+      "key": 711906,
+      "weight": 8
+    },
+    {
+      "key": 790108,
+      "weight": 8
+    },
+    {
+      "key": 937555,
+      "weight": 8
+    },
+    {
+      "key": 811609,
+      "weight": 8
+    },
+    {
+      "key": 812562,
+      "weight": 8
+    },
+    {
+      "key": 840281,
+      "weight": 8
+    },
+    {
+      "key": 841234,
+      "weight": 8
+    },
+    {
+      "key": 859233,
+      "weight": 8
+    },
+    {
+      "key": 858154,
+      "weight": 8
+    },
+    {
+      "key": 863394,
+      "weight": 8
+    },
+    {
+      "key": 862315,
+      "weight": 8
+    },
+    {
+      "key": 875877,
+      "weight": 8
+    },
+    {
+      "key": 874924,
+      "weight": 8
+    },
+    {
+      "key": 880038,
+      "weight": 8
+    },
+    {
+      "key": 879085,
+      "weight": 8
+    },
+    {
+      "key": 920171,
+      "weight": 8
+    },
+    {
+      "key": 920802,
+      "weight": 8
+    },
+    {
+      "key": 954969,
+      "weight": 8
+    },
+    {
+      "key": 955922,
+      "weight": 8
+    },
+    {
+      "key": 961452,
+      "weight": 8
+    },
+    {
+      "key": 961829,
+      "weight": 8
+    },
+    {
+      "key": 973419,
+      "weight": 8
+    },
+    {
+      "key": 974050,
+      "weight": 8
+    },
+    {
+      "key": 983641,
+      "weight": 8
+    },
+    {
+      "key": 984594,
+      "weight": 8
+    },
+    {
+      "key": 2360157,
+      "weight": 8
+    },
+    {
+      "key": 2361236,
+      "weight": 8
+    },
+    {
+      "key": 2380702,
+      "weight": 8
+    },
+    {
+      "key": 2381781,
+      "weight": 8
+    },
+    {
+      "key": 2401164,
+      "weight": 8
+    },
+    {
+      "key": 2400533,
+      "weight": 8
+    },
+    {
+      "key": 2448741,
+      "weight": 8
+    },
+    {
+      "key": 2447788,
+      "weight": 8
+    },
+    {
+      "key": 2452902,
+      "weight": 8
+    },
+    {
+      "key": 2451949,
+      "weight": 8
+    },
+    {
+      "key": 2544477,
+      "weight": 8
+    },
+    {
+      "key": 2545556,
+      "weight": 8
+    },
+    {
+      "key": 2628203,
+      "weight": 8
+    },
+    {
+      "key": 2628834,
+      "weight": 8
+    },
+    {
+      "key": 2694241,
+      "weight": 8
+    },
+    {
+      "key": 2693162,
+      "weight": 8
+    },
+    {
+      "key": 2710885,
+      "weight": 8
+    },
+    {
+      "key": 2709932,
+      "weight": 8
+    },
+    {
+      "key": 2715046,
+      "weight": 8
+    },
+    {
+      "key": 2714093,
+      "weight": 8
+    },
+    {
+      "key": 2755179,
+      "weight": 8
+    },
+    {
+      "key": 2755810,
+      "weight": 8
+    },
+    {
+      "key": 2796460,
+      "weight": 8
+    },
+    {
+      "key": 2796837,
+      "weight": 8
+    },
+    {
+      "key": 2808427,
+      "weight": 8
+    },
+    {
+      "key": 2809058,
+      "weight": 8
+    },
+    {
+      "key": 2894443,
+      "weight": 8
+    },
+    {
+      "key": 2895074,
+      "weight": 8
+    },
+    {
+      "key": 2956385,
+      "weight": 8
+    },
+    {
+      "key": 2955306,
+      "weight": 8
+    },
+    {
+      "key": 2977190,
+      "weight": 8
+    },
+    {
+      "key": 2976237,
+      "weight": 8
+    },
+    {
+      "key": 3050611,
+      "weight": 8
+    },
+    {
+      "key": 3051242,
+      "weight": 8
+    },
+    {
+      "key": 3058604,
+      "weight": 8
+    },
+    {
+      "key": 3058981,
+      "weight": 8
+    },
+    {
+      "key": 3070571,
+      "weight": 8
+    },
+    {
+      "key": 3071202,
+      "weight": 8
+    },
+    {
+      "key": 4739998,
+      "weight": 8
+    },
+    {
+      "key": 4741077,
+      "weight": 8
+    },
+    {
+      "key": 4798307,
+      "weight": 8
+    },
+    {
+      "key": 4799396,
+      "weight": 8
+    },
+    {
+      "key": 4808037,
+      "weight": 8
+    },
+    {
+      "key": 4807084,
+      "weight": 8
+    },
+    {
+      "key": 4812198,
+      "weight": 8
+    },
+    {
+      "key": 4811245,
+      "weight": 8
+    },
+    {
+      "key": 5007075,
+      "weight": 8
+    },
+    {
+      "key": 5064420,
+      "weight": 8
+    },
+    {
+      "key": 5074342,
+      "weight": 8
+    },
+    {
+      "key": 5073389,
+      "weight": 8
+    },
+    {
+      "key": 7193846,
+      "weight": 8
+    },
+    {
+      "key": 5093162,
+      "weight": 8
+    },
+    {
+      "key": 5093582,
+      "weight": 8
+    },
+    {
+      "key": 5055121,
+      "weight": 8
+    },
+    {
+      "key": 7193257,
+      "weight": 8
+    },
+    {
+      "key": 7194226,
+      "weight": 8
+    },
+    {
+      "key": 7193814,
+      "weight": 8
+    },
+    {
+      "key": 7194950,
+      "weight": 8
+    },
+    {
+      "key": 7194956,
+      "weight": 8
+    },
+    {
+      "key": 7194957,
+      "weight": 8
+    },
+    {
+      "key": 7193807,
+      "weight": 8
+    }
+  ]
+}

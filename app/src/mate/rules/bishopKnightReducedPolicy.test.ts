@@ -106,13 +106,13 @@ test('the old behind-White score remains removed', () => {
 })
 
 
-test('r6 prefers opposite color before king centrality in all symmetries', () => {
+test('king centrality can now prefer a bishop-colored king with r6 removed, across D4', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     const fen = transformFen('1NK5/8/2B5/8/8/k7/8/8 w - - 0 1', transform)
     const moves = (['d7', 'd8'] as const).map(to => getChess(fen).move({from: transformSquare('c8', transform), to: transformSquare(to, transform)}).san)
     const scores = moves.map(san => scoreKnightAndBishopWhiteMove(fen, san))
-    assert.ok(compareScoresByRules(scores[0]!, scores[1]!, knightAndBishopWhiteRules) > 0)
+    assert.ok(compareScoresByRules(scores[0]!, scores[1]!, knightAndBishopWhiteRules) < 0)
     const ideal = getIdealKnightAndBishopWhiteMoves(fen)
-    assert.ok(!ideal.includes(moves[0]!), transform.name)
+    assert.ok(ideal.includes(moves[0]!), transform.name)
   }
 })

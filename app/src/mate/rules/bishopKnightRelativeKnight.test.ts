@@ -4,7 +4,7 @@ import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../c
 import { getIdealKnightAndBishopWhiteMoves, scoreKnightAndBishopWhiteMove } from './bishopKnight';
 import { knightAndBishopRelativeKnightMove } from './bishopKnightRelativeKnight';
 
-test('r9.1 retains Nd2 but yields to the higher-priority r6 king move across D4', () => {
+test('r9.1 prefers Nd2 with r6 removed, across D4', () => {
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen('B7/8/8/8/5k2/5N2/4K3/8 w - - 0 1', t);
     const from = transformSquare('f3', t), to = transformSquare('d2', t);
@@ -13,7 +13,7 @@ test('r9.1 retains Nd2 but yields to the higher-priority r6 king move across D4'
     assert.equal(scoreKnightAndBishopWhiteMove(fen, knightMove).relativeKnightPenalty, 0);
     const kingMove = getChess(fen).move({from: transformSquare('e2', t), to}).san;
     assert.equal(scoreKnightAndBishopWhiteMove(fen, kingMove).relativeKnightPenalty, 1);
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [kingMove], t.name);
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [knightMove], t.name);
   }
 });
 

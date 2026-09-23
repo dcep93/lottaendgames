@@ -137,11 +137,6 @@ test("bishop-and-knight rules are registered", () => {
       helpText: "Play the 5.5 step.",
     },
     {
-      id: "r6",
-      shortLabel: "rule r6",
-      helpText: "Prefer king off bishop's color, unless escaping a corner.",
-    },
-    {
       id: "r8",
       shortLabel: "rule r8",
       helpText: "With a central king, prefer bishop on the long diagonal, then a central bishop, then knight move proximity to a precage square, then knight off the bishop's color.",
@@ -225,7 +220,6 @@ test("bishop-and-knight rules are registered", () => {
       "r4",
       "r5",
       "r5.5",
-      "r6",
       "r8",
       "r9.1",
       "r9.8",
@@ -244,7 +238,7 @@ test("bishop-and-knight rules are registered", () => {
     ruleSet.whiteRuleDescriptions.map(({ id }) => id),
     knightAndBishopWhiteRules.map(({ id }) => id),
   );
-  assert.equal(knightAndBishopWhiteRules.length, 22);
+  assert.equal(knightAndBishopWhiteRules.length, 21);
 });
 
 test("immediate mate keeps precedence without the mating-net rule", () => {
