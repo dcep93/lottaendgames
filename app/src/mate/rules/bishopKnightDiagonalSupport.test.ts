@@ -89,7 +89,7 @@ test('Ba4 with Kd6 Nd3 is supported across Black placements and breaks the loade
   }
 })
 
-test('Kd6 supports Bd7 with Nd3 and ties Be8 without later preferences', () => {
+test('Kd6 supports Bd7 with Nd3 while r10 prefers the farther Be8', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const counters of ['0 1', '38 20']) {
       const fen = transformFen(`8/8/3K4/k7/B7/3N4/8/8 w - - ${counters}`, transform)
@@ -98,7 +98,7 @@ test('Kd6 supports Bd7 with Nd3 and ties Be8 without later preferences', () => {
       assert.equal(knightAndBishopSupportedDiagonal(board.fen()).size, 5)
       assert.equal(scoreKnightAndBishopWhiteMove(fen, bd7).supportedDiagonalSizeScore, 5)
       const be8 = getChess(fen).move({from: transformSquare('a4', transform), to: transformSquare('e8', transform)}).san
-      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen).sort(), [bd7, be8].sort())
+      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [be8])
     }
   }
 })
@@ -499,7 +499,7 @@ test('a five-bishop with Nd3 still rejects Bb5 even with an eligible king', () =
   }
 })
 
-test('Bd7 remains supported and Bc6 is rejected while Kd6 ties supported bishop moves', () => {
+test('Bd7 remains supported and Bc6 is rejected while r10 breaks the supported tie', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     const fen = transformFen('8/2K5/8/k7/B7/3N4/8/8 w - - 2 2', transform)
     const bd7 = getChess(fen).move({from: transformSquare('a4', transform), to: transformSquare('d7', transform)}).san
@@ -508,8 +508,9 @@ test('Bd7 remains supported and Bc6 is rejected while Kd6 ties supported bishop 
     const bc6 = getChess(loaded).move({from: transformSquare('a4', transform), to: transformSquare('c6', transform)}).san
     assert.equal(scoreKnightAndBishopWhiteMove(loaded, bc6).supportedDiagonalSizeScore, 99)
     const preferred = getChess(loaded).move({from: transformSquare('c7', transform), to: transformSquare('d6', transform)}).san
-    const bishopTies = (['d7', 'e8'] as const).map(to => getChess(loaded).move({from: transformSquare('a4', transform), to: transformSquare(to, transform)}).san)
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(loaded).sort(), [preferred, ...bishopTies].sort())
+    assert.equal(scoreKnightAndBishopWhiteMove(loaded, preferred).supportedDiagonalSizeScore, 5)
+    const escape = getChess(loaded).move({from: transformSquare('a4', transform), to: transformSquare('e8', transform)}).san
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(loaded), [escape])
   }
 })
 
@@ -941,7 +942,9 @@ test('declared Kb5 Ba6 versus Ka7 supports all knight locations except the middl
     }
     const before = transformFen('8/k7/B7/K2N4/8/8/8/8 w - - 2 2', transform)
     const move = getChess(before).move({from: transformSquare('a5', transform), to: transformSquare('b5', transform)}).san
-    assert.ok(getIdealKnightAndBishopWhiteMoves(before).includes(move))
+    assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 3)
+    const escape = getChess(before).move({from: transformSquare('a6', transform), to: transformSquare('c8', transform)}).san
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(before), [escape])
     for (const fen of [
       'k7/8/B7/1K6/8/8/8/4N3 b - - 0 1', // Different Black square.
       '8/k7/B1K5/8/8/8/8/4N3 b - - 0 1', // Different White king.

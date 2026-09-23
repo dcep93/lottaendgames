@@ -106,9 +106,9 @@ test('the old behind-White score remains removed', () => {
 })
 
 
-test('the experiment leaves former late-rule distinctions tied in all symmetries', () => {
+test('former center preferences stay absent outside the new r10 range in all symmetries', () => {
   for (const transform of SQUARE_TRANSFORMS) {
-    const fen = transformFen('1NK5/8/1kB5/8/8/8/8/8 w - - 0 1', transform)
+    const fen = transformFen('1NK5/8/2B5/8/8/k7/8/8 w - - 0 1', transform)
     const moves = (['d7', 'd8'] as const).map(to => getChess(fen).move({from: transformSquare('c8', transform), to: transformSquare(to, transform)}).san)
     const scores = moves.map(san => scoreKnightAndBishopWhiteMove(fen, san))
     assert.equal(compareScoresByRules(scores[0]!, scores[1]!, knightAndBishopWhiteRules), 0)
