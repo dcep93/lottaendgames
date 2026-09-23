@@ -50,7 +50,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly startsWithCentralKing: boolean;
   readonly bishopCenterPenalty: number;
   readonly minorBlackDistanceScore: number;
-  readonly minorWhiteDistanceScore: number;
+  readonly minorSeparationScore: number;
   readonly nearbyBishopEscapeScore: number;
   readonly knightBlackMoatDistanceScore: number;
   readonly kingCoordinationPenalty: number;
@@ -266,9 +266,9 @@ function scoreKnightAndBishopWhiteMoveCore(
     relativeKnightPenalty: context.relativeKnightMove && context.relativeKnightMove !== move.from + move.to ? 1 : 0,
     startsWithCentralKing: context.startsWithCentralKing,
     bishopCenterPenalty: bishop && centerDistance(bishop.square) === 0 ? 0 : 1,
-    get minorWhiteDistanceScore() {
-      return whiteKing ? [bishop, knight].reduce((sum, piece) => sum + (piece
-        ? Math.sqrt(squaredEuclideanDistance(piece.square, whiteKing.square)) : 0), 0) : 0;
+    get minorSeparationScore() {
+      return bishop && knight
+        ? -Math.sqrt(squaredEuclideanDistance(bishop.square, knight.square)) : 0;
     },
     get minorBlackDistanceScore() {
       return blackKing ? -[bishop, knight].reduce((sum, piece) => sum + (piece
@@ -540,9 +540,9 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     {
       id: "r20",
       shortLabel: "rule r20",
-      helpText: "Maximize piece distance from Black's king, then minimize distance from White's king.",
+      helpText: "Maximize piece distance from Black's king, then maximize their distance from each other.",
       compare: (first, second) => first.minorBlackDistanceScore - second.minorBlackDistanceScore
-        || first.minorWhiteDistanceScore - second.minorWhiteDistanceScore,
+        || first.minorSeparationScore - second.minorSeparationScore,
     },
   ];
 
@@ -681,7 +681,7 @@ const bishopKnightHelp: RuleHelp = {
     "For r9.95, evaluate after White moves. A qualifying square is strictly between the kings on at least one shortest Manhattan path (horizontal and vertical steps only): its Manhattan distances to the two kings sum to the Manhattan distance between the kings. Prefer the bishop occupying such a square, then controlling one along an unblocked diagonal, then neither.",
     "For r9.8, evaluate after White moves: penalize a position if any single legal Black king move would attack both the bishop and knight at once. A bishop or knight defended by White’s king, or a knight defended by a bishop off the board edge, is not considered attackable for this rule.",
     "For r8, White’s king must be on d4, e4, d5 or e5 before moving. Evaluate the bishop and knight preferences after White moves. A precage square is diagonally adjacent to a central bishop, off the long diagonals, and behind the bishop from Black’s king’s perspective.",
-    "For r9.9, minimize White’s king Euclidean distance to the board’s midpoint. For r20, maximize the sum of the bishop’s and knight’s Euclidean distances from Black’s king, then minimize their summed Euclidean distances from White’s king. Evaluate after White moves.",
+    "For r9.9, minimize White’s king Euclidean distance to the board’s midpoint. For r20, maximize the sum of the bishop’s and knight’s Euclidean distances from Black’s king, then maximize the Euclidean distance between the bishop and knight. Evaluate after White moves.",
     "For r17, require at least two king steps between bishop and knight (adjacent diagonals do not qualify). Count bishop protection through Black’s king, which must leave the checking diagonal. Other intervening pieces still block protection. Evaluate after White moves.",
     "For r15, check the knight’s two-king-step range before White moves. Fix the moat one file or rank from White’s starting king toward Black along their greater separation; use both axes when tied. Black’s side is the region beyond that line. Maximize the knight’s Euclidean distance from the nearest Black-side region after White moves; squares inside either region score zero. The moat also exists when the kings are farther than two steps apart.",
     "For r10, check before White moves: the bishop must be within two king steps of Black’s king. Prefer an escape to at least three king steps after White moves; all such escapes tie under r10. Below that threshold, maximize Euclidean distance.",

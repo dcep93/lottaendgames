@@ -1,0 +1,305 @@
+{
+  "baselinePolicy": "0205bf45031c0133c0f82a5b59b1c4f169d88469",
+  "policyFingerprint": "28d4c1fc4cd97323a90005bb2cb2afe2f88878edd5d283c2703343995e6010b7",
+  "baselinePositions": 641,
+  "remainingPositions": 73,
+  "removedPositions": 568,
+  "remainingPhysicalPositions": 584,
+  "seeds": 54633,
+  "expanded": 67929,
+  "seconds": 51,
+  "survivors": [
+    {
+      "key": 75156,
+      "weight": 8
+    },
+    {
+      "key": 74525,
+      "weight": 8
+    },
+    {
+      "key": 89445,
+      "weight": 8
+    },
+    {
+      "key": 88492,
+      "weight": 8
+    },
+    {
+      "key": 185181,
+      "weight": 8
+    },
+    {
+      "key": 186260,
+      "weight": 8
+    },
+    {
+      "key": 339106,
+      "weight": 8
+    },
+    {
+      "key": 338027,
+      "weight": 8
+    },
+    {
+      "key": 351589,
+      "weight": 8
+    },
+    {
+      "key": 350636,
+      "weight": 8
+    },
+    {
+      "key": 437164,
+      "weight": 8
+    },
+    {
+      "key": 437541,
+      "weight": 8
+    },
+    {
+      "key": 447325,
+      "weight": 8
+    },
+    {
+      "key": 448404,
+      "weight": 8
+    },
+    {
+      "key": 449131,
+      "weight": 8
+    },
+    {
+      "key": 449762,
+      "weight": 8
+    },
+    {
+      "key": 598097,
+      "weight": 8
+    },
+    {
+      "key": 561224,
+      "weight": 8
+    },
+    {
+      "key": 601250,
+      "weight": 8
+    },
+    {
+      "key": 600171,
+      "weight": 8
+    },
+    {
+      "key": 613733,
+      "weight": 8
+    },
+    {
+      "key": 612780,
+      "weight": 8
+    },
+    {
+      "key": 699308,
+      "weight": 8
+    },
+    {
+      "key": 699685,
+      "weight": 8
+    },
+    {
+      "key": 711275,
+      "weight": 8
+    },
+    {
+      "key": 711906,
+      "weight": 8
+    },
+    {
+      "key": 790108,
+      "weight": 8
+    },
+    {
+      "key": 937555,
+      "weight": 8
+    },
+    {
+      "key": 811609,
+      "weight": 8
+    },
+    {
+      "key": 812562,
+      "weight": 8
+    },
+    {
+      "key": 840281,
+      "weight": 8
+    },
+    {
+      "key": 841234,
+      "weight": 8
+    },
+    {
+      "key": 863394,
+      "weight": 8
+    },
+    {
+      "key": 862315,
+      "weight": 8
+    },
+    {
+      "key": 875877,
+      "weight": 8
+    },
+    {
+      "key": 874924,
+      "weight": 8
+    },
+    {
+      "key": 954969,
+      "weight": 8
+    },
+    {
+      "key": 955922,
+      "weight": 8
+    },
+    {
+      "key": 961452,
+      "weight": 8
+    },
+    {
+      "key": 961829,
+      "weight": 8
+    },
+    {
+      "key": 973419,
+      "weight": 8
+    },
+    {
+      "key": 974050,
+      "weight": 8
+    },
+    {
+      "key": 983641,
+      "weight": 8
+    },
+    {
+      "key": 984594,
+      "weight": 8
+    },
+    {
+      "key": 2448741,
+      "weight": 8
+    },
+    {
+      "key": 2447788,
+      "weight": 8
+    },
+    {
+      "key": 2544477,
+      "weight": 8
+    },
+    {
+      "key": 2545556,
+      "weight": 8
+    },
+    {
+      "key": 2710885,
+      "weight": 8
+    },
+    {
+      "key": 2709932,
+      "weight": 8
+    },
+    {
+      "key": 2796460,
+      "weight": 8
+    },
+    {
+      "key": 2796837,
+      "weight": 8
+    },
+    {
+      "key": 2808427,
+      "weight": 8
+    },
+    {
+      "key": 2809058,
+      "weight": 8
+    },
+    {
+      "key": 3058604,
+      "weight": 8
+    },
+    {
+      "key": 3058981,
+      "weight": 8
+    },
+    {
+      "key": 3070571,
+      "weight": 8
+    },
+    {
+      "key": 3071202,
+      "weight": 8
+    },
+    {
+      "key": 4808037,
+      "weight": 8
+    },
+    {
+      "key": 4807084,
+      "weight": 8
+    },
+    {
+      "key": 5007075,
+      "weight": 8
+    },
+    {
+      "key": 5064420,
+      "weight": 8
+    },
+    {
+      "key": 7193846,
+      "weight": 8
+    },
+    {
+      "key": 5093162,
+      "weight": 8
+    },
+    {
+      "key": 5093582,
+      "weight": 8
+    },
+    {
+      "key": 5055121,
+      "weight": 8
+    },
+    {
+      "key": 7193257,
+      "weight": 8
+    },
+    {
+      "key": 7194226,
+      "weight": 8
+    },
+    {
+      "key": 7193814,
+      "weight": 8
+    },
+    {
+      "key": 7194950,
+      "weight": 8
+    },
+    {
+      "key": 7194956,
+      "weight": 8
+    },
+    {
+      "key": 7194957,
+      "weight": 8
+    },
+    {
+      "key": 7193807,
+      "weight": 8
+    }
+  ]
+}

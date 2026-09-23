@@ -65,8 +65,9 @@ test('r9.8 allows Nb6 when White’s king already defends the bishop, across D4'
     // Kc5 can approach both Bd5 and Nb6, but Ke5 already protects the bishop.
     assert.equal(score('8/8/8/3BK3/Nk6/8/8/8 w - - 2 2').bothMinorsNextAttackPenalty, 0, t.name);
     const loaded = transformFen('8/8/8/3BK3/Nk6/8/8/8 w - - 2 2', t);
-    const nb6 = getChess(loaded).move({from: transformSquare('a4', t), to: transformSquare('b6', t)}).san;
-    assert.ok(getIdealKnightAndBishopWhiteMoves(loaded).includes(nb6), t.name);
+    // r9.8 permits Nb6; r20 now breaks the distance tie toward greater minor separation.
+    const nb2 = getChess(loaded).move({from: transformSquare('a4', t), to: transformSquare('b2', t)}).san;
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(loaded), [nb2], t.name);
     // Moving White’s king away restores the same double-attack threat.
     assert.equal(score('8/8/5K2/3B4/Nk6/8/8/8 w - - 2 2').bothMinorsNextAttackPenalty, 1, t.name);
   }
