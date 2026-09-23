@@ -1,23 +1,24 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess';
-import { getIdealKnightAndBishopWhiteMoves, scoreKnightAndBishopWhiteMove } from './bishopKnight';
+import { scoreKnightAndBishopWhiteMove } from './bishopKnight';
 
 test('r10 escapes the loaded nearby bishop in every symmetry', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     const fen = transformFen('1NK5/8/1kB5/8/8/8/8/8 w - - 0 1', transform);
-    const move = (to: 'h1' | 'a8') => getChess(fen).move({from: transformSquare('c6', transform), to: transformSquare(to, transform)}).san;
-    assert.equal(scoreKnightAndBishopWhiteMove(fen, move('h1')).nearbyBishopEscapeScore, -Math.sqrt(61));
+    const move = (to: 'h1' | 'a8' | 'f3' | 'e4') => getChess(fen).move({from: transformSquare('c6', transform), to: transformSquare(to, transform)}).san;
+    assert.equal(scoreKnightAndBishopWhiteMove(fen, move('h1')).nearbyBishopEscapeScore, -3);
     assert.equal(scoreKnightAndBishopWhiteMove(fen, move('a8')).nearbyBishopEscapeScore, -Math.sqrt(5));
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [move('h1')], transform.name);
+    assert.equal(scoreKnightAndBishopWhiteMove(fen, move('f3')).nearbyBishopEscapeScore, -3);
+    assert.equal(scoreKnightAndBishopWhiteMove(fen, move('e4')).nearbyBishopEscapeScore, -3);
   }
 });
 
 test('r10 checks the two-step range before White moves regardless of king centrality', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const [fen, from, to, expected] of [
-      // Exactly two steps activates; the escape remains scored beyond the range.
-      ['7K/8/5k2/8/4B3/8/N7/8 w - - 0 1', 'e4', 'a8', -Math.sqrt(29)],
+      // Exactly two steps activates; all escapes beyond the range tie.
+      ['7K/8/5k2/8/4B3/8/N7/8 w - - 0 1', 'e4', 'a8', -3],
       // Three steps does not activate, even when the bishop moves closer.
       ['7K/5k2/8/8/4B3/8/N7/8 w - - 0 1', 'e4', 'd5', 0],
       // A central king no longer exempts the bishop.
