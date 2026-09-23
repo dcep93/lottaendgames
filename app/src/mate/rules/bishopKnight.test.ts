@@ -184,7 +184,7 @@ test("bishop-and-knight rules are registered", () => {
     {
       id: "r17",
       shortLabel: "rule r17",
-      helpText: "Protect the knight using the bishop.",
+      helpText: "Protect the knight using the bishop from at least 2 squares away.",
     },
     {
       id: "r18",

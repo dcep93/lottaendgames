@@ -42,3 +42,14 @@ test('r17 prefers Be6+ through Black’s king across D4 without changing actual 
     assert.equal(bishopControlsOrOccupiesSquare(chess.fen(),transformSquare('e6',t),transformSquare('b3',t)),false,t.name);
   }
 });
+
+
+test('r17 excludes adjacent protection but accepts exactly two squares and longer across D4', () => {
+  for (const t of SQUARE_TRANSFORMS) {
+    const fen=transformFen('2k1B2K/8/2N5/8/8/8/8/8 w - - 6 4',t);
+    for (const [from,to,penalty] of [['e8','d7',1],['h8','h7',0],['e8','f7',1]] as const) {
+      const san=getChess(fen).move({from:transformSquare(from,t),to:transformSquare(to,t)}).san;
+      assert.equal(scoreKnightAndBishopWhiteMove(fen,san).knightBishopProtectionPenalty,penalty,`${t.name} ${san}`);
+    }
+  }
+});
