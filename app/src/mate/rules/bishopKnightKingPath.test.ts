@@ -3,23 +3,16 @@ import test from 'node:test';
 import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess';
 import { getIdealKnightAndBishopWhiteMoves, knightAndBishopWhiteRules, scoreKnightAndBishopWhiteMove } from './bishopKnight';
 
-test('r9.95 gates on source king distance while r9.96 remains independent, across D4', () => {
+test('r9.95 applies at any king separation, across D4', () => {
   const path = knightAndBishopWhiteRules.find(rule => rule.id === 'r9.95')!;
-  const diagonal = knightAndBishopWhiteRules.find(rule => rule.id === 'r9.96')!;
+  assert.equal(path.applies, undefined);
   for (const t of SQUARE_TRANSFORMS) {
-    const score = (source: string, from: 'h8' | 'c6', to: 'g8' | 'd5' | 'e8') => {
-      const fen = transformFen(source, t);
-      return scoreKnightAndBishopWhiteMove(fen, getChess(fen).move({from: transformSquare(from, t), to: transformSquare(to, t)}).san);
-    };
-    // Moving closer does not activate the rule mid-move.
-    assert.equal(path.applies!(score('7K/8/N3k3/8/8/8/8/7B w - - 0 1', 'h8', 'g8')), false);
-    assert.equal(path.applies!(score('7K/8/N4k2/8/8/8/8/7B w - - 0 1', 'h8', 'g8')), true);
-    const distant = '7K/8/N1B5/8/8/4k3/8/8 w - - 0 1';
-    const long = score(distant, 'c6', 'd5');
-    const off = score(distant, 'c6', 'e8');
-    assert.equal(path.applies!(long), false);
-    assert.equal(diagonal.applies, undefined);
-    assert.ok(diagonal.compare!(long, off) < 0);
+    const fen = transformFen('8/8/8/8/2Bk4/8/8/4K1N1 w - - 2 2', t);
+    const score = (to: 'e2' | 'g8') => scoreKnightAndBishopWhiteMove(fen,
+      getChess(fen).move({from: transformSquare('c4', t), to: transformSquare(to, t)}).san);
+    assert.equal(score('e2').bishopKingPathPenalty, 0);
+    assert.equal(score('g8').bishopKingPathPenalty, 2);
+    assert.ok(path.compare(score('e2'), score('g8')) < 0);
   }
 });
 

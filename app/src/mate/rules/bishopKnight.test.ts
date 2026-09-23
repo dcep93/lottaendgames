@@ -164,7 +164,7 @@ test("bishop-and-knight rules are registered", () => {
     {
       id: "r9.95",
       shortLabel: "rule r9.95",
-      helpText: "If the kings are within 2 steps apart, prefer bishop occupation else control of a square on a shortest Manhattan path between the kings.",
+      helpText: "Prefer bishop occupation else control of a square on a shortest Manhattan path between the kings.",
     },
     {
       id: "r9.96",
