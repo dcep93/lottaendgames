@@ -149,7 +149,7 @@ test("bishop-and-knight rules are registered", () => {
     {
       id: "r9.9",
       shortLabel: "rule r9.9",
-      helpText: "Prefer king on opposite color to bishop, then minimize distance to the center.",
+      helpText: "Minimize king distance to the center.",
     },
     {
       id: "r10",
@@ -164,7 +164,7 @@ test("bishop-and-knight rules are registered", () => {
     {
       id: "r18",
       shortLabel: "rule r18",
-      helpText: "Prefer bishop control of a square on a shortest path between the kings.",
+      helpText: "Prefer bishop occupation else control of a square on a shortest path between the kings.",
     },
     {
       id: "r20",

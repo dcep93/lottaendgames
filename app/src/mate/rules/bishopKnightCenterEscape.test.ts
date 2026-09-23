@@ -3,7 +3,7 @@ import test from 'node:test';
 import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess';
 import { knightAndBishopWhiteRules, scoreKnightAndBishopWhiteMove } from './bishopKnight';
 
-test('r9.9 prioritizes opposite color over center distance; r20 only scores minor distance', () => {
+test('r9.9 prefers center distance regardless of color; r20 only scores minor distance', () => {
   const r99 = knightAndBishopWhiteRules.find(rule => rule.id === 'r9.9')!;
   const r20 = knightAndBishopWhiteRules.find(rule => rule.id === 'r20')!;
   assert.ok(r99.compare); assert.ok(r20.compare);
@@ -15,8 +15,9 @@ test('r9.9 prioritizes opposite color over center distance; r20 only scores mino
     };
     const far = score('a8', 'h1'), near = score('a8', 'f3');
     const offColorFar = score('d4', 'c3'), offColorNear = score('d4', 'e3'), sameColorCentral = score('d4', 'd5');
-    assert.ok(r99.compare(offColorFar, sameColorCentral) < 0, transform.name);
+    assert.ok(r99.compare(offColorFar, sameColorCentral) > 0, transform.name);
     assert.ok(r99.compare(offColorNear, offColorFar) < 0, transform.name);
+    assert.equal(r99.compare(far, sameColorCentral), 0, transform.name);
     assert.ok(r20.compare(far, near) < 0, transform.name);
     assert.equal(r20.compare(offColorFar, sameColorCentral), 0, transform.name);
     assert.equal(far.minorBlackDistanceScore, -Math.sqrt(29) - Math.sqrt(41));
