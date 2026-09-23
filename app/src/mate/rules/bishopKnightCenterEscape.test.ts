@@ -41,6 +41,8 @@ test('r20 breaks equal Black-distance ties toward White’s king across D4', () 
     assert.equal(near.minorWhiteDistanceScore, Math.sqrt(2) + 3, t.name);
     assert.equal(far.minorWhiteDistanceScore, Math.sqrt(2) + 5, t.name);
     assert.ok(r20.compare(near, far) < 0, t.name);
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [move('b6')], t.name);
+    // Without r9.98, r17 can retain Na4 and protect it with Bc6.
+    const bishopDefense = getChess(fen).move({from: transformSquare('d5', t), to: transformSquare('c6', t)}).san;
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [bishopDefense], t.name);
   }
 });

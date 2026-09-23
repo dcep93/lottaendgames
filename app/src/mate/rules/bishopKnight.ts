@@ -91,7 +91,6 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly nonCentralBishopDistanceScore: number;
   readonly knightBishopProtectionPenalty: number;
   readonly knightEdgePenalty: number;
-  readonly knightBishopColorPenalty: number;
   readonly bishopLongDiagonalIntersectionScore: number;
 };
 
@@ -371,7 +370,6 @@ function scoreKnightAndBishopWhiteMoveCore(
       return bishop && knight && bishopControlsOrOccupiesSquare(resultFen, bishop.square, knight.square) ? 0 : 1;
     },
     knightEdgePenalty: knight && /^[ah]|[18]$/.test(knight.square) ? 1 : 0,
-    knightBishopColorPenalty: knight && bishop && squareColor(knight.square) === squareColor(bishop.square) ? 1 : 0,
     get nonCentralBishopDistanceScore() {
       return bishop && blackKing && centerDistance(bishop.square) !== 0
         ? -Math.sqrt(squaredEuclideanDistance(bishop.square, blackKing.square)) : 0;
@@ -514,12 +512,6 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       shortLabel: "rule r9.96",
       helpText: "Prefer the bishop occupying the long diagonal.",
       compare: (first, second) => first.bishopLongDiagonalPenalty - second.bishopLongDiagonalPenalty,
-    },
-    {
-      id: "r9.98",
-      shortLabel: "rule r9.98",
-      helpText: "Prefer the knight off the bishop's color.",
-      compare: (first, second) => first.knightBishopColorPenalty - second.knightBishopColorPenalty,
     },
     {
       id: "r10",
