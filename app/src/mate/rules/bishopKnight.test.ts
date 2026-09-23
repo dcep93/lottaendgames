@@ -187,6 +187,11 @@ test("bishop-and-knight rules are registered", () => {
       helpText: "If the knight is within 2 steps of Black's king, maximize its distance from Black's side of the king moat.",
     },
     {
+      id: "r18",
+      shortLabel: "rule r18",
+      helpText: "Prefer the knight off the edge of the board.",
+    },
+    {
       id: "r20",
       shortLabel: "rule r20",
       helpText: "Maximize piece distance from Black's king, then minimize distance from White's king.",
@@ -225,6 +230,7 @@ test("bishop-and-knight rules are registered", () => {
       "r9.98",
       "r10",
       "r15",
+      "r18",
       "r20",
     ],
   );
@@ -232,7 +238,7 @@ test("bishop-and-knight rules are registered", () => {
     ruleSet.whiteRuleDescriptions.map(({ id }) => id),
     knightAndBishopWhiteRules.map(({ id }) => id),
   );
-  assert.equal(knightAndBishopWhiteRules.length, 20);
+  assert.equal(knightAndBishopWhiteRules.length, 21);
 });
 
 test("immediate mate keeps precedence without the mating-net rule", () => {
