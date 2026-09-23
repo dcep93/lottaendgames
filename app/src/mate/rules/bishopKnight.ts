@@ -702,10 +702,17 @@ const bishopKnightHelp: RuleHelp = {
   noteBoards: [{
     id: "bishop-knight-rule-r5-5",
     title: "rule r5.5 — Play the 5.5 step",
-    caption: "1. Kd3. Match White Kc3 and Bc4 against Black Ke5, regardless of the knight’s location. Include rotations and reflections, but no translations. The move must be legal and earlier rules retain priority.",
+    caption: "1. Kd3. Match White Kc3 and Bc4 with Black’s king on any central square (d4, e4, d5 or e5), regardless of the knight’s location. Include rotations and reflections, but no translations. The move must be legal and earlier rules retain priority.",
     pieces: [{square: "c3", piece: "K"}, {square: "c4", piece: "B"}, {square: "e5", piece: "k"}],
     highlights: [{square: "d3", kind: "key"}],
     arrows: [{from: "c3", to: "d3"}],
+  }, {
+    id: "bishop-knight-rule-r5-5-kd7",
+    title: "rule r5.5 — Play the 5.5 step",
+    caption: "1. Kd7. Match White Kc7 and Bc6 with Black’s king on any central square (d4, e4, d5 or e5), regardless of the knight’s location. Include rotations and reflections, but no translations. The move must be legal and earlier rules retain priority.",
+    pieces: [{square: "c7", piece: "K"}, {square: "c6", piece: "B"}, {square: "e5", piece: "k"}],
+    highlights: [{square: "d7", kind: "key"}],
+    arrows: [{from: "c7", to: "d7"}],
   }, {
     id: "bishop-knight-rule-r9-1",
     title: "rule r9.1 — Play the 9.1 move",
