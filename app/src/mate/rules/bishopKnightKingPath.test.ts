@@ -12,7 +12,7 @@ test('r9.95 applies at any king separation, across D4', () => {
       getChess(fen).move({from: transformSquare('c4', t), to: transformSquare(to, t)}).san);
     assert.equal(score('e2').bishopKingPathPenalty, 0);
     assert.equal(score('g8').bishopKingPathPenalty, 2);
-    assert.ok(path.compare(score('e2'), score('g8')) < 0);
+    assert.ok(path.compare!(score('e2'), score('g8')) < 0);
   }
 });
 

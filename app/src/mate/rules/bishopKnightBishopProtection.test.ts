@@ -39,7 +39,7 @@ test('r17 credits Be6+ through Black’s king while earlier r9.95 prefers path c
     const move = chess.move({from: transformSquare('c8',t), to: transformSquare('e6',t)}).san;
     assert.equal(scoreKnightAndBishopWhiteMove(fen,move).knightBishopProtectionPenalty,0,t.name);
     const nd2 = getChess(fen).move({from:transformSquare('b3',t),to:transformSquare('d2',t)}).san;
-    assert.ok(knightAndBishopWhiteRules.find(r=>r.id==='r9.95')!.compare(
+    assert.ok(knightAndBishopWhiteRules.find(r=>r.id==='r9.95')!.compare!(
       scoreKnightAndBishopWhiteMove(fen,nd2),scoreKnightAndBishopWhiteMove(fen,move)) < 0);
     assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[nd2],t.name);
     assert.equal(bishopControlsOrOccupiesSquare(chess.fen(),transformSquare('e6',t),transformSquare('b3',t)),false,t.name);

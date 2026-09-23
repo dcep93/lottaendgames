@@ -16,7 +16,7 @@ test('r17.5 prefers edge or diagonal king-knight adjacency after either piece mo
         getChess(fen).move({from:transformSquare('d1',transform),to:transformSquare(to,transform)}).san);
       assert.equal(score('f2').knightProtectionPenalty, 0);
       assert.equal(score('b2').knightProtectionPenalty, 1);
-      assert.ok(rule.compare(score('f2'),score('b2')) < 0);
+      assert.ok(rule.compare!(score('f2'),score('b2')) < 0);
     }
     const fen = transformFen('B7/8/8/8/3k4/8/8/3NK3 w - - 0 1', transform);
     const move = getChess(fen).move({from:transformSquare('e1',transform),to:transformSquare('d2',transform)}).san;

@@ -988,7 +988,7 @@ test('declared second-move Nf6 supports Kb5 Ba6 versus Ka8 without adding a knig
     for (const counters of ['2 2', '41 23']) {
       const before = transformFen(`k7/3N4/B7/1K6/8/8/8/8 w - - ${counters}`, transform)
       const board = getChess(before)
-      const move = board.move({from: transformSquare('d7', transform), to: transformSquare('f6', transform)}).san
+      board.move({from: transformSquare('d7', transform), to: transformSquare('f6', transform)})
       assert.deepEqual(knightAndBishopSupportedDiagonal(board.fen()), {size: 3, knight: 99})
       // Both remain supported, but r17.5 now prefers the king-adjacent knight.
       const nc5 = getChess(before).move({from: transformSquare('d7', transform), to: transformSquare('c5', transform)}).san
