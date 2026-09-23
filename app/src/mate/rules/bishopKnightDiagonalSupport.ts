@@ -293,7 +293,10 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
     pattern.wall.length === 5 && pattern.wall.includes(bishop.square) &&
     pattern.support.includes(knight.square))) return {size: 99, knight: 99}
   if (edgeDistance(knight.square) === 0) return {size: 99, knight: 99}
-  if (kingDistance(white.square, black.square) > 3) return {size: 99, knight: 99}
+  const kingsTooFarApart = kingDistance(white.square, black.square) > 3
+  if (kingsTooFarApart && !DIAGONALS.some(pattern => pattern.wall.includes(bishop.square) &&
+    isInsideBishopDiagonal(black.square, pattern.wall) &&
+    isInsideBishopDiagonal(white.square, pattern.wall))) return {size: 99, knight: 99}
   if (DECLARED_UNSUPPORTED_REFLECTIONS.some(pattern =>
     pattern.king === white.square && pattern.bishop === bishop.square &&
     pattern.knight === knight.square && pattern.black === black.square)) return {size: 99, knight: 99}
@@ -365,6 +368,7 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
   for (const pattern of DIAGONALS) {
     if (pattern.wall.length > best.size || !pattern.wall.includes(bishop.square) ||
       !isInsideBishopDiagonal(black.square, pattern.wall)) continue
+    if (kingsTooFarApart && !isInsideBishopDiagonal(white.square, pattern.wall)) continue
     if (pattern.wall.length === 5 && (excludedFive || losesFiveKingRace || losesFiveBishopTempoRace)) continue
     if (pattern.wall.length === 3 && excludedThree) continue
     // Seven-diagonal support requires the knight on its actual support square.

@@ -271,7 +271,7 @@ test('a shortest-route bishop attack breaks a tied d6 race if the king cannot de
     const before = transformFen('6K1/k7/8/8/2B5/3N4/8/8 w - - 0 1', transform)
     const bb5 = getChess(before).move({from: transformSquare('c4', transform), to: transformSquare('b5', transform)}).san
     assert.equal(scoreKnightAndBishopWhiteMove(before, bb5).supportedDiagonalSizeScore, 99)
-    assert.ok(getIdealKnightAndBishopWhiteMoves(before).every(san => scoreKnightAndBishopWhiteMove(before, san).supportedDiagonalSizeScore === 99))
+    assert.ok(!getIdealKnightAndBishopWhiteMoves(before).includes(bb5))
     for (const [position, expected] of [
       // A better race no longer suffices with Nd3 and a king outside c5/c6/c7.
       ['8/k4K2/8/1B6/8/3N4/8/8 b - - 0 1', 99],
@@ -288,7 +288,7 @@ test('a bishop attack on Black’s shortest e7 route adds one step to the Nd3 ki
     const before = transformFen('k7/8/4B3/8/8/1K1N4/8/8 w - - 0 1', transform)
     const bd7 = getChess(before).move({from: transformSquare('e6', transform), to: transformSquare('d7', transform)}).san
     assert.equal(scoreKnightAndBishopWhiteMove(before, bd7).supportedDiagonalSizeScore, 99)
-    assert.ok(getIdealKnightAndBishopWhiteMoves(before).every(san => scoreKnightAndBishopWhiteMove(before, san).supportedDiagonalSizeScore === 99))
+    assert.ok(!getIdealKnightAndBishopWhiteMoves(before).includes(bd7))
     for (const [position, expected] of [
       // Paying the e7 attack tempo no longer suffices with Nd3 and a king outside c5/c6/c7.
       ['k7/3B4/8/8/1K6/3N4/8/8 b - - 0 1', 99],
@@ -833,7 +833,7 @@ test('Kg4 Bf1 Ne2 against Kh2 is unsupported by exact placement, including refle
 })
 
 
-test('all supported diagonals require kings within three steps after White, including reflections', () => {
+test('kings outside the diagonal require kings within three steps after White, including reflections', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     const board = getChess(transformFen('8/8/1k2B3/8/8/3N4/8/1K6 w - - 0 1', transform))
     const before = board.fen()
@@ -845,6 +845,21 @@ test('all supported diagonals require kings within three steps after White, incl
       ['k7/8/3K4/8/B7/3N4/8/8 b - - 1 1', 5],
       ['1k6/8/BK6/3N4/8/8/8/8 b - - 1 1', 3],
     ] as const) assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, size)
+  }
+})
+
+test('White inside the diagonal waives king distance while other support checks remain, across D4', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    const board = getChess(transformFen('K7/8/8/8/k7/3N4/B7/8 w - - 0 1', transform))
+    board.move({from: transformSquare('a8', transform), to: transformSquare('b7', transform)})
+    board.move({from: transformSquare('a4', transform), to: transformSquare('a3', transform)})
+    const before = board.fen()
+    const san = board.move({from: transformSquare('a2', transform), to: transformSquare('d5', transform)}).san
+    assert.equal(knightAndBishopSupportedDiagonal(board.fen()).size, 7)
+    assert.equal(scoreKnightAndBishopWhiteMove(before, san).supportedDiagonalSizeScore, 7)
+    board.remove(transformSquare('d3', transform))
+    board.put({type: 'n', color: 'w'}, transformSquare('f4', transform))
+    assert.equal(knightAndBishopSupportedDiagonal(board.fen()).size, 99)
   }
 })
 

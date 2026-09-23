@@ -116,8 +116,8 @@ test('a3 flush walks toward b2 on the opposite color with any seven bishop place
       assert.equal(d6.supportedDiagonalSizeScore,7)
       assert.equal(d6.supportedSevenFlushColorPenalty,0)
       assert.equal(d6.supportedSevenFlushDistance,4)
-      // Ke7 would put the kings more than three steps apart.
-      assert.equal(scoreKnightAndBishopWhiteMove(reflected,san('e7')).supportedDiagonalSizeScore,99)
+      // Ke7 is inside the diagonal, so the distance limit is waived.
+      assert.equal(scoreKnightAndBishopWhiteMove(reflected,san('e7')).supportedDiagonalSizeScore,7)
       if (!start.includes('k2N4')) {
         const d7 = scoreKnightAndBishopWhiteMove(reflected,san('d7'))
         assert.equal(d7.supportedDiagonalSizeScore,7)
