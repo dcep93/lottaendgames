@@ -1,0 +1,1334 @@
+{
+  "populations": {
+    "3": {
+      "total": {
+        "orbits": 296,
+        "physical": 2368
+      },
+      "directLoop": {
+        "orbits": 2,
+        "physical": 16
+      },
+      "directLoopFromFreshStart": {
+        "orbits": 2,
+        "physical": 16
+      },
+      "canLoop": {
+        "orbits": 3,
+        "physical": 24
+      },
+      "noLoop": {
+        "orbits": 293,
+        "physical": 2344
+      },
+      "canMate": {
+        "orbits": 250,
+        "physical": 2000
+      },
+      "canFail": {
+        "orbits": 43,
+        "physical": 344
+      }
+    },
+    "5": {
+      "total": {
+        "orbits": 723,
+        "physical": 5784
+      },
+      "directLoop": {
+        "orbits": 0,
+        "physical": 0
+      },
+      "directLoopFromFreshStart": {
+        "orbits": 0,
+        "physical": 0
+      },
+      "canLoop": {
+        "orbits": 2,
+        "physical": 16
+      },
+      "noLoop": {
+        "orbits": 721,
+        "physical": 5768
+      },
+      "canMate": {
+        "orbits": 671,
+        "physical": 5368
+      },
+      "canFail": {
+        "orbits": 50,
+        "physical": 400
+      }
+    },
+    "7": {
+      "total": {
+        "orbits": 1443,
+        "physical": 11544
+      },
+      "directLoop": {
+        "orbits": 0,
+        "physical": 0
+      },
+      "directLoopFromFreshStart": {
+        "orbits": 0,
+        "physical": 0
+      },
+      "canLoop": {
+        "orbits": 0,
+        "physical": 0
+      },
+      "noLoop": {
+        "orbits": 1443,
+        "physical": 11544
+      },
+      "canMate": {
+        "orbits": 1429,
+        "physical": 11432
+      },
+      "canFail": {
+        "orbits": 14,
+        "physical": 112
+      }
+    },
+    "all": {
+      "total": {
+        "orbits": 1707888,
+        "physical": 13660584
+      },
+      "directLoop": {
+        "orbits": 1119,
+        "physical": 8952
+      },
+      "directLoopFromFreshStart": {
+        "orbits": 183,
+        "physical": 1464
+      },
+      "canLoop": {
+        "orbits": 36762,
+        "physical": 294096
+      },
+      "noLoop": {
+        "orbits": 1671126,
+        "physical": 13366488
+      },
+      "canMate": {
+        "orbits": 1361461,
+        "physical": 10889944
+      },
+      "canFail": {
+        "orbits": 318631,
+        "physical": 2548272
+      }
+    },
+    "supported": {
+      "total": {
+        "orbits": 2462,
+        "physical": 19696
+      },
+      "directLoop": {
+        "orbits": 2,
+        "physical": 16
+      },
+      "directLoopFromFreshStart": {
+        "orbits": 2,
+        "physical": 16
+      },
+      "canLoop": {
+        "orbits": 5,
+        "physical": 40
+      },
+      "noLoop": {
+        "orbits": 2457,
+        "physical": 19656
+      },
+      "canMate": {
+        "orbits": 2350,
+        "physical": 18800
+      },
+      "canFail": {
+        "orbits": 107,
+        "physical": 856
+      }
+    },
+    "unsupported": {
+      "total": {
+        "orbits": 1705426,
+        "physical": 13640888
+      },
+      "directLoop": {
+        "orbits": 1117,
+        "physical": 8936
+      },
+      "directLoopFromFreshStart": {
+        "orbits": 181,
+        "physical": 1448
+      },
+      "canLoop": {
+        "orbits": 36757,
+        "physical": 294056
+      },
+      "noLoop": {
+        "orbits": 1668669,
+        "physical": 13346832
+      },
+      "canMate": {
+        "orbits": 1359111,
+        "physical": 10871144
+      },
+      "canFail": {
+        "orbits": 318524,
+        "physical": 2547416
+      }
+    }
+  },
+  "loopFamilies": {
+    "total": 605,
+    "withSupportedCycle": 1,
+    "reachableFromSupportedStart": 2,
+    "reachableAfterAnySupportedPosition": 2,
+    "unsupportedOnly": 603
+  },
+  "positionMotifs": [
+    {
+      "label": "Unsupported; Noncentral bishop not king-protected; edge king; knight unprotected by king",
+      "orbits": 317,
+      "physical": 2536,
+      "families": [
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        40,
+        41,
+        42,
+        45,
+        46,
+        47,
+        51,
+        52,
+        53,
+        54,
+        55,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        81,
+        82,
+        83,
+        94,
+        95,
+        96,
+        97,
+        98,
+        99,
+        100,
+        114,
+        115,
+        116,
+        117,
+        120,
+        121,
+        122,
+        123,
+        124,
+        125,
+        126,
+        127,
+        128,
+        129,
+        130,
+        131,
+        132,
+        133,
+        134,
+        135,
+        136,
+        137,
+        138,
+        139,
+        140,
+        141,
+        142,
+        143,
+        144,
+        145,
+        146,
+        147,
+        148,
+        149,
+        150,
+        151,
+        152,
+        153,
+        154,
+        155,
+        156,
+        157,
+        158,
+        159,
+        160,
+        161,
+        162,
+        163,
+        164,
+        165,
+        166,
+        170,
+        171,
+        172,
+        181,
+        182,
+        186,
+        193,
+        194,
+        195,
+        196,
+        197,
+        198,
+        200,
+        202,
+        203,
+        204,
+        205,
+        206,
+        207,
+        209,
+        210,
+        211,
+        212,
+        213,
+        214,
+        215,
+        216,
+        217,
+        218,
+        219,
+        220,
+        221,
+        222,
+        223,
+        224,
+        225,
+        226,
+        227,
+        232,
+        233,
+        234,
+        235,
+        236,
+        241,
+        242,
+        243,
+        244,
+        245,
+        246,
+        247,
+        248,
+        249,
+        250,
+        254,
+        255,
+        256,
+        257,
+        258,
+        259,
+        260,
+        261,
+        262,
+        263,
+        264,
+        265,
+        266,
+        267,
+        268,
+        269,
+        270,
+        271,
+        272,
+        275,
+        276,
+        277,
+        278
+      ],
+      "exampleKey": 10859
+    },
+    {
+      "label": "Unsupported; Noncentral bishop not king-protected; interior king; knight unprotected by king",
+      "orbits": 227,
+      "physical": 1816,
+      "families": [
+        283,
+        284,
+        285,
+        288,
+        286,
+        287,
+        289,
+        290,
+        296,
+        297,
+        298,
+        318,
+        299,
+        317,
+        320,
+        321,
+        324,
+        322,
+        323,
+        325,
+        349,
+        350,
+        351,
+        352,
+        359,
+        360,
+        362,
+        363,
+        364,
+        365,
+        366,
+        367,
+        372,
+        373,
+        374,
+        375,
+        376,
+        377,
+        378,
+        379,
+        380,
+        381,
+        382,
+        389,
+        393,
+        394,
+        396,
+        397,
+        398,
+        401,
+        402,
+        403,
+        404,
+        405,
+        419,
+        420,
+        421,
+        422,
+        423,
+        424,
+        425,
+        426,
+        427,
+        428,
+        429,
+        430,
+        431,
+        432,
+        433,
+        434,
+        435,
+        436,
+        437,
+        438,
+        439,
+        440,
+        441,
+        442,
+        444,
+        445,
+        446,
+        451,
+        452,
+        454,
+        453,
+        455,
+        456,
+        462,
+        463,
+        464,
+        501,
+        502,
+        503,
+        504,
+        508,
+        509,
+        510,
+        512,
+        513,
+        514,
+        516,
+        517,
+        518,
+        519,
+        520,
+        521,
+        522,
+        523,
+        524,
+        525,
+        526,
+        527,
+        530,
+        533,
+        546,
+        549,
+        555,
+        565,
+        566,
+        567,
+        568,
+        574,
+        581,
+        596,
+        600
+      ],
+      "exampleKey": 2374251
+    },
+    {
+      "label": "Unsupported; Noncentral bishop not king-protected; interior king; knight king-protected",
+      "orbits": 97,
+      "physical": 776,
+      "families": [
+        291,
+        292,
+        301,
+        302,
+        305,
+        370,
+        371,
+        303,
+        304,
+        306,
+        309,
+        357,
+        355,
+        307,
+        314,
+        308,
+        315,
+        356,
+        310,
+        311,
+        312,
+        313,
+        354,
+        316,
+        358,
+        369,
+        383,
+        384,
+        385,
+        443,
+        386,
+        387,
+        388,
+        395,
+        411,
+        414,
+        415,
+        450,
+        459,
+        460,
+        511,
+        528,
+        529,
+        531,
+        559,
+        532,
+        553,
+        534,
+        536,
+        535,
+        538,
+        543,
+        550,
+        551,
+        554,
+        537,
+        544,
+        552,
+        539,
+        540,
+        541,
+        542,
+        545,
+        547,
+        564,
+        548,
+        569,
+        570,
+        574,
+        571,
+        572,
+        573,
+        575,
+        576,
+        577,
+        598,
+        578,
+        579,
+        599,
+        597,
+        600
+      ],
+      "exampleKey": 2388002
+    },
+    {
+      "label": "Unsupported; Noncentral bishop king-protected; interior king; knight unprotected by king",
+      "orbits": 86,
+      "physical": 688,
+      "families": [
+        279,
+        280,
+        281,
+        282,
+        329,
+        330,
+        341,
+        331,
+        332,
+        340,
+        333,
+        339,
+        343,
+        348,
+        344,
+        345,
+        346,
+        347,
+        361,
+        390,
+        391,
+        392,
+        399,
+        400,
+        406,
+        407,
+        409,
+        410,
+        417,
+        418,
+        447,
+        448,
+        449,
+        458,
+        461,
+        471,
+        472,
+        473,
+        477,
+        478,
+        480,
+        481,
+        483,
+        484,
+        486,
+        487,
+        489,
+        490,
+        492,
+        500
+      ],
+      "exampleKey": 2360157
+    },
+    {
+      "label": "Unsupported; Noncentral bishop king-protected; edge king; knight unprotected by king",
+      "orbits": 55,
+      "physical": 440,
+      "families": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        50,
+        91,
+        92,
+        93,
+        101,
+        102,
+        103,
+        106,
+        107,
+        108,
+        111,
+        112,
+        113,
+        167,
+        169,
+        187,
+        191,
+        192,
+        229,
+        231,
+        237,
+        239,
+        240
+      ],
+      "exampleKey": 4938
+    },
+    {
+      "label": "Unsupported; Noncentral bishop king-protected; interior king; knight on edge, unprotected by king",
+      "orbits": 53,
+      "physical": 424,
+      "families": [
+        327,
+        328,
+        333,
+        334,
+        342,
+        407,
+        408,
+        416,
+        465,
+        467,
+        468,
+        469,
+        470,
+        474,
+        479,
+        482,
+        485,
+        488,
+        491,
+        493,
+        494,
+        495,
+        496,
+        497,
+        556,
+        557,
+        558,
+        563
+      ],
+      "exampleKey": 2400539
+    },
+    {
+      "label": "Unsupported; Noncentral bishop not king-protected; edge king; knight king-protected",
+      "orbits": 49,
+      "physical": 392,
+      "families": [
+        1,
+        2,
+        79,
+        21,
+        22,
+        24,
+        25,
+        29,
+        23,
+        26,
+        30,
+        56,
+        57,
+        58,
+        27,
+        36,
+        28,
+        37,
+        59,
+        33,
+        34,
+        35,
+        38,
+        60,
+        69,
+        70,
+        80,
+        84,
+        85,
+        87,
+        88,
+        89,
+        90,
+        118,
+        119,
+        129,
+        135,
+        145,
+        168,
+        176,
+        177,
+        178,
+        201,
+        199,
+        208,
+        230
+      ],
+      "exampleKey": 225876
+    },
+    {
+      "label": "Unsupported; Noncentral bishop not king-protected; edge king; knight on edge, unprotected by king",
+      "orbits": 45,
+      "physical": 360,
+      "families": [
+        17,
+        19,
+        20,
+        31,
+        32,
+        39,
+        43,
+        44,
+        48,
+        49,
+        51,
+        67,
+        121,
+        127,
+        171,
+        173,
+        174,
+        175,
+        179,
+        180,
+        183,
+        184,
+        185,
+        197,
+        205,
+        213,
+        233,
+        241,
+        244,
+        250,
+        251,
+        252,
+        253,
+        261,
+        266,
+        267,
+        273,
+        274,
+        277
+      ],
+      "exampleKey": 22485
+    },
+    {
+      "label": "Unsupported; Noncentral bishop king-protected; interior king; knight king-protected",
+      "orbits": 40,
+      "physical": 320,
+      "families": [
+        329,
+        335,
+        368,
+        336,
+        337,
+        338,
+        409,
+        471,
+        410,
+        411,
+        412,
+        475,
+        413,
+        443,
+        414,
+        415,
+        457,
+        459,
+        511,
+        460,
+        466,
+        467,
+        476,
+        498,
+        499,
+        505,
+        506,
+        529,
+        531,
+        559,
+        561,
+        562,
+        560,
+        570,
+        579,
+        576,
+        598,
+        577,
+        578,
+        599,
+        580,
+        585,
+        582,
+        597
+      ],
+      "exampleKey": 2400794
+    },
+    {
+      "label": "Unsupported; Unprotected by king central bishop; knight on edge, off precage",
+      "orbits": 27,
+      "physical": 216,
+      "families": [
+        19,
+        20,
+        44,
+        31,
+        32,
+        39,
+        43,
+        48,
+        49,
+        173,
+        174,
+        175,
+        179,
+        180,
+        183,
+        184,
+        185,
+        293,
+        294,
+        295,
+        300,
+        319,
+        326,
+        353
+      ],
+      "exampleKey": 115730
+    },
+    {
+      "label": "Unsupported; Noncentral bishop king-protected; edge king; knight king-protected",
+      "orbits": 23,
+      "physical": 184,
+      "families": [
+        1,
+        2,
+        3,
+        80,
+        79,
+        84,
+        85,
+        86,
+        87,
+        88,
+        89,
+        90,
+        168,
+        188,
+        189,
+        190,
+        199,
+        230,
+        238
+      ],
+      "exampleKey": 4701
+    },
+    {
+      "label": "Unsupported; Unprotected by king central bishop; knight king-protected, off precage",
+      "orbits": 18,
+      "physical": 144,
+      "families": [
+        21,
+        69,
+        70,
+        176,
+        177,
+        178,
+        208,
+        291,
+        292,
+        301,
+        302,
+        369,
+        304,
+        370,
+        371,
+        335,
+        336,
+        368,
+        337,
+        338,
+        457,
+        506,
+        505,
+        560,
+        561,
+        562
+      ],
+      "exampleKey": 115282
+    },
+    {
+      "label": "Unsupported; Noncentral bishop not king-protected; interior king; knight on edge, unprotected by king",
+      "orbits": 18,
+      "physical": 144,
+      "families": [
+        287,
+        293,
+        294,
+        295,
+        300,
+        319,
+        326,
+        353,
+        364,
+        422,
+        464,
+        504,
+        513,
+        515,
+        530,
+        567,
+        581
+      ],
+      "exampleKey": 2381781
+    },
+    {
+      "label": "Unsupported; Noncentral bishop king-protected; edge king; knight on edge, unprotected by king",
+      "orbits": 15,
+      "physical": 120,
+      "families": [
+        4,
+        5,
+        6,
+        104,
+        105,
+        109,
+        110,
+        112
+      ],
+      "exampleKey": 4370
+    },
+    {
+      "label": "Unsupported; Unprotected by king central bishop; knight unprotected by king, off precage",
+      "orbits": 14,
+      "physical": 112,
+      "families": [
+        40,
+        42,
+        47,
+        46,
+        182,
+        296,
+        297,
+        317,
+        320,
+        325,
+        323,
+        344,
+        345,
+        507
+      ],
+      "exampleKey": 117330
+    },
+    {
+      "label": "Unsupported; King-protected central bishop; knight unprotected by king, off precage",
+      "orbits": 11,
+      "physical": 88,
+      "families": [
+        584,
+        586,
+        587,
+        588,
+        589,
+        591,
+        592,
+        601
+      ],
+      "exampleKey": 5091933
+    },
+    {
+      "label": "Unsupported; King-protected central bishop; knight on edge, off precage",
+      "orbits": 8,
+      "physical": 64,
+      "families": [
+        590,
+        593,
+        594,
+        595
+      ],
+      "exampleKey": 5093932
+    },
+    {
+      "label": "Unsupported; King-protected central bishop; knight on precage",
+      "orbits": 7,
+      "physical": 56,
+      "families": [
+        583,
+        602,
+        603,
+        604
+      ],
+      "exampleKey": 5092650
+    },
+    {
+      "label": "Unsupported; King-protected central bishop; knight king-protected, off precage",
+      "orbits": 5,
+      "physical": 40,
+      "families": [
+        580,
+        584,
+        585,
+        586,
+        587,
+        588,
+        589
+      ],
+      "exampleKey": 5093134
+    },
+    {
+      "label": "Unsupported; Noncentral bishop not king-protected; central king; knight unprotected by king",
+      "orbits": 2,
+      "physical": 16,
+      "families": [
+        605
+      ],
+      "exampleKey": 7238413
+    },
+    {
+      "label": "3-diagonal; Noncentral bishop king-protected; edge king; knight unprotected by king",
+      "orbits": 1,
+      "physical": 8,
+      "families": [
+        228
+      ],
+      "exampleKey": 796360
+    },
+    {
+      "label": "3-diagonal; Noncentral bishop not king-protected; edge king; knight unprotected by king",
+      "orbits": 1,
+      "physical": 8,
+      "families": [
+        228
+      ],
+      "exampleKey": 853697
+    }
+  ],
+  "supportLoss": {
+    "all": {
+      "whiteDecisions": {
+        "orbits": 30,
+        "physical": 240
+      },
+      "events": {
+        "orbits": 34,
+        "physical": 272
+      },
+      "sourcePositions": {
+        "orbits": 34,
+        "physical": 272
+      }
+    },
+    "nonMating": {
+      "whiteDecisions": {
+        "orbits": 26,
+        "physical": 208
+      },
+      "events": {
+        "orbits": 30,
+        "physical": 240
+      },
+      "sourcePositions": {
+        "orbits": 30,
+        "physical": 240
+      }
+    },
+    "mating": {
+      "whiteDecisions": {
+        "orbits": 4,
+        "physical": 32
+      },
+      "events": {
+        "orbits": 4,
+        "physical": 32
+      },
+      "sourcePositions": {
+        "orbits": 4,
+        "physical": 32
+      }
+    },
+    "playableExamples": {
+      "whiteDecisions": {
+        "orbits": 28,
+        "physical": 224
+      },
+      "events": {
+        "orbits": 32,
+        "physical": 256
+      },
+      "sourcePositions": {
+        "orbits": 32,
+        "physical": 256
+      }
+    },
+    "censusOnlyExamples": {
+      "whiteDecisions": {
+        "orbits": 2,
+        "physical": 16
+      },
+      "events": {
+        "orbits": 2,
+        "physical": 16
+      },
+      "sourcePositions": {
+        "orbits": 2,
+        "physical": 16
+      }
+    },
+    "noLegalSupportPreservingMove": {
+      "whiteDecisions": {
+        "orbits": 22,
+        "physical": 176
+      },
+      "events": {
+        "orbits": 26,
+        "physical": 208
+      },
+      "sourcePositions": {
+        "orbits": 26,
+        "physical": 208
+      }
+    },
+    "legalSupportPreservingMoveExists": {
+      "whiteDecisions": {
+        "orbits": 4,
+        "physical": 32
+      },
+      "events": {
+        "orbits": 4,
+        "physical": 32
+      },
+      "sourcePositions": {
+        "orbits": 4,
+        "physical": 32
+      }
+    },
+    "safeSupportPreservingMoveExists": {
+      "whiteDecisions": {
+        "orbits": 0,
+        "physical": 0
+      },
+      "events": {
+        "orbits": 0,
+        "physical": 0
+      },
+      "sourcePositions": {
+        "orbits": 0,
+        "physical": 0
+      }
+    },
+    "noSafeSupportPreservingMove": {
+      "whiteDecisions": {
+        "orbits": 26,
+        "physical": 208
+      },
+      "events": {
+        "orbits": 30,
+        "physical": 240
+      },
+      "sourcePositions": {
+        "orbits": 30,
+        "physical": 240
+      }
+    },
+    "canLoop": {
+      "whiteDecisions": {
+        "orbits": 1,
+        "physical": 8
+      },
+      "events": {
+        "orbits": 2,
+        "physical": 16
+      },
+      "sourcePositions": {
+        "orbits": 2,
+        "physical": 16
+      }
+    },
+    "canMate": {
+      "whiteDecisions": {
+        "orbits": 29,
+        "physical": 232
+      },
+      "events": {
+        "orbits": 32,
+        "physical": 256
+      },
+      "sourcePositions": {
+        "orbits": 32,
+        "physical": 256
+      }
+    },
+    "canFail": {
+      "whiteDecisions": {
+        "orbits": 0,
+        "physical": 0
+      },
+      "events": {
+        "orbits": 0,
+        "physical": 0
+      },
+      "sourcePositions": {
+        "orbits": 0,
+        "physical": 0
+      }
+    },
+    "bySize": [
+      {
+        "size": 3,
+        "whiteDecisions": {
+          "orbits": 2,
+          "physical": 16
+        },
+        "events": {
+          "orbits": 2,
+          "physical": 16
+        },
+        "sourcePositions": {
+          "orbits": 2,
+          "physical": 16
+        }
+      },
+      {
+        "size": 5,
+        "whiteDecisions": {
+          "orbits": 16,
+          "physical": 128
+        },
+        "events": {
+          "orbits": 20,
+          "physical": 160
+        },
+        "sourcePositions": {
+          "orbits": 20,
+          "physical": 160
+        }
+      },
+      {
+        "size": 7,
+        "whiteDecisions": {
+          "orbits": 8,
+          "physical": 64
+        },
+        "events": {
+          "orbits": 8,
+          "physical": 64
+        },
+        "sourcePositions": {
+          "orbits": 8,
+          "physical": 64
+        }
+      }
+    ]
+  },
+  "policyCommit": "ba5dd20d7dcff189bce0b96595b17bdc0dba72b0",
+  "artifacts": "/Users/danielcepeda/repos/_codex_output/bn-full-2026-09-23-r995-two"
+}
