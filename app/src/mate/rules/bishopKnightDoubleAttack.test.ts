@@ -22,3 +22,21 @@ test('r9.8 requires both pieces to be attacked by the same legal reply', () => {
     assert.equal(scoreKnightAndBishopWhiteMove(fen, san).bothMinorsNextAttackPenalty, 0);
   }
 });
+
+
+test('r9.8 allows Nb6 when White’s king already defends the bishop, across D4', () => {
+  for (const t of SQUARE_TRANSFORMS) {
+    const score = (source: string) => {
+      const fen = transformFen(source, t);
+      const san = getChess(fen).move({from: transformSquare('a4', t), to: transformSquare('b6', t)}).san;
+      return scoreKnightAndBishopWhiteMove(fen, san);
+    };
+    // Kc5 can approach both Bd5 and Nb6, but Ke5 already protects the bishop.
+    assert.equal(score('8/8/8/3BK3/Nk6/8/8/8 w - - 2 2').bothMinorsNextAttackPenalty, 0, t.name);
+    const loaded = transformFen('8/8/8/3BK3/Nk6/8/8/8 w - - 2 2', t);
+    const nb6 = getChess(loaded).move({from: transformSquare('a4', t), to: transformSquare('b6', t)}).san;
+    assert.ok(getIdealKnightAndBishopWhiteMoves(loaded).includes(nb6), t.name);
+    // Moving White’s king away restores the same double-attack threat.
+    assert.equal(score('8/8/5K2/3B4/Nk6/8/8/8 w - - 2 2').bothMinorsNextAttackPenalty, 1, t.name);
+  }
+});
