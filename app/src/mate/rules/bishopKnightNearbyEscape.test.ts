@@ -5,7 +5,7 @@ import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../c
 import { getIdealKnightAndBishopWhiteMoves, knightAndBishopWhiteRules, scoreKnightAndBishopWhiteMove } from './bishopKnight';
 import { compareScoresByRules } from './selection';
 
-test('r9.1 scores escape only when an attacked bishop remains without king defense', () => {
+test('r9.1 scores escape unless a king move defends the attacked bishop', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const [source, from, to, expected] of [
       ['8/8/8/3Bk3/8/8/1K6/N7 w - - 0 1', 'd5', 'a8', -5],
@@ -200,6 +200,11 @@ test('r9.1 prefers loaded Kd3 king defense to bishop escape, including reflectio
     const defend = scoreKnightAndBishopWhiteMove(fen, move('c2', 'd3'));
     const far = scoreKnightAndBishopWhiteMove(fen, move('e4', 'a8'));
     const near = scoreKnightAndBishopWhiteMove(fen, move('e4', 'c6'));
+    const bishopApproach = scoreKnightAndBishopWhiteMove(fen, move('e4', 'd3'));
+    assert.equal(bishopApproach.attackedBishopDefensePenalty, 1);
+    assert.equal(bishopApproach.attackedBishopEscapeScore, -Math.sqrt(5));
+    assert.ok(compareScoresByRules(defend, bishopApproach, [rule]) < 0);
+    assert.ok(compareScoresByRules(far, bishopApproach, [rule]) < 0);
     assert.equal(defend.attackedBishopDefensePenalty, 0);
     assert.equal(defend.attackedBishopEscapeScore, 0);
     assert.equal(far.attackedBishopDefensePenalty, 1);

@@ -139,7 +139,7 @@ test("bishop-and-knight rules are registered", () => {
     {
       id: "r9.1",
       shortLabel: "rule r9.1",
-      helpText: "If a bishop is attacked, prefer king defense, otherwise maximize its distance from Black's king.",
+      helpText: "If a bishop is attacked, prefer moving the king to defend it, otherwise maximize its distance from Black's king.",
     },
     {
       id: "r9.2",
