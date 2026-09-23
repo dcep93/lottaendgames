@@ -10,7 +10,7 @@ import { knightAndBishopKnightTargetSquares } from '../../app/src/mate/rules/bis
 import { getMateRuleSet } from '../../app/src/mate/rules/index.ts';
 import { encodeMateReplay } from '../../app/src/mate/share.ts';
 const dir = process.env.AUDIT_DIR!;
-const supportedScope = process.env.AUDIT_SCOPE === 'supported';
+const supportedScope = process.env.AUDIT_SCOPE === 'supported' || process.env.AUDIT_SCOPE === 'all';
 if (!dir)
     throw new Error('Run via npm run audit:unsupported');
 const db = new DatabaseSync(dir + '/census.sqlite', { readOnly: true });
@@ -306,7 +306,7 @@ for (const kind of [...new Set(families.map(f => f.kind))]) {
     const fs = families.filter(f => f.kind === kind);
     archetypes.push({ kind, families: fs.length, closedFamilies: fs.filter(f => f.closed).length, canReachFromUnsupportedPlacements: roots, cyclePlies: [...new Set(fs.map(f => f.cyclePlies))].sort((a, b) => a - b), rules: [...new Set(fs.flatMap(f => f.rules))].sort() });
 }
-const result = { diagonal: Number(process.env.AUDIT_DIAGONAL ?? 0) || null, population: supportedScope ? 'supported' : 'unsupported', counts, graph: { nodes: n, edges, cyclicNodes: cyclic.reduce((s, v) => s + v, 0), cyclicFamilies: families.length }, archetypes, families, policyFingerprint: (db.prepare("SELECT value FROM meta WHERE key='hash'").get() as any).value };
+const result = { diagonal: Number(process.env.AUDIT_DIAGONAL ?? 0) || null, population: process.env.AUDIT_SCOPE ?? 'unsupported', counts, graph: { nodes: n, edges, cyclicNodes: cyclic.reduce((s, v) => s + v, 0), cyclicFamilies: families.length }, archetypes, families, policyFingerprint: (db.prepare("SELECT value FROM meta WHERE key='hash'").get() as any).value };
 writeFileSync(dir + '/node-outcomes.bin', Uint8Array.from({ length: n }, (_, i) => Number(!!loop[i]) | Number(!!hasSupport[i]) << 1 | Number(!!hasMate[i]) << 2 | Number(!!hasFailure[i]) << 3));
 writeFileSync(dir + '/result.json', JSON.stringify(result, null, 2));
 writeFileSync(dir + '/loop-leading-roots.json', JSON.stringify(rootLoops));

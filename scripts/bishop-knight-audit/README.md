@@ -23,6 +23,45 @@ Scope is included in the checkpoint fingerprint; cross-scope root reuse is
 rejected. Default `--scope unsupported` retains the original support-terminal
 behavior. Do not run the unsupported-only `direct-membership.mts` postprocessor
 on a supported audit.
+## Full audit: support changes and loops together
+
+```sh
+npm run audit:unsupported -- --scope all --out /absolute/full-audit --workers 4
+```
+
+This selects every supported and unsupported post-White placement and **does not
+stop at support**. It follows all best-move ties through support changes with
+Black's return history intact. Run it when measuring support loss and loops in
+the same policy snapshot. Neither a support-terminal audit nor the union of two
+separate starting populations is a substitute for preserving history across
+support boundaries.
+
+Additional persisted outputs:
+
+- `full-report.md`: D4 orbit and physical counts by initial support status, direct
+  cycle membership, eventual loop reachability, piece-position motifs, losses,
+  and replay links.
+- `full-details.json`: machine-readable population partitions and component
+  origins, including cycles reached after support with history.
+- `support-loss-events.json`: every best White transition from the prior supported
+  White result to an unsupported White result, deduplicated jointly under D4.
+  It separates mating losses and records possible subsequent outcomes.
+
+Support is evaluated after White, never reclassified just because Black moved.
+A loss event retains three boards: the prior post-White result, the current
+White-turn board, and the new post-White result. One shared symmetry transforms
+all three. Actual orbit sizes are counted; symmetric placements are not blindly
+multiplied or divided by eight. Loop totals are cyclic components, which can
+contain multiple simple loops. Replay links are checked by the app decoder.
+
+The full postprocessors reuse the saved graph, so changing report groupings
+requires no new census. With the matching source snapshot, run from `app/`:
+
+```sh
+AUDIT_DIR=/absolute/full-audit npx tsx ../scripts/bishop-knight-audit/full-details.mts
+AUDIT_DIR=/absolute/full-audit npx tsx ../scripts/bishop-knight-audit/full-report.mts
+```
+
 ## Staged work: seven, then five, then three
 
 ```sh

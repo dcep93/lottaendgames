@@ -1,6 +1,6 @@
 /** Restrict starting positions only; supported continuations never stop at a smaller diagonal. */
 export function includesRoot(size: number, scope: string, diagonal = 0): boolean {
-    return scope === 'supported'
+    return scope === 'all' ? true : scope === 'supported'
         ? size !== 99 && (!diagonal || size === diagonal)
         : size === 99;
 }

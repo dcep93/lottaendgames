@@ -9,6 +9,7 @@ test('stages select only their starting diagonal; original populations remain av
     for (const stage of [7,5,3]) assert.deepEqual(sizes.filter(s=>includesRoot(s,'supported',stage)),[stage]);
     assert.deepEqual(sizes.filter(s=>includesRoot(s,'supported')),[3,5,7]);
     assert.deepEqual(sizes.filter(s=>includesRoot(s,'unsupported')),[99]);
+    assert.deepEqual(sizes.filter(s=>includesRoot(s,'all')),sizes);
 });
 
 test('zero-loop and all-branches-mate gates distinguish terminal failure and empty audits', () => {

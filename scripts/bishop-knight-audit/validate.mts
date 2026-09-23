@@ -57,7 +57,7 @@ for (const [kind, batch] of [['root', roots], ['node', nodes]] as const) {
         const supported = support(ch.fen()).size;
         assert.equal(r.supported, supported);
         const diagonal = Number(process.env.AUDIT_DIAGONAL ?? 0);
-        const selected = process.env.AUDIT_SCOPE === 'supported'
+        const selected = process.env.AUDIT_SCOPE === 'all' ? true : process.env.AUDIT_SCOPE === 'supported'
             ? supported !== 99 && (!diagonal || supported === diagonal) : supported === 99;
         let flags = 0;
         const children = new Set<number>();
@@ -90,7 +90,7 @@ for (const [kind, batch] of [['root', roots], ['node', nodes]] as const) {
                         flags |= 2;
                     else if (ch.isStalemate())
                         flags |= 4;
-                    else if (process.env.AUDIT_SCOPE !== 'supported' && support(ch.fen()).size !== 99)
+                    else if (process.env.AUDIT_SCOPE !== 'supported' && process.env.AUDIT_SCOPE !== 'all' && support(ch.fen()).size !== 99)
                         flags |= 1;
                     else
                         for (const reply of black(ch.fen(), p === NONE ? undefined : fen(p)).idealMoves) {

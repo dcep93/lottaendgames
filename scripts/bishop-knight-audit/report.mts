@@ -3,7 +3,7 @@ import { supportedReport } from './supported-report.mts';
 const dir = process.env.AUDIT_DIR!;
 const r = JSON.parse(readFileSync(dir + '/result.json', 'utf8'));
 const manifest = JSON.parse(readFileSync(dir + '/manifest.json', 'utf8'));
-if (r.population === 'supported') {
+if (r.population === 'supported' || r.population === 'all') {
     let text = supportedReport(r, manifest);
     if (process.env.AUDIT_COMPARE) {
         const previous = JSON.parse(readFileSync(process.env.AUDIT_COMPARE, 'utf8'));

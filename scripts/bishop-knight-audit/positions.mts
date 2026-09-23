@@ -24,7 +24,7 @@ for (const family of result.families) {
     }
 }
 const motifs = positionMotifs([...placements.values()], result.diagonal);
-const counted = result.population === 'supported' ? motifs.selectedCyclePlacements : motifs.directBySize[99] ?? 0;
+const counted = result.population === 'all' ? motifs.allCyclePlacements : result.population === 'supported' ? motifs.selectedCyclePlacements : motifs.directBySize[99] ?? 0;
 assert.equal(counted, result.counts.directOnAnyDiscoveredLoop);
 writeFileSync(dir + '/placement-archetypes.json', JSON.stringify(motifs, null, 2));
 result.placements = motifs;

@@ -15,7 +15,9 @@ test('audit command explains usage and rejects invalid worker counts',()=>{
  const scope=spawnSync(process.execPath,[runner,'--scope','unknown'],{encoding:'utf8'});
  assert.notEqual(scope.status,0);assert.match(scope.stderr,/scope must be unsupported or supported/);
  const reuse=spawnSync(process.execPath,[runner,'--scope','supported','--roots-from','/unused'],{encoding:'utf8'});
- assert.notEqual(reuse.status,0);assert.match(reuse.stderr,/Supported audits require a fresh root census/);
+ assert.notEqual(reuse.status,0);assert.match(reuse.stderr,/Supported and full audits require a fresh root census/);
+ const fullReuse=spawnSync(process.execPath,[runner,'--scope','all','--roots-from','/unused'],{encoding:'utf8'});
+ assert.notEqual(fullReuse.status,0);assert.match(fullReuse.stderr,/Supported and full audits require a fresh root census/);
 });
 
 test('a stale fingerprint cannot overwrite a checkpoint or start workers',()=>{

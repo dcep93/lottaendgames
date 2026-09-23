@@ -14,7 +14,7 @@ type Policy = {
     flags: number;
     branches: Branch[];
 };
-const continueSupport = process.env.AUDIT_SCOPE === 'supported';
+const continueSupport = process.env.AUDIT_SCOPE === 'supported' || process.env.AUDIT_SCOPE === 'all';
 const policies = new Map<number, Policy>();
 const moveCode = (m: any) => sqIndex(m.from) * 64 + sqIndex(m.to);
 function root(key: number) {
