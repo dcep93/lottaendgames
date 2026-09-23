@@ -23,10 +23,10 @@ test('r9.95 prefers control across a shortest Manhattan path in every symmetry',
     assert.equal(scoreKnightAndBishopWhiteMove(fen, move('b3')).bishopKingPathPenalty, 1, t.name);
     assert.equal(scoreKnightAndBishopWhiteMove(fen, move('e8')).bishopKingPathPenalty, 2, t.name);
     assert.ok(!getIdealKnightAndBishopWhiteMoves(fen).includes(move('e8')), t.name);
-    // Nc4 blocks Bb3's ray to d5, between kings on d6 and d3.
+    // X-ray control through Nc4 reaches d5, between kings on d6 and d3.
     const blocked = transformFen('8/8/3K4/8/2N5/3k4/B7/8 w - - 0 1', t);
     const san = getChess(blocked).move({from: transformSquare('a2', t), to: transformSquare('b3', t)}).san;
-    assert.equal(scoreKnightAndBishopWhiteMove(blocked, san).bishopKingPathPenalty, 2, t.name);
+    assert.equal(scoreKnightAndBishopWhiteMove(blocked, san).bishopKingPathPenalty, 1, t.name);
   }
 });
 
@@ -87,5 +87,19 @@ test('r9.96 prefers long-diagonal occupation after r9.95 path qualification acro
       return scoreKnightAndBishopWhiteMove(priorityFen, san);
     };
     assert.ok(compare(score('h8', 'f7'), score('e6', 'd5')) < 0, t.name);
+  }
+});
+
+
+test('r9.95 allows Nd5 x-ray control so stable bishop protection wins across D4', () => {
+  for (const t of SQUARE_TRANSFORMS) {
+    const fen = transformFen('8/8/2B5/8/1Nk5/8/8/7K w - - 2 2', t);
+    const move = (to: 'd5' | 'c2') => getChess(fen).move({from: transformSquare('b4', t), to: transformSquare(to, t)}).san;
+    const nd5 = scoreKnightAndBishopWhiteMove(fen, move('d5'));
+    const nc2 = scoreKnightAndBishopWhiteMove(fen, move('c2'));
+    assert.equal(nd5.bishopKingPathPenalty, 1, t.name);
+    assert.equal(nc2.bishopKingPathPenalty, 1, t.name);
+    assert.equal(nd5.knightBishopProtectionPenalty, 0, t.name);
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [move('d5')], t.name);
   }
 });
