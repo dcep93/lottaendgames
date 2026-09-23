@@ -1029,3 +1029,22 @@ test('same-color edge kings retain support with previous-stage or current-stage 
     assert.equal(knightAndBishopSupportedDiagonal(transformFen('2KB4/8/1k6/8/8/8/8/N7 b - - 0 1', transform)).size, 99)
   }
 })
+
+
+test('declared 2. Nd5 is supported and preferred with Kb5 Ba6 against Kb8', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    for (const counters of ['2 2', '51 28']) {
+      const before = transformFen(`1k6/8/BN6/1K6/8/8/8/8 w - - ${counters}`, transform)
+      const board = getChess(before)
+      const move = board.move({from: transformSquare('b6', transform), to: transformSquare('d5', transform)}).san
+      assert.deepEqual(knightAndBishopSupportedDiagonal(board.fen()), {size: 3, knight: 99})
+      assert.equal(scoreKnightAndBishopWhiteMove(before, move).declaredSupportedThreePenalty, 0)
+      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(before), [move])
+    }
+    for (const position of [
+      'k7/8/B7/1K1N4/8/8/8/8 b - - 3 2', // Different Black square.
+      '1k6/8/BN6/1K6/8/8/8/8 b - - 3 2', // Knight has not moved to d5.
+      '1k6/8/B7/3N4/2K5/8/8/8 b - - 3 2', // Different White king.
+    ]) assert.equal(knightAndBishopSupportedDiagonal(transformFen(position, transform)).size, 99)
+  }
+})

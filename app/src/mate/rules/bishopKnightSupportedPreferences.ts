@@ -29,10 +29,13 @@ export function declaredSupportedFiveMove(fen: string): string | undefined {
   return fiveDeclarations.get(fen.split(' ').slice(0, 2).join(' '))
 }
 
-const threeDeclarations = new Map(SQUARE_TRANSFORMS.map(transform => [
-  transformFen('8/k7/B1K5/3N4/8/8/8/8 w - - 0 1', transform).split(' ').slice(0, 2).join(' '),
-  transformSquare('c6', transform) + transformSquare('b5', transform),
-] as const))
+const threeDeclarations = new Map(([
+  ['8/k7/B1K5/3N4/8/8/8/8 w - - 0 1', 'c6', 'b5'],
+  ['1k6/8/BN6/1K6/8/8/8/8 w - - 0 1', 'b6', 'd5'],
+] as const).flatMap(([fen, from, to]) => SQUARE_TRANSFORMS.map(transform => [
+  transformFen(fen, transform).split(' ').slice(0, 2).join(' '),
+  transformSquare(from, transform) + transformSquare(to, transform),
+] as const)))
 
 export function declaredSupportedThreeMove(fen: string): string | undefined {
   return threeDeclarations.get(fen.split(' ').slice(0, 2).join(' '))

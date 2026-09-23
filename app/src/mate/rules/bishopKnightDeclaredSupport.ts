@@ -19,6 +19,7 @@ export function isRecordedSupportedCornerPosition(fen: string): boolean {
 const SUPPORT_WITHOUT_KNIGHT_TARGET = [
   {king: 'b5', bishop: 'a6', black: 'a7'}, // Any knight location, explicitly declared.
   {king: 'b5', bishop: 'a6', black: 'a8', knight: 'f6'}, // Result after 2. Nf6.
+  {king: 'b5', bishop: 'a6', black: 'b8', knight: 'd5'}, // Result after 2. Nd5.
 ] as const
 const SUPPORT_WITHOUT_KNIGHT_TARGET_REFLECTIONS = SUPPORT_WITHOUT_KNIGHT_TARGET.flatMap(placement =>
   SQUARE_TRANSFORMS.map(transform => ({
