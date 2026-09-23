@@ -89,7 +89,7 @@ test('Ba4 with Kd6 Nd3 is supported across Black placements and breaks the loade
   }
 })
 
-test('Kd6 supports Bd7 with Nd3 while r10 prefers the farther Be8', () => {
+test('Kd6 supports Bd7 with Nd3 and r9.95 prefers it over farther Be8', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const counters of ['0 1', '38 20']) {
       const fen = transformFen(`8/8/3K4/k7/B7/3N4/8/8 w - - ${counters}`, transform)
@@ -97,8 +97,7 @@ test('Kd6 supports Bd7 with Nd3 while r10 prefers the farther Be8', () => {
       const bd7 = board.move({from: transformSquare('a4', transform), to: transformSquare('d7', transform)}).san
       assert.equal(knightAndBishopSupportedDiagonal(board.fen()).size, 5)
       assert.equal(scoreKnightAndBishopWhiteMove(fen, bd7).supportedDiagonalSizeScore, 5)
-      const be8 = getChess(fen).move({from: transformSquare('a4', transform), to: transformSquare('e8', transform)}).san
-      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [be8])
+      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [bd7])
     }
   }
 })
