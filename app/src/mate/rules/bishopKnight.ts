@@ -39,6 +39,7 @@ import type {
 } from "./types";
 
 export type KnightAndBishopWhiteMoveScore = {
+  readonly minorBlackDistanceScore: number;
   readonly nearbyBishopEscapeScore: number;
   readonly knightBlackMoatDistanceScore: number;
   readonly kingCoordinationPenalty: number;
@@ -226,6 +227,10 @@ function scoreKnightAndBishopWhiteMoveCore(
     get knightBlackMoatDistanceScore() {
       const distance = knight ? knightDistanceFromBlackMoatSide(knight.square, context.knightMoatSides) : 0;
       return distance ? -distance : 0;
+    },
+    get minorBlackDistanceScore() {
+      return blackKing ? -[bishop, knight].reduce((sum, piece) => sum + (piece
+        ? Math.sqrt(squaredEuclideanDistance(piece.square, blackKing.square)) : 0), 0) : 0;
     },
     get nearbyBishopEscapeScore() {
       return context.shouldDistanceNearbyBishop && bishop && blackKing
@@ -419,6 +424,13 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       helpText: "If the knight is within 2 steps of Black's king, maximize its distance from Black's side of the king moat.",
       compare: (first, second) => first.knightBlackMoatDistanceScore - second.knightBlackMoatDistanceScore,
     },
+    {
+      id: "r20",
+      shortLabel: "rule r20",
+      helpText: "Minimize king distance to the center, then maximize piece distance from Black's king.",
+      compare: (first, second) => first.kingCenterProximityScore - second.kingCenterProximityScore
+        || first.minorBlackDistanceScore - second.minorBlackDistanceScore,
+    },
   ];
 
 export function compareKnightAndBishopWhiteScores(
@@ -552,6 +564,7 @@ const bishopKnightHelp: RuleHelp = {
     "Stay away from a bishop-colored corner.",
   ],
   notes: [
+    "For r20, minimize White’s king Euclidean distance to the board’s midpoint, then maximize the sum of the bishop’s and knight’s Euclidean distances from Black’s king. Evaluate after White moves.",
     "For r15, check the knight’s two-king-step range before White moves. Fix the moat one file or rank from White’s starting king toward Black along their greater separation; use both axes when tied. Black’s side is the region beyond that line. Maximize the knight’s Euclidean distance from the nearest Black-side region after White moves; squares inside either region score zero. The moat also exists when the kings are farther than two steps apart.",
     "For r10, check before White moves: the bishop must be within two king steps of Black’s king. Maximize the bishop’s Euclidean distance from Black after the move, including destinations beyond two steps.",
     "r2.5 general preferences, after exact declarations: With a supported 3 diagonal, equally prefer the king on b6 or c7. With a supported 5 diagonal and Nd5, prefer the bishop on b5 or d7. With Bb5 and Nd5, prefer king step proximity to the square two files to the right of Black’s king. Otherwise, with a supported 5 diagonal, Nd5 and Black on or adjacent to a5, prefer king step proximity to b4. With a supported 5 diagonal and Nd3, prefer king step proximity to the square two files to the right of Black’s king. With a supported 7 diagonal and Black on or adjacent to a3, prefer the king off the bishop’s color, then king step proximity to b2. Then prefer the bishop on b3, king step proximity to the square two files to the right of Black’s king, and king step proximity to e8. Include reflections.",
