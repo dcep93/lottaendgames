@@ -134,7 +134,12 @@ test("bishop-and-knight rules are registered", () => {
     {
       id: "r10",
       shortLabel: "rule r10",
-      helpText: "With a non-central White king, if the bishop is within 2 steps of Black's king, maximize the bishop's distance from Black's king.",
+      helpText: "If the bishop is within 2 steps of Black's king, maximize its distance from Black's king.",
+    },
+    {
+      id: "r15",
+      shortLabel: "rule r15",
+      helpText: "If the knight is within 2 steps of Black's king, maximize its distance from Black's side of the king moat.",
     },
   ]);
   assert.equal(ruleSet.help.noteBoards.find(board => board.animationSrc)?.id, "bishop-knight-rule-r4-flush");
@@ -160,13 +165,14 @@ test("bishop-and-knight rules are registered", () => {
       "r4",
       "r5",
       "r10",
+      "r15",
     ],
   );
   assert.deepEqual(
     ruleSet.whiteRuleDescriptions.map(({ id }) => id),
     knightAndBishopWhiteRules.map(({ id }) => id),
   );
-  assert.equal(knightAndBishopWhiteRules.length, 9);
+  assert.equal(knightAndBishopWhiteRules.length, 10);
 });
 
 test("immediate mate keeps precedence without the mating-net rule", () => {
