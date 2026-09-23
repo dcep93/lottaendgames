@@ -1,24 +1,21 @@
-import type { Square } from 'chess.js';
 import { centerDistance } from './bishopKnightGeometry';
-import { findPiece, getChess, SQUARE_TRANSFORMS, transformSquare } from '../chess';
+import { findPiece, getChess, squareCoords, squareFromCoordinates } from '../chess';
 
-// Fixed board placements: D4 symmetries only, without translations.
-const steps: readonly { king: Square; bishop: Square; target: Square }[] = [
-  { king: 'c3', bishop: 'c4', target: 'd3' },
-  { king: 'c7', bishop: 'c6', target: 'd7' },
-];
-const patterns = steps.flatMap(step => SQUARE_TRANSFORMS.map(transform => ({
-  king: transformSquare(step.king, transform),
-  bishop: transformSquare(step.bishop, transform),
-  target: transformSquare(step.target, transform),
-})));
-
+/** Anchor the king/bishop step to Black's central king, including every D4 orientation. */
 export function knightAndBishopFivePointFiveMove(fen: string): string | undefined {
   if (fen.split(' ')[1] !== 'w') return undefined;
   const king = findPiece(fen, 'w', 'k'), bishop = findPiece(fen, 'w', 'b'), black = findPiece(fen, 'b', 'k');
-  if (!black || centerDistance(black.square) !== 0) return undefined;
-  const pattern = patterns.find(p => king?.square === p.king && bishop?.square === p.bishop);
-  if (!pattern) return undefined;
-  return getChess(fen).moves({ verbose: true }).some(move => move.from === pattern.king && move.to === pattern.target)
-    ? pattern.king + pattern.target : undefined;
+  if (!king || !bishop || !black || centerDistance(black.square) !== 0) return undefined;
+  const white = squareCoords(king.square), dark = squareCoords(black.square), minor = squareCoords(bishop.square);
+  const dx = dark.file - white.file, dy = dark.rank - white.rank;
+  if (Math.abs(dx) !== 2 || Math.abs(dy) !== 2) return undefined;
+  const x = Math.sign(dx), y = Math.sign(dy);
+  // The bishop occupies one inward orthogonal neighbor; the king takes the other.
+  const target = minor.file === white.file && minor.rank === white.rank + y
+    ? squareFromCoordinates(white.file + x, white.rank)
+    : minor.file === white.file + x && minor.rank === white.rank
+      ? squareFromCoordinates(white.file, white.rank + y) : null;
+  if (!target) return undefined;
+  return getChess(fen).moves({ verbose: true }).some(move => move.from === king.square && move.to === target)
+    ? king.square + target : undefined;
 }

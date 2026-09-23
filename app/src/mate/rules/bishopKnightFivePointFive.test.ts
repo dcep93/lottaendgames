@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess';
+import { squareCoords, squareFromCoordinates, getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess';
 import { bishopKnightRuleSet, getIdealKnightAndBishopWhiteMoves } from './bishopKnight';
 import { knightAndBishopFivePointFiveMove } from './bishopKnightFivePointFive';
 
-test('r5.5 matches any central Black king for both fixed steps, across D4', () => {
+test('r5.5 requires the diagonal king offset rather than matching any central Black square, across D4', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const [source, from, to] of [
       ['8/2K5/2B5/1N2k3/8/8/8/8 w - - 0 1', 'c7', 'd7'],
@@ -17,7 +17,7 @@ test('r5.5 matches any central Black king for both fixed steps, across D4', () =
         const fen = transformFen(c.fen(), transform);
         const move = {from: transformSquare(from, transform), to: transformSquare(to, transform)};
         const legal = getChess(fen).moves({verbose: true}).some(m => m.from === move.from && m.to === move.to);
-        assert.equal(knightAndBishopFivePointFiveMove(fen), legal ? move.from + move.to : undefined);
+        assert.equal(knightAndBishopFivePointFiveMove(fen), legal && black === 'e5' ? move.from + move.to : undefined);
       }
     }
     for (const source of [
@@ -48,7 +48,7 @@ test('r5.5 prefers Kd3 across D4 independently of knight placement', () => {
   }
 });
 
-test('r5.5 rejects translations, mismatched pieces and occupied destinations', () => {
+test('r5.5 rejects noncentral Black kings, mismatched pieces and occupied destinations', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const source of [
       '8/8/8/5k2/1N1B4/3K4/8/8 w - - 0 1',
@@ -65,4 +65,32 @@ test('r5.5 diagram shows the prescribed king step and omits the irrelevant knigh
   assert.ok(board);
   assert.deepEqual(board.arrows, [{from: 'c3', to: 'd3'}]);
   assert.deepEqual(board.pieces, [{square: 'c3', piece: 'K'}, {square: 'c4', piece: 'B'}, {square: 'e5', piece: 'k'}]);
+});
+
+
+test('r5.5 shifts the whole relative arrangement with each central Black square, across D4', () => {
+  for (const black of ['d4', 'e4', 'd5', 'e5'] as const) {
+    const {file,rank} = squareCoords(black);
+    const king = squareFromCoordinates(file-2,rank-2)!;
+    const bishop = squareFromCoordinates(file-2,rank-1)!;
+    const target = squareFromCoordinates(file-1,rank-2)!;
+    const board = getChess('7k/8/8/8/8/8/8/K7 w - - 0 1');
+    board.clear();
+    board.put({type:'k',color:'b'},black);
+    board.put({type:'k',color:'w'},king);
+    board.put({type:'b',color:'w'},bishop);
+    board.put({type:'n',color:'w'},'h1');
+    for (const transform of SQUARE_TRANSFORMS) {
+      const fen = transformFen(board.fen(),transform);
+      assert.equal(knightAndBishopFivePointFiveMove(fen),transformSquare(king,transform)+transformSquare(target,transform));
+    }
+  }
+  for (const transform of SQUARE_TRANSFORMS) {
+    const loaded = transformFen('8/8/1KB5/4k3/8/8/8/3N4 w - - 2 2',transform);
+    assert.equal(knightAndBishopFivePointFiveMove(loaded),undefined);
+    const kc5 = getChess(loaded).move({from:transformSquare('b6',transform),to:transformSquare('c5',transform)}).san;
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(loaded),[kc5]);
+    assert.equal(knightAndBishopFivePointFiveMove(transformFen('8/8/1KB5/8/3k4/8/8/3N4 w - - 2 2',transform)),
+      transformSquare('b6',transform)+transformSquare('b5',transform));
+  }
 });
