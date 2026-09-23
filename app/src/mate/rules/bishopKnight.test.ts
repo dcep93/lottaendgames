@@ -139,7 +139,7 @@ test("bishop-and-knight rules are registered", () => {
     {
       id: "r6",
       shortLabel: "rule r6",
-      helpText: "Prefer king off bishop's color.",
+      helpText: "Prefer king off bishop's color, unless escaping a corner.",
     },
     {
       id: "r8",
