@@ -15,7 +15,7 @@ test('older exact three support requires the newly eligible king placements, inc
       const reflected = transformFen(fen, transform)
       assert.equal(isRecordedSupportedCornerPosition(reflected), true)
       assert.equal(isRecordedSupportedCornerPosition(reflected.replace(' b ', ' w ')), false)
-      assert.equal(knightAndBishopSupportedDiagonal(reflected).size, fen.includes('B1K5') ? 99 : 3)
+      assert.equal(knightAndBishopSupportedDiagonal(reflected).size, fen.includes('B1K5') || fen.includes('1N6/BK6') ? 99 : 3)
     }
     assert.equal(isRecordedSupportedCornerPosition(transformFen('1k6/1N6/B1K5/8/8/8/8/8 b - - 0 1', transform)), false)
     assert.equal(knightAndBishopSupportedDiagonal(transformFen('1kB5/8/3N4/1K6/8/8/8/8 b - - 0 1', transform)).size, 99)

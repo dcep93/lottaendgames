@@ -260,6 +260,10 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
   const bishop = findPiece(fen, 'w', 'b')
   const knight = findPiece(fen, 'w', 'n')
   if (!white || !black || !bishop || !knight) return {size: 99, knight: 99}
+  // A knight on the three-diagonal's middle square (Ng2 with Bf1/ Bh3)
+  // disqualifies support, including older king-and-bishop placement declarations.
+  if (DIAGONALS.some(pattern => pattern.wall.length === 3 &&
+    pattern.wall.includes(bishop.square) && pattern.wall[1] === knight.square)) return {size: 99, knight: 99}
   // The Ba6/Kb6 declaration requires Black inside its diagonal, retaining real knight targets.
   if (isDeclaredInsideThreeSupport(white.square, bishop.square, black.square)) return {
     size: 3,

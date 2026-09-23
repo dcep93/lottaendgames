@@ -4,6 +4,21 @@ import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../c
 import { knightAndBishopSupportedDiagonal } from './bishopKnightDiagonalSupport'
 import { scoreKnightAndBishopWhiteMove } from './bishopKnight'
 
+test('a knight on the middle three-diagonal square disqualifies even declared king support', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    for (const fen of [
+      '8/8/8/8/8/8/5KNk/5B2 b - - 1 1',
+      '8/8/8/8/8/7k/5KN1/5B2 b - - 3 2',
+      '8/8/8/8/8/5K1B/6Nk/8 b - - 1 1',
+    ]) assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 99)
+    const start = transformFen('8/8/B7/8/8/8/5KNk/8 w - - 0 1', transform)
+    const san = getChess(start).move({from: transformSquare('a6', transform), to: transformSquare('f1', transform)}).san
+    assert.equal(scoreKnightAndBishopWhiteMove(start, san).supportedDiagonalSizeScore, 99)
+    // The neighboring support knight remains eligible with the same king and bishop.
+    assert.equal(knightAndBishopSupportedDiagonal(transformFen('8/8/8/8/8/8/4NK1k/5B2 b - - 1 1', transform)).size, 3)
+  }
+})
+
 test('three-diagonal king adjacency does not waive same-color off-support restriction', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const fen of ['k1B5/8/8/3N4/8/8/8/7K b - - 0 1']) {
