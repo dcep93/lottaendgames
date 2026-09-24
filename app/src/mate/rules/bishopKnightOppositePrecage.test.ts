@@ -66,3 +66,21 @@ test('r7.8 prefers Nd3 in the loaded position across D4', () => {
     assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [move])
   }
 })
+
+
+test('r7.8 gives no frozen-target credit after the bishop leaves the center, across D4', () => {
+  const start = '8/8/8/1k1BK3/N7/8/8/8 w - - 0 1'
+  for (const t of SQUARE_TRANSFORMS) {
+    const fen = transformFen(start, t)
+    const san = (from: 'd5' | 'a4', to: 'b3' | 'e4' | 'b6') =>
+      getChess(fen).move({from: transformSquare(from, t), to: transformSquare(to, t)}).san
+    const offCenter = score(fen, san('d5', 'b3'))
+    const central = score(fen, san('d5', 'e4'))
+    const knightMove = score(fen, san('a4', 'b6'))
+    assert.equal(offCenter.oppositePrecageDistance, 99)
+    assert.equal(offCenter.oppositePrecageEuclideanDistanceSquared, 99)
+    assert.ok(rule.compare!(central, offCenter) < 0)
+    assert.ok(rule.compare!(knightMove, offCenter) < 0)
+    assert.ok(!getIdealKnightAndBishopWhiteMoves(fen).includes(san('d5', 'b3')))
+  }
+})
