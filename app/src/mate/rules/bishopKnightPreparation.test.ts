@@ -148,3 +148,15 @@ test('r5 prescribes second-move Nf4 after Kf5 Ke8 across D4', () => {
     assert.deepEqual(getIdealKnightAndBishopWhiteMoves(before), [san])
   }
 })
+
+
+test('r5 prescribes Ne5 with Kd4 Bd5 Nc4 against Kb8 across D4', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    const fen = transformFen('1k6/8/8/3B4/2NK4/8/8/8 w - - 0 1', transform)
+    const from = transformSquare('c4', transform)
+    const to = transformSquare('e5', transform)
+    const san = getChess(fen).move({from, to}).san
+    assert.equal(knightAndBishopDeclaredPreparationMove(fen), from + to)
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [san])
+  }
+})
