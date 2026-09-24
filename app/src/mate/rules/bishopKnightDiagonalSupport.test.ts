@@ -685,13 +685,13 @@ test('support classification requires a position after White moves', () => {
   assert.equal(knightAndBishopSupportedDiagonal(board.fen()).size, 99)
 })
 
-test('Kb6 cannot rescue a knight on the middle three-diagonal square', () => {
+test('reflected Kc7 declaration permits Kb6 Ba6 Nb7 against Ka8', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     const fen = transformFen('k7/1N6/B7/1K6/8/8/8/8 w - - 0 1', transform)
     const kb6 = getChess(fen).move({from: transformSquare('b5', transform), to: transformSquare('b6', transform)}).san
     const score = scoreKnightAndBishopWhiteMove(fen, kb6)
-    assert.equal(score.supportedDiagonalSizeScore, 99)
-    assert.equal(score.supportedDiagonalKnightScore, 99)
+    assert.equal(score.supportedDiagonalSizeScore, 3)
+    assert.ok(score.supportedDiagonalKnightScore < 99)
   }
 })
 
@@ -1004,7 +1004,7 @@ test('declared second-move Nf6 supports Kb5 Ba6 versus Ka8 without adding a knig
 })
 
 
-test('Ba6 Kb6 requires Black inside and knight off the middle three-diagonal square', () => {
+test('Ba6 Kb6 requires Black inside and allows the declared middle-square knight against Ka8', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const black of allSquares()) {
       if (black === 'a6' || kingDistance('b6', black) <= 1) continue
@@ -1016,7 +1016,7 @@ test('Ba6 Kb6 requires Black inside and knight off the middle three-diagonal squ
         board.put({type: 'n', color: 'w'}, knight)
         const size = knightAndBishopSupportedDiagonal(transformFen(board.fen(), transform)).size
         const inside = isInsideBishopDiagonal(black, ['a6', 'b7', 'c8'])
-        assert.equal(size === 3, inside && knight !== 'b7', `${black} ${knight} ${transform.name}`)
+        assert.equal(size === 3, inside && (knight !== 'b7' || black === 'a8'), `${black} ${knight} ${transform.name}`)
       }
     }
     const before = transformFen('1k6/8/B7/NK6/8/8/8/8 w - - 2 2', transform)
@@ -1334,5 +1334,23 @@ test('Ke7 cannot establish support with Black Kf5 outside the Bb5 cage', () => {
     const move = board.move({from: transformSquare('f8', transform), to: transformSquare('e7', transform)}).san
     assert.deepEqual(knightAndBishopSupportedDiagonal(board.fen()), {size: 99, knight: 99})
     assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 99)
+  }
+})
+
+
+test('declared Kc7 with Bc8 Nb7 against Ka8 supports three across D4', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    for (const counters of ['0 1', '23 12']) {
+      const before = transformFen(`k1BK4/1N6/8/8/8/8/8/8 w - - ${counters}`, transform)
+      const board = getChess(before)
+      const move = board.move({from: transformSquare('d8', transform), to: transformSquare('c7', transform)}).san
+      assert.equal(knightAndBishopSupportedDiagonal(board.fen()).size, 3)
+      assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 3)
+      assert.ok(getIdealKnightAndBishopWhiteMoves(before).includes(move))
+    }
+    for (const fen of [
+      'k1B5/1N6/2K5/8/8/8/8/8 b - - 0 1', // Different king placement: no exception.
+      '2B5/1NK5/8/4k3/8/8/8/8 b - - 0 1', // Outside the cage.
+    ]) assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 99)
   }
 })

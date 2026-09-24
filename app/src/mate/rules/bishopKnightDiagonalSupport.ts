@@ -1,6 +1,6 @@
 import type { Square } from 'chess.js'
 import { isInsideBishopDiagonal } from './bishopKnightGeometry'
-import { isDeclaredCheckingThreePlacement, isDeclaredCornerSupportWithoutKnightTarget, isDeclaredInsideThreeSupport, isRecordedSupportedCornerPosition } from './bishopKnightDeclaredSupport'
+import { isDeclaredC7CornerSupport, isDeclaredCheckingThreePlacement, isDeclaredCornerSupportWithoutKnightTarget, isDeclaredInsideThreeSupport, isRecordedSupportedCornerPosition } from './bishopKnightDeclaredSupport'
 import { knightAndBishopKnightProximityToSquare } from './bishopKnightStrategy'
 import { allSquares, edgeDistance, getChess, isKnightMove, findPiece, kingDistance, squaredEuclideanDistance, squareColor, squareCoords, squareFromCoordinates, SQUARE_TRANSFORMS, transformSquare } from '../chess'
 
@@ -333,6 +333,12 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
       pattern.wall.includes(bishop.square) && isInsideBishopDiagonal(black.square, pattern.wall) &&
       replies.every(square => isInsideBishopDiagonal(square, pattern.wall)))
     return enclosed ? {size: 3, knight: 99} : {size: 99, knight: 99}
+  }
+  // The exact Kc7/Bc8/Nb7 against Ka8 declaration overrides the middle-square exclusion.
+  if (isDeclaredC7CornerSupport(fen)) return {
+    size: 3,
+    knight: Math.min(...DIAGONALS.filter(pattern => pattern.wall.length === 3 && pattern.wall.includes(bishop.square))
+      .map(pattern => supportDistance(fen, white.square, pattern))),
   }
   // A knight on the three-diagonal's middle square (Ng2 with Bf1/ Bh3)
   // disqualifies support, including older king-and-bishop placement declarations.
