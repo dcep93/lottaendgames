@@ -1,3 +1,4 @@
+import { stableBishopProtectionDistance } from "./bishopKnightStableProtection";
 import { knightAndBishopThreeKingPlacementPenalty, knightAndBishopFiveBishopPenalty, knightAndBishopFiveKingTargetDistance, knightAndBishopShouldCheckThreeDiagonal, evaluateKnightAndBishopSupportedDiagonal } from "./bishopKnightDiagonalSupport";
 import type { Square } from "chess.js";
 import {
@@ -15,7 +16,7 @@ import {
   BLACK_CAPTURE_PRIORITY,
   BLACK_RETURN_PRIORITY,
 } from "./blackPriorities";
-import { bishopControlsOrOccupiesSquare, bishopLongDiagonalIntersection, centerDistance } from "./bishopKnightGeometry";
+import { bishopLongDiagonalIntersection, centerDistance } from "./bishopKnightGeometry";
 import {
   getKnightAndBishopLookupWhiteMoves,
   getKnightAndBishopPhaseLabel,
@@ -327,18 +328,7 @@ function scoreKnightAndBishopWhiteMoveCore(
       return bishop && targets.length
         ? -Math.sqrt(Math.min(...targets.map(target => squaredEuclideanDistance(bishop.square, target)))) : 0;
     },
-    get knightBishopProtectionPenalty() {
-      if (!bishop || !knight
-        || !bishopControlsOrOccupiesSquare(resultFen, bishop.square, knight.square, blackKing?.square)) return 1;
-      // Keep room to slide on the protecting diagonal, toward the knight or away from it.
-      if (kingDistance(bishop.square, knight.square) >= 2) return 0;
-      const b = squareCoordinates(bishop.square), n = squareCoordinates(knight.square);
-      const file = b.file + Math.sign(b.file - n.file);
-      const rank = b.rank + Math.sign(b.rank - n.rank);
-      if (file < 0 || file > 7 || rank < 0 || rank > 7) return 1;
-      const retreat = `${"abcdefgh"[file]}${rank + 1}` as Square;
-      return retreat === whiteKing?.square ? 1 : 0;
-    },
+    get knightBishopProtectionPenalty() { return stableBishopProtectionDistance(resultFen); },
     knightBishopColorPenalty: knight && bishop && squareColor(knight.square) === squareColor(bishop.square) ? 1 : 0,
     get nonCentralBishopDistanceScore() {
       return bishop && blackKing && centerDistance(bishop.square) !== 0
@@ -466,7 +456,7 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     {
       id: "r9.98",
       shortLabel: "rule r9.98",
-      helpText: "Protect the knight using a stable bishop.",
+      helpText: "Prefer knight move proximity to a stable bishop protected square.",
       compare: (first, second) => first.knightBishopProtectionPenalty - second.knightBishopProtectionPenalty,
     },
     {

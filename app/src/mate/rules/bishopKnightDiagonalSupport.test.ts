@@ -990,9 +990,9 @@ test('declared second-move Nf6 supports Kb5 Ba6 versus Ka8 without adding a knig
       const board = getChess(before)
       board.move({from: transformSquare('d7', transform), to: transformSquare('f6', transform)})
       assert.deepEqual(knightAndBishopSupportedDiagonal(board.fen()), {size: 3, knight: 99})
-      // Without the removed adjacency rule, r20 prefers the farther knight.
-      const nf6 = getChess(before).move({from: transformSquare('d7', transform), to: transformSquare('f6', transform)}).san
-      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(before), [nf6])
+      // r9.98 now prefers a knight one move from bishop protection.
+      const nb6 = getChess(before).move({from: transformSquare('d7', transform), to: transformSquare('b6', transform)}).san
+      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(before), [nb6])
     }
     for (const fen of [
       'k7/8/B4N2/2K5/8/8/8/8 b - - 0 1',
