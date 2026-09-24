@@ -1,3 +1,4 @@
+import { knightAndBishopPrecageSideTarget, type PrecageSideTarget } from "./bishopKnightPrecageSide";
 import { stableBishopProtectionDistance } from "./bishopKnightStableProtection";
 import { knightAndBishopThreeKingPlacementPenalty, knightAndBishopFiveBishopPenalty, knightAndBishopFiveKingTargetDistance, knightAndBishopShouldCheckThreeDiagonal, evaluateKnightAndBishopSupportedDiagonal } from "./bishopKnightDiagonalSupport";
 import type { Square } from "chess.js";
@@ -59,6 +60,8 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly oppositePrecageDistance: number;
   readonly oppositePrecageEuclideanDistanceSquared: number;
   readonly precageKingDistanceSquared: number;
+  readonly precageSideDistance: number;
+  readonly precageSideCornerDistanceSquared: number;
   readonly declaredPreparationPenalty: number;
   readonly supportedThreeCheckScore: number;
   readonly supportedDiagonalSizeScore: number;
@@ -155,6 +158,7 @@ type KnightAndBishopPositionScoreContext = {
   readonly shouldEscapeNearbyPairBishop: boolean;
   readonly shouldDefendKnight: boolean;
   readonly startsWithPrecageKnight: boolean;
+  readonly precageSideTarget: PrecageSideTarget | undefined;
   readonly oppositePrecageTargets: readonly Square[];
   readonly declaredPreparationMove: string | undefined;
   readonly declaredSupportedKnightAdvance: string | undefined;
@@ -182,6 +186,7 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
       bishopOppositionTarget = `${"abcdefgh"[file]}${rank + 1}` as Square;
   }
   return {
+    precageSideTarget: knightAndBishopPrecageSideTarget(fen),
     fivePointFiveMove: knightAndBishopFivePointFiveMove(fen),
     relativeKnightMove: knightAndBishopRelativeKnightMove(fen),
     startsWithMiddle16King: !!whiteKing && isMiddle16Square(whiteKing.square),
@@ -328,6 +333,10 @@ function scoreKnightAndBishopWhiteMoveCore(
       return context.oppositePrecageTargets.length
         ? Math.min(...context.oppositePrecageTargets.map(target => knightAndBishopKnightProximityToSquare(resultFen, target))) : 0;
     },
+    precageSideDistance: context.precageSideTarget && whiteKing
+      ? Math.abs(squareCoordinates(whiteKing.square)[context.precageSideTarget.axis] - context.precageSideTarget.edge) : 0,
+    precageSideCornerDistanceSquared: context.precageSideTarget && whiteKing
+      ? squaredEuclideanDistance(whiteKing.square, context.precageSideTarget.corner) : 0,
     precageKingDistanceSquared: context.startsWithPrecageKnight && whiteKing && blackKing
       ? squaredEuclideanDistance(whiteKing.square, blackKing.square) : 0,
     declaredPreparationPenalty: context.declaredPreparationMove && context.declaredPreparationMove !== move.from + move.to ? 1 : 0,
@@ -448,6 +457,15 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       shortLabel: "rule r5.5",
       helpText: "Play the 5.5 step.",
       compare: (first, second) => first.declaredStepPenalty - second.declaredStepPenalty,
+    },
+    {
+      id: "r6",
+      shortLabel: "rule r6",
+      helpText: "With a central bishop on the same side as Black's king, and a precage knight opposite Black's king, prefer king proximity to the bishop's side, then king proximity to the non-target corner.",
+      subpriorities: [
+        { compare: (first, second) => first.precageSideDistance - second.precageSideDistance },
+        { compare: (first, second) => first.precageSideCornerDistanceSquared - second.precageSideCornerDistanceSquared },
+      ],
     },
     {
       id: "r7",
@@ -643,6 +661,7 @@ const bishopKnightHelp: RuleHelp = {
     "Stay away from a bishop-colored corner.",
   ],
   notes: [
+    "For r6, use the rank or file halves separating the central bishop from the precage knight. Require Black in the bishop’s half before White moves. Prefer king distance to that half’s outer edge, then Euclidean proximity to its non-target corner. For Bd5/Nc4 with Black on ranks 5–8, target rank 8, then h8; include all board symmetries.",
     "For r9.99, filter the shared precage targets to the opposite side from Black before White moves. Require a middle-16 king and central bishop. Measure knight moves after White moves, then break ties by Euclidean proximity to the target. If Black is on the bishop’s long diagonal, there is no opposite-side target and this rule is neutral.",
     "For r5.1, require a central bishop and knight on a precage square before White moves, then minimize the resulting Euclidean distance between the kings.",
     "For r8, White’s king must be on files c–f and ranks 3–6 before moving. Evaluate the bishop and knight preferences after White moves. Precage targets do not require adjacency to the bishop. With a light-squared central bishop they are c4, d3, e6 and f5, including board symmetries; r5.1, r8 and r9.99 share these targets.",
