@@ -1,0 +1,21 @@
+import assert from 'node:assert/strict';
+import {DatabaseSync} from 'node:sqlite';
+import {readFileSync,writeFileSync} from 'node:fs';
+import {cyclicEdgeLabels} from './cycle-cohort.mts';
+const args=process.argv.slice(2);
+const option=(name:string)=>{const i=args.indexOf(name);assert.ok(i>=0&&args[i+1],`Missing ${name}`);return args[i+1]!;};
+const source=option('--audit'),destination=option('--out');
+const r=JSON.parse(readFileSync(source+'/result.json','utf8')),m=JSON.parse(readFileSync(source+'/manifest.json','utf8'));
+const db=new DatabaseSync(source+'/census.sqlite',{readOnly:true});
+assert.ok(db.prepare("SELECT value FROM meta WHERE key='graphComplete'").get());
+const ids=[...new Set<number>(r.families.flatMap((f:any)=>f.nodeIds))],index=new Map(ids.map((id,i)=>[id,i]));
+const node=db.prepare('SELECT payload FROM nodes WHERE id=?'),root=db.prepare('SELECT key,weight,supported FROM roots WHERE key=?');
+const roots=new Map<number,any>();
+const edges=ids.map(id=>JSON.parse((node.get(id) as any).payload).edges.flatMap(([to,label]:number[])=>{
+ if(!index.has(to!))return [];let p=roots.get(label!);if(!p){p=root.get(label!);assert.ok(p);roots.set(label!,p);}return p.supported===99?[[index.get(to!),label]]:[];
+}));
+const cyclic=cyclicEdgeLabels(edges);
+const boards=[...cyclic].sort((a,b)=>a-b).map(k=>({key:k,weight:roots.get(k).weight}));
+const cohort={policyCommit:m.commit,policyFingerprint:r.policyFingerprint,blackPolicy:r.blackPolicy??'legacy-restricted',sourceAudit:source,definition:'All D4-deduplicated post-White positions on cycles containing only unsupported White results in the last completed full audit. Extracted from all internal SCC edges, not just representative witnesses.',boards};
+writeFileSync(destination,JSON.stringify(cohort,null,2)+'\n');
+console.log({cycleNodes:ids.length,cohort:boards.length,physical:boards.reduce((a,b)=>a+b.weight,0)});db.close();

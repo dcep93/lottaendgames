@@ -108,21 +108,44 @@ preferences. They can supply the historical cohort, but its survivors must be
 rechecked with **all legal Black replies**, and its old density is not a current
 all-legal measurement.
 
-The existing exhaustive cohort checker is available as:
+The current frozen baseline is `cohort-r51-reset-2026-09-24.json`: 1,336
+positions on wholly unsupported cycles in the last completed full audit.
+Its historical Black policy is recorded separately from the all-legal recheck.
 
 ```sh
-app/node_modules/.bin/tsx scripts/bishop-knight-audit/cohort.mts \
-  --baseline /absolute/path/to/frozen-cohort.json \
-  --out /absolute/path/to/cohort-check
+# Only after a new full audit: extract all cyclic positions, not just witnesses.
+app/node_modules/.bin/tsx scripts/bishop-knight-audit/freeze-unsupported-cohort.mts \
+  --audit /absolute/completed-full-audit --out /absolute/frozen-cohort.json
+
+# Exact current-policy membership, all cycle lengths, wholly unsupported cycles.
+app/node_modules/.bin/tsx scripts/bishop-knight-audit/unsupported-cohort.mts \
+  --baseline scripts/bishop-knight-audit/cohort-r51-reset-2026-09-24.json \
+  --out /absolute/cohort-check
+
+# Five-second residual sample, reusing the closed graph from that exact check.
+app/node_modules/.bin/tsx scripts/bishop-knight-audit/residual-estimate.mts \
+  --baseline scripts/bishop-knight-audit/cohort-r51-reset-2026-09-24.json \
+  --cohort-dir /absolute/cohort-check \
+  --census /absolute/completed-full-audit/census.sqlite \
+  --unsupported-population CURRENT_D4_UNSUPPORTED_POPULATION
 ```
 
-It seeds every legal noncapturing Black reply, expands preferred White moves and
-all legal Black replies, and identifies direct membership through edges internal
-to cyclic strongly connected components. A capture terminates only its own branch.
-It currently counts cycles through support changes; the unsupported-only estimator
-must restrict membership to cycles with unsupported post-White results, rather
-than treating this command's unfiltered survivor count as the unsupported total.
-`result.json` records the current policy bundle fingerprint and surviving keys.
+The cohort checker uses two workers and caches complete results by policy and
+baseline fingerprints. A changed policy needs a fresh output directory. Captures
+and supported White results terminate their own branches. Cycle membership uses
+labels on edges inside cyclic strongly connected components, so paths merely
+leading to a loop never count. The sampler validates both fingerprints and
+interleaves unfinished searches rather than letting one deep search consume the
+whole budget. Its output explicitly separates hits, nonloops, and unresolved
+samples; incomplete classification yields a detection lower-bound estimate.
+Population preload and fingerprint validation precede the five-second sampling
+clock. The unsupported population argument must come from the current support
+census; an older census may supply the unchanged legal-placement domain, but its
+support counts must not silently be reused after a support-rule change.
+
+The older `cohort.mts` remains available for historical cohort checks that follow
+paths through support changes; do not use its unfiltered counts as unsupported-
+only loop totals.
 
 ## Staged work: seven, then five, then three
 
