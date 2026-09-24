@@ -26,7 +26,7 @@ import {
   knightAndBishopPiecesPresent,
 } from "./bishopKnightLookup";
 import { knightAndBishopCenterProximityScore, knightAndBishopKingCenterProximityScore, knightAndBishopKnightTargetProximityScore, knightAndBishopTargetCorners } from "./bishopKnightStrategy";
-import { knightAndBishopDeclaredCornerFlushMove } from "./bishopKnightCornerFlush";
+import { precageKingEdges, kingEdgeDistance, type BoardEdge } from "./bishopKnightPrecageEdges";
 import { declaredSupportedThreeMove, declaredSupportedFiveMove, declaredSupportedSevenMove } from "./bishopKnightSupportedPreferences";
 import { knightAndBishopDeclaredPreparationMove } from "./bishopKnightPreparation";
 import { knightAndBishopShouldCoordinateKing, knightAndBishopKingCoordinatesMinors } from "./bishopKnightCoordination";
@@ -62,7 +62,8 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly bishopOppositionPenalty: number;
   readonly knightNextAttackPenalty: number;
   readonly knightCenterProximityScore: number;
-  readonly declaredCornerFlushPenalty: number;
+  readonly precagePrimaryEdgeDistance: number;
+  readonly precageSecondaryEdgeDistance: number;
   readonly declaredPreparationPenalty: number;
   readonly supportedThreeCheckScore: number;
   readonly supportedDiagonalSizeScore: number;
@@ -161,7 +162,7 @@ type KnightAndBishopPositionScoreContext = {
   readonly knightMoatSides: readonly KingMoatSide[];
   readonly shouldEscapeNearbyPairBishop: boolean;
   readonly shouldDefendKnight: boolean;
-  readonly declaredCornerFlushMove: string | undefined;
+  readonly precageEdges: readonly BoardEdge[];
   readonly declaredPreparationMove: string | undefined;
   readonly declaredSupportedThreeMove: string | undefined;
   readonly declaredSupportedFiveMove: string | undefined;
@@ -203,7 +204,7 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
     shouldEscapeBishop: !!bishop && !!blackKing && kingDistance(bishop.square, blackKing.square) === 1,
     shouldDefendKnight: !!knight && !!blackKing && kingDistance(knight.square, blackKing.square) === 1,
     shouldCoordinateKing: knightAndBishopShouldCoordinateKing(fen),
-    declaredCornerFlushMove: knightAndBishopDeclaredCornerFlushMove(fen),
+    precageEdges: precageKingEdges(fen),
     declaredPreparationMove: knightAndBishopDeclaredPreparationMove(fen),
     declaredSupportedThreeMove: declaredSupportedThreeMove(fen),
     declaredSupportedFiveMove: declaredSupportedFiveMove(fen),
@@ -343,7 +344,8 @@ function scoreKnightAndBishopWhiteMoveCore(
     declaredSupportedFivePenalty: context.declaredSupportedFiveMove === undefined ? undefined
       : context.declaredSupportedFiveMove === move.from + move.to ? 0 : 1,
     declaredSupportedSevenPenalty: context.declaredSupportedSevenMove && context.declaredSupportedSevenMove !== move.from + move.to ? 1 : 0,
-    declaredCornerFlushPenalty: context.declaredCornerFlushMove && context.declaredCornerFlushMove !== move.from + move.to ? 1 : 0,
+    precagePrimaryEdgeDistance: whiteKing ? kingEdgeDistance(whiteKing.square, context.precageEdges[0]) : 0,
+    precageSecondaryEdgeDistance: whiteKing ? kingEdgeDistance(whiteKing.square, context.precageEdges[1]) : 0,
     declaredPreparationPenalty: context.declaredPreparationMove && context.declaredPreparationMove !== move.from + move.to ? 1 : 0,
     mateScore: checkmate ? 0 : 1,
     stalemateScore: !checkmate && blackReplies.length === 0 ? 1 : 0,
@@ -460,16 +462,17 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       ],
     },
     {
-      id: "r4",
-      shortLabel: "rule r4",
-      helpText: "Flush the king from the non target corner.",
-      compare: (first, second) => first.declaredCornerFlushPenalty - second.declaredCornerFlushPenalty,
-    },
-    {
       id: "r5",
       shortLabel: "rule r5",
       helpText: "Prepare the 7 diagonal.",
       compare: (first, second) => first.declaredPreparationPenalty - second.declaredPreparationPenalty,
+    },
+    {
+      id: "r5.1",
+      shortLabel: "rule r5.1",
+      helpText: "With a central bishop and knight on the precage square, prefer king proximity to the edge that the bishop is closer to but the knight is further from, then to the edge both pieces are closer to.",
+      compare: (first, second) => first.precagePrimaryEdgeDistance - second.precagePrimaryEdgeDistance
+        || first.precageSecondaryEdgeDistance - second.precageSecondaryEdgeDistance,
     },
     {
       id: "r5.5",
@@ -690,6 +693,7 @@ const bishopKnightHelp: RuleHelp = {
     "Stay away from a bishop-colored corner.",
   ],
   notes: [
+    "For r5.1, use the central bishop and occupied precage square before White moves to fix the two target edges. Compare White’s resulting king distance to the primary edge, then the shared nearer edge. For Bd5/Nc4, the order is top, then left. The existing behind-the-bishop requirement for a precage square still applies.",
     "For r9.95, evaluate bishop occupation and control after White moves at any king separation. r9.96 independently prefers the bishop on its long diagonal.",
     "For r9.95, evaluate after White moves. A qualifying square is strictly between the kings on at least one shortest Manhattan path (horizontal and vertical steps only): its Manhattan distances to the two kings sum to the Manhattan distance between the kings. Prefer the bishop occupying such a square, then controlling one (including x-ray control through White’s knight), then neither.",
     "For r9.8, evaluate after White moves: penalize a position if any single legal Black king move would attack both the bishop and knight at once. A bishop or knight defended by White’s king, or a knight defended by a bishop off the board edge, is not considered attackable for this rule.",
@@ -703,7 +707,6 @@ const bishopKnightHelp: RuleHelp = {
     "Support squares, with reflections: Bb7+ with Kb6 against Ka8 is supported when the knight is within one move of an available c6/d7 support square, including an edge knight. Ba6 with Kb6 is supported regardless of the knight, provided Black is inside the a6–c8 diagonal; this declaration overrides the other placement restrictions below and retains the c6/d7 knight targets. when White’s king shares the bishop’s color and is not on the board edge, the knight must occupy an actual support square for that diagonal; one-move proximity and previous-stage support do not qualify. Explicitly declared supported placements are exempt from this requirement. a bishop on c6 is always unsupported, regardless of the kings or knight; this supersedes all earlier Bc6 support exceptions. With a five-diagonal bishop and its five-diagonal knight (Nd5 for a4–e8), White’s king on the bishop’s color disqualifies support unless the king is on the board edge, except the declared Kd7/Bb5/Nd5 versus Kb7 placement after 2. Kd7. A knight on the board edge disqualifies support, except that Kb5/Ba6 is explicitly supported regardless of the knight’s location whenever Black is inside the a6–c8 diagonal, including rotations and reflections. This supersedes the older Ka7-only and Nf6/Nd5 placement exceptions, also permits a knight on the middle diagonal square, and bypasses the same-color/off-support restriction. It does not create a three-diagonal knight target. A seven-diagonal bishop is supported only when the knight occupies its seven-diagonal support square: d3 for a2–g8, including reflections. Being one knight move away does not qualify. All supported diagonals require the kings to be at most three king steps apart after White moves, including declared placement exceptions. With a seven-diagonal bishop, if Black is strictly closer to the bishop by Euclidean distance than White, White’s king must be strictly to the right of Black’s king in the qualifying support orientation. Distance ties remain eligible. With Nd3, five-diagonal support requires White’s king at least two files to the right of Black’s king, including declared placement exceptions and all rotations and reflections. The bishop must also be on a4 or adjacent to White’s king by edge or diagonal, except that Bd7 or Be8 with Nd3 is eligible when Black is on the a-file. This waives bishop adjacency; other support requirements still apply. Evaluate after White moves. For a2–g8, d3; for a4–e8, d5, with d3 as the previous-stage support square. Except for declared placement exceptions, with Nd3 a five-diagonal is supported only with the bishop on a4 or d7 and White’s king on c5, c6 or c7 after White moves; Ba4 and Bd7 also permit Kd6. Bd7 with Nd3 is additionally eligible whenever the kings are within two king steps after White moves. Be8 with Nd3 and Black on the a-file also waives the listed White-king placements and bishop adjacency requirement. All other support checks still apply. For a6–c8, only Kc7 selects b5/c6 and Kb6 selects c6/d7. There is no three-diagonal knight support square with White’s king elsewhere; then the knight must occupy d5, the previous-stage support square. This supersedes older Kd7, Kb5 and exact Kc6 target declarations. Three-diagonal support also requires White’s king adjacent to a6 or c8, or on c6 with Ba6 (including reflections).",
     "An n-diagonal is supported when the knight occupies its previous-stage support square or is within one knight move of its own support square, and Black has no legal move onto the (n+1)-diagonal. Evaluate after White moves. White’s king must be on or inside the (n+2)-diagonal. A diagonal is unsupported if Black can legally step onto it.",
     "For every immediate Black move attacking an undefended bishop, White must have a legal response that leaves Black unable to step onto the (n+1)-diagonal.",
-    "r5 exact preference: White Kd5, Bd7 and Nd3 against Black Kb6 prefers Kd6. Include reflections; r1.5 remains higher priority.",
     "r2.5 exact preferences: White Ka5, Ba6 and Nd5 against Black Ka7 prefers Kb5. White Kb5, Ba6 and Nb6 against Black Kb8 prefers Nd5. White Ke7, Bb5 and Nd5 against Black Kb7 prefers Kd8. White Kc6, Ba4 and Nd5 against Black Ka6 prefers Kc5. White Kc6, Ba6 and Nd5 against Black Ka7 prefers Kb5. White Kd6, Bd7 and Nd3 against Black Ka5 prefers Kc5. With Bb3 and Nd3, White Kc7 against Black Ka5 prefers Kc6, and White Kc6 against Black Ka6 prefers Kc5. White Kd6, Bb3 and Nd3 against Black Kb5 prefers Kd5. White Kf7 or Kf8, Bb3 and Nd3 against Black Kd6 prefers Ke8, before its general bishop and king-target preferences. Include reflections; move counters do not matter. r1.5 remains higher priority.",
     "Exact unsupported placement: White Kg4, Bf1 and Ne2 against Black Kh2 is not a supported three-diagonal. Include reflections; move counters do not matter.",
     "Exact unsupported placement: White Kb5, Bc8 and Nc6 against Black Ka7 is not a supported three-diagonal. Include reflections; move counters do not matter.",
@@ -736,15 +739,6 @@ const bishopKnightHelp: RuleHelp = {
     pieces: [{square: "e2", piece: "K"}, {square: "f4", piece: "k"}, {square: "f3", piece: "N"}, {square: "a8", piece: "B"}],
     highlights: [{square: "d2", kind: "key"}],
     arrows: [{from: "f3", to: "d2"}],
-  }, {
-    id: "bishop-knight-rule-r4-flush",
-    title: "rule r4 — Flush the king from the non target corner",
-    caption: "1. Ne5 Kg8 2. Nf7 Kf8 3. Kf6 Kg8 4. Bf5 Kf8 5. Bh7 Ke8 6. Ne5 Kf8 7. Nd3 Ke8 8. Bg8 Kf8 9. Bb3 Ke8",
-    animationSrc: "/mate/bishop-knight/rule-r4-flush.gif",
-    animationAlt: "The loaded nine-move flushing sequence, starting with Ne5 and ending with Bb3 Ke8, with a2–g8 highlighted.",
-    pieces: [],
-    highlights: [],
-
   }],
 };
 

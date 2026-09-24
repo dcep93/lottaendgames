@@ -122,14 +122,14 @@ test("bishop-and-knight rules are registered", () => {
       helpText: "With a supported diagonal, prefer forcing Black’s king towards the target corner.",
     },
     {
-      id: "r4",
-      shortLabel: "rule r4",
-      helpText: "Flush the king from the non target corner.",
-    },
-    {
       id: "r5",
       shortLabel: "rule r5",
       helpText: "Prepare the 7 diagonal.",
+    },
+    {
+      id: "r5.1",
+      shortLabel: "rule r5.1",
+      helpText: "With a central bishop and knight on the precage square, prefer king proximity to the edge that the bishop is closer to but the knight is further from, then to the edge both pieces are closer to.",
     },
     {
       id: "r5.5",
@@ -197,7 +197,7 @@ test("bishop-and-knight rules are registered", () => {
       helpText: "Maximize piece distance from Black's king, then maximize their distance from each other.",
     },
   ]);
-  assert.equal(ruleSet.help.noteBoards.find(board => board.animationSrc)?.id, "bishop-knight-rule-r4-flush");
+  assert.equal(ruleSet.help.noteBoards.some(board => board.id === "bishop-knight-rule-r4-flush"), false);
   assert.deepEqual(ruleSet.help.blackPriorities, [
     "Take a piece when White isn't looking.",
     "Return to the previous board position when possible.",
@@ -217,8 +217,8 @@ test("bishop-and-knight rules are registered", () => {
       "r1",
       "r1.5",
       "r2.5",
-      "r4",
       "r5",
+      "r5.1",
       "r5.5",
       "r8",
       "r9.1",
