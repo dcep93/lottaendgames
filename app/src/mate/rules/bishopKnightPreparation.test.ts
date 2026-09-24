@@ -1,9 +1,10 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { SQUARE_TRANSFORMS, transformFen } from '../chess'
+import { SQUARE_TRANSFORMS, transformFen, transformSquare, getChess } from '../chess'
+import { getIdealKnightAndBishopWhiteMoves } from './bishopKnight'
 import { knightAndBishopDeclaredPreparationMove } from './bishopKnightPreparation'
 
-test('r5 reset removes all old exact and wildcard declarations in every D4 orientation', () => {
+test('r5 keeps undeclared old exact and wildcard prescriptions cleared across D4', () => {
   for (const fen of [
     '1k6/8/8/8/2NKB3/8/8/8 w - - 0 1',
     '8/k7/8/3B4/2NK4/8/8/8 w - - 2 2',
@@ -15,8 +16,6 @@ test('r5 reset removes all old exact and wildcard declarations in every D4 orien
     '2k5/8/3K4/3B4/2N5/8/8/8 w - - 2 2',
     '8/2k1K3/8/3B4/2N5/8/8/8 w - - 4 3',
     '2k1K3/8/8/3B4/2N5/8/8/8 w - - 6 4',
-    '2k5/4K3/8/3B4/2N5/8/8/8 w - - 4 3',
-    '8/2k5/5K2/3B4/2N5/8/8/8 w - - 0 1',
     '8/3k2K1/8/3B4/2N5/8/8/8 w - - 2 2',
     '8/3B4/1k6/3K4/8/3N4/8/8 w - - 0 1',
     '8/8/8/8/6K1/7B/4N2k/8 w - - 0 1',
@@ -62,5 +61,22 @@ test('r5 reset removes all old exact and wildcard declarations in every D4 orien
     '8/8/8/2KB4/3N1k2/8/8/8 w - - 0 1',
   ]) for (const transform of SQUARE_TRANSFORMS) {
     assert.equal(knightAndBishopDeclaredPreparationMove(transformFen(fen, transform)), undefined)
+  }
+})
+
+
+test('r5 prescribes Ke7 and then Ne5 in the declared line across D4', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    const chess = getChess(transformFen('8/2k5/5K2/3B4/2N5/8/8/8 w - - 0 1', transform))
+    for (const [from, to, replyFrom, replyTo] of [
+      ['f6', 'e7', 'c7', 'c8'], ['c4', 'e5', 'c8', 'c7'],
+    ] as const) {
+      const expected = transformSquare(from, transform) + transformSquare(to, transform)
+      assert.equal(knightAndBishopDeclaredPreparationMove(chess.fen()), expected)
+      const move = chess.moves({ verbose: true }).find(m => m.from + m.to === expected)!
+      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(chess.fen()), [move.san])
+      chess.move(move.san)
+      chess.move({ from: transformSquare(replyFrom, transform), to: transformSquare(replyTo, transform) })
+    }
   }
 })
