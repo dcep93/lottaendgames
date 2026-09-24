@@ -1,0 +1,509 @@
+{
+  "request": "r5.1: king proximity to Black king parallel diagonal, then Black king square",
+  "method": {
+    "scope": "All post-White KBNvK placements; continue through support changes; all preferred White ties and every legal Black reply; no return-history filtering.",
+    "fingerprint": "eb3aed573c82e643b64a2706c9ba3c3270445e1df7a591b268490c81a3d54809",
+    "source": "/Users/danielcepeda/repos/_codex_output/bn-r5-ne5-kb8-2026-09-24",
+    "affectedNodes": 2419,
+    "policiesChanged": 1064,
+    "exact": true,
+    "d4Deduplicated": true
+  },
+  "unsupportedOnlyCycles": {
+    "orbits": 1082,
+    "physical": 8656
+  },
+  "unsupportedPositionsOnAnyCycle": {
+    "orbits": 1175,
+    "physical": 9400
+  },
+  "previousSnapshotComparison": {
+    "previous": 520,
+    "surviving": 417,
+    "removed": 103,
+    "added": 665,
+    "current": 1082
+  },
+  "frozenBaselineComparison": {
+    "baseline": 1159,
+    "baselinePolicy": "9fbb749008394a1503cc3c0817b932d1e814bc88",
+    "baselineBlackPolicy": "all-legal",
+    "survivors": 464,
+    "newPositions": 618
+  },
+  "supportedPositionsOnCycles": {
+    "orbits": 465,
+    "physical": 3720
+  },
+  "supportLoss": {
+    "whiteDecisions": {
+      "orbits": 17,
+      "physical": 136
+    },
+    "events": {
+      "orbits": 22,
+      "physical": 176
+    },
+    "sourcePositions": {
+      "orbits": 21,
+      "physical": 168
+    }
+  },
+  "unsupportedMotifs": [
+    {
+      "motif": "Unprotected by king central bishop; knight on precage",
+      "orbits": 178,
+      "physical": 1424
+    },
+    {
+      "motif": "King-protected central bishop; knight on precage",
+      "orbits": 155,
+      "physical": 1240
+    },
+    {
+      "motif": "Noncentral bishop not king-protected; interior king; knight king-protected",
+      "orbits": 114,
+      "physical": 912
+    },
+    {
+      "motif": "Noncentral bishop not king-protected; interior king; knight unprotected by king",
+      "orbits": 105,
+      "physical": 840
+    },
+    {
+      "motif": "Noncentral bishop not king-protected; central king; knight unprotected by king",
+      "orbits": 69,
+      "physical": 552
+    },
+    {
+      "motif": "Noncentral bishop not king-protected; central king; knight king-protected",
+      "orbits": 68,
+      "physical": 544
+    },
+    {
+      "motif": "King-protected central bishop; knight king-protected, off precage",
+      "orbits": 67,
+      "physical": 536
+    },
+    {
+      "motif": "Noncentral bishop not king-protected; interior king; knight on edge, unprotected by king",
+      "orbits": 59,
+      "physical": 472
+    },
+    {
+      "motif": "Noncentral bishop not king-protected; edge king; knight unprotected by king",
+      "orbits": 46,
+      "physical": 368
+    },
+    {
+      "motif": "Noncentral bishop king-protected; interior king; knight unprotected by king",
+      "orbits": 39,
+      "physical": 312
+    },
+    {
+      "motif": "King-protected central bishop; knight unprotected by king, off precage",
+      "orbits": 38,
+      "physical": 304
+    },
+    {
+      "motif": "Noncentral bishop king-protected; interior king; knight on edge, unprotected by king",
+      "orbits": 36,
+      "physical": 288
+    },
+    {
+      "motif": "Noncentral bishop not king-protected; central king; knight on edge, unprotected by king",
+      "orbits": 25,
+      "physical": 200
+    },
+    {
+      "motif": "Unprotected by king central bishop; knight king-protected, off precage",
+      "orbits": 23,
+      "physical": 184
+    },
+    {
+      "motif": "Noncentral bishop king-protected; central king; knight unprotected by king",
+      "orbits": 22,
+      "physical": 176
+    },
+    {
+      "motif": "Noncentral bishop king-protected; central king; knight on edge, unprotected by king",
+      "orbits": 10,
+      "physical": 80
+    },
+    {
+      "motif": "Noncentral bishop king-protected; interior king; knight king-protected",
+      "orbits": 8,
+      "physical": 64
+    },
+    {
+      "motif": "Noncentral bishop king-protected; central king; knight king-protected",
+      "orbits": 7,
+      "physical": 56
+    },
+    {
+      "motif": "Noncentral bishop not king-protected; edge king; knight king-protected",
+      "orbits": 4,
+      "physical": 32
+    },
+    {
+      "motif": "Noncentral bishop not king-protected; edge king; knight on edge, unprotected by king",
+      "orbits": 3,
+      "physical": 24
+    },
+    {
+      "motif": "Noncentral bishop king-protected; edge king; knight king-protected",
+      "orbits": 2,
+      "physical": 16
+    },
+    {
+      "motif": "Noncentral bishop king-protected; edge king; knight unprotected by king",
+      "orbits": 2,
+      "physical": 16
+    },
+    {
+      "motif": "Noncentral bishop king-protected; edge king; knight on edge, unprotected by king",
+      "orbits": 1,
+      "physical": 8
+    },
+    {
+      "motif": "Unprotected by king central bishop; knight on edge, off precage",
+      "orbits": 1,
+      "physical": 8
+    }
+  ],
+  "examples": {
+    "unsupported": [
+      {
+        "motif": "Unprotected by king central bishop; knight on precage",
+        "positions": 178,
+        "examples": [
+          {
+            "fen": "8/8/8/2kB4/2N5/3K4/8/8 w - - 0 1",
+            "moves": [
+              "Ke4",
+              "Kb4",
+              "Kd3",
+              "Kc5"
+            ],
+            "d": 2,
+            "phases": [
+              99,
+              99
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/2kB4/2N5/3K4/8/8_w_-_-_0_1&moves=Ke4,Kb4,Kd3,Kc5&cursor=0",
+            "motif": "Unprotected by king central bishop; knight on precage"
+          },
+          {
+            "fen": "8/2k5/8/3B1K2/2N5/8/8/8 w - - 0 1",
+            "moves": [
+              "Ke5",
+              "Kd7",
+              "Kf5",
+              "Kc7"
+            ],
+            "d": 2,
+            "phases": [
+              99,
+              99
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=8/2k5/8/3B1K2/2N5/8/8/8_w_-_-_0_1&moves=Ke5,Kd7,Kf5,Kc7&cursor=0",
+            "motif": "Unprotected by king central bishop; knight on precage"
+          },
+          {
+            "fen": "1k6/8/8/3B4/2N5/4K3/8/8 w - - 0 1",
+            "moves": [
+              "Kf4",
+              "Ka7",
+              "Ke3",
+              "Kb8"
+            ],
+            "d": 2,
+            "phases": [
+              99,
+              99
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=1k6/8/8/3B4/2N5/4K3/8/8_w_-_-_0_1&moves=Kf4,Ka7,Ke3,Kb8&cursor=0",
+            "motif": "Unprotected by king central bishop; knight on precage"
+          }
+        ]
+      }
+    ],
+    "supported": [
+      {
+        "motif": "7-diagonal; Noncentral bishop not king-protected; interior king; knight unprotected by king",
+        "positions": 148,
+        "examples": [
+          {
+            "fen": "4k1B1/8/4K3/8/8/3N4/8/8 w - - 0 1",
+            "moves": [
+              "Bf7+",
+              "Kd8",
+              "Bg8",
+              "Ke8"
+            ],
+            "d": 0,
+            "phases": [
+              7,
+              7
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=4k1B1/8/4K3/8/8/3N4/8/8_w_-_-_0_1&moves=Bf7%2B,Kd8,Bg8,Ke8&cursor=0",
+            "motif": "Noncentral bishop not king-protected; interior king; knight unprotected by king"
+          },
+          {
+            "fen": "3k4/8/4K3/8/8/1B1N4/8/8 w - - 0 1",
+            "moves": [
+              "Ba4",
+              "Kc8",
+              "Bb3",
+              "Kd8"
+            ],
+            "d": 0,
+            "phases": [
+              5,
+              7
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=3k4/8/4K3/8/8/1B1N4/8/8_w_-_-_0_1&moves=Ba4,Kc8,Bb3,Kd8&cursor=0",
+            "motif": "Noncentral bishop not king-protected; interior king; knight unprotected by king"
+          },
+          {
+            "fen": "8/2k5/4K3/8/8/1B1N4/8/8 w - - 0 1",
+            "moves": [
+              "Ke7",
+              "Kc6",
+              "Ke6",
+              "Kc7"
+            ],
+            "d": 0,
+            "phases": [
+              7,
+              7
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=8/2k5/4K3/8/8/1B1N4/8/8_w_-_-_0_1&moves=Ke7,Kc6,Ke6,Kc7&cursor=0",
+            "motif": "Noncentral bishop not king-protected; interior king; knight unprotected by king"
+          }
+        ]
+      }
+    ],
+    "losses": [
+      {
+        "motif": "5-diagonal; Noncentral bishop not king-protected; interior king; knight unprotected by king; B moves",
+        "positions": 6,
+        "examples": [
+          {
+            "fen": "8/k2K4/8/1B6/1N6/8/8/8 w - - 0 1",
+            "moves": [
+              "Kd6",
+              "Kb6",
+              "Bc6",
+              "Ka5"
+            ],
+            "d": 5,
+            "phases": [
+              5,
+              99
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=8/k2K4/8/1B6/1N6/8/8/8_w_-_-_0_1&moves=Kd6,Kb6,Bc6,Ka5&cursor=0"
+          },
+          {
+            "fen": "1k6/3B4/8/1K6/8/4N3/8/8 w - - 0 1",
+            "moves": [
+              "Kc5",
+              "Kc7",
+              "Bc6",
+              "Kd8"
+            ],
+            "d": 1,
+            "phases": [
+              5,
+              99
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=1k6/3B4/8/1K6/8/4N3/8/8_w_-_-_0_1&moves=Kc5,Kc7,Bc6,Kd8&cursor=0"
+          },
+          {
+            "fen": "8/k2K4/8/1B6/8/4N3/8/8 w - - 0 1",
+            "moves": [
+              "Kd6",
+              "Kb6",
+              "Bc6",
+              "Ka5"
+            ],
+            "d": 1,
+            "phases": [
+              5,
+              99
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=8/k2K4/8/1B6/8/4N3/8/8_w_-_-_0_1&moves=Kd6,Kb6,Bc6,Ka5&cursor=0"
+          }
+        ]
+      }
+    ]
+  },
+  "tenFourPlyUnsupportedLoops": [
+    {
+      "fen": "8/8/8/2kB4/2N5/3K4/8/8 w - - 0 1",
+      "moves": [
+        "Ke4",
+        "Kb4",
+        "Kd3",
+        "Kc5"
+      ],
+      "d": 2,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/2kB4/2N5/3K4/8/8_w_-_-_0_1&moves=Ke4,Kb4,Kd3,Kc5&cursor=0",
+      "motif": "Unprotected by king central bishop; knight on precage"
+    },
+    {
+      "fen": "8/k7/8/3B4/2N5/3K4/8/8 w - - 0 1",
+      "moves": [
+        "Kd4",
+        "Ka6",
+        "Kd3",
+        "Ka7"
+      ],
+      "d": 2,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/k7/8/3B4/2N5/3K4/8/8_w_-_-_0_1&moves=Kd4,Ka6,Kd3,Ka7&cursor=0",
+      "motif": "Unprotected by king central bishop; knight on precage"
+    },
+    {
+      "fen": "8/2k5/8/3B1K2/2N5/8/8/8 w - - 0 1",
+      "moves": [
+        "Ke5",
+        "Kd7",
+        "Kf5",
+        "Kc7"
+      ],
+      "d": 2,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/2k5/8/3B1K2/2N5/8/8/8_w_-_-_0_1&moves=Ke5,Kd7,Kf5,Kc7&cursor=0",
+      "motif": "Unprotected by king central bishop; knight on precage"
+    },
+    {
+      "fen": "1k6/8/8/3B4/2N5/4K3/8/8 w - - 0 1",
+      "moves": [
+        "Kf4",
+        "Ka7",
+        "Ke3",
+        "Kb8"
+      ],
+      "d": 2,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=1k6/8/8/3B4/2N5/4K3/8/8_w_-_-_0_1&moves=Kf4,Ka7,Ke3,Kb8&cursor=0",
+      "motif": "Unprotected by king central bishop; knight on precage"
+    },
+    {
+      "fen": "3k4/8/8/3B4/2N2K2/8/8/8 w - - 0 1",
+      "moves": [
+        "Kg5",
+        "Kc7",
+        "Kf4",
+        "Kd8"
+      ],
+      "d": 2,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=3k4/8/8/3B4/2N2K2/8/8/8_w_-_-_0_1&moves=Kg5,Kc7,Kf4,Kd8&cursor=0",
+      "motif": "Unprotected by king central bishop; knight on precage"
+    },
+    {
+      "fen": "8/3k4/5K2/3B4/2N5/8/8/8 w - - 0 1",
+      "moves": [
+        "Kf5",
+        "Kd8",
+        "Kf6",
+        "Kd7"
+      ],
+      "d": 2,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/3k4/5K2/3B4/2N5/8/8/8_w_-_-_0_1&moves=Kf5,Kd8,Kf6,Kd7&cursor=0",
+      "motif": "Unprotected by king central bishop; knight on precage"
+    },
+    {
+      "fen": "8/3K4/4N1k1/3B4/8/8/8/8 w - - 0 1",
+      "moves": [
+        "Ke8",
+        "Kf5",
+        "Kd7",
+        "Kg6"
+      ],
+      "d": 10,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/3K4/4N1k1/3B4/8/8/8/8_w_-_-_0_1&moves=Ke8,Kf5,Kd7,Kg6&cursor=0",
+      "motif": "Unprotected by king central bishop; knight on precage"
+    },
+    {
+      "fen": "8/3K4/4N3/3B3k/8/8/8/8 w - - 0 1",
+      "moves": [
+        "Ke8",
+        "Kg4",
+        "Kd7",
+        "Kh5"
+      ],
+      "d": 10,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/3K4/4N3/3B3k/8/8/8/8_w_-_-_0_1&moves=Ke8,Kg4,Kd7,Kh5&cursor=0",
+      "motif": "Unprotected by king central bishop; knight on precage"
+    },
+    {
+      "fen": "8/3K4/8/3B2k1/2N5/8/8/8 w - - 0 1",
+      "moves": [
+        "Ke7",
+        "Kf5",
+        "Kd7",
+        "Kg5"
+      ],
+      "d": 2,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/3K4/8/3B2k1/2N5/8/8/8_w_-_-_0_1&moves=Ke7,Kf5,Kd7,Kg5&cursor=0",
+      "motif": "Unprotected by king central bishop; knight on precage"
+    },
+    {
+      "fen": "8/3K4/8/3B3k/2N5/8/8/8 w - - 0 1",
+      "moves": [
+        "Ke8",
+        "Kg4",
+        "Kd7",
+        "Kh5"
+      ],
+      "d": 2,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/3K4/8/3B3k/2N5/8/8/8_w_-_-_0_1&moves=Ke8,Kg4,Kd7,Kh5&cursor=0",
+      "motif": "Unprotected by king central bishop; knight on precage"
+    }
+  ],
+  "validation": [
+    "20 targeted tests passed",
+    "tsc -b passed",
+    "Every linked White move checked against production preferences; Black moves legal; replay decoder verified",
+    "Loop witnesses close after four plies"
+  ]
+}
