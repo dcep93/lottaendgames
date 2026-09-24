@@ -50,8 +50,10 @@ test('same-file seven kings reject support only when Black is closer to the bish
     const san = board.move({from: transformSquare('c3', transform), to: transformSquare('d4', transform)}).san
     assert.equal(scoreKnightAndBishopWhiteMove(before, san).supportedDiagonalSizeScore, 99)
     assert.equal(bishopKnightRuleSet.phaseAfterWhiteMove!(board.fen()), '1/2')
-    // A support change does not itself prohibit a move when every candidate is unsupported.
-    assert.ok(getIdealKnightAndBishopWhiteMoves(before).includes(san))
+    // All candidates remain unsupported; the expanded r8 may choose another move.
+    for (const preferred of getIdealKnightAndBishopWhiteMoves(before)) {
+      assert.equal(scoreKnightAndBishopWhiteMove(before, preferred).supportedDiagonalSizeScore, 99)
+    }
     const cases = [
       // Same-file kings: White is closer, then an equal-distance tie.
       ['8/8/8/1k6/8/1B1N4/1K6/8 b - - 3 2', '2/2'],

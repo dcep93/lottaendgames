@@ -39,9 +39,8 @@ test('r20 breaks equal Black-distance ties by separating the bishop and knight a
     assert.equal(near.minorSeparationScore, -Math.sqrt(5), t.name);
     assert.equal(far.minorSeparationScore, -Math.sqrt(13), t.name);
     assert.ok(r20.compare(far, near) < 0, t.name);
-    // Stable bishop protection can retain Na4 and protect it with Bc6.
-    const bishopDefense = getChess(fen).move({from: transformSquare('d5', t), to: transformSquare('c6', t)}).san;
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [bishopDefense], t.name);
+    // R8 now applies from e6 and keeps the bishop central; r20 selects Nb2.
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [move('b2')], t.name);
   }
 });
 

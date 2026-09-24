@@ -1,0 +1,337 @@
+{
+  "date": "2026-09-24",
+  "change": "r8 applies to White kings on middle-16 squares before moving",
+  "whitePolicy": "all preferred moves",
+  "blackPolicy": "all legal replies",
+  "deduplication": "D4 root orbits; example cycles also deduplicated under cyclic rotation",
+  "cycleLengthLimitPlies": 4,
+  "sampling": {
+    "seed": 20260924,
+    "method": "Reservoir sample of 5000 unsupported canonical roots in ascending key order, using LCG 1664525/1013904223 modulo 2^32",
+    "population": 1705389,
+    "sampleSize": 5000,
+    "directCycleHits": 3,
+    "estimatedDirectFourPlyOrbits": 1023.2334,
+    "wilson95Interval": [
+      348.0203719135676,
+      3006.1538254471166
+    ],
+    "limitations": "Does not estimate longer cycles. Motif ranking from only three random hits is tentative. Targeted examples are not included in the estimator."
+  },
+  "supportedCheck": {
+    "population": 2499,
+    "directFourPlyOrbits": 46,
+    "scope": "All supported post-White census placements. Loops may include unsupported positions. Supplied support-loss examples include a verified preferred setup move; raw loss-motif counts can include sources without a preferred predecessor."
+  },
+  "unsupportedMotifs": [
+    {
+      "label": "unsupported; central bishop; bishop not king-protected; edge knight; interior king",
+      "sampleHits": 2
+    },
+    {
+      "label": "unsupported; noncentral bishop; bishop not king-protected; edge knight; interior king",
+      "sampleHits": 1
+    }
+  ],
+  "supportedMotifs": [
+    {
+      "label": "7-diagonal; noncentral bishop; bishop not king-protected; interior knight without bishop protection; interior king",
+      "positions": 14
+    },
+    {
+      "label": "7-diagonal; noncentral bishop; bishop not king-protected; interior knight without bishop protection; edge king",
+      "positions": 11
+    },
+    {
+      "label": "5-diagonal; noncentral bishop; bishop not king-protected; interior knight without bishop protection; edge king",
+      "positions": 6
+    },
+    {
+      "label": "5-diagonal; noncentral bishop; bishop not king-protected; interior knight without bishop protection; interior king",
+      "positions": 4
+    },
+    {
+      "label": "5-diagonal; noncentral bishop; king protects bishop; interior knight without bishop protection; edge king",
+      "positions": 3
+    },
+    {
+      "label": "3-diagonal; noncentral bishop; king protects bishop; interior knight without bishop protection; interior king",
+      "positions": 2
+    },
+    {
+      "label": "7-diagonal; noncentral bishop; bishop not king-protected; interior knight without bishop protection; central king",
+      "positions": 2
+    },
+    {
+      "label": "3-diagonal; noncentral bishop; king protects bishop; bishop protects interior knight; interior king",
+      "positions": 1
+    },
+    {
+      "label": "7-diagonal; central bishop; king protects bishop; interior knight without bishop protection; interior king",
+      "positions": 1
+    },
+    {
+      "label": "5-diagonal; noncentral bishop; bishop not king-protected; interior knight without bishop protection; central king",
+      "positions": 1
+    },
+    {
+      "label": "7-diagonal; noncentral bishop; king protects bishop; interior knight without bishop protection; central king",
+      "positions": 1
+    }
+  ],
+  "lossMotifs": [
+    {
+      "label": "3-diagonal; noncentral bishop; king protects bishop; interior knight without bishop protection; interior king",
+      "sourcePositions": 31
+    },
+    {
+      "label": "3-diagonal; noncentral bishop; king protects bishop; edge knight; interior king",
+      "sourcePositions": 24
+    },
+    {
+      "label": "5-diagonal; noncentral bishop; bishop not king-protected; interior knight without bishop protection; interior king",
+      "sourcePositions": 24
+    },
+    {
+      "label": "5-diagonal; noncentral bishop; king protects bishop; interior knight without bishop protection; interior king",
+      "sourcePositions": 6
+    },
+    {
+      "label": "7-diagonal; noncentral bishop; king protects bishop; interior knight without bishop protection; interior king",
+      "sourcePositions": 2
+    },
+    {
+      "label": "7-diagonal; noncentral bishop; king protects bishop; interior knight without bishop protection; edge king",
+      "sourcePositions": 1
+    },
+    {
+      "label": "3-diagonal; noncentral bishop; king protects bishop; bishop protects interior knight; edge king",
+      "sourcePositions": 1
+    },
+    {
+      "label": "7-diagonal; noncentral bishop; king protects bishop; bishop protects interior knight; interior king",
+      "sourcePositions": 1
+    },
+    {
+      "label": "3-diagonal; noncentral bishop; king protects bishop; bishop protects interior knight; interior king",
+      "sourcePositions": 1
+    },
+    {
+      "label": "7-diagonal; central bishop; king protects bishop; interior knight without bishop protection; interior king",
+      "sourcePositions": 1
+    }
+  ],
+  "examples": {
+    "unsupported": [
+      {
+        "fen": "N7/8/3k4/3B4/5K2/8/8/8 w - - 0 1",
+        "moves": [
+          "Nb6",
+          "Kc5",
+          "Na8",
+          "Kd6"
+        ],
+        "phases": [
+          99,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=N7/8/3k4/3B4/5K2/8/8/8_w_-_-_0_1&moves=Nb6,Kc5,Na8,Kd6&cursor=0"
+      },
+      {
+        "fen": "N7/8/3k4/3B4/8/2K5/8/8 w - - 0 1",
+        "moves": [
+          "Nb6",
+          "Kc5",
+          "Na8",
+          "Kd6"
+        ],
+        "phases": [
+          99,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=N7/8/3k4/3B4/8/2K5/8/8_w_-_-_0_1&moves=Nb6,Kc5,Na8,Kd6&cursor=0"
+      },
+      {
+        "fen": "N7/8/3k4/3B4/8/3K4/8/8 w - - 0 1",
+        "moves": [
+          "Nb6",
+          "Kc5",
+          "Na8",
+          "Kd6"
+        ],
+        "phases": [
+          99,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=N7/8/3k4/3B4/8/3K4/8/8_w_-_-_0_1&moves=Nb6,Kc5,Na8,Kd6&cursor=0"
+      },
+      {
+        "fen": "N7/8/3k4/3B4/8/4K3/8/8 w - - 0 1",
+        "moves": [
+          "Nb6",
+          "Kc5",
+          "Na8",
+          "Kd6"
+        ],
+        "phases": [
+          99,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=N7/8/3k4/3B4/8/4K3/8/8_w_-_-_0_1&moves=Nb6,Kc5,Na8,Kd6&cursor=0"
+      },
+      {
+        "fen": "N7/8/3k4/3B4/8/5K2/8/8 w - - 0 1",
+        "moves": [
+          "Nb6",
+          "Kc5",
+          "Na8",
+          "Kd6"
+        ],
+        "phases": [
+          99,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=N7/8/3k4/3B4/8/5K2/8/8_w_-_-_0_1&moves=Nb6,Kc5,Na8,Kd6&cursor=0"
+      }
+    ],
+    "losses": [
+      {
+        "fen": "1k6/8/BN6/K7/8/8/8/8 w - - 0 1",
+        "moves": [
+          "Kb5",
+          "Kc7",
+          "Kc5"
+        ],
+        "phases": [
+          3,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=1k6/8/BN6/K7/8/8/8/8_w_-_-_0_1&moves=Kb5,Kc7,Kc5&cursor=0"
+      },
+      {
+        "fen": "1k6/8/B7/8/KN6/8/8/8 w - - 0 1",
+        "moves": [
+          "Kb5",
+          "Kc7",
+          "Kc5"
+        ],
+        "phases": [
+          3,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=1k6/8/B7/8/KN6/8/8/8_w_-_-_0_1&moves=Kb5,Kc7,Kc5&cursor=0"
+      },
+      {
+        "fen": "1k6/8/B7/8/K7/1N6/8/8 w - - 0 1",
+        "moves": [
+          "Kb5",
+          "Kc7",
+          "Kc5"
+        ],
+        "phases": [
+          3,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=1k6/8/B7/8/K7/1N6/8/8_w_-_-_0_1&moves=Kb5,Kc7,Kc5&cursor=0"
+      },
+      {
+        "fen": "1k6/8/B7/8/K7/8/1N6/8 w - - 0 1",
+        "moves": [
+          "Kb5",
+          "Kc7",
+          "Kc5"
+        ],
+        "phases": [
+          3,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=1k6/8/B7/8/K7/8/1N6/8_w_-_-_0_1&moves=Kb5,Kc7,Kc5&cursor=0"
+      },
+      {
+        "fen": "1k6/8/B7/2N5/K7/8/8/8 w - - 0 1",
+        "moves": [
+          "Kb5",
+          "Kc7",
+          "Kc4"
+        ],
+        "phases": [
+          3,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=1k6/8/B7/2N5/K7/8/8/8_w_-_-_0_1&moves=Kb5,Kc7,Kc4&cursor=0"
+      }
+    ],
+    "supported": [
+      {
+        "fen": "8/4k1K1/8/8/8/1B1N4/8/8 w - - 0 1",
+        "moves": [
+          "Kg6",
+          "Ke8",
+          "Kg7",
+          "Ke7"
+        ],
+        "phases": [
+          7,
+          7
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/4k1K1/8/8/8/1B1N4/8/8_w_-_-_0_1&moves=Kg6,Ke8,Kg7,Ke7&cursor=0"
+      },
+      {
+        "fen": "4k3/6K1/8/8/8/1B1N4/8/8 w - - 0 1",
+        "moves": [
+          "Kg8",
+          "Ke7",
+          "Kg7",
+          "Ke8"
+        ],
+        "phases": [
+          7,
+          7
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=4k3/6K1/8/8/8/1B1N4/8/8_w_-_-_0_1&moves=Kg8,Ke7,Kg7,Ke8&cursor=0"
+      },
+      {
+        "fen": "8/3k1K2/8/8/8/1B1N4/8/8 w - - 0 1",
+        "moves": [
+          "Kf8",
+          "Kd8",
+          "Kf7",
+          "Kd7"
+        ],
+        "phases": [
+          7,
+          7
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/3k1K2/8/8/8/1B1N4/8/8_w_-_-_0_1&moves=Kf8,Kd8,Kf7,Kd7&cursor=0"
+      },
+      {
+        "fen": "3k4/5K2/8/8/8/1B1N4/8/8 w - - 0 1",
+        "moves": [
+          "Kf8",
+          "Kd7",
+          "Kf7",
+          "Kd8"
+        ],
+        "phases": [
+          7,
+          7
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=3k4/5K2/8/8/8/1B1N4/8/8_w_-_-_0_1&moves=Kf8,Kd7,Kf7,Kd8&cursor=0"
+      },
+      {
+        "fen": "8/1k1K4/8/8/8/1B1N4/8/8 w - - 0 1",
+        "moves": [
+          "Ke8",
+          "Ka8",
+          "Kd7",
+          "Kb7"
+        ],
+        "phases": [
+          7,
+          7
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/1k1K4/8/8/8/1B1N4/8/8_w_-_-_0_1&moves=Ke8,Ka8,Kd7,Kb7&cursor=0"
+      }
+    ]
+  }
+}
