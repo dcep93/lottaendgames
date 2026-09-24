@@ -127,7 +127,7 @@ test('Nd3 five support combines right-side kings with declared placements or nea
       board.put({type: 'b', color: 'w'}, bishop)
       for (const transform of SQUARE_TRANSFORMS) {
         assert.equal(knightAndBishopSupportedDiagonal(transformFen(board.fen(), transform)).size,
-          king === 'e7' && ['a4', 'b5'].includes(bishop) ? 5 : (edgeDistance(king) === 0 || squareColor(king) !== squareColor(bishop)) && king[0] >= 'c' && (['a4', 'd7'].includes(bishop) || kingDistance(king, bishop) === 1) && ((['a4', 'd7'].includes(bishop) && ['c5', 'c6', 'c7'].includes(king)) || (['a4', 'd7'].includes(bishop) && king === 'd6') || (bishop === 'd7' && kingDistance(king, 'a7') <= 2)) ? 5 : 99, `${king}, ${bishop}, ${transform.name}`)
+          (bishop === 'a4' && kingDistance(king, 'e7') <= 1) || (king === 'e7' && ['a4', 'b5'].includes(bishop)) ? 5 : (edgeDistance(king) === 0 || squareColor(king) !== squareColor(bishop)) && king[0] >= 'c' && (['a4', 'd7'].includes(bishop) || kingDistance(king, bishop) === 1) && ((['a4', 'd7'].includes(bishop) && ['c5', 'c6', 'c7'].includes(king)) || (['a4', 'd7'].includes(bishop) && king === 'd6') || (bishop === 'd7' && kingDistance(king, 'a7') <= 2)) ? 5 : 99, `${king}, ${bishop}, ${transform.name}`)
       }
     }
   }
@@ -1263,9 +1263,8 @@ test('declared 2. Ke5 with Ba4 Nd3 against Kc7 is supported across D4', () => {
     const move = board.move({from: transformSquare('d5', t), to: transformSquare('e5', t)}).san
     assert.equal(knightAndBishopSupportedDiagonal(board.fen()).size, 5)
     assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 5)
-    assert.ok(getIdealKnightAndBishopWhiteMoves(before).includes(move))
-    // The declaration does not also exempt the previously discussed Ke6 placement.
-    assert.equal(knightAndBishopSupportedDiagonal(transformFen('8/2k5/4K3/8/B7/3N4/8/8 b - - 0 1', t)).size, 99)
+    // The later e7-cage declaration also supports Ke6; preference is decided by later rules.
+    assert.equal(knightAndBishopSupportedDiagonal(transformFen('8/2k5/4K3/8/B7/3N4/8/8 b - - 0 1', t)).size, 5)
   }
 })
 
@@ -1373,5 +1372,26 @@ test('Ka2 Nd3 automatically disqualifies support, including D4 equivalents', () 
     board.put({type: 'b', color: 'w'}, bishop)
     board.put({type: 'k', color: 'b'}, black)
     assert.equal(knightAndBishopSupportedDiagonal(board.fen()).size, 99, `${bishop} ${black}`)
+  }
+})
+
+
+test('Ba4 Nd3 with White on or adjacent to e7 supports five when Black cannot move to a5 or d6', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    const board = getChess(transformFen('8/2k5/8/4K3/8/1B1N4/8/8 w - - 0 1', transform))
+    board.move({from: transformSquare('b3', transform), to: transformSquare('a4', transform)})
+    board.move({from: transformSquare('c7', transform), to: transformSquare('c8', transform)})
+    const before = board.fen()
+    const move = board.move({from: transformSquare('e5', transform), to: transformSquare('d6', transform)}).san
+    const replies = board.moves({verbose: true}).map(reply => reply.to)
+    assert.ok(!replies.includes(transformSquare('a5', transform)))
+    assert.ok(!replies.includes(transformSquare('d6', transform)))
+    assert.equal(knightAndBishopSupportedDiagonal(board.fen()).size, 5)
+    assert.equal(knightAndBishopSupportedDiagonal(board.fen(), replies).size, 5)
+    assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 5)
+    // The universal cage prerequisite still applies.
+    assert.equal(knightAndBishopSupportedDiagonal(transformFen('8/8/3K4/7k/B7/3N4/8/8 b - - 0 1', transform)).size, 99)
+    // Black can reach a5, so proximity to e7 alone does not declare support.
+    assert.equal(knightAndBishopSupportedDiagonal(transformFen('8/8/5K2/1k6/B7/3N4/8/8 b - - 0 1', transform)).size, 99)
   }
 })

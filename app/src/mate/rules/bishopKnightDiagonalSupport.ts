@@ -158,6 +158,14 @@ const DECLARED_FIVE_WHITE_PLACEMENTS = (['a4', 'b5'] as const).flatMap(bishop =>
     support: transformSquare('d5', transform),
   })))
 
+const FIVE_E7_CAGE_PLACEMENTS = SQUARE_TRANSFORMS.map(transform => ({
+  bishop: transformSquare('a4', transform),
+  knight: transformSquare('d3', transform),
+  kingTarget: transformSquare('e7', transform),
+  exits: (['a5', 'd6'] as const).map(square => transformSquare(square, transform)),
+  support: transformSquare('d5', transform),
+}))
+
 const DECLARED_FIVE_E7_ADJACENCY = SQUARE_TRANSFORMS.map(transform => ({
   bishop: transformSquare('a4', transform),
   knight: transformSquare('d3', transform),
@@ -310,6 +318,18 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
   if (declaredWhitePlacement) return {
     size: 5,
     knight: knightAndBishopKnightProximityToSquare(fen, declaredWhitePlacement.support),
+  }
+  // White near e7 supports Ba4/Nd3 when neither specified escape is a legal Black reply.
+  const e7CagePlacement = FIVE_E7_CAGE_PLACEMENTS.find(pattern =>
+    pattern.bishop === bishop.square && pattern.knight === knight.square &&
+    kingDistance(white.square, pattern.kingTarget) <= 1)
+  if (e7CagePlacement) {
+    const replies = blackDestinations ?? getChess(fen).moves({verbose: true})
+      .filter(move => move.piece === 'k').map(move => move.to)
+    if (!replies.some(square => e7CagePlacement.exits.includes(square))) return {
+      size: 5,
+      knight: knightAndBishopKnightProximityToSquare(fen, e7CagePlacement.support),
+    }
   }
   // An approaching knight cannot sustain support by rescuing an undefended bishop
   // after Black attacks it. An occupied current- or previous-stage support square
