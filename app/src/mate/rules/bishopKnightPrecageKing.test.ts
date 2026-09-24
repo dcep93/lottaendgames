@@ -30,7 +30,7 @@ test('r5.1 activates before White moves and does not reward disabling its condit
 })
 
 
-test('r5.1 prioritizes the parallel diagonal before direct king proximity across D4', () => {
+test('r5.1 targets the nearest qualifying diagonal, not all farther diagonals, across D4', () => {
   const start = '8/2k5/8/3BK3/2N5/8/8/8 w - - 0 1'
   const rule = knightAndBishopWhiteRules.find(r => r.id === 'r5.1')!
   for (const t of SQUARE_TRANSFORMS) {
@@ -63,5 +63,29 @@ test('r5.1 ties diagonal offsets one and two at one king step, then approaches B
     assert.equal(diagonal.precageKingDiagonalSteps, 1)
     assert.ok(rule.compare!(straight, diagonal) < 0)
     assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [san('d4')])
+  }
+})
+
+
+test('r5.1 prefers logged 2. Kf6 beyond the parallel diagonal across D4', () => {
+  const line = getChess('8/2k5/8/3B1K2/2N5/8/8/8 w - - 0 1')
+  line.move('Ke5')
+  line.move('Kd7')
+  for (const t of SQUARE_TRANSFORMS) {
+    const fen = transformFen(line.fen(), t)
+    const san = getChess(fen).move({from: transformSquare('e5',t), to: transformSquare('f6',t)}).san
+    assert.equal(scoreKnightAndBishopWhiteMove(fen, san).precageKingDiagonalSteps, 0)
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [san])
+  }
+})
+
+
+test('r5.1 measures steps to board squares rather than an infinite diagonal across D4', () => {
+  const start = 'K7/8/8/3B4/2N5/8/8/1k6 w - - 0 1'
+  for (const t of SQUARE_TRANSFORMS) {
+    const fen = transformFen(start, t)
+    const san = getChess(fen).move({from: transformSquare('a8',t), to: transformSquare('b8',t)}).san
+    // Black b1 selects the opposite-color diagonal consisting of a1 alone.
+    assert.equal(scoreKnightAndBishopWhiteMove(fen, san).precageKingDiagonalSteps, 7)
   }
 })
