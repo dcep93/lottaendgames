@@ -134,6 +134,14 @@ const DECLARED_FIVE_PLACEMENTS = DECLARED_FIVE_SUPPORT.flatMap(placement => SQUA
   support: transformSquare('d5', transform),
 })))
 
+const DECLARED_FIVE_E7_ADJACENCY = SQUARE_TRANSFORMS.map(transform => ({
+  bishop: transformSquare('a4', transform),
+  knight: transformSquare('d3', transform),
+  black: transformSquare('d8', transform),
+  kingTarget: transformSquare('e7', transform),
+  support: transformSquare('d5', transform),
+}))
+
 const FIVE_BISHOP_APPROACHES = SQUARE_TRANSFORMS.map(transform => ({
   wall: (['a4', 'b5', 'c6', 'd7', 'e8'] as const).map(square => transformSquare(square, transform)),
   bishops: (['a4', 'b5', 'c6'] as const).map(square => transformSquare(square, transform)),
@@ -262,6 +270,12 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
   const bishop = findPiece(fen, 'w', 'b')
   const knight = findPiece(fen, 'w', 'n')
   if (!white || !black || !bishop || !knight) return {size: 99, knight: 99}
+  // This exact arrangement has an explicit necessary-and-sufficient king condition.
+  const e7Placement = DECLARED_FIVE_E7_ADJACENCY.find(pattern =>
+    pattern.bishop === bishop.square && pattern.knight === knight.square && pattern.black === black.square)
+  if (e7Placement) return kingDistance(white.square, e7Placement.kingTarget) === 1
+    ? {size: 5, knight: knightAndBishopKnightProximityToSquare(fen, e7Placement.support)}
+    : {size: 99, knight: 99}
   // The Ba6/Kb5 declaration allows every knight square while Black stays inside.
   // It does not create a knight target and supersedes the middle-square exclusion.
   if (isDeclaredCornerSupportWithoutKnightTarget(white.square, bishop.square, black.square)) {

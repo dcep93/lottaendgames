@@ -1096,3 +1096,20 @@ test('Ba6 Kb5 support requires Black unable to leave the diagonal immediately', 
   assert.deepEqual(getIdealKnightAndBishopWhiteMoves(start),[san]);
  }
 });
+
+
+test('Ba4 Nd3 versus Kd8 is supported iff White king is adjacent to e7, across D4', () => {
+ for (const king of allSquares()) {
+  if (['a4','d3','d8'].includes(king) || kingDistance(king,'d8') <= 1) continue
+  const board=getChess('3k4/8/8/8/B7/3N4/8/7K b - - 0 1')
+  board.remove('h1')
+  board.put({type:'k',color:'w'},king)
+  for (const t of SQUARE_TRANSFORMS) {
+   assert.equal(knightAndBishopSupportedDiagonal(transformFen(board.fen(),t)).size,
+    kingDistance(king,'e7') === 1 ? 5 : 99, king+' '+t.name)
+  }
+ }
+ const before='3k1K2/8/8/8/8/1B1N4/8/8 w - - 2 2'
+ assert.equal(scoreKnightAndBishopWhiteMove(before,'Ba4').supportedDiagonalSizeScore,5)
+ assert.deepEqual(getIdealKnightAndBishopWhiteMoves(before),['Ba4'])
+});
