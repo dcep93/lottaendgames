@@ -82,6 +82,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly stalemateScore: number;
   readonly pieceSafetyScore: number;
   readonly kingCenterProximityScore: number;
+  readonly kingBlackProximityScore: number;
   readonly bishopLongDiagonalPenalty: number;
   readonly bishopProtectedCenterPenalty: number;
   readonly bishopTargetCornerDistanceScore: number;
@@ -386,6 +387,9 @@ function scoreKnightAndBishopWhiteMoveCore(
     get knightTargetProximityScore() {
       return knightTargetProximity ??= knightAndBishopKnightTargetProximityScore(resultFen);
     },
+    get kingBlackProximityScore() {
+      return whiteKing && blackKing ? squaredEuclideanDistance(whiteKing.square, blackKing.square) : 0;
+    },
     get kingCenterProximityScore() {
       return kingCenterProximity ??= knightAndBishopKingCenterProximityScore(resultFen);
     },
@@ -500,8 +504,9 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     {
       id: "r9.9",
       shortLabel: "rule r9.9",
-      helpText: "Minimize king distance to the center.",
-      compare: (first, second) => first.kingCenterProximityScore - second.kingCenterProximityScore,
+      helpText: "Minimize king distance to the center, then king proximity.",
+      compare: (first, second) => first.kingCenterProximityScore - second.kingCenterProximityScore
+        || first.kingBlackProximityScore - second.kingBlackProximityScore,
     },
     {
       id: "r9.95",
@@ -689,7 +694,7 @@ const bishopKnightHelp: RuleHelp = {
     "For r9.95, evaluate after White moves. A qualifying square is strictly between the kings on at least one shortest Manhattan path (horizontal and vertical steps only): its Manhattan distances to the two kings sum to the Manhattan distance between the kings. Prefer the bishop occupying such a square, then controlling one (including x-ray control through White’s knight), then neither.",
     "For r9.8, evaluate after White moves: penalize a position if any single legal Black king move would attack both the bishop and knight at once. A bishop or knight defended by White’s king, or a knight defended by a bishop off the board edge, is not considered attackable for this rule.",
     "For r8, White’s king must be on d4, e4, d5 or e5 before moving. Evaluate the bishop and knight preferences after White moves. A precage square is diagonally adjacent to a central bishop, off the long diagonals, and behind the bishop from Black’s king’s perspective.",
-    "For r9.9, minimize White’s king Euclidean distance to the board’s midpoint. For r20, maximize the sum of the bishop’s and knight’s Euclidean distances from Black’s king, then maximize the Euclidean distance between the bishop and knight. Evaluate after White moves.",
+    "For r9.9, minimize White’s king Euclidean distance to the board’s midpoint, then its Euclidean distance to Black’s king. For r20, maximize the sum of the bishop’s and knight’s Euclidean distances from Black’s king, then maximize the Euclidean distance between the bishop and knight. Evaluate after White moves.",
     "For r9.98, count bishop protection through Black’s king, which must leave the checking diagonal. Other intervening pieces still block protection. Evaluate after White moves.",
     "For r15, check the knight’s two-king-step range before White moves. Fix the moat one file or rank from White’s starting king toward Black along their greater separation; use both axes when tied. Black’s side is the region beyond that line. Maximize the knight’s Euclidean distance from the nearest Black-side region after White moves; squares inside either region score zero. The moat also exists when the kings are farther than two steps apart.",
     "For r10, check before White moves: the bishop must be within two king steps of Black’s king. Prefer an escape to at least three king steps after White moves; all such escapes tie under r10. Below that threshold, maximize Euclidean distance.",

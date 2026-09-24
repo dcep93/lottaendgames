@@ -18,7 +18,7 @@ test('r9.9 scores center distance without r6; r20 scores minor distances from Bl
     const offColorFar = score('d4', 'c3'), offColorNear = score('d4', 'e3'), sameColorCentral = score('d4', 'd5');
     assert.ok(r99.compare(offColorFar, sameColorCentral) > 0, transform.name);
     assert.ok(r99.compare(offColorNear, offColorFar) < 0, transform.name);
-    assert.equal(r99.compare(far, sameColorCentral), 0, transform.name);
+    assert.ok(r99.compare(far, sameColorCentral) > 0, transform.name);
     assert.equal('kingBishopColorPenalty' in sameColorCentral, false);
     assert.ok(r20.compare(far, near) < 0, transform.name);
     assert.equal(r20.compare(offColorFar, sameColorCentral), 0, transform.name);
@@ -42,5 +42,22 @@ test('r20 breaks equal Black-distance ties by separating the bishop and knight a
     // Stable bishop protection can retain Na4 and protect it with Bc6.
     const bishopDefense = getChess(fen).move({from: transformSquare('d5', t), to: transformSquare('c6', t)}).san;
     assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [bishopDefense], t.name);
+  }
+});
+
+
+test('r9.9 breaks center-distance ties toward Black while keeping centrality first across D4', () => {
+  const compare = knightAndBishopWhiteRules.find(rule => rule.id === 'r9.9')!.compare!;
+  for (const t of SQUARE_TRANSFORMS) {
+    const fen = transformFen('8/8/6k1/3BK3/2N5/8/8/8 w - - 6 4', t);
+    const score = (to: 'd4' | 'e4' | 'f4') => scoreKnightAndBishopWhiteMove(fen,
+      getChess(fen).move({from: transformSquare('e5', t), to: transformSquare(to, t)}).san);
+    const d4 = score('d4'), e4 = score('e4'), f4 = score('f4');
+    assert.equal(d4.kingCenterProximityScore, e4.kingCenterProximityScore, t.name);
+    assert.equal(e4.kingBlackProximityScore, 8, t.name);
+    assert.equal(d4.kingBlackProximityScore, 13, t.name);
+    assert.ok(compare(e4, d4) < 0, t.name);
+    assert.ok(f4.kingBlackProximityScore < d4.kingBlackProximityScore, t.name);
+    assert.ok(compare(d4, f4) < 0, t.name);
   }
 });

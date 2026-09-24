@@ -1,0 +1,57 @@
+{
+  "baselinePolicy": "0205bf45031c0133c0f82a5b59b1c4f169d88469",
+  "policyFingerprint": "1e2f593e9891e6768a02a94bc5939478ce808d83fdb764850ae25ce703042047",
+  "baselinePositions": 641,
+  "remainingPositions": 11,
+  "removedPositions": 630,
+  "remainingPhysicalPositions": 88,
+  "seeds": 54633,
+  "expanded": 65716,
+  "seconds": 46,
+  "survivors": [
+    {
+      "key": 790108,
+      "weight": 8
+    },
+    {
+      "key": 937555,
+      "weight": 8
+    },
+    {
+      "key": 2916130,
+      "weight": 8
+    },
+    {
+      "key": 3059483,
+      "weight": 8
+    },
+    {
+      "key": 5055121,
+      "weight": 8
+    },
+    {
+      "key": 7099870,
+      "weight": 8
+    },
+    {
+      "key": 7193814,
+      "weight": 8
+    },
+    {
+      "key": 7194950,
+      "weight": 8
+    },
+    {
+      "key": 7194956,
+      "weight": 8
+    },
+    {
+      "key": 7194957,
+      "weight": 8
+    },
+    {
+      "key": 7193807,
+      "weight": 8
+    }
+  ]
+}
