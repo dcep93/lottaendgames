@@ -7,6 +7,27 @@ import { getIdealKnightAndBishopWhiteMoves, scoreKnightAndBishopWhiteMove } from
 
 const sixDiagonal = ['a3', 'b4', 'c5', 'd6', 'e7', 'f8'] as const
 
+test('Kd6 supports a safe five-bishop with a knight one move from both support stages and no six-diagonal exit', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    const board = getChess(transformFen('8/8/3K4/k7/B7/3N4/8/8 w - - 0 1', transform))
+    board.move({from: transformSquare('a4', transform), to: transformSquare('e8', transform)})
+    board.move({from: transformSquare('a5', transform), to: transformSquare('b6', transform)})
+    const before = board.fen()
+    const move = board.move({from: transformSquare('d3', transform), to: transformSquare('f4', transform)}).san
+    assert.equal(knightAndBishopSupportedDiagonal(board.fen()).size, 5)
+    assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 5)
+    const replies = board.moves({verbose: true}).filter(m => m.piece === 'k').map(m => m.to)
+    assert.deepEqual(knightAndBishopSupportedDiagonal(board.fen(), replies), knightAndBishopSupportedDiagonal(board.fen()))
+    // Threatening the bishop, an open boundary, a wrong knight, or Bc6 cannot use this declaration.
+    for (const fen of [
+      '8/8/1k1K4/8/B4N2/8/8/8 b - - 0 1',
+      '4B3/8/3K4/1k6/5N2/8/8/8 b - - 0 1',
+      '4B3/8/1k1K4/8/8/4N3/8/8 b - - 0 1',
+      '8/8/1kBK4/8/5N2/8/8/8 b - - 0 1',
+    ]) assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 99, fen)
+  }
+})
+
 test('five-diagonal with an approaching knight requires kings within two steps, across D4', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     const board = getChess(transformFen('1k3K2/8/8/1B6/8/4N3/8/8 w - - 0 1', transform))

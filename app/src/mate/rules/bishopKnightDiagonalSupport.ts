@@ -323,6 +323,22 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
   if (fivePatterns.length && kingDistance(white.square, black.square) > 2 &&
     !fivePatterns.some(pattern => pattern.support.includes(knight.square) ||
       pattern.previousSupport === knight.square)) return {size: 99, knight: 99}
+  // Kd6 may support an approaching five-knight when it can reach both d3 and
+  // d5, the bishop stays safe, and Black cannot step onto the six-diagonal.
+  const guardedFive = fivePatterns.find(pattern => pattern.kingGuard === white.square &&
+    !UNSUPPORTED_BISHOP_SQUARES.has(bishop.square) &&
+    isInsideBishopDiagonal(black.square, pattern.wall) &&
+    pattern.previousSupport && isKnightMove(knight.square, pattern.previousSupport) &&
+    pattern.support.some(square => isKnightMove(knight.square, square)))
+  if (guardedFive) {
+    const replies = blackDestinations ?? getChess(fen).moves({verbose: true})
+      .filter(move => move.piece === 'k').map(move => move.to)
+    if (replies.every(square => kingDistance(square, bishop.square) > 1 &&
+      !guardedFive.boundary.includes(square))) return {
+      size: 5,
+      knight: supportDistance(fen, white.square, guardedFive),
+    }
+  }
   const declaredWhitePlacement = DECLARED_FIVE_WHITE_PLACEMENTS.find(pattern =>
     pattern.king === white.square && pattern.bishop === bishop.square && pattern.knight === knight.square)
   if (declaredWhitePlacement) return {
