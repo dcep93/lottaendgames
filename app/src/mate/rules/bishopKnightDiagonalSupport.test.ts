@@ -7,6 +7,19 @@ import { getIdealKnightAndBishopWhiteMoves, scoreKnightAndBishopWhiteMove } from
 
 const sixDiagonal = ['a3', 'b4', 'c5', 'd6', 'e7', 'f8'] as const
 
+test('declared Bf7+ with Ke6 Nd3 versus Ke8 is unsupported only in its exact placement across D4', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    const before = transformFen('4k1B1/8/4K3/8/8/3N4/8/8 w - - 0 1', transform)
+    const board = getChess(before)
+    const move = board.move({from: transformSquare('g8', transform), to: transformSquare('f7', transform)}).san
+    assert.deepEqual(knightAndBishopSupportedDiagonal(board.fen()), {size: 99, knight: 99})
+    assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 99)
+    // Moving White king to f6 retains support; the declaration is not a blanket Bf7 ban.
+    assert.equal(knightAndBishopSupportedDiagonal(transformFen(
+      '4k3/5B2/5K2/8/8/3N4/8/8 b - - 0 1', transform)).size, 7)
+  }
+})
+
 test('seven-diagonal support has no relative-rank restriction, across D4', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     // White below the bishop and Black above White, with Black on either side of the bishop rank.
