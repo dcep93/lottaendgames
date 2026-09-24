@@ -51,11 +51,3 @@ export function isDeclaredCheckingThreePlacement(king: Square, bishop: Square, b
   return KING_PROTECTED_CHECKING_BISHOP.some(placement =>
     placement.king === king && placement.bishop === bishop && placement.black === black)
 }
-
-// Exact Kc7 declaration: king defense permits Nb7 on the three-diagonal wall.
-const C7_CORNER_SUPPORT = new Set(SQUARE_TRANSFORMS.map(transform =>
-  transformFen('k1B5/1NK5/8/8/8/8/8/8 b - - 0 1', transform).split(' ').slice(0, 2).join(' ')))
-
-export function isDeclaredC7CornerSupport(fen: string): boolean {
-  return C7_CORNER_SUPPORT.has(fen.split(' ').slice(0, 2).join(' '))
-}

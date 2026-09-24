@@ -1,6 +1,6 @@
 import type { Square } from 'chess.js'
 import { isInsideBishopDiagonal } from './bishopKnightGeometry'
-import { isDeclaredC7CornerSupport, isDeclaredCheckingThreePlacement, isDeclaredCornerSupportWithoutKnightTarget, isDeclaredInsideThreeSupport, isRecordedSupportedCornerPosition } from './bishopKnightDeclaredSupport'
+import { isDeclaredCheckingThreePlacement, isDeclaredCornerSupportWithoutKnightTarget, isDeclaredInsideThreeSupport, isRecordedSupportedCornerPosition } from './bishopKnightDeclaredSupport'
 import { knightAndBishopKnightProximityToSquare } from './bishopKnightStrategy'
 import { allSquares, edgeDistance, getChess, isKnightMove, findPiece, kingDistance, squaredEuclideanDistance, squareColor, squareCoords, squareFromCoordinates, SQUARE_TRANSFORMS, transformSquare } from '../chess'
 
@@ -85,6 +85,10 @@ const DIAGONALS = CANONICAL_DIAGONALS.flatMap(pattern => SQUARE_TRANSFORMS.map(t
 // Ka2/Nd3 cannot support a cage, regardless of bishop or Black king placement.
 const UNSUPPORTED_KING_KNIGHT_PAIRS = new Set(SQUARE_TRANSFORMS.map(transform =>
   `${transformSquare('a2', transform)}/${transformSquare('d3', transform)}`))
+
+// Black Ka8 with Bc8/Nb7 is never supported, regardless of White's king.
+const UNSUPPORTED_CORNER_MINOR_PLACEMENTS = new Set(SQUARE_TRANSFORMS.map(transform =>
+  `${transformSquare('a8', transform)}/${transformSquare('c8', transform)}/${transformSquare('b7', transform)}`))
 
 // Bc6 and its reflected squares are unsupported regardless of other pieces.
 const UNSUPPORTED_BISHOP_SQUARES = new Set(SQUARE_TRANSFORMS.map(transform => transformSquare('c6', transform)))
@@ -303,6 +307,7 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
   const knight = findPiece(fen, 'w', 'n')
   if (!white || !black || !bishop || !knight) return {size: 99, knight: 99}
   if (UNSUPPORTED_KING_KNIGHT_PAIRS.has(`${white.square}/${knight.square}`)) return {size: 99, knight: 99}
+  if (UNSUPPORTED_CORNER_MINOR_PLACEMENTS.has(`${black.square}/${bishop.square}/${knight.square}`)) return {size: 99, knight: 99}
   // Cage membership is mandatory before every support declaration or exception.
   if (!DIAGONALS.some(pattern => pattern.wall.includes(bishop.square) &&
     isInsideBishopDiagonal(black.square, pattern.wall))) return {size: 99, knight: 99}
@@ -358,12 +363,6 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
       pattern.wall.includes(bishop.square) && isInsideBishopDiagonal(black.square, pattern.wall) &&
       replies.every(square => isInsideBishopDiagonal(square, pattern.wall)))
     return enclosed ? {size: 3, knight: 99} : {size: 99, knight: 99}
-  }
-  // The exact Kc7/Bc8/Nb7 against Ka8 declaration overrides the middle-square exclusion.
-  if (isDeclaredC7CornerSupport(fen)) return {
-    size: 3,
-    knight: Math.min(...DIAGONALS.filter(pattern => pattern.wall.length === 3 && pattern.wall.includes(bishop.square))
-      .map(pattern => supportDistance(fen, white.square, pattern))),
   }
   // A knight on the three-diagonal's middle square (Ng2 with Bf1/ Bh3)
   // disqualifies support, including older king-and-bishop placement declarations.
