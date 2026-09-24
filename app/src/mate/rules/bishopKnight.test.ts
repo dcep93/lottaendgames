@@ -147,6 +147,11 @@ test("bishop-and-knight rules are registered", () => {
       helpText: "An undefended knight should not be the only defender of an attacked bishop.",
     },
     {
+      id: "r6.8",
+      shortLabel: "rule r6.8",
+      helpText: "Do not allow Black to attack both undefended pieces next move.",
+    },
+    {
       id: "r7",
       shortLabel: "rule r7",
       helpText: "Prefer king proximity to a central square opposite the bishop's color.",
@@ -212,6 +217,7 @@ test("bishop-and-knight rules are registered", () => {
       "r5.5",
       "r6",
       "r6.5",
+      "r6.8",
       "r7",
       "r7.8",
       "r8",
@@ -226,7 +232,7 @@ test("bishop-and-knight rules are registered", () => {
     ruleSet.whiteRuleDescriptions.map(({ id }) => id),
     knightAndBishopWhiteRules.map(({ id }) => id),
   );
-  assert.equal(knightAndBishopWhiteRules.length, 19);
+  assert.equal(knightAndBishopWhiteRules.length, 20);
 });
 
 test("immediate mate keeps precedence without the mating-net rule", () => {

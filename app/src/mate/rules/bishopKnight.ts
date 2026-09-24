@@ -50,6 +50,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly kingCoordinationPenalty: number;
   readonly attackedBishopDefensePenalty: number;
   readonly undefendedKnightOnlyBishopDefenderPenalty: number;
+  readonly undefendedMinorForkPenalty: number;
   readonly attackedBishopEscapeScore: number;
   readonly nearbyPairBishopEscapeScore: number;
   readonly nearbyPairCentralDefensePenalty: number;
@@ -255,6 +256,19 @@ function scoreKnightAndBishopWhiteMoveCore(
       && kingDistance(bishop.square, blackKing.square) === 1
       && squaredEuclideanDistance(bishop.square, knight.square) === 5
       && !bishopKingDefended && !knightKingDefended ? 1 : 0,
+    get undefendedMinorForkPenalty() {
+      if (!bishop || !knight || bishopKingDefended || knightKingDefended) return 0;
+      return blackReplies.some(reply => {
+        if (reply.captured || kingDistance(reply.to, bishop.square) !== 1
+          || kingDistance(reply.to, knight.square) !== 1) return false;
+        chess.move(reply);
+        try {
+          return !chess.isAttacked(bishop.square, "w") && !chess.isAttacked(knight.square, "w");
+        } finally {
+          chess.undo();
+        }
+      }) ? 1 : 0;
+    },
     attackedBishopDefensePenalty: context.shouldEscapeBishop && !bishopDefendedByKingMove ? 1 : 0,
     get attackedBishopEscapeScore() {
       return context.shouldEscapeBishop && !bishopDefendedByKingMove && bishop && blackKing
@@ -468,6 +482,12 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       shortLabel: "rule r6.5",
       helpText: "An undefended knight should not be the only defender of an attacked bishop.",
       compare: (first, second) => first.undefendedKnightOnlyBishopDefenderPenalty - second.undefendedKnightOnlyBishopDefenderPenalty,
+    },
+    {
+      id: "r6.8",
+      shortLabel: "rule r6.8",
+      helpText: "Do not allow Black to attack both undefended pieces next move.",
+      compare: (first, second) => first.undefendedMinorForkPenalty - second.undefendedMinorForkPenalty,
     },
     {
       id: "r7",
