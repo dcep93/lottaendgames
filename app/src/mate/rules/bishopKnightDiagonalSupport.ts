@@ -2,7 +2,7 @@ import type { Square } from 'chess.js'
 import { isInsideBishopDiagonal } from './bishopKnightGeometry'
 import { isDeclaredCheckingThreePlacement, isDeclaredCornerSupportWithoutKnightTarget, isDeclaredInsideThreeSupport, isRecordedSupportedCornerPosition } from './bishopKnightDeclaredSupport'
 import { knightAndBishopKnightProximityToSquare } from './bishopKnightStrategy'
-import { allSquares, edgeDistance, getChess, findPiece, kingDistance, squaredEuclideanDistance, squareColor, squareCoords, squareFromCoordinates, SQUARE_TRANSFORMS, transformSquare } from '../chess'
+import { allSquares, edgeDistance, getChess, isKnightMove, findPiece, kingDistance, squaredEuclideanDistance, squareColor, squareCoords, squareFromCoordinates, SQUARE_TRANSFORMS, transformSquare } from '../chess'
 
 const CANONICAL_DIAGONALS: readonly {
   wall: readonly Square[];
@@ -120,6 +120,9 @@ const THREE_BISHOP_RACES = SQUARE_TRANSFORMS.map(transform => ({
 }))
 
 const DECLARED_FIVE_SUPPORT = [
+  // Bb5 with Kd6 versus Kd8 accepts a knight one move from either seven-stage square.
+  ...allSquares().filter(square => isKnightMove(square, 'd3') || isKnightMove(square, 'f5'))
+    .map(knight => ({king: 'd6' as const, bishop: 'b5' as const, knight, black: 'd8' as const})),
   {king: 'c5', bishop: 'd7', knight: 'e3', black: 'a5'},
   {king: 'd8', bishop: 'a4', knight: 'd3', black: 'b8'},
   {king: 'd8', bishop: 'a4', knight: 'd3', black: 'b7'},

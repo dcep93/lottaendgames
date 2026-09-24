@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { allSquares, edgeDistance, getChess, kingDistance, squareColor, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess'
+import { allSquares, edgeDistance, getChess, isKnightMove, kingDistance, squareColor, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess'
 import { isInsideBishopDiagonal } from './bishopKnightGeometry'
 import { knightAndBishopSupportedDiagonal } from './bishopKnightDiagonalSupport'
 import { getIdealKnightAndBishopWhiteMoves, scoreKnightAndBishopWhiteMove } from './bishopKnight'
@@ -1201,5 +1201,29 @@ test('declared second-move Bd7 with Kc5 Ne3 against Ka5 is supported and preferr
     assert.deepEqual(getIdealKnightAndBishopWhiteMoves(before), [move.san])
     const nearby = transformFen('8/3B4/8/k1K5/8/5N2/8/8 b - - 3 2', transform)
     assert.equal(knightAndBishopSupportedDiagonal(nearby).size, 99)
+  }
+})
+
+
+test('Bb5 with Kd6 versus Kd8 supports knights one move from d3 or f5 across D4', () => {
+  for (const knight of allSquares().filter(square =>
+    edgeDistance(square) > 0 && square !== 'd6' &&
+    (isKnightMove(square, 'd3') || isKnightMove(square, 'f5')))) {
+    const original = getChess('3k4/8/3K4/1B6/8/8/8/8 b - - 0 1')
+    original.put({type: 'n', color: 'w'}, knight)
+    for (const transform of SQUARE_TRANSFORMS) {
+      assert.equal(knightAndBishopSupportedDiagonal(transformFen(original.fen(), transform)).size, 5, knight + ' ' + transform.name)
+    }
+  }
+  for (const transform of SQUARE_TRANSFORMS) {
+    const before = transformFen('3kB3/8/3K4/8/8/4N3/8/8 w - - 2 2', transform)
+    const board = getChess(before)
+    const move = board.move({from: transformSquare('e8', transform), to: transformSquare('b5', transform)})
+    assert.equal(scoreKnightAndBishopWhiteMove(before, move.san).supportedDiagonalSizeScore, 5)
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(before), [move.san])
+    for (const fen of [
+      '3k4/8/3K4/1B6/8/5N2/8/8 b - - 0 1',
+      '3k4/8/3K4/1B6/8/8/8/2N5 b - - 0 1',
+    ]) assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 99)
   }
 })
