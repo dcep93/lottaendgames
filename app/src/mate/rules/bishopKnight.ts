@@ -26,7 +26,7 @@ import {
 } from "./bishopKnightLookup";
 import { knightAndBishopCenterProximityScore, knightAndBishopKingCenterProximityScore, knightAndBishopKnightTargetProximityScore, knightAndBishopTargetCorners } from "./bishopKnightStrategy";
 import { precageKingEdges, kingEdgeDistance, type BoardEdge } from "./bishopKnightPrecageEdges";
-import { declaredSupportedThreeMove, declaredSupportedFiveMove, declaredSupportedSevenMove } from "./bishopKnightSupportedPreferences";
+import { declaredSupportedThreeMove, declaredSupportedFiveMove, declaredSupportedSevenMove, declaredSupportedKnightAdvance } from "./bishopKnightSupportedPreferences";
 import { knightAndBishopDeclaredPreparationMove } from "./bishopKnightPreparation";
 import { knightAndBishopShouldCoordinateKing, knightAndBishopKingCoordinatesMinors } from "./bishopKnightCoordination";
 import { knightAndBishopFivePointFiveMove } from "./bishopKnightFivePointFive";
@@ -62,6 +62,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly supportedThreeCheckScore: number;
   readonly supportedDiagonalSizeScore: number;
   readonly supportedDiagonalKnightScore: number;
+  readonly declaredSupportedKnightAdvancePenalty: number;
   readonly declaredSupportedThreePenalty: number;
   readonly declaredSupportedFivePenalty: number | undefined;
   readonly declaredSupportedSevenPenalty: number;
@@ -154,6 +155,7 @@ type KnightAndBishopPositionScoreContext = {
   readonly shouldDefendKnight: boolean;
   readonly precageEdges: readonly BoardEdge[];
   readonly declaredPreparationMove: string | undefined;
+  readonly declaredSupportedKnightAdvance: string | undefined;
   readonly declaredSupportedThreeMove: string | undefined;
   readonly declaredSupportedFiveMove: string | undefined;
   readonly declaredSupportedSevenMove: string | undefined;
@@ -192,6 +194,7 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
     shouldCoordinateKing: knightAndBishopShouldCoordinateKing(fen),
     precageEdges: precageKingEdges(fen),
     declaredPreparationMove: knightAndBishopDeclaredPreparationMove(fen),
+    declaredSupportedKnightAdvance: declaredSupportedKnightAdvance(fen),
     declaredSupportedThreeMove: declaredSupportedThreeMove(fen),
     declaredSupportedFiveMove: declaredSupportedFiveMove(fen),
     declaredSupportedSevenMove: declaredSupportedSevenMove(fen),
@@ -301,6 +304,7 @@ function scoreKnightAndBishopWhiteMoveCore(
       const support = supportedDiagonal ??= evaluateKnightAndBishopSupportedDiagonal(resultFen, blackReplies.map(move => move.to));
       return support.size === 7 ? support.sevenKingTieDistance ?? 0 : 0;
     },
+    declaredSupportedKnightAdvancePenalty: context.declaredSupportedKnightAdvance && context.declaredSupportedKnightAdvance !== move.from + move.to ? 1 : 0,
     declaredSupportedThreePenalty: context.declaredSupportedThreeMove && context.declaredSupportedThreeMove !== move.from + move.to ? 1 : 0,
     declaredSupportedFivePenalty: context.declaredSupportedFiveMove === undefined ? undefined
       : context.declaredSupportedFiveMove === move.from + move.to ? 0 : 1,
@@ -386,6 +390,7 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       helpText: "Prefer a supported smaller odd diagonal, then knight move proximity to its support square.",
       subpriorities: [
         { compare: (first, second) => first.supportedDiagonalSizeScore - second.supportedDiagonalSizeScore },
+        { compare: (first, second) => first.declaredSupportedKnightAdvancePenalty - second.declaredSupportedKnightAdvancePenalty },
         { compare: (first, second) => first.supportedDiagonalKnightScore - second.supportedDiagonalKnightScore },
       ],
     },

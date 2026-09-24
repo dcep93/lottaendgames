@@ -43,3 +43,14 @@ const threeDeclarations = new Map(([
 export function declaredSupportedThreeMove(fen: string): string | undefined {
   return threeDeclarations.get(fen.split(' ').slice(0, 2).join(' '))
 }
+
+// This exact knight advance is preferred before r1.5's normal knight-distance tie-break.
+// It does not bypass support size, piece safety, or the earlier rules.
+const knightAdvanceDeclarations = new Map(SQUARE_TRANSFORMS.map(transform => [
+  transformFen('1k6/3B4/1K6/3N4/8/8/8/8 w - - 0 1', transform).split(' ').slice(0, 2).join(' '),
+  transformSquare('d5', transform) + transformSquare('f6', transform),
+] as const))
+
+export function declaredSupportedKnightAdvance(fen: string): string | undefined {
+  return knightAdvanceDeclarations.get(fen.split(' ').slice(0, 2).join(' '))
+}
