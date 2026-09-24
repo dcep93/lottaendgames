@@ -1,0 +1,403 @@
+{
+  "change": "r5.1 uses resulting Euclidean king proximity when the starting bishop is central and the knight occupies precage; replaces edge targeting",
+  "method": {
+    "source": "/Users/danielcepeda/repos/_codex_output/bn-kd6-unsupported-2026-09-24",
+    "affectedNodes": 2419,
+    "policiesChanged": 1715,
+    "condition": "central bishop and knight on precage before White moves",
+    "sourceHash": "a73c5fd3c72214c881e40c6e04e8d01233d3684b68fc00622b84b3864784ab53",
+    "patch": "diff --git a/app/src/mate/rules/bishopKnight.ts b/app/src/mate/rules/bishopKnight.ts\nindex 1dec9e7..1fe1e3b 100644\n--- a/app/src/mate/rules/bishopKnight.ts\n+++ b/app/src/mate/rules/bishopKnight.ts\n@@ -24,8 +24,7 @@ import {\n   isKnightAndBishopWManeuverPosition,\n   knightAndBishopPiecesPresent,\n } from \"./bishopKnightLookup\";\n-import { knightKingProtectionDistance, knightAndBishopCenterProximityScore, knightAndBishopKingCenterProximityScore, knightAndBishopKnightTargetProximityScore, knightAndBishopTargetCorners } from \"./bishopKnightStrategy\";\n-import { precageKingEdges, kingEdgeDistance, type BoardEdge } from \"./bishopKnightPrecageEdges\";\n+import { knightAndBishopKnightTargetSquares, knightKingProtectionDistance, knightAndBishopCenterProximityScore, knightAndBishopKingCenterProximityScore, knightAndBishopKnightTargetProximityScore, knightAndBishopTargetCorners } from \"./bishopKnightStrategy\";\n import { declaredSupportedThreeMove, declaredSupportedFiveMove, declaredSupportedSevenMove, declaredSupportedKnightAdvance } from \"./bishopKnightSupportedPreferences\";\n import { knightAndBishopDeclaredPreparationMove } from \"./bishopKnightPreparation\";\n import { knightAndBishopShouldCoordinateKing, knightAndBishopKingCoordinatesMinors } from \"./bishopKnightCoordination\";\n@@ -57,8 +56,7 @@ export type KnightAndBishopWhiteMoveScore = {\n   readonly bishopOppositionPenalty: number;\n   readonly knightNextAttackPenalty: number;\n   readonly knightCenterProximityScore: number;\n-  readonly precagePrimaryEdgeDistance: number;\n-  readonly precageSecondaryEdgeDistance: number;\n+  readonly precageKingDistanceSquared: number;\n   readonly declaredPreparationPenalty: number;\n   readonly supportedThreeCheckScore: number;\n   readonly supportedDiagonalSizeScore: number;\n@@ -154,7 +152,7 @@ type KnightAndBishopPositionScoreContext = {\n   readonly shouldEscapeBishop: boolean;\n   readonly shouldEscapeNearbyPairBishop: boolean;\n   readonly shouldDefendKnight: boolean;\n-  readonly precageEdges: readonly BoardEdge[];\n+  readonly startsWithPrecageKnight: boolean;\n   readonly declaredPreparationMove: string | undefined;\n   readonly declaredSupportedKnightAdvance: string | undefined;\n   readonly declaredSupportedThreeMove: string | undefined;\n@@ -193,7 +191,7 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {\n     shouldEscapeBishop: !!bishop && !!blackKing && kingDistance(bishop.square, blackKing.square) === 1,\n     shouldDefendKnight: !!knight && !!blackKing && kingDistance(knight.square, blackKing.square) === 1,\n     shouldCoordinateKing: knightAndBishopShouldCoordinateKing(fen),\n-    precageEdges: precageKingEdges(fen),\n+    startsWithPrecageKnight: !!knight && knightAndBishopKnightTargetSquares(fen).includes(knight.square),\n     declaredPreparationMove: knightAndBishopDeclaredPreparationMove(fen),\n     declaredSupportedKnightAdvance: declaredSupportedKnightAdvance(fen),\n     declaredSupportedThreeMove: declaredSupportedThreeMove(fen),\n@@ -311,8 +309,8 @@ function scoreKnightAndBishopWhiteMoveCore(\n     declaredSupportedFivePenalty: context.declaredSupportedFiveMove === undefined ? undefined\n       : context.declaredSupportedFiveMove === move.from + move.to ? 0 : 1,\n     declaredSupportedSevenPenalty: context.declaredSupportedSevenMove && context.declaredSupportedSevenMove !== move.from + move.to ? 1 : 0,\n-    precagePrimaryEdgeDistance: whiteKing ? kingEdgeDistance(whiteKing.square, context.precageEdges[0]) : 0,\n-    precageSecondaryEdgeDistance: whiteKing ? kingEdgeDistance(whiteKing.square, context.precageEdges[1]) : 0,\n+    precageKingDistanceSquared: context.startsWithPrecageKnight && whiteKing && blackKing\n+      ? squaredEuclideanDistance(whiteKing.square, blackKing.square) : 0,\n     declaredPreparationPenalty: context.declaredPreparationMove && context.declaredPreparationMove !== move.from + move.to ? 1 : 0,\n     mateScore: checkmate ? 0 : 1,\n     stalemateScore: !checkmate && blackReplies.length === 0 ? 1 : 0,\n@@ -423,9 +421,8 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit\n     {\n       id: \"r5.1\",\n       shortLabel: \"rule r5.1\",\n-      helpText: \"With a central bishop and knight on the precage square, prefer king proximity to the edge that the bishop is closer to but the knight is further from, then to the edge both pieces are closer to.\",\n-      compare: (first, second) => first.precagePrimaryEdgeDistance - second.precagePrimaryEdgeDistance\n-        || first.precageSecondaryEdgeDistance - second.precageSecondaryEdgeDistance,\n+      helpText: \"With a central bishop and knight on the precage square, prefer king proximity.\",\n+      compare: (first, second) => first.precageKingDistanceSquared - second.precageKingDistanceSquared,\n     },\n     {\n       id: \"r5.5\",\n@@ -620,7 +617,7 @@ const bishopKnightHelp: RuleHelp = {\n     \"Stay away from a bishop-colored corner.\",\n   ],\n   notes: [\n-    \"For r5.1, use the central bishop and occupied precage square before White moves to fix the two target edges. Compare White\u2019s resulting king distance to the primary edge, then the shared nearer edge. For Bd5/Nc4, the order is top, then left.\",\n+    \"For r5.1, require a central bishop and knight on a precage square before White moves, then minimize the resulting Euclidean distance between the kings.\",\n     \"For r8, White\u2019s king must be on files c\u2013f and ranks 3\u20136 before moving. Evaluate the bishop and knight preferences after White moves. A precage square is noncentral, off both long diagonals, and diagonally adjacent to a central bishop.\",\n     \"For r7, minimize White\u2019s king Euclidean distance to the board\u2019s midpoint. For r20, maximize the sum of the bishop\u2019s and knight\u2019s Euclidean distances from Black\u2019s king, measured after White moves.\",\n     \"For r9.98, count bishop protection through Black\u2019s king, which must leave the checking diagonal. Other intervening pieces still block protection. Evaluate after White moves.\",\ndiff --git a/app/src/mate/rules/bishopKnightPrecageEdges.ts b/app/src/mate/rules/bishopKnightPrecageEdges.ts\ndeleted file mode 100644\nindex a6fc097..0000000\n--- a/app/src/mate/rules/bishopKnightPrecageEdges.ts\n+++ /dev/null\n@@ -1,27 +0,0 @@\n-import type { Square } from 'chess.js'\n-import { findPiece, squareCoordinates } from '../chess'\n-import { knightAndBishopKnightTargetSquares } from './bishopKnightStrategy'\n-\n-export type BoardEdge = 'left' | 'right' | 'top' | 'bottom'\n-\n-export function kingEdgeDistance(square: Square, edge: BoardEdge | undefined): number {\n-  const { file, rank } = squareCoordinates(square)\n-  switch (edge) {\n-    case 'left': return file\n-    case 'right': return 7 - file\n-    case 'top': return 7 - rank\n-    case 'bottom': return rank\n-    default: return 0\n-  }\n-}\n-\n-export function precageKingEdges(fen: string): readonly BoardEdge[] {\n-  const bishop = findPiece(fen, 'w', 'b')\n-  const knight = findPiece(fen, 'w', 'n')\n-  if (!bishop || !knight || !knightAndBishopKnightTargetSquares(fen).includes(knight.square)) return []\n-  const { file, rank } = squareCoordinates(bishop.square)\n-  const near: BoardEdge[] = [file < 4 ? 'left' : 'right', rank < 4 ? 'bottom' : 'top']\n-  const primary = near.find(edge => kingEdgeDistance(knight.square, edge) > kingEdgeDistance(bishop.square, edge))\n-  const secondary = near.find(edge => kingEdgeDistance(knight.square, edge) < kingEdgeDistance(bishop.square, edge))\n-  return primary && secondary ? [primary, secondary] : []\n-}\n"
+  },
+  "fingerprint": "ad6f6d8a237ede03b08d995efd844a1d0bb6fd86d08c2c56dd3fb8aa03910e56",
+  "baselineComparison": {
+    "baseline": 1159,
+    "baselinePolicy": "9fbb749008394a1503cc3c0817b932d1e814bc88",
+    "baselineBlackPolicy": "all-legal",
+    "survivors": 352,
+    "newPositions": 163
+  },
+  "whollyUnsupportedLoops": {
+    "orbits": 515,
+    "physical": 4120
+  },
+  "unsupportedOnAnyCycle": {
+    "orbits": 550,
+    "physical": 4400
+  },
+  "supportedOnAnyCycle": {
+    "orbits": 175,
+    "physical": 1400
+  },
+  "nonmatingSupportLosses": {
+    "whiteDecisions": {
+      "orbits": 30,
+      "physical": 240
+    },
+    "events": {
+      "orbits": 38,
+      "physical": 304
+    },
+    "sourcePositions": {
+      "orbits": 38,
+      "physical": 304
+    }
+  },
+  "unsupportedMotifs": [
+    {
+      "motif": "King-protected central bishop; knight on precage",
+      "orbits": 94,
+      "physical": 752
+    },
+    {
+      "motif": "Unprotected by king central bishop; knight on precage",
+      "orbits": 75,
+      "physical": 600
+    },
+    {
+      "motif": "Noncentral bishop not king-protected; interior king; knight on edge, unprotected by king",
+      "orbits": 59,
+      "physical": 472
+    },
+    {
+      "motif": "King-protected central bishop; knight king-protected, off precage",
+      "orbits": 41,
+      "physical": 328
+    },
+    {
+      "motif": "Noncentral bishop king-protected; interior king; knight on edge, unprotected by king",
+      "orbits": 36,
+      "physical": 288
+    },
+    {
+      "motif": "Noncentral bishop not king-protected; interior king; knight king-protected",
+      "orbits": 36,
+      "physical": 288
+    },
+    {
+      "motif": "Noncentral bishop not king-protected; central king; knight unprotected by king",
+      "orbits": 32,
+      "physical": 256
+    },
+    {
+      "motif": "Noncentral bishop not king-protected; central king; knight on edge, unprotected by king",
+      "orbits": 25,
+      "physical": 200
+    },
+    {
+      "motif": "Noncentral bishop not king-protected; central king; knight king-protected",
+      "orbits": 24,
+      "physical": 192
+    },
+    {
+      "motif": "Noncentral bishop not king-protected; interior king; knight unprotected by king",
+      "orbits": 20,
+      "physical": 160
+    },
+    {
+      "motif": "King-protected central bishop; knight unprotected by king, off precage",
+      "orbits": 13,
+      "physical": 104
+    },
+    {
+      "motif": "Noncentral bishop not king-protected; edge king; knight unprotected by king",
+      "orbits": 11,
+      "physical": 88
+    },
+    {
+      "motif": "Noncentral bishop king-protected; interior king; knight unprotected by king",
+      "orbits": 11,
+      "physical": 88
+    },
+    {
+      "motif": "Noncentral bishop king-protected; central king; knight unprotected by king",
+      "orbits": 11,
+      "physical": 88
+    },
+    {
+      "motif": "Noncentral bishop king-protected; central king; knight on edge, unprotected by king",
+      "orbits": 10,
+      "physical": 80
+    },
+    {
+      "motif": "Noncentral bishop not king-protected; edge king; knight king-protected",
+      "orbits": 4,
+      "physical": 32
+    },
+    {
+      "motif": "Noncentral bishop king-protected; interior king; knight king-protected",
+      "orbits": 4,
+      "physical": 32
+    },
+    {
+      "motif": "Noncentral bishop not king-protected; edge king; knight on edge, unprotected by king",
+      "orbits": 3,
+      "physical": 24
+    },
+    {
+      "motif": "Noncentral bishop king-protected; edge king; knight king-protected",
+      "orbits": 2,
+      "physical": 16
+    },
+    {
+      "motif": "Noncentral bishop king-protected; edge king; knight unprotected by king",
+      "orbits": 2,
+      "physical": 16
+    },
+    {
+      "motif": "Noncentral bishop king-protected; edge king; knight on edge, unprotected by king",
+      "orbits": 1,
+      "physical": 8
+    },
+    {
+      "motif": "Unprotected by king central bishop; knight king-protected, off precage",
+      "orbits": 1,
+      "physical": 8
+    }
+  ],
+  "examples": {
+    "unsupported": [
+      {
+        "motif": "King-protected central bishop; knight on precage",
+        "positions": 94,
+        "examples": [
+          {
+            "fen": "8/8/8/3B4/2NK4/8/8/1k6 w - - 0 1",
+            "moves": [
+              "Kc3",
+              "Ka1",
+              "Kb3",
+              "Kb1",
+              "Bg8",
+              "Ka1",
+              "Kc3",
+              "Kb1",
+              "Kd4",
+              "Ka1",
+              "Bd5",
+              "Kb1"
+            ],
+            "d": 2,
+            "phases": [
+              99,
+              99,
+              99,
+              99,
+              99,
+              99
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/3B4/2NK4/8/8/1k6_w_-_-_0_1&moves=Kc3,Ka1,Kb3,Kb1,Bg8,Ka1,Kc3,Kb1,Kd4,Ka1,Bd5,Kb1&cursor=0",
+            "motif": "King-protected central bishop; knight on precage"
+          },
+          {
+            "fen": "8/6k1/8/3BK3/2N5/8/8/8 w - - 0 1",
+            "moves": [
+              "Ke6",
+              "Kg6",
+              "Nd6",
+              "Kg7",
+              "Ke5",
+              "Kh8",
+              "Nc4",
+              "Kg7"
+            ],
+            "d": 2,
+            "phases": [
+              99,
+              99,
+              99,
+              99
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=8/6k1/8/3BK3/2N5/8/8/8_w_-_-_0_1&moves=Ke6,Kg6,Nd6,Kg7,Ke5,Kh8,Nc4,Kg7&cursor=0",
+            "motif": "King-protected central bishop; knight on precage"
+          },
+          {
+            "fen": "8/8/8/3B4/1kN1K3/8/8/8 w - - 0 1",
+            "moves": [
+              "Kd4",
+              "Ka4",
+              "Kc3",
+              "Kb5",
+              "Kb3",
+              "Kc5",
+              "Bg8",
+              "Kd4",
+              "Kb4",
+              "Kd3",
+              "Kc5",
+              "Kc3",
+              "Kd5",
+              "Kd3",
+              "Ke5",
+              "Kc2",
+              "Bd5",
+              "Kc3",
+              "Ke4",
+              "Kb4"
+            ],
+            "d": 2,
+            "phases": [
+              99,
+              99,
+              99,
+              99,
+              99,
+              99,
+              99,
+              99,
+              99,
+              99
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/3B4/1kN1K3/8/8/8_w_-_-_0_1&moves=Kd4,Ka4,Kc3,Kb5,Kb3,Kc5,Bg8,Kd4,Kb4,Kd3,Kc5,Kc3,Kd5,Kd3,Ke5,Kc2,Bd5,Kc3,Ke4,Kb4&cursor=0",
+            "motif": "King-protected central bishop; knight on precage"
+          }
+        ]
+      }
+    ],
+    "supported": [
+      {
+        "motif": "7-diagonal; Noncentral bishop not king-protected; interior king; knight unprotected by king",
+        "positions": 60,
+        "examples": [
+          {
+            "fen": "4k1B1/8/4K3/8/8/3N4/8/8 w - - 0 1",
+            "moves": [
+              "Bf7+",
+              "Kd8",
+              "Bg8",
+              "Ke8"
+            ],
+            "d": 0,
+            "phases": [
+              7,
+              7
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=4k1B1/8/4K3/8/8/3N4/8/8_w_-_-_0_1&moves=Bf7%2B,Kd8,Bg8,Ke8&cursor=0",
+            "motif": "Noncentral bishop not king-protected; interior king; knight unprotected by king"
+          },
+          {
+            "fen": "8/8/3K4/1k6/8/1B1N4/8/8 w - - 0 1",
+            "moves": [
+              "Kd5",
+              "Kb6",
+              "Ba4",
+              "Kc7",
+              "Bb3",
+              "Kb7",
+              "Ke6",
+              "Kb6",
+              "Kd6",
+              "Kb5"
+            ],
+            "d": 0,
+            "phases": [
+              7,
+              5,
+              7,
+              7,
+              7
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/3K4/1k6/8/1B1N4/8/8_w_-_-_0_1&moves=Kd5,Kb6,Ba4,Kc7,Bb3,Kb7,Ke6,Kb6,Kd6,Kb5&cursor=0",
+            "motif": "Noncentral bishop not king-protected; interior king; knight unprotected by king"
+          },
+          {
+            "fen": "3k4/8/4K3/8/8/1B1N4/8/8 w - - 0 1",
+            "moves": [
+              "Ba4",
+              "Kc7",
+              "Bb3",
+              "Kb6",
+              "Kd6",
+              "Kb5",
+              "Kd5",
+              "Kb6",
+              "Ba4",
+              "Kc7",
+              "Bb3",
+              "Kd7",
+              "Ke5",
+              "Ke8",
+              "Ke6",
+              "Kd8"
+            ],
+            "d": 0,
+            "phases": [
+              5,
+              7,
+              7,
+              7,
+              5,
+              7,
+              7,
+              7
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=3k4/8/4K3/8/8/1B1N4/8/8_w_-_-_0_1&moves=Ba4,Kc7,Bb3,Kb6,Kd6,Kb5,Kd5,Kb6,Ba4,Kc7,Bb3,Kd7,Ke5,Ke8,Ke6,Kd8&cursor=0",
+            "motif": "Noncentral bishop not king-protected; interior king; knight unprotected by king"
+          }
+        ]
+      }
+    ],
+    "losses": [
+      {
+        "motif": "5-diagonal; Noncentral bishop not king-protected; interior king; knight unprotected by king; B moves",
+        "positions": 12,
+        "examples": [
+          {
+            "fen": "8/8/k1K5/8/B7/4N3/8/8 w - - 0 1",
+            "moves": [
+              "Kc5",
+              "Ka5",
+              "Bc6",
+              "Ka6"
+            ],
+            "d": 1,
+            "phases": [
+              5,
+              99
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/k1K5/8/B7/4N3/8/8_w_-_-_0_1&moves=Kc5,Ka5,Bc6,Ka6&cursor=0"
+          },
+          {
+            "fen": "2k1B3/8/2K5/8/8/2N5/8/8 w - - 0 1",
+            "moves": [
+              "Kd6",
+              "Kd8",
+              "Bc6",
+              "Kc8"
+            ],
+            "d": 1,
+            "phases": [
+              5,
+              99
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=2k1B3/8/2K5/8/8/2N5/8/8_w_-_-_0_1&moves=Kd6,Kd8,Bc6,Kc8&cursor=0"
+          },
+          {
+            "fen": "2k1B3/8/2K5/8/8/4N3/8/8 w - - 0 1",
+            "moves": [
+              "Kd6",
+              "Kd8",
+              "Bc6",
+              "Kc8"
+            ],
+            "d": 1,
+            "phases": [
+              5,
+              99
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=2k1B3/8/2K5/8/8/4N3/8/8_w_-_-_0_1&moves=Kd6,Kd8,Bc6,Kc8&cursor=0"
+          }
+        ]
+      }
+    ]
+  },
+  "validation": {
+    "focusedTests": "15 passed",
+    "typescript": "passed",
+    "broaderTests": "186 passed, 3 failed; the same 3 failures reproduced using unchanged HEAD policy",
+    "preexistingFailures": [
+      "bishopKnightCentralSetup: r8 loaded Kd6 loop",
+      "bishopKnightRelativeKnight: r9.1 Nd2",
+      "bishopKnightThreeSupport: Ba6 Kb5 every knight"
+    ]
+  }
+}

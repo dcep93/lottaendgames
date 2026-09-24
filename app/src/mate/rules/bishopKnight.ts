@@ -24,8 +24,7 @@ import {
   isKnightAndBishopWManeuverPosition,
   knightAndBishopPiecesPresent,
 } from "./bishopKnightLookup";
-import { knightKingProtectionDistance, knightAndBishopCenterProximityScore, knightAndBishopKingCenterProximityScore, knightAndBishopKnightTargetProximityScore, knightAndBishopTargetCorners } from "./bishopKnightStrategy";
-import { precageKingEdges, kingEdgeDistance, type BoardEdge } from "./bishopKnightPrecageEdges";
+import { knightAndBishopKnightTargetSquares, knightKingProtectionDistance, knightAndBishopCenterProximityScore, knightAndBishopKingCenterProximityScore, knightAndBishopKnightTargetProximityScore, knightAndBishopTargetCorners } from "./bishopKnightStrategy";
 import { declaredSupportedThreeMove, declaredSupportedFiveMove, declaredSupportedSevenMove, declaredSupportedKnightAdvance } from "./bishopKnightSupportedPreferences";
 import { knightAndBishopDeclaredPreparationMove } from "./bishopKnightPreparation";
 import { knightAndBishopShouldCoordinateKing, knightAndBishopKingCoordinatesMinors } from "./bishopKnightCoordination";
@@ -57,8 +56,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly bishopOppositionPenalty: number;
   readonly knightNextAttackPenalty: number;
   readonly knightCenterProximityScore: number;
-  readonly precagePrimaryEdgeDistance: number;
-  readonly precageSecondaryEdgeDistance: number;
+  readonly precageKingDistanceSquared: number;
   readonly declaredPreparationPenalty: number;
   readonly supportedThreeCheckScore: number;
   readonly supportedDiagonalSizeScore: number;
@@ -154,7 +152,7 @@ type KnightAndBishopPositionScoreContext = {
   readonly shouldEscapeBishop: boolean;
   readonly shouldEscapeNearbyPairBishop: boolean;
   readonly shouldDefendKnight: boolean;
-  readonly precageEdges: readonly BoardEdge[];
+  readonly startsWithPrecageKnight: boolean;
   readonly declaredPreparationMove: string | undefined;
   readonly declaredSupportedKnightAdvance: string | undefined;
   readonly declaredSupportedThreeMove: string | undefined;
@@ -193,7 +191,7 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
     shouldEscapeBishop: !!bishop && !!blackKing && kingDistance(bishop.square, blackKing.square) === 1,
     shouldDefendKnight: !!knight && !!blackKing && kingDistance(knight.square, blackKing.square) === 1,
     shouldCoordinateKing: knightAndBishopShouldCoordinateKing(fen),
-    precageEdges: precageKingEdges(fen),
+    startsWithPrecageKnight: !!knight && knightAndBishopKnightTargetSquares(fen).includes(knight.square),
     declaredPreparationMove: knightAndBishopDeclaredPreparationMove(fen),
     declaredSupportedKnightAdvance: declaredSupportedKnightAdvance(fen),
     declaredSupportedThreeMove: declaredSupportedThreeMove(fen),
@@ -311,8 +309,8 @@ function scoreKnightAndBishopWhiteMoveCore(
     declaredSupportedFivePenalty: context.declaredSupportedFiveMove === undefined ? undefined
       : context.declaredSupportedFiveMove === move.from + move.to ? 0 : 1,
     declaredSupportedSevenPenalty: context.declaredSupportedSevenMove && context.declaredSupportedSevenMove !== move.from + move.to ? 1 : 0,
-    precagePrimaryEdgeDistance: whiteKing ? kingEdgeDistance(whiteKing.square, context.precageEdges[0]) : 0,
-    precageSecondaryEdgeDistance: whiteKing ? kingEdgeDistance(whiteKing.square, context.precageEdges[1]) : 0,
+    precageKingDistanceSquared: context.startsWithPrecageKnight && whiteKing && blackKing
+      ? squaredEuclideanDistance(whiteKing.square, blackKing.square) : 0,
     declaredPreparationPenalty: context.declaredPreparationMove && context.declaredPreparationMove !== move.from + move.to ? 1 : 0,
     mateScore: checkmate ? 0 : 1,
     stalemateScore: !checkmate && blackReplies.length === 0 ? 1 : 0,
@@ -423,9 +421,8 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     {
       id: "r5.1",
       shortLabel: "rule r5.1",
-      helpText: "With a central bishop and knight on the precage square, prefer king proximity to the edge that the bishop is closer to but the knight is further from, then to the edge both pieces are closer to.",
-      compare: (first, second) => first.precagePrimaryEdgeDistance - second.precagePrimaryEdgeDistance
-        || first.precageSecondaryEdgeDistance - second.precageSecondaryEdgeDistance,
+      helpText: "With a central bishop and knight on the precage square, prefer king proximity.",
+      compare: (first, second) => first.precageKingDistanceSquared - second.precageKingDistanceSquared,
     },
     {
       id: "r5.5",
@@ -620,7 +617,7 @@ const bishopKnightHelp: RuleHelp = {
     "Stay away from a bishop-colored corner.",
   ],
   notes: [
-    "For r5.1, use the central bishop and occupied precage square before White moves to fix the two target edges. Compare White’s resulting king distance to the primary edge, then the shared nearer edge. For Bd5/Nc4, the order is top, then left.",
+    "For r5.1, require a central bishop and knight on a precage square before White moves, then minimize the resulting Euclidean distance between the kings.",
     "For r8, White’s king must be on files c–f and ranks 3–6 before moving. Evaluate the bishop and knight preferences after White moves. A precage square is noncentral, off both long diagonals, and diagonally adjacent to a central bishop.",
     "For r7, minimize White’s king Euclidean distance to the board’s midpoint. For r20, maximize the sum of the bishop’s and knight’s Euclidean distances from Black’s king, measured after White moves.",
     "For r9.98, count bishop protection through Black’s king, which must leave the checking diagonal. Other intervening pieces still block protection. Evaluate after White moves.",
