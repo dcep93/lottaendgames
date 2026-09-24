@@ -14,11 +14,11 @@ test('supported seven prefers b3 in the knight support orientation, including ev
     const preferred = scoreKnightAndBishopWhiteMove(reflected,san('b3'))
     const otherEnd = scoreKnightAndBishopWhiteMove(reflected,san('f7'))
     assert.equal(preferred.supportedDiagonalSizeScore,7)
-    assert.equal(otherEnd.supportedDiagonalSizeScore,7)
+    assert.equal(otherEnd.supportedDiagonalSizeScore,99)
     assert.equal(preferred.supportedDiagonalKnightScore,0)
-    assert.equal(otherEnd.supportedDiagonalKnightScore,0)
+    assert.equal(otherEnd.supportedDiagonalKnightScore,99)
     assert.equal(preferred.supportedSevenBishopPenalty,0)
-    // Both kings are below Bf7; it remains supported but Bb3 is preferred.
+    // Kd4 is below Bf7 and Black Kb5 is above White: Bf7 is unsupported.
     assert.deepEqual(getIdealKnightAndBishopWhiteMoves(reflected),[san('b3')])
   }
 })
