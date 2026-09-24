@@ -184,70 +184,80 @@
       "moves": [
         "Kb5",
         "Kc7",
-        "Kc5"
+        "Kc5",
+        "Kb8"
       ],
       "eligible": true,
       "d": 13,
       "phases": [
         3,
         99
-      ]
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=1k6/8/BN6/K7/8/8/8/8_w_-_-_0_1&moves=Kb5,Kc7,Kc5,Kb8&cursor=0"
     },
     {
       "fen": "1k6/8/B7/8/KN6/8/8/8 w - - 0 1",
       "moves": [
         "Kb5",
         "Kc7",
-        "Kc5"
+        "Kc5",
+        "Kb8"
       ],
       "eligible": true,
       "d": 5,
       "phases": [
         3,
         99
-      ]
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=1k6/8/B7/8/KN6/8/8/8_w_-_-_0_1&moves=Kb5,Kc7,Kc5,Kb8&cursor=0"
     },
     {
       "fen": "1k6/8/B7/8/K7/1N6/8/8 w - - 0 1",
       "moves": [
         "Kb5",
         "Kc7",
-        "Kc5"
+        "Kc5",
+        "Kb8"
       ],
       "eligible": true,
       "d": 4,
       "phases": [
         3,
         99
-      ]
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=1k6/8/B7/8/K7/1N6/8/8_w_-_-_0_1&moves=Kb5,Kc7,Kc5,Kb8&cursor=0"
     },
     {
       "fen": "1k6/8/B7/8/K7/8/1N6/8 w - - 0 1",
       "moves": [
         "Kb5",
         "Kc7",
-        "Kc5"
+        "Kc5",
+        "Kb8"
       ],
       "eligible": true,
       "d": 5,
       "phases": [
         3,
         99
-      ]
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=1k6/8/B7/8/K7/8/1N6/8_w_-_-_0_1&moves=Kb5,Kc7,Kc5,Kb8&cursor=0"
     },
     {
       "fen": "1k6/8/B7/2N5/K7/8/8/8 w - - 0 1",
       "moves": [
         "Kb5",
         "Kc7",
-        "Kc4"
+        "Kc4",
+        "Kb8"
       ],
       "eligible": true,
       "d": 5,
       "phases": [
         3,
         99
-      ]
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=1k6/8/B7/2N5/K7/8/8/8_w_-_-_0_1&moves=Kb5,Kc7,Kc4,Kb8&cursor=0"
     }
   ],
   "supportedExamples": [
@@ -306,5 +316,6 @@
       "eligible": true,
       "d": 1
     }
-  ]
+  ],
+  "replayValidation": "Support-loss links include a final legal Black reply, as nonterminal replays must end on White to move. Validated through decodeMateReplay with cursor=0."
 }
