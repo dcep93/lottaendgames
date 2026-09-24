@@ -49,6 +49,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly knightKingProtectionDistance: number;
   readonly kingCoordinationPenalty: number;
   readonly attackedBishopDefensePenalty: number;
+  readonly undefendedKnightOnlyBishopDefenderPenalty: number;
   readonly attackedBishopEscapeScore: number;
   readonly nearbyPairBishopEscapeScore: number;
   readonly nearbyPairCentralDefensePenalty: number;
@@ -242,6 +243,10 @@ function scoreKnightAndBishopWhiteMoveCore(
       return blackKing ? -[bishop, knight].reduce((sum, piece) => sum + (piece
         ? Math.sqrt(squaredEuclideanDistance(piece.square, blackKing.square)) : 0), 0) : 0;
     },
+    undefendedKnightOnlyBishopDefenderPenalty: bishop && knight && blackKing
+      && kingDistance(bishop.square, blackKing.square) === 1
+      && squaredEuclideanDistance(bishop.square, knight.square) === 5
+      && !bishopKingDefended && !knightKingDefended ? 1 : 0,
     attackedBishopDefensePenalty: context.shouldEscapeBishop && !bishopDefendedByKingMove ? 1 : 0,
     get attackedBishopEscapeScore() {
       return context.shouldEscapeBishop && !bishopDefendedByKingMove && bishop && blackKing
@@ -433,6 +438,12 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       shortLabel: "rule r7",
       helpText: "Prefer king proximity to a central square opposite the bishop's color.",
       compare: (first, second) => first.kingCenterProximityScore - second.kingCenterProximityScore,
+    },
+    {
+      id: "r7.5",
+      shortLabel: "rule r7.5",
+      helpText: "An undefended knight should not be the only defender of an attacked bishop.",
+      compare: (first, second) => first.undefendedKnightOnlyBishopDefenderPenalty - second.undefendedKnightOnlyBishopDefenderPenalty,
     },
     {
       id: "r8",
