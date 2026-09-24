@@ -97,6 +97,7 @@ const UNSUPPORTED_THREE_ENDPOINTS = SQUARE_TRANSFORMS.map(transform => ({
 }))
 
 const DECLARED_UNSUPPORTED_PLACEMENTS = [
+  {bishop: 'e8', king: 'd6', knight: 'b4', black: 'c8'},
   {bishop: 'c8', king: 'b5', knight: 'c6', black: 'a7'},
   {bishop: 'f1', king: 'g4', knight: 'e2', black: 'h2'},
   {bishop: 'b1', king: 'd3', knight: 'c4', black: 'd1'},

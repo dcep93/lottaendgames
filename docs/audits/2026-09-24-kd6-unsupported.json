@@ -1,0 +1,475 @@
+{
+  "change": "Declare Kd6 Be8 Nb4 versus Kc8 unsupported, including D4 transforms",
+  "method": {
+    "source": "/Users/danielcepeda/repos/_codex_output/bn-full-2026-09-24-9fbb749",
+    "changedPolicy": "three exact r5 declarations and one exact support rejection",
+    "changedKeys": [
+      81128945876991,
+      50342486081535,
+      86083559751679,
+      83873245429759,
+      2692273405951,
+      8549048516607,
+      12947095027711,
+      17345141538815,
+      17281841102847,
+      12883794591743,
+      8485748080639,
+      2185869918207,
+      7090319917055,
+      42274692005887,
+      48131467116543,
+      52529513627647,
+      52466213191679,
+      48068166680575,
+      41768288518143,
+      6583916429311,
+      11488366428159,
+      46672738516991,
+      81857110605823,
+      87713885716479,
+      87650585280511,
+      81350707118079,
+      46166335029247,
+      10981962940415,
+      15886412939263,
+      86255157116927,
+      121439529205759,
+      120933125718015,
+      85748753629183,
+      50564381540351,
+      15380009451519,
+      15406332903423,
+      50590704992255,
+      85775077081087,
+      119057617518591,
+      118994317082623,
+      85268673593343,
+      50084301504511,
+      14899929415679,
+      11008286392319,
+      46192658481151,
+      79475198918655,
+      83809944993791,
+      79411898482687,
+      45686254993407,
+      10501882904575,
+      6610239881215,
+      48625572904959,
+      44227526393855,
+      39829479882751,
+      6103836393471,
+      310361718783,
+      9043154305023,
+      4645107793919,
+      247061282815,
+      87446658220031,
+      87515377696767,
+      87584097173503,
+      87652816650239,
+      87721536126975,
+      87790255603711,
+      87858975080447,
+      87927694557183,
+      86896902406143,
+      86965621882879,
+      87034341359615,
+      87103060836351,
+      87171780313087,
+      87240499789823,
+      87309219266559,
+      87377938743295,
+      86347146592255,
+      86415866068991,
+      86484585545727,
+      86553305022463,
+      86622024499199,
+      86690743975935,
+      86759463452671,
+      85797390778367,
+      85934829731839,
+      86003549208575,
+      86072268685311,
+      86140988162047,
+      86278427115519,
+      85247634964479,
+      85316354441215,
+      85385073917951,
+      85453793394687,
+      85522512871423,
+      85659951824895,
+      85728671301631,
+      84766598627327,
+      84835318104063,
+      85041476534271,
+      85110196011007,
+      85178915487743,
+      84148123336703,
+      84285562290175,
+      84423001243647,
+      84491720720383,
+      84560440197119,
+      84629159673855,
+      83598367522815,
+      83667086999551,
+      83804525953023,
+      83941964906495,
+      84010684383231,
+      84079403859967,
+      83897941491711,
+      83899015233535,
+      83900088975359,
+      83901162717183,
+      83902236459007,
+      83903310200831,
+      83904383942655,
+      83905457684479,
+      83889351557119,
+      83890425298943,
+      83891499040767,
+      83892572782591,
+      83893646524415,
+      83894720266239,
+      83895794008063,
+      83896867749887,
+      83880761622527,
+      83881835364351,
+      83882909106175,
+      83883982847999,
+      83885056589823,
+      83886130331647,
+      83887204073471,
+      83888277815295,
+      83872171687935,
+      83874319171583,
+      83875392913407,
+      83876466655231,
+      83877540397055,
+      83878614138879,
+      83879687880703,
+      83863581753343,
+      83864655495167,
+      83865729236991,
+      83866802978815,
+      83867876720639,
+      83868950462463,
+      83870024204287,
+      83871097946111,
+      83854991818751,
+      83857139302399,
+      83859286786047,
+      83860360527871,
+      83861434269695,
+      83862508011519,
+      83847475625983,
+      83848549367807,
+      83849623109631,
+      83851770593279,
+      83852844335103,
+      83853918076927,
+      83837811949567,
+      83838885691391,
+      83841033175039,
+      83843180658687,
+      83844254400511,
+      83845328142335
+    ],
+    "rejectedSupportKey": 4999234,
+    "sourceHash": "6fe2ff2cdab8460ff61546454bbaa6e707a768445be075825eef3270b0c62d94",
+    "patch": "diff --git a/app/src/mate/rules/bishopKnightDiagonalSupport.ts b/app/src/mate/rules/bishopKnightDiagonalSupport.ts\nindex 59ea1f5..178df6a 100644\n--- a/app/src/mate/rules/bishopKnightDiagonalSupport.ts\n+++ b/app/src/mate/rules/bishopKnightDiagonalSupport.ts\n@@ -97,6 +97,7 @@ const UNSUPPORTED_THREE_ENDPOINTS = SQUARE_TRANSFORMS.map(transform => ({\n }))\n \n const DECLARED_UNSUPPORTED_PLACEMENTS = [\n+  {bishop: 'e8', king: 'd6', knight: 'b4', black: 'c8'},\n   {bishop: 'c8', king: 'b5', knight: 'c6', black: 'a7'},\n   {bishop: 'f1', king: 'g4', knight: 'e2', black: 'h2'},\n   {bishop: 'b1', king: 'd3', knight: 'c4', black: 'd1'},\ndiff --git a/app/src/mate/rules/bishopKnightPreparation.ts b/app/src/mate/rules/bishopKnightPreparation.ts\nindex 3a43ad4..cb58787 100644\n--- a/app/src/mate/rules/bishopKnightPreparation.ts\n+++ b/app/src/mate/rules/bishopKnightPreparation.ts\n@@ -1,4 +1,15 @@\n-// r5 is intentionally empty. New declarations can be added here later.\n-export function knightAndBishopDeclaredPreparationMove(_fen: string): string | undefined {\n-  return undefined\n+import { SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess'\n+\n+// Exact r5 declarations; counters do not affect placement. All earlier rules retain priority.\n+const declarations = new Map(([\n+  ['8/2k5/5K2/3B4/2N5/8/8/8 w - - 0 1', 'f6', 'e7'],\n+  ['2k5/4K3/8/3B4/2N5/8/8/8 w - - 2 2', 'c4', 'e5'],\n+  ['8/8/8/3B4/2Nk1K2/8/8/8 w - - 0 1', 'd5', 'e6'],\n+] as const).flatMap(([fen, from, to]) => SQUARE_TRANSFORMS.map(transform => [\n+  transformFen(fen, transform).split(' ').slice(0, 2).join(' '),\n+  transformSquare(from, transform) + transformSquare(to, transform),\n+] as const)))\n+\n+export function knightAndBishopDeclaredPreparationMove(fen: string): string | undefined {\n+  return declarations.get(fen.split(' ').slice(0, 2).join(' '))\n }\n"
+  },
+  "fingerprint": "a73c5fd3c72214c881e40c6e04e8d01233d3684b68fc00622b84b3864784ab53",
+  "baselineComparison": {
+    "baseline": 1159,
+    "baselinePolicy": "9fbb749008394a1503cc3c0817b932d1e814bc88",
+    "baselineBlackPolicy": "all-legal",
+    "survivors": 1157,
+    "newPositions": 0
+  },
+  "whollyUnsupportedLoops": {
+    "orbits": 1157,
+    "physical": 9256
+  },
+  "unsupportedOnAnyCycle": {
+    "orbits": 1188,
+    "physical": 9504
+  },
+  "supportedOnAnyCycle": {
+    "orbits": 266,
+    "physical": 2128
+  },
+  "nonmatingSupportLosses": {
+    "whiteDecisions": {
+      "orbits": 30,
+      "physical": 240
+    },
+    "events": {
+      "orbits": 38,
+      "physical": 304
+    },
+    "sourcePositions": {
+      "orbits": 38,
+      "physical": 304
+    }
+  },
+  "examples": {
+    "unsupported": [
+      {
+        "motif": "Unprotected by king central bishop; knight on precage",
+        "positions": 277,
+        "examples": [
+          {
+            "fen": "8/6k1/8/3B4/2N5/2K5/8/8 w - - 0 1",
+            "moves": [
+              "Kb4",
+              "Kh6",
+              "Ka5",
+              "Kg7",
+              "Ka6",
+              "Kf8",
+              "Ka7",
+              "Ke8",
+              "Ka8",
+              "Kd8",
+              "Bg8",
+              "Kc8",
+              "Ka7",
+              "Kc7",
+              "Ka6",
+              "Kc6",
+              "Ka5",
+              "Kd7",
+              "Kb4",
+              "Ke7",
+              "Kc3",
+              "Kf8",
+              "Bd5",
+              "Kg7"
+            ],
+            "d": 2,
+            "phases": [
+              99,
+              99,
+              99,
+              99,
+              99,
+              99,
+              99,
+              99,
+              99,
+              99,
+              99,
+              99
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=8/6k1/8/3B4/2N5/2K5/8/8_w_-_-_0_1&moves=Kb4,Kh6,Ka5,Kg7,Ka6,Kf8,Ka7,Ke8,Ka8,Kd8,Bg8,Kc8,Ka7,Kc7,Ka6,Kc6,Ka5,Kd7,Kb4,Ke7,Kc3,Kf8,Bd5,Kg7&cursor=0",
+            "motif": "Unprotected by king central bishop; knight on precage"
+          },
+          {
+            "fen": "2k5/8/5K2/3B4/2N5/8/8/8 w - - 0 1",
+            "moves": [
+              "Ke7",
+              "Kc7",
+              "Ke8",
+              "Kc8",
+              "Bg8",
+              "Kc7",
+              "Ke7",
+              "Kc6",
+              "Ke6",
+              "Kc5",
+              "Ke5",
+              "Kc6",
+              "Bd5+",
+              "Kd7",
+              "Kf6",
+              "Kc8"
+            ],
+            "d": 2,
+            "phases": [
+              99,
+              99,
+              99,
+              99,
+              99,
+              99,
+              99,
+              99
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=2k5/8/5K2/3B4/2N5/8/8/8_w_-_-_0_1&moves=Ke7,Kc7,Ke8,Kc8,Bg8,Kc7,Ke7,Kc6,Ke6,Kc5,Ke5,Kc6,Bd5%2B,Kd7,Kf6,Kc8&cursor=0",
+            "motif": "Unprotected by king central bishop; knight on precage"
+          },
+          {
+            "fen": "2k5/8/8/1K1B4/2N5/8/8/8 w - - 0 1",
+            "moves": [
+              "Ka6",
+              "Kb8",
+              "Bg8",
+              "Kc8",
+              "Kb5",
+              "Kd8",
+              "Kc5",
+              "Ke8",
+              "Kd4",
+              "Ke7",
+              "Bd5",
+              "Kd7",
+              "Kc5",
+              "Kc7",
+              "Kb5",
+              "Kc8"
+            ],
+            "d": 2,
+            "phases": [
+              99,
+              99,
+              99,
+              99,
+              99,
+              99,
+              99,
+              99
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=2k5/8/8/1K1B4/2N5/8/8/8_w_-_-_0_1&moves=Ka6,Kb8,Bg8,Kc8,Kb5,Kd8,Kc5,Ke8,Kd4,Ke7,Bd5,Kd7,Kc5,Kc7,Kb5,Kc8&cursor=0",
+            "motif": "Unprotected by king central bishop; knight on precage"
+          }
+        ]
+      }
+    ],
+    "supported": [
+      {
+        "motif": "7-diagonal; Noncentral bishop not king-protected; interior king; knight unprotected by king",
+        "positions": 89,
+        "examples": [
+          {
+            "fen": "4k1B1/8/4K3/8/8/3N4/8/8 w - - 0 1",
+            "moves": [
+              "Bf7+",
+              "Kd8",
+              "Bg8",
+              "Ke8"
+            ],
+            "d": 0,
+            "phases": [
+              7,
+              7
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=4k1B1/8/4K3/8/8/3N4/8/8_w_-_-_0_1&moves=Bf7%2B,Kd8,Bg8,Ke8&cursor=0",
+            "motif": "Noncentral bishop not king-protected; interior king; knight unprotected by king"
+          },
+          {
+            "fen": "8/8/3K4/1k6/8/1B1N4/8/8 w - - 0 1",
+            "moves": [
+              "Kd5",
+              "Kb6",
+              "Ba4",
+              "Kc7",
+              "Bb3",
+              "Kb7",
+              "Ke6",
+              "Kb6",
+              "Kd6",
+              "Kb5"
+            ],
+            "d": 0,
+            "phases": [
+              7,
+              5,
+              7,
+              7,
+              7
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/3K4/1k6/8/1B1N4/8/8_w_-_-_0_1&moves=Kd5,Kb6,Ba4,Kc7,Bb3,Kb7,Ke6,Kb6,Kd6,Kb5&cursor=0",
+            "motif": "Noncentral bishop not king-protected; interior king; knight unprotected by king"
+          },
+          {
+            "fen": "3k4/8/4K3/8/8/1B1N4/8/8 w - - 0 1",
+            "moves": [
+              "Ba4",
+              "Kc7",
+              "Bb3",
+              "Kb6",
+              "Kd6",
+              "Kb5",
+              "Kd5",
+              "Kb6",
+              "Ba4",
+              "Kc7",
+              "Bb3",
+              "Kd7",
+              "Ke5",
+              "Ke8",
+              "Ke6",
+              "Kd8"
+            ],
+            "d": 0,
+            "phases": [
+              5,
+              7,
+              7,
+              7,
+              5,
+              7,
+              7,
+              7
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=3k4/8/4K3/8/8/1B1N4/8/8_w_-_-_0_1&moves=Ba4,Kc7,Bb3,Kb6,Kd6,Kb5,Kd5,Kb6,Ba4,Kc7,Bb3,Kd7,Ke5,Ke8,Ke6,Kd8&cursor=0",
+            "motif": "Noncentral bishop not king-protected; interior king; knight unprotected by king"
+          }
+        ]
+      }
+    ],
+    "losses": [
+      {
+        "motif": "5-diagonal; Noncentral bishop not king-protected; interior king; knight unprotected by king; B moves",
+        "positions": 12,
+        "examples": [
+          {
+            "fen": "8/8/k1K5/8/B7/4N3/8/8 w - - 0 1",
+            "moves": [
+              "Kc5",
+              "Ka5",
+              "Bc6",
+              "Ka6"
+            ],
+            "d": 1,
+            "phases": [
+              5,
+              99
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/k1K5/8/B7/4N3/8/8_w_-_-_0_1&moves=Kc5,Ka5,Bc6,Ka6&cursor=0"
+          },
+          {
+            "fen": "2k1B3/8/2K5/8/8/2N5/8/8 w - - 0 1",
+            "moves": [
+              "Kd6",
+              "Kd8",
+              "Bc6",
+              "Kc8"
+            ],
+            "d": 1,
+            "phases": [
+              5,
+              99
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=2k1B3/8/2K5/8/8/2N5/8/8_w_-_-_0_1&moves=Kd6,Kd8,Bc6,Kc8&cursor=0"
+          },
+          {
+            "fen": "2k1B3/8/2K5/8/8/4N3/8/8 w - - 0 1",
+            "moves": [
+              "Kd6",
+              "Kd8",
+              "Bc6",
+              "Kc8"
+            ],
+            "d": 1,
+            "phases": [
+              5,
+              99
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=2k1B3/8/2K5/8/8/4N3/8/8_w_-_-_0_1&moves=Kd6,Kd8,Bc6,Kc8&cursor=0"
+          }
+        ]
+      }
+    ]
+  }
+}

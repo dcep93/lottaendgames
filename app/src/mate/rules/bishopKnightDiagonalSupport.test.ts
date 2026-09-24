@@ -1175,3 +1175,15 @@ test('declared second-move Ba4 with Kd8 Nd3 against Kb8 or Kb7 is supported acro
     }
   }
 })
+
+
+test('declared Kd6 Be8 Nb4 against Kc8 is unsupported across D4', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    const before = transformFen('2k1B3/8/2K5/8/1N6/8/8/8 w - - 0 1', transform)
+    const chess = getChess(before)
+    const move = chess.move({ from: transformSquare('c6', transform), to: transformSquare('d6', transform) })
+    assert.equal(knightAndBishopSupportedDiagonal(chess.fen()).size, 99)
+    assert.equal(scoreKnightAndBishopWhiteMove(before, move.san).supportedDiagonalSizeScore, 99)
+    assert.equal(knightAndBishopSupportedDiagonal(transformFen('2k1B3/8/3K4/8/8/2N5/8/8 b - - 1 1', transform)).size, 5)
+  }
+})
