@@ -480,6 +480,13 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       compare: (first, second) => first.undefendedKnightOnlyBishopDefenderPenalty - second.undefendedKnightOnlyBishopDefenderPenalty,
     },
     {
+      id: "r7.8",
+      shortLabel: "rule r7.8",
+      helpText: "With a middle-16 square king and a central bishop, prefer knight move proximity to a precage square on the opposite side of the bishop's long diagonal to Black's king.",
+      compare: (first, second) => first.oppositePrecageDistance - second.oppositePrecageDistance
+        || first.oppositePrecageEuclideanDistanceSquared - second.oppositePrecageEuclideanDistanceSquared,
+    },
+    {
       id: "r8",
       shortLabel: "rule r8",
       helpText: "With a king on a middle-16 square, prefer bishop on the long diagonal, then a central bishop, then knight move proximity to a precage square, then knight off the bishop's color.",
@@ -502,13 +509,6 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       shortLabel: "rule r9.98",
       helpText: "Prefer knight move proximity to a stable bishop protected square.",
       compare: (first, second) => first.knightBishopProtectionPenalty - second.knightBishopProtectionPenalty,
-    },
-    {
-      id: "r9.99",
-      shortLabel: "rule r9.99",
-      helpText: "With a middle-16 square king and a central bishop, prefer knight move proximity to a precage square on the opposite side of the bishop's long diagonal to Black's king.",
-      compare: (first, second) => first.oppositePrecageDistance - second.oppositePrecageDistance
-        || first.oppositePrecageEuclideanDistanceSquared - second.oppositePrecageEuclideanDistanceSquared,
     },
     {
       id: "r10",
@@ -662,9 +662,9 @@ const bishopKnightHelp: RuleHelp = {
   ],
   notes: [
     "For r6, use the rank or file halves separating the central bishop from the precage knight. Require Black in the bishop’s half before White moves. Prefer king distance to that half’s outer edge, then Euclidean proximity to its non-target corner. For Bd5/Nc4 with Black on ranks 5–8, target rank 8, then h8; include all board symmetries.",
-    "For r9.99, filter the shared precage targets to the opposite side from Black before White moves. Require a middle-16 king and central bishop. Measure knight moves after White moves, then break ties by Euclidean proximity to the target. If Black is on the bishop’s long diagonal, there is no opposite-side target and this rule is neutral.",
+    "For r7.8, filter the shared precage targets to the opposite side from Black before White moves. Require a middle-16 king and central bishop. Measure knight moves after White moves, then break ties by Euclidean proximity to the target. If Black is on the bishop’s long diagonal, there is no opposite-side target and this rule is neutral.",
     "For r5.1, require a central bishop and knight on a precage square before White moves, then minimize the resulting king-step distance between the kings.",
-    "For r8, White’s king must be on files c–f and ranks 3–6 before moving. Evaluate the bishop and knight preferences after White moves. Precage targets do not require adjacency to the bishop. With a light-squared central bishop they are c4, d3, e6 and f5, including board symmetries; r5.1, r8 and r9.99 share these targets.",
+    "For r8, White’s king must be on files c–f and ranks 3–6 before moving. Evaluate the bishop and knight preferences after White moves. Precage targets do not require adjacency to the bishop. With a light-squared central bishop they are c4, d3, e6 and f5, including board symmetries; r5.1, r8 and r7.8 share these targets.",
     "For r7, minimize White’s king Euclidean distance to the board’s midpoint. For r20, maximize the sum of the bishop’s and knight’s Euclidean distances from Black’s king, measured after White moves.",
     "For r9.98, count bishop protection through Black’s king, which must leave the checking diagonal. Other intervening pieces still block protection. Evaluate after White moves.",
     "r2.5 general preferences, after exact declarations: With a supported 3 diagonal, equally prefer the king on b6 or c7. With a supported 5 diagonal and Nd5, prefer the bishop on b5 or d7. With Bb5 and Nd5, prefer king step proximity to the square two files to the right of Black’s king. Otherwise, with a supported 5 diagonal, Nd5 and Black on or adjacent to a5, prefer king step proximity to b4. With a supported 5 diagonal and Nd3, prefer king step proximity to the square two files to the right of Black’s king. With a supported 7 diagonal and Black on or adjacent to a3, prefer the king off the bishop’s color, then king step proximity to b2. Then prefer the bishop on b3, king step proximity to the square two files to the right of Black’s king, and king step proximity to e8. Include reflections.",

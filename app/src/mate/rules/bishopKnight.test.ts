@@ -152,6 +152,11 @@ test("bishop-and-knight rules are registered", () => {
       helpText: "An undefended knight should not be the only defender of an attacked bishop.",
     },
     {
+      id: "r7.8",
+      shortLabel: "rule r7.8",
+      helpText: "With a middle-16 square king and a central bishop, prefer knight move proximity to a precage square on the opposite side of the bishop's long diagonal to Black's king.",
+    },
+    {
       id: "r8",
       shortLabel: "rule r8",
       helpText: "With a king on a middle-16 square, prefer bishop on the long diagonal, then a central bishop, then knight move proximity to a precage square, then knight off the bishop's color.",
@@ -165,11 +170,6 @@ test("bishop-and-knight rules are registered", () => {
       id: "r9.98",
       shortLabel: "rule r9.98",
       helpText: "Prefer knight move proximity to a stable bishop protected square.",
-    },
-    {
-      id: "r9.99",
-      shortLabel: "rule r9.99",
-      helpText: "With a middle-16 square king and a central bishop, prefer knight move proximity to a precage square on the opposite side of the bishop's long diagonal to Black's king.",
     },
     {
       id: "r10",
@@ -213,10 +213,10 @@ test("bishop-and-knight rules are registered", () => {
       "r6",
       "r7",
       "r7.5",
+      "r7.8",
       "r8",
       "r9.1",
       "r9.98",
-      "r9.99",
       "r10",
       "r19",
       "r20",
