@@ -1,5 +1,5 @@
 import type { Square } from 'chess.js'
-import { allSquares, findPiece, getChess, isKnightMove, squareColor, squareCoords, squaredEuclideanDistance, SQUARE_TRANSFORMS, transformSquare } from '../chess'
+import { allSquares, kingDistance, findPiece, getChess, isKnightMove, squareColor, squareCoords, squaredEuclideanDistance, SQUARE_TRANSFORMS, transformSquare } from '../chess'
 
 const matingBishopDiagonal = ['a7', 'b6', 'c5', 'd4', 'e3', 'f2', 'g1'] as const
 const bishopApproachDiagonal = ['b6', 'c5', 'd4', 'e3', 'f2', 'g1'] as const
@@ -185,4 +185,17 @@ export function knightAndBishopTargetCornerDiagonals(fen: string): readonly (rea
     const distance = (line: readonly Square[]) => Math.min(...line.map(square => squaredEuclideanDistance(square, corner)))
     return distance(diagonal) === Math.min(...diagonals.map(distance))
   }))
+}
+
+
+/** Knight-move distance to an available square defended by White's king. */
+export function knightKingProtectionDistance(fen: string): number {
+ const king = findPiece(fen, 'w', 'k');
+ const knight = findPiece(fen, 'w', 'n');
+ if (!king || !knight) return 99;
+ const bishop = findPiece(fen, 'w', 'b');
+ const black = findPiece(fen, 'b', 'k');
+ const targets = squares.filter(s => kingDistance(s, king.square) === 1
+   && s !== bishop?.square && s !== black?.square);
+ return Math.min(...targets.map(s => knightDistances.get(knight.square)!.get(s)!));
 }

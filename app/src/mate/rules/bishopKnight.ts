@@ -24,7 +24,7 @@ import {
   isKnightAndBishopWManeuverPosition,
   knightAndBishopPiecesPresent,
 } from "./bishopKnightLookup";
-import { knightAndBishopCenterProximityScore, knightAndBishopKingCenterProximityScore, knightAndBishopKnightTargetProximityScore, knightAndBishopTargetCorners } from "./bishopKnightStrategy";
+import { knightKingProtectionDistance, knightAndBishopCenterProximityScore, knightAndBishopKingCenterProximityScore, knightAndBishopKnightTargetProximityScore, knightAndBishopTargetCorners } from "./bishopKnightStrategy";
 import { precageKingEdges, kingEdgeDistance, type BoardEdge } from "./bishopKnightPrecageEdges";
 import { declaredSupportedThreeMove, declaredSupportedFiveMove, declaredSupportedSevenMove, declaredSupportedKnightAdvance } from "./bishopKnightSupportedPreferences";
 import { knightAndBishopDeclaredPreparationMove } from "./bishopKnightPreparation";
@@ -46,7 +46,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly startsWithMiddle16King: boolean;
   readonly bishopCenterPenalty: number;
   readonly minorBlackDistanceScore: number;
-  readonly minorSeparationScore: number;
+  readonly knightKingProtectionDistance: number;
   readonly kingCoordinationPenalty: number;
   readonly attackedBishopDefensePenalty: number;
   readonly attackedBishopEscapeScore: number;
@@ -237,10 +237,7 @@ function scoreKnightAndBishopWhiteMoveCore(
     relativeKnightPenalty: context.relativeKnightMove && context.relativeKnightMove !== move.from + move.to ? 1 : 0,
     startsWithMiddle16King: context.startsWithMiddle16King,
     bishopCenterPenalty: bishop && centerDistance(bishop.square) === 0 ? 0 : 1,
-    get minorSeparationScore() {
-      return bishop && knight
-        ? -Math.sqrt(squaredEuclideanDistance(bishop.square, knight.square)) : 0;
-    },
+    get knightKingProtectionDistance() { return knightKingProtectionDistance(resultFen); },
     get minorBlackDistanceScore() {
       return blackKing ? -[bishop, knight].reduce((sum, piece) => sum + (piece
         ? Math.sqrt(squaredEuclideanDistance(piece.square, blackKing.square)) : 0), 0) : 0;
@@ -465,11 +462,16 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       compare: (first, second) => first.knightBishopProtectionPenalty - second.knightBishopProtectionPenalty,
     },
     {
+      id: "r10",
+      shortLabel: "rule r10",
+      helpText: "Drift the knight towards White king protection.",
+      compare: (first, second) => first.knightKingProtectionDistance - second.knightKingProtectionDistance,
+    },
+    {
       id: "r20",
       shortLabel: "rule r20",
-      helpText: "Maximize piece distance from Black's king, then maximize their distance from each other.",
-      compare: (first, second) => first.minorBlackDistanceScore - second.minorBlackDistanceScore
-        || first.minorSeparationScore - second.minorSeparationScore,
+      helpText: "Maximize piece distance from Black's king.",
+      compare: (first, second) => first.minorBlackDistanceScore - second.minorBlackDistanceScore,
     },
   ];
 
@@ -606,7 +608,7 @@ const bishopKnightHelp: RuleHelp = {
   notes: [
     "For r5.1, use the central bishop and occupied precage square before White moves to fix the two target edges. Compare White’s resulting king distance to the primary edge, then the shared nearer edge. For Bd5/Nc4, the order is top, then left. The existing behind-the-bishop requirement for a precage square still applies.",
     "For r8, White’s king must be on files c–f and ranks 3–6 before moving. Evaluate the bishop and knight preferences after White moves. A precage square is diagonally adjacent to a central bishop, off the long diagonals, and behind the bishop from Black’s king’s perspective.",
-    "For r7, minimize White’s king Euclidean distance to the board’s midpoint, then its king-step distance to Black’s king. For r20, maximize the sum of the bishop’s and knight’s Euclidean distances from Black’s king, then maximize the Euclidean distance between the bishop and knight. Evaluate after White moves.",
+    "For r7, minimize White’s king Euclidean distance to the board’s midpoint, then its king-step distance to Black’s king. For r20, maximize the sum of the bishop’s and knight’s Euclidean distances from Black’s king, measured after White moves.",
     "For r9.98, count bishop protection through Black’s king, which must leave the checking diagonal. Other intervening pieces still block protection. Evaluate after White moves.",
     "r2.5 general preferences, after exact declarations: With a supported 3 diagonal, equally prefer the king on b6 or c7. With a supported 5 diagonal and Nd5, prefer the bishop on b5 or d7. With Bb5 and Nd5, prefer king step proximity to the square two files to the right of Black’s king. Otherwise, with a supported 5 diagonal, Nd5 and Black on or adjacent to a5, prefer king step proximity to b4. With a supported 5 diagonal and Nd3, prefer king step proximity to the square two files to the right of Black’s king. With a supported 7 diagonal and Black on or adjacent to a3, prefer the king off the bishop’s color, then king step proximity to b2. Then prefer the bishop on b3, king step proximity to the square two files to the right of Black’s king, and king step proximity to e8. Include reflections.",
     "The target corner is the bishop-colored corner closest to Black's king.",

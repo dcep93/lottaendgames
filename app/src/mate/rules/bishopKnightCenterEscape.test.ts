@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess';
-import { getIdealKnightAndBishopWhiteMoves, knightAndBishopWhiteRules, scoreKnightAndBishopWhiteMove } from './bishopKnight';
+import { knightAndBishopWhiteRules, scoreKnightAndBishopWhiteMove } from './bishopKnight';
 
 test('r7 scores center distance without r6; r20 scores minor distances from Black and each other', () => {
   assert.ok(!knightAndBishopWhiteRules.some(rule => rule.id === 'r6'));
@@ -27,7 +27,7 @@ test('r7 scores center distance without r6; r20 scores minor distances from Blac
 });
 
 
-test('r20 breaks equal Black-distance ties by separating the bishop and knight across D4', () => {
+test('r20 leaves equal Black-distance moves tied regardless of minor separation across D4', () => {
   const r20 = knightAndBishopWhiteRules.find(rule => rule.id === 'r20')!;
   assert.ok(r20.compare);
   for (const t of SQUARE_TRANSFORMS) {
@@ -36,11 +36,7 @@ test('r20 breaks equal Black-distance ties by separating the bishop and knight a
     const near = scoreKnightAndBishopWhiteMove(fen, move('b6'));
     const far = scoreKnightAndBishopWhiteMove(fen, move('b2'));
     assert.equal(near.minorBlackDistanceScore, far.minorBlackDistanceScore, t.name);
-    assert.equal(near.minorSeparationScore, -Math.sqrt(5), t.name);
-    assert.equal(far.minorSeparationScore, -Math.sqrt(13), t.name);
-    assert.ok(r20.compare(far, near) < 0, t.name);
-    // R8 now applies from e6 and keeps the bishop central; r20 selects Nb2.
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [move('b2')], t.name);
+    assert.equal(r20.compare(far, near), 0, t.name);
   }
 });
 
