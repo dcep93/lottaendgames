@@ -127,7 +127,7 @@ test('Nd3 five support combines right-side kings with declared placements or nea
       board.put({type: 'b', color: 'w'}, bishop)
       for (const transform of SQUARE_TRANSFORMS) {
         assert.equal(knightAndBishopSupportedDiagonal(transformFen(board.fen(), transform)).size,
-          (edgeDistance(king) === 0 || squareColor(king) !== squareColor(bishop)) && king[0] >= 'c' && (['a4', 'd7'].includes(bishop) || kingDistance(king, bishop) === 1) && ((['a4', 'd7'].includes(bishop) && ['c5', 'c6', 'c7'].includes(king)) || (['a4', 'd7'].includes(bishop) && king === 'd6') || (bishop === 'd7' && kingDistance(king, 'a7') <= 2)) ? 5 : 99, `${king}, ${bishop}, ${transform.name}`)
+          king === 'e7' && ['a4', 'b5'].includes(bishop) ? 5 : (edgeDistance(king) === 0 || squareColor(king) !== squareColor(bishop)) && king[0] >= 'c' && (['a4', 'd7'].includes(bishop) || kingDistance(king, bishop) === 1) && ((['a4', 'd7'].includes(bishop) && ['c5', 'c6', 'c7'].includes(king)) || (['a4', 'd7'].includes(bishop) && king === 'd6') || (bishop === 'd7' && kingDistance(king, 'a7') <= 2)) ? 5 : 99, `${king}, ${bishop}, ${transform.name}`)
       }
     }
   }
@@ -499,7 +499,7 @@ test('Kd6 with Nd3 rejects Bb5 and Bc6 but permits Be8 against the a-file', () =
   }
 })
 
-test('a five-bishop with Nd3 still rejects Bb5 even with an eligible king', () => {
+test('a five-bishop with Nd3 rejects Bb5 except for the declared Ke7 placement', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     const before = transformFen('8/3K4/8/k7/B7/3N4/8/8 w - - 2 2', transform)
     const bc6 = getChess(before).move({from: transformSquare('a4', transform), to: transformSquare('c6', transform)}).san
@@ -511,7 +511,8 @@ test('a five-bishop with Nd3 still rejects Bb5 even with an eligible king', () =
       if (king === 'b5') continue
       board.put({color: 'w', type: 'b'}, 'b5')
       const size = knightAndBishopSupportedDiagonal(transformFen(board.fen(), transform)).size
-      assert.notEqual(size, 5, king)
+      if (king === 'e7') assert.equal(size, 5)
+      else assert.notEqual(size, 5, king)
     }
   }
 })
@@ -1290,5 +1291,36 @@ test('the bishop-attack restriction preserves king defense and occupied support 
       '1k6/3B4/3K4/8/1N6/8/8/8 b - - 0 1', // Kd6 already defends Bd7.
       '1k6/3B4/8/2KN4/8/8/8/8 b - - 0 1', // Nd5 occupies the five support square.
     ]) assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 5)
+  }
+})
+
+
+test('Ke7 Nd3 declares Ba4 and Bb5 supported regardless of Black, across D4', () => {
+  for (const bishop of ['a4', 'b5'] as const) {
+    for (const black of allSquares()) {
+      if ([bishop, 'e7', 'd3'].includes(black) || kingDistance('e7', black) <= 1) continue
+      const board = getChess('8/4K3/8/8/B7/3N4/8/7k b - - 0 1')
+      board.remove('a4')
+      board.remove('h1')
+      board.put({type: 'b', color: 'w'}, bishop)
+      board.put({type: 'k', color: 'b'}, black)
+      for (const transform of SQUARE_TRANSFORMS) {
+        const fen = transformFen(board.fen(), transform)
+        assert.deepEqual(knightAndBishopSupportedDiagonal(fen), {size: 5, knight: 2}, `${bishop}, ${black}, ${transform.name}`)
+      }
+    }
+  }
+})
+
+test('loaded Ke7 after Ba4 Kc8 is supported without extending to a different knight or Bc6', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    const before = transformFen('2k5/8/4K3/8/B7/3N4/8/8 w - - 2 2', transform)
+    const board = getChess(before)
+    const move = board.move({from: transformSquare('e6', transform), to: transformSquare('e7', transform)}).san
+    assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 5)
+    for (const fen of [
+      '2k5/4K3/8/8/B7/8/8/1N6 b - - 0 1',
+      '2k5/4K3/2B5/8/8/3N4/8/8 b - - 0 1',
+    ]) assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 99)
   }
 })

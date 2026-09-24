@@ -145,6 +145,15 @@ const DECLARED_FIVE_PLACEMENTS = DECLARED_FIVE_SUPPORT.flatMap(placement => SQUA
   support: transformSquare('d5', transform),
 })))
 
+// Ke7/Nd3 supports Ba4 or Bb5 independently of Black's square.
+const DECLARED_FIVE_WHITE_PLACEMENTS = (['a4', 'b5'] as const).flatMap(bishop =>
+  SQUARE_TRANSFORMS.map(transform => ({
+    king: transformSquare('e7', transform),
+    bishop: transformSquare(bishop, transform),
+    knight: transformSquare('d3', transform),
+    support: transformSquare('d5', transform),
+  })))
+
 const DECLARED_FIVE_E7_ADJACENCY = SQUARE_TRANSFORMS.map(transform => ({
   bishop: transformSquare('a4', transform),
   knight: transformSquare('d3', transform),
@@ -287,6 +296,12 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
   if (fivePatterns.length && !fivePatterns.some(pattern => pattern.support.includes(knight.square) ||
     (pattern.previousSupport && (knight.square === pattern.previousSupport || isKnightMove(knight.square, pattern.previousSupport))))) {
     return {size: 99, knight: 99}
+  }
+  const declaredWhitePlacement = DECLARED_FIVE_WHITE_PLACEMENTS.find(pattern =>
+    pattern.king === white.square && pattern.bishop === bishop.square && pattern.knight === knight.square)
+  if (declaredWhitePlacement) return {
+    size: 5,
+    knight: knightAndBishopKnightProximityToSquare(fen, declaredWhitePlacement.support),
   }
   // An approaching knight cannot sustain support by rescuing an undefended bishop
   // after Black attacks it. An occupied current- or previous-stage support square
