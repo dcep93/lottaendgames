@@ -80,3 +80,15 @@ test('r5 prescribes Ke7 and then Ne5 in the declared line across D4', () => {
     }
   }
 })
+
+
+test('r5 prescribes Be6 only for the declared placement across D4', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    const fen = transformFen('8/8/8/3B4/2Nk1K2/8/8/8 w - - 0 1', transform)
+    const expected = transformSquare('d5', transform) + transformSquare('e6', transform)
+    assert.equal(knightAndBishopDeclaredPreparationMove(fen), expected)
+    const san = getChess(fen).moves({ verbose: true }).find(m => m.from + m.to === expected)!.san
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [san])
+    assert.equal(knightAndBishopDeclaredPreparationMove(transformFen('8/8/8/3B4/2N2K2/3k4/8/8 w - - 0 1', transform)), undefined)
+  }
+})
