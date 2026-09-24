@@ -128,8 +128,8 @@ const THREE_BISHOP_RACES = SQUARE_TRANSFORMS.map(transform => ({
 }))
 
 const DECLARED_FIVE_SUPPORT = [
-  // Bb5 with Kd6 versus Kd8 accepts a knight one move from either seven-stage square.
-  ...allSquares().filter(square => isKnightMove(square, 'd3') || isKnightMove(square, 'f5'))
+  // Bb5 with Kd6 versus Kd8 accepts a knight one move from both a seven-stage square and d5.
+  ...allSquares().filter(square => (isKnightMove(square, 'd3') || isKnightMove(square, 'f5')) && isKnightMove(square, 'd5'))
     .map(knight => ({king: 'd6' as const, bishop: 'b5' as const, knight, black: 'd8' as const})),
   {king: 'c5', bishop: 'd7', knight: 'e3', black: 'a5'},
   {king: 'd8', bishop: 'a4', knight: 'd3', black: 'b8'},
@@ -312,10 +312,12 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
   if (!DIAGONALS.some(pattern => pattern.wall.includes(bishop.square) &&
     isInsideBishopDiagonal(black.square, pattern.wall))) return {size: 99, knight: 99}
   // Every five-diagonal, including declared placements, needs an occupied five/seven
-  // support square or a knight one move from a corresponding seven support square.
+  // support square or a knight one move from BOTH corresponding support stages.
   const fivePatterns = DIAGONALS.filter(pattern => pattern.wall.length === 5 && pattern.wall.includes(bishop.square))
   if (fivePatterns.length && !fivePatterns.some(pattern => pattern.support.includes(knight.square) ||
-    (pattern.previousSupport && (knight.square === pattern.previousSupport || isKnightMove(knight.square, pattern.previousSupport))))) {
+    pattern.previousSupport === knight.square ||
+    (pattern.previousSupport && isKnightMove(knight.square, pattern.previousSupport) &&
+      pattern.support.some(square => isKnightMove(knight.square, square))))) {
     return {size: 99, knight: 99}
   }
   // An approaching knight needs nearby kings; only an occupied five/seven

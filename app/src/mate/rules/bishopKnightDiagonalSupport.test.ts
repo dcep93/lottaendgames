@@ -7,6 +7,27 @@ import { getIdealKnightAndBishopWhiteMoves, scoreKnightAndBishopWhiteMove } from
 
 const sixDiagonal = ['a3', 'b4', 'c5', 'd6', 'e7', 'f8'] as const
 
+test('five-diagonal approaching knight must be one move from both support stages across D4', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    const before = transformFen('3k4/8/2K5/1BN5/8/8/8/8 w - - 0 1', transform)
+    const board = getChess(before)
+    const move = board.move({from: transformSquare('c6', transform), to: transformSquare('d6', transform)}).san
+    assert.equal(knightAndBishopSupportedDiagonal(board.fen()).size, 99)
+    assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 99)
+    // The earlier exact Kd8 declaration cannot rescue a one-stage-only approach.
+    for (const knight of ['c5', 'e5', 'f2'] as const) {
+      const position = getChess('3k4/8/3K4/1B6/8/8/8/8 b - - 0 1')
+      position.put({type: 'n', color: 'w'}, knight)
+      assert.equal(knightAndBishopSupportedDiagonal(transformFen(position.fen(), transform)).size, 99)
+    }
+    for (const knight of ['b4', 'f4', 'e3', 'e7'] as const) {
+      const position = getChess('3k4/8/3K4/1B6/8/8/8/8 b - - 0 1')
+      position.put({type: 'n', color: 'w'}, knight)
+      assert.equal(knightAndBishopSupportedDiagonal(transformFen(position.fen(), transform)).size, 5)
+    }
+  }
+})
+
 test('declared Bf7+ with Ke6 Nd3 versus Ke8 is unsupported only in its exact placement across D4', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     const before = transformFen('4k1B1/8/4K3/8/8/3N4/8/8 w - - 0 1', transform)
@@ -1285,7 +1306,7 @@ test('declared second-move Bd7 with Kc5 Ne3 against Ka5 is supported and preferr
 })
 
 
-test('Bb5 with Kd6 versus Kd8 supports knights one move from d3 or f5 across D4', () => {
+test('Bb5 with Kd6 versus Kd8 supports approaches to both d5 and d3 or f5 across D4', () => {
   for (const knight of allSquares().filter(square =>
     edgeDistance(square) > 0 && square !== 'd6' &&
     (isKnightMove(square, 'd3') || isKnightMove(square, 'f5')))) {
@@ -1293,7 +1314,7 @@ test('Bb5 with Kd6 versus Kd8 supports knights one move from d3 or f5 across D4'
     original.put({type: 'n', color: 'w'}, knight)
     for (const transform of SQUARE_TRANSFORMS) {
       assert.equal(knightAndBishopSupportedDiagonal(transformFen(original.fen(), transform)).size,
-        ['b2', 'b7', 'g2', 'g7'].includes(knight) ? 99 : 5, knight + ' ' + transform.name)
+        !isKnightMove(knight, 'd5') || ['b2', 'b7', 'g2', 'g7'].includes(knight) ? 99 : 5, knight + ' ' + transform.name)
     }
   }
   for (const transform of SQUARE_TRANSFORMS) {
@@ -1310,10 +1331,10 @@ test('Bb5 with Kd6 versus Kd8 supports knights one move from d3 or f5 across D4'
 })
 
 
-test('five support always requires an occupied five/seven square or a one-move seven approach across D4', () => {
+test('five support rejects knights outside both-stage eligibility across D4', () => {
   for (const knight of allSquares()) {
     if (['d6', 'b5', 'd8'].includes(knight) || ['d3', 'f5', 'd5'].includes(knight) ||
-      isKnightMove(knight, 'd3') || isKnightMove(knight, 'f5')) continue
+      ((isKnightMove(knight, 'd3') || isKnightMove(knight, 'f5')) && isKnightMove(knight, 'd5'))) continue
     const board = getChess('3k4/8/3K4/1B6/8/8/8/8 b - - 0 1')
     board.put({type: 'n', color: 'w'}, knight)
     for (const transform of SQUARE_TRANSFORMS) {
