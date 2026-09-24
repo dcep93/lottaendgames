@@ -2,9 +2,9 @@ import {DatabaseSync} from 'node:sqlite';
 import {readFileSync, writeFileSync} from 'node:fs';
 import assert from 'node:assert/strict';
 import {BASE, NONE, code, fen, canonical, transform, unpack, square, distance, pair, transforms, pack} from './encoding.mts';
-import {precedingPostWhite, transitionOrbit, applyEncodedWhiteMove} from './transition-orbits.mts';
+import {transitionOrbit, applyEncodedWhiteMove} from './transition-orbits.mts';
 import {getChess,validateMatePosition} from '../../app/src/mate/chess.ts';
-import {getIdealKnightAndBishopWhiteMoves as white, getKnightAndBishopOpponentCandidates as black} from '../../app/src/mate/rules/bishopKnight.ts';
+import {getIdealKnightAndBishopWhiteMoves as white} from '../../app/src/mate/rules/bishopKnight.ts';
 import {knightAndBishopSupportedDiagonal as support} from '../../app/src/mate/rules/bishopKnightDiagonalSupport.ts';
 import {encodeMateReplay,decodeMateReplay} from '../../app/src/mate/share.ts';
 
@@ -100,29 +100,14 @@ function recordLoss(before:number,current:number,post:number,outcome:number,term
     let t=0;while([before,current,post].map(k=>transform(k,t)).join(',')!==o.key)t++;
     losses.set(o.key,{...o,size:sizes[before]!,moved,motif:motif(o.boards[0]!),outcomes:outcome,terminal,history,fresh:!history,...(previousWhite===undefined?{}:{previousWhite:transform(previousWhite,t)})});
 }
-let sourceHistories=0;
+// Every supported post-White board is a root. Enumerating all its legal replies
+// covers support-loss contexts completely without reconstructing prior history.
 const supportedHistoryNodes=new Set<number>();
-for(const r of db.prepare('SELECT * FROM nodes').iterate() as any){
-    const before=precedingPostWhite(r.key);
-    if(before===null||sizes[before]===99)continue;
-    sourceHistories++;supportedHistoryNodes.add(r.id);
-    const current=Math.floor(r.key/BASE),p=JSON.parse(r.payload);
-    for(const [child,post,move] of p.edges){
-        if(sizes[post]!==99)continue;
-        const actualPost=applyEncodedWhiteMove(current,move);
-        assert.equal(canonical(actualPost),post);
-        recordLoss(before,current,actualPost,outcomes[child]!, '',true,r.key%BASE);
-
-    }
-    if(p.flags)for(const t of terminalWhiteMoves(current))recordLoss(before,current,t.post,t.outcomes,t.terminal,true,r.key%BASE);
-}
-console.log({sourceHistories,lossEvents:losses.size});
-// Fresh supported roots have no previous White board. Replay their selected Black replies.
 const getNode=db.prepare('SELECT id,payload FROM nodes WHERE key=?');
 for(const root of supportedRoots){
     const ch=getChess(fen(root.key,'b'));
     if(!ch.moves().length)continue;
-    for(const san of black(ch.fen()).idealMoves){
+    for(const san of ch.moves()){
         const move=ch.move(san);
         if(!move.captured){
             const current=code(ch.fen()),node=getNode.get(pair(current,NONE)) as any;
@@ -141,7 +126,7 @@ for(const root of supportedRoots){
         ch.undo();
     }
 }
-// Continue from support reached with history as well as fresh supported roots.
+// Continue from every supported root through all legal Black replies.
 // This distinguishes a supported-origin cycle from merely containing support on the cycle.
 const getNodeById=db.prepare('SELECT payload FROM nodes WHERE id=?');
 const supportReach=new Uint8Array(result.graph.nodes),queue=[...supportedHistoryNodes];
@@ -175,12 +160,12 @@ for(const f of families){
         assert.equal(code(dst.fen()),normalized,'Loop must return to the same physical board');
         const hash=encodeMateReplay(fen(normalized),moves,0);
         if(!decodeMateReplay(hash,'bishop-knight').ok)continue;
-        const replay=getChess(fen(normalized)),history:string[]=[];
+        const replay=getChess(fen(normalized));
         let verified=true;
         for(const san of [...moves,...moves,...moves]){
             const before=replay.fen();
-            if(replay.turn()==='w'){verified &&=white(before).includes(san);history.push(before);}
-            else verified &&=black(before,history.at(-2)).idealMoves.includes(san);
+            if(replay.turn()==='w') verified &&=white(before).includes(san);
+            else verified &&=getChess(before).moves().includes(san);
             replay.move(san);
         }
         const candidate={...f.witness,fen:fen(normalized),moves,url:'http://localhost:5173/mate/bishop-knight'+hash,freshLoadVerified:verified};
@@ -226,7 +211,7 @@ const events=[...losses.values()].map(l=>{
         alternatives.undo();
     }
     let startFen=fen(current),moves=[san],lossPly=1,setupIsBest=true;
-    if(!decodeMateReplay(encodeMateReplay(startFen,[san,...(ch.moves().length?[black(after).idealMoves[0]!]:[])],0),'bishop-knight').ok){
+    if(!decodeMateReplay(encodeMateReplay(startFen,[san,...(ch.moves().length?[getChess(after).moves()[0]!]:[])],0),'bishop-knight').ok){
         if(previous===undefined||!validateMatePosition('bishop-knight',fen(previous)).ok){
             const setup=findSetupWhite(boards[0]!);
             if(!setup)return {...l,sourceKey:canonical(l.boards[0]!),beforeWhiteResult:fen(boards[0]!,'b'),fen:fen(current),move:san,after,supportedLegalAlternatives,startFen,moves,lossPly,setupIsBest:false,url:null,replayUnavailable:'No legal UI-admissible one-White-move predecessor; census-only example'};
@@ -239,7 +224,7 @@ const events=[...losses.values()].map(l=>{
         assert.equal(code(prefix.fen()),current);
         moves=[first,reply,san];startFen=fen(previous!);lossPly=3;
     }
-    if(ch.moves().length){const reply=black(after,lossPly===3?startFen:undefined).idealMoves[0]!;moves.push(ch.move(reply).san);}
+    if(ch.moves().length){const reply=getChess(after).moves()[0]!;moves.push(ch.move(reply).san);}
     const hash=encodeMateReplay(startFen,moves,0);
     assert.ok(decodeMateReplay(hash,'bishop-knight').ok,'Loss replay link must decode: '+JSON.stringify({startFen,moves,terminal:l.terminal}));
     return {...l,sourceKey:canonical(l.boards[0]!),beforeWhiteResult:fen(boards[0]!,'b'),fen:fen(current),move:san,after,supportedLegalAlternatives,startFen,moves,lossPly,setupIsBest,url:'http://localhost:5173/mate/bishop-knight'+hash};

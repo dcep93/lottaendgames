@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../../app/src/mate/chess.ts';
-import { getIdealKnightAndBishopWhiteMoves as white, getKnightAndBishopOpponentCandidates as black } from '../../app/src/mate/rules/bishopKnight.ts';
+import { getIdealKnightAndBishopWhiteMoves as white } from '../../app/src/mate/rules/bishopKnight.ts';
 import { knightAndBishopSupportedDiagonal as support } from '../../app/src/mate/rules/bishopKnightDiagonalSupport.ts';
 import { pack, fen, code, rootOrbits, distance } from './encoding.mts';
 let count = 0, total = 0;
@@ -25,13 +25,13 @@ for (let i = 0; i < 1000;) {
         number
     ]), bf = fen(key, 'b'), wf = fen(key);
     const cb = getChess(bf);
-    const sup = support(bf), bm = black(bf).idealMoves;
+    const sup = support(bf), bm = getChess(bf).moves();
     const validWhite = !cb.isAttacked(cb.findPiece({ type: 'k', color: 'b' })[0]!, 'w');
     const wm = validWhite ? white(wf) : [];
     for (const t of SQUARE_TRANSFORMS) {
         const tf = transformFen(bf, t);
         assert.deepEqual(support(tf), sup);
-        assert.deepEqual(mappedMoves(tf, black(tf).idealMoves, SQUARE_TRANSFORMS[0]), mappedMoves(bf, bm, t));
+        assert.deepEqual(mappedMoves(tf, getChess(tf).moves(), SQUARE_TRANSFORMS[0]), mappedMoves(bf, bm, t));
         if (validWhite) {
             const tw = transformFen(wf, t);
             assert.deepEqual(mappedMoves(tw, white(tw), SQUARE_TRANSFORMS[0]), mappedMoves(wf, wm, t));

@@ -4,7 +4,7 @@ import { writeFileSync } from 'node:fs';
 import assert from 'node:assert/strict';
 import { BASE, NONE, fen, code, unpack, square, transforms, transform } from './encoding.mts';
 import { getChess, findPiece, kingDistance, squareColor, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../../app/src/mate/chess.ts';
-import { getIdealKnightAndBishopWhiteMoves as white, getKnightAndBishopOpponentCandidates as black } from '../../app/src/mate/rules/bishopKnight.ts';
+import { getIdealKnightAndBishopWhiteMoves as white } from '../../app/src/mate/rules/bishopKnight.ts';
 import { knightAndBishopSupportedDiagonal as support } from '../../app/src/mate/rules/bishopKnightDiagonalSupport.ts';
 import { knightAndBishopKnightTargetSquares } from '../../app/src/mate/rules/bishopKnightStrategy.ts';
 import { getMateRuleSet } from '../../app/src/mate/rules/index.ts';
@@ -194,14 +194,13 @@ assert.equal(counts.canLoop + counts.noLoop, counts.audited);
 console.log({ phase: 'classify', counts, components: cycleComps.size });
 const rules = getMateRuleSet('bishop-knight'), families: any[] = [];
 function coordMove(encoded: number, t: number) { const from = transforms[t]![encoded >>> 6]!, to = transforms[t]![encoded & 63]!; return { from: square(from), to: square(to) }; }
-function verifyWitness(f: string, moves: string[]) { const ch = getChess(f), turns: string[] = []; for (const san of [...moves, ...moves, ...moves]) {
+function verifyWitness(f: string, moves: string[]) { const ch = getChess(f); for (const san of [...moves, ...moves, ...moves]) {
     const before = ch.fen();
     if (ch.turn() === 'w') {
         if (!white(before).includes(san))
             return false;
-        turns.push(before);
     }
-    else if (!black(before, turns.at(-2)).idealMoves.includes(san))
+    else if (!getChess(before).moves().includes(san))
         return false;
     ch.move(san);
     if (!supportedScope && ch.turn() === 'b' && support(ch.fen()).size !== 99)
@@ -226,7 +225,7 @@ function witness(start: number, chosen: number[]) {
             boards.push(ch.fen());
             moves.push(ch.move(coordMove(wm[edge]!, orient) as any).san);
             moves.push(ch.move(coordMove(bm[edge]!, orient) as any).san);
-            actualPrev = actual;
+            actualPrev = NONE;
             actual = code(ch.fen());
             current = child[edge]!;
         }
@@ -306,7 +305,7 @@ for (const kind of [...new Set(families.map(f => f.kind))]) {
     const fs = families.filter(f => f.kind === kind);
     archetypes.push({ kind, families: fs.length, closedFamilies: fs.filter(f => f.closed).length, canReachFromUnsupportedPlacements: roots, cyclePlies: [...new Set(fs.map(f => f.cyclePlies))].sort((a, b) => a - b), rules: [...new Set(fs.flatMap(f => f.rules))].sort() });
 }
-const result = { diagonal: Number(process.env.AUDIT_DIAGONAL ?? 0) || null, population: process.env.AUDIT_SCOPE ?? 'unsupported', counts, graph: { nodes: n, edges, cyclicNodes: cyclic.reduce((s, v) => s + v, 0), cyclicFamilies: families.length }, archetypes, families, policyFingerprint: (db.prepare("SELECT value FROM meta WHERE key='hash'").get() as any).value };
+const result = { blackPolicy: "all-legal", diagonal: Number(process.env.AUDIT_DIAGONAL ?? 0) || null, population: process.env.AUDIT_SCOPE ?? 'unsupported', counts, graph: { nodes: n, edges, cyclicNodes: cyclic.reduce((s, v) => s + v, 0), cyclicFamilies: families.length }, archetypes, families, policyFingerprint: (db.prepare("SELECT value FROM meta WHERE key='hash'").get() as any).value };
 writeFileSync(dir + '/node-outcomes.bin', Uint8Array.from({ length: n }, (_, i) => Number(!!loop[i]) | Number(!!hasSupport[i]) << 1 | Number(!!hasMate[i]) << 2 | Number(!!hasFailure[i]) << 3));
 writeFileSync(dir + '/result.json', JSON.stringify(result, null, 2));
 writeFileSync(dir + '/loop-leading-roots.json', JSON.stringify(rootLoops));

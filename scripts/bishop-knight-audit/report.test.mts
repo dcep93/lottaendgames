@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
@@ -45,4 +46,17 @@ test('seven-stage percentages exclude five- and three-diagonal starting position
   assert.match(text,/40 7-diagonal post-White/);
   assert.match(text,/Directly on a loop \| 8 \| 20\.0000%/);
   assert.match(text,/3-diagonal; edge bishop \| 8/);
+});
+
+test('reports reject comparisons with the previous restricted Black policy', () => {
+  const dir = fileURLToPath(new URL('../../.audit/report-policy-test/', import.meta.url));
+  mkdirSync(dir, { recursive: true });
+  try {
+    writeFileSync(join(dir, 'manifest.json'), '{}');
+    writeFileSync(join(dir, 'result.json'), JSON.stringify({ blackPolicy: 'all-legal' }));
+    writeFileSync(join(dir, 'old.json'), '{}');
+    assert.throws(() => execFileSync(process.execPath, ['--import', 'tsx', new URL('./report.mts', import.meta.url).pathname], {
+      env: { ...process.env, AUDIT_DIR: dir, AUDIT_COMPARE: join(dir, 'old.json') }, stdio: 'pipe',
+    }), /Cannot compare different Black policies/);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
 });

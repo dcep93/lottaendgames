@@ -1,9 +1,9 @@
 import { fork } from 'node:child_process';
 import { writeFileSync } from 'node:fs';
 import assert from 'node:assert/strict';
-import { BASE, NONE, code, fen, pair, pack, distance, canonical } from './encoding.mts';
+import { BASE, code, fen, pair, pack, distance, canonical } from './encoding.mts';
 import { getChess } from '../../app/src/mate/chess.ts';
-import { getIdealKnightAndBishopWhiteMoves as white, getKnightAndBishopOpponentCandidates as black } from '../../app/src/mate/rules/bishopKnight.ts';
+import { getIdealKnightAndBishopWhiteMoves as white } from '../../app/src/mate/rules/bishopKnight.ts';
 import { knightAndBishopSupportedDiagonal as support } from '../../app/src/mate/rules/bishopKnightDiagonalSupport.ts';
 const dir = process.env.AUDIT_DIR!;
 let seed = 20260920;
@@ -21,7 +21,7 @@ while (roots.length < 1000) {
     const k = pack(...p);
     roots.push({ key: k, weight: 1 });
     const ch = getChess(fen(k, 'b'));
-    const replies = black(ch.fen()).idealMoves;
+    const replies = ch.moves();
     if (!replies.length || ch.move(replies[0]!)?.captured)
         continue;
     const before = code(ch.fen());
@@ -30,7 +30,7 @@ while (roots.length < 1000) {
     if (!moves.length)
         continue;
     ch.move(moves[0]!);
-    const reply = black(ch.fen()).idealMoves[0];
+    const reply = ch.moves()[0];
     if (reply && !ch.move(reply)?.captured)
         nodes.push({ id: nodes.length, key: pair(code(ch.fen()), before) });
 }
@@ -64,7 +64,7 @@ for (const [kind, batch] of [['root', roots], ['node', nodes]] as const) {
         if (selected) {
             if (ch.isCheckmate()) flags |= 2;
             else if (ch.isStalemate()) flags |= 4;
-            else for (const san of black(ch.fen()).idealMoves) {
+            else for (const san of ch.moves()) {
                 const move = ch.move(san);
                 if (move.captured) flags |= 4;
                 else children.add(canonical(code(ch.fen())));
@@ -76,7 +76,7 @@ for (const [kind, batch] of [['root', roots], ['node', nodes]] as const) {
     }
     if (kind === 'node')
         for (const r of optimized.result) {
-            const key = nodes[r.id].key, k = Math.floor(key / BASE), p = key % BASE, ch = getChess(fen(k));
+            const key = nodes[r.id].key, k = Math.floor(key / BASE), ch = getChess(fen(k));
             let flags = 0;
             const children: number[] = [];
             if (ch.isCheckmate())
@@ -93,18 +93,18 @@ for (const [kind, batch] of [['root', roots], ['node', nodes]] as const) {
                     else if (process.env.AUDIT_SCOPE !== 'supported' && process.env.AUDIT_SCOPE !== 'all' && support(ch.fen()).size !== 99)
                         flags |= 1;
                     else
-                        for (const reply of black(ch.fen(), p === NONE ? undefined : fen(p)).idealMoves) {
+                        for (const reply of ch.moves()) {
                             const move = ch.move(reply);
                             if (move.captured)
                                 flags |= 4;
                             else
-                                children.push(pair(code(ch.fen()), k));
+                                children.push(pair(code(ch.fen())));
                             ch.undo();
                         }
                     ch.undo();
                 }
             assert.equal(r.flags, flags);
-            assert.deepEqual(r.edges.map((e: number[]) => e[0]).sort((a: number, b: number) => a - b), children.sort((a, b) => a - b), 'Compressed Black history differs from production');
+            assert.deepEqual(r.edges.map((e: number[]) => e[0]).sort((a: number, b: number) => a - b), children.sort((a, b) => a - b), 'All-legal Black expansion differs from direct legal enumeration');
         }
     console.log('Validated', kind, batch.length);
 }

@@ -1,8 +1,9 @@
+import { policyEdges } from './policy-edges.mts';
 import { fork } from 'node:child_process';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { DatabaseSync } from 'node:sqlite';
-import { BASE, NONE, pair, canonical, rootOrbits } from './encoding.mts';
+import { BASE, NONE, rootOrbits } from './encoding.mts';
 const dir = process.env.AUDIT_DIR!;
 if (!dir)
     throw new Error('Run via npm run audit:unsupported');
@@ -43,11 +44,11 @@ function add(key: number) { let id = ids.get(key); if (id === undefined) {
     ids.set(key, id);
     addRow.run(id, key);
 } return id; }
-function finishNode(id: number, pol: any) { const key = keys[id]!, k = Math.floor(key / BASE), p = key % BASE; const edges: number[][] = []; for (const b of pol.branches) {
-    const returns = p !== NONE && (p >>> 6) === (b.post >>> 6) && b.legal.includes(p & 63);
-    for (const target of returns ? [p & 63] : b.base)
-        edges.push([add(pair((b.post & ~63) | target, k)), canonical(b.post), b.w, b.b[target]]);
-} saveNode.run(JSON.stringify({ flags: pol.flags, edges }), id); done.add(id); completeNodes++; }
+function finishNode(id: number, pol: any) {
+    const edges = policyEdges(pol).map(([key, ...rest]) => [add(key!), ...rest]);
+    saveNode.run(JSON.stringify({ flags: pol.flags, edges }), id);
+    done.add(id); completeNodes++;
+}
 const completedRoots = new Set<number>();
 let rawRoots = 0, unsupported = 0, rootCount = 0;
 for (const row of db.prepare('SELECT key,weight,supported FROM roots').iterate() as any) {

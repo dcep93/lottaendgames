@@ -1,8 +1,9 @@
+import { policyEdges } from './policy-edges.mts';
 import { includesRoot } from './population.mts';
 import { getChess } from '../../app/src/mate/chess.ts';
-import { getIdealKnightAndBishopWhiteMoves as white, getKnightAndBishopOpponentCandidates as black } from '../../app/src/mate/rules/bishopKnight.ts';
+import { getIdealKnightAndBishopWhiteMoves as white } from '../../app/src/mate/rules/bishopKnight.ts';
 import { knightAndBishopSupportedDiagonal as support } from '../../app/src/mate/rules/bishopKnightDiagonalSupport.ts';
-import { BASE, NONE, fen, code, canonical, pair, sqIndex } from './encoding.mts';
+import { BASE, fen, code, canonical, sqIndex } from './encoding.mts';
 type Branch = {
     post: number;
     legal: number[];
@@ -24,7 +25,7 @@ function root(key: number) {
         return { key, supported, flags: 0, children: [] };
     if (!legal.length)
         return { key, supported, flags: ch.isCheckmate() ? 2 : 4, children: [] };
-    const moves = black(f).idealMoves;
+    const moves = legal.map(m => m.san);
     let flags = 0;
     const children: number[] = [];
     for (const san of moves) {
@@ -63,13 +64,11 @@ function policy(k: number) {
             }
             if (legal.some(m => m.captured)) {
                 out.flags |= 4;
-                ch.undo();
-                continue;
             }
-            const ideal = new Set(black(pf).idealMoves), bs: Record<number, number> = {};
-            for (const m of legal)
+            const replies = legal.filter(m => !m.captured), bs: Record<number, number> = {};
+            for (const m of replies)
                 bs[sqIndex(m.to)] = moveCode(m);
-            out.branches.push({ post, legal: legal.map(m => sqIndex(m.to)), base: legal.filter(m => ideal.has(m.san)).map(m => sqIndex(m.to)), w: moveCode(m), b: bs });
+            out.branches.push({ post, legal: replies.map(m => sqIndex(m.to)), base: replies.map(m => sqIndex(m.to)), w: moveCode(m), b: bs });
             ch.undo();
         }
     policies.set(k, out);
@@ -77,13 +76,10 @@ function policy(k: number) {
         policies.delete(policies.keys().next().value!);
     return out;
 }
-function expand(id: number, key: number) { const k = Math.floor(key / BASE), p = key % BASE, pol = policy(k); const edges: number[][] = []; for (const branch of pol.branches) {
-    const returns = p !== NONE && (p >>> 6) === (branch.post >>> 6) && branch.legal.includes(p & 63);
-    for (const target of returns ? [p & 63] : branch.base) {
-        const next = (branch.post & ~63) | target;
-        edges.push([pair(next, k), canonical(branch.post), branch.w, branch.b[target]!]);
-    }
-} return { id, flags: pol.flags, edges, policy: pol }; }
+function expand(id: number, key: number) {
+    const pol = policy(Math.floor(key / BASE));
+    return { id, flags: pol.flags, edges: policyEdges(pol), policy: pol };
+}
 process.on('message', (message: any) => { try {
     const result = message.kind === 'root' ? message.batch.map((x: any) => ({ ...root(x.key), weight: x.weight })) : message.batch.map((x: any) => expand(x.id, x.key));
     process.send!({ kind: message.kind, result });

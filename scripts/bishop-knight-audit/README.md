@@ -1,3 +1,7 @@
+# Audit policy: preferred White × all legal Black
+
+Since 2026-09-23, every Black legal reply is enumerated. Historical reports using app-selected Black replies are narrower evidence, not exhaustive counts for this policy. Rerun into a new output directory to establish the new baseline. Production Black preferences remain unchanged. A saved replay follows its explicit Black moves; Play Best may select a different reply.
+
 # Bishop-and-knight unsupported-position audit
 
 From `app/`:
@@ -30,10 +34,10 @@ npm run audit:unsupported -- --scope all --out /absolute/full-audit --workers 4
 ```
 
 This selects every supported and unsupported post-White placement and **does not
-stop at support**. It follows all best-move ties through support changes with
-Black's return history intact. Run it when measuring support loss and loops in
+stop at support**. It follows all preferred White ties through support changes and
+every legal Black reply. Run it when measuring support loss and loops in
 the same policy snapshot. Neither a support-terminal audit nor the union of two
-separate starting populations is a substitute for preserving history across
+separate starting populations is a substitute for following paths across
 support boundaries.
 
 Additional persisted outputs:
@@ -42,7 +46,7 @@ Additional persisted outputs:
   cycle membership, eventual loop reachability, piece-position motifs, losses,
   and replay links.
 - `full-details.json`: machine-readable population partitions and component
-  origins, including cycles reached after support with history.
+  origins, including cycles reached after support.
 - `support-loss-events.json`: every best White transition from the prior supported
   White result to an unsupported White result, deduplicated jointly under D4.
   It separates mating losses and records possible subsequent outcomes.
@@ -83,20 +87,9 @@ all-position census. It also catches changed loops through the original boards;
 breaking an old witness alone is not sufficient. Newly cyclic boards outside
 the cohort are deliberately excluded from the progress count.
 
-For each cohort post-White board P, enumerate all reversible legal White moves
-to cover each possible preceding White board F. Seed every noncapturing legal
-Black reply Q with the jointly D4-canonical history (Q,F). Capturable-minor and
-mate/stalemate branches terminate just as in the full audit. Any policy cycle
-containing P must pass through one of these seeds. Expand the current production
-worker through all best-move ties and support changes, preserving return history.
-Count a cohort board only when its post-White label occurs on an edge internal
-to a cyclic strongly connected component. Initial seeds may overapproximate
-histories, but only complete cycles made of current-policy edges are counted;
-this does not impose or measure fresh-start reachability.
+For each cohort post-White board, seed every legal noncapturing Black reply. Expand preferred White moves and every legal Black reply, continuing through support changes. Count a cohort board only when its post-White label occurs on an edge internal to a cyclic strongly connected component. Incoming paths and exits do not count. History is unnecessary, and a capture only terminates its own branch.
 
-Validation: the baseline policy recovers all 641 boards; SCC tests exclude
-incoming paths and exits. With the r8 knight-color tie-breaker, 557 remain.
-One worker checks this cohort in roughly 40 seconds on the current machine.
+Older measurements for the 641-board cohort used restricted Black preferences; those values and timings do not describe the current graph.
 `result.json` records the policy bundle fingerprint and exact surviving keys.
 
 ## Staged work: seven, then five, then three
@@ -151,7 +144,7 @@ physical placements. Support is classified only after White moves.
   reachable and exclusive placement counts.
 - `root-family-membership.json`: which loop components each starting placement
   can reach, useful for measuring overlapping coverage of proposed fixes.
-- `census.sqlite`: roots, cached White-position policies, and history-aware edges.
+- `census.sqlite`: roots, cached White-position policies, and legal-reply edges.
 - `manifest.json`: policy commit, exact bundle fingerprint, runtime and scope.
 - `progress.json`: phase, elapsed time, roots and graph states processed.
 - `*.complete`: completed stages; rerunning the same command resumes unfinished
@@ -174,33 +167,22 @@ replies, not White move choices. The command extracts the root evaluator's full
 transitive dependency closure from both executable worker snapshots and compares
 its normalized executable hash. If support or Black's policy changed, reuse is
 rejected: omit `--roots-from` for a full census. Identical roots are copied in one
-transaction with fresh node IDs; every White policy and history transition is
+transaction with fresh node IDs; every preferred White move and legal Black reply is
 still recomputed. This saves the enumeration phase on most preference-only edits.
 
 ## Meaning of the numbers
 
 A starting position is a **Black-to-move board immediately after White moves**.
-The first Black choice has no prior-position history. Thereafter each graph
-state stores the current White-to-move board **and the previous White-turn
-board**, because Black's return preference depends on that history.
+Black replies are all legal moves, with no capture priority, score filtering, or return preference. States use canonical boards without history. The old pair encoding is retained with a constant NONE history field for storage compatibility, but old snapshots cannot be resumed under the new fingerprint.
 
-All tied best White moves and all tied best Black replies are followed. Branches
+All tied preferred White moves and all legal Black replies are followed. A capture terminates only that reply; all other replies continue. Branches
 stop at a supported diagonal, mate, stalemate, or capture of a minor piece.
 “Can reach a loop” means **at least one** best-move branch reaches a cycle;
 “cannot reach a loop” does **not** mean forced mate. Support is a boundary here,
 not a claim about subsequent play. The fifty-move rule and repetition claims
 are intentionally excluded from structural cycle detection.
 
-“On a discovered loop” counts a post-White board occurring in a cyclic
-history-aware component. “Fresh starts that can return to a loop containing
-themselves” is stricter: the same board without history must be able to reach
-that component. These are different denominators from White-turn history
-states; the report's percentages always use unsupported post-White placements.
-
-A component is a strongly connected group of history states and may contain
-multiple distinct cycles. Reach counts overlap across components/archetypes;
-exclusive reach and cumulative coverage avoid double counting. Exposure ranks
-are not a promise that one rule change removes that many looping starts.
+“On a discovered loop” counts a post-White board on an internal cyclic-component edge. Merely reaching a loop does not count. With all legal Black replies, prior history cannot change membership. A component can contain multiple minimal loops; component totals are not counts of all possible simple cycles.
 
 ## Speed and safeguards
 
@@ -208,22 +190,20 @@ are not a promise that one rule change removes that many looping starts.
 - Bounded worker-local memoization of a pure piece-placement read, returning
   fresh copies to preserve the production API contract.
 - Multiple worker processes evaluate independent batches.
-- Compute each White-position policy once; reconstruct cheap transitions for
-  each distinct return history from its cached branch data.
+- Compute each canonical White-position policy once; expand its legal Black replies without duplicate history states.
 - SQLite transactions and checkpoints make interrupted runs resumable.
 - Graph analysis uses typed arrays and iterative traversals, not recursive DFS.
 
 Before enumeration, deterministic samples compare the optimized worker against
-an unmodified production bundle and direct production history handling. Another
+an unmodified production bundle and direct preferred-White and legal-Black move generation. Another
 1,000 random placements check all eight symmetries. SCC reachability is checked
 independently by repeatedly removing sinks. Witnesses are replayed three times
-against production move selection. A cycle that needs preexisting history is
-explicitly labeled instead of being advertised as a valid fresh-load replay.
+against preferred White moves and legal Black replies. Production Play Best may choose another Black reply, so replay the saved moves to see the witness.
 
 ## Maintaining the scaffold
 
 `worker.mts` is the only policy adapter. `encoding.mts` owns packed placements,
-D4 canonicalization, and paired-history keys. `census.mts` owns parallel work and
+D4 canonicalization, and legacy paired keys with constant NONE history. `census.mts` owns parallel work and
 checkpointing. `analyze.mts` owns SCC/outcome analysis and witnesses.
 `classify.mts` adds rule traces, reach/exclusive counts, and descriptive mechanism
 groups. `report.mts` renders the result. Rule descriptions in `classify.mts`
