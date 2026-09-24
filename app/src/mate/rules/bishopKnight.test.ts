@@ -137,6 +137,11 @@ test("bishop-and-knight rules are registered", () => {
       helpText: "Play the 5.5 step.",
     },
     {
+      id: "r7",
+      shortLabel: "rule r7",
+      helpText: "Minimize king distance to the center, then prefer king proximity.",
+    },
+    {
       id: "r8",
       shortLabel: "rule r8",
       helpText: "With a king on a middle-16 square, prefer bishop on the long diagonal, then a central bishop, then knight move proximity to a precage square, then knight off the bishop's color.",
@@ -145,11 +150,6 @@ test("bishop-and-knight rules are registered", () => {
       id: "r9.1",
       shortLabel: "rule r9.1",
       helpText: "Play the 9.1 move.",
-    },
-    {
-      id: "r9.9",
-      shortLabel: "rule r9.9",
-      helpText: "Minimize king distance to the center, then prefer king proximity.",
     },
     {
       id: "r9.98",
@@ -185,9 +185,9 @@ test("bishop-and-knight rules are registered", () => {
       "r5",
       "r5.1",
       "r5.5",
+      "r7",
       "r8",
       "r9.1",
-      "r9.9",
       "r9.98",
       "r20",
     ],

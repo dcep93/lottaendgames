@@ -28,7 +28,7 @@ test('r9.98 recognizes bishop defense via either minor and respects blockers acr
     }
   }
   const ids=knightAndBishopWhiteRules.map(r=>r.id);
-  assert.ok(ids.indexOf('r9.9')<ids.indexOf('r9.98') && ids.indexOf('r9.98')<ids.indexOf('r20'));
+  assert.ok(ids.indexOf('r7')<ids.indexOf('r9.98') && ids.indexOf('r9.98')<ids.indexOf('r20'));
 });
 
 

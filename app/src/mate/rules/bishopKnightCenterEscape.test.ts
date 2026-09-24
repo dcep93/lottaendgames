@@ -3,9 +3,9 @@ import test from 'node:test';
 import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess';
 import { getIdealKnightAndBishopWhiteMoves, knightAndBishopWhiteRules, scoreKnightAndBishopWhiteMove } from './bishopKnight';
 
-test('r9.9 scores center distance without r6; r20 scores minor distances from Black and each other', () => {
+test('r7 scores center distance without r6; r20 scores minor distances from Black and each other', () => {
   assert.ok(!knightAndBishopWhiteRules.some(rule => rule.id === 'r6'));
-  const r99 = knightAndBishopWhiteRules.find(rule => rule.id === 'r9.9')!;
+  const r99 = knightAndBishopWhiteRules.find(rule => rule.id === 'r7')!;
   const r20 = knightAndBishopWhiteRules.find(rule => rule.id === 'r20')!;
   assert.ok(r99.compare); assert.ok(r20.compare);
   for (const transform of SQUARE_TRANSFORMS) {
@@ -45,8 +45,8 @@ test('r20 breaks equal Black-distance ties by separating the bishop and knight a
 });
 
 
-test('r9.9 breaks center-distance ties toward Black while keeping centrality first across D4', () => {
-  const compare = knightAndBishopWhiteRules.find(rule => rule.id === 'r9.9')!.compare!;
+test('r7 breaks center-distance ties toward Black while keeping centrality first across D4', () => {
+  const compare = knightAndBishopWhiteRules.find(rule => rule.id === 'r7')!.compare!;
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen('8/8/6k1/3BK3/2N5/8/8/8 w - - 6 4', t);
     const score = (to: 'd4' | 'e4' | 'f4') => scoreKnightAndBishopWhiteMove(fen,

@@ -515,7 +515,7 @@ test('a five-bishop with Nd3 still rejects Bb5 even with an eligible king', () =
   }
 })
 
-test('Bd7 remains supported and Bc6 is rejected while r9.9 breaks the supported tie', () => {
+test('Bd7 remains supported and Bc6 is rejected while r7 breaks the supported tie', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     const fen = transformFen('8/2K5/8/k7/B7/3N4/8/8 w - - 2 2', transform)
     const bd7 = getChess(fen).move({from: transformSquare('a4', transform), to: transformSquare('d7', transform)}).san
