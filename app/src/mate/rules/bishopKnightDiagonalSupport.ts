@@ -458,6 +458,9 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
     knight: Math.min(...DIAGONALS.filter(pattern => pattern.wall.length === 3 && pattern.wall.includes(bishop.square))
       .map(pattern => supportDistance(fen, white.square, pattern))),
   }
+  // Explicitly declared supported placements above keep their exceptions.
+  // Ordinary support requires opposite colors, including kings on the edge.
+  if (squareColor(white.square) === squareColor(bishop.square)) return {size: 99, knight: 99}
   if (kingDistance(black.square, bishop.square) === 1 &&
     kingDistance(white.square, bishop.square) > 1 &&
     squaredEuclideanDistance(knight.square, bishop.square) === 5) return {size: 99, knight: 99}

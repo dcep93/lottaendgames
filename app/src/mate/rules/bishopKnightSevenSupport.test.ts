@@ -13,9 +13,9 @@ test('a bishop attack along the f6 escape race rejects tied Kc2 support across D
     // White wins the escape race from c3; proximity to the bishop alone is not a veto.
     const ahead = transformFen('8/5B2/8/1k6/8/2KN4/8/8 b - - 1 1', transform)
     assert.equal(bishopKnightRuleSet.phaseAfterWhiteMove!(ahead), '2/2')
-    // The tied escape race is also allowed when White is closer to the bishop.
+    // Being closer to the bishop no longer waives the king-color restriction.
     const defended = transformFen('8/8/8/1k6/8/1B1N4/2K5/8 b - - 1 1', transform)
-    assert.equal(bishopKnightRuleSet.phaseAfterWhiteMove!(defended), '2/2')
+    assert.equal(bishopKnightRuleSet.phaseAfterWhiteMove!(defended), '1/2')
   }
 })
 

@@ -7,6 +7,21 @@ import { getIdealKnightAndBishopWhiteMoves, scoreKnightAndBishopWhiteMove } from
 
 const sixDiagonal = ['a3', 'b4', 'c5', 'd6', 'e7', 'f8'] as const
 
+test('ordinary support requires opposite king and bishop colors, preserving declarations across D4', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    for (const fen of [
+      '6B1/1k6/8/8/4K3/3N4/8/8 b - - 0 1',
+      '8/8/k7/8/2K5/1B1N4/8/8 b - - 0 1',
+    ]) assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 99)
+    // Kb5/Ba6 was explicitly declared supported regardless of the knight.
+    assert.equal(knightAndBishopSupportedDiagonal(transformFen(
+      'k7/8/B7/1K1N4/8/8/8/8 b - - 0 1', transform)).size, 3)
+    // A specifically declared five-diagonal placement retains its exception.
+    assert.equal(knightAndBishopSupportedDiagonal(transformFen(
+      '8/1k1K4/8/1B1N4/8/8/8/8 b - - 0 1', transform)).size, 5)
+  }
+})
+
 test('seven-diagonal king on the wall below bishop is unsupported with Nd3 across D4', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const [fen, from, to] of [
@@ -18,9 +33,9 @@ test('seven-diagonal king on the wall below bishop is unsupported with Nd3 acros
       assert.equal(knightAndBishopSupportedDiagonal(board.fen()).size, 99)
       assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 99)
     }
-    // White above its bishop on the same wall remains eligible.
+    // White above its bishop on the same wall now fails the general color rule.
     assert.equal(knightAndBishopSupportedDiagonal(transformFen(
-      '8/8/k7/8/2K5/1B1N4/8/8 b - - 0 1', transform)).size, 7)
+      '8/8/k7/8/2K5/1B1N4/8/8 b - - 0 1', transform)).size, 99)
   }
 })
 
@@ -240,7 +255,7 @@ test('Nd3 five support combines right-side kings with declared placements or nea
       board.put({type: 'b', color: 'w'}, bishop)
       for (const transform of SQUARE_TRANSFORMS) {
         assert.equal(knightAndBishopSupportedDiagonal(transformFen(board.fen(), transform)).size,
-          (bishop === 'a4' && kingDistance(king, 'e7') <= 1) || (king === 'e7' && ['a4', 'b5'].includes(bishop)) ? 5 : (edgeDistance(king) === 0 || squareColor(king) !== squareColor(bishop)) && king[0] >= 'c' && (['a4', 'd7'].includes(bishop) || kingDistance(king, bishop) === 1) && ((['a4', 'd7'].includes(bishop) && ['c5', 'c6', 'c7'].includes(king)) || (['a4', 'd7'].includes(bishop) && king === 'd6') || (bishop === 'd7' && kingDistance(king, 'a7') <= 2)) ? 5 : 99, `${king}, ${bishop}, ${transform.name}`)
+          (bishop === 'a4' && kingDistance(king, 'e7') <= 1) || (king === 'e7' && ['a4', 'b5'].includes(bishop)) ? 5 : (squareColor(king) !== squareColor(bishop)) && king[0] >= 'c' && (['a4', 'd7'].includes(bishop) || kingDistance(king, bishop) === 1) && ((['a4', 'd7'].includes(bishop) && ['c5', 'c6', 'c7'].includes(king)) || (['a4', 'd7'].includes(bishop) && king === 'd6') || (bishop === 'd7' && kingDistance(king, 'a7') <= 2)) ? 5 : 99, `${king}, ${bishop}, ${transform.name}`)
       }
     }
   }
@@ -263,7 +278,7 @@ test('Ba4 ends the loaded seven-diagonal shuttle through supported five-diagonal
   }
 })
 
-test('declared Bb1 with Kd3 Nc4 against Kd1 is unsupported only in its exact placement', () => {
+test('declared Bb1 rejection and nearby king-color restriction apply across D4', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const counters of ['0 1', '43 27']) {
       const before = transformFen(`8/8/8/8/2N5/3K4/B7/3k4 w - - ${counters}`, transform)
@@ -272,10 +287,10 @@ test('declared Bb1 with Kd3 Nc4 against Kd1 is unsupported only in its exact pla
       assert.deepEqual(knightAndBishopSupportedDiagonal(board.fen()), {size: 99, knight: 99})
       assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 99)
     }
-    for (const nearby of [
-      '8/8/8/8/2N5/3K4/8/1B2k3 b - - 1 1',
-      '8/8/8/8/2N5/4K3/8/1B1k4 b - - 1 1',
-    ]) assert.equal(knightAndBishopSupportedDiagonal(transformFen(nearby, transform)).size, 7)
+    for (const [nearby, expected] of [
+      ['8/8/8/8/2N5/3K4/8/1B2k3 b - - 1 1', 99], // Kd3 shares Bb1's color.
+      ['8/8/8/8/2N5/4K3/8/1B1k4 b - - 1 1', 7],
+    ] as const) assert.equal(knightAndBishopSupportedDiagonal(transformFen(nearby, transform)).size, expected)
   }
 })
 
@@ -478,7 +493,7 @@ test('support requires the seven knight in place while smaller diagonals may use
       ['k7/2K5/8/8/B7/3N4/8/8 b - - 0 1', 5, 2],
       ['3k2K1/8/2B5/3N4/8/8/8/8 b - - 0 1', 99, 99],
       ['8/8/k7/2K5/B4N2/8/8/8 b - - 0 1', 99, 99],
-      ['3k2K1/8/8/3B4/8/3N4/8/8 b - - 0 1', 7, 0],
+      ['3k2K1/8/8/3B4/8/3N4/8/8 b - - 0 1', 99, 99],
       ['3k2K1/8/8/3B4/8/8/5N2/8 b - - 0 1', 99, 99],
     ] as const) assert.deepEqual(knightAndBishopSupportedDiagonal(transformFen(fen, transform)), {size, knight: distance}, `${fen}: ${transform.name}`)
     for (const fen of [
@@ -670,7 +685,7 @@ test('the same outer limit applies to three- and seven-diagonals', () => {
       ['k7/8/B1K5/3N4/8/8/8/8 b - - 0 1', 99],
       ['k7/8/B7/2KN4/8/8/8/8 b - - 0 1', 99],
       ['8/8/8/3B1N2/k7/8/8/K7 b - - 0 1', 7],
-      ['8/8/8/3B1N2/k7/8/8/1K6 b - - 0 1', 7],
+      ['8/8/8/3B1N2/k7/8/8/1K6 b - - 0 1', 99],
       ['8/8/8/3B1N2/k7/8/8/2K5 b - - 0 1', 99],
     ] as const) assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, size, fen)
   }
@@ -723,7 +738,7 @@ test('a five-diagonal without a five-knight requires White to match the d6 king 
     assert.ok(getIdealKnightAndBishopWhiteMoves(fen).every(san => scoreKnightAndBishopWhiteMove(fen, san).supportedDiagonalSizeScore === 99))
     for (const [position, expected] of [
       ['1k6/8/K7/8/B4N2/8/8/8 b - - 0 1', 99],
-      ['1k6/8/K7/3N4/B7/8/8/8 b - - 0 1', 5], // Edge king is exempt from the color restriction.
+      ['1k6/8/K7/3N4/B7/8/8/8 b - - 0 1', 99], // Edge kings also need opposite colors.
       ['1k6/8/1K6/8/B4N2/8/8/8 b - - 0 1', 99], // Same file with an off-support knight.
     ] as const) {
       assert.equal(knightAndBishopSupportedDiagonal(transformFen(position, transform)).size, expected)
@@ -890,8 +905,8 @@ test('a seven-knight must occupy support even when the bishop is defended or can
     for (const [fen, expected] of [
       // Kf5 permits ...Kd6; the possible Ke4 response no longer rescues support.
       ['8/4k3/8/3BNK2/8/8/8/8 b - - 3 2', 99],
-      // On d3, the knight retains the existing response allowance.
-      ['8/4k3/8/3B1K2/8/3N4/8/8 b - - 3 2', 7],
+      // Occupied d3 no longer waives the same-color king restriction.
+      ['8/4k3/8/3B1K2/8/3N4/8/8 b - - 3 2', 99],
       // With Ke4 already defending Bd5, ...Kc5 attacks a defended bishop.
       ['8/8/3k4/3BN3/4K3/8/8/8 b - - 5 3', 99],
       // A remote Black king cannot attack the bishop next move.
@@ -974,8 +989,9 @@ test('White inside the diagonal waives king distance while other support checks 
     board.move({from: transformSquare('a4', transform), to: transformSquare('a3', transform)})
     const before = board.fen()
     const san = board.move({from: transformSquare('a2', transform), to: transformSquare('d5', transform)}).san
-    assert.equal(knightAndBishopSupportedDiagonal(board.fen()).size, 7)
-    assert.equal(scoreKnightAndBishopWhiteMove(before, san).supportedDiagonalSizeScore, 7)
+    assert.equal(knightAndBishopSupportedDiagonal(board.fen()).size, 99)
+    assert.equal(scoreKnightAndBishopWhiteMove(before, san).supportedDiagonalSizeScore, 99)
+    // Kb7 and Bd5 share a color despite White being inside the diagonal.
     board.remove(transformSquare('d3', transform))
     board.put({type: 'n', color: 'w'}, transformSquare('f4', transform))
     assert.equal(knightAndBishopSupportedDiagonal(board.fen()).size, 99)
@@ -1016,7 +1032,7 @@ test('seven support requires the matching occupied knight square in all reflecti
     // Canonical d3 and its alternate f5 orientation both retain support when occupied.
     for (const fen of [
       '8/8/8/8/1k1K4/3N4/B7/8 b - - 1 1',
-      '8/8/2k5/5N2/8/3K4/B7/8 b - - 3 2',
+      '6B1/4k3/8/4KN2/8/8/8/8 b - - 3 2',
     ]) assert.deepEqual(knightAndBishopSupportedDiagonal(transformFen(fen, transform)), {size: 7, knight: 0})
   }
 })
@@ -1166,18 +1182,18 @@ test('Bb7+ with Kb6 is supported and preferred by r1 with Na7 one move from c6',
 })
 
 
-test('same-color edge kings retain support only when independent placement requirements hold', () => {
+test('same-color edge kings require a specific support declaration', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const counters of ['2 2', '43 25']) {
       const before = transformFen(`3K4/3B4/k7/8/8/3N4/8/8 w - - ${counters}`, transform)
       const board = getChess(before)
       const move = board.move({from: transformSquare('d8', transform), to: transformSquare('c8', transform)}).san
-      assert.equal(knightAndBishopSupportedDiagonal(board.fen()).size, 5)
-      assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 5)
+      assert.equal(knightAndBishopSupportedDiagonal(board.fen()).size, 99)
+      assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 99)
     }
     // An edge king still needs two files of separation with Nd3.
     assert.equal(knightAndBishopSupportedDiagonal(transformFen('2K5/3B4/1k6/8/8/3N4/8/8 b - - 3 2', transform)).size, 99)
-    assert.equal(knightAndBishopSupportedDiagonal(transformFen('1k6/8/K7/3N4/B7/8/8/8 b - - 0 1', transform)).size, 5)
+    assert.equal(knightAndBishopSupportedDiagonal(transformFen('1k6/8/K7/3N4/B7/8/8/8 b - - 0 1', transform)).size, 99)
     // The edge exemption does not waive the independent knight-on-edge restriction.
     assert.equal(knightAndBishopSupportedDiagonal(transformFen('2KB4/8/1k6/8/8/8/8/N7 b - - 0 1', transform)).size, 99)
   }
