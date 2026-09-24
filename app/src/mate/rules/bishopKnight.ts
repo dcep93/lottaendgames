@@ -529,8 +529,13 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     {
       id: "r10",
       shortLabel: "rule r10",
-      helpText: "Drift the knight towards White king protection.",
-      compare: (first, second) => first.knightKingProtectionDistance - second.knightKingProtectionDistance,
+      helpText: "Prefer a precage knight, else drift the knight towards White king protection.",
+      compare: (first, second) => {
+        const firstPrecage = first.knightTargetProximityScore === 0;
+        const secondPrecage = second.knightTargetProximityScore === 0;
+        if (firstPrecage || secondPrecage) return Number(secondPrecage) - Number(firstPrecage);
+        return first.knightKingProtectionDistance - second.knightKingProtectionDistance;
+      },
     },
     {
       id: "r19",

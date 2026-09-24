@@ -179,7 +179,7 @@ test("bishop-and-knight rules are registered", () => {
     {
       id: "r10",
       shortLabel: "rule r10",
-      helpText: "Drift the knight towards White king protection.",
+      helpText: "Prefer a precage knight, else drift the knight towards White king protection.",
     },
     {
       id: "r19",
