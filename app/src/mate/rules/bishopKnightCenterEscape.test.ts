@@ -17,7 +17,7 @@ test('r7 scores center distance without r6; r20 scores minor distances from Blac
     const far = score('a8', 'h1'), near = score('a8', 'f3');
     const offColorFar = score('d4', 'c3'), offColorNear = score('d4', 'e3'), sameColorCentral = score('d4', 'd5');
     assert.ok(r99.compare(offColorFar, sameColorCentral) > 0, transform.name);
-    assert.equal(r99.compare(offColorNear, offColorFar), 0, transform.name);
+    assert.ok(r99.compare(offColorNear, offColorFar) < 0, transform.name);
     assert.equal(r99.compare(far, sameColorCentral), 0, transform.name);
     assert.equal('kingBishopColorPenalty' in sameColorCentral, false);
     assert.ok(r20.compare(far, near) < 0, transform.name);
