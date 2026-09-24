@@ -28,3 +28,13 @@ test('the declaration does not prescribe an illegal bishop move or a different k
  assert.equal(declaredSupportedSevenMove('8/4k1K1/8/8/8/3N4/8/B7 w - - 0 1'),undefined);
  assert.equal(declaredSupportedSevenMove('8/4k3/6K1/8/8/1B1N4/8/8 w - - 0 1'),undefined);
 });
+
+
+test('r2.5 prefers declared Bc4 with Kg7 Nd3 versus Ke8 across D4 and move counters', () => {
+ for (const t of SQUARE_TRANSFORMS) for (const counters of ['0 1', '23 12']) {
+  const f=transformFen('4k3/6K1/8/8/8/1B1N4/8/8 w - - '+counters,t);
+  const m=getChess(f).move({from:transformSquare('b3',t),to:transformSquare('c4',t)}).san;
+  assert.equal(scoreKnightAndBishopWhiteMove(f,m).supportedDiagonalSizeScore,7);
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(f),[m],t.name);
+ }
+});

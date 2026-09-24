@@ -2,6 +2,7 @@ import { findPiece, getChess, SQUARE_TRANSFORMS, transformFen, transformSquare }
 
 // Exact r2.5 declarations, subordinate to r1.5; counters do not affect placement.
 const declarations = new Map(([
+  ['4k3/6K1/8/8/8/1B1N4/8/8 w - - 0 1', 'b3', 'c4'],
   ['8/2K5/8/k7/8/1B1N4/8/8 w - - 0 1', 'c7', 'c6'],
   ['8/8/k1K5/8/8/1B1N4/8/8 w - - 0 1', 'c6', 'c5'],
   ['8/8/3K4/1k6/8/1B1N4/8/8 w - - 0 1', 'd6', 'd5'],
