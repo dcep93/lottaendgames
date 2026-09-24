@@ -431,7 +431,7 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     {
       id: "r7",
       shortLabel: "rule r7",
-      helpText: "Minimize king distance to the center.",
+      helpText: "Prefer king proximity to a central square opposite the bishop's color.",
       compare: (first, second) => first.kingCenterProximityScore - second.kingCenterProximityScore,
     },
     {
