@@ -1184,7 +1184,8 @@ test('declared Kd6 Be8 Nb4 against Kc8 is unsupported across D4', () => {
     const move = chess.move({ from: transformSquare('c6', transform), to: transformSquare('d6', transform) })
     assert.equal(knightAndBishopSupportedDiagonal(chess.fen()).size, 99)
     assert.equal(scoreKnightAndBishopWhiteMove(before, move.san).supportedDiagonalSizeScore, 99)
-    assert.equal(knightAndBishopSupportedDiagonal(transformFen('2k1B3/8/3K4/8/8/2N5/8/8 b - - 1 1', transform)).size, 5)
+    // Nc3 now also fails the universal five-diagonal knight requirement.
+    assert.equal(knightAndBishopSupportedDiagonal(transformFen('2k1B3/8/3K4/8/8/2N5/8/8 b - - 1 1', transform)).size, 99)
   }
 })
 
@@ -1225,5 +1226,27 @@ test('Bb5 with Kd6 versus Kd8 supports knights one move from d3 or f5 across D4'
       '3k4/8/3K4/1B6/8/5N2/8/8 b - - 0 1',
       '3k4/8/3K4/1B6/8/8/8/2N5 b - - 0 1',
     ]) assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 99)
+  }
+})
+
+
+test('five support always requires an occupied five/seven square or a one-move seven approach across D4', () => {
+  for (const knight of allSquares()) {
+    if (['d6', 'b5', 'd8'].includes(knight) || ['d3', 'f5', 'd5'].includes(knight) ||
+      isKnightMove(knight, 'd3') || isKnightMove(knight, 'f5')) continue
+    const board = getChess('3k4/8/3K4/1B6/8/8/8/8 b - - 0 1')
+    board.put({type: 'n', color: 'w'}, knight)
+    for (const transform of SQUARE_TRANSFORMS) {
+      assert.equal(knightAndBishopSupportedDiagonal(transformFen(board.fen(), transform)).size, 99, knight + ' ' + transform.name)
+    }
+  }
+  for (const transform of SQUARE_TRANSFORMS) {
+    const before = transformFen('2k1B3/8/2K5/8/8/2N5/8/8 w - - 0 1', transform)
+    const board = getChess(before)
+    const move = board.move({from: transformSquare('c6', transform), to: transformSquare('d6', transform)})
+    assert.equal(knightAndBishopSupportedDiagonal(board.fen()).size, 99)
+    assert.equal(scoreKnightAndBishopWhiteMove(before, move.san).supportedDiagonalSizeScore, 99)
+    // This older exact declaration is also subject to the new universal requirement.
+    assert.equal(knightAndBishopSupportedDiagonal(transformFen('1k6/3B4/1K3N2/8/8/8/8/8 b - - 0 1', transform)).size, 99)
   }
 })

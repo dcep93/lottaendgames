@@ -280,6 +280,13 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
   const bishop = findPiece(fen, 'w', 'b')
   const knight = findPiece(fen, 'w', 'n')
   if (!white || !black || !bishop || !knight) return {size: 99, knight: 99}
+  // Every five-diagonal, including declared placements, needs an occupied five/seven
+  // support square or a knight one move from a corresponding seven support square.
+  const fivePatterns = DIAGONALS.filter(pattern => pattern.wall.length === 5 && pattern.wall.includes(bishop.square))
+  if (fivePatterns.length && !fivePatterns.some(pattern => pattern.support.includes(knight.square) ||
+    (pattern.previousSupport && (knight.square === pattern.previousSupport || isKnightMove(knight.square, pattern.previousSupport))))) {
+    return {size: 99, knight: 99}
+  }
   // This exact arrangement has an explicit necessary-and-sufficient king condition.
   const e7Placement = DECLARED_FIVE_E7_ADJACENCY.find(pattern =>
     pattern.bishop === bishop.square && pattern.knight === knight.square && pattern.black === black.square)
