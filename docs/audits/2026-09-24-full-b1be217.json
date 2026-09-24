@@ -1,0 +1,4941 @@
+{
+  "policyCommit": "b1be217877bdaaec6cd57d3ecedefbabf34ea514",
+  "policyFingerprint": "2cc975bd54eac0e59be44d3b7b7ea6ba547410c8cf9c7ca0ad4ad519b231fd34",
+  "scope": "All post-White KBNvK placements; continue through support changes; all preferred White ties and every legal Black reply; no return-history filtering.",
+  "method": {
+    "fullDomain": true,
+    "reusedFingerprintMatchedCompleteGraph": true,
+    "databaseIntegrity": "ok",
+    "rootOrbits": 1707888,
+    "physicalRootPlacements": 13660584,
+    "graph": {
+      "nodes": 1359344,
+      "edges": 6553208,
+      "cyclicNodes": 1311,
+      "cyclicFamilies": 155
+    },
+    "classification": "Exact White K/B/N squares modulo the eight D4 board symmetries, without translations; Black square varies. Groups form a disjoint partition of positions. Larger minor-pair groups are a separate coarser partition, not competing motif sizes.",
+    "cycleDefinition": "Direct membership on cycles; no loop-reachability counts. White: all preferred ties. Black: every legal reply. Continue through support changes.",
+    "newFrozenBaseline": "cohort-full-b1be217-2026-09-24.json"
+  },
+  "unsupportedOnlyCycles": {
+    "orbits": 659,
+    "physical": 5272
+  },
+  "unsupportedPositionsOnAnyCycle": {
+    "orbits": 705,
+    "physical": 5640
+  },
+  "supportedPositionsOnCycles": {
+    "orbits": 251,
+    "physical": 2008
+  },
+  "nonMatingSupportLoss": {
+    "whiteDecisions": {
+      "orbits": 17,
+      "physical": 136
+    },
+    "events": {
+      "orbits": 22,
+      "physical": 176
+    },
+    "sourcePositions": {
+      "orbits": 21,
+      "physical": 168
+    }
+  },
+  "unsupportedExactWhiteFormations": [
+    {
+      "orbits": 35,
+      "physical": 280,
+      "pieces": {
+        "K": "e5",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 34,
+      "physical": 272,
+      "pieces": {
+        "K": "d4",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 23,
+      "physical": 184,
+      "pieces": {
+        "K": "d4",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 18,
+      "physical": 144,
+      "pieces": {
+        "K": "e5",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 14,
+      "physical": 112,
+      "pieces": {
+        "K": "d4",
+        "B": "g8",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 12,
+      "physical": 96,
+      "pieces": {
+        "K": "e5",
+        "B": "c4",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 11,
+      "physical": 88,
+      "pieces": {
+        "K": "d4",
+        "B": "d5",
+        "N": "e3"
+      }
+    },
+    {
+      "orbits": 7,
+      "physical": 56,
+      "pieces": {
+        "K": "e3",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 7,
+      "physical": 56,
+      "pieces": {
+        "K": "c5",
+        "B": "g8",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 7,
+      "physical": 56,
+      "pieces": {
+        "K": "e5",
+        "B": "e6",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 7,
+      "physical": 56,
+      "pieces": {
+        "K": "d4",
+        "B": "d5",
+        "N": "c5"
+      }
+    },
+    {
+      "orbits": 6,
+      "physical": 48,
+      "pieces": {
+        "K": "f5",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 6,
+      "physical": 48,
+      "pieces": {
+        "K": "f4",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 6,
+      "physical": 48,
+      "pieces": {
+        "K": "e5",
+        "B": "g8",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 6,
+      "physical": 48,
+      "pieces": {
+        "K": "d4",
+        "B": "c4",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 6,
+      "physical": 48,
+      "pieces": {
+        "K": "e4",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 5,
+      "physical": 40,
+      "pieces": {
+        "K": "d6",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 5,
+      "physical": 40,
+      "pieces": {
+        "K": "d4",
+        "B": "d5",
+        "N": "b4"
+      }
+    },
+    {
+      "orbits": 5,
+      "physical": 40,
+      "pieces": {
+        "K": "e4",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 4,
+      "physical": 32,
+      "pieces": {
+        "K": "g8",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 4,
+      "physical": 32,
+      "pieces": {
+        "K": "c7",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 4,
+      "physical": 32,
+      "pieces": {
+        "K": "f6",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 4,
+      "physical": 32,
+      "pieces": {
+        "K": "f3",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 4,
+      "physical": 32,
+      "pieces": {
+        "K": "c3",
+        "B": "g8",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 4,
+      "physical": 32,
+      "pieces": {
+        "K": "f5",
+        "B": "e6",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 4,
+      "physical": 32,
+      "pieces": {
+        "K": "c5",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 4,
+      "physical": 32,
+      "pieces": {
+        "K": "e6",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 4,
+      "physical": 32,
+      "pieces": {
+        "K": "f5",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 4,
+      "physical": 32,
+      "pieces": {
+        "K": "e5",
+        "B": "c8",
+        "N": "a6"
+      }
+    },
+    {
+      "orbits": 4,
+      "physical": 32,
+      "pieces": {
+        "K": "e5",
+        "B": "a4",
+        "N": "d1"
+      }
+    },
+    {
+      "orbits": 3,
+      "physical": 24,
+      "pieces": {
+        "K": "c8",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 3,
+      "physical": 24,
+      "pieces": {
+        "K": "f8",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 3,
+      "physical": 24,
+      "pieces": {
+        "K": "h5",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 3,
+      "physical": 24,
+      "pieces": {
+        "K": "b6",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 3,
+      "physical": 24,
+      "pieces": {
+        "K": "f7",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 3,
+      "physical": 24,
+      "pieces": {
+        "K": "f7",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 3,
+      "physical": 24,
+      "pieces": {
+        "K": "g3",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 3,
+      "physical": 24,
+      "pieces": {
+        "K": "g4",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 3,
+      "physical": 24,
+      "pieces": {
+        "K": "b4",
+        "B": "g8",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 3,
+      "physical": 24,
+      "pieces": {
+        "K": "c6",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 3,
+      "physical": 24,
+      "pieces": {
+        "K": "f6",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 3,
+      "physical": 24,
+      "pieces": {
+        "K": "d3",
+        "B": "a4",
+        "N": "a3"
+      }
+    },
+    {
+      "orbits": 3,
+      "physical": 24,
+      "pieces": {
+        "K": "e6",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 3,
+      "physical": 24,
+      "pieces": {
+        "K": "f5",
+        "B": "c4",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 3,
+      "physical": 24,
+      "pieces": {
+        "K": "e5",
+        "B": "d5",
+        "N": "e3"
+      }
+    },
+    {
+      "orbits": 3,
+      "physical": 24,
+      "pieces": {
+        "K": "e5",
+        "B": "b3",
+        "N": "d1"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "g8",
+        "B": "e6",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "a2",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "c8",
+        "B": "g8",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "a3",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "f8",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "c1",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "h6",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "h5",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "h4",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "b2",
+        "B": "a4",
+        "N": "d1"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "c7",
+        "B": "g8",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "b3",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "f2",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "d7",
+        "B": "c8",
+        "N": "c2"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "g4",
+        "B": "g8",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "g5",
+        "B": "e6",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "g5",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "g5",
+        "B": "c4",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "c3",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "c4",
+        "B": "a2",
+        "N": "g1"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "e6",
+        "B": "g8",
+        "N": "b2"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "d6",
+        "B": "g8",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "d3",
+        "B": "a2",
+        "N": "c1"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "d3",
+        "B": "a2",
+        "N": "d4"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "c4",
+        "B": "b3",
+        "N": "a5"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "c4",
+        "B": "b3",
+        "N": "g1"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "e6",
+        "B": "f7",
+        "N": "b2"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "c4",
+        "B": "b5",
+        "N": "a3"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "c4",
+        "B": "b7",
+        "N": "a5"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "d3",
+        "B": "b3",
+        "N": "c1"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "c4",
+        "B": "c6",
+        "N": "a5"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "f5",
+        "B": "e8",
+        "N": "a4"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "e3",
+        "B": "c4",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "f5",
+        "B": "d7",
+        "N": "a4"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "d3",
+        "B": "d5",
+        "N": "d4"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "e3",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "e6",
+        "B": "c4",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "f4",
+        "B": "c4",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "d5",
+        "B": "a8",
+        "N": "a3"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "d5",
+        "B": "a8",
+        "N": "a1"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "d5",
+        "B": "a8",
+        "N": "b2"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "d5",
+        "B": "a8",
+        "N": "c3"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "d5",
+        "B": "a8",
+        "N": "c1"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "d5",
+        "B": "a8",
+        "N": "d2"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "d5",
+        "B": "a8",
+        "N": "e3"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "d5",
+        "B": "a8",
+        "N": "e1"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "d5",
+        "B": "a8",
+        "N": "f2"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "d5",
+        "B": "a8",
+        "N": "g1"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "e5",
+        "B": "c8",
+        "N": "b4"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "d5",
+        "B": "g8",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "e5",
+        "B": "b7",
+        "N": "a6"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "d5",
+        "B": "c6",
+        "N": "a3"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "d5",
+        "B": "c6",
+        "N": "a1"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "d5",
+        "B": "c6",
+        "N": "b2"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "d5",
+        "B": "c6",
+        "N": "c3"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "d5",
+        "B": "c6",
+        "N": "c1"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "d5",
+        "B": "c6",
+        "N": "d2"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "d5",
+        "B": "c6",
+        "N": "e3"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "d5",
+        "B": "c6",
+        "N": "e1"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "d5",
+        "B": "c6",
+        "N": "f2"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "d5",
+        "B": "c6",
+        "N": "g1"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "d4",
+        "B": "c6",
+        "N": "b5"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "d4",
+        "B": "c6",
+        "N": "b6"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "d4",
+        "B": "c8",
+        "N": "b6"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "d4",
+        "B": "e6",
+        "N": "e3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "a1",
+        "B": "a2",
+        "N": "b2"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "a1",
+        "B": "a2",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "h8",
+        "B": "e6",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "a8",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "a8",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "h8",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "h8",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "h1",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "h1",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "a7",
+        "B": "b7",
+        "N": "a6"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "a7",
+        "B": "c8",
+        "N": "a6"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "a7",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "a7",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "b8",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "b8",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "g8",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "b1",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "h7",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "g1",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "g1",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "h2",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "h2",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "a6",
+        "B": "c6",
+        "N": "a7"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "c8",
+        "B": "e6",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "a6",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "c8",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "a3",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "h6",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "h3",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "h3",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d1",
+        "B": "a2",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "h5",
+        "B": "g8",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "a4",
+        "B": "b3",
+        "N": "d1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "e8",
+        "B": "d7",
+        "N": "b5"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d1",
+        "B": "b3",
+        "N": "c2"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d1",
+        "B": "b3",
+        "N": "a4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d1",
+        "B": "b3",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "h5",
+        "B": "f7",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "e8",
+        "B": "c6",
+        "N": "b5"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "e8",
+        "B": "c6",
+        "N": "a4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d1",
+        "B": "a4",
+        "N": "c2"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "h5",
+        "B": "e6",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "a4",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "e8",
+        "B": "b5",
+        "N": "a4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d1",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d1",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "e1",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "h4",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "h5",
+        "B": "c4",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "a4",
+        "B": "g8",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "b7",
+        "B": "a8",
+        "N": "a3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "b7",
+        "B": "a8",
+        "N": "a2"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "b7",
+        "B": "a8",
+        "N": "c2"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "b7",
+        "B": "a8",
+        "N": "c1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "b2",
+        "B": "a4",
+        "N": "c2"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "b2",
+        "B": "b3",
+        "N": "a4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "b2",
+        "B": "b3",
+        "N": "c2"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "b2",
+        "B": "b3",
+        "N": "d1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "b7",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "b7",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "b2",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "g7",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "g7",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "g2",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "g2",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "b3",
+        "B": "a2",
+        "N": "a7"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "f7",
+        "B": "g8",
+        "N": "a6"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "b3",
+        "B": "a2",
+        "N": "f1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "b3",
+        "B": "a2",
+        "N": "g1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "f7",
+        "B": "g8",
+        "N": "f2"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "f7",
+        "B": "g8",
+        "N": "f1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "b6",
+        "B": "b5",
+        "N": "a4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "f7",
+        "B": "e6",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "c7",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "b3",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "f2",
+        "B": "c4",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "b6",
+        "B": "e8",
+        "N": "a4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "c2",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "c2",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "g6",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "f2",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "g3",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "f7",
+        "B": "c4",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "g3",
+        "B": "c4",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "b6",
+        "B": "g8",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "b3",
+        "B": "g8",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d7",
+        "B": "c8",
+        "N": "a4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d7",
+        "B": "c8",
+        "N": "a3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d7",
+        "B": "c8",
+        "N": "e3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d7",
+        "B": "c8",
+        "N": "a2"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d7",
+        "B": "c8",
+        "N": "b2"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d7",
+        "B": "c8",
+        "N": "c1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "b5",
+        "B": "a4",
+        "N": "f1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d7",
+        "B": "e8",
+        "N": "f2"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d2",
+        "B": "a2",
+        "N": "c1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "b4",
+        "B": "b3",
+        "N": "a5"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "b4",
+        "B": "b5",
+        "N": "a3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "b4",
+        "B": "b7",
+        "N": "a5"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d2",
+        "B": "b3",
+        "N": "c1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "b5",
+        "B": "c6",
+        "N": "a7"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "b4",
+        "B": "c6",
+        "N": "a5"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d2",
+        "B": "a4",
+        "N": "e2"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d2",
+        "B": "a4",
+        "N": "c3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "b5",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "b4",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "e7",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "e7",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "g4",
+        "B": "e6",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "b4",
+        "B": "d7",
+        "N": "b3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "b4",
+        "B": "d7",
+        "N": "c5"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d2",
+        "B": "b5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "g5",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "e2",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "e2",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "g4",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d2",
+        "B": "a6",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "b4",
+        "B": "f7",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "c6",
+        "B": "a8",
+        "N": "a2"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "c6",
+        "B": "a8",
+        "N": "c1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "c3",
+        "B": "a2",
+        "N": "c2"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "c3",
+        "B": "a2",
+        "N": "d4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "c6",
+        "B": "c8",
+        "N": "a2"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "c6",
+        "B": "c8",
+        "N": "c1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "c3",
+        "B": "a4",
+        "N": "g1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "f6",
+        "B": "e8",
+        "N": "f1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "f6",
+        "B": "c8",
+        "N": "a4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "f6",
+        "B": "c8",
+        "N": "b2"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "c6",
+        "B": "b7",
+        "N": "a2"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "c6",
+        "B": "b7",
+        "N": "c1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "f6",
+        "B": "e6",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "c3",
+        "B": "d5",
+        "N": "a5"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "c3",
+        "B": "d5",
+        "N": "b3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "c3",
+        "B": "d5",
+        "N": "c2"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "c3",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "f6",
+        "B": "d5",
+        "N": "d2"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "f3",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "c3",
+        "B": "e8",
+        "N": "g1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "f6",
+        "B": "a4",
+        "N": "f1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "f3",
+        "B": "c8",
+        "N": "b6"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "f3",
+        "B": "c8",
+        "N": "a4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "c5",
+        "B": "a8",
+        "N": "b6"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "c4",
+        "B": "a2",
+        "N": "b4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "e6",
+        "B": "g8",
+        "N": "f1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "e6",
+        "B": "g8",
+        "N": "d1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d6",
+        "B": "c8",
+        "N": "a2"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d6",
+        "B": "c8",
+        "N": "c1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "c4",
+        "B": "a4",
+        "N": "g1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "e6",
+        "B": "e8",
+        "N": "a2"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "e6",
+        "B": "e8",
+        "N": "f1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "e6",
+        "B": "e8",
+        "N": "c1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d6",
+        "B": "e8",
+        "N": "a2"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "c5",
+        "B": "a4",
+        "N": "g1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d6",
+        "B": "e8",
+        "N": "c1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d6",
+        "B": "e8",
+        "N": "f1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "c4",
+        "B": "a6",
+        "N": "b4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "e6",
+        "B": "c8",
+        "N": "a2"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "e6",
+        "B": "c8",
+        "N": "c1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "c4",
+        "B": "b3",
+        "N": "c1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "c4",
+        "B": "b3",
+        "N": "f1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "e6",
+        "B": "f7",
+        "N": "g1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "e6",
+        "B": "f7",
+        "N": "f1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "e6",
+        "B": "f7",
+        "N": "d1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d6",
+        "B": "d7",
+        "N": "a2"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d6",
+        "B": "d7",
+        "N": "c1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "c4",
+        "B": "b5",
+        "N": "g1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "e6",
+        "B": "d7",
+        "N": "a2"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "e6",
+        "B": "d7",
+        "N": "f1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "e6",
+        "B": "d7",
+        "N": "c1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "c5",
+        "B": "c8",
+        "N": "b6"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d3",
+        "B": "b3",
+        "N": "d4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "c5",
+        "B": "c6",
+        "N": "b6"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d3",
+        "B": "a4",
+        "N": "b6"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "f5",
+        "B": "e8",
+        "N": "c3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d3",
+        "B": "a4",
+        "N": "a7"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "f5",
+        "B": "e8",
+        "N": "b5"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "f5",
+        "B": "e8",
+        "N": "a7"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "f5",
+        "B": "e8",
+        "N": "a3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "c5",
+        "B": "d7",
+        "N": "b6"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d6",
+        "B": "d5",
+        "N": "c5"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d6",
+        "B": "d5",
+        "N": "e3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d6",
+        "B": "d5",
+        "N": "d2"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "c4",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "e6",
+        "B": "d5",
+        "N": "c5"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "c5",
+        "B": "e8",
+        "N": "g1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d6",
+        "B": "a4",
+        "N": "f1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "f5",
+        "B": "d7",
+        "N": "c3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d3",
+        "B": "d5",
+        "N": "e3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d3",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "f4",
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "c4",
+        "B": "e8",
+        "N": "g1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "e6",
+        "B": "a4",
+        "N": "f1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "f5",
+        "B": "c8",
+        "N": "b2"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "f5",
+        "B": "c8",
+        "N": "a4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "c5",
+        "B": "f7",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d3",
+        "B": "e6",
+        "N": "a7"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "f5",
+        "B": "c4",
+        "N": "a6"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "f5",
+        "B": "b3",
+        "N": "f2"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "f5",
+        "B": "b3",
+        "N": "d1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d3",
+        "B": "e8",
+        "N": "a3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d3",
+        "B": "e8",
+        "N": "a7"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "f5",
+        "B": "a4",
+        "N": "a7"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "f5",
+        "B": "a4",
+        "N": "a3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d3",
+        "B": "g8",
+        "N": "d4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d4",
+        "B": "a2",
+        "N": "b4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d4",
+        "B": "a4",
+        "N": "a7"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d4",
+        "B": "a6",
+        "N": "b4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d4",
+        "B": "a8",
+        "N": "b6"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "e5",
+        "B": "d5",
+        "N": "d4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d4",
+        "B": "d7",
+        "N": "b6"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "e4",
+        "B": "d5",
+        "N": "e3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "e4",
+        "B": "d5",
+        "N": "b4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "e4",
+        "B": "d5",
+        "N": "c5"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d4",
+        "B": "e8",
+        "N": "a7"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d4",
+        "B": "e8",
+        "N": "b5"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "e5",
+        "B": "a4",
+        "N": "c3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "e5",
+        "B": "a4",
+        "N": "f2"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "e5",
+        "B": "b3",
+        "N": "f2"
+      }
+    }
+  ],
+  "unsupportedMinorPairs": [
+    {
+      "orbits": 168,
+      "physical": 1344,
+      "pieces": {
+        "B": "d5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 117,
+      "physical": 936,
+      "pieces": {
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 48,
+      "physical": 384,
+      "pieces": {
+        "B": "g8",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 33,
+      "physical": 264,
+      "pieces": {
+        "B": "c4",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 21,
+      "physical": 168,
+      "pieces": {
+        "B": "e6",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 17,
+      "physical": 136,
+      "pieces": {
+        "B": "d5",
+        "N": "e3"
+      }
+    },
+    {
+      "orbits": 10,
+      "physical": 80,
+      "pieces": {
+        "B": "d5",
+        "N": "c5"
+      }
+    },
+    {
+      "orbits": 6,
+      "physical": 48,
+      "pieces": {
+        "B": "b3",
+        "N": "d1"
+      }
+    },
+    {
+      "orbits": 6,
+      "physical": 48,
+      "pieces": {
+        "B": "a4",
+        "N": "d1"
+      }
+    },
+    {
+      "orbits": 6,
+      "physical": 48,
+      "pieces": {
+        "B": "d5",
+        "N": "b4"
+      }
+    },
+    {
+      "orbits": 5,
+      "physical": 40,
+      "pieces": {
+        "B": "c8",
+        "N": "a6"
+      }
+    },
+    {
+      "orbits": 4,
+      "physical": 32,
+      "pieces": {
+        "B": "a8",
+        "N": "c1"
+      }
+    },
+    {
+      "orbits": 4,
+      "physical": 32,
+      "pieces": {
+        "B": "c8",
+        "N": "a4"
+      }
+    },
+    {
+      "orbits": 4,
+      "physical": 32,
+      "pieces": {
+        "B": "c8",
+        "N": "a2"
+      }
+    },
+    {
+      "orbits": 4,
+      "physical": 32,
+      "pieces": {
+        "B": "c8",
+        "N": "c1"
+      }
+    },
+    {
+      "orbits": 4,
+      "physical": 32,
+      "pieces": {
+        "B": "a4",
+        "N": "f1"
+      }
+    },
+    {
+      "orbits": 4,
+      "physical": 32,
+      "pieces": {
+        "B": "b3",
+        "N": "c1"
+      }
+    },
+    {
+      "orbits": 4,
+      "physical": 32,
+      "pieces": {
+        "B": "c8",
+        "N": "b6"
+      }
+    },
+    {
+      "orbits": 4,
+      "physical": 32,
+      "pieces": {
+        "B": "a4",
+        "N": "a3"
+      }
+    },
+    {
+      "orbits": 3,
+      "physical": 24,
+      "pieces": {
+        "B": "b7",
+        "N": "a6"
+      }
+    },
+    {
+      "orbits": 3,
+      "physical": 24,
+      "pieces": {
+        "B": "f7",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 3,
+      "physical": 24,
+      "pieces": {
+        "B": "c6",
+        "N": "b5"
+      }
+    },
+    {
+      "orbits": 3,
+      "physical": 24,
+      "pieces": {
+        "B": "a8",
+        "N": "a3"
+      }
+    },
+    {
+      "orbits": 3,
+      "physical": 24,
+      "pieces": {
+        "B": "a2",
+        "N": "g1"
+      }
+    },
+    {
+      "orbits": 3,
+      "physical": 24,
+      "pieces": {
+        "B": "e8",
+        "N": "a4"
+      }
+    },
+    {
+      "orbits": 3,
+      "physical": 24,
+      "pieces": {
+        "B": "c8",
+        "N": "b2"
+      }
+    },
+    {
+      "orbits": 3,
+      "physical": 24,
+      "pieces": {
+        "B": "a2",
+        "N": "c1"
+      }
+    },
+    {
+      "orbits": 3,
+      "physical": 24,
+      "pieces": {
+        "B": "b3",
+        "N": "a5"
+      }
+    },
+    {
+      "orbits": 3,
+      "physical": 24,
+      "pieces": {
+        "B": "b5",
+        "N": "a3"
+      }
+    },
+    {
+      "orbits": 3,
+      "physical": 24,
+      "pieces": {
+        "B": "b7",
+        "N": "a5"
+      }
+    },
+    {
+      "orbits": 3,
+      "physical": 24,
+      "pieces": {
+        "B": "c6",
+        "N": "a5"
+      }
+    },
+    {
+      "orbits": 3,
+      "physical": 24,
+      "pieces": {
+        "B": "a2",
+        "N": "d4"
+      }
+    },
+    {
+      "orbits": 3,
+      "physical": 24,
+      "pieces": {
+        "B": "a4",
+        "N": "g1"
+      }
+    },
+    {
+      "orbits": 3,
+      "physical": 24,
+      "pieces": {
+        "B": "e8",
+        "N": "f1"
+      }
+    },
+    {
+      "orbits": 3,
+      "physical": 24,
+      "pieces": {
+        "B": "e8",
+        "N": "g1"
+      }
+    },
+    {
+      "orbits": 3,
+      "physical": 24,
+      "pieces": {
+        "B": "c6",
+        "N": "b6"
+      }
+    },
+    {
+      "orbits": 3,
+      "physical": 24,
+      "pieces": {
+        "B": "a4",
+        "N": "a7"
+      }
+    },
+    {
+      "orbits": 3,
+      "physical": 24,
+      "pieces": {
+        "B": "e8",
+        "N": "a7"
+      }
+    },
+    {
+      "orbits": 3,
+      "physical": 24,
+      "pieces": {
+        "B": "d5",
+        "N": "d4"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "B": "a2",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "B": "c6",
+        "N": "a7"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "B": "b3",
+        "N": "c2"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "B": "b3",
+        "N": "a4"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "B": "a4",
+        "N": "c2"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "B": "b5",
+        "N": "a4"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "B": "a8",
+        "N": "a2"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "B": "g8",
+        "N": "f1"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "B": "c8",
+        "N": "c2"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "B": "a4",
+        "N": "c3"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "B": "d5",
+        "N": "d2"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "B": "a8",
+        "N": "b6"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "B": "a2",
+        "N": "b4"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "B": "g8",
+        "N": "b2"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "B": "e8",
+        "N": "a2"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "B": "e8",
+        "N": "c1"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "B": "a6",
+        "N": "b4"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "B": "b3",
+        "N": "g1"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "B": "f7",
+        "N": "b2"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "B": "d7",
+        "N": "a2"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "B": "d7",
+        "N": "c1"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "B": "e8",
+        "N": "b5"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "B": "e8",
+        "N": "a3"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "B": "d7",
+        "N": "b6"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "B": "d7",
+        "N": "a4"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "B": "b3",
+        "N": "f2"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "B": "a8",
+        "N": "a1"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "B": "a8",
+        "N": "b2"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "B": "a8",
+        "N": "c3"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "B": "a8",
+        "N": "d2"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "B": "a8",
+        "N": "e3"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "B": "a8",
+        "N": "e1"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "B": "a8",
+        "N": "f2"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "B": "a8",
+        "N": "g1"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "B": "c8",
+        "N": "b4"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "B": "c6",
+        "N": "a3"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "B": "c6",
+        "N": "a1"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "B": "c6",
+        "N": "b2"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "B": "c6",
+        "N": "c3"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "B": "c6",
+        "N": "c1"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "B": "c6",
+        "N": "d2"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "B": "c6",
+        "N": "e3"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "B": "c6",
+        "N": "e1"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "B": "c6",
+        "N": "f2"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "B": "c6",
+        "N": "g1"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "B": "e6",
+        "N": "e3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "B": "a2",
+        "N": "b2"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "B": "d7",
+        "N": "b5"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "B": "b3",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "B": "c6",
+        "N": "a4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "B": "a8",
+        "N": "c2"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "B": "a2",
+        "N": "a7"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "B": "g8",
+        "N": "a6"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "B": "a2",
+        "N": "f1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "B": "g8",
+        "N": "f2"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "B": "c8",
+        "N": "a3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "B": "c8",
+        "N": "e3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "B": "e8",
+        "N": "f2"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "B": "a4",
+        "N": "e2"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "B": "d7",
+        "N": "b3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "B": "d7",
+        "N": "c5"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "B": "b5",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "B": "a6",
+        "N": "c4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "B": "a2",
+        "N": "c2"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "B": "b7",
+        "N": "a2"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "B": "b7",
+        "N": "c1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "B": "d5",
+        "N": "a5"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "B": "d5",
+        "N": "b3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "B": "d5",
+        "N": "c2"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "B": "g8",
+        "N": "d1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "B": "b3",
+        "N": "f1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "B": "f7",
+        "N": "g1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "B": "f7",
+        "N": "f1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "B": "f7",
+        "N": "d1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "B": "b5",
+        "N": "g1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "B": "d7",
+        "N": "f1"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "B": "b3",
+        "N": "d4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "B": "a4",
+        "N": "b6"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "B": "e8",
+        "N": "c3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "B": "d7",
+        "N": "c3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "B": "e6",
+        "N": "a7"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "B": "c4",
+        "N": "a6"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "B": "g8",
+        "N": "d4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "B": "a4",
+        "N": "f2"
+      }
+    }
+  ],
+  "supportedExactWhiteFormations": [
+    {
+      "orbits": 11,
+      "physical": 88,
+      "pieces": {
+        "K": "e7",
+        "B": "g8",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 11,
+      "physical": 88,
+      "pieces": {
+        "K": "e7",
+        "B": "b3",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 11,
+      "physical": 88,
+      "pieces": {
+        "K": "e5",
+        "B": "b3",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 10,
+      "physical": 80,
+      "pieces": {
+        "K": "d4",
+        "B": "b3",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 10,
+      "physical": 80,
+      "pieces": {
+        "K": "d4",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 9,
+      "physical": 72,
+      "pieces": {
+        "K": "e6",
+        "B": "b3",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 9,
+      "physical": 72,
+      "pieces": {
+        "K": "e5",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 8,
+      "physical": 64,
+      "pieces": {
+        "K": "f6",
+        "B": "b3",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 8,
+      "physical": 64,
+      "pieces": {
+        "K": "d5",
+        "B": "b3",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 7,
+      "physical": 56,
+      "pieces": {
+        "K": "c5",
+        "B": "b3",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 7,
+      "physical": 56,
+      "pieces": {
+        "K": "d6",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 7,
+      "physical": 56,
+      "pieces": {
+        "K": "f5",
+        "B": "b3",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 6,
+      "physical": 48,
+      "pieces": {
+        "K": "f7",
+        "B": "b3",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 6,
+      "physical": 48,
+      "pieces": {
+        "K": "c5",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 6,
+      "physical": 48,
+      "pieces": {
+        "K": "d6",
+        "B": "b3",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 5,
+      "physical": 40,
+      "pieces": {
+        "K": "e8",
+        "B": "b3",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 5,
+      "physical": 40,
+      "pieces": {
+        "K": "g7",
+        "B": "b3",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 5,
+      "physical": 40,
+      "pieces": {
+        "K": "c3",
+        "B": "b3",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 5,
+      "physical": 40,
+      "pieces": {
+        "K": "d6",
+        "B": "g8",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 4,
+      "physical": 32,
+      "pieces": {
+        "K": "f8",
+        "B": "b3",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 4,
+      "physical": 32,
+      "pieces": {
+        "K": "e6",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 4,
+      "physical": 32,
+      "pieces": {
+        "K": "f5",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 4,
+      "physical": 32,
+      "pieces": {
+        "K": "d4",
+        "B": "g8",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 3,
+      "physical": 24,
+      "pieces": {
+        "K": "g6",
+        "B": "b3",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 3,
+      "physical": 24,
+      "pieces": {
+        "K": "d7",
+        "B": "b3",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 3,
+      "physical": 24,
+      "pieces": {
+        "K": "f6",
+        "B": "g8",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 3,
+      "physical": 24,
+      "pieces": {
+        "K": "c3",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 3,
+      "physical": 24,
+      "pieces": {
+        "K": "e6",
+        "B": "g8",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 3,
+      "physical": 24,
+      "pieces": {
+        "K": "e4",
+        "B": "b3",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "d8",
+        "B": "a4",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "b2",
+        "B": "b3",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "c2",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "b5",
+        "B": "a6",
+        "N": "b7"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "b4",
+        "B": "b3",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "c6",
+        "B": "b3",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "c6",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "f6",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "c3",
+        "B": "g8",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "d6",
+        "B": "e8",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "c4",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "c5",
+        "B": "g8",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "d5",
+        "B": "g8",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 2,
+      "physical": 16,
+      "pieces": {
+        "K": "e5",
+        "B": "e6",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "a2",
+        "B": "d7",
+        "N": "d5"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "g8",
+        "B": "b3",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "h7",
+        "B": "b3",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "a3",
+        "B": "d7",
+        "N": "d5"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "f8",
+        "B": "a4",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d8",
+        "B": "e8",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d8",
+        "B": "d7",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "a5",
+        "B": "d7",
+        "N": "d5"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "g7",
+        "B": "f7",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "b2",
+        "B": "c4",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "b2",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "g7",
+        "B": "c4",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "b2",
+        "B": "g8",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "b6",
+        "B": "d7",
+        "N": "d5"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "g6",
+        "B": "e6",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "g6",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "f7",
+        "B": "a4",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "b5",
+        "B": "a6",
+        "N": "b6"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "b5",
+        "B": "a6",
+        "N": "d5"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "b5",
+        "B": "d7",
+        "N": "d5"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "b4",
+        "B": "d5",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "b4",
+        "B": "d7",
+        "N": "d5"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d7",
+        "B": "a4",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "c3",
+        "B": "c4",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "f6",
+        "B": "e6",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "f6",
+        "B": "c4",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "f6",
+        "B": "a4",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "c4",
+        "B": "b3",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "e6",
+        "B": "f7",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d6",
+        "B": "d7",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "c5",
+        "B": "d7",
+        "N": "b4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d6",
+        "B": "b5",
+        "N": "c5"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "c5",
+        "B": "d7",
+        "N": "d5"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "c5",
+        "B": "d7",
+        "N": "d4"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "c5",
+        "B": "d7",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d6",
+        "B": "b5",
+        "N": "b2"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d6",
+        "B": "b5",
+        "N": "f2"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d6",
+        "B": "a4",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "e6",
+        "B": "a4",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "e5",
+        "B": "g8",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d5",
+        "B": "a4",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "d5",
+        "B": "d7",
+        "N": "d3"
+      }
+    },
+    {
+      "orbits": 1,
+      "physical": 8,
+      "pieces": {
+        "K": "e4",
+        "B": "g8",
+        "N": "d3"
+      }
+    }
+  ],
+  "supportedLargestMinorPair": {
+    "bishop": "b3",
+    "knight": "d3",
+    "orbits": 120
+  },
+  "lossTarget": {
+    "sourceOrbits": 8,
+    "whiteDecisions": 4,
+    "events": 8,
+    "description": "Five-diagonal bishop on b5 or d7; king on d6 or c5, adjacent to c6; knight on b4 or e3, approaching a seven-support square. Preferred Bc6 loses support."
+  },
+  "examples": {
+    "unsupported": [
+      {
+        "motif": "White Ke5, Bd5, Nc4 (D4 equivalents)",
+        "positions": 35,
+        "examples": [
+          {
+            "fen": "8/3k4/8/3BK3/2N5/8/8/8 w - - 0 1",
+            "moves": [
+              "Be4",
+              "Ke7",
+              "Bd5",
+              "Kd7"
+            ],
+            "d": 2,
+            "phases": [
+              99,
+              99
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=8/3k4/8/3BK3/2N5/8/8/8_w_-_-_0_1&moves=Be4,Ke7,Bd5,Kd7&cursor=0",
+            "motif": "King-protected central bishop; knight on precage"
+          },
+          {
+            "fen": "8/8/8/2kBK3/2N5/8/8/8 w - - 0 1",
+            "moves": [
+              "Nd6",
+              "Kb4",
+              "Nc4",
+              "Kc5"
+            ],
+            "d": 2,
+            "phases": [
+              99,
+              99
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/2kBK3/2N5/8/8/8_w_-_-_0_1&moves=Nd6,Kb4,Nc4,Kc5&cursor=0",
+            "motif": "King-protected central bishop; knight on precage"
+          },
+          {
+            "fen": "8/8/4N3/3B1k2/3K4/8/8/8 w - - 0 1",
+            "moves": [
+              "Nc5",
+              "Kf4",
+              "Ne6+",
+              "Kf5"
+            ],
+            "d": 10,
+            "phases": [
+              99,
+              99
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/4N3/3B1k2/3K4/8/8/8_w_-_-_0_1&moves=Nc5,Kf4,Ne6%2B,Kf5&cursor=0",
+            "motif": "King-protected central bishop; knight on precage"
+          }
+        ]
+      }
+    ],
+    "supported": [
+      {
+        "motif": "White Ke7, Bb3, Nd3 (D4 equivalents)",
+        "positions": 11,
+        "examples": [
+          {
+            "fen": "8/2k1K3/8/8/8/1B1N4/8/8 w - - 0 1",
+            "moves": [
+              "Ke8",
+              "Kc8",
+              "Ke7",
+              "Kc7"
+            ],
+            "d": 0,
+            "phases": [
+              7,
+              7
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=8/2k1K3/8/8/8/1B1N4/8/8_w_-_-_0_1&moves=Ke8,Kc8,Ke7,Kc7&cursor=0",
+            "motif": "Noncentral bishop not king-protected; interior king; knight unprotected by king"
+          },
+          {
+            "fen": "8/4K3/2k5/8/8/1B1N4/8/8 w - - 0 1",
+            "moves": [
+              "Ke6",
+              "Kc7",
+              "Ke7",
+              "Kc6"
+            ],
+            "d": 0,
+            "phases": [
+              7,
+              7
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=8/4K3/2k5/8/8/1B1N4/8/8_w_-_-_0_1&moves=Ke6,Kc7,Ke7,Kc6&cursor=0",
+            "motif": "Noncentral bishop not king-protected; interior king; knight unprotected by king"
+          },
+          {
+            "fen": "8/4K3/8/1k6/8/1B1N4/8/8 w - - 0 1",
+            "moves": [
+              "Ke6",
+              "Kc6",
+              "Ke7",
+              "Kb5"
+            ],
+            "d": 0,
+            "phases": [
+              7,
+              7
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=8/4K3/8/1k6/8/1B1N4/8/8_w_-_-_0_1&moves=Ke6,Kc6,Ke7,Kb5&cursor=0",
+            "motif": "Noncentral bishop not king-protected; interior king; knight unprotected by king"
+          }
+        ]
+      }
+    ],
+    "losses": [
+      {
+        "motif": "5-diagonal flank bishop; king adjacent to c6; knight approaching seven-support",
+        "positions": 8,
+        "examples": [
+          {
+            "fen": "1k6/3B4/8/1K6/1N6/8/8/8 w - - 0 1",
+            "moves": [
+              "Kc5",
+              "Kc7",
+              "Bc6",
+              "Kd8"
+            ],
+            "d": 5,
+            "phases": [
+              5,
+              99
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=1k6/3B4/8/1K6/1N6/8/8/8_w_-_-_0_1&moves=Kc5,Kc7,Bc6,Kd8&cursor=0"
+          },
+          {
+            "fen": "8/k2K4/8/1B6/1N6/8/8/8 w - - 0 1",
+            "moves": [
+              "Kd6",
+              "Kb6",
+              "Bc6",
+              "Ka5"
+            ],
+            "d": 5,
+            "phases": [
+              5,
+              99
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=8/k2K4/8/1B6/1N6/8/8/8_w_-_-_0_1&moves=Kd6,Kb6,Bc6,Ka5&cursor=0"
+          },
+          {
+            "fen": "1k6/3B4/8/1K6/8/4N3/8/8 w - - 0 1",
+            "moves": [
+              "Kc5",
+              "Kc7",
+              "Bc6",
+              "Kd8"
+            ],
+            "d": 1,
+            "phases": [
+              5,
+              99
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=1k6/3B4/8/1K6/8/4N3/8/8_w_-_-_0_1&moves=Kc5,Kc7,Bc6,Kd8&cursor=0"
+          }
+        ]
+      }
+    ]
+  }
+}

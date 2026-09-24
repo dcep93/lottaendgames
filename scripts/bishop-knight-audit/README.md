@@ -108,14 +108,17 @@ preferences. They can supply the historical cohort, but its survivors must be
 rechecked with **all legal Black replies**, and its old density is not a current
 all-legal measurement.
 
-The current frozen baseline is `cohort-full-2026-09-24.json`: **1,159 D4 positions /
-9,272 physical positions** on wholly unsupported cycles, from the exhaustive
-all-legal-Black audit of policy `9fbb749`. There are another 30 unsupported D4
-positions on mixed supported/unsupported cycles. The older 1,336-position
-`cohort-r51-reset-2026-09-24.json` remains historical evidence; 62 of those
-positions still lie on wholly unsupported cycles under this policy.
+The current frozen baseline is `cohort-full-b1be217-2026-09-24.json`: **659 D4 positions /
+5,272 physical positions** on wholly unsupported cycles, from the full-domain
+audit of policy `b1be217`. Another 46 unsupported D4 positions lie only on mixed
+supported/unsupported cycles. The older `cohort-full-2026-09-24.json` (1,159
+positions, policy `9fbb749`) and other cohorts remain historical evidence.
 
-See `docs/audits/2026-09-24-full-9fbb749.md` for the new exact counts and replays.
+See `docs/audits/2026-09-24-full-b1be217.md` for the exact counts and replays.
+Use exact White K/B/N formations modulo D4 as the fine motif partition and
+B/N setups as a separate coarser partition. Neither uses translations or played
+moves to determine membership. Report the granularity alongside “largest”; do
+not compare or add counts across the two partitions.
 
 ```sh
 # Only after a new full audit: extract all cyclic positions, not just witnesses.
@@ -124,12 +127,12 @@ app/node_modules/.bin/tsx scripts/bishop-knight-audit/freeze-unsupported-cohort.
 
 # Exact current-policy membership, all cycle lengths, wholly unsupported cycles.
 app/node_modules/.bin/tsx scripts/bishop-knight-audit/unsupported-cohort.mts \
-  --baseline scripts/bishop-knight-audit/cohort-full-2026-09-24.json \
+  --baseline scripts/bishop-knight-audit/cohort-full-b1be217-2026-09-24.json \
   --out /absolute/cohort-check
 
 # Five-second residual sample, reusing the closed graph from that exact check.
 app/node_modules/.bin/tsx scripts/bishop-knight-audit/residual-estimate.mts \
-  --baseline scripts/bishop-knight-audit/cohort-full-2026-09-24.json \
+  --baseline scripts/bishop-knight-audit/cohort-full-b1be217-2026-09-24.json \
   --cohort-dir /absolute/cohort-check \
   --census /absolute/completed-full-audit/census.sqlite \
   --unsupported-population CURRENT_D4_UNSUPPORTED_POPULATION
