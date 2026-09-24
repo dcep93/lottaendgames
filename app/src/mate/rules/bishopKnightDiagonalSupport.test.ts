@@ -1154,3 +1154,24 @@ test('declared Ba4 with Kd7 Nd3 against Kb8 is supported and preferred across D4
     }
   }
 })
+
+
+test('declared second-move Ba4 with Kd8 Nd3 against Kb8 or Kb7 is supported across D4', () => {
+  const lines = [
+    {fen: '3K4/1k6/4B3/8/8/3N4/8/8 w - - 1 2', reply: 'b8'},
+    {fen: '3K4/8/1k2B3/8/8/3N4/8/8 w - - 1 2', reply: 'b7'},
+  ] as const
+  for (const transform of SQUARE_TRANSFORMS) {
+    for (const {fen, reply} of lines) {
+      const board = getChess(transformFen(fen, transform))
+      board.move({from: transformSquare('e6', transform), to: transformSquare('d7', transform)})
+      const black = reply === 'b8' ? 'b7' : 'b6'
+      board.move({from: transformSquare(black, transform), to: transformSquare(reply, transform)})
+      const before = board.fen()
+      const move = board.move({from: transformSquare('d7', transform), to: transformSquare('a4', transform)}).san
+      assert.equal(knightAndBishopSupportedDiagonal(board.fen()).size, 5)
+      assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 5)
+      assert.ok(getIdealKnightAndBishopWhiteMoves(before).includes(move), before)
+    }
+  }
+})
