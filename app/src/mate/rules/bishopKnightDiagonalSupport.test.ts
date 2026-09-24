@@ -1140,3 +1140,17 @@ test('declared Kd8 with Be8 Nd3 against Kb6 is supported across D4', () => {
     }
   }
 })
+
+
+test('declared Ba4 with Kd7 Nd3 against Kb8 is supported and preferred across D4', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    for (const counters of ['1 2', '31 18']) {
+      const before = transformFen(`1k6/3K4/8/8/8/1B1N4/8/8 w - - ${counters}`, transform)
+      const board = getChess(before)
+      const move = board.move({from: transformSquare('b3', transform), to: transformSquare('a4', transform)}).san
+      assert.equal(knightAndBishopSupportedDiagonal(board.fen()).size, 5)
+      assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 5)
+      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(before), [move])
+    }
+  }
+})
