@@ -288,6 +288,18 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
     (pattern.previousSupport && (knight.square === pattern.previousSupport || isKnightMove(knight.square, pattern.previousSupport))))) {
     return {size: 99, knight: 99}
   }
+  // An approaching knight cannot sustain support by rescuing an undefended bishop
+  // after Black attacks it. An occupied current- or previous-stage support square
+  // is required to permit that response, including for declared placements.
+  const knightOnSupport = DIAGONALS.some(pattern => pattern.wall.includes(bishop.square) &&
+    isInsideBishopDiagonal(black.square, pattern.wall) &&
+    (supportTargets(white.square, pattern).includes(knight.square) || pattern.previousSupport === knight.square))
+  if (!knightOnSupport && kingDistance(black.square, bishop.square) <= 2 &&
+    kingDistance(white.square, bishop.square) > 1 && !isKnightMove(knight.square, bishop.square)) {
+    const replies = blackDestinations ?? getChess(fen).moves({verbose: true})
+      .filter(move => move.piece === 'k').map(move => move.to)
+    if (replies.some(square => kingDistance(square, bishop.square) <= 1)) return {size: 99, knight: 99}
+  }
   // This exact arrangement has an explicit necessary-and-sufficient king condition.
   const e7Placement = DECLARED_FIVE_E7_ADJACENCY.find(pattern =>
     pattern.bishop === bishop.square && pattern.knight === knight.square && pattern.black === black.square)

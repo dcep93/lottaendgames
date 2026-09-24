@@ -1,0 +1,712 @@
+{
+  "request": "If the knight occupies no current- or previous-stage support square and Black can immediately attack an undefended bishop with a legal move, reject support. This rejects Kc5 with Bd7/Nb4 versus Kb8.",
+  "method": {
+    "kind": "Incremental update of maintained graph, not an independent fresh enumeration",
+    "source": "/Users/danielcepeda/repos/_codex_output/bn-r78-central-result-2026-09-24",
+    "policyFingerprint": "89b256218b090a8c11eb6c2684b5139dfa42b7f65f4c9c04de481c7ef609a96c",
+    "affectedNodes": 4329,
+    "policiesChanged": 437,
+    "supportRootsRemoved": 39,
+    "unaffectedReason": "The only production change adds an unconditional rejection before the existing classifier. Re-evaluate all 2339 previously supported root orbits; 39 become unsupported. Refresh each changed board and every possible one-White-piece predecessor present in the graph. Restoring the support module reproduces the prior executable worker exactly. Previously unsupported results cannot change.",
+    "white": "all preferred ties",
+    "black": "all legal replies",
+    "deduplication": "D4; post-White positions directly on cycles",
+    "cycleLengthLimit": null
+  },
+  "unsupportedOnlyCycles": {
+    "orbits": 1215,
+    "physical": 9720
+  },
+  "unsupportedPositionsOnAnyCycle": {
+    "orbits": 1221,
+    "physical": 9768
+  },
+  "baselineComparison": {
+    "baseline": 659,
+    "baselinePolicy": "b1be217877bdaaec6cd57d3ecedefbabf34ea514",
+    "baselineBlackPolicy": "all-legal",
+    "survivors": 425,
+    "newPositions": 790
+  },
+  "previousComparison": {
+    "previous": 1215,
+    "survivors": 1215,
+    "removed": 0,
+    "added": 0,
+    "current": 1215
+  },
+  "supportedPositionsOnCycles": {
+    "orbits": 77,
+    "physical": 616
+  },
+  "supportLoss": {
+    "whiteDecisions": {
+      "orbits": 16,
+      "physical": 128
+    },
+    "events": {
+      "orbits": 17,
+      "physical": 136
+    },
+    "sourcePositions": {
+      "orbits": 16,
+      "physical": 128
+    }
+  },
+  "pieceFormations": {
+    "definition": "Exact White K/B/N squares modulo the eight D4 board symmetries, without translations; Black square varies. Groups form a disjoint partition of positions. Larger minor-pair groups are a separate coarser partition, not competing motif sizes.",
+    "unsupportedExactWhite": [
+      {
+        "orbits": 39,
+        "physical": 312,
+        "pieces": {
+          "K": "e5",
+          "B": "d5",
+          "N": "c4"
+        }
+      },
+      {
+        "orbits": 37,
+        "physical": 296,
+        "pieces": {
+          "K": "d4",
+          "B": "d5",
+          "N": "c5"
+        }
+      },
+      {
+        "orbits": 25,
+        "physical": 200,
+        "pieces": {
+          "K": "e5",
+          "B": "g8",
+          "N": "c4"
+        }
+      },
+      {
+        "orbits": 25,
+        "physical": 200,
+        "pieces": {
+          "K": "d4",
+          "B": "d5",
+          "N": "b3"
+        }
+      },
+      {
+        "orbits": 24,
+        "physical": 192,
+        "pieces": {
+          "K": "c4",
+          "B": "d5",
+          "N": "d4"
+        }
+      },
+      {
+        "orbits": 23,
+        "physical": 184,
+        "pieces": {
+          "K": "d4",
+          "B": "d5",
+          "N": "c4"
+        }
+      },
+      {
+        "orbits": 23,
+        "physical": 184,
+        "pieces": {
+          "K": "d4",
+          "B": "d5",
+          "N": "e3"
+        }
+      },
+      {
+        "orbits": 22,
+        "physical": 176,
+        "pieces": {
+          "K": "d3",
+          "B": "d5",
+          "N": "b3"
+        }
+      },
+      {
+        "orbits": 22,
+        "physical": 176,
+        "pieces": {
+          "K": "d4",
+          "B": "c6",
+          "N": "c5"
+        }
+      },
+      {
+        "orbits": 22,
+        "physical": 176,
+        "pieces": {
+          "K": "e5",
+          "B": "c4",
+          "N": "d3"
+        }
+      }
+    ],
+    "unsupportedMinorPairs": [
+      {
+        "orbits": 166,
+        "physical": 1328,
+        "pieces": {
+          "B": "d5",
+          "N": "c4"
+        }
+      },
+      {
+        "orbits": 105,
+        "physical": 840,
+        "pieces": {
+          "B": "g8",
+          "N": "c4"
+        }
+      },
+      {
+        "orbits": 97,
+        "physical": 776,
+        "pieces": {
+          "B": "c4",
+          "N": "d3"
+        }
+      },
+      {
+        "orbits": 94,
+        "physical": 752,
+        "pieces": {
+          "B": "d5",
+          "N": "d3"
+        }
+      },
+      {
+        "orbits": 72,
+        "physical": 576,
+        "pieces": {
+          "B": "e6",
+          "N": "c4"
+        }
+      },
+      {
+        "orbits": 66,
+        "physical": 528,
+        "pieces": {
+          "B": "d5",
+          "N": "b3"
+        }
+      },
+      {
+        "orbits": 49,
+        "physical": 392,
+        "pieces": {
+          "B": "d5",
+          "N": "c5"
+        }
+      },
+      {
+        "orbits": 44,
+        "physical": 352,
+        "pieces": {
+          "B": "d5",
+          "N": "d4"
+        }
+      },
+      {
+        "orbits": 42,
+        "physical": 336,
+        "pieces": {
+          "B": "f7",
+          "N": "c4"
+        }
+      },
+      {
+        "orbits": 26,
+        "physical": 208,
+        "pieces": {
+          "B": "d5",
+          "N": "e3"
+        }
+      }
+    ],
+    "supportedExactWhite": [
+      {
+        "orbits": 6,
+        "physical": 48,
+        "pieces": {
+          "K": "e7",
+          "B": "b3",
+          "N": "d3"
+        }
+      },
+      {
+        "orbits": 6,
+        "physical": 48,
+        "pieces": {
+          "K": "e6",
+          "B": "b3",
+          "N": "d3"
+        }
+      },
+      {
+        "orbits": 5,
+        "physical": 40,
+        "pieces": {
+          "K": "e8",
+          "B": "b3",
+          "N": "d3"
+        }
+      },
+      {
+        "orbits": 5,
+        "physical": 40,
+        "pieces": {
+          "K": "g7",
+          "B": "b3",
+          "N": "d3"
+        }
+      },
+      {
+        "orbits": 5,
+        "physical": 40,
+        "pieces": {
+          "K": "f7",
+          "B": "b3",
+          "N": "d3"
+        }
+      },
+      {
+        "orbits": 4,
+        "physical": 32,
+        "pieces": {
+          "K": "f8",
+          "B": "b3",
+          "N": "d3"
+        }
+      },
+      {
+        "orbits": 4,
+        "physical": 32,
+        "pieces": {
+          "K": "f6",
+          "B": "b3",
+          "N": "d3"
+        }
+      },
+      {
+        "orbits": 3,
+        "physical": 24,
+        "pieces": {
+          "K": "d7",
+          "B": "b3",
+          "N": "d3"
+        }
+      },
+      {
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "d8",
+          "B": "a4",
+          "N": "d3"
+        }
+      },
+      {
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "b5",
+          "B": "a6",
+          "N": "b7"
+        }
+      }
+    ],
+    "supportedMinorPairs": [
+      {
+        "orbits": 43,
+        "physical": 344,
+        "pieces": {
+          "B": "b3",
+          "N": "d3"
+        }
+      },
+      {
+        "orbits": 10,
+        "physical": 80,
+        "pieces": {
+          "B": "a4",
+          "N": "d3"
+        }
+      },
+      {
+        "orbits": 7,
+        "physical": 56,
+        "pieces": {
+          "B": "d7",
+          "N": "d5"
+        }
+      },
+      {
+        "orbits": 3,
+        "physical": 24,
+        "pieces": {
+          "B": "e8",
+          "N": "d3"
+        }
+      },
+      {
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "B": "d7",
+          "N": "d3"
+        }
+      },
+      {
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "B": "f7",
+          "N": "d3"
+        }
+      },
+      {
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "B": "a6",
+          "N": "b7"
+        }
+      },
+      {
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "B": "c4",
+          "N": "d3"
+        }
+      },
+      {
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "B": "a6",
+          "N": "b6"
+        }
+      },
+      {
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "B": "a6",
+          "N": "d5"
+        }
+      }
+    ]
+  },
+  "fourPly": {
+    "fourPlyPositions": 295,
+    "longerOnly": 920,
+    "distinctFourPlyLoops": 165,
+    "motifs": [
+      {
+        "label": "Noncentral bishop not king-protected; interior king; knight unprotected by king",
+        "positions": 130,
+        "fourPlyPositions": 12
+      },
+      {
+        "label": "Unprotected by king central bishop; knight on precage",
+        "positions": 126,
+        "fourPlyPositions": 21
+      },
+      {
+        "label": "Noncentral bishop not king-protected; central king; knight king-protected",
+        "positions": 121,
+        "fourPlyPositions": 0
+      },
+      {
+        "label": "King-protected central bishop; knight king-protected, off precage",
+        "positions": 115,
+        "fourPlyPositions": 6
+      },
+      {
+        "label": "Noncentral bishop not king-protected; central king; knight unprotected by king",
+        "positions": 106,
+        "fourPlyPositions": 26
+      },
+      {
+        "label": "King-protected central bishop; knight on precage",
+        "positions": 95,
+        "fourPlyPositions": 9
+      },
+      {
+        "label": "King-protected central bishop; knight unprotected by king, off precage",
+        "positions": 94,
+        "fourPlyPositions": 19
+      },
+      {
+        "label": "Noncentral bishop not king-protected; interior king; knight king-protected",
+        "positions": 63,
+        "fourPlyPositions": 17
+      },
+      {
+        "label": "Noncentral bishop king-protected; interior king; knight unprotected by king",
+        "positions": 59,
+        "fourPlyPositions": 9
+      },
+      {
+        "label": "Noncentral bishop not king-protected; interior king; knight on edge, unprotected by king",
+        "positions": 59,
+        "fourPlyPositions": 59
+      },
+      {
+        "label": "Noncentral bishop not king-protected; edge king; knight unprotected by king",
+        "positions": 46,
+        "fourPlyPositions": 14
+      },
+      {
+        "label": "Noncentral bishop king-protected; interior king; knight on edge, unprotected by king",
+        "positions": 36,
+        "fourPlyPositions": 36
+      },
+      {
+        "label": "Unprotected by king central bishop; knight unprotected by king, off precage",
+        "positions": 28,
+        "fourPlyPositions": 5
+      },
+      {
+        "label": "Noncentral bishop not king-protected; central king; knight on edge, unprotected by king",
+        "positions": 25,
+        "fourPlyPositions": 25
+      },
+      {
+        "label": "Noncentral bishop king-protected; central king; knight unprotected by king",
+        "positions": 25,
+        "fourPlyPositions": 10
+      },
+      {
+        "label": "Unprotected by king central bishop; knight king-protected, off precage",
+        "positions": 18,
+        "fourPlyPositions": 0
+      },
+      {
+        "label": "King-protected central bishop; knight on edge, off precage",
+        "positions": 14,
+        "fourPlyPositions": 0
+      },
+      {
+        "label": "Noncentral bishop king-protected; edge king; knight unprotected by king",
+        "positions": 12,
+        "fourPlyPositions": 3
+      },
+      {
+        "label": "Noncentral bishop king-protected; central king; knight king-protected",
+        "positions": 12,
+        "fourPlyPositions": 0
+      },
+      {
+        "label": "Noncentral bishop king-protected; interior king; knight king-protected",
+        "positions": 11,
+        "fourPlyPositions": 4
+      },
+      {
+        "label": "Noncentral bishop king-protected; central king; knight on edge, unprotected by king",
+        "positions": 10,
+        "fourPlyPositions": 10
+      },
+      {
+        "label": "Noncentral bishop not king-protected; edge king; knight king-protected",
+        "positions": 4,
+        "fourPlyPositions": 4
+      },
+      {
+        "label": "Noncentral bishop not king-protected; edge king; knight on edge, unprotected by king",
+        "positions": 3,
+        "fourPlyPositions": 3
+      },
+      {
+        "label": "Noncentral bishop king-protected; edge king; knight king-protected",
+        "positions": 2,
+        "fourPlyPositions": 2
+      },
+      {
+        "label": "Noncentral bishop king-protected; edge king; knight on edge, unprotected by king",
+        "positions": 1,
+        "fourPlyPositions": 1
+      }
+    ]
+  },
+  "examples": {
+    "unsupported": [
+      {
+        "motif": "Bd5/Nc4 fixed minor-piece setup; either king varies (D4 equivalents)",
+        "positions": 166,
+        "examples": [
+          {
+            "fen": "8/k7/8/3B4/2NK4/8/8/8 w - - 0 1",
+            "moves": [
+              "Nd6",
+              "Kb8",
+              "Nc4",
+              "Ka7"
+            ],
+            "d": 2,
+            "phases": [
+              99,
+              99
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=8/k7/8/3B4/2NK4/8/8/8_w_-_-_0_1&moves=Nd6,Kb8,Nc4,Ka7&cursor=0",
+            "motif": "King-protected central bishop; knight on precage"
+          },
+          {
+            "fen": "8/8/8/3B1k2/2NK4/8/8/8 w - - 0 1",
+            "moves": [
+              "Be4+",
+              "Ke6",
+              "Bd5+",
+              "Kf5"
+            ],
+            "d": 2,
+            "phases": [
+              99,
+              99
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/3B1k2/2NK4/8/8/8_w_-_-_0_1&moves=Be4%2B,Ke6,Bd5%2B,Kf5&cursor=0",
+            "motif": "King-protected central bishop; knight on precage"
+          },
+          {
+            "fen": "1k6/8/8/3BK3/2N5/8/8/8 w - - 0 1",
+            "moves": [
+              "Kd6",
+              "Ka7",
+              "Ke5",
+              "Kb8"
+            ],
+            "d": 2,
+            "phases": [
+              99,
+              99
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=1k6/8/8/3BK3/2N5/8/8/8_w_-_-_0_1&moves=Kd6,Ka7,Ke5,Kb8&cursor=0",
+            "motif": "King-protected central bishop; knight unprotected by king, off precage"
+          }
+        ]
+      }
+    ],
+    "supported": [
+      {
+        "motif": "Bb3/Nd3 fixed minor-piece setup; either king varies (D4 equivalents)",
+        "positions": 43,
+        "examples": [
+          {
+            "fen": "8/2k5/8/4K3/8/1B1N4/8/8 w - - 0 1",
+            "moves": [
+              "Ba4",
+              "Kc8",
+              "Bb3",
+              "Kc7"
+            ],
+            "d": 0,
+            "phases": [
+              5,
+              7
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=8/2k5/8/4K3/8/1B1N4/8/8_w_-_-_0_1&moves=Ba4,Kc8,Bb3,Kc7&cursor=0",
+            "motif": "Noncentral bishop not king-protected; central king; knight unprotected by king"
+          },
+          {
+            "fen": "3k4/8/4K3/8/8/1B1N4/8/8 w - - 0 1",
+            "moves": [
+              "Ba4",
+              "Kc8",
+              "Bb3",
+              "Kd8"
+            ],
+            "d": 0,
+            "phases": [
+              5,
+              7
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=3k4/8/4K3/8/8/1B1N4/8/8_w_-_-_0_1&moves=Ba4,Kc8,Bb3,Kd8&cursor=0",
+            "motif": "Noncentral bishop not king-protected; interior king; knight unprotected by king"
+          },
+          {
+            "fen": "8/2k5/4K3/8/8/1B1N4/8/8 w - - 0 1",
+            "moves": [
+              "Ke7",
+              "Kc6",
+              "Ke6",
+              "Kc7"
+            ],
+            "d": 0,
+            "phases": [
+              7,
+              7
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=8/2k5/4K3/8/8/1B1N4/8/8_w_-_-_0_1&moves=Ke7,Kc6,Ke6,Kc7&cursor=0",
+            "motif": "Noncentral bishop not king-protected; interior king; knight unprotected by king"
+          }
+        ]
+      }
+    ],
+    "losses": [
+      {
+        "motif": "Five-diagonal bishop and knight both undefended by the interior White king",
+        "positions": 5,
+        "examples": [
+          {
+            "fen": "8/k2B4/8/8/8/K3N3/8/8 w - - 0 1",
+            "moves": [
+              "Kb4",
+              "Kb8",
+              "Kc4",
+              "Kc7"
+            ],
+            "d": 1,
+            "phases": [
+              5,
+              99
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=8/k2B4/8/8/8/K3N3/8/8_w_-_-_0_1&moves=Kb4,Kb8,Kc4,Kc7&cursor=0"
+          },
+          {
+            "fen": "1k3K2/8/8/1B6/1N6/8/8/8 w - - 0 1",
+            "moves": [
+              "Ke7",
+              "Ka7",
+              "Ke6",
+              "Kb6"
+            ],
+            "d": 5,
+            "phases": [
+              5,
+              99
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=1k3K2/8/8/1B6/1N6/8/8/8_w_-_-_0_1&moves=Ke7,Ka7,Ke6,Kb6&cursor=0"
+          },
+          {
+            "fen": "1k3K2/8/8/1B6/8/4N3/8/8 w - - 0 1",
+            "moves": [
+              "Ke7",
+              "Ka7",
+              "Ke6",
+              "Kb6"
+            ],
+            "d": 1,
+            "phases": [
+              5,
+              99
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=1k3K2/8/8/1B6/8/4N3/8/8_w_-_-_0_1&moves=Ke7,Ka7,Ke6,Kb6&cursor=0"
+          }
+        ]
+      }
+    ]
+  },
+  "validation": [
+    "87 focused support tests pass, including D4 regression, provided legal-reply destinations, king-defense and occupied-support controls; update two superseded Ba4/Nf4 expectations",
+    "tsc -b app passes",
+    "Full bishop-knight suite: 204/209 pass; all five remaining failures reproduced with the unchanged HEAD support module (CenterEscape, CentralSetup, KnightBishopDefense, RelativeKnight, ThreeSupport)",
+    "All 165 four-ply loops and nine report replay links checked against live preferred White moves, legal Black replies and support classification"
+  ]
+}
