@@ -2,25 +2,24 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess'
 import { knightAndBishopKnightTargetSquares } from './bishopKnightStrategy'
+import { getIdealKnightAndBishopWhiteMoves } from './bishopKnight'
 
-test('precage targets stay behind Be4 against Ke5 and Kd6, in every reflection', () => {
-  const line = getChess('8/8/8/4k3/4B3/4K3/4N3/8 w - - 0 1')
-  const positions = [line.fen()]
-  line.move('Nd4')
-  line.move('Kd6')
-  positions.push(line.fen())
-  for (const position of positions) for (const transform of SQUARE_TRANSFORMS) {
-    assert.deepEqual(knightAndBishopKnightTargetSquares(transformFen(position, transform)), [transformSquare('d3', transform)])
+test('precage squares depend on central bishop geometry, not Black king direction, across D4', () => {
+ for (const t of SQUARE_TRANSFORMS) {
+  for (const f of ['8/8/8/4k3/4B3/4K3/4N3/8 w - - 0 1',
+    '8/8/3k4/8/4B3/4K3/4N3/8 w - - 0 1']) {
+   assert.deepEqual(new Set(knightAndBishopKnightTargetSquares(transformFen(f,t))),
+    new Set(['d3','f5'].map(s=>transformSquare(s as 'd3'|'f5',t))))
   }
+ }
 })
 
-test('a perpendicular diagonal neighbor is not strictly behind the bishop', () => {
-  for (const transform of SQUARE_TRANSFORMS) {
-    const fen = transformFen('8/7k/8/3KB3/8/2N5/8/8 w - - 0 1', transform)
-    // Be5's d6/f4 candidates are perpendicular to the e5–h8 direction.
-    const board = getChess(fen)
-    board.remove(transformSquare('h7', transform))
-    board.put({type: 'k', color: 'b'}, transformSquare('h8', transform))
-    assert.deepEqual(knightAndBishopKnightTargetSquares(board.fen()), [])
-  }
+test('Nc4 is preferred immediately beside Bd5 in the loaded position across D4', () => {
+ for (const t of SQUARE_TRANSFORMS) {
+  const f=transformFen('8/8/8/3BK3/8/2k5/1N6/8 w - - 0 1',t)
+  assert.deepEqual(new Set(knightAndBishopKnightTargetSquares(f)),
+   new Set(['c4','e6'].map(s=>transformSquare(s as 'c4'|'e6',t))))
+  const m=getChess(f).move({from:transformSquare('b2',t),to:transformSquare('c4',t)}).san
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(f),[m])
+ }
 })

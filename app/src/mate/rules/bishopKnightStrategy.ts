@@ -121,17 +121,13 @@ const knightDistances = new Map(squares.map(start => {
 export function knightAndBishopKnightTargetSquares(fen: string): Square[] {
   const bishop = findPiece(fen, 'w', 'b')
   if (!bishop || !CENTRAL_SQUARES.includes(bishop.square)) return []
-  const blackKing = findPiece(fen, 'b', 'k')
   const center = squareCoords(bishop.square)
-  const black = blackKing && squareCoords(blackKing.square)
   return squares.filter(square => {
     const target = squareCoords(square)
     return Math.abs(target.file - center.file) === 1 &&
       Math.abs(target.rank - center.rank) === 1 &&
-      target.file !== target.rank && target.file + target.rank !== 7 &&
-      // Behind the bishop: strictly opposite Black's direction from the bishop.
-      (!black || (target.file - center.file) * (black.file - center.file) +
-        (target.rank - center.rank) * (black.rank - center.rank) < 0)
+      !CENTRAL_SQUARES.includes(square) &&
+      target.file !== target.rank && target.file + target.rank !== 7
   })
 }
 

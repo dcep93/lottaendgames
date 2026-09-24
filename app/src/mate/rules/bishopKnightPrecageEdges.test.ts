@@ -7,6 +7,7 @@ import { scoreKnightAndBishopWhiteMove, knightAndBishopWhiteRules } from './bish
 const position = '8/2k5/8/3BK3/2N5/8/8/8 w - - 0 1'
 test('r5.1 targets top then left for Bd5/Nc4 and preserves distances under every D4 transform', () => {
   assert.deepEqual(precageKingEdges(position), ['top', 'left'])
+  assert.deepEqual(precageKingEdges('8/8/k7/2KB4/2N5/8/8/8 w - - 0 1'), ['top', 'left'])
   for (const transform of SQUARE_TRANSFORMS) {
     const edges = precageKingEdges(transformFen(position, transform))
     assert.equal(edges.length, 2)
@@ -18,7 +19,6 @@ test('r5.1 targets top then left for Bd5/Nc4 and preserves distances under every
 })
 test('r5.1 requires a central bishop and an occupied eligible precage square', () => {
   for (const fen of [
-    '8/8/k7/2KB4/2N5/8/8/8 w - - 0 1',
     '8/2k5/8/3BK3/8/2N5/8/8 w - - 0 1',
     '8/2k5/3B4/4K3/2N5/8/8/8 w - - 0 1',
   ]) assert.deepEqual(precageKingEdges(fen), [])
