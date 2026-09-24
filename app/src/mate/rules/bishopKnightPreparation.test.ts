@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import { SQUARE_TRANSFORMS, transformFen, transformSquare, getChess } from '../chess'
 import { getIdealKnightAndBishopWhiteMoves } from './bishopKnight'
+import { getMateRuleSet } from './index'
 import { knightAndBishopDeclaredPreparationMove } from './bishopKnightPreparation'
 
 test('r5 keeps undeclared old exact and wildcard prescriptions cleared across D4', () => {
@@ -65,98 +66,33 @@ test('r5 keeps undeclared old exact and wildcard prescriptions cleared across D4
 })
 
 
-test('r5 prescribes Ke7 and then Ne5 in the declared line across D4', () => {
-  for (const transform of SQUARE_TRANSFORMS) {
-    const chess = getChess(transformFen('8/2k5/5K2/3B4/2N5/8/8/8 w - - 0 1', transform))
-    for (const [from, to, replyFrom, replyTo] of [
-      ['f6', 'e7', 'c7', 'c8'], ['c4', 'e5', 'c8', 'c7'],
-    ] as const) {
-      const expected = transformSquare(from, transform) + transformSquare(to, transform)
-      assert.equal(knightAndBishopDeclaredPreparationMove(chess.fen()), expected)
-      const move = chess.moves({ verbose: true }).find(m => m.from + m.to === expected)!
-      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(chess.fen()), [move.san])
-      chess.move(move.san)
-      chess.move({ from: transformSquare(replyFrom, transform), to: transformSquare(replyTo, transform) })
-    }
+test('r5 clears every recent declaration across D4 and move counters', () => {
+  for (const fen of [
+    '8/2k5/5K2/3B4/2N5/8/8/8 w - - 0 1',
+    '2k5/4K3/8/3B4/2N5/8/8/8 w - - 2 2',
+    '8/8/8/3B4/2Nk1K2/8/8/8 w - - 0 1',
+    '7k/8/4NK2/3B4/8/8/8/8 w - - 2 2',
+    '3N4/7k/5K2/3B4/8/8/8/8 w - - 4 3',
+    '6k1/5N2/5K2/3B4/8/8/8/8 w - - 6 4',
+    '5k2/5N2/5K2/8/4B3/8/8/8 w - - 8 5',
+    '4k3/5N1B/5K2/8/8/8/8/8 w - - 10 6',
+    '3k4/7B/5K2/4N3/8/8/8/8 w - - 12 7',
+    '4k3/8/4N3/3BK3/8/8/8/8 w - - 2 2',
+    '5k2/8/8/3BK3/5N2/8/8/8 w - - 4 3',
+    '4k3/8/4N3/3B1K2/8/8/8/8 w - - 2 2',
+    '1k6/8/8/3B4/2NK4/8/8/8 w - - 0 1',
+  ]) for (const transform of SQUARE_TRANSFORMS) {
+    const transformed = transformFen(fen, transform)
+    assert.equal(knightAndBishopDeclaredPreparationMove(transformed), undefined)
+    assert.equal(knightAndBishopDeclaredPreparationMove(transformed.split(' ').slice(0, 4).join(' ') + ' 0 1'), undefined)
   }
 })
 
-
-test('r5 prescribes Be6 only for the declared placement across D4', () => {
-  for (const transform of SQUARE_TRANSFORMS) {
-    const fen = transformFen('8/8/8/3B4/2Nk1K2/8/8/8 w - - 0 1', transform)
-    const expected = transformSquare('d5', transform) + transformSquare('e6', transform)
-    assert.equal(knightAndBishopDeclaredPreparationMove(fen), expected)
-    const san = getChess(fen).moves({ verbose: true }).find(m => m.from + m.to === expected)!.san
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [san])
-    assert.equal(knightAndBishopDeclaredPreparationMove(transformFen('8/8/8/3B4/2N2K2/3k4/8/8 w - - 0 1', transform)), undefined)
-  }
-})
-
-
-test('r5 prescribes moves 2–7 of the Kh7 line across D4, regardless of counters', () => {
-  for (const transform of SQUARE_TRANSFORMS) {
-    const original = getChess('8/7k/4N3/3BK3/8/8/8/8 w - - 0 1')
-    for (const [index, san] of [
-      'Kf6', 'Kh8', 'Nd8', 'Kh7', 'Nf7', 'Kg8', 'Be4', 'Kf8',
-      'Bh7', 'Ke8', 'Ne5', 'Kd8', 'Bg8', 'Ke8',
-    ].entries()) {
-      const before = original.fen()
-      const move = original.move(san)
-      if (index < 2 || index % 2 !== 0) continue
-      const fen = transformFen(before, transform)
-      const from = transformSquare(move.from, transform)
-      const to = transformSquare(move.to, transform)
-      const expected = getChess(fen).move({ from, to }).san
-      assert.equal(knightAndBishopDeclaredPreparationMove(fen), from + to)
-      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [expected])
-      const resetCounters = fen.split(' ').slice(0, 4).join(' ') + ' 0 1'
-      assert.equal(knightAndBishopDeclaredPreparationMove(resetCounters), from + to)
-    }
-  }
-})
-
-
-test('r5 prescribes Nf4 and Kf6 in the declared Ke8 line across D4', () => {
-  for (const transform of SQUARE_TRANSFORMS) {
-    const original = getChess('8/4k3/4N3/3B4/4K3/8/8/8 w - - 0 1')
-    for (const [index, san] of ['Ke5', 'Ke8', 'Nf4', 'Kf8', 'Kf6', 'Ke8'].entries()) {
-      const before = original.fen()
-      const move = original.move(san)
-      if (index < 2 || index % 2 !== 0) continue
-      const fen = transformFen(before, transform)
-      const from = transformSquare(move.from, transform)
-      const to = transformSquare(move.to, transform)
-      const expected = getChess(fen).move({ from, to }).san
-      assert.equal(knightAndBishopDeclaredPreparationMove(fen), from + to)
-      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [expected])
-    }
-  }
-})
-
-
-test('r5 prescribes second-move Nf4 after Kf5 Ke8 across D4', () => {
-  for (const transform of SQUARE_TRANSFORMS) {
-    const board = getChess(transformFen('8/5k2/4N3/3B4/4K3/8/8/8 w - - 0 1', transform))
-    board.move({from: transformSquare('e4', transform), to: transformSquare('f5', transform)})
-    board.move({from: transformSquare('f7', transform), to: transformSquare('e8', transform)})
-    const before = board.fen()
-    const from = transformSquare('e6', transform)
-    const to = transformSquare('f4', transform)
-    const san = board.move({from, to}).san
-    assert.equal(knightAndBishopDeclaredPreparationMove(before), from + to)
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(before), [san])
-  }
-})
-
-
-test('r5 prescribes Ne5 with Kd4 Bd5 Nc4 against Kb8 across D4', () => {
+test('clearing r5 restores the general Kc5 preference in the loaded position across D4', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     const fen = transformFen('1k6/8/8/3B4/2NK4/8/8/8 w - - 0 1', transform)
-    const from = transformSquare('c4', transform)
-    const to = transformSquare('e5', transform)
-    const san = getChess(fen).move({from, to}).san
-    assert.equal(knightAndBishopDeclaredPreparationMove(fen), from + to)
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [san])
+    const move = getChess(fen).move({from: transformSquare('d4', transform), to: transformSquare('c5', transform)}).san
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [move])
+    assert.equal(getMateRuleSet('bishop-knight').currentWhiteHint(fen)?.id, 'r5.1')
   }
 })
