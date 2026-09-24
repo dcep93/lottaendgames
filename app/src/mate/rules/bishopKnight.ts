@@ -24,7 +24,7 @@ import {
   isKnightAndBishopWManeuverPosition,
   knightAndBishopPiecesPresent,
 } from "./bishopKnightLookup";
-import { knightAndBishopKnightTargetSquares, knightKingProtectionDistance, knightAndBishopCenterProximityScore, knightAndBishopKingCenterProximityScore, knightAndBishopKnightTargetProximityScore, knightAndBishopTargetCorners } from "./bishopKnightStrategy";
+import { knightAndBishopKnightTargetSquares, knightAndBishopKnightProximityToSquare, knightKingProtectionDistance, knightAndBishopCenterProximityScore, knightAndBishopKingCenterProximityScore, knightAndBishopKnightTargetProximityScore, knightAndBishopTargetCorners } from "./bishopKnightStrategy";
 import { declaredSupportedThreeMove, declaredSupportedFiveMove, declaredSupportedSevenMove, declaredSupportedKnightAdvance } from "./bishopKnightSupportedPreferences";
 import { knightAndBishopDeclaredPreparationMove } from "./bishopKnightPreparation";
 import { knightAndBishopShouldCoordinateKing, knightAndBishopKingCoordinatesMinors } from "./bishopKnightCoordination";
@@ -56,6 +56,8 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly bishopOppositionPenalty: number;
   readonly knightNextAttackPenalty: number;
   readonly knightCenterProximityScore: number;
+  readonly oppositePrecageDistance: number;
+  readonly oppositePrecageEuclideanDistanceSquared: number;
   readonly precageKingDiagonalSteps: number;
   readonly precageKingDistanceSquared: number;
   readonly declaredPreparationPenalty: number;
@@ -154,6 +156,7 @@ type KnightAndBishopPositionScoreContext = {
   readonly shouldEscapeNearbyPairBishop: boolean;
   readonly shouldDefendKnight: boolean;
   readonly startsWithPrecageKnight: boolean;
+  readonly oppositePrecageTargets: readonly Square[];
   readonly declaredPreparationMove: string | undefined;
   readonly declaredSupportedKnightAdvance: string | undefined;
   readonly declaredSupportedThreeMove: string | undefined;
@@ -193,6 +196,14 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
     shouldDefendKnight: !!knight && !!blackKing && kingDistance(knight.square, blackKing.square) === 1,
     shouldCoordinateKing: knightAndBishopShouldCoordinateKing(fen),
     startsWithPrecageKnight: !!knight && knightAndBishopKnightTargetSquares(fen).includes(knight.square),
+    oppositePrecageTargets: whiteKing && isMiddle16Square(whiteKing.square) && bishop && blackKing
+      ? knightAndBishopKnightTargetSquares(fen).filter(target => {
+        const index = (square: Square) => {
+          const { file, rank } = squareCoordinates(square);
+          return squareColor(bishop.square) === 1 ? file + rank - 7 : file - rank;
+        };
+        return index(target) * index(blackKing.square) < 0;
+      }) : [],
     declaredPreparationMove: knightAndBishopDeclaredPreparationMove(fen),
     declaredSupportedKnightAdvance: declaredSupportedKnightAdvance(fen),
     declaredSupportedThreeMove: declaredSupportedThreeMove(fen),
@@ -310,6 +321,14 @@ function scoreKnightAndBishopWhiteMoveCore(
     declaredSupportedFivePenalty: context.declaredSupportedFiveMove === undefined ? undefined
       : context.declaredSupportedFiveMove === move.from + move.to ? 0 : 1,
     declaredSupportedSevenPenalty: context.declaredSupportedSevenMove && context.declaredSupportedSevenMove !== move.from + move.to ? 1 : 0,
+    get oppositePrecageEuclideanDistanceSquared() {
+      return knight && context.oppositePrecageTargets.length
+        ? Math.min(...context.oppositePrecageTargets.map(target => squaredEuclideanDistance(knight.square, target))) : 0;
+    },
+    get oppositePrecageDistance() {
+      return context.oppositePrecageTargets.length
+        ? Math.min(...context.oppositePrecageTargets.map(target => knightAndBishopKnightProximityToSquare(resultFen, target))) : 0;
+    },
     get precageKingDiagonalSteps() {
       if (!context.startsWithPrecageKnight || !whiteKing || !blackKing || !bishop) return 0;
       const white = squareCoordinates(whiteKing.square), black = squareCoordinates(blackKing.square);
@@ -489,6 +508,13 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       compare: (first, second) => first.knightBishopProtectionPenalty - second.knightBishopProtectionPenalty,
     },
     {
+      id: "r9.99",
+      shortLabel: "rule r9.99",
+      helpText: "With a middle-16 square king and a central bishop, prefer knight move proximity to a precage square on the opposite side of the bishop's long diagonal to Black's king.",
+      compare: (first, second) => first.oppositePrecageDistance - second.oppositePrecageDistance
+        || first.oppositePrecageEuclideanDistanceSquared - second.oppositePrecageEuclideanDistanceSquared,
+    },
+    {
       id: "r10",
       shortLabel: "rule r10",
       helpText: "Drift the knight towards White king protection.",
@@ -639,6 +665,7 @@ const bishopKnightHelp: RuleHelp = {
     "Stay away from a bishop-colored corner.",
   ],
   notes: [
+    "For r9.99, select opposite-side precage targets before White moves, requiring a middle-16 king and central bishop. Measure knight moves after White moves, then break ties by Euclidean proximity to the target. If Black is on the bishop’s long diagonal, there is no opposite-side target and this rule is neutral.",
     "For r5.1, require a central bishop and knight on a precage square before White moves. First target the nearest parallel diagonal of the opposite color strictly beyond Black’s king, away from the bishop’s long diagonal. Minimize king steps to its board squares, then Euclidean distance to Black’s king. If Black is on the long diagonal, use either equally near opposite-color diagonal. If no qualifying diagonal remains on the board, only the king-proximity tiebreaker applies.",
     "For r8, White’s king must be on files c–f and ranks 3–6 before moving. Evaluate the bishop and knight preferences after White moves. A precage square is noncentral, off both long diagonals, and diagonally adjacent to a central bishop.",
     "For r7, minimize White’s king Euclidean distance to the board’s midpoint. For r20, maximize the sum of the bishop’s and knight’s Euclidean distances from Black’s king, measured after White moves.",
