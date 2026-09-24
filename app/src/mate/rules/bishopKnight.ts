@@ -56,7 +56,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly bishopOppositionPenalty: number;
   readonly knightNextAttackPenalty: number;
   readonly knightCenterProximityScore: number;
-  readonly precageKingDiagonalDistanceSquared: number;
+  readonly precageKingDiagonalSteps: number;
   readonly precageKingDistanceSquared: number;
   readonly declaredPreparationPenalty: number;
   readonly supportedThreeCheckScore: number;
@@ -310,13 +310,13 @@ function scoreKnightAndBishopWhiteMoveCore(
     declaredSupportedFivePenalty: context.declaredSupportedFiveMove === undefined ? undefined
       : context.declaredSupportedFiveMove === move.from + move.to ? 0 : 1,
     declaredSupportedSevenPenalty: context.declaredSupportedSevenMove && context.declaredSupportedSevenMove !== move.from + move.to ? 1 : 0,
-    get precageKingDiagonalDistanceSquared() {
+    get precageKingDiagonalSteps() {
       if (!context.startsWithPrecageKnight || !whiteKing || !blackKing || !bishop) return 0;
       const white = squareCoordinates(whiteKing.square), black = squareCoordinates(blackKing.square);
       const fileDelta = white.file - black.file, rankDelta = white.rank - black.rank;
       // Light bishops use a8–h1 (constant file + rank); dark bishops use a1–h8.
       const offset = squareColor(bishop.square) === 1 ? fileDelta + rankDelta : fileDelta - rankDelta;
-      return offset * offset / 2;
+      return Math.ceil(Math.abs(offset) / 2);
     },
     precageKingDistanceSquared: context.startsWithPrecageKnight && whiteKing && blackKing
       ? squaredEuclideanDistance(whiteKing.square, blackKing.square) : 0,
@@ -430,8 +430,8 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     {
       id: "r5.1",
       shortLabel: "rule r5.1",
-      helpText: "With a central bishop and knight on the precage square, prefer king proximity to the Black king's diagonal parallel to the bishop's long diagonal, then king proximity to Black's king's square.",
-      compare: (first, second) => first.precageKingDiagonalDistanceSquared - second.precageKingDiagonalDistanceSquared
+      helpText: "With a central bishop and knight on the precage square, prefer king step proximity to the Black king's diagonal parallel to the bishop's long diagonal, then king proximity to Black's king's square.",
+      compare: (first, second) => first.precageKingDiagonalSteps - second.precageKingDiagonalSteps
         || first.precageKingDistanceSquared - second.precageKingDistanceSquared,
     },
     {
@@ -627,7 +627,7 @@ const bishopKnightHelp: RuleHelp = {
     "Stay away from a bishop-colored corner.",
   ],
   notes: [
-    "For r5.1, require a central bishop and knight on a precage square before White moves. First minimize White’s king’s perpendicular distance to the diagonal through Black’s king parallel to the bishop’s long diagonal; then minimize the Euclidean distance between the kings.",
+    "For r5.1, require a central bishop and knight on a precage square before White moves. First minimize the minimum number of king steps to the diagonal through Black’s king parallel to the bishop’s long diagonal; then minimize the Euclidean distance between the kings.",
     "For r8, White’s king must be on files c–f and ranks 3–6 before moving. Evaluate the bishop and knight preferences after White moves. A precage square is noncentral, off both long diagonals, and diagonally adjacent to a central bishop.",
     "For r7, minimize White’s king Euclidean distance to the board’s midpoint. For r20, maximize the sum of the bishop’s and knight’s Euclidean distances from Black’s king, measured after White moves.",
     "For r9.98, count bishop protection through Black’s king, which must leave the checking diagonal. Other intervening pieces still block protection. Evaluate after White moves.",
