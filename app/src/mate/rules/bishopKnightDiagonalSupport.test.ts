@@ -308,7 +308,7 @@ test('Nd3 five support combines right-side kings with declared placements or nea
       board.put({type: 'b', color: 'w'}, bishop)
       for (const transform of SQUARE_TRANSFORMS) {
         assert.equal(knightAndBishopSupportedDiagonal(transformFen(board.fen(), transform)).size,
-          (bishop === 'a4' && kingDistance(king, 'e7') <= 1) || (king === 'e7' && ['a4', 'b5'].includes(bishop)) ? 5 : (squareColor(king) !== squareColor(bishop)) && king[0] >= 'c' && (['a4', 'd7'].includes(bishop) || kingDistance(king, bishop) === 1) && ((['a4', 'd7'].includes(bishop) && ['c5', 'c6', 'c7'].includes(king)) || (['a4', 'd7'].includes(bishop) && king === 'd6') || (bishop === 'd7' && kingDistance(king, 'a7') <= 2)) ? 5 : 99, `${king}, ${bishop}, ${transform.name}`)
+          (bishop === 'd7' && king === 'c8') || (bishop === 'a4' && kingDistance(king, 'e7') <= 1) || (king === 'e7' && ['a4', 'b5'].includes(bishop)) ? 5 : (squareColor(king) !== squareColor(bishop)) && king[0] >= 'c' && (['a4', 'd7'].includes(bishop) || kingDistance(king, bishop) === 1) && ((['a4', 'd7'].includes(bishop) && ['c5', 'c6', 'c7'].includes(king)) || (['a4', 'd7'].includes(bishop) && king === 'd6') || (bishop === 'd7' && kingDistance(king, 'a7') <= 2)) ? 5 : 99, `${king}, ${bishop}, ${transform.name}`)
       }
     }
   }
@@ -791,7 +791,7 @@ test('a five-diagonal without a five-knight requires White to match the d6 king 
     assert.ok(getIdealKnightAndBishopWhiteMoves(fen).every(san => scoreKnightAndBishopWhiteMove(fen, san).supportedDiagonalSizeScore === 99))
     for (const [position, expected] of [
       ['1k6/8/K7/8/B4N2/8/8/8 b - - 0 1', 99],
-      ['1k6/8/K7/3N4/B7/8/8/8 b - - 0 1', 99], // Edge kings also need opposite colors.
+      ['1k6/8/K7/3N4/B7/8/8/8 b - - 0 1', 5], // Same-color king lies beyond the wall.
       ['1k6/8/1K6/8/B4N2/8/8/8 b - - 0 1', 99], // Same file with an off-support knight.
     ] as const) {
       assert.equal(knightAndBishopSupportedDiagonal(transformFen(position, transform)).size, expected)
@@ -1235,18 +1235,18 @@ test('Bb7+ with Kb6 is supported and preferred by r1 with Na7 one move from c6',
 })
 
 
-test('same-color edge kings require a specific support declaration', () => {
+test('same-color edge kings beyond the wall can support while other requirements remain', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const counters of ['2 2', '43 25']) {
       const before = transformFen(`3K4/3B4/k7/8/8/3N4/8/8 w - - ${counters}`, transform)
       const board = getChess(before)
       const move = board.move({from: transformSquare('d8', transform), to: transformSquare('c8', transform)}).san
-      assert.equal(knightAndBishopSupportedDiagonal(board.fen()).size, 99)
-      assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 99)
+      assert.equal(knightAndBishopSupportedDiagonal(board.fen()).size, 5)
+      assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 5)
     }
     // An edge king still needs two files of separation with Nd3.
     assert.equal(knightAndBishopSupportedDiagonal(transformFen('2K5/3B4/1k6/8/8/3N4/8/8 b - - 3 2', transform)).size, 99)
-    assert.equal(knightAndBishopSupportedDiagonal(transformFen('1k6/8/K7/3N4/B7/8/8/8 b - - 0 1', transform)).size, 99)
+    assert.equal(knightAndBishopSupportedDiagonal(transformFen('1k6/8/K7/3N4/B7/8/8/8 b - - 0 1', transform)).size, 5)
     // The edge exemption does not waive the independent knight-on-edge restriction.
     assert.equal(knightAndBishopSupportedDiagonal(transformFen('2KB4/8/1k6/8/8/8/8/N7 b - - 0 1', transform)).size, 99)
   }
@@ -1593,4 +1593,16 @@ test('Black Ka8 Bc8 Nb7 is never supported for any White king placement across D
   }
   // The broader Nb7 ban also applies when Black changes squares.
   assert.equal(knightAndBishopSupportedDiagonal('1kB5/1N1K4/8/8/8/8/8/8 b - - 0 1').size, 99)
+})
+
+test('same-color king beyond the seven wall is eligible but on or outside it is not, across D4', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    for (const [fen, expected] of [
+      ['1k6/8/2K5/8/8/1B1N4/8/8 b - - 0 1', 7],
+      ['1k6/8/8/8/2K5/1B1N4/8/8 b - - 0 1', 99],
+      ['8/8/3k4/8/4K3/1B1N4/8/8 b - - 0 1', 99],
+      ['1k6/8/2K5/8/8/1B2N3/8/8 b - - 0 1', 99],
+      ['8/8/2K5/8/8/1B1N1k2/8/8 b - - 0 1', 99],
+    ] as const) assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, expected, fen)
+  }
 })

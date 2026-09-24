@@ -424,10 +424,10 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
     pattern.knight === knight.square && pattern.black === black.square)
   // Universal post-White limits, including declared support placements.
   if (UNSUPPORTED_BISHOP_SQUARES.has(bishop.square)) return {size: 99, knight: 99}
-  // Away from the edge, a five-bishop with its five-knight requires the king off the bishop's color.
+  // Outside the cage, a five-bishop with its five-knight requires a non-edge king off the bishop's color.
   if (edgeDistance(white.square) > 0 && !declaredFive?.allowSameColorKing && squareColor(white.square) === squareColor(bishop.square) && DIAGONALS.some(pattern =>
     pattern.wall.length === 5 && pattern.wall.includes(bishop.square) &&
-    pattern.support.includes(knight.square))) return {size: 99, knight: 99}
+    !isInsideBishopDiagonal(white.square, pattern.wall) && pattern.support.includes(knight.square))) return {size: 99, knight: 99}
   if (edgeDistance(knight.square) === 0) return {size: 99, knight: 99}
   const kingsTooFarApart = kingDistance(white.square, black.square) > 3
   if (kingsTooFarApart && !DIAGONALS.some(pattern => pattern.wall.includes(bishop.square) &&
@@ -466,8 +466,11 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
       .map(pattern => supportDistance(fen, white.square, pattern))),
   }
   // Explicitly declared supported placements above keep their exceptions.
-  // Ordinary support requires opposite colors, including kings on the edge.
-  if (squareColor(white.square) === squareColor(bishop.square)) return {size: 99, knight: 99}
+  // Same-color kings may support from strictly beyond the bishop's wall toward
+  // its target corner. Kings on the wall or outside it still need opposite colors.
+  if (squareColor(white.square) === squareColor(bishop.square) && !DIAGONALS.some(pattern =>
+    pattern.wall.includes(bishop.square) && isInsideBishopDiagonal(black.square, pattern.wall) &&
+    isInsideBishopDiagonal(white.square, pattern.wall))) return {size: 99, knight: 99}
   if (kingDistance(black.square, bishop.square) === 1 &&
     kingDistance(white.square, bishop.square) > 1 &&
     squaredEuclideanDistance(knight.square, bishop.square) === 5) return {size: 99, knight: 99}
@@ -513,9 +516,9 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
     if (pattern.wall.length === 3 && excludedThree) continue
     // Seven-diagonal support requires the knight on its actual support square.
     if (pattern.wall.length === 7 && !pattern.support.includes(knight.square)) continue
-    // Exact declarations and edge kings are exempt; other same-color kings need an occupied current-stage target.
+    // Beyond the wall, same-color kings do not need the older occupied-target color exemption.
     if (edgeDistance(white.square) > 0 && squareColor(white.square) === squareColor(bishop.square) &&
-      !supportTargets(white.square, pattern).includes(knight.square)) continue
+      !isInsideBishopDiagonal(white.square, pattern.wall) && !supportTargets(white.square, pattern).includes(knight.square)) continue
     // Apply the king-side requirement in each qualifying seven-support orientation.
     if (pattern.wall.length === 7 &&
       (king.file - blackCoordinatesForSupport.file) * pattern.rightOffset.file +
