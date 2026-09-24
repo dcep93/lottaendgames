@@ -350,9 +350,9 @@ test('a bishop-attack response must preserve the bishop as well as close the esc
     const replies = board.moves({verbose: true})
     assert.ok(replies.every(reply => !boundary.includes(reply.to)))
     assert.ok(replies.some(reply => reply.to === transformSquare('a6', transform) && reply.captured === 'b'))
-    // Kb5 now qualifies through the unconditional king/bishop placement declaration.
+    // The placement declaration cannot bypass Black’s immediate c7 escape.
     const kb5 = getChess(fen).move({from: transformSquare('c6', transform), to: transformSquare('b5', transform)}).san
-    assert.equal(scoreKnightAndBishopWhiteMove(fen, kb5).supportedDiagonalSizeScore, 3)
+    assert.equal(scoreKnightAndBishopWhiteMove(fen, kb5).supportedDiagonalSizeScore, 99)
   }
 })
 
@@ -1082,3 +1082,17 @@ test('declared 2. Nd5 is supported and preferred with Kb5 Ba6 against Kb8', () =
     ]) assert.equal(knightAndBishopSupportedDiagonal(transformFen(position, transform)).size, 99)
   }
 })
+
+
+test('Ba6 Kb5 support requires Black unable to leave the diagonal immediately', () => {
+ for (const t of SQUARE_TRANSFORMS) {
+  const f = transformFen('1k6/8/B7/8/KN6/8/8/8 w - - 0 1',t);
+  const c = getChess(f);c.move({from:transformSquare('a4',t),to:transformSquare('b5',t)});
+  assert.ok(c.moves({verbose:true}).some(m=>m.to===transformSquare('c7',t)));
+  assert.equal(knightAndBishopSupportedDiagonal(c.fen()).size,99);
+  const start=transformFen('1k6/8/BN6/K7/8/8/8/8 w - - 0 1',t);
+  const san=getChess(start).move({from:transformSquare('b6',t),to:transformSquare('d5',t)}).san;
+  assert.equal(scoreKnightAndBishopWhiteMove(start,san).supportedDiagonalSizeScore,3);
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(start),[san]);
+ }
+});

@@ -264,7 +264,14 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
   if (!white || !black || !bishop || !knight) return {size: 99, knight: 99}
   // The Ba6/Kb5 declaration allows every knight square while Black stays inside.
   // It does not create a knight target and supersedes the middle-square exclusion.
-  if (isDeclaredCornerSupportWithoutKnightTarget(white.square, bishop.square, black.square)) return {size: 3, knight: 99}
+  if (isDeclaredCornerSupportWithoutKnightTarget(white.square, bishop.square, black.square)) {
+    const replies = blackDestinations ?? getChess(fen).moves({verbose: true})
+      .filter(move => move.piece === 'k').map(move => move.to)
+    const enclosed = DIAGONALS.some(pattern => pattern.wall.length === 3 &&
+      pattern.wall.includes(bishop.square) && isInsideBishopDiagonal(black.square, pattern.wall) &&
+      replies.every(square => isInsideBishopDiagonal(square, pattern.wall)))
+    return enclosed ? {size: 3, knight: 99} : {size: 99, knight: 99}
+  }
   // A knight on the three-diagonal's middle square (Ng2 with Bf1/ Bh3)
   // disqualifies support, including older king-and-bishop placement declarations.
   if (DIAGONALS.some(pattern => pattern.wall.length === 3 &&
