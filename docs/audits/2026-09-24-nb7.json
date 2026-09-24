@@ -1,0 +1,642 @@
+{
+  "request": "Nb7 is automatically unsupported, including all D4 equivalents Nb2 Ng2 Ng7, before every support declaration or exception.",
+  "method": {
+    "kind": "Incremental maintained graph update, not a fresh enumeration",
+    "source": "/Users/danielcepeda/repos/_codex_output/bn-five-d6-2026-09-24",
+    "policyFingerprint": "a4cf040c81c139e3ad3709018916a034a8fc111a611e44c55da56c0e6d511b0e",
+    "affectedNodes": 1965,
+    "policiesChanged": 121,
+    "supportRootsRemoved": 21,
+    "coverage": "Re-evaluated every previously supported root; change only introduces a rejection. Recomputed all possible White predecessors of the 21 changed support roots. Restoring the changed production modules reproduced the prior audited executable fingerprint.",
+    "white": "all preferred ties",
+    "black": "all legal replies",
+    "deduplication": "D4; post-White positions on cycles, not reachability"
+  },
+  "unsupportedOnlyCycles": {
+    "orbits": 859,
+    "physical": 6872
+  },
+  "unsupportedPositionsOnAnyCycle": {
+    "orbits": 863,
+    "physical": 6904
+  },
+  "baselineComparison": {
+    "baseline": 659,
+    "baselinePolicy": "b1be217877bdaaec6cd57d3ecedefbabf34ea514",
+    "baselineBlackPolicy": "all-legal",
+    "survivors": 327,
+    "newPositions": 532
+  },
+  "previousComparison": {
+    "previous": 859,
+    "survivors": 859,
+    "removed": 0,
+    "added": 0,
+    "current": 859
+  },
+  "supportedPositionsOnCycles": {
+    "orbits": 37,
+    "physical": 296
+  },
+  "supportLoss": {
+    "whiteDecisions": {
+      "orbits": 10,
+      "physical": 80
+    },
+    "events": {
+      "orbits": 10,
+      "physical": 80
+    },
+    "sourcePositions": {
+      "orbits": 9,
+      "physical": 72
+    }
+  },
+  "supportLossWithPreferredSetup": {
+    "sourcePositions": 6,
+    "censusOnlySourcesWithoutPreferredEntry": [
+      562880,
+      2891777,
+      5023363
+    ],
+    "links": [
+      {
+        "source": 562880,
+        "unavailable": "No valid replay with a preferred setup move found"
+      },
+      {
+        "source": 2700941,
+        "fen": "8/8/1k6/8/2B5/3N4/K7/8 w - - 0 1",
+        "moves": [
+          "Kb3",
+          "Kc7",
+          "Kc3",
+          "Kd6"
+        ],
+        "d": 0,
+        "phases": [
+          7,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/1k6/8/2B5/3N4/K7/8_w_-_-_0_1&moves=Kb3,Kc7,Kc3,Kd6&cursor=0",
+        "lossPly": 3,
+        "preferredSetup": true
+      },
+      {
+        "source": 2891777,
+        "unavailable": "No valid replay with a preferred setup move found"
+      },
+      {
+        "source": 5023363,
+        "unavailable": "No valid replay with a preferred setup move found"
+      },
+      {
+        "source": 5024515,
+        "fen": "4k1B1/8/4K3/8/8/3N4/8/8 w - - 0 1",
+        "moves": [
+          "Bf7+",
+          "Kf8",
+          "Ne5",
+          "Kg7"
+        ],
+        "d": 0,
+        "phases": [
+          7,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=4k1B1/8/4K3/8/8/3N4/8/8_w_-_-_0_1&moves=Bf7%2B,Kf8,Ne5,Kg7&cursor=0",
+        "lossPly": 3,
+        "preferredSetup": true
+      },
+      {
+        "source": 5084803,
+        "fen": "3k4/8/2K5/1BN5/8/8/8/8 w - - 0 1",
+        "moves": [
+          "Kd6",
+          "Kc8",
+          "Ke5",
+          "Kc7"
+        ],
+        "d": 5,
+        "phases": [
+          5,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=3k4/8/2K5/1BN5/8/8/8/8_w_-_-_0_1&moves=Kd6,Kc8,Ke5,Kc7&cursor=0",
+        "lossPly": 3,
+        "preferredSetup": true
+      },
+      {
+        "source": 5084931,
+        "fen": "8/3B4/2K5/k7/3N4/8/8/8 w - - 0 1",
+        "moves": [
+          "Kc5",
+          "Ka6",
+          "Kd5",
+          "Kb7"
+        ],
+        "d": 1,
+        "phases": [
+          5,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/3B4/2K5/k7/3N4/8/8/8_w_-_-_0_1&moves=Kc5,Ka6,Kd5,Kb7&cursor=0",
+        "lossPly": 3,
+        "preferredSetup": true
+      },
+      {
+        "source": 5086531,
+        "fen": "3k4/8/2K5/1B6/8/8/5N2/8 w - - 0 1",
+        "moves": [
+          "Kd6",
+          "Kc8",
+          "Ke5",
+          "Kb7"
+        ],
+        "d": 5,
+        "phases": [
+          5,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=3k4/8/2K5/1B6/8/8/5N2/8_w_-_-_0_1&moves=Kd6,Kc8,Ke5,Kb7&cursor=0",
+        "lossPly": 3,
+        "preferredSetup": true
+      },
+      {
+        "source": 5097110,
+        "fen": "8/2k5/8/3B4/8/1K1N4/8/8 w - - 0 1",
+        "moves": [
+          "Kc4",
+          "Kd8",
+          "Kc5",
+          "Ke7"
+        ],
+        "d": 0,
+        "phases": [
+          7,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/2k5/8/3B4/8/1K1N4/8/8_w_-_-_0_1&moves=Kc4,Kd8,Kc5,Ke7&cursor=0",
+        "lossPly": 3,
+        "preferredSetup": true
+      }
+    ]
+  },
+  "pieceFormations": {
+    "unsupportedMinorPairs": [
+      {
+        "orbits": 132,
+        "physical": 1056,
+        "pieces": {
+          "K": "h8",
+          "B": "d5",
+          "N": "c4"
+        }
+      },
+      {
+        "orbits": 68,
+        "physical": 544,
+        "pieces": {
+          "K": "h8",
+          "B": "g8",
+          "N": "c4"
+        }
+      },
+      {
+        "orbits": 60,
+        "physical": 480,
+        "pieces": {
+          "K": "c4",
+          "B": "d5",
+          "N": "b3"
+        }
+      },
+      {
+        "orbits": 53,
+        "physical": 424,
+        "pieces": {
+          "K": "h8",
+          "B": "d5",
+          "N": "d3"
+        }
+      },
+      {
+        "orbits": 50,
+        "physical": 400,
+        "pieces": {
+          "K": "d6",
+          "B": "d5",
+          "N": "c5"
+        }
+      },
+      {
+        "orbits": 48,
+        "physical": 384,
+        "pieces": {
+          "K": "h8",
+          "B": "e6",
+          "N": "c4"
+        }
+      },
+      {
+        "orbits": 39,
+        "physical": 312,
+        "pieces": {
+          "K": "g8",
+          "B": "f7",
+          "N": "c4"
+        }
+      },
+      {
+        "orbits": 28,
+        "physical": 224,
+        "pieces": {
+          "K": "c3",
+          "B": "d5",
+          "N": "d4"
+        }
+      },
+      {
+        "orbits": 20,
+        "physical": 160,
+        "pieces": {
+          "K": "c6",
+          "B": "d5",
+          "N": "e3"
+        }
+      },
+      {
+        "orbits": 19,
+        "physical": 152,
+        "pieces": {
+          "K": "d4",
+          "B": "c6",
+          "N": "c5"
+        }
+      }
+    ],
+    "supportedMinorPairs": [
+      {
+        "orbits": 7,
+        "physical": 56,
+        "pieces": {
+          "K": "a3",
+          "B": "d7",
+          "N": "d5"
+        }
+      },
+      {
+        "orbits": 7,
+        "physical": 56,
+        "pieces": {
+          "K": "g7",
+          "B": "b3",
+          "N": "d3"
+        }
+      },
+      {
+        "orbits": 5,
+        "physical": 40,
+        "pieces": {
+          "K": "d6",
+          "B": "e8",
+          "N": "d3"
+        }
+      },
+      {
+        "orbits": 4,
+        "physical": 32,
+        "pieces": {
+          "K": "e7",
+          "B": "a4",
+          "N": "d3"
+        }
+      },
+      {
+        "orbits": 4,
+        "physical": 32,
+        "pieces": {
+          "K": "d6",
+          "B": "d7",
+          "N": "d3"
+        }
+      },
+      {
+        "orbits": 3,
+        "physical": 24,
+        "pieces": {
+          "K": "g7",
+          "B": "f7",
+          "N": "d3"
+        }
+      },
+      {
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "g7",
+          "B": "c4",
+          "N": "d3"
+        }
+      },
+      {
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "b5",
+          "B": "a6",
+          "N": "b6"
+        }
+      },
+      {
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "b5",
+          "B": "a6",
+          "N": "d5"
+        }
+      },
+      {
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "e6",
+          "B": "g8",
+          "N": "d3"
+        }
+      }
+    ],
+    "lossSources": [
+      {
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "a6",
+          "B": "b7",
+          "N": "d5"
+        }
+      },
+      {
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "b3",
+          "B": "c4",
+          "N": "d3"
+        }
+      },
+      {
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "b5",
+          "B": "a6",
+          "N": "a8"
+        }
+      },
+      {
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "c4",
+          "B": "b3",
+          "N": "d3"
+        }
+      },
+      {
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "e6",
+          "B": "f7",
+          "N": "d3"
+        }
+      },
+      {
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d6",
+          "B": "b5",
+          "N": "c5"
+        }
+      },
+      {
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "c5",
+          "B": "d7",
+          "N": "d4"
+        }
+      },
+      {
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d6",
+          "B": "b5",
+          "N": "f2"
+        }
+      },
+      {
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "c4",
+          "B": "d5",
+          "N": "d3"
+        }
+      }
+    ]
+  },
+  "examples": {
+    "unsupported": [
+      {
+        "motif": "Bd5/Nd3 fixed minor-piece setup; either king varies (D4 equivalents)",
+        "positions": 53,
+        "examples": [
+          {
+            "fen": "8/8/7k/3BK3/8/3N4/8/8 w - - 0 1",
+            "moves": [
+              "Kf5",
+              "Kg7",
+              "Ke5",
+              "Kh6"
+            ],
+            "d": 0,
+            "phases": [
+              99,
+              99
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/7k/3BK3/8/3N4/8/8_w_-_-_0_1&moves=Kf5,Kg7,Ke5,Kh6&cursor=0",
+            "motif": "King-protected central bishop; knight on precage"
+          },
+          {
+            "fen": "8/8/3K4/3B1k2/8/3N4/8/8 w - - 0 1",
+            "moves": [
+              "Nc5",
+              "Kf6",
+              "Nd3",
+              "Kf5"
+            ],
+            "d": 0,
+            "phases": [
+              99,
+              99
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/3K4/3B1k2/8/3N4/8/8_w_-_-_0_1&moves=Nc5,Kf6,Nd3,Kf5&cursor=0",
+            "motif": "King-protected central bishop; knight on precage"
+          },
+          {
+            "fen": "8/6k1/8/3B1K2/8/3N4/8/8 w - - 0 1",
+            "moves": [
+              "Ke5",
+              "Kh7",
+              "Kf5",
+              "Kg7"
+            ],
+            "d": 0,
+            "phases": [
+              99,
+              99
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=8/6k1/8/3B1K2/8/3N4/8/8_w_-_-_0_1&moves=Ke5,Kh7,Kf5,Kg7&cursor=0",
+            "motif": "Unprotected by king central bishop; knight on precage"
+          }
+        ]
+      }
+    ],
+    "supported": [
+      {
+        "motif": "Bd7/Nd5 fixed minor-piece setup; either king varies (D4 equivalents)",
+        "positions": 7,
+        "examples": [
+          {
+            "fen": "1k6/8/3K4/1B1N4/8/8/8/8 w - - 0 1",
+            "moves": [
+              "Ke7",
+              "Ka7",
+              "Kd6",
+              "Kb8"
+            ],
+            "d": 4,
+            "phases": [
+              5,
+              5
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=1k6/8/3K4/1B1N4/8/8/8/8_w_-_-_0_1&moves=Ke7,Ka7,Kd6,Kb8&cursor=0",
+            "motif": "Noncentral bishop not king-protected; interior king; knight king-protected"
+          },
+          {
+            "fen": "1k6/3K4/8/1B1N4/8/8/8/8 w - - 0 1",
+            "moves": [
+              "Kd8",
+              "Kb7",
+              "Kd7",
+              "Kb8"
+            ],
+            "d": 4,
+            "phases": [
+              5,
+              5
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=1k6/3K4/8/1B1N4/8/8/8/8_w_-_-_0_1&moves=Kd8,Kb7,Kd7,Kb8&cursor=0",
+            "motif": "Noncentral bishop not king-protected; interior king; knight unprotected by king"
+          },
+          {
+            "fen": "1k6/3B4/1K6/3N4/8/8/8/8 w - - 0 1",
+            "moves": [
+              "Kc5",
+              "Ka8",
+              "Kb6",
+              "Kb8"
+            ],
+            "d": 4,
+            "phases": [
+              5,
+              5
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=1k6/3B4/1K6/3N4/8/8/8/8_w_-_-_0_1&moves=Kc5,Ka8,Kb6,Kb8&cursor=0",
+            "motif": "Noncentral bishop not king-protected; interior king; knight unprotected by king"
+          }
+        ]
+      }
+    ],
+    "losses": [
+      {
+        "motif": "Bb5, Kd6 and knight approaching support; after ...Kc8, preferred Ke5 separates kings by three steps",
+        "positions": 2,
+        "examples": [
+          {
+            "source": 5084803,
+            "fen": "3k4/8/2K5/1BN5/8/8/8/8 w - - 0 1",
+            "moves": [
+              "Kd6",
+              "Kc8",
+              "Ke5",
+              "Kc7"
+            ],
+            "d": 5,
+            "phases": [
+              5,
+              99
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=3k4/8/2K5/1BN5/8/8/8/8_w_-_-_0_1&moves=Kd6,Kc8,Ke5,Kc7&cursor=0",
+            "lossPly": 3,
+            "preferredSetup": true
+          },
+          {
+            "source": 5086531,
+            "fen": "3k4/8/2K5/1B6/8/8/5N2/8 w - - 0 1",
+            "moves": [
+              "Kd6",
+              "Kc8",
+              "Ke5",
+              "Kb7"
+            ],
+            "d": 5,
+            "phases": [
+              5,
+              99
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=3k4/8/2K5/1B6/8/8/5N2/8_w_-_-_0_1&moves=Kd6,Kc8,Ke5,Kb7&cursor=0",
+            "lossPly": 3,
+            "preferredSetup": true
+          }
+        ]
+      },
+      {
+        "motif": "Seven-diagonal Bf7/Nd3, followed by preferred Ne5 losing support",
+        "positions": 1,
+        "examples": [
+          {
+            "source": 5024515,
+            "fen": "4k1B1/8/4K3/8/8/3N4/8/8 w - - 0 1",
+            "moves": [
+              "Bf7+",
+              "Kf8",
+              "Ne5",
+              "Kg7"
+            ],
+            "d": 0,
+            "phases": [
+              7,
+              99
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=4k1B1/8/4K3/8/8/3N4/8/8_w_-_-_0_1&moves=Bf7%2B,Kf8,Ne5,Kg7&cursor=0",
+            "lossPly": 3,
+            "preferredSetup": true
+          }
+        ]
+      }
+    ]
+  },
+  "validation": [
+    "117 targeted rule/support tests pass, including forbidden knight squares overriding earlier declarations and D4 symmetry",
+    "tsc -b app passes",
+    "All 2301 remaining supported census roots independently checked to exclude forbidden knights and agree with live support",
+    "All nine replay links checked against live White preferences and legal Black replies; D4-distinct loops repeated three times"
+  ]
+}
