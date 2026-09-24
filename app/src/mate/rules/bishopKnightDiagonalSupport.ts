@@ -589,6 +589,7 @@ export function knightAndBishopFiveKingTargetDistance(fen: string): number {
   const distances = DIAGONALS.filter(pattern => pattern.wall.length === 5 &&
     (pattern.previousSupport === knight.square || pattern.support.includes(knight.square)) && pattern.wall.includes(bishop.square) &&
     isInsideBishopDiagonal(black.square, pattern.wall)).flatMap(pattern => {
+      if (pattern.previousSupport === knight.square) return [kingDistance(white.square, pattern.kingGuard!)]
       if (pattern.support.includes(knight.square) && bishop.square !== pattern.fiveRightTargetBishop) {
         return kingDistance(black.square, pattern.fiveFlushTrigger) <= 1
           ? [kingDistance(white.square, pattern.fiveFlushTarget)] : []

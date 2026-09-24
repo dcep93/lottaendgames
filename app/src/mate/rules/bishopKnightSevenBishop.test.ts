@@ -205,7 +205,27 @@ test('a-file Bd7 support restores the existing Kc5 preference', () => {
 })
 
 
-test('supported five with previous-stage Nd3 approaches two files right of Black', () => {
+test('r2.5 prefers loaded second-move Kd6 with a five bishop and Nd3 across D4', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    const board = getChess(transformFen('k7/8/4K3/8/B7/3N4/8/8 w - - 0 1', transform))
+    board.move({from: transformSquare('e6', transform), to: transformSquare('d7', transform)})
+    board.move({from: transformSquare('a8', transform), to: transformSquare('b7', transform)})
+    const position = board.fen()
+    const move = board.move({from: transformSquare('d7', transform), to: transformSquare('d6', transform)}).san
+    assert.equal(scoreKnightAndBishopWhiteMove(position, move).supportedFiveKingTargetDistance, 0)
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(position), [move])
+    assert.equal(getMateRuleSet('bishop-knight').currentWhiteHint(position)?.id, 'r2.5')
+    // The target remains fixed while Black changes squares inside the cage.
+    for (const black of ['a8', 'b7', 'c8'] as const) {
+      const b = getChess('8/3K4/8/8/B7/3N4/8/7k b - - 0 1')
+      b.remove('h1')
+      b.put({type: 'k', color: 'b'}, black)
+      assert.equal(knightAndBishopFiveKingTargetDistance(transformFen(b.fen(), transform)), 1)
+    }
+  }
+})
+
+test('supported five with previous-stage Nd3 approaches d6', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     const position = transformFen('8/8/1k2K3/8/B7/3N4/8/8 w - - 0 1', transform)
     const san = (to: 'd6' | 'd5') => getChess(position).move({from: transformSquare('e6', transform), to: transformSquare(to, transform)}).san
