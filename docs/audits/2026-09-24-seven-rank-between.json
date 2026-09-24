@@ -1,0 +1,8524 @@
+{
+  "request": "With Nd3 and a seven-diagonal bishop, reject support only when White is below the bishop AND Black is above the bishop in rank; D4 equivalents apply.",
+  "method": {
+    "kind": "Incremental maintained graph update, not a fresh enumeration",
+    "source": "/Users/danielcepeda/repos/_codex_output/bn-seven-rank-2026-09-24",
+    "policyFingerprint": "181344a9074741876d41cbbab533023e96fdb8c63f8d102d27c678355ff3094c",
+    "affectedNodes": 29528,
+    "policiesChanged": 3358,
+    "supportRootsRestored": 337,
+    "coverage": "The previous rank-only rejection removed 477 roots. Re-evaluated that complete set; 337 are restored. The new guard is a strict relaxation, so no other root can change. Refreshed every potential White predecessor of restored roots; prior executable fingerprint reproduced.",
+    "white": "all preferred ties",
+    "black": "all legal replies",
+    "deduplication": "D4, post-White positions on cycles"
+  },
+  "unsupportedOnlyCycles": {
+    "orbits": 887,
+    "physical": 7096
+  },
+  "unsupportedPositionsOnAnyCycle": {
+    "orbits": 894,
+    "physical": 7152
+  },
+  "previousComparison": {
+    "previous": 1024,
+    "survivors": 893,
+    "removed": 131,
+    "added": 1,
+    "current": 894
+  },
+  "previousUnsupportedOnlyComparison": {
+    "previous": 1016,
+    "survivors": 887,
+    "removed": 129,
+    "added": 0,
+    "current": 887
+  },
+  "baselineComparison": {
+    "baseline": 659,
+    "baselinePolicy": "b1be217877bdaaec6cd57d3ecedefbabf34ea514",
+    "baselineBlackPolicy": "all-legal",
+    "survivors": 328,
+    "newPositions": 559
+  },
+  "supportedPositionsOnCycles": {
+    "orbits": 56,
+    "physical": 448
+  },
+  "supportLoss": {
+    "whiteDecisions": {
+      "orbits": 42,
+      "physical": 336
+    },
+    "events": {
+      "orbits": 58,
+      "physical": 464
+    },
+    "sourcePositions": {
+      "orbits": 38,
+      "physical": 304
+    }
+  },
+  "supportLossWithPreferredSetup": {
+    "sourcePositions": 35,
+    "censusOnlySourcesWithoutPreferredEntry": [
+      562880,
+      2891777,
+      5023363
+    ],
+    "links": [
+      {
+        "source": 369880,
+        "fen": "8/8/B7/8/k7/3N4/8/1K6 w - - 0 1",
+        "moves": [
+          "Bc4",
+          "Ka5",
+          "Kc2",
+          "Kb6"
+        ],
+        "d": 0,
+        "phases": [
+          7,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/B7/8/k7/3N4/8/1K6_w_-_-_0_1&moves=Bc4,Ka5,Kc2,Kb6&cursor=0",
+        "lossPly": 3,
+        "preferredSetup": true
+      },
+      {
+        "source": 562880,
+        "unavailable": "No valid replay with a preferred setup move found"
+      },
+      {
+        "source": 566916,
+        "fen": "8/8/8/k7/8/1B1N4/K7/8 w - - 0 1",
+        "moves": [
+          "Ka3",
+          "Kb5",
+          "Kb2",
+          "Kc6"
+        ],
+        "d": 0,
+        "phases": [
+          7,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/k7/8/1B1N4/K7/8_w_-_-_0_1&moves=Ka3,Kb5,Kb2,Kc6&cursor=0",
+        "lossPly": 3,
+        "preferredSetup": true
+      },
+      {
+        "source": 566917,
+        "fen": "8/8/k7/8/8/1B1N4/K7/8 w - - 0 1",
+        "moves": [
+          "Ka3",
+          "Kb5",
+          "Kb2",
+          "Kc6"
+        ],
+        "d": 0,
+        "phases": [
+          7,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/k7/8/8/1B1N4/K7/8_w_-_-_0_1&moves=Ka3,Kb5,Kb2,Kc6&cursor=0",
+        "lossPly": 3,
+        "preferredSetup": true
+      },
+      {
+        "source": 2475652,
+        "fen": "8/8/8/k2B4/8/3N4/8/K7 w - - 0 1",
+        "moves": [
+          "Kb2",
+          "Kb6",
+          "Kc3",
+          "Kc7"
+        ],
+        "d": 0,
+        "phases": [
+          7,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/k2B4/8/3N4/8/K7_w_-_-_0_1&moves=Kb2,Kb6,Kc3,Kc7&cursor=0",
+        "lossPly": 3,
+        "preferredSetup": true
+      },
+      {
+        "source": 2693473,
+        "fen": "8/3k1B1K/8/8/8/3N4/8/8 w - - 0 1",
+        "moves": [
+          "Kg6",
+          "Kc8",
+          "Kf5",
+          "Kb8"
+        ],
+        "d": 0,
+        "phases": [
+          7,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/3k1B1K/8/8/8/3N4/8/8_w_-_-_0_1&moves=Kg6,Kc8,Kf5,Kb8&cursor=0",
+        "lossPly": 3,
+        "preferredSetup": true
+      },
+      {
+        "source": 2737796,
+        "fen": "8/8/8/k2B4/8/3N4/K7/8 w - - 0 1",
+        "moves": [
+          "Kb3",
+          "Kb6",
+          "Kc4",
+          "Kc7"
+        ],
+        "d": 0,
+        "phases": [
+          7,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/k2B4/8/3N4/K7/8_w_-_-_0_1&moves=Kb3,Kb6,Kc4,Kc7&cursor=0",
+        "lossPly": 3,
+        "preferredSetup": true
+      },
+      {
+        "source": 2766048,
+        "fen": "8/8/8/k2B4/8/3N4/8/1K6 w - - 0 1",
+        "moves": [
+          "Kc2",
+          "Ka6",
+          "Kc3",
+          "Ka7"
+        ],
+        "d": 0,
+        "phases": [
+          7,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/k2B4/8/3N4/8/1K6_w_-_-_0_1&moves=Kc2,Ka6,Kc3,Ka7&cursor=0",
+        "lossPly": 3,
+        "preferredSetup": true
+      },
+      {
+        "source": 2766049,
+        "fen": "8/8/8/1k1B4/8/3N4/8/1K6 w - - 0 1",
+        "moves": [
+          "Kc2",
+          "Ka6",
+          "Kc3",
+          "Ka7"
+        ],
+        "d": 0,
+        "phases": [
+          7,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/1k1B4/8/3N4/8/1K6_w_-_-_0_1&moves=Kc2,Ka6,Kc3,Ka7&cursor=0",
+        "lossPly": 3,
+        "preferredSetup": true
+      },
+      {
+        "source": 2774661,
+        "fen": "8/8/k3B3/8/8/3N4/K7/8 w - - 0 1",
+        "moves": [
+          "Kb3",
+          "Kb7",
+          "Kc4",
+          "Kc6"
+        ],
+        "d": 0,
+        "phases": [
+          7,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/k3B3/8/8/3N4/K7/8_w_-_-_0_1&moves=Kb3,Kb7,Kc4,Kc6&cursor=0",
+        "lossPly": 3,
+        "preferredSetup": true
+      },
+      {
+        "source": 2891777,
+        "unavailable": "No valid replay with a preferred setup move found"
+      },
+      {
+        "source": 2963085,
+        "fen": "8/8/1k6/8/2B5/K2N4/8/8 w - - 0 1",
+        "moves": [
+          "Kb4",
+          "Kc6",
+          "Kc3",
+          "Kd6"
+        ],
+        "d": 0,
+        "phases": [
+          7,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/1k6/8/2B5/K2N4/8/8_w_-_-_0_1&moves=Kb4,Kc6,Kc3,Kd6&cursor=0",
+        "lossPly": 3,
+        "preferredSetup": true
+      },
+      {
+        "source": 2963086,
+        "fen": "8/1k6/8/8/2B5/K2N4/8/8 w - - 0 1",
+        "moves": [
+          "Kb4",
+          "Kc6",
+          "Kc3",
+          "Kd6"
+        ],
+        "d": 0,
+        "phases": [
+          7,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/1k6/8/8/2B5/K2N4/8/8_w_-_-_0_1&moves=Kb4,Kc6,Kc3,Kd6&cursor=0",
+        "lossPly": 3,
+        "preferredSetup": true
+      },
+      {
+        "source": 4871813,
+        "fen": "8/8/k3B3/8/8/3N4/1K6/8 w - - 0 1",
+        "moves": [
+          "Kc3",
+          "Kb7",
+          "Kd4",
+          "Kc6"
+        ],
+        "d": 0,
+        "phases": [
+          7,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/k3B3/8/8/3N4/1K6/8_w_-_-_0_1&moves=Kc3,Kb7,Kd4,Kc6&cursor=0",
+        "lossPly": 3,
+        "preferredSetup": true
+      },
+      {
+        "source": 4871821,
+        "fen": "8/8/1k2B3/8/8/3N4/1K6/8 w - - 0 1",
+        "moves": [
+          "Kc3",
+          "Kc7",
+          "Kd4",
+          "Kd6"
+        ],
+        "d": 0,
+        "phases": [
+          7,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/1k2B3/8/8/3N4/1K6/8_w_-_-_0_1&moves=Kc3,Kc7,Kd4,Kd6&cursor=0",
+        "lossPly": 3,
+        "preferredSetup": true
+      },
+      {
+        "source": 5023363,
+        "unavailable": "No valid replay with a preferred setup move found"
+      },
+      {
+        "source": 5052777,
+        "fen": "8/2k2B2/8/8/6K1/3N4/8/8 w - - 0 1",
+        "moves": [
+          "Kf5",
+          "Kb8",
+          "Ke5",
+          "Ka8"
+        ],
+        "d": 0,
+        "phases": [
+          7,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/2k2B2/8/8/6K1/3N4/8/8_w_-_-_0_1&moves=Kf5,Kb8,Ke5,Ka8&cursor=0",
+        "lossPly": 3,
+        "preferredSetup": true
+      },
+      {
+        "source": 5065411,
+        "fen": "3k4/8/2K1B3/8/8/3N4/8/8 w - - 0 1",
+        "moves": [
+          "Kd6",
+          "Ke8",
+          "Ke5",
+          "Ke7"
+        ],
+        "d": 0,
+        "phases": [
+          7,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=3k4/8/2K1B3/8/8/3N4/8/8_w_-_-_0_1&moves=Kd6,Ke8,Ke5,Ke7&cursor=0",
+        "lossPly": 3,
+        "preferredSetup": true
+      },
+      {
+        "source": 5084803,
+        "fen": "3k4/8/2K5/1BN5/8/8/8/8 w - - 0 1",
+        "moves": [
+          "Kd6",
+          "Kc8",
+          "Ke5",
+          "Kc7"
+        ],
+        "d": 105,
+        "phases": [
+          5,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=3k4/8/2K5/1BN5/8/8/8/8_w_-_-_0_1&moves=Kd6,Kc8,Ke5,Kc7&cursor=0",
+        "lossPly": 3,
+        "preferredSetup": true
+      },
+      {
+        "source": 5084931,
+        "fen": "3k4/8/2K5/1B2N3/8/8/8/8 w - - 0 1",
+        "moves": [
+          "Kd6",
+          "Kc8",
+          "Kd5",
+          "Kb7"
+        ],
+        "d": 105,
+        "phases": [
+          5,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=3k4/8/2K5/1B2N3/8/8/8/8_w_-_-_0_1&moves=Kd6,Kc8,Kd5,Kb7&cursor=0",
+        "lossPly": 3,
+        "preferredSetup": true
+      },
+      {
+        "source": 5086531,
+        "fen": "3k4/8/2K5/1B6/8/8/5N2/8 w - - 0 1",
+        "moves": [
+          "Kd6",
+          "Kc8",
+          "Ke5",
+          "Kb7"
+        ],
+        "d": 105,
+        "phases": [
+          5,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=3k4/8/2K5/1B6/8/8/5N2/8_w_-_-_0_1&moves=Kd6,Kc8,Ke5,Kb7&cursor=0",
+        "lossPly": 3,
+        "preferredSetup": true
+      },
+      {
+        "source": 5089642,
+        "fen": "8/8/2k1B3/8/6K1/3N4/8/8 w - - 0 1",
+        "moves": [
+          "Kf5",
+          "Kb7",
+          "Ke5",
+          "Ka8"
+        ],
+        "d": 0,
+        "phases": [
+          7,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/2k1B3/8/6K1/3N4/8/8_w_-_-_0_1&moves=Kf5,Kb7,Ke5,Ka8&cursor=0",
+        "lossPly": 3,
+        "preferredSetup": true
+      },
+      {
+        "source": 5093200,
+        "fen": "2k5/8/8/3B4/1K6/3N4/8/8 w - - 0 1",
+        "moves": [
+          "Kc5",
+          "Kd7",
+          "Be4",
+          "Ke8"
+        ],
+        "d": 0,
+        "phases": [
+          7,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=2k5/8/8/3B4/1K6/3N4/8/8_w_-_-_0_1&moves=Kc5,Kd7,Be4,Ke8&cursor=0",
+        "lossPly": 3,
+        "preferredSetup": true
+      },
+      {
+        "source": 5093201,
+        "fen": "8/2k5/8/1K1B4/8/3N4/8/8 w - - 0 1",
+        "moves": [
+          "Kc5",
+          "Kd7",
+          "Be4",
+          "Ke8"
+        ],
+        "d": 0,
+        "phases": [
+          7,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/2k5/8/1K1B4/8/3N4/8/8_w_-_-_0_1&moves=Kc5,Kd7,Be4,Ke8&cursor=0",
+        "lossPly": 3,
+        "preferredSetup": true
+      },
+      {
+        "source": 5113664,
+        "fen": "k3B3/8/8/1K6/8/3N4/8/8 w - - 0 1",
+        "moves": [
+          "Kc5",
+          "Kb8",
+          "Kd4",
+          "Kc8"
+        ],
+        "d": 0,
+        "phases": [
+          5,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=k3B3/8/8/1K6/8/3N4/8/8_w_-_-_0_1&moves=Kc5,Kb8,Kd4,Kc8&cursor=0",
+        "lossPly": 3,
+        "preferredSetup": true
+      },
+      {
+        "source": 5113665,
+        "fen": "4B3/k7/8/1K6/8/3N4/8/8 w - - 0 1",
+        "moves": [
+          "Kc5",
+          "Kb8",
+          "Kd4",
+          "Kc8"
+        ],
+        "d": 0,
+        "phases": [
+          5,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=4B3/k7/8/1K6/8/3N4/8/8_w_-_-_0_1&moves=Kc5,Kb8,Kd4,Kc8&cursor=0",
+        "lossPly": 3,
+        "preferredSetup": true
+      },
+      {
+        "source": 5133965,
+        "fen": "8/8/1k2B3/8/8/1K1N4/8/8 w - - 0 1",
+        "moves": [
+          "Kc4",
+          "Kc7",
+          "Kd4",
+          "Kd6"
+        ],
+        "d": 0,
+        "phases": [
+          7,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/1k2B3/8/8/1K1N4/8/8_w_-_-_0_1&moves=Kc4,Kc7,Kd4,Kd6&cursor=0",
+        "lossPly": 3,
+        "preferredSetup": true
+      },
+      {
+        "source": 5170822,
+        "fen": "8/k4B2/8/8/8/1K1N4/8/8 w - - 0 1",
+        "moves": [
+          "Kc4",
+          "Kb8",
+          "Kd4",
+          "Kc7"
+        ],
+        "d": 0,
+        "phases": [
+          7,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/k4B2/8/8/8/1K1N4/8/8_w_-_-_0_1&moves=Kc4,Kb8,Kd4,Kc7&cursor=0",
+        "lossPly": 3,
+        "preferredSetup": true
+      },
+      {
+        "source": 5170830,
+        "fen": "8/1k3B2/8/8/8/1K1N4/8/8 w - - 0 1",
+        "moves": [
+          "Kc4",
+          "Kc8",
+          "Kd4",
+          "Kd7"
+        ],
+        "d": 0,
+        "phases": [
+          7,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/1k3B2/8/8/8/1K1N4/8/8_w_-_-_0_1&moves=Kc4,Kc8,Kd4,Kd7&cursor=0",
+        "lossPly": 3,
+        "preferredSetup": true
+      },
+      {
+        "source": 7121678,
+        "fen": "8/1k3B2/8/8/5K2/3N4/8/8 w - - 0 1",
+        "moves": [
+          "Ke5",
+          "Ka8",
+          "Bd5+",
+          "Ka7"
+        ],
+        "d": 0,
+        "phases": [
+          7,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/1k3B2/8/8/5K2/3N4/8/8_w_-_-_0_1&moves=Ke5,Ka8,Bd5%2B,Ka7&cursor=0",
+        "lossPly": 3,
+        "preferredSetup": true
+      },
+      {
+        "source": 7133898,
+        "fen": "8/2k2B2/8/8/2K5/3N4/8/8 w - - 0 1",
+        "moves": [
+          "Kd5",
+          "Kd8",
+          "Kd4",
+          "Kc7"
+        ],
+        "d": 0,
+        "phases": [
+          7,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/2k2B2/8/8/2K5/3N4/8/8_w_-_-_0_1&moves=Kd5,Kd8,Kd4,Kc7&cursor=0",
+        "lossPly": 3,
+        "preferredSetup": true
+      },
+      {
+        "source": 7170222,
+        "fen": "8/2k2B2/8/8/8/3N1K2/8/8 w - - 0 1",
+        "moves": [
+          "Ke4",
+          "Kb8",
+          "Kd4",
+          "Ka7"
+        ],
+        "d": 0,
+        "phases": [
+          7,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/2k2B2/8/8/8/3N1K2/8/8_w_-_-_0_1&moves=Ke4,Kb8,Kd4,Ka7&cursor=0",
+        "lossPly": 3,
+        "preferredSetup": true
+      },
+      {
+        "source": 7170230,
+        "fen": "8/1k3B2/8/8/8/3N1K2/8/8 w - - 0 1",
+        "moves": [
+          "Ke4",
+          "Ka8",
+          "Kd4",
+          "Kb8"
+        ],
+        "d": 0,
+        "phases": [
+          7,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/1k3B2/8/8/8/3N1K2/8/8_w_-_-_0_1&moves=Ke4,Ka8,Kd4,Kb8&cursor=0",
+        "lossPly": 3,
+        "preferredSetup": true
+      },
+      {
+        "source": 7198901,
+        "fen": "8/8/1k2B3/8/8/3N1K2/8/8 w - - 0 1",
+        "moves": [
+          "Ke4",
+          "Ka7",
+          "Kd4",
+          "Ka8"
+        ],
+        "d": 0,
+        "phases": [
+          7,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/1k2B3/8/8/3N1K2/8/8_w_-_-_0_1&moves=Ke4,Ka7,Kd4,Ka8&cursor=0",
+        "lossPly": 3,
+        "preferredSetup": true
+      },
+      {
+        "source": 7226662,
+        "fen": "8/8/8/1k1B4/8/3N1K2/8/8 w - - 0 1",
+        "moves": [
+          "Ke4",
+          "Ka6",
+          "Kd4",
+          "Ka7"
+        ],
+        "d": 0,
+        "phases": [
+          7,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/1k1B4/8/3N1K2/8/8_w_-_-_0_1&moves=Ke4,Ka6,Kd4,Ka7&cursor=0",
+        "lossPly": 3,
+        "preferredSetup": true
+      },
+      {
+        "source": 7267974,
+        "fen": "8/k4B2/8/8/8/2KN4/8/8 w - - 0 1",
+        "moves": [
+          "Kd4",
+          "Kb8",
+          "Bd5",
+          "Kc7"
+        ],
+        "d": 0,
+        "phases": [
+          7,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/k4B2/8/8/8/2KN4/8/8_w_-_-_0_1&moves=Kd4,Kb8,Bd5,Kc7&cursor=0",
+        "lossPly": 3,
+        "preferredSetup": true
+      },
+      {
+        "source": 7267982,
+        "fen": "8/1k3B2/8/8/8/2KN4/8/8 w - - 0 1",
+        "moves": [
+          "Kd4",
+          "Kc8",
+          "Bd5",
+          "Kd7"
+        ],
+        "d": 0,
+        "phases": [
+          7,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/1k3B2/8/8/8/2KN4/8/8_w_-_-_0_1&moves=Kd4,Kc8,Bd5,Kd7&cursor=0",
+        "lossPly": 3,
+        "preferredSetup": true
+      },
+      {
+        "source": 7267990,
+        "fen": "8/2k2B2/8/8/8/2KN4/8/8 w - - 0 1",
+        "moves": [
+          "Kd4",
+          "Kd8",
+          "Bd5",
+          "Ke7"
+        ],
+        "d": 0,
+        "phases": [
+          7,
+          99
+        ],
+        "url": "http://localhost:5173/mate/bishop-knight#fen=8/2k2B2/8/8/8/2KN4/8/8_w_-_-_0_1&moves=Kd4,Kd8,Bd5,Ke7&cursor=0",
+        "lossPly": 3,
+        "preferredSetup": true
+      }
+    ]
+  },
+  "formationMotifs": {
+    "definition": "Exact White K/B/N squares modulo the eight D4 board symmetries, without translations; Black square varies. Groups form a disjoint partition of positions. Larger minor-pair groups are a separate coarser partition, not competing motif sizes.",
+    "unsupported": [
+      {
+        "keys": [
+          7193856,
+          7193861,
+          7193862,
+          7193864,
+          7193865,
+          7193868,
+          7193869,
+          7193871,
+          7193872,
+          7193873,
+          7193878,
+          7193880,
+          7193881,
+          7193885,
+          7193886,
+          7193887,
+          7193888,
+          7193889,
+          7193894,
+          7193895,
+          7193896,
+          7193897,
+          7193898,
+          7193899,
+          7193900,
+          7193901,
+          7193902,
+          7193903,
+          7193904,
+          7193905,
+          7193906,
+          7193907,
+          7193908,
+          7193909,
+          7193910,
+          7193911,
+          7193913,
+          7193914,
+          7193915,
+          7193916,
+          7193917,
+          7193918,
+          7193919
+        ],
+        "orbits": 43,
+        "physical": 344,
+        "pieces": {
+          "K": "d4",
+          "B": "d5",
+          "N": "c5"
+        }
+      },
+      {
+        "keys": [
+          7194944,
+          7194946,
+          7194947,
+          7194948,
+          7194949,
+          7194950,
+          7194951,
+          7194952,
+          7194953,
+          7194954,
+          7194955,
+          7194956,
+          7194957,
+          7194958,
+          7194959,
+          7194960,
+          7194961,
+          7194965,
+          7194967,
+          7194968,
+          7194969,
+          7194973,
+          7194974,
+          7194982,
+          7194983,
+          7194988,
+          7194989,
+          7194990,
+          7194992,
+          7194993,
+          7194994,
+          7194997,
+          7195001,
+          7195002,
+          7195003,
+          7195004,
+          7195005,
+          7195006
+        ],
+        "orbits": 38,
+        "physical": 304,
+        "pieces": {
+          "K": "e5",
+          "B": "d5",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          7193222,
+          7193229,
+          7193231,
+          7193238,
+          7193239,
+          7193245,
+          7193246,
+          7193247,
+          7193254,
+          7193255,
+          7193257,
+          7193259,
+          7193260,
+          7193261,
+          7193263,
+          7193264,
+          7193266,
+          7193267,
+          7193268,
+          7193269,
+          7193270,
+          7193273,
+          7193274,
+          7193275,
+          7193276,
+          7193277,
+          7193278,
+          7193279
+        ],
+        "orbits": 28,
+        "physical": 224,
+        "pieces": {
+          "K": "d4",
+          "B": "d5",
+          "N": "b3"
+        }
+      },
+      {
+        "keys": [
+          7193807,
+          7193814,
+          7193821,
+          7193822,
+          7193823,
+          7193829,
+          7193830,
+          7193831,
+          7193833,
+          7193835,
+          7193836,
+          7193837,
+          7193839,
+          7193840,
+          7193841,
+          7193842,
+          7193843,
+          7193844,
+          7193845,
+          7193846,
+          7193849,
+          7193850,
+          7193851,
+          7193852,
+          7193853,
+          7193854,
+          7193855
+        ],
+        "orbits": 27,
+        "physical": 216,
+        "pieces": {
+          "K": "d4",
+          "B": "d5",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          5125199,
+          5125206,
+          5125207,
+          5125213,
+          5125214,
+          5125215,
+          5125222,
+          5125223,
+          5125229,
+          5125230,
+          5125231,
+          5125234,
+          5125235,
+          5125236,
+          5125238,
+          5125241,
+          5125242,
+          5125243,
+          5125244,
+          5125245
+        ],
+        "orbits": 20,
+        "physical": 160,
+        "pieces": {
+          "K": "d3",
+          "B": "d5",
+          "N": "b3"
+        }
+      },
+      {
+        "keys": [
+          7084355,
+          7084356,
+          7084357,
+          7084358,
+          7084359,
+          7084363,
+          7084364,
+          7084365,
+          7084366,
+          7084367,
+          7084373,
+          7084375,
+          7084381,
+          7084382,
+          7084390,
+          7084391,
+          7084396,
+          7084397,
+          7084403,
+          7084405
+        ],
+        "orbits": 20,
+        "physical": 160,
+        "pieces": {
+          "K": "e5",
+          "B": "g8",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          7165200,
+          7165209,
+          7165216,
+          7165217,
+          7165222,
+          7165224,
+          7165225,
+          7165226,
+          7165227,
+          7165228,
+          7165229,
+          7165230,
+          7165232,
+          7165233,
+          7165234,
+          7165235,
+          7165236,
+          7165237,
+          7165238
+        ],
+        "orbits": 19,
+        "physical": 152,
+        "pieces": {
+          "K": "d4",
+          "B": "c6",
+          "N": "c5"
+        }
+      },
+      {
+        "keys": [
+          7194277,
+          7194278,
+          7194279,
+          7194283,
+          7194284,
+          7194285,
+          7194287,
+          7194290,
+          7194291,
+          7194292,
+          7194293,
+          7194294,
+          7194297,
+          7194298,
+          7194299,
+          7194300,
+          7194301,
+          7194302,
+          7194303
+        ],
+        "orbits": 19,
+        "physical": 152,
+        "pieces": {
+          "K": "d4",
+          "B": "d5",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          5097793,
+          5097794,
+          5097795,
+          5097796,
+          5097797,
+          5097801,
+          5097805,
+          5097807,
+          5097808,
+          5097809,
+          5097815,
+          5097816,
+          5097817,
+          5097825,
+          5097828,
+          5097832,
+          5097833,
+          5097840
+        ],
+        "orbits": 18,
+        "physical": 144,
+        "pieces": {
+          "K": "e6",
+          "B": "d5",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          7194761,
+          7194784,
+          7194785,
+          7194793,
+          7194795,
+          7194797,
+          7194800,
+          7194802,
+          7194804,
+          7194805,
+          7194806,
+          7194809,
+          7194810,
+          7194811,
+          7194812,
+          7194813,
+          7194814,
+          7194815
+        ],
+        "orbits": 18,
+        "physical": 144,
+        "pieces": {
+          "K": "d4",
+          "B": "d5",
+          "N": "e3"
+        }
+      },
+      {
+        "keys": [
+          7121220,
+          7121221,
+          7121222,
+          7121224,
+          7121228,
+          7121229,
+          7121230,
+          7121232,
+          7121237,
+          7121241,
+          7121245,
+          7121246,
+          7121248,
+          7121249,
+          7121256,
+          7121260
+        ],
+        "orbits": 16,
+        "physical": 128,
+        "pieces": {
+          "K": "e5",
+          "B": "f7",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          7158080,
+          7158082,
+          7158084,
+          7158086,
+          7158088,
+          7158089,
+          7158091,
+          7158094,
+          7158096,
+          7158097,
+          7158101,
+          7158104,
+          7158105,
+          7158112,
+          7158121,
+          7158122
+        ],
+        "orbits": 16,
+        "physical": 128,
+        "pieces": {
+          "K": "e5",
+          "B": "e6",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          5097177,
+          5097186,
+          5097188,
+          5097193,
+          5097195,
+          5097197,
+          5097202,
+          5097203,
+          5097204,
+          5097205,
+          5097209,
+          5097210,
+          5097211,
+          5097212,
+          5097213
+        ],
+        "orbits": 15,
+        "physical": 120,
+        "pieces": {
+          "K": "c4",
+          "B": "d5",
+          "N": "d4"
+        }
+      },
+      {
+        "keys": [
+          7195392,
+          7195394,
+          7195400,
+          7195401,
+          7195402,
+          7195408,
+          7195409,
+          7195416,
+          7195417,
+          7195424,
+          7195425,
+          7195432,
+          7195433,
+          7195440,
+          7195449
+        ],
+        "orbits": 15,
+        "physical": 120,
+        "pieces": {
+          "K": "e5",
+          "B": "d5",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          7166117,
+          7166118,
+          7166121,
+          7166122,
+          7166123,
+          7166125,
+          7166126,
+          7166130,
+          7166132,
+          7166133,
+          7166134,
+          7166137,
+          7166138,
+          7166139
+        ],
+        "orbits": 14,
+        "physical": 112,
+        "pieces": {
+          "K": "d4",
+          "B": "c6",
+          "N": "e3"
+        }
+      },
+      {
+        "keys": [
+          5096093,
+          5096100,
+          5096102,
+          5096107,
+          5096109,
+          5096115,
+          5096116,
+          5096117,
+          5096118,
+          5096123,
+          5096124,
+          5096125,
+          5096126
+        ],
+        "orbits": 13,
+        "physical": 104,
+        "pieces": {
+          "K": "c4",
+          "B": "d5",
+          "N": "b3"
+        }
+      },
+      {
+        "keys": [
+          7192733,
+          7192747,
+          7192748,
+          7192749,
+          7192754,
+          7192755,
+          7192756,
+          7192757,
+          7192761,
+          7192762,
+          7192763,
+          7192764,
+          7192765
+        ],
+        "orbits": 13,
+        "physical": 104,
+        "pieces": {
+          "K": "d4",
+          "B": "d5",
+          "N": "a3"
+        }
+      },
+      {
+        "keys": [
+          7193385,
+          7193387,
+          7193388,
+          7193392,
+          7193394,
+          7193395,
+          7193396,
+          7193401,
+          7193402,
+          7193403,
+          7193404
+        ],
+        "orbits": 11,
+        "physical": 88,
+        "pieces": {
+          "K": "d4",
+          "B": "d5",
+          "N": "b5"
+        }
+      },
+      {
+        "keys": [
+          4987204,
+          4987205,
+          4987206,
+          4987207,
+          4987213,
+          4987214,
+          4987215,
+          4987221,
+          4987223,
+          4987235
+        ],
+        "orbits": 10,
+        "physical": 80,
+        "pieces": {
+          "K": "e6",
+          "B": "g8",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          5064839,
+          5064846,
+          5064847,
+          5064854,
+          5064855,
+          5064862,
+          5064863,
+          5064869,
+          5064871
+        ],
+        "orbits": 9,
+        "physical": 72,
+        "pieces": {
+          "K": "d6",
+          "B": "e6",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          5125837,
+          5125846,
+          5125853,
+          5125854,
+          5125862,
+          5125869,
+          5125874,
+          5125875,
+          5125876
+        ],
+        "orbits": 9,
+        "physical": 72,
+        "pieces": {
+          "K": "d3",
+          "B": "d5",
+          "N": "d4"
+        }
+      },
+      {
+        "keys": [
+          7120128,
+          7120130,
+          7120136,
+          7120144,
+          7120157,
+          7120170,
+          7120171,
+          7120172,
+          7120173
+        ],
+        "orbits": 9,
+        "physical": 72,
+        "pieces": {
+          "K": "d4",
+          "B": "b3",
+          "N": "c5"
+        }
+      },
+      {
+        "keys": [
+          7091481,
+          7091485,
+          7091489,
+          7091497,
+          7091498,
+          7091499,
+          7091500,
+          7091501
+        ],
+        "orbits": 8,
+        "physical": 64,
+        "pieces": {
+          "K": "d4",
+          "B": "a4",
+          "N": "c5"
+        }
+      },
+      {
+        "keys": [
+          7194438,
+          7194457,
+          7194464,
+          7194465,
+          7194472,
+          7194473,
+          7194475,
+          7194480
+        ],
+        "orbits": 8,
+        "physical": 64,
+        "pieces": {
+          "K": "e5",
+          "B": "d5",
+          "N": "c5"
+        }
+      },
+      {
+        "keys": [
+          3000645,
+          3000653,
+          3000655,
+          3000657,
+          3000665,
+          3000666
+        ],
+        "orbits": 6,
+        "physical": 48,
+        "pieces": {
+          "K": "e7",
+          "B": "d5",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          5016341,
+          5016344,
+          5016352,
+          5016353,
+          5016356,
+          5016357
+        ],
+        "orbits": 6,
+        "physical": 48,
+        "pieces": {
+          "K": "f5",
+          "B": "g8",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          5024080,
+          5024089,
+          5024096,
+          5024097,
+          5024098,
+          5024099
+        ],
+        "orbits": 6,
+        "physical": 48,
+        "pieces": {
+          "K": "e6",
+          "B": "f7",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          5068514,
+          5068515,
+          5068516,
+          5068530,
+          5068531,
+          5068532
+        ],
+        "orbits": 6,
+        "physical": 48,
+        "pieces": {
+          "K": "c4",
+          "B": "c6",
+          "N": "d4"
+        }
+      },
+      {
+        "keys": [
+          5096235,
+          5096242,
+          5096243,
+          5096249,
+          5096250,
+          5096251
+        ],
+        "orbits": 6,
+        "physical": 48,
+        "pieces": {
+          "K": "c4",
+          "B": "d5",
+          "N": "b5"
+        }
+      },
+      {
+        "keys": [
+          5126913,
+          5126914,
+          5126918,
+          5126921,
+          5126928,
+          5126937
+        ],
+        "orbits": 6,
+        "physical": 48,
+        "pieces": {
+          "K": "f5",
+          "B": "d5",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          7194831,
+          7194838,
+          7194858,
+          7194860,
+          7194866,
+          7194867
+        ],
+        "orbits": 6,
+        "physical": 48,
+        "pieces": {
+          "K": "d4",
+          "B": "d5",
+          "N": "e4"
+        }
+      },
+      {
+        "keys": [
+          7195910,
+          7195917,
+          7195921,
+          7195929,
+          7195937,
+          7195945
+        ],
+        "orbits": 6,
+        "physical": 48,
+        "pieces": {
+          "K": "e5",
+          "B": "d5",
+          "N": "d2"
+        }
+      },
+      {
+        "keys": [
+          2890053,
+          2890054,
+          2890061,
+          2890062,
+          2890069
+        ],
+        "orbits": 5,
+        "physical": 40,
+        "pieces": {
+          "K": "e7",
+          "B": "g8",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          4725068,
+          4725085,
+          4725086,
+          4725090,
+          4725091
+        ],
+        "orbits": 5,
+        "physical": 40,
+        "pieces": {
+          "K": "f6",
+          "B": "g8",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          4761924,
+          4761925,
+          4761932,
+          4761933,
+          4761941
+        ],
+        "orbits": 5,
+        "physical": 40,
+        "pieces": {
+          "K": "f6",
+          "B": "f7",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          4798784,
+          4798792,
+          4798797,
+          4798800,
+          4798818
+        ],
+        "orbits": 5,
+        "physical": 40,
+        "pieces": {
+          "K": "f6",
+          "B": "e6",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          4835648,
+          4835652,
+          4835656,
+          4835660,
+          4835664
+        ],
+        "orbits": 5,
+        "physical": 40,
+        "pieces": {
+          "K": "f6",
+          "B": "d5",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          5126465,
+          5126466,
+          5126467,
+          5126468,
+          5126469
+        ],
+        "orbits": 5,
+        "physical": 40,
+        "pieces": {
+          "K": "f5",
+          "B": "d5",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          7092381,
+          7092389,
+          7092395,
+          7092397,
+          7092402
+        ],
+        "orbits": 5,
+        "physical": 40,
+        "pieces": {
+          "K": "d4",
+          "B": "a4",
+          "N": "e3"
+        }
+      },
+      {
+        "keys": [
+          7193933,
+          7193961,
+          7193968,
+          7193970,
+          7193977
+        ],
+        "orbits": 5,
+        "physical": 40,
+        "pieces": {
+          "K": "d4",
+          "B": "d5",
+          "N": "c6"
+        }
+      },
+      {
+        "keys": [
+          7194895,
+          7194902,
+          7194918,
+          7194930,
+          7194937
+        ],
+        "orbits": 5,
+        "physical": 40,
+        "pieces": {
+          "K": "e5",
+          "B": "d5",
+          "N": "d4"
+        }
+      },
+      {
+        "keys": [
+          2657036,
+          2657044,
+          2657049,
+          2657052
+        ],
+        "orbits": 4,
+        "physical": 32,
+        "pieces": {
+          "K": "g6",
+          "B": "g8",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          2963784,
+          2963792,
+          2963800,
+          2963801
+        ],
+        "orbits": 4,
+        "physical": 32,
+        "pieces": {
+          "K": "e7",
+          "B": "e6",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          5093505,
+          5093525,
+          5093533,
+          5093540
+        ],
+        "orbits": 4,
+        "physical": 32,
+        "pieces": {
+          "K": "d6",
+          "B": "d5",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          7083293,
+          7083307,
+          7083308,
+          7083309
+        ],
+        "orbits": 4,
+        "physical": 32,
+        "pieces": {
+          "K": "d4",
+          "B": "a2",
+          "N": "c5"
+        }
+      },
+      {
+        "keys": [
+          7099862,
+          7099869,
+          7099870,
+          7099871
+        ],
+        "orbits": 4,
+        "physical": 32,
+        "pieces": {
+          "K": "e5",
+          "B": "c8",
+          "N": "a6"
+        }
+      },
+      {
+        "keys": [
+          7195526,
+          7195533,
+          7195561,
+          7195568
+        ],
+        "orbits": 4,
+        "physical": 32,
+        "pieces": {
+          "K": "e5",
+          "B": "d5",
+          "N": "b3"
+        }
+      },
+      {
+        "keys": [
+          7230706,
+          7230708,
+          7230709,
+          7230710
+        ],
+        "orbits": 4,
+        "physical": 32,
+        "pieces": {
+          "K": "d4",
+          "B": "e6",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          7241515,
+          7241516,
+          7241523,
+          7241531
+        ],
+        "orbits": 4,
+        "physical": 32,
+        "pieces": {
+          "K": "e5",
+          "B": "a4",
+          "N": "d1"
+        }
+      },
+      {
+        "keys": [
+          117067,
+          117073,
+          117074
+        ],
+        "orbits": 3,
+        "physical": 24,
+        "pieces": {
+          "K": "h8",
+          "B": "d5",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          297739,
+          297746,
+          297747
+        ],
+        "orbits": 3,
+        "physical": 24,
+        "pieces": {
+          "K": "h7",
+          "B": "g8",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          408331,
+          408336,
+          408339
+        ],
+        "orbits": 3,
+        "physical": 24,
+        "pieces": {
+          "K": "h7",
+          "B": "d5",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          641348,
+          641356,
+          641362
+        ],
+        "orbits": 3,
+        "physical": 24,
+        "pieces": {
+          "K": "f8",
+          "B": "d5",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          2627908,
+          2627916,
+          2627930
+        ],
+        "orbits": 3,
+        "physical": 24,
+        "pieces": {
+          "K": "f7",
+          "B": "g8",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          2701636,
+          2701656,
+          2701657
+        ],
+        "orbits": 3,
+        "physical": 24,
+        "pieces": {
+          "K": "f7",
+          "B": "e6",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          2767632,
+          2767640,
+          2767641
+        ],
+        "orbits": 3,
+        "physical": 24,
+        "pieces": {
+          "K": "g6",
+          "B": "d5",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          5022985,
+          5023011,
+          5023012
+        ],
+        "orbits": 3,
+        "physical": 24,
+        "pieces": {
+          "K": "c4",
+          "B": "b3",
+          "N": "c5"
+        }
+      },
+      {
+        "keys": [
+          5098241,
+          5098242,
+          5098274
+        ],
+        "orbits": 3,
+        "physical": 24,
+        "pieces": {
+          "K": "e6",
+          "B": "d5",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          7166445,
+          7166446,
+          7166447
+        ],
+        "orbits": 3,
+        "physical": 24,
+        "pieces": {
+          "K": "e5",
+          "B": "c6",
+          "N": "a4"
+        }
+      },
+      {
+        "keys": [
+          7193302,
+          7193330,
+          7193337
+        ],
+        "orbits": 3,
+        "physical": 24,
+        "pieces": {
+          "K": "d4",
+          "B": "d5",
+          "N": "b4"
+        }
+      },
+      {
+        "keys": [
+          7230925,
+          7230926,
+          7230927
+        ],
+        "orbits": 3,
+        "physical": 24,
+        "pieces": {
+          "K": "e5",
+          "B": "c4",
+          "N": "a6"
+        }
+      },
+      {
+        "keys": [
+          7267564,
+          7267571,
+          7267572
+        ],
+        "orbits": 3,
+        "physical": 24,
+        "pieces": {
+          "K": "d4",
+          "B": "f7",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          7270187,
+          7270195,
+          7270203
+        ],
+        "orbits": 3,
+        "physical": 24,
+        "pieces": {
+          "K": "e5",
+          "B": "b3",
+          "N": "d1"
+        }
+      },
+      {
+        "keys": [
+          4688,
+          4689
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "a1",
+          "B": "a2",
+          "N": "b2"
+        }
+      },
+      {
+        "keys": [
+          5328,
+          5329
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "a1",
+          "B": "a2",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          6481,
+          6482
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "h8",
+          "B": "g8",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          80194,
+          80209
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "h8",
+          "B": "e6",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          342339,
+          342352
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "g8",
+          "B": "e6",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          379203,
+          379211
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "g8",
+          "B": "d5",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          407883,
+          407891
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "h7",
+          "B": "d5",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          530756,
+          530764
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "f8",
+          "B": "g8",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          792901,
+          792909
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "e8",
+          "B": "g8",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          903493,
+          903501
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "e8",
+          "B": "d5",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          936654,
+          936661
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "h4",
+          "B": "d5",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          2365785,
+          2365786
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "g7",
+          "B": "g8",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          2373139,
+          2373146
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "b2",
+          "B": "a4",
+          "N": "d1"
+        }
+      },
+      {
+        "keys": [
+          2402628,
+          2402636
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "g7",
+          "B": "f7",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          2439512,
+          2439513
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "g7",
+          "B": "e6",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          2476355,
+          2476363
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "g7",
+          "B": "d5",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          2738500,
+          2738508
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "f7",
+          "B": "d5",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          2926937,
+          2926938
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "e7",
+          "B": "f7",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          4987938,
+          4987954
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "c4",
+          "B": "a2",
+          "N": "g1"
+        }
+      },
+      {
+        "keys": [
+          4988324,
+          4988340
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "e6",
+          "B": "g8",
+          "N": "b2"
+        }
+      },
+      {
+        "keys": [
+          4994338,
+          4994340
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "c4",
+          "B": "a4",
+          "N": "c5"
+        }
+      },
+      {
+        "keys": [
+          5015268,
+          5015275
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "d3",
+          "B": "a2",
+          "N": "d4"
+        }
+      },
+      {
+        "keys": [
+          5021958,
+          5021974
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "c4",
+          "B": "b3",
+          "N": "a5"
+        }
+      },
+      {
+        "keys": [
+          5024802,
+          5024818
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "c4",
+          "B": "b3",
+          "N": "g1"
+        }
+      },
+      {
+        "keys": [
+          5025188,
+          5025204
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "e6",
+          "B": "f7",
+          "N": "b2"
+        }
+      },
+      {
+        "keys": [
+          5030016,
+          5030032
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "c4",
+          "B": "b5",
+          "N": "a3"
+        }
+      },
+      {
+        "keys": [
+          5053216,
+          5053217
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "f5",
+          "B": "f7",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          5080099,
+          5080100
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "d3",
+          "B": "a4",
+          "N": "a3"
+        }
+      },
+      {
+        "keys": [
+          5082916,
+          5082924
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "f5",
+          "B": "e8",
+          "N": "a4"
+        }
+      },
+      {
+        "keys": [
+          5082979,
+          5082987
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "f5",
+          "B": "e8",
+          "N": "a3"
+        }
+      },
+      {
+        "keys": [
+          5088989,
+          5088996
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "d3",
+          "B": "c4",
+          "N": "d4"
+        }
+      },
+      {
+        "keys": [
+          5096738,
+          5096740
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "c4",
+          "B": "d5",
+          "N": "c5"
+        }
+      },
+      {
+        "keys": [
+          5097314,
+          5097323
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "e6",
+          "B": "d5",
+          "N": "c5"
+        }
+      },
+      {
+        "keys": [
+          5119780,
+          5119788
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "f5",
+          "B": "d7",
+          "N": "a4"
+        }
+      },
+      {
+        "keys": [
+          5130369,
+          5130389
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "f4",
+          "B": "d5",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          5230434,
+          5230435
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "f5",
+          "B": "a4",
+          "N": "a3"
+        }
+      },
+      {
+        "keys": [
+          7078218,
+          7078225
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "d5",
+          "B": "a8",
+          "N": "a3"
+        }
+      },
+      {
+        "keys": [
+          7078346,
+          7078353
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "d5",
+          "B": "a8",
+          "N": "a1"
+        }
+      },
+      {
+        "keys": [
+          7078794,
+          7078801
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "d5",
+          "B": "a8",
+          "N": "b2"
+        }
+      },
+      {
+        "keys": [
+          7079242,
+          7079249
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "d5",
+          "B": "a8",
+          "N": "c3"
+        }
+      },
+      {
+        "keys": [
+          7079370,
+          7079377
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "d5",
+          "B": "a8",
+          "N": "c1"
+        }
+      },
+      {
+        "keys": [
+          7079818,
+          7079825
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "d5",
+          "B": "a8",
+          "N": "d2"
+        }
+      },
+      {
+        "keys": [
+          7080266,
+          7080273
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "d5",
+          "B": "a8",
+          "N": "e3"
+        }
+      },
+      {
+        "keys": [
+          7080394,
+          7080401
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "d5",
+          "B": "a8",
+          "N": "e1"
+        }
+      },
+      {
+        "keys": [
+          7080842,
+          7080849
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "d5",
+          "B": "a8",
+          "N": "f2"
+        }
+      },
+      {
+        "keys": [
+          7081418,
+          7081425
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "d5",
+          "B": "a8",
+          "N": "g1"
+        }
+      },
+      {
+        "keys": [
+          7100821,
+          7100822
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "e5",
+          "B": "c8",
+          "N": "b4"
+        }
+      },
+      {
+        "keys": [
+          7136734,
+          7136735
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "e5",
+          "B": "b7",
+          "N": "a6"
+        }
+      },
+      {
+        "keys": [
+          7151937,
+          7151944
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "d5",
+          "B": "c6",
+          "N": "a3"
+        }
+      },
+      {
+        "keys": [
+          7152065,
+          7152072
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "d5",
+          "B": "c6",
+          "N": "a1"
+        }
+      },
+      {
+        "keys": [
+          7152513,
+          7152520
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "d5",
+          "B": "c6",
+          "N": "b2"
+        }
+      },
+      {
+        "keys": [
+          7152961,
+          7152968
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "d5",
+          "B": "c6",
+          "N": "c3"
+        }
+      },
+      {
+        "keys": [
+          7153089,
+          7153096
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "d5",
+          "B": "c6",
+          "N": "c1"
+        }
+      },
+      {
+        "keys": [
+          7153537,
+          7153544
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "d5",
+          "B": "c6",
+          "N": "d2"
+        }
+      },
+      {
+        "keys": [
+          7153985,
+          7153992
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "d5",
+          "B": "c6",
+          "N": "e3"
+        }
+      },
+      {
+        "keys": [
+          7154113,
+          7154120
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "d5",
+          "B": "c6",
+          "N": "e1"
+        }
+      },
+      {
+        "keys": [
+          7154561,
+          7154568
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "d5",
+          "B": "c6",
+          "N": "f2"
+        }
+      },
+      {
+        "keys": [
+          7155137,
+          7155144
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "d5",
+          "B": "c6",
+          "N": "g1"
+        }
+      },
+      {
+        "keys": [
+          7162005,
+          7162021
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "d5",
+          "B": "e6",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          7164676,
+          7164677
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "d4",
+          "B": "c6",
+          "N": "b5"
+        }
+      },
+      {
+        "keys": [
+          7195049,
+          7195056
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "e5",
+          "B": "d5",
+          "N": "b4"
+        }
+      },
+      {
+        "keys": [
+          117522
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "h8",
+          "B": "d5",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          148753
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "h1",
+          "B": "d5",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          149329
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "h1",
+          "B": "d5",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          299154
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "a7",
+          "B": "b7",
+          "N": "a6"
+        }
+      },
+      {
+        "keys": [
+          305483
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "g8",
+          "B": "f7",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          327819
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "a7",
+          "B": "c8",
+          "N": "a6"
+        }
+      },
+      {
+        "keys": [
+          410896
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "g1",
+          "B": "d5",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          411472
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "g1",
+          "B": "d5",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          559890
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "h6",
+          "B": "g8",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          567634
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "f8",
+          "B": "f7",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          598088
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "a6",
+          "B": "c6",
+          "N": "a7"
+        }
+      },
+      {
+        "keys": [
+          604497
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "f8",
+          "B": "e6",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          636177
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "a6",
+          "B": "d5",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          670028
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "h6",
+          "B": "d5",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          670484
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "h6",
+          "B": "d5",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          820882
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d1",
+          "B": "a2",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          828947
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "a4",
+          "B": "b3",
+          "N": "d1"
+        }
+      },
+      {
+        "keys": [
+          837523
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "e8",
+          "B": "d7",
+          "N": "b5"
+        }
+      },
+      {
+        "keys": [
+          850637
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "h4",
+          "B": "g8",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          856723
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d1",
+          "B": "b3",
+          "N": "c2"
+        }
+      },
+      {
+        "keys": [
+          857620
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d1",
+          "B": "b3",
+          "N": "a4"
+        }
+      },
+      {
+        "keys": [
+          857747
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d1",
+          "B": "b3",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          874386
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "e8",
+          "B": "c6",
+          "N": "b5"
+        }
+      },
+      {
+        "keys": [
+          874963
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "e8",
+          "B": "c6",
+          "N": "a4"
+        }
+      },
+      {
+        "keys": [
+          885394
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d1",
+          "B": "a4",
+          "N": "c2"
+        }
+      },
+      {
+        "keys": [
+          895753
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "h5",
+          "B": "e6",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          899201
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d8",
+          "B": "d5",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          907981
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "h4",
+          "B": "e6",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          911828
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "e8",
+          "B": "b5",
+          "N": "a4"
+        }
+      },
+      {
+        "keys": [
+          932626
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "h5",
+          "B": "d5",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          2359637
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "b7",
+          "B": "a8",
+          "N": "a3"
+        }
+      },
+      {
+        "keys": [
+          2359702
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "b7",
+          "B": "a8",
+          "N": "a2"
+        }
+      },
+      {
+        "keys": [
+          2360716
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "b7",
+          "B": "a8",
+          "N": "c2"
+        }
+      },
+      {
+        "keys": [
+          2360781
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "b7",
+          "B": "a8",
+          "N": "c1"
+        }
+      },
+      {
+        "keys": [
+          2372698
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "b2",
+          "B": "a4",
+          "N": "c2"
+        }
+      },
+      {
+        "keys": [
+          2400473
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "b2",
+          "B": "b3",
+          "N": "a4"
+        }
+      },
+      {
+        "keys": [
+          2401363
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "b2",
+          "B": "b3",
+          "N": "c2"
+        }
+      },
+      {
+        "keys": [
+          2401817
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "b2",
+          "B": "b3",
+          "N": "d1"
+        }
+      },
+      {
+        "keys": [
+          2508634
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "g2",
+          "B": "d5",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          2625942
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "b3",
+          "B": "a2",
+          "N": "a7"
+        }
+      },
+      {
+        "keys": [
+          2627021
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "f7",
+          "B": "g8",
+          "N": "a6"
+        }
+      },
+      {
+        "keys": [
+          2628138
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "b3",
+          "B": "a2",
+          "N": "f1"
+        }
+      },
+      {
+        "keys": [
+          2628658
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "b3",
+          "B": "a2",
+          "N": "g1"
+        }
+      },
+      {
+        "keys": [
+          2628769
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "f7",
+          "B": "g8",
+          "N": "f2"
+        }
+      },
+      {
+        "keys": [
+          2629289
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "f7",
+          "B": "g8",
+          "N": "f1"
+        }
+      },
+      {
+        "keys": [
+          2666785
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "b6",
+          "B": "b5",
+          "N": "a4"
+        }
+      },
+      {
+        "keys": [
+          2693913
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "g6",
+          "B": "f7",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          2752794
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "b6",
+          "B": "e8",
+          "N": "a4"
+        }
+      },
+      {
+        "keys": [
+          2770777
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "f2",
+          "B": "d5",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          2893866
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d7",
+          "B": "c8",
+          "N": "a4"
+        }
+      },
+      {
+        "keys": [
+          2894378
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d7",
+          "B": "c8",
+          "N": "a3"
+        }
+      },
+      {
+        "keys": [
+          2894898
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d7",
+          "B": "c8",
+          "N": "a2"
+        }
+      },
+      {
+        "keys": [
+          2894945
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d7",
+          "B": "c8",
+          "N": "b2"
+        }
+      },
+      {
+        "keys": [
+          2895009
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d7",
+          "B": "c8",
+          "N": "c2"
+        }
+      },
+      {
+        "keys": [
+          2895529
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d7",
+          "B": "c8",
+          "N": "c1"
+        }
+      },
+      {
+        "keys": [
+          2903021
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "b5",
+          "B": "a4",
+          "N": "f1"
+        }
+      },
+      {
+        "keys": [
+          2903398
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d7",
+          "B": "e8",
+          "N": "f2"
+        }
+      },
+      {
+        "keys": [
+          2919193
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "g5",
+          "B": "g8",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          2924813
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "b4",
+          "B": "b3",
+          "N": "a5"
+        }
+      },
+      {
+        "keys": [
+          2932873
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "b4",
+          "B": "b5",
+          "N": "a3"
+        }
+      },
+      {
+        "keys": [
+          2953353
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d2",
+          "B": "b3",
+          "N": "c1"
+        }
+      },
+      {
+        "keys": [
+          2957393
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "b5",
+          "B": "c6",
+          "N": "a7"
+        }
+      },
+      {
+        "keys": [
+          2969869
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "b4",
+          "B": "c6",
+          "N": "a5"
+        }
+      },
+      {
+        "keys": [
+          2982682
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d2",
+          "B": "a4",
+          "N": "e2"
+        }
+      },
+      {
+        "keys": [
+          2983065
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d2",
+          "B": "a4",
+          "N": "c3"
+        }
+      },
+      {
+        "keys": [
+          2995481
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "b5",
+          "B": "d5",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          2996353
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d7",
+          "B": "d5",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          3007132
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "b4",
+          "B": "d7",
+          "N": "b3"
+        }
+      },
+      {
+        "keys": [
+          3007773
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "b4",
+          "B": "d7",
+          "N": "c5"
+        }
+      },
+      {
+        "keys": [
+          3020443
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d2",
+          "B": "b5",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          3029776
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "g5",
+          "B": "d5",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          3049122
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d2",
+          "B": "a6",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          4718998
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "c6",
+          "B": "a8",
+          "N": "a2"
+        }
+      },
+      {
+        "keys": [
+          4720077
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "c6",
+          "B": "a8",
+          "N": "c1"
+        }
+      },
+      {
+        "keys": [
+          4729906
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "c6",
+          "B": "c8",
+          "N": "a2"
+        }
+      },
+      {
+        "keys": [
+          4730537
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "c6",
+          "B": "c8",
+          "N": "c1"
+        }
+      },
+      {
+        "keys": [
+          4734002
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "c3",
+          "B": "a4",
+          "N": "g1"
+        }
+      },
+      {
+        "keys": [
+          4734633
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "f6",
+          "B": "e8",
+          "N": "f1"
+        }
+      },
+      {
+        "keys": [
+          4738098
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "c6",
+          "B": "e8",
+          "N": "a2"
+        }
+      },
+      {
+        "keys": [
+          4738729
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "c6",
+          "B": "e8",
+          "N": "c1"
+        }
+      },
+      {
+        "keys": [
+          4741613
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "f6",
+          "B": "c8",
+          "N": "a4"
+        }
+      },
+      {
+        "keys": [
+          4742566
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "f6",
+          "B": "c8",
+          "N": "b2"
+        }
+      },
+      {
+        "keys": [
+          4755862
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "c6",
+          "B": "b7",
+          "N": "a2"
+        }
+      },
+      {
+        "keys": [
+          4756941
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "c6",
+          "B": "b7",
+          "N": "c1"
+        }
+      },
+      {
+        "keys": [
+          4766770
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "c6",
+          "B": "d7",
+          "N": "a2"
+        }
+      },
+      {
+        "keys": [
+          4767401
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "c6",
+          "B": "d7",
+          "N": "c1"
+        }
+      },
+      {
+        "keys": [
+          4798179
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "c3",
+          "B": "c4",
+          "N": "d4"
+        }
+      },
+      {
+        "keys": [
+          4831075
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "c6",
+          "B": "d5",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          4831587
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "c6",
+          "B": "d5",
+          "N": "e3"
+        }
+      },
+      {
+        "keys": [
+          4835042
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "c3",
+          "B": "d5",
+          "N": "d4"
+        }
+      },
+      {
+        "keys": [
+          4836096
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "f6",
+          "B": "d5",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          4881458
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "c3",
+          "B": "e8",
+          "N": "g1"
+        }
+      },
+      {
+        "keys": [
+          4882089
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "f6",
+          "B": "a4",
+          "N": "f1"
+        }
+      },
+      {
+        "keys": [
+          4914226
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "f3",
+          "B": "c8",
+          "N": "b1"
+        }
+      },
+      {
+        "keys": [
+          4914547
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "f3",
+          "B": "c8",
+          "N": "b6"
+        }
+      },
+      {
+        "keys": [
+          4914857
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "f3",
+          "B": "c8",
+          "N": "a3"
+        }
+      },
+      {
+        "keys": [
+          4914924
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "f3",
+          "B": "c8",
+          "N": "a4"
+        }
+      },
+      {
+        "keys": [
+          4985252
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "c4",
+          "B": "a2",
+          "N": "a7"
+        }
+      },
+      {
+        "keys": [
+          4985828
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "e6",
+          "B": "g8",
+          "N": "a7"
+        }
+      },
+      {
+        "keys": [
+          4986148
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "c4",
+          "B": "a2",
+          "N": "c5"
+        }
+      },
+      {
+        "keys": [
+          4988585
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "e6",
+          "B": "g8",
+          "N": "f1"
+        }
+      },
+      {
+        "keys": [
+          4988717
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "e6",
+          "B": "g8",
+          "N": "d1"
+        }
+      },
+      {
+        "keys": [
+          4992050
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d6",
+          "B": "c8",
+          "N": "a2"
+        }
+      },
+      {
+        "keys": [
+          4992681
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d6",
+          "B": "c8",
+          "N": "c1"
+        }
+      },
+      {
+        "keys": [
+          4994795
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "c4",
+          "B": "a4",
+          "N": "d4"
+        }
+      },
+      {
+        "keys": [
+          4996146
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "c4",
+          "B": "a4",
+          "N": "g1"
+        }
+      },
+      {
+        "keys": [
+          4996597
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "e6",
+          "B": "e8",
+          "N": "a2"
+        }
+      },
+      {
+        "keys": [
+          4996777
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "e6",
+          "B": "e8",
+          "N": "f1"
+        }
+      },
+      {
+        "keys": [
+          4996974
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "e6",
+          "B": "e8",
+          "N": "c1"
+        }
+      },
+      {
+        "keys": [
+          5000242
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d6",
+          "B": "e8",
+          "N": "a2"
+        }
+      },
+      {
+        "keys": [
+          5000693
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "c5",
+          "B": "a4",
+          "N": "g1"
+        }
+      },
+      {
+        "keys": [
+          5000873
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d6",
+          "B": "e8",
+          "N": "c1"
+        }
+      },
+      {
+        "keys": [
+          5001070
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d6",
+          "B": "e8",
+          "N": "f1"
+        }
+      },
+      {
+        "keys": [
+          5004338
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "c4",
+          "B": "a6",
+          "N": "g1"
+        }
+      },
+      {
+        "keys": [
+          5004724
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "e6",
+          "B": "c8",
+          "N": "b2"
+        }
+      },
+      {
+        "keys": [
+          5004789
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "e6",
+          "B": "c8",
+          "N": "a2"
+        }
+      },
+      {
+        "keys": [
+          5004969
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "e6",
+          "B": "c8",
+          "N": "f1"
+        }
+      },
+      {
+        "keys": [
+          5005101
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "e6",
+          "B": "c8",
+          "N": "d1"
+        }
+      },
+      {
+        "keys": [
+          5005166
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "e6",
+          "B": "c8",
+          "N": "c1"
+        }
+      },
+      {
+        "keys": [
+          5007513
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d6",
+          "B": "g8",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          5013923
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d3",
+          "B": "a2",
+          "N": "g1"
+        }
+      },
+      {
+        "keys": [
+          5014499
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "f5",
+          "B": "g8",
+          "N": "g1"
+        }
+      },
+      {
+        "keys": [
+          5022755
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "c4",
+          "B": "b3",
+          "N": "c1"
+        }
+      },
+      {
+        "keys": [
+          5024306
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "c4",
+          "B": "b3",
+          "N": "f1"
+        }
+      },
+      {
+        "keys": [
+          5025385
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "e6",
+          "B": "f7",
+          "N": "g1"
+        }
+      },
+      {
+        "keys": [
+          5025449
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "e6",
+          "B": "f7",
+          "N": "f1"
+        }
+      },
+      {
+        "keys": [
+          5025581
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "e6",
+          "B": "f7",
+          "N": "d1"
+        }
+      },
+      {
+        "keys": [
+          5028914
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d6",
+          "B": "d7",
+          "N": "a2"
+        }
+      },
+      {
+        "keys": [
+          5029545
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d6",
+          "B": "d7",
+          "N": "c1"
+        }
+      },
+      {
+        "keys": [
+          5033010
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "c4",
+          "B": "b5",
+          "N": "g1"
+        }
+      },
+      {
+        "keys": [
+          5033461
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "e6",
+          "B": "d7",
+          "N": "a2"
+        }
+      },
+      {
+        "keys": [
+          5033641
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "e6",
+          "B": "d7",
+          "N": "f1"
+        }
+      },
+      {
+        "keys": [
+          5033838
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "e6",
+          "B": "d7",
+          "N": "c1"
+        }
+      },
+      {
+        "keys": [
+          5036189
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d6",
+          "B": "f7",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          5050496
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d3",
+          "B": "b3",
+          "N": "c1"
+        }
+      },
+      {
+        "keys": [
+          5052132
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d3",
+          "B": "b3",
+          "N": "d4"
+        }
+      },
+      {
+        "keys": [
+          5067014
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "c4",
+          "B": "c6",
+          "N": "a5"
+        }
+      },
+      {
+        "keys": [
+          5080356
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d3",
+          "B": "a4",
+          "N": "e3"
+        }
+      },
+      {
+        "keys": [
+          5081699
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d3",
+          "B": "a4",
+          "N": "b6"
+        }
+      },
+      {
+        "keys": [
+          5081955
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "f5",
+          "B": "e8",
+          "N": "c3"
+        }
+      },
+      {
+        "keys": [
+          5082147
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d3",
+          "B": "a4",
+          "N": "a7"
+        }
+      },
+      {
+        "keys": [
+          5082338
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "f5",
+          "B": "e8",
+          "N": "b5"
+        }
+      },
+      {
+        "keys": [
+          5082723
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "f5",
+          "B": "e8",
+          "N": "a7"
+        }
+      },
+      {
+        "keys": [
+          5093021
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d6",
+          "B": "d5",
+          "N": "c5"
+        }
+      },
+      {
+        "keys": [
+          5094101
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d6",
+          "B": "d5",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          5094621
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d6",
+          "B": "d5",
+          "N": "d2"
+        }
+      },
+      {
+        "keys": [
+          5095588
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "c4",
+          "B": "d5",
+          "N": "a3"
+        }
+      },
+      {
+        "keys": [
+          5097707
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "c4",
+          "B": "d5",
+          "N": "e4"
+        }
+      },
+      {
+        "keys": [
+          5098786
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "e6",
+          "B": "d5",
+          "N": "d2"
+        }
+      },
+      {
+        "keys": [
+          5115381
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "c5",
+          "B": "e8",
+          "N": "g1"
+        }
+      },
+      {
+        "keys": [
+          5115758
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d6",
+          "B": "a4",
+          "N": "f1"
+        }
+      },
+      {
+        "keys": [
+          5118819
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "f5",
+          "B": "d7",
+          "N": "c3"
+        }
+      },
+      {
+        "keys": [
+          5143602
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "c4",
+          "B": "e8",
+          "N": "g1"
+        }
+      },
+      {
+        "keys": [
+          5144233
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "e6",
+          "B": "a4",
+          "N": "f1"
+        }
+      },
+      {
+        "keys": [
+          5148084
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "f5",
+          "B": "c8",
+          "N": "b2"
+        }
+      },
+      {
+        "keys": [
+          5148149
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "f5",
+          "B": "c8",
+          "N": "b1"
+        }
+      },
+      {
+        "keys": [
+          5148461
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "f5",
+          "B": "c8",
+          "N": "a4"
+        }
+      },
+      {
+        "keys": [
+          5148526
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "f5",
+          "B": "c8",
+          "N": "a3"
+        }
+      },
+      {
+        "keys": [
+          5164066
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d3",
+          "B": "e6",
+          "N": "a7"
+        }
+      },
+      {
+        "keys": [
+          5164713
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "f5",
+          "B": "c4",
+          "N": "a6"
+        }
+      },
+      {
+        "keys": [
+          5176370
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "f4",
+          "B": "c8",
+          "N": "b1"
+        }
+      },
+      {
+        "keys": [
+          5177001
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "f4",
+          "B": "c8",
+          "N": "a3"
+        }
+      },
+      {
+        "keys": [
+          5199268
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "f5",
+          "B": "b3",
+          "N": "f2"
+        }
+      },
+      {
+        "keys": [
+          5200349
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "f5",
+          "B": "b3",
+          "N": "d1"
+        }
+      },
+      {
+        "keys": [
+          5227554
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d3",
+          "B": "e8",
+          "N": "a3"
+        }
+      },
+      {
+        "keys": [
+          5229602
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d3",
+          "B": "e8",
+          "N": "a7"
+        }
+      },
+      {
+        "keys": [
+          5230178
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "f5",
+          "B": "a4",
+          "N": "a7"
+        }
+      },
+      {
+        "keys": [
+          5236452
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d3",
+          "B": "g8",
+          "N": "d4"
+        }
+      },
+      {
+        "keys": [
+          7078097
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d5",
+          "B": "a8",
+          "N": "a5"
+        }
+      },
+      {
+        "keys": [
+          7090582
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d4",
+          "B": "a4",
+          "N": "a7"
+        }
+      },
+      {
+        "keys": [
+          7133349
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d5",
+          "B": "f7",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          7141164
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "e4",
+          "B": "a2",
+          "N": "d4"
+        }
+      },
+      {
+        "keys": [
+          7151816
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d5",
+          "B": "c6",
+          "N": "a5"
+        }
+      },
+      {
+        "keys": [
+          7167398
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "e5",
+          "B": "c6",
+          "N": "b2"
+        }
+      },
+      {
+        "keys": [
+          7195376
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "e5",
+          "B": "d5",
+          "N": "e3"
+        }
+      },
+      {
+        "keys": [
+          7229846
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d4",
+          "B": "e6",
+          "N": "a7"
+        }
+      },
+      {
+        "keys": [
+          7238045
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d4",
+          "B": "e8",
+          "N": "a7"
+        }
+      },
+      {
+        "keys": [
+          7238413
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d4",
+          "B": "e8",
+          "N": "b5"
+        }
+      },
+      {
+        "keys": [
+          7240563
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "e5",
+          "B": "a4",
+          "N": "c3"
+        }
+      },
+      {
+        "keys": [
+          7240884
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "e5",
+          "B": "a4",
+          "N": "f2"
+        }
+      },
+      {
+        "keys": [
+          7269556
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "e5",
+          "B": "b3",
+          "N": "f2"
+        }
+      },
+      {
+        "keys": [
+          7305501
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "e5",
+          "B": "a2",
+          "N": "d4"
+        }
+      }
+    ],
+    "unsupportedMinorPairs": [
+      {
+        "keys": [
+          117067,
+          117073,
+          117074,
+          149329,
+          379203,
+          379211,
+          408331,
+          408336,
+          408339,
+          411472,
+          636177,
+          641348,
+          641356,
+          641362,
+          670484,
+          899201,
+          903493,
+          903501,
+          932626,
+          936654,
+          936661,
+          2476355,
+          2476363,
+          2508634,
+          2738500,
+          2738508,
+          2767632,
+          2767640,
+          2767641,
+          2770777,
+          2995481,
+          2996353,
+          3000645,
+          3000653,
+          3000655,
+          3000657,
+          3000665,
+          3000666,
+          3029776,
+          4835648,
+          4835652,
+          4835656,
+          4835660,
+          4835664,
+          5093505,
+          5093525,
+          5093533,
+          5093540,
+          5097793,
+          5097794,
+          5097795,
+          5097796,
+          5097797,
+          5097801,
+          5097805,
+          5097807,
+          5097808,
+          5097809,
+          5097815,
+          5097816,
+          5097817,
+          5097825,
+          5097828,
+          5097832,
+          5097833,
+          5097840,
+          5126913,
+          5126914,
+          5126918,
+          5126921,
+          5126928,
+          5126937,
+          7193807,
+          7193814,
+          7193821,
+          7193822,
+          7193823,
+          7193829,
+          7193830,
+          7193831,
+          7193833,
+          7193835,
+          7193836,
+          7193837,
+          7193839,
+          7193840,
+          7193841,
+          7193842,
+          7193843,
+          7193844,
+          7193845,
+          7193846,
+          7193849,
+          7193850,
+          7193851,
+          7193852,
+          7193853,
+          7193854,
+          7193855,
+          7194944,
+          7194946,
+          7194947,
+          7194948,
+          7194949,
+          7194950,
+          7194951,
+          7194952,
+          7194953,
+          7194954,
+          7194955,
+          7194956,
+          7194957,
+          7194958,
+          7194959,
+          7194960,
+          7194961,
+          7194965,
+          7194967,
+          7194968,
+          7194969,
+          7194973,
+          7194974,
+          7194982,
+          7194983,
+          7194988,
+          7194989,
+          7194990,
+          7194992,
+          7194993,
+          7194994,
+          7194997,
+          7195001,
+          7195002,
+          7195003,
+          7195004,
+          7195005,
+          7195006
+        ],
+        "orbits": 137,
+        "physical": 1096,
+        "pieces": {
+          "K": "h8",
+          "B": "d5",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          6481,
+          6482,
+          297739,
+          297746,
+          297747,
+          530756,
+          530764,
+          559890,
+          792901,
+          792909,
+          850637,
+          2365785,
+          2365786,
+          2627908,
+          2627916,
+          2627930,
+          2657036,
+          2657044,
+          2657049,
+          2657052,
+          2890053,
+          2890054,
+          2890061,
+          2890062,
+          2890069,
+          2919193,
+          4725068,
+          4725085,
+          4725086,
+          4725090,
+          4725091,
+          4987204,
+          4987205,
+          4987206,
+          4987207,
+          4987213,
+          4987214,
+          4987215,
+          4987221,
+          4987223,
+          4987235,
+          5007513,
+          5016341,
+          5016344,
+          5016352,
+          5016353,
+          5016356,
+          5016357,
+          7084355,
+          7084356,
+          7084357,
+          7084358,
+          7084359,
+          7084363,
+          7084364,
+          7084365,
+          7084366,
+          7084367,
+          7084373,
+          7084375,
+          7084381,
+          7084382,
+          7084390,
+          7084391,
+          7084396,
+          7084397,
+          7084403,
+          7084405
+        ],
+        "orbits": 68,
+        "physical": 544,
+        "pieces": {
+          "K": "h8",
+          "B": "g8",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          5096093,
+          5096100,
+          5096102,
+          5096107,
+          5096109,
+          5096115,
+          5096116,
+          5096117,
+          5096118,
+          5096123,
+          5096124,
+          5096125,
+          5096126,
+          5125199,
+          5125206,
+          5125207,
+          5125213,
+          5125214,
+          5125215,
+          5125222,
+          5125223,
+          5125229,
+          5125230,
+          5125231,
+          5125234,
+          5125235,
+          5125236,
+          5125238,
+          5125241,
+          5125242,
+          5125243,
+          5125244,
+          5125245,
+          7193222,
+          7193229,
+          7193231,
+          7193238,
+          7193239,
+          7193245,
+          7193246,
+          7193247,
+          7193254,
+          7193255,
+          7193257,
+          7193259,
+          7193260,
+          7193261,
+          7193263,
+          7193264,
+          7193266,
+          7193267,
+          7193268,
+          7193269,
+          7193270,
+          7193273,
+          7193274,
+          7193275,
+          7193276,
+          7193277,
+          7193278,
+          7193279,
+          7195526,
+          7195533,
+          7195561,
+          7195568
+        ],
+        "orbits": 65,
+        "physical": 520,
+        "pieces": {
+          "K": "c4",
+          "B": "d5",
+          "N": "b3"
+        }
+      },
+      {
+        "keys": [
+          5093021,
+          5096738,
+          5096740,
+          5097314,
+          5097323,
+          7193856,
+          7193861,
+          7193862,
+          7193864,
+          7193865,
+          7193868,
+          7193869,
+          7193871,
+          7193872,
+          7193873,
+          7193878,
+          7193880,
+          7193881,
+          7193885,
+          7193886,
+          7193887,
+          7193888,
+          7193889,
+          7193894,
+          7193895,
+          7193896,
+          7193897,
+          7193898,
+          7193899,
+          7193900,
+          7193901,
+          7193902,
+          7193903,
+          7193904,
+          7193905,
+          7193906,
+          7193907,
+          7193908,
+          7193909,
+          7193910,
+          7193911,
+          7193913,
+          7193914,
+          7193915,
+          7193916,
+          7193917,
+          7193918,
+          7193919,
+          7194438,
+          7194457,
+          7194464,
+          7194465,
+          7194472,
+          7194473,
+          7194475,
+          7194480
+        ],
+        "orbits": 56,
+        "physical": 448,
+        "pieces": {
+          "K": "d6",
+          "B": "d5",
+          "N": "c5"
+        }
+      },
+      {
+        "keys": [
+          117522,
+          148753,
+          407883,
+          407891,
+          410896,
+          670028,
+          4831075,
+          4836096,
+          5094101,
+          5098241,
+          5098242,
+          5098274,
+          5126465,
+          5126466,
+          5126467,
+          5126468,
+          5126469,
+          5130369,
+          5130389,
+          7194277,
+          7194278,
+          7194279,
+          7194283,
+          7194284,
+          7194285,
+          7194287,
+          7194290,
+          7194291,
+          7194292,
+          7194293,
+          7194294,
+          7194297,
+          7194298,
+          7194299,
+          7194300,
+          7194301,
+          7194302,
+          7194303,
+          7195392,
+          7195394,
+          7195400,
+          7195401,
+          7195402,
+          7195408,
+          7195409,
+          7195416,
+          7195417,
+          7195424,
+          7195425,
+          7195432,
+          7195433,
+          7195440,
+          7195449
+        ],
+        "orbits": 53,
+        "physical": 424,
+        "pieces": {
+          "K": "h8",
+          "B": "d5",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          80194,
+          80209,
+          342339,
+          342352,
+          604497,
+          895753,
+          907981,
+          2439512,
+          2439513,
+          2701636,
+          2701656,
+          2701657,
+          2963784,
+          2963792,
+          2963800,
+          2963801,
+          4798784,
+          4798792,
+          4798797,
+          4798800,
+          4798818,
+          5064839,
+          5064846,
+          5064847,
+          5064854,
+          5064855,
+          5064862,
+          5064863,
+          5064869,
+          5064871,
+          7158080,
+          7158082,
+          7158084,
+          7158086,
+          7158088,
+          7158089,
+          7158091,
+          7158094,
+          7158096,
+          7158097,
+          7158101,
+          7158104,
+          7158105,
+          7158112,
+          7158121,
+          7158122,
+          7162005,
+          7162021,
+          7230706,
+          7230708,
+          7230709,
+          7230710
+        ],
+        "orbits": 52,
+        "physical": 416,
+        "pieces": {
+          "K": "h8",
+          "B": "e6",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          305483,
+          567634,
+          2402628,
+          2402636,
+          2693913,
+          2926937,
+          2926938,
+          4761924,
+          4761925,
+          4761932,
+          4761933,
+          4761941,
+          5024080,
+          5024089,
+          5024096,
+          5024097,
+          5024098,
+          5024099,
+          5036189,
+          5053216,
+          5053217,
+          7121220,
+          7121221,
+          7121222,
+          7121224,
+          7121228,
+          7121229,
+          7121230,
+          7121232,
+          7121237,
+          7121241,
+          7121245,
+          7121246,
+          7121248,
+          7121249,
+          7121256,
+          7121260,
+          7133349,
+          7267564,
+          7267571,
+          7267572
+        ],
+        "orbits": 41,
+        "physical": 328,
+        "pieces": {
+          "K": "g8",
+          "B": "f7",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          4835042,
+          5097177,
+          5097186,
+          5097188,
+          5097193,
+          5097195,
+          5097197,
+          5097202,
+          5097203,
+          5097204,
+          5097205,
+          5097209,
+          5097210,
+          5097211,
+          5097212,
+          5097213,
+          5125837,
+          5125846,
+          5125853,
+          5125854,
+          5125862,
+          5125869,
+          5125874,
+          5125875,
+          5125876,
+          7194895,
+          7194902,
+          7194918,
+          7194930,
+          7194937
+        ],
+        "orbits": 30,
+        "physical": 240,
+        "pieces": {
+          "K": "c3",
+          "B": "d5",
+          "N": "d4"
+        }
+      },
+      {
+        "keys": [
+          4831587,
+          7194761,
+          7194784,
+          7194785,
+          7194793,
+          7194795,
+          7194797,
+          7194800,
+          7194802,
+          7194804,
+          7194805,
+          7194806,
+          7194809,
+          7194810,
+          7194811,
+          7194812,
+          7194813,
+          7194814,
+          7194815,
+          7195376
+        ],
+        "orbits": 20,
+        "physical": 160,
+        "pieces": {
+          "K": "c6",
+          "B": "d5",
+          "N": "e3"
+        }
+      },
+      {
+        "keys": [
+          7165200,
+          7165209,
+          7165216,
+          7165217,
+          7165222,
+          7165224,
+          7165225,
+          7165226,
+          7165227,
+          7165228,
+          7165229,
+          7165230,
+          7165232,
+          7165233,
+          7165234,
+          7165235,
+          7165236,
+          7165237,
+          7165238
+        ],
+        "orbits": 19,
+        "physical": 152,
+        "pieces": {
+          "K": "d4",
+          "B": "c6",
+          "N": "c5"
+        }
+      },
+      {
+        "keys": [
+          5096235,
+          5096242,
+          5096243,
+          5096249,
+          5096250,
+          5096251,
+          7193385,
+          7193387,
+          7193388,
+          7193392,
+          7193394,
+          7193395,
+          7193396,
+          7193401,
+          7193402,
+          7193403,
+          7193404
+        ],
+        "orbits": 17,
+        "physical": 136,
+        "pieces": {
+          "K": "c4",
+          "B": "d5",
+          "N": "b5"
+        }
+      },
+      {
+        "keys": [
+          7153985,
+          7153992,
+          7166117,
+          7166118,
+          7166121,
+          7166122,
+          7166123,
+          7166125,
+          7166126,
+          7166130,
+          7166132,
+          7166133,
+          7166134,
+          7166137,
+          7166138,
+          7166139
+        ],
+        "orbits": 16,
+        "physical": 128,
+        "pieces": {
+          "K": "d5",
+          "B": "c6",
+          "N": "e3"
+        }
+      },
+      {
+        "keys": [
+          5095588,
+          7192733,
+          7192747,
+          7192748,
+          7192749,
+          7192754,
+          7192755,
+          7192756,
+          7192757,
+          7192761,
+          7192762,
+          7192763,
+          7192764,
+          7192765
+        ],
+        "orbits": 14,
+        "physical": 112,
+        "pieces": {
+          "K": "c4",
+          "B": "d5",
+          "N": "a3"
+        }
+      },
+      {
+        "keys": [
+          5022985,
+          5023011,
+          5023012,
+          7120128,
+          7120130,
+          7120136,
+          7120144,
+          7120157,
+          7120170,
+          7120171,
+          7120172,
+          7120173
+        ],
+        "orbits": 12,
+        "physical": 96,
+        "pieces": {
+          "K": "c4",
+          "B": "b3",
+          "N": "c5"
+        }
+      },
+      {
+        "keys": [
+          4994338,
+          4994340,
+          7091481,
+          7091485,
+          7091489,
+          7091497,
+          7091498,
+          7091499,
+          7091500,
+          7091501
+        ],
+        "orbits": 10,
+        "physical": 80,
+        "pieces": {
+          "K": "c4",
+          "B": "a4",
+          "N": "c5"
+        }
+      },
+      {
+        "keys": [
+          5094621,
+          5098786,
+          7195910,
+          7195917,
+          7195921,
+          7195929,
+          7195937,
+          7195945
+        ],
+        "orbits": 8,
+        "physical": 64,
+        "pieces": {
+          "K": "d6",
+          "B": "d5",
+          "N": "d2"
+        }
+      },
+      {
+        "keys": [
+          5097707,
+          7194831,
+          7194838,
+          7194858,
+          7194860,
+          7194866,
+          7194867
+        ],
+        "orbits": 7,
+        "physical": 56,
+        "pieces": {
+          "K": "c4",
+          "B": "d5",
+          "N": "e4"
+        }
+      },
+      {
+        "keys": [
+          828947,
+          2401817,
+          5200349,
+          7270187,
+          7270195,
+          7270203
+        ],
+        "orbits": 6,
+        "physical": 48,
+        "pieces": {
+          "K": "a4",
+          "B": "b3",
+          "N": "d1"
+        }
+      },
+      {
+        "keys": [
+          2373139,
+          2373146,
+          7241515,
+          7241516,
+          7241523,
+          7241531
+        ],
+        "orbits": 6,
+        "physical": 48,
+        "pieces": {
+          "K": "b2",
+          "B": "a4",
+          "N": "d1"
+        }
+      },
+      {
+        "keys": [
+          5068514,
+          5068515,
+          5068516,
+          5068530,
+          5068531,
+          5068532
+        ],
+        "orbits": 6,
+        "physical": 48,
+        "pieces": {
+          "K": "c4",
+          "B": "c6",
+          "N": "d4"
+        }
+      },
+      {
+        "keys": [
+          5080356,
+          7092381,
+          7092389,
+          7092395,
+          7092397,
+          7092402
+        ],
+        "orbits": 6,
+        "physical": 48,
+        "pieces": {
+          "K": "d3",
+          "B": "a4",
+          "N": "e3"
+        }
+      },
+      {
+        "keys": [
+          327819,
+          7099862,
+          7099869,
+          7099870,
+          7099871
+        ],
+        "orbits": 5,
+        "physical": 40,
+        "pieces": {
+          "K": "a7",
+          "B": "c8",
+          "N": "a6"
+        }
+      },
+      {
+        "keys": [
+          4986148,
+          7083293,
+          7083307,
+          7083308,
+          7083309
+        ],
+        "orbits": 5,
+        "physical": 40,
+        "pieces": {
+          "K": "c4",
+          "B": "a2",
+          "N": "c5"
+        }
+      },
+      {
+        "keys": [
+          7193302,
+          7193330,
+          7193337,
+          7195049,
+          7195056
+        ],
+        "orbits": 5,
+        "physical": 40,
+        "pieces": {
+          "K": "d4",
+          "B": "d5",
+          "N": "b4"
+        }
+      },
+      {
+        "keys": [
+          7193933,
+          7193961,
+          7193968,
+          7193970,
+          7193977
+        ],
+        "orbits": 5,
+        "physical": 40,
+        "pieces": {
+          "K": "d4",
+          "B": "d5",
+          "N": "c6"
+        }
+      },
+      {
+        "keys": [
+          874963,
+          7166445,
+          7166446,
+          7166447
+        ],
+        "orbits": 4,
+        "physical": 32,
+        "pieces": {
+          "K": "e8",
+          "B": "c6",
+          "N": "a4"
+        }
+      },
+      {
+        "keys": [
+          2360781,
+          4720077,
+          7079370,
+          7079377
+        ],
+        "orbits": 4,
+        "physical": 32,
+        "pieces": {
+          "K": "b7",
+          "B": "a8",
+          "N": "c1"
+        }
+      },
+      {
+        "keys": [
+          2628658,
+          4987938,
+          4987954,
+          5013923
+        ],
+        "orbits": 4,
+        "physical": 32,
+        "pieces": {
+          "K": "b3",
+          "B": "a2",
+          "N": "g1"
+        }
+      },
+      {
+        "keys": [
+          2893866,
+          4741613,
+          4914924,
+          5148461
+        ],
+        "orbits": 4,
+        "physical": 32,
+        "pieces": {
+          "K": "d7",
+          "B": "c8",
+          "N": "a4"
+        }
+      },
+      {
+        "keys": [
+          2894378,
+          4914857,
+          5148526,
+          5177001
+        ],
+        "orbits": 4,
+        "physical": 32,
+        "pieces": {
+          "K": "d7",
+          "B": "c8",
+          "N": "a3"
+        }
+      },
+      {
+        "keys": [
+          2894898,
+          4729906,
+          4992050,
+          5004789
+        ],
+        "orbits": 4,
+        "physical": 32,
+        "pieces": {
+          "K": "d7",
+          "B": "c8",
+          "N": "a2"
+        }
+      },
+      {
+        "keys": [
+          2894945,
+          4742566,
+          5004724,
+          5148084
+        ],
+        "orbits": 4,
+        "physical": 32,
+        "pieces": {
+          "K": "d7",
+          "B": "c8",
+          "N": "b2"
+        }
+      },
+      {
+        "keys": [
+          2895529,
+          4730537,
+          4992681,
+          5005166
+        ],
+        "orbits": 4,
+        "physical": 32,
+        "pieces": {
+          "K": "d7",
+          "B": "c8",
+          "N": "c1"
+        }
+      },
+      {
+        "keys": [
+          2903021,
+          4882089,
+          5115758,
+          5144233
+        ],
+        "orbits": 4,
+        "physical": 32,
+        "pieces": {
+          "K": "b5",
+          "B": "a4",
+          "N": "f1"
+        }
+      },
+      {
+        "keys": [
+          5015268,
+          5015275,
+          7141164,
+          7305501
+        ],
+        "orbits": 4,
+        "physical": 32,
+        "pieces": {
+          "K": "d3",
+          "B": "a2",
+          "N": "d4"
+        }
+      },
+      {
+        "keys": [
+          5080099,
+          5080100,
+          5230434,
+          5230435
+        ],
+        "orbits": 4,
+        "physical": 32,
+        "pieces": {
+          "K": "d3",
+          "B": "a4",
+          "N": "a3"
+        }
+      },
+      {
+        "keys": [
+          5164713,
+          7230925,
+          7230926,
+          7230927
+        ],
+        "orbits": 4,
+        "physical": 32,
+        "pieces": {
+          "K": "f5",
+          "B": "c4",
+          "N": "a6"
+        }
+      },
+      {
+        "keys": [
+          5328,
+          5329,
+          820882
+        ],
+        "orbits": 3,
+        "physical": 24,
+        "pieces": {
+          "K": "a1",
+          "B": "a2",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          299154,
+          7136734,
+          7136735
+        ],
+        "orbits": 3,
+        "physical": 24,
+        "pieces": {
+          "K": "a7",
+          "B": "b7",
+          "N": "a6"
+        }
+      },
+      {
+        "keys": [
+          874386,
+          7164676,
+          7164677
+        ],
+        "orbits": 3,
+        "physical": 24,
+        "pieces": {
+          "K": "e8",
+          "B": "c6",
+          "N": "b5"
+        }
+      },
+      {
+        "keys": [
+          2359637,
+          7078218,
+          7078225
+        ],
+        "orbits": 3,
+        "physical": 24,
+        "pieces": {
+          "K": "b7",
+          "B": "a8",
+          "N": "a3"
+        }
+      },
+      {
+        "keys": [
+          2752794,
+          5082916,
+          5082924
+        ],
+        "orbits": 3,
+        "physical": 24,
+        "pieces": {
+          "K": "b6",
+          "B": "e8",
+          "N": "a4"
+        }
+      },
+      {
+        "keys": [
+          2924813,
+          5021958,
+          5021974
+        ],
+        "orbits": 3,
+        "physical": 24,
+        "pieces": {
+          "K": "b4",
+          "B": "b3",
+          "N": "a5"
+        }
+      },
+      {
+        "keys": [
+          2932873,
+          5030016,
+          5030032
+        ],
+        "orbits": 3,
+        "physical": 24,
+        "pieces": {
+          "K": "b4",
+          "B": "b5",
+          "N": "a3"
+        }
+      },
+      {
+        "keys": [
+          2953353,
+          5022755,
+          5050496
+        ],
+        "orbits": 3,
+        "physical": 24,
+        "pieces": {
+          "K": "d2",
+          "B": "b3",
+          "N": "c1"
+        }
+      },
+      {
+        "keys": [
+          2969869,
+          5067014,
+          7151816
+        ],
+        "orbits": 3,
+        "physical": 24,
+        "pieces": {
+          "K": "b4",
+          "B": "c6",
+          "N": "a5"
+        }
+      },
+      {
+        "keys": [
+          4734002,
+          4996146,
+          5000693
+        ],
+        "orbits": 3,
+        "physical": 24,
+        "pieces": {
+          "K": "c3",
+          "B": "a4",
+          "N": "g1"
+        }
+      },
+      {
+        "keys": [
+          4734633,
+          4996777,
+          5001070
+        ],
+        "orbits": 3,
+        "physical": 24,
+        "pieces": {
+          "K": "f6",
+          "B": "e8",
+          "N": "f1"
+        }
+      },
+      {
+        "keys": [
+          4738098,
+          4996597,
+          5000242
+        ],
+        "orbits": 3,
+        "physical": 24,
+        "pieces": {
+          "K": "c6",
+          "B": "e8",
+          "N": "a2"
+        }
+      },
+      {
+        "keys": [
+          4738729,
+          4996974,
+          5000873
+        ],
+        "orbits": 3,
+        "physical": 24,
+        "pieces": {
+          "K": "c6",
+          "B": "e8",
+          "N": "c1"
+        }
+      },
+      {
+        "keys": [
+          4766770,
+          5028914,
+          5033461
+        ],
+        "orbits": 3,
+        "physical": 24,
+        "pieces": {
+          "K": "c6",
+          "B": "d7",
+          "N": "a2"
+        }
+      },
+      {
+        "keys": [
+          4767401,
+          5029545,
+          5033838
+        ],
+        "orbits": 3,
+        "physical": 24,
+        "pieces": {
+          "K": "c6",
+          "B": "d7",
+          "N": "c1"
+        }
+      },
+      {
+        "keys": [
+          4798179,
+          5088989,
+          5088996
+        ],
+        "orbits": 3,
+        "physical": 24,
+        "pieces": {
+          "K": "c3",
+          "B": "c4",
+          "N": "d4"
+        }
+      },
+      {
+        "keys": [
+          4881458,
+          5115381,
+          5143602
+        ],
+        "orbits": 3,
+        "physical": 24,
+        "pieces": {
+          "K": "c3",
+          "B": "e8",
+          "N": "g1"
+        }
+      },
+      {
+        "keys": [
+          4914226,
+          5148149,
+          5176370
+        ],
+        "orbits": 3,
+        "physical": 24,
+        "pieces": {
+          "K": "f3",
+          "B": "c8",
+          "N": "b1"
+        }
+      },
+      {
+        "keys": [
+          5082147,
+          5230178,
+          7090582
+        ],
+        "orbits": 3,
+        "physical": 24,
+        "pieces": {
+          "K": "d3",
+          "B": "a4",
+          "N": "a7"
+        }
+      },
+      {
+        "keys": [
+          5082723,
+          5229602,
+          7238045
+        ],
+        "orbits": 3,
+        "physical": 24,
+        "pieces": {
+          "K": "f5",
+          "B": "e8",
+          "N": "a7"
+        }
+      },
+      {
+        "keys": [
+          5082979,
+          5082987,
+          5227554
+        ],
+        "orbits": 3,
+        "physical": 24,
+        "pieces": {
+          "K": "f5",
+          "B": "e8",
+          "N": "a3"
+        }
+      },
+      {
+        "keys": [
+          7152513,
+          7152520,
+          7167398
+        ],
+        "orbits": 3,
+        "physical": 24,
+        "pieces": {
+          "K": "d5",
+          "B": "c6",
+          "N": "b2"
+        }
+      },
+      {
+        "keys": [
+          4688,
+          4689
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "a1",
+          "B": "a2",
+          "N": "b2"
+        }
+      },
+      {
+        "keys": [
+          598088,
+          2957393
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "a6",
+          "B": "c6",
+          "N": "a7"
+        }
+      },
+      {
+        "keys": [
+          856723,
+          2401363
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "d1",
+          "B": "b3",
+          "N": "c2"
+        }
+      },
+      {
+        "keys": [
+          857620,
+          2400473
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "d1",
+          "B": "b3",
+          "N": "a4"
+        }
+      },
+      {
+        "keys": [
+          885394,
+          2372698
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "d1",
+          "B": "a4",
+          "N": "c2"
+        }
+      },
+      {
+        "keys": [
+          911828,
+          2666785
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "e8",
+          "B": "b5",
+          "N": "a4"
+        }
+      },
+      {
+        "keys": [
+          2359702,
+          4718998
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "b7",
+          "B": "a8",
+          "N": "a2"
+        }
+      },
+      {
+        "keys": [
+          2625942,
+          4985252
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "b3",
+          "B": "a2",
+          "N": "a7"
+        }
+      },
+      {
+        "keys": [
+          2629289,
+          4988585
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "f7",
+          "B": "g8",
+          "N": "f1"
+        }
+      },
+      {
+        "keys": [
+          2983065,
+          7240563
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "d2",
+          "B": "a4",
+          "N": "c3"
+        }
+      },
+      {
+        "keys": [
+          4988324,
+          4988340
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "e6",
+          "B": "g8",
+          "N": "b2"
+        }
+      },
+      {
+        "keys": [
+          5024802,
+          5024818
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "c4",
+          "B": "b3",
+          "N": "g1"
+        }
+      },
+      {
+        "keys": [
+          5025188,
+          5025204
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "e6",
+          "B": "f7",
+          "N": "b2"
+        }
+      },
+      {
+        "keys": [
+          5082338,
+          7238413
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "f5",
+          "B": "e8",
+          "N": "b5"
+        }
+      },
+      {
+        "keys": [
+          5119780,
+          5119788
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "f5",
+          "B": "d7",
+          "N": "a4"
+        }
+      },
+      {
+        "keys": [
+          5164066,
+          7229846
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "d3",
+          "B": "e6",
+          "N": "a7"
+        }
+      },
+      {
+        "keys": [
+          5199268,
+          7269556
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "f5",
+          "B": "b3",
+          "N": "f2"
+        }
+      },
+      {
+        "keys": [
+          7078346,
+          7078353
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "d5",
+          "B": "a8",
+          "N": "a1"
+        }
+      },
+      {
+        "keys": [
+          7078794,
+          7078801
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "d5",
+          "B": "a8",
+          "N": "b2"
+        }
+      },
+      {
+        "keys": [
+          7079242,
+          7079249
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "d5",
+          "B": "a8",
+          "N": "c3"
+        }
+      },
+      {
+        "keys": [
+          7079818,
+          7079825
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "d5",
+          "B": "a8",
+          "N": "d2"
+        }
+      },
+      {
+        "keys": [
+          7080266,
+          7080273
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "d5",
+          "B": "a8",
+          "N": "e3"
+        }
+      },
+      {
+        "keys": [
+          7080394,
+          7080401
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "d5",
+          "B": "a8",
+          "N": "e1"
+        }
+      },
+      {
+        "keys": [
+          7080842,
+          7080849
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "d5",
+          "B": "a8",
+          "N": "f2"
+        }
+      },
+      {
+        "keys": [
+          7081418,
+          7081425
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "d5",
+          "B": "a8",
+          "N": "g1"
+        }
+      },
+      {
+        "keys": [
+          7100821,
+          7100822
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "e5",
+          "B": "c8",
+          "N": "b4"
+        }
+      },
+      {
+        "keys": [
+          7151937,
+          7151944
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "d5",
+          "B": "c6",
+          "N": "a3"
+        }
+      },
+      {
+        "keys": [
+          7152065,
+          7152072
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "d5",
+          "B": "c6",
+          "N": "a1"
+        }
+      },
+      {
+        "keys": [
+          7152961,
+          7152968
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "d5",
+          "B": "c6",
+          "N": "c3"
+        }
+      },
+      {
+        "keys": [
+          7153089,
+          7153096
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "d5",
+          "B": "c6",
+          "N": "c1"
+        }
+      },
+      {
+        "keys": [
+          7153537,
+          7153544
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "d5",
+          "B": "c6",
+          "N": "d2"
+        }
+      },
+      {
+        "keys": [
+          7154113,
+          7154120
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "d5",
+          "B": "c6",
+          "N": "e1"
+        }
+      },
+      {
+        "keys": [
+          7154561,
+          7154568
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "d5",
+          "B": "c6",
+          "N": "f2"
+        }
+      },
+      {
+        "keys": [
+          7155137,
+          7155144
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "d5",
+          "B": "c6",
+          "N": "g1"
+        }
+      },
+      {
+        "keys": [
+          837523
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "e8",
+          "B": "d7",
+          "N": "b5"
+        }
+      },
+      {
+        "keys": [
+          857747
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d1",
+          "B": "b3",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          2360716
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "b7",
+          "B": "a8",
+          "N": "c2"
+        }
+      },
+      {
+        "keys": [
+          2627021
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "f7",
+          "B": "g8",
+          "N": "a6"
+        }
+      },
+      {
+        "keys": [
+          2628138
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "b3",
+          "B": "a2",
+          "N": "f1"
+        }
+      },
+      {
+        "keys": [
+          2628769
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "f7",
+          "B": "g8",
+          "N": "f2"
+        }
+      },
+      {
+        "keys": [
+          2895009
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d7",
+          "B": "c8",
+          "N": "c2"
+        }
+      },
+      {
+        "keys": [
+          2903398
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d7",
+          "B": "e8",
+          "N": "f2"
+        }
+      },
+      {
+        "keys": [
+          2982682
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d2",
+          "B": "a4",
+          "N": "e2"
+        }
+      },
+      {
+        "keys": [
+          3007132
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "b4",
+          "B": "d7",
+          "N": "b3"
+        }
+      },
+      {
+        "keys": [
+          3007773
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "b4",
+          "B": "d7",
+          "N": "c5"
+        }
+      },
+      {
+        "keys": [
+          3020443
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d2",
+          "B": "b5",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          3049122
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d2",
+          "B": "a6",
+          "N": "c4"
+        }
+      },
+      {
+        "keys": [
+          4755862
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "c6",
+          "B": "b7",
+          "N": "a2"
+        }
+      },
+      {
+        "keys": [
+          4756941
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "c6",
+          "B": "b7",
+          "N": "c1"
+        }
+      },
+      {
+        "keys": [
+          4914547
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "f3",
+          "B": "c8",
+          "N": "b6"
+        }
+      },
+      {
+        "keys": [
+          4985828
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "e6",
+          "B": "g8",
+          "N": "a7"
+        }
+      },
+      {
+        "keys": [
+          4988717
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "e6",
+          "B": "g8",
+          "N": "d1"
+        }
+      },
+      {
+        "keys": [
+          4994795
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "c4",
+          "B": "a4",
+          "N": "d4"
+        }
+      },
+      {
+        "keys": [
+          5004338
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "c4",
+          "B": "a6",
+          "N": "g1"
+        }
+      },
+      {
+        "keys": [
+          5004969
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "e6",
+          "B": "c8",
+          "N": "f1"
+        }
+      },
+      {
+        "keys": [
+          5005101
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "e6",
+          "B": "c8",
+          "N": "d1"
+        }
+      },
+      {
+        "keys": [
+          5014499
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "f5",
+          "B": "g8",
+          "N": "g1"
+        }
+      },
+      {
+        "keys": [
+          5024306
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "c4",
+          "B": "b3",
+          "N": "f1"
+        }
+      },
+      {
+        "keys": [
+          5025385
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "e6",
+          "B": "f7",
+          "N": "g1"
+        }
+      },
+      {
+        "keys": [
+          5025449
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "e6",
+          "B": "f7",
+          "N": "f1"
+        }
+      },
+      {
+        "keys": [
+          5025581
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "e6",
+          "B": "f7",
+          "N": "d1"
+        }
+      },
+      {
+        "keys": [
+          5033010
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "c4",
+          "B": "b5",
+          "N": "g1"
+        }
+      },
+      {
+        "keys": [
+          5033641
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "e6",
+          "B": "d7",
+          "N": "f1"
+        }
+      },
+      {
+        "keys": [
+          5052132
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d3",
+          "B": "b3",
+          "N": "d4"
+        }
+      },
+      {
+        "keys": [
+          5081699
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d3",
+          "B": "a4",
+          "N": "b6"
+        }
+      },
+      {
+        "keys": [
+          5081955
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "f5",
+          "B": "e8",
+          "N": "c3"
+        }
+      },
+      {
+        "keys": [
+          5118819
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "f5",
+          "B": "d7",
+          "N": "c3"
+        }
+      },
+      {
+        "keys": [
+          5236452
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d3",
+          "B": "g8",
+          "N": "d4"
+        }
+      },
+      {
+        "keys": [
+          7078097
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d5",
+          "B": "a8",
+          "N": "a5"
+        }
+      },
+      {
+        "keys": [
+          7240884
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "e5",
+          "B": "a4",
+          "N": "f2"
+        }
+      }
+    ],
+    "supported": [
+      {
+        "keys": [
+          5028552,
+          5028568,
+          5028561,
+          5028560
+        ],
+        "orbits": 4,
+        "physical": 32,
+        "pieces": {
+          "K": "d6",
+          "B": "d7",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          2550540,
+          2550532,
+          2550548
+        ],
+        "orbits": 3,
+        "physical": 24,
+        "pieces": {
+          "K": "g7",
+          "B": "b3",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          4999872,
+          4999888,
+          4999880
+        ],
+        "orbits": 3,
+        "physical": 24,
+        "pieces": {
+          "K": "d6",
+          "B": "e8",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          2586244,
+          2586243
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "b2",
+          "B": "g8",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          3046166,
+          3046167
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "e7",
+          "B": "a4",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          3074847,
+          3074837
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "e7",
+          "B": "b3",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          4724364,
+          4724356
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "c3",
+          "B": "a2",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          4834956,
+          4834948
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "c3",
+          "B": "d5",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          4871820,
+          4871812
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "c3",
+          "B": "e6",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          4908684,
+          4908676
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "c3",
+          "B": "f7",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          4945548,
+          4945540
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "c3",
+          "B": "g8",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          5093200,
+          5093201
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "c5",
+          "B": "d5",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          5113665,
+          5113664
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "c5",
+          "B": "e8",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          5114568,
+          5114560
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "d6",
+          "B": "a4",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          386820
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "a2",
+          "B": "d7",
+          "N": "d5"
+        }
+      },
+      {
+        "keys": [
+          530052
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "a3",
+          "B": "a2",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          566917
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "a3",
+          "B": "b3",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          648965
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "a3",
+          "B": "d7",
+          "N": "d5"
+        }
+      },
+      {
+        "keys": [
+          890561
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "a5",
+          "B": "d7",
+          "N": "d5"
+        }
+      },
+      {
+        "keys": [
+          2365059
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "b2",
+          "B": "a2",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          2403083
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "g7",
+          "B": "f7",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          2438787
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "b2",
+          "B": "c4",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          2475651
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "b2",
+          "B": "d5",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          2512515
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "b2",
+          "B": "e6",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          2513667
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "g7",
+          "B": "c4",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          2549379
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "b2",
+          "B": "f7",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          2725568
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "b6",
+          "B": "d7",
+          "N": "d5"
+        }
+      },
+      {
+        "keys": [
+          2892417
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "b5",
+          "B": "a6",
+          "N": "b6"
+        }
+      },
+      {
+        "keys": [
+          2893512
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "b5",
+          "B": "a6",
+          "N": "d5"
+        }
+      },
+      {
+        "keys": [
+          2987721
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "b5",
+          "B": "d7",
+          "N": "d5"
+        }
+      },
+      {
+        "keys": [
+          3008262
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "b4",
+          "B": "d7",
+          "N": "d5"
+        }
+      },
+      {
+        "keys": [
+          3054288
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d7",
+          "B": "b3",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          5084803
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d6",
+          "B": "b5",
+          "N": "c5"
+        }
+      },
+      {
+        "keys": [
+          5084872
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "c5",
+          "B": "d7",
+          "N": "d5"
+        }
+      },
+      {
+        "keys": [
+          5084931
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "c5",
+          "B": "d7",
+          "N": "d4"
+        }
+      },
+      {
+        "keys": [
+          5086531
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d6",
+          "B": "b5",
+          "N": "f2"
+        }
+      },
+      {
+        "keys": [
+          5171998
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "e6",
+          "B": "b3",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          7170222
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "e4",
+          "B": "f7",
+          "N": "d3"
+        }
+      }
+    ],
+    "supportedMinorPairs": [
+      {
+        "keys": [
+          566917,
+          2550540,
+          2550532,
+          2550548,
+          3074847,
+          5171998,
+          3074837,
+          3054288
+        ],
+        "orbits": 8,
+        "physical": 64,
+        "pieces": {
+          "K": "a3",
+          "B": "b3",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          648965,
+          386820,
+          2987721,
+          890561,
+          5084872,
+          3008262,
+          2725568
+        ],
+        "orbits": 7,
+        "physical": 56,
+        "pieces": {
+          "K": "a3",
+          "B": "d7",
+          "N": "d5"
+        }
+      },
+      {
+        "keys": [
+          4834956,
+          4834948,
+          2475651,
+          5093200,
+          5093201
+        ],
+        "orbits": 5,
+        "physical": 40,
+        "pieces": {
+          "K": "c3",
+          "B": "d5",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          4999872,
+          4999888,
+          4999880,
+          5113665,
+          5113664
+        ],
+        "orbits": 5,
+        "physical": 40,
+        "pieces": {
+          "K": "d6",
+          "B": "e8",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          7170222,
+          2403083,
+          4908684,
+          4908676,
+          2549379
+        ],
+        "orbits": 5,
+        "physical": 40,
+        "pieces": {
+          "K": "e4",
+          "B": "f7",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          530052,
+          4724364,
+          4724356,
+          2365059
+        ],
+        "orbits": 4,
+        "physical": 32,
+        "pieces": {
+          "K": "a3",
+          "B": "a2",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          2586244,
+          4945548,
+          4945540,
+          2586243
+        ],
+        "orbits": 4,
+        "physical": 32,
+        "pieces": {
+          "K": "b2",
+          "B": "g8",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          3046166,
+          3046167,
+          5114568,
+          5114560
+        ],
+        "orbits": 4,
+        "physical": 32,
+        "pieces": {
+          "K": "e7",
+          "B": "a4",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          5028552,
+          5028568,
+          5028561,
+          5028560
+        ],
+        "orbits": 4,
+        "physical": 32,
+        "pieces": {
+          "K": "d6",
+          "B": "d7",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          4871820,
+          4871812,
+          2512515
+        ],
+        "orbits": 3,
+        "physical": 24,
+        "pieces": {
+          "K": "c3",
+          "B": "e6",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          2513667,
+          2438787
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "g7",
+          "B": "c4",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          2892417
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "b5",
+          "B": "a6",
+          "N": "b6"
+        }
+      },
+      {
+        "keys": [
+          2893512
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "b5",
+          "B": "a6",
+          "N": "d5"
+        }
+      },
+      {
+        "keys": [
+          5084803
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d6",
+          "B": "b5",
+          "N": "c5"
+        }
+      },
+      {
+        "keys": [
+          5084931
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "c5",
+          "B": "d7",
+          "N": "d4"
+        }
+      },
+      {
+        "keys": [
+          5086531
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d6",
+          "B": "b5",
+          "N": "f2"
+        }
+      }
+    ],
+    "lossSources": [
+      {
+        "keys": [
+          7267974,
+          7267982,
+          7267990
+        ],
+        "orbits": 3,
+        "physical": 24,
+        "pieces": {
+          "K": "d4",
+          "B": "f7",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          566916,
+          566917
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "a3",
+          "B": "b3",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          2766048,
+          2766049
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "c2",
+          "B": "d5",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          2963085,
+          2963086
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "b4",
+          "B": "c4",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          4871813,
+          4871821
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "c3",
+          "B": "e6",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          5093200,
+          5093201
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "c5",
+          "B": "d5",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          5113664,
+          5113665
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "c5",
+          "B": "e8",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          5170822,
+          5170830
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "c4",
+          "B": "f7",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          7170222,
+          7170230
+        ],
+        "orbits": 2,
+        "physical": 16,
+        "pieces": {
+          "K": "e4",
+          "B": "f7",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          369880
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "b1",
+          "B": "c4",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          562880
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "a6",
+          "B": "b7",
+          "N": "d5"
+        }
+      },
+      {
+        "keys": [
+          2475652
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "b2",
+          "B": "d5",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          2693473
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "g6",
+          "B": "f7",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          2737796
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "b3",
+          "B": "d5",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          2774661
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "b3",
+          "B": "e6",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          2891777
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "b5",
+          "B": "a6",
+          "N": "a8"
+        }
+      },
+      {
+        "keys": [
+          5023363
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "c4",
+          "B": "b3",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          5052777
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "f5",
+          "B": "f7",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          5065411
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d6",
+          "B": "e6",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          5084803
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d6",
+          "B": "b5",
+          "N": "c5"
+        }
+      },
+      {
+        "keys": [
+          5084931
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "c5",
+          "B": "d7",
+          "N": "d4"
+        }
+      },
+      {
+        "keys": [
+          5086531
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d6",
+          "B": "b5",
+          "N": "f2"
+        }
+      },
+      {
+        "keys": [
+          5089642
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "f5",
+          "B": "e6",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          5133965
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "c4",
+          "B": "e6",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          7121678
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "e5",
+          "B": "f7",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          7133898
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "d5",
+          "B": "f7",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          7198901
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "e4",
+          "B": "e6",
+          "N": "d3"
+        }
+      },
+      {
+        "keys": [
+          7226662
+        ],
+        "orbits": 1,
+        "physical": 8,
+        "pieces": {
+          "K": "e4",
+          "B": "d5",
+          "N": "d3"
+        }
+      }
+    ]
+  },
+  "examples": {
+    "unsupported": [
+      {
+        "motif": "Bd5/Nb3 fixed minor-piece setup; either king varies (D4 equivalents)",
+        "positions": 65,
+        "examples": [
+          {
+            "fen": "8/k7/8/3BK3/8/1N6/8/8 w - - 0 1",
+            "moves": [
+              "Nd4",
+              "Kb8",
+              "Nb3",
+              "Ka7"
+            ],
+            "d": 204,
+            "phases": [
+              99,
+              99
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=8/k7/8/3BK3/8/1N6/8/8_w_-_-_0_1&moves=Nd4,Kb8,Nb3,Ka7&cursor=0",
+            "motif": "King-protected central bishop; knight unprotected by king, off precage"
+          },
+          {
+            "fen": "8/8/1k6/3BK3/8/1N6/8/8 w - - 0 1",
+            "moves": [
+              "Nd4",
+              "Kc7",
+              "Nb3",
+              "Kb6"
+            ],
+            "d": 204,
+            "phases": [
+              99,
+              99
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/1k6/3BK3/8/1N6/8/8_w_-_-_0_1&moves=Nd4,Kc7,Nb3,Kb6&cursor=0",
+            "motif": "King-protected central bishop; knight unprotected by king, off precage"
+          },
+          {
+            "fen": "8/8/1k6/4K3/4B3/8/2N5/8 w - - 0 1",
+            "moves": [
+              "Nd4",
+              "Kc7",
+              "Nc2",
+              "Kb6"
+            ],
+            "d": 202,
+            "phases": [
+              99,
+              99
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/1k6/4K3/4B3/8/2N5/8_w_-_-_0_1&moves=Nd4,Kc7,Nc2,Kb6&cursor=0",
+            "motif": "King-protected central bishop; knight unprotected by king, off precage"
+          }
+        ]
+      }
+    ],
+    "supported": [
+      {
+        "motif": "Bb3/Nd3 fixed minor-piece setup; either king varies (D4 equivalents)",
+        "positions": 8,
+        "examples": [
+          {
+            "fen": "8/8/k3K3/8/8/1B1N4/8/8 w - - 0 1",
+            "moves": [
+              "Kd7",
+              "Kb5",
+              "Ke6",
+              "Ka6"
+            ],
+            "d": 0,
+            "phases": [
+              7,
+              7
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/k3K3/8/8/1B1N4/8/8_w_-_-_0_1&moves=Kd7,Kb5,Ke6,Ka6&cursor=0",
+            "motif": "Noncentral bishop not king-protected; interior king; knight unprotected by king"
+          },
+          {
+            "fen": "8/4K3/8/1k6/8/1B1N4/8/8 w - - 0 1",
+            "moves": [
+              "Ke6",
+              "Kc6",
+              "Ke7",
+              "Kb5"
+            ],
+            "d": 0,
+            "phases": [
+              7,
+              7
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=8/4K3/8/1k6/8/1B1N4/8/8_w_-_-_0_1&moves=Ke6,Kc6,Ke7,Kb5&cursor=0",
+            "motif": "Noncentral bishop not king-protected; interior king; knight unprotected by king"
+          },
+          {
+            "fen": "8/4K3/k7/8/8/1B1N4/8/8 w - - 0 1",
+            "moves": [
+              "Ba4",
+              "Ka5",
+              "Bb3",
+              "Ka6"
+            ],
+            "d": 0,
+            "phases": [
+              5,
+              7
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=8/4K3/k7/8/8/1B1N4/8/8_w_-_-_0_1&moves=Ba4,Ka5,Bb3,Ka6&cursor=0",
+            "motif": "Noncentral bishop not king-protected; interior king; knight unprotected by king"
+          }
+        ]
+      }
+    ],
+    "losses": [
+      {
+        "motif": "Kd4 Bf7 Nd3; Black varies",
+        "positions": 3,
+        "examples": [
+          {
+            "source": 7267974,
+            "fen": "8/k4B2/8/8/8/2KN4/8/8 w - - 0 1",
+            "moves": [
+              "Kd4",
+              "Kb8",
+              "Bd5",
+              "Kc7"
+            ],
+            "d": 0,
+            "phases": [
+              7,
+              99
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=8/k4B2/8/8/8/2KN4/8/8_w_-_-_0_1&moves=Kd4,Kb8,Bd5,Kc7&cursor=0",
+            "lossPly": 3,
+            "preferredSetup": true
+          },
+          {
+            "source": 7267982,
+            "fen": "8/1k3B2/8/8/8/2KN4/8/8 w - - 0 1",
+            "moves": [
+              "Kd4",
+              "Kc8",
+              "Bd5",
+              "Kd7"
+            ],
+            "d": 0,
+            "phases": [
+              7,
+              99
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=8/1k3B2/8/8/8/2KN4/8/8_w_-_-_0_1&moves=Kd4,Kc8,Bd5,Kd7&cursor=0",
+            "lossPly": 3,
+            "preferredSetup": true
+          },
+          {
+            "source": 7267990,
+            "fen": "8/2k2B2/8/8/8/2KN4/8/8 w - - 0 1",
+            "moves": [
+              "Kd4",
+              "Kd8",
+              "Bd5",
+              "Ke7"
+            ],
+            "d": 0,
+            "phases": [
+              7,
+              99
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=8/2k2B2/8/8/8/2KN4/8/8_w_-_-_0_1&moves=Kd4,Kd8,Bd5,Ke7&cursor=0",
+            "lossPly": 3,
+            "preferredSetup": true
+          }
+        ]
+      }
+    ]
+  },
+  "verification": {
+    "targetedTests": 108,
+    "typescriptBuild": "pass",
+    "loadedKg7": {
+      "supported": 7,
+      "preferred": [
+        "Kg7"
+      ]
+    }
+  }
+}

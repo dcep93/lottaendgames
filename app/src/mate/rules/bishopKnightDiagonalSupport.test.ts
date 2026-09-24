@@ -7,7 +7,7 @@ import { getIdealKnightAndBishopWhiteMoves, scoreKnightAndBishopWhiteMove } from
 
 const sixDiagonal = ['a3', 'b4', 'c5', 'd6', 'e7', 'f8'] as const
 
-test('seven-diagonal Nd3 requires White king at least level with its bishop in rank across D4', () => {
+test('seven-diagonal Nd3 rejects White below bishop only when Black is above it across D4', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     const before = transformFen('8/2k5/8/3B4/8/1K1N4/8/8 w - - 0 1', transform)
     const board = getChess(before)
@@ -20,6 +20,10 @@ test('seven-diagonal Nd3 requires White king at least level with its bishop in r
       // Equal rank remains eligible when all other support conditions pass.
       ['8/8/8/k7/8/1BKN4/8/8 b - - 0 1', 7],
       ['8/3k4/5K2/8/8/1B1N4/8/8 b - - 0 1', 7],
+      // White below the bishop is permitted when Black is below it too.
+      ['6B1/4k1K1/8/8/8/3N4/8/8 b - - 0 1', 7],
+      // Black level with the bishop does not trigger the strict-above condition.
+      ['8/8/8/1k1B4/3K4/3N4/8/8 b - - 0 1', 7],
       // Five-diagonal support is unaffected.
       ['8/3B4/1k1K4/8/8/3N4/8/8 b - - 0 1', 5],
     ] as const) assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, size, fen)
@@ -970,9 +974,9 @@ test('seven support requires the matching occupied knight square in all reflecti
   for (const transform of SQUARE_TRANSFORMS) {
     // Former Ne7+ loop: one move from reflected f5 is insufficient.
     assert.equal(knightAndBishopSupportedDiagonal(transformFen('8/4N3/2k5/8/8/3K4/B7/8 b - - 3 2', transform)).size, 99)
-    // Occupation alone is insufficient when White is below the bishop in the knight's orientation.
+    // Occupied support remains eligible when Black is not above the bishop.
     assert.deepEqual(knightAndBishopSupportedDiagonal(transformFen('8/8/8/8/1k1K4/3N4/B7/8 b - - 1 1', transform)), {size: 7, knight: 0})
-    assert.deepEqual(knightAndBishopSupportedDiagonal(transformFen('8/8/2k5/5N2/8/3K4/B7/8 b - - 3 2', transform)), {size: 99, knight: 99})
+    assert.deepEqual(knightAndBishopSupportedDiagonal(transformFen('8/8/2k5/5N2/8/3K4/B7/8 b - - 3 2', transform)), {size: 7, knight: 0})
   }
 })
 

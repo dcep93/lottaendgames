@@ -14,11 +14,11 @@ test('supported seven prefers b3 in the knight support orientation, including ev
     const preferred = scoreKnightAndBishopWhiteMove(reflected,san('b3'))
     const otherEnd = scoreKnightAndBishopWhiteMove(reflected,san('f7'))
     assert.equal(preferred.supportedDiagonalSizeScore,7)
-    assert.equal(otherEnd.supportedDiagonalSizeScore,99)
+    assert.equal(otherEnd.supportedDiagonalSizeScore,7)
     assert.equal(preferred.supportedDiagonalKnightScore,0)
-    assert.equal(otherEnd.supportedDiagonalKnightScore,99)
+    assert.equal(otherEnd.supportedDiagonalKnightScore,0)
     assert.equal(preferred.supportedSevenBishopPenalty,0)
-    // Bf7 leaves White Kd4 below the bishop, so it is unsupported.
+    // Both kings are below Bf7; it remains supported but Bb3 is preferred.
     assert.deepEqual(getIdealKnightAndBishopWhiteMoves(reflected),[san('b3')])
   }
 })
@@ -127,7 +127,7 @@ test('a3 flush walks toward b2 on the opposite color only while retaining seven 
     const highBishop = transformFen('6B1/8/4K3/8/k7/3N4/8/8 w - - 0 1', transform)
     for (const to of ['d6', 'd7', 'e7'] as const) {
       const san = getChess(highBishop).move({from: transformSquare('e6', transform), to: transformSquare(to, transform)}).san
-      assert.equal(scoreKnightAndBishopWhiteMove(highBishop, san).supportedDiagonalSizeScore, 99)
+      assert.equal(scoreKnightAndBishopWhiteMove(highBishop, san).supportedDiagonalSizeScore, 7)
     }
     const outside = transformFen('4K3/8/8/k2B4/8/3N4/8/8 w - - 0 1',transform)
     for (const san of getChess(outside).moves()) {
