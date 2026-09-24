@@ -1,7 +1,7 @@
 import type { Square } from 'chess.js'
 import { isInsideBishopDiagonal } from './bishopKnightGeometry'
 import { isDeclaredCheckingThreePlacement, isDeclaredCornerSupportWithoutKnightTarget, isDeclaredInsideThreeSupport, isRecordedSupportedCornerPosition } from './bishopKnightDeclaredSupport'
-import { knightAndBishopKnightProximityToSquare } from './bishopKnightStrategy'
+import { knightAndBishopKnightProximityToSquare, knightAndBishopTargetCorners } from './bishopKnightStrategy'
 import { allSquares, edgeDistance, getChess, isKnightMove, findPiece, kingDistance, squaredEuclideanDistance, squareColor, squareCoords, squareFromCoordinates, SQUARE_TRANSFORMS, transformSquare } from '../chess'
 
 const CANONICAL_DIAGONALS: readonly {
@@ -317,6 +317,10 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
   // Cage membership is mandatory before every support declaration or exception.
   if (!DIAGONALS.some(pattern => pattern.wall.includes(bishop.square) &&
     isInsideBishopDiagonal(black.square, pattern.wall))) return {size: 99, knight: 99}
+  // White may not be strictly ahead of Black in king steps to the target corner.
+  // If target corners tie, retaining an eligible target is sufficient.
+  if (knightAndBishopTargetCorners(fen).every(corner =>
+    kingDistance(white.square, corner) < kingDistance(black.square, corner))) return {size: 99, knight: 99}
   // Every five-diagonal, including declared placements, needs an occupied five/seven
   // support square or a knight one move from BOTH corresponding support stages.
   const fivePatterns = DIAGONALS.filter(pattern => pattern.wall.length === 5 && pattern.wall.includes(bishop.square))

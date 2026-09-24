@@ -7,6 +7,19 @@ import { getIdealKnightAndBishopWhiteMoves, scoreKnightAndBishopWhiteMove } from
 
 const sixDiagonal = ['a3', 'b4', 'c5', 'd6', 'e7', 'f8'] as const
 
+test('White closer by king steps to the target corner disqualifies support across D4', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    const before = transformFen('K5B1/8/1k6/8/8/3N4/8/8 w - - 0 1', transform)
+    const board = getChess(before)
+    const move = board.move({from: transformSquare('a8', transform), to: transformSquare('b8', transform)}).san
+    assert.equal(knightAndBishopSupportedDiagonal(board.fen()).size, 99)
+    assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 99)
+    // Both kings are three steps from a8; a tie remains eligible.
+    assert.equal(knightAndBishopSupportedDiagonal(transformFen(
+      '8/8/3K4/1k6/8/1B1N4/8/8 b - - 0 1', transform)).size, 7)
+  }
+})
+
 test('Nd3 with White king anywhere on the a-file is unsupported across D4', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const king of allSquares().filter(square => square[0] === 'a')) {
@@ -311,7 +324,7 @@ test('declared Bb1 rejection and nearby king-color restriction apply across D4',
     }
     for (const [nearby, expected] of [
       ['8/8/8/8/2N5/3K4/8/1B2k3 b - - 1 1', 99], // Kd3 shares Bb1's color.
-      ['8/8/8/8/2N5/4K3/8/1B1k4 b - - 1 1', 7],
+      ['8/8/8/8/2N5/4K3/8/1B1k4 b - - 1 1', 99] // White is closer to the h1 target.,
     ] as const) assert.equal(knightAndBishopSupportedDiagonal(transformFen(nearby, transform)).size, expected)
   }
 })
@@ -668,11 +681,11 @@ test('a five-bishop with Nd3 rejects Bb5 except for the declared Ke7 placement',
   }
 })
 
-test('Bd7 remains supported and Bc6 is rejected while r7 breaks the supported tie', () => {
+test('Bd7 rejects White ahead in the corner race while Kd6 retains support', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     const fen = transformFen('8/2K5/8/k7/B7/3N4/8/8 w - - 2 2', transform)
     const bd7 = getChess(fen).move({from: transformSquare('a4', transform), to: transformSquare('d7', transform)}).san
-    assert.equal(scoreKnightAndBishopWhiteMove(fen, bd7).supportedDiagonalSizeScore, 5)
+    assert.equal(scoreKnightAndBishopWhiteMove(fen, bd7).supportedDiagonalSizeScore, 99)
     const loaded = transformFen('8/2K5/k7/8/B7/3N4/8/8 w - - 2 2', transform)
     const bc6 = getChess(loaded).move({from: transformSquare('a4', transform), to: transformSquare('c6', transform)}).san
     assert.equal(scoreKnightAndBishopWhiteMove(loaded, bc6).supportedDiagonalSizeScore, 99)
