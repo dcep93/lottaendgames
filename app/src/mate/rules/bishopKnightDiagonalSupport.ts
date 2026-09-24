@@ -82,9 +82,10 @@ const DIAGONALS = CANONICAL_DIAGONALS.flatMap(pattern => SQUARE_TRANSFORMS.map(t
   kingRaceSquares: pattern.kingRaceSquares?.map(square => transformSquare(square, transform)),
 })))
 
-// Ka2/Nd3 cannot support a cage, regardless of bishop or Black king placement.
-const UNSUPPORTED_KING_KNIGHT_PAIRS = new Set(SQUARE_TRANSFORMS.map(transform =>
-  `${transformSquare('a2', transform)}/${transformSquare('d3', transform)}`))
+// Nd3 with White king anywhere on the a-file cannot support a cage.
+const UNSUPPORTED_KING_KNIGHT_PAIRS = new Set(SQUARE_TRANSFORMS.flatMap(transform =>
+  allSquares().filter(square => square[0] === 'a').map(square =>
+    `${transformSquare(square, transform)}/${transformSquare('d3', transform)}`)))
 
 // Nb7 and every D4-equivalent square disqualify support before any exceptions.
 const UNSUPPORTED_KNIGHT_SQUARES = new Set(SQUARE_TRANSFORMS.map(transform => transformSquare('b7', transform)))

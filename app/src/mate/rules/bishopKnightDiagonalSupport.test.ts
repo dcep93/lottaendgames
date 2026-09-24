@@ -7,6 +7,28 @@ import { getIdealKnightAndBishopWhiteMoves, scoreKnightAndBishopWhiteMove } from
 
 const sixDiagonal = ['a3', 'b4', 'c5', 'd6', 'e7', 'f8'] as const
 
+test('Nd3 with White king anywhere on the a-file is unsupported across D4', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    for (const king of allSquares().filter(square => square[0] === 'a')) {
+      const board = getChess('6B1/8/5k2/8/8/3N4/8/7K b - - 0 1')
+      board.remove('h1')
+      board.put({type: 'k', color: 'w'}, king)
+      assert.equal(knightAndBishopSupportedDiagonal(transformFen(board.fen(), transform)).size, 99)
+    }
+    for (const [fen, from, to] of [
+      ['8/8/8/8/k7/3N4/8/KB6 w - - 0 1', 'b1', 'a2'],
+      ['2B5/K7/8/k7/8/3N4/8/8 w - - 0 1', 'c8', 'e6'],
+    ] as const) {
+      const before = transformFen(fen, transform), board = getChess(before)
+      const move = board.move({from: transformSquare(from, transform), to: transformSquare(to, transform)}).san
+      assert.equal(knightAndBishopSupportedDiagonal(board.fen()).size, 99)
+      assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 99)
+    }
+    assert.equal(knightAndBishopSupportedDiagonal(transformFen(
+      '8/8/8/1k6/8/1B1N4/1K6/8 b - - 0 1', transform)).size, 7)
+  }
+})
+
 test('ordinary support requires opposite king and bishop colors, preserving declarations across D4', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const fen of [
