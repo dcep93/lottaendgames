@@ -103,7 +103,7 @@ test('Ba4 with Kd6 Nd3 is supported across Black placements and breaks the loade
   }
 })
 
-test('Kd6 supports Bd7 with Nd3 while r10 prefers the farther Be8', () => {
+test('Kd6 supports Bd7 with Nd3 and permits the preferred Be8', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const counters of ['0 1', '38 20']) {
       const fen = transformFen(`8/8/3K4/k7/B7/3N4/8/8 w - - ${counters}`, transform)
@@ -990,9 +990,9 @@ test('declared second-move Nf6 supports Kb5 Ba6 versus Ka8 without adding a knig
       const board = getChess(before)
       board.move({from: transformSquare('d7', transform), to: transformSquare('f6', transform)})
       assert.deepEqual(knightAndBishopSupportedDiagonal(board.fen()), {size: 3, knight: 99})
-      // Both remain supported, but r17.5 now prefers the king-adjacent knight.
-      const nc5 = getChess(before).move({from: transformSquare('d7', transform), to: transformSquare('c5', transform)}).san
-      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(before), [nc5])
+      // Without the removed adjacency rule, r20 prefers the farther knight.
+      const nf6 = getChess(before).move({from: transformSquare('d7', transform), to: transformSquare('f6', transform)}).san
+      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(before), [nf6])
     }
     for (const fen of [
       'k7/8/B4N2/2K5/8/8/8/8 b - - 0 1',

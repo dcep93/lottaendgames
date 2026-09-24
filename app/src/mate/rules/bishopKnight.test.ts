@@ -147,49 +147,14 @@ test("bishop-and-knight rules are registered", () => {
       helpText: "Play the 9.1 move.",
     },
     {
-      id: "r9.8",
-      shortLabel: "rule r9.8",
-      helpText: "Prefer Black to be unable to attack both minor pieces next move.",
-    },
-    {
       id: "r9.9",
       shortLabel: "rule r9.9",
       helpText: "Minimize king distance to the center, then prefer king proximity.",
     },
     {
-      id: "r9.95",
-      shortLabel: "rule r9.95",
-      helpText: "Prefer bishop occupation else control of a square on a shortest Manhattan path between the kings.",
-    },
-    {
-      id: "r9.96",
-      shortLabel: "rule r9.96",
-      helpText: "Prefer the bishop occupying the long diagonal.",
-    },
-    {
       id: "r9.98",
       shortLabel: "rule r9.98",
       helpText: "Protect the knight using a stable bishop.",
-    },
-    {
-      id: "r10",
-      shortLabel: "rule r10",
-      helpText: "If the bishop is within 2 steps of Black's king, maximize its distance from Black's king to at least 3 steps away.",
-    },
-    {
-      id: "r15",
-      shortLabel: "rule r15",
-      helpText: "If the knight is within 2 steps of Black's king, maximize its distance from Black's side of the king moat.",
-    },
-    {
-      id: "r17.5",
-      shortLabel: "rule r17.5",
-      helpText: "Prefer the knight adjacent to White's king.",
-    },
-    {
-      id: "r18",
-      shortLabel: "rule r18",
-      helpText: "Prefer the knight off the edge of the board.",
     },
     {
       id: "r20",
@@ -222,15 +187,8 @@ test("bishop-and-knight rules are registered", () => {
       "r5.5",
       "r8",
       "r9.1",
-      "r9.8",
       "r9.9",
-      "r9.95",
-      "r9.96",
       "r9.98",
-      "r10",
-      "r15",
-      "r17.5",
-      "r18",
       "r20",
     ],
   );
@@ -238,7 +196,7 @@ test("bishop-and-knight rules are registered", () => {
     ruleSet.whiteRuleDescriptions.map(({ id }) => id),
     knightAndBishopWhiteRules.map(({ id }) => id),
   );
-  assert.equal(knightAndBishopWhiteRules.length, 21);
+  assert.equal(knightAndBishopWhiteRules.length, 14);
 });
 
 test("immediate mate keeps precedence without the mating-net rule", () => {

@@ -28,20 +28,16 @@ test('r9.98 recognizes bishop defense via either minor and respects blockers acr
     }
   }
   const ids=knightAndBishopWhiteRules.map(r=>r.id);
-  assert.ok(ids.indexOf('r9.96')<ids.indexOf('r9.98') && ids.indexOf('r9.98')<ids.indexOf('r10'));
+  assert.ok(ids.indexOf('r9.9')<ids.indexOf('r9.98') && ids.indexOf('r9.98')<ids.indexOf('r20'));
 });
 
 
-test('r9.98 credits Be6+ through Black’s king while earlier r9.95 prefers path control, across D4', () => {
+test('r9.98 credits Be6+ through Black’s king across D4', () => {
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen('K1B5/8/8/8/2k5/1N6/8/8 w - - 0 1', t);
     const chess = getChess(fen);
     const move = chess.move({from: transformSquare('c8',t), to: transformSquare('e6',t)}).san;
     assert.equal(scoreKnightAndBishopWhiteMove(fen,move).knightBishopProtectionPenalty,0,t.name);
-    const nd2 = getChess(fen).move({from:transformSquare('b3',t),to:transformSquare('d2',t)}).san;
-    assert.ok(knightAndBishopWhiteRules.find(r=>r.id==='r9.95')!.compare!(
-      scoreKnightAndBishopWhiteMove(fen,nd2),scoreKnightAndBishopWhiteMove(fen,move)) < 0);
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[nd2],t.name);
     assert.equal(bishopControlsOrOccupiesSquare(chess.fen(),transformSquare('e6',t),transformSquare('b3',t)),false,t.name);
   }
 });
