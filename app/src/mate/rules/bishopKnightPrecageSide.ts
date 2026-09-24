@@ -1,5 +1,5 @@
 import type { Square } from 'chess.js'
-import { findPiece, squareColor, squareCoordinates } from '../chess'
+import { findPiece, kingDistance, squareColor, squareCoordinates } from '../chess'
 import { knightAndBishopKnightTargetSquares } from './bishopKnightStrategy'
 
 export type PrecageSideTarget = {
@@ -12,7 +12,9 @@ export type PrecageSideTarget = {
 export function knightAndBishopPrecageSideTarget(fen: string): PrecageSideTarget | undefined {
   const bishop = findPiece(fen, 'w', 'b')
   const knight = findPiece(fen, 'w', 'n')
-  if (!bishop || !knight || !knightAndBishopKnightTargetSquares(fen).includes(knight.square)) return
+  const whiteKing = findPiece(fen, 'w', 'k')
+  const blackKing = findPiece(fen, 'b', 'k')
+  if (!bishop || !knight || !whiteKing || !blackKing || !knightAndBishopKnightTargetSquares(fen).includes(knight.square)) return
   const b = squareCoordinates(bishop.square), n = squareCoordinates(knight.square)
   for (const axis of ['file', 'rank'] as const) {
     const high = b[axis] >= 4
@@ -20,6 +22,9 @@ export function knightAndBishopPrecageSideTarget(fen: string): PrecageSideTarget
     const edge = high ? 7 : 0
     const corner = (['a1', 'a8', 'h1', 'h8'] as const).find(square =>
       squareCoordinates(square)[axis] === edge && squareColor(square) !== squareColor(bishop.square))!
+    const targetCorner = (['a1', 'a8', 'h1', 'h8'] as const).find(square =>
+      squareCoordinates(square)[axis] === edge && squareColor(square) === squareColor(bishop.square))!
+    if (kingDistance(blackKing.square, targetCorner) >= kingDistance(whiteKing.square, targetCorner)) return
     return { axis, edge, corner }
   }
 }

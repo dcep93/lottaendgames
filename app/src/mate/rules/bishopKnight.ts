@@ -471,7 +471,7 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     {
       id: "r6",
       shortLabel: "rule r6",
-      helpText: "With a precage knight, prefer king proximity to the bishop's side, then king proximity to the non-target corner.",
+      helpText: "With a precage knight and Black's king closer by king steps to the target corner than White's king, prefer king proximity to the bishop's side, then king proximity to the non-target corner.",
       subpriorities: [
         { compare: (first, second) => first.precageSideDistance - second.precageSideDistance },
         { compare: (first, second) => first.precageSideCornerDistanceSquared - second.precageSideCornerDistanceSquared },

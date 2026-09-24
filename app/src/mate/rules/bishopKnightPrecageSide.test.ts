@@ -34,9 +34,17 @@ test('r6 uses pre-move eligibility and accepts nonadjacent precage knights', () 
   ]) assert.equal(target(fen), undefined)
 })
 
-test('r6 allows Black in the knight rank half when they are opposite across the long diagonal', () => {
-  const fen = '8/8/8/3BK3/2N4k/8/8/8 w - - 0 1'
-  for (const t of SQUARE_TRANSFORMS) {
-    assert.equal(target(transformFen(fen, t))?.corner, transformSquare('h8', t))
+test('r6 is inactive when White is closer to the target corner, including the loaded position', () => {
+  for (const start of [
+    '8/2K1k3/8/3B4/2N5/8/8/8 w - - 0 1', // a8: White 2 steps, Black 4.
+    '8/8/8/3BK3/2N4k/8/8/8 w - - 0 1', // a8: White 4, Black 7.
+    '8/4k3/8/3BK3/2N5/8/8/8 w - - 0 1', // a8: both 4 steps.
+  ]) for (const t of SQUARE_TRANSFORMS) {
+    const fen = transformFen(start, t)
+    assert.equal(target(fen), undefined)
+    for (const move of getChess(fen).moves()) {
+      assert.equal(score(fen, move).precageSideDistance, 0)
+      assert.equal(score(fen, move).precageSideCornerDistanceSquared, 0)
+    }
   }
 })
