@@ -33,3 +33,10 @@ test('r6 uses pre-move eligibility and accepts nonadjacent precage knights', () 
     '8/3k4/8/4K3/2N5/1B6/8/8 w - - 0 1', // Noncentral bishop.
   ]) assert.equal(target(fen), undefined)
 })
+
+test('r6 allows Black in the knight rank half when they are opposite across the long diagonal', () => {
+  const fen = '8/8/8/3BK3/2N4k/8/8/8 w - - 0 1'
+  for (const t of SQUARE_TRANSFORMS) {
+    assert.equal(target(transformFen(fen, t))?.corner, transformSquare('h8', t))
+  }
+})

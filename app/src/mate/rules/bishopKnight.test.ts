@@ -139,7 +139,7 @@ test("bishop-and-knight rules are registered", () => {
     {
       id: "r6",
       shortLabel: "rule r6",
-      helpText: "With a central bishop on the same side as Black's king, and a precage knight opposite Black's king, prefer king proximity to the bishop's side, then king proximity to the non-target corner.",
+      helpText: "With a precage knight, prefer king proximity to the bishop's side, then king proximity to the non-target corner.",
     },
     {
       id: "r7",
@@ -154,7 +154,7 @@ test("bishop-and-knight rules are registered", () => {
     {
       id: "r7.8",
       shortLabel: "rule r7.8",
-      helpText: "With a middle-16 square king and a central bishop, prefer knight move proximity to a precage square on the opposite side of the bishop's long diagonal to Black's king.",
+      helpText: "With a middle-16 square king, prefer knight move proximity to a precage square.",
     },
     {
       id: "r8",

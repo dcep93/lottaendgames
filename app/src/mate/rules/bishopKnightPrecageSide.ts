@@ -8,16 +8,15 @@ export type PrecageSideTarget = {
   corner: Square
 }
 
-// Freeze the shared bishop/Black half and its non-target corner before White moves.
+// Freeze the bishop half opposite the eligible precage knight and its non-target corner before White moves.
 export function knightAndBishopPrecageSideTarget(fen: string): PrecageSideTarget | undefined {
   const bishop = findPiece(fen, 'w', 'b')
   const knight = findPiece(fen, 'w', 'n')
-  const black = findPiece(fen, 'b', 'k')
-  if (!bishop || !knight || !black || !knightAndBishopKnightTargetSquares(fen).includes(knight.square)) return
-  const b = squareCoordinates(bishop.square), n = squareCoordinates(knight.square), k = squareCoordinates(black.square)
+  if (!bishop || !knight || !knightAndBishopKnightTargetSquares(fen).includes(knight.square)) return
+  const b = squareCoordinates(bishop.square), n = squareCoordinates(knight.square)
   for (const axis of ['file', 'rank'] as const) {
     const high = b[axis] >= 4
-    if ((n[axis] >= 4) === high || (k[axis] >= 4) !== high) continue
+    if ((n[axis] >= 4) === high) continue
     const edge = high ? 7 : 0
     const corner = (['a1', 'a8', 'h1', 'h8'] as const).find(square =>
       squareCoordinates(square)[axis] === edge && squareColor(square) !== squareColor(bishop.square))!
