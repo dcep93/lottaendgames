@@ -19,7 +19,9 @@ test('r7 scores center distance without r6; r20 scores minor distances from Blac
     assert.ok(r99.compare(offColorFar, sameColorCentral) > 0, transform.name);
     assert.ok(r99.compare(offColorNear, offColorFar) < 0, transform.name);
     assert.equal(r99.compare(far, sameColorCentral), 0, transform.name);
-    assert.equal('kingBishopColorPenalty' in sameColorCentral, false);
+    assert.equal(sameColorCentral.kingBishopColorPenalty, 1);
+    assert.equal(offColorNear.kingBishopColorPenalty, 0);
+    assert.ok(knightAndBishopWhiteRules.find(r => r.id === 'r19')!.compare!(offColorNear, sameColorCentral) < 0);
     assert.ok(r20.compare(far, near) < 0, transform.name);
     assert.equal(r20.compare(offColorFar, sameColorCentral), 0, transform.name);
     assert.equal(far.minorBlackDistanceScore, -Math.sqrt(29) - Math.sqrt(41));
