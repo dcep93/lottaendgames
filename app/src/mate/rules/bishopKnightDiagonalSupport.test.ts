@@ -1113,3 +1113,17 @@ test('Ba4 Nd3 versus Kd8 is supported iff White king is adjacent to e7, across D
  assert.equal(scoreKnightAndBishopWhiteMove(before,'Ba4').supportedDiagonalSizeScore,5)
  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(before),['Ba4'])
 });
+
+
+test('declared Ba4 with Kd7 Nd3 against Kb7 is supported and preferred across D4', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    for (const counters of ['0 1', '27 15']) {
+      const before = transformFen(`8/1k1K4/8/8/8/1B1N4/8/8 w - - ${counters}`, transform)
+      const board = getChess(before)
+      const move = board.move({from: transformSquare('b3', transform), to: transformSquare('a4', transform)}).san
+      assert.equal(knightAndBishopSupportedDiagonal(board.fen()).size, 5)
+      assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 5)
+      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(before), [move])
+    }
+  }
+})
