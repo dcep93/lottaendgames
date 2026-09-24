@@ -11,6 +11,8 @@ const declarations = new Map(([
   ['5k2/5N2/5K2/8/4B3/8/8/8 w - - 8 5', 'e4', 'h7'],
   ['4k3/5N1B/5K2/8/8/8/8/8 w - - 10 6', 'f7', 'e5'],
   ['3k4/7B/5K2/4N3/8/8/8/8 w - - 12 7', 'h7', 'g8'],
+  ['4k3/8/4N3/3BK3/8/8/8/8 w - - 2 2', 'e6', 'f4'],
+  ['5k2/8/8/3BK3/5N2/8/8/8 w - - 4 3', 'e5', 'f6'],
 ] as const).flatMap(([fen, from, to]) => SQUARE_TRANSFORMS.map(transform => [
   transformFen(fen, transform).split(' ').slice(0, 2).join(' '),
   transformSquare(from, transform) + transformSquare(to, transform),
