@@ -1354,3 +1354,24 @@ test('declared Kc7 with Bc8 Nb7 against Ka8 supports three across D4', () => {
     ]) assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 99)
   }
 })
+
+
+test('Ka2 Nd3 automatically disqualifies support, including D4 equivalents', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    const before = transformFen('8/8/8/k7/B7/3N4/K7/8 w - - 0 1', transform)
+    const board = getChess(before)
+    const move = board.move({from: transformSquare('a4', transform), to: transformSquare('b3', transform)}).san
+    assert.deepEqual(knightAndBishopSupportedDiagonal(board.fen()), {size: 99, knight: 99})
+    assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 99)
+    // Moving the king off the declared square can still establish support.
+    assert.equal(knightAndBishopSupportedDiagonal(transformFen('8/8/8/k7/8/1B1N4/1K6/8 b - - 0 1', transform)).size, 7)
+  }
+  for (const bishop of allSquares()) for (const black of allSquares()) {
+    if (new Set(['a2', 'd3', bishop, black]).size !== 4 || kingDistance('a2', black) <= 1) continue
+    const board = getChess('7k/8/8/8/8/3N4/K7/8 b - - 0 1')
+    board.remove('h8')
+    board.put({type: 'b', color: 'w'}, bishop)
+    board.put({type: 'k', color: 'b'}, black)
+    assert.equal(knightAndBishopSupportedDiagonal(board.fen()).size, 99, `${bishop} ${black}`)
+  }
+})

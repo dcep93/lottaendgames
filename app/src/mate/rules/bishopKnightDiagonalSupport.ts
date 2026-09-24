@@ -82,6 +82,10 @@ const DIAGONALS = CANONICAL_DIAGONALS.flatMap(pattern => SQUARE_TRANSFORMS.map(t
   kingRaceSquares: pattern.kingRaceSquares?.map(square => transformSquare(square, transform)),
 })))
 
+// Ka2/Nd3 cannot support a cage, regardless of bishop or Black king placement.
+const UNSUPPORTED_KING_KNIGHT_PAIRS = new Set(SQUARE_TRANSFORMS.map(transform =>
+  `${transformSquare('a2', transform)}/${transformSquare('d3', transform)}`))
+
 // Bc6 and its reflected squares are unsupported regardless of other pieces.
 const UNSUPPORTED_BISHOP_SQUARES = new Set(SQUARE_TRANSFORMS.map(transform => transformSquare('c6', transform)))
 
@@ -290,6 +294,7 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
   const bishop = findPiece(fen, 'w', 'b')
   const knight = findPiece(fen, 'w', 'n')
   if (!white || !black || !bishop || !knight) return {size: 99, knight: 99}
+  if (UNSUPPORTED_KING_KNIGHT_PAIRS.has(`${white.square}/${knight.square}`)) return {size: 99, knight: 99}
   // Cage membership is mandatory before every support declaration or exception.
   if (!DIAGONALS.some(pattern => pattern.wall.includes(bishop.square) &&
     isInsideBishopDiagonal(black.square, pattern.wall))) return {size: 99, knight: 99}
