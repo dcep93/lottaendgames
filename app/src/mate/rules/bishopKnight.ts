@@ -24,7 +24,7 @@ import {
   isKnightAndBishopWManeuverPosition,
   knightAndBishopPiecesPresent,
 } from "./bishopKnightLookup";
-import { knightAndBishopKnightTargetSquares, knightAndBishopKnightProximityToSquare, knightKingProtectionDistance, knightAndBishopCenterProximityScore, knightAndBishopKingCenterProximityScore, knightAndBishopKnightTargetProximityScore, knightAndBishopTargetCorners } from "./bishopKnightStrategy";
+import { knightAndBishopKnightTargetSquares, knightAndBishopPrecageApproachSquares, knightAndBishopKnightProximityToSquare, knightKingProtectionDistance, knightAndBishopCenterProximityScore, knightAndBishopKingCenterProximityScore, knightAndBishopKnightTargetProximityScore, knightAndBishopTargetCorners } from "./bishopKnightStrategy";
 import { declaredSupportedThreeMove, declaredSupportedFiveMove, declaredSupportedSevenMove, declaredSupportedKnightAdvance } from "./bishopKnightSupportedPreferences";
 import { knightAndBishopDeclaredPreparationMove } from "./bishopKnightPreparation";
 import { knightAndBishopShouldCoordinateKing, knightAndBishopKingCoordinatesMinors } from "./bishopKnightCoordination";
@@ -196,7 +196,7 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
     shouldCoordinateKing: knightAndBishopShouldCoordinateKing(fen),
     startsWithPrecageKnight: !!knight && knightAndBishopKnightTargetSquares(fen).includes(knight.square),
     oppositePrecageTargets: whiteKing && isMiddle16Square(whiteKing.square) && bishop && blackKing
-      ? knightAndBishopKnightTargetSquares(fen).filter(target => {
+      ? knightAndBishopPrecageApproachSquares(fen).filter(target => {
         const index = (square: Square) => {
           const { file, rank } = squareCoordinates(square);
           return squareColor(bishop.square) === 1 ? file + rank - 7 : file - rank;
@@ -643,7 +643,7 @@ const bishopKnightHelp: RuleHelp = {
     "Stay away from a bishop-colored corner.",
   ],
   notes: [
-    "For r9.99, select opposite-side precage targets before White moves, requiring a middle-16 king and central bishop. Measure knight moves after White moves, then break ties by Euclidean proximity to the target. If Black is on the bishop’s long diagonal, there is no opposite-side target and this rule is neutral.",
+    "For r9.99 only, approach c4, d3, e6 or f5 with a light-squared central bishop, including board symmetries; filter these to the opposite side from Black before White moves. Require a middle-16 king and central bishop. Other rules retain their existing precage targets. Measure knight moves after White moves, then break ties by Euclidean proximity to the target. If Black is on the bishop’s long diagonal, there is no opposite-side target and this rule is neutral.",
     "For r5.1, require a central bishop and knight on a precage square before White moves, then minimize the resulting Euclidean distance between the kings.",
     "For r8, White’s king must be on files c–f and ranks 3–6 before moving. Evaluate the bishop and knight preferences after White moves. A precage square is noncentral, off both long diagonals, and diagonally adjacent to a central bishop.",
     "For r7, minimize White’s king Euclidean distance to the board’s midpoint. For r20, maximize the sum of the bishop’s and knight’s Euclidean distances from Black’s king, measured after White moves.",
