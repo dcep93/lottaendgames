@@ -133,3 +133,18 @@ test('r5 prescribes Nf4 and Kf6 in the declared Ke8 line across D4', () => {
     }
   }
 })
+
+
+test('r5 prescribes second-move Nf4 after Kf5 Ke8 across D4', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    const board = getChess(transformFen('8/5k2/4N3/3B4/4K3/8/8/8 w - - 0 1', transform))
+    board.move({from: transformSquare('e4', transform), to: transformSquare('f5', transform)})
+    board.move({from: transformSquare('f7', transform), to: transformSquare('e8', transform)})
+    const before = board.fen()
+    const from = transformSquare('e6', transform)
+    const to = transformSquare('f4', transform)
+    const san = board.move({from, to}).san
+    assert.equal(knightAndBishopDeclaredPreparationMove(before), from + to)
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(before), [san])
+  }
+})
