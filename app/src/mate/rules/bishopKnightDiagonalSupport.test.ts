@@ -1295,7 +1295,7 @@ test('the bishop-attack restriction preserves king defense and occupied support 
 })
 
 
-test('Ke7 Nd3 declares Ba4 and Bb5 supported regardless of Black, across D4', () => {
+test('Ke7 Nd3 declares Ba4 and Bb5 supported only with Black inside the cage, across D4', () => {
   for (const bishop of ['a4', 'b5'] as const) {
     for (const black of allSquares()) {
       if ([bishop, 'e7', 'd3'].includes(black) || kingDistance('e7', black) <= 1) continue
@@ -1306,7 +1306,8 @@ test('Ke7 Nd3 declares Ba4 and Bb5 supported regardless of Black, across D4', ()
       board.put({type: 'k', color: 'b'}, black)
       for (const transform of SQUARE_TRANSFORMS) {
         const fen = transformFen(board.fen(), transform)
-        assert.deepEqual(knightAndBishopSupportedDiagonal(fen), {size: 5, knight: 2}, `${bishop}, ${black}, ${transform.name}`)
+        const inside = isInsideBishopDiagonal(black, ['a4', 'b5', 'c6', 'd7', 'e8'])
+        assert.deepEqual(knightAndBishopSupportedDiagonal(fen), inside ? {size: 5, knight: 2} : {size: 99, knight: 99}, `${bishop}, ${black}, ${transform.name}`)
       }
     }
   }
@@ -1322,5 +1323,16 @@ test('loaded Ke7 after Ba4 Kc8 is supported without extending to a different kni
       '2k5/4K3/8/8/B7/8/8/1N6 b - - 0 1',
       '2k5/4K3/2B5/8/8/3N4/8/8 b - - 0 1',
     ]) assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 99)
+  }
+})
+
+
+test('Ke7 cannot establish support with Black Kf5 outside the Bb5 cage', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    const before = transformFen('5K2/8/8/1B3k2/8/3N4/8/8 w - - 0 1', transform)
+    const board = getChess(before)
+    const move = board.move({from: transformSquare('f8', transform), to: transformSquare('e7', transform)}).san
+    assert.deepEqual(knightAndBishopSupportedDiagonal(board.fen()), {size: 99, knight: 99})
+    assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 99)
   }
 })

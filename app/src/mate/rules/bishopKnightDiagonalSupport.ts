@@ -145,7 +145,7 @@ const DECLARED_FIVE_PLACEMENTS = DECLARED_FIVE_SUPPORT.flatMap(placement => SQUA
   support: transformSquare('d5', transform),
 })))
 
-// Ke7/Nd3 supports Ba4 or Bb5 independently of Black's square.
+// Ke7/Nd3 supports Ba4 or Bb5 while Black remains inside the target-corner cage.
 const DECLARED_FIVE_WHITE_PLACEMENTS = (['a4', 'b5'] as const).flatMap(bishop =>
   SQUARE_TRANSFORMS.map(transform => ({
     king: transformSquare('e7', transform),
@@ -290,6 +290,9 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
   const bishop = findPiece(fen, 'w', 'b')
   const knight = findPiece(fen, 'w', 'n')
   if (!white || !black || !bishop || !knight) return {size: 99, knight: 99}
+  // Cage membership is mandatory before every support declaration or exception.
+  if (!DIAGONALS.some(pattern => pattern.wall.includes(bishop.square) &&
+    isInsideBishopDiagonal(black.square, pattern.wall))) return {size: 99, knight: 99}
   // Every five-diagonal, including declared placements, needs an occupied five/seven
   // support square or a knight one move from a corresponding seven support square.
   const fivePatterns = DIAGONALS.filter(pattern => pattern.wall.length === 5 && pattern.wall.includes(bishop.square))
