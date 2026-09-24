@@ -43,7 +43,7 @@ test('r20 leaves equal Black-distance moves tied regardless of minor separation 
 });
 
 
-test('r7 breaks center-distance ties toward Black while keeping centrality first across D4', () => {
+test('r7 ties equally central kings regardless of distance to Black across D4', () => {
   const compare = knightAndBishopWhiteRules.find(rule => rule.id === 'r7')!.compare!;
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen('8/8/6k1/3BK3/2N5/8/8/8 w - - 6 4', t);
@@ -51,16 +51,13 @@ test('r7 breaks center-distance ties toward Black while keeping centrality first
       getChess(fen).move({from: transformSquare('e5', t), to: transformSquare(to, t)}).san);
     const d4 = score('d4'), e4 = score('e4'), f4 = score('f4');
     assert.equal(d4.kingCenterProximityScore, e4.kingCenterProximityScore, t.name);
-    assert.equal(e4.kingBlackProximityScore, 2, t.name);
-    assert.equal(d4.kingBlackProximityScore, 3, t.name);
-    assert.ok(compare(e4, d4) < 0, t.name);
-    assert.ok(f4.kingBlackProximityScore < d4.kingBlackProximityScore, t.name);
+    assert.equal(compare(e4, d4), 0, t.name);
     assert.ok(compare(d4, f4) < 0, t.name);
   }
 });
 
 
-test('r7 ties equal king-step distances even when Euclidean distances differ', () => {
+test('r7 ties central placements regardless of Black proximity', () => {
  const f = 'B7/8/6k1/8/3K4/8/8/1N6 w - - 0 1';
  const rule = knightAndBishopWhiteRules.find(r => r.id === 'r7')!;
  for (const t of SQUARE_TRANSFORMS) {
