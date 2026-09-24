@@ -524,3 +524,26 @@ test('r5 prescribes the loaded Kd6 Ke7 Ke8 Ne5 sequence across D4', () => {
     line.move(black!)
   }
 })
+
+
+test('r5 prescribes both loaded return-history loop exits across D4', () => {
+  for (const [start, moves] of [
+    ['1k6/8/8/8/2NKB3/8/8/8 w - - 0 1', ['Bd5', 'Ka7', 'Ne5', 'Kb6']],
+    ['8/2k5/8/3B4/2NK4/8/8/8 w - - 0 1', ['Ke5', 'Kc8', 'Kf6', 'Kd7', 'Kf7', 'Kc7', 'Ke7', 'Kc8']],
+  ] as const) {
+    const line = getChess(start)
+    for (const san of moves) {
+      const position = line.fen(), isWhite = line.turn() === 'w'
+      const move = line.move(san)
+      if (!isWhite) continue
+      for (const transform of SQUARE_TRANSFORMS) {
+        const fen = transformFen(position, transform)
+        const from = transformSquare(move.from, transform), to = transformSquare(move.to, transform)
+        const expected = getChess(fen).move({from, to}).san
+        assert.equal(knightAndBishopDeclaredPreparationMove(fen), from + to, fen)
+        assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [expected], fen)
+        assert.equal(getMateRuleSet('bishop-knight').currentWhiteHint(fen)?.id, 'r5', fen)
+      }
+    }
+  }
+})
