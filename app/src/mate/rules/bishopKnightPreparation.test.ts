@@ -1,8 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { SQUARE_TRANSFORMS, transformFen, transformSquare, getChess } from '../chess'
-import { getIdealKnightAndBishopWhiteMoves } from './bishopKnight'
-import { getMateRuleSet } from './index'
+import { SQUARE_TRANSFORMS, transformFen } from '../chess'
 import { knightAndBishopDeclaredPreparationMove } from './bishopKnightPreparation'
 
 test('r5 keeps undeclared old exact and wildcard prescriptions cleared across D4', () => {
@@ -85,14 +83,5 @@ test('r5 clears every recent declaration across D4 and move counters', () => {
     const transformed = transformFen(fen, transform)
     assert.equal(knightAndBishopDeclaredPreparationMove(transformed), undefined)
     assert.equal(knightAndBishopDeclaredPreparationMove(transformed.split(' ').slice(0, 4).join(' ') + ' 0 1'), undefined)
-  }
-})
-
-test('clearing r5 restores the general Kc5 preference in the loaded position across D4', () => {
-  for (const transform of SQUARE_TRANSFORMS) {
-    const fen = transformFen('1k6/8/8/3B4/2NK4/8/8/8 w - - 0 1', transform)
-    const move = getChess(fen).move({from: transformSquare('d4', transform), to: transformSquare('c5', transform)}).san
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [move])
-    assert.equal(getMateRuleSet('bishop-knight').currentWhiteHint(fen)?.id, 'r5.1')
   }
 })

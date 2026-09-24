@@ -129,7 +129,7 @@ test("bishop-and-knight rules are registered", () => {
     {
       id: "r5.1",
       shortLabel: "rule r5.1",
-      helpText: "With a central bishop and knight on the precage square, prefer king proximity.",
+      helpText: "With a central bishop and knight on the precage square, prefer king step proximity.",
     },
     {
       id: "r5.5",
