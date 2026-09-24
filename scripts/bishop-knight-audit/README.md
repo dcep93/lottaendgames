@@ -66,31 +66,63 @@ AUDIT_DIR=/absolute/full-audit npx tsx ../scripts/bishop-knight-audit/full-detai
 AUDIT_DIR=/absolute/full-audit npx tsx ../scripts/bishop-knight-audit/full-report.mts
 ```
 
-## Fixed cycle-position cohort (current progress metric)
+## Fixed cohort plus five-second residual estimate
 
-The user wants **positions on loops**, not positions that can reach loops.
-Keep the 641 D4-distinct post-White positions in `cohort-2026-09-23.json` fixed
-until explicitly asked to replace the baseline. It comes from the exhaustive
-`0205bf4` audit. After each preference change, report remaining positions out of
-641, counting each board once, even if it lies on multiple cycles.
+After a rule change, estimate **positions directly on unsupported loops**, never
+positions that can merely reach a loop. Use preferred White moves (including
+all ties), every legal Black reply, and D4-deduplicated post-White positions.
 
-From the repository root:
+1. Extract **all** positions on unsupported cycles from the last completed full
+   audit, not just one witness per component. Freeze this cohort and record the
+   source audit, policy fingerprint, and Black policy. Do not replace it with a
+   short-cycle sample after each change. A new full audit replaces the baseline.
+2. Recheck that fixed cohort under the current rules. Report `x / b` positions
+   still on an unsupported loop. Breaking the old witness is insufficient: the
+   position may lie on a different cycle. Supported results do not count toward
+   the unsupported survivor total. Do not impose a four-ply cycle limit.
+3. Spend **five seconds**, not a fixed 5,000-position run, sampling uniformly
+   from the remaining current unsupported D4 domain, excluding the entire
+   baseline cohort. Record elapsed sampling time, seed, attempted positions,
+   resolved positions, loop hits, and unresolved positions. Keep positions and
+   unique loop families as separate counts; several samples can occupy one loop.
+4. Let `R` be the size of that remainder, `n` the sample size, and `k` the sampled
+   positions directly on unsupported loops. Assuming representative sampling,
+   estimate `x + R * k / n`. Show the exact survivor count and the extrapolated
+   contribution separately, together with uncertainty and the sampling scope.
+   Exclude baseline members from `R` even when their old loop has disappeared.
+
+The budget is for the residual sampling phase. Reuse cached root populations and
+current-policy results to keep repeated runs quick. Never carry cached membership
+results across a policy change without rechecking them. If the deadline interrupts
+cycle classification, preserve an unresolved status: an unfinished search is not
+proof of no cycle. Do not compute an apparently exact density from only the fast,
+completed cases. Report bounds or a clearly labeled detection lower bound when
+classification is incomplete. Zero discoveries in five seconds does not establish
+that the remainder is loop-free. Do not silently substitute four-ply detection for
+arbitrary cycle membership.
+
+The historical `cohort-2026-09-23.json` contains 641 D4 positions from the older
+`0205bf4` audit. It is retained for reproducibility; use the latest completed full
+audit when creating the current baseline. Older audits used restricted Black
+preferences. They can supply the historical cohort, but its survivors must be
+rechecked with **all legal Black replies**, and its old density is not a current
+all-legal measurement.
+
+The existing exhaustive cohort checker is available as:
 
 ```sh
 app/node_modules/.bin/tsx scripts/bishop-knight-audit/cohort.mts \
-  --baseline scripts/bishop-knight-audit/cohort-2026-09-23.json \
+  --baseline /absolute/path/to/frozen-cohort.json \
   --out /absolute/path/to/cohort-check
 ```
 
-This is an exhaustive cycle-membership check for this fixed cohort, not a new
-all-position census. It also catches changed loops through the original boards;
-breaking an old witness alone is not sufficient. Newly cyclic boards outside
-the cohort are deliberately excluded from the progress count.
-
-For each cohort post-White board, seed every legal noncapturing Black reply. Expand preferred White moves and every legal Black reply, continuing through support changes. Count a cohort board only when its post-White label occurs on an edge internal to a cyclic strongly connected component. Incoming paths and exits do not count. History is unnecessary, and a capture only terminates its own branch.
-
-Older measurements for the 641-board cohort used restricted Black preferences; those values and timings do not describe the current graph.
-`result.json` records the policy bundle fingerprint and exact surviving keys.
+It seeds every legal noncapturing Black reply, expands preferred White moves and
+all legal Black replies, and identifies direct membership through edges internal
+to cyclic strongly connected components. A capture terminates only its own branch.
+It currently counts cycles through support changes; the unsupported-only estimator
+must restrict membership to cycles with unsupported post-White results, rather
+than treating this command's unfiltered survivor count as the unsupported total.
+`result.json` records the current policy bundle fingerprint and surviving keys.
 
 ## Staged work: seven, then five, then three
 
