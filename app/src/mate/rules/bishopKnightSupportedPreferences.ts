@@ -1,4 +1,4 @@
-import { SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess'
+import { findPiece, getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess'
 
 // Exact r2.5 declarations, subordinate to r1.5; counters do not affect placement.
 const declarations = new Map(([
@@ -12,7 +12,22 @@ const declarations = new Map(([
   transformSquare(from,transform) + transformSquare(to,transform),
 ] as const)))
 
+const sevenBishopPlacements = SQUARE_TRANSFORMS.map(transform => ({
+  king: transformSquare('g7', transform),
+  knight: transformSquare('d3', transform),
+  black: transformSquare('e7', transform),
+  target: transformSquare('f7', transform),
+}))
+
 export function declaredSupportedSevenMove(fen: string): string | undefined {
+  const king = findPiece(fen, 'w', 'k')?.square
+  const knight = findPiece(fen, 'w', 'n')?.square
+  const black = findPiece(fen, 'b', 'k')?.square
+  const placement = sevenBishopPlacements.find(p => p.king === king && p.knight === knight && p.black === black)
+  if (placement && fen.split(' ')[1] === 'w') {
+    const bishopMove = getChess(fen).moves({verbose:true}).find(m => m.piece === 'b' && m.to === placement.target)
+    if (bishopMove) return bishopMove.from + bishopMove.to
+  }
   return declarations.get(fen.split(' ').slice(0,2).join(' '))
 }
 
