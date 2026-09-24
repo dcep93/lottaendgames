@@ -1,0 +1,1719 @@
+{
+  "change": "Prescribe logged moves 2\u20137 under r5: Nd8, Nf7, Be4, Bh7, Ne5, Bg8; exact placements across D4, counters ignored",
+  "method": {
+    "source": "/Users/danielcepeda/repos/_codex_output/bn-r51-proximity-2026-09-24",
+    "changedPolicy": "bishopKnightPreparation.ts",
+    "changedKeys": [
+      4834496,
+      4833544,
+      4833921,
+      4834384,
+      4723800,
+      4724448
+    ],
+    "sourceHash": "ad6f6d8a237ede03b08d995efd844a1d0bb6fd86d08c2c56dd3fb8aa03910e56",
+    "patch": "diff --git a/app/src/mate/rules/bishopKnightPreparation.ts b/app/src/mate/rules/bishopKnightPreparation.ts\nindex cb58787..79c1fb3 100644\n--- a/app/src/mate/rules/bishopKnightPreparation.ts\n+++ b/app/src/mate/rules/bishopKnightPreparation.ts\n@@ -5,6 +5,12 @@ const declarations = new Map(([\n   ['8/2k5/5K2/3B4/2N5/8/8/8 w - - 0 1', 'f6', 'e7'],\n   ['2k5/4K3/8/3B4/2N5/8/8/8 w - - 2 2', 'c4', 'e5'],\n   ['8/8/8/3B4/2Nk1K2/8/8/8 w - - 0 1', 'd5', 'e6'],\n+  ['7k/8/4NK2/3B4/8/8/8/8 w - - 2 2', 'e6', 'd8'],\n+  ['3N4/7k/5K2/3B4/8/8/8/8 w - - 4 3', 'd8', 'f7'],\n+  ['6k1/5N2/5K2/3B4/8/8/8/8 w - - 6 4', 'd5', 'e4'],\n+  ['5k2/5N2/5K2/8/4B3/8/8/8 w - - 8 5', 'e4', 'h7'],\n+  ['4k3/5N1B/5K2/8/8/8/8/8 w - - 10 6', 'f7', 'e5'],\n+  ['3k4/7B/5K2/4N3/8/8/8/8 w - - 12 7', 'h7', 'g8'],\n ] as const).flatMap(([fen, from, to]) => SQUARE_TRANSFORMS.map(transform => [\n   transformFen(fen, transform).split(' ').slice(0, 2).join(' '),\n   transformSquare(from, transform) + transformSquare(to, transform),\n"
+  },
+  "auditDirectory": "/Users/danielcepeda/repos/_codex_output/bn-r5-line-2026-09-24",
+  "policyFingerprint": "820e280d1496b762418487e116964d4a26980a9e1b4777abd89ae3706c44035f",
+  "unsupportedOnlyCycles": {
+    "orbits": 528,
+    "physical": 4224
+  },
+  "baselineComparison": {
+    "baseline": 1159,
+    "baselinePolicy": "9fbb749008394a1503cc3c0817b932d1e814bc88",
+    "baselineBlackPolicy": "all-legal",
+    "survivors": 352,
+    "newPositions": 176
+  },
+  "previousChangeComparison": {
+    "previous": 515,
+    "survivors": 511,
+    "removed": 4,
+    "added": 17
+  },
+  "supportedOnCycles": {
+    "orbits": 175,
+    "physical": 1400
+  },
+  "unsupportedOnAnyCycle": {
+    "orbits": 563,
+    "physical": 4504
+  },
+  "unsupportedMotifs": [
+    {
+      "motif": "King-protected central bishop; knight on precage",
+      "orbits": 94,
+      "physical": 752
+    },
+    {
+      "motif": "Unprotected by king central bishop; knight on precage",
+      "orbits": 78,
+      "physical": 624
+    },
+    {
+      "motif": "Noncentral bishop not king-protected; interior king; knight on edge, unprotected by king",
+      "orbits": 59,
+      "physical": 472
+    },
+    {
+      "motif": "King-protected central bishop; knight king-protected, off precage",
+      "orbits": 41,
+      "physical": 328
+    },
+    {
+      "motif": "Noncentral bishop not king-protected; interior king; knight king-protected",
+      "orbits": 37,
+      "physical": 296
+    },
+    {
+      "motif": "Noncentral bishop king-protected; interior king; knight on edge, unprotected by king",
+      "orbits": 36,
+      "physical": 288
+    },
+    {
+      "motif": "Noncentral bishop not king-protected; central king; knight unprotected by king",
+      "orbits": 32,
+      "physical": 256
+    },
+    {
+      "motif": "Noncentral bishop not king-protected; central king; knight on edge, unprotected by king",
+      "orbits": 25,
+      "physical": 200
+    },
+    {
+      "motif": "Noncentral bishop not king-protected; central king; knight king-protected",
+      "orbits": 23,
+      "physical": 184
+    },
+    {
+      "motif": "Noncentral bishop not king-protected; interior king; knight unprotected by king",
+      "orbits": 21,
+      "physical": 168
+    },
+    {
+      "motif": "King-protected central bishop; knight unprotected by king, off precage",
+      "orbits": 13,
+      "physical": 104
+    },
+    {
+      "motif": "Noncentral bishop king-protected; central king; knight unprotected by king",
+      "orbits": 13,
+      "physical": 104
+    },
+    {
+      "motif": "Noncentral bishop not king-protected; edge king; knight unprotected by king",
+      "orbits": 12,
+      "physical": 96
+    },
+    {
+      "motif": "Noncentral bishop king-protected; interior king; knight unprotected by king",
+      "orbits": 12,
+      "physical": 96
+    },
+    {
+      "motif": "Noncentral bishop king-protected; central king; knight on edge, unprotected by king",
+      "orbits": 10,
+      "physical": 80
+    },
+    {
+      "motif": "Unprotected by king central bishop; knight king-protected, off precage",
+      "orbits": 5,
+      "physical": 40
+    },
+    {
+      "motif": "Noncentral bishop not king-protected; edge king; knight king-protected",
+      "orbits": 4,
+      "physical": 32
+    },
+    {
+      "motif": "Noncentral bishop king-protected; interior king; knight king-protected",
+      "orbits": 4,
+      "physical": 32
+    },
+    {
+      "motif": "Noncentral bishop not king-protected; edge king; knight on edge, unprotected by king",
+      "orbits": 3,
+      "physical": 24
+    },
+    {
+      "motif": "Noncentral bishop king-protected; edge king; knight king-protected",
+      "orbits": 2,
+      "physical": 16
+    },
+    {
+      "motif": "Noncentral bishop king-protected; edge king; knight unprotected by king",
+      "orbits": 2,
+      "physical": 16
+    },
+    {
+      "motif": "Noncentral bishop king-protected; edge king; knight on edge, unprotected by king",
+      "orbits": 1,
+      "physical": 8
+    },
+    {
+      "motif": "Unprotected by king central bishop; knight on edge, off precage",
+      "orbits": 1,
+      "physical": 8
+    }
+  ],
+  "supportLoss": {
+    "all": {
+      "whiteDecisions": {
+        "orbits": 35,
+        "physical": 280
+      },
+      "events": {
+        "orbits": 43,
+        "physical": 344
+      },
+      "sourcePositions": {
+        "orbits": 43,
+        "physical": 344
+      }
+    },
+    "nonMating": {
+      "whiteDecisions": {
+        "orbits": 30,
+        "physical": 240
+      },
+      "events": {
+        "orbits": 38,
+        "physical": 304
+      },
+      "sourcePositions": {
+        "orbits": 38,
+        "physical": 304
+      }
+    },
+    "mating": {
+      "whiteDecisions": {
+        "orbits": 5,
+        "physical": 40
+      },
+      "events": {
+        "orbits": 5,
+        "physical": 40
+      },
+      "sourcePositions": {
+        "orbits": 5,
+        "physical": 40
+      }
+    },
+    "playableExamples": {
+      "whiteDecisions": {
+        "orbits": 32,
+        "physical": 256
+      },
+      "events": {
+        "orbits": 40,
+        "physical": 320
+      },
+      "sourcePositions": {
+        "orbits": 40,
+        "physical": 320
+      }
+    },
+    "censusOnlyExamples": {
+      "whiteDecisions": {
+        "orbits": 3,
+        "physical": 24
+      },
+      "events": {
+        "orbits": 3,
+        "physical": 24
+      },
+      "sourcePositions": {
+        "orbits": 3,
+        "physical": 24
+      }
+    },
+    "noLegalSupportPreservingMove": {
+      "whiteDecisions": {
+        "orbits": 18,
+        "physical": 144
+      },
+      "events": {
+        "orbits": 26,
+        "physical": 208
+      },
+      "sourcePositions": {
+        "orbits": 26,
+        "physical": 208
+      }
+    },
+    "legalSupportPreservingMoveExists": {
+      "whiteDecisions": {
+        "orbits": 12,
+        "physical": 96
+      },
+      "events": {
+        "orbits": 12,
+        "physical": 96
+      },
+      "sourcePositions": {
+        "orbits": 12,
+        "physical": 96
+      }
+    },
+    "safeSupportPreservingMoveExists": {
+      "whiteDecisions": {
+        "orbits": 0,
+        "physical": 0
+      },
+      "events": {
+        "orbits": 0,
+        "physical": 0
+      },
+      "sourcePositions": {
+        "orbits": 0,
+        "physical": 0
+      }
+    },
+    "noSafeSupportPreservingMove": {
+      "whiteDecisions": {
+        "orbits": 30,
+        "physical": 240
+      },
+      "events": {
+        "orbits": 38,
+        "physical": 304
+      },
+      "sourcePositions": {
+        "orbits": 38,
+        "physical": 304
+      }
+    },
+    "canLoop": {
+      "whiteDecisions": {
+        "orbits": 28,
+        "physical": 224
+      },
+      "events": {
+        "orbits": 36,
+        "physical": 288
+      },
+      "sourcePositions": {
+        "orbits": 36,
+        "physical": 288
+      }
+    },
+    "canMate": {
+      "whiteDecisions": {
+        "orbits": 33,
+        "physical": 264
+      },
+      "events": {
+        "orbits": 41,
+        "physical": 328
+      },
+      "sourcePositions": {
+        "orbits": 41,
+        "physical": 328
+      }
+    },
+    "canFail": {
+      "whiteDecisions": {
+        "orbits": 24,
+        "physical": 192
+      },
+      "events": {
+        "orbits": 31,
+        "physical": 248
+      },
+      "sourcePositions": {
+        "orbits": 31,
+        "physical": 248
+      }
+    },
+    "bySize": [
+      {
+        "size": 3,
+        "whiteDecisions": {
+          "orbits": 3,
+          "physical": 24
+        },
+        "events": {
+          "orbits": 4,
+          "physical": 32
+        },
+        "sourcePositions": {
+          "orbits": 4,
+          "physical": 32
+        }
+      },
+      {
+        "size": 5,
+        "whiteDecisions": {
+          "orbits": 22,
+          "physical": 176
+        },
+        "events": {
+          "orbits": 29,
+          "physical": 232
+        },
+        "sourcePositions": {
+          "orbits": 29,
+          "physical": 232
+        }
+      },
+      {
+        "size": 7,
+        "whiteDecisions": {
+          "orbits": 5,
+          "physical": 40
+        },
+        "events": {
+          "orbits": 5,
+          "physical": 40
+        },
+        "sourcePositions": {
+          "orbits": 5,
+          "physical": 40
+        }
+      }
+    ],
+    "motifs": [
+      {
+        "label": "5-diagonal; Noncentral bishop not king-protected; interior king; knight unprotected by king; B moves",
+        "whiteDecisions": {
+          "orbits": 8,
+          "physical": 64
+        },
+        "events": {
+          "orbits": 12,
+          "physical": 96
+        },
+        "sourcePositions": {
+          "orbits": 12,
+          "physical": 96
+        },
+        "canLoop": {
+          "whiteDecisions": {
+            "orbits": 7,
+            "physical": 56
+          },
+          "events": {
+            "orbits": 11,
+            "physical": 88
+          },
+          "sourcePositions": {
+            "orbits": 11,
+            "physical": 88
+          }
+        },
+        "canFail": {
+          "whiteDecisions": {
+            "orbits": 4,
+            "physical": 32
+          },
+          "events": {
+            "orbits": 7,
+            "physical": 56
+          },
+          "sourcePositions": {
+            "orbits": 7,
+            "physical": 56
+          }
+        },
+        "example": {
+          "boards": [
+            4998210,
+            4998211,
+            5055555
+          ],
+          "key": "4998210,4998211,5055555",
+          "weight": 8,
+          "size": 5,
+          "moved": "B",
+          "motif": "Noncentral bishop not king-protected; interior king; knight unprotected by king",
+          "outcomes": 8,
+          "terminal": "stalemate",
+          "history": false,
+          "fresh": true,
+          "sourceKey": 4998210,
+          "beforeWhiteResult": "2k1B3/8/1N1K4/8/8/8/8/8 b - - 0 1",
+          "fen": "3kB3/8/1N1K4/8/8/8/8/8 w - - 0 1",
+          "move": "Bc6",
+          "after": "3k4/8/1NBK4/8/8/8/8/8 b - - 1 1",
+          "supportedLegalAlternatives": [],
+          "startFen": "3kB3/8/1N1K4/8/8/8/8/8 w - - 0 1",
+          "moves": [
+            "Bc6"
+          ],
+          "lossPly": 1,
+          "setupIsBest": true,
+          "url": "http://localhost:5173/mate/bishop-knight#fen=3kB3/8/1N1K4/8/8/8/8/8_w_-_-_0_1&moves=Bc6&cursor=0"
+        }
+      },
+      {
+        "label": "5-diagonal; Noncentral bishop not king-protected; interior king; knight king-protected; B moves",
+        "whiteDecisions": {
+          "orbits": 4,
+          "physical": 32
+        },
+        "events": {
+          "orbits": 6,
+          "physical": 48
+        },
+        "sourcePositions": {
+          "orbits": 6,
+          "physical": 48
+        },
+        "canLoop": {
+          "whiteDecisions": {
+            "orbits": 3,
+            "physical": 24
+          },
+          "events": {
+            "orbits": 5,
+            "physical": 40
+          },
+          "sourcePositions": {
+            "orbits": 5,
+            "physical": 40
+          }
+        },
+        "canFail": {
+          "whiteDecisions": {
+            "orbits": 3,
+            "physical": 24
+          },
+          "events": {
+            "orbits": 5,
+            "physical": 40
+          },
+          "sourcePositions": {
+            "orbits": 5,
+            "physical": 40
+          }
+        },
+        "example": {
+          "boards": [
+            4997762,
+            4997763,
+            5055107
+          ],
+          "key": "4997762,4997763,5055107",
+          "weight": 8,
+          "size": 5,
+          "moved": "B",
+          "motif": "Noncentral bishop not king-protected; interior king; knight king-protected",
+          "outcomes": 5,
+          "terminal": "",
+          "history": false,
+          "fresh": true,
+          "sourceKey": 4997762,
+          "beforeWhiteResult": "8/8/kN6/2K5/B7/8/8/8 b - - 0 1",
+          "fen": "8/8/1N6/k1K5/B7/8/8/8 w - - 0 1",
+          "move": "Bc6",
+          "after": "8/8/1NB5/k1K5/8/8/8/8 b - - 1 1",
+          "supportedLegalAlternatives": [],
+          "startFen": "8/8/1N6/k1K5/B7/8/8/8 w - - 0 1",
+          "moves": [
+            "Bc6",
+            "Ka6"
+          ],
+          "lossPly": 1,
+          "setupIsBest": true,
+          "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/1N6/k1K5/B7/8/8/8_w_-_-_0_1&moves=Bc6,Ka6&cursor=0"
+        }
+      },
+      {
+        "label": "5-diagonal; Noncentral bishop king-protected; interior king; knight unprotected by king; K moves",
+        "whiteDecisions": {
+          "orbits": 4,
+          "physical": 32
+        },
+        "events": {
+          "orbits": 4,
+          "physical": 32
+        },
+        "sourcePositions": {
+          "orbits": 4,
+          "physical": 32
+        },
+        "canLoop": {
+          "whiteDecisions": {
+            "orbits": 4,
+            "physical": 32
+          },
+          "events": {
+            "orbits": 4,
+            "physical": 32
+          },
+          "sourcePositions": {
+            "orbits": 4,
+            "physical": 32
+          }
+        },
+        "canFail": {
+          "whiteDecisions": {
+            "orbits": 4,
+            "physical": 32
+          },
+          "events": {
+            "orbits": 4,
+            "physical": 32
+          },
+          "sourcePositions": {
+            "orbits": 4,
+            "physical": 32
+          }
+        },
+        "example": {
+          "boards": [
+            5027138,
+            5027139,
+            7386435
+          ],
+          "key": "5027138,5027139,7386435",
+          "weight": 8,
+          "size": 5,
+          "moved": "K",
+          "motif": "Noncentral bishop king-protected; interior king; knight unprotected by king",
+          "outcomes": 13,
+          "terminal": "",
+          "history": false,
+          "fresh": true,
+          "sourceKey": 5027138,
+          "beforeWhiteResult": "8/8/k7/1BK5/8/2N5/8/8 b - - 0 1",
+          "fen": "8/8/8/kBK5/8/2N5/8/8 w - - 0 1",
+          "move": "Kd4",
+          "after": "8/8/8/kB6/3K4/2N5/8/8 b - - 1 1",
+          "supportedLegalAlternatives": [
+            {
+              "san": "Nd5",
+              "size": 5,
+              "best": false,
+              "safe": false,
+              "stalemate": true,
+              "capturePossible": false
+            }
+          ],
+          "startFen": "8/8/k7/2K5/B7/2N5/8/8 w - - 0 1",
+          "moves": [
+            "Bb5+",
+            "Ka5",
+            "Kd4",
+            "Kb6"
+          ],
+          "lossPly": 3,
+          "setupIsBest": false,
+          "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/k7/2K5/B7/2N5/8/8_w_-_-_0_1&moves=Bb5%2B,Ka5,Kd4,Kb6&cursor=0"
+        }
+      },
+      {
+        "label": "5-diagonal; Noncentral bishop not king-protected; interior king; knight unprotected by king; K moves",
+        "whiteDecisions": {
+          "orbits": 2,
+          "physical": 16
+        },
+        "events": {
+          "orbits": 3,
+          "physical": 24
+        },
+        "sourcePositions": {
+          "orbits": 3,
+          "physical": 24
+        },
+        "canLoop": {
+          "whiteDecisions": {
+            "orbits": 2,
+            "physical": 16
+          },
+          "events": {
+            "orbits": 3,
+            "physical": 24
+          },
+          "sourcePositions": {
+            "orbits": 3,
+            "physical": 24
+          }
+        },
+        "canFail": {
+          "whiteDecisions": {
+            "orbits": 2,
+            "physical": 16
+          },
+          "events": {
+            "orbits": 3,
+            "physical": 24
+          },
+          "sourcePositions": {
+            "orbits": 3,
+            "physical": 24
+          }
+        },
+        "example": {
+          "boards": [
+            4998466,
+            4998467,
+            7357763
+          ],
+          "key": "4998466,4998467,7357763",
+          "weight": 8,
+          "size": 5,
+          "moved": "K",
+          "motif": "Noncentral bishop not king-protected; interior king; knight unprotected by king",
+          "outcomes": 13,
+          "terminal": "",
+          "history": false,
+          "fresh": true,
+          "sourceKey": 4998466,
+          "beforeWhiteResult": "8/8/k7/2K5/B7/2N5/8/8 b - - 0 1",
+          "fen": "8/8/8/k1K5/B7/2N5/8/8 w - - 0 1",
+          "move": "Kd4",
+          "after": "8/8/8/k7/B2K4/2N5/8/8 b - - 1 1",
+          "supportedLegalAlternatives": [],
+          "startFen": "8/8/8/k1K5/B7/2N5/8/8 w - - 0 1",
+          "moves": [
+            "Kd4",
+            "Ka6"
+          ],
+          "lossPly": 1,
+          "setupIsBest": true,
+          "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/k1K5/B7/2N5/8/8_w_-_-_0_1&moves=Kd4,Ka6&cursor=0"
+        }
+      },
+      {
+        "label": "3-diagonal; Noncentral bishop king-protected; interior king; knight unprotected by king; K moves",
+        "whiteDecisions": {
+          "orbits": 1,
+          "physical": 8
+        },
+        "events": {
+          "orbits": 2,
+          "physical": 16
+        },
+        "sourcePositions": {
+          "orbits": 2,
+          "physical": 16
+        },
+        "canLoop": {
+          "whiteDecisions": {
+            "orbits": 1,
+            "physical": 8
+          },
+          "events": {
+            "orbits": 2,
+            "physical": 16
+          },
+          "sourcePositions": {
+            "orbits": 2,
+            "physical": 16
+          }
+        },
+        "canFail": {
+          "whiteDecisions": {
+            "orbits": 1,
+            "physical": 8
+          },
+          "events": {
+            "orbits": 2,
+            "physical": 16
+          },
+          "sourcePositions": {
+            "orbits": 2,
+            "physical": 16
+          }
+        },
+        "example": {
+          "boards": [
+            2892352,
+            2892360,
+            5251656
+          ],
+          "key": "2892352,2892360,5251656",
+          "weight": 8,
+          "size": 3,
+          "moved": "K",
+          "motif": "Noncentral bishop king-protected; interior king; knight unprotected by king",
+          "outcomes": 13,
+          "terminal": "",
+          "history": false,
+          "fresh": true,
+          "sourceKey": 2892352,
+          "beforeWhiteResult": "k7/1N6/B7/1K6/8/8/8/8 b - - 0 1",
+          "fen": "1k6/1N6/B7/1K6/8/8/8/8 w - - 0 1",
+          "move": "Kc4",
+          "after": "1k6/1N6/B7/8/2K5/8/8/8 b - - 1 1",
+          "supportedLegalAlternatives": [],
+          "startFen": "1k6/1N6/B7/1K6/8/8/8/8 w - - 0 1",
+          "moves": [
+            "Kc4",
+            "Kc8"
+          ],
+          "lossPly": 1,
+          "setupIsBest": true,
+          "url": "http://localhost:5173/mate/bishop-knight#fen=1k6/1N6/B7/1K6/8/8/8/8_w_-_-_0_1&moves=Kc4,Kc8&cursor=0"
+        }
+      },
+      {
+        "label": "5-diagonal; Noncentral bishop king-protected; interior king; knight unprotected by king; N moves",
+        "whiteDecisions": {
+          "orbits": 2,
+          "physical": 16
+        },
+        "events": {
+          "orbits": 2,
+          "physical": 16
+        },
+        "sourcePositions": {
+          "orbits": 2,
+          "physical": 16
+        },
+        "canLoop": {
+          "whiteDecisions": {
+            "orbits": 2,
+            "physical": 16
+          },
+          "events": {
+            "orbits": 2,
+            "physical": 16
+          },
+          "sourcePositions": {
+            "orbits": 2,
+            "physical": 16
+          }
+        },
+        "canFail": {
+          "whiteDecisions": {
+            "orbits": 2,
+            "physical": 16
+          },
+          "events": {
+            "orbits": 2,
+            "physical": 16
+          },
+          "sourcePositions": {
+            "orbits": 2,
+            "physical": 16
+          }
+        },
+        "example": {
+          "boards": [
+            2897286,
+            2897295,
+            2898383
+          ],
+          "key": "2897286,2897295,2898383",
+          "weight": 8,
+          "size": 5,
+          "moved": "N",
+          "motif": "Noncentral bishop king-protected; interior king; knight unprotected by king",
+          "outcomes": 13,
+          "terminal": "",
+          "history": false,
+          "fresh": true,
+          "sourceKey": 2897286,
+          "beforeWhiteResult": "1k2B3/4K3/1N6/8/8/8/8/8 b - - 0 1",
+          "fen": "4B3/k3K3/1N6/8/8/8/8/8 w - - 0 1",
+          "move": "Na4",
+          "after": "4B3/k3K3/8/8/N7/8/8/8 b - - 1 1",
+          "supportedLegalAlternatives": [
+            {
+              "san": "Kd6",
+              "size": 5,
+              "best": false,
+              "safe": false,
+              "stalemate": false,
+              "capturePossible": true
+            }
+          ],
+          "startFen": "4B3/k3K3/1N6/8/8/8/8/8 w - - 0 1",
+          "moves": [
+            "Na4",
+            "Ka8"
+          ],
+          "lossPly": 1,
+          "setupIsBest": true,
+          "url": "http://localhost:5173/mate/bishop-knight#fen=4B3/k3K3/1N6/8/8/8/8/8_w_-_-_0_1&moves=Na4,Ka8&cursor=0"
+        }
+      },
+      {
+        "label": "5-diagonal; Noncentral bishop not king-protected; interior king; knight unprotected by king; N moves",
+        "whiteDecisions": {
+          "orbits": 2,
+          "physical": 16
+        },
+        "events": {
+          "orbits": 2,
+          "physical": 16
+        },
+        "sourcePositions": {
+          "orbits": 2,
+          "physical": 16
+        },
+        "canLoop": {
+          "whiteDecisions": {
+            "orbits": 2,
+            "physical": 16
+          },
+          "events": {
+            "orbits": 2,
+            "physical": 16
+          },
+          "sourcePositions": {
+            "orbits": 2,
+            "physical": 16
+          }
+        },
+        "canFail": {
+          "whiteDecisions": {
+            "orbits": 2,
+            "physical": 16
+          },
+          "events": {
+            "orbits": 2,
+            "physical": 16
+          },
+          "sourcePositions": {
+            "orbits": 2,
+            "physical": 16
+          }
+        },
+        "example": {
+          "boards": [
+            3007878,
+            3007887,
+            3007247
+          ],
+          "key": "3007878,3007887,3007247",
+          "weight": 8,
+          "size": 5,
+          "moved": "N",
+          "motif": "Noncentral bishop not king-protected; interior king; knight unprotected by king",
+          "outcomes": 13,
+          "terminal": "",
+          "history": false,
+          "fresh": true,
+          "sourceKey": 3007878,
+          "beforeWhiteResult": "1k6/4K3/1N6/1B6/8/8/8/8 b - - 0 1",
+          "fen": "8/k3K3/1N6/1B6/8/8/8/8 w - - 0 1",
+          "move": "Nd7",
+          "after": "8/k2NK3/8/1B6/8/8/8/8 b - - 1 1",
+          "supportedLegalAlternatives": [
+            {
+              "san": "Kd6",
+              "size": 5,
+              "best": false,
+              "safe": false,
+              "stalemate": false,
+              "capturePossible": true
+            }
+          ],
+          "startFen": "8/k3K3/1N6/1B6/8/8/8/8 w - - 0 1",
+          "moves": [
+            "Nd7",
+            "Ka8"
+          ],
+          "lossPly": 1,
+          "setupIsBest": true,
+          "url": "http://localhost:5173/mate/bishop-knight#fen=8/k3K3/1N6/1B6/8/8/8/8_w_-_-_0_1&moves=Nd7,Ka8&cursor=0"
+        }
+      },
+      {
+        "label": "7-diagonal; Noncentral bishop king-protected; edge king; knight unprotected by king; K moves",
+        "whiteDecisions": {
+          "orbits": 1,
+          "physical": 8
+        },
+        "events": {
+          "orbits": 1,
+          "physical": 8
+        },
+        "sourcePositions": {
+          "orbits": 1,
+          "physical": 8
+        },
+        "canLoop": {
+          "whiteDecisions": {
+            "orbits": 1,
+            "physical": 8
+          },
+          "events": {
+            "orbits": 1,
+            "physical": 8
+          },
+          "sourcePositions": {
+            "orbits": 1,
+            "physical": 8
+          }
+        },
+        "canFail": {
+          "whiteDecisions": {
+            "orbits": 1,
+            "physical": 8
+          },
+          "events": {
+            "orbits": 1,
+            "physical": 8
+          },
+          "sourcePositions": {
+            "orbits": 1,
+            "physical": 8
+          }
+        },
+        "example": {
+          "boards": [
+            304772,
+            304781,
+            2401933
+          ],
+          "key": "304772,304781,2401933",
+          "weight": 8,
+          "size": 7,
+          "moved": "K",
+          "motif": "Noncentral bishop king-protected; edge king; knight unprotected by king",
+          "outcomes": 13,
+          "terminal": "",
+          "history": false,
+          "fresh": true,
+          "sourceKey": 304772,
+          "beforeWhiteResult": "8/8/8/k7/8/1B1N4/K7/8 b - - 0 1",
+          "fen": "8/8/1k6/8/8/1B1N4/K7/8 w - - 0 1",
+          "move": "Kb2",
+          "after": "8/8/1k6/8/8/1B1N4/1K6/8 b - - 1 1",
+          "supportedLegalAlternatives": [],
+          "startFen": "8/8/1k6/8/8/1B1N4/K7/8 w - - 0 1",
+          "moves": [
+            "Kb2",
+            "Ka7"
+          ],
+          "lossPly": 1,
+          "setupIsBest": true,
+          "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/1k6/8/8/1B1N4/K7/8_w_-_-_0_1&moves=Kb2,Ka7&cursor=0"
+        }
+      },
+      {
+        "label": "3-diagonal; Noncentral bishop king-protected; edge king; knight unprotected by king; B moves",
+        "whiteDecisions": {
+          "orbits": 1,
+          "physical": 8
+        },
+        "events": {
+          "orbits": 1,
+          "physical": 8
+        },
+        "sourcePositions": {
+          "orbits": 1,
+          "physical": 8
+        },
+        "canLoop": {
+          "whiteDecisions": {
+            "orbits": 1,
+            "physical": 8
+          },
+          "events": {
+            "orbits": 1,
+            "physical": 8
+          },
+          "sourcePositions": {
+            "orbits": 1,
+            "physical": 8
+          }
+        },
+        "canFail": {
+          "whiteDecisions": {
+            "orbits": 0,
+            "physical": 0
+          },
+          "events": {
+            "orbits": 0,
+            "physical": 0
+          },
+          "sourcePositions": {
+            "orbits": 0,
+            "physical": 0
+          }
+        },
+        "example": {
+          "boards": [
+            562880,
+            562888,
+            599752
+          ],
+          "key": "562880,562888,599752",
+          "weight": 8,
+          "size": 3,
+          "moved": "B",
+          "motif": "Noncentral bishop king-protected; edge king; knight unprotected by king",
+          "outcomes": 5,
+          "terminal": "",
+          "history": false,
+          "fresh": true,
+          "sourceKey": 562880,
+          "beforeWhiteResult": "k7/1B6/K7/3N4/8/8/8/8 b - - 0 1",
+          "fen": "1k6/1B6/K7/3N4/8/8/8/8 w - - 0 1",
+          "move": "Bc6",
+          "after": "1k6/8/K1B5/3N4/8/8/8/8 b - - 1 1",
+          "supportedLegalAlternatives": [
+            {
+              "san": "Kb6",
+              "size": 3,
+              "best": false,
+              "safe": false,
+              "stalemate": true,
+              "capturePossible": false
+            }
+          ],
+          "startFen": "k1B5/8/K7/3N4/8/8/8/8 w - - 0 1",
+          "moves": [
+            "Bb7+",
+            "Kb8",
+            "Bc6",
+            "Kc8"
+          ],
+          "lossPly": 3,
+          "setupIsBest": false,
+          "url": "http://localhost:5173/mate/bishop-knight#fen=k1B5/8/K7/3N4/8/8/8/8_w_-_-_0_1&moves=Bb7%2B,Kb8,Bc6,Kc8&cursor=0"
+        }
+      },
+      {
+        "label": "7-diagonal; Noncentral bishop king-protected; interior king; knight unprotected by king; K moves",
+        "whiteDecisions": {
+          "orbits": 1,
+          "physical": 8
+        },
+        "events": {
+          "orbits": 1,
+          "physical": 8
+        },
+        "sourcePositions": {
+          "orbits": 1,
+          "physical": 8
+        },
+        "canLoop": {
+          "whiteDecisions": {
+            "orbits": 1,
+            "physical": 8
+          },
+          "events": {
+            "orbits": 1,
+            "physical": 8
+          },
+          "sourcePositions": {
+            "orbits": 1,
+            "physical": 8
+          }
+        },
+        "canFail": {
+          "whiteDecisions": {
+            "orbits": 1,
+            "physical": 8
+          },
+          "events": {
+            "orbits": 1,
+            "physical": 8
+          },
+          "sourcePositions": {
+            "orbits": 1,
+            "physical": 8
+          }
+        },
+        "example": {
+          "boards": [
+            2700941,
+            2700950,
+            4798102
+          ],
+          "key": "2700941,2700950,4798102",
+          "weight": 8,
+          "size": 7,
+          "moved": "K",
+          "motif": "Noncentral bishop king-protected; interior king; knight unprotected by king",
+          "outcomes": 13,
+          "terminal": "",
+          "history": false,
+          "fresh": true,
+          "sourceKey": 2700941,
+          "beforeWhiteResult": "8/8/1k6/8/2B5/1K1N4/8/8 b - - 0 1",
+          "fen": "8/2k5/8/8/2B5/1K1N4/8/8 w - - 0 1",
+          "move": "Kc3",
+          "after": "8/2k5/8/8/2B5/2KN4/8/8 b - - 1 1",
+          "supportedLegalAlternatives": [],
+          "startFen": "8/2k5/8/8/2B5/1K1N4/8/8 w - - 0 1",
+          "moves": [
+            "Kc3",
+            "Kb8"
+          ],
+          "lossPly": 1,
+          "setupIsBest": true,
+          "url": "http://localhost:5173/mate/bishop-knight#fen=8/2k5/8/8/2B5/1K1N4/8/8_w_-_-_0_1&moves=Kc3,Kb8&cursor=0"
+        }
+      },
+      {
+        "label": "3-diagonal; Noncentral bishop king-protected; interior king; knight on edge, unprotected by king; N moves",
+        "whiteDecisions": {
+          "orbits": 1,
+          "physical": 8
+        },
+        "events": {
+          "orbits": 1,
+          "physical": 8
+        },
+        "sourcePositions": {
+          "orbits": 1,
+          "physical": 8
+        },
+        "canLoop": {
+          "whiteDecisions": {
+            "orbits": 1,
+            "physical": 8
+          },
+          "events": {
+            "orbits": 1,
+            "physical": 8
+          },
+          "sourcePositions": {
+            "orbits": 1,
+            "physical": 8
+          }
+        },
+        "canFail": {
+          "whiteDecisions": {
+            "orbits": 1,
+            "physical": 8
+          },
+          "events": {
+            "orbits": 1,
+            "physical": 8
+          },
+          "sourcePositions": {
+            "orbits": 1,
+            "physical": 8
+          }
+        },
+        "example": {
+          "boards": [
+            2891777,
+            2891784,
+            2892424
+          ],
+          "key": "2891777,2891784,2892424",
+          "weight": 8,
+          "size": 3,
+          "moved": "N",
+          "motif": "Noncentral bishop king-protected; interior king; knight on edge, unprotected by king",
+          "outcomes": 13,
+          "terminal": "",
+          "history": false,
+          "fresh": true,
+          "sourceKey": 2891777,
+          "beforeWhiteResult": "N7/k7/B7/1K6/8/8/8/8 b - - 0 1",
+          "fen": "Nk6/8/B7/1K6/8/8/8/8 w - - 0 1",
+          "move": "Nb6",
+          "after": "1k6/8/BN6/1K6/8/8/8/8 b - - 1 1",
+          "supportedLegalAlternatives": [
+            {
+              "san": "Kb6",
+              "size": 3,
+              "best": false,
+              "safe": false,
+              "stalemate": false,
+              "capturePossible": true
+            }
+          ],
+          "startFen": "Nk6/8/B7/1K6/8/8/8/8 w - - 0 1",
+          "moves": [
+            "Nb6",
+            "Kc7"
+          ],
+          "lossPly": 1,
+          "setupIsBest": true,
+          "url": "http://localhost:5173/mate/bishop-knight#fen=Nk6/8/B7/1K6/8/8/8/8_w_-_-_0_1&moves=Nb6,Kc7&cursor=0"
+        }
+      },
+      {
+        "label": "7-diagonal; Noncentral bishop king-protected; interior king; knight king-protected; N moves",
+        "whiteDecisions": {
+          "orbits": 1,
+          "physical": 8
+        },
+        "events": {
+          "orbits": 1,
+          "physical": 8
+        },
+        "sourcePositions": {
+          "orbits": 1,
+          "physical": 8
+        },
+        "canLoop": {
+          "whiteDecisions": {
+            "orbits": 1,
+            "physical": 8
+          },
+          "events": {
+            "orbits": 1,
+            "physical": 8
+          },
+          "sourcePositions": {
+            "orbits": 1,
+            "physical": 8
+          }
+        },
+        "canFail": {
+          "whiteDecisions": {
+            "orbits": 1,
+            "physical": 8
+          },
+          "events": {
+            "orbits": 1,
+            "physical": 8
+          },
+          "sourcePositions": {
+            "orbits": 1,
+            "physical": 8
+          }
+        },
+        "example": {
+          "boards": [
+            5023363,
+            5023362,
+            5022978
+          ],
+          "key": "5023363,5023362,5022978",
+          "weight": 8,
+          "size": 7,
+          "moved": "N",
+          "motif": "Noncentral bishop king-protected; interior king; knight king-protected",
+          "outcomes": 13,
+          "terminal": "",
+          "history": false,
+          "fresh": true,
+          "sourceKey": 5023363,
+          "beforeWhiteResult": "8/8/8/8/k1K5/1B1N4/8/8 b - - 0 1",
+          "fen": "8/8/8/8/2K5/kB1N4/8/8 w - - 0 1",
+          "move": "Nc5",
+          "after": "8/8/8/2N5/2K5/kB6/8/8 b - - 1 1",
+          "supportedLegalAlternatives": [
+            {
+              "san": "Kc3",
+              "size": 7,
+              "best": false,
+              "safe": false,
+              "stalemate": true,
+              "capturePossible": false
+            }
+          ],
+          "startFen": "8/8/8/8/k1K5/3N4/B7/8 w - - 0 1",
+          "moves": [
+            "Bb3+",
+            "Ka3",
+            "Nc5",
+            "Kb2"
+          ],
+          "lossPly": 3,
+          "setupIsBest": false,
+          "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/8/k1K5/3N4/B7/8_w_-_-_0_1&moves=Bb3%2B,Ka3,Nc5,Kb2&cursor=0"
+        }
+      },
+      {
+        "label": "7-diagonal; Noncentral bishop king-protected; interior king; knight unprotected by king; N moves",
+        "whiteDecisions": {
+          "orbits": 1,
+          "physical": 8
+        },
+        "events": {
+          "orbits": 1,
+          "physical": 8
+        },
+        "sourcePositions": {
+          "orbits": 1,
+          "physical": 8
+        },
+        "canLoop": {
+          "whiteDecisions": {
+            "orbits": 1,
+            "physical": 8
+          },
+          "events": {
+            "orbits": 1,
+            "physical": 8
+          },
+          "sourcePositions": {
+            "orbits": 1,
+            "physical": 8
+          }
+        },
+        "canFail": {
+          "whiteDecisions": {
+            "orbits": 1,
+            "physical": 8
+          },
+          "events": {
+            "orbits": 1,
+            "physical": 8
+          },
+          "sourcePositions": {
+            "orbits": 1,
+            "physical": 8
+          }
+        },
+        "example": {
+          "boards": [
+            5024515,
+            5024514,
+            5023426
+          ],
+          "key": "5024515,5024514,5023426",
+          "weight": 8,
+          "size": 7,
+          "moved": "N",
+          "motif": "Noncentral bishop king-protected; interior king; knight unprotected by king",
+          "outcomes": 13,
+          "terminal": "",
+          "history": false,
+          "fresh": true,
+          "sourceKey": 5024515,
+          "beforeWhiteResult": "4k3/5B2/4K3/8/8/3N4/8/8 b - - 0 1",
+          "fen": "5k2/5B2/4K3/8/8/3N4/8/8 w - - 0 1",
+          "move": "Ne5",
+          "after": "5k2/5B2/4K3/4N3/8/8/8/8 b - - 1 1",
+          "supportedLegalAlternatives": [
+            {
+              "san": "Kf6",
+              "size": 7,
+              "best": false,
+              "safe": false,
+              "stalemate": true,
+              "capturePossible": false
+            }
+          ],
+          "startFen": "5k2/5B2/4K3/8/8/3N4/8/8 w - - 0 1",
+          "moves": [
+            "Ne5",
+            "Kg7"
+          ],
+          "lossPly": 1,
+          "setupIsBest": true,
+          "url": "http://localhost:5173/mate/bishop-knight#fen=5k2/5B2/4K3/8/8/3N4/8/8_w_-_-_0_1&moves=Ne5,Kg7&cursor=0"
+        }
+      },
+      {
+        "label": "7-diagonal; King-protected central bishop; knight king-protected, off precage; K moves",
+        "whiteDecisions": {
+          "orbits": 1,
+          "physical": 8
+        },
+        "events": {
+          "orbits": 1,
+          "physical": 8
+        },
+        "sourcePositions": {
+          "orbits": 1,
+          "physical": 8
+        },
+        "canLoop": {
+          "whiteDecisions": {
+            "orbits": 1,
+            "physical": 8
+          },
+          "events": {
+            "orbits": 1,
+            "physical": 8
+          },
+          "sourcePositions": {
+            "orbits": 1,
+            "physical": 8
+          }
+        },
+        "canFail": {
+          "whiteDecisions": {
+            "orbits": 1,
+            "physical": 8
+          },
+          "events": {
+            "orbits": 1,
+            "physical": 8
+          },
+          "sourcePositions": {
+            "orbits": 1,
+            "physical": 8
+          }
+        },
+        "example": {
+          "boards": [
+            5097110,
+            5097119,
+            7194271
+          ],
+          "key": "5097110,5097119,7194271",
+          "weight": 8,
+          "size": 7,
+          "moved": "K",
+          "motif": "King-protected central bishop; knight king-protected, off precage",
+          "outcomes": 13,
+          "terminal": "",
+          "history": false,
+          "fresh": true,
+          "sourceKey": 5097110,
+          "beforeWhiteResult": "8/2k5/8/3B4/2K5/3N4/8/8 b - - 0 1",
+          "fen": "3k4/8/8/3B4/2K5/3N4/8/8 w - - 0 1",
+          "move": "Kd4",
+          "after": "3k4/8/8/3B4/3K4/3N4/8/8 b - - 1 1",
+          "supportedLegalAlternatives": [],
+          "startFen": "3k4/8/8/3B4/2K5/3N4/8/8 w - - 0 1",
+          "moves": [
+            "Kd4",
+            "Ke8"
+          ],
+          "lossPly": 1,
+          "setupIsBest": true,
+          "url": "http://localhost:5173/mate/bishop-knight#fen=3k4/8/8/3B4/2K5/3N4/8/8_w_-_-_0_1&moves=Kd4,Ke8&cursor=0"
+        }
+      }
+    ]
+  },
+  "examples": {
+    "unsupported": [
+      {
+        "motif": "King-protected central bishop; knight on precage",
+        "positions": 94,
+        "examples": [
+          {
+            "fen": "8/5k2/4N3/3BK3/8/8/8/8 w - - 0 1",
+            "moves": [
+              "Kf5",
+              "Ke8",
+              "Kf6",
+              "Kd7",
+              "Kf7",
+              "Kd6",
+              "Ba2",
+              "Ke5",
+              "Ke7",
+              "Kf5",
+              "Kd6",
+              "Kf6",
+              "Kd5",
+              "Kf7",
+              "Ke5",
+              "Kg8",
+              "Bd5",
+              "Kf7"
+            ],
+            "d": 10,
+            "phases": [
+              99,
+              99,
+              99,
+              99,
+              99,
+              99,
+              99,
+              99,
+              99
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=8/5k2/4N3/3BK3/8/8/8/8_w_-_-_0_1&moves=Kf5,Ke8,Kf6,Kd7,Kf7,Kd6,Ba2,Ke5,Ke7,Kf5,Kd6,Kf6,Kd5,Kf7,Ke5,Kg8,Bd5,Kf7&cursor=0",
+            "motif": "King-protected central bishop; knight on precage"
+          },
+          {
+            "fen": "8/6k1/8/3BK3/2N5/8/8/8 w - - 0 1",
+            "moves": [
+              "Ke6",
+              "Kg6",
+              "Nd6",
+              "Kg7",
+              "Ke5",
+              "Kh8",
+              "Nc4",
+              "Kg7"
+            ],
+            "d": 2,
+            "phases": [
+              99,
+              99,
+              99,
+              99
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=8/6k1/8/3BK3/2N5/8/8/8_w_-_-_0_1&moves=Ke6,Kg6,Nd6,Kg7,Ke5,Kh8,Nc4,Kg7&cursor=0",
+            "motif": "King-protected central bishop; knight on precage"
+          },
+          {
+            "fen": "8/4k3/4N3/3B4/4K3/8/8/8 w - - 0 1",
+            "moves": [
+              "Ke5",
+              "Ke8",
+              "Kf6",
+              "Kd7",
+              "Kf7",
+              "Kd6",
+              "Ba2",
+              "Ke5",
+              "Ke7",
+              "Kf5",
+              "Kd6",
+              "Kf6",
+              "Kd5",
+              "Kf5",
+              "Kd4",
+              "Kg6",
+              "Bd5",
+              "Kf6",
+              "Ke4",
+              "Ke7"
+            ],
+            "d": 10,
+            "phases": [
+              99,
+              99,
+              99,
+              99,
+              99,
+              99,
+              99,
+              99,
+              99,
+              99
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=8/4k3/4N3/3B4/4K3/8/8/8_w_-_-_0_1&moves=Ke5,Ke8,Kf6,Kd7,Kf7,Kd6,Ba2,Ke5,Ke7,Kf5,Kd6,Kf6,Kd5,Kf5,Kd4,Kg6,Bd5,Kf6,Ke4,Ke7&cursor=0",
+            "motif": "King-protected central bishop; knight on precage"
+          }
+        ]
+      }
+    ],
+    "supported": [
+      {
+        "motif": "7-diagonal; Noncentral bishop not king-protected; interior king; knight unprotected by king",
+        "positions": 60,
+        "examples": [
+          {
+            "fen": "4k1B1/8/4K3/8/8/3N4/8/8 w - - 0 1",
+            "moves": [
+              "Bf7+",
+              "Kd8",
+              "Bg8",
+              "Ke8"
+            ],
+            "d": 0,
+            "phases": [
+              7,
+              7
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=4k1B1/8/4K3/8/8/3N4/8/8_w_-_-_0_1&moves=Bf7%2B,Kd8,Bg8,Ke8&cursor=0",
+            "motif": "Noncentral bishop not king-protected; interior king; knight unprotected by king"
+          },
+          {
+            "fen": "8/8/3K4/1k6/8/1B1N4/8/8 w - - 0 1",
+            "moves": [
+              "Kd5",
+              "Kb6",
+              "Ba4",
+              "Kc7",
+              "Bb3",
+              "Kb7",
+              "Ke6",
+              "Kb6",
+              "Kd6",
+              "Kb5"
+            ],
+            "d": 0,
+            "phases": [
+              7,
+              5,
+              7,
+              7,
+              7
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/3K4/1k6/8/1B1N4/8/8_w_-_-_0_1&moves=Kd5,Kb6,Ba4,Kc7,Bb3,Kb7,Ke6,Kb6,Kd6,Kb5&cursor=0",
+            "motif": "Noncentral bishop not king-protected; interior king; knight unprotected by king"
+          },
+          {
+            "fen": "3k4/8/4K3/8/8/1B1N4/8/8 w - - 0 1",
+            "moves": [
+              "Ba4",
+              "Kc7",
+              "Bb3",
+              "Kb6",
+              "Kd6",
+              "Kb5",
+              "Kd5",
+              "Kb6",
+              "Ba4",
+              "Kc7",
+              "Bb3",
+              "Kd7",
+              "Ke5",
+              "Ke8",
+              "Ke6",
+              "Kd8"
+            ],
+            "d": 0,
+            "phases": [
+              5,
+              7,
+              7,
+              7,
+              5,
+              7,
+              7,
+              7
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=3k4/8/4K3/8/8/1B1N4/8/8_w_-_-_0_1&moves=Ba4,Kc7,Bb3,Kb6,Kd6,Kb5,Kd5,Kb6,Ba4,Kc7,Bb3,Kd7,Ke5,Ke8,Ke6,Kd8&cursor=0",
+            "motif": "Noncentral bishop not king-protected; interior king; knight unprotected by king"
+          }
+        ]
+      }
+    ],
+    "losses": [
+      {
+        "motif": "5-diagonal; Noncentral bishop not king-protected; interior king; knight unprotected by king; B moves",
+        "positions": 12,
+        "examples": [
+          {
+            "fen": "8/8/k1K5/8/B7/4N3/8/8 w - - 0 1",
+            "moves": [
+              "Kc5",
+              "Ka5",
+              "Bc6",
+              "Ka6"
+            ],
+            "d": 1,
+            "phases": [
+              5,
+              99
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/k1K5/8/B7/4N3/8/8_w_-_-_0_1&moves=Kc5,Ka5,Bc6,Ka6&cursor=0"
+          },
+          {
+            "fen": "2k1B3/8/2K5/8/8/2N5/8/8 w - - 0 1",
+            "moves": [
+              "Kd6",
+              "Kd8",
+              "Bc6",
+              "Kc8"
+            ],
+            "d": 1,
+            "phases": [
+              5,
+              99
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=2k1B3/8/2K5/8/8/2N5/8/8_w_-_-_0_1&moves=Kd6,Kd8,Bc6,Kc8&cursor=0"
+          },
+          {
+            "fen": "2k1B3/8/2K5/8/8/4N3/8/8 w - - 0 1",
+            "moves": [
+              "Kd6",
+              "Kd8",
+              "Bc6",
+              "Kc8"
+            ],
+            "d": 1,
+            "phases": [
+              5,
+              99
+            ],
+            "url": "http://localhost:5173/mate/bishop-knight#fen=2k1B3/8/2K5/8/8/4N3/8/8_w_-_-_0_1&moves=Kd6,Kd8,Bc6,Kc8&cursor=0"
+          }
+        ]
+      }
+    ]
+  },
+  "validation": {
+    "tests": "bishopKnightPreparation.test.ts: 4 passed, new six-move line checked across all eight D4 transforms",
+    "typescript": "tsc -b passed"
+  }
+}

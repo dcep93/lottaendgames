@@ -92,3 +92,26 @@ test('r5 prescribes Be6 only for the declared placement across D4', () => {
     assert.equal(knightAndBishopDeclaredPreparationMove(transformFen('8/8/8/3B4/2N2K2/3k4/8/8 w - - 0 1', transform)), undefined)
   }
 })
+
+
+test('r5 prescribes moves 2–7 of the Kh7 line across D4, regardless of counters', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    const original = getChess('8/7k/4N3/3BK3/8/8/8/8 w - - 0 1')
+    for (const [index, san] of [
+      'Kf6', 'Kh8', 'Nd8', 'Kh7', 'Nf7', 'Kg8', 'Be4', 'Kf8',
+      'Bh7', 'Ke8', 'Ne5', 'Kd8', 'Bg8', 'Ke8',
+    ].entries()) {
+      const before = original.fen()
+      const move = original.move(san)
+      if (index < 2 || index % 2 !== 0) continue
+      const fen = transformFen(before, transform)
+      const from = transformSquare(move.from, transform)
+      const to = transformSquare(move.to, transform)
+      const expected = getChess(fen).move({ from, to }).san
+      assert.equal(knightAndBishopDeclaredPreparationMove(fen), from + to)
+      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [expected])
+      const resetCounters = fen.split(' ').slice(0, 4).join(' ') + ' 0 1'
+      assert.equal(knightAndBishopDeclaredPreparationMove(resetCounters), from + to)
+    }
+  }
+})
