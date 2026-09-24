@@ -7,6 +7,20 @@ import { getIdealKnightAndBishopWhiteMoves, scoreKnightAndBishopWhiteMove } from
 
 const sixDiagonal = ['a3', 'b4', 'c5', 'd6', 'e7', 'f8'] as const
 
+test('five-diagonal with an approaching knight requires kings within two steps, across D4', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    const board = getChess(transformFen('1k3K2/8/8/1B6/8/4N3/8/8 w - - 0 1', transform))
+    const before = board.fen()
+    const move = board.move({from: transformSquare('f8', transform), to: transformSquare('e7', transform)}).san
+    assert.equal(knightAndBishopSupportedDiagonal(board.fen()).size, 99)
+    assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 99)
+    // At two steps, the approaching knight may still support the cage.
+    assert.equal(knightAndBishopSupportedDiagonal(transformFen('3k4/8/3K4/1B6/8/4N3/8/8 b - - 0 1', transform)).size, 5)
+    // An occupied seven square retains the existing remote-king declaration.
+    assert.equal(knightAndBishopSupportedDiagonal(transformFen('1k6/4K3/8/1B6/8/3N4/8/8 b - - 0 1', transform)).size, 5)
+  }
+})
+
 test('an off-support knight cannot support five with White level with or left of Black, even on the edge', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     const before = transformFen('8/8/8/k7/BN6/8/K7/8 w - - 0 1', transform)
@@ -652,8 +666,8 @@ test('an undefended near-side five-bishop needs a king response to Kb6 with c5 u
     for (const [allowed, expected] of [
       // The old remote-king case now fails the universal distance limit.
       ['8/k7/2B1K3/8/5N2/8/8/8 b - - 0 1', 99],
-      // Kd6 already controls c5.
-      ['8/k7/3K4/8/B4N2/8/8/8 b - - 0 1', 5],
+      // Kd6 controls c5, but kings three steps apart now disqualify Nf4.
+      ['8/k7/3K4/8/B4N2/8/8/8 b - - 0 1', 99],
       // Knight defense does not waive the universal distance limit.
       ['8/k7/2B1K3/8/1N6/8/8/8 b - - 0 1', 99],
       // From b8 Black cannot reach b6 next move.
@@ -796,7 +810,8 @@ test('one-move knight support requires an empty destination in every orientation
       ['8/8/8/8/2B5/k7/1NK5/8 b - - 3 2', 99],
       // Kd5 blocks Nf4 from reaching the five-diagonal support square.
       ['k7/8/8/1B1K4/5N2/8/8/8 b - - 1 1', 99],
-      ['k7/8/8/1BK5/5N2/8/8/8 b - - 1 1', 5],
+      // Even an empty target cannot rescue an approaching knight with remote kings.
+      ['k7/8/8/1BK5/5N2/8/8/8 b - - 1 1', 99],
       // Occupation by the supporting knight itself remains valid.
       ['k7/8/8/1BKN4/8/8/8/8 b - - 1 1', 5],
     ] as const) assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, expected, fen)

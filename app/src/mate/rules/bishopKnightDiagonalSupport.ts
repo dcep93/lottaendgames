@@ -318,6 +318,11 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
     (pattern.previousSupport && (knight.square === pattern.previousSupport || isKnightMove(knight.square, pattern.previousSupport))))) {
     return {size: 99, knight: 99}
   }
+  // An approaching knight needs nearby kings; only an occupied five/seven
+  // support square can sustain a five-diagonal with kings farther apart.
+  if (fivePatterns.length && kingDistance(white.square, black.square) > 2 &&
+    !fivePatterns.some(pattern => pattern.support.includes(knight.square) ||
+      pattern.previousSupport === knight.square)) return {size: 99, knight: 99}
   const declaredWhitePlacement = DECLARED_FIVE_WHITE_PLACEMENTS.find(pattern =>
     pattern.king === white.square && pattern.bishop === bishop.square && pattern.knight === knight.square)
   if (declaredWhitePlacement) return {
