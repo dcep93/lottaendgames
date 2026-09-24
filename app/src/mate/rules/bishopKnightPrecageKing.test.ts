@@ -20,7 +20,7 @@ test('r5.1 activates before White moves and does not reward disabling its condit
   assert.equal(scoreKnightAndBishopWhiteMove(position,'Ne3').precageKingDistanceSquared, 32)
   for (const [fen,move] of [
     ['8/6k1/3B4/8/2N5/2K5/8/8 w - - 0 1','Kd4'],
-    ['8/6k1/8/3B4/8/2KN4/8/8 w - - 0 1','Kd4'],
+    ['8/6k1/8/3B4/8/2K1N3/8/8 w - - 0 1','Kd4'],
   ]) assert.equal(scoreKnightAndBishopWhiteMove(fen!,move!).precageKingDistanceSquared,0)
 })
 
@@ -31,6 +31,16 @@ test('r5.1 prefers direct king proximity in the loaded position across D4', () =
     const fen = transformFen(start,t)
     const san = getChess(fen).move({from:transformSquare('e5',t),to:transformSquare('e6',t)}).san
     assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[san])
+    assert.equal(scoreKnightAndBishopWhiteMove(fen,san).precageKingDistanceSquared,5)
+  }
+})
+
+
+test('r5.1 activates for Nd3 with Bd5 even without bishop adjacency, across D4', () => {
+  const start='8/4k3/8/3BK3/8/3N4/8/8 w - - 0 1'
+  for (const t of SQUARE_TRANSFORMS) {
+    const fen=transformFen(start,t)
+    const san=getChess(fen).move({from:transformSquare('e5',t),to:transformSquare('f5',t)}).san
     assert.equal(scoreKnightAndBishopWhiteMove(fen,san).precageKingDistanceSquared,5)
   }
 })

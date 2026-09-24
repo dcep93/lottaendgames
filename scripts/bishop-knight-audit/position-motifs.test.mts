@@ -10,6 +10,8 @@ test('audit precage labels match production on either side of the bishop across 
     '8/8/8/3BK3/2N5/2k5/8/8 w - - 0 1',
     '8/8/4N3/3BK3/8/2k5/8/8 w - - 0 1',
     '8/8/8/3BK3/3N4/2k5/8/8 w - - 0 1',
+    '8/8/8/3BK3/8/2kN4/8/8 w - - 0 1',
+    '8/8/8/3BKN2/8/2k5/8/8 w - - 0 1',
   ]) for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen(original, t);
     const expected = knightAndBishopKnightTargetSquares(fen).includes(findPiece(fen, 'w', 'n')!.square);

@@ -45,7 +45,7 @@ test('r9.99 prefers Nc5 toward d3 across D4', () => {
 })
 
 
-test('r9.99 prefers Nc5 over Nd4 with the king on e5 across D4', () => {
+test('r9.99 favors Nc5 over Nd4 but r8 preserves a shared precage target with Be4 across D4', () => {
   const start = '8/8/4N1k1/3BK3/8/8/8/8 w - - 0 1'
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen(start,t)
@@ -54,6 +54,7 @@ test('r9.99 prefers Nc5 over Nd4 with the king on e5 across D4', () => {
     assert.equal(closer.oppositePrecageDistance,1)
     assert.equal(farther.oppositePrecageDistance,3)
     assert.ok(rule.compare!(closer,farther)<0)
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[san('c5')])
+    const bishopMove = getChess(fen).move({from:transformSquare('d5',t),to:transformSquare('e4',t)}).san
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[bishopMove])
   }
 })

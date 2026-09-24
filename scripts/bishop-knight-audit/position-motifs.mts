@@ -1,4 +1,5 @@
-import { unpack, distance, square } from './encoding.mts';
+import { unpack, distance, square, fen } from './encoding.mts';
+import { knightAndBishopKnightTargetSquares } from '../../app/src/mate/rules/bishopKnightStrategy.ts';
 export type CyclicPlacement = {key: number; weight: number; size: number; families: number[]};
 const central = new Set([27, 28, 35, 36]);
 const region = (s: number) => central.has(s) ? 'central' : s % 8 === 0 || s % 8 === 7 || s < 8 || s >= 56 ? 'edge' : 'interior';
@@ -29,9 +30,7 @@ export function piecePositionMotif(key: number): string {
     const [king, bishop, knight] = unpack(key);
     const kingProtectsBishop = distance(king, bishop) === 1;
     if (central.has(bishop)) {
-        const dx = (knight & 7) - (bishop & 7), dy = (knight >> 3) - (bishop >> 3);
-        const precage = Math.abs(dx) === 1 && Math.abs(dy) === 1 && !central.has(knight)
-            && (knight & 7) !== (knight >> 3) && (knight & 7) + (knight >> 3) !== 7;
+        const precage = knightAndBishopKnightTargetSquares(fen(key)).includes(square(knight));
         return `${kingProtectsBishop ? 'King-protected' : 'Unprotected by king'} central bishop; knight ${precage ? 'on precage' : distance(king, knight) === 1 ? 'king-protected, off precage' : region(knight) === 'edge' ? 'on edge, off precage' : 'unprotected by king, off precage'}`;
     }
     return `Noncentral bishop ${kingProtectsBishop ? 'king-protected' : 'not king-protected'}; ${region(king)} king; knight ${distance(king, knight) === 1 ? 'king-protected' : region(knight) === 'edge' ? 'on edge, unprotected by king' : 'unprotected by king'}`;

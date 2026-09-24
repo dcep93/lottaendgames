@@ -125,20 +125,6 @@ const knightDistances = new Map(squares.map(start => {
 export function knightAndBishopKnightTargetSquares(fen: string): Square[] {
   const bishop = findPiece(fen, 'w', 'b')
   if (!bishop || !CENTRAL_SQUARES.includes(bishop.square)) return []
-  const center = squareCoords(bishop.square)
-  return squares.filter(square => {
-    const target = squareCoords(square)
-    return Math.abs(target.file - center.file) === 1 &&
-      Math.abs(target.rank - center.rank) === 1 &&
-      !CENTRAL_SQUARES.includes(square) &&
-      target.file !== target.rank && target.file + target.rank !== 7
-  })
-}
-
-// r9.99 can approach either same-color central bishop setup.
-export function knightAndBishopPrecageApproachSquares(fen: string): Square[] {
-  const bishop = findPiece(fen, 'w', 'b')
-  if (!bishop || !CENTRAL_SQUARES.includes(bishop.square)) return []
   const centers = CENTRAL_SQUARES.filter(square => squareColor(square) === squareColor(bishop.square)).map(squareCoords)
   return squares.filter(square => {
     const target = squareCoords(square)
