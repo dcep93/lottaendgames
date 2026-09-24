@@ -7,32 +7,15 @@ import { getIdealKnightAndBishopWhiteMoves, scoreKnightAndBishopWhiteMove } from
 
 const sixDiagonal = ['a3', 'b4', 'c5', 'd6', 'e7', 'f8'] as const
 
-test('seven-diagonal Nd3 rejects White below bishop when Black is above White across D4', () => {
+test('seven-diagonal support has no relative-rank restriction, across D4', () => {
   for (const transform of SQUARE_TRANSFORMS) {
-    const before = transformFen('8/2k5/8/3B4/8/1K1N4/8/8 w - - 0 1', transform)
-    const board = getChess(before)
-    const move = board.move({from: transformSquare('b3', transform), to: transformSquare('c4', transform)}).san
-    assert.deepEqual(knightAndBishopSupportedDiagonal(board.fen()), {size: 99, knight: 99})
-    assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 99)
-    for (const [fen, size] of [
-      // The restriction follows the bishop rank, not a fixed rank cutoff.
-      ['8/8/2k5/8/8/1B1N4/1K6/8 b - - 0 1', 99],
-      // Equal rank remains eligible when all other support conditions pass.
-      ['8/8/8/k7/8/1BKN4/8/8 b - - 0 1', 7],
-      ['8/3k4/5K2/8/8/1B1N4/8/8 b - - 0 1', 7],
-      // Black level with White does not trigger the strict-above condition.
-      ['6B1/4k1K1/8/8/8/3N4/8/8 b - - 0 1', 7],
-      // Black level with the bishop is still above White and rejects support.
-      ['8/8/8/1k1B4/3K4/3N4/8/8 b - - 0 1', 99],
-      // Loaded Kd4 with Bf7: Black a7 is above White even though level with bishop.
-      ['8/k4B2/8/8/3K4/3N4/8/8 b - - 0 1', 99],
-      // Black between the ranks also disqualifies support.
-      ['8/5B2/8/1k6/3K4/3N4/8/8 b - - 0 1', 99],
-      // Black below White leaves the placement eligible.
-      ['6B1/6K1/3k4/8/8/3N4/8/8 b - - 0 1', 7],
-      // Five-diagonal support is unaffected.
-      ['8/3B4/1k1K4/8/8/3N4/8/8 b - - 0 1', 5],
-    ] as const) assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, size, fen)
+    // White below the bishop and Black above White, with Black on either side of the bishop rank.
+    for (const fen of [
+      '8/2k5/8/3B4/2K5/3N4/8/8 b - - 0 1',
+      '8/k4B2/8/8/3K4/3N4/8/8 b - - 0 1',
+      '8/5B2/8/1k6/3K4/3N4/8/8 b - - 0 1',
+      '6B1/4k1K1/8/8/8/3N4/8/8 b - - 0 1',
+    ]) assert.equal(knightAndBishopSupportedDiagonal(transformFen(fen, transform)).size, 7, fen)
   }
 })
 
@@ -559,8 +542,7 @@ test('a seven-diagonal is unsupported when Black can step onto a square screened
     assert.equal(knightAndBishopSupportedDiagonal(screened.fen()).size, 99)
     assert.equal(scoreKnightAndBishopWhiteMove(fen, move).supportedDiagonalSizeScore, 99)
     const noEntry = transformFen('8/k7/8/3B4/2K5/3N4/8/8 b - - 0 1', transform)
-    // No immediate entry is insufficient when White is below the bishop.
-    assert.equal(knightAndBishopSupportedDiagonal(noEntry).size, 99)
+    assert.equal(knightAndBishopSupportedDiagonal(noEntry).size, 7)
   }
 })
 
@@ -980,9 +962,11 @@ test('seven support requires the matching occupied knight square in all reflecti
   for (const transform of SQUARE_TRANSFORMS) {
     // Former Ne7+ loop: one move from reflected f5 is insufficient.
     assert.equal(knightAndBishopSupportedDiagonal(transformFen('8/4N3/2k5/8/8/3K4/B7/8 b - - 3 2', transform)).size, 99)
-    // The mirrored Nf5 placement fails when Black is above White in that orientation.
-    assert.deepEqual(knightAndBishopSupportedDiagonal(transformFen('8/8/8/8/1k1K4/3N4/B7/8 b - - 1 1', transform)), {size: 7, knight: 0})
-    assert.deepEqual(knightAndBishopSupportedDiagonal(transformFen('8/8/2k5/5N2/8/3K4/B7/8 b - - 3 2', transform)), {size: 99, knight: 99})
+    // Canonical d3 and its alternate f5 orientation both retain support when occupied.
+    for (const fen of [
+      '8/8/8/8/1k1K4/3N4/B7/8 b - - 1 1',
+      '8/8/2k5/5N2/8/3K4/B7/8 b - - 3 2',
+    ]) assert.deepEqual(knightAndBishopSupportedDiagonal(transformFen(fen, transform)), {size: 7, knight: 0})
   }
 })
 
@@ -1442,8 +1426,8 @@ test('Ka2 Nd3 automatically disqualifies support, including D4 equivalents', () 
     const move = board.move({from: transformSquare('a4', transform), to: transformSquare('b3', transform)}).san
     assert.deepEqual(knightAndBishopSupportedDiagonal(board.fen()), {size: 99, knight: 99})
     assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 99)
-    // Kb2 is off the forbidden square, but is still below Bb3.
-    assert.equal(knightAndBishopSupportedDiagonal(transformFen('8/8/8/k7/8/1B1N4/1K6/8 b - - 0 1', transform)).size, 99)
+    // Moving the king off the declared square can still establish support.
+    assert.equal(knightAndBishopSupportedDiagonal(transformFen('8/8/8/k7/8/1B1N4/1K6/8 b - - 0 1', transform)).size, 7)
   }
   for (const bishop of allSquares()) for (const black of allSquares()) {
     if (new Set(['a2', 'd3', bishop, black]).size !== 4 || kingDistance('a2', black) <= 1) continue

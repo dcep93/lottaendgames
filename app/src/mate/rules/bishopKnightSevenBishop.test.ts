@@ -14,11 +14,11 @@ test('supported seven prefers b3 in the knight support orientation, including ev
     const preferred = scoreKnightAndBishopWhiteMove(reflected,san('b3'))
     const otherEnd = scoreKnightAndBishopWhiteMove(reflected,san('f7'))
     assert.equal(preferred.supportedDiagonalSizeScore,7)
-    assert.equal(otherEnd.supportedDiagonalSizeScore,99)
+    assert.equal(otherEnd.supportedDiagonalSizeScore,7)
     assert.equal(preferred.supportedDiagonalKnightScore,0)
-    assert.equal(otherEnd.supportedDiagonalKnightScore,99)
+    assert.equal(otherEnd.supportedDiagonalKnightScore,0)
     assert.equal(preferred.supportedSevenBishopPenalty,0)
-    // Kd4 is below Bf7 and Black Kb5 is above White: Bf7 is unsupported.
+    assert.equal(otherEnd.supportedSevenBishopPenalty,1)
     assert.deepEqual(getIdealKnightAndBishopWhiteMoves(reflected),[san('b3')])
   }
 })
@@ -102,11 +102,12 @@ test('r2.5 also prescribes Ke8 from Kf8 after Kf8 Kd6, including reflections', (
   }
 })
 
-test('a3 flush walks toward b2 on the opposite color only while retaining seven support', () => {
+test('a3 flush walks toward b2 on the opposite color with any seven bishop placement', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const start of [
       '8/8/4K3/3B4/k7/3N4/8/8 w - - 0 1',
       '8/8/4K3/3B4/8/k2N4/8/8 w - - 0 1',
+      '6B1/8/4K3/8/k7/3N4/8/8 w - - 0 1',
     ]) {
       const reflected = transformFen(start,transform)
       const san = (to: 'd6' | 'd7' | 'e7') => getChess(reflected).move({from:transformSquare('e6',transform),to:transformSquare(to,transform)}).san
@@ -123,11 +124,6 @@ test('a3 flush walks toward b2 on the opposite color only while retaining seven 
         assert.equal(d7.supportedSevenFlushColorPenalty,1)
         assert.equal(d7.supportedSevenFlushDistance,5)
       }
-    }
-    const highBishop = transformFen('6B1/8/4K3/8/k7/3N4/8/8 w - - 0 1', transform)
-    for (const to of ['d6', 'd7', 'e7'] as const) {
-      const san = getChess(highBishop).move({from: transformSquare('e6', transform), to: transformSquare(to, transform)}).san
-      assert.equal(scoreKnightAndBishopWhiteMove(highBishop, san).supportedDiagonalSizeScore, 7)
     }
     const outside = transformFen('4K3/8/8/k2B4/8/3N4/8/8 w - - 0 1',transform)
     for (const san of getChess(outside).moves()) {

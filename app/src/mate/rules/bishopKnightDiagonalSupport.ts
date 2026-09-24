@@ -61,8 +61,6 @@ const DIAGONALS = CANONICAL_DIAGONALS.flatMap(pattern => SQUARE_TRANSFORMS.map(t
   fiveRightTargetBishop: transformSquare('b5', transform),
   fiveFlushTrigger: transformSquare('a5', transform),
   fiveFlushTarget: transformSquare('b4', transform),
-  upOffset: {file: transform.map(0, 1).file - transform.map(0, 0).file,
-    rank: transform.map(0, 1).rank - transform.map(0, 0).rank},
   rightOffset: {file: transform.map(2, 0).file - transform.map(0, 0).file,
     rank: transform.map(2, 0).rank - transform.map(0, 0).rank},
   corner: squareCoords(transformSquare('a8', transform)),
@@ -309,16 +307,6 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
   if (!white || !black || !bishop || !knight) return {size: 99, knight: 99}
   if (UNSUPPORTED_KING_KNIGHT_PAIRS.has(`${white.square}/${knight.square}`)) return {size: 99, knight: 99}
   if (UNSUPPORTED_KNIGHT_SQUARES.has(knight.square)) return {size: 99, knight: 99}
-  // Nd3 fixes the orientation: reject White below the bishop only with Black above White.
-  const kingPosition = squareCoords(white.square)
-  const bishopPosition = squareCoords(bishop.square)
-  const blackPosition = squareCoords(black.square)
-  if (DIAGONALS.some(pattern => pattern.wall.length === 7 &&
-    pattern.wall.includes(bishop.square) && pattern.support.includes(knight.square) &&
-    ((kingPosition.file - bishopPosition.file) * pattern.upOffset.file +
-      (kingPosition.rank - bishopPosition.rank) * pattern.upOffset.rank < 0) &&
-    ((blackPosition.file - kingPosition.file) * pattern.upOffset.file +
-      (blackPosition.rank - kingPosition.rank) * pattern.upOffset.rank > 0))) return {size: 99, knight: 99}
   // Cage membership is mandatory before every support declaration or exception.
   if (!DIAGONALS.some(pattern => pattern.wall.includes(bishop.square) &&
     isInsideBishopDiagonal(black.square, pattern.wall))) return {size: 99, knight: 99}
