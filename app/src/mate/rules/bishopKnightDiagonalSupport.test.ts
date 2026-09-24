@@ -1187,3 +1187,19 @@ test('declared Kd6 Be8 Nb4 against Kc8 is unsupported across D4', () => {
     assert.equal(knightAndBishopSupportedDiagonal(transformFen('2k1B3/8/3K4/8/8/2N5/8/8 b - - 1 1', transform)).size, 5)
   }
 })
+
+
+test('declared second-move Bd7 with Kc5 Ne3 against Ka5 is supported and preferred across D4', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    const board = getChess(transformFen('8/8/k1K5/8/B7/4N3/8/8 w - - 0 1', transform))
+    board.move({from: transformSquare('c6', transform), to: transformSquare('c5', transform)})
+    board.move({from: transformSquare('a6', transform), to: transformSquare('a5', transform)})
+    const before = board.fen()
+    const move = board.move({from: transformSquare('a4', transform), to: transformSquare('d7', transform)})
+    assert.equal(knightAndBishopSupportedDiagonal(board.fen()).size, 5)
+    assert.equal(scoreKnightAndBishopWhiteMove(before, move.san).supportedDiagonalSizeScore, 5)
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(before), [move.san])
+    const nearby = transformFen('8/3B4/8/k1K5/8/5N2/8/8 b - - 3 2', transform)
+    assert.equal(knightAndBishopSupportedDiagonal(nearby).size, 99)
+  }
+})
