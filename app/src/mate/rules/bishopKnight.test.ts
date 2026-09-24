@@ -129,7 +129,7 @@ test("bishop-and-knight rules are registered", () => {
     {
       id: "r5.1",
       shortLabel: "rule r5.1",
-      helpText: "With a central bishop and knight on the precage square, prefer king step proximity to the diagonal parallel to the bishop's long diagonal but opposite color on or beyond the Black king, then king proximity to Black's king's square.",
+      helpText: "With a central bishop and knight on the precage square, prefer king step proximity to the diagonal parallel to the bishop's long diagonal but opposite color beyond the Black king, then king proximity to Black's king's square.",
     },
     {
       id: "r5.5",
