@@ -1250,3 +1250,19 @@ test('five support always requires an occupied five/seven square or a one-move s
     assert.equal(knightAndBishopSupportedDiagonal(transformFen('1k6/3B4/1K3N2/8/8/8/8/8 b - - 0 1', transform)).size, 99)
   }
 })
+
+test('declared 2. Ke5 with Ba4 Nd3 against Kc7 is supported across D4', () => {
+  for (const t of SQUARE_TRANSFORMS) {
+    const board = getChess(transformFen('8/8/1k6/3K4/8/1B1N4/8/8 w - - 0 1', t))
+    board.move({from: transformSquare('b3', t), to: transformSquare('a4', t)})
+    assert.equal(knightAndBishopSupportedDiagonal(board.fen()).size, 5)
+    board.move({from: transformSquare('b6', t), to: transformSquare('c7', t)})
+    const before = board.fen()
+    const move = board.move({from: transformSquare('d5', t), to: transformSquare('e5', t)}).san
+    assert.equal(knightAndBishopSupportedDiagonal(board.fen()).size, 5)
+    assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 5)
+    assert.ok(getIdealKnightAndBishopWhiteMoves(before).includes(move))
+    // The declaration does not also exempt the previously discussed Ke6 placement.
+    assert.equal(knightAndBishopSupportedDiagonal(transformFen('8/2k5/4K3/8/B7/3N4/8/8 b - - 0 1', t)).size, 99)
+  }
+})

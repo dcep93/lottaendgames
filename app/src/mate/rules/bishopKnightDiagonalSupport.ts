@@ -133,6 +133,7 @@ const DECLARED_FIVE_SUPPORT = [
   {king: 'd7', bishop: 'b5', knight: 'd5', black: 'b7', allowSameColorKing: true},
   {king: 'd5', bishop: 'd7', knight: 'd3', black: 'a5', allowRemoteBishop: true},
   {king: 'd5', bishop: 'a4', knight: 'd3', black: 'b6'},
+  {king: 'e5', bishop: 'a4', knight: 'd3', black: 'c7'},
 ] as const
 const DECLARED_FIVE_PLACEMENTS = DECLARED_FIVE_SUPPORT.flatMap(placement => SQUARE_TRANSFORMS.map(transform => ({
   allowSameColorKing: 'allowSameColorKing' in placement && placement.allowSameColorKing,
