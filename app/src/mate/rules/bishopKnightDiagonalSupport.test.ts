@@ -7,6 +7,18 @@ import { getIdealKnightAndBishopWhiteMoves, scoreKnightAndBishopWhiteMove } from
 
 const sixDiagonal = ['a3', 'b4', 'c5', 'd6', 'e7', 'f8'] as const
 
+test('declared Kb6 with Bf7 Nd3 against Kb8 is unsupported across D4 and move counters', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    for (const counters of ['0 1', '26 14']) {
+      const before = transformFen(`1k6/5B2/K7/8/8/3N4/8/8 w - - ${counters}`, transform)
+      const board = getChess(before)
+      const move = board.move({from: transformSquare('a6', transform), to: transformSquare('b6', transform)}).san
+      assert.equal(knightAndBishopSupportedDiagonal(board.fen()).size, 99)
+      assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 99)
+    }
+  }
+})
+
 test('White on a lower target-corner diagonal disqualifies support across D4', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     const before = transformFen('K5B1/8/1k6/8/8/3N4/8/8 w - - 0 1', transform)
