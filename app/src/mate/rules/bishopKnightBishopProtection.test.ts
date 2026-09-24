@@ -71,3 +71,27 @@ test('r9.98 excludes only adjacent targets of edge bishops across D4', () => {
     assert.equal(scoreKnightAndBishopWhiteMove(blocked, san).knightBishopProtectionPenalty, 0, t.name);
   }
 });
+
+test('r9.98 ranks on, then one move away, then ties every farther distance across D4', () => {
+  const rule = knightAndBishopWhiteRules.find(r => r.id === 'r9.98')!;
+  for (const t of SQUARE_TRANSFORMS) {
+    const fen = transformFen('B7/8/8/8/7k/8/2N5/7K w - - 0 1', t);
+    const score = (from: 'a8' | 'c2' | 'h1', to: 'e4' | 'b4' | 'a3' | 'g1') => {
+      const san = getChess(fen).move({from:transformSquare(from,t),to:transformSquare(to,t)}).san;
+      return scoreKnightAndBishopWhiteMove(fen,san);
+    };
+    const on = score('a8','e4'), one = score('c2','b4'), two = score('h1','g1'), three = score('c2','a3');
+    assert.deepEqual([on,one,two,three].map(s=>s.knightBishopProtectionPenalty),[0,1,2,3]);
+    assert.ok(rule.compare!(on,one)<0);
+    assert.ok(rule.compare!(one,two)<0);
+    assert.equal(rule.compare!(two,three),0);
+    const loaded = transformFen('8/8/B7/1K6/3k4/3N4/8/8 w - - 0 1',t);
+    const far = (to: 'b4' | 'e1') => {
+      const san = getChess(loaded).move({from:transformSquare('d3',t),to:transformSquare(to,t)}).san;
+      return scoreKnightAndBishopWhiteMove(loaded,san);
+    };
+    assert.equal(far('b4').knightBishopProtectionPenalty,3);
+    assert.equal(far('e1').knightBishopProtectionPenalty,5);
+    assert.equal(rule.compare!(far('b4'),far('e1')),0);
+  }
+});

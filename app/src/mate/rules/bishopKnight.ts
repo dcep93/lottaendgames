@@ -523,8 +523,8 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     {
       id: "r9.98",
       shortLabel: "rule r9.98",
-      helpText: "Prefer knight move proximity to a stable bishop protected square.",
-      compare: (first, second) => first.knightBishopProtectionPenalty - second.knightBishopProtectionPenalty,
+      helpText: "Prefer knight on or else one move from a stable bishop protected square.",
+      compare: (first, second) => Math.min(2, first.knightBishopProtectionPenalty) - Math.min(2, second.knightBishopProtectionPenalty),
     },
     {
       id: "r10",
