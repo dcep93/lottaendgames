@@ -308,6 +308,11 @@ export function evaluateKnightAndBishopSupportedDiagonal(fen: string, blackDesti
   if (!white || !black || !bishop || !knight) return {size: 99, knight: 99}
   if (UNSUPPORTED_KING_KNIGHT_PAIRS.has(`${white.square}/${knight.square}`)) return {size: 99, knight: 99}
   if (UNSUPPORTED_KNIGHT_SQUARES.has(knight.square)) return {size: 99, knight: 99}
+  // Walls retain canonical rank order through D4 transforms. With occupied seven
+  // support, White may not sit on the same wall below its bishop.
+  if (DIAGONALS.some(pattern => pattern.wall.length === 7 && pattern.support.includes(knight.square) &&
+    pattern.wall.includes(bishop.square) && pattern.wall.includes(white.square) &&
+    pattern.wall.indexOf(white.square) < pattern.wall.indexOf(bishop.square))) return {size: 99, knight: 99}
   // Cage membership is mandatory before every support declaration or exception.
   if (!DIAGONALS.some(pattern => pattern.wall.includes(bishop.square) &&
     isInsideBishopDiagonal(black.square, pattern.wall))) return {size: 99, knight: 99}

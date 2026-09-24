@@ -7,6 +7,23 @@ import { getIdealKnightAndBishopWhiteMoves, scoreKnightAndBishopWhiteMove } from
 
 const sixDiagonal = ['a3', 'b4', 'c5', 'd6', 'e7', 'f8'] as const
 
+test('seven-diagonal king on the wall below bishop is unsupported with Nd3 across D4', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    for (const [fen, from, to] of [
+      ['8/2k5/8/3B4/8/1K1N4/8/8 w - - 0 1', 'b3', 'c4'],
+      ['8/8/1k6/8/2B5/3N4/K7/8 w - - 0 1', 'a2', 'b3'],
+    ] as const) {
+      const before = transformFen(fen, transform), board = getChess(before)
+      const move = board.move({from: transformSquare(from, transform), to: transformSquare(to, transform)}).san
+      assert.equal(knightAndBishopSupportedDiagonal(board.fen()).size, 99)
+      assert.equal(scoreKnightAndBishopWhiteMove(before, move).supportedDiagonalSizeScore, 99)
+    }
+    // White above its bishop on the same wall remains eligible.
+    assert.equal(knightAndBishopSupportedDiagonal(transformFen(
+      '8/8/k7/8/2K5/1B1N4/8/8 b - - 0 1', transform)).size, 7)
+  }
+})
+
 test('five-diagonal approaching knight must be one move from both support stages across D4', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     const before = transformFen('3k4/8/2K5/1BN5/8/8/8/8 w - - 0 1', transform)
@@ -41,11 +58,10 @@ test('declared Bf7+ with Ke6 Nd3 versus Ke8 is unsupported only in its exact pla
   }
 })
 
-test('seven-diagonal support has no relative-rank restriction, across D4', () => {
+test('seven-diagonal king below bishop remains eligible off the bishop diagonal, across D4', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     // White below the bishop and Black above White, with Black on either side of the bishop rank.
     for (const fen of [
-      '8/2k5/8/3B4/2K5/3N4/8/8 b - - 0 1',
       '8/k4B2/8/8/3K4/3N4/8/8 b - - 0 1',
       '8/5B2/8/1k6/3K4/3N4/8/8 b - - 0 1',
       '6B1/4k1K1/8/8/8/3N4/8/8 b - - 0 1',
@@ -576,7 +592,8 @@ test('a seven-diagonal is unsupported when Black can step onto a square screened
     assert.equal(knightAndBishopSupportedDiagonal(screened.fen()).size, 99)
     assert.equal(scoreKnightAndBishopWhiteMove(fen, move).supportedDiagonalSizeScore, 99)
     const noEntry = transformFen('8/k7/8/3B4/2K5/3N4/8/8 b - - 0 1', transform)
-    assert.equal(knightAndBishopSupportedDiagonal(noEntry).size, 7)
+    // Even without an immediate entry, Kc4 is on the seven wall below Bd5.
+    assert.equal(knightAndBishopSupportedDiagonal(noEntry).size, 99)
   }
 })
 
