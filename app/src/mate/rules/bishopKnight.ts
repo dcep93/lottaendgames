@@ -464,16 +464,16 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       ],
     },
     {
+      id: "r6.5",
+      shortLabel: "rule r6.5",
+      helpText: "An undefended knight should not be the only defender of an attacked bishop.",
+      compare: (first, second) => first.undefendedKnightOnlyBishopDefenderPenalty - second.undefendedKnightOnlyBishopDefenderPenalty,
+    },
+    {
       id: "r7",
       shortLabel: "rule r7",
       helpText: "Prefer king proximity to a central square opposite the bishop's color.",
       compare: (first, second) => first.kingCenterProximityScore - second.kingCenterProximityScore,
-    },
-    {
-      id: "r7.5",
-      shortLabel: "rule r7.5",
-      helpText: "An undefended knight should not be the only defender of an attacked bishop.",
-      compare: (first, second) => first.undefendedKnightOnlyBishopDefenderPenalty - second.undefendedKnightOnlyBishopDefenderPenalty,
     },
     {
       id: "r7.8",

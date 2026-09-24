@@ -142,14 +142,14 @@ test("bishop-and-knight rules are registered", () => {
       helpText: "With a precage knight, prefer king proximity to the bishop's side, then king proximity to the non-target corner.",
     },
     {
+      id: "r6.5",
+      shortLabel: "rule r6.5",
+      helpText: "An undefended knight should not be the only defender of an attacked bishop.",
+    },
+    {
       id: "r7",
       shortLabel: "rule r7",
       helpText: "Prefer king proximity to a central square opposite the bishop's color.",
-    },
-    {
-      id: "r7.5",
-      shortLabel: "rule r7.5",
-      helpText: "An undefended knight should not be the only defender of an attacked bishop.",
     },
     {
       id: "r7.8",
@@ -211,8 +211,8 @@ test("bishop-and-knight rules are registered", () => {
       "r5.1",
       "r5.5",
       "r6",
+      "r6.5",
       "r7",
-      "r7.5",
       "r7.8",
       "r8",
       "r9.1",
