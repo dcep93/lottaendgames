@@ -6,14 +6,8 @@ if (!dir)
     throw new Error('Run via npm run audit:unsupported');
 const result = JSON.parse(readFileSync(dir + '/result.json', 'utf8'));
 const labels: Record<string, string[]> = {
-    'r1.5': ['supported diagonal size', 'knight distance to support'],
-    'r9.1': ['bishop distance from Black'],
-    'r9.2': ['king defense of knight'],
-    'r9.3': ['central king defense of minor', 'bishop distance from Black'],
-    'r10': ['king center distance', 'king off bishop color', 'bishop on long diagonal', 'king-protected central bishop', 'knight distance to precage', 'king protection of knight', 'noncentral bishop distance from Black', 'knight off bishop color'],
-    'r15': ['long-diagonal intersection distance from Black'],
-    'r20': ['avoid next knight attack'],
-    'r25': ['knight center distance']
+    'r1.5': ['supported diagonal size', 'declared supported knight advance', 'knight distance to support'],
+    'r8': ['bishop on long diagonal', 'central bishop', 'knight distance to precage', 'knight off bishop color'],
 };
 const frequencies: Record<string, number> = {};
 for (const family of result.families) {
@@ -27,7 +21,7 @@ for (const family of result.families) {
                 const before = remaining.length;
                 remaining = [...selectCandidatesByRules(remaining, [{ ...rule, compare: undefined, subpriorities: [subs[i]!] }]).idealCandidates];
                 if (remaining.length < before)
-                    trace.push({ rule: rule.id, priority: i + 1, meaning: labels[rule.id]?.[i] ?? rule.id, survivors: remaining.map(x => x.san) });
+                    trace.push({ rule: rule.id, priority: i + 1, meaning: labels[rule.id]?.[i] ?? (rule.helpText || rule.id), survivors: remaining.map(x => x.san) });
             }
         }
         if (!remaining.some(x => x.san === frame.move))

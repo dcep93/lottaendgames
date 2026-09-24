@@ -108,9 +108,14 @@ preferences. They can supply the historical cohort, but its survivors must be
 rechecked with **all legal Black replies**, and its old density is not a current
 all-legal measurement.
 
-The current frozen baseline is `cohort-r51-reset-2026-09-24.json`: 1,336
-positions on wholly unsupported cycles in the last completed full audit.
-Its historical Black policy is recorded separately from the all-legal recheck.
+The current frozen baseline is `cohort-full-2026-09-24.json`: **1,159 D4 positions /
+9,272 physical positions** on wholly unsupported cycles, from the exhaustive
+all-legal-Black audit of policy `9fbb749`. There are another 30 unsupported D4
+positions on mixed supported/unsupported cycles. The older 1,336-position
+`cohort-r51-reset-2026-09-24.json` remains historical evidence; 62 of those
+positions still lie on wholly unsupported cycles under this policy.
+
+See `docs/audits/2026-09-24-full-9fbb749.md` for the new exact counts and replays.
 
 ```sh
 # Only after a new full audit: extract all cyclic positions, not just witnesses.
@@ -119,12 +124,12 @@ app/node_modules/.bin/tsx scripts/bishop-knight-audit/freeze-unsupported-cohort.
 
 # Exact current-policy membership, all cycle lengths, wholly unsupported cycles.
 app/node_modules/.bin/tsx scripts/bishop-knight-audit/unsupported-cohort.mts \
-  --baseline scripts/bishop-knight-audit/cohort-r51-reset-2026-09-24.json \
+  --baseline scripts/bishop-knight-audit/cohort-full-2026-09-24.json \
   --out /absolute/cohort-check
 
 # Five-second residual sample, reusing the closed graph from that exact check.
 app/node_modules/.bin/tsx scripts/bishop-knight-audit/residual-estimate.mts \
-  --baseline scripts/bishop-knight-audit/cohort-r51-reset-2026-09-24.json \
+  --baseline scripts/bishop-knight-audit/cohort-full-2026-09-24.json \
   --cohort-dir /absolute/cohort-check \
   --census /absolute/completed-full-audit/census.sqlite \
   --unsupported-population CURRENT_D4_UNSUPPORTED_POPULATION
@@ -230,10 +235,11 @@ still recomputed. This saves the enumeration phase on most preference-only edits
 A starting position is a **Black-to-move board immediately after White moves**.
 Black replies are all legal moves, with no capture priority, score filtering, or return preference. States use canonical boards without history. The old pair encoding is retained with a constant NONE history field for storage compatibility, but old snapshots cannot be resumed under the new fingerprint.
 
-All tied preferred White moves and all legal Black replies are followed. A capture terminates only that reply; all other replies continue. Branches
+All tied preferred White moves and all legal Black replies are followed. A capture terminates only that reply; all other replies continue. In the default unsupported-only scope, branches
 stop at a supported diagonal, mate, stalemate, or capture of a minor piece.
+With `--scope all` or `--scope supported`, support is not terminal.
 “Can reach a loop” means **at least one** best-move branch reaches a cycle;
-“cannot reach a loop” does **not** mean forced mate. Support is a boundary here,
+“cannot reach a loop” does **not** mean forced mate. For the unsupported-only scope, support is a boundary,
 not a claim about subsequent play. The fifty-move rule and repetition claims
 are intentionally excluded from structural cycle detection.
 
@@ -263,7 +269,7 @@ checkpointing. `analyze.mts` owns SCC/outcome analysis and witnesses.
 `classify.mts` adds rule traces, reach/exclusive counts, and descriptive mechanism
 groups. `report.mts` renders the result. Rule descriptions in `classify.mts`
 should be updated when ordered subpriorities change; unmatched rules still get
-an explicit rule ID and priority number rather than changing move selection.
+the current rule help text and priority number rather than changing move selection.
 
 Run focused scaffold tests:
 

@@ -3,6 +3,7 @@ import {readFileSync, writeFileSync} from 'node:fs';
 import assert from 'node:assert/strict';
 import {BASE, NONE, code, fen, canonical, transform, unpack, square, distance, pair, transforms, pack} from './encoding.mts';
 import {transitionOrbit, applyEncodedWhiteMove} from './transition-orbits.mts';
+import {piecePositionMotif as motif} from './position-motifs.mts';
 import {getChess,validateMatePosition} from '../../app/src/mate/chess.ts';
 import {getIdealKnightAndBishopWhiteMoves as white} from '../../app/src/mate/rules/bishopKnight.ts';
 import {knightAndBishopSupportedDiagonal as support} from '../../app/src/mate/rules/bishopKnightDiagonalSupport.ts';
@@ -25,18 +26,6 @@ for(const r of db.prepare('SELECT key,weight,supported FROM roots').iterate() as
         supportedRoots.push({key:r.key,weight:r.weight,size:r.supported});
         for(let t=0;t<8;t++) sizes[transform(r.key,t)]=r.supported;
     }
-}
-const central=(s:number)=>[27,28,35,36].includes(s);
-const edge=(s:number)=>s<8||s>=56||(s&7)===0||(s&7)===7;
-function motif(k:number){
-    const [wk,b,n,bk]=unpack(k) as [number,number,number,number];
-    const kp=distance(wk,b)===1;
-    if(central(b)){
-        const dx=(n&7)-(b&7),dy=(n>>3)-(b>>3);
-        const precage=Math.abs(dx)===1&&Math.abs(dy)===1&&(n&7)!==(n>>3)&&(n&7)+(n>>3)!==7&&dx*((bk&7)-(b&7))+dy*((bk>>3)-(b>>3))<0;
-        return `${kp?'King-protected':'Unprotected by king'} central bishop; knight ${precage?'on precage':distance(wk,n)===1?'king-protected, off precage':edge(n)?'on edge, off precage':'unprotected by king, off precage'}`;
-    }
-    return `Noncentral bishop ${kp?'king-protected':'not king-protected'}; ${central(wk)?'central':edge(wk)?'edge':'interior'} king; knight ${distance(wk,n)===1?'king-protected':edge(n)?'on edge, unprotected by king':'unprotected by king'}`;
 }
 const cycleBoards=new Map<number,any>(result.placements.boards.map((b:any)=>[b.key,b]));
 const empty=()=>({orbits:0,physical:0});
@@ -136,10 +125,11 @@ for(let h=0;h<queue.length;h++){
     for(const [child] of p.edges)if(!supportReach[child]){supportReach[child]=1;queue.push(child);}
 }
 for(const f of families)f.reachableAfterAnySupportedPosition=f.nodeIds.some((id:number)=>supportReach[id]);
-// Normalize example orientation: light bishop nearer a8 than h1, then knight nearer a1.
+// Normalize example orientation: light bishop nearer a8 than h1, then knight nearer d3.
 function displayBoards(boards:number[]){
     const opts=Array.from({length:8},(_,t)=>boards.map(k=>transform(k,t)));
-    const score=(v:number[])=>{const [,b,n]=unpack(v[1]!) as [number,number,number,number];return [((b&7)+(b>>3))%2===1?0:1, distance(b,56)<distance(b,7)?0:1, distance(n,0),v[1]!];};
+    const euclidean2=(a:number,b:number)=>((a&7)-(b&7))**2+((a>>3)-(b>>3))**2;
+    const score=(v:number[])=>{const [,b,n]=unpack(v[1]!) as [number,number,number,number];return [((b&7)+(b>>3))%2===1?0:1, euclidean2(b,56)<euclidean2(b,7)?0:1, euclidean2(n,19),v[1]!];};
     opts.sort((a,b)=>{const x=score(a),y=score(b);for(let i=0;i<x.length;i++)if(x[i]!==y[i])return x[i]!-y[i]!;return 0;});return opts[0]!;
 }
 for(const f of families){

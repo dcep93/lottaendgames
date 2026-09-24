@@ -22,3 +22,17 @@ export function positionMotifs(placements: CyclicPlacement[], selectedSize: numb
         selectedCyclePlacements: boards.filter(b => selectedSize ? b.size === selectedSize : b.size !== 99).reduce((n,b) => n+b.weight, 0),
         motifs: [...groups.values()].map(g => ({...g, families: [...g.families].sort((a,b) => a-b)})).sort((a,b) => b.positions-a.positions || a.motif.localeCompare(b.motif)), boards};
 }
+
+
+/** Piece placement only; keep precage membership aligned with the production rule. */
+export function piecePositionMotif(key: number): string {
+    const [king, bishop, knight] = unpack(key);
+    const kingProtectsBishop = distance(king, bishop) === 1;
+    if (central.has(bishop)) {
+        const dx = (knight & 7) - (bishop & 7), dy = (knight >> 3) - (bishop >> 3);
+        const precage = Math.abs(dx) === 1 && Math.abs(dy) === 1 && !central.has(knight)
+            && (knight & 7) !== (knight >> 3) && (knight & 7) + (knight >> 3) !== 7;
+        return `${kingProtectsBishop ? 'King-protected' : 'Unprotected by king'} central bishop; knight ${precage ? 'on precage' : distance(king, knight) === 1 ? 'king-protected, off precage' : region(knight) === 'edge' ? 'on edge, off precage' : 'unprotected by king, off precage'}`;
+    }
+    return `Noncentral bishop ${kingProtectsBishop ? 'king-protected' : 'not king-protected'}; ${region(king)} king; knight ${distance(king, knight) === 1 ? 'king-protected' : region(knight) === 'edge' ? 'on edge, unprotected by king' : 'unprotected by king'}`;
+}
