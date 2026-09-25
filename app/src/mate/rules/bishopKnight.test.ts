@@ -107,6 +107,11 @@ test("bishop-and-knight rules are registered", () => {
       helpText: "",
     },
     {
+      id: "r4",
+      shortLabel: "rule r4",
+      helpText: "If the bishop is adjacent to White's non central 16 king, place it at least 3 steps from Black's king, maximizing its distance from White's king.",
+    },
+    {
       id: "r5",
       shortLabel: "rule r5",
       helpText: "Play the r5 move.",
@@ -120,11 +125,6 @@ test("bishop-and-knight rules are registered", () => {
       id: "r6.5",
       shortLabel: "rule r6.5",
       helpText: "To save an attacked bishop, move it to adjacent to the central White king or else maximize its distance from the Black king.",
-    },
-    {
-      id: "r6.6",
-      shortLabel: "rule r6.6",
-      helpText: "If the bishop is adjacent to White's non central 16 king, place it at least 3 steps from Black's king, maximizing its distance from White's king.",
     },
     {
       id: "r7",
@@ -159,10 +159,10 @@ test("bishop-and-knight rules are registered", () => {
       "mate",
       "minors safe",
       "no stalemate",
+      "r4",
       "r5",
       "r6",
       "r6.5",
-      "r6.6",
       "r7",
       "r8",
       "r20",

@@ -297,8 +297,12 @@ test('r6 rejects Nb7 when Bf7 blocks its onward route, but allows it with f7 fre
   const fen=transformFen(blocked ? '5K2/5B2/8/N1k5/8/8/8/8 w - - 0 1' : '5K2/8/8/N1k5/8/7B/8/8 w - - 0 1',t);
   const knightMove=getChess(fen).move({from:transformSquare('a5',t),to:transformSquare('b7',t)}).san;
   const protectedMove=getChess(fen).move({from:transformSquare('a5',t),to:transformSquare('c4',t)}).san;
-  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[blocked ? protectedMove : knightMove],t.name);
+  const preferred=blocked ? getChess(fen).move({from:transformSquare('f7',t),to:transformSquare('a2',t)}).san : knightMove;
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[preferred],t.name);
   assert.equal(scoreKnightAndBishopWhiteMove(fen,knightMove).knightDriftObstructionPenalty,blocked ? 2 : 0,t.name);
-  if(blocked) assert.equal(explainMove(bishopKnightRuleSet.scoreWhiteCandidates!(fen,getChess(fen).moves()),knightAndBishopWhiteRules,protectedMove)?.id,'r6',t.name);
+  if(blocked) {
+   assert.ok(knightAndBishopWhiteRules.find(r=>r.id==='r6')!.compare!(scoreKnightAndBishopWhiteMove(fen,protectedMove),scoreKnightAndBishopWhiteMove(fen,knightMove))<0,t.name);
+   assert.equal(explainMove(bishopKnightRuleSet.scoreWhiteCandidates!(fen,getChess(fen).moves()),knightAndBishopWhiteRules,preferred)?.id,'r4',t.name);
+  }
  }
 });

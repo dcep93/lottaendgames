@@ -538,6 +538,13 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       compare: (first, second) => first.stalemateScore - second.stalemateScore,
     },
     {
+      id: "r4",
+      shortLabel: "rule r4",
+      helpText: "If the bishop is adjacent to White's non central 16 king, place it at least 3 steps from Black's king, maximizing its distance from White's king.",
+      compare: (first, second) => first.bishopSeparationPenalty - second.bishopSeparationPenalty
+        || first.bishopWhiteKingDistanceScore - second.bishopWhiteKingDistanceScore,
+    },
+    {
       id: "r5",
       shortLabel: "rule r5",
       helpText: "Play the r5 move.",
@@ -569,13 +576,6 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       helpText: "To save an attacked bishop, move it to adjacent to the central White king or else maximize its distance from the Black king.",
       compare: (first, second) => first.attackedBishopDefensePenalty - second.attackedBishopDefensePenalty
         || (first.attackedBishopDefensePenalty === 0 ? 0 : first.attackedBishopDistanceScore - second.attackedBishopDistanceScore),
-    },
-    {
-      id: "r6.6",
-      shortLabel: "rule r6.6",
-      helpText: "If the bishop is adjacent to White's non central 16 king, place it at least 3 steps from Black's king, maximizing its distance from White's king.",
-      compare: (first, second) => first.bishopSeparationPenalty - second.bishopSeparationPenalty
-        || first.bishopWhiteKingDistanceScore - second.bishopWhiteKingDistanceScore,
     },
     {
       id: "r7",
