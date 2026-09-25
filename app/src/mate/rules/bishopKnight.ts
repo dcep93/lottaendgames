@@ -515,8 +515,10 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     {
       id: "r6",
       shortLabel: "rule r6",
-      helpText: "Prefer the knight protected by a stable bishop, otherwise drift the knight towards king protection, then prefer knight central 16 proximity.",
+      helpText: "Prefer the knight with king protection, then prefer stable bishop protection, otherwise drift the knight towards king protection, then prefer knight central 16 proximity.",
       compare: (first, second) => {
+        const kingProtection = first.kingKnightAdjacencyPenalty - second.kingKnightAdjacencyPenalty;
+        if (kingProtection) return kingProtection;
         const protection = first.knightStableBishopProtectionPenalty - second.knightStableBishopProtectionPenalty;
         if (protection) return protection;
         if (first.knightStableBishopProtectionPenalty === 0) return 0;

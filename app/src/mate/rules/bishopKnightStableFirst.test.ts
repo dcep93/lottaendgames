@@ -32,3 +32,19 @@ test('r6 recognizes resulting stable bishop defense, including interior adjacenc
   assert.equal(scoreKnightAndBishopWhiteMove(fen,san).knightStableBishopProtectionPenalty,c.penalty,t.name);
  }
 });
+
+
+test('r6 keeps king protection, then adds stable bishop protection with Nd5 across D4',()=>{
+ for(const t of SQUARE_TRANSFORMS){
+  const fen=transformFen('B4k2/8/8/4K3/5N2/8/8/8 w - - 2 2',t);
+  const san=(to:'d5'|'e6')=>getChess(fen).move({from:transformSquare('f4',t),to:transformSquare(to,t)}).san;
+  const both=scoreKnightAndBishopWhiteMove(fen,san('d5'));
+  const kingOnly=scoreKnightAndBishopWhiteMove(fen,san('e6'));
+  assert.equal(both.kingKnightAdjacencyPenalty,0,t.name);
+  assert.equal(kingOnly.kingKnightAdjacencyPenalty,0,t.name);
+  assert.equal(both.knightStableBishopProtectionPenalty,0,t.name);
+  assert.equal(kingOnly.knightStableBishopProtectionPenalty,1,t.name);
+  assert.ok(r6.compare!(both,kingOnly)<0,t.name);
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[san('d5')],t.name);
+ }
+});
