@@ -154,7 +154,7 @@ test("bishop-and-knight rules are registered", () => {
     {
       id: "r7.8",
       shortLabel: "rule r7.8",
-      helpText: "With a middle-16 square king, prefer knight move proximity to a precage square.",
+      helpText: "With a middle-16 square king, prefer knight move proximity to a precage square, then prefer the knight adjacent to the king.",
     },
     {
       id: "r8",

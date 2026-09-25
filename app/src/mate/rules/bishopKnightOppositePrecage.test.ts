@@ -84,3 +84,26 @@ test('r7.8 gives no frozen-target credit after the bishop leaves the center, acr
     assert.ok(!getIdealKnightAndBishopWhiteMoves(fen).includes(san('d5', 'b3')))
   }
 })
+
+
+test('r7.8 prefers knight adjacency even without a central bishop, across D4', () => {
+  for (const t of SQUARE_TRANSFORMS) {
+    const fen = transformFen('4B3/8/8/8/3k1K2/2N5/8/8 w - - 0 1', t)
+    const san = (to: 'e4' | 'a4') => getChess(fen).move({from: transformSquare('c3', t), to: transformSquare(to, t)}).san
+    const adjacent = score(fen, san('e4')), distant = score(fen, san('a4'))
+    assert.equal(adjacent.oppositePrecageDistance, 0)
+    assert.equal(distant.oppositePrecageDistance, 0)
+    assert.equal(adjacent.middle16KnightKingAdjacencyPenalty, 0)
+    assert.equal(distant.middle16KnightKingAdjacencyPenalty, 1)
+    assert.ok(rule.compare!(adjacent, distant) < 0)
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [san('e4')])
+  }
+})
+
+test('r7.8 adjacency stays neutral with a king starting outside the middle 16', () => {
+  const fen = '4B3/8/8/8/3k4/2N5/5K2/8 w - - 0 1'
+  const adjacent = score(fen, 'Ne2'), distant = score(fen, 'Na4')
+  assert.equal(adjacent.middle16KnightKingAdjacencyPenalty, 0)
+  assert.equal(distant.middle16KnightKingAdjacencyPenalty, 0)
+  assert.equal(rule.compare!(adjacent, distant), 0)
+})
