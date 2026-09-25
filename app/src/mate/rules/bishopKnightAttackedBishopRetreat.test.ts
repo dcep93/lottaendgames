@@ -26,3 +26,19 @@ test('r6.5 does not activate for a bishop Black is not attacking across D4', () 
   for(const score of scores)assert.equal(rule.compare!(score,scores[0]!),0,t.name);
  }
 });
+
+test('r6.5 stays neutral when the attacked bishop already has king protection, across D4', () => {
+ const rule=knightAndBishopWhiteRules.find(r=>r.id==='r6.5')!;
+ for(const start of [
+  '8/8/8/8/3kBK2/4N3/8/8 w - - 0 1',
+  '8/8/8/8/8/2kB4/4K3/N7 w - - 0 1',
+ ])for(const t of SQUARE_TRANSFORMS){
+  const fen=transformFen(start,t);
+  const scores=getChess(fen).moves().map(m=>scoreKnightAndBishopWhiteMove(fen,m));
+  assert.ok(scores.length>1);
+  for(const score of scores){
+   assert.equal(score.attackedBishopDistanceScore,0,t.name);
+   assert.equal(rule.compare!(score,scores[0]!),0,t.name);
+  }
+ }
+});

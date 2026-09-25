@@ -221,7 +221,8 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
       && kingDistance(bishop.square, blackKing.square) <= 2
       && kingDistance(knight.square, blackKing.square) <= 2
       && !bishopCentrallyDefended && !knightCentrallyDefended,
-    shouldEscapeBishop: !!bishop && !!blackKing && kingDistance(bishop.square, blackKing.square) === 1,
+    shouldEscapeBishop: !!bishop && !!blackKing && kingDistance(bishop.square, blackKing.square) === 1
+      && (!whiteKing || kingDistance(bishop.square, whiteKing.square) !== 1),
     shouldDefendKnight: !!knight && !!blackKing && kingDistance(knight.square, blackKing.square) === 1,
     shouldCoordinateKing: knightAndBishopShouldCoordinateKing(fen),
     startsWithPrecageKnight: !!knight && knightAndBishopKnightTargetSquares(fen).includes(knight.square),
