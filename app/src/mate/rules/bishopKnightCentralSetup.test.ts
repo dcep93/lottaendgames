@@ -12,7 +12,7 @@ test('r6 king defense precedes stable bishop defense and r8 centralization acros
     const rule = knightAndBishopWhiteRules.find(rule => rule.id === 'r8')!;
     assert.ok(compareScoresByRules(scoreKnightAndBishopWhiteMove(fen, san), scoreKnightAndBishopWhiteMove(fen, knightMove), [rule]) < 0);
     const defense=getChess(fen).move({from:transformSquare('a8',transform),to:transformSquare('g2',transform)}).san;
-    assert.equal(scoreKnightAndBishopWhiteMove(fen,defense).knightStableBishopProtectionPenalty,1);
+    assert.equal(scoreKnightAndBishopWhiteMove(fen,defense).knightStableBishopProtectionPenalty,0);
     const protectedByKing=scoreKnightAndBishopWhiteMove(fen,knightMove);
     const protectedByBishop=scoreKnightAndBishopWhiteMove(fen,defense);
     assert.equal(protectedByKing.kingKnightAdjacencyPenalty,0);

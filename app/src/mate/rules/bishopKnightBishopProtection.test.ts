@@ -7,10 +7,10 @@ import { getIdealKnightAndBishopWhiteMoves, scoreKnightAndBishopWhiteMove } from
 test('stable bishop protection metric recognizes bishop defense via either minor and respects blockers across D4', () => {
   for (const t of SQUARE_TRANSFORMS) {
     for (const [fen,from,to,penalty] of [
-      ['2B5/6K1/8/4k3/1N6/8/8/8 w - - 0 1','b4','a6',2],
+      ['2B5/6K1/8/4k3/1N6/8/8/8 w - - 0 1','b4','a6',0],
       ['2B5/6K1/8/4k3/1N6/8/8/8 w - - 0 1','b4','c6',2],
-      ['2B5/7K/8/3N4/8/7k/8/8 w - - 0 1','c8','b7',2],
-      ['B7/8/2K5/3N4/8/7k/8/8 w - - 0 1','c6','b5',2],
+      ['2B5/7K/8/3N4/8/7k/8/8 w - - 0 1','c8','b7',0],
+      ['B7/8/2K5/3N4/8/7k/8/8 w - - 0 1','c6','b5',0],
       ['B7/8/2K5/3N4/8/7k/8/8 w - - 0 1','c6','b7',99],
     ] as const) {
       const f=transformFen(fen,t);
@@ -43,13 +43,13 @@ test('stable bishop protection metric allows adjacent protection with retreat ro
 });
 
 
-test('stable bishop protection metric excludes edge-adjacent targets and squares too far from Black across D4', () => {
+test('stable bishop protection metric excludes edge-adjacent targets but allows distant defense across D4', () => {
   for (const t of SQUARE_TRANSFORMS) {
     for (const [source, penalty] of [
-      ['B7/1N6/8/8/7k/8/8/7K w - - 0 1', 4],
+      ['B7/1N6/8/8/7k/8/8/7K w - - 0 1', 2],
       ['2B5/1N6/8/8/7k/8/8/7K w - - 0 1', 2],
-      ['B7/8/2N5/8/7k/8/8/7K w - - 0 1', 2],
-      ['8/1B6/2N5/8/7k/8/8/7K w - - 0 1', 2],
+      ['B7/8/2N5/8/7k/8/8/7K w - - 0 1', 0],
+      ['8/1B6/2N5/8/7k/8/8/7K w - - 0 1', 0],
     ] as const) {
       const fen = transformFen(source, t);
       const san = getChess(fen).move({from: transformSquare('h1', t), to: transformSquare('g1', t)}).san;
@@ -57,7 +57,7 @@ test('stable bishop protection metric excludes edge-adjacent targets and squares
     }
     const blocked = transformFen('1K6/1B6/2N5/8/7k/8/8/8 w - - 0 1', t);
     const san = getChess(blocked).move({from: transformSquare('b8', t), to: transformSquare('a8', t)}).san;
-    assert.equal(scoreKnightAndBishopWhiteMove(blocked, san).knightBishopProtectionPenalty, 2, t.name);
+    assert.equal(scoreKnightAndBishopWhiteMove(blocked, san).knightBishopProtectionPenalty, 0, t.name);
   }
 });
 
@@ -69,14 +69,15 @@ test('stable bishop protection metric measures knight moves to protected squares
       return scoreKnightAndBishopWhiteMove(fen,san);
     };
     const on = score('a8','e4'), one = score('c2','b4'), two = score('h1','g1'), three = score('c2','a3');
-    assert.deepEqual([on,one,two,three].map(s=>s.knightBishopProtectionPenalty),[2,3,2,3]);
+    assert.deepEqual([on,one,two,three].map(s=>s.knightBishopProtectionPenalty),[0,1,2,3]);
     const loaded = transformFen('8/8/B7/1K6/3k4/3N4/8/8 w - - 0 1',t);
     const far = (to: 'b4' | 'e1') => {
       const san = getChess(loaded).move({from:transformSquare('d3',t),to:transformSquare(to,t)}).san;
       return scoreKnightAndBishopWhiteMove(loaded,san);
     };
-    assert.equal(far('b4').knightBishopProtectionPenalty,99);
-    assert.equal(far('e1').knightBishopProtectionPenalty,99);
+    // Kb5 blocks the inward ray; the distant c8 target remains available.
+    assert.equal(far('b4').knightBishopProtectionPenalty,3);
+    assert.equal(far('e1').knightBishopProtectionPenalty,5);
   }
 });
 

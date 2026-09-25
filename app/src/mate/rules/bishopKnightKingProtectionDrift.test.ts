@@ -30,13 +30,13 @@ test('r6 has no special preference for establishing a precage knight across D4',
   assert.equal(precage.knightTargetProximityScore,0);
   assert.equal(away.knightTargetProximityScore,99);
   assert.equal(rule.compare!(precage,away),0);
-  // Distant bishop defense does not hold the knight back from drifting.
-  const kingMove = getChess(fen).move({from:transformSquare('c4',t),to:transformSquare('e3',t)}).san;
+  // Stable bishop defense is retained while the king approaches.
+  const kingMove = getChess(fen).move({from:transformSquare('h5',t),to:transformSquare('h4',t)}).san;
   assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[kingMove]);
  }
 });
 
-test('r6 compares drift when Black is too far from the bishop-defended knight', () => {
+test('r6 preserves bishop defense regardless of Black distance', () => {
  const fen = '8/3k4/8/3B4/2N2K2/8/8/8 w - - 0 1';
  const near = scoreKnightAndBishopWhiteMove(fen,'Ke4');
  const far = scoreKnightAndBishopWhiteMove(fen,'Kg4');
@@ -44,9 +44,9 @@ test('r6 compares drift when Black is too far from the bishop-defended knight', 
  assert.equal(far.knightTargetProximityScore,0);
  assert.notEqual(near.knightKingProtectionDistance,far.knightKingProtectionDistance);
  const rule = knightAndBishopWhiteRules.find(r => r.id === 'r6')!;
- assert.equal(near.knightStableBishopProtectionPenalty,1);
- assert.equal(far.knightStableBishopProtectionPenalty,1);
- assert.ok(rule.compare!(near,far)<0);
+ assert.equal(near.knightStableBishopProtectionPenalty,0);
+ assert.equal(far.knightStableBishopProtectionPenalty,0);
+ assert.equal(rule.compare!(near,far),0);
 });
 
 
@@ -125,7 +125,7 @@ test('r6 ranks Nb4 above the Nb8 trap, but stable Be2 defense wins across D4', (
 });
 
 
-test('r6 allows both Nb5 and Ne2 drift when Black is too far for stable defense across D4', () => {
+test('r6 prefers stable Nb5 defense over the viable Ne2 drift across D4', () => {
  const rule = knightAndBishopWhiteRules.find(r => r.id === 'r6')!;
  const board = getChess('7K/8/2Nk4/8/8/8/8/5B2 w - - 0 1');
  board.move('Nd4');
@@ -141,9 +141,9 @@ test('r6 allows both Nb5 and Ne2 drift when Black is too far for stable defense 
   const otherEscape = scoreKnightAndBishopWhiteMove(fen, san('b5'));
   assert.ok(rule.compare!(escape, back) < 0, t.name);
   assert.equal(escape.knightStableBishopProtectionPenalty,1);
-  assert.equal(otherEscape.knightStableBishopProtectionPenalty,1);
-  assert.equal(rule.compare!(otherEscape,escape),0,t.name);
-  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen).sort(), [san('b5'),san('e2')].sort(), t.name);
+  assert.equal(otherEscape.knightStableBishopProtectionPenalty,0);
+  assert.ok(rule.compare!(otherEscape,escape)<0,t.name);
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen).sort(), [san('b5')].sort(), t.name);
  }
 });
 
@@ -267,7 +267,7 @@ test('r6 equally values Nc3 and Ne3 inside the central 16 across D4', () => {
   assert.equal(other.knightMiddle16ProximityScore,0,t.name);
   assert.equal(r6.compare!(center,other),0,t.name);
   const defense=getChess(fen).move({from:transformSquare('a8',t),to:transformSquare('f3',t)}).san;
-  assert.equal(scoreKnightAndBishopWhiteMove(fen,defense).knightStableBishopProtectionPenalty,1);
+  assert.equal(scoreKnightAndBishopWhiteMove(fen,defense).knightStableBishopProtectionPenalty,0);
   const longDiagonal=getChess(fen).move({from:transformSquare('a8',t),to:transformSquare('h1',t)}).san;
   assert.equal(r6.compare!(scoreKnightAndBishopWhiteMove(fen,defense),scoreKnightAndBishopWhiteMove(fen,longDiagonal)),0,t.name);
   assert.ok(r6.compare!(center,scoreKnightAndBishopWhiteMove(fen,longDiagonal))<0,t.name);

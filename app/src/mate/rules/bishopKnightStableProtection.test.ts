@@ -34,11 +34,11 @@ test('distance planning sees past the moving knight and Black king but not White
   assert.ok(!stableBishopProtectedSquares(blocked).includes('g6'))
 })
 
-test('stable bishop protection requires Black within two king steps of the knight, across D4', () => {
+test('stable bishop protection does not depend on Black’s distance from the knight, across D4', () => {
  for(const t of SQUARE_TRANSFORMS){
   for(const [position,stable] of [
-   ['8/8/BK1k4/8/8/8/8/5N2 w - - 0 1',false],
-   ['8/8/BK6/8/8/2k5/8/5N2 w - - 0 1',false],
+   ['8/8/BK1k4/8/8/8/8/5N2 w - - 0 1',true],
+   ['8/8/BK6/8/8/2k5/8/5N2 w - - 0 1',true],
    ['8/8/BK6/8/8/3k4/8/5N2 w - - 0 1',true],
   ] as const){
    const fen=transformFen(position,t);
@@ -48,14 +48,30 @@ test('stable bishop protection requires Black within two king steps of the knigh
 });
 
 
-test('the loaded bishop shuffle yields to Ne3 when Black is far from Nf1, across D4', () => {
+test('the loaded distant knight retains bishop protection, across D4', () => {
  for(const t of SQUARE_TRANSFORMS){
   const f=transformFen('8/8/BK1k4/8/8/8/8/5N2 w - - 0 1',t);
   const bishop=getChess(f).move({from:transformSquare('a6',t),to:transformSquare('b5',t)}).san;
   const knight=getChess(f).move({from:transformSquare('f1',t),to:transformSquare('e3',t)}).san;
   const held=scoreKnightAndBishopWhiteMove(f,bishop);
-  assert.equal(held.knightStableBishopProtectionPenalty,1,t.name);
-  assert.equal(held.unprotectedMinorCount,1,t.name); // Bishop is king-defended; knight is not stably defended.
-  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(f),[knight],t.name);
+  assert.equal(held.knightStableBishopProtectionPenalty,0,t.name);
+  assert.equal(held.unprotectedMinorCount,0,t.name); // Bishop is king-defended; knight is bishop-defended.
+  assert.ok(!getIdealKnightAndBishopWhiteMoves(f).includes(knight),t.name);
+ }
+});
+
+
+test('preserving distant bishop protection allows Kg2 instead of the Nc3 shuttle across D4', () => {
+ for(const t of SQUARE_TRANSFORMS){
+  const f=transformFen('4B3/8/8/8/N7/8/8/k6K w - - 0 1',t);
+  const ch=getChess(f);
+  const king=ch.move({from:transformSquare('h1',t),to:transformSquare('g2',t)}).san;
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(f),[king],t.name);
+  assert.equal(scoreKnightAndBishopWhiteMove(f,king).knightStableBishopProtectionPenalty,0,t.name);
+  for(const reply of ch.moves()){
+   ch.move(reply);
+   assert.ok(stableBishopProtectedSquares(ch.fen()).includes(transformSquare('a4',t)),t.name);
+   ch.undo();
+  }
  }
 });
