@@ -4,12 +4,17 @@ import {getChess, SQUARE_TRANSFORMS, transformFen, transformSquare} from '../che
 import {bishopKnightRuleSet, getIdealKnightAndBishopWhiteMoves, knightAndBishopWhiteRules, scoreKnightAndBishopWhiteMove} from './bishopKnight';
 import {explainMove} from './selection';
 
-test('r6.5 chooses Be8 to save the attacked bishop across D4', () => {
+test('r6 stable defense outranks r6.5 retreat distance across D4', () => {
  for(const t of SQUARE_TRANSFORMS) {
   const fen=transformFen('7K/8/8/8/Bk6/8/8/3N4 w - - 0 1',t);
-  const move=getChess(fen).move({from:transformSquare('a4',t),to:transformSquare('e8',t)}).san;
+  const move=getChess(fen).move({from:transformSquare('a4',t),to:transformSquare('c2',t)}).san;
+  const retreat=getChess(fen).move({from:transformSquare('a4',t),to:transformSquare('e8',t)}).san;
+  const score=scoreKnightAndBishopWhiteMove(fen,move), far=scoreKnightAndBishopWhiteMove(fen,retreat);
+  assert.ok(knightAndBishopWhiteRules.find(r=>r.id==='r6.5')!.compare!(far,score)<0);
+  assert.equal(score.knightStableBishopProtectionPenalty,0);
+  assert.equal(far.knightStableBishopProtectionPenalty,1);
   assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[move],t.name);
-  assert.equal(explainMove(bishopKnightRuleSet.scoreWhiteCandidates!(fen,getChess(fen).moves()),knightAndBishopWhiteRules,move)?.id,'r6.5',t.name);
+  assert.equal(explainMove(bishopKnightRuleSet.scoreWhiteCandidates!(fen,getChess(fen).moves()),knightAndBishopWhiteRules,move)?.id,'r6',t.name);
  }
 });
 

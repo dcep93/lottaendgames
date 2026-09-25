@@ -4,14 +4,16 @@ import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../c
 import { getIdealKnightAndBishopWhiteMoves, knightAndBishopWhiteRules, scoreKnightAndBishopWhiteMove } from './bishopKnight';
 import { compareScoresByRules } from './selection';
 
-test('r7 knight adjacency precedes r8 bishop centralization across D4', () => {
+test('r6 stable bishop defense precedes r8 bishop centralization across D4', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     const fen = transformFen('B7/8/8/5k2/3K4/8/8/5N2 w - - 0 1', transform);
     const san = getChess(fen).move({from: transformSquare('a8', transform), to: transformSquare('d5', transform)}).san;
     const knightMove = getChess(fen).move({from: transformSquare('f1', transform), to: transformSquare('e3', transform)}).san;
     const rule = knightAndBishopWhiteRules.find(rule => rule.id === 'r8')!;
     assert.ok(compareScoresByRules(scoreKnightAndBishopWhiteMove(fen, san), scoreKnightAndBishopWhiteMove(fen, knightMove), [rule]) < 0);
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [knightMove], transform.name);
+    const defense=getChess(fen).move({from:transformSquare('a8',transform),to:transformSquare('g2',transform)}).san;
+    assert.equal(scoreKnightAndBishopWhiteMove(fen,defense).knightStableBishopProtectionPenalty,0);
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[defense],transform.name);
   }
 });
 

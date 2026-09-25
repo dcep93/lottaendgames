@@ -1,0 +1,188 @@
+{
+  "scope": "Targeted current-policy recheck and bounded example search, not a full graph audit",
+  "baseline": "d003cdc82a098254a6c081801614b8700def3863",
+  "baselineFourPlyCycles": 746,
+  "survivingBaselineFourPlyCycles": 11,
+  "discoveredOutsideBaselineFourPlyCycles": 100,
+  "knownFourPlyCycles": 111,
+  "motifs": [
+    {
+      "motif": "king shuffle; knight stably bishop-protected throughout",
+      "cycles": 100,
+      "positions": 43
+    },
+    {
+      "motif": "bishop shuffle; knight without stable bishop protection throughout",
+      "cycles": 6,
+      "positions": 12
+    },
+    {
+      "motif": "knight shuffle; knight without stable bishop protection throughout",
+      "cycles": 3,
+      "positions": 5
+    },
+    {
+      "motif": "king shuffle; knight without stable bishop protection throughout",
+      "cycles": 2,
+      "positions": 4
+    }
+  ],
+  "examples": [
+    {
+      "group": 0,
+      "motif": "King shuffles while the knight remains stably bishop-protected",
+      "fen": "B5k1/8/8/3NK3/8/8/8/8 w - - 0 1",
+      "moves": [
+        "Kd4",
+        "Kh8",
+        "Ke5",
+        "Kg8"
+      ],
+      "area": 20,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=B5k1/8/8/3NK3/8/8/8/8_w_-_-_0_1&moves=Kd4,Kh8,Ke5,Kg8&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "King shuffles while the knight remains stably bishop-protected",
+      "fen": "B6k/8/8/3N4/3K4/8/8/8 w - - 0 1",
+      "moves": [
+        "Ke5",
+        "Kh7",
+        "Kd4",
+        "Kh8"
+      ],
+      "area": 20,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=B6k/8/8/3N4/3K4/8/8/8_w_-_-_0_1&moves=Ke5,Kh7,Kd4,Kh8&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "King shuffles while the knight remains stably bishop-protected",
+      "fen": "B7/6k1/8/3NK3/8/8/8/8 w - - 0 1",
+      "moves": [
+        "Kd4",
+        "Kh8",
+        "Ke5",
+        "Kg7"
+      ],
+      "area": 20,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=B7/6k1/8/3NK3/8/8/8/8_w_-_-_0_1&moves=Kd4,Kh8,Ke5,Kg7&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "King shuffles while the knight remains stably bishop-protected",
+      "fen": "B6k/8/8/3NK3/8/8/8/8 w - - 0 1",
+      "moves": [
+        "Kd4",
+        "Kg8",
+        "Ke5",
+        "Kh8"
+      ],
+      "area": 20,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=B6k/8/8/3NK3/8/8/8/8_w_-_-_0_1&moves=Kd4,Kg8,Ke5,Kh8&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "King shuffles while the knight remains stably bishop-protected",
+      "fen": "B4k2/8/8/3NK3/8/8/8/8 w - - 0 1",
+      "moves": [
+        "Kd4",
+        "Kg8",
+        "Ke5",
+        "Kf8"
+      ],
+      "area": 20,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=B4k2/8/8/3NK3/8/8/8/8_w_-_-_0_1&moves=Kd4,Kg8,Ke5,Kf8&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "King shuffles while the knight remains stably bishop-protected",
+      "fen": "B5k1/8/8/3N4/3K4/8/8/8 w - - 0 1",
+      "moves": [
+        "Ke5",
+        "Kh7",
+        "Kd4",
+        "Kg8"
+      ],
+      "area": 20,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=B5k1/8/8/3N4/3K4/8/8/8_w_-_-_0_1&moves=Ke5,Kh7,Kd4,Kg8&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "King shuffles while the knight remains stably bishop-protected",
+      "fen": "B7/5k2/8/3NK3/8/8/8/8 w - - 0 1",
+      "moves": [
+        "Kd4",
+        "Kg8",
+        "Ke5",
+        "Kf7"
+      ],
+      "area": 20,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=B7/5k2/8/3NK3/8/8/8/8_w_-_-_0_1&moves=Kd4,Kg8,Ke5,Kf7&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "King shuffles while the knight remains stably bishop-protected",
+      "fen": "B4k2/8/8/3N4/3K4/8/8/8 w - - 0 1",
+      "moves": [
+        "Ke5",
+        "Kg8",
+        "Kd4",
+        "Kf8"
+      ],
+      "area": 20,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=B4k2/8/8/3N4/3K4/8/8/8_w_-_-_0_1&moves=Ke5,Kg8,Kd4,Kf8&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "King shuffles while the knight remains stably bishop-protected",
+      "fen": "B3k3/8/8/3NK3/8/8/8/8 w - - 0 1",
+      "moves": [
+        "Kd4",
+        "Kf8",
+        "Ke5",
+        "Ke8"
+      ],
+      "area": 20,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=B3k3/8/8/3NK3/8/8/8/8_w_-_-_0_1&moves=Kd4,Kf8,Ke5,Ke8&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "King shuffles while the knight remains stably bishop-protected",
+      "fen": "B3k3/8/8/3N4/3K4/8/8/8 w - - 0 1",
+      "moves": [
+        "Ke5",
+        "Kf8",
+        "Kd4",
+        "Ke8"
+      ],
+      "area": 20,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=B3k3/8/8/3N4/3K4/8/8/8_w_-_-_0_1&moves=Ke5,Kf8,Kd4,Ke8&cursor=0"
+    },
+    {
+      "group": 1,
+      "motif": "Bishop shuffles without stable knight protection",
+      "fen": "B7/8/8/8/8/1k6/1N6/2K5 w - - 0 1",
+      "moves": [
+        "Bh1",
+        "Kc3",
+        "Ba8",
+        "Kb3"
+      ],
+      "area": 24,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=B7/8/8/8/8/1k6/1N6/2K5_w_-_-_0_1&moves=Bh1,Kc3,Ba8,Kb3&cursor=0"
+    },
+    {
+      "group": 1,
+      "motif": "Bishop shuffles without stable knight protection",
+      "fen": "2B5/8/8/8/8/K1k5/1N6/8 w - - 0 1",
+      "moves": [
+        "Bh3",
+        "Kc2",
+        "Bc8",
+        "Kc3"
+      ],
+      "area": 21,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=2B5/8/8/8/8/K1k5/1N6/8_w_-_-_0_1&moves=Bh3,Kc2,Bc8,Kc3&cursor=0"
+    }
+  ]
+}

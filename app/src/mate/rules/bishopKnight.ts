@@ -52,9 +52,9 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly minorCenterDistanceScore: number;
   readonly knightKingProtectionDistance: number;
   readonly knightKingProximityScore: number;
-  readonly startsWithStableBishopProtectedKnight: boolean;
   readonly knightDriftBlocked: boolean;
   readonly knightDriftObstructionPenalty: number;
+  readonly knightStableBishopProtectionPenalty: number;
   readonly knightDriftScore: readonly [number, number, number];
   readonly kingKnightAdjacencyPenalty: number;
   readonly kingKnightDistanceScore: number;
@@ -164,7 +164,6 @@ function distanceToNearestUnprotectedKnightOrBishop(fen: string): number {
 }
 
 type KnightAndBishopPositionScoreContext = {
-  readonly startsWithStableBishopProtectedKnight: boolean;
   readonly knightDriftBlocked: boolean;
   readonly knightDriftBaseline: readonly [number, number, number];
   readonly sixPointNineMove: string | undefined;
@@ -201,7 +200,6 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
   const bishopCentrallyDefended = !!bishop && centralKing && kingDistance(whiteKing.square, bishop.square) === 1;
   const knightCentrallyDefended = !!knight && centralKing && kingDistance(whiteKing.square, knight.square) === 1;
   return {
-    startsWithStableBishopProtectedKnight: !!knight && stableBishopProtectedSquares(fen).includes(knight.square),
     get knightDriftBaseline() {
       return driftBaseline ??= !knight || !blackKing || !whiteKing || !bishop ? [0, 99, 99] : [
         blackBlocksKnightDrift(knight.square, blackKing.square, whiteKing.square) ? 2
@@ -266,9 +264,12 @@ function scoreKnightAndBishopWhiteMoveCore(
   const knightKingDefended = !!knight && !!whiteKing && kingDistance(knight.square, whiteKing.square) === 1;
   const bishopStablyDefended = bishopKingDefended || (!!bishop && !!knight
     && squaredEuclideanDistance(bishop.square, knight.square) === 5);
+  let knightBishopStableDefense: boolean | undefined;
+  const knightBishopStablyDefended = () => knightBishopStableDefense ??= !!knight
+    && stableBishopProtectedSquares(resultFen).includes(knight.square);
   let knightStableDefense: boolean | undefined;
   const knightStablyDefended = () => knightStableDefense ??= knightKingDefended
-    || (!!knight && stableBishopProtectedSquares(resultFen).includes(knight.square));
+    || knightBishopStablyDefended();
   const knightEdgeOpposition = (() => {
     if (move.piece !== "n" || !knight || !whiteKing || kingDistance(knight.square, whiteKing.square) <= 2 || !blackKing
       || squaredEuclideanDistance(knight.square, blackKing.square) !== 4) return false;
@@ -293,8 +294,8 @@ function scoreKnightAndBishopWhiteMoveCore(
     bishopCenterPenalty: bishop && centerDistance(bishop.square) === 0 ? 0 : 1,
     kingKnightAdjacencyPenalty: knightKingDefended ? 0 : 1,
     kingKnightDistanceScore: whiteKing && knight ? kingDistance(whiteKing.square, knight.square) : 99,
-    startsWithStableBishopProtectedKnight: context.startsWithStableBishopProtectedKnight,
     knightDriftBlocked: context.knightDriftBlocked,
+    get knightStableBishopProtectionPenalty() { return knightBishopStablyDefended() ? 0 : 1; },
     get knightDriftScore(): readonly [number, number, number] {
       const baseline = context.knightDriftBaseline;
       // A possible chase calls for a king approach, ranked by r7.
@@ -514,9 +515,11 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     {
       id: "r6",
       shortLabel: "rule r6",
-      helpText: "Unless the knight is protected by a stable bishop, drift the knight towards king protection, then prefer knight central 16 proximity.",
-      applies: score => !score.startsWithStableBishopProtectedKnight,
+      helpText: "Prefer the knight protected by a stable bishop, otherwise drift the knight towards king protection, then prefer knight central 16 proximity.",
       compare: (first, second) => {
+        const protection = first.knightStableBishopProtectionPenalty - second.knightStableBishopProtectionPenalty;
+        if (protection) return protection;
+        if (first.knightStableBishopProtectionPenalty === 0) return 0;
         const a = first.knightDriftScore, b = second.knightDriftScore;
         const obstruction = a[0] - b[0];
         if (obstruction) return obstruction;
