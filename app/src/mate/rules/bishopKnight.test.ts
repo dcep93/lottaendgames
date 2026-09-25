@@ -122,6 +122,11 @@ test("bishop-and-knight rules are registered", () => {
       helpText: "To save an attacked bishop, move it to adjacent to the central White king or else maximize its distance from the Black king.",
     },
     {
+      id: "r6.6",
+      shortLabel: "rule r6.6",
+      helpText: "If the bishop is adjacent to White's non central 16 king, place it at least 3 steps from Black's king, maximizing its distance from White's king.",
+    },
+    {
       id: "r7",
       shortLabel: "rule r7",
       helpText: "Prefer king step proximity to the knight, then king central proximity, then prefer the king on the color opposite the bishop.",
@@ -157,6 +162,7 @@ test("bishop-and-knight rules are registered", () => {
       "r5",
       "r6",
       "r6.5",
+      "r6.6",
       "r7",
       "r8",
       "r20",
@@ -166,7 +172,7 @@ test("bishop-and-knight rules are registered", () => {
     ruleSet.whiteRuleDescriptions.map(({ id }) => id),
     knightAndBishopWhiteRules.map(({ id }) => id),
   );
-  assert.equal(knightAndBishopWhiteRules.length, 9);
+  assert.equal(knightAndBishopWhiteRules.length, 10);
   assert.deepEqual(ruleSet.help.noteBoards.map(board=>board.id), ["bishop-knight-rule-r5-hop", "bishop-knight-rule-r5-opposition"]);
 });
 
