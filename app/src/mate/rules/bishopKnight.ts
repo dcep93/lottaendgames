@@ -4,6 +4,7 @@ import { stableBishopProtectionDistance, stableBishopProtectedSquares } from "./
 import { knightAndBishopThreeKingPlacementPenalty, knightAndBishopFiveBishopPenalty, knightAndBishopFiveKingTargetDistance, knightAndBishopShouldCheckThreeDiagonal, evaluateKnightAndBishopSupportedDiagonal } from "./bishopKnightDiagonalSupport";
 import type { Square } from "chess.js";
 import {
+  edgeDistance,
   findPiece,
   getChess,
   getEndgamePiecePlacements,
@@ -240,7 +241,7 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
     shouldEscapeBishop: !!bishop && !!blackKing && kingDistance(bishop.square, blackKing.square) === 1
       && (!whiteKing || kingDistance(bishop.square, whiteKing.square) !== 1),
     shouldSeparateBishop: !!bishop && !!whiteKing && !centralKing
-      && kingDistance(bishop.square, whiteKing.square) === 1,
+      && kingDistance(bishop.square, whiteKing.square) <= (edgeDistance(bishop.square) === 0 ? 2 : 1),
     shouldDefendKnight: !!knight && !!blackKing && kingDistance(knight.square, blackKing.square) === 1,
     shouldCoordinateKing: knightAndBishopShouldCoordinateKing(fen),
     startsWithPrecageKnight: !!knight && knightAndBishopKnightTargetSquares(fen).includes(knight.square),

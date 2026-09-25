@@ -49,11 +49,25 @@ test('r4 unclutters beside a middle-16 king outside the central four, across D4'
  }
 });
 
+test('r4 clears a nearby edge bishop before the knight crowds its exit, across D4',()=>{
+ for(const t of SQUARE_TRANSFORMS){
+  for(const start of [
+   'B7/8/1K1k4/2N5/8/8/8/8 w - - 0 1',
+  ]){
+   const fen=transformFen(start,t);
+   const retreat=getChess(fen).move({from:transformSquare('a8',t),to:transformSquare('h1',t)}).san;
+   assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[retreat],t.name);
+   assert.equal(explainMove(bishopKnightRuleSet.scoreWhiteCandidates!(fen,getChess(fen).moves()),knightAndBishopWhiteRules,retreat)?.id,'r4',t.name);
+  }
+ }
+});
+
 test('r4 uses the starting king and bishop arrangement, across D4',()=>{
  for(const t of SQUARE_TRANSFORMS){
   for(const fen of [
    '8/8/8/1BN5/1k1K4/8/8/8 w - - 0 1', // Adjacent king on central d4.
    '8/1K6/8/1BN5/1k6/8/8/8 w - - 0 1', // King outside middle 16, but not adjacent.
+   'B7/8/4k3/1K6/2N5/8/8/8 w - - 0 1', // Edge bishop three steps from the king.
   ]){
    const f=transformFen(fen,t);
    for(const move of getChess(f).moves()){
