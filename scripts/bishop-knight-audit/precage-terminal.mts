@@ -15,7 +15,11 @@ const original = JSON.parse(readFileSync(source + '/result.json', 'utf8'));
 assert.equal(original.blackPolicy, 'all-legal');
 assert.equal(original.population, 'all');
 const bundle = await build({entryPoints:['scripts/bishop-knight-audit/worker.mts'],bundle:true,platform:'node',format:'esm',write:false});
-assert.equal(createHash('sha256').update(bundle.outputFiles[0]!.contents).digest('hex'), original.policyFingerprint, 'Source policy is stale: refresh move choices first');
+const manifest = JSON.parse(readFileSync(source + '/manifest.json', 'utf8'));
+const policyFingerprint = manifest.referenceWorkerFingerprint;
+assert.equal(createHash('sha256').update(readFileSync(source + '/reference-worker.mjs')).digest('hex'), policyFingerprint, 'Source worker fingerprint is invalid');
+assert.equal(createHash('sha256').update(bundle.outputFiles[0]!.contents).digest('hex'), policyFingerprint, 'Source policy is stale: refresh move choices first');
+assert.ok([manifest.fingerprint, policyFingerprint].includes(original.policyFingerprint), 'Source result does not match its manifest');
 const db = new DatabaseSync(source + '/census.sqlite', {readOnly:true});
 const terminalCache = new Map<number,boolean>();
 function terminal(key:number) {
@@ -50,7 +54,7 @@ const boards=[...placements.values()].map(p=>({...p,size:p.supported}));
 const groups=new Map<string,number[]>();for(const b of boards){const m=loopPositionMotif(b.key);groups.set(m,[...(groups.get(m)??[]),b.key]);}
 const motifs=[...groups].map(([motif,keys])=>({motif,count:keys.length,keys})).sort((a,b)=>b.count-a.count);
 const surviving=new Set(boards.map(b=>b.key));
-const report={source,policyFingerprint:original.policyFingerprint,blackPolicy:'all-legal',population:'all',terminalDefinition:'Central bishop diagonally adjacent to knight, or degenerate A/B/C; stop at either side to move. This is an audit terminal, not a support declaration.',method:'Remove terminal positions and edges from the complete source graph; recompute SCCs. Only original cyclic components need inspection because deletions cannot create cycles.',independentCycleMembershipVerified:true,sourceLoopPositions:original.placements.boards.length,remainingLoopPositions:boards.length,physicalLoopPositions:boards.reduce((a,b)=>a+b.weight,0),excludedLoopPositions:original.placements.boards.length-boards.length,sourcePositionsWithoutExclusions:original.placements.boards.filter((b:any)=>!terminal(b.key)).length,cyclicComponents:cyclic.length,whiteTurnCyclePositions:cyclic.reduce((n,c)=>n+c.length,0),motifs,placements:{boards},families:cyclic.map((c,i)=>({id:i,nodeIds:c.map(v=>ids[v])})),supportLosses:0,supportedLoops:boards.filter(b=>b.size!==99).length};
+const report={source,exclusionFingerprint:createHash('sha256').update(readFileSync('scripts/bishop-knight-audit/loop-exclusions.mts')).digest('hex'),policyFingerprint,sourceGraphFingerprint:original.policyFingerprint,blackPolicy:'all-legal',population:'all',terminalDefinition:'Central bishop diagonally adjacent to knight, or degenerate A/B/C; stop at either side to move. This is an audit terminal, not a support declaration.',method:'Remove terminal positions and edges from the complete source graph; recompute SCCs. Only original cyclic components need inspection because deletions cannot create cycles.',independentCycleMembershipVerified:true,sourceLoopPositions:original.placements.boards.length,remainingLoopPositions:boards.length,physicalLoopPositions:boards.reduce((a,b)=>a+b.weight,0),excludedLoopPositions:original.placements.boards.length-boards.length,sourcePositionsWithoutExclusions:original.placements.boards.filter((b:any)=>!terminal(b.key)).length,cyclicComponents:cyclic.length,whiteTurnCyclePositions:cyclic.reduce((n,c)=>n+c.length,0),motifs,placements:{boards},families:cyclic.map((c,i)=>({id:i,nodeIds:c.map(v=>ids[v])})),supportLosses:0,supportedLoops:boards.filter(b=>b.size!==99).length};
 assert.ok(boards.every(b=>!terminal(b.key)&&b.size===99));
 assert.ok(original.placements.boards.filter((b:any)=>surviving.has(b.key)).length===boards.length);
 mkdirSync(out,{recursive:true});writeFileSync(out+'/result.json',JSON.stringify(report,null,2));
