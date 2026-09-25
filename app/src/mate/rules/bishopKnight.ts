@@ -63,6 +63,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly undefendedKnightOnlyBishopDefenderPenalty: number;
   readonly undefendedMinorForkPenalty: number;
   readonly attackedBishopEscapeScore: number;
+  readonly attackedBishopDistanceScore: number;
   readonly nearbyPairBishopEscapeScore: number;
   readonly nearbyPairCentralDefensePenalty: number;
   readonly attackedKnightDefensePenalty: number;
@@ -352,6 +353,8 @@ function scoreKnightAndBishopWhiteMoveCore(
         }
       }) ? 1 : 0;
     },
+    attackedBishopDistanceScore: context.shouldEscapeBishop && bishop && blackKing
+      ? -squaredEuclideanDistance(bishop.square, blackKing.square) : 0,
     attackedBishopDefensePenalty: context.shouldEscapeBishop && !bishopDefendedByKingMove ? 1 : 0,
     get attackedBishopEscapeScore() {
       return context.shouldEscapeBishop && !bishopDefendedByKingMove && bishop && blackKing
@@ -520,6 +523,12 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
         return a[1] - b[1] || a[2] - b[2]
           || first.knightMiddle16ProximityScore - second.knightMiddle16ProximityScore;
       },
+    },
+    {
+      id: "r6.5",
+      shortLabel: "rule r6.5",
+      helpText: "To save an attacked bishop, maximize its distance from the Black king.",
+      compare: (first, second) => first.attackedBishopDistanceScore - second.attackedBishopDistanceScore,
     },
     {
       id: "r7",

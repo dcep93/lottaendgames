@@ -112,6 +112,11 @@ test("bishop-and-knight rules are registered", () => {
       helpText: "Unless the knight is protected by a stable bishop, drift the knight towards king protection, then prefer knight central 16 proximity.",
     },
     {
+      id: "r6.5",
+      shortLabel: "rule r6.5",
+      helpText: "To save an attacked bishop, maximize its distance from the Black king.",
+    },
+    {
       id: "r7",
       shortLabel: "rule r7",
       helpText: "Prefer king step proximity to the knight, then king central proximity, then prefer the king on the color opposite the bishop.",
@@ -145,6 +150,7 @@ test("bishop-and-knight rules are registered", () => {
       "minors safe",
       "no stalemate",
       "r6",
+      "r6.5",
       "r7",
       "r8",
       "r20",
@@ -154,7 +160,7 @@ test("bishop-and-knight rules are registered", () => {
     ruleSet.whiteRuleDescriptions.map(({ id }) => id),
     knightAndBishopWhiteRules.map(({ id }) => id),
   );
-  assert.equal(knightAndBishopWhiteRules.length, 7);
+  assert.equal(knightAndBishopWhiteRules.length, 8);
   assert.deepEqual(ruleSet.help.noteBoards, []);
 });
 
