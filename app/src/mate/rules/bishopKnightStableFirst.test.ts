@@ -34,7 +34,7 @@ test('r6 recognizes resulting stable bishop defense, including interior adjacenc
 });
 
 
-test('r6 keeps king protection, then adds stable bishop protection with Nd5 across D4',()=>{
+test('r6 ties king-protected knights regardless of additional bishop protection across D4',()=>{
  for(const t of SQUARE_TRANSFORMS){
   const fen=transformFen('B4k2/8/8/4K3/5N2/8/8/8 w - - 2 2',t);
   const san=(to:'d5'|'e6')=>getChess(fen).move({from:transformSquare('f4',t),to:transformSquare(to,t)}).san;
@@ -44,7 +44,8 @@ test('r6 keeps king protection, then adds stable bishop protection with Nd5 acro
   assert.equal(kingOnly.kingKnightAdjacencyPenalty,0,t.name);
   assert.equal(both.knightStableBishopProtectionPenalty,0,t.name);
   assert.equal(kingOnly.knightStableBishopProtectionPenalty,1,t.name);
-  assert.ok(r6.compare!(both,kingOnly)<0,t.name);
-  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[san('d5')],t.name);
+  assert.equal(r6.compare!(both,kingOnly),0,t.name);
+  const centralBishops=(['d5','e4'] as const).map(to=>getChess(fen).move({from:transformSquare('a8',t),to:transformSquare(to,t)}).san);
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen).sort(),centralBishops.sort(),t.name);
  }
 });

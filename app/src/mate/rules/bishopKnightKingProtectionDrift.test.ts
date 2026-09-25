@@ -268,7 +268,9 @@ test('r6 equally values Nc3 and Ne3 inside the central 16 across D4', () => {
   assert.equal(r6.compare!(center,other),0,t.name);
   const defense=getChess(fen).move({from:transformSquare('a8',t),to:transformSquare('f3',t)}).san;
   assert.equal(scoreKnightAndBishopWhiteMove(fen,defense).knightStableBishopProtectionPenalty,0);
-  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[defense],t.name);
+  const longDiagonal=getChess(fen).move({from:transformSquare('a8',t),to:transformSquare('h1',t)}).san;
+  assert.equal(r6.compare!(scoreKnightAndBishopWhiteMove(fen,defense),scoreKnightAndBishopWhiteMove(fen,longDiagonal)),0,t.name);
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[longDiagonal],t.name);
  }
 });
 
