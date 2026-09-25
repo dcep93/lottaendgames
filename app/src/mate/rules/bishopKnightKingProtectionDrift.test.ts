@@ -30,7 +30,8 @@ test('r6 has no special preference for establishing a precage knight across D4',
   assert.equal(precage.knightTargetProximityScore,0);
   assert.equal(away.knightTargetProximityScore,99);
   assert.equal(rule.compare!(precage,away),0);
-  const knightMove = getChess(fen).move({from:transformSquare('h5',t),to:transformSquare('h4',t)}).san;
+  // Ne3 has the protected continuation Ng4 regardless of the precage label.
+  const knightMove = getChess(fen).move({from:transformSquare('c4',t),to:transformSquare('e3',t)}).san;
   assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[knightMove]);
  }
 });
@@ -195,6 +196,24 @@ test('r6 does not credit Nf1 retreat; r7 chooses Kh5 and Ng4 is protected after 
    board.move(reply);
    board.move({from:transformSquare('h2',t),to:transformSquare('g4',t)});
    assert.equal(board.isAttacked(transformSquare('g4',t),'w'),true,t.name);
+   assert.ok(!board.moves({verbose:true}).some(m=>m.captured==='n'),t.name);
+   board.undo(); board.undo();
+  }
+ }
+});
+
+test('r6 allows Nc1 edge opposition because Ne2 reaches king protection across D4', () => {
+ for (const t of SQUARE_TRANSFORMS) {
+  const fen = transformFen('6B1/8/8/8/8/1Nk5/8/5K2 w - - 2 2',t);
+  const board = getChess(fen);
+  const move = board.move({from:transformSquare('b3',t),to:transformSquare('c1',t)}).san;
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[move],t.name);
+  assert.equal(scoreKnightAndBishopWhiteMove(fen,move).knightDriftObstructionPenalty,0,t.name);
+  assert.equal(explainMove(bishopKnightRuleSet.scoreWhiteCandidates!(fen,getChess(fen).moves()),knightAndBishopWhiteRules,move)?.id,'r6',t.name);
+  for (const reply of board.moves()) {
+   board.move(reply);
+   board.move({from:transformSquare('c1',t),to:transformSquare('e2',t)});
+   assert.equal(board.isAttacked(transformSquare('e2',t),'w'),true,t.name);
    assert.ok(!board.moves({verbose:true}).some(m=>m.captured==='n'),t.name);
    board.undo(); board.undo();
   }

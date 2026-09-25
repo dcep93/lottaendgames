@@ -23,6 +23,9 @@ export function knightDriftThreatPenalty(white: Square, bishop: Square, knight: 
     if (threat === knight || threat === bishop || kingDistance(threat, white) <= 1
       || isKnightMove(knight, threat) || bishopControls(bishop, threat, [white, knight])) continue;
     if (kingDistance(threat, knight) !== 1) continue;
+    // A chase cannot force retreat when the knight can jump into king protection.
+    if (knightMoved && jumps.get(knight)!.some(s => s !== white && s !== bishop && s !== threat
+      && kingDistance(s, white) === 1)) continue;
     if (kingDistance(threat, white) < kingDistance(knight, white)) penalty = 1;
     if (!knightMoved) continue;
     // An existing defense or a single safe king step makes the knight reachable.

@@ -268,6 +268,8 @@ function scoreKnightAndBishopWhiteMoveCore(
   const knightEdgeOpposition = (() => {
     if (move.piece !== "n" || !knight || !whiteKing || kingDistance(knight.square, whiteKing.square) <= 2 || !blackKing
       || squaredEuclideanDistance(knight.square, blackKing.square) !== 4) return false;
+    // An edge square is not a retreat trap when the next jump reaches protection.
+    if (knightKingProtectionDistance(resultFen) === 1) return false;
     const n = squareCoordinates(knight.square);
     const k = squareCoordinates(blackKing.square);
     const file = 2 * n.file - k.file;
