@@ -109,7 +109,7 @@ test("bishop-and-knight rules are registered", () => {
     {
       id: "r7",
       shortLabel: "rule r7",
-      helpText: "Prefer king step-then-Euclidean proximity to a central square, then prefer king on the color opposite the bishop.",
+      helpText: "Prefer king proximity to a central square, then prefer king on the color opposite the bishop.",
     },
     {
       id: "r8",
@@ -124,7 +124,7 @@ test("bishop-and-knight rules are registered", () => {
     {
       id: "r20",
       shortLabel: "rule r20",
-      helpText: "Maximize piece distance from Black's king, then prefer piece Euclidean distance to the center.",
+      helpText: "Maximize piece distance from Black's king, then prefer piece Euclidean proximity to the center.",
     },
   ]);
   assert.equal(ruleSet.help.noteBoards.some(board => board.id === "bishop-knight-rule-r4-flush"), false);

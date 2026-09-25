@@ -245,7 +245,21 @@ function scoreKnightAndBishopWhiteMoveCore(
     relativeKnightPenalty: context.relativeKnightMove && context.relativeKnightMove !== move.from + move.to ? 1 : 0,
     startsWithMiddle16King: context.startsWithMiddle16King,
     bishopCenterPenalty: bishop && centerDistance(bishop.square) === 0 ? 0 : 1,
-    get knightKingProtectionDistance() { return knightKingProtectionDistance(resultFen); },
+    get knightKingProtectionDistance() {
+      const distance = knightKingProtectionDistance(resultFen);
+      // Opposition near the edge can force an unprotected knight back.
+      if (move.piece === "n" && !knightKingDefended && knight && blackKing
+        && squaredEuclideanDistance(knight.square, blackKing.square) === 4) {
+        const n = squareCoordinates(knight.square);
+        const k = squareCoordinates(blackKing.square);
+        const beyondFile = 2 * n.file - k.file;
+        const beyondRank = 2 * n.rank - k.rank;
+        if (beyondFile < 0 || beyondFile > 7 || beyondRank < 0 || beyondRank > 7) {
+          return Math.max(distance, knightKingProtectionDistance(fen));
+        }
+      }
+      return distance;
+    },
     get minorCenterDistanceScore() {
       return [bishop, knight].reduce((sum, piece) => sum + (piece
         ? Math.sqrt(knightAndBishopCenterProximityScore(piece.square)) / 2 : 0), 0);
@@ -427,9 +441,8 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     {
       id: "r7",
       shortLabel: "rule r7",
-      helpText: "Prefer king step-then-Euclidean proximity to a central square, then prefer king on the color opposite the bishop.",
-      compare: (first, second) => first.kingCenterProximityScore - second.kingCenterProximityScore
-        || first.kingCenterEuclideanScore - second.kingCenterEuclideanScore
+      helpText: "Prefer king proximity to a central square, then prefer king on the color opposite the bishop.",
+      compare: (first, second) => first.kingCenterEuclideanScore - second.kingCenterEuclideanScore
         || first.kingBishopColorPenalty - second.kingBishopColorPenalty,
     },
     {
@@ -458,7 +471,7 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     {
       id: "r20",
       shortLabel: "rule r20",
-      helpText: "Maximize piece distance from Black's king, then prefer piece Euclidean distance to the center.",
+      helpText: "Maximize piece distance from Black's king, then prefer piece Euclidean proximity to the center.",
       compare: (first, second) => first.minorBlackDistanceScore - second.minorBlackDistanceScore
         || first.minorCenterDistanceScore - second.minorCenterDistanceScore,
     },
@@ -596,7 +609,7 @@ const bishopKnightHelp: RuleHelp = {
   ],
   notes: [
     "For r8, White’s king must be on files c–f and ranks 3–6 before moving. Evaluate the bishop and knight preferences after White moves. Precage squares require a central bishop and must lie strictly opposite Black across the bishop’s long diagonal. For a light-squared bishop, select the opposite-side pair from c4, d3, e6 and f5; include board symmetries. No targets exist when Black is on the long diagonal. Bishop adjacency is not required. Rules r8 and r10 share these targets.",
-    "For r7, minimize White’s king steps to the nearest of d4, e4, d5 or e5, then Euclidean distance to the nearest of those squares, then prefer the king on the color opposite the bishop. For r20, maximize the sum of the bishop’s and knight’s Euclidean distances from Black’s king, then minimize the sum of their Euclidean distances to the board’s midpoint, measured after White moves.",
+    "For r7, minimize White’s king Euclidean distance to the nearest of d4, e4, d5 or e5, then prefer the king on the color opposite the bishop. For r20, maximize the sum of the bishop’s and knight’s Euclidean distances from Black’s king, then minimize the sum of their Euclidean distances to the board’s midpoint, measured after White moves.",
     "The target corner is the bishop-colored corner closest to Black's king.",
     "Support has been reset. No position is supported until explicitly declared under the new rules; all earlier support declarations and r2.5 preferences have been discarded.",
   ],

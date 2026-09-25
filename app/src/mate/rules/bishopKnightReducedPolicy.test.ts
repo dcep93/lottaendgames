@@ -95,7 +95,7 @@ test('the old behind-White score remains removed', () => {
 })
 
 
-test('king steps and Euclidean proximity outrank color across D4', () => {
+test('king Euclidean proximity outranks color across D4', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     const fen = transformFen('1NK5/8/2B5/8/8/k7/8/8 w - - 0 1', transform)
     const moves = (['d7', 'd8'] as const).map(to => getChess(fen).move({from: transformSquare('c8', transform), to: transformSquare(to, transform)}).san)

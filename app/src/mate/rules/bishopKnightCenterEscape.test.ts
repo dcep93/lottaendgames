@@ -3,7 +3,7 @@ import test from 'node:test';
 import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess';
 import { knightAndBishopWhiteRules, scoreKnightAndBishopWhiteMove } from './bishopKnight';
 
-test('r7 ranks central king steps, Euclidean distance, then opposite color; r20 scores minor distances from Black', () => {
+test('r7 ranks central king Euclidean distance, then opposite color; r20 scores minor distances from Black', () => {
   const r99 = knightAndBishopWhiteRules.find(rule => rule.id === 'r7')!;
   const r20 = knightAndBishopWhiteRules.find(rule => rule.id === 'r20')!;
   assert.ok(r99.compare); assert.ok(r20.compare);
@@ -43,7 +43,7 @@ test('r20 breaks equal Black-distance ties by minor Euclidean proximity to the c
 });
 
 
-test('r7 puts central-square steps ahead of color across D4', () => {
+test('r7 puts central-square proximity ahead of color across D4', () => {
   const compare = knightAndBishopWhiteRules.find(rule => rule.id === 'r7')!.compare!;
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen('8/7k/8/3BK3/2N5/8/8/8 w - - 6 4', t);

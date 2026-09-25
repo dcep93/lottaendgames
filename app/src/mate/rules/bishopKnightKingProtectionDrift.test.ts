@@ -44,3 +44,28 @@ test('r10 does not use king protection as a tiebreak once the knight is on preca
  const rule = knightAndBishopWhiteRules.find(r => r.id === 'r10')!;
  assert.equal(rule.compare!(near,far),0);
 });
+
+
+test('r10 gives no progress credit for unprotected knight opposition toward the edge across D4', () => {
+ const cases = [
+  {fen: '6K1/8/Nk6/8/8/8/8/3B4 w - - 0 1', from: 'a6', to: 'b8'},
+  {fen: '4B1K1/8/8/1Nk5/8/8/8/8 w - - 14 8', from: 'b5', to: 'c7'},
+ ] as const;
+ for (const example of cases) for (const t of SQUARE_TRANSFORMS) {
+  const fen = transformFen(example.fen, t);
+  const chess = getChess(fen);
+  const san = chess.move({from: transformSquare(example.from, t), to: transformSquare(example.to, t)}).san;
+  const before = knightKingProtectionDistance(fen);
+  assert.ok(knightKingProtectionDistance(chess.fen()) <= before, t.name);
+  assert.equal(scoreKnightAndBishopWhiteMove(fen, san).knightKingProtectionDistance, before, t.name);
+  assert.ok(!getIdealKnightAndBishopWhiteMoves(fen).includes(san), t.name);
+ }
+});
+
+test('r10 still credits reaching king protection in knight opposition across D4', () => {
+ for (const t of SQUARE_TRANSFORMS) {
+  const fen = transformFen('4B3/3K4/8/1Nk5/8/8/8/8 w - - 0 1', t);
+  const san = getChess(fen).move({from: transformSquare('b5', t), to: transformSquare('c7', t)}).san;
+  assert.equal(scoreKnightAndBishopWhiteMove(fen, san).knightKingProtectionDistance, 0, t.name);
+ }
+});
