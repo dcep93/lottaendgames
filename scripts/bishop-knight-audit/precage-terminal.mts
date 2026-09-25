@@ -3,8 +3,8 @@ import {DatabaseSync} from 'node:sqlite';
 import {createHash} from 'node:crypto';
 import {build} from '../../app/node_modules/esbuild/lib/main.js';
 import assert from 'node:assert/strict';
-import {BASE, fen, unpack, square} from './encoding.mts';
-import {knightAndBishopKnightTargetSquares} from '../../app/src/mate/rules/bishopKnightStrategy.ts';
+import {BASE, fen} from './encoding.mts';
+import {loopExclusion} from './loop-exclusions.mts';
 import {piecePositionMotif} from './position-motifs.mts';
 
 // Removing terminal vertices/edges cannot introduce cycles. Every surviving
@@ -19,7 +19,7 @@ assert.equal(createHash('sha256').update(bundle.outputFiles[0]!.contents).digest
 const db = new DatabaseSync(source + '/census.sqlite', {readOnly:true});
 const terminalCache = new Map<number,boolean>();
 function terminal(key:number) {
-  if (!terminalCache.has(key)) terminalCache.set(key, knightAndBishopKnightTargetSquares(fen(key)).some(target => target === square(unpack(key)[2]!)));
+  if (!terminalCache.has(key)) terminalCache.set(key, loopExclusion(fen(key)) !== null);
   return terminalCache.get(key)!;
 }
 const ids:number[] = [...new Set<number>(original.families.flatMap((f:any)=>f.nodeIds))];
@@ -50,7 +50,7 @@ const boards=[...placements.values()].map(p=>({...p,size:p.supported}));
 const groups=new Map<string,number[]>();for(const b of boards){const m=piecePositionMotif(b.key);groups.set(m,[...(groups.get(m)??[]),b.key]);}
 const motifs=[...groups].map(([motif,keys])=>({motif,count:keys.length,keys})).sort((a,b)=>b.count-a.count);
 const surviving=new Set(boards.map(b=>b.key));
-const report={source,policyFingerprint:original.policyFingerprint,blackPolicy:'all-legal',population:'all',terminalDefinition:'Central bishop and knight currently on a production precage square; stop at either side to move. This is an audit terminal, not a support declaration.',method:'Remove terminal positions and edges from the complete source graph; recompute SCCs. Only original cyclic components need inspection because deletions cannot create cycles.',independentCycleMembershipVerified:true,sourceLoopPositions:original.placements.boards.length,remainingLoopPositions:boards.length,physicalLoopPositions:boards.reduce((a,b)=>a+b.weight,0),excludedLoopPositions:original.placements.boards.length-boards.length,sourcePositionsWithoutPrecage:original.placements.boards.filter((b:any)=>!terminal(b.key)).length,cyclicComponents:cyclic.length,whiteTurnCyclePositions:cyclic.reduce((n,c)=>n+c.length,0),motifs,placements:{boards},families:cyclic.map((c,i)=>({id:i,nodeIds:c.map(v=>ids[v])})),supportLosses:0,supportedLoops:boards.filter(b=>b.size!==99).length};
+const report={source,policyFingerprint:original.policyFingerprint,blackPolicy:'all-legal',population:'all',terminalDefinition:'Central bishop diagonally adjacent to knight, or degenerate A/B/C; stop at either side to move. This is an audit terminal, not a support declaration.',method:'Remove terminal positions and edges from the complete source graph; recompute SCCs. Only original cyclic components need inspection because deletions cannot create cycles.',independentCycleMembershipVerified:true,sourceLoopPositions:original.placements.boards.length,remainingLoopPositions:boards.length,physicalLoopPositions:boards.reduce((a,b)=>a+b.weight,0),excludedLoopPositions:original.placements.boards.length-boards.length,sourcePositionsWithoutExclusions:original.placements.boards.filter((b:any)=>!terminal(b.key)).length,cyclicComponents:cyclic.length,whiteTurnCyclePositions:cyclic.reduce((n,c)=>n+c.length,0),motifs,placements:{boards},families:cyclic.map((c,i)=>({id:i,nodeIds:c.map(v=>ids[v])})),supportLosses:0,supportedLoops:boards.filter(b=>b.size!==99).length};
 assert.ok(boards.every(b=>!terminal(b.key)&&b.size===99));
 assert.ok(original.placements.boards.filter((b:any)=>surviving.has(b.key)).length===boards.length);
 mkdirSync(out,{recursive:true});writeFileSync(out+'/result.json',JSON.stringify(report,null,2));

@@ -1,10 +1,15 @@
-## Current reporting scope: precage terminals
+## Current reporting scope: terminals and degenerate positions
 
-Until the user changes this scope, treat a central bishop with a knight on a
-currently eligible precage square as an audit terminal, for either side to move.
-Use the production precage predicate, including the opposite-side requirement
-relative to Black. This does not declare support or change app move preferences.
-After obtaining a complete, current `--scope all` graph, run from the repository root:
+Stop at a central bishop (d4/e4/d5/e5) diagonally adjacent to the knight,
+regardless of production precage eligibility. Exclude degenerate A/B/C positions
+using `loop-exclusions.mts`: Black is adjacent to both minors and White lacks the
+specified king rescue. A is knight-defends-bishop; B is edge-bishop-defends-knight
+without a king rescue of the bishop or a legal knight rescue destination; C has
+no king move defending both minors. Existing king defenses count as rescues.
+These are reporting exclusions, not changes to move preferences or support.
+Check every ply of an example, including setups that enter a degenerate position.
+
+The existing command name is retained for compatibility:
 
 ```sh
 ./app/node_modules/.bin/tsx scripts/bishop-knight-audit/precage-terminal.mts SOURCE_AUDIT OUTPUT_DIRECTORY
@@ -315,3 +320,12 @@ plus counts per component. It deduplicates boards before restoring symmetry
 weights, asserts the total matches the exhaustive analysis, and reports overlaps
 between groups. Use these counts when targeting positions directly on cycles;
 use the main report's reach counts when targeting all starts leading to cycles.
+
+## Quick loop examples (no full audit)
+
+Run `./app/node_modules/.bin/tsx scripts/bishop-knight-audit/select-loop-examples.mts CANDIDATE_JSON ...`
+to revalidate saved four-ply examples against current preferences and exclusions.
+It returns up to four D4-distinct loops, sorted by White's inclusive bounding-box
+area. Every White move must remain preferred, every Black move legal, and every
+ply free of terminals/degeneracies. Replay links are decoded before emission.
+A short result only describes the supplied candidate set; it is not a global count.
