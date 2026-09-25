@@ -1,0 +1,74 @@
+{
+  "change": "r6.5 prefers moving an attacked bishop adjacent to White king. All such landings tie within r6.5; otherwise maximize bishop Euclidean distance from Black. Already king-defended starting bishops keep r6.5 inactive.",
+  "scope": "Replay of all 2467 four-ply witnesses from full audit 3947731, not a full-domain count or arbitrary-cycle position-membership check.",
+  "previousSurvivingCycles": 77,
+  "survivingCycleWitnesses": 67,
+  "brokenThisChange": 10,
+  "reactivatedWitnesses": 0,
+  "displayEligibleCycles": 3,
+  "hiddenMiddle16Cycles": 64,
+  "motifs": [
+    {
+      "motif": "bishop shuffle; central bishop throughout; knight king-protected throughout; no stable bishop defense",
+      "cycles": 61,
+      "positions": 35
+    },
+    {
+      "motif": "knight shuffle; central bishop throughout; knight king-protected throughout; no stable bishop defense",
+      "cycles": 3,
+      "positions": 6
+    },
+    {
+      "motif": "knight shuffle; bishop outside center throughout; knight king-protected throughout; no stable bishop defense",
+      "cycles": 2,
+      "positions": 3
+    },
+    {
+      "motif": "king shuffle; bishop outside center throughout; knight king-protected throughout; no stable bishop defense",
+      "cycles": 1,
+      "positions": 2
+    }
+  ],
+  "examples": [
+    {
+      "group": 0,
+      "motif": "knight shuffle; bishop outside center throughout; knight king-protected throughout; no stable bishop defense",
+      "fen": "8/k7/B7/1K6/1N6/8/8/8 w - - 0 1",
+      "moves": [
+        "Nc6+",
+        "Ka8",
+        "Nb4",
+        "Ka7"
+      ],
+      "area": 6,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/k7/B7/1K6/1N6/8/8/8_w_-_-_0_1&moves=Nc6%2B,Ka8,Nb4,Ka7&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "knight shuffle; bishop outside center throughout; knight king-protected throughout; no stable bishop defense",
+      "fen": "1k6/8/B7/1K6/1N6/8/8/8 w - - 0 1",
+      "moves": [
+        "Nc6+",
+        "Ka8",
+        "Nb4",
+        "Kb8"
+      ],
+      "area": 6,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=1k6/8/B7/1K6/1N6/8/8/8_w_-_-_0_1&moves=Nc6%2B,Ka8,Nb4,Kb8&cursor=0"
+    },
+    {
+      "group": 1,
+      "motif": "king shuffle; bishop outside center throughout; knight king-protected throughout; no stable bishop defense",
+      "fen": "B7/8/KN6/2k5/8/8/8/8 w - - 0 1",
+      "moves": [
+        "Kb7",
+        "Kd6",
+        "Ka6",
+        "Kc5"
+      ],
+      "area": 6,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=B7/8/KN6/2k5/8/8/8/8_w_-_-_0_1&moves=Kb7,Kd6,Ka6,Kc5&cursor=0"
+    }
+  ],
+  "validation": "15 targeted tests pass, including D4 transformations, adjacency priority, distance fallback, and the existing king-defense exemption. Production build passes. Broad suite: 134 pass, same 4 pre-existing failures."
+}
