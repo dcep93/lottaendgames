@@ -18,3 +18,10 @@ test('audit precage labels match production on either side of the bishop across 
     assert.equal(piecePositionMotif(code(fen)).endsWith('knight on precage'), expected, fen);
   }
 });
+
+test('loop archetypes describe geometry and are D4 invariant', async () => {
+  const {loopPositionMotif} = await import('./position-motifs.mts');
+  const original = '8/8/8/2NBk3/2K5/8/8/8 w - - 0 1';
+  const expected = 'central bishop; bishop king-protected; knight king-protected; knight orthogonally adjacent to bishop';
+  for (const t of SQUARE_TRANSFORMS) assert.equal(loopPositionMotif(code(transformFen(original,t))), expected);
+});

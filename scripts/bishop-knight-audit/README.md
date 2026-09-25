@@ -329,3 +329,12 @@ It returns up to four D4-distinct loops, sorted by White's inclusive bounding-bo
 area. Every White move must remain preferred, every Black move legal, and every
 ply free of terminals/degeneracies. Replay links are decoded before emission.
 A short result only describes the supplied candidate set; it is not a global count.
+
+After terminal/degenerate filtering, count exact four-ply cycles with
+`./app/node_modules/.bin/tsx scripts/bishop-knight-audit/count-four-ply.mts FILTERED_AUDIT`.
+This recomputes current preferred White moves and every legal Black reply for the
+remaining cycle placements, checks exact four-ply closure, and deduplicates the
+entire four-position cycle under D4 and choice of starting turn. It does not count
+mere reachability or call every cyclic component a single simple loop. Reporting
+archetypes use bishop region, king protection of each minor, and bishop–knight
+adjacency, independent of production precage labels.

@@ -35,3 +35,14 @@ export function piecePositionMotif(key: number): string {
     }
     return `Noncentral bishop ${kingProtectsBishop ? 'king-protected' : 'not king-protected'}; ${region(king)} king; knight ${distance(king, knight) === 1 ? 'king-protected' : region(knight) === 'edge' ? 'on edge, unprotected by king' : 'unprotected by king'}`;
 }
+
+/** Reporting archetypes use piece geometry, independently of policy precage labels. */
+export function loopPositionMotif(key: number): string {
+    const [king, bishop, knight] = unpack(key);
+    const dx = Math.abs((bishop & 7) - (knight & 7));
+    const dy = Math.abs((bishop >> 3) - (knight >> 3));
+    const relation = dx + dy === 1 ? 'knight orthogonally adjacent to bishop'
+        : dx === 1 && dy === 1 ? 'knight diagonally adjacent to bishop'
+        : 'knight separated from bishop';
+    return `${region(bishop)} bishop; ${distance(king, bishop) === 1 ? 'bishop king-protected' : 'bishop not king-protected'}; ${distance(king, knight) === 1 ? 'knight king-protected' : 'knight not king-protected'}; ${relation}`;
+}
