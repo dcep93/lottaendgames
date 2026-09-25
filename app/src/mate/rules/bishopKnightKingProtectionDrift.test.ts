@@ -60,6 +60,8 @@ test('r6 gives no progress credit for unprotected knight opposition toward the e
   assert.equal(scoreKnightAndBishopWhiteMove(fen, san).knightKingProtectionDistance, before, t.name);
   const candidate = scoreKnightAndBishopWhiteMove(fen, san);
   assert.equal(candidate.knightDriftBlocked, true, t.name);
+  assert.equal(candidate.knightDriftObstructionPenalty, 1, t.name);
+  assert.ok(!getIdealKnightAndBishopWhiteMoves(fen).includes(san), t.name);
  }
 });
 
@@ -95,5 +97,21 @@ test('r6 leaves drift neutral when an adjacent Black king blocks the way toward 
   const toward = scoreKnightAndBishopWhiteMove(fen, san('e4'));
   assert.equal(retreat.knightDriftBlocked, true);
   assert.equal(rule.compare!(retreat, toward), 0);
+ }
+});
+
+
+test('r6 rejects Nb8 before the blocked-drift fallback to r7, preferring Nb4 across D4', () => {
+ const rule = knightAndBishopWhiteRules.find(r => r.id === 'r6')!;
+ for (const t of SQUARE_TRANSFORMS) {
+  const fen = transformFen('6K1/8/Nk6/8/8/8/8/3B4 w - - 0 1', t);
+  const san = (to: 'b4' | 'b8') => getChess(fen).move({from: transformSquare('a6', t), to: transformSquare(to, t)}).san;
+  const safe = scoreKnightAndBishopWhiteMove(fen, san('b4'));
+  const edge = scoreKnightAndBishopWhiteMove(fen, san('b8'));
+  assert.equal(safe.knightDriftBlocked, true);
+  assert.equal(edge.knightDriftBlocked, true);
+  assert.ok(edge.kingKnightDistanceScore < safe.kingKnightDistanceScore);
+  assert.ok(rule.compare!(safe, edge) < 0, t.name);
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [san('b4')], t.name);
  }
 });

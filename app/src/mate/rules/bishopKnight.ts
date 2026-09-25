@@ -52,6 +52,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly knightKingProtectionDistance: number;
   readonly knightKingProximityScore: number;
   readonly knightDriftBlocked: boolean;
+  readonly knightDriftObstructionPenalty: number;
   readonly kingKnightAdjacencyPenalty: number;
   readonly kingKnightDistanceScore: number;
   readonly kingCoordinationPenalty: number;
@@ -179,6 +180,10 @@ type KnightAndBishopPositionScoreContext = {
   readonly shouldCheckThreeDiagonal: boolean;
 };
 
+function blackBlocksKnightDrift(knight: Square, black: Square, white: Square): boolean {
+  return manhattanDistance(knight, black) === 1 && kingDistance(black, white) < kingDistance(knight, white);
+}
+
 function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
   let shouldCheckThreeDiagonal: boolean | undefined;
   const whiteKing = findPiece(fen, "w", "k");
@@ -190,8 +195,7 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
   const knightCentrallyDefended = !!knight && centralKing && kingDistance(whiteKing.square, knight.square) === 1;
   return {
     knightDriftBlocked: !!knight && !!blackKing && !!whiteKing
-      && manhattanDistance(knight.square, blackKing.square) === 1
-      && kingDistance(blackKing.square, whiteKing.square) < kingDistance(knight.square, whiteKing.square),
+      && blackBlocksKnightDrift(knight.square, blackKing.square, whiteKing.square),
     precageSideTarget: knightAndBishopPrecageSideTarget(fen),
     sixPointNineMove: knightAndBishopSixPointNineMove(fen),
     fivePointFiveMove: knightAndBishopFivePointFiveMove(fen),
@@ -271,6 +275,8 @@ function scoreKnightAndBishopWhiteMoveCore(
     kingKnightAdjacencyPenalty: knightKingDefended ? 0 : 1,
     kingKnightDistanceScore: whiteKing && knight ? squaredEuclideanDistance(whiteKing.square, knight.square) : 99,
     knightDriftBlocked: context.knightDriftBlocked,
+    knightDriftObstructionPenalty: Number(knightEdgeOpposition || (!!knight && !!blackKing && !!whiteKing
+      && blackBlocksKnightDrift(knight.square, blackKing.square, whiteKing.square))),
     get knightKingProtectionDistance() {
       const distance = knightKingProtectionDistance(resultFen);
       // Opposition near the edge can force an unprotected knight back.
@@ -469,6 +475,8 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       shortLabel: "rule r6",
       helpText: "Drift the knight towards king protection.",
       compare: (first, second) => {
+        const obstruction = first.knightDriftObstructionPenalty - second.knightDriftObstructionPenalty;
+        if (obstruction) return obstruction;
         if (first.knightDriftBlocked && second.knightDriftBlocked) return 0;
         return first.knightKingProtectionDistance - second.knightKingProtectionDistance
           || first.knightKingProximityScore - second.knightKingProximityScore;
