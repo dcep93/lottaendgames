@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import {getChess, SQUARE_TRANSFORMS, transformFen, transformSquare} from '../chess'
-import {getIdealKnightAndBishopWhiteMoves, scoreKnightAndBishopWhiteMove} from './bishopKnight'
+import {getIdealKnightAndBishopWhiteMoves, scoreKnightAndBishopWhiteMove, knightAndBishopWhiteRules} from './bishopKnight'
 
-test('r6 establishes king protection without the removed double-attack preference across D4', () => {
+test('r4 unclutters before r6 establishes king protection, without the removed double-attack preference across D4', () => {
   const start = '3k4/8/1NB5/2K5/8/8/8/8 w - - 0 1'
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen(start, t)
@@ -11,7 +11,11 @@ test('r6 establishes king protection without the removed double-attack preferenc
     assert.equal(scoreKnightAndBishopWhiteMove(fen, move('c5', 'd4')).undefendedMinorForkPenalty, 1)
     assert.equal(scoreKnightAndBishopWhiteMove(fen, move('c5', 'd5')).undefendedMinorForkPenalty, 0)
     const knightMove = getChess(fen).move({from: transformSquare('b6', t), to: transformSquare('d5', t)}).san
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [knightMove])
+    const retreat = getChess(fen).move({from: transformSquare('c6', t), to: transformSquare('h1', t)}).san
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [retreat])
+    const knightScore=scoreKnightAndBishopWhiteMove(fen,knightMove), retreatScore=scoreKnightAndBishopWhiteMove(fen,retreat)
+    assert.ok(knightAndBishopWhiteRules.find(r=>r.id==='r4')!.compare!(retreatScore,knightScore)<0)
+    assert.ok(knightAndBishopWhiteRules.find(r=>r.id==='r6')!.compare!(knightScore,retreatScore)<0)
   }
 })
 

@@ -5,7 +5,7 @@ import {bishopKnightRuleSet,getIdealKnightAndBishopWhiteMoves,knightAndBishopWhi
 import {explainMove} from './selection';
 
 const start='8/8/1K6/1BN5/1k6/8/8/8 w - - 0 1';
-test('r4 separates the bishop from a king outside the middle 16, across D4',()=>{
+test('r4 separates the bishop from a noncentral king, across D4',()=>{
  for(const t of SQUARE_TRANSFORMS){
   const fen=transformFen(start,t);
   const san=(to:'f1'|'e2'|'c6')=>getChess(fen).move({from:transformSquare('b5',t),to:transformSquare(to,t)}).san;
@@ -35,10 +35,24 @@ test('r4 separates the bishop from a king outside the middle 16, across D4',()=>
  }
 });
 
+test('r4 unclutters beside a middle-16 king outside the central four, across D4',()=>{
+ for(const t of SQUARE_TRANSFORMS){
+  for(const [start,from,to] of [
+   ['8/8/8/2k5/2BN4/2K5/8/8 w - - 0 1','c4','g8'],
+   ['8/8/2K5/1BN5/1k6/8/8/8 w - - 0 1','b5','f1'],
+  ] as const){
+   const fen=transformFen(start,t);
+   const san=getChess(fen).move({from:transformSquare(from,t),to:transformSquare(to,t)}).san;
+   assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[san],t.name);
+   assert.equal(explainMove(bishopKnightRuleSet.scoreWhiteCandidates!(fen,getChess(fen).moves()),knightAndBishopWhiteRules,san)?.id,'r4',t.name);
+  }
+ }
+});
+
 test('r4 uses the starting king and bishop arrangement, across D4',()=>{
  for(const t of SQUARE_TRANSFORMS){
   for(const fen of [
-   '8/8/2K5/1BN5/1k6/8/8/8 w - - 0 1', // Adjacent king on the c6 boundary of middle 16.
+   '8/8/8/1BN5/1k1K4/8/8/8 w - - 0 1', // Adjacent king on central d4.
    '8/1K6/8/1BN5/1k6/8/8/8 w - - 0 1', // King outside middle 16, but not adjacent.
   ]){
    const f=transformFen(fen,t);

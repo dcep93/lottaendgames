@@ -109,7 +109,7 @@ test("bishop-and-knight rules are registered", () => {
     {
       id: "r4",
       shortLabel: "rule r4",
-      helpText: "If the bishop is adjacent to White's non central 16 king, place it at least 3 steps from Black's king, maximizing its distance from White's king.",
+      helpText: "Without a central White king, unclutter the bishop.",
     },
     {
       id: "r5",

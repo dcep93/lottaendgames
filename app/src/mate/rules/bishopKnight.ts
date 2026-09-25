@@ -239,7 +239,7 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
       && !bishopCentrallyDefended && !knightCentrallyDefended,
     shouldEscapeBishop: !!bishop && !!blackKing && kingDistance(bishop.square, blackKing.square) === 1
       && (!whiteKing || kingDistance(bishop.square, whiteKing.square) !== 1),
-    shouldSeparateBishop: !!bishop && !!whiteKing && !isMiddle16Square(whiteKing.square)
+    shouldSeparateBishop: !!bishop && !!whiteKing && !centralKing
       && kingDistance(bishop.square, whiteKing.square) === 1,
     shouldDefendKnight: !!knight && !!blackKing && kingDistance(knight.square, blackKing.square) === 1,
     shouldCoordinateKing: knightAndBishopShouldCoordinateKing(fen),
@@ -540,7 +540,7 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     {
       id: "r4",
       shortLabel: "rule r4",
-      helpText: "If the bishop is adjacent to White's non central 16 king, place it at least 3 steps from Black's king, maximizing its distance from White's king.",
+      helpText: "Without a central White king, unclutter the bishop.",
       compare: (first, second) => first.bishopSeparationPenalty - second.bishopSeparationPenalty
         || first.bishopWhiteKingDistanceScore - second.bishopWhiteKingDistanceScore,
     },
