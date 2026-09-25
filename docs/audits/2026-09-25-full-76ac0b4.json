@@ -1,0 +1,1024 @@
+{
+  "policyCommit": "76ac0b4137d2248af30c01abe31e1f6a776c39c5",
+  "source": "/Users/danielcepeda/repos/_codex_output/bn-full-76ac0b4-2026-09-25",
+  "filtered": "/Users/danielcepeda/repos/_codex_output/bn-full-76ac0b4-2026-09-25-filtered",
+  "policyFingerprint": "fcc6b937f20f2c2f646f2c2d011c8aa937cf1bbbb1853d009a7d2e1921a99d08",
+  "exclusionFingerprint": "4b6ef04757ab61336240fb423b2c3014304d71c194989ca6333613edf466b30f",
+  "remainingLoopPositions": 5919,
+  "physicalLoopPositions": 47352,
+  "cyclicComponents": 1384,
+  "whiteTurnCyclePositions": 6075,
+  "independentCycleMembershipVerified": true,
+  "supportLosses": 0,
+  "supportedLoops": 0,
+  "terminalDefinition": "Central bishop diagonally adjacent to knight, or degenerate A/B/C; stop at either side to move. This is an audit terminal, not a support declaration.",
+  "distinctFourPlyCycles": 4847,
+  "hiddenMiddle16FourPlyCycles": 74,
+  "displayEligibleFourPlyCycles": 4773,
+  "comparisonToPreviousFullAudit": {
+    "policyCommit": "39477313b7498dd5d389c9b196ac0797ccc5d837",
+    "previousPositions": 2989,
+    "survivingPositions": 204,
+    "resolvedPositions": 2785,
+    "newPositions": 5715,
+    "previousFourPlyCycles": 2467,
+    "survivingFourPlyCycles": 67,
+    "newFourPlyCycles": 4780
+  },
+  "domain": {
+    "d4Placements": 1707888,
+    "physicalPlacements": 13660584,
+    "whitePolicies": 1359344,
+    "transitions": 6416664
+  },
+  "validation": {
+    "passed": true,
+    "seed": 20260920,
+    "roots": 1000,
+    "nodes": 1929,
+    "fingerprint": "9fc7cfee147a4d670d34a4d210141adb081f41c6f395075192af4f2560462c7b"
+  },
+  "symmetrySamplePassed": 1000,
+  "harnessTestsPassed": 39,
+  "motifs": [
+    {
+      "motif": "knight shuffle; bishop outside center throughout; knight without king protection; no stable bishop defense",
+      "cycles": 3714,
+      "positions": 4236
+    },
+    {
+      "motif": "knight shuffle; bishop outside center throughout; knight king-protected throughout; no stable bishop defense",
+      "cycles": 585,
+      "positions": 806
+    },
+    {
+      "motif": "knight shuffle; central bishop throughout; knight without king protection; no stable bishop defense",
+      "cycles": 244,
+      "positions": 344
+    },
+    {
+      "motif": "knight shuffle; bishop outside center throughout; knight king-protected throughout; alternates stable bishop defense",
+      "cycles": 101,
+      "positions": 152
+    },
+    {
+      "motif": "bishop shuffle; central bishop throughout; knight king-protected throughout; no stable bishop defense",
+      "cycles": 70,
+      "positions": 49
+    },
+    {
+      "motif": "bishop shuffle; bishop outside center throughout; knight king-protected throughout; no stable bishop defense",
+      "cycles": 47,
+      "positions": 70
+    },
+    {
+      "motif": "knight shuffle; central bishop throughout; knight king-protected throughout; no stable bishop defense",
+      "cycles": 31,
+      "positions": 44
+    },
+    {
+      "motif": "bishop shuffle; bishop enters/leaves center; knight king-protected throughout; no stable bishop defense",
+      "cycles": 30,
+      "positions": 45
+    },
+    {
+      "motif": "knight shuffle; central bishop throughout; knight king-protected throughout; alternates stable bishop defense",
+      "cycles": 10,
+      "positions": 16
+    },
+    {
+      "motif": "bishop shuffle; bishop outside center throughout; knight without king protection; no stable bishop defense",
+      "cycles": 7,
+      "positions": 13
+    },
+    {
+      "motif": "bishop shuffle; bishop enters/leaves center; knight without king protection; no stable bishop defense",
+      "cycles": 5,
+      "positions": 9
+    },
+    {
+      "motif": "bishop shuffle; bishop outside center throughout; knight king-protected throughout; stable bishop defense",
+      "cycles": 2,
+      "positions": 3
+    },
+    {
+      "motif": "king shuffle; bishop outside center throughout; knight king-protected throughout; no stable bishop defense",
+      "cycles": 1,
+      "positions": 2
+    }
+  ],
+  "displayEligibleMotifs": [
+    {
+      "motif": "knight shuffle; bishop outside center throughout; knight without king protection; no stable bishop defense",
+      "cycles": 3714,
+      "positions": 4236
+    },
+    {
+      "motif": "knight shuffle; bishop outside center throughout; knight king-protected throughout; no stable bishop defense",
+      "cycles": 585,
+      "positions": 806
+    },
+    {
+      "motif": "knight shuffle; central bishop throughout; knight without king protection; no stable bishop defense",
+      "cycles": 244,
+      "positions": 344
+    },
+    {
+      "motif": "knight shuffle; bishop outside center throughout; knight king-protected throughout; alternates stable bishop defense",
+      "cycles": 101,
+      "positions": 152
+    },
+    {
+      "motif": "bishop shuffle; bishop outside center throughout; knight king-protected throughout; no stable bishop defense",
+      "cycles": 46,
+      "positions": 70
+    },
+    {
+      "motif": "bishop shuffle; bishop enters/leaves center; knight king-protected throughout; no stable bishop defense",
+      "cycles": 30,
+      "positions": 45
+    },
+    {
+      "motif": "knight shuffle; central bishop throughout; knight king-protected throughout; no stable bishop defense",
+      "cycles": 28,
+      "positions": 44
+    },
+    {
+      "motif": "knight shuffle; central bishop throughout; knight king-protected throughout; alternates stable bishop defense",
+      "cycles": 10,
+      "positions": 16
+    },
+    {
+      "motif": "bishop shuffle; bishop outside center throughout; knight without king protection; no stable bishop defense",
+      "cycles": 7,
+      "positions": 13
+    },
+    {
+      "motif": "bishop shuffle; bishop enters/leaves center; knight without king protection; no stable bishop defense",
+      "cycles": 5,
+      "positions": 9
+    },
+    {
+      "motif": "bishop shuffle; bishop outside center throughout; knight king-protected throughout; stable bishop defense",
+      "cycles": 2,
+      "positions": 3
+    },
+    {
+      "motif": "king shuffle; bishop outside center throughout; knight king-protected throughout; no stable bishop defense",
+      "cycles": 1,
+      "positions": 2
+    }
+  ],
+  "largestMotifMechanism": {
+    "postCounts": {
+      "one white result stable": 3714
+    },
+    "traces": [
+      {
+        "fen": "4B3/8/8/8/N7/8/8/k6K w - - 0 1",
+        "frames": [
+          {
+            "move": "Nc3",
+            "trace": [
+              {
+                "rule": "minors safe",
+                "survivors": [
+                  "Bf7",
+                  "Bg6",
+                  "Bh5",
+                  "Bd7",
+                  "Bc6",
+                  "Bb5",
+                  "Nb6",
+                  "Nc5",
+                  "Nc3",
+                  "Kg2",
+                  "Kh2",
+                  "Kg1"
+                ]
+              },
+              {
+                "rule": "r6",
+                "survivors": [
+                  "Nc3"
+                ]
+              }
+            ]
+          },
+          {
+            "move": "Na4+",
+            "trace": [
+              {
+                "rule": "minors safe",
+                "survivors": [
+                  "Na4+",
+                  "Nb5",
+                  "Nd5",
+                  "Ne4",
+                  "Ne2",
+                  "Nd1+"
+                ]
+              },
+              {
+                "rule": "r6",
+                "survivors": [
+                  "Na4+"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "fen": "7K/8/8/8/B7/k7/8/3N4 w - - 0 1",
+        "frames": [
+          {
+            "move": "Nc3",
+            "trace": [
+              {
+                "rule": "minors safe",
+                "survivors": [
+                  "Bb5",
+                  "Bc6",
+                  "Bd7",
+                  "Be8",
+                  "Bc2",
+                  "Nc3"
+                ]
+              },
+              {
+                "rule": "r6",
+                "survivors": [
+                  "Nc3"
+                ]
+              }
+            ]
+          },
+          {
+            "move": "Nd1+",
+            "trace": [
+              {
+                "rule": "minors safe",
+                "survivors": [
+                  "Nb5",
+                  "Nd5",
+                  "Ne4",
+                  "Ne2",
+                  "Nd1+"
+                ]
+              },
+              {
+                "rule": "r6",
+                "survivors": [
+                  "Nd1+"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "fen": "2B5/8/N7/8/8/2k5/8/7K w - - 0 1",
+        "frames": [
+          {
+            "move": "Nc5",
+            "trace": [
+              {
+                "rule": "minors safe",
+                "survivors": [
+                  "Bd7",
+                  "Be6",
+                  "Bf5",
+                  "Bg4",
+                  "Bh3",
+                  "Bb7",
+                  "Nb8",
+                  "Nc7",
+                  "Nc5",
+                  "Kg2",
+                  "Kh2",
+                  "Kg1"
+                ]
+              },
+              {
+                "rule": "r6",
+                "survivors": [
+                  "Nc5"
+                ]
+              }
+            ]
+          },
+          {
+            "move": "Na6+",
+            "trace": [
+              {
+                "rule": "minors safe",
+                "survivors": [
+                  "Na6+",
+                  "Nb7",
+                  "Nd7",
+                  "Ne6",
+                  "Ne4",
+                  "Nd3+"
+                ]
+              },
+              {
+                "rule": "r6",
+                "survivors": [
+                  "Na6+"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "fen": "2B5/8/N7/8/8/1k6/8/7K w - - 0 1",
+        "frames": [
+          {
+            "move": "Nc5+",
+            "trace": [
+              {
+                "rule": "minors safe",
+                "survivors": [
+                  "Bd7",
+                  "Be6+",
+                  "Bf5",
+                  "Bg4",
+                  "Bh3",
+                  "Bb7",
+                  "Nb8",
+                  "Nc7",
+                  "Nc5+",
+                  "Kg2",
+                  "Kh2",
+                  "Kg1"
+                ]
+              },
+              {
+                "rule": "r6",
+                "survivors": [
+                  "Nc5+"
+                ]
+              }
+            ]
+          },
+          {
+            "move": "Na6+",
+            "trace": [
+              {
+                "rule": "minors safe",
+                "survivors": [
+                  "Na6+",
+                  "Nb7",
+                  "Nd7",
+                  "Ne6",
+                  "Ne4",
+                  "Nd3+"
+                ]
+              },
+              {
+                "rule": "r6",
+                "survivors": [
+                  "Na6+"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "fen": "2B5/8/N7/8/8/k7/8/7K w - - 0 1",
+        "frames": [
+          {
+            "move": "Nc5",
+            "trace": [
+              {
+                "rule": "minors safe",
+                "survivors": [
+                  "Bd7",
+                  "Be6",
+                  "Bf5",
+                  "Bg4",
+                  "Bh3",
+                  "Bb7",
+                  "Nb8",
+                  "Nc7",
+                  "Nc5",
+                  "Kg2",
+                  "Kh2",
+                  "Kg1"
+                ]
+              },
+              {
+                "rule": "r6",
+                "survivors": [
+                  "Nc5"
+                ]
+              }
+            ]
+          },
+          {
+            "move": "Na6+",
+            "trace": [
+              {
+                "rule": "minors safe",
+                "survivors": [
+                  "Na6+",
+                  "Nb7",
+                  "Nd7",
+                  "Ne6",
+                  "Ne4",
+                  "Nd3+"
+                ]
+              },
+              {
+                "rule": "r6",
+                "survivors": [
+                  "Na6+"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "fen": "B4k2/8/2N5/8/8/8/8/7K w - - 0 1",
+        "frames": [
+          {
+            "move": "Nd4",
+            "trace": [
+              {
+                "rule": "minors safe",
+                "survivors": [
+                  "Bb7",
+                  "Na7",
+                  "Nb8",
+                  "Nd8",
+                  "Ne5",
+                  "Nd4",
+                  "Nb4",
+                  "Na5",
+                  "Kg2",
+                  "Kh2",
+                  "Kg1"
+                ]
+              },
+              {
+                "rule": "r6",
+                "survivors": [
+                  "Ne5",
+                  "Nd4"
+                ]
+              },
+              {
+                "rule": "r20",
+                "survivors": [
+                  "Nd4"
+                ]
+              }
+            ]
+          },
+          {
+            "move": "Nc6",
+            "trace": [
+              {
+                "rule": "r6",
+                "survivors": [
+                  "Nc6"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "fen": "B7/5k2/2N5/8/8/8/8/7K w - - 0 1",
+        "frames": [
+          {
+            "move": "Nd4",
+            "trace": [
+              {
+                "rule": "minors safe",
+                "survivors": [
+                  "Bb7",
+                  "Na7",
+                  "Nb8",
+                  "Nd8+",
+                  "Ne5+",
+                  "Nd4",
+                  "Nb4",
+                  "Na5",
+                  "Kg2",
+                  "Kh2",
+                  "Kg1"
+                ]
+              },
+              {
+                "rule": "r6",
+                "survivors": [
+                  "Ne5+",
+                  "Nd4"
+                ]
+              },
+              {
+                "rule": "r20",
+                "survivors": [
+                  "Nd4"
+                ]
+              }
+            ]
+          },
+          {
+            "move": "Nc6",
+            "trace": [
+              {
+                "rule": "r6",
+                "survivors": [
+                  "Nc6"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "fen": "B7/4k3/8/8/3N4/8/8/7K w - - 0 1",
+        "frames": [
+          {
+            "move": "Nc6+",
+            "trace": [
+              {
+                "rule": "minors safe",
+                "survivors": [
+                  "Bb7",
+                  "Bc6",
+                  "Bd5",
+                  "Be4",
+                  "Bf3",
+                  "Bg2",
+                  "Nb5",
+                  "Nc6+",
+                  "Nf5+",
+                  "Nf3",
+                  "Ne2",
+                  "Nc2",
+                  "Nb3",
+                  "Kg2",
+                  "Kh2",
+                  "Kg1"
+                ]
+              },
+              {
+                "rule": "r6",
+                "survivors": [
+                  "Nc6+"
+                ]
+              }
+            ]
+          },
+          {
+            "move": "Nd4",
+            "trace": [
+              {
+                "rule": "minors safe",
+                "survivors": [
+                  "Bb7",
+                  "Na7",
+                  "Nb8",
+                  "Nd8",
+                  "Ne5",
+                  "Nd4",
+                  "Nb4",
+                  "Na5",
+                  "Kg2",
+                  "Kh2",
+                  "Kg1"
+                ]
+              },
+              {
+                "rule": "r6",
+                "survivors": [
+                  "Ne5",
+                  "Nd4"
+                ]
+              },
+              {
+                "rule": "r20",
+                "survivors": [
+                  "Nd4"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "fen": "B7/8/2N2k2/8/8/8/8/7K w - - 0 1",
+        "frames": [
+          {
+            "move": "Nd4",
+            "trace": [
+              {
+                "rule": "minors safe",
+                "survivors": [
+                  "Bb7",
+                  "Na7",
+                  "Nb8",
+                  "Nd8",
+                  "Nd4",
+                  "Nb4",
+                  "Na5",
+                  "Kg2",
+                  "Kh2",
+                  "Kg1"
+                ]
+              },
+              {
+                "rule": "r6",
+                "survivors": [
+                  "Nd4"
+                ]
+              }
+            ]
+          },
+          {
+            "move": "Nc6+",
+            "trace": [
+              {
+                "rule": "minors safe",
+                "survivors": [
+                  "Bb7",
+                  "Bc6",
+                  "Bd5",
+                  "Be4",
+                  "Bf3",
+                  "Bg2",
+                  "Nb5",
+                  "Nc6+",
+                  "Nf5+",
+                  "Nf3",
+                  "Ne2",
+                  "Nc2",
+                  "Nb3",
+                  "Kg2",
+                  "Kh2",
+                  "Kg1"
+                ]
+              },
+              {
+                "rule": "r6",
+                "survivors": [
+                  "Nc6+"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "fen": "4B3/8/8/8/N7/8/7K/k7 w - - 0 1",
+        "frames": [
+          {
+            "move": "Nc3",
+            "trace": [
+              {
+                "rule": "minors safe",
+                "survivors": [
+                  "Bf7",
+                  "Bg6",
+                  "Bh5",
+                  "Bd7",
+                  "Bc6",
+                  "Bb5",
+                  "Nb6",
+                  "Nc5",
+                  "Nc3",
+                  "Kg3",
+                  "Kh3",
+                  "Kh1",
+                  "Kg1",
+                  "Kg2"
+                ]
+              },
+              {
+                "rule": "r6",
+                "survivors": [
+                  "Nc3"
+                ]
+              }
+            ]
+          },
+          {
+            "move": "Na4+",
+            "trace": [
+              {
+                "rule": "minors safe",
+                "survivors": [
+                  "Na4+",
+                  "Nb5",
+                  "Nd5",
+                  "Ne4",
+                  "Ne2",
+                  "Nd1+"
+                ]
+              },
+              {
+                "rule": "r6",
+                "survivors": [
+                  "Na4+"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "fen": "B7/8/8/4k3/8/8/5KN1/8 w - - 0 1",
+        "frames": [
+          {
+            "move": "Ne3",
+            "trace": [
+              {
+                "rule": "minors safe",
+                "survivors": [
+                  "Bb7",
+                  "Bc6",
+                  "Bf3",
+                  "Ke3",
+                  "Kf3",
+                  "Kg3",
+                  "Kg1",
+                  "Kf1",
+                  "Ke1",
+                  "Ke2",
+                  "Ne3",
+                  "Nh4",
+                  "Ne1"
+                ]
+              },
+              {
+                "rule": "r6",
+                "survivors": [
+                  "Ne3"
+                ]
+              }
+            ]
+          },
+          {
+            "move": "Ng2+",
+            "trace": [
+              {
+                "rule": "minors safe",
+                "survivors": [
+                  "Bb7",
+                  "Bc6",
+                  "Bd5",
+                  "Bf3",
+                  "Bg2",
+                  "Bh1",
+                  "Nc4",
+                  "Nd5+",
+                  "Ng2+",
+                  "Nf1",
+                  "Nd1",
+                  "Nc2",
+                  "Ke2"
+                ]
+              },
+              {
+                "rule": "r5",
+                "survivors": [
+                  "Ng2+"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "fen": "6B1/8/8/k7/8/8/NK6/8 w - - 0 1",
+        "frames": [
+          {
+            "move": "Nc3",
+            "trace": [
+              {
+                "rule": "minors safe",
+                "survivors": [
+                  "Bh7",
+                  "Bf7",
+                  "Be6",
+                  "Bd5",
+                  "Bc4",
+                  "Bb3",
+                  "Nc3",
+                  "Nc1",
+                  "Ka3",
+                  "Kb3",
+                  "Kc3",
+                  "Kc2",
+                  "Kc1",
+                  "Kb1",
+                  "Ka1"
+                ]
+              },
+              {
+                "rule": "r6",
+                "survivors": [
+                  "Nc3"
+                ]
+              }
+            ]
+          },
+          {
+            "move": "Na2+",
+            "trace": [
+              {
+                "rule": "minors safe",
+                "survivors": [
+                  "Bh7",
+                  "Bf7",
+                  "Be6",
+                  "Bd5",
+                  "Bb3",
+                  "Ba2",
+                  "Nd5+",
+                  "Ne4",
+                  "Ne2",
+                  "Nd1",
+                  "Nb1",
+                  "Na2+",
+                  "Kc2"
+                ]
+              },
+              {
+                "rule": "r5",
+                "survivors": [
+                  "Na2+"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "examples": [
+    {
+      "group": 0,
+      "motif": "knight shuffle; bishop outside center throughout; knight without king protection; no stable bishop defense",
+      "fen": "4B3/8/8/8/N7/8/8/k6K w - - 0 1",
+      "moves": [
+        "Nc3",
+        "Kb2",
+        "Na4+",
+        "Ka1"
+      ],
+      "area": 64,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=4B3/8/8/8/N7/8/8/k6K_w_-_-_0_1&moves=Nc3,Kb2,Na4%2B,Ka1&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "knight shuffle; bishop outside center throughout; knight without king protection; no stable bishop defense",
+      "fen": "7K/8/8/8/B7/k7/8/3N4 w - - 0 1",
+      "moves": [
+        "Nc3",
+        "Kb2",
+        "Nd1+",
+        "Ka3"
+      ],
+      "area": 64,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=7K/8/8/8/B7/k7/8/3N4_w_-_-_0_1&moves=Nc3,Kb2,Nd1%2B,Ka3&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "knight shuffle; bishop outside center throughout; knight without king protection; no stable bishop defense",
+      "fen": "2B5/8/N7/8/8/2k5/8/7K w - - 0 1",
+      "moves": [
+        "Nc5",
+        "Kb4",
+        "Na6+",
+        "Kc3"
+      ],
+      "area": 64,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=2B5/8/N7/8/8/2k5/8/7K_w_-_-_0_1&moves=Nc5,Kb4,Na6%2B,Kc3&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "knight shuffle; bishop outside center throughout; knight without king protection; no stable bishop defense",
+      "fen": "2B5/8/N7/8/8/1k6/8/7K w - - 0 1",
+      "moves": [
+        "Nc5+",
+        "Kb4",
+        "Na6+",
+        "Kb3"
+      ],
+      "area": 64,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=2B5/8/N7/8/8/1k6/8/7K_w_-_-_0_1&moves=Nc5%2B,Kb4,Na6%2B,Kb3&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "knight shuffle; bishop outside center throughout; knight without king protection; no stable bishop defense",
+      "fen": "2B5/8/N7/8/8/k7/8/7K w - - 0 1",
+      "moves": [
+        "Nc5",
+        "Kb4",
+        "Na6+",
+        "Ka3"
+      ],
+      "area": 64,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=2B5/8/N7/8/8/k7/8/7K_w_-_-_0_1&moves=Nc5,Kb4,Na6%2B,Ka3&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "knight shuffle; bishop outside center throughout; knight without king protection; no stable bishop defense",
+      "fen": "B4k2/8/2N5/8/8/8/8/7K w - - 0 1",
+      "moves": [
+        "Nd4",
+        "Ke8",
+        "Nc6",
+        "Kf8"
+      ],
+      "area": 64,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=B4k2/8/2N5/8/8/8/8/7K_w_-_-_0_1&moves=Nd4,Ke8,Nc6,Kf8&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "knight shuffle; bishop outside center throughout; knight without king protection; no stable bishop defense",
+      "fen": "B7/5k2/2N5/8/8/8/8/7K w - - 0 1",
+      "moves": [
+        "Nd4",
+        "Ke8",
+        "Nc6",
+        "Kf7"
+      ],
+      "area": 64,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=B7/5k2/2N5/8/8/8/8/7K_w_-_-_0_1&moves=Nd4,Ke8,Nc6,Kf7&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "knight shuffle; bishop outside center throughout; knight without king protection; no stable bishop defense",
+      "fen": "B7/4k3/8/8/3N4/8/8/7K w - - 0 1",
+      "moves": [
+        "Nc6+",
+        "Kf8",
+        "Nd4",
+        "Ke7"
+      ],
+      "area": 64,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=B7/4k3/8/8/3N4/8/8/7K_w_-_-_0_1&moves=Nc6%2B,Kf8,Nd4,Ke7&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "knight shuffle; bishop outside center throughout; knight without king protection; no stable bishop defense",
+      "fen": "B7/8/2N2k2/8/8/8/8/7K w - - 0 1",
+      "moves": [
+        "Nd4",
+        "Ke7",
+        "Nc6+",
+        "Kf6"
+      ],
+      "area": 64,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=B7/8/2N2k2/8/8/8/8/7K_w_-_-_0_1&moves=Nd4,Ke7,Nc6%2B,Kf6&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "knight shuffle; bishop outside center throughout; knight without king protection; no stable bishop defense",
+      "fen": "4B3/8/8/8/N7/8/7K/k7 w - - 0 1",
+      "moves": [
+        "Nc3",
+        "Kb2",
+        "Na4+",
+        "Ka1"
+      ],
+      "area": 56,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=4B3/8/8/8/N7/8/7K/k7_w_-_-_0_1&moves=Nc3,Kb2,Na4%2B,Ka1&cursor=0"
+    },
+    {
+      "group": 1,
+      "motif": "knight shuffle; bishop outside center throughout; knight king-protected throughout; no stable bishop defense",
+      "fen": "B7/8/8/4k3/8/8/5KN1/8 w - - 0 1",
+      "moves": [
+        "Ne3",
+        "Kf4",
+        "Ng2+",
+        "Ke5"
+      ],
+      "area": 49,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=B7/8/8/4k3/8/8/5KN1/8_w_-_-_0_1&moves=Ne3,Kf4,Ng2%2B,Ke5&cursor=0"
+    },
+    {
+      "group": 1,
+      "motif": "knight shuffle; bishop outside center throughout; knight king-protected throughout; no stable bishop defense",
+      "fen": "6B1/8/8/k7/8/8/NK6/8 w - - 0 1",
+      "moves": [
+        "Nc3",
+        "Kb4",
+        "Na2+",
+        "Ka5"
+      ],
+      "area": 49,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=6B1/8/8/k7/8/8/NK6/8_w_-_-_0_1&moves=Nc3,Kb4,Na2%2B,Ka5&cursor=0"
+    }
+  ]
+}
