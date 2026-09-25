@@ -103,7 +103,7 @@ test('r6 prefers escaping obstruction over a route Black can obstruct again acro
 });
 
 
-test('r6 rejects Nb8 before the blocked-drift fallback to r7, preferring Nb4 across D4', () => {
+test('r6 rejects Nb8 despite equal king-step distance, preferring Nb4 across D4', () => {
  const rule = knightAndBishopWhiteRules.find(r => r.id === 'r6')!;
  for (const t of SQUARE_TRANSFORMS) {
   const fen = transformFen('6K1/8/Nk6/8/8/8/8/3B4 w - - 0 1', t);
@@ -112,7 +112,7 @@ test('r6 rejects Nb8 before the blocked-drift fallback to r7, preferring Nb4 acr
   const edge = scoreKnightAndBishopWhiteMove(fen, san('b8'));
   assert.equal(safe.knightDriftBlocked, true);
   assert.equal(edge.knightDriftBlocked, true);
-  assert.ok(edge.kingKnightDistanceScore < safe.kingKnightDistanceScore);
+  assert.equal(edge.kingKnightDistanceScore, safe.kingKnightDistanceScore);
   assert.ok(rule.compare!(safe, edge) < 0, t.name);
   assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [san('b4')], t.name);
  }

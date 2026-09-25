@@ -288,7 +288,7 @@ function scoreKnightAndBishopWhiteMoveCore(
     startsWithMiddle16King: context.startsWithMiddle16King,
     bishopCenterPenalty: bishop && centerDistance(bishop.square) === 0 ? 0 : 1,
     kingKnightAdjacencyPenalty: knightKingDefended ? 0 : 1,
-    kingKnightDistanceScore: whiteKing && knight ? squaredEuclideanDistance(whiteKing.square, knight.square) : 99,
+    kingKnightDistanceScore: whiteKing && knight ? kingDistance(whiteKing.square, knight.square) : 99,
     knightDriftBlocked: context.knightDriftBlocked,
     get knightDriftScore(): readonly [number, number, number] {
       const baseline = context.knightDriftBaseline;
@@ -515,7 +515,7 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     {
       id: "r7",
       shortLabel: "rule r7",
-      helpText: "Prefer king proximity to the knight, then king central proximity, then prefer the king on the color opposite the bishop.",
+      helpText: "Prefer king step proximity to the knight, then king central proximity, then prefer the king on the color opposite the bishop.",
       compare: (first, second) => first.kingKnightDistanceScore - second.kingKnightDistanceScore
         || first.kingCenterEuclideanScore - second.kingCenterEuclideanScore
         || first.kingBishopColorPenalty - second.kingBishopColorPenalty,
@@ -674,7 +674,7 @@ const bishopKnightHelp: RuleHelp = {
   ],
   notes: [
     "For r8, White’s king must be on files c–f and ranks 3–6 before moving. Evaluate the bishop and knight preferences after White moves. Precage squares require a central bishop and must lie strictly opposite Black across the bishop’s long diagonal. For a light-squared bishop, select the opposite-side pair from c4, d3, e6 and f5; include board symmetries. No targets exist when Black is on the long diagonal. Bishop adjacency is not required.",
-    "For r7, minimize White’s king Euclidean distance to the knight, then its Euclidean distance to the nearest of d4, e4, d5 or e5, then prefer the king on the color opposite the bishop. For r20, prefer stable protection, then maximize unprotected minor-piece Euclidean distance from Black’s king, then minimize the sum of their Euclidean distances to the board’s midpoint, measured after White moves.",
+    "For r7, minimize White’s king step distance to the knight, then its Euclidean distance to the nearest of d4, e4, d5 or e5, then prefer the king on the color opposite the bishop. For r20, prefer stable protection, then maximize unprotected minor-piece Euclidean distance from Black’s king, then minimize the sum of their Euclidean distances to the board’s midpoint, measured after White moves.",
     "The target corner is the bishop-colored corner closest to Black's king.",
     "Support has been reset. No position is supported until explicitly declared under the new rules; all earlier support declarations and r2.5 preferences have been discarded.",
   ],
