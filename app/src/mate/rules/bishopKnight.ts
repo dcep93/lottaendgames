@@ -50,6 +50,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly minorCenterDistanceScore: number;
   readonly knightKingProtectionDistance: number;
   readonly knightKingProximityScore: number;
+  readonly knightDriftBlocked: boolean;
   readonly kingKnightAdjacencyPenalty: number;
   readonly kingCoordinationPenalty: number;
   readonly attackedBishopDefensePenalty: number;
@@ -156,6 +157,7 @@ function distanceToNearestUnprotectedKnightOrBishop(fen: string): number {
 }
 
 type KnightAndBishopPositionScoreContext = {
+  readonly knightDriftBlocked: boolean;
   readonly sixPointNineMove: string | undefined;
   readonly fivePointFiveMove: string | undefined;
   readonly relativeKnightMove: string | undefined;
@@ -185,6 +187,9 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
   const bishopCentrallyDefended = !!bishop && centralKing && kingDistance(whiteKing.square, bishop.square) === 1;
   const knightCentrallyDefended = !!knight && centralKing && kingDistance(whiteKing.square, knight.square) === 1;
   return {
+    knightDriftBlocked: !!knight && !!blackKing && !!whiteKing
+      && manhattanDistance(knight.square, blackKing.square) === 1
+      && kingDistance(blackKing.square, whiteKing.square) < kingDistance(knight.square, whiteKing.square),
     precageSideTarget: knightAndBishopPrecageSideTarget(fen),
     sixPointNineMove: knightAndBishopSixPointNineMove(fen),
     fivePointFiveMove: knightAndBishopFivePointFiveMove(fen),
@@ -257,6 +262,7 @@ function scoreKnightAndBishopWhiteMoveCore(
     startsWithMiddle16King: context.startsWithMiddle16King,
     bishopCenterPenalty: bishop && centerDistance(bishop.square) === 0 ? 0 : 1,
     kingKnightAdjacencyPenalty: knightKingDefended ? 0 : 1,
+    knightDriftBlocked: context.knightDriftBlocked,
     get knightKingProtectionDistance() {
       const distance = knightKingProtectionDistance(resultFen);
       // Opposition near the edge can force an unprotected knight back.
@@ -474,6 +480,7 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
         const firstPrecage = first.knightTargetProximityScore === 0;
         const secondPrecage = second.knightTargetProximityScore === 0;
         if (firstPrecage || secondPrecage) return Number(secondPrecage) - Number(firstPrecage);
+        if (first.knightDriftBlocked && second.knightDriftBlocked) return 0;
         return first.knightKingProtectionDistance - second.knightKingProtectionDistance
           || first.knightKingProximityScore - second.knightKingProximityScore;
       },

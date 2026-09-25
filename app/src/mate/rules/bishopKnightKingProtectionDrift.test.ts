@@ -83,3 +83,16 @@ test('r10 breaks equal protection-distance ties toward White king: Nb2 over Nb6 
   assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [san('b2')], t.name);
  }
 });
+
+
+test('r10 leaves drift neutral when an adjacent Black king blocks the way toward White king across D4', () => {
+ const rule = knightAndBishopWhiteRules.find(r => r.id === 'r10')!;
+ for (const t of SQUARE_TRANSFORMS) {
+  const fen = transformFen('K7/8/8/7B/2k5/2N5/8/8 w - - 0 1', t);
+  const san = (to: 'd1' | 'e4') => getChess(fen).move({from: transformSquare('c3', t), to: transformSquare(to, t)}).san;
+  const retreat = scoreKnightAndBishopWhiteMove(fen, san('d1'));
+  const toward = scoreKnightAndBishopWhiteMove(fen, san('e4'));
+  assert.equal(retreat.knightDriftBlocked, true);
+  assert.equal(rule.compare!(retreat, toward), 0);
+ }
+});
