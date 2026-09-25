@@ -45,3 +45,34 @@ test('r5 applies to translated geometry, but rejects missing geometric condition
   assert.equal(knightAndBishopR5Move(transformFen(c.fen,t)),expected,t.name);
  }
 });
+
+test('r5 advances the king before a knight move permits the reverse hop, across D4',()=>{
+ const start='B7/8/8/8/3k4/8/8/5KN1 w - - 0 1';
+ for(const t of SQUARE_TRANSFORMS){
+  const fen=transformFen(start,t), board=getChess(fen);
+  const from=transformSquare('f1',t),to=transformSquare('f2',t);
+  assert.equal(knightAndBishopR5Move(fen),from+to,t.name);
+  const san=board.move({from,to}).san;
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[san],t.name);
+  assert.equal(explainMove(bishopKnightRuleSet.scoreWhiteCandidates!(fen,getChess(fen).moves()),knightAndBishopWhiteRules,san)?.id,'r5',t.name);
+  const alternative=getChess(fen);
+  alternative.move({from:transformSquare('g1',t),to:transformSquare('e2',t)});
+  alternative.move({from:transformSquare('d4',t),to:transformSquare('e3',t)});
+  assert.equal(knightAndBishopR5Move(alternative.fen()),transformSquare('e2',t)+transformSquare('g1',t),t.name);
+ }
+});
+
+test('r5 anticipation requires an available knight jump, a legal Black trigger, and an available king step',()=>{
+ const cases=[
+  {fen:'1B6/8/8/3k4/8/8/5KN1/8 w - - 0 1',move:['f2','f3']},
+  {fen:'B7/8/8/k7/8/8/8/5KN1 w - - 0 1'}, // Black cannot reach e3.
+  {fen:'8/8/8/8/3k4/8/5B2/5KN1 w - - 0 1'}, // Bishop occupies f2.
+  {fen:'8/8/8/8/3k4/8/4B3/5KN1 w - - 0 1'}, // Bishop occupies e2.
+  {fen:'8/8/8/8/3k4/4B3/8/5KN1 w - - 0 1'}, // The trigger square is occupied by the bishop.
+  {fen:'8/8/8/8/3k4/8/3B4/5KN1 w - - 0 1'}, // Bd2 controls the trigger e3.
+ ] as const;
+ for(const c of cases)for(const t of SQUARE_TRANSFORMS){
+  const expected='move' in c?transformSquare(c.move[0],t)+transformSquare(c.move[1],t):undefined;
+  assert.equal(knightAndBishopR5Move(transformFen(c.fen,t)),expected,`${c.fen} ${t.name}`);
+ }
+});
