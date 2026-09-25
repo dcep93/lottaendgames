@@ -28,6 +28,7 @@ import {
 } from "./bishopKnightLookup";
 import { knightAndBishopKnightTargetSquares, knightAndBishopKnightProximityToSquare, knightKingProtectionDistance, knightAndBishopCenterProximityScore, knightAndBishopKingCenterProximityScore, knightAndBishopKingCenterEuclideanScore, knightAndBishopKnightTargetProximityScore, knightAndBishopTargetCorners } from "./bishopKnightStrategy";
 import { knightAndBishopR5Move } from "./bishopKnightR5";
+import { knightAndBishopR5OppositionMoves } from "./bishopKnightR5Opposition";
 import { knightAndBishopShouldCoordinateKing, knightAndBishopKingCoordinatesMinors } from "./bishopKnightCoordination";
 import { knightAndBishopSixPointNineMove } from "./bishopKnightSixPointNine";
 import { knightAndBishopFivePointFiveMove } from "./bishopKnightFivePointFive";
@@ -177,7 +178,7 @@ type KnightAndBishopPositionScoreContext = {
   readonly startsWithPrecageKnight: boolean;
   readonly precageSideTarget: PrecageSideTarget | undefined;
   readonly oppositePrecageTargets: readonly Square[];
-  readonly declaredPreparationMove: string | undefined;
+  readonly declaredPreparationMoves: readonly string[] | undefined;
   readonly declaredSupportedKnightAdvance: string | undefined;
   readonly declaredSupportedThreeMove: string | undefined;
   readonly declaredSupportedFiveMove: string | undefined;
@@ -228,7 +229,10 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
     startsWithPrecageKnight: !!knight && knightAndBishopKnightTargetSquares(fen).includes(knight.square),
     oppositePrecageTargets: whiteKing && isMiddle16Square(whiteKing.square)
       ? knightAndBishopKnightTargetSquares(fen) : [],
-    declaredPreparationMove: knightAndBishopR5Move(fen),
+    declaredPreparationMoves: (() => {
+      const move=knightAndBishopR5Move(fen);
+      return knightAndBishopR5OppositionMoves(fen) ?? (move ? [move] : undefined);
+    })(),
     declaredSupportedKnightAdvance: undefined,
     declaredSupportedThreeMove: undefined,
     declaredSupportedFiveMove: undefined,
@@ -445,7 +449,7 @@ function scoreKnightAndBishopWhiteMoveCore(
       ? squaredEuclideanDistance(whiteKing.square, context.precageSideTarget.corner) : 0,
     precageKingSteps: context.startsWithPrecageKnight && whiteKing && blackKing
       ? kingDistance(whiteKing.square, blackKing.square) : 0,
-    declaredPreparationPenalty: context.declaredPreparationMove && context.declaredPreparationMove !== move.from + move.to ? 1 : 0,
+    declaredPreparationPenalty: context.declaredPreparationMoves && !context.declaredPreparationMoves.includes(move.from + move.to) && !context.declaredPreparationMoves.includes(move.piece) ? 1 : 0,
     mateScore: checkmate ? 0 : 1,
     stalemateScore: !checkmate && blackReplies.length === 0 ? 1 : 0,
     pieceSafetyScore: !knightAndBishopPiecesPresent(resultFen) || blackReplies.some(({ captured }) => captured === "b" || captured === "n") ? 1 : 0,
@@ -717,6 +721,13 @@ const bishopKnightHelp: RuleHelp = {
     pieces: [{square: "d1", piece: "K"}, {square: "c2", piece: "N"}, {square: "c3", piece: "k"}, {square: "a8", piece: "B"}],
     highlights: [{square: "d2", kind: "key"}],
     arrows: [{from: "c2", to: "e1"}, {from: "d1", to: "d2"}],
+  }, {
+    id: "bishop-knight-rule-r5-opposition",
+    title: "rule r5 — Check, then advance",
+    caption: "Nd1+ prepares Kd2. If Black blocks d2, wait with the bishop first.",
+    pieces: [{square: "c1", piece: "K"}, {square: "b2", piece: "N"}, {square: "c3", piece: "k"}, {square: "e8", piece: "B"}],
+    highlights: [{square: "d2", kind: "key"}],
+    arrows: [{from: "b2", to: "d1"}, {from: "c1", to: "d2"}],
   }],
 };
 

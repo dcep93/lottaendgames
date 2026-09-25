@@ -167,7 +167,7 @@ test("bishop-and-knight rules are registered", () => {
     knightAndBishopWhiteRules.map(({ id }) => id),
   );
   assert.equal(knightAndBishopWhiteRules.length, 9);
-  assert.deepEqual(ruleSet.help.noteBoards.map(board=>board.id), ["bishop-knight-rule-r5-hop"]);
+  assert.deepEqual(ruleSet.help.noteBoards.map(board=>board.id), ["bishop-knight-rule-r5-hop", "bishop-knight-rule-r5-opposition"]);
 });
 
 test("immediate mate keeps precedence without the mating-net rule", () => {
