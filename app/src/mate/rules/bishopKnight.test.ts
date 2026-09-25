@@ -119,7 +119,7 @@ test("bishop-and-knight rules are registered", () => {
     {
       id: "r6.5",
       shortLabel: "rule r6.5",
-      helpText: "To save an attacked bishop, move it to adjacent to the White king or else maximize its distance from the Black king.",
+      helpText: "To save an attacked bishop, move it to adjacent to the central White king or else maximize its distance from the Black king.",
     },
     {
       id: "r7",

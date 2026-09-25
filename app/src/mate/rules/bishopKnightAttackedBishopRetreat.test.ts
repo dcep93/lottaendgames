@@ -43,7 +43,7 @@ test('r6.5 stays neutral when the attacked bishop already has king protection, a
  }
 });
 
-test('r6.5 moves an attacked bishop next to White king before considering retreat distance, across D4',()=>{
+test('r6.5 moves an attacked bishop next to a central White king before considering retreat distance, across D4',()=>{
  const rule=knightAndBishopWhiteRules.find(r=>r.id==='r6.5')!;
  for(const t of SQUARE_TRANSFORMS){
   const fen=transformFen('8/8/3kB3/8/3K4/4N3/8/8 w - - 0 1',t);
@@ -62,11 +62,29 @@ test('r6.5 moves an attacked bishop next to White king before considering retrea
 });
 
 test('r6.5 defense preference requires moving the bishop, rather than the king',()=>{
- const fen='8/8/3kB3/8/5K2/4N3/8/8 w - - 0 1';
+ const fen='8/8/3kB3/8/4K3/4N3/8/8 w - - 0 1';
  const rule=knightAndBishopWhiteRules.find(r=>r.id==='r6.5')!;
  const king=scoreKnightAndBishopWhiteMove(fen,'Kf5');
- const bishop=scoreKnightAndBishopWhiteMove(fen,'Bg4');
+ const bishop=scoreKnightAndBishopWhiteMove(fen,'Bd5');
  assert.equal(king.attackedBishopDefensePenalty,1);
  assert.equal(bishop.attackedBishopDefensePenalty,0);
  assert.ok(rule.compare!(bishop,king)<0);
+});
+
+test('r6.5 uses distance rather than adjacency to a noncentral king, across D4',()=>{
+ const rule=knightAndBishopWhiteRules.find(r=>r.id==='r6.5')!;
+ for(const t of SQUARE_TRANSFORMS){
+  // f4 is in the middle 16, but is not one of the central four squares.
+  const fen=transformFen('8/8/3kB3/8/5K2/4N3/8/8 w - - 0 1',t);
+  const san=(to:'g4'|'a2')=>getChess(fen).move({from:transformSquare('e6',t),to:transformSquare(to,t)}).san;
+  const adjacent=scoreKnightAndBishopWhiteMove(fen,san('g4'));
+  const far=scoreKnightAndBishopWhiteMove(fen,san('a2'));
+  assert.equal(adjacent.attackedBishopDefensePenalty,1,t.name);
+  assert.equal(far.attackedBishopDefensePenalty,1,t.name);
+  assert.ok(rule.compare!(far,adjacent)<0,t.name);
+  const loaded=transformFen('8/8/8/8/2B5/2k5/5N2/5K2 w - - 0 1',t);
+  const escape=getChess(loaded).move({from:transformSquare('c4',t),to:transformSquare('g8',t)}).san;
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(loaded),[escape],t.name);
+  assert.equal(explainMove(bishopKnightRuleSet.scoreWhiteCandidates!(loaded,getChess(loaded).moves()),knightAndBishopWhiteRules,escape)?.id,'r6.5',t.name);
+ }
 });
