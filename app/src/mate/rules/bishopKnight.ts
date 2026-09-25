@@ -425,81 +425,12 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       compare: (first, second) => first.stalemateScore - second.stalemateScore,
     },
     {
-      id: "r1",
-      shortLabel: "rule r1",
-      helpText: "With a king supported 3 diagonal and the knight within 1 move of the support square, check.",
-      compare: (first, second) => first.supportedThreeCheckScore - second.supportedThreeCheckScore,
-    },
-    {
-      id: "r1.5",
-      shortLabel: "rule r1.5",
-      helpText: "Prefer a supported smaller odd diagonal, then knight move proximity to its support square.",
-      subpriorities: [
-        { compare: (first, second) => first.supportedDiagonalSizeScore - second.supportedDiagonalSizeScore },
-        { compare: (first, second) => first.declaredSupportedKnightAdvancePenalty - second.declaredSupportedKnightAdvancePenalty },
-        { compare: (first, second) => first.supportedDiagonalKnightScore - second.supportedDiagonalKnightScore },
-      ],
-    },
-    {
-      id: "r5",
-      shortLabel: "rule r5",
-      helpText: "Prepare the 7 diagonal.",
-      compare: (first, second) => first.declaredPreparationPenalty - second.declaredPreparationPenalty,
-    },
-    {
-      id: "r5.1",
-      shortLabel: "rule r5.1",
-      helpText: "With a central bishop and knight on the precage square, prefer king step proximity.",
-      compare: (first, second) => first.precageKingSteps - second.precageKingSteps,
-    },
-    {
-      id: "r5.5",
-      shortLabel: "rule r5.5",
-      helpText: "Play the 5.5 step.",
-      compare: (first, second) => first.declaredStepPenalty - second.declaredStepPenalty,
-    },
-    {
-      id: "r6",
-      shortLabel: "rule r6",
-      helpText: "With a precage knight and Black's king closer by king steps to the target corner than White's king, prefer king proximity to within 1 of the bishop's side, then king proximity to the non-target corner.",
-      subpriorities: [
-        { compare: (first, second) => first.precageSideDistance - second.precageSideDistance },
-        { compare: (first, second) => first.precageSideCornerDistanceSquared - second.precageSideCornerDistanceSquared },
-      ],
-    },
-    {
-      id: "r6.5",
-      shortLabel: "rule r6.5",
-      helpText: "An undefended knight should not be the only defender of an attacked bishop.",
-      compare: (first, second) => first.undefendedKnightOnlyBishopDefenderPenalty - second.undefendedKnightOnlyBishopDefenderPenalty,
-    },
-    {
-      id: "r6.8",
-      shortLabel: "rule r6.8",
-      helpText: "Do not allow Black to attack both undefended pieces next move.",
-      compare: (first, second) => first.undefendedMinorForkPenalty - second.undefendedMinorForkPenalty,
-    },
-    {
-      id: "r6.9",
-      shortLabel: "rule r6.9",
-      helpText: "Play the 6.9 move.",
-      compare: (first, second) => first.sixPointNinePenalty - second.sixPointNinePenalty,
-    },
-    {
       id: "r7",
       shortLabel: "rule r7",
       helpText: "Prefer king step-then-Euclidean proximity to a central square, then prefer king on the color opposite the bishop.",
       compare: (first, second) => first.kingCenterProximityScore - second.kingCenterProximityScore
         || first.kingCenterEuclideanScore - second.kingCenterEuclideanScore
         || first.kingBishopColorPenalty - second.kingBishopColorPenalty,
-    },
-    {
-      id: "r7.8",
-      shortLabel: "rule r7.8",
-      helpText: "With a middle-16 square king, prefer knight move proximity to a precage square, then prefer the knight adjacent to the king.",
-      compare: (first, second) => first.oppositePrecageDistance - second.oppositePrecageDistance
-        || first.oppositePrecageEuclideanDistanceSquared - second.oppositePrecageEuclideanDistanceSquared
-        || first.middle16KnightKingAdjacencyPenalty - second.middle16KnightKingAdjacencyPenalty,
     },
     {
       id: "r8",
@@ -512,24 +443,6 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
         { compare: (first, second) => first.knightTargetProximityScore - second.knightTargetProximityScore },
         { compare: (first, second) => first.knightBishopColorPenalty - second.knightBishopColorPenalty },
       ],
-    },
-    {
-      id: "r8.5",
-      shortLabel: "rule r8.5",
-      helpText: "Prefer king opposition with the bishop between the kings.",
-      compare: (first, second) => first.bishopOppositionPenalty - second.bishopOppositionPenalty,
-    },
-    {
-      id: "r9.1",
-      shortLabel: "rule r9.1",
-      helpText: "Play the 9.1 move.",
-      compare: (first, second) => first.relativeKnightPenalty - second.relativeKnightPenalty,
-    },
-    {
-      id: "r9.98",
-      shortLabel: "rule r9.98",
-      helpText: "Prefer knight on or else one move from a stable bishop protected square.",
-      compare: (first, second) => Math.min(2, first.knightBishopProtectionPenalty) - Math.min(2, second.knightBishopProtectionPenalty),
     },
     {
       id: "r10",
@@ -682,44 +595,12 @@ const bishopKnightHelp: RuleHelp = {
     "Stay away from a bishop-colored corner.",
   ],
   notes: [
-    "For r6, use the rank or file halves separating the central bishop from the precage knight. Require an eligible precage knight before White moves. Prefer king distance to within one step of that half’s outer edge (the edge and its adjacent rank or file tie), then Euclidean proximity to its non-target corner. For Bd5/Nc4 with Black on ranks 5–8, target rank 8, then h8; include all board symmetries.",
-    "For r7.8, freeze the shared precage targets before White moves. Require a middle-16 king. After White moves, require the bishop to remain central; otherwise there is no precage target and no proximity credit. Measure knight moves, then break ties by Euclidean proximity to the target, then prefer knight adjacency to White’s king. With no precage targets, proximity is neutral but adjacency still applies when the king starts in the middle 16.",
-    "For r5.1, require a central bishop and knight on a precage square before White moves, then minimize the resulting king-step distance between the kings.",
-    "For r8, White’s king must be on files c–f and ranks 3–6 before moving. Evaluate the bishop and knight preferences after White moves. Precage squares require a central bishop and must lie strictly opposite Black across the bishop’s long diagonal. For a light-squared bishop, select the opposite-side pair from c4, d3, e6 and f5; include board symmetries. No targets exist when Black is on the long diagonal. Bishop adjacency is not required. Rules r5.1, r6, r7.8 and r8 share these targets.",
+    "For r8, White’s king must be on files c–f and ranks 3–6 before moving. Evaluate the bishop and knight preferences after White moves. Precage squares require a central bishop and must lie strictly opposite Black across the bishop’s long diagonal. For a light-squared bishop, select the opposite-side pair from c4, d3, e6 and f5; include board symmetries. No targets exist when Black is on the long diagonal. Bishop adjacency is not required. Rules r8 and r10 share these targets.",
     "For r7, minimize White’s king steps to the nearest of d4, e4, d5 or e5, then Euclidean distance to the nearest of those squares, then prefer the king on the color opposite the bishop. For r20, maximize the sum of the bishop’s and knight’s Euclidean distances from Black’s king, then minimize the sum of their Euclidean distances to the board’s midpoint, measured after White moves.",
-    "For r9.98, count bishop protection through Black’s king, which must leave the checking diagonal. Other intervening pieces still block protection. Evaluate after White moves.",
     "The target corner is the bishop-colored corner closest to Black's king.",
     "Support has been reset. No position is supported until explicitly declared under the new rules; all earlier support declarations and r2.5 preferences have been discarded.",
   ],
-  noteBoards: [{
-    id: "bishop-knight-rule-r5-5",
-    title: "rule r5.5 — Play the 5.5 step",
-    caption: "1. Kd3. Example: White Kc3 and Bc4 against Black Ke5. Anchor this relative arrangement to any central Black king: White starts two files and two ranks away, the bishop is one orthogonal step toward Black, and White steps toward Black on the other axis. Include rotations and reflections; the knight’s location is irrelevant. The move must be legal and earlier rules retain priority.",
-    pieces: [{square: "c3", piece: "K"}, {square: "c4", piece: "B"}, {square: "e5", piece: "k"}],
-    highlights: [{square: "d3", kind: "key"}],
-    arrows: [{from: "c3", to: "d3"}],
-  }, {
-    id: "bishop-knight-rule-r5-5-kd7",
-    title: "rule r5.5 — Play the 5.5 step",
-    caption: "1. Kd7. Example: White Kc7 and Bc6 against Black Ke5. Preserve the relative king/bishop arrangement when Black occupies another central square. White starts two squares diagonally from Black and steps inward beside the bishop. Include rotations and reflections; the knight’s location is irrelevant. The move must be legal and earlier rules retain priority.",
-    pieces: [{square: "c7", piece: "K"}, {square: "c6", piece: "B"}, {square: "e5", piece: "k"}],
-    highlights: [{square: "d7", kind: "key"}],
-    arrows: [{from: "c7", to: "d7"}],
-  }, {
-    id: "bishop-knight-rule-r6-9",
-    title: "rule r6.9 — Play the 6.9 move",
-    caption: "Kd6 takes opposition with the bishop between the kings. The bishop is on the long diagonal, two squares from the corner; Black is adjacent, and White’s king is central and adjacent to the bishop. Include rotations and reflections, without translations. The knight’s location is irrelevant; the move must be legal and earlier rules retain priority.",
-    pieces: [{square: "d5", piece: "K"}, {square: "c6", piece: "B"}, {square: "b6", piece: "k"}],
-    highlights: [{square: "d6", kind: "key"}],
-    arrows: [{from: "d5", to: "d6"}],
-  }, {
-    id: "bishop-knight-rule-r9-1",
-    title: "rule r9.1 — Play the 9.1 move",
-    caption: "1. Nd2. Match the relative positions of White’s king, Black’s king and the knight, regardless of the bishop’s location. Include translations, rotations and reflections; the move must be legal and earlier rules retain priority.",
-    pieces: [{square: "e2", piece: "K"}, {square: "f4", piece: "k"}, {square: "f3", piece: "N"}, {square: "a8", piece: "B"}],
-    highlights: [{square: "d2", kind: "key"}],
-    arrows: [{from: "f3", to: "d2"}],
-  }],
+  noteBoards: [],
 };
 
 function whiteLegalMoves(fen: string): readonly string[] {

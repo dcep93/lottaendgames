@@ -3,18 +3,18 @@ import test from 'node:test'
 import {getChess, SQUARE_TRANSFORMS, transformFen, transformSquare} from '../chess'
 import {getIdealKnightAndBishopWhiteMoves, scoreKnightAndBishopWhiteMove} from './bishopKnight'
 
-test('r6.8 rejects the loaded double attack before centralization across D4', () => {
+test('r7 centralizes without the removed double-attack preference across D4', () => {
   const start = '3k4/8/1NB5/2K5/8/8/8/8 w - - 0 1'
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen(start, t)
     const move = (from: 'c5', to: 'd4' | 'd5') => getChess(fen).move({from: transformSquare(from, t), to: transformSquare(to, t)}).san
     assert.equal(scoreKnightAndBishopWhiteMove(fen, move('c5', 'd4')).undefendedMinorForkPenalty, 1)
     assert.equal(scoreKnightAndBishopWhiteMove(fen, move('c5', 'd5')).undefendedMinorForkPenalty, 0)
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [move('c5', 'd5')])
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [move('c5', 'd4')])
   }
 })
 
-test('r6.8 allows a double attack when either minor piece is defended', () => {
+test('double-attack metric allows a double attack when either minor piece is defended', () => {
   const cases = [
     ['8/1N6/B1k5/8/3K4/8/8/8 w - - 0 1', 'b7', 'c5'], // Nc5 is king-defended, even after ...Kb6.
     ['8/8/2Bk4/8/1N6/8/8/7K w - - 0 1', 'h1', 'h2'], // Nb4 defends Bc6 after ...Kc5.
@@ -27,7 +27,7 @@ test('r6.8 allows a double attack when either minor piece is defended', () => {
   }
 })
 
-test('r6.8 ignores a geometric fork on an illegal Black destination', () => {
+test('double-attack metric ignores a geometric fork on an illegal Black destination', () => {
   const start = '3k4/8/2B1N3/8/8/8/8/7K w - - 0 1'
   // ...Ke7 attacks only Ne6; the common attack square d7 is bishop-controlled.
   const board = getChess(start)

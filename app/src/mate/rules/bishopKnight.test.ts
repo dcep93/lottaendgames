@@ -107,79 +107,14 @@ test("bishop-and-knight rules are registered", () => {
       helpText: "",
     },
     {
-      id: "r1",
-      shortLabel: "rule r1",
-      helpText: "With a king supported 3 diagonal and the knight within 1 move of the support square, check.",
-    },
-    {
-      id: "r1.5",
-      shortLabel: "rule r1.5",
-      helpText: "Prefer a supported smaller odd diagonal, then knight move proximity to its support square.",
-    },
-    {
-      id: "r5",
-      shortLabel: "rule r5",
-      helpText: "Prepare the 7 diagonal.",
-    },
-    {
-      id: "r5.1",
-      shortLabel: "rule r5.1",
-      helpText: "With a central bishop and knight on the precage square, prefer king step proximity.",
-    },
-    {
-      id: "r5.5",
-      shortLabel: "rule r5.5",
-      helpText: "Play the 5.5 step.",
-    },
-    {
-      id: "r6",
-      shortLabel: "rule r6",
-      helpText: "With a precage knight and Black's king closer by king steps to the target corner than White's king, prefer king proximity to within 1 of the bishop's side, then king proximity to the non-target corner.",
-    },
-    {
-      id: "r6.5",
-      shortLabel: "rule r6.5",
-      helpText: "An undefended knight should not be the only defender of an attacked bishop.",
-    },
-    {
-      id: "r6.8",
-      shortLabel: "rule r6.8",
-      helpText: "Do not allow Black to attack both undefended pieces next move.",
-    },
-    {
-      id: "r6.9",
-      shortLabel: "rule r6.9",
-      helpText: "Play the 6.9 move.",
-    },
-    {
       id: "r7",
       shortLabel: "rule r7",
       helpText: "Prefer king step-then-Euclidean proximity to a central square, then prefer king on the color opposite the bishop.",
     },
     {
-      id: "r7.8",
-      shortLabel: "rule r7.8",
-      helpText: "With a middle-16 square king, prefer knight move proximity to a precage square, then prefer the knight adjacent to the king.",
-    },
-    {
       id: "r8",
       shortLabel: "rule r8",
       helpText: "With a king on a middle-16 square, prefer bishop on the long diagonal, then a central bishop, then knight move proximity to a precage square, then knight off the bishop's color.",
-    },
-    {
-      id: "r8.5",
-      shortLabel: "rule r8.5",
-      helpText: "Prefer king opposition with the bishop between the kings.",
-    },
-    {
-      id: "r9.1",
-      shortLabel: "rule r9.1",
-      helpText: "Play the 9.1 move.",
-    },
-    {
-      id: "r9.98",
-      shortLabel: "rule r9.98",
-      helpText: "Prefer knight on or else one move from a stable bishop protected square.",
     },
     {
       id: "r10",
@@ -209,21 +144,8 @@ test("bishop-and-knight rules are registered", () => {
       "mate",
       "minors safe",
       "no stalemate",
-      "r1",
-      "r1.5",
-      "r5",
-      "r5.1",
-      "r5.5",
-      "r6",
-      "r6.5",
-      "r6.8",
-      "r6.9",
       "r7",
-      "r7.8",
       "r8",
-      "r8.5",
-      "r9.1",
-      "r9.98",
       "r10",
       "r20",
     ],
@@ -232,7 +154,8 @@ test("bishop-and-knight rules are registered", () => {
     ruleSet.whiteRuleDescriptions.map(({ id }) => id),
     knightAndBishopWhiteRules.map(({ id }) => id),
   );
-  assert.equal(knightAndBishopWhiteRules.length, 20);
+  assert.equal(knightAndBishopWhiteRules.length, 7);
+  assert.deepEqual(ruleSet.help.noteBoards, []);
 });
 
 test("immediate mate keeps precedence without the mating-net rule", () => {

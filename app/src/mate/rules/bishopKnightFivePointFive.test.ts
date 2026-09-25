@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { squareCoords, squareFromCoordinates, getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess';
-import { bishopKnightRuleSet, getIdealKnightAndBishopWhiteMoves } from './bishopKnight';
+import { getIdealKnightAndBishopWhiteMoves } from './bishopKnight';
 import { knightAndBishopFivePointFiveMove } from './bishopKnightFivePointFive';
 
-test('r5.5 requires the diagonal king offset rather than matching any central Black square, across D4', () => {
+test('retained 5.5 pattern helper requires the diagonal king offset rather than matching any central Black square, across D4', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const [source, from, to] of [
       ['8/2K5/2B5/1N2k3/8/8/8/8 w - - 0 1', 'c7', 'd7'],
@@ -33,7 +33,7 @@ test('r5.5 requires the diagonal king offset rather than matching any central Bl
   }
 });
 
-test('r5.5 prefers Kd3 across D4 independently of knight placement', () => {
+test('retained 5.5 pattern helper prefers Kd3 across D4 independently of knight placement', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const source of [
       '8/8/8/4k3/N1B5/2K5/8/8 w - - 0 1',
@@ -48,7 +48,7 @@ test('r5.5 prefers Kd3 across D4 independently of knight placement', () => {
   }
 });
 
-test('r5.5 rejects noncentral Black kings, mismatched pieces and occupied destinations', () => {
+test('retained 5.5 pattern helper rejects noncentral Black kings, mismatched pieces and occupied destinations', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     for (const source of [
       '8/8/8/5k2/1N1B4/3K4/8/8 w - - 0 1',
@@ -60,15 +60,9 @@ test('r5.5 rejects noncentral Black kings, mismatched pieces and occupied destin
   }
 });
 
-test('r5.5 diagram shows the prescribed king step and omits the irrelevant knight', () => {
-  const board = bishopKnightRuleSet.help.noteBoards?.find(board => board.id === 'bishop-knight-rule-r5-5');
-  assert.ok(board);
-  assert.deepEqual(board.arrows, [{from: 'c3', to: 'd3'}]);
-  assert.deepEqual(board.pieces, [{square: 'c3', piece: 'K'}, {square: 'c4', piece: 'B'}, {square: 'e5', piece: 'k'}]);
-});
 
 
-test('r5.5 shifts the whole relative arrangement with each central Black square, across D4', () => {
+test('retained 5.5 pattern helper shifts the whole relative arrangement with each central Black square, across D4', () => {
   for (const black of ['d4', 'e4', 'd5', 'e5'] as const) {
     const {file,rank} = squareCoords(black);
     const king = squareFromCoordinates(file-2,rank-2)!;
