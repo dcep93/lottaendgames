@@ -252,3 +252,19 @@ test('r6 equally values Nc3 and Ne3 inside the central 16 across D4', () => {
   assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[san('e3')],t.name);
  }
 });
+
+
+test('r6 routes via Nc4 when the edge bishop occupies the Nb7 rescue square across D4', () => {
+ for (const t of SQUARE_TRANSFORMS) {
+  const fen = transformFen('2BK4/8/1k6/N7/8/8/8/8 w - - 0 1',t);
+  const san = (to: 'c4' | 'b7') => getChess(fen).move({from:transformSquare('a5',t),to:transformSquare(to,t)}).san;
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[san('c4')],t.name);
+  assert.equal(scoreKnightAndBishopWhiteMove(fen,san('b7')).knightDriftObstructionPenalty,2,t.name);
+  assert.equal(scoreKnightAndBishopWhiteMove(fen,san('c4')).knightDriftObstructionPenalty,0,t.name);
+  const board=getChess(fen);
+  board.move(san('b7'));
+  board.move({from:transformSquare('b6',t),to:transformSquare('c6',t)});
+  assert.ok(!board.moves({verbose:true}).some(m=>m.piece==='k' && m.to===transformSquare('c8',t)),t.name);
+  assert.equal(explainMove(bishopKnightRuleSet.scoreWhiteCandidates!(fen,getChess(fen).moves()),knightAndBishopWhiteRules,san('c4'))?.id,'r6',t.name);
+ }
+});

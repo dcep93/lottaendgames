@@ -1,5 +1,5 @@
 import type {Square} from 'chess.js';
-import {allSquares, isKnightMove, kingDistance, squareCoordinates, squaredEuclideanDistance} from '../chess';
+import {allSquares, edgeDistance, isKnightMove, kingDistance, squareCoordinates, squaredEuclideanDistance} from '../chess';
 
 const squares = allSquares();
 const neighbours = new Map(squares.map(s => [s, squares.filter(t => kingDistance(s, t) === 1)]));
@@ -30,10 +30,16 @@ export function knightDriftThreatPenalty(white: Square, bishop: Square, knight: 
     if (knightMoved && jumps.get(knight)!.some(s => s !== white && s !== bishop && s !== threat
       && squaredEuclideanDistance(s, white) < squaredEuclideanDistance(knight, white)
       && kingDistance(s, bishop) > 1 && bishopControls(bishop, s, [white, threat]))) continue;
+    // A safe forward jump followed by a jump into king protection is also a route.
+    if (knightMoved && jumps.get(knight)!.some(s => s !== white && s !== bishop && s !== threat
+      && kingDistance(s, threat) > 1
+      && squaredEuclideanDistance(s, white) < squaredEuclideanDistance(knight, white)
+      && jumps.get(s)!.some(t => t !== bishop && t !== white && kingDistance(t, white) === 1))) continue;
     if (kingDistance(threat, white) < kingDistance(knight, white)) penalty = 1;
     if (!knightMoved) continue;
-    // An existing defense or a single safe king step makes the knight reachable.
-    if (kingDistance(white, knight) === 1 || bishopControls(bishop, knight, [white, threat])
+    // Stable defense or a single safe king step makes the knight reachable.
+    // An adjacent edge bishop blocks the rescue square instead of securing the route.
+    if (kingDistance(white, knight) === 1 || ((edgeDistance(bishop) > 0 || kingDistance(bishop, knight) > 1) && bishopControls(bishop, knight, [white, threat]))
       || neighbours.get(white)!.some(s => s !== bishop && s !== knight
         && kingDistance(s, knight) === 1 && kingDistance(s, threat) > 1)) continue;
     const safeForwardJump = jumps.get(knight)!.some(s => s !== white && s !== bishop && s !== threat
