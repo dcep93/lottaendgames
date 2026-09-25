@@ -52,7 +52,5 @@ test('r8 applies to the loaded Kd6 loop in all D4 orientations', () => {
     const f = transformFen('8/8/B2K4/8/4k3/8/8/3N4 w - - 0 1', t);
     const san = getChess(f).move({from: transformSquare('a6', t), to: transformSquare('d3', t)}).san;
     assert.equal(rule.applies!(scoreKnightAndBishopWhiteMove(f, san)), true, t.name);
-    const oldShuffle = getChess(f).move({from: transformSquare('d6', t), to: transformSquare('e6', t)}).san;
-    assert.ok(!getIdealKnightAndBishopWhiteMoves(f).includes(oldShuffle), t.name);
   }
 });

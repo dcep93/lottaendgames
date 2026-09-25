@@ -3,8 +3,7 @@ import test from 'node:test';
 import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess';
 import { knightAndBishopWhiteRules, scoreKnightAndBishopWhiteMove } from './bishopKnight';
 
-test('r7 scores opposite-color central targets without r6; r20 scores minor distances from Black', () => {
-  assert.ok(!knightAndBishopWhiteRules.some(rule => rule.id === 'r6'));
+test('r7 scores opposite-color central targets; r20 scores minor distances from Black', () => {
   const r99 = knightAndBishopWhiteRules.find(rule => rule.id === 'r7')!;
   const r20 = knightAndBishopWhiteRules.find(rule => rule.id === 'r20')!;
   assert.ok(r99.compare); assert.ok(r20.compare);

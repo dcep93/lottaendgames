@@ -2,16 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { bishopControlsOrOccupiesSquare } from './bishopKnightGeometry';
 import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess';
-import { getIdealKnightAndBishopWhiteMoves, scoreKnightAndBishopWhiteMove, knightAndBishopWhiteRules } from './bishopKnight';
-
-test('r2.5 prescribes Kb5 in the supported bishop shuttle across D4', () => {
-  for (const t of SQUARE_TRANSFORMS) {
-    const fen = transformFen('8/k7/B7/K2N4/8/8/8/8 w - - 0 1', t);
-    const san = getChess(fen).move({from: transformSquare('a5',t), to: transformSquare('b5',t)}).san;
-    assert.equal(scoreKnightAndBishopWhiteMove(fen,san).supportedDiagonalSizeScore,3);
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[san],t.name);
-  }
-});
+import { scoreKnightAndBishopWhiteMove, knightAndBishopWhiteRules } from './bishopKnight';
 
 test('r9.98 recognizes bishop defense via either minor and respects blockers across D4', () => {
   for (const t of SQUARE_TRANSFORMS) {

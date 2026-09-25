@@ -15,18 +15,18 @@ const deps: MateSessionDeps = {
   getRuleSet: getMateRuleSet,
 }
 
-test('supported three, five and seven diagonals enter phase 2 after White in every orientation', () => {
-  for (const [fen, size] of [
+test('former supported diagonals remain phase 1 after the declaration reset in every orientation', () => {
+  for (const [fen] of [
     ['k7/8/BK6/3N4/8/8/8/8 b - - 1 1', 3],
     ['2k5/3B4/3K4/3N4/8/8/8/8 b - - 1 1', 5],
     ['8/8/8/1k6/8/1B1N4/1K6/8 b - - 1 1', 7],
   ] as const) {
     for (const transform of SQUARE_TRANSFORMS) {
       const reflected = transformFen(fen, transform)
-      assert.equal(knightAndBishopSupportedDiagonal(reflected).size, size)
-      assert.equal(rule.phaseAfterWhiteMove!(reflected), '2/2')
+      assert.equal(knightAndBishopSupportedDiagonal(reflected).size, 99)
+      assert.equal(rule.phaseAfterWhiteMove!(reflected), '1/2')
       const session = createMateSession({mateId: 'bishop-knight', mode: 'standard', startingFen: reflected}, deps)
-      assert.equal(getCurrentPhase(rule, session), '2/2')
+      assert.equal(getCurrentPhase(rule, session), '1/2')
     }
   }
 })
@@ -36,13 +36,13 @@ test('phase follows each White result through Black replies, replay, undo and re
     mateId: 'bishop-knight', mode: 'standard', startingFen: start,
     moves: ['Bd7+', 'Kb8', 'Be6', 'Kb7'],
   }, deps)
-  assert.deepEqual(session.logs.map(log => log.phase), ['2/2', '1/2'])
+  assert.deepEqual(session.logs.map(log => log.phase), ['1/2', '1/2'])
   // Both sides of a Black reply retain the preceding White result.
-  for (const expected of ['1/2', '1/2', '2/2', '2/2', '1/2']) {
+  for (const expected of ['1/2', '1/2', '1/2', '1/2', '1/2']) {
     assert.equal(getCurrentPhase(rule, session), expected)
     session = undoMateMove(session)
   }
-  for (const expected of ['2/2', '2/2', '1/2', '1/2']) {
+  for (const expected of ['1/2', '1/2', '1/2', '1/2']) {
     session = redoMateMove(session)
     assert.equal(getCurrentPhase(rule, session), expected)
   }
@@ -55,7 +55,7 @@ test('mating lookup positions do not enter phase 2 without support', () => {
   const session = createMateReplaySession({
     mateId: 'bishop-knight', mode: 'standard', startingFen: mating, moves: ['Bb7#'],
   }, deps)
-  assert.equal(getCurrentPhase(rule, session), knightAndBishopSupportedDiagonal(session.fen).size < 99 ? '2/2' : '1/2')
+  assert.equal(getCurrentPhase(rule, session), '1/2')
   const unsupported = createMateReplaySession({
     mateId: 'bishop-knight', mode: 'standard',
     startingFen: '8/8/8/2k1K2N/4B3/8/8/8 w - - 0 1',
@@ -83,12 +83,12 @@ test('Kg5 loop stays in phase 1 despite the former mating-path classification', 
 })
 
 
-test('Bb3 support persists through the loaded Black Kc6 reply', () => {
+test('former Bb3 support stays cleared through the loaded Black Kc6 reply', () => {
   const session = createMateReplaySession({
     mateId: 'bishop-knight', mode: 'standard',
     startingFen: '8/8/8/8/k7/2KN4/B7/8 w - - 0 1',
     moves: ['Kb2', 'Kb5', 'Bb3', 'Kc6'],
   }, deps)
-  assert.deepEqual(session.logs.map(log => log.phase), ['2/2', '2/2'])
-  assert.equal(getCurrentPhase(rule, session), '2/2')
+  assert.deepEqual(session.logs.map(log => log.phase), ['1/2', '1/2'])
+  assert.equal(getCurrentPhase(rule, session), '1/2')
 })

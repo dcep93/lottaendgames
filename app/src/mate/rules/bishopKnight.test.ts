@@ -117,11 +117,6 @@ test("bishop-and-knight rules are registered", () => {
       helpText: "Prefer a supported smaller odd diagonal, then knight move proximity to its support square.",
     },
     {
-      id: "r2.5",
-      shortLabel: "rule r2.5",
-      helpText: "With a supported diagonal, prefer forcing Black’s king towards the target corner.",
-    },
-    {
       id: "r5",
       shortLabel: "rule r5",
       helpText: "Prepare the 7 diagonal.",
@@ -211,7 +206,6 @@ test("bishop-and-knight rules are registered", () => {
       "no stalemate",
       "r1",
       "r1.5",
-      "r2.5",
       "r5",
       "r5.1",
       "r5.5",
@@ -232,7 +226,7 @@ test("bishop-and-knight rules are registered", () => {
     ruleSet.whiteRuleDescriptions.map(({ id }) => id),
     knightAndBishopWhiteRules.map(({ id }) => id),
   );
-  assert.equal(knightAndBishopWhiteRules.length, 20);
+  assert.equal(knightAndBishopWhiteRules.length, 19);
 });
 
 test("immediate mate keeps precedence without the mating-net rule", () => {
