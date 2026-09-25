@@ -24,7 +24,8 @@ test('r6.5 rejects only an attacked bishop defended solely by an undefended knig
   assert.ok(!ids.includes('r7.5'))
   assert.equal(ids.indexOf('r6.5'), ids.indexOf('r6') + 1)
   assert.equal(ids.indexOf('r6.8'), ids.indexOf('r6.5') + 1)
-  assert.equal(ids.indexOf('r7'), ids.indexOf('r6.8') + 1)
+  assert.equal(ids.indexOf('r6.9'), ids.indexOf('r6.8') + 1)
+  assert.equal(ids.indexOf('r7'), ids.indexOf('r6.9') + 1)
 })
 
 

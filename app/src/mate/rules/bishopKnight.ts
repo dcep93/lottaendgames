@@ -152,7 +152,6 @@ type KnightAndBishopPositionScoreContext = {
   readonly fivePointFiveMove: string | undefined;
   readonly relativeKnightMove: string | undefined;
   readonly startsWithMiddle16King: boolean;
-  readonly bishopOppositionTarget: Square | undefined;
   readonly shouldCoordinateKing: boolean;
   readonly shouldEscapeBishop: boolean;
   readonly shouldEscapeNearbyPairBishop: boolean;
@@ -177,20 +176,11 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
   const knight = findPiece(fen, "w", "n");
   const bishopCentrallyDefended = !!bishop && centralKing && kingDistance(whiteKing.square, bishop.square) === 1;
   const knightCentrallyDefended = !!knight && centralKing && kingDistance(whiteKing.square, knight.square) === 1;
-  let bishopOppositionTarget: Square | undefined;
-  if (whiteKing && bishop && blackKing
-    && manhattanDistance(bishop.square, blackKing.square) === 1) {
-    const b = squareCoordinates(bishop.square), k = squareCoordinates(blackKing.square);
-    const file = 2 * b.file - k.file, rank = 2 * b.rank - k.rank;
-    if (file >= 0 && file < 8 && rank >= 0 && rank < 8)
-      bishopOppositionTarget = `${"abcdefgh"[file]}${rank + 1}` as Square;
-  }
   return {
     precageSideTarget: knightAndBishopPrecageSideTarget(fen),
     fivePointFiveMove: knightAndBishopFivePointFiveMove(fen),
     relativeKnightMove: knightAndBishopRelativeKnightMove(fen),
     startsWithMiddle16King: !!whiteKing && isMiddle16Square(whiteKing.square),
-    bishopOppositionTarget,
     shouldEscapeNearbyPairBishop: !!bishop && !!knight && !!blackKing
       && kingDistance(bishop.square, knight.square) === 1
       && kingDistance(bishop.square, blackKing.square) <= 2
@@ -279,8 +269,12 @@ function scoreKnightAndBishopWhiteMoveCore(
         ? -Math.sqrt(squaredEuclideanDistance(bishop.square, blackKing.square)) : 0;
     },
     attackedKnightDefensePenalty: context.shouldDefendKnight && !knightKingDefended ? 1 : 0,
-    bishopOppositionPenalty: context.bishopOppositionTarget
-      && !(move.piece === "k" && move.to === context.bishopOppositionTarget) ? 1 : 0,
+    bishopOppositionPenalty: whiteKing && bishop && blackKing
+      && manhattanDistance(whiteKing.square, blackKing.square) === 2
+      && manhattanDistance(whiteKing.square, bishop.square) === 1
+      && manhattanDistance(blackKing.square, bishop.square) === 1
+      && (squareCoordinates(whiteKing.square).file === squareCoordinates(blackKing.square).file
+        || squareCoordinates(whiteKing.square).rank === squareCoordinates(blackKing.square).rank) ? 0 : 1,
     get knightCenterProximityScore() {
       return knight ? knightAndBishopCenterProximityScore(knight.square) : 0;
     },
@@ -467,6 +461,12 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       shortLabel: "rule r6.8",
       helpText: "Do not allow Black to attack both undefended pieces next move.",
       compare: (first, second) => first.undefendedMinorForkPenalty - second.undefendedMinorForkPenalty,
+    },
+    {
+      id: "r6.9",
+      shortLabel: "rule r6.9",
+      helpText: "Prefer king opposition with the bishop between the kings.",
+      compare: (first, second) => first.bishopOppositionPenalty - second.bishopOppositionPenalty,
     },
     {
       id: "r7",

@@ -1,0 +1,155 @@
+{
+  "request": "r6.9 \u2014 Prefer king opposition with the bishop between the kings.",
+  "implementation": "After White moves, prefer kings two squares apart on one rank or file with the bishop on the intervening square. Establishing it with a bishop move or retaining it with a knight move also qualifies. Earlier priorities remain ahead of r6.9, which precedes r7.",
+  "loadedExample": {
+    "fen": "8/8/1kB5/3K4/8/8/8/6N1 w - - 0 1",
+    "preferred": [
+      "Kd6"
+    ]
+  },
+  "method": {
+    "kind": "Exact affected-policy refresh followed by whole-domain graph cycle analysis",
+    "source": "/Users/danielcepeda/repos/_codex_output/bn-support-cleared-fresh-policies-2026-09-24",
+    "policyFingerprint": "d6f13ec2fc1efb702515543353c9c052f5eb32957b038457b9d14efe98384d16",
+    "affectedNodes": 19052,
+    "policiesChanged": 12242,
+    "coverageProof": {
+      "method": "Independent exhaustive reverse enumeration of every bishop-interposed opposition and all geometric White predecessors",
+      "arrangements": 11712,
+      "predecessorOrbits": 18732,
+      "refreshedSuperset": 19052,
+      "missing": 0
+    },
+    "unchangedPolicies": "Every move has the same r6.9 penalty outside the geometrical affected superset; unchanged White policies are reused from the full fresh census.",
+    "rootReuse": "Root legality and support code are unchanged. Baseline worker bundle matches the freshly audited source exactly. The root bundle hash changes due to retained White-rule registration side effects; source inspection establishes that root behavior is unchanged.",
+    "white": "All preferred moves including ties",
+    "black": "All legal replies",
+    "counts": "Post-White placements directly on any cycle, D4 deduplicated, no translations"
+  },
+  "unsupportedPositionsOnLoops": {
+    "orbits": 2414,
+    "physical": 19312
+  },
+  "baselineComparison": {
+    "previous": 1389,
+    "survivors": 1283,
+    "removed": 106,
+    "added": 1131,
+    "current": 2414
+  },
+  "largestPiecePositionMotifs": [
+    {
+      "motif": "Noncentral bishop king-protected; interior king; knight unprotected by king",
+      "orbits": 281,
+      "physical": 2248
+    },
+    {
+      "motif": "Noncentral bishop king-protected; interior king; knight on edge, unprotected by king",
+      "orbits": 232,
+      "physical": 1856
+    },
+    {
+      "motif": "King-protected central bishop; knight unprotected by king, off precage",
+      "orbits": 213,
+      "physical": 1704
+    },
+    {
+      "motif": "King-protected central bishop; knight king-protected, off precage",
+      "orbits": 191,
+      "physical": 1528
+    },
+    {
+      "motif": "Noncentral bishop not king-protected; central king; knight unprotected by king",
+      "orbits": 181,
+      "physical": 1448
+    }
+  ],
+  "exampleSelection": "Largest White-piece bounding rectangles within the largest motif, excluding Bd5/Nc4 in every D4 orientation and every ply.",
+  "examples": [
+    {
+      "fen": "5k2/8/6B1/6K1/8/8/1N6/8 w - - 0 1",
+      "moves": [
+        "Kf5",
+        "Kg7",
+        "Kg5",
+        "Kf8"
+      ],
+      "d": 105,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=5k2/8/6B1/6K1/8/8/1N6/8_w_-_-_0_1&moves=Kf5,Kg7,Kg5,Kf8&cursor=0",
+      "motif": "Noncentral bishop king-protected; interior king; knight unprotected by king",
+      "rectangle": [
+        6,
+        5
+      ],
+      "area": 30
+    },
+    {
+      "fen": "5k2/8/6B1/6K1/8/8/2N5/8 w - - 0 1",
+      "moves": [
+        "Kf5",
+        "Kg7",
+        "Kg5",
+        "Kf8"
+      ],
+      "d": 202,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=5k2/8/6B1/6K1/8/8/2N5/8_w_-_-_0_1&moves=Kf5,Kg7,Kg5,Kf8&cursor=0",
+      "motif": "Noncentral bishop king-protected; interior king; knight unprotected by king",
+      "rectangle": [
+        5,
+        5
+      ],
+      "area": 25
+    },
+    {
+      "fen": "3k4/8/2B5/2K5/8/8/6N1/8 w - - 0 1",
+      "moves": [
+        "Kd4",
+        "Kc7",
+        "Kc5",
+        "Kd8"
+      ],
+      "d": 210,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=3k4/8/2B5/2K5/8/8/6N1/8_w_-_-_0_1&moves=Kd4,Kc7,Kc5,Kd8&cursor=0",
+      "motif": "Noncentral bishop king-protected; interior king; knight unprotected by king",
+      "rectangle": [
+        5,
+        5
+      ],
+      "area": 25
+    }
+  ],
+  "supportedPositionsOnLoops": 0,
+  "supportLosses": 0,
+  "supportNote": "Support declarations remain empty.",
+  "validation": {
+    "bishopKnightTests": 93,
+    "productionBuild": "passed",
+    "exhaustiveReverseAffectedCoverage": "passed",
+    "independentGraphCheck": {
+      "method": "Independent root enumeration and iterative Tarjan SCC over saved graph",
+      "rootOrbits": 1707888,
+      "physicalRoots": 13660584,
+      "whiteDecisionNodes": 1359344,
+      "edges": 6559612,
+      "postWhiteCycleOrbits": 2414,
+      "postWhiteCyclePhysical": 19312,
+      "whiteTurnCycleOrbits": 3405,
+      "cyclicComponents": 350,
+      "percent": 0.1413441630832935,
+      "seconds": 4.869
+    },
+    "examples": "Three laps verified: preferred White moves, legal Black replies, all unsupported, exact closure, D4 distinct, working replay decoding."
+  }
+}
