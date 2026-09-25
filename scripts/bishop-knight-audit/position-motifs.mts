@@ -30,7 +30,7 @@ export function piecePositionMotif(key: number): string {
     const [king, bishop, knight] = unpack(key);
     const kingProtectsBishop = distance(king, bishop) === 1;
     if (central.has(bishop)) {
-        const precage = knightAndBishopKnightTargetSquares(fen(key)).includes(square(knight));
+        const precage = knightAndBishopKnightTargetSquares(fen(key)).some(target => target === square(knight));
         return `${kingProtectsBishop ? 'King-protected' : 'Unprotected by king'} central bishop; knight ${precage ? 'on precage' : distance(king, knight) === 1 ? 'king-protected, off precage' : region(knight) === 'edge' ? 'on edge, off precage' : 'unprotected by king, off precage'}`;
     }
     return `Noncentral bishop ${kingProtectsBishop ? 'king-protected' : 'not king-protected'}; ${region(king)} king; knight ${distance(king, knight) === 1 ? 'king-protected' : region(knight) === 'edge' ? 'on edge, unprotected by king' : 'unprotected by king'}`;

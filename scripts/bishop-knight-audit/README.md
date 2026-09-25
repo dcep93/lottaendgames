@@ -1,3 +1,23 @@
+## Current reporting scope: precage terminals
+
+Until the user changes this scope, treat a central bishop with a knight on a
+currently eligible precage square as an audit terminal, for either side to move.
+Use the production precage predicate, including the opposite-side requirement
+relative to Black. This does not declare support or change app move preferences.
+After obtaining a complete, current `--scope all` graph, run from the repository root:
+
+```sh
+./app/node_modules/.bin/tsx scripts/bishop-knight-audit/precage-terminal.mts SOURCE_AUDIT OUTPUT_DIRECTORY
+```
+
+The postprocessor verifies the production policy fingerprint, removes transitions
+that encounter a terminal before White, after White, or after Black, and recomputes
+cycle membership. It inspects the original cyclic components only: deleting edges
+cannot create a cycle outside them. Independent reachability checks validate the
+resulting cycle-position set. Report D4-distinct post-White positions **on** loops,
+not positions that can reach a loop, and distinguish cyclic components from individual
+four-ply cycles. Saved source counts must not be presented as terminal-filtered counts.
+
 # Audit policy: preferred White × all legal Black
 
 Since 2026-09-23, every Black legal reply is enumerated. Historical reports using app-selected Black replies are narrower evidence, not exhaustive counts for this policy. Rerun into a new output directory to establish the new baseline. Production Black preferences remain unchanged. A saved replay follows its explicit Black moves; Play Best may select a different reply.
