@@ -5,10 +5,10 @@ import {getIdealKnightAndBishopWhiteMoves, knightAndBishopWhiteRules, scoreKnigh
 
 test('r8.5 prefers opposition but no longer overrides r7 centralization across D4', () => {
   for (const t of SQUARE_TRANSFORMS) {
-    const fen = transformFen('8/8/1kB5/3K4/8/8/8/6N1 w - - 0 1', t)
-    const san = getChess(fen).move({from: transformSquare('d5', t), to: transformSquare('d6', t)}).san
+    const fen = transformFen('8/8/1kB5/4K3/8/8/8/6N1 w - - 0 1', t)
+    const san = getChess(fen).move({from: transformSquare('e5', t), to: transformSquare('d6', t)}).san
     assert.equal(scoreKnightAndBishopWhiteMove(fen, san).bishopOppositionPenalty, 0)
-    const central = getChess(fen).move({from: transformSquare('d5', t), to: transformSquare('d4', t)}).san
+    const central = getChess(fen).move({from: transformSquare('e5', t), to: transformSquare('d4', t)}).san
     const compare = knightAndBishopWhiteRules.find(r => r.id === 'r8.5')!.compare!
     assert.ok(compare(scoreKnightAndBishopWhiteMove(fen, san), scoreKnightAndBishopWhiteMove(fen, central)) < 0)
     assert.ok(!getIdealKnightAndBishopWhiteMoves(fen).includes(san))

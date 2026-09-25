@@ -1,0 +1,310 @@
+{
+  "request": "r6.9 \u2014 Play the 6.9 move.",
+  "implementation": "Match White Kd5/Bc6 against Black Kb6, with D4 rotations and reflections but no translations. Prefer Kd6, provided legal, before r7. The knight does not constrain the pattern. Include a note-board diagram showing the arrangement and king step.",
+  "method": {
+    "kind": "Exact full-graph cycle analysis after affected-policy refresh",
+    "refresh": {
+      "source": "/Users/danielcepeda/repos/_codex_output/bn-r78-adjacency-2026-09-24",
+      "recomputedEveryPolicy": false,
+      "recomputedPolicies": 56,
+      "oldPoliciesReused": 1359288,
+      "rootOrbits": 1707888,
+      "physicalRoots": 13660584,
+      "rootDomainReenumerated": true,
+      "unchangedRootCodeVerified": true,
+      "workers": 4,
+      "seconds": 0.479,
+      "policiesChanged": 52
+    },
+    "reuseProof": "The only new policy criterion is r6.9, identically zero outside the eight absolute White-king/bishop/Black-king patterns. Recompute all 56 matching canonical positions, including blocked targets. All other policy dependencies match the previous worker fingerprint exactly; unchanged move choices and flags are reused.",
+    "reuseValidation": {
+      "oldPreferredRankTiesChecked": 1359014,
+      "unchangedPolicies": 1359288,
+      "freshlyCheckedUnchangedPolicies": 512,
+      "mismatches": 0
+    },
+    "independentVerification": {
+      "method": "Independent root enumeration and iterative Tarjan SCC over saved graph",
+      "rootOrbits": 1707888,
+      "physicalRoots": 13660584,
+      "whiteDecisionNodes": 1359344,
+      "edges": 6471510,
+      "postWhiteCycleOrbits": 1545,
+      "postWhiteCyclePhysical": 12360,
+      "whiteTurnCycleOrbits": 2668,
+      "cyclicComponents": 32,
+      "percent": 0.09046260644726117,
+      "seconds": 5.732
+    },
+    "blackPolicy": "All legal replies; all preferred White moves including ties."
+  },
+  "unsupportedPositionsOnLoops": {
+    "orbits": 1545,
+    "physical": 12360
+  },
+  "original1389Comparison": {
+    "previous": 1389,
+    "survivors": 836,
+    "removed": 553,
+    "introduced": 709,
+    "current": 1545
+  },
+  "previousReportComparison": {
+    "previous": 1555,
+    "survivors": 1535,
+    "removed": 20,
+    "introduced": 10,
+    "current": 1545
+  },
+  "largestPiecePositionMotifs": [
+    {
+      "motif": "Noncentral bishop not king-protected; central king; knight king-protected",
+      "orbits": 425,
+      "physical": 3400
+    },
+    {
+      "motif": "King-protected central bishop; knight king-protected, off precage",
+      "orbits": 209,
+      "physical": 1672
+    },
+    {
+      "motif": "Unprotected by king central bishop; knight on precage",
+      "orbits": 146,
+      "physical": 1168
+    },
+    {
+      "motif": "King-protected central bishop; knight unprotected by king, off precage",
+      "orbits": 137,
+      "physical": 1096
+    },
+    {
+      "motif": "King-protected central bishop; knight on precage",
+      "orbits": 135,
+      "physical": 1080
+    }
+  ],
+  "exampleSelection": "Latest requested filter: four-ply loops with the largest White-piece bounding rectangles, D4 distinct, distinct White arrangements, excluding Bd5/Nc4 equivalents. These are not restricted to the largest overall motif.",
+  "examples": [
+    {
+      "fen": "7K/4k3/8/8/2N1B3/8/8/8 w - - 0 1",
+      "moves": [
+        "Kg8",
+        "Kf6",
+        "Kh8",
+        "Ke7"
+      ],
+      "d": 202,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=7K/4k3/8/8/2N1B3/8/8/8_w_-_-_0_1&moves=Kg8,Kf6,Kh8,Ke7&cursor=0",
+      "motif": "Unprotected by king central bishop; knight on precage",
+      "rectangle": [
+        6,
+        5
+      ],
+      "area": 30
+    },
+    {
+      "fen": "K1k5/8/8/8/2N1B3/8/8/8 w - - 0 1",
+      "moves": [
+        "Ka7",
+        "Kc7",
+        "Ka8",
+        "Kc8"
+      ],
+      "d": 202,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=K1k5/8/8/8/2N1B3/8/8/8_w_-_-_0_1&moves=Ka7,Kc7,Ka8,Kc8&cursor=0",
+      "motif": "Unprotected by king central bishop; knight on precage",
+      "rectangle": [
+        5,
+        5
+      ],
+      "area": 25
+    },
+    {
+      "fen": "6K1/3k4/8/8/2N1B3/8/8/8 w - - 0 1",
+      "moves": [
+        "Kf8",
+        "Ke6",
+        "Kg8",
+        "Kd7"
+      ],
+      "d": 202,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=6K1/3k4/8/8/2N1B3/8/8/8_w_-_-_0_1&moves=Kf8,Ke6,Kg8,Kd7&cursor=0",
+      "motif": "Unprotected by king central bishop; knight on precage",
+      "rectangle": [
+        5,
+        5
+      ],
+      "area": 25
+    },
+    {
+      "fen": "3K4/8/2Nk4/8/B7/8/8/8 w - - 0 1",
+      "moves": [
+        "Bb5",
+        "Kc5",
+        "Ba4",
+        "Kd6"
+      ],
+      "d": 210,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=3K4/8/2Nk4/8/B7/8/8/8_w_-_-_0_1&moves=Bb5,Kc5,Ba4,Kd6&cursor=0",
+      "motif": "Noncentral bishop not king-protected; edge king; knight unprotected by king",
+      "rectangle": [
+        4,
+        5
+      ],
+      "area": 20
+    },
+    {
+      "fen": "2B5/8/N7/1k2K3/8/8/8/8 w - - 0 1",
+      "moves": [
+        "Bb7",
+        "Kb6",
+        "Bc8",
+        "Kb5"
+      ],
+      "d": 218,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=2B5/8/N7/1k2K3/8/8/8/8_w_-_-_0_1&moves=Bb7,Kb6,Bc8,Kb5&cursor=0",
+      "motif": "Noncentral bishop not king-protected; central king; knight on edge, unprotected by king",
+      "rectangle": [
+        5,
+        4
+      ],
+      "area": 20
+    },
+    {
+      "fen": "8/8/2B5/4K3/8/1k6/1N6/8 w - - 0 1",
+      "moves": [
+        "Na4",
+        "Kb4",
+        "Nb2",
+        "Kb3"
+      ],
+      "d": 105,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/2B5/4K3/8/1k6/1N6/8_w_-_-_0_1&moves=Na4,Kb4,Nb2,Kb3&cursor=0",
+      "motif": "Noncentral bishop not king-protected; central king; knight unprotected by king",
+      "rectangle": [
+        4,
+        5
+      ],
+      "area": 20
+    },
+    {
+      "fen": "1k6/N7/4B3/8/3K4/8/8/8 w - - 0 1",
+      "moves": [
+        "Nc8",
+        "Kc7",
+        "Na7",
+        "Kb8"
+      ],
+      "d": 325,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=1k6/N7/4B3/8/3K4/8/8/8_w_-_-_0_1&moves=Nc8,Kc7,Na7,Kb8&cursor=0",
+      "motif": "Noncentral bishop not king-protected; central king; knight on edge, unprotected by king",
+      "rectangle": [
+        5,
+        4
+      ],
+      "area": 20
+    },
+    {
+      "fen": "8/3k4/K7/3B4/8/3N4/8/8 w - - 0 1",
+      "moves": [
+        "Kb5",
+        "Kc7",
+        "Ka6",
+        "Kd7"
+      ],
+      "d": 0,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/3k4/K7/3B4/8/3N4/8/8_w_-_-_0_1&moves=Kb5,Kc7,Ka6,Kd7&cursor=0",
+      "motif": "Unprotected by king central bishop; knight on precage",
+      "rectangle": [
+        4,
+        4
+      ],
+      "area": 16
+    },
+    {
+      "fen": "8/8/8/8/Bk6/8/3KN3/8 w - - 0 1",
+      "moves": [
+        "Nc3",
+        "Kc4",
+        "Ne2",
+        "Kb4"
+      ],
+      "d": 202,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/8/Bk6/8/3KN3/8_w_-_-_0_1&moves=Nc3,Kc4,Ne2,Kb4&cursor=0",
+      "motif": "Noncentral bishop not king-protected; interior king; knight king-protected",
+      "rectangle": [
+        5,
+        3
+      ],
+      "area": 15
+    },
+    {
+      "fen": "8/3B4/3k4/8/1K6/1N6/8/8 w - - 0 1",
+      "moves": [
+        "Nc5",
+        "Kd5",
+        "Nb3",
+        "Kd6"
+      ],
+      "d": 204,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/3B4/3k4/8/1K6/1N6/8/8_w_-_-_0_1&moves=Nc5,Kd5,Nb3,Kd6&cursor=0",
+      "motif": "Noncentral bishop not king-protected; interior king; knight king-protected",
+      "rectangle": [
+        3,
+        5
+      ],
+      "area": 15
+    }
+  ],
+  "supportLosses": 0,
+  "supportedPositionsOnLoops": 0,
+  "supportNote": "All previous support declarations remain discarded.",
+  "validation": {
+    "bishopKnightTests": 99,
+    "productionBuild": "passed",
+    "loadedPreferred": [
+      "Kd6"
+    ],
+    "examples": "All ten four-ply loops replayed for three laps with preferred White moves, legal Black replies, exact closure, D4 distinctness, unsupported status, and replay decoding verified."
+  }
+}

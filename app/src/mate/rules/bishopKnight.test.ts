@@ -147,6 +147,11 @@ test("bishop-and-knight rules are registered", () => {
       helpText: "Do not allow Black to attack both undefended pieces next move.",
     },
     {
+      id: "r6.9",
+      shortLabel: "rule r6.9",
+      helpText: "Play the 6.9 move.",
+    },
+    {
       id: "r7",
       shortLabel: "rule r7",
       helpText: "Prefer king step-then-Euclidean proximity to a central square, then prefer king on the color opposite the bishop.",
@@ -212,6 +217,7 @@ test("bishop-and-knight rules are registered", () => {
       "r6",
       "r6.5",
       "r6.8",
+      "r6.9",
       "r7",
       "r7.8",
       "r8",
@@ -226,7 +232,7 @@ test("bishop-and-knight rules are registered", () => {
     ruleSet.whiteRuleDescriptions.map(({ id }) => id),
     knightAndBishopWhiteRules.map(({ id }) => id),
   );
-  assert.equal(knightAndBishopWhiteRules.length, 19);
+  assert.equal(knightAndBishopWhiteRules.length, 20);
 });
 
 test("immediate mate keeps precedence without the mating-net rule", () => {

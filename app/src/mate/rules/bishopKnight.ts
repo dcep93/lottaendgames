@@ -28,6 +28,7 @@ import {
 import { knightAndBishopKnightTargetSquares, knightAndBishopKnightProximityToSquare, knightKingProtectionDistance, knightAndBishopCenterProximityScore, knightAndBishopKingCenterProximityScore, knightAndBishopKingCenterEuclideanScore, knightAndBishopKnightTargetProximityScore, knightAndBishopTargetCorners } from "./bishopKnightStrategy";
 import { knightAndBishopDeclaredPreparationMove } from "./bishopKnightPreparation";
 import { knightAndBishopShouldCoordinateKing, knightAndBishopKingCoordinatesMinors } from "./bishopKnightCoordination";
+import { knightAndBishopSixPointNineMove } from "./bishopKnightSixPointNine";
 import { knightAndBishopFivePointFiveMove } from "./bishopKnightFivePointFive";
 import { knightAndBishopRelativeKnightMove } from "./bishopKnightRelativeKnight";
 import { compareScoresByRules, selectIdealMoves } from "./selection";
@@ -40,6 +41,7 @@ import type {
 } from "./types";
 
 export type KnightAndBishopWhiteMoveScore = {
+  readonly sixPointNinePenalty: number;
   readonly declaredStepPenalty: number;
   readonly relativeKnightPenalty: number;
   readonly startsWithMiddle16King: boolean;
@@ -152,6 +154,7 @@ function distanceToNearestUnprotectedKnightOrBishop(fen: string): number {
 }
 
 type KnightAndBishopPositionScoreContext = {
+  readonly sixPointNineMove: string | undefined;
   readonly fivePointFiveMove: string | undefined;
   readonly relativeKnightMove: string | undefined;
   readonly startsWithMiddle16King: boolean;
@@ -181,6 +184,7 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
   const knightCentrallyDefended = !!knight && centralKing && kingDistance(whiteKing.square, knight.square) === 1;
   return {
     precageSideTarget: knightAndBishopPrecageSideTarget(fen),
+    sixPointNineMove: knightAndBishopSixPointNineMove(fen),
     fivePointFiveMove: knightAndBishopFivePointFiveMove(fen),
     relativeKnightMove: knightAndBishopRelativeKnightMove(fen),
     startsWithMiddle16King: !!whiteKing && isMiddle16Square(whiteKing.square),
@@ -236,6 +240,7 @@ function scoreKnightAndBishopWhiteMoveCore(
       return context.shouldCoordinateKing
         && !(move.piece === "k" && knightAndBishopKingCoordinatesMinors(resultFen)) ? 1 : 0;
     },
+    sixPointNinePenalty: context.sixPointNineMove && context.sixPointNineMove !== move.from + move.to ? 1 : 0,
     declaredStepPenalty: context.fivePointFiveMove && context.fivePointFiveMove !== move.from + move.to ? 1 : 0,
     relativeKnightPenalty: context.relativeKnightMove && context.relativeKnightMove !== move.from + move.to ? 1 : 0,
     startsWithMiddle16King: context.startsWithMiddle16King,
@@ -475,6 +480,12 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       compare: (first, second) => first.undefendedMinorForkPenalty - second.undefendedMinorForkPenalty,
     },
     {
+      id: "r6.9",
+      shortLabel: "rule r6.9",
+      helpText: "Play the 6.9 move.",
+      compare: (first, second) => first.sixPointNinePenalty - second.sixPointNinePenalty,
+    },
+    {
       id: "r7",
       shortLabel: "rule r7",
       helpText: "Prefer king step-then-Euclidean proximity to a central square, then prefer king on the color opposite the bishop.",
@@ -694,6 +705,13 @@ const bishopKnightHelp: RuleHelp = {
     pieces: [{square: "c7", piece: "K"}, {square: "c6", piece: "B"}, {square: "e5", piece: "k"}],
     highlights: [{square: "d7", kind: "key"}],
     arrows: [{from: "c7", to: "d7"}],
+  }, {
+    id: "bishop-knight-rule-r6-9",
+    title: "rule r6.9 — Play the 6.9 move",
+    caption: "Kd6 takes opposition with the bishop between the kings. The bishop is on the long diagonal, two squares from the corner; Black is adjacent, and White’s king is central and adjacent to the bishop. Include rotations and reflections, without translations. The knight’s location is irrelevant; the move must be legal and earlier rules retain priority.",
+    pieces: [{square: "d5", piece: "K"}, {square: "c6", piece: "B"}, {square: "b6", piece: "k"}],
+    highlights: [{square: "d6", kind: "key"}],
+    arrows: [{from: "d5", to: "d6"}],
   }, {
     id: "bishop-knight-rule-r9-1",
     title: "rule r9.1 — Play the 9.1 move",
