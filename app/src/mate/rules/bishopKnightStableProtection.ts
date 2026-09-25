@@ -2,7 +2,7 @@ import type { Square } from 'chess.js'
 import { edgeDistance, findPiece, kingDistance, squareCoords, squareFromCoords } from '../chess'
 import { knightAndBishopKnightProximityToSquare } from './bishopKnightStrategy'
 
-/** All bishop-protected targets except squares adjacent to an edge bishop.
+/** Bishop-protected targets within two king steps of Black, except squares adjacent to an edge bishop.
  * Preserve x-ray protection through Black's king. The knight's current square
  * does not block a ray used to plan where that knight should move.
  */
@@ -19,6 +19,7 @@ export function stableBishopProtectedSquares(fen: string): Square[] {
       if (!square || square === whiteKing) break
       if (square === blackKing) continue
       if (edgeDistance(bishop.square) === 0 && kingDistance(bishop.square, square) === 1) continue
+      if (!blackKing || kingDistance(blackKing, square) > 2) continue
       targets.push(square)
     }
   }

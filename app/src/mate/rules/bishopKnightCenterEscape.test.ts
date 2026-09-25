@@ -107,8 +107,9 @@ test('r20 prefers stable bishop protection to distance, then central proximity a
   const protectedRetreat = scoreKnightAndBishopWhiteMove(fen, san('d1'));
   const distant = scoreKnightAndBishopWhiteMove(fen, san('b1'));
   const protectedCentral = scoreKnightAndBishopWhiteMove(fen, san('e2'));
-  assert.equal(protectedRetreat.unprotectedMinorCount, 1);
+  assert.equal(protectedRetreat.unprotectedMinorCount, 2);
   assert.equal(distant.unprotectedMinorCount, 2);
+  assert.equal(protectedCentral.unprotectedMinorCount, 1);
   assert.ok(r20.compare!(protectedRetreat, distant) < 0);
   assert.ok(r20.compare!(protectedCentral, protectedRetreat) < 0);
  }
