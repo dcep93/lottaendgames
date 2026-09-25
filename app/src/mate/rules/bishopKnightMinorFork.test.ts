@@ -10,7 +10,7 @@ test('r7 preserves adjacency without the removed double-attack preference across
     const move = (from: 'c5', to: 'd4' | 'd5') => getChess(fen).move({from: transformSquare(from, t), to: transformSquare(to, t)}).san
     assert.equal(scoreKnightAndBishopWhiteMove(fen, move('c5', 'd4')).undefendedMinorForkPenalty, 1)
     assert.equal(scoreKnightAndBishopWhiteMove(fen, move('c5', 'd5')).undefendedMinorForkPenalty, 0)
-    const bishopMove = getChess(fen).move({from: transformSquare('c6', t), to: transformSquare('e4', t)}).san
+    const bishopMove = getChess(fen).move({from: transformSquare('c6', t), to: transformSquare('d5', t)}).san
     assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [bishopMove])
   }
 })

@@ -81,11 +81,11 @@ test('stable bishop protection metric measures knight moves to protected squares
 });
 
 
-test('removing the early knight preferences breaks the recorded bishop and knight shuttles across D4', () => {
+test('stable protection and king adjacency break the recorded shuttles across D4', () => {
   for (const t of SQUARE_TRANSFORMS) {
     for (const [start, from, to] of [
       ['3K4/8/2Nk4/8/B7/8/8/8 w - - 0 1', 'c6', 'e7'],
-      ['8/3B4/3k4/8/1K6/1N6/8/8 w - - 0 1', 'd7', 'h3'],
+      ['8/3B4/3k4/8/1K6/1N6/8/8 w - - 0 1', 'b3', 'c5'],
     ] as const) {
       const fen = transformFen(start, t);
       const san = getChess(fen).move({from: transformSquare(from, t), to: transformSquare(to, t)}).san;
