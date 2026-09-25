@@ -100,6 +100,12 @@ export function knightAndBishopKingCenterProximityScore(fen: string): number {
   return Math.min(...CENTRAL_SQUARES.map(square => kingDistance(king.square, square)))
 }
 
+export function knightAndBishopKingCenterEuclideanScore(fen: string): number {
+  const king = findPiece(fen, 'w', 'k')
+  if (!king) return 99
+  return Math.min(...CENTRAL_SQUARES.map(square => squaredEuclideanDistance(king.square, square)))
+}
+
 const CENTRAL_SQUARES: readonly Square[] = ['d4', 'e4', 'd5', 'e5']
 const squares = allSquares()
 const knightNeighbors = new Map(squares.map(square =>

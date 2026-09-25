@@ -25,7 +25,7 @@ import {
   isKnightAndBishopWManeuverPosition,
   knightAndBishopPiecesPresent,
 } from "./bishopKnightLookup";
-import { knightAndBishopKnightTargetSquares, knightAndBishopKnightProximityToSquare, knightKingProtectionDistance, knightAndBishopCenterProximityScore, knightAndBishopKingCenterProximityScore, knightAndBishopKnightTargetProximityScore, knightAndBishopTargetCorners } from "./bishopKnightStrategy";
+import { knightAndBishopKnightTargetSquares, knightAndBishopKnightProximityToSquare, knightKingProtectionDistance, knightAndBishopCenterProximityScore, knightAndBishopKingCenterProximityScore, knightAndBishopKingCenterEuclideanScore, knightAndBishopKnightTargetProximityScore, knightAndBishopTargetCorners } from "./bishopKnightStrategy";
 import { knightAndBishopDeclaredPreparationMove } from "./bishopKnightPreparation";
 import { knightAndBishopShouldCoordinateKing, knightAndBishopKingCoordinatesMinors } from "./bishopKnightCoordination";
 import { knightAndBishopFivePointFiveMove } from "./bishopKnightFivePointFive";
@@ -82,6 +82,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly stalemateScore: number;
   readonly pieceSafetyScore: number;
   readonly kingCenterProximityScore: number;
+  readonly kingCenterEuclideanScore: number;
   readonly bishopLongDiagonalPenalty: number;
   readonly bishopProtectedCenterPenalty: number;
   readonly bishopTargetCornerDistanceScore: number;
@@ -217,6 +218,7 @@ function scoreKnightAndBishopWhiteMoveCore(
   const protectedCentralBishop = !!bishop && !!whiteKing && centerDistance(bishop.square) === 0
     && kingDistance(bishop.square, whiteKing.square) === 1;
   let kingCenterProximity: number | undefined;
+  let kingCenterEuclidean: number | undefined;
   let knightTargetProximity: number | undefined;
   const knight = findPiece(resultFen, "w", "n");
   const blackKing = findPiece(resultFen, "b", "k");
@@ -373,6 +375,9 @@ function scoreKnightAndBishopWhiteMoveCore(
     get knightTargetProximityScore() {
       return knightTargetProximity ??= knightAndBishopKnightTargetProximityScore(resultFen);
     },
+    get kingCenterEuclideanScore() {
+      return kingCenterEuclidean ??= knightAndBishopKingCenterEuclideanScore(resultFen);
+    },
     get kingCenterProximityScore() {
       return kingCenterProximity ??= knightAndBishopKingCenterProximityScore(resultFen);
     },
@@ -471,8 +476,9 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     {
       id: "r7",
       shortLabel: "rule r7",
-      helpText: "Prefer king step proximity to a central square, then prefer king on the color opposite the bishop.",
+      helpText: "Prefer king step-then-Euclidean proximity to a central square, then prefer king on the color opposite the bishop.",
       compare: (first, second) => first.kingCenterProximityScore - second.kingCenterProximityScore
+        || first.kingCenterEuclideanScore - second.kingCenterEuclideanScore
         || first.kingBishopColorPenalty - second.kingBishopColorPenalty,
     },
     {
@@ -660,7 +666,7 @@ const bishopKnightHelp: RuleHelp = {
     "For r7.8, freeze the shared precage targets before White moves. Require a middle-16 king. After White moves, require the bishop to remain central; otherwise there is no precage target and no proximity credit. Measure knight moves, then break ties by Euclidean proximity to the target. If Black is on the bishop’s long diagonal, there is no opposite-side target and this rule is neutral.",
     "For r5.1, require a central bishop and knight on a precage square before White moves, then minimize the resulting king-step distance between the kings.",
     "For r8, White’s king must be on files c–f and ranks 3–6 before moving. Evaluate the bishop and knight preferences after White moves. Precage squares require a central bishop and must lie strictly opposite Black across the bishop’s long diagonal. For a light-squared bishop, select the opposite-side pair from c4, d3, e6 and f5; include board symmetries. No targets exist when Black is on the long diagonal. Bishop adjacency is not required. Rules r5.1, r6, r7.8 and r8 share these targets.",
-    "For r7, minimize White’s king steps to the nearest of d4, e4, d5 or e5, then prefer the king on the color opposite the bishop. For r20, maximize the sum of the bishop’s and knight’s Euclidean distances from Black’s king, measured after White moves.",
+    "For r7, minimize White’s king steps to the nearest of d4, e4, d5 or e5, then Euclidean distance to the nearest of those squares, then prefer the king on the color opposite the bishop. For r20, maximize the sum of the bishop’s and knight’s Euclidean distances from Black’s king, measured after White moves.",
     "For r9.98, count bishop protection through Black’s king, which must leave the checking diagonal. Other intervening pieces still block protection. Evaluate after White moves.",
     "The target corner is the bishop-colored corner closest to Black's king.",
     "Support has been reset. No position is supported until explicitly declared under the new rules; all earlier support declarations and r2.5 preferences have been discarded.",

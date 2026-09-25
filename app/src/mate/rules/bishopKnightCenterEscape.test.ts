@@ -3,7 +3,7 @@ import test from 'node:test';
 import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess';
 import { knightAndBishopWhiteRules, scoreKnightAndBishopWhiteMove } from './bishopKnight';
 
-test('r7 ranks central king steps then opposite color; r20 scores minor distances from Black', () => {
+test('r7 ranks central king steps, Euclidean distance, then opposite color; r20 scores minor distances from Black', () => {
   const r99 = knightAndBishopWhiteRules.find(rule => rule.id === 'r7')!;
   const r20 = knightAndBishopWhiteRules.find(rule => rule.id === 'r20')!;
   assert.ok(r99.compare); assert.ok(r20.compare);
@@ -16,7 +16,7 @@ test('r7 ranks central king steps then opposite color; r20 scores minor distance
     const far = score('a8', 'h1'), near = score('a8', 'f3');
     const offColorFar = score('d4', 'c3'), offColorNear = score('d4', 'e3'), sameColorCentral = score('d4', 'd5');
     assert.ok(r99.compare(offColorFar, sameColorCentral) > 0, transform.name);
-    assert.equal(r99.compare(offColorNear, offColorFar), 0, transform.name);
+    assert.ok(r99.compare(offColorNear, offColorFar) < 0, transform.name);
     assert.ok(r99.compare(far, sameColorCentral) < 0, transform.name);
     assert.equal(sameColorCentral.kingBishopColorPenalty, 1);
     assert.equal(offColorNear.kingBishopColorPenalty, 0);
@@ -55,7 +55,9 @@ test('r7 puts central-square steps ahead of color across D4', () => {
     assert.equal(f6.kingCenterProximityScore, 1, t.name);
     assert.ok(compare(d4, e4) < 0, t.name);
     assert.ok(compare(e4, f4) < 0, t.name);
-    assert.equal(compare(f4, f6), 0, t.name);
+    assert.equal(f4.kingCenterEuclideanScore, 1);
+    assert.equal(f6.kingCenterEuclideanScore, 2);
+    assert.ok(compare(f4, f6) < 0, t.name);
     // The same-color central square wins over an opposite-color square one step out.
     assert.ok(compare(e4, f4) < 0, t.name);
   }
@@ -72,6 +74,8 @@ test('r7 prefers inward diagonal king steps in the loaded loop across D4', () =>
     assert.equal(f5.kingCenterProximityScore, 1);
     assert.equal(f6.kingCenterProximityScore, 1);
     assert.ok(rule.compare!(f4, f5) < 0);
-    assert.equal(rule.compare!(f4, f6), 0);
+    assert.ok(rule.compare!(f4, f6) < 0);
+    // Euclidean proximity breaks the step tie before opposite color does.
+    assert.ok(rule.compare!(f5, f6) < 0);
   }
 });

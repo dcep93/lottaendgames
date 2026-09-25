@@ -1,0 +1,167 @@
+{
+  "request": "r7 \u2014 Prefer king step-then-Euclidean proximity to a central square, then prefer king on the color opposite the bishop.",
+  "implementation": "Compare resulting king-step distance to the nearest of d4/e4/d5/e5, then squared Euclidean distance to the nearest of those squares, then opposite bishop color.",
+  "method": {
+    "kind": "Exact complete-graph analysis after conservative affected-policy refresh",
+    "refresh": {
+      "source": "/Users/danielcepeda/repos/_codex_output/bn-r7-step-2026-09-24",
+      "recomputedEveryPolicy": false,
+      "recomputedPolicies": 391721,
+      "oldPoliciesReused": 967623,
+      "rootOrbits": 1707888,
+      "physicalRoots": 13660584,
+      "rootDomainReenumerated": true,
+      "unchangedRootCodeVerified": true,
+      "workers": 4,
+      "seconds": 590.247,
+      "policiesChanged": 332750
+    },
+    "reuseProof": "For every White node, compare old and new r7 ranks of the king's stationary square and every geometrically legal king destination. Reuse only where old preferred branches still tie and no old equal/worse r7 candidate could become preferable; earlier priorities are unchanged. Recompute all remaining nodes. The omitted redundant r19 is covered by the previous equivalence proof.",
+    "reuseValidation": {
+      "oldPreferredRankTiesChecked": 1359014,
+      "unchangedPolicies": 967623,
+      "freshlyCheckedUnchangedPolicies": 512,
+      "mismatches": 0
+    },
+    "independentGraphVerification": {
+      "method": "Independent root enumeration and iterative Tarjan SCC over saved graph",
+      "rootOrbits": 1707888,
+      "physicalRoots": 13660584,
+      "whiteDecisionNodes": 1359344,
+      "edges": 6515322,
+      "postWhiteCycleOrbits": 2393,
+      "postWhiteCyclePhysical": 19144,
+      "whiteTurnCycleOrbits": 3621,
+      "cyclicComponents": 286,
+      "percent": 0.14011457425779678,
+      "seconds": 7.081
+    },
+    "blackPolicy": "All legal Black replies; every preferred White move including ties"
+  },
+  "unsupportedPositionsOnLoops": {
+    "orbits": 2393,
+    "physical": 19144
+  },
+  "original1389Comparison": {
+    "previous": 1389,
+    "survivors": 915,
+    "removed": 474,
+    "introduced": 1478,
+    "current": 2393
+  },
+  "previousReportComparison": {
+    "previous": 3287,
+    "survivors": 1772,
+    "removed": 1515,
+    "introduced": 621,
+    "current": 2393
+  },
+  "largestPiecePositionMotifs": [
+    {
+      "motif": "Noncentral bishop not king-protected; central king; knight king-protected",
+      "orbits": 340,
+      "physical": 2720
+    },
+    {
+      "motif": "Noncentral bishop not king-protected; interior king; knight unprotected by king",
+      "orbits": 261,
+      "physical": 2088
+    },
+    {
+      "motif": "King-protected central bishop; knight unprotected by king, off precage",
+      "orbits": 261,
+      "physical": 2088
+    },
+    {
+      "motif": "King-protected central bishop; knight king-protected, off precage",
+      "orbits": 218,
+      "physical": 1744
+    },
+    {
+      "motif": "Noncentral bishop not king-protected; central king; knight unprotected by king",
+      "orbits": 190,
+      "physical": 1520
+    }
+  ],
+  "exampleSelection": "Largest White-piece bounding rectangles within the largest piece-position motif; D4 distinct and exclude Bd5/Nc4 equivalents throughout.",
+  "examples": [
+    {
+      "fen": "8/8/1kB5/4K3/5N2/8/8/8 w - - 0 1",
+      "moves": [
+        "Kd6",
+        "Ka7",
+        "Ke5",
+        "Kb6"
+      ],
+      "d": 105,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/1kB5/4K3/5N2/8/8/8_w_-_-_0_1&moves=Kd6,Ka7,Ke5,Kb6&cursor=0",
+      "motif": "Noncentral bishop not king-protected; central king; knight king-protected",
+      "rectangle": [
+        4,
+        3
+      ],
+      "area": 12
+    },
+    {
+      "fen": "8/2k5/2B5/8/3KN3/8/8/8 w - - 0 1",
+      "moves": [
+        "Kc5",
+        "Kb8",
+        "Kd4",
+        "Kc7"
+      ],
+      "d": 202,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/2k5/2B5/8/3KN3/8/8/8_w_-_-_0_1&moves=Kc5,Kb8,Kd4,Kc7&cursor=0",
+      "motif": "Noncentral bishop not king-protected; central king; knight king-protected",
+      "rectangle": [
+        3,
+        3
+      ],
+      "area": 9
+    },
+    {
+      "fen": "8/2k5/2B5/4N3/3K4/8/8/8 w - - 0 1",
+      "moves": [
+        "Kc5",
+        "Kb8",
+        "Kd4",
+        "Kc7"
+      ],
+      "d": 105,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/2k5/2B5/4N3/3K4/8/8/8_w_-_-_0_1&moves=Kc5,Kb8,Kd4,Kc7&cursor=0",
+      "motif": "Noncentral bishop not king-protected; central king; knight king-protected",
+      "rectangle": [
+        3,
+        3
+      ],
+      "area": 9
+    }
+  ],
+  "supportLosses": 0,
+  "supportedPositionsOnLoops": 0,
+  "supportNote": "No support declarations exist after the reset.",
+  "validation": {
+    "bishopKnightTests": 94,
+    "productionBuild": "passed",
+    "loadedPosition": {
+      "fen": "B7/3k4/6K1/8/8/8/6N1/8 w - - 2 2",
+      "preferred": [
+        "Kf5"
+      ],
+      "reason": "Kf5 and Kf6 are both one step from the center; Euclidean distances 1 and sqrt(2) precede color."
+    },
+    "examples": "Three laps, legal Black replies, preferred White moves, exact closure, unsupported status, D4 distinctness and replay decoding verified."
+  }
+}
