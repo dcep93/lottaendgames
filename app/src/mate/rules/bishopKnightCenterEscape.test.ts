@@ -28,7 +28,7 @@ test('r7 ranks central king steps, Euclidean distance, then opposite color; r20 
 });
 
 
-test('r20 leaves equal Black-distance moves tied regardless of minor separation across D4', () => {
+test('r20 breaks equal Black-distance ties by minor Euclidean proximity to the center across D4', () => {
   const r20 = knightAndBishopWhiteRules.find(rule => rule.id === 'r20')!;
   assert.ok(r20.compare);
   for (const t of SQUARE_TRANSFORMS) {
@@ -37,7 +37,8 @@ test('r20 leaves equal Black-distance moves tied regardless of minor separation 
     const near = scoreKnightAndBishopWhiteMove(fen, move('b6'));
     const far = scoreKnightAndBishopWhiteMove(fen, move('b2'));
     assert.equal(near.minorBlackDistanceScore, far.minorBlackDistanceScore, t.name);
-    assert.equal(r20.compare(far, near), 0, t.name);
+    assert.ok(near.minorCenterDistanceScore < far.minorCenterDistanceScore, t.name);
+    assert.ok(r20.compare(near, far) < 0, t.name);
   }
 });
 
