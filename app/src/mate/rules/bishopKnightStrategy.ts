@@ -96,11 +96,8 @@ export function knightAndBishopCenterProximityScore(square: Square): number {
 
 export function knightAndBishopKingCenterProximityScore(fen: string): number {
   const king = findPiece(fen, 'w', 'k')
-  const bishop = findPiece(fen, 'w', 'b')
-  if (!king || !bishop) return 99
-  return Math.min(...CENTRAL_SQUARES
-    .filter(square => squareColor(square) !== squareColor(bishop.square))
-    .map(square => squaredEuclideanDistance(king.square, square)))
+  if (!king) return 99
+  return Math.min(...CENTRAL_SQUARES.map(square => kingDistance(king.square, square)))
 }
 
 const CENTRAL_SQUARES: readonly Square[] = ['d4', 'e4', 'd5', 'e5']

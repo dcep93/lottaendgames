@@ -1,0 +1,183 @@
+{
+  "request": "r7 \u2014 Prefer king step proximity to a central square, then prefer king on the color opposite the bishop.",
+  "implementation": "After White moves, minimize Chebyshev distance from White king to the nearest of d4, e4, d5, e5. Break equal-step ties by king color opposite the bishop. Keep r7 in its existing priority position.",
+  "loadedExample": {
+    "fen": "5k2/8/6B1/6K1/8/8/1N6/8 w - - 0 1",
+    "preferred": [
+      "Kf6",
+      "Kf4"
+    ]
+  },
+  "method": {
+    "kind": "Exact affected-policy refresh and full graph cycle analysis",
+    "policyFingerprint": "ba58d4c094d73cc82e770833525043168b709e3eac2ca0b87c10c823c0eafd1d",
+    "refresh": {
+      "source": "/Users/danielcepeda/repos/_codex_output/bn-r69-2026-09-24",
+      "recomputedEveryPolicy": false,
+      "recomputedPolicies": 545502,
+      "oldPoliciesReused": 813842,
+      "rootOrbits": 1707888,
+      "physicalRoots": 13660584,
+      "rootDomainReenumerated": true,
+      "unchangedRootCodeVerified": true,
+      "workers": 4,
+      "seconds": 1016.968,
+      "policiesChanged": 426451
+    },
+    "reuseProof": [
+      "Only the r7 metric and its color tiebreaker changed; all earlier and later priorities are unchanged.",
+      "For each source, the old preferred moves identify the winning old r7 rank. Every candidate at a better old rank was eliminated by an earlier unchanged priority.",
+      "Enumerate a superset of possible resulting White king squares: staying put for minor moves, plus every on-board adjacent square not occupied by a White minor or adjacent to Black king.",
+      "Reuse only when every square tied at the old winning rank has new rank no better than the best existing preferred move, every worse old rank remains strictly worse under the new rule, and all existing preferred moves remain tied under the new rule.",
+      "Recompute all other positions, including potential subsets of the existing preferred moves and terminal/missing-branch cases.",
+      "No support or root Black-legality code changed. The production bundle reconstructed from the prior commit exactly matches the baseline fingerprint."
+    ],
+    "reuseValidation": {
+      "oldPreferredRankTiesChecked": 1359014,
+      "unchangedPolicies": 813842,
+      "freshlyCheckedUnchangedPolicies": 512,
+      "mismatches": 0
+    },
+    "white": "All preferred ties",
+    "black": "All legal replies",
+    "countingUnit": "D4-deduplicated post-White positions directly on cycles of any length, not positions merely reaching cycles",
+    "independentGraphCheck": {
+      "method": "Independent root enumeration and iterative Tarjan SCC over saved graph",
+      "rootOrbits": 1707888,
+      "physicalRoots": 13660584,
+      "whiteDecisionNodes": 1359344,
+      "edges": 6962663,
+      "postWhiteCycleOrbits": 3287,
+      "postWhiteCyclePhysical": 26296,
+      "whiteTurnCycleOrbits": 4210,
+      "cyclicComponents": 615,
+      "percent": 0.19245992711465856,
+      "seconds": 4.63
+    }
+  },
+  "unsupportedPositionsOnLoops": {
+    "orbits": 3287,
+    "physical": 26296
+  },
+  "original1389Comparison": {
+    "previous": 1389,
+    "survivors": 807,
+    "removed": 582,
+    "introduced": 2480,
+    "current": 3287
+  },
+  "previousReportComparison": {
+    "previous": 2414,
+    "survivors": 1491,
+    "removed": 923,
+    "introduced": 1796,
+    "current": 3287
+  },
+  "largestPiecePositionMotifs": [
+    {
+      "motif": "Noncentral bishop not king-protected; interior king; knight unprotected by king",
+      "orbits": 557,
+      "physical": 4456
+    },
+    {
+      "motif": "Noncentral bishop not king-protected; interior king; knight on edge, unprotected by king",
+      "orbits": 409,
+      "physical": 3272
+    },
+    {
+      "motif": "Noncentral bishop not king-protected; edge king; knight unprotected by king",
+      "orbits": 264,
+      "physical": 2112
+    },
+    {
+      "motif": "Noncentral bishop not king-protected; central king; knight unprotected by king",
+      "orbits": 239,
+      "physical": 1912
+    },
+    {
+      "motif": "King-protected central bishop; knight unprotected by king, off precage",
+      "orbits": 213,
+      "physical": 1704
+    }
+  ],
+  "exampleSelection": "Largest White-piece bounding rectangles within the largest motif; exclude Bd5/Nc4 across D4 throughout each loop.",
+  "examples": [
+    {
+      "fen": "B7/6K1/4k3/8/8/8/6N1/8 w - - 0 1",
+      "moves": [
+        "Bb7",
+        "Ke7",
+        "Ba8",
+        "Ke6"
+      ],
+      "d": 210,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=B7/6K1/4k3/8/8/8/6N1/8_w_-_-_0_1&moves=Bb7,Ke7,Ba8,Ke6&cursor=0",
+      "motif": "Noncentral bishop not king-protected; interior king; knight unprotected by king",
+      "rectangle": [
+        7,
+        7
+      ],
+      "area": 49
+    },
+    {
+      "fen": "8/1N4K1/4k3/8/8/8/8/7B w - - 0 1",
+      "moves": [
+        "Bg2",
+        "Kf5",
+        "Bh1",
+        "Ke6"
+      ],
+      "d": 220,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/1N4K1/4k3/8/8/8/8/7B_w_-_-_0_1&moves=Bg2,Kf5,Bh1,Ke6&cursor=0",
+      "motif": "Noncentral bishop not king-protected; interior king; knight unprotected by king",
+      "rectangle": [
+        7,
+        7
+      ],
+      "area": 49
+    },
+    {
+      "fen": "B7/6K1/4k3/8/8/5N2/8/8 w - - 0 1",
+      "moves": [
+        "Bb7",
+        "Ke7",
+        "Ba8",
+        "Ke6"
+      ],
+      "d": 204,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=B7/6K1/4k3/8/8/5N2/8/8_w_-_-_0_1&moves=Bb7,Ke7,Ba8,Ke6&cursor=0",
+      "motif": "Noncentral bishop not king-protected; interior king; knight unprotected by king",
+      "rectangle": [
+        7,
+        6
+      ],
+      "area": 42
+    }
+  ],
+  "supportLosses": 0,
+  "supportedPositionsOnLoops": 0,
+  "supportNote": "No support declarations exist.",
+  "validation": {
+    "bishopKnightTests": 94,
+    "productionBuild": "passed",
+    "optimizedWorkerAgainstProduction": {
+      "passed": true,
+      "seed": 20260920,
+      "roots": 1000,
+      "nodes": 1928
+    },
+    "examples": "Three laps with preferred White moves, legal Black moves, exact closure, D4 distinctness, unsupported status and replay decoding verified."
+  }
+}

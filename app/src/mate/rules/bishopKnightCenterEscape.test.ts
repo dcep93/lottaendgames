@@ -3,7 +3,7 @@ import test from 'node:test';
 import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess';
 import { knightAndBishopWhiteRules, scoreKnightAndBishopWhiteMove } from './bishopKnight';
 
-test('r7 scores opposite-color central targets; r20 scores minor distances from Black', () => {
+test('r7 ranks central king steps then opposite color; r20 scores minor distances from Black', () => {
   const r99 = knightAndBishopWhiteRules.find(rule => rule.id === 'r7')!;
   const r20 = knightAndBishopWhiteRules.find(rule => rule.id === 'r20')!;
   assert.ok(r99.compare); assert.ok(r20.compare);
@@ -42,7 +42,7 @@ test('r20 leaves equal Black-distance moves tied regardless of minor separation 
 });
 
 
-test('r7 prefers the nearest opposite-color central square across D4', () => {
+test('r7 puts central-square steps ahead of color across D4', () => {
   const compare = knightAndBishopWhiteRules.find(rule => rule.id === 'r7')!.compare!;
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen('8/7k/8/3BK3/2N5/8/8/8 w - - 6 4', t);
@@ -50,11 +50,28 @@ test('r7 prefers the nearest opposite-color central square across D4', () => {
       getChess(fen).move({from: transformSquare('e5', t), to: transformSquare(to, t)}).san);
     const d4 = score('d4'), e4 = score('e4'), f4 = score('f4'), f6 = score('f6');
     assert.equal(d4.kingCenterProximityScore, 0, t.name);
-    assert.equal(e4.kingCenterProximityScore, 1, t.name);
-    assert.equal(f4.kingCenterProximityScore, 2, t.name);
-    assert.equal(f6.kingCenterProximityScore, 2, t.name);
+    assert.equal(e4.kingCenterProximityScore, 0, t.name);
+    assert.equal(f4.kingCenterProximityScore, 1, t.name);
+    assert.equal(f6.kingCenterProximityScore, 1, t.name);
     assert.ok(compare(d4, e4) < 0, t.name);
     assert.ok(compare(e4, f4) < 0, t.name);
     assert.equal(compare(f4, f6), 0, t.name);
+    // The same-color central square wins over an opposite-color square one step out.
+    assert.ok(compare(e4, f4) < 0, t.name);
+  }
+});
+
+
+test('r7 prefers inward diagonal king steps in the loaded loop across D4', () => {
+  for (const t of SQUARE_TRANSFORMS) {
+    const fen = transformFen('5k2/8/6B1/6K1/8/8/1N6/8 w - - 0 1', t);
+    const move = (to: 'f4' | 'f5' | 'f6') => getChess(fen).move({from: transformSquare('g5', t), to: transformSquare(to, t)}).san;
+    const rule = knightAndBishopWhiteRules.find(r => r.id === 'r7')!;
+    const f4 = scoreKnightAndBishopWhiteMove(fen, move('f4')), f5 = scoreKnightAndBishopWhiteMove(fen, move('f5')), f6 = scoreKnightAndBishopWhiteMove(fen, move('f6'));
+    assert.equal(f4.kingCenterProximityScore, 1);
+    assert.equal(f5.kingCenterProximityScore, 1);
+    assert.equal(f6.kingCenterProximityScore, 1);
+    assert.ok(rule.compare!(f4, f5) < 0);
+    assert.equal(rule.compare!(f4, f6), 0);
   }
 });

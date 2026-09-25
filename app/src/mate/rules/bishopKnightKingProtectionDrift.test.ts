@@ -29,7 +29,8 @@ test('r10 prefers establishing a precage knight over the loaded bishop shuffle a
   assert.equal(precage.knightTargetProximityScore,0);
   assert.equal(away.knightTargetProximityScore,99);
   assert.ok(rule.compare!(precage,away)<0);
-  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[move('d5')]);
+  const kingMoves = (['h6', 'h4'] as const).map(to => getChess(fen).move({from:transformSquare('h5',t),to:transformSquare(to,t)}).san);
+  assert.deepEqual(new Set(getIdealKnightAndBishopWhiteMoves(fen)),new Set(kingMoves));
  }
 });
 
