@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess';
-import { knightAndBishopWhiteRules, scoreKnightAndBishopWhiteMove } from './bishopKnight';
+import { getIdealKnightAndBishopWhiteMoves, knightAndBishopWhiteRules, scoreKnightAndBishopWhiteMove } from './bishopKnight';
 
 test('r7 breaks equal knight proximity by central proximity and color; r20 scores minor distances from Black', () => {
   const r99 = knightAndBishopWhiteRules.find(rule => rule.id === 'r7')!;
@@ -99,7 +99,7 @@ test('r20 excludes minors defended by either the king or the other minor across 
 });
 
 
-test('r20 prefers stable bishop protection to distance, then central proximity across D4', () => {
+test('r20 keeps initially undefended minors in the distance score even after gaining defense across D4', () => {
  const r20 = knightAndBishopWhiteRules.find(r => r.id === 'r20')!;
  for (const t of SQUARE_TRANSFORMS) {
   const fen = transformFen('K7/8/8/7B/2k5/2N5/8/8 w - - 0 1', t);
@@ -109,9 +109,9 @@ test('r20 prefers stable bishop protection to distance, then central proximity a
   const protectedCentral = scoreKnightAndBishopWhiteMove(fen, san('e2'));
   assert.equal(protectedRetreat.unprotectedMinorCount, 2);
   assert.equal(distant.unprotectedMinorCount, 2);
-  assert.equal(protectedCentral.unprotectedMinorCount, 1);
+  assert.equal(protectedCentral.unprotectedMinorCount, 2);
   assert.ok(r20.compare!(protectedRetreat, distant) < 0);
-  assert.ok(r20.compare!(protectedCentral, protectedRetreat) < 0);
+  assert.ok(r20.compare!(protectedCentral, protectedRetreat) > 0);
  }
 });
 
@@ -120,5 +120,31 @@ test('r20 does not count an edge bishop protecting an adjacent knight as stable,
   const fen = transformFen('B7/1N6/8/8/4k3/8/8/7K w - - 0 1', t);
   const san = getChess(fen).move({from: transformSquare('h1', t), to: transformSquare('h2', t)}).san;
   assert.equal(scoreKnightAndBishopWhiteMove(fen, san).unprotectedMinorCount, 2, t.name);
+ }
+});
+
+test('r20 fixes the undefended pieces before moving and prefers Bh5 in the reported loop, across D4',()=>{
+ const r20=knightAndBishopWhiteRules.find(r=>r.id==='r20')!;
+ for(const t of SQUARE_TRANSFORMS){
+  const fen=transformFen('4B3/8/8/2k5/8/2NK4/8/8 w - - 0 1',t);
+  const san=(to:'h5'|'b5')=>getChess(fen).move({from:transformSquare('e8',t),to:transformSquare(to,t)}).san;
+  const far=scoreKnightAndBishopWhiteMove(fen,san('h5'));
+  const newlyDefended=scoreKnightAndBishopWhiteMove(fen,san('b5'));
+  assert.equal(far.unprotectedMinorCount,1,t.name);
+  assert.equal(newlyDefended.unprotectedMinorCount,1,t.name);
+  assert.equal(far.minorBlackDistanceScore,-5,t.name);
+  assert.equal(newlyDefended.minorBlackDistanceScore,-1,t.name);
+  assert.ok(r20.compare!(far,newlyDefended)<0,t.name);
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[san('h5')],t.name);
+ }
+});
+
+test('r20 keeps an initially defended bishop excluded even when its move leaves king protection',()=>{
+ for(const t of SQUARE_TRANSFORMS){
+  const fen=transformFen('8/8/1k6/8/4B3/2NK4/8/8 w - - 0 1',t);
+  const move=getChess(fen).move({from:transformSquare('e4',t),to:transformSquare('h1',t)}).san;
+  const score=scoreKnightAndBishopWhiteMove(fen,move);
+  assert.equal(score.unprotectedMinorCount,0,t.name);
+  assert.equal(score.minorBlackDistanceScore,-0,t.name);
  }
 });

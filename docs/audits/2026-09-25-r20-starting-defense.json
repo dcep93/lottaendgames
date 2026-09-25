@@ -1,0 +1,197 @@
+{
+  "change": "r20 freezes undefended bishop/knight identity in the starting position and measures their distances after each candidate move. Its unprotected count is also frozen; gaining defense during a move does not remove that piece from distance scoring. r6 protection remains evaluated after the move.",
+  "scope": "Replay of all 2467 four-ply witnesses from full audit 3947731, not a full-domain recount or arbitrary-cycle position-membership check.",
+  "previousSurvivingCycles": 79,
+  "survivingCycleWitnesses": 77,
+  "brokenThisChange": 2,
+  "reactivatedWitnesses": 0,
+  "displayEligibleCycles": 13,
+  "hiddenMiddle16Cycles": 64,
+  "displayFilter": "Hide examples when both White-to-move positions have all three White pieces on c3\u2013f6. Do not remove them from totals.",
+  "motifs": [
+    {
+      "motif": "bishop shuffle; central bishop throughout; knight king-protected throughout; no stable bishop defense",
+      "cycles": 61,
+      "positions": 35
+    },
+    {
+      "motif": "bishop shuffle; bishop outside center throughout; knight king-protected throughout; no stable bishop defense",
+      "cycles": 10,
+      "positions": 14
+    },
+    {
+      "motif": "knight shuffle; central bishop throughout; knight king-protected throughout; no stable bishop defense",
+      "cycles": 3,
+      "positions": 6
+    },
+    {
+      "motif": "knight shuffle; bishop outside center throughout; knight king-protected throughout; no stable bishop defense",
+      "cycles": 2,
+      "positions": 3
+    },
+    {
+      "motif": "king shuffle; bishop outside center throughout; knight king-protected throughout; no stable bishop defense",
+      "cycles": 1,
+      "positions": 2
+    }
+  ],
+  "examples": [
+    {
+      "group": 0,
+      "motif": "bishop shuffle; bishop outside center throughout; knight king-protected throughout; no stable bishop defense",
+      "fen": "8/2k5/2B5/8/4K3/5N2/8/8 w - - 0 1",
+      "moves": [
+        "Ba4",
+        "Kd8",
+        "Bc6",
+        "Kc7"
+      ],
+      "area": 16,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/2k5/2B5/8/4K3/5N2/8/8_w_-_-_0_1&moves=Ba4,Kd8,Bc6,Kc7&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "bishop shuffle; bishop outside center throughout; knight king-protected throughout; no stable bishop defense",
+      "fen": "2k5/8/8/8/B3K3/5N2/8/8 w - - 0 1",
+      "moves": [
+        "Bc6",
+        "Kc7",
+        "Ba4",
+        "Kc8"
+      ],
+      "area": 12,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=2k5/8/8/8/B3K3/5N2/8/8_w_-_-_0_1&moves=Bc6,Kc7,Ba4,Kc8&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "bishop shuffle; bishop outside center throughout; knight king-protected throughout; no stable bishop defense",
+      "fen": "1k6/8/8/8/B3K3/5N2/8/8 w - - 0 1",
+      "moves": [
+        "Bc6",
+        "Kc7",
+        "Ba4",
+        "Kb8"
+      ],
+      "area": 12,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=1k6/8/8/8/B3K3/5N2/8/8_w_-_-_0_1&moves=Bc6,Kc7,Ba4,Kb8&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "bishop shuffle; bishop outside center throughout; knight king-protected throughout; no stable bishop defense",
+      "fen": "3k4/8/8/4K3/B3N3/8/8/8 w - - 0 1",
+      "moves": [
+        "Bc6",
+        "Kc7",
+        "Ba4",
+        "Kd8"
+      ],
+      "area": 10,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=3k4/8/8/4K3/B3N3/8/8/8_w_-_-_0_1&moves=Bc6,Kc7,Ba4,Kd8&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "bishop shuffle; bishop outside center throughout; knight king-protected throughout; no stable bishop defense",
+      "fen": "2k5/8/8/4K3/B3N3/8/8/8 w - - 0 1",
+      "moves": [
+        "Bc6",
+        "Kc7",
+        "Ba4",
+        "Kc8"
+      ],
+      "area": 10,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=2k5/8/8/4K3/B3N3/8/8/8_w_-_-_0_1&moves=Bc6,Kc7,Ba4,Kc8&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "bishop shuffle; bishop outside center throughout; knight king-protected throughout; no stable bishop defense",
+      "fen": "1k6/8/8/4K3/B3N3/8/8/8 w - - 0 1",
+      "moves": [
+        "Bc6",
+        "Kc7",
+        "Ba4",
+        "Kb8"
+      ],
+      "area": 10,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=1k6/8/8/4K3/B3N3/8/8/8_w_-_-_0_1&moves=Bc6,Kc7,Ba4,Kb8&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "bishop shuffle; bishop outside center throughout; knight king-protected throughout; no stable bishop defense",
+      "fen": "8/2k5/2B5/8/3KN3/8/8/8 w - - 0 1",
+      "moves": [
+        "Ba4",
+        "Kb8",
+        "Bc6",
+        "Kc7"
+      ],
+      "area": 9,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/2k5/2B5/8/3KN3/8/8/8_w_-_-_0_1&moves=Ba4,Kb8,Bc6,Kc7&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "bishop shuffle; bishop outside center throughout; knight king-protected throughout; no stable bishop defense",
+      "fen": "8/2k5/2B5/8/3NK3/8/8/8 w - - 0 1",
+      "moves": [
+        "Ba4",
+        "Kd6",
+        "Bc6",
+        "Kc7"
+      ],
+      "area": 9,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/2k5/2B5/8/3NK3/8/8/8_w_-_-_0_1&moves=Ba4,Kd6,Bc6,Kc7&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "bishop shuffle; bishop outside center throughout; knight king-protected throughout; no stable bishop defense",
+      "fen": "2k5/8/8/8/B2KN3/8/8/8 w - - 0 1",
+      "moves": [
+        "Bc6",
+        "Kc7",
+        "Ba4",
+        "Kc8"
+      ],
+      "area": 5,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=2k5/8/8/8/B2KN3/8/8/8_w_-_-_0_1&moves=Bc6,Kc7,Ba4,Kc8&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "bishop shuffle; bishop outside center throughout; knight king-protected throughout; no stable bishop defense",
+      "fen": "3k4/8/8/8/B2KN3/8/8/8 w - - 0 1",
+      "moves": [
+        "Bc6",
+        "Kc7",
+        "Ba4",
+        "Kd8"
+      ],
+      "area": 5,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=3k4/8/8/8/B2KN3/8/8/8_w_-_-_0_1&moves=Bc6,Kc7,Ba4,Kd8&cursor=0"
+    },
+    {
+      "group": 1,
+      "motif": "knight shuffle; bishop outside center throughout; knight king-protected throughout; no stable bishop defense",
+      "fen": "8/k7/B7/1K6/1N6/8/8/8 w - - 0 1",
+      "moves": [
+        "Nc6+",
+        "Ka8",
+        "Nb4",
+        "Ka7"
+      ],
+      "area": 6,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/k7/B7/1K6/1N6/8/8/8_w_-_-_0_1&moves=Nc6%2B,Ka8,Nb4,Ka7&cursor=0"
+    },
+    {
+      "group": 1,
+      "motif": "knight shuffle; bishop outside center throughout; knight king-protected throughout; no stable bishop defense",
+      "fen": "1k6/8/B7/1K6/1N6/8/8/8 w - - 0 1",
+      "moves": [
+        "Nc6+",
+        "Ka8",
+        "Nb4",
+        "Kb8"
+      ],
+      "area": 6,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=1k6/8/B7/1K6/1N6/8/8/8_w_-_-_0_1&moves=Nc6%2B,Ka8,Nb4,Kb8&cursor=0"
+    }
+  ],
+  "validation": "22 targeted tests and production build pass; full bishop-knight suite retains only the four pre-existing failures. Bh5 verified across all D4 transforms."
+}

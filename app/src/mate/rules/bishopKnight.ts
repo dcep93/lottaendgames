@@ -166,6 +166,8 @@ function distanceToNearestUnprotectedKnightOrBishop(fen: string): number {
 }
 
 type KnightAndBishopPositionScoreContext = {
+  readonly startsWithUnprotectedBishop: boolean;
+  readonly startsWithUnprotectedKnight: boolean;
   readonly knightDriftBlocked: boolean;
   readonly knightDriftBaseline: readonly [number, number, number];
   readonly sixPointNineMove: string | undefined;
@@ -201,7 +203,16 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
   const knight = findPiece(fen, "w", "n");
   const bishopCentrallyDefended = !!bishop && centralKing && kingDistance(whiteKing.square, bishop.square) === 1;
   const knightCentrallyDefended = !!knight && centralKing && kingDistance(whiteKing.square, knight.square) === 1;
+  let unprotectedKnight: boolean | undefined;
   return {
+    startsWithUnprotectedBishop: !!bishop
+      && (!whiteKing || kingDistance(whiteKing.square,bishop.square)!==1)
+      && (!knight || squaredEuclideanDistance(bishop.square,knight.square)!==5),
+    get startsWithUnprotectedKnight() {
+      return unprotectedKnight ??= !!knight
+        && (!whiteKing || kingDistance(whiteKing.square,knight.square)!==1)
+        && !stableBishopProtectedSquares(fen).includes(knight.square);
+    },
     get knightDriftBaseline() {
       return driftBaseline ??= !knight || !blackKing || !whiteKing || !bishop ? [0, 99, 99] : [
         blackBlocksKnightDrift(knight.square, blackKing.square, whiteKing.square) ? 2
@@ -268,14 +279,9 @@ function scoreKnightAndBishopWhiteMoveCore(
   const bishopKingDefended = !!bishop && !!whiteKing && kingDistance(bishop.square, whiteKing.square) === 1;
   const bishopDefendedByKingMove = move.piece === "k" && bishopKingDefended;
   const knightKingDefended = !!knight && !!whiteKing && kingDistance(knight.square, whiteKing.square) === 1;
-  const bishopStablyDefended = bishopKingDefended || (!!bishop && !!knight
-    && squaredEuclideanDistance(bishop.square, knight.square) === 5);
   let knightBishopStableDefense: boolean | undefined;
   const knightBishopStablyDefended = () => knightBishopStableDefense ??= !!knight
     && stableBishopProtectedSquares(resultFen).includes(knight.square);
-  let knightStableDefense: boolean | undefined;
-  const knightStablyDefended = () => knightStableDefense ??= knightKingDefended
-    || knightBishopStablyDefended();
   const knightEdgeOpposition = (() => {
     if (move.piece !== "n" || !knight || !whiteKing || kingDistance(knight.square, whiteKing.square) <= 2 || !blackKing
       || squaredEuclideanDistance(knight.square, blackKing.square) !== 4) return false;
@@ -336,12 +342,12 @@ function scoreKnightAndBishopWhiteMoveCore(
         ? Math.sqrt(knightAndBishopCenterProximityScore(piece.square)) / 2 : 0), 0);
     },
     get unprotectedMinorCount() {
-      return Number(!!bishop && !bishopStablyDefended) + Number(!!knight && !knightStablyDefended());
+      return Number(context.startsWithUnprotectedBishop) + Number(context.startsWithUnprotectedKnight);
     },
     get minorBlackDistanceScore() {
       if (!blackKing) return 0;
-      return -(bishop && !bishopStablyDefended ? Math.sqrt(squaredEuclideanDistance(bishop.square, blackKing.square)) : 0)
-        - (knight && !knightStablyDefended() ? Math.sqrt(squaredEuclideanDistance(knight.square, blackKing.square)) : 0);
+      return -(bishop && context.startsWithUnprotectedBishop ? Math.sqrt(squaredEuclideanDistance(bishop.square, blackKing.square)) : 0)
+        - (knight && context.startsWithUnprotectedKnight ? Math.sqrt(squaredEuclideanDistance(knight.square, blackKing.square)) : 0);
     },
     undefendedKnightOnlyBishopDefenderPenalty: bishop && knight && blackKing
       && kingDistance(bishop.square, blackKing.square) === 1
@@ -714,7 +720,7 @@ const bishopKnightHelp: RuleHelp = {
   ],
   notes: [
     "For r8, White’s king must be on files c–f and ranks 3–6 before moving. Evaluate the bishop and knight preferences after White moves. Precage squares require a central bishop and must lie strictly opposite Black across the bishop’s long diagonal. For a light-squared bishop, select the opposite-side pair from c4, d3, e6 and f5; include board symmetries. No targets exist when Black is on the long diagonal. Bishop adjacency is not required.",
-    "For r7, minimize White’s king step distance to the knight, then its Euclidean distance to the nearest of d4, e4, d5 or e5, then prefer the king on the color opposite the bishop. For r20, prefer stable protection, then maximize unprotected minor-piece Euclidean distance from Black’s king, then minimize the sum of their Euclidean distances to the board’s midpoint, measured after White moves.",
+    "For r7, minimize White’s king step distance to the knight, then its Euclidean distance to the nearest of d4, e4, d5 or e5, then prefer the king on the color opposite the bishop. For r20, identify unprotected minor pieces before White moves, then maximize their resulting Euclidean distance from Black’s king. Finally minimize the sum of both minor pieces’ resulting Euclidean distances to the board’s midpoint.",
     "The target corner is the bishop-colored corner closest to Black's king.",
     "Support has been reset. No position is supported until explicitly declared under the new rules; all earlier support declarations and r2.5 preferences have been discarded.",
   ],

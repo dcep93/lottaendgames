@@ -1,7 +1,7 @@
 import {readFileSync} from 'node:fs';
 import {findPiece, getChess, squareCoordinates} from '../../app/src/mate/chess.ts';
 import {encodeMateReplay, decodeMateReplay} from '../../app/src/mate/share.ts';
-import {code, transform} from './encoding.mts';
+import {code, transform, unpack} from './encoding.mts';
 import {verifyLoopExample} from './verify-loop-example.mts';
 
 type Example = {fen: string; moves: string[]};
@@ -23,6 +23,9 @@ for (const candidate of candidates) {
     if (board.turn() === 'w') states.push(code(board.fen()));
     board.move(san);
   }
+  // Display filter only: these cycles still belong in audit totals.
+  const inMiddle16 = (s: number) => (s & 7) >= 2 && (s & 7) <= 5 && (s >> 3) >= 2 && (s >> 3) <= 5;
+  if (states.length === 2 && states.every(k => unpack(k).slice(0, 3).every(inMiddle16))) continue;
   const identity = Array.from({length: 8}, (_, t) => states.map(k => transform(k, t)).sort((a, b) => a - b).join(',')).sort()[0]!;
   if (seen.has(identity)) continue;
   const hash = encodeMateReplay(candidate.fen, candidate.moves, 0);

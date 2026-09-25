@@ -45,7 +45,8 @@ test('r6 ties king-protected knights regardless of additional bishop protection 
   assert.equal(both.knightStableBishopProtectionPenalty,1,t.name);
   assert.equal(kingOnly.knightStableBishopProtectionPenalty,1,t.name);
   assert.equal(r6.compare!(both,kingOnly),0,t.name);
-  const centralBishops=(['d5','e4'] as const).map(to=>getChess(fen).move({from:transformSquare('a8',t),to:transformSquare(to,t)}).san);
+  // r20 still scores the initially undefended bishop: e4 is farther from Black.
+  const centralBishops=(['e4'] as const).map(to=>getChess(fen).move({from:transformSquare('a8',t),to:transformSquare(to,t)}).san);
   assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen).sort(),centralBishops.sort(),t.name);
  }
 });
