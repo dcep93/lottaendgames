@@ -23,11 +23,14 @@ export function knightAndBishopR5OppositionMoves(fen:string): readonly string[] 
   }
   const dx=n.file-w.file,dy=n.rank-w.rank;
   if(Math.abs(dx)+Math.abs(dy)!==1)return undefined;
+  const knightBehind=center(n)>center(w);
   for(const side of [-1,1]){
     const fx=dy*side,fy=dx*side;
     const forward=bx*fx+by*fy,lateral=bx*dx+by*dy;
-    if(forward<2||forward>3||Math.abs(lateral)>1)continue;
-    const next={file:n.file+fx,rank:n.rank+fy},to=squareFromCoords(next.file,next.rank);
+    if(forward<2||forward>3||Math.abs(lateral)>(knightBehind?2:1))continue;
+    // With the knight behind, advance from the king while retaining its defense.
+    const origin=knightBehind?w:n;
+    const next={file:origin.file+fx,rank:origin.rank+fy},to=squareFromCoords(next.file,next.rank);
     if(!to||occupied.has(to)||center(next)>=center(w))continue;
     if(Math.max(Math.abs(next.file-b.file),Math.abs(next.rank-b.rank))>1)return [king.square+to];
     return ['b']; // Allow bishop waits; r5 scoring prefers the farthest from Black.

@@ -69,3 +69,24 @@ test('r5 chooses Bh7 for the waiting position from the reported loop, across D4'
   assert.equal(explainMove(bishopKnightRuleSet.scoreWhiteCandidates!(fen,getChess(fen).moves()),knightAndBishopWhiteRules,san)?.id,'r5',t.name);
  }
 });
+
+test('r5 waits with Bh5 then advances Kb2 when Na1 is behind Ka2, across D4',()=>{
+ for(const t of SQUARE_TRANSFORMS){
+  const board=getChess(transformFen('4B3/8/8/8/8/2k5/K7/N7 w - - 0 1',t));
+  assert.deepEqual(knightAndBishopR5OppositionMoves(board.fen()),['b'],t.name);
+  const wait=getChess(board.fen()).move({from:transformSquare('e8',t),to:transformSquare('h5',t)}).san;
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(board.fen()),[wait],t.name);
+  assert.equal(explainMove(bishopKnightRuleSet.scoreWhiteCandidates!(board.fen(),board.moves()),knightAndBishopWhiteRules,wait)?.id,'r5',t.name);
+  const far=scoreKnightAndBishopWhiteMove(board.fen(),wait);
+  for(const m of board.moves({verbose:true}).filter(m=>m.piece==='b')){
+   assert.ok(far.preparationBishopWaitDistance<=scoreKnightAndBishopWhiteMove(board.fen(),m.san).preparationBishopWaitDistance,t.name);
+  }
+  board.move(wait);board.move({from:transformSquare('c3',t),to:transformSquare('d4',t)});
+  const advance=getChess(board.fen()).move({from:transformSquare('a2',t),to:transformSquare('b2',t)}).san;
+  assert.deepEqual(knightAndBishopR5OppositionMoves(board.fen()),[transformSquare('a2',t)+transformSquare('b2',t)],t.name);
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(board.fen()),[advance],t.name);
+  assert.equal(explainMove(bishopKnightRuleSet.scoreWhiteCandidates!(board.fen(),board.moves()),knightAndBishopWhiteRules,advance)?.id,'r5',t.name);
+  board.move(advance);
+  assert.ok(board.isAttacked(transformSquare('a1',t),'w'),t.name);
+ }
+});
