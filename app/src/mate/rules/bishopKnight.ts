@@ -463,12 +463,6 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       compare: (first, second) => first.stalemateScore - second.stalemateScore,
     },
     {
-      id: "r6.9",
-      shortLabel: "rule r6.9",
-      helpText: "With the bishop two squares diagonal from the corner, Black’s king adjacent to it, and White’s king central and adjacent to the bishop, take opposition.",
-      compare: (first, second) => first.sixPointNinePenalty - second.sixPointNinePenalty,
-    },
-    {
       id: "r7",
       shortLabel: "rule r7",
       helpText: "Prefer the king adjacent to the knight, then king central proximity, then prefer the king on the color opposite the bishop.",

@@ -1,20 +1,15 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess';
-import {getIdealKnightAndBishopWhiteMoves, knightAndBishopWhiteRules, scoreKnightAndBishopWhiteMove} from './bishopKnight';
 import { knightAndBishopSixPointNineMove } from './bishopKnightSixPointNine';
 
-test('r6.9 takes opposition in every D4 orientation, independent of the knight', () => {
+test('retained 6.9 pattern helper takes opposition in every D4 orientation, independent of the knight', () => {
   for (const knightRank of ['6N1', 'N7', '4N3']) {
     for (const t of SQUARE_TRANSFORMS) {
       const fen = transformFen(`8/8/1kB5/3K4/8/8/8/${knightRank} w - - 2 2`, t);
       const from = transformSquare('d5', t), to = transformSquare('d6', t);
       assert.equal(knightAndBishopSixPointNineMove(fen), from + to);
-      const san = getChess(fen).move({ from, to }).san;
-      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [san], t.name);
-      const rule = knightAndBishopWhiteRules.find(r => r.id === 'r6.9')!;
-      const retreat = getChess(fen).move({from: transformSquare('c6', t), to: transformSquare('a8', t)}).san;
-      assert.ok(rule.compare!(scoreKnightAndBishopWhiteMove(fen, san), scoreKnightAndBishopWhiteMove(fen, retreat)) < 0);
+      assert.ok(getChess(fen).move({ from, to }));
     }
   }
 });

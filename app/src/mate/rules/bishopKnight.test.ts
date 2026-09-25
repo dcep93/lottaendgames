@@ -107,11 +107,6 @@ test("bishop-and-knight rules are registered", () => {
       helpText: "",
     },
     {
-      id: "r6.9",
-      shortLabel: "rule r6.9",
-      helpText: "With the bishop two squares diagonal from the corner, Black’s king adjacent to it, and White’s king central and adjacent to the bishop, take opposition.",
-    },
-    {
       id: "r7",
       shortLabel: "rule r7",
       helpText: "Prefer the king adjacent to the knight, then king central proximity, then prefer the king on the color opposite the bishop.",
@@ -149,7 +144,6 @@ test("bishop-and-knight rules are registered", () => {
       "mate",
       "minors safe",
       "no stalemate",
-      "r6.9",
       "r7",
       "r8",
       "r10",
@@ -160,7 +154,7 @@ test("bishop-and-knight rules are registered", () => {
     ruleSet.whiteRuleDescriptions.map(({ id }) => id),
     knightAndBishopWhiteRules.map(({ id }) => id),
   );
-  assert.equal(knightAndBishopWhiteRules.length, 8);
+  assert.equal(knightAndBishopWhiteRules.length, 7);
   assert.deepEqual(ruleSet.help.noteBoards, []);
 });
 
