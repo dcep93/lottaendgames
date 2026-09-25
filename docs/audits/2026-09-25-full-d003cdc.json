@@ -1,0 +1,344 @@
+{
+  "source": "/Users/danielcepeda/repos/_codex_output/bn-full-d003cdc-2026-09-25",
+  "baselineComparison": {
+    "previousPositions": 7073,
+    "retainedPositions": 27,
+    "newPositions": 973,
+    "previousFourPlyCycles": 11237,
+    "retainedFourPlyCycles": 2,
+    "newFourPlyCycles": 744
+  },
+  "policyFingerprint": "ef54ffe74f47c6280de6b25ae1818d6291585d9d1a31049e3a94bfd706463846",
+  "positionsOnLoops": 1000,
+  "physicalPositionsOnLoops": 8000,
+  "cyclicFamilies": 294,
+  "fourPlyLoops": 746,
+  "motifs": [
+    {
+      "motif": "interior bishop; bishop not king-protected; knight not king-protected; knight separated from bishop",
+      "count": 350
+    },
+    {
+      "motif": "edge bishop; bishop not king-protected; knight not king-protected; knight separated from bishop",
+      "count": 243
+    },
+    {
+      "motif": "edge bishop; bishop not king-protected; knight king-protected; knight separated from bishop",
+      "count": 130
+    },
+    {
+      "motif": "interior bishop; bishop not king-protected; knight king-protected; knight separated from bishop",
+      "count": 71
+    },
+    {
+      "motif": "interior bishop; bishop king-protected; knight king-protected; knight diagonally adjacent to bishop",
+      "count": 38
+    },
+    {
+      "motif": "central bishop; bishop not king-protected; knight not king-protected; knight separated from bishop",
+      "count": 34
+    },
+    {
+      "motif": "interior bishop; bishop not king-protected; knight not king-protected; knight diagonally adjacent to bishop",
+      "count": 33
+    },
+    {
+      "motif": "central bishop; bishop king-protected; knight king-protected; knight separated from bishop",
+      "count": 21
+    },
+    {
+      "motif": "central bishop; bishop king-protected; knight king-protected; knight orthogonally adjacent to bishop",
+      "count": 18
+    },
+    {
+      "motif": "edge bishop; bishop king-protected; knight king-protected; knight separated from bishop",
+      "count": 11
+    },
+    {
+      "motif": "interior bishop; bishop king-protected; knight king-protected; knight orthogonally adjacent to bishop",
+      "count": 10
+    },
+    {
+      "motif": "edge bishop; bishop king-protected; knight not king-protected; knight separated from bishop",
+      "count": 8
+    },
+    {
+      "motif": "interior bishop; bishop king-protected; knight king-protected; knight separated from bishop",
+      "count": 8
+    },
+    {
+      "motif": "interior bishop; bishop not king-protected; knight king-protected; knight diagonally adjacent to bishop",
+      "count": 8
+    },
+    {
+      "motif": "edge bishop; bishop not king-protected; knight not king-protected; knight orthogonally adjacent to bishop",
+      "count": 4
+    },
+    {
+      "motif": "interior bishop; bishop not king-protected; knight king-protected; knight orthogonally adjacent to bishop",
+      "count": 4
+    },
+    {
+      "motif": "edge bishop; bishop king-protected; knight king-protected; knight diagonally adjacent to bishop",
+      "count": 3
+    },
+    {
+      "motif": "interior bishop; bishop not king-protected; knight not king-protected; knight orthogonally adjacent to bishop",
+      "count": 2
+    },
+    {
+      "motif": "edge bishop; bishop not king-protected; knight king-protected; knight diagonally adjacent to bishop",
+      "count": 2
+    },
+    {
+      "motif": "edge bishop; bishop not king-protected; knight not king-protected; knight diagonally adjacent to bishop",
+      "count": 1
+    },
+    {
+      "motif": "central bishop; bishop not king-protected; knight king-protected; knight orthogonally adjacent to bishop",
+      "count": 1
+    }
+  ],
+  "cycleMotifs": [
+    {
+      "motif": "knight shuffle; knight alternates stable bishop protection",
+      "cycles": 573,
+      "positions": 766
+    },
+    {
+      "motif": "bishop shuffle; knight without stable bishop protection throughout",
+      "cycles": 88,
+      "positions": 86
+    },
+    {
+      "motif": "knight shuffle; knight without stable bishop protection throughout",
+      "cycles": 75,
+      "positions": 130
+    },
+    {
+      "motif": "king shuffle; knight without stable bishop protection throughout",
+      "cycles": 8,
+      "positions": 16
+    },
+    {
+      "motif": "bishop shuffle; knight alternates stable bishop protection",
+      "cycles": 2,
+      "positions": 4
+    }
+  ],
+  "examples": [
+    {
+      "group": 0,
+      "motif": "Knight shuffles out of and back into stable bishop protection",
+      "fen": "7K/8/8/8/Bk6/8/8/3N4 w - - 0 1",
+      "moves": [
+        "Nb2",
+        "Kc3",
+        "Nd1+",
+        "Kb4"
+      ],
+      "area": 64,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=7K/8/8/8/Bk6/8/8/3N4_w_-_-_0_1&moves=Nb2,Kc3,Nd1%2B,Kb4&cursor=0",
+      "rules": [
+        "r7",
+        "minors safe"
+      ]
+    },
+    {
+      "group": 0,
+      "motif": "Knight shuffles out of and back into stable bishop protection",
+      "fen": "7K/8/8/2k5/B7/8/8/3N4 w - - 0 1",
+      "moves": [
+        "Nc3",
+        "Kd4",
+        "Nd1",
+        "Kc5"
+      ],
+      "area": 64,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=7K/8/8/2k5/B7/8/8/3N4_w_-_-_0_1&moves=Nc3,Kd4,Nd1,Kc5&cursor=0",
+      "rules": [
+        "r20",
+        "r6"
+      ]
+    },
+    {
+      "group": 0,
+      "motif": "Knight shuffles out of and back into stable bishop protection",
+      "fen": "7K/8/8/3k4/B7/8/8/3N4 w - - 0 1",
+      "moves": [
+        "Nc3+",
+        "Kd4",
+        "Nd1",
+        "Kd5"
+      ],
+      "area": 64,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=7K/8/8/3k4/B7/8/8/3N4_w_-_-_0_1&moves=Nc3%2B,Kd4,Nd1,Kd5&cursor=0",
+      "rules": [
+        "r20",
+        "r6"
+      ]
+    },
+    {
+      "group": 0,
+      "motif": "Knight shuffles out of and back into stable bishop protection",
+      "fen": "7K/8/8/4k3/B7/8/8/3N4 w - - 0 1",
+      "moves": [
+        "Nc3",
+        "Kd4",
+        "Nd1",
+        "Ke5"
+      ],
+      "area": 64,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=7K/8/8/4k3/B7/8/8/3N4_w_-_-_0_1&moves=Nc3,Kd4,Nd1,Ke5&cursor=0",
+      "rules": [
+        "r20",
+        "r6"
+      ]
+    },
+    {
+      "group": 0,
+      "motif": "Knight shuffles out of and back into stable bishop protection",
+      "fen": "6K1/8/8/8/Bk6/8/8/3N4 w - - 0 1",
+      "moves": [
+        "Nb2",
+        "Kc3",
+        "Nd1+",
+        "Kb4"
+      ],
+      "area": 56,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=6K1/8/8/8/Bk6/8/8/3N4_w_-_-_0_1&moves=Nb2,Kc3,Nd1%2B,Kb4&cursor=0",
+      "rules": [
+        "r7",
+        "minors safe"
+      ]
+    },
+    {
+      "group": 0,
+      "motif": "Knight shuffles out of and back into stable bishop protection",
+      "fen": "6K1/8/8/2k5/B7/8/8/3N4 w - - 0 1",
+      "moves": [
+        "Nc3",
+        "Kd4",
+        "Nd1",
+        "Kc5"
+      ],
+      "area": 56,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=6K1/8/8/2k5/B7/8/8/3N4_w_-_-_0_1&moves=Nc3,Kd4,Nd1,Kc5&cursor=0",
+      "rules": [
+        "r20",
+        "r6"
+      ]
+    },
+    {
+      "group": 0,
+      "motif": "Knight shuffles out of and back into stable bishop protection",
+      "fen": "6K1/8/8/3k4/B7/8/8/3N4 w - - 0 1",
+      "moves": [
+        "Nc3+",
+        "Kd4",
+        "Nd1",
+        "Kd5"
+      ],
+      "area": 56,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=6K1/8/8/3k4/B7/8/8/3N4_w_-_-_0_1&moves=Nc3%2B,Kd4,Nd1,Kd5&cursor=0",
+      "rules": [
+        "r20",
+        "r6"
+      ]
+    },
+    {
+      "group": 0,
+      "motif": "Knight shuffles out of and back into stable bishop protection",
+      "fen": "6K1/8/8/4k3/B7/8/8/3N4 w - - 0 1",
+      "moves": [
+        "Nc3",
+        "Kd4",
+        "Nd1",
+        "Ke5"
+      ],
+      "area": 56,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=6K1/8/8/4k3/B7/8/8/3N4_w_-_-_0_1&moves=Nc3,Kd4,Nd1,Ke5&cursor=0",
+      "rules": [
+        "r20",
+        "r6"
+      ]
+    },
+    {
+      "group": 0,
+      "motif": "Knight shuffles out of and back into stable bishop protection",
+      "fen": "B6K/8/5k2/8/8/8/6N1/8 w - - 0 1",
+      "moves": [
+        "Nh4",
+        "Kg5",
+        "Ng2",
+        "Kf6"
+      ],
+      "area": 56,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=B6K/8/5k2/8/8/8/6N1/8_w_-_-_0_1&moves=Nh4,Kg5,Ng2,Kf6&cursor=0",
+      "rules": [
+        "r20",
+        "r6"
+      ]
+    },
+    {
+      "group": 0,
+      "motif": "Knight shuffles out of and back into stable bishop protection",
+      "fen": "7K/8/B3k3/8/8/8/4N3/8 w - - 0 1",
+      "moves": [
+        "Nd4+",
+        "Ke5",
+        "Ne2",
+        "Ke6"
+      ],
+      "area": 56,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=7K/8/B3k3/8/8/8/4N3/8_w_-_-_0_1&moves=Nd4%2B,Ke5,Ne2,Ke6&cursor=0",
+      "rules": [
+        "r20",
+        "r20"
+      ]
+    },
+    {
+      "group": 1,
+      "motif": "Bishop shuffles while the knight has no stable bishop protection",
+      "fen": "B7/8/8/8/8/2k5/2N5/3K4 w - - 0 1",
+      "moves": [
+        "Bh1",
+        "Kd3",
+        "Ba8",
+        "Kc3"
+      ],
+      "area": 32,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=B7/8/8/8/8/2k5/2N5/3K4_w_-_-_0_1&moves=Bh1,Kd3,Ba8,Kc3&cursor=0",
+      "rules": [
+        "r20",
+        "r20"
+      ]
+    },
+    {
+      "group": 1,
+      "motif": "Bishop shuffles while the knight has no stable bishop protection",
+      "fen": "4B3/8/8/8/K1k5/1N6/8/8 w - - 0 1",
+      "moves": [
+        "Bb5+",
+        "Kc3",
+        "Be8",
+        "Kc4"
+      ],
+      "area": 30,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=4B3/8/8/8/K1k5/1N6/8/8_w_-_-_0_1&moves=Bb5%2B,Kc3,Be8,Kc4&cursor=0",
+      "rules": [
+        "r20",
+        "r20"
+      ]
+    }
+  ],
+  "policyCommit": "d003cdc82a098254a6c081801614b8700def3863",
+  "exclusionFingerprint": "4b6ef04757ab61336240fb423b2c3014304d71c194989ca6333613edf466b30f",
+  "domain": {
+    "physicalPostWhitePlacements": 13660584,
+    "D4PostWhitePlacements": 1707888,
+    "whitePoliciesRecomputed": 1359344
+  },
+  "supportedLoopPositions": 0,
+  "supportLosses": 0
+}
