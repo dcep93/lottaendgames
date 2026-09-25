@@ -107,6 +107,11 @@ test("bishop-and-knight rules are registered", () => {
       helpText: "",
     },
     {
+      id: "r5",
+      shortLabel: "rule r5",
+      helpText: "Play the r5 move.",
+    },
+    {
       id: "r6",
       shortLabel: "rule r6",
       helpText: "Prefer the knight with king protection, otherwise prefer stable bishop protection, otherwise drift the knight towards king protection, then prefer knight central 16 proximity.",
@@ -149,6 +154,7 @@ test("bishop-and-knight rules are registered", () => {
       "mate",
       "minors safe",
       "no stalemate",
+      "r5",
       "r6",
       "r6.5",
       "r7",
@@ -160,8 +166,8 @@ test("bishop-and-knight rules are registered", () => {
     ruleSet.whiteRuleDescriptions.map(({ id }) => id),
     knightAndBishopWhiteRules.map(({ id }) => id),
   );
-  assert.equal(knightAndBishopWhiteRules.length, 8);
-  assert.deepEqual(ruleSet.help.noteBoards, []);
+  assert.equal(knightAndBishopWhiteRules.length, 9);
+  assert.deepEqual(ruleSet.help.noteBoards.map(board=>board.id), ["bishop-knight-rule-r5-hop"]);
 });
 
 test("immediate mate keeps precedence without the mating-net rule", () => {

@@ -27,7 +27,7 @@ import {
   knightAndBishopPiecesPresent,
 } from "./bishopKnightLookup";
 import { knightAndBishopKnightTargetSquares, knightAndBishopKnightProximityToSquare, knightKingProtectionDistance, knightAndBishopCenterProximityScore, knightAndBishopKingCenterProximityScore, knightAndBishopKingCenterEuclideanScore, knightAndBishopKnightTargetProximityScore, knightAndBishopTargetCorners } from "./bishopKnightStrategy";
-import { knightAndBishopDeclaredPreparationMove } from "./bishopKnightPreparation";
+import { knightAndBishopR5Move } from "./bishopKnightR5";
 import { knightAndBishopShouldCoordinateKing, knightAndBishopKingCoordinatesMinors } from "./bishopKnightCoordination";
 import { knightAndBishopSixPointNineMove } from "./bishopKnightSixPointNine";
 import { knightAndBishopFivePointFiveMove } from "./bishopKnightFivePointFive";
@@ -227,7 +227,7 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
     startsWithPrecageKnight: !!knight && knightAndBishopKnightTargetSquares(fen).includes(knight.square),
     oppositePrecageTargets: whiteKing && isMiddle16Square(whiteKing.square)
       ? knightAndBishopKnightTargetSquares(fen) : [],
-    declaredPreparationMove: knightAndBishopDeclaredPreparationMove(fen),
+    declaredPreparationMove: knightAndBishopR5Move(fen),
     declaredSupportedKnightAdvance: undefined,
     declaredSupportedThreeMove: undefined,
     declaredSupportedFiveMove: undefined,
@@ -513,6 +513,12 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       compare: (first, second) => first.stalemateScore - second.stalemateScore,
     },
     {
+      id: "r5",
+      shortLabel: "rule r5",
+      helpText: "Play the r5 move.",
+      compare: (first, second) => first.declaredPreparationPenalty - second.declaredPreparationPenalty,
+    },
+    {
       id: "r6",
       shortLabel: "rule r6",
       helpText: "Prefer the knight with king protection, otherwise prefer stable bishop protection, otherwise drift the knight towards king protection, then prefer knight central 16 proximity.",
@@ -703,7 +709,14 @@ const bishopKnightHelp: RuleHelp = {
     "The target corner is the bishop-colored corner closest to Black's king.",
     "Support has been reset. No position is supported until explicitly declared under the new rules; all earlier support declarations and r2.5 preferences have been discarded.",
   ],
-  noteBoards: [],
+  noteBoards: [{
+    id: "bishop-knight-rule-r5-hop",
+    title: "rule r5 — Play the r5 move",
+    caption: "Ne1 clears the way for Kd2. The bishop may be elsewhere.",
+    pieces: [{square: "d1", piece: "K"}, {square: "c2", piece: "N"}, {square: "c3", piece: "k"}, {square: "a8", piece: "B"}],
+    highlights: [{square: "d2", kind: "key"}],
+    arrows: [{from: "c2", to: "e1"}, {from: "d1", to: "d2"}],
+  }],
 };
 
 function whiteLegalMoves(fen: string): readonly string[] {

@@ -1,0 +1,169 @@
+{
+  "scope": "Recheck of previously verified 79 four-ply cycles, not a full audit",
+  "previousCycles": 79,
+  "survivingCycles": 69,
+  "largestSpecificMotif": {
+    "description": "Central bishop shuffles while White king protects the knight",
+    "cycles": 61
+  },
+  "rule": "R5 requires diagonally adjacent White king and knight, Black orthogonally adjacent to the knight, a knight move from White king, and strictly closer than White king to the board midpoint by Euclidean distance. Hop the knight across White king along the perpendicular axis. Bishop placement does not affect recognition except when it occupies the landing square. Existing mate/safety/stalemate priorities precede r5.",
+  "validation": "70 focused tests pass, including D4, translated geometry, all available bishop squares, and legality of Kd2 after every Black reply in the supplied position; TypeScript/Vite build passed.",
+  "examples": [
+    {
+      "group": 0,
+      "motif": "Central bishop shuffles while the king protects the knight",
+      "fen": "8/8/8/3B4/3K4/4N3/8/k7 w - - 0 1",
+      "moves": [
+        "Be4",
+        "Ka2",
+        "Bd5+",
+        "Ka1"
+      ],
+      "area": 6,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/3B4/3K4/4N3/8/k7_w_-_-_0_1&moves=Be4,Ka2,Bd5%2B,Ka1&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "Central bishop shuffles while the king protects the knight",
+      "fen": "8/8/8/3B4/3K4/4N3/1k6/8 w - - 0 1",
+      "moves": [
+        "Be4",
+        "Ka1",
+        "Bd5",
+        "Kb2"
+      ],
+      "area": 6,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/3B4/3K4/4N3/1k6/8_w_-_-_0_1&moves=Be4,Ka1,Bd5,Kb2&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "Central bishop shuffles while the king protects the knight",
+      "fen": "8/8/8/3B4/3K4/k3N3/8/8 w - - 0 1",
+      "moves": [
+        "Be4",
+        "Ka2",
+        "Bd5+",
+        "Ka3"
+      ],
+      "area": 6,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/3B4/3K4/k3N3/8/8_w_-_-_0_1&moves=Be4,Ka2,Bd5%2B,Ka3&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "Central bishop shuffles while the king protects the knight",
+      "fen": "8/8/8/3B4/k2K4/4N3/8/8 w - - 0 1",
+      "moves": [
+        "Be4",
+        "Ka3",
+        "Bd5",
+        "Ka4"
+      ],
+      "area": 6,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/3B4/k2K4/4N3/8/8_w_-_-_0_1&moves=Be4,Ka3,Bd5,Ka4&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "Central bishop shuffles while the king protects the knight",
+      "fen": "8/8/8/3B4/1k1K4/4N3/8/8 w - - 0 1",
+      "moves": [
+        "Be4",
+        "Ka3",
+        "Bd5",
+        "Kb4"
+      ],
+      "area": 6,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/3B4/1k1K4/4N3/8/8_w_-_-_0_1&moves=Be4,Ka3,Bd5,Kb4&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "Central bishop shuffles while the king protects the knight",
+      "fen": "8/8/8/k2B4/3K4/4N3/8/8 w - - 0 1",
+      "moves": [
+        "Be4",
+        "Ka4",
+        "Bd5",
+        "Ka5"
+      ],
+      "area": 6,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/k2B4/3K4/4N3/8/8_w_-_-_0_1&moves=Be4,Ka4,Bd5,Ka5&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "Central bishop shuffles while the king protects the knight",
+      "fen": "8/8/8/1k1B4/3K4/4N3/8/8 w - - 0 1",
+      "moves": [
+        "Be4",
+        "Ka4",
+        "Bd5",
+        "Kb5"
+      ],
+      "area": 6,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/1k1B4/3K4/4N3/8/8_w_-_-_0_1&moves=Be4,Ka4,Bd5,Kb5&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "Central bishop shuffles while the king protects the knight",
+      "fen": "8/8/k7/3B4/3K4/4N3/8/8 w - - 0 1",
+      "moves": [
+        "Be4",
+        "Ka5",
+        "Bd5",
+        "Ka6"
+      ],
+      "area": 6,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/k7/3B4/3K4/4N3/8/8_w_-_-_0_1&moves=Be4,Ka5,Bd5,Ka6&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "Central bishop shuffles while the king protects the knight",
+      "fen": "8/8/1k6/3B4/3K4/4N3/8/8 w - - 0 1",
+      "moves": [
+        "Be4",
+        "Ka5",
+        "Bd5",
+        "Kb6"
+      ],
+      "area": 6,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/1k6/3B4/3K4/4N3/8/8_w_-_-_0_1&moves=Be4,Ka5,Bd5,Kb6&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "Central bishop shuffles while the king protects the knight",
+      "fen": "8/k7/8/3B4/3K4/4N3/8/8 w - - 0 1",
+      "moves": [
+        "Be4",
+        "Ka6",
+        "Bd5",
+        "Ka7"
+      ],
+      "area": 6,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/k7/8/3B4/3K4/4N3/8/8_w_-_-_0_1&moves=Be4,Ka6,Bd5,Ka7&cursor=0"
+    },
+    {
+      "group": 1,
+      "motif": "Knight shuffles without stable bishop protection",
+      "fen": "8/8/8/8/1N1k4/1K6/B7/8 w - - 0 1",
+      "moves": [
+        "Nc2+",
+        "Kd3",
+        "Nb4+",
+        "Kd4"
+      ],
+      "area": 6,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/8/1N1k4/1K6/B7/8_w_-_-_0_1&moves=Nc2%2B,Kd3,Nb4%2B,Kd4&cursor=0"
+    },
+    {
+      "group": 1,
+      "motif": "Knight shuffles without stable bishop protection",
+      "fen": "1k6/8/8/2NB4/3K4/8/8/8 w - - 0 1",
+      "moves": [
+        "Nd3",
+        "Ka7",
+        "Nc5",
+        "Kb8"
+      ],
+      "area": 4,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=1k6/8/8/2NB4/3K4/8/8/8_w_-_-_0_1&moves=Nd3,Ka7,Nc5,Kb8&cursor=0"
+    }
+  ]
+}
