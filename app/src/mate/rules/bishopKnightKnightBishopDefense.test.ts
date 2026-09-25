@@ -24,7 +24,7 @@ test('bishop-defense metric flags only an attacked bishop defended solely by an 
 })
 
 
-test('r7 centralizes without the removed undefended-knight preference across D4', () => {
+test('r7 preserves king–knight adjacency before centralization across D4', () => {
   const start = '2Bk4/8/1N6/2K5/8/8/8/8 w - - 0 1'
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen(start, t)
@@ -32,6 +32,6 @@ test('r7 centralizes without the removed undefended-knight preference across D4'
     const kingMove = getChess(fen).move({from: transformSquare('c5', t), to: transformSquare('d4', t)}).san
     assert.equal(scoreKnightAndBishopWhiteMove(fen, kingMove).undefendedKnightOnlyBishopDefenderPenalty, 1)
     assert.equal(scoreKnightAndBishopWhiteMove(fen, bishopMove).undefendedKnightOnlyBishopDefenderPenalty, 0)
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [kingMove])
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [bishopMove])
   }
 })

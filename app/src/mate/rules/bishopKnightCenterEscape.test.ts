@@ -80,3 +80,20 @@ test('r7 prefers inward diagonal king steps in the loaded loop across D4', () =>
     assert.ok(rule.compare!(f5, f6) < 0);
   }
 });
+
+
+test('r20 excludes minors defended by either the king or the other minor across D4', () => {
+  const cases = [
+    // After Kh2, Bc6 defends Nd5; only the bishop contributes.
+    ['8/8/2B5/3N4/8/1k6/8/7K w - - 0 1', 'h1', 'h2', -Math.sqrt(10)],
+    // After Kh2, Nb4 defends Bc6; only the knight contributes.
+    ['8/8/2B5/8/1N6/8/3k4/7K w - - 0 1', 'h1', 'h2', -Math.sqrt(8)],
+    // Kd5 protects both minor pieces.
+    ['7k/8/8/8/2BKN3/8/8/8 w - - 0 1', 'd4', 'd5', -0],
+  ] as const;
+  for (const [start, from, to, expected] of cases) for (const t of SQUARE_TRANSFORMS) {
+    const fen = transformFen(start, t);
+    const san = getChess(fen).move({from: transformSquare(from, t), to: transformSquare(to, t)}).san;
+    assert.equal(scoreKnightAndBishopWhiteMove(fen, san).minorBlackDistanceScore, expected, t.name);
+  }
+});

@@ -95,13 +95,13 @@ test('the old behind-White score remains removed', () => {
 })
 
 
-test('king Euclidean proximity outranks color across D4', () => {
+test('king adjacency outranks centralization, then Euclidean proximity outranks color across D4', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     const fen = transformFen('1NK5/8/2B5/8/8/k7/8/8 w - - 0 1', transform)
     const moves = (['d7', 'd8'] as const).map(to => getChess(fen).move({from: transformSquare('c8', transform), to: transformSquare(to, transform)}).san)
     const scores = moves.map(san => scoreKnightAndBishopWhiteMove(fen, san))
     assert.ok(compareScoresByRules(scores[0]!, scores[1]!, knightAndBishopWhiteRules) < 0)
     const ideal = getIdealKnightAndBishopWhiteMoves(fen)
-    assert.deepEqual(ideal, [getChess(fen).move({from: transformSquare('c8', transform), to: transformSquare('d7', transform)}).san], transform.name)
+    assert.deepEqual(ideal, [getChess(fen).move({from: transformSquare('c8', transform), to: transformSquare('c7', transform)}).san], transform.name)
   }
 })

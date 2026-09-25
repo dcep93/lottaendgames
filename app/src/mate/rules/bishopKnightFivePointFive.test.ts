@@ -25,8 +25,7 @@ test('retained 5.5 pattern helper requires the diagonal king offset rather than 
       '8/2K5/2B5/4k3/8/8/1N6/8 w - - 0 1',
     ]) {
       const fen = transformFen(source, transform);
-      const san = getChess(fen).move({from: transformSquare('c7', transform), to: transformSquare('d7', transform)}).san;
-      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [san], transform.name);
+      assert.equal(knightAndBishopFivePointFiveMove(fen), transformSquare('c7', transform) + transformSquare('d7', transform));
     }
     assert.equal(knightAndBishopFivePointFiveMove(transformFen('8/2KN4/2B5/4k3/8/8/8/8 w - - 0 1', transform)), undefined);
     assert.equal(knightAndBishopFivePointFiveMove(transformFen('8/2K5/2B5/1N3k2/8/8/8/8 w - - 0 1', transform)), undefined);
@@ -43,7 +42,6 @@ test('retained 5.5 pattern helper prefers Kd3 across D4 independently of knight 
       const fen = transformFen(source, transform);
       const from = transformSquare('c3', transform), to = transformSquare('d3', transform);
       assert.equal(knightAndBishopFivePointFiveMove(fen), from + to);
-      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [getChess(fen).move({from, to}).san]);
     }
   }
 });
