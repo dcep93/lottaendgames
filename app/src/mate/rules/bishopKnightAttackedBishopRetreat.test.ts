@@ -4,6 +4,22 @@ import {getChess, SQUARE_TRANSFORMS, transformFen, transformSquare} from '../che
 import {bishopKnightRuleSet, getIdealKnightAndBishopWhiteMoves, knightAndBishopWhiteRules, scoreKnightAndBishopWhiteMove} from './bishopKnight';
 import {explainMove} from './selection';
 
+test('r6.5 avoids crowding the bishop beside both White pieces, across D4',()=>{
+ const rule=knightAndBishopWhiteRules.find(r=>r.id==='r6.5')!;
+ for(const t of SQUARE_TRANSFORMS){
+  const fen=transformFen('1k6/1B6/8/2NK4/8/8/8/8 w - - 0 1',t);
+  const san=(to:'a6'|'c6')=>getChess(fen).move({from:transformSquare('b7',t),to:transformSquare(to,t)}).san;
+  const clear=scoreKnightAndBishopWhiteMove(fen,san('a6'));
+  const crowded=scoreKnightAndBishopWhiteMove(fen,san('c6'));
+  assert.equal(clear.attackedBishopCrowdingPenalty,0,t.name);
+  assert.equal(crowded.attackedBishopCrowdingPenalty,1,t.name);
+  assert.equal(clear.attackedBishopDistanceScore,crowded.attackedBishopDistanceScore,t.name);
+  assert.ok(rule.compare!(clear,crowded)<0,t.name);
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[san('a6')],t.name);
+  assert.equal(explainMove(bishopKnightRuleSet.scoreWhiteCandidates!(fen,getChess(fen).moves()),knightAndBishopWhiteRules,san('a6'))?.id,'r6.5',t.name);
+ }
+});
+
 test('r6 preserves bishop protection before the r6.5 retreat preference across D4', () => {
  for(const t of SQUARE_TRANSFORMS) {
   const fen=transformFen('7K/8/8/8/Bk6/8/8/3N4 w - - 0 1',t);

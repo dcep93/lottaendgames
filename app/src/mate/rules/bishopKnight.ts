@@ -62,6 +62,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly kingKnightDistanceScore: number;
   readonly kingCoordinationPenalty: number;
   readonly attackedBishopDefensePenalty: number;
+  readonly attackedBishopCrowdingPenalty: number;
   readonly undefendedKnightOnlyBishopDefenderPenalty: number;
   readonly undefendedMinorForkPenalty: number;
   readonly attackedBishopEscapeScore: number;
@@ -381,6 +382,8 @@ function scoreKnightAndBishopWhiteMoveCore(
       ? -squaredEuclideanDistance(bishop.square, blackKing.square) : 0,
     attackedBishopDefensePenalty: context.shouldEscapeBishop
       && !(move.piece === "b" && bishopKingDefended && whiteKing && centerDistance(whiteKing.square) === 0) ? 1 : 0,
+    attackedBishopCrowdingPenalty: context.shouldEscapeBishop && move.piece === "b"
+      && bishopKingDefended && bishop && knight && kingDistance(bishop.square, knight.square) === 1 ? 1 : 0,
     bishopSeparationPenalty: context.shouldSeparateBishop && !bishopSeparated && !bishopExitCleared ? 1 : 0,
     bishopWhiteKingDistanceScore: bishopSeparated && whiteKing
       ? -squaredEuclideanDistance(bishop.square, whiteKing.square) : 0,
@@ -578,7 +581,8 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       id: "r6.5",
       shortLabel: "rule r6.5",
       helpText: "To save an attacked bishop, move it to adjacent to the central White king or else maximize its distance from the Black king.",
-      compare: (first, second) => first.attackedBishopDefensePenalty - second.attackedBishopDefensePenalty
+      compare: (first, second) => first.attackedBishopCrowdingPenalty - second.attackedBishopCrowdingPenalty
+        || first.attackedBishopDefensePenalty - second.attackedBishopDefensePenalty
         || (first.attackedBishopDefensePenalty === 0 ? 0 : first.attackedBishopDistanceScore - second.attackedBishopDistanceScore),
     },
     {

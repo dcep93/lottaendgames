@@ -1,0 +1,44 @@
+{
+  "scope": "Replay of all 4847 saved four-ply cycles from full audit 76ac0b4; not a fresh full-domain audit. New cycles were not searched.",
+  "previousSurvivors": 68,
+  "currentSurvivors": 66,
+  "brokenSinceLastChange": 2,
+  "revivedSavedCycles": 0,
+  "hiddenMiddle16": 64,
+  "displayEligibleMotifs": [
+    {
+      "motif": "bishop shuffle; bishop outside center throughout; knight king-protected throughout; stable bishop defense",
+      "cycles": 2
+    },
+    {
+      "motif": "bishop shuffle; central bishop throughout; knight king-protected throughout; no stable bishop defense",
+      "cycles": 0
+    },
+    {
+      "motif": "knight shuffle; central bishop throughout; knight king-protected throughout; no stable bishop defense",
+      "cycles": 0
+    }
+  ],
+  "examples": [
+    {
+      "group": 0,
+      "motif": "bishop shuffle; bishop outside center throughout; knight king-protected throughout; stable bishop defense",
+      "fen": "B7/8/8/2KNk3/8/8/8/8 w - - 0 1",
+      "moves": [
+        "Bb7",
+        "Ke4",
+        "Ba8",
+        "Ke5"
+      ],
+      "area": 16,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=B7/8/8/2KNk3/8/8/8/8_w_-_-_0_1&moves=Bb7,Ke4,Ba8,Ke5&cursor=0"
+    }
+  ],
+  "validation": {
+    "focusedTestsPassed": 17,
+    "bishopKnightTestsPassed": 146,
+    "build": "passed",
+    "preExistingFailures": 4
+  },
+  "policySourceSha256": "ee8e0c89398b7f90a9acaf905d56511c89067d8f56f67d2d848f29b4a0482e68"
+}
