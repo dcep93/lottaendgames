@@ -54,6 +54,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly knightKingProximityScore: number;
   readonly knightDriftBlocked: boolean;
   readonly knightDriftObstructionPenalty: number;
+  readonly knightDriftScore: readonly [number, number, number];
   readonly kingKnightAdjacencyPenalty: number;
   readonly kingKnightDistanceScore: number;
   readonly kingCoordinationPenalty: number;
@@ -162,6 +163,7 @@ function distanceToNearestUnprotectedKnightOrBishop(fen: string): number {
 
 type KnightAndBishopPositionScoreContext = {
   readonly knightDriftBlocked: boolean;
+  readonly knightDriftBaseline: readonly [number, number, number];
   readonly sixPointNineMove: string | undefined;
   readonly fivePointFiveMove: string | undefined;
   readonly relativeKnightMove: string | undefined;
@@ -187,6 +189,7 @@ function blackBlocksKnightDrift(knight: Square, black: Square, white: Square): b
 
 function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
   let shouldCheckThreeDiagonal: boolean | undefined;
+  let driftBaseline: readonly [number, number, number] | undefined;
   const whiteKing = findPiece(fen, "w", "k");
   const blackKing = findPiece(fen, "b", "k");
   const centralKing = !!whiteKing && centerDistance(whiteKing.square) === 0;
@@ -195,6 +198,15 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
   const bishopCentrallyDefended = !!bishop && centralKing && kingDistance(whiteKing.square, bishop.square) === 1;
   const knightCentrallyDefended = !!knight && centralKing && kingDistance(whiteKing.square, knight.square) === 1;
   return {
+    get knightDriftBaseline() {
+      return driftBaseline ??= !knight || !blackKing || !whiteKing || !bishop ? [0, 99, 99] : [
+        blackBlocksKnightDrift(knight.square, blackKing.square, whiteKing.square) ? 2
+          : knightDriftThreatPenalty(whiteKing.square, bishop.square, knight.square, blackKing.square, false),
+        knightKingProtectionDistance(fen),
+        kingDistance(knight.square, whiteKing.square) === 1 ? 0
+          : squaredEuclideanDistance(knight.square, whiteKing.square),
+      ];
+    },
     knightDriftBlocked: !!knight && !!blackKing && !!whiteKing
       && blackBlocksKnightDrift(knight.square, blackKing.square, whiteKing.square),
     precageSideTarget: knightAndBishopPrecageSideTarget(fen),
@@ -276,6 +288,19 @@ function scoreKnightAndBishopWhiteMoveCore(
     kingKnightAdjacencyPenalty: knightKingDefended ? 0 : 1,
     kingKnightDistanceScore: whiteKing && knight ? squaredEuclideanDistance(whiteKing.square, knight.square) : 99,
     knightDriftBlocked: context.knightDriftBlocked,
+    get knightDriftScore(): readonly [number, number, number] {
+      const baseline = context.knightDriftBaseline;
+      // A possible chase calls for a king approach, ranked by r7.
+      if (move.piece === "k" && baseline[0] === 1) return baseline;
+      const distance = this.knightKingProtectionDistance;
+      const proximity = this.knightKingProximityScore;
+      const retreat = move.piece === "n" && !context.knightDriftBlocked
+        && (distance > baseline[1] || (distance === baseline[1] && proximity >= baseline[2]));
+      // Avoiding a possible chase is not progress when the knight retreats.
+      const obstruction = retreat ? Math.max(baseline[0], this.knightDriftObstructionPenalty)
+        : this.knightDriftObstructionPenalty;
+      return [obstruction, distance, proximity];
+    },
     get knightDriftObstructionPenalty() {
       if (!knight || !blackKing || !whiteKing || !bishop) return 0;
       if (knightEdgeOpposition || blackBlocksKnightDrift(knight.square, blackKing.square, whiteKing.square)) return 2;
@@ -479,11 +504,11 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       shortLabel: "rule r6",
       helpText: "Drift the knight towards king protection.",
       compare: (first, second) => {
-        const obstruction = first.knightDriftObstructionPenalty - second.knightDriftObstructionPenalty;
+        const a = first.knightDriftScore, b = second.knightDriftScore;
+        const obstruction = a[0] - b[0];
         if (obstruction) return obstruction;
         if (first.knightDriftBlocked && second.knightDriftBlocked) return 0;
-        return first.knightKingProtectionDistance - second.knightKingProtectionDistance
-          || first.knightKingProximityScore - second.knightKingProximityScore;
+        return a[1] - b[1] || a[2] - b[2];
       },
     },
     {

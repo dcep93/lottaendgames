@@ -43,7 +43,7 @@ test('shared scoring context and lazy scores are independent of candidate evalua
       // Materialize getters after all candidates were created, in reverse field order.
       const fields = Object.keys(individually).reverse() as (keyof typeof individually)[]
       for (const field of fields) {
-        assert.equal(candidate.score[field], individually[field], `${fen}: ${candidate.san}: ${field}`)
+        assert.deepEqual(candidate.score[field], individually[field], `${fen}: ${candidate.san}: ${field}`)
       }
     }
   }

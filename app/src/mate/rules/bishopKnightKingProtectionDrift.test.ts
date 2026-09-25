@@ -1,8 +1,9 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {getChess, SQUARE_TRANSFORMS, transformFen, transformSquare} from '../chess';
-import {knightAndBishopWhiteRules, getIdealKnightAndBishopWhiteMoves, scoreKnightAndBishopWhiteMove} from './bishopKnight';
+import {bishopKnightRuleSet, knightAndBishopWhiteRules, getIdealKnightAndBishopWhiteMoves, scoreKnightAndBishopWhiteMove} from './bishopKnight';
 import {knightKingProtectionDistance} from './bishopKnightStrategy';
+import {explainMove} from './selection';
 
 test('r6 prefers Nf2 toward White king protection across D4', () => {
  for (const t of SQUARE_TRANSFORMS) {
@@ -174,5 +175,28 @@ test('r6 allows Nb7 because Kc8 can establish protection after Kb6 across D4', (
   board.move({from:transformSquare('b5',t),to:transformSquare('b6',t)});
   board.move({from:transformSquare('d8',t),to:transformSquare('c8',t)});
   assert.equal(board.isAttacked(transformSquare('b7',t),'w'),true,t.name);
+ }
+});
+
+test('r6 does not credit Nf1 retreat; r7 chooses Kh5 and Ng4 is protected after every reply across D4', () => {
+ const r6 = knightAndBishopWhiteRules.find(r => r.id === 'r6')!;
+ for (const t of SQUARE_TRANSFORMS) {
+  const fen = transformFen('B7/8/7K/8/5k2/8/7N/8 w - - 2 2', t);
+  const san = (from: 'h2' | 'h6', to: 'f1' | 'h5' | 'g6') => getChess(fen)
+    .move({from:transformSquare(from,t),to:transformSquare(to,t)}).san;
+  const retreat = san('h2','f1'), approach = san('h6','h5');
+  const approachScore = scoreKnightAndBishopWhiteMove(fen,approach);
+  assert.ok(r6.compare!(approachScore,scoreKnightAndBishopWhiteMove(fen,retreat)) < 0,t.name);
+  assert.equal(r6.compare!(approachScore,scoreKnightAndBishopWhiteMove(fen,san('h6','g6'))),0,t.name);
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[approach],t.name);
+  assert.equal(explainMove(bishopKnightRuleSet.scoreWhiteCandidates!(fen,getChess(fen).moves()),knightAndBishopWhiteRules,approach)?.id,'r7',t.name);
+  const board = getChess(fen); board.move(approach);
+  for (const reply of board.moves()) {
+   board.move(reply);
+   board.move({from:transformSquare('h2',t),to:transformSquare('g4',t)});
+   assert.equal(board.isAttacked(transformSquare('g4',t),'w'),true,t.name);
+   assert.ok(!board.moves({verbose:true}).some(m=>m.captured==='n'),t.name);
+   board.undo(); board.undo();
+  }
  }
 });
