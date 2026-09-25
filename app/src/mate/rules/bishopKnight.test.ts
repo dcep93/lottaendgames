@@ -107,19 +107,19 @@ test("bishop-and-knight rules are registered", () => {
       helpText: "",
     },
     {
+      id: "r6",
+      shortLabel: "rule r6",
+      helpText: "Drift the knight towards king protection.",
+    },
+    {
       id: "r7",
       shortLabel: "rule r7",
-      helpText: "Prefer the king adjacent to the knight, then king central proximity, then prefer the king on the color opposite the bishop.",
+      helpText: "Prefer the king proximity to the knight, then king central proximity, then prefer the king on the color opposite the bishop.",
     },
     {
       id: "r8",
       shortLabel: "rule r8",
       helpText: "With a king on a middle-16 square, prefer bishop on the long diagonal, then a central bishop, then knight move proximity to a precage square, then knight off the bishop's color.",
-    },
-    {
-      id: "r10",
-      shortLabel: "rule r10",
-      helpText: "Prefer a precage knight, else drift the knight towards White king protection.",
     },
     {
       id: "r20",
@@ -144,9 +144,9 @@ test("bishop-and-knight rules are registered", () => {
       "mate",
       "minors safe",
       "no stalemate",
+      "r6",
       "r7",
       "r8",
-      "r10",
       "r20",
     ],
   );

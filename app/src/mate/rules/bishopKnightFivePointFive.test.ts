@@ -1,7 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { squareCoords, squareFromCoordinates, getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess';
-import { getIdealKnightAndBishopWhiteMoves } from './bishopKnight';
 import { knightAndBishopFivePointFiveMove } from './bishopKnightFivePointFive';
 
 test('retained 5.5 pattern helper requires the diagonal king offset rather than matching any central Black square, across D4', () => {
@@ -80,8 +79,6 @@ test('retained 5.5 pattern helper shifts the whole relative arrangement with eac
   for (const transform of SQUARE_TRANSFORMS) {
     const loaded = transformFen('8/8/1KB5/4k3/8/8/8/3N4 w - - 2 2',transform);
     assert.equal(knightAndBishopFivePointFiveMove(loaded),undefined);
-    const kc5 = getChess(loaded).move({from:transformSquare('b6',transform),to:transformSquare('c5',transform)}).san;
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(loaded),[kc5]);
     assert.equal(knightAndBishopFivePointFiveMove(transformFen('8/8/1KB5/8/3k4/8/8/3N4 w - - 2 2',transform)),
       transformSquare('b6',transform)+transformSquare('b5',transform));
   }

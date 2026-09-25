@@ -45,7 +45,7 @@ test('precage metric ranks Nc5 over Ng5 while r7 prefers knight adjacency across
 })
 
 
-test('remaining rules prefer Nf4+ after removing the earlier precage preference across D4', () => {
+test('r6 preserves existing knight protection before later bishop preferences across D4', () => {
   const start = '8/8/4N1k1/3BK3/8/8/8/8 w - - 0 1'
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen(start,t)
@@ -53,15 +53,15 @@ test('remaining rules prefer Nf4+ after removing the earlier precage preference 
     const closer = score(fen,san('c5')), farther = score(fen,san('d4'))
     assert.equal(closer.oppositePrecageDistance,1)
     assert.equal(farther.oppositePrecageDistance,3)
-    const knightMove = getChess(fen).move({from:transformSquare('e6',t),to:transformSquare('f4',t)}).san
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[knightMove])
+    const bishopMove = getChess(fen).move({from:transformSquare('d5',t),to:transformSquare('e4',t)}).san
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[bishopMove])
   }
 })
 
-test('r7 keeps the king next to the precage knight across D4', () => {
+test('r6 brings the knight under king protection before precage preferences across D4', () => {
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen('8/8/8/2NBK1k1/8/8/8/8 w - - 0 1', t)
-    const move = getChess(fen).move({from:transformSquare('e5',t),to:transformSquare('d4',t)}).san
+    const move = getChess(fen).move({from:transformSquare('c5',t),to:transformSquare('e4',t)}).san
     assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [move])
   }
 })
