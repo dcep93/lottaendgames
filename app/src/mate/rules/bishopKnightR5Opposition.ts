@@ -4,7 +4,7 @@ const center=(p:{file:number;rank:number})=>(p.file-3.5)**2+(p.rank-3.5)**2;
 
 /** Check to break inward opposition, then advance beside the knight or wait with the bishop. */
 export function knightAndBishopR5OppositionMoves(fen:string): readonly string[] | undefined {
-  const king=findPiece(fen,'w','k'),knight=findPiece(fen,'w','n'),black=findPiece(fen,'b','k');
+  const king=findPiece(fen,'w','k'),knight=findPiece(fen,'w','n'),black=findPiece(fen,'b','k'),bishop=findPiece(fen,'w','b');
   if(!king||!knight||!black)return undefined;
   const w=squareCoords(king.square),n=squareCoords(knight.square),b=squareCoords(black.square);
   const occupied=new Set(getEndgamePiecePlacements(fen).map(p=>p.square));
@@ -32,7 +32,12 @@ export function knightAndBishopR5OppositionMoves(fen:string): readonly string[] 
     const origin=knightBehind?w:n;
     const next={file:origin.file+fx,rank:origin.rank+fy},to=squareFromCoords(next.file,next.rank);
     if(!to||occupied.has(to)||center(next)>=center(w))continue;
-    if(Math.max(Math.abs(next.file-b.file),Math.abs(next.rank-b.rank))>1)return [king.square+to];
+    const c=bishop && squareCoords(bishop.square);
+    // If advancing leaves the bishop hanging, save it with the waiting move first.
+    const bishopHanging=c && Math.max(Math.abs(c.file-b.file),Math.abs(c.rank-b.rank))===1
+      && Math.max(Math.abs(c.file-next.file),Math.abs(c.rank-next.rank))>1
+      && Math.abs(c.file-n.file)*Math.abs(c.rank-n.rank)!==2;
+    if(Math.max(Math.abs(next.file-b.file),Math.abs(next.rank-b.rank))>1 && !bishopHanging)return [king.square+to];
     return ['b']; // Allow bishop waits; r5 scoring prefers the farthest from Black.
   }
   return undefined;
