@@ -2,9 +2,9 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { bishopControlsOrOccupiesSquare } from './bishopKnightGeometry';
 import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess';
-import { getIdealKnightAndBishopWhiteMoves, scoreKnightAndBishopWhiteMove } from './bishopKnight';
+import { scoreKnightAndBishopWhiteMove, knightAndBishopWhiteRules } from './bishopKnight';
 
-test('stable bishop protection metric recognizes bishop defense via either minor and respects blockers across D4', () => {
+test('r9.98 recognizes bishop defense via either minor and respects blockers across D4', () => {
   for (const t of SQUARE_TRANSFORMS) {
     for (const [fen,from,to,penalty] of [
       ['2B5/6K1/8/4k3/1N6/8/8/8 w - - 0 1','b4','a6',0],
@@ -18,10 +18,12 @@ test('stable bishop protection metric recognizes bishop defense via either minor
       assert.equal(scoreKnightAndBishopWhiteMove(f,san).knightBishopProtectionPenalty,penalty,`${t.name} ${san}`);
     }
   }
+  const ids=knightAndBishopWhiteRules.map(r=>r.id);
+  assert.ok(ids.indexOf('r7')<ids.indexOf('r9.98') && ids.indexOf('r9.98')<ids.indexOf('r20'));
 });
 
 
-test('stable bishop protection metric credits Be6+ through Black’s king across D4', () => {
+test('r9.98 credits Be6+ through Black’s king across D4', () => {
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen('K1B5/8/8/8/2k5/1N6/8/8 w - - 0 1', t);
     const chess = getChess(fen);
@@ -32,7 +34,7 @@ test('stable bishop protection metric credits Be6+ through Black’s king across
 });
 
 
-test('stable bishop protection metric allows adjacent protection with retreat room and longer protection across D4', () => {
+test('r9.98 allows adjacent protection with retreat room and longer protection across D4', () => {
   for (const t of SQUARE_TRANSFORMS) {
     const fen=transformFen('2k1B2K/8/2N5/8/8/8/8/8 w - - 6 4',t);
     for (const [from,to,penalty] of [['e8','d7',0],['h8','h7',0],['e8','f7',2]] as const) {
@@ -43,7 +45,7 @@ test('stable bishop protection metric allows adjacent protection with retreat ro
 });
 
 
-test('stable bishop protection metric excludes only adjacent targets of edge bishops across D4', () => {
+test('r9.98 excludes only adjacent targets of edge bishops across D4', () => {
   for (const t of SQUARE_TRANSFORMS) {
     for (const [source, penalty] of [
       ['B7/1N6/8/8/7k/8/8/7K w - - 0 1', 2],
@@ -61,7 +63,8 @@ test('stable bishop protection metric excludes only adjacent targets of edge bis
   }
 });
 
-test('stable bishop protection metric measures knight moves to protected squares across D4', () => {
+test('r9.98 ranks on, then one move away, then ties every farther distance across D4', () => {
+  const rule = knightAndBishopWhiteRules.find(r => r.id === 'r9.98')!;
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen('B7/8/8/8/7k/8/2N5/7K w - - 0 1', t);
     const score = (from: 'a8' | 'c2' | 'h1', to: 'e4' | 'b4' | 'a3' | 'g1') => {
@@ -70,6 +73,9 @@ test('stable bishop protection metric measures knight moves to protected squares
     };
     const on = score('a8','e4'), one = score('c2','b4'), two = score('h1','g1'), three = score('c2','a3');
     assert.deepEqual([on,one,two,three].map(s=>s.knightBishopProtectionPenalty),[0,1,2,3]);
+    assert.ok(rule.compare!(on,one)<0);
+    assert.ok(rule.compare!(one,two)<0);
+    assert.equal(rule.compare!(two,three),0);
     const loaded = transformFen('8/8/B7/1K6/3k4/3N4/8/8 w - - 0 1',t);
     const far = (to: 'b4' | 'e1') => {
       const san = getChess(loaded).move({from:transformSquare('d3',t),to:transformSquare(to,t)}).san;
@@ -77,19 +83,6 @@ test('stable bishop protection metric measures knight moves to protected squares
     };
     assert.equal(far('b4').knightBishopProtectionPenalty,3);
     assert.equal(far('e1').knightBishopProtectionPenalty,5);
-  }
-});
-
-
-test('removing the early knight preferences breaks the recorded bishop and knight shuttles across D4', () => {
-  for (const t of SQUARE_TRANSFORMS) {
-    for (const [start, from, to] of [
-      ['3K4/8/2Nk4/8/B7/8/8/8 w - - 0 1', 'c6', 'e7'],
-      ['8/3B4/3k4/8/1K6/1N6/8/8 w - - 0 1', 'd7', 'h3'],
-    ] as const) {
-      const fen = transformFen(start, t);
-      const san = getChess(fen).move({from: transformSquare(from, t), to: transformSquare(to, t)}).san;
-      assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [san], t.name);
-    }
+    assert.equal(rule.compare!(far('b4'),far('e1')),0);
   }
 });

@@ -157,6 +157,11 @@ test("bishop-and-knight rules are registered", () => {
       helpText: "Prefer king step-then-Euclidean proximity to a central square, then prefer king on the color opposite the bishop.",
     },
     {
+      id: "r7.8",
+      shortLabel: "rule r7.8",
+      helpText: "With a middle-16 square king, prefer knight move proximity to a precage square, then prefer the knight adjacent to the king.",
+    },
+    {
       id: "r8",
       shortLabel: "rule r8",
       helpText: "With a king on a middle-16 square, prefer bishop on the long diagonal, then a central bishop, then knight move proximity to a precage square, then knight off the bishop's color.",
@@ -170,6 +175,11 @@ test("bishop-and-knight rules are registered", () => {
       id: "r9.1",
       shortLabel: "rule r9.1",
       helpText: "Play the 9.1 move.",
+    },
+    {
+      id: "r9.98",
+      shortLabel: "rule r9.98",
+      helpText: "Prefer knight on or else one move from a stable bishop protected square.",
     },
     {
       id: "r10",
@@ -209,9 +219,11 @@ test("bishop-and-knight rules are registered", () => {
       "r6.8",
       "r6.9",
       "r7",
+      "r7.8",
       "r8",
       "r8.5",
       "r9.1",
+      "r9.98",
       "r10",
       "r20",
     ],
@@ -220,7 +232,7 @@ test("bishop-and-knight rules are registered", () => {
     ruleSet.whiteRuleDescriptions.map(({ id }) => id),
     knightAndBishopWhiteRules.map(({ id }) => id),
   );
-  assert.equal(knightAndBishopWhiteRules.length, 18);
+  assert.equal(knightAndBishopWhiteRules.length, 20);
 });
 
 test("immediate mate keeps precedence without the mating-net rule", () => {
