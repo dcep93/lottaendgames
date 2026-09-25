@@ -42,3 +42,30 @@ test('r5 opposition step translates and rejects outward opposition or a bishop-b
   assert.deepEqual(knightAndBishopR5OppositionMoves(transformFen(c.fen,t)),expected,t.name);
  }
 });
+
+test('r5 maximizes bishop Euclidean distance during the waiting step, across D4',()=>{
+ const rule=knightAndBishopWhiteRules.find(r=>r.id==='r5')!;
+ for(const t of SQUARE_TRANSFORMS){
+  const fen=transformFen('4B3/8/8/8/8/3k4/8/2KN4 w - - 2 2',t);
+  const san=(to:'d7'|'f7'|'h5')=>getChess(fen).move({from:transformSquare('e8',t),to:transformSquare(to,t)}).san;
+  const near=scoreKnightAndBishopWhiteMove(fen,san('d7'));
+  const far=scoreKnightAndBishopWhiteMove(fen,san('f7'));
+  const equallyFar=scoreKnightAndBishopWhiteMove(fen,san('h5'));
+  assert.equal(near.preparationBishopWaitDistance,-16,t.name);
+  assert.equal(far.preparationBishopWaitDistance,-20,t.name);
+  assert.ok(rule.compare!(far,near)<0,t.name);
+  assert.equal(rule.compare!(far,equallyFar),0,t.name);
+  for(const move of getIdealKnightAndBishopWhiteMoves(fen))assert.ok([san('f7'),san('h5')].includes(move),`${t.name} ${move}`);
+  const outside=scoreKnightAndBishopWhiteMove(transformFen(start,t),getChess(transformFen(start,t)).move({from:transformSquare('e8',t),to:transformSquare('d7',t)}).san);
+  assert.equal(outside.preparationBishopWaitDistance,0,t.name);
+ }
+});
+
+test('r5 chooses Bh7 for the waiting position from the reported loop, across D4',()=>{
+ for(const t of SQUARE_TRANSFORMS){
+  const fen=transformFen('6B1/8/8/8/8/N1k5/K7/8 w - - 0 1',t);
+  const san=getChess(fen).move({from:transformSquare('g8',t),to:transformSquare('h7',t)}).san;
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[san],t.name);
+  assert.equal(explainMove(bishopKnightRuleSet.scoreWhiteCandidates!(fen,getChess(fen).moves()),knightAndBishopWhiteRules,san)?.id,'r5',t.name);
+ }
+});

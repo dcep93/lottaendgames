@@ -78,6 +78,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly precageSideDistance: number;
   readonly precageSideCornerDistanceSquared: number;
   readonly declaredPreparationPenalty: number;
+  readonly preparationBishopWaitDistance: number;
   readonly supportedThreeCheckScore: number;
   readonly supportedDiagonalSizeScore: number;
   readonly supportedDiagonalKnightScore: number;
@@ -450,6 +451,8 @@ function scoreKnightAndBishopWhiteMoveCore(
     precageKingSteps: context.startsWithPrecageKnight && whiteKing && blackKing
       ? kingDistance(whiteKing.square, blackKing.square) : 0,
     declaredPreparationPenalty: context.declaredPreparationMoves && !context.declaredPreparationMoves.includes(move.from + move.to) && !context.declaredPreparationMoves.includes(move.piece) ? 1 : 0,
+    preparationBishopWaitDistance: context.declaredPreparationMoves?.includes("b") && move.piece === "b" && bishop && blackKing
+      ? -squaredEuclideanDistance(bishop.square, blackKing.square) : 0,
     mateScore: checkmate ? 0 : 1,
     stalemateScore: !checkmate && blackReplies.length === 0 ? 1 : 0,
     pieceSafetyScore: !knightAndBishopPiecesPresent(resultFen) || blackReplies.some(({ captured }) => captured === "b" || captured === "n") ? 1 : 0,
@@ -521,7 +524,8 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       id: "r5",
       shortLabel: "rule r5",
       helpText: "Play the r5 move.",
-      compare: (first, second) => first.declaredPreparationPenalty - second.declaredPreparationPenalty,
+      compare: (first, second) => first.declaredPreparationPenalty - second.declaredPreparationPenalty
+        || first.preparationBishopWaitDistance - second.preparationBishopWaitDistance,
     },
     {
       id: "r6",
@@ -724,7 +728,7 @@ const bishopKnightHelp: RuleHelp = {
   }, {
     id: "bishop-knight-rule-r5-opposition",
     title: "rule r5 — Check, then advance",
-    caption: "Nd1+ prepares Kd2. If Black blocks d2, wait with the bishop first.",
+    caption: "Nd1+ prepares Kd2. If Black blocks d2, wait with the bishop as far from Black as possible.",
     pieces: [{square: "c1", piece: "K"}, {square: "b2", piece: "N"}, {square: "c3", piece: "k"}, {square: "e8", piece: "B"}],
     highlights: [{square: "d2", kind: "key"}],
     arrows: [{from: "b2", to: "d1"}, {from: "c1", to: "d2"}],

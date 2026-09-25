@@ -30,7 +30,7 @@ export function knightAndBishopR5OppositionMoves(fen:string): readonly string[] 
     const next={file:n.file+fx,rank:n.rank+fy},to=squareFromCoords(next.file,next.rank);
     if(!to||occupied.has(to)||center(next)>=center(w))continue;
     if(Math.max(Math.abs(next.file-b.file),Math.abs(next.rank-b.rank))>1)return [king.square+to];
-    return ['b']; // All bishop waits tie here; later rules select among them.
+    return ['b']; // Allow bishop waits; r5 scoring prefers the farthest from Black.
   }
   return undefined;
 }
