@@ -67,7 +67,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly attackedKnightDefensePenalty: number;
   readonly bishopOppositionPenalty: number;
   readonly knightNextAttackPenalty: number;
-  readonly knightCenterProximityScore: number;
+  readonly knightMiddle16ProximityScore: number;
   readonly oppositePrecageDistance: number;
   readonly middle16KnightKingAdjacencyPenalty: number;
   readonly oppositePrecageEuclideanDistanceSquared: number;
@@ -365,8 +365,11 @@ function scoreKnightAndBishopWhiteMoveCore(
       && manhattanDistance(blackKing.square, bishop.square) === 1
       && (squareCoordinates(whiteKing.square).file === squareCoordinates(blackKing.square).file
         || squareCoordinates(whiteKing.square).rank === squareCoordinates(blackKing.square).rank) ? 0 : 1,
-    get knightCenterProximityScore() {
-      return knight ? knightAndBishopCenterProximityScore(knight.square) : 0;
+    get knightMiddle16ProximityScore() {
+      if (!knight) return 0;
+      const { file, rank } = squareCoordinates(knight.square);
+      return Math.max(2 - file, 0, file - 5) ** 2
+        + Math.max(2 - rank, 0, rank - 5) ** 2;
     },
     get knightNextAttackPenalty() {
       return knight
@@ -504,13 +507,13 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     {
       id: "r6",
       shortLabel: "rule r6",
-      helpText: "Drift the knight towards king protection, then prefer central proximity.",
+      helpText: "Drift the knight towards king protection, then prefer central 16 proximity.",
       compare: (first, second) => {
         const a = first.knightDriftScore, b = second.knightDriftScore;
         const obstruction = a[0] - b[0];
         if (obstruction) return obstruction;
         return a[1] - b[1] || a[2] - b[2]
-          || first.knightCenterProximityScore - second.knightCenterProximityScore;
+          || first.knightMiddle16ProximityScore - second.knightMiddle16ProximityScore;
       },
     },
     {

@@ -238,7 +238,7 @@ test('r6 prefers Nd4 around the blocking king with the protected continuation Ne
  }
 });
 
-test('r6 prefers central Ne3 among equally king-protected knight placements across D4', () => {
+test('r6 equally values Nc3 and Ne3 inside the central 16 across D4', () => {
  const r6 = knightAndBishopWhiteRules.find(r=>r.id==='r6')!;
  for (const t of SQUARE_TRANSFORMS) {
   const fen = transformFen('B7/8/8/8/8/k7/3K4/3N4 w - - 0 1',t);
@@ -246,7 +246,9 @@ test('r6 prefers central Ne3 among equally king-protected knight placements acro
   const center = scoreKnightAndBishopWhiteMove(fen,san('e3'));
   const other = scoreKnightAndBishopWhiteMove(fen,san('c3'));
   assert.deepEqual(center.knightDriftScore,other.knightDriftScore,t.name);
-  assert.ok(r6.compare!(center,other)<0,t.name);
+  assert.equal(center.knightMiddle16ProximityScore,0,t.name);
+  assert.equal(other.knightMiddle16ProximityScore,0,t.name);
+  assert.equal(r6.compare!(center,other),0,t.name);
   assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[san('e3')],t.name);
  }
 });
