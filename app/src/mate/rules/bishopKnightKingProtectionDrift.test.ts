@@ -29,7 +29,7 @@ test('r6 has no special preference for establishing a precage knight across D4',
   assert.equal(precage.knightTargetProximityScore,0);
   assert.equal(away.knightTargetProximityScore,99);
   assert.equal(rule.compare!(precage,away),0);
-  const knightMove = getChess(fen).move({from:transformSquare('c4',t),to:transformSquare('e3',t)}).san;
+  const knightMove = getChess(fen).move({from:transformSquare('h5',t),to:transformSquare('h4',t)}).san;
   assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[knightMove]);
  }
 });
@@ -60,7 +60,7 @@ test('r6 gives no progress credit for unprotected knight opposition toward the e
   assert.equal(scoreKnightAndBishopWhiteMove(fen, san).knightKingProtectionDistance, before, t.name);
   const candidate = scoreKnightAndBishopWhiteMove(fen, san);
   assert.equal(candidate.knightDriftBlocked, true, t.name);
-  assert.equal(candidate.knightDriftObstructionPenalty, 1, t.name);
+  assert.equal(candidate.knightDriftObstructionPenalty, 2, t.name);
   assert.ok(!getIdealKnightAndBishopWhiteMoves(fen).includes(san), t.name);
  }
 });
@@ -88,7 +88,7 @@ test('r6 breaks equal protection-distance ties toward White king: Nb2 over Nb6 a
 });
 
 
-test('r6 leaves drift neutral when an adjacent Black king blocks the way toward White king across D4', () => {
+test('r6 prefers escaping obstruction over a route Black can obstruct again across D4', () => {
  const rule = knightAndBishopWhiteRules.find(r => r.id === 'r6')!;
  for (const t of SQUARE_TRANSFORMS) {
   const fen = transformFen('K7/8/8/7B/2k5/2N5/8/8 w - - 0 1', t);
@@ -96,7 +96,7 @@ test('r6 leaves drift neutral when an adjacent Black king blocks the way toward 
   const retreat = scoreKnightAndBishopWhiteMove(fen, san('d1'));
   const toward = scoreKnightAndBishopWhiteMove(fen, san('e4'));
   assert.equal(retreat.knightDriftBlocked, true);
-  assert.equal(rule.compare!(retreat, toward), 0);
+  assert.ok(rule.compare!(retreat, toward) < 0);
  }
 });
 
@@ -113,5 +113,35 @@ test('r6 rejects Nb8 before the blocked-drift fallback to r7, preferring Nb4 acr
   assert.ok(edge.kingKnightDistanceScore < safe.kingKnightDistanceScore);
   assert.ok(rule.compare!(safe, edge) < 0, t.name);
   assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [san('b4')], t.name);
+ }
+});
+
+
+test('r6 allows Ne2 and Nb5 but rejects Nc6 after Nd4 Ke5 across D4', () => {
+ const rule = knightAndBishopWhiteRules.find(r => r.id === 'r6')!;
+ const board = getChess('7K/8/2Nk4/8/8/8/8/5B2 w - - 0 1');
+ board.move('Nd4');
+ board.move('Ke5');
+ for (const t of SQUARE_TRANSFORMS) {
+  const fen = transformFen(board.fen(), t);
+  const san = (to: 'e2' | 'c6' | 'b5') => getChess(fen).move({from: transformSquare('d4', t), to: transformSquare(to, t)}).san;
+  const escape = scoreKnightAndBishopWhiteMove(fen, san('e2'));
+  const back = scoreKnightAndBishopWhiteMove(fen, san('c6'));
+  assert.equal(escape.knightDriftBlocked, true);
+  assert.equal(escape.knightDriftObstructionPenalty, 0);
+  assert.equal(back.knightDriftObstructionPenalty, 1);
+  const otherEscape = scoreKnightAndBishopWhiteMove(fen, san('b5'));
+  assert.ok(rule.compare!(escape, back) < 0, t.name);
+  assert.equal(rule.compare!(escape, otherEscape), 0, t.name);
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [san('b5')], t.name);
+ }
+});
+
+
+test('diagonal adjacency behind the knight does not block drift across D4', () => {
+ for (const t of SQUARE_TRANSFORMS) {
+  const fen = transformFen('7K/8/8/8/3N4/2k5/8/5B2 w - - 0 1', t);
+  const san = getChess(fen).move({from: transformSquare('d4', t), to: transformSquare('e2', t)}).san;
+  assert.equal(scoreKnightAndBishopWhiteMove(fen, san).knightDriftBlocked, false, t.name);
  }
 });

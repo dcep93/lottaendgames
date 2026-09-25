@@ -181,7 +181,7 @@ type KnightAndBishopPositionScoreContext = {
 };
 
 function blackBlocksKnightDrift(knight: Square, black: Square, white: Square): boolean {
-  return manhattanDistance(knight, black) === 1 && kingDistance(black, white) < kingDistance(knight, white);
+  return kingDistance(knight, black) === 1 && kingDistance(black, white) < kingDistance(knight, white);
 }
 
 function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
@@ -275,8 +275,11 @@ function scoreKnightAndBishopWhiteMoveCore(
     kingKnightAdjacencyPenalty: knightKingDefended ? 0 : 1,
     kingKnightDistanceScore: whiteKing && knight ? squaredEuclideanDistance(whiteKing.square, knight.square) : 99,
     knightDriftBlocked: context.knightDriftBlocked,
-    knightDriftObstructionPenalty: Number(knightEdgeOpposition || (!!knight && !!blackKing && !!whiteKing
-      && blackBlocksKnightDrift(knight.square, blackKing.square, whiteKing.square))),
+    get knightDriftObstructionPenalty() {
+      if (!knight || !blackKing || !whiteKing) return 0;
+      if (knightEdgeOpposition || blackBlocksKnightDrift(knight.square, blackKing.square, whiteKing.square)) return 2;
+      return Number(blackReplies.some(reply => blackBlocksKnightDrift(knight.square, reply.to, whiteKing.square)));
+    },
     get knightKingProtectionDistance() {
       const distance = knightKingProtectionDistance(resultFen);
       // Opposition near the edge can force an unprotected knight back.
