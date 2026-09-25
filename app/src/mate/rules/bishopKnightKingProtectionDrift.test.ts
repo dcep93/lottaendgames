@@ -163,3 +163,16 @@ test('r6 rejects the Na7 pocket and brings the king forward instead across D4', 
   assert.deepEqual(safeKnightMoves.map(m=>m.to),[transformSquare('c8',t)],t.name);
  }
 });
+
+test('r6 allows Nb7 because Kc8 can establish protection after Kb6 across D4', () => {
+ for (const t of SQUARE_TRANSFORMS) {
+  const fen = transformFen('3K4/8/8/Nk6/8/7B/8/8 w - - 0 1', t);
+  const board = getChess(fen);
+  const move = board.move({from: transformSquare('a5',t),to:transformSquare('b7',t)}).san;
+  assert.ok(getIdealKnightAndBishopWhiteMoves(fen).includes(move),t.name);
+  assert.ok(scoreKnightAndBishopWhiteMove(fen,move).knightDriftObstructionPenalty < 2,t.name);
+  board.move({from:transformSquare('b5',t),to:transformSquare('b6',t)});
+  board.move({from:transformSquare('d8',t),to:transformSquare('c8',t)});
+  assert.equal(board.isAttacked(transformSquare('b7',t),'w'),true,t.name);
+ }
+});
