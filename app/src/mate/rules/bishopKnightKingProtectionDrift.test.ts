@@ -145,3 +145,21 @@ test('diagonal adjacency behind the knight does not block drift across D4', () =
   assert.equal(scoreKnightAndBishopWhiteMove(fen, san).knightDriftBlocked, false, t.name);
  }
 });
+
+test('r6 rejects the Na7 pocket and brings the king forward instead across D4', () => {
+ const rule = knightAndBishopWhiteRules.find(r => r.id === 'r6')!;
+ for (const t of SQUARE_TRANSFORMS) {
+  const fen = transformFen('2N3B1/8/2k5/8/8/8/K7/8 w - - 2 2', t);
+  const san = (from: 'c8' | 'a2', to: 'a7' | 'b3') => getChess(fen).move({from:transformSquare(from,t),to:transformSquare(to,t)}).san;
+  const pocket = san('c8','a7'), approach = san('a2','b3');
+  assert.ok(rule.compare!(scoreKnightAndBishopWhiteMove(fen,approach),scoreKnightAndBishopWhiteMove(fen,pocket)) < 0,t.name);
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[approach],t.name);
+  const board=getChess(fen);
+  board.move(pocket);
+  board.move({from:transformSquare('c6',t),to:transformSquare('b6',t)});
+  const safeKnightMoves=board.moves({verbose:true}).filter(m=>m.piece==='n').filter(m=>{
+   board.move(m);const safe=!board.moves({verbose:true}).some(r=>r.captured==='n');board.undo();return safe;
+  });
+  assert.deepEqual(safeKnightMoves.map(m=>m.to),[transformSquare('c8',t)],t.name);
+ }
+});

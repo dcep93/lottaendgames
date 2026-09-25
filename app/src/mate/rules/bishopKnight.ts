@@ -184,6 +184,28 @@ function blackBlocksKnightDrift(knight: Square, black: Square, white: Square): b
   return kingDistance(knight, black) === 1 && kingDistance(black, white) < kingDistance(knight, white);
 }
 
+// A shorter geometric route is not drift if Black can attack the knight
+// and leave it no safe jump closer to its king.
+function blackCanForceKnightRetreat(fen: string, knight: Square, white: Square): boolean {
+  const board = getChess(fen);
+  for (const reply of board.moves({verbose: true})) {
+    if (reply.captured || kingDistance(reply.to, knight) !== 1) continue;
+    board.move(reply);
+    if (board.isAttacked(knight, "w")) { board.undo(); continue; }
+    const forward = board.moves({verbose: true}).filter(move => move.piece === "n"
+      && squaredEuclideanDistance(move.to, white) < squaredEuclideanDistance(knight, white));
+    const canAdvance = forward.some(move => {
+      board.move(move);
+      const safe = !board.moves({verbose: true}).some(response => response.captured === "n");
+      board.undo();
+      return safe;
+    });
+    board.undo();
+    if (!canAdvance) return true;
+  }
+  return false;
+}
+
 function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
   let shouldCheckThreeDiagonal: boolean | undefined;
   const whiteKing = findPiece(fen, "w", "k");
@@ -277,7 +299,8 @@ function scoreKnightAndBishopWhiteMoveCore(
     knightDriftBlocked: context.knightDriftBlocked,
     get knightDriftObstructionPenalty() {
       if (!knight || !blackKing || !whiteKing) return 0;
-      if (knightEdgeOpposition || blackBlocksKnightDrift(knight.square, blackKing.square, whiteKing.square)) return 2;
+      if (knightEdgeOpposition || blackBlocksKnightDrift(knight.square, blackKing.square, whiteKing.square)
+        || (move.piece === "n" && blackCanForceKnightRetreat(resultFen, knight.square, whiteKing.square))) return 2;
       return Number(blackReplies.some(reply => blackBlocksKnightDrift(knight.square, reply.to, whiteKing.square)));
     },
     get knightKingProtectionDistance() {

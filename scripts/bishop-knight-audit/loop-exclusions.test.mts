@@ -34,9 +34,9 @@ test('a loop entering the new terminal after White is excluded', async () => {
   assert.equal(verifyLoopExample('8/8/8/8/1kNKB3/8/8/8 w - - 0 1', ['Bd5', 'Kb5', 'Be4', 'Kb4']), false);
 });
 
-test('replacement examples close under current preferences without exclusions', async () => {
+test('example verifier rejects the fixed drift loop and accepts remaining eligible loops', async () => {
   const {verifyLoopExample} = await import('./verify-loop-example.mts');
-  assert.equal(verifyLoopExample("6B1/N7/1k6/8/8/8/K7/8 w - - 0 1", ["Nc8+", "Kc6", "Na7+", "Kb6"]), true);
+  assert.equal(verifyLoopExample("6B1/N7/1k6/8/8/8/K7/8 w - - 0 1", ["Nc8+", "Kc6", "Na7+", "Kb6"]), false);
   assert.equal(verifyLoopExample("8/N1k5/K1B5/8/8/8/8/8 w - - 0 1", ["Bb5", "Kb8", "Bc6", "Kc7"]), true);
   assert.equal(verifyLoopExample("8/KB6/N7/1k6/8/8/8/8 w - - 0 1", ["Ba8", "Ka5", "Bb7", "Kb5"]), true);
   assert.equal(verifyLoopExample("8/8/8/2NBk3/2K5/8/8/8 w - - 0 1", ["Be4", "Kd6", "Bd5", "Ke5"]), true);
