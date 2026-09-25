@@ -504,12 +504,13 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     {
       id: "r6",
       shortLabel: "rule r6",
-      helpText: "Drift the knight towards king protection.",
+      helpText: "Drift the knight towards king protection, then prefer central proximity.",
       compare: (first, second) => {
         const a = first.knightDriftScore, b = second.knightDriftScore;
         const obstruction = a[0] - b[0];
         if (obstruction) return obstruction;
-        return a[1] - b[1] || a[2] - b[2];
+        return a[1] - b[1] || a[2] - b[2]
+          || first.knightCenterProximityScore - second.knightCenterProximityScore;
       },
     },
     {

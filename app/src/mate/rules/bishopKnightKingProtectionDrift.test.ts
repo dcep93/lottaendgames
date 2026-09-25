@@ -237,3 +237,16 @@ test('r6 prefers Nd4 around the blocking king with the protected continuation Ne
   }
  }
 });
+
+test('r6 prefers central Ne3 among equally king-protected knight placements across D4', () => {
+ const r6 = knightAndBishopWhiteRules.find(r=>r.id==='r6')!;
+ for (const t of SQUARE_TRANSFORMS) {
+  const fen = transformFen('B7/8/8/8/8/k7/3K4/3N4 w - - 0 1',t);
+  const san = (to: 'c3' | 'e3') => getChess(fen).move({from:transformSquare('d1',t),to:transformSquare(to,t)}).san;
+  const center = scoreKnightAndBishopWhiteMove(fen,san('e3'));
+  const other = scoreKnightAndBishopWhiteMove(fen,san('c3'));
+  assert.deepEqual(center.knightDriftScore,other.knightDriftScore,t.name);
+  assert.ok(r6.compare!(center,other)<0,t.name);
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[san('e3')],t.name);
+ }
+});
