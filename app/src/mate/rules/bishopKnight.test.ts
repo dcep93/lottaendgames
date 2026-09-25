@@ -114,7 +114,7 @@ test("bishop-and-knight rules are registered", () => {
     {
       id: "r7",
       shortLabel: "rule r7",
-      helpText: "Prefer the king proximity to the knight, then king central proximity, then prefer the king on the color opposite the bishop.",
+      helpText: "Prefer king proximity to the knight, then king central proximity, then prefer the king on the color opposite the bishop.",
     },
     {
       id: "r8",
