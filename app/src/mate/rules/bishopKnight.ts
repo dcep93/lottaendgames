@@ -49,6 +49,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly minorBlackDistanceScore: number;
   readonly minorCenterDistanceScore: number;
   readonly knightKingProtectionDistance: number;
+  readonly knightKingProximityScore: number;
   readonly kingKnightAdjacencyPenalty: number;
   readonly kingCoordinationPenalty: number;
   readonly attackedBishopDefensePenalty: number;
@@ -235,6 +236,15 @@ function scoreKnightAndBishopWhiteMoveCore(
   const bishopKingDefended = !!bishop && !!whiteKing && kingDistance(bishop.square, whiteKing.square) === 1;
   const bishopDefendedByKingMove = move.piece === "k" && bishopKingDefended;
   const knightKingDefended = !!knight && !!whiteKing && kingDistance(knight.square, whiteKing.square) === 1;
+  const knightEdgeOpposition = (() => {
+    if (move.piece !== "n" || !knight || !whiteKing || kingDistance(knight.square, whiteKing.square) <= 2 || !blackKing
+      || squaredEuclideanDistance(knight.square, blackKing.square) !== 4) return false;
+    const n = squareCoordinates(knight.square);
+    const k = squareCoordinates(blackKing.square);
+    const file = 2 * n.file - k.file;
+    const rank = 2 * n.rank - k.rank;
+    return file < 0 || file > 7 || rank < 0 || rank > 7;
+  })();
   let supportedDiagonal: ReturnType<typeof evaluateKnightAndBishopSupportedDiagonal> | undefined;
   return {
     get kingCoordinationPenalty() {
@@ -250,17 +260,13 @@ function scoreKnightAndBishopWhiteMoveCore(
     get knightKingProtectionDistance() {
       const distance = knightKingProtectionDistance(resultFen);
       // Opposition near the edge can force an unprotected knight back.
-      if (move.piece === "n" && !knightKingDefended && knight && blackKing
-        && squaredEuclideanDistance(knight.square, blackKing.square) === 4) {
-        const n = squareCoordinates(knight.square);
-        const k = squareCoordinates(blackKing.square);
-        const beyondFile = 2 * n.file - k.file;
-        const beyondRank = 2 * n.rank - k.rank;
-        if (beyondFile < 0 || beyondFile > 7 || beyondRank < 0 || beyondRank > 7) {
-          return Math.max(distance, knightKingProtectionDistance(fen));
-        }
-      }
-      return distance;
+      return knightEdgeOpposition ? Math.max(distance, knightKingProtectionDistance(fen)) : distance;
+    },
+    get knightKingProximityScore() {
+      if (!knight || !whiteKing) return 99;
+      if (knightKingDefended) return 0;
+      const distance = squaredEuclideanDistance(knight.square, whiteKing.square);
+      return knightEdgeOpposition ? 99 : distance;
     },
     get minorCenterDistanceScore() {
       return [bishop, knight].reduce((sum, piece) => sum + (piece
@@ -468,7 +474,8 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
         const firstPrecage = first.knightTargetProximityScore === 0;
         const secondPrecage = second.knightTargetProximityScore === 0;
         if (firstPrecage || secondPrecage) return Number(secondPrecage) - Number(firstPrecage);
-        return first.knightKingProtectionDistance - second.knightKingProtectionDistance;
+        return first.knightKingProtectionDistance - second.knightKingProtectionDistance
+          || first.knightKingProximityScore - second.knightKingProximityScore;
       },
     },
     {

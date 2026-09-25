@@ -69,3 +69,17 @@ test('r10 still credits reaching king protection in knight opposition across D4'
   assert.equal(scoreKnightAndBishopWhiteMove(fen, san).knightKingProtectionDistance, 0, t.name);
  }
 });
+
+
+test('r10 breaks equal protection-distance ties toward White king: Nb2 over Nb6 across D4', () => {
+ const rule = knightAndBishopWhiteRules.find(r => r.id === 'r10')!;
+ for (const t of SQUARE_TRANSFORMS) {
+  const fen = transformFen('8/7B/8/8/Nk6/8/8/3K4 w - - 0 1', t);
+  const san = (to: 'b2' | 'b6') => getChess(fen).move({from: transformSquare('a4', t), to: transformSquare(to, t)}).san;
+  const toward = scoreKnightAndBishopWhiteMove(fen, san('b2'));
+  const away = scoreKnightAndBishopWhiteMove(fen, san('b6'));
+  assert.equal(toward.knightKingProtectionDistance, away.knightKingProtectionDistance);
+  assert.ok(rule.compare!(toward, away) < 0, t.name);
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [san('b2')], t.name);
+ }
+});
