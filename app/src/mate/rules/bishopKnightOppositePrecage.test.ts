@@ -1,20 +1,19 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import {getChess, SQUARE_TRANSFORMS, transformFen, transformSquare} from '../chess'
-import {scoreKnightAndBishopWhiteMove as score, getIdealKnightAndBishopWhiteMoves, knightAndBishopWhiteRules} from './bishopKnight'
+import {scoreKnightAndBishopWhiteMove as score, getIdealKnightAndBishopWhiteMoves} from './bishopKnight'
 
-const rule = knightAndBishopWhiteRules.find(r => r.id === 'r7.8')!
-test('r7.8 targets c4 across the long diagonal from Black, across D4', () => {
+test('precage metric targets c4 across the long diagonal from Black, across D4', () => {
   const start = '8/8/5k2/3B4/5K2/4N3/8/8 w - - 0 1'
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen(start,t)
     const san = (to: 'c4' | 'g4') => getChess(fen).move({from:transformSquare('e3',t),to:transformSquare(to,t)}).san
     const onTarget = score(fen,san('c4')), away = score(fen,san('g4'))
+    assert.ok(onTarget.oppositePrecageDistance < away.oppositePrecageDistance)
     assert.equal(onTarget.oppositePrecageDistance,0)
-    assert.ok(rule.compare!(onTarget,away)<0)
   }
 })
-test('r7.8 freezes eligibility and targets before White moves', () => {
+test('precage metric freezes eligibility and targets before White moves', () => {
   const start = '8/8/4Nk2/3B4/5K2/8/8/8 w - - 0 1'
   assert.equal(score(start,'Be4').oppositePrecageDistance,2)
   assert.equal(score(start,'Kg4').oppositePrecageDistance,2)
@@ -31,7 +30,7 @@ test('Nc5 reaches d3 in one knight move while Ng5 needs three to either target',
 })
 
 
-test('r7.8 ranks Nc5 over Ng5 while the earlier king rule can choose Ke4 across D4', () => {
+test('precage metric ranks Nc5 over Ng5 while the earlier king rule can choose Ke4 across D4', () => {
   const start = '8/8/4Nk2/3B4/5K2/8/8/8 w - - 0 1'
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen(start,t)
@@ -39,14 +38,13 @@ test('r7.8 ranks Nc5 over Ng5 while the earlier king rule can choose Ke4 across 
     const closer = score(fen,san('c5')), farther = score(fen,san('g5'))
     assert.equal(closer.oppositePrecageEuclideanDistanceSquared,1)
     assert.equal(farther.oppositePrecageEuclideanDistanceSquared,13)
-    assert.ok(rule.compare!(closer,farther)<0)
     const kingMove = getChess(fen).move({from:transformSquare('f4',t),to:transformSquare('e4',t)}).san
     assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[kingMove])
   }
 })
 
 
-test('r7.8 takes priority over r8 to prefer Nc5 instead of Be4 across D4', () => {
+test('remaining rules prefer Nf4+ after removing the earlier precage preference across D4', () => {
   const start = '8/8/4N1k1/3BK3/8/8/8/8 w - - 0 1'
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen(start,t)
@@ -54,12 +52,12 @@ test('r7.8 takes priority over r8 to prefer Nc5 instead of Be4 across D4', () =>
     const closer = score(fen,san('c5')), farther = score(fen,san('d4'))
     assert.equal(closer.oppositePrecageDistance,1)
     assert.equal(farther.oppositePrecageDistance,3)
-    assert.ok(rule.compare!(closer,farther)<0)
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[san('c5')])
+    const knightMove = getChess(fen).move({from:transformSquare('e6',t),to:transformSquare('f4',t)}).san
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[knightMove])
   }
 })
 
-test('r7.8 prefers Nd3 in the loaded position across D4', () => {
+test('remaining policy still prefers Nd3 in the loaded position across D4', () => {
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen('8/8/8/2NBK1k1/8/8/8/8 w - - 0 1', t)
     const move = getChess(fen).move({from:transformSquare('c5',t),to:transformSquare('d3',t)}).san
@@ -68,7 +66,7 @@ test('r7.8 prefers Nd3 in the loaded position across D4', () => {
 })
 
 
-test('r7.8 gives no frozen-target credit after the bishop leaves the center, across D4', () => {
+test('precage metric gives no frozen-target credit after the bishop leaves the center, across D4', () => {
   const start = '8/8/8/1k1BK3/N7/8/8/8 w - - 0 1'
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen(start, t)
@@ -79,14 +77,13 @@ test('r7.8 gives no frozen-target credit after the bishop leaves the center, acr
     const knightMove = score(fen, san('a4', 'b6'))
     assert.equal(offCenter.oppositePrecageDistance, 99)
     assert.equal(offCenter.oppositePrecageEuclideanDistanceSquared, 99)
-    assert.ok(rule.compare!(central, offCenter) < 0)
-    assert.ok(rule.compare!(knightMove, offCenter) < 0)
-    assert.ok(!getIdealKnightAndBishopWhiteMoves(fen).includes(san('d5', 'b3')))
+    assert.ok(central.oppositePrecageDistance < offCenter.oppositePrecageDistance)
+    assert.ok(knightMove.oppositePrecageDistance < offCenter.oppositePrecageDistance)
   }
 })
 
 
-test('r7.8 prefers knight adjacency even without a central bishop, across D4', () => {
+test('remaining policy still brings the knight next to the king without a central bishop, across D4', () => {
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen('4B3/8/8/8/3k1K2/2N5/8/8 w - - 0 1', t)
     const san = (to: 'e4' | 'a4') => getChess(fen).move({from: transformSquare('c3', t), to: transformSquare(to, t)}).san
@@ -95,15 +92,13 @@ test('r7.8 prefers knight adjacency even without a central bishop, across D4', (
     assert.equal(distant.oppositePrecageDistance, 0)
     assert.equal(adjacent.middle16KnightKingAdjacencyPenalty, 0)
     assert.equal(distant.middle16KnightKingAdjacencyPenalty, 1)
-    assert.ok(rule.compare!(adjacent, distant) < 0)
     assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [san('e4')])
   }
 })
 
-test('r7.8 adjacency stays neutral with a king starting outside the middle 16', () => {
+test('precage metric adjacency stays neutral with a king starting outside the middle 16', () => {
   const fen = '4B3/8/8/8/3k4/2N5/5K2/8 w - - 0 1'
   const adjacent = score(fen, 'Ne2'), distant = score(fen, 'Na4')
   assert.equal(adjacent.middle16KnightKingAdjacencyPenalty, 0)
   assert.equal(distant.middle16KnightKingAdjacencyPenalty, 0)
-  assert.equal(rule.compare!(adjacent, distant), 0)
 })

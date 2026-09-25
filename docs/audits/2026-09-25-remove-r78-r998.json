@@ -1,0 +1,854 @@
+{
+  "change": "Remove r7.8 and r9.98; leave every other production rule unchanged.",
+  "baselineCommit": "9e2126e",
+  "scope": "Central bishop and knight currently on a production precage square; stop at either side to move. This is an audit terminal, not a support declaration.",
+  "whitePolicy": "all preferred ties",
+  "blackPolicy": "all legal replies",
+  "counting": "D4-distinct post-White positions ON loops, not positions reaching loops. Four-ply loops separately deduplicated by D4 and cycle phase.",
+  "fullDomainAudit": {
+    "source": "/Users/danielcepeda/repos/_codex_output/bn-r6-band-2026-09-24",
+    "recomputedEveryPolicy": false,
+    "recomputedPolicies": 259356,
+    "oldPoliciesReused": 1099988,
+    "rootOrbits": 1707888,
+    "physicalRoots": 13660584,
+    "rootDomainReenumerated": true,
+    "unchangedRootCodeVerified": true,
+    "workers": 4,
+    "seconds": 300.341,
+    "policiesChanged": 116433
+  },
+  "independentVerification": {
+    "method": "Independent root enumeration and iterative Tarjan SCC over saved graph",
+    "rootOrbits": 1707888,
+    "physicalRoots": 13660584,
+    "whiteDecisionNodes": 1359344,
+    "edges": 6498486,
+    "postWhiteCycleOrbits": 1916,
+    "postWhiteCyclePhysical": 15328,
+    "whiteTurnCycleOrbits": 3242,
+    "cyclicComponents": 132,
+    "percent": 0.1121853423643705,
+    "seconds": 3.996
+  },
+  "reuseValidation": {
+    "unchangedPolicies": 1099988,
+    "freshlyCheckedUnchangedPolicies": 512,
+    "mismatches": 0
+  },
+  "comparison": {
+    "previousPositions": 71,
+    "currentPositions": 256,
+    "survivingPositions": 29,
+    "removedPositions": 42,
+    "newPositions": 227,
+    "previousFourPly": 41,
+    "currentFourPly": 132,
+    "survivingFourPly": 18,
+    "newFourPly": 114
+  },
+  "policyFingerprint": "cd7f2fd0e19e46eb9df84b074c8ecdf92ef28df220174162f36c885f6429be25",
+  "rawPositionsOnLoops": 2048,
+  "cyclicComponents": 120,
+  "supportLosses": 0,
+  "supportedLoops": 0,
+  "largestMotif": {
+    "description": "White king on an edge, noncentral bishop, neither minor protected by White king. Includes knight edge/interior variants of the same relationship.",
+    "positions": 140,
+    "percentOfCyclePositions": 54.6875,
+    "componentMotifs": [
+      "Noncentral bishop not king-protected; edge king; knight unprotected by king",
+      "Noncentral bishop not king-protected; edge king; knight on edge, unprotected by king"
+    ]
+  },
+  "motifs": [
+    {
+      "motif": "Noncentral bishop not king-protected; edge king; knight unprotected by king",
+      "count": 74,
+      "keys": [
+        9100,
+        10530,
+        10907,
+        14626,
+        15003,
+        17100,
+        17731,
+        96546,
+        96923,
+        95579,
+        96532,
+        97702,
+        125218,
+        125595,
+        129314,
+        129691,
+        128347,
+        129300,
+        157986,
+        158363,
+        162082,
+        162459,
+        194850,
+        195227,
+        276835,
+        277212,
+        280931,
+        281308,
+        283405,
+        284036,
+        330849,
+        362851,
+        363228,
+        387362,
+        387739,
+        391523,
+        391900,
+        395619,
+        395996,
+        415116,
+        424291,
+        424668,
+        506211,
+        506588,
+        510307,
+        510684,
+        549710,
+        588702,
+        592993,
+        653667,
+        654044,
+        793177,
+        817753,
+        846425,
+        850521,
+        855137,
+        875097,
+        879193,
+        883289,
+        884134,
+        907865,
+        911961,
+        916057,
+        940633,
+        944729,
+        948825,
+        954969,
+        977497,
+        981593,
+        989785,
+        1014361,
+        1018457,
+        1022553,
+        1026649
+      ]
+    },
+    {
+      "motif": "Noncentral bishop not king-protected; edge king; knight on edge, unprotected by king",
+      "count": 66,
+      "keys": [
+        8469,
+        12630,
+        13261,
+        96749,
+        274774,
+        275405,
+        307606,
+        308685,
+        329770,
+        332182,
+        333261,
+        360854,
+        361933,
+        363058,
+        364137,
+        392181,
+        393134,
+        414037,
+        418198,
+        419277,
+        450966,
+        452045,
+        455062,
+        456141,
+        479638,
+        480717,
+        487830,
+        488909,
+        507381,
+        507758,
+        508310,
+        509389,
+        516502,
+        517581,
+        550341,
+        587749,
+        591914,
+        625202,
+        626281,
+        680342,
+        681421,
+        792098,
+        816674,
+        845346,
+        849442,
+        854058,
+        874018,
+        878114,
+        882210,
+        883181,
+        887346,
+        888425,
+        906786,
+        910882,
+        914978,
+        939554,
+        943650,
+        947746,
+        955922,
+        976418,
+        980514,
+        988706,
+        1013282,
+        1017378,
+        1021474,
+        1025570
+      ]
+    },
+    {
+      "motif": "Noncentral bishop not king-protected; interior king; knight unprotected by king",
+      "count": 25,
+      "keys": [
+        2374507,
+        2374884,
+        2378603,
+        2378980,
+        2377636,
+        2378589,
+        2382699,
+        2383076,
+        2381732,
+        2382685,
+        2407275,
+        2407652,
+        2411371,
+        2411748,
+        2521963,
+        2522340,
+        2554731,
+        2555108,
+        2719142,
+        2784107,
+        2784484,
+        4989504,
+        4989512,
+        4997958,
+        4997966
+      ]
+    },
+    {
+      "motif": "Noncentral bishop not king-protected; edge king; knight king-protected",
+      "count": 21,
+      "keys": [
+        290961,
+        291346,
+        323729,
+        324114,
+        356497,
+        356882,
+        389265,
+        389650,
+        422033,
+        422418,
+        454801,
+        455186,
+        487569,
+        487954,
+        503953,
+        504338,
+        508049,
+        508434,
+        512145,
+        512530,
+        598088
+      ]
+    },
+    {
+      "motif": "Noncentral bishop not king-protected; interior king; knight on edge, unprotected by king",
+      "count": 18,
+      "keys": [
+        2371926,
+        2372557,
+        2515350,
+        2516429,
+        2718189,
+        2722354,
+        2723433,
+        2837554,
+        2838185,
+        5071175,
+        2984498,
+        2985577,
+        3013621,
+        3014574,
+        3099698,
+        3100329,
+        4848629,
+        4849582
+      ]
+    },
+    {
+      "motif": "Noncentral bishop king-protected; edge king; knight unprotected by king",
+      "count": 8,
+      "keys": [
+        6243,
+        6874,
+        299869,
+        300948,
+        305251,
+        305882,
+        566174,
+        797273
+      ]
+    },
+    {
+      "motif": "Noncentral bishop king-protected; interior king; knight unprotected by king",
+      "count": 7,
+      "keys": [
+        2370411,
+        2370788,
+        2433885,
+        2434964,
+        2700190,
+        2892353,
+        2900805
+      ]
+    },
+    {
+      "motif": "Noncentral bishop king-protected; edge king; knight on edge, unprotected by king",
+      "count": 6,
+      "keys": [
+        295318,
+        296397,
+        303510,
+        304589,
+        567253,
+        796194
+      ]
+    },
+    {
+      "motif": "Noncentral bishop king-protected; central king; knight king-protected",
+      "count": 6,
+      "keys": [
+        7152835,
+        7152833,
+        7153424,
+        7153432,
+        7153416,
+        7152840
+      ]
+    },
+    {
+      "motif": "Noncentral bishop not king-protected; central king; knight on edge, unprotected by king",
+      "count": 6,
+      "keys": [
+        7136735,
+        7099862,
+        7136734,
+        7166445,
+        7229846,
+        7230925
+      ]
+    },
+    {
+      "motif": "Noncentral bishop not king-protected; central king; knight unprotected by king",
+      "count": 5,
+      "keys": [
+        7201615,
+        7164676,
+        7164677,
+        7238413,
+        7167398
+      ]
+    },
+    {
+      "motif": "Noncentral bishop king-protected; interior king; knight king-protected",
+      "count": 3,
+      "keys": [
+        5055121,
+        5056145,
+        5056273
+      ]
+    },
+    {
+      "motif": "Unprotected by king central bishop; knight on edge, off precage",
+      "count": 2,
+      "keys": [
+        147732,
+        902690
+      ]
+    },
+    {
+      "motif": "Unprotected by king central bishop; knight unprotected by king, off precage",
+      "count": 2,
+      "keys": [
+        148811,
+        903769
+      ]
+    },
+    {
+      "motif": "Noncentral bishop king-protected; interior king; knight on edge, unprotected by king",
+      "count": 2,
+      "keys": [
+        2957393,
+        2701269
+      ]
+    },
+    {
+      "motif": "Noncentral bishop not king-protected; interior king; knight king-protected",
+      "count": 2,
+      "keys": [
+        2953353,
+        5083793
+      ]
+    },
+    {
+      "motif": "Noncentral bishop king-protected; central king; knight unprotected by king",
+      "count": 2,
+      "keys": [
+        7152280,
+        7152264
+      ]
+    },
+    {
+      "motif": "Noncentral bishop not king-protected; central king; knight king-protected",
+      "count": 1,
+      "keys": [
+        7079121
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "fen": "4B3/N7/1k6/8/8/8/7K/8 w - - 0 1",
+      "moves": [
+        "Nc8+",
+        "Kc7",
+        "Na7",
+        "Kb6"
+      ],
+      "d": 325,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=4B3/N7/1k6/8/8/8/7K/8_w_-_-_0_1&moves=Nc8%2B,Kc7,Na7,Kb6&cursor=0",
+      "motif": "Noncentral bishop not king-protected; edge king; knight on edge, unprotected by king",
+      "rectangle": [
+        8,
+        7
+      ],
+      "area": 56
+    },
+    {
+      "fen": "4B3/N7/1k6/8/8/8/8/6K1 w - - 0 1",
+      "moves": [
+        "Nc8+",
+        "Kc7",
+        "Na7",
+        "Kb6"
+      ],
+      "d": 325,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=4B3/N7/1k6/8/8/8/8/6K1_w_-_-_0_1&moves=Nc8%2B,Kc7,Na7,Kb6&cursor=0",
+      "motif": "Noncentral bishop not king-protected; edge king; knight on edge, unprotected by king",
+      "rectangle": [
+        7,
+        8
+      ],
+      "area": 56
+    },
+    {
+      "fen": "6K1/8/Nk6/8/8/8/8/3B4 w - - 0 1",
+      "moves": [
+        "Nb8",
+        "Kc7",
+        "Na6+",
+        "Kb6"
+      ],
+      "d": 218,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=6K1/8/Nk6/8/8/8/8/3B4_w_-_-_0_1&moves=Nb8,Kc7,Na6%2B,Kb6&cursor=0",
+      "motif": "Noncentral bishop not king-protected; edge king; knight on edge, unprotected by king",
+      "rectangle": [
+        7,
+        8
+      ],
+      "area": 56
+    },
+    {
+      "fen": "6K1/8/Nk6/8/8/8/8/1B6 w - - 0 1",
+      "moves": [
+        "Nb8",
+        "Kc7",
+        "Na6+",
+        "Kb6"
+      ],
+      "d": 218,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=6K1/8/Nk6/8/8/8/8/1B6_w_-_-_0_1&moves=Nb8,Kc7,Na6%2B,Kb6&cursor=0",
+      "motif": "Noncentral bishop not king-protected; edge king; knight on edge, unprotected by king",
+      "rectangle": [
+        7,
+        8
+      ],
+      "area": 56
+    },
+    {
+      "fen": "8/7B/8/8/Nk6/8/8/3K4 w - - 0 1",
+      "moves": [
+        "Nb6",
+        "Kc5",
+        "Na4+",
+        "Kb4"
+      ],
+      "d": 210,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/7B/8/8/Nk6/8/8/3K4_w_-_-_0_1&moves=Nb6,Kc5,Na4%2B,Kb4&cursor=0",
+      "motif": "Noncentral bishop not king-protected; edge king; knight on edge, unprotected by king",
+      "rectangle": [
+        8,
+        7
+      ],
+      "area": 56
+    },
+    {
+      "fen": "6K1/8/Nk6/8/8/8/2B5/8 w - - 0 1",
+      "moves": [
+        "Nb8",
+        "Kc7",
+        "Na6+",
+        "Kb6"
+      ],
+      "d": 218,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=6K1/8/Nk6/8/8/8/2B5/8_w_-_-_0_1&moves=Nb8,Kc7,Na6%2B,Kb6&cursor=0",
+      "motif": "Noncentral bishop not king-protected; edge king; knight on edge, unprotected by king",
+      "rectangle": [
+        7,
+        7
+      ],
+      "area": 49
+    },
+    {
+      "fen": "6B1/N7/1k6/8/8/8/K7/8 w - - 0 1",
+      "moves": [
+        "Nc8+",
+        "Kc7",
+        "Na7",
+        "Kb6"
+      ],
+      "d": 325,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=6B1/N7/1k6/8/8/8/K7/8_w_-_-_0_1&moves=Nc8%2B,Kc7,Na7,Kb6&cursor=0",
+      "motif": "Noncentral bishop not king-protected; edge king; knight on edge, unprotected by king",
+      "rectangle": [
+        7,
+        7
+      ],
+      "area": 49
+    },
+    {
+      "fen": "7K/8/2Nk4/8/8/8/8/5B2 w - - 0 1",
+      "moves": [
+        "Nd4",
+        "Ke5",
+        "Nc6+",
+        "Kd6"
+      ],
+      "d": 210,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=7K/8/2Nk4/8/8/8/8/5B2_w_-_-_0_1&moves=Nd4,Ke5,Nc6%2B,Kd6&cursor=0",
+      "motif": "Noncentral bishop not king-protected; edge king; knight unprotected by king",
+      "rectangle": [
+        6,
+        8
+      ],
+      "area": 48
+    },
+    {
+      "fen": "K7/8/8/7B/2k5/2N5/8/8 w - - 0 1",
+      "moves": [
+        "Ne4",
+        "Kd5",
+        "Nc3+",
+        "Kc4"
+      ],
+      "d": 301,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=K7/8/8/7B/2k5/2N5/8/8_w_-_-_0_1&moves=Ne4,Kd5,Nc3%2B,Kc4&cursor=0",
+      "motif": "Noncentral bishop not king-protected; edge king; knight unprotected by king",
+      "rectangle": [
+        8,
+        6
+      ],
+      "area": 48
+    },
+    {
+      "fen": "7K/8/2Nk4/8/8/8/8/3B4 w - - 0 1",
+      "moves": [
+        "Nd4",
+        "Ke5",
+        "Nc6+",
+        "Kd6"
+      ],
+      "d": 210,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=7K/8/2Nk4/8/8/8/8/3B4_w_-_-_0_1&moves=Nd4,Ke5,Nc6%2B,Kd6&cursor=0",
+      "motif": "Noncentral bishop not king-protected; edge king; knight unprotected by king",
+      "rectangle": [
+        6,
+        8
+      ],
+      "area": 48
+    },
+    {
+      "fen": "K7/8/8/3k4/4N3/7B/8/8 w - - 0 1",
+      "moves": [
+        "Nc3+",
+        "Kc4",
+        "Ne4",
+        "Kd5"
+      ],
+      "d": 202,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=K7/8/8/3k4/4N3/7B/8/8_w_-_-_0_1&moves=Nc3%2B,Kc4,Ne4,Kd5&cursor=0",
+      "motif": "Noncentral bishop not king-protected; edge king; knight unprotected by king",
+      "rectangle": [
+        8,
+        6
+      ],
+      "area": 48
+    },
+    {
+      "fen": "3K4/8/8/Nk6/8/7B/8/8 w - - 0 1",
+      "moves": [
+        "Nb3",
+        "Kc4",
+        "Na5+",
+        "Kb5"
+      ],
+      "d": 313,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=3K4/8/8/Nk6/8/7B/8/8_w_-_-_0_1&moves=Nb3,Kc4,Na5%2B,Kb5&cursor=0",
+      "motif": "Noncentral bishop not king-protected; edge king; knight on edge, unprotected by king",
+      "rectangle": [
+        8,
+        6
+      ],
+      "area": 48
+    },
+    {
+      "fen": "7K/8/2Nk4/8/8/8/4B3/8 w - - 0 1",
+      "moves": [
+        "Nd4",
+        "Ke5",
+        "Nc6+",
+        "Kd6"
+      ],
+      "d": 210,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=7K/8/2Nk4/8/8/8/4B3/8_w_-_-_0_1&moves=Nd4,Ke5,Nc6%2B,Kd6&cursor=0",
+      "motif": "Noncentral bishop not king-protected; edge king; knight unprotected by king",
+      "rectangle": [
+        6,
+        7
+      ],
+      "area": 42
+    },
+    {
+      "fen": "K7/8/8/8/2k3B1/2N5/8/8 w - - 0 1",
+      "moves": [
+        "Ne4",
+        "Kd5",
+        "Nc3+",
+        "Kc4"
+      ],
+      "d": 301,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=K7/8/8/8/2k3B1/2N5/8/8_w_-_-_0_1&moves=Ne4,Kd5,Nc3%2B,Kc4&cursor=0",
+      "motif": "Noncentral bishop not king-protected; edge king; knight unprotected by king",
+      "rectangle": [
+        7,
+        6
+      ],
+      "area": 42
+    },
+    {
+      "fen": "8/7K/8/2Nk4/8/8/8/3B4 w - - 0 1",
+      "moves": [
+        "Nd3",
+        "Ke4",
+        "Nc5+",
+        "Kd5"
+      ],
+      "d": 105,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/7K/8/2Nk4/8/8/8/3B4_w_-_-_0_1&moves=Nd3,Ke4,Nc5%2B,Kd5&cursor=0",
+      "motif": "Noncentral bishop not king-protected; edge king; knight unprotected by king",
+      "rectangle": [
+        6,
+        7
+      ],
+      "area": 42
+    },
+    {
+      "fen": "6K1/8/Nk6/8/8/1B6/8/8 w - - 0 1",
+      "moves": [
+        "Nb8",
+        "Kc7",
+        "Na6+",
+        "Kb6"
+      ],
+      "d": 218,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=6K1/8/Nk6/8/8/1B6/8/8_w_-_-_0_1&moves=Nb8,Kc7,Na6%2B,Kb6&cursor=0",
+      "motif": "Noncentral bishop not king-protected; edge king; knight on edge, unprotected by king",
+      "rectangle": [
+        7,
+        6
+      ],
+      "area": 42
+    },
+    {
+      "fen": "8/K7/8/8/8/1k6/N7/5B2 w - - 0 1",
+      "moves": [
+        "Nc1+",
+        "Kc2",
+        "Na2",
+        "Kb3"
+      ],
+      "d": 210,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/K7/8/8/8/1k6/N7/5B2_w_-_-_0_1&moves=Nc1%2B,Kc2,Na2,Kb3&cursor=0",
+      "motif": "Noncentral bishop not king-protected; edge king; knight on edge, unprotected by king",
+      "rectangle": [
+        6,
+        7
+      ],
+      "area": 42
+    },
+    {
+      "fen": "8/8/1N6/2k5/8/8/8/3K3B w - - 0 1",
+      "moves": [
+        "Na4+",
+        "Kb4",
+        "Nb6",
+        "Kc5"
+      ],
+      "d": 313,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/1N6/2k5/8/8/8/3K3B_w_-_-_0_1&moves=Na4%2B,Kb4,Nb6,Kc5&cursor=0",
+      "motif": "Noncentral bishop not king-protected; edge king; knight unprotected by king",
+      "rectangle": [
+        7,
+        6
+      ],
+      "area": 42
+    },
+    {
+      "fen": "3K4/7B/8/8/2k5/1N6/8/8 w - - 0 1",
+      "moves": [
+        "Na5+",
+        "Kb5",
+        "Nb3",
+        "Kc4"
+      ],
+      "d": 204,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=3K4/7B/8/8/2k5/1N6/8/8_w_-_-_0_1&moves=Na5%2B,Kb5,Nb3,Kc4&cursor=0",
+      "motif": "Noncentral bishop not king-protected; edge king; knight unprotected by king",
+      "rectangle": [
+        7,
+        6
+      ],
+      "area": 42
+    },
+    {
+      "fen": "8/8/1N6/2k5/8/7B/8/3K4 w - - 0 1",
+      "moves": [
+        "Na4+",
+        "Kb4",
+        "Nb6",
+        "Kc5"
+      ],
+      "d": 313,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/1N6/2k5/8/7B/8/3K4_w_-_-_0_1&moves=Na4%2B,Kb4,Nb6,Kc5&cursor=0",
+      "motif": "Noncentral bishop not king-protected; edge king; knight unprotected by king",
+      "rectangle": [
+        7,
+        6
+      ],
+      "area": 42
+    }
+  ],
+  "verification": "101 bishop-knight tests and production build passed. 20 examples validated through three laps: every White move preferred, every Black move legal, terminal excluded at every ply, replay decoder passes. Independent Tarjan verified complete graph cycles; terminal cycles independently verified by return reachability.",
+  "conclusion": "Regression overall. Original cohort improves, but full-domain cycle positions increase 71 to 256 and four-ply loops increase 41 to 132. Recommend reverting this experiment; the earlier reachable-cohort recommendation did not cover new cycles in other regions."
+}

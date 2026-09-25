@@ -494,14 +494,6 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
         || first.kingBishopColorPenalty - second.kingBishopColorPenalty,
     },
     {
-      id: "r7.8",
-      shortLabel: "rule r7.8",
-      helpText: "With a middle-16 square king, prefer knight move proximity to a precage square, then prefer the knight adjacent to the king.",
-      compare: (first, second) => first.oppositePrecageDistance - second.oppositePrecageDistance
-        || first.oppositePrecageEuclideanDistanceSquared - second.oppositePrecageEuclideanDistanceSquared
-        || first.middle16KnightKingAdjacencyPenalty - second.middle16KnightKingAdjacencyPenalty,
-    },
-    {
       id: "r8",
       shortLabel: "rule r8",
       helpText: "With a king on a middle-16 square, prefer bishop on the long diagonal, then a central bishop, then knight move proximity to a precage square, then knight off the bishop's color.",
@@ -524,12 +516,6 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       shortLabel: "rule r9.1",
       helpText: "Play the 9.1 move.",
       compare: (first, second) => first.relativeKnightPenalty - second.relativeKnightPenalty,
-    },
-    {
-      id: "r9.98",
-      shortLabel: "rule r9.98",
-      helpText: "Prefer knight on or else one move from a stable bishop protected square.",
-      compare: (first, second) => Math.min(2, first.knightBishopProtectionPenalty) - Math.min(2, second.knightBishopProtectionPenalty),
     },
     {
       id: "r10",
@@ -683,11 +669,9 @@ const bishopKnightHelp: RuleHelp = {
   ],
   notes: [
     "For r6, use the rank or file halves separating the central bishop from the precage knight. Require an eligible precage knight before White moves. Prefer king distance to within one step of that half’s outer edge (the edge and its adjacent rank or file tie), then Euclidean proximity to its non-target corner. For Bd5/Nc4 with Black on ranks 5–8, target rank 8, then h8; include all board symmetries.",
-    "For r7.8, freeze the shared precage targets before White moves. Require a middle-16 king. After White moves, require the bishop to remain central; otherwise there is no precage target and no proximity credit. Measure knight moves, then break ties by Euclidean proximity to the target, then prefer knight adjacency to White’s king. With no precage targets, proximity is neutral but adjacency still applies when the king starts in the middle 16.",
     "For r5.1, require a central bishop and knight on a precage square before White moves, then minimize the resulting king-step distance between the kings.",
-    "For r8, White’s king must be on files c–f and ranks 3–6 before moving. Evaluate the bishop and knight preferences after White moves. Precage squares require a central bishop and must lie strictly opposite Black across the bishop’s long diagonal. For a light-squared bishop, select the opposite-side pair from c4, d3, e6 and f5; include board symmetries. No targets exist when Black is on the long diagonal. Bishop adjacency is not required. Rules r5.1, r6, r7.8 and r8 share these targets.",
+    "For r8, White’s king must be on files c–f and ranks 3–6 before moving. Evaluate the bishop and knight preferences after White moves. Precage squares require a central bishop and must lie strictly opposite Black across the bishop’s long diagonal. For a light-squared bishop, select the opposite-side pair from c4, d3, e6 and f5; include board symmetries. No targets exist when Black is on the long diagonal. Bishop adjacency is not required. Rules r5.1, r6 and r8 share these targets.",
     "For r7, minimize White’s king steps to the nearest of d4, e4, d5 or e5, then Euclidean distance to the nearest of those squares, then prefer the king on the color opposite the bishop. For r20, maximize the sum of the bishop’s and knight’s Euclidean distances from Black’s king, then minimize the sum of their Euclidean distances to the board’s midpoint, measured after White moves.",
-    "For r9.98, count bishop protection through Black’s king, which must leave the checking diagonal. Other intervening pieces still block protection. Evaluate after White moves.",
     "The target corner is the bishop-colored corner closest to Black's king.",
     "Support has been reset. No position is supported until explicitly declared under the new rules; all earlier support declarations and r2.5 preferences have been discarded.",
   ],
