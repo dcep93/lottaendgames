@@ -134,7 +134,7 @@ test("bishop-and-knight rules are registered", () => {
     {
       id: "r6",
       shortLabel: "rule r6",
-      helpText: "With a precage knight and Black's king closer by king steps to the target corner than White's king, prefer king proximity to the bishop's side, then king proximity to the non-target corner.",
+      helpText: "With a precage knight and Black's king closer by king steps to the target corner than White's king, prefer king proximity to within 1 of the bishop's side, then king proximity to the non-target corner.",
     },
     {
       id: "r6.5",
