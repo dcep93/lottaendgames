@@ -40,5 +40,6 @@ test('example verifier rejects eliminated drift loops', async () => {
   assert.equal(verifyLoopExample("B7/8/8/8/8/8/k2K4/3N4 w - - 0 1", ["Bh1", "Kb1", "Ba8", "Ka2"]), false);
   assert.equal(verifyLoopExample("B7/6k1/8/3N4/3K4/8/8/8 w - - 0 1", ["Ke5", "Kg6", "Kd4", "Kg7"]), false);
   assert.equal(verifyLoopExample("8/8/4B3/8/8/8/1k5K/N7 w - - 0 1", ["Nb3", "Kc3", "Na1", "Kb2"]), false);
+  assert.equal(verifyLoopExample("5K2/5B2/8/N1k5/8/8/8/8 w - - 0 1", ["Nb7+", "Kc6", "Na5+", "Kc5"]), false);
   assert.equal(verifyLoopExample("2BK4/8/1k6/N7/8/8/8/8 w - - 0 1", ["Nb7", "Kc6", "Na5+", "Kb6"]), false);
 });

@@ -152,6 +152,11 @@ export function knightAndBishopKnightTargetProximityScore(fen: string): number {
     ? Math.min(...targets.map(target => knightDistances.get(knight.square)!.get(target)!)) : 99
 }
 
+/** Precomputed board geometry; no move generation. */
+export function knightMoveDistance(from: Square, to: Square): number {
+  return knightDistances.get(from)!.get(to)!
+}
+
 export function knightAndBishopKnightProximityToSquare(fen: string, target: Square): number {
   const knight = findPiece(fen, 'w', 'n')
   return knight ? knightDistances.get(knight.square)!.get(target)! : 99

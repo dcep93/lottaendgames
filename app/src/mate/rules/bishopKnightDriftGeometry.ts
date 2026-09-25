@@ -1,4 +1,5 @@
 import type {Square} from 'chess.js';
+import {knightMoveDistance} from './bishopKnightStrategy';
 import {allSquares, edgeDistance, isKnightMove, kingDistance, squareCoordinates, squaredEuclideanDistance} from '../chess';
 
 const squares = allSquares();
@@ -42,7 +43,12 @@ export function knightDriftThreatPenalty(white: Square, bishop: Square, knight: 
     if (kingDistance(white, knight) === 1 || ((edgeDistance(bishop) > 0 || kingDistance(bishop, knight) > 1) && bishopControls(bishop, knight, [white, threat]))
       || neighbours.get(white)!.some(s => s !== bishop && s !== knight
         && kingDistance(s, knight) === 1 && kingDistance(s, threat) > 1)) continue;
+    // An onward step must shorten the knight route to an unoccupied protected square.
+    const protectionTargets = neighbours.get(white)!.filter(s => s !== bishop && s !== threat);
+    const remaining = (from: Square) => Math.min(...protectionTargets.map(to => knightMoveDistance(from, to)));
+    const distance = remaining(knight);
     const safeForwardJump = jumps.get(knight)!.some(s => s !== white && s !== bishop && s !== threat
+      && remaining(s) < distance
       && squaredEuclideanDistance(s, white) < squaredEuclideanDistance(knight, white)
       && (kingDistance(s, threat) > 1 || kingDistance(s, white) === 1 || bishopControls(bishop, s, [white, threat])));
     if (!safeForwardJump) return 2;

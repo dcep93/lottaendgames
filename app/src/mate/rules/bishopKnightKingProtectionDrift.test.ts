@@ -131,7 +131,7 @@ test('r6 allows Ne2 and Nb5 but rejects Nc6 after Nd4 Ke5 across D4', () => {
   const back = scoreKnightAndBishopWhiteMove(fen, san('c6'));
   assert.equal(escape.knightDriftBlocked, true);
   assert.equal(escape.knightDriftObstructionPenalty, 0);
-  assert.equal(back.knightDriftObstructionPenalty, 1);
+  assert.ok(back.knightDriftObstructionPenalty > escape.knightDriftObstructionPenalty);
   const otherEscape = scoreKnightAndBishopWhiteMove(fen, san('b5'));
   assert.ok(rule.compare!(escape, back) < 0, t.name);
   assert.equal(rule.compare!(escape, otherEscape), 0, t.name);
@@ -286,5 +286,17 @@ test('r6 skips drift and centralization only with stable bishop protection at th
   const fen=transformFen(c.fen,t);
   for(const move of getChess(fen).moves())
    assert.equal(r6.applies!(scoreKnightAndBishopWhiteMove(fen,move)),c.active,`${t.name} ${move}`);
+ }
+});
+
+
+test('r6 rejects Nb7 when Bf7 blocks its onward route, but allows it with f7 free across D4', () => {
+ for(const t of SQUARE_TRANSFORMS) for(const blocked of [true,false]) {
+  const fen=transformFen(blocked ? '5K2/5B2/8/N1k5/8/8/8/8 w - - 0 1' : '5K2/8/8/N1k5/8/7B/8/8 w - - 0 1',t);
+  const knightMove=getChess(fen).move({from:transformSquare('a5',t),to:transformSquare('b7',t)}).san;
+  const kingMove=getChess(fen).move({from:transformSquare('f8',t),to:transformSquare('e7',t)}).san;
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[blocked ? kingMove : knightMove],t.name);
+  assert.equal(scoreKnightAndBishopWhiteMove(fen,knightMove).knightDriftObstructionPenalty,blocked ? 2 : 0,t.name);
+  if(blocked) assert.equal(explainMove(bishopKnightRuleSet.scoreWhiteCandidates!(fen,getChess(fen).moves()),knightAndBishopWhiteRules,kingMove)?.id,'r7',t.name);
  }
 });
