@@ -285,6 +285,9 @@ function scoreKnightAndBishopWhiteMoveCore(
   const bishopKingDefended = !!bishop && !!whiteKing && kingDistance(bishop.square, whiteKing.square) === 1;
   const bishopSeparated = context.shouldSeparateBishop && move.piece === "b" && bishop && blackKing
     && kingDistance(bishop.square, blackKing.square) >= 3;
+  const bishopExitCleared = context.shouldSeparateBishop && move.piece === "k" && bishop && whiteKing
+    && squaredEuclideanDistance(bishop.square, move.from) === 2
+    && squaredEuclideanDistance(bishop.square, whiteKing.square) !== 2;
   const bishopDefendedByKingMove = move.piece === "k" && bishopKingDefended;
   const knightKingDefended = !!knight && !!whiteKing && kingDistance(knight.square, whiteKing.square) === 1;
   let knightBishopStableDefense: boolean | undefined;
@@ -378,7 +381,7 @@ function scoreKnightAndBishopWhiteMoveCore(
       ? -squaredEuclideanDistance(bishop.square, blackKing.square) : 0,
     attackedBishopDefensePenalty: context.shouldEscapeBishop
       && !(move.piece === "b" && bishopKingDefended && whiteKing && centerDistance(whiteKing.square) === 0) ? 1 : 0,
-    bishopSeparationPenalty: context.shouldSeparateBishop && !bishopSeparated ? 1 : 0,
+    bishopSeparationPenalty: context.shouldSeparateBishop && !bishopSeparated && !bishopExitCleared ? 1 : 0,
     bishopWhiteKingDistanceScore: bishopSeparated && whiteKing
       ? -squaredEuclideanDistance(bishop.square, whiteKing.square) : 0,
     get attackedBishopEscapeScore() {

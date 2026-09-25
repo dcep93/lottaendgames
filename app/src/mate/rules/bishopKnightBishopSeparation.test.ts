@@ -62,6 +62,29 @@ test('r4 clears a nearby edge bishop before the knight crowds its exit, across D
  }
 });
 
+test('r4 lets the king clear a diagonally adjacent bishop exit, across D4',()=>{
+ for(const t of SQUARE_TRANSFORMS){
+  const fen=transformFen('BN1k4/1K6/8/8/8/8/8/8 w - - 2 2',t);
+  const clear=getChess(fen).move({from:transformSquare('b7',t),to:transformSquare('a7',t)}).san;
+  const back=getChess(fen).move({from:transformSquare('b8',t),to:transformSquare('c6',t)}).san;
+  assert.equal(scoreKnightAndBishopWhiteMove(fen,clear).bishopSeparationPenalty,0,t.name);
+  assert.equal(scoreKnightAndBishopWhiteMove(fen,back).bishopSeparationPenalty,1,t.name);
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[clear],t.name);
+  assert.ok(knightAndBishopWhiteRules.find(r=>r.id==='r4')!.compare!(scoreKnightAndBishopWhiteMove(fen,clear),scoreKnightAndBishopWhiteMove(fen,back))<0,t.name);
+  // Among clearing king moves, r6 retains protection of Nb8.
+  assert.equal(explainMove(bishopKnightRuleSet.scoreWhiteCandidates!(fen,getChess(fen).moves()),knightAndBishopWhiteRules,clear)?.id,'r6',t.name);
+ }
+});
+
+test('r4 does not credit an ordinary king move when the king is not blocking a bishop exit, across D4',()=>{
+ for(const t of SQUARE_TRANSFORMS){
+  const fen=transformFen('8/8/8/8/8/1K6/1N6/2B3k1 w - - 0 1',t);
+  // b3 is not diagonal-adjacent to c1, so leaving it clears no bishop exit.
+  const move=getChess(fen).move({from:transformSquare('b3',t),to:transformSquare('a3',t)}).san;
+  assert.equal(scoreKnightAndBishopWhiteMove(fen,move).bishopSeparationPenalty,1,t.name);
+ }
+});
+
 test('r4 uses the starting king and bishop arrangement, across D4',()=>{
  for(const t of SQUARE_TRANSFORMS){
   for(const fen of [
