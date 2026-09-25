@@ -1,0 +1,135 @@
+{
+  "request": "Remove r19 \u2014 Prefer the king off the bishop's color.",
+  "implementation": "Removed r19 from production priorities and help registration; retained r7's existing color tiebreaker.",
+  "method": {
+    "kind": "Reuse the complete graph after proving the rule removal behaviorally neutral",
+    "equivalenceProof": {
+      "source": "/Users/danielcepeda/repos/_codex_output/bn-r7-step-2026-09-24",
+      "previousPolicyFingerprint": "ba58d4c094d73cc82e770833525043168b709e3eac2ca0b87c10c823c0eafd1d",
+      "policyFingerprint": "b93e689d2caadb7a885daa4c09da5bb29c36472ec01e3cde7f654a3fc5023b69",
+      "onlyProductionChange": "Remove r19 registration",
+      "proof": "r7 is unconditional and ranks kingCenterProximityScore followed by kingBishopColorPenalty. All moves surviving r7 tie on both. Subsequent rules only remove candidates, so surviving moves still tie on kingBishopColorPenalty at r19. Removing r19 cannot change preferred White moves or any graph edge.",
+      "graphEdgesChanged": 0
+    }
+  },
+  "unsupportedPositionsOnLoops": {
+    "orbits": 3287,
+    "physical": 26296
+  },
+  "original1389Comparison": {
+    "previous": 1389,
+    "survivors": 807,
+    "removed": 582,
+    "introduced": 2480,
+    "current": 3287
+  },
+  "previousReportComparison": {
+    "previous": 3287,
+    "survivors": 3287,
+    "removed": 0,
+    "introduced": 0,
+    "current": 3287
+  },
+  "largestPiecePositionMotifs": [
+    {
+      "motif": "Noncentral bishop not king-protected; interior king; knight unprotected by king",
+      "orbits": 557,
+      "physical": 4456
+    },
+    {
+      "motif": "Noncentral bishop not king-protected; interior king; knight on edge, unprotected by king",
+      "orbits": 409,
+      "physical": 3272
+    },
+    {
+      "motif": "Noncentral bishop not king-protected; edge king; knight unprotected by king",
+      "orbits": 264,
+      "physical": 2112
+    },
+    {
+      "motif": "Noncentral bishop not king-protected; central king; knight unprotected by king",
+      "orbits": 239,
+      "physical": 1912
+    },
+    {
+      "motif": "King-protected central bishop; knight unprotected by king, off precage",
+      "orbits": 213,
+      "physical": 1704
+    }
+  ],
+  "exampleSelection": "Largest White-piece bounding rectangles within the largest motif; exclude Bd5/Nc4 across D4 throughout each loop.",
+  "examples": [
+    {
+      "fen": "B7/6K1/4k3/8/8/8/6N1/8 w - - 0 1",
+      "moves": [
+        "Bb7",
+        "Ke7",
+        "Ba8",
+        "Ke6"
+      ],
+      "d": 210,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=B7/6K1/4k3/8/8/8/6N1/8_w_-_-_0_1&moves=Bb7,Ke7,Ba8,Ke6&cursor=0",
+      "motif": "Noncentral bishop not king-protected; interior king; knight unprotected by king",
+      "rectangle": [
+        7,
+        7
+      ],
+      "area": 49
+    },
+    {
+      "fen": "8/1N4K1/4k3/8/8/8/8/7B w - - 0 1",
+      "moves": [
+        "Bg2",
+        "Kf5",
+        "Bh1",
+        "Ke6"
+      ],
+      "d": 220,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/1N4K1/4k3/8/8/8/8/7B_w_-_-_0_1&moves=Bg2,Kf5,Bh1,Ke6&cursor=0",
+      "motif": "Noncentral bishop not king-protected; interior king; knight unprotected by king",
+      "rectangle": [
+        7,
+        7
+      ],
+      "area": 49
+    },
+    {
+      "fen": "B7/6K1/4k3/8/8/5N2/8/8 w - - 0 1",
+      "moves": [
+        "Bb7",
+        "Ke7",
+        "Ba8",
+        "Ke6"
+      ],
+      "d": 204,
+      "phases": [
+        99,
+        99
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=B7/6K1/4k3/8/8/5N2/8/8_w_-_-_0_1&moves=Bb7,Ke7,Ba8,Ke6&cursor=0",
+      "motif": "Noncentral bishop not king-protected; interior king; knight unprotected by king",
+      "rectangle": [
+        7,
+        6
+      ],
+      "area": 42
+    }
+  ],
+  "supportLosses": 0,
+  "supportedPositionsOnLoops": 0,
+  "supportNote": "No support declarations exist.",
+  "validation": {
+    "bishopKnightTests": 94,
+    "productionBuild": "passed",
+    "productionSourceDiff": "Only the r19 registration was removed. Prior worker bundle fingerprint matches the previous complete graph audit.",
+    "examples": "Reverified three laps, preferred White moves, legal Black replies, exact closure, unsupported status, D4 distinctness and replay decoding."
+  }
+}

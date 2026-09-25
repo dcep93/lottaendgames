@@ -518,12 +518,6 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       },
     },
     {
-      id: "r19",
-      shortLabel: "rule r19",
-      helpText: "Prefer the king off the bishop's color.",
-      compare: (first, second) => first.kingBishopColorPenalty - second.kingBishopColorPenalty,
-    },
-    {
       id: "r20",
       shortLabel: "rule r20",
       helpText: "Maximize piece distance from Black's king.",

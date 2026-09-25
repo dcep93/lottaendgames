@@ -182,11 +182,6 @@ test("bishop-and-knight rules are registered", () => {
       helpText: "Prefer a precage knight, else drift the knight towards White king protection.",
     },
     {
-      id: "r19",
-      shortLabel: "rule r19",
-      helpText: "Prefer the king off the bishop's color.",
-    },
-    {
       id: "r20",
       shortLabel: "rule r20",
       helpText: "Maximize piece distance from Black's king.",
@@ -224,7 +219,6 @@ test("bishop-and-knight rules are registered", () => {
       "r9.1",
       "r9.98",
       "r10",
-      "r19",
       "r20",
     ],
   );
@@ -232,7 +226,7 @@ test("bishop-and-knight rules are registered", () => {
     ruleSet.whiteRuleDescriptions.map(({ id }) => id),
     knightAndBishopWhiteRules.map(({ id }) => id),
   );
-  assert.equal(knightAndBishopWhiteRules.length, 20);
+  assert.equal(knightAndBishopWhiteRules.length, 19);
 });
 
 test("immediate mate keeps precedence without the mating-net rule", () => {

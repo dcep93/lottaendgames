@@ -20,7 +20,7 @@ test('r7 ranks central king steps then opposite color; r20 scores minor distance
     assert.ok(r99.compare(far, sameColorCentral) < 0, transform.name);
     assert.equal(sameColorCentral.kingBishopColorPenalty, 1);
     assert.equal(offColorNear.kingBishopColorPenalty, 0);
-    assert.ok(knightAndBishopWhiteRules.find(r => r.id === 'r19')!.compare!(offColorNear, sameColorCentral) < 0);
+    assert.ok(!knightAndBishopWhiteRules.some(r => r.id === 'r19'));
     assert.ok(r20.compare(far, near) < 0, transform.name);
     assert.equal(r20.compare(offColorFar, sameColorCentral), 0, transform.name);
     assert.equal(far.minorBlackDistanceScore, -Math.sqrt(29) - Math.sqrt(41));
