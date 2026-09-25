@@ -219,3 +219,21 @@ test('r6 allows Nc1 edge opposition because Ne2 reaches king protection across D
   }
  }
 });
+
+test('r6 prefers Nd4 around the blocking king with the protected continuation Ne6 across D4', () => {
+ for (const t of SQUARE_TRANSFORMS) {
+  const fen = transformFen('6B1/K7/8/8/1k6/1N6/8/8 w - - 2 2',t);
+  const board = getChess(fen);
+  const move = board.move({from:transformSquare('b3',t),to:transformSquare('d4',t)}).san;
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[move],t.name);
+  assert.equal(scoreKnightAndBishopWhiteMove(fen,move).knightDriftObstructionPenalty,0,t.name);
+  assert.equal(explainMove(bishopKnightRuleSet.scoreWhiteCandidates!(fen,getChess(fen).moves()),knightAndBishopWhiteRules,move)?.id,'r6',t.name);
+  for (const reply of board.moves()) {
+   board.move(reply);
+   board.move({from:transformSquare('d4',t),to:transformSquare('e6',t)});
+   assert.equal(board.isAttacked(transformSquare('e6',t),'w'),true,t.name);
+   assert.ok(!board.moves({verbose:true}).some(m=>m.captured==='n'),t.name);
+   board.undo(); board.undo();
+  }
+ }
+});

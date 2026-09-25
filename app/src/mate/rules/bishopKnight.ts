@@ -509,7 +509,6 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
         const a = first.knightDriftScore, b = second.knightDriftScore;
         const obstruction = a[0] - b[0];
         if (obstruction) return obstruction;
-        if (first.knightDriftBlocked && second.knightDriftBlocked) return 0;
         return a[1] - b[1] || a[2] - b[2];
       },
     },
