@@ -519,15 +519,16 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       compare: (first, second) => {
         const kingProtection = first.kingKnightAdjacencyPenalty - second.kingKnightAdjacencyPenalty;
         if (kingProtection) return kingProtection;
-        if (first.kingKnightAdjacencyPenalty === 0) return 0;
+        const center = first.knightMiddle16ProximityScore - second.knightMiddle16ProximityScore;
+        if (first.kingKnightAdjacencyPenalty === 0) return center;
         const protection = first.knightStableBishopProtectionPenalty - second.knightStableBishopProtectionPenalty;
         if (protection) return protection;
-        if (first.knightStableBishopProtectionPenalty === 0) return 0;
+        if (first.knightStableBishopProtectionPenalty === 0) return center;
         const a = first.knightDriftScore, b = second.knightDriftScore;
         const obstruction = a[0] - b[0];
         if (obstruction) return obstruction;
         return a[1] - b[1] || a[2] - b[2]
-          || first.knightMiddle16ProximityScore - second.knightMiddle16ProximityScore;
+          || center;
       },
     },
     {

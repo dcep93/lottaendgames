@@ -49,3 +49,19 @@ test('r6 ties king-protected knights regardless of additional bishop protection 
   assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen).sort(),centralBishops.sort(),t.name);
  }
 });
+
+
+test('r6 centralizes an already king-protected knight with Ne3 in the reported position across D4',()=>{
+ for(const t of SQUARE_TRANSFORMS){
+  const fen=transformFen('B7/8/8/8/8/8/k2K4/3N4 w - - 0 1',t);
+  const knight=getChess(fen).move({from:transformSquare('d1',t),to:transformSquare('e3',t)}).san;
+  const bishop=getChess(fen).move({from:transformSquare('a8',t),to:transformSquare('h1',t)}).san;
+  const inward=scoreKnightAndBishopWhiteMove(fen,knight), unchanged=scoreKnightAndBishopWhiteMove(fen,bishop);
+  assert.equal(inward.kingKnightAdjacencyPenalty,0,t.name);
+  assert.equal(unchanged.kingKnightAdjacencyPenalty,0,t.name);
+  assert.equal(inward.knightMiddle16ProximityScore,0,t.name);
+  assert.ok(unchanged.knightMiddle16ProximityScore>0,t.name);
+  assert.ok(r6.compare!(inward,unchanged)<0,t.name);
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[knight],t.name);
+ }
+});

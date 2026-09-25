@@ -95,7 +95,7 @@ test('the old behind-White score remains removed', () => {
 })
 
 
-test('r6 leaves king-protected candidates tied so r7 can approach across D4', () => {
+test('r6 centralizes king-protected knights before r7 king approach across D4', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     const fen = transformFen('1NK5/8/2B5/8/8/k7/8/8 w - - 0 1', transform)
     const moves = (['d7', 'd8'] as const).map(to => getChess(fen).move({from: transformSquare('c8', transform), to: transformSquare(to, transform)}).san)
@@ -104,8 +104,8 @@ test('r6 leaves king-protected candidates tied so r7 can approach across D4', ()
     const ideal = getIdealKnightAndBishopWhiteMoves(fen)
     const approach=getChess(fen).move({from:transformSquare('c8',transform),to:transformSquare('c7',transform)}).san
     const knight=getChess(fen).move({from:transformSquare('b8',transform),to:transformSquare('d7',transform)}).san
-    assert.equal(knightAndBishopWhiteRules.find(r=>r.id==='r6')!.compare!(scoreKnightAndBishopWhiteMove(fen,approach),scoreKnightAndBishopWhiteMove(fen,knight)),0)
-    assert.deepEqual(ideal,[approach],transform.name)
+    assert.ok(knightAndBishopWhiteRules.find(r=>r.id==='r6')!.compare!(scoreKnightAndBishopWhiteMove(fen,knight),scoreKnightAndBishopWhiteMove(fen,approach))<0)
+    assert.deepEqual(ideal,[knight],transform.name)
   }
 })
 

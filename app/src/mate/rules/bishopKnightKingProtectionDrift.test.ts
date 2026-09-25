@@ -270,7 +270,8 @@ test('r6 equally values Nc3 and Ne3 inside the central 16 across D4', () => {
   assert.equal(scoreKnightAndBishopWhiteMove(fen,defense).knightStableBishopProtectionPenalty,0);
   const longDiagonal=getChess(fen).move({from:transformSquare('a8',t),to:transformSquare('h1',t)}).san;
   assert.equal(r6.compare!(scoreKnightAndBishopWhiteMove(fen,defense),scoreKnightAndBishopWhiteMove(fen,longDiagonal)),0,t.name);
-  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[longDiagonal],t.name);
+  assert.ok(r6.compare!(center,scoreKnightAndBishopWhiteMove(fen,longDiagonal))<0,t.name);
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[san('e3')],t.name);
  }
 });
 
@@ -298,6 +299,6 @@ test('r6 rejects Nb7 when Bf7 blocks its onward route, but allows it with f7 fre
   const protectedMove=getChess(fen).move({from:transformSquare('a5',t),to:transformSquare('c4',t)}).san;
   assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[blocked ? protectedMove : knightMove],t.name);
   assert.equal(scoreKnightAndBishopWhiteMove(fen,knightMove).knightDriftObstructionPenalty,blocked ? 2 : 0,t.name);
-  if(blocked) assert.equal(explainMove(bishopKnightRuleSet.scoreWhiteCandidates!(fen,getChess(fen).moves()),knightAndBishopWhiteRules,protectedMove)?.id,'r7',t.name);
+  if(blocked) assert.equal(explainMove(bishopKnightRuleSet.scoreWhiteCandidates!(fen,getChess(fen).moves()),knightAndBishopWhiteRules,protectedMove)?.id,'r6',t.name);
  }
 });
