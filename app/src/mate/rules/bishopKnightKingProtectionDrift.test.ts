@@ -202,14 +202,16 @@ test('r6 does not credit Nf1 retreat; r7 chooses Kh5 and Ng4 is protected after 
  }
 });
 
-test('r6 allows Nc1 edge opposition because Ne2 reaches king protection across D4', () => {
+test('Nc1 remains a viable route but stable Bg8 protection defers to Ke2 under r7 across D4', () => {
  for (const t of SQUARE_TRANSFORMS) {
   const fen = transformFen('6B1/8/8/8/8/1Nk5/8/5K2 w - - 2 2',t);
   const board = getChess(fen);
   const move = board.move({from:transformSquare('b3',t),to:transformSquare('c1',t)}).san;
-  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[move],t.name);
+  const kingMove = getChess(fen).move({from:transformSquare('f1',t),to:transformSquare('e2',t)}).san;
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[kingMove],t.name);
+  assert.equal(knightAndBishopWhiteRules.find(r=>r.id==='r6')!.applies!(scoreKnightAndBishopWhiteMove(fen,move)),false,t.name);
   assert.equal(scoreKnightAndBishopWhiteMove(fen,move).knightDriftObstructionPenalty,0,t.name);
-  assert.equal(explainMove(bishopKnightRuleSet.scoreWhiteCandidates!(fen,getChess(fen).moves()),knightAndBishopWhiteRules,move)?.id,'r6',t.name);
+  assert.equal(explainMove(bishopKnightRuleSet.scoreWhiteCandidates!(fen,getChess(fen).moves()),knightAndBishopWhiteRules,kingMove)?.id,'r7',t.name);
   for (const reply of board.moves()) {
    board.move(reply);
    board.move({from:transformSquare('c1',t),to:transformSquare('e2',t)});
@@ -220,14 +222,16 @@ test('r6 allows Nc1 edge opposition because Ne2 reaches king protection across D
  }
 });
 
-test('r6 prefers Nd4 around the blocking king with the protected continuation Ne6 across D4', () => {
+test('Nd4 remains a viable route but stable Bg8 protection defers to Kb6 under r7 across D4', () => {
  for (const t of SQUARE_TRANSFORMS) {
   const fen = transformFen('6B1/K7/8/8/1k6/1N6/8/8 w - - 2 2',t);
   const board = getChess(fen);
   const move = board.move({from:transformSquare('b3',t),to:transformSquare('d4',t)}).san;
-  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[move],t.name);
+  const kingMove = getChess(fen).move({from:transformSquare('a7',t),to:transformSquare('b6',t)}).san;
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[kingMove],t.name);
+  assert.equal(knightAndBishopWhiteRules.find(r=>r.id==='r6')!.applies!(scoreKnightAndBishopWhiteMove(fen,move)),false,t.name);
   assert.equal(scoreKnightAndBishopWhiteMove(fen,move).knightDriftObstructionPenalty,0,t.name);
-  assert.equal(explainMove(bishopKnightRuleSet.scoreWhiteCandidates!(fen,getChess(fen).moves()),knightAndBishopWhiteRules,move)?.id,'r6',t.name);
+  assert.equal(explainMove(bishopKnightRuleSet.scoreWhiteCandidates!(fen,getChess(fen).moves()),knightAndBishopWhiteRules,kingMove)?.id,'r7',t.name);
   for (const reply of board.moves()) {
    board.move(reply);
    board.move({from:transformSquare('d4',t),to:transformSquare('e6',t)});
@@ -266,5 +270,21 @@ test('r6 routes via Nc4 when the edge bishop occupies the Nb7 rescue square acro
   board.move({from:transformSquare('b6',t),to:transformSquare('c6',t)});
   assert.ok(!board.moves({verbose:true}).some(m=>m.piece==='k' && m.to===transformSquare('c8',t)),t.name);
   assert.equal(explainMove(bishopKnightRuleSet.scoreWhiteCandidates!(fen,getChess(fen).moves()),knightAndBishopWhiteRules,san('c4'))?.id,'r6',t.name);
+ }
+});
+
+
+test('r6 skips drift and centralization only with stable bishop protection at the start across D4', () => {
+ const r6=knightAndBishopWhiteRules.find(r=>r.id==='r6')!;
+ const cases=[
+  {fen:'8/8/4B3/8/8/1N1k2K1/8/8 w - - 0 1', active:false},
+  {fen:'8/8/2B5/1N6/8/8/5k2/7K w - - 0 1', active:false},
+  {fen:'2B4K/1N6/8/8/8/8/5k2/8 w - - 0 1', active:true},
+  {fen:'2BK4/8/1k6/N7/8/8/8/8 w - - 0 1', active:true},
+ ] as const;
+ for(const c of cases) for(const t of SQUARE_TRANSFORMS) {
+  const fen=transformFen(c.fen,t);
+  for(const move of getChess(fen).moves())
+   assert.equal(r6.applies!(scoreKnightAndBishopWhiteMove(fen,move)),c.active,`${t.name} ${move}`);
  }
 });

@@ -109,7 +109,7 @@ test("bishop-and-knight rules are registered", () => {
     {
       id: "r6",
       shortLabel: "rule r6",
-      helpText: "Drift the knight towards king protection, then prefer central 16 proximity.",
+      helpText: "Unless the knight is protected by a stable bishop, drift the knight towards king protection, then prefer knight central 16 proximity.",
     },
     {
       id: "r7",

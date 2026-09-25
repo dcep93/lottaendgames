@@ -52,6 +52,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly minorCenterDistanceScore: number;
   readonly knightKingProtectionDistance: number;
   readonly knightKingProximityScore: number;
+  readonly startsWithStableBishopProtectedKnight: boolean;
   readonly knightDriftBlocked: boolean;
   readonly knightDriftObstructionPenalty: number;
   readonly knightDriftScore: readonly [number, number, number];
@@ -162,6 +163,7 @@ function distanceToNearestUnprotectedKnightOrBishop(fen: string): number {
 }
 
 type KnightAndBishopPositionScoreContext = {
+  readonly startsWithStableBishopProtectedKnight: boolean;
   readonly knightDriftBlocked: boolean;
   readonly knightDriftBaseline: readonly [number, number, number];
   readonly sixPointNineMove: string | undefined;
@@ -198,6 +200,7 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
   const bishopCentrallyDefended = !!bishop && centralKing && kingDistance(whiteKing.square, bishop.square) === 1;
   const knightCentrallyDefended = !!knight && centralKing && kingDistance(whiteKing.square, knight.square) === 1;
   return {
+    startsWithStableBishopProtectedKnight: !!knight && stableBishopProtectedSquares(fen).includes(knight.square),
     get knightDriftBaseline() {
       return driftBaseline ??= !knight || !blackKing || !whiteKing || !bishop ? [0, 99, 99] : [
         blackBlocksKnightDrift(knight.square, blackKing.square, whiteKing.square) ? 2
@@ -289,6 +292,7 @@ function scoreKnightAndBishopWhiteMoveCore(
     bishopCenterPenalty: bishop && centerDistance(bishop.square) === 0 ? 0 : 1,
     kingKnightAdjacencyPenalty: knightKingDefended ? 0 : 1,
     kingKnightDistanceScore: whiteKing && knight ? kingDistance(whiteKing.square, knight.square) : 99,
+    startsWithStableBishopProtectedKnight: context.startsWithStableBishopProtectedKnight,
     knightDriftBlocked: context.knightDriftBlocked,
     get knightDriftScore(): readonly [number, number, number] {
       const baseline = context.knightDriftBaseline;
@@ -507,7 +511,8 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     {
       id: "r6",
       shortLabel: "rule r6",
-      helpText: "Drift the knight towards king protection, then prefer central 16 proximity.",
+      helpText: "Unless the knight is protected by a stable bishop, drift the knight towards king protection, then prefer knight central 16 proximity.",
+      applies: score => !score.startsWithStableBishopProtectedKnight,
       compare: (first, second) => {
         const a = first.knightDriftScore, b = second.knightDriftScore;
         const obstruction = a[0] - b[0];
