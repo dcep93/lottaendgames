@@ -147,11 +147,6 @@ test("bishop-and-knight rules are registered", () => {
       helpText: "Do not allow Black to attack both undefended pieces next move.",
     },
     {
-      id: "r6.9",
-      shortLabel: "rule r6.9",
-      helpText: "Prefer king opposition with the bishop between the kings.",
-    },
-    {
       id: "r7",
       shortLabel: "rule r7",
       helpText: "Prefer king step-then-Euclidean proximity to a central square, then prefer king on the color opposite the bishop.",
@@ -165,6 +160,11 @@ test("bishop-and-knight rules are registered", () => {
       id: "r8",
       shortLabel: "rule r8",
       helpText: "With a king on a middle-16 square, prefer bishop on the long diagonal, then a central bishop, then knight move proximity to a precage square, then knight off the bishop's color.",
+    },
+    {
+      id: "r8.5",
+      shortLabel: "rule r8.5",
+      helpText: "Prefer king opposition with the bishop between the kings.",
     },
     {
       id: "r9.1",
@@ -212,10 +212,10 @@ test("bishop-and-knight rules are registered", () => {
       "r6",
       "r6.5",
       "r6.8",
-      "r6.9",
       "r7",
       "r7.8",
       "r8",
+      "r8.5",
       "r9.1",
       "r9.98",
       "r10",

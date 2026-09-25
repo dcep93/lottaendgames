@@ -468,12 +468,6 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       compare: (first, second) => first.undefendedMinorForkPenalty - second.undefendedMinorForkPenalty,
     },
     {
-      id: "r6.9",
-      shortLabel: "rule r6.9",
-      helpText: "Prefer king opposition with the bishop between the kings.",
-      compare: (first, second) => first.bishopOppositionPenalty - second.bishopOppositionPenalty,
-    },
-    {
       id: "r7",
       shortLabel: "rule r7",
       helpText: "Prefer king step-then-Euclidean proximity to a central square, then prefer king on the color opposite the bishop.",
@@ -499,6 +493,12 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
         { compare: (first, second) => first.knightTargetProximityScore - second.knightTargetProximityScore },
         { compare: (first, second) => first.knightBishopColorPenalty - second.knightBishopColorPenalty },
       ],
+    },
+    {
+      id: "r8.5",
+      shortLabel: "rule r8.5",
+      helpText: "Prefer king opposition with the bishop between the kings.",
+      compare: (first, second) => first.bishopOppositionPenalty - second.bishopOppositionPenalty,
     },
     {
       id: "r9.1",
