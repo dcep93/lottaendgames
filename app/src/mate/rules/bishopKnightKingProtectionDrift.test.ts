@@ -46,3 +46,20 @@ test('r7 centralizes an already king-protected knight without requiring closer k
     assert.equal(selection.lastEliminatingRule?.id, 'r7', t.name);
   }
 });
+
+
+test('r7 permits double opposition behind a diagonal blocker, across D4', () => {
+  for (const t of SQUARE_TRANSFORMS) {
+    const fen = transformFen('2BK4/8/8/8/2k5/1N6/8/8 w - - 2 2', t);
+    const move = getChess(fen).move({from: transformSquare('b3', t), to: transformSquare('c1', t)}).san;
+    const score = scoreKnightAndBishopWhiteMove(fen, move);
+    assert.equal(score.knightDriftQualifies, true, t.name);
+    const candidates = getChess(fen).moves().map(san => ({san, score: scoreKnightAndBishopWhiteMove(fen, san)}));
+    assert.deepEqual(selectCandidatesByRules(candidates, knightAndBishopWhiteRules).idealCandidates.map(c => c.san), [move], t.name);
+    for (const quiet of ['2B5/8/8/8/2k5/1N6/8/K7 w - - 2 2', '2BK4/8/8/8/3k4/1N6/8/8 w - - 2 2']) {
+      const position = transformFen(quiet, t);
+      const retreat = getChess(position).move({from: transformSquare('b3', t), to: transformSquare('c1', t)}).san;
+      assert.equal(scoreKnightAndBishopWhiteMove(position, retreat).knightDriftQualifies, false, t.name);
+    }
+  }
+});

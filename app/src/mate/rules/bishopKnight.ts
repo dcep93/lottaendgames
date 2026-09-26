@@ -359,8 +359,16 @@ function scoreKnightAndBishopWhiteMoveCore(
     kingApproachDistanceScore: whiteKing && startingKnight ? kingDistance(whiteKing.square, startingKnight.square) : 99,
     get knightDriftQualifies() {
       if (knightKingDefended) return true;
-      if (move.piece !== "n" || !whiteKing || !knight || !bishop
-        || kingDistance(knight.square, whiteKing.square) >= kingDistance(move.from, whiteKing.square)) return false;
+      if (move.piece !== "n" || !whiteKing || !knight || !bishop || !blackKing) return false;
+      const n = squareCoordinates(move.from), b = squareCoordinates(blackKing.square);
+      const w = squareCoordinates(whiteKing.square), target = squareCoordinates(knight.square);
+      const dx = b.file - n.file, dy = b.rank - n.rank;
+      // With Black diagonally between knight and king, retreat into double opposition.
+      if (Math.abs(dx) === 1 && Math.abs(dy) === 1
+        && dx * (w.file - b.file) >= 0 && dy * (w.rank - b.rank) >= 0
+        && ((target.file === b.file && target.rank === n.rank - 2 * dy)
+          || (target.rank === b.rank && target.file === n.file - 2 * dx))) return true;
+      if (kingDistance(knight.square, whiteKing.square) >= kingDistance(move.from, whiteKing.square)) return false;
       const squares = allSquares();
       return blackReplies.every(reply => {
         const black = reply.to;
