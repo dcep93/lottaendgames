@@ -4,6 +4,8 @@ import { stableBishopProtectionDistance, stableBishopProtectedSquares } from "./
 import { knightAndBishopThreeKingPlacementPenalty, knightAndBishopFiveBishopPenalty, knightAndBishopFiveKingTargetDistance, knightAndBishopShouldCheckThreeDiagonal, evaluateKnightAndBishopSupportedDiagonal } from "./bishopKnightDiagonalSupport";
 import type { Square } from "chess.js";
 import {
+  SQUARE_TRANSFORMS,
+  transformSquare,
   allSquares,
   edgeDistance,
   isKnightMove,
@@ -56,6 +58,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly bishopCentralProximityScore: number;
   readonly bishopTooCloseToBlackPenalty: number;
   readonly cornerBishopUnclutterScore: number;
+  readonly declaredBishopUnclutterPenalty: number;
   readonly bishopCrowdsEdgePairPenalty: number;
   readonly bishopKingCentralNavigationScore: number;
   readonly bishopShuffleControlPenalty: number;
@@ -182,6 +185,7 @@ type KnightAndBishopPositionScoreContext = {
   readonly bishopShuffleTargets: readonly Square[];
   readonly startsWithUnprotectedBishop: boolean;
   readonly clutteredCornerKing: Square | undefined;
+  readonly declaredBishopUnclutterMove: string | undefined;
   readonly startsWithUnprotectedKnight: boolean;
   readonly sixPointNineMove: string | undefined;
   readonly fivePointFiveMove: string | undefined;
@@ -203,6 +207,13 @@ type KnightAndBishopPositionScoreContext = {
   readonly shouldCheckThreeDiagonal: boolean;
 };
 
+// User-declared position; D4 symmetries only, with no translations.
+const bishopUnclutterDeclarations = SQUARE_TRANSFORMS.map(t => ({
+  king: transformSquare("b7", t), bishop: transformSquare("a8", t),
+  knight: transformSquare("c7", t), black: transformSquare("c5", t),
+  target: transformSquare("b8", t),
+}));
+
 function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
   let shouldCheckThreeDiagonal: boolean | undefined;
   const whiteKing = findPiece(fen, "w", "k");
@@ -217,6 +228,11 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
     knightOppositeCentralTargets: (["d4", "e4", "d5", "e5"] as const).filter(target =>
       bishop && target !== whiteKing?.square && squareColor(target) !== squareColor(bishop.square)),
     bishopShuffleTargets: knightAndBishopShuffleTargets(fen),
+    declaredBishopUnclutterMove: (() => {
+      const pattern = bishopUnclutterDeclarations.find(p => p.king === whiteKing?.square
+        && p.bishop === bishop?.square && p.knight === knight?.square && p.black === blackKing?.square);
+      return pattern ? pattern.king + pattern.target : undefined;
+    })(),
     // The bishop occupies one exit from a corner; Black blocks the other.
     clutteredCornerKing: whiteKing && bishop && blackKing
       && ["a1", "a8", "h1", "h8"].includes(whiteKing.square)
@@ -321,6 +337,8 @@ function scoreKnightAndBishopWhiteMoveCore(
         + Math.min(...kingTargets.map(square => squaredEuclideanDistance(whiteKing.square, square)));
     },
     // Only immediate proximity counts; do not preempt a possible future approach.
+    declaredBishopUnclutterPenalty: context.declaredBishopUnclutterMove
+      && move.from + move.to !== context.declaredBishopUnclutterMove ? 1 : 0,
     cornerBishopUnclutterScore: context.clutteredCornerKing && bishop
       ? -squaredEuclideanDistance(bishop.square, context.clutteredCornerKing) : 0,
     bishopCrowdsEdgePairPenalty: bishop && whiteKing && knight
@@ -567,7 +585,8 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       id: "r4.5",
       shortLabel: "rule r4.5",
       helpText: "Ensure a distant bishop.",
-      compare: (first, second) => first.cornerBishopUnclutterScore - second.cornerBishopUnclutterScore
+      compare: (first, second) => first.declaredBishopUnclutterPenalty - second.declaredBishopUnclutterPenalty
+        || first.cornerBishopUnclutterScore - second.cornerBishopUnclutterScore
         || first.bishopTooCloseToBlackPenalty - second.bishopTooCloseToBlackPenalty
         || first.bishopCrowdsEdgePairPenalty - second.bishopCrowdsEdgePairPenalty,
     },

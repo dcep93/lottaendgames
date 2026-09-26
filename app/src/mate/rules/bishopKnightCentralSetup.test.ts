@@ -214,3 +214,18 @@ test('r4.5 avoids crowding an adjacent edge king and knight with Bb7, across D4'
     }
   }
 });
+
+
+test('r4.5 clears b7 with the declared Kb8, only in the named position and D4 symmetries', () => {
+  for (const t of SQUARE_TRANSFORMS) {
+    const fen = transformFen('B7/1KN5/8/2k5/8/8/8/8 w - - 2 2', t);
+    const move = getChess(fen).move({from: transformSquare('b7', t), to: transformSquare('b8', t)}).san;
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [move], t.name);
+    for (const quiet of ['B7/1KN5/8/4k3/8/8/8/8 w - - 2 2', 'B7/1K6/N7/1k6/8/8/8/8 w - - 0 1']) {
+      const position = transformFen(quiet, t);
+      for (const san of getChess(position).moves()) {
+        assert.equal(scoreKnightAndBishopWhiteMove(position, san).declaredBishopUnclutterPenalty, 0, t.name);
+      }
+    }
+  }
+});
