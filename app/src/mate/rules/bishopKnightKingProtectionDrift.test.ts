@@ -160,7 +160,25 @@ test('invalid drift loses to an ordinary king move before later rules, across D4
     assert.equal(scoreKnightAndBishopWhiteMove(fen, invalid).knightDriftRank, 2, t.name);
     assert.equal(scoreKnightAndBishopWhiteMove(fen, ordinary).knightDriftRank, 1, t.name);
     const selection = selectCandidatesByRules(candidates, knightAndBishopWhiteRules);
-    assert.deepEqual(selection.idealCandidates.map(c => c.san), [ordinary], t.name);
+    assert.ok(!selection.idealCandidates.some(c => c.san === invalid), t.name);
+    const pair = candidates.filter(c => c.san === invalid || c.san === ordinary);
+    assert.deepEqual(selectCandidatesByRules(pair, knightAndBishopWhiteRules.filter(r => r.id === 'r6'))
+      .idealCandidates.map(c => c.san), [ordinary], t.name);
     assert.equal(selection.eliminatedBy.get(candidates.find(c => c.san === invalid)!)?.id, 'r6', t.name);
+  }
+});
+
+test('approaching an intervening Black king is allowed when three or more steps remain, across D4', () => {
+  for (const t of SQUARE_TRANSFORMS) for (const start of [
+    '2B5/8/8/2K1k3/8/8/8/7N w - - 0 1', // Nf2 leaves three steps to Black.
+    'B7/8/2K1k3/8/8/8/8/7N w - - 0 1', // Nf2 leaves four steps to Black.
+  ]) {
+    const fen = transformFen(start, t);
+    const move = getChess(fen).move({from: transformSquare('h1', t), to: transformSquare('f2', t)}).san;
+    const score = scoreKnightAndBishopWhiteMove(fen, move);
+    assert.equal(score.knightDriftQualifies, true, t.name);
+    assert.equal(score.knightDriftRank, 0, t.name);
+    const candidates = getChess(fen).moves().map(san => ({san, score: scoreKnightAndBishopWhiteMove(fen, san)}));
+    assert.deepEqual(selectCandidatesByRules(candidates, knightAndBishopWhiteRules).idealCandidates.map(c => c.san), [move], t.name);
   }
 });

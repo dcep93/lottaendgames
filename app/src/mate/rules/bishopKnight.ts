@@ -346,8 +346,8 @@ function scoreKnightAndBishopWhiteMoveCore(
       const w = squareCoordinates(whiteKing.square);
       const blackBetween = b.file >= Math.min(n.file, w.file) && b.file <= Math.max(n.file, w.file)
         && b.rank >= Math.min(n.rank, w.rank) && b.rank <= Math.max(n.rank, w.rank);
-      if (blackBetween && kingDistance(knight.square, blackKing.square)
-        < kingDistance(move.from, blackKing.square)) return false;
+      if (blackBetween && kingDistance(knight.square, blackKing.square) < 3
+        && kingDistance(knight.square, blackKing.square) < kingDistance(move.from, blackKing.square)) return false;
       if (this.knightDoubleOpposition) return true;
       // If both opposition destinations are unavailable, take the other flank,
       // away from the obstructing bishop and closer to White's king.
