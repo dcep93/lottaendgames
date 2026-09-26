@@ -150,3 +150,17 @@ test('r6 reaches king protection before taking a double-opposition detour, acros
     assert.equal(selection.eliminatedBy.get(candidates.find(c => c.san === move('g3'))!)?.id, 'r6', t.name);
   }
 });
+
+test('invalid drift loses to an ordinary king move before later rules, across D4', () => {
+  for (const t of SQUARE_TRANSFORMS) {
+    const fen = transformFen('K7/2k5/8/8/8/2N5/8/7B w - - 0 1', t);
+    const invalid = getChess(fen).move({from: transformSquare('c3', t), to: transformSquare('d5', t)}).san;
+    const ordinary = getChess(fen).move({from: transformSquare('a8', t), to: transformSquare('a7', t)}).san;
+    const candidates = getChess(fen).moves().map(san => ({san, score: scoreKnightAndBishopWhiteMove(fen, san)}));
+    assert.equal(scoreKnightAndBishopWhiteMove(fen, invalid).knightDriftRank, 2, t.name);
+    assert.equal(scoreKnightAndBishopWhiteMove(fen, ordinary).knightDriftRank, 1, t.name);
+    const selection = selectCandidatesByRules(candidates, knightAndBishopWhiteRules);
+    assert.deepEqual(selection.idealCandidates.map(c => c.san), [ordinary], t.name);
+    assert.equal(selection.eliminatedBy.get(candidates.find(c => c.san === invalid)!)?.id, 'r6', t.name);
+  }
+});

@@ -69,6 +69,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly kingKnightAdjacencyPenalty: number;
   readonly kingKnightDistanceScore: number;
   readonly knightDriftQualifies: boolean;
+  readonly knightDriftRank: number;
   readonly knightDoubleOpposition: boolean;
   readonly kingBlackDistanceSquared: number;
   readonly kingCoordinationPenalty: number;
@@ -335,6 +336,9 @@ function scoreKnightAndBishopWhiteMoveCore(
     kingKnightAdjacencyPenalty: knightKingDefended ? 0 : 1,
     kingKnightDistanceScore: whiteKing && knight ? kingDistance(whiteKing.square, knight.square) : 99,
     knightDoubleOpposition: !!knight && !!doubleOppositionTargets?.includes(knight.square),
+    get knightDriftRank() {
+      return this.knightDriftQualifies ? 0 : move.piece === "n" ? 2 : 1;
+    },
     get knightDriftQualifies() {
       if (knightKingDefended) return true;
       if (move.piece !== "n" || !whiteKing || !knight || !bishop || !blackKing) return false;
@@ -598,7 +602,7 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       id: "r6",
       shortLabel: "rule r6",
       helpText: "Drift the knight towards king protection, then prefer knight central 16 proximity.",
-      compare: (first, second) => Number(second.knightDriftQualifies) - Number(first.knightDriftQualifies)
+      compare: (first, second) => first.knightDriftRank - second.knightDriftRank
         || (first.knightDriftQualifies && second.knightDriftQualifies
           ? first.kingKnightAdjacencyPenalty - second.kingKnightAdjacencyPenalty
             || Number(second.knightDoubleOpposition) - Number(first.knightDoubleOpposition)
