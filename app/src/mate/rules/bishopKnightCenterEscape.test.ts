@@ -6,7 +6,8 @@ import { getIdealKnightAndBishopWhiteMoves, knightAndBishopWhiteRules, scoreKnig
 test('r6 breaks equal knight proximity by central proximity only; r20 scores minor distances from Black', () => {
   const r99 = knightAndBishopWhiteRules.find(rule => rule.id === 'r6')!;
   const r20 = knightAndBishopWhiteRules.find(rule => rule.id === 'r20')!;
-  assert.ok(r99.compare); assert.ok(r20.compare);
+  const compare = r99.subpriorities![0]!.compare!;
+  assert.ok(compare); assert.ok(r20.compare);
   for (const transform of SQUARE_TRANSFORMS) {
     const fen = transformFen('B7/8/5k2/8/3K4/8/8/1N6 w - - 0 1', transform);
     const score = (from: 'a8' | 'd4', to: 'h1' | 'f3' | 'c3' | 'e3' | 'd5') => {
@@ -15,9 +16,9 @@ test('r6 breaks equal knight proximity by central proximity only; r20 scores min
     };
     const far = score('a8', 'h1'), near = score('a8', 'f3');
     const offColorFar = score('d4', 'c3'), offColorNear = score('d4', 'e3'), sameColorCentral = score('d4', 'd5');
-    assert.ok(r99.compare(offColorFar, sameColorCentral) > 0, transform.name);
-    assert.ok(r99.compare(offColorNear, offColorFar) < 0, transform.name);
-    assert.equal(r99.compare(far, sameColorCentral), 0, transform.name);
+    assert.ok(compare(offColorFar, sameColorCentral) > 0, transform.name);
+    assert.ok(compare(offColorNear, offColorFar) < 0, transform.name);
+    assert.equal(compare(far, sameColorCentral), 0, transform.name);
     assert.equal(sameColorCentral.kingBishopColorPenalty, 1);
     assert.equal(offColorNear.kingBishopColorPenalty, 0);
     assert.ok(!knightAndBishopWhiteRules.some(r => r.id === 'r19'));
@@ -44,7 +45,7 @@ test('r20 breaks equal Black-distance ties by minor Euclidean proximity to the c
 
 
 test('r6 ranks knight proximity before Euclidean central-square proximity across D4', () => {
-  const compare = knightAndBishopWhiteRules.find(rule => rule.id === 'r6')!.compare!;
+  const compare = knightAndBishopWhiteRules.find(rule => rule.id === 'r6')!.subpriorities![0]!.compare!;
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen('8/7k/8/3BK3/2N5/8/8/8 w - - 6 4', t);
     const score = (to: 'd4' | 'e4' | 'f4' | 'f6') => scoreKnightAndBishopWhiteMove(fen,
@@ -74,10 +75,10 @@ test('r6 leaves equal knight and central distances tied across D4', () => {
     assert.equal(f4.kingCenterProximityScore, 1);
     assert.equal(f5.kingCenterProximityScore, 1);
     assert.equal(f6.kingCenterProximityScore, 1);
-    assert.equal(rule.compare!(f4, f5), 0);
-    assert.ok(rule.compare!(f4, f6) < 0);
+    assert.equal(rule.subpriorities![0]!.compare!(f4, f5), 0);
+    assert.ok(rule.subpriorities![0]!.compare!(f4, f6) < 0);
     // Euclidean central proximity still breaks the equal central-step distance.
-    assert.ok(rule.compare!(f5, f6) < 0);
+    assert.ok(rule.subpriorities![0]!.compare!(f5, f6) < 0);
   }
 });
 
@@ -161,7 +162,7 @@ test('r6 ignores Black proximity after knight and central proximity tie, across 
   assert.equal(near.kingKnightDistanceScore,stay.kingKnightDistanceScore,t.name);
   assert.equal(near.kingCenterEuclideanScore,stay.kingCenterEuclideanScore,t.name);
   assert.ok(near.kingBlackDistanceSquared<stay.kingBlackDistanceSquared,t.name);
-  assert.equal(rule.compare!(near,stay),0,t.name);
+  assert.equal(rule.subpriorities![0]!.compare!(near,stay),0,t.name);
  }
 });
 
@@ -187,9 +188,9 @@ test('r6 lets Nc5 beat king retreats using resulting proximity, across D4', () =
     assert.equal(k.kingKnightDistanceScore, 1, t.name);
     assert.ok(n.kingCenterEuclideanScore < k.kingCenterEuclideanScore, t.name);
     const r6 = knightAndBishopWhiteRules.find(rule => rule.id === 'r6')!;
-    assert.ok(r6.compare!(n, k) < 0, t.name);
+    assert.ok(r6.subpriorities![0]!.compare!(n, k) < 0, t.name);
     const otherKnight = getChess(fen).move({from: transformSquare('a4', t), to: transformSquare('c3', t)}).san;
-    assert.equal(r6.compare!(n, scoreKnightAndBishopWhiteMove(fen, otherKnight)), 0, t.name);
+    assert.equal(r6.subpriorities![0]!.compare!(n, scoreKnightAndBishopWhiteMove(fen, otherKnight)), 0, t.name);
     // r20 subsequently prefers Nc3, farther from Black's king.
     assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [otherKnight], t.name);
   }

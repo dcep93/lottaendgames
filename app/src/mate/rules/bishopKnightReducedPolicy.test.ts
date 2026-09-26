@@ -104,7 +104,7 @@ test('r6 centralizes king-protected knights before r7 king approach across D4', 
     const ideal = getIdealKnightAndBishopWhiteMoves(fen)
     const approach=getChess(fen).move({from:transformSquare('c8',transform),to:transformSquare('c7',transform)}).san
     const knight=getChess(fen).move({from:transformSquare('b8',transform),to:transformSquare('d7',transform)}).san
-    assert.ok(knightAndBishopWhiteRules.find(r=>r.id==='r6')!.compare!(scoreKnightAndBishopWhiteMove(fen,knight),scoreKnightAndBishopWhiteMove(fen,approach))<0)
+    assert.ok(knightAndBishopWhiteRules.find(r=>r.id==='r6')!.subpriorities![0]!.compare!(scoreKnightAndBishopWhiteMove(fen,knight),scoreKnightAndBishopWhiteMove(fen,approach))<0)
     assert.deepEqual(ideal,[knight],transform.name)
   }
 })

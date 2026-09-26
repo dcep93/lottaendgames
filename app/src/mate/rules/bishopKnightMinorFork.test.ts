@@ -14,7 +14,7 @@ test('r6 establishes king protection without a clutter or double-attack preferen
     const retreat = getChess(fen).move({from: transformSquare('c6', t), to: transformSquare('h1', t)}).san
     assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [knightMove])
     const knightScore=scoreKnightAndBishopWhiteMove(fen,knightMove), retreatScore=scoreKnightAndBishopWhiteMove(fen,retreat)
-    assert.ok(knightAndBishopWhiteRules.find(r=>r.id==='r6')!.compare!(knightScore,retreatScore)<0)
+    assert.ok(knightAndBishopWhiteRules.find(r=>r.id==='r6')!.subpriorities![0]!.compare!(knightScore,retreatScore)<0)
   }
 })
 

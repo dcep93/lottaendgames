@@ -592,8 +592,12 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       id: "r6",
       shortLabel: "rule r6",
       helpText: "Prefer king step proximity to the knight, then king central proximity.",
-      compare: (first, second) => first.kingKnightDistanceScore - second.kingKnightDistanceScore
-        || first.kingCenterEuclideanScore - second.kingCenterEuclideanScore,
+      subpriorities: [{
+        // Let r7 route around a diagonal Black king before demanding proximity.
+        when: scores => !scores.some(score => score.knightDoubleOpposition),
+        compare: (first, second) => first.kingKnightDistanceScore - second.kingKnightDistanceScore
+          || first.kingCenterEuclideanScore - second.kingCenterEuclideanScore,
+      }],
     },
     {
       id: "r7",

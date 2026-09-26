@@ -15,8 +15,8 @@ test('r6 drifts toward the king instead of preserving distant bishop defense acr
   assert.equal(alsoKeep.knightStableBishopProtectionPenalty,0,t.name);
   assert.equal(leave.knightStableBishopProtectionPenalty,1,t.name);
   assert.ok(leave.knightKingProtectionDistance<keep.knightKingProtectionDistance,t.name);
-  assert.ok(r6.compare!(leave,keep)<0,t.name);
-  assert.ok(r6.compare!(leave,alsoKeep)<0,t.name);
+  assert.ok(r6.subpriorities![0]!.compare!(leave,keep)<0,t.name);
+  assert.ok(r6.subpriorities![0]!.compare!(leave,alsoKeep)<0,t.name);
   assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[knight],t.name);
  }
 });
@@ -44,7 +44,7 @@ test('r6 ties king-protected knights regardless of additional bishop protection 
   assert.equal(kingOnly.kingKnightAdjacencyPenalty,0,t.name);
   assert.equal(both.knightStableBishopProtectionPenalty,0,t.name);
   assert.equal(kingOnly.knightStableBishopProtectionPenalty,1,t.name);
-  assert.equal(r6.compare!(both,kingOnly),0,t.name);
+  assert.equal(r6.subpriorities![0]!.compare!(both,kingOnly),0,t.name);
   // r4 now routes the knight toward the opposite-color central target.
   assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[san('e6')],t.name);
  }
@@ -61,7 +61,7 @@ test('r6 centralizes an already king-protected knight with Ne3 in the reported p
   assert.equal(unchanged.kingKnightAdjacencyPenalty,0,t.name);
   assert.equal(inward.knightMiddle16ProximityScore,0,t.name);
   assert.ok(unchanged.knightMiddle16ProximityScore>0,t.name);
-  assert.ok(r6.compare!(inward,unchanged)<0,t.name);
+  assert.ok(r6.subpriorities![0]!.compare!(inward,unchanged)<0,t.name);
   assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[knight],t.name);
  }
 });
@@ -75,7 +75,7 @@ test('r6 breaks the recorded bishop shuttle by drifting Nc3, across D4',()=>{
   const progress=scoreKnightAndBishopWhiteMove(fen,drift), protection=scoreKnightAndBishopWhiteMove(fen,defend);
   assert.equal(protection.knightStableBishopProtectionPenalty,0,t.name);
   assert.ok(progress.knightKingProtectionDistance<protection.knightKingProtectionDistance,t.name);
-  assert.ok(r6.compare!(progress,protection)<0,t.name);
+  assert.ok(r6.subpriorities![0]!.compare!(progress,protection)<0,t.name);
   assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[drift],t.name);
  }
 });
