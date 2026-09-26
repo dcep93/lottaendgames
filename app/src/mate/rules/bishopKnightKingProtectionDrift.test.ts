@@ -63,3 +63,25 @@ test('r7 permits double opposition behind a diagonal blocker, across D4', () => 
     }
   }
 });
+
+
+test('r7 detours via Na4 when c8 is occupied, then brings the knight closer with Nb2, across D4', () => {
+  for (const t of SQUARE_TRANSFORMS) {
+    for (const [start, from, to] of [
+      ['2B5/8/1N6/2k5/8/4K3/8/8 w - - 2 2', 'b6', 'a4'],
+      ['2B5/8/8/8/Nk6/4K3/8/8 w - - 4 3', 'a4', 'b2'],
+    ] as const) {
+      const fen = transformFen(start, t);
+      const move = getChess(fen).move({from: transformSquare(from, t), to: transformSquare(to, t)}).san;
+      const candidates = getChess(fen).moves().map(san => ({san, score: scoreKnightAndBishopWhiteMove(fen, san)}));
+      const selection = selectCandidatesByRules(candidates, knightAndBishopWhiteRules);
+      assert.deepEqual(selection.idealCandidates.map(c => c.san), [move], t.name);
+      assert.equal(selection.lastEliminatingRule?.id, 'r7', t.name);
+    }
+    const open = transformFen('8/8/1N6/2k5/8/4K3/8/6B1 w - - 2 2', t);
+    const opposition = getChess(open).move({from: transformSquare('b6', t), to: transformSquare('c8', t)}).san;
+    const detour = getChess(open).move({from: transformSquare('b6', t), to: transformSquare('a4', t)}).san;
+    assert.equal(scoreKnightAndBishopWhiteMove(open, opposition).knightDoubleOpposition, true, t.name);
+    assert.equal(scoreKnightAndBishopWhiteMove(open, detour).knightDriftQualifies, false, t.name);
+  }
+});

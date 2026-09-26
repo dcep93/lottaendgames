@@ -16,6 +16,7 @@ import {
   manhattanDistance,
   squareColor,
   squareCoordinates,
+  squareFromCoords,
   squaredEuclideanDistance,
 } from "../chess";
 import {
@@ -73,6 +74,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly kingKnightDistanceScore: number;
   readonly kingApproachDistanceScore: number;
   readonly knightDriftQualifies: boolean;
+  readonly knightDoubleOpposition: boolean;
   readonly kingBlackDistanceSquared: number;
   readonly kingCoordinationPenalty: number;
   readonly attackedBishopDefensePenalty: number;
@@ -302,6 +304,14 @@ function scoreKnightAndBishopWhiteMoveCore(
   const knight = findPiece(resultFen, "w", "n");
   const blackKing = findPiece(resultFen, "b", "k");
   const startingKnight = findPiece(fen, "w", "n");
+  const doubleOppositionTargets = (() => {
+    if (move.piece !== "n" || !whiteKing || !blackKing) return undefined;
+    const n = squareCoordinates(move.from), b = squareCoordinates(blackKing.square);
+    const w = squareCoordinates(whiteKing.square), dx = b.file - n.file, dy = b.rank - n.rank;
+    if (Math.abs(dx) !== 1 || Math.abs(dy) !== 1
+      || dx * (w.file - b.file) < 0 || dy * (w.rank - b.rank) < 0) return undefined;
+    return [squareFromCoords(b.file, n.rank - 2 * dy), squareFromCoords(n.file - 2 * dx, b.rank)];
+  })();
   const nearbyPairCentrallyDefended = !!whiteKing && centerDistance(whiteKing.square) === 0
     && ((!!bishop && kingDistance(bishop.square, whiteKing.square) === 1)
       || (!!knight && kingDistance(knight.square, whiteKing.square) === 1));
@@ -360,17 +370,18 @@ function scoreKnightAndBishopWhiteMoveCore(
     kingKnightAdjacencyPenalty: knightKingDefended ? 0 : 1,
     kingKnightDistanceScore: whiteKing && knight ? kingDistance(whiteKing.square, knight.square) : 99,
     kingApproachDistanceScore: whiteKing && startingKnight ? kingDistance(whiteKing.square, startingKnight.square) : 99,
+    knightDoubleOpposition: !!knight && !!doubleOppositionTargets?.includes(knight.square),
     get knightDriftQualifies() {
       if (knightKingDefended) return true;
       if (move.piece !== "n" || !whiteKing || !knight || !bishop || !blackKing) return false;
-      const n = squareCoordinates(move.from), b = squareCoordinates(blackKing.square);
-      const w = squareCoordinates(whiteKing.square), target = squareCoordinates(knight.square);
-      const dx = b.file - n.file, dy = b.rank - n.rank;
-      // With Black diagonally between knight and king, retreat into double opposition.
-      if (Math.abs(dx) === 1 && Math.abs(dy) === 1
-        && dx * (w.file - b.file) >= 0 && dy * (w.rank - b.rank) >= 0
-        && ((target.file === b.file && target.rank === n.rank - 2 * dy)
-          || (target.rank === b.rank && target.file === n.file - 2 * dx))) return true;
+      if (this.knightDoubleOpposition) return true;
+      // If both opposition destinations are unavailable, take the other flank,
+      // away from the obstructing bishop and closer to White's king.
+      if (doubleOppositionTargets?.every(square => !square
+        || [bishop.square, whiteKing.square, blackKing.square].includes(square))
+        && kingDistance(knight.square, bishop.square) > 1
+        && squaredEuclideanDistance(knight.square, whiteKing.square)
+          < squaredEuclideanDistance(move.from, whiteKing.square)) return true;
       if (kingDistance(knight.square, whiteKing.square) >= kingDistance(move.from, whiteKing.square)) return false;
       const squares = allSquares();
       return blackReplies.every(reply => {
@@ -627,7 +638,9 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       helpText: "Drift the knight towards king protection, then prefer knight central 16 proximity.",
       compare: (first, second) => Number(second.knightDriftQualifies) - Number(first.knightDriftQualifies)
         || (first.knightDriftQualifies && second.knightDriftQualifies
-          ? first.knightMiddle16ProximityScore - second.knightMiddle16ProximityScore : 0),
+          ? Number(second.knightDoubleOpposition) - Number(first.knightDoubleOpposition)
+            || first.knightKingProximityScore - second.knightKingProximityScore
+            || first.knightMiddle16ProximityScore - second.knightMiddle16ProximityScore : 0),
     },
     {
       id: "r8",
