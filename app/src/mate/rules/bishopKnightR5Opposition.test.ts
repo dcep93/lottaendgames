@@ -110,3 +110,14 @@ test('r5 waits with Bh5 then advances Kb2 when Na1 is behind Ka2, across D4',()=
   assert.ok(board.isAttacked(transformSquare('a1',t),'w'),t.name);
  }
 });
+
+test('r5 does not hop an inward knight when the king can slide behind it, across D4',()=>{
+ for(const t of SQUARE_TRANSFORMS){
+  const fen=transformFen('B7/1K1k4/2N5/8/8/8/8/8 w - - 0 1',t);
+  assert.equal(knightAndBishopR5OppositionMoves(fen),undefined,t.name);
+  const advance=getChess(fen).move({from:transformSquare('b7',t),to:transformSquare('b6',t)}).san;
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[advance],t.name);
+  // The original check remains necessary when both inward slides are blocked.
+  assert.deepEqual(knightAndBishopR5OppositionMoves(transformFen(start,t)),[transformSquare('b2',t)+transformSquare('d1',t)],t.name);
+ }
+});

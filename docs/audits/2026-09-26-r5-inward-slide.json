@@ -1,0 +1,37 @@
+{
+  "scope": "Saved-loop replay and five-second mixed fresh search; not global audit",
+  "change": "Skip r5 opposition knight check when knight is more central and king can safely slide inward beside it",
+  "preferred": "Kb6",
+  "priorDisplayedCycles": 2,
+  "survivingDisplayedCycles": 1,
+  "survivingDisplayedFourPlyCycles": 1,
+  "displayedD4PostWhitePositions": 2,
+  "old318CyclesSurvivingBeforeDisplayFilter": 53,
+  "oldFullAuditWitnessesSurviving": 0,
+  "fresh": {
+    "scope": "bounded fresh search, not global audit",
+    "milliseconds": 5004,
+    "attempted": 317,
+    "checkedRoots": 219,
+    "completedRoots": 218,
+    "cycles": 0,
+    "policy": "working r5 inward king slide",
+    "sampling": "mixed uniform physical placements, close knight/king placements, and shuffled old loop roots"
+  },
+  "examples": [
+    {
+      "group": 0,
+      "motif": "r7 \u2194 r7",
+      "fen": "8/8/8/1KN5/2Bk4/8/8/8 w - - 0 1",
+      "moves": [
+        "Kb4",
+        "Ke5",
+        "Kb5",
+        "Kd4"
+      ],
+      "area": 4,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/1KN5/2Bk4/8/8/8_w_-_-_0_1&moves=Kb4,Ke5,Kb5,Kd4&cursor=0"
+    }
+  ],
+  "validation": "34 focused tests including all D4 transforms and original blocked-slide check; production build passes"
+}

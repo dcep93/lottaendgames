@@ -11,7 +11,17 @@ export function knightAndBishopR5OppositionMoves(fen:string): readonly string[] 
   const bx=b.file-w.file,by=b.rank-w.rank;
   if((bx===0&&Math.abs(by)===2)||(by===0&&Math.abs(bx)===2)){
     const inward={file:w.file+Math.sign(bx),rank:w.rank+Math.sign(by)};
-    if(center(inward)<center(w)){
+    // An inward knight already gives the king a useful side to slide behind.
+    const canSlideBehindKnight=center(n)<center(w) && [
+      {file:n.file,rank:w.rank}, {file:w.file,rank:n.rank},
+    ].some(p=>{
+      const to=squareFromCoords(p.file,p.rank);
+      return to && !occupied.has(to) && center(p)<center(w)
+        && Math.max(Math.abs(p.file-w.file),Math.abs(p.rank-w.rank))===1
+        && Math.max(Math.abs(p.file-n.file),Math.abs(p.rank-n.rank))===1
+        && Math.max(Math.abs(p.file-b.file),Math.abs(p.rank-b.rank))>1;
+    });
+    if(center(inward)<center(w) && !canSlideBehindKnight){
       const checks:string[]=[];
       for(const [dx,dy] of [[1,2],[2,1],[2,-1],[1,-2],[-1,-2],[-2,-1],[-2,1],[-1,2]]){
         const x=n.file+dx!,y=n.rank+dy!,to=squareFromCoords(x,y);
