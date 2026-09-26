@@ -6,7 +6,7 @@ After Bf1 Ke6 in the supplied line, r4 is neutral for every candidate and Ke4 is
 
 ## Replay
 
-98 of the 15,917 saved D4 four-ply witnesses survive, down from 183. 85 previous witnesses broke; none reappeared. 64 survivors are hidden by the all-White-pieces-middle-16 display filter, leaving 34. The r4/r5 motif falls from 73 to 1.
+98 of the 15,917 saved D4 four-ply witnesses survive, down from 183. 86 previous witnesses broke; one older saved witness reappeared (a net reduction of 85). 64 survivors are hidden by the all-White-pieces-middle-16 display filter, leaving 34. The r4/r5 motif falls from 73 to 1.
 
 Largest visible motif: r4/r6, 19 cycles. Next: r6.5/r8, 8 cycles. Only two cycles of the largest motif satisfy the joint orientation requirements (bishop and Black nearer a8 than h1), so this report supplies two rather than inventing or relabeling ten. Each example was verified for preferred White moves, legal Black replies, four-ply closure, D4 uniqueness and terminal/degenerate exclusions every ply.
 
