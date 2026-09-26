@@ -6,38 +6,40 @@ import {compareScoresByRules} from './selection';
 
 const r4=knightAndBishopWhiteRules.find(rule=>rule.id==='r4')!;
 
-test('r4 requires both king and knight in the starting middle 16, across D4',()=>{
+test('r4 requires a starting central-four king and middle-16 knight, across D4',()=>{
  for(const t of SQUARE_TRANSFORMS)for(const [start,enabled] of [
-  ['B7/8/k7/8/5K2/5N2/8/8 w - - 0 1',true],
+  ['B7/8/k7/8/3K4/5N2/8/8 w - - 0 1',true],
+  ['B7/8/k7/8/5K2/5N2/8/8 w - - 0 1',false],
   ['B7/8/k7/8/6K1/5N2/8/8 w - - 0 1',false],
-  ['B7/8/k7/8/5K2/8/5N2/8 w - - 0 1',false],
+  ['B7/8/k7/8/3K4/8/5N2/8 w - - 0 1',false],
  ] as const){
   const fen=transformFen(start,t);
   for(const san of getChess(fen).moves())assert.equal(r4.applies!(scoreKnightAndBishopWhiteMove(fen,san)),enabled,`${t.name} ${san}`);
  }
 });
 
-test('r4 reaches an opposite-color central square, then chooses king protection, across D4',()=>{
+test('r4 reaches an opposite-color center before king protection, across D4',()=>{
  for(const t of SQUARE_TRANSFORMS){
-  const fen=transformFen('B7/8/k7/8/5K2/5N2/8/8 w - - 0 1',t);
-  const san=(to:'d4'|'e5'|'h2')=>getChess(fen).move({from:transformSquare('f3',t),to:transformSquare(to,t)}).san;
-  const exposed=scoreKnightAndBishopWhiteMove(fen,san('d4'));
-  const protectedCenter=scoreKnightAndBishopWhiteMove(fen,san('e5'));
-  const away=scoreKnightAndBishopWhiteMove(fen,san('h2'));
-  assert.equal(exposed.knightOppositeCentralDistance,0,t.name);
-  assert.equal(protectedCenter.knightOppositeCentralDistance,0,t.name);
+  const fen=transformFen('B7/8/k7/8/3K4/5N2/8/8 w - - 0 1',t);
+  const san=(from:'f3'|'d4',to:'e5'|'h2'|'e4'|'c4')=>getChess(fen).move({from:transformSquare(from,t),to:transformSquare(to,t)}).san;
+  const target=scoreKnightAndBishopWhiteMove(fen,san('f3','e5'));
+  const away=scoreKnightAndBishopWhiteMove(fen,san('f3','h2'));
+  const protectedKnight=scoreKnightAndBishopWhiteMove(fen,san('d4','e4'));
+  const exposed=scoreKnightAndBishopWhiteMove(fen,san('d4','c4'));
+  assert.equal(target.knightOppositeCentralDistance,0,t.name);
   assert.ok(away.knightOppositeCentralDistance>0,t.name);
+  assert.equal(protectedKnight.knightOppositeCentralDistance,exposed.knightOppositeCentralDistance,t.name);
+  assert.equal(protectedKnight.kingKnightAdjacencyPenalty,0,t.name);
   assert.equal(exposed.kingKnightAdjacencyPenalty,1,t.name);
-  assert.equal(protectedCenter.kingKnightAdjacencyPenalty,0,t.name);
-  assert.ok(compareScoresByRules(exposed,away,[r4])<0,t.name);
-  assert.ok(compareScoresByRules(protectedCenter,exposed,[r4])<0,t.name);
-  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[san('e5')],t.name);
+  assert.ok(compareScoresByRules(target,protectedKnight,[r4])<0,t.name);
+  assert.ok(compareScoresByRules(protectedKnight,exposed,[r4])<0,t.name);
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[san('f3','e5')],t.name);
  }
 });
 
 test('r4 requires both a long-diagonal bishop and knight protection for its last preference, across D4',()=>{
  for(const t of SQUARE_TRANSFORMS){
-  const fen=transformFen('B7/8/k7/4NK2/8/8/8/8 w - - 0 1',t);
+  const fen=transformFen('B7/8/k7/4N3/3K4/8/8/8 w - - 0 1',t);
   const san=(to:'c6'|'b7'|'d5'|'f3')=>getChess(fen).move({from:transformSquare('a8',t),to:transformSquare(to,t)}).san;
   const defended=scoreKnightAndBishopWhiteMove(fen,san('c6'));
   const longOnly=scoreKnightAndBishopWhiteMove(fen,san('b7'));
@@ -52,10 +54,17 @@ test('r4 requires both a long-diagonal bishop and knight protection for its last
  }
 });
 
-test('new r4 breaks the supplied bishop waiting shuttle across D4',()=>{
+test('r4 stays inactive throughout the reported Kc6 boundary shuffle, across D4',()=>{
  for(const t of SQUARE_TRANSFORMS){
-  const fen=transformFen('8/8/4k3/8/4NK2/8/8/7B w - - 0 1',t);
-  const move=getChess(fen).move({from:transformSquare('e4',t),to:transformSquare('g3',t)}).san;
-  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[move],t.name);
+  const fen=transformFen('B7/8/2K5/1N6/8/8/k7/8 w - - 0 1',t);
+  const ch=getChess(fen);
+  ch.move({from:transformSquare('b5',t),to:transformSquare('d6',t)});
+  ch.move({from:transformSquare('a2',t),to:transformSquare('b1',t)});
+  for(const position of [fen,ch.fen()])for(const move of getChess(position).moves()){
+   assert.equal(r4.applies!(scoreKnightAndBishopWhiteMove(position,move)),false,`${t.name} ${move}`);
+  }
+  const retreat=ch.move({from:transformSquare('d6',t),to:transformSquare('b5',t)}).san;
+  ch.undo();
+  assert.ok(!getIdealKnightAndBishopWhiteMoves(ch.fen()).includes(retreat),t.name);
  }
 });

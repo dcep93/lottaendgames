@@ -123,7 +123,7 @@ test('r20 does not count an edge bishop protecting an adjacent knight as stable,
  }
 });
 
-test('r20 keeps pre-move defense scoring while r4 takes priority, across D4',()=>{
+test('r20 keeps pre-move defense scoring with r4 inactive for Kd3, across D4',()=>{
  const r20=knightAndBishopWhiteRules.find(r=>r.id==='r20')!;
  for(const t of SQUARE_TRANSFORMS){
   const fen=transformFen('4B3/8/8/2k5/8/2NK4/8/8 w - - 0 1',t);
@@ -135,8 +135,8 @@ test('r20 keeps pre-move defense scoring while r4 takes priority, across D4',()=
   assert.equal(far.minorBlackDistanceScore,-5,t.name);
   assert.equal(newlyDefended.minorBlackDistanceScore,-1,t.name);
   assert.ok(r20.compare!(far,newlyDefended)<0,t.name);
-  const centralRoute=getChess(fen).move({from:transformSquare('c3',t),to:transformSquare('e2',t)}).san;
-  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[centralRoute],t.name);
+  assert.equal(far.startsWithCentralKingAndMiddle16Knight,false,t.name);
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[san('h5')],t.name);
  }
 });
 

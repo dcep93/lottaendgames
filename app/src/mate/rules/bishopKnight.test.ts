@@ -109,7 +109,7 @@ test("bishop-and-knight rules are registered", () => {
     {
       id: "r4",
       shortLabel: "rule r4",
-      helpText: "With a central 16 king and knight, maneuver the knight to a central square opposite the bishop's color, then prefer king protection, then prefer the bishop on the long diagonal and protected by the knight.",
+      helpText: "With a central king and central 16 knight, maneuver the knight to a central square opposite the bishop's color, then prefer king protection, then prefer the bishop on the long diagonal and protected by the knight.",
     },
     {
       id: "r5",

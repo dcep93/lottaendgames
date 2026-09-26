@@ -1,0 +1,64 @@
+{
+  "scope": "Saved four-ply witness replay and bounded fresh discovery; not a full audit",
+  "rule": "r4 requires a central-four White king and middle-16 knight before White moves; ranking unchanged",
+  "oldSavedWitnesses": 15917,
+  "oldSavedSurvivors": 3,
+  "previousFreshWitnesses": 34,
+  "previousFreshSurvivors": 0,
+  "freshSearch": {
+    "milliseconds": 5003,
+    "checkedRoots": 421,
+    "additionalCycles": 0,
+    "uniformSample": false
+  },
+  "motifs": {
+    "r20/r20": 2,
+    "r20/r5": 1
+  },
+  "validation": {
+    "build": "pass",
+    "focusedTests": {
+      "pass": 32,
+      "fail": 0
+    },
+    "knownUnchangedFailure": "bishopKnightBishopProtection: stable protection and king adjacency break the recorded shuttles across D4"
+  },
+  "examples": [
+    {
+      "motif": "r20 / r20",
+      "fen": "8/8/8/3k4/B3N3/4K3/8/8 w - - 0 1",
+      "moves": [
+        "Bd1",
+        "Ke5",
+        "Ba4",
+        "Kd5"
+      ],
+      "bishopNearH1Fallback": false,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/3k4/B3N3/4K3/8/8_w_-_-_0_1&moves=Bd1,Ke5,Ba4,Kd5&cursor=0"
+    },
+    {
+      "motif": "r20 / r20",
+      "fen": "8/8/8/3k4/4N3/4K3/6B1/8 w - - 0 1",
+      "moves": [
+        "Bh1",
+        "Ke5",
+        "Bg2",
+        "Kd5"
+      ],
+      "bishopNearH1Fallback": true,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/3k4/4N3/4K3/6B1/8_w_-_-_0_1&moves=Bh1,Ke5,Bg2,Kd5&cursor=0"
+    },
+    {
+      "motif": "r20 / r5",
+      "fen": "8/8/4k3/8/4NK2/8/8/7B w - - 0 1",
+      "moves": [
+        "Bg2",
+        "Kd5",
+        "Bh1",
+        "Ke6"
+      ],
+      "bishopNearH1Fallback": true,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/4k3/8/4NK2/8/8/7B_w_-_-_0_1&moves=Bg2,Kd5,Bh1,Ke6&cursor=0"
+    }
+  ]
+}

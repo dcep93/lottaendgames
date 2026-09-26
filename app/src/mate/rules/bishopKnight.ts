@@ -47,7 +47,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly declaredStepPenalty: number;
   readonly relativeKnightPenalty: number;
   readonly startsWithMiddle16King: boolean;
-  readonly startsWithMiddle16KingAndKnight: boolean;
+  readonly startsWithCentralKingAndMiddle16Knight: boolean;
   readonly bishopCenterPenalty: number;
   readonly knightOppositeCentralDistance: number;
   readonly knightProtectedLongDiagonalBishopPenalty: number;
@@ -177,7 +177,7 @@ type KnightAndBishopPositionScoreContext = {
   readonly fivePointFiveMove: string | undefined;
   readonly relativeKnightMove: string | undefined;
   readonly startsWithMiddle16King: boolean;
-  readonly startsWithMiddle16KingAndKnight: boolean;
+  readonly startsWithCentralKingAndMiddle16Knight: boolean;
   readonly shouldCoordinateKing: boolean;
   readonly shouldEscapeBishop: boolean;
   readonly shouldEscapeNearbyPairBishop: boolean;
@@ -233,8 +233,7 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
     fivePointFiveMove: knightAndBishopFivePointFiveMove(fen),
     relativeKnightMove: knightAndBishopRelativeKnightMove(fen),
     startsWithMiddle16King: !!whiteKing && isMiddle16Square(whiteKing.square),
-    startsWithMiddle16KingAndKnight: !!whiteKing && !!knight
-      && isMiddle16Square(whiteKing.square) && isMiddle16Square(knight.square),
+    startsWithCentralKingAndMiddle16Knight: centralKing && !!knight && isMiddle16Square(knight.square),
     shouldEscapeNearbyPairBishop: !!bishop && !!knight && !!blackKing
       && kingDistance(bishop.square, knight.square) === 1
       && kingDistance(bishop.square, blackKing.square) <= 2
@@ -309,7 +308,7 @@ function scoreKnightAndBishopWhiteMoveCore(
     declaredStepPenalty: context.fivePointFiveMove && context.fivePointFiveMove !== move.from + move.to ? 1 : 0,
     relativeKnightPenalty: context.relativeKnightMove && context.relativeKnightMove !== move.from + move.to ? 1 : 0,
     startsWithMiddle16King: context.startsWithMiddle16King,
-    startsWithMiddle16KingAndKnight: context.startsWithMiddle16KingAndKnight,
+    startsWithCentralKingAndMiddle16Knight: context.startsWithCentralKingAndMiddle16Knight,
     get knightOppositeCentralDistance() {
       if (!knight || !bishop) return 99;
       const targets: readonly Square[] = ["d4", "e4", "d5", "e5"];
@@ -547,8 +546,8 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     {
       id: "r4",
       shortLabel: "rule r4",
-      helpText: "With a central 16 king and knight, maneuver the knight to a central square opposite the bishop's color, then prefer king protection, then prefer the bishop on the long diagonal and protected by the knight.",
-      applies: score => score.startsWithMiddle16KingAndKnight,
+      helpText: "With a central king and central 16 knight, maneuver the knight to a central square opposite the bishop's color, then prefer king protection, then prefer the bishop on the long diagonal and protected by the knight.",
+      applies: score => score.startsWithCentralKingAndMiddle16Knight,
       compare: (first, second) => first.knightOppositeCentralDistance - second.knightOppositeCentralDistance
         || first.kingKnightAdjacencyPenalty - second.kingKnightAdjacencyPenalty
         || first.knightProtectedLongDiagonalBishopPenalty - second.knightProtectedLongDiagonalBishopPenalty,
