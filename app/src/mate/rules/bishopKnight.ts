@@ -347,7 +347,7 @@ function scoreKnightAndBishopWhiteMoveCore(
     get knightDriftObstructionPenalty() {
       if (!knight || !blackKing || !whiteKing || !bishop) return 0;
       if (knightEdgeOpposition || blackBlocksKnightDrift(knight.square, blackKing.square, whiteKing.square)) return 2;
-      return knightDriftThreatPenalty(whiteKing.square, bishop.square, knight.square, blackKing.square, move.piece === "n");
+      return knightDriftThreatPenalty(whiteKing.square, bishop.square, knight.square, blackKing.square, move.piece === "n", move.piece === "n" ? move.from : undefined);
     },
     get knightKingProtectionDistance() {
       const distance = knightKingProtectionDistance(resultFen);

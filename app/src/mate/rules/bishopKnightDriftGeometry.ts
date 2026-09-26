@@ -18,21 +18,22 @@ function bishopControls(bishop: Square, target: Square, blockers: readonly Squar
 }
 
 /** Local geometry only: no chess move generation or response search. */
-export function knightDriftThreatPenalty(white: Square, bishop: Square, knight: Square, black: Square, knightMoved: boolean): number {
+export function knightDriftThreatPenalty(white: Square, bishop: Square, knight: Square, black: Square, knightMoved: boolean, departure?: Square): number {
   let penalty = 0;
   for (const threat of neighbours.get(black)!) {
     if (threat === knight || threat === bishop || kingDistance(threat, white) <= 1
       || isKnightMove(knight, threat) || bishopControls(bishop, threat, [white, knight])) continue;
     if (kingDistance(threat, knight) !== 1) continue;
+    // Returning to the departure square is not onward progress.
     // A chase cannot force retreat when the knight can jump into king protection.
-    if (knightMoved && jumps.get(knight)!.some(s => s !== white && s !== bishop && s !== threat
+    if (knightMoved && jumps.get(knight)!.some(s => s !== departure && s !== white && s !== bishop && s !== threat
       && kingDistance(s, white) === 1)) continue;
     // A protected forward stepping stone also lets the knight escape a chase.
-    if (knightMoved && jumps.get(knight)!.some(s => s !== white && s !== bishop && s !== threat
+    if (knightMoved && jumps.get(knight)!.some(s => s !== departure && s !== white && s !== bishop && s !== threat
       && squaredEuclideanDistance(s, white) < squaredEuclideanDistance(knight, white)
       && kingDistance(s, bishop) > 1 && bishopControls(bishop, s, [white, threat]))) continue;
     // A safe forward jump followed by a jump into king protection is also a route.
-    if (knightMoved && jumps.get(knight)!.some(s => s !== white && s !== bishop && s !== threat
+    if (knightMoved && jumps.get(knight)!.some(s => s !== departure && s !== white && s !== bishop && s !== threat
       && kingDistance(s, threat) > 1
       && squaredEuclideanDistance(s, white) < squaredEuclideanDistance(knight, white)
       && jumps.get(s)!.some(t => t !== bishop && t !== white && kingDistance(t, white) === 1))) continue;
@@ -47,7 +48,7 @@ export function knightDriftThreatPenalty(white: Square, bishop: Square, knight: 
     const protectionTargets = neighbours.get(white)!.filter(s => s !== bishop && s !== threat);
     const remaining = (from: Square) => Math.min(...protectionTargets.map(to => knightMoveDistance(from, to)));
     const distance = remaining(knight);
-    const safeForwardJump = jumps.get(knight)!.some(s => s !== white && s !== bishop && s !== threat
+    const safeForwardJump = jumps.get(knight)!.some(s => s !== departure && s !== white && s !== bishop && s !== threat
       && remaining(s) < distance
       && squaredEuclideanDistance(s, white) < squaredEuclideanDistance(knight, white)
       && (kingDistance(s, threat) > 1 || kingDistance(s, white) === 1 || bishopControls(bishop, s, [white, threat])));

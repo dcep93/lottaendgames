@@ -307,3 +307,17 @@ test('r6 rejects Nb7 when Bf7 blocks its onward route, but allows it with f7 fre
   }
  }
 });
+
+
+test('r6 goes around Black via Na5 rather than counting a return to Nb3 as progress, across D4',()=>{
+ const r6=knightAndBishopWhiteRules.find(rule=>rule.id==='r6')!;
+ for(const bishopFen of ['8/5B2/8/8/8/1Nk5/7K/8 w - - 2 2','8/8/4B3/8/8/1Nk5/7K/8 w - - 2 2'])for(const t of SQUARE_TRANSFORMS){
+  const fen=transformFen(bishopFen,t);
+  const san=(to:'a1'|'a5')=>getChess(fen).move({from:transformSquare('b3',t),to:transformSquare(to,t)}).san;
+  const retreat=scoreKnightAndBishopWhiteMove(fen,san('a1')),onward=scoreKnightAndBishopWhiteMove(fen,san('a5'));
+  assert.equal(retreat.knightDriftObstructionPenalty,2,t.name);
+  assert.equal(onward.knightDriftObstructionPenalty,0,t.name);
+  assert.ok(r6.compare!(onward,retreat)<0,t.name);
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[san('a5')],t.name);
+ }
+});
