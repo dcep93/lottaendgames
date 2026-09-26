@@ -213,6 +213,7 @@ type KnightAndBishopPositionScoreContext = {
 const bishopUnclutterDeclarations = SQUARE_TRANSFORMS.flatMap(t => [
   {king: "b7", bishop: "a8", knight: "c7", black: "c5", from: "b7", target: "b8"},
   {king: "b8", bishop: "a8", knight: "c7", black: undefined, from: "a8", target: "g2"},
+  {king: "f8", bishop: "e8", knight: "c5", black: undefined, from: "e8", target: "a4"},
 ].map(p => ({
   king: transformSquare(p.king as Square, t), bishop: transformSquare(p.bishop as Square, t),
   knight: transformSquare(p.knight as Square, t), black: p.black ? transformSquare(p.black as Square, t) : undefined,

@@ -244,3 +244,17 @@ test('r4.5 follows Kb8 with Bg2 based on the White formation, across D4', () => 
     assert.ok(compareScoresByRules(target, scoreKnightAndBishopWhiteMove(fen, back), [r45]) < 0, t.name);
   }
 });
+
+
+test('r4.5 unclutters Be8 with Ba4 beside Kf8 and Nc5, across D4', () => {
+  for (const t of SQUARE_TRANSFORMS) for (const start of [
+    '4BK2/8/5k2/2N5/8/8/8/8 w - - 0 1',
+    '4BK2/8/7k/2N5/8/8/8/8 w - - 0 1',
+  ]) {
+    const fen = transformFen(start, t);
+    const move = getChess(fen).move({from: transformSquare('e8', t), to: transformSquare('a4', t)}).san;
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [move], t.name);
+    const knightMove = getChess(fen).move({from: transformSquare('c5', t), to: transformSquare('a4', t)}).san;
+    assert.ok(compareScoresByRules(scoreKnightAndBishopWhiteMove(fen, move), scoreKnightAndBishopWhiteMove(fen, knightMove), [r45]) < 0, t.name);
+  }
+});
