@@ -1,0 +1,32 @@
+{
+  "scope": "saved four-ply replay plus five-second mixed discovery, not global audit",
+  "change": "r4 first prefers bishop at least two king steps from Black; distance beyond two receives no reward",
+  "regression": {
+    "fen": "Bk6/8/8/3N4/4K3/8/8/8 w - - 0 1",
+    "preferred": [
+      "Bc6"
+    ],
+    "afterKc8": [
+      "Nf4",
+      "Ne3"
+    ]
+  },
+  "lastSurvivingCycleCount": 1,
+  "lastSurvivingCyclesRemaining": 0,
+  "earlierRecentCyclesReplayed": 110,
+  "earlierRecentCyclesSurviving": 0,
+  "oldFullAuditWitnessesReplayed": 15917,
+  "oldFullAuditWitnessesSurviving": 0,
+  "fresh": {
+    "scope": "bounded fresh search, not global audit",
+    "milliseconds": 5005,
+    "attempted": 334,
+    "checkedRoots": 230,
+    "completedRoots": 229,
+    "cycles": 0,
+    "policy": "working r4 capped bishop distance",
+    "sampling": "mixed uniform physical placements, close knight/king placements, and shuffled old loop roots"
+  },
+  "tests": "31 focused tests including D4 geometry and capped-distance regression; build passed",
+  "examples": []
+}
