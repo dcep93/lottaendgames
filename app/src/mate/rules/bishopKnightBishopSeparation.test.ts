@@ -10,8 +10,8 @@ test('r4 does not move a bishop back into the king crowding zone, across D4',()=
  for(const t of SQUARE_TRANSFORMS){
   const fen=transformFen('3k4/1B6/2K5/8/8/8/8/7N w - - 2 2',t);
   const retreat=getChess(fen).move({from:transformSquare('b7',t),to:transformSquare('a8',t)}).san;
-  assert.equal(scoreKnightAndBishopWhiteMove(fen,retreat).bishopSeparationPenalty,1,t.name);
-  const clear=getChess(fen).move({from:transformSquare('b7',t),to:transformSquare('a6',t)}).san;
+  assert.equal(scoreKnightAndBishopWhiteMove(fen,retreat).bishopSeparationPenalty,0,t.name);
+  const clear=getChess(fen).move({from:transformSquare('h1',t),to:transformSquare('f2',t)}).san;
   assert.equal(scoreKnightAndBishopWhiteMove(fen,clear).bishopSeparationPenalty,0,t.name);
   assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[clear],t.name);
   // Moving closer from the original corner cannot earn an uncluttering bonus either.
@@ -149,5 +149,23 @@ test('r4 leaves Bf1 alone after the waiting move and allows Ke4, across D4',()=>
   }
   const advance=getChess(fen).move({from:transformSquare('e3',t),to:transformSquare('e4',t)}).san;
   assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[advance],t.name);
+ }
+});
+
+
+test('r4 ignores Black proximity when the distant knight can drift past the bishop, across D4',()=>{
+ for(const t of SQUARE_TRANSFORMS){
+  const fen=transformFen('8/8/3K4/1k1B4/8/8/N7/8 w - - 0 1',t);
+  const drift=getChess(fen).move({from:transformSquare('a2',t),to:transformSquare('c3',t)}).san;
+  const retreat=getChess(fen).move({from:transformSquare('d5',t),to:transformSquare('h1',t)}).san;
+  for(const san of getChess(fen).moves()){
+   const score=scoreKnightAndBishopWhiteMove(fen,san);
+   assert.equal(score.bishopSeparationPenalty,0,`${t.name} ${san}`);
+   assert.equal(score.bishopWhiteKingDistanceScore,0,`${t.name} ${san}`);
+  }
+  const progress=scoreKnightAndBishopWhiteMove(fen,drift);
+  assert.equal(progress.knightMiddle16ProximityScore,0,t.name);
+  assert.ok(progress.knightKingProximityScore<scoreKnightAndBishopWhiteMove(fen,retreat).knightKingProximityScore,t.name);
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[drift],t.name);
  }
 });

@@ -1,0 +1,133 @@
+{
+  "date": "2026-09-26",
+  "baselineFullAudit": "eecb6a9640b8cef4bd97e77d40cbe7f9061312eb",
+  "baselineFourPlyCycles": 15917,
+  "previousReplaySurvivors": 98,
+  "survivingSavedFourPlyCycles": 79,
+  "brokenPreviousWitnesses": 19,
+  "reappearedSavedWitnesses": 0,
+  "displayEligibleCycles": 15,
+  "scope": "Saved four-ply witnesses only, not a fresh global count or new-cycle search.",
+  "groups": [
+    {
+      "motif": "r8 \u2194 r8",
+      "cycles": 64,
+      "positions": 38
+    },
+    {
+      "motif": "r6.5 \u2194 r8",
+      "cycles": 8,
+      "positions": 12
+    },
+    {
+      "motif": "r4 \u2194 r8",
+      "cycles": 2,
+      "positions": 3
+    },
+    {
+      "motif": "r20 \u2194 r6.5",
+      "cycles": 2,
+      "positions": 3
+    },
+    {
+      "motif": "r20 \u2194 r20",
+      "cycles": 1,
+      "positions": 2
+    },
+    {
+      "motif": "r4 \u2194 r5",
+      "cycles": 1,
+      "positions": 2
+    },
+    {
+      "motif": "r20 \u2194 r5",
+      "cycles": 1,
+      "positions": 2
+    }
+  ],
+  "examples": [
+    {
+      "group": 0,
+      "motif": "r6.5 \u2194 r8",
+      "fen": "Bk6/8/8/2NK4/8/8/8/8 w - - 0 1",
+      "moves": [
+        "Bb7",
+        "Kc7",
+        "Ba8",
+        "Kb8"
+      ],
+      "area": 16,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=Bk6/8/8/2NK4/8/8/8/8_w_-_-_0_1&moves=Bb7,Kc7,Ba8,Kb8&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "r6.5 \u2194 r8",
+      "fen": "3k4/8/8/4K3/B3N3/8/8/8 w - - 0 1",
+      "moves": [
+        "Bc6",
+        "Kc7",
+        "Ba4",
+        "Kd8"
+      ],
+      "area": 10,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=3k4/8/8/4K3/B3N3/8/8/8_w_-_-_0_1&moves=Bc6,Kc7,Ba4,Kd8&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "r6.5 \u2194 r8",
+      "fen": "8/2k5/2B5/8/3KN3/8/8/8 w - - 0 1",
+      "moves": [
+        "Ba4",
+        "Kb8",
+        "Bc6",
+        "Kc7"
+      ],
+      "area": 9,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/2k5/2B5/8/3KN3/8/8/8_w_-_-_0_1&moves=Ba4,Kb8,Bc6,Kc7&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "r6.5 \u2194 r8",
+      "fen": "8/2k5/2B5/8/3NK3/8/8/8 w - - 0 1",
+      "moves": [
+        "Ba4",
+        "Kd6",
+        "Bc6",
+        "Kc7"
+      ],
+      "area": 9,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/2k5/2B5/8/3NK3/8/8/8_w_-_-_0_1&moves=Ba4,Kd6,Bc6,Kc7&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "r6.5 \u2194 r8",
+      "fen": "2k5/8/8/8/B2KN3/8/8/8 w - - 0 1",
+      "moves": [
+        "Bc6",
+        "Kc7",
+        "Ba4",
+        "Kc8"
+      ],
+      "area": 5,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=2k5/8/8/8/B2KN3/8/8/8_w_-_-_0_1&moves=Bc6,Kc7,Ba4,Kc8&cursor=0"
+    },
+    {
+      "group": 1,
+      "motif": "r4 \u2194 r8",
+      "fen": "B7/8/8/2k5/2N5/3K4/8/8 w - - 0 1",
+      "moves": [
+        "Be4",
+        "Kb5",
+        "Ba8",
+        "Kc5"
+      ],
+      "area": 24,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=B7/8/8/2k5/2N5/3K4/8/8_w_-_-_0_1&moves=Be4,Kb5,Ba8,Kc5&cursor=0"
+    }
+  ],
+  "validation": {
+    "focusedTestsPassed": 10,
+    "build": "passed",
+    "preexistingFailures": 4
+  }
+}
