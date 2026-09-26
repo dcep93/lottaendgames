@@ -1,0 +1,98 @@
+{
+  "cyclesFound": 318,
+  "fourPlyCyclesFound": 126,
+  "longerCyclesFound": 192,
+  "d4PostWhitePositions": 88,
+  "displayEligibleCycles": 14,
+  "displayEligibleD4PostWhitePositions": 23,
+  "displayEligibleSignatures": [
+    "10082659,10082652,7985500,7985507",
+    "7157927,7157926,7159014,7159015",
+    "7161614,7161621,7235349,7235342",
+    "7157901,7157902,7158990,7158991,7157903,7157894,7158982,7158989",
+    "7157902,7157901,7158989,7158990",
+    "7157910,7157909,7158997,7158998",
+    "7157918,7157919,7159007,7159015,7157927,7157926,7159014,7159006",
+    "7162078,7162069,7235797,7235806",
+    "7162070,7162069,7235797,7235798",
+    "7162062,7162069,7235797,7235790",
+    "7125205,7125214,7162078,7162069",
+    "7125205,7125206,7162070,7162069",
+    "7125205,7125198,7162062,7162069",
+    "13077154,13077153,13077537,13077538"
+  ],
+  "displayEligibleFourPlyCycles": 12,
+  "policy": "76905e6",
+  "search": {
+    "scope": "bounded fresh search, not global audit",
+    "milliseconds": 120001,
+    "attempted": 9515,
+    "checkedRoots": 6557,
+    "completedRoots": 6556,
+    "cycles": 10,
+    "policy": "76905e6",
+    "sampling": "mixed uniform physical placements, close knight/king placements, and shuffled old loop roots"
+  },
+  "walkSearch": {
+    "milliseconds": 60000,
+    "starts": 1350,
+    "steps": 33401,
+    "cycles": 309,
+    "scope": "random preferred White/legal Black walks; not exhaustive"
+  },
+  "examples": [
+    {
+      "group": 0,
+      "motif": "r4 \u2194 r4",
+      "fen": "8/3B1k2/8/8/3NK3/8/8/8 w - - 0 1",
+      "moves": [
+        "Bf5",
+        "Kf6",
+        "Bd7",
+        "Kf7"
+      ],
+      "area": 8,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/3B1k2/8/8/3NK3/8/8/8_w_-_-_0_1&moves=Bf5,Kf6,Bd7,Kf7&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "r4 \u2194 r4",
+      "fen": "8/3Bk3/8/8/3NK3/8/8/8 w - - 0 1",
+      "moves": [
+        "Bf5",
+        "Kf6",
+        "Bd7",
+        "Ke7"
+      ],
+      "area": 8,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/3Bk3/8/8/3NK3/8/8/8_w_-_-_0_1&moves=Bf5,Kf6,Bd7,Ke7&cursor=0"
+    },
+    {
+      "group": 1,
+      "motif": "r20 \u2194 r4",
+      "fen": "8/8/1k6/8/2BK4/4N3/8/8 w - - 0 1",
+      "moves": [
+        "Ng4",
+        "Kb7",
+        "Ne3",
+        "Kb6"
+      ],
+      "area": 6,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/1k6/8/2BK4/4N3/8/8_w_-_-_0_1&moves=Ng4,Kb7,Ne3,Kb6&cursor=0"
+    },
+    {
+      "group": 1,
+      "motif": "r20 \u2194 r4",
+      "fen": "8/8/2k5/8/2BK4/4N3/8/8 w - - 0 1",
+      "moves": [
+        "Ng4",
+        "Kc7",
+        "Ne3",
+        "Kc6"
+      ],
+      "area": 6,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/2k5/8/2BK4/4N3/8/8_w_-_-_0_1&moves=Ng4,Kc7,Ne3,Kc6&cursor=0"
+    }
+  ],
+  "scope": "Fresh bounded search. Preferred White moves and legal Black replies. Terminal and degenerate exclusions applied at every ply. D4 deduplicated. Display hides cycles whose every White frame has all White pieces in the middle 16. Not global counts."
+}
