@@ -350,8 +350,8 @@ function scoreKnightAndBishopWhiteMoveCore(
       if (move.piece !== "n" || !whiteKing || !knight || !bishop || !blackKing) return false;
       const n = squareCoordinates(move.from), b = squareCoordinates(blackKing.square);
       const w = squareCoordinates(whiteKing.square);
-      const blackBetween = b.file >= Math.min(n.file, w.file) && b.file <= Math.max(n.file, w.file)
-        && b.rank >= Math.min(n.rank, w.rank) && b.rank <= Math.max(n.rank, w.rank);
+      const blackBetween = b.file > Math.min(n.file, w.file) && b.file < Math.max(n.file, w.file)
+        && b.rank > Math.min(n.rank, w.rank) && b.rank < Math.max(n.rank, w.rank);
       if (blackBetween && kingDistance(knight.square, blackKing.square) < 3
         && kingDistance(knight.square, blackKing.square) < kingDistance(move.from, blackKing.square)) return false;
       if (this.knightDoubleOpposition) return true;
