@@ -124,7 +124,7 @@ test("bishop-and-knight rules are registered", () => {
     {
       id: "r5.5",
       shortLabel: "rule r5.5",
-      helpText: "Prefer an attacked knight not to be defended only by the bishop.",
+      helpText: "Prefer an attacked piece to be defended by the king.",
     },
     {
       id: "r6",

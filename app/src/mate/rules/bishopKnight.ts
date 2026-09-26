@@ -62,7 +62,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly minorBlackDistanceScore: number;
   readonly unprotectedMinorCount: number;
   readonly minorCenterDistanceScore: number;
-  readonly attackedKnightBishopOnlyPenalty: number;
+  readonly attackedMinorWithoutKingDefensePenalty: number;
   readonly knightKingProtectionDistance: number;
   readonly knightKingProximityScore: number;
   readonly knightStableBishopProtectionPenalty: number;
@@ -329,10 +329,9 @@ function scoreKnightAndBishopWhiteMoveCore(
       ? -squaredEuclideanDistance(bishop.square, whiteKing.square) : 0,
     bishopCentralProximityScore: bishop ? knightAndBishopCenterProximityScore(bishop.square) : 99,
     bishopCenterPenalty: bishop && centerDistance(bishop.square) === 0 ? 0 : 1,
-    attackedKnightBishopOnlyPenalty: knight && bishop && blackKing
-      && kingDistance(knight.square, blackKing.square) === 1
-      && !knightKingDefended
-      && bishopControlsOrOccupiesSquare(resultFen, bishop.square, knight.square) ? 1 : 0,
+    attackedMinorWithoutKingDefensePenalty: [bishop, knight].filter(piece => piece && blackKing
+      && kingDistance(piece.square, blackKing.square) === 1
+      && (!whiteKing || kingDistance(piece.square, whiteKing.square) !== 1)).length,
     kingKnightAdjacencyPenalty: knightKingDefended ? 0 : 1,
     kingKnightDistanceScore: whiteKing && knight ? kingDistance(whiteKing.square, knight.square) : 99,
     knightDoubleOpposition: !!knight && !!doubleOppositionTargets?.includes(knight.square),
@@ -586,8 +585,8 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     {
       id: "r5.5",
       shortLabel: "rule r5.5",
-      helpText: "Prefer an attacked knight not to be defended only by the bishop.",
-      compare: (first, second) => first.attackedKnightBishopOnlyPenalty - second.attackedKnightBishopOnlyPenalty,
+      helpText: "Prefer an attacked piece to be defended by the king.",
+      compare: (first, second) => first.attackedMinorWithoutKingDefensePenalty - second.attackedMinorWithoutKingDefensePenalty,
     },
     {
       id: "r6",
