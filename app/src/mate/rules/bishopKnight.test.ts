@@ -109,7 +109,12 @@ test("bishop-and-knight rules are registered", () => {
     {
       id: "r4",
       shortLabel: "rule r4",
-      helpText: "With a central king and central 16 knight, then ensure a distant bishop, then prefer king protection of the knight, maneuver the knight to a central square opposite the bishop's color, then navigate to a central bishop and the king to a central square opposite the bishop's color.",
+      helpText: "With a central king and central 16 knight, then prefer king protection of the knight, maneuver the knight to a central square opposite the bishop's color, then navigate to a central bishop and the king to a central square opposite the bishop's color.",
+    },
+    {
+      id: "r4.5",
+      shortLabel: "rule r4.5",
+      helpText: "Ensure a distant bishop.",
     },
     {
       id: "r5",
@@ -155,6 +160,7 @@ test("bishop-and-knight rules are registered", () => {
       "minors safe",
       "no stalemate",
       "r4",
+      "r4.5",
       "r5",
       "r6",
       "r7",
@@ -166,7 +172,7 @@ test("bishop-and-knight rules are registered", () => {
     ruleSet.whiteRuleDescriptions.map(({ id }) => id),
     knightAndBishopWhiteRules.map(({ id }) => id),
   );
-  assert.equal(knightAndBishopWhiteRules.length, 9);
+  assert.equal(knightAndBishopWhiteRules.length, 10);
   assert.deepEqual(ruleSet.help.noteBoards.map(board=>board.id), ["bishop-knight-rule-r5-hop", "bishop-knight-rule-r5-opposition"]);
 });
 

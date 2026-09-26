@@ -569,12 +569,17 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     {
       id: "r4",
       shortLabel: "rule r4",
-      helpText: "With a central king and central 16 knight, then ensure a distant bishop, then prefer king protection of the knight, maneuver the knight to a central square opposite the bishop's color, then navigate to a central bishop and the king to a central square opposite the bishop's color.",
+      helpText: "With a central king and central 16 knight, then prefer king protection of the knight, maneuver the knight to a central square opposite the bishop's color, then navigate to a central bishop and the king to a central square opposite the bishop's color.",
       applies: score => score.startsWithCentralKingAndMiddle16Knight,
-      compare: (first, second) => first.bishopTooCloseToBlackPenalty - second.bishopTooCloseToBlackPenalty
-        || first.kingKnightAdjacencyPenalty - second.kingKnightAdjacencyPenalty
+      compare: (first, second) => first.kingKnightAdjacencyPenalty - second.kingKnightAdjacencyPenalty
         || first.knightOppositeCentralDistance - second.knightOppositeCentralDistance
         || first.bishopKingCentralNavigationScore - second.bishopKingCentralNavigationScore,
+    },
+    {
+      id: "r4.5",
+      shortLabel: "rule r4.5",
+      helpText: "Ensure a distant bishop.",
+      compare: (first, second) => first.bishopTooCloseToBlackPenalty - second.bishopTooCloseToBlackPenalty,
     },
     {
       id: "r5",
