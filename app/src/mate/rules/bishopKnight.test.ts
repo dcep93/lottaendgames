@@ -127,6 +127,11 @@ test("bishop-and-knight rules are registered", () => {
       helpText: "Prefer king step proximity to the knight, then king central proximity, then prefer the king on the color opposite the bishop.",
     },
     {
+      id: "r8",
+      shortLabel: "rule r8",
+      helpText: "With the kings in opposition or a knight's move apart, and the black king more central than the white king, and the knight between the kings, use the bishop to control black's more central shuffling square.",
+    },
+    {
       id: "r20",
       shortLabel: "rule r20",
       helpText: "Maximize unprotected piece distance from Black's king, then prefer central proximity.",
@@ -153,6 +158,7 @@ test("bishop-and-knight rules are registered", () => {
       "r5",
       "r6",
       "r7",
+      "r8",
       "r20",
     ],
   );
@@ -160,7 +166,7 @@ test("bishop-and-knight rules are registered", () => {
     ruleSet.whiteRuleDescriptions.map(({ id }) => id),
     knightAndBishopWhiteRules.map(({ id }) => id),
   );
-  assert.equal(knightAndBishopWhiteRules.length, 8);
+  assert.equal(knightAndBishopWhiteRules.length, 9);
   assert.deepEqual(ruleSet.help.noteBoards.map(board=>board.id), ["bishop-knight-rule-r5-hop", "bishop-knight-rule-r5-opposition"]);
 });
 

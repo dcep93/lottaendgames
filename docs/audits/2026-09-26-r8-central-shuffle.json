@@ -1,0 +1,47 @@
+{
+  "scope": "Saved four-ply witness replay and five-second discovery, not a full audit",
+  "rule": "r8: bishop control of the central Black shuffle square behind an interposed knight",
+  "geometry": "Orthogonal opposition or knight-distance kings; knight immediately in front of White toward Black; Black strictly closer to board midpoint. Among current/adjacent Black squares preserving that geometry, target those nearest the midpoint. Frozen before White moves. Bishop control respects blockers.",
+  "validation": {
+    "preferredMove": "Bb3+",
+    "focusedTests": 18,
+    "build": "pass",
+    "D4": true
+  },
+  "savedWitnessesChecked": 15917,
+  "survivingFourPlyCycles": 2,
+  "previousReportCycles": 3,
+  "freshSearch": {
+    "milliseconds": 5003,
+    "checkedRoots": 413,
+    "signatures": []
+  },
+  "examples": [
+    {
+      "group": 0,
+      "motif": "r20 \u2194 r20",
+      "fen": "8/8/8/3k4/4N3/4K3/6B1/8 w - - 0 1",
+      "moves": [
+        "Bh1",
+        "Ke5",
+        "Bg2",
+        "Kd5"
+      ],
+      "area": 9,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/3k4/4N3/4K3/6B1/8_w_-_-_0_1&moves=Bh1,Ke5,Bg2,Kd5&cursor=0"
+    },
+    {
+      "group": 1,
+      "motif": "r20 \u2194 r5",
+      "fen": "8/8/4k3/8/4NK2/8/8/7B w - - 0 1",
+      "moves": [
+        "Bg2",
+        "Kd5",
+        "Bh1",
+        "Ke6"
+      ],
+      "area": 16,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/4k3/8/4NK2/8/8/7B_w_-_-_0_1&moves=Bg2,Kd5,Bh1,Ke6&cursor=0"
+    }
+  ]
+}

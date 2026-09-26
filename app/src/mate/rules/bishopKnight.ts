@@ -1,3 +1,4 @@
+import { knightAndBishopShuffleTargets } from "./bishopKnightShuffle";
 import { knightDriftThreatPenalty } from "./bishopKnightDriftGeometry";
 import { knightAndBishopPrecageSideTarget, type PrecageSideTarget } from "./bishopKnightPrecageSide";
 import { stableBishopProtectionDistance, stableBishopProtectedSquares } from "./bishopKnightStableProtection";
@@ -18,7 +19,7 @@ import {
   BLACK_CAPTURE_PRIORITY,
   BLACK_RETURN_PRIORITY,
 } from "./blackPriorities";
-import { bishopLongDiagonalIntersection, centerDistance, isMiddle16Square } from "./bishopKnightGeometry";
+import { bishopControlsOrOccupiesSquare, bishopLongDiagonalIntersection, centerDistance, isMiddle16Square } from "./bishopKnightGeometry";
 import {
   getKnightAndBishopLookupWhiteMoves,
   getKnightAndBishopPhaseLabel,
@@ -51,6 +52,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly bishopCenterPenalty: number;
   readonly knightOppositeCentralDistance: number;
   readonly bishopCentralProximityScore: number;
+  readonly bishopShuffleControlPenalty: number;
   readonly minorBlackDistanceScore: number;
   readonly unprotectedMinorCount: number;
   readonly minorCenterDistanceScore: number;
@@ -169,6 +171,7 @@ function distanceToNearestUnprotectedKnightOrBishop(fen: string): number {
 }
 
 type KnightAndBishopPositionScoreContext = {
+  readonly bishopShuffleTargets: readonly Square[];
   readonly startsWithUnprotectedBishop: boolean;
   readonly startsWithUnprotectedKnight: boolean;
   readonly knightDriftBlocked: boolean;
@@ -209,6 +212,7 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
   const knightCentrallyDefended = !!knight && centralKing && kingDistance(whiteKing.square, knight.square) === 1;
   let unprotectedKnight: boolean | undefined;
   return {
+    bishopShuffleTargets: knightAndBishopShuffleTargets(fen),
     startsWithUnprotectedBishop: !!bishop
       && (!whiteKing || kingDistance(whiteKing.square,bishop.square)!==1)
       && (!knight || squaredEuclideanDistance(bishop.square,knight.square)!==5),
@@ -300,6 +304,10 @@ function scoreKnightAndBishopWhiteMoveCore(
   })();
   let supportedDiagonal: ReturnType<typeof evaluateKnightAndBishopSupportedDiagonal> | undefined;
   return {
+    get bishopShuffleControlPenalty() {
+      return context.bishopShuffleTargets.length && !context.bishopShuffleTargets.some(target =>
+        bishop && bishop.square !== target && bishopControlsOrOccupiesSquare(resultFen, bishop.square, target)) ? 1 : 0;
+    },
     get kingCoordinationPenalty() {
       return context.shouldCoordinateKing
         && !(move.piece === "k" && knightAndBishopKingCoordinatesMinors(resultFen)) ? 1 : 0;
@@ -576,6 +584,12 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       compare: (first, second) => first.kingKnightDistanceScore - second.kingKnightDistanceScore
         || first.kingCenterEuclideanScore - second.kingCenterEuclideanScore
         || first.kingBishopColorPenalty - second.kingBishopColorPenalty,
+    },
+    {
+      id: "r8",
+      shortLabel: "rule r8",
+      helpText: "With the kings in opposition or a knight's move apart, and the black king more central than the white king, and the knight between the kings, use the bishop to control black's more central shuffling square.",
+      compare: (first, second) => first.bishopShuffleControlPenalty - second.bishopShuffleControlPenalty,
     },
     {
       id: "r20",
