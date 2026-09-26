@@ -118,3 +118,21 @@ test('r6 rejects Nd4 when a diagonal chase leaves no onward king-step progress, 
     assert.ok(!selectCandidatesByRules(candidates, knightAndBishopWhiteRules).idealCandidates.some(c => c.san === move), t.name);
   }
 });
+
+test('r6 rejects approaching Black between the knight and king without gaining protection, across D4', () => {
+  for (const t of SQUARE_TRANSFORMS) {
+    for (const [start, qualifies] of [
+      ['B3K3/8/8/4k3/8/8/5N2/8 w - - 0 1', false],
+      ['B3K3/8/8/k7/8/8/5N2/8 w - - 0 1', true],
+      ['B7/8/8/7K/8/7k/5N2/8 w - - 0 1', true], // Reaching king protection overrides approaching Black.
+    ] as const) {
+      const fen = transformFen(start, t);
+      const move = getChess(fen).move({from: transformSquare('f2', t), to: transformSquare('g4', t)}).san;
+      assert.equal(scoreKnightAndBishopWhiteMove(fen, move).knightDriftQualifies, qualifies, t.name);
+      if (!qualifies) {
+        const candidates = getChess(fen).moves().map(san => ({san, score: scoreKnightAndBishopWhiteMove(fen, san)}));
+        assert.ok(!selectCandidatesByRules(candidates, knightAndBishopWhiteRules).idealCandidates.some(c => c.san === move), t.name);
+      }
+    }
+  }
+});
