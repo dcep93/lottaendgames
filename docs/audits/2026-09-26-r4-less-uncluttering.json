@@ -1,0 +1,113 @@
+{
+  "date": "2026-09-26",
+  "baselineFullAudit": "eecb6a9640b8cef4bd97e77d40cbe7f9061312eb",
+  "baselineFourPlyCycles": 15917,
+  "previousReplaySurvivors": 183,
+  "survivingSavedFourPlyCycles": 98,
+  "brokenPreviousWitnesses": 86,
+  "reappearedSavedWitnesses": 1,
+  "displayEligibleCycles": 34,
+  "scope": "Saved four-ply witnesses only, not a fresh global count or new-cycle search.",
+  "groups": [
+    {
+      "motif": "r8 \u2194 r8",
+      "cycles": 64,
+      "positions": 38
+    },
+    {
+      "motif": "r4 \u2194 r6",
+      "cycles": 19,
+      "positions": 28
+    },
+    {
+      "motif": "r6.5 \u2194 r8",
+      "cycles": 8,
+      "positions": 12
+    },
+    {
+      "motif": "r4 \u2194 r8",
+      "cycles": 2,
+      "positions": 3
+    },
+    {
+      "motif": "r20 \u2194 r6.5",
+      "cycles": 2,
+      "positions": 3
+    },
+    {
+      "motif": "r20 \u2194 r20",
+      "cycles": 1,
+      "positions": 2
+    },
+    {
+      "motif": "r4 \u2194 r5",
+      "cycles": 1,
+      "positions": 2
+    },
+    {
+      "motif": "r20 \u2194 r5",
+      "cycles": 1,
+      "positions": 2
+    }
+  ],
+  "examples": [
+    {
+      "group": 0,
+      "motif": "r4 \u2194 r6",
+      "fen": "8/3K4/4B3/2k5/8/8/N7/8 w - - 0 1",
+      "moves": [
+        "Bh3",
+        "Kc4",
+        "Be6+",
+        "Kc5"
+      ],
+      "area": 30,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/3K4/4B3/2k5/8/8/N7/8_w_-_-_0_1&moves=Bh3,Kc4,Be6%2B,Kc5&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "r4 \u2194 r6",
+      "fen": "8/8/3K4/1k1B4/8/8/N7/8 w - - 0 1",
+      "moves": [
+        "Bh1",
+        "Kc4",
+        "Bd5+",
+        "Kb5"
+      ],
+      "area": 20,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/3K4/1k1B4/8/8/N7/8_w_-_-_0_1&moves=Bh1,Kc4,Bd5%2B,Kb5&cursor=0"
+    },
+    {
+      "group": 1,
+      "motif": "r6.5 \u2194 r8",
+      "fen": "Bk6/8/8/2NK4/8/8/8/8 w - - 0 1",
+      "moves": [
+        "Bb7",
+        "Kc7",
+        "Ba8",
+        "Kb8"
+      ],
+      "area": 16,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=Bk6/8/8/2NK4/8/8/8/8_w_-_-_0_1&moves=Bb7,Kc7,Ba8,Kb8&cursor=0"
+    },
+    {
+      "group": 1,
+      "motif": "r6.5 \u2194 r8",
+      "fen": "3k4/8/8/4K3/B3N3/8/8/8 w - - 0 1",
+      "moves": [
+        "Bc6",
+        "Kc7",
+        "Ba4",
+        "Kd8"
+      ],
+      "area": 10,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=3k4/8/8/4K3/B3N3/8/8/8_w_-_-_0_1&moves=Bc6,Kc7,Ba4,Kd8&cursor=0"
+    }
+  ],
+  "exampleLimit": "Only two cycles of the largest visible motif satisfy the joint bishop/Black-king orientation requirements, even allowing repeated White layouts and start positions.",
+  "validation": {
+    "focusedTestsPassed": 15,
+    "build": "passed",
+    "preexistingFailures": 4
+  }
+}

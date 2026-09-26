@@ -48,7 +48,7 @@ test('stable bishop protection does not depend on Black’s distance from the kn
 });
 
 
-test('the loaded distant knight retains bishop protection, across D4', () => {
+test('distant bishop protection remains measured but a quiet edge bishop permits drift, across D4', () => {
  for(const t of SQUARE_TRANSFORMS){
   const f=transformFen('8/8/BK1k4/8/8/8/8/5N2 w - - 0 1',t);
   const bishop=getChess(f).move({from:transformSquare('a6',t),to:transformSquare('b5',t)}).san;
@@ -56,7 +56,7 @@ test('the loaded distant knight retains bishop protection, across D4', () => {
   const held=scoreKnightAndBishopWhiteMove(f,bishop);
   assert.equal(held.knightStableBishopProtectionPenalty,0,t.name);
   assert.equal(held.unprotectedMinorCount,0,t.name); // Bishop is king-defended; knight is bishop-defended.
-  assert.ok(!getIdealKnightAndBishopWhiteMoves(f).includes(knight),t.name);
+  assert.ok(getIdealKnightAndBishopWhiteMoves(f).includes(knight),t.name);
  }
 });
 

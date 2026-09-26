@@ -11,8 +11,9 @@ test('r4 does not move a bishop back into the king crowding zone, across D4',()=
   const fen=transformFen('3k4/1B6/2K5/8/8/8/8/7N w - - 2 2',t);
   const retreat=getChess(fen).move({from:transformSquare('b7',t),to:transformSquare('a8',t)}).san;
   assert.equal(scoreKnightAndBishopWhiteMove(fen,retreat).bishopSeparationPenalty,1,t.name);
-  const kingMoves=(['d5'] as const).map(to=>getChess(fen).move({from:transformSquare('c6',t),to:transformSquare(to,t)}).san);
-  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen).sort(),kingMoves.sort(),t.name);
+  const clear=getChess(fen).move({from:transformSquare('b7',t),to:transformSquare('a6',t)}).san;
+  assert.equal(scoreKnightAndBishopWhiteMove(fen,clear).bishopSeparationPenalty,0,t.name);
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[clear],t.name);
   // Moving closer from the original corner cannot earn an uncluttering bonus either.
   const original=transformFen('B3k3/8/2K5/8/8/8/8/7N w - - 0 1',t);
   const inward=getChess(original).move({from:transformSquare('a8',t),to:transformSquare('b7',t)}).san;
@@ -111,12 +112,12 @@ test('r4 lets the king clear a diagonally adjacent bishop exit, across D4',()=>{
  }
 });
 
-test('r4 does not credit an ordinary king move when the king is not blocking a bishop exit, across D4',()=>{
+test('r4 stays neutral for a noncorner edge bishop two steps from the king, across D4',()=>{
  for(const t of SQUARE_TRANSFORMS){
   const fen=transformFen('8/8/8/8/8/1K6/1N6/2B3k1 w - - 0 1',t);
-  // b3 is not diagonal-adjacent to c1, so leaving it clears no bishop exit.
+  // Bc1 has room: being two steps from Kb3 is not clutter.
   const move=getChess(fen).move({from:transformSquare('b3',t),to:transformSquare('a3',t)}).san;
-  assert.equal(scoreKnightAndBishopWhiteMove(fen,move).bishopSeparationPenalty,1,t.name);
+  assert.equal(scoreKnightAndBishopWhiteMove(fen,move).bishopSeparationPenalty,0,t.name);
  }
 });
 
@@ -134,5 +135,19 @@ test('r4 uses the starting king and bishop arrangement, across D4',()=>{
     assert.equal(s.bishopWhiteKingDistanceScore,0,`${t.name} ${move}`);
    }
   }
+ }
+});
+
+
+test('r4 leaves Bf1 alone after the waiting move and allows Ke4, across D4',()=>{
+ for(const t of SQUARE_TRANSFORMS){
+  const fen=transformFen('8/8/4k3/8/8/4KN2/8/5B2 w - - 2 2',t);
+  for(const san of getChess(fen).moves()){
+   const score=scoreKnightAndBishopWhiteMove(fen,san);
+   assert.equal(score.bishopSeparationPenalty,0,`${t.name} ${san}`);
+   assert.equal(score.bishopWhiteKingDistanceScore,0,`${t.name} ${san}`);
+  }
+  const advance=getChess(fen).move({from:transformSquare('e3',t),to:transformSquare('e4',t)}).san;
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[advance],t.name);
  }
 });

@@ -4,7 +4,6 @@ import { stableBishopProtectionDistance, stableBishopProtectedSquares } from "./
 import { knightAndBishopThreeKingPlacementPenalty, knightAndBishopFiveBishopPenalty, knightAndBishopFiveKingTargetDistance, knightAndBishopShouldCheckThreeDiagonal, evaluateKnightAndBishopSupportedDiagonal } from "./bishopKnightDiagonalSupport";
 import type { Square } from "chess.js";
 import {
-  edgeDistance,
   findPiece,
   getChess,
   getEndgamePiecePlacements,
@@ -241,8 +240,9 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
       && !bishopCentrallyDefended && !knightCentrallyDefended,
     shouldEscapeBishop: !!bishop && !!blackKing && kingDistance(bishop.square, blackKing.square) === 1
       && (!whiteKing || kingDistance(bishop.square, whiteKing.square) !== 1),
+    // Only a corner needs the wider warning zone: a noncorner edge has two inward diagonal directions.
     shouldSeparateBishop: !!bishop && !!whiteKing && !centralKing
-      && (edgeDistance(bishop.square) === 0
+      && (CORNERS.includes(bishop.square)
         ? kingDistance(bishop.square, whiteKing.square) <= 2
         : kingDistance(bishop.square, whiteKing.square) === 1
           && ((!!blackKing && kingDistance(bishop.square, blackKing.square) <= 2)
@@ -290,7 +290,7 @@ function scoreKnightAndBishopWhiteMoveCore(
   const bishopKingDefended = !!bishop && !!whiteKing && kingDistance(bishop.square, whiteKing.square) === 1;
   const bishopSeparated = context.shouldSeparateBishop && move.piece === "b" && bishop && blackKing && whiteKing
     && kingDistance(bishop.square, blackKing.square) >= 3
-    && kingDistance(bishop.square, whiteKing.square) > (edgeDistance(bishop.square) === 0 ? 2 : 1);
+    && kingDistance(bishop.square, whiteKing.square) > (CORNERS.includes(bishop.square) ? 2 : 1);
   const bishopExitCleared = context.shouldSeparateBishop && move.piece === "k" && bishop && whiteKing
     && squaredEuclideanDistance(bishop.square, move.from) === 2
     && squaredEuclideanDistance(bishop.square, whiteKing.square) !== 2;
