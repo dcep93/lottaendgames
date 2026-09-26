@@ -340,10 +340,9 @@ function scoreKnightAndBishopWhiteMoveCore(
       return Math.min(...bishopTargets.map(square => squaredEuclideanDistance(bishop.square, square)))
         + Math.min(...kingTargets.map(square => squaredEuclideanDistance(whiteKing.square, square)));
     },
-    // Stay clear through Black's next legal step; extra distance earns no bonus.
+    // Only immediate proximity counts; do not preempt a possible future approach.
     bishopTooCloseToBlackPenalty: bishop && blackKing
-      && (kingDistance(bishop.square, blackKing.square) <= 1
-        || blackReplies.some(reply => reply.piece === "k" && kingDistance(bishop.square, reply.to) <= 1)) ? 1 : 0,
+      && kingDistance(bishop.square, blackKing.square) <= 1 ? 1 : 0,
     bishopCentralProximityScore: bishop ? knightAndBishopCenterProximityScore(bishop.square) : 99,
     bishopCenterPenalty: bishop && centerDistance(bishop.square) === 0 ? 0 : 1,
     kingKnightAdjacencyPenalty: knightKingDefended ? 0 : 1,
