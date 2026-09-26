@@ -61,7 +61,7 @@ test('distant bishop protection remains measured but a quiet edge bishop permits
 });
 
 
-test('r6 drifts via Nc3 instead of preserving distant bishop protection across D4', () => {
+test('r7 drifts via Nc3 instead of preserving distant bishop protection across D4', () => {
  for(const t of SQUARE_TRANSFORMS){
   const f=transformFen('4B3/8/8/8/N7/8/8/k6K w - - 0 1',t);
   const ch=getChess(f);

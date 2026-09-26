@@ -3,7 +3,7 @@ import test from 'node:test'
 import {getChess, SQUARE_TRANSFORMS, transformFen, transformSquare} from '../chess'
 import {getIdealKnightAndBishopWhiteMoves, scoreKnightAndBishopWhiteMove} from './bishopKnight'
 
-test('opposition metric remains neutral to the r7 move choice across D4', () => {
+test('opposition metric remains neutral to the r6 move choice across D4', () => {
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen('8/8/1kB5/4K3/8/8/8/6N1 w - - 0 1', t)
     const san = getChess(fen).move({from: transformSquare('e5', t), to: transformSquare('d6', t)}).san

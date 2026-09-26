@@ -4,7 +4,7 @@ import {getChess,SQUARE_TRANSFORMS,transformFen,transformSquare} from '../chess'
 import {getIdealKnightAndBishopWhiteMoves,knightAndBishopWhiteRules,scoreKnightAndBishopWhiteMove} from './bishopKnight';
 import {knightAndBishopShuffleTargets} from './bishopKnightShuffle';
 
-test('r8 favors Bb3+ control but r6 first approaches Black with Kd3, across D4',()=>{
+test('r8 favors Bb3+ control but r7 first approaches Black with Kd3, across D4',()=>{
  for(const t of SQUARE_TRANSFORMS){
   const fen=transformFen('8/8/8/3k4/B3N3/4K3/8/8 w - - 0 1',t);
   assert.deepEqual([...knightAndBishopShuffleTargets(fen)].sort(),['d5','e5'].map(s=>transformSquare(s as 'd5'|'e5',t)).sort());

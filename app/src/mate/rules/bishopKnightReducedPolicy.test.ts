@@ -95,7 +95,7 @@ test('the old behind-White score remains removed', () => {
 })
 
 
-test('r6 centralizes king-protected knights before r7 king approach across D4', () => {
+test('r7 centralizes king-protected knights before r6 king approach across D4', () => {
   for (const transform of SQUARE_TRANSFORMS) {
     const fen = transformFen('1NK5/8/2B5/8/8/k7/8/8 w - - 0 1', transform)
     const moves = (['d7', 'd8'] as const).map(to => getChess(fen).move({from: transformSquare('c8', transform), to: transformSquare(to, transform)}).san)
@@ -104,19 +104,19 @@ test('r6 centralizes king-protected knights before r7 king approach across D4', 
     const ideal = getIdealKnightAndBishopWhiteMoves(fen)
     const approach=getChess(fen).move({from:transformSquare('c8',transform),to:transformSquare('c7',transform)}).san
     const knight=getChess(fen).move({from:transformSquare('b8',transform),to:transformSquare('d7',transform)}).san
-    assert.ok(knightAndBishopWhiteRules.find(r=>r.id==='r6')!.subpriorities![0]!.compare!(scoreKnightAndBishopWhiteMove(fen,knight),scoreKnightAndBishopWhiteMove(fen,approach))<0)
+    assert.ok(knightAndBishopWhiteRules.find(r=>r.id==='r7')!.subpriorities![0]!.compare!(scoreKnightAndBishopWhiteMove(fen,knight),scoreKnightAndBishopWhiteMove(fen,approach))<0)
     assert.deepEqual(ideal,[knight],transform.name)
   }
 })
 
-test('r7 ties equal king-step distances and then prefers central proximity across D4', () => {
-  const r7 = knightAndBishopWhiteRules.find(rule => rule.id === 'r7')!
+test('r6 ties equal king-step distances and then prefers central proximity across D4', () => {
+  const r6 = knightAndBishopWhiteRules.find(rule => rule.id === 'r6')!
   for (const transform of SQUARE_TRANSFORMS) {
     const fen = transformFen('1NK5/8/2B5/8/8/k7/8/8 w - - 0 1', transform)
     const scores = (['d7', 'd8'] as const).map(to => scoreKnightAndBishopWhiteMove(fen,
       getChess(fen).move({from: transformSquare('c8',transform),to:transformSquare(to,transform)}).san))
     assert.equal(scores[0]!.kingKnightDistanceScore,2,transform.name)
     assert.equal(scores[1]!.kingKnightDistanceScore,2,transform.name)
-    assert.ok(r7.compare!(scores[0]!,scores[1]!) < 0,transform.name)
+    assert.ok(r6.compare!(scores[0]!,scores[1]!) < 0,transform.name)
   }
 })

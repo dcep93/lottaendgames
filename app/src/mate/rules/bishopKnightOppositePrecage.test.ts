@@ -83,7 +83,7 @@ test('precage metric gives no frozen-target credit after the bishop leaves the c
 })
 
 
-test('r4 remains inactive with a noncentral king and r6 establishes protection, across D4', () => {
+test('r4 remains inactive with a noncentral king and r7 establishes protection, across D4', () => {
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen('4B3/8/8/8/3k1K2/2N5/8/8 w - - 0 1', t)
     const san = (to: 'e4' | 'a4' | 'e2') => getChess(fen).move({from: transformSquare('c3', t), to: transformSquare(to, t)}).san
