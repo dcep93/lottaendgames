@@ -107,9 +107,14 @@ test("bishop-and-knight rules are registered", () => {
       helpText: "",
     },
     {
+      id: "r3",
+      shortLabel: "rule r3",
+      helpText: "Play the r3 step.",
+    },
+    {
       id: "r4",
       shortLabel: "rule r4",
-      helpText: "With a central king and central 16 knight, prefer 3 central pieces, then ensure a distant bishop, then prefer king protection of the knight, maneuver the knight to a central square opposite the bishop's color, prefer the king opposite the bishop's color, then prefer bishop central proximity.",
+      helpText: "With a central king and central 16 knight, then ensure a distant bishop, then prefer king protection of the knight, maneuver the knight to a central square opposite the bishop's color, prefer the king opposite the bishop's color, then prefer bishop central proximity.",
     },
     {
       id: "r5",
@@ -154,6 +159,7 @@ test("bishop-and-knight rules are registered", () => {
       "mate",
       "minors safe",
       "no stalemate",
+      "r3",
       "r4",
       "r5",
       "r6",
@@ -166,8 +172,8 @@ test("bishop-and-knight rules are registered", () => {
     ruleSet.whiteRuleDescriptions.map(({ id }) => id),
     knightAndBishopWhiteRules.map(({ id }) => id),
   );
-  assert.equal(knightAndBishopWhiteRules.length, 9);
-  assert.deepEqual(ruleSet.help.noteBoards.map(board=>board.id), ["bishop-knight-rule-r5-hop", "bishop-knight-rule-r5-opposition"]);
+  assert.equal(knightAndBishopWhiteRules.length, 10);
+  assert.deepEqual(ruleSet.help.noteBoards.map(board=>board.id), ["bishop-knight-rule-r3-step", "bishop-knight-rule-r5-hop", "bishop-knight-rule-r5-opposition"]);
 });
 
 test("immediate mate keeps precedence without the mating-net rule", () => {

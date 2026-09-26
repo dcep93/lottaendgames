@@ -125,16 +125,13 @@ test('r4 puts king protection before a shorter knight route, across D4',()=>{
  }
 });
 
-test('r4 completes a central trio before king color, with color ahead of noncentral bishop proximity, across D4',()=>{
+test('r4 changes king color before bringing the bishop inward, across D4',()=>{
  for(const t of SQUARE_TRANSFORMS){
   const fen=transformFen('B7/5k2/8/8/3NK3/8/8/8 w - - 0 1',t);
   const san=(from:'e4'|'a8',to:'e5'|'c6'|'d5')=>getChess(fen).move({from:transformSquare(from,t),to:transformSquare(to,t)}).san;
   const king=san('e4','e5'),bishop=san('a8','c6');
   assert.ok(compareScoresByRules(scoreKnightAndBishopWhiteMove(fen,king),scoreKnightAndBishopWhiteMove(fen,bishop),[r4])<0,t.name);
-  const trio=san('a8','d5');
-  assert.equal(scoreKnightAndBishopWhiteMove(fen,trio).threeCentralPiecesPenalty,0,t.name);
-  assert.equal(scoreKnightAndBishopWhiteMove(fen,bishop).threeCentralPiecesPenalty,1,t.name);
-  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[trio],t.name);
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[king],t.name);
  }
 });
 
@@ -145,21 +142,5 @@ test('r4 rejects Bf5 because Black can immediately approach with Kf6, across D4'
   assert.equal(scoreKnightAndBishopWhiteMove(fen,san('f5')).bishopTooCloseToBlackPenalty,1,t.name);
   for(const to of ['g4','b5'] as const)assert.equal(scoreKnightAndBishopWhiteMove(fen,san(to)).bishopTooCloseToBlackPenalty,0,t.name);
   assert.deepEqual([...getIdealKnightAndBishopWhiteMoves(fen)].sort(),[san('g4'),san('b5')].sort(),t.name);
- }
-});
-
-
-test('r4 keeps the central trio ahead of bishop clearance, across D4',()=>{
- for(const t of SQUARE_TRANSFORMS){
-  const fen=transformFen('8/8/1k6/3B4/3NK3/8/8/8 w - - 4 3',t);
-  const san=(from:'e4'|'d5',to:'e5'|'g8')=>getChess(fen).move({from:transformSquare(from,t),to:transformSquare(to,t)}).san;
-  const trio=scoreKnightAndBishopWhiteMove(fen,san('e4','e5'));
-  const distant=scoreKnightAndBishopWhiteMove(fen,san('d5','g8'));
-  assert.equal(trio.threeCentralPiecesPenalty,0,t.name);
-  assert.equal(distant.threeCentralPiecesPenalty,1,t.name);
-  assert.equal(trio.bishopTooCloseToBlackPenalty,1,t.name);
-  assert.equal(distant.bishopTooCloseToBlackPenalty,0,t.name);
-  assert.ok(compareScoresByRules(trio,distant,[r4])<0,t.name);
-  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[san('e4','e5')],t.name);
  }
 });

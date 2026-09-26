@@ -1,3 +1,4 @@
+import { knightAndBishopR3Target } from './bishopKnightR3';
 import { knightAndBishopShuffleTargets } from "./bishopKnightShuffle";
 import { knightDriftThreatPenalty } from "./bishopKnightDriftGeometry";
 import { knightAndBishopPrecageSideTarget, type PrecageSideTarget } from "./bishopKnightPrecageSide";
@@ -53,7 +54,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly knightOppositeCentralDistance: number;
   readonly bishopCentralProximityScore: number;
   readonly bishopTooCloseToBlackPenalty: number;
-  readonly threeCentralPiecesPenalty: number;
+  readonly r3StepPenalty: number;
   readonly bishopShuffleControlPenalty: number;
   readonly minorBlackDistanceScore: number;
   readonly unprotectedMinorCount: number;
@@ -180,6 +181,7 @@ type KnightAndBishopPositionScoreContext = {
   readonly startsWithUnprotectedKnight: boolean;
   readonly knightDriftBlocked: boolean;
   readonly knightDriftBaseline: readonly [number, number, number];
+  readonly r3Target: Square | undefined;
   readonly sixPointNineMove: string | undefined;
   readonly fivePointFiveMove: string | undefined;
   readonly relativeKnightMove: string | undefined;
@@ -219,6 +221,7 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
     knightOppositeCentralTargets: (["d4", "e4", "d5", "e5"] as const).filter(target =>
       bishop && target !== whiteKing?.square && squareColor(target) !== squareColor(bishop.square)),
     bishopShuffleTargets: knightAndBishopShuffleTargets(fen),
+    r3Target: knightAndBishopR3Target(fen),
     startsWithUnprotectedBishop: !!bishop
       && (!whiteKing || kingDistance(whiteKing.square,bishop.square)!==1)
       && (!knight || squaredEuclideanDistance(bishop.square,knight.square)!==5),
@@ -328,7 +331,7 @@ function scoreKnightAndBishopWhiteMoveCore(
       const targets = context.knightOppositeCentralTargets.filter(target => target !== whiteKing?.square);
       return targets.length ? Math.min(...targets.map(target => knightMoveDistance(knight.square, target))) : 99;
     },
-    threeCentralPiecesPenalty: [whiteKing, bishop, knight].every(piece => piece && centerDistance(piece.square) === 0) ? 0 : 1,
+    r3StepPenalty: context.r3Target && whiteKing?.square !== context.r3Target ? 1 : 0,
     // Stay clear through Black's next legal step; extra distance earns no bonus.
     bishopTooCloseToBlackPenalty: bishop && blackKing
       && (kingDistance(bishop.square, blackKing.square) <= 1
@@ -560,12 +563,17 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       compare: (first, second) => first.stalemateScore - second.stalemateScore,
     },
     {
+      id: "r3",
+      shortLabel: "rule r3",
+      helpText: "Play the r3 step.",
+      compare: (first, second) => first.r3StepPenalty - second.r3StepPenalty,
+    },
+    {
       id: "r4",
       shortLabel: "rule r4",
-      helpText: "With a central king and central 16 knight, prefer 3 central pieces, then ensure a distant bishop, then prefer king protection of the knight, maneuver the knight to a central square opposite the bishop's color, prefer the king opposite the bishop's color, then prefer bishop central proximity.",
+      helpText: "With a central king and central 16 knight, then ensure a distant bishop, then prefer king protection of the knight, maneuver the knight to a central square opposite the bishop's color, prefer the king opposite the bishop's color, then prefer bishop central proximity.",
       applies: score => score.startsWithCentralKingAndMiddle16Knight,
-      compare: (first, second) => first.threeCentralPiecesPenalty - second.threeCentralPiecesPenalty
-        || first.bishopTooCloseToBlackPenalty - second.bishopTooCloseToBlackPenalty
+      compare: (first, second) => first.bishopTooCloseToBlackPenalty - second.bishopTooCloseToBlackPenalty
         || first.kingKnightAdjacencyPenalty - second.kingKnightAdjacencyPenalty
         || first.knightOppositeCentralDistance - second.knightOppositeCentralDistance
         || first.kingBishopColorPenalty - second.kingBishopColorPenalty
@@ -752,6 +760,13 @@ const bishopKnightHelp: RuleHelp = {
     "Support has been reset. No position is supported until explicitly declared under the new rules; all earlier support declarations and r2.5 preferences have been discarded.",
   ],
   noteBoards: [{
+    id: "bishop-knight-rule-r3-step",
+    title: "rule r3 — Play the r3 step",
+    caption: "Kd5 switches to the other central square beside Nd4. Black is two diagonal steps from h8, and Nd4 is two more inward. The bishop may be anywhere on the opposite color to Black. Include rotations and reflections.",
+    pieces: [{square: "e4", piece: "K"}, {square: "d4", piece: "N"}, {square: "f6", piece: "k"}, {square: "a6", piece: "B"}],
+    highlights: [{square: "h8", kind: "key"}, {square: "d5", kind: "key"}],
+    arrows: [{from: "e4", to: "d5"}],
+  }, {
     id: "bishop-knight-rule-r5-hop",
     title: "rule r5 — Play the r5 move",
     caption: "Ne1 clears the way for Kd2. The bishop may be elsewhere.",
