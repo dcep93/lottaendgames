@@ -297,6 +297,9 @@ function scoreKnightAndBishopWhiteMoveCore(
   let knightBishopStableDefense: boolean | undefined;
   const knightBishopStablyDefended = () => knightBishopStableDefense ??= !!knight
     && stableBishopProtectedSquares(resultFen).includes(knight.square);
+  let driftGeometryPenalty: number | undefined;
+  const geometricDriftPenalty = () => driftGeometryPenalty ??= !knight || !whiteKing || !blackKing || !bishop ? 0
+    : knightDriftThreatPenalty(whiteKing.square, bishop.square, knight.square, blackKing.square, move.piece === "n", move.piece === "n" ? move.from : undefined);
   const knightEdgeOpposition = (() => {
     if (move.piece !== "n" || !knight || !whiteKing || kingDistance(knight.square, whiteKing.square) <= 2 || !blackKing
       || squaredEuclideanDistance(knight.square, blackKing.square) !== 4) return false;
@@ -306,7 +309,8 @@ function scoreKnightAndBishopWhiteMoveCore(
     const k = squareCoordinates(blackKing.square);
     const file = 2 * n.file - k.file;
     const rank = 2 * n.rank - k.rank;
-    return file < 0 || file > 7 || rank < 0 || rank > 7;
+    // Edge opposition is a trap only if no safe onward route reaches protection.
+    return (file < 0 || file > 7 || rank < 0 || rank > 7) && geometricDriftPenalty() !== 0;
   })();
   let supportedDiagonal: ReturnType<typeof evaluateKnightAndBishopSupportedDiagonal> | undefined;
   return {
@@ -363,7 +367,7 @@ function scoreKnightAndBishopWhiteMoveCore(
     get knightDriftObstructionPenalty() {
       if (!knight || !blackKing || !whiteKing || !bishop) return 0;
       if (knightEdgeOpposition || blackBlocksKnightDrift(knight.square, blackKing.square, whiteKing.square)) return 2;
-      return knightDriftThreatPenalty(whiteKing.square, bishop.square, knight.square, blackKing.square, move.piece === "n", move.piece === "n" ? move.from : undefined);
+      return geometricDriftPenalty();
     },
     get knightKingProtectionDistance() {
       const distance = knightKingProtectionDistance(resultFen);

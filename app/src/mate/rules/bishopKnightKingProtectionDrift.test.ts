@@ -334,3 +334,19 @@ test('r6 allows Nd1+ through a safe forward jump and one king step, across D4',(
   assert.equal(knightKingProtectionDistance(chess.fen()),0,t.name);
  }
 });
+
+
+test('r6 allows Nc2 beside the edge when Ne1 and Ng2 reach protection, across D4',()=>{
+ for(const t of SQUARE_TRANSFORMS){
+  const fen=transformFen('4B3/8/8/8/1Nk5/7K/8/8 w - - 2 2',t);
+  const san=getChess(fen).move({from:transformSquare('b4',t),to:transformSquare('c2',t)}).san;
+  const score=scoreKnightAndBishopWhiteMove(fen,san);
+  assert.equal(score.knightDriftObstructionPenalty,0,t.name);
+  assert.equal(score.knightKingProximityScore,26,t.name);
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[san],t.name);
+  const chess=getChess(fen);
+  for(const [from,to] of [['b4','c2'],['c4','c3'],['c2','e1'],['c3','d2'],['e1','g2']] as const)
+    chess.move({from:transformSquare(from,t),to:transformSquare(to,t)});
+  assert.equal(knightKingProtectionDistance(chess.fen()),0,t.name);
+ }
+});
