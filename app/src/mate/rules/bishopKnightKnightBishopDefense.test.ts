@@ -24,7 +24,7 @@ test('bishop-defense metric flags only an attacked bishop defended solely by an 
 })
 
 
-test('r7 brings the king nearer the knight before centralization across D4', () => {
+test('r4 takes precedence over the old king approach across D4', () => {
   const start = '2Bk4/8/1N6/2K5/8/8/8/8 w - - 0 1'
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen(start, t)
@@ -32,7 +32,7 @@ test('r7 brings the king nearer the knight before centralization across D4', () 
     const kingMove = getChess(fen).move({from: transformSquare('c5', t), to: transformSquare('d4', t)}).san
     assert.equal(scoreKnightAndBishopWhiteMove(fen, kingMove).undefendedKnightOnlyBishopDefenderPenalty, 1)
     assert.equal(scoreKnightAndBishopWhiteMove(fen, bishopMove).undefendedKnightOnlyBishopDefenderPenalty, 0)
-    const nearKing = getChess(fen).move({from: transformSquare('c5', t), to: transformSquare('c6', t)}).san
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [nearKing])
+    const setup=(['e6','f5'] as const).map(to=>getChess(fen).move({from:transformSquare('c8',t),to:transformSquare(to,t)}).san)
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen).sort(),setup.sort())
   }
 })

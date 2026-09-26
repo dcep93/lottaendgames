@@ -26,7 +26,7 @@ import {
   isKnightAndBishopWManeuverPosition,
   knightAndBishopPiecesPresent,
 } from "./bishopKnightLookup";
-import { knightAndBishopKnightTargetSquares, knightAndBishopKnightProximityToSquare, knightKingProtectionDistance, knightAndBishopCenterProximityScore, knightAndBishopKingCenterProximityScore, knightAndBishopKingCenterEuclideanScore, knightAndBishopKnightTargetProximityScore, knightAndBishopTargetCorners } from "./bishopKnightStrategy";
+import { knightMoveDistance, knightAndBishopKnightTargetSquares, knightAndBishopKnightProximityToSquare, knightKingProtectionDistance, knightAndBishopCenterProximityScore, knightAndBishopKingCenterProximityScore, knightAndBishopKingCenterEuclideanScore, knightAndBishopKnightTargetProximityScore, knightAndBishopTargetCorners } from "./bishopKnightStrategy";
 import { knightAndBishopR5Move } from "./bishopKnightR5";
 import { knightAndBishopR5OppositionMoves } from "./bishopKnightR5Opposition";
 import { knightAndBishopShouldCoordinateKing, knightAndBishopKingCoordinatesMinors } from "./bishopKnightCoordination";
@@ -47,7 +47,10 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly declaredStepPenalty: number;
   readonly relativeKnightPenalty: number;
   readonly startsWithMiddle16King: boolean;
+  readonly startsWithMiddle16KingAndKnight: boolean;
   readonly bishopCenterPenalty: number;
+  readonly knightOppositeCentralDistance: number;
+  readonly knightProtectedLongDiagonalBishopPenalty: number;
   readonly minorBlackDistanceScore: number;
   readonly unprotectedMinorCount: number;
   readonly minorCenterDistanceScore: number;
@@ -174,6 +177,7 @@ type KnightAndBishopPositionScoreContext = {
   readonly fivePointFiveMove: string | undefined;
   readonly relativeKnightMove: string | undefined;
   readonly startsWithMiddle16King: boolean;
+  readonly startsWithMiddle16KingAndKnight: boolean;
   readonly shouldCoordinateKing: boolean;
   readonly shouldEscapeBishop: boolean;
   readonly shouldEscapeNearbyPairBishop: boolean;
@@ -229,6 +233,8 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
     fivePointFiveMove: knightAndBishopFivePointFiveMove(fen),
     relativeKnightMove: knightAndBishopRelativeKnightMove(fen),
     startsWithMiddle16King: !!whiteKing && isMiddle16Square(whiteKing.square),
+    startsWithMiddle16KingAndKnight: !!whiteKing && !!knight
+      && isMiddle16Square(whiteKing.square) && isMiddle16Square(knight.square),
     shouldEscapeNearbyPairBishop: !!bishop && !!knight && !!blackKing
       && kingDistance(bishop.square, knight.square) === 1
       && kingDistance(bishop.square, blackKing.square) <= 2
@@ -303,6 +309,17 @@ function scoreKnightAndBishopWhiteMoveCore(
     declaredStepPenalty: context.fivePointFiveMove && context.fivePointFiveMove !== move.from + move.to ? 1 : 0,
     relativeKnightPenalty: context.relativeKnightMove && context.relativeKnightMove !== move.from + move.to ? 1 : 0,
     startsWithMiddle16King: context.startsWithMiddle16King,
+    startsWithMiddle16KingAndKnight: context.startsWithMiddle16KingAndKnight,
+    get knightOppositeCentralDistance() {
+      if (!knight || !bishop) return 99;
+      const targets: readonly Square[] = ["d4", "e4", "d5", "e5"];
+      return Math.min(...targets.filter(target => squareColor(target) !== squareColor(bishop.square))
+        .map(target => knightMoveDistance(knight.square, target)));
+    },
+    get knightProtectedLongDiagonalBishopPenalty() {
+      return this.bishopLongDiagonalPenalty === 0 && bishop && knight
+        && squaredEuclideanDistance(bishop.square, knight.square) === 5 ? 0 : 1;
+    },
     bishopCenterPenalty: bishop && centerDistance(bishop.square) === 0 ? 0 : 1,
     kingKnightAdjacencyPenalty: knightKingDefended ? 0 : 1,
     kingKnightDistanceScore: whiteKing && knight ? kingDistance(whiteKing.square, knight.square) : 99,
@@ -528,6 +545,15 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       compare: (first, second) => first.stalemateScore - second.stalemateScore,
     },
     {
+      id: "r4",
+      shortLabel: "rule r4",
+      helpText: "With a central 16 king and knight, maneuver the knight to a central square opposite the bishop's color, then prefer king protection, then prefer the bishop on the long diagonal and protected by the knight.",
+      applies: score => score.startsWithMiddle16KingAndKnight,
+      compare: (first, second) => first.knightOppositeCentralDistance - second.knightOppositeCentralDistance
+        || first.kingKnightAdjacencyPenalty - second.kingKnightAdjacencyPenalty
+        || first.knightProtectedLongDiagonalBishopPenalty - second.knightProtectedLongDiagonalBishopPenalty,
+    },
+    {
       id: "r5",
       shortLabel: "rule r5",
       helpText: "Play the r5 move.",
@@ -548,31 +574,12 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       },
     },
     {
-      id: "r6.5",
-      shortLabel: "rule r6.5",
-      helpText: "To save an attacked bishop, move it to adjacent to the central White king or else maximize its distance from the Black king.",
-      compare: (first, second) => first.attackedBishopDefensePenalty - second.attackedBishopDefensePenalty
-        || (first.attackedBishopDefensePenalty === 0 ? 0 : first.attackedBishopDistanceScore - second.attackedBishopDistanceScore),
-    },
-    {
       id: "r7",
       shortLabel: "rule r7",
       helpText: "Prefer king step proximity to the knight, then king central proximity, then prefer the king on the color opposite the bishop.",
       compare: (first, second) => first.kingKnightDistanceScore - second.kingKnightDistanceScore
         || first.kingCenterEuclideanScore - second.kingCenterEuclideanScore
         || first.kingBishopColorPenalty - second.kingBishopColorPenalty,
-    },
-    {
-      id: "r8",
-      shortLabel: "rule r8",
-      helpText: "With a king on a central 16 square, prefer bishop on the long diagonal, then a central bishop, then knight move proximity to a precage square, then knight off the bishop's color.",
-      applies: score => score.startsWithMiddle16King,
-      subpriorities: [
-        { compare: (first, second) => first.bishopLongDiagonalPenalty - second.bishopLongDiagonalPenalty },
-        { compare: (first, second) => first.bishopCenterPenalty - second.bishopCenterPenalty },
-        { compare: (first, second) => first.knightTargetProximityScore - second.knightTargetProximityScore },
-        { compare: (first, second) => first.knightBishopColorPenalty - second.knightBishopColorPenalty },
-      ],
     },
     {
       id: "r20",

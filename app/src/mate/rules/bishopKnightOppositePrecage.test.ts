@@ -30,22 +30,22 @@ test('Nc5 reaches d3 in one knight move while Ng5 needs three to either target',
 })
 
 
-test('precage metric ranks Nc5 over Ng5 while r7 prefers knight adjacency across D4', () => {
+test('r4 reaches the opposite-color center ahead of the retained precage metric across D4', () => {
   const start = '8/8/4Nk2/3B4/5K2/8/8/8 w - - 0 1'
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen(start,t)
-    const san = (to: 'c5' | 'g5') => getChess(fen).move({from:transformSquare('e6',t),to:transformSquare(to,t)}).san
+    const san = (to: 'c5' | 'g5' | 'd4') => getChess(fen).move({from:transformSquare('e6',t),to:transformSquare(to,t)}).san
     const closer = score(fen,san('c5')), farther = score(fen,san('g5'))
     assert.equal(closer.oppositePrecageEuclideanDistanceSquared,1)
     assert.equal(farther.oppositePrecageEuclideanDistanceSquared,13)
     assert.equal(farther.kingKnightAdjacencyPenalty, 0)
     assert.equal(closer.kingKnightAdjacencyPenalty, 1)
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[san('g5')])
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[san('d4')])
   }
 })
 
 
-test('r6 preserves existing knight protection before later bishop preferences across D4', () => {
+test('r4 moves a protected knight onto the opposite-color center across D4', () => {
   const start = '8/8/4N1k1/3BK3/8/8/8/8 w - - 0 1'
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen(start,t)
@@ -53,15 +53,14 @@ test('r6 preserves existing knight protection before later bishop preferences ac
     const closer = score(fen,san('c5')), farther = score(fen,san('d4'))
     assert.equal(closer.oppositePrecageDistance,1)
     assert.equal(farther.oppositePrecageDistance,3)
-    const bishopMove = getChess(fen).move({from:transformSquare('d5',t),to:transformSquare('e4',t)}).san
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[bishopMove])
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[san('d4')])
   }
 })
 
-test('r6 brings the knight under king protection before precage preferences across D4', () => {
+test('r4 routes toward the opposite-color center before precage preferences across D4', () => {
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen('8/8/8/2NBK1k1/8/8/8/8 w - - 0 1', t)
-    const move = getChess(fen).move({from:transformSquare('c5',t),to:transformSquare('e4',t)}).san
+    const move = getChess(fen).move({from:transformSquare('c5',t),to:transformSquare('e6',t)}).san
     assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [move])
   }
 })
@@ -84,16 +83,16 @@ test('precage metric gives no frozen-target credit after the bishop leaves the c
 })
 
 
-test('remaining policy still brings the knight next to the king without a central bishop, across D4', () => {
+test('r4 applies without a central bishop and routes the knight toward the opposite-color center, across D4', () => {
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen('4B3/8/8/8/3k1K2/2N5/8/8 w - - 0 1', t)
-    const san = (to: 'e4' | 'a4') => getChess(fen).move({from: transformSquare('c3', t), to: transformSquare(to, t)}).san
+    const san = (to: 'e4' | 'a4' | 'e2') => getChess(fen).move({from: transformSquare('c3', t), to: transformSquare(to, t)}).san
     const adjacent = score(fen, san('e4')), distant = score(fen, san('a4'))
     assert.equal(adjacent.oppositePrecageDistance, 0)
     assert.equal(distant.oppositePrecageDistance, 0)
     assert.equal(adjacent.middle16KnightKingAdjacencyPenalty, 0)
     assert.equal(distant.middle16KnightKingAdjacencyPenalty, 1)
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [san('e4')])
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [san('e2')])
   }
 })
 

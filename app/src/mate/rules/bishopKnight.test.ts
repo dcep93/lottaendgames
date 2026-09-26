@@ -107,6 +107,11 @@ test("bishop-and-knight rules are registered", () => {
       helpText: "",
     },
     {
+      id: "r4",
+      shortLabel: "rule r4",
+      helpText: "With a central 16 king and knight, maneuver the knight to a central square opposite the bishop's color, then prefer king protection, then prefer the bishop on the long diagonal and protected by the knight.",
+    },
+    {
       id: "r5",
       shortLabel: "rule r5",
       helpText: "Play the r5 move.",
@@ -117,19 +122,9 @@ test("bishop-and-knight rules are registered", () => {
       helpText: "Drift the knight towards king protection, then prefer knight central 16 proximity.",
     },
     {
-      id: "r6.5",
-      shortLabel: "rule r6.5",
-      helpText: "To save an attacked bishop, move it to adjacent to the central White king or else maximize its distance from the Black king.",
-    },
-    {
       id: "r7",
       shortLabel: "rule r7",
       helpText: "Prefer king step proximity to the knight, then king central proximity, then prefer the king on the color opposite the bishop.",
-    },
-    {
-      id: "r8",
-      shortLabel: "rule r8",
-      helpText: "With a king on a central 16 square, prefer bishop on the long diagonal, then a central bishop, then knight move proximity to a precage square, then knight off the bishop's color.",
     },
     {
       id: "r20",
@@ -154,11 +149,10 @@ test("bishop-and-knight rules are registered", () => {
       "mate",
       "minors safe",
       "no stalemate",
+      "r4",
       "r5",
       "r6",
-      "r6.5",
       "r7",
-      "r8",
       "r20",
     ],
   );
@@ -166,7 +160,7 @@ test("bishop-and-knight rules are registered", () => {
     ruleSet.whiteRuleDescriptions.map(({ id }) => id),
     knightAndBishopWhiteRules.map(({ id }) => id),
   );
-  assert.equal(knightAndBishopWhiteRules.length, 9);
+  assert.equal(knightAndBishopWhiteRules.length, 8);
   assert.deepEqual(ruleSet.help.noteBoards.map(board=>board.id), ["bishop-knight-rule-r5-hop", "bishop-knight-rule-r5-opposition"]);
 });
 

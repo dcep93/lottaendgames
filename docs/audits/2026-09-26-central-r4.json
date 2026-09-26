@@ -1,0 +1,59 @@
+{
+  "date": "2026-09-26",
+  "rule": "r4",
+  "semantics": {
+    "eligibility": "White king and knight both start in c3-f6",
+    "first": "Minimum knight moves to d4/e4/d5/e5 of opposite color to bishop",
+    "second": "Knight protected by White king",
+    "third": "Bishop both on a long diagonal and protected by knight"
+  },
+  "removedRules": [
+    "r6.5",
+    "r8"
+  ],
+  "baselineFourPlyCycles": 15917,
+  "previousReplaySurvivors": 66,
+  "survivingSavedFourPlyCycles": 0,
+  "freshSearch": {
+    "milliseconds": 5000,
+    "checkedStarts": 413,
+    "distinctCycles": 34,
+    "displayEligible": 34,
+    "scope": "Five-second discovery seeded partly with past loop starts, not a uniform census or global estimate.",
+    "motif": "r4 \u2194 r6: knight crosses the middle-16 eligibility boundary and returns."
+  },
+  "examples": [
+    {
+      "group": 0,
+      "motif": "r4 \u2194 r6",
+      "fen": "B7/8/2K5/1N6/8/8/k7/8 w - - 0 1",
+      "moves": [
+        "Nd6",
+        "Kb1",
+        "Nb5",
+        "Ka2"
+      ],
+      "area": 12,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=B7/8/2K5/1N6/8/8/k7/8_w_-_-_0_1&moves=Nd6,Kb1,Nb5,Ka2&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "r4 \u2194 r6",
+      "fen": "6k1/1B6/2K5/2N5/8/8/8/8 w - - 0 1",
+      "moves": [
+        "Nd7",
+        "Kh8",
+        "Nc5",
+        "Kg8"
+      ],
+      "area": 6,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=6k1/1B6/2K5/2N5/8/8/8/8_w_-_-_0_1&moves=Nd7,Kh8,Nc5,Kg8&cursor=0"
+    }
+  ],
+  "validation": {
+    "build": "passed",
+    "bishopKnightTestsPassed": 139,
+    "bishopKnightTestsTotal": 140,
+    "remainingPreexistingFailure": "stable protection and king adjacency break the recorded shuttles across D4"
+  }
+}
