@@ -1,0 +1,54 @@
+{
+  "scope": "Saved-loop replay plus five-second fresh discovery; not global audit",
+  "change": "R4 distant bishop must not be adjacent to Black now or after any legal Black king reply; reuses existing blackReplies with no additional move generation",
+  "examplePreferred": [
+    "Bg4",
+    "Bb5"
+  ],
+  "earlierBc6StillPreferred": true,
+  "priorDisplayedCycles": 3,
+  "survivingDisplayedCycles": 2,
+  "survivingDisplayedFourPlyCycles": 2,
+  "displayedD4PostWhitePositions": 4,
+  "old318CyclesSurvivingBeforeDisplayFilter": 54,
+  "oldFullAuditWitnessesSurviving": 0,
+  "fresh": {
+    "scope": "bounded fresh search, not global audit",
+    "milliseconds": 5003,
+    "attempted": 329,
+    "checkedRoots": 220,
+    "completedRoots": 219,
+    "cycles": 0,
+    "policy": "working r4 next-step clearance",
+    "sampling": "mixed uniform physical placements, close knight/king placements, and shuffled old loop roots"
+  },
+  "examples": [
+    {
+      "group": 0,
+      "motif": "r7 \u2194 r7",
+      "fen": "8/8/8/1KN5/2Bk4/8/8/8 w - - 0 1",
+      "moves": [
+        "Kb4",
+        "Ke5",
+        "Kb5",
+        "Kd4"
+      ],
+      "area": 4,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/1KN5/2Bk4/8/8/8_w_-_-_0_1&moves=Kb4,Ke5,Kb5,Kd4&cursor=0"
+    },
+    {
+      "group": 1,
+      "motif": "r5 \u2194 r6",
+      "fen": "B7/1K1k4/2N5/8/8/8/8/8 w - - 0 1",
+      "moves": [
+        "Nb8+",
+        "Kd6",
+        "Nc6",
+        "Kd7"
+      ],
+      "area": 9,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=B7/1K1k4/2N5/8/8/8/8/8_w_-_-_0_1&moves=Nb8%2B,Kd6,Nc6,Kd7&cursor=0"
+    }
+  ],
+  "validation": "34 focused tests including D4 regression; production build passed"
+}

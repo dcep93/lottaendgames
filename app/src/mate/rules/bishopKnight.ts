@@ -327,8 +327,10 @@ function scoreKnightAndBishopWhiteMoveCore(
       const targets = context.knightOppositeCentralTargets.filter(target => target !== whiteKing?.square);
       return targets.length ? Math.min(...targets.map(target => knightMoveDistance(knight.square, target))) : 99;
     },
-    // Clear immediate contact; extra distance must not reward a bishop retreat cycle.
-    bishopTooCloseToBlackPenalty: bishop && blackKing && kingDistance(bishop.square, blackKing.square) < 2 ? 1 : 0,
+    // Stay clear through Black's next legal step; extra distance earns no bonus.
+    bishopTooCloseToBlackPenalty: bishop && blackKing
+      && (kingDistance(bishop.square, blackKing.square) <= 1
+        || blackReplies.some(reply => reply.piece === "k" && kingDistance(bishop.square, reply.to) <= 1)) ? 1 : 0,
     bishopCentralProximityScore: bishop ? knightAndBishopCenterProximityScore(bishop.square) : 99,
     bishopCenterPenalty: bishop && centerDistance(bishop.square) === 0 ? 0 : 1,
     kingKnightAdjacencyPenalty: knightKingDefended ? 0 : 1,
