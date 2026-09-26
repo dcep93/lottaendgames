@@ -109,7 +109,7 @@ test("bishop-and-knight rules are registered", () => {
     {
       id: "r4",
       shortLabel: "rule r4",
-      helpText: "With a central king and central 16 knight, ensure a distant bishop, then maneuver the knight to a central square opposite the bishop's color, then prefer king protection, then prefer bishop central proximity.",
+      helpText: "With a central king and central 16 knight, ensure a distant bishop, then prefer king protection, maneuver the knight to a central square opposite the bishop's color, prefer the king opposite the bishop's color, then prefer bishop central proximity.",
     },
     {
       id: "r5",

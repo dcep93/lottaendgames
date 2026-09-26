@@ -1,0 +1,65 @@
+{
+  "scope": "Saved-loop replay plus five-second mixed discovery; not global audit",
+  "change": "r4: capped bishop clearance, knight king protection, opposite-color central knight target, opposite-color king, bishop central proximity",
+  "reportedPositionPreferred": "Ke5",
+  "previousDisplayedCycles": 14,
+  "survivingDisplayedCycles": 3,
+  "survivingDisplayedFourPlyCycles": 3,
+  "displayedD4PostWhitePositions": 6,
+  "allRecentCyclesReplayed": 318,
+  "allRecentCyclesSurvivingBeforeMiddle16DisplayExclusion": 55,
+  "oldFullAuditWitnessesReplayed": 15917,
+  "oldFullAuditWitnessesSurviving": 0,
+  "fresh": {
+    "scope": "bounded fresh search, not global audit",
+    "milliseconds": 5004,
+    "attempted": 316,
+    "checkedRoots": 228,
+    "completedRoots": 227,
+    "cycles": 0,
+    "policy": "working r4 protection-first and king color",
+    "sampling": "mixed uniform physical placements, close knight/king placements, and shuffled old loop roots"
+  },
+  "examples": [
+    {
+      "group": 0,
+      "motif": "r4 \u2194 r4",
+      "fen": "8/3Bk3/8/8/3NK3/8/8/8 w - - 0 1",
+      "moves": [
+        "Bf5",
+        "Kf6",
+        "Bd7",
+        "Ke7"
+      ],
+      "area": 8,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/3Bk3/8/8/3NK3/8/8/8_w_-_-_0_1&moves=Bf5,Kf6,Bd7,Ke7&cursor=0"
+    },
+    {
+      "group": 1,
+      "motif": "r7 \u2194 r7",
+      "fen": "8/8/8/1KN5/2Bk4/8/8/8 w - - 0 1",
+      "moves": [
+        "Kb4",
+        "Ke5",
+        "Kb5",
+        "Kd4"
+      ],
+      "area": 4,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/1KN5/2Bk4/8/8/8_w_-_-_0_1&moves=Kb4,Ke5,Kb5,Kd4&cursor=0"
+    },
+    {
+      "group": 2,
+      "motif": "r5 \u2194 r6",
+      "fen": "B7/1K1k4/2N5/8/8/8/8/8 w - - 0 1",
+      "moves": [
+        "Nb8+",
+        "Kd6",
+        "Nc6",
+        "Kd7"
+      ],
+      "area": 9,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=B7/1K1k4/2N5/8/8/8/8/8_w_-_-_0_1&moves=Nb8%2B,Kd6,Nc6,Kd7&cursor=0"
+    }
+  ],
+  "validation": "33 focused tests including D4 priority regressions and production build pass"
+}

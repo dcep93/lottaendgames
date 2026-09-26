@@ -19,7 +19,7 @@ test('r4 requires a starting central-four king and middle-16 knight, across D4',
  }
 });
 
-test('r4 reaches an opposite-color center before king protection, across D4',()=>{
+test('r4 reaches a protected opposite-color center, across D4',()=>{
  for(const t of SQUARE_TRANSFORMS){
   const fen=transformFen('B7/8/8/k7/3K4/5N2/8/8 w - - 0 1',t);
   const san=(from:'f3'|'d4',to:'e5'|'h2'|'e4'|'c4')=>getChess(fen).move({from:transformSquare(from,t),to:transformSquare(to,t)}).san;
@@ -107,5 +107,27 @@ test('r4 clears bishop contact once, then resumes knight progress, across D4',()
   const expected=['f4','e3'].map(to=>getChess(next).move({from:transformSquare('d5',t),to:transformSquare(to as 'f4'|'e3',t)}).san);
   assert.deepEqual([...getIdealKnightAndBishopWhiteMoves(next)].sort(),expected.sort(),t.name);
   for(const san of expected)assert.equal(scoreKnightAndBishopWhiteMove(next,san).bishopTooCloseToBlackPenalty,0,t.name);
+ }
+});
+
+test('r4 puts king protection before a shorter knight route, across D4',()=>{
+ for(const t of SQUARE_TRANSFORMS){
+  const fen=transformFen('B6k/8/8/2N5/3K4/8/8/8 w - - 0 1',t);
+  const score=(to:'e4'|'d7')=>scoreKnightAndBishopWhiteMove(fen,getChess(fen).move({from:transformSquare('c5',t),to:transformSquare(to,t)}).san);
+  const protectedMove=score('e4'),shorterRoute=score('d7');
+  assert.equal(protectedMove.kingKnightAdjacencyPenalty,0,t.name);
+  assert.equal(shorterRoute.kingKnightAdjacencyPenalty,1,t.name);
+  assert.ok(protectedMove.knightOppositeCentralDistance>shorterRoute.knightOppositeCentralDistance,t.name);
+  assert.ok(compareScoresByRules(protectedMove,shorterRoute,[r4])<0,t.name);
+ }
+});
+
+test('r4 changes king color before bringing the bishop inward, across D4',()=>{
+ for(const t of SQUARE_TRANSFORMS){
+  const fen=transformFen('8/3B1k2/8/8/3NK3/8/8/8 w - - 0 1',t);
+  const san=(from:'e4'|'d7',to:'e5'|'f5')=>getChess(fen).move({from:transformSquare(from,t),to:transformSquare(to,t)}).san;
+  const king=san('e4','e5'),bishop=san('d7','f5');
+  assert.ok(compareScoresByRules(scoreKnightAndBishopWhiteMove(fen,king),scoreKnightAndBishopWhiteMove(fen,bishop),[r4])<0,t.name);
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[king],t.name);
  }
 });
