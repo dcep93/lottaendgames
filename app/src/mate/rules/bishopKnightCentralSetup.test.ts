@@ -6,13 +6,13 @@ import {compareScoresByRules} from './selection';
 
 const r4=knightAndBishopWhiteRules.find(rule=>rule.id==='r4')!;
 
-test('r4 requires a starting central-four king, middle-16 knight, and distant bishop, across D4',()=>{
+test('r4 requires a starting central-four king and middle-16 knight, across D4',()=>{
  for(const t of SQUARE_TRANSFORMS)for(const [start,enabled] of [
   ['B7/8/8/k7/3K4/5N2/8/8 w - - 0 1',true],
   ['B7/8/8/k7/5K2/5N2/8/8 w - - 0 1',false],
   ['B7/8/8/k7/6K1/5N2/8/8 w - - 0 1',false],
   ['B7/8/8/k7/3K4/8/5N2/8 w - - 0 1',false],
-  ['B7/8/k7/8/3K4/5N2/8/8 w - - 0 1',false], // Bishop only two king steps away.
+  ['B7/8/k7/8/3K4/5N2/8/8 w - - 0 1',true], // Bishop proximity does not gate r4.
  ] as const){
   const fen=transformFen(start,t);
   for(const san of getChess(fen).moves())assert.equal(r4.applies!(scoreKnightAndBishopWhiteMove(fen,san)),enabled,`${t.name} ${san}`);
@@ -78,9 +78,9 @@ test('r4 centralizes the bishop in the supplied Ba2 position, across D4',()=>{
  }
 });
 
-test('r4 is inactive with the supplied bishop two steps from Black, across D4',()=>{
+test('r4 stays active with the supplied bishop two steps from Black, across D4',()=>{
  for(const t of SQUARE_TRANSFORMS){
   const fen=transformFen('2k5/8/2B5/3N4/4K3/8/8/8 w - - 2 2',t);
-  for(const move of getChess(fen).moves())assert.equal(r4.applies!(scoreKnightAndBishopWhiteMove(fen,move)),false,`${t.name} ${move}`);
+  for(const move of getChess(fen).moves())assert.equal(r4.applies!(scoreKnightAndBishopWhiteMove(fen,move)),true,`${t.name} ${move}`);
  }
 });
