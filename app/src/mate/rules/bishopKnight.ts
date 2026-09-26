@@ -54,9 +54,9 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly bishopCenterPenalty: number;
   readonly knightOppositeCentralDistance: number;
   readonly bishopCentralProximityScore: number;
-  readonly startsWithBishopNearNoncentralKing: boolean;
+  readonly startsWithBishopAdjacentToNoncentralKing: boolean;
   readonly bishopWhiteKingDistanceScore: number;
-  readonly bishopNearNoncentralKingPenalty: number;
+  readonly bishopMoveNearNoncentralKingPenalty: number;
   readonly bishopKingCentralNavigationScore: number;
   readonly bishopShuffleControlPenalty: number;
   readonly minorBlackDistanceScore: number;
@@ -182,7 +182,7 @@ type KnightAndBishopPositionScoreContext = {
   readonly knightOppositeCentralTargets: readonly Square[];
   readonly bishopShuffleTargets: readonly Square[];
   readonly startsWithUnprotectedBishop: boolean;
-  readonly startsWithBishopNearNoncentralKing: boolean;
+  readonly startsWithBishopAdjacentToNoncentralKing: boolean;
   readonly startsWithUnprotectedKnight: boolean;
   readonly sixPointNineMove: string | undefined;
   readonly fivePointFiveMove: string | undefined;
@@ -218,8 +218,8 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
     knightOppositeCentralTargets: (["d4", "e4", "d5", "e5"] as const).filter(target =>
       bishop && target !== whiteKing?.square && squareColor(target) !== squareColor(bishop.square)),
     bishopShuffleTargets: knightAndBishopShuffleTargets(fen),
-    startsWithBishopNearNoncentralKing: !!whiteKing && !!bishop && !centralKing
-      && kingDistance(whiteKing.square, bishop.square) <= 2,
+    startsWithBishopAdjacentToNoncentralKing: !!whiteKing && !!bishop && !centralKing
+      && kingDistance(whiteKing.square, bishop.square) === 1,
     startsWithUnprotectedBishop: !!bishop
       && (!whiteKing || kingDistance(whiteKing.square,bishop.square)!==1)
       && (!knight || squaredEuclideanDistance(bishop.square,knight.square)!==5),
@@ -324,10 +324,10 @@ function scoreKnightAndBishopWhiteMoveCore(
       return Math.min(...bishopTargets.map(square => squaredEuclideanDistance(bishop.square, square)))
         + Math.min(...kingTargets.map(square => squaredEuclideanDistance(whiteKing.square, square)));
     },
-    startsWithBishopNearNoncentralKing: context.startsWithBishopNearNoncentralKing,
-    bishopNearNoncentralKingPenalty: bishop && whiteKing && centerDistance(whiteKing.square) !== 0
+    startsWithBishopAdjacentToNoncentralKing: context.startsWithBishopAdjacentToNoncentralKing,
+    bishopMoveNearNoncentralKingPenalty: move.piece === "b" && bishop && whiteKing && centerDistance(whiteKing.square) !== 0
       && kingDistance(bishop.square, whiteKing.square) <= 2 ? 1 : 0,
-    bishopWhiteKingDistanceScore: context.startsWithBishopNearNoncentralKing && bishop && whiteKing
+    bishopWhiteKingDistanceScore: context.startsWithBishopAdjacentToNoncentralKing && bishop && whiteKing
       ? -squaredEuclideanDistance(bishop.square, whiteKing.square) : 0,
     bishopCentralProximityScore: bishop ? knightAndBishopCenterProximityScore(bishop.square) : 99,
     bishopCenterPenalty: bishop && centerDistance(bishop.square) === 0 ? 0 : 1,
@@ -575,7 +575,7 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       id: "r4.5",
       shortLabel: "rule r4.5",
       helpText: "Prefer an uncluttered bishop.",
-      compare: (first, second) => first.bishopNearNoncentralKingPenalty - second.bishopNearNoncentralKingPenalty
+      compare: (first, second) => first.bishopMoveNearNoncentralKingPenalty - second.bishopMoveNearNoncentralKingPenalty
         || first.bishopWhiteKingDistanceScore - second.bishopWhiteKingDistanceScore,
     },
     {
