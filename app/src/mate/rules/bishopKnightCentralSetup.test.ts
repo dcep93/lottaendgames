@@ -198,3 +198,19 @@ test('r4.5 allows Kg4 to approach the bishop without moving it, across D4', () =
     assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [move], t.name);
   }
 });
+
+test('r4.5 rejects a king move that leaves the bishop with no legal moves, across D4', () => {
+  for (const t of SQUARE_TRANSFORMS) for (const start of [
+    'B1K5/2N5/3k4/8/8/8/8/8 w - - 0 1',
+    'B1K5/2N5/8/4k3/8/8/8/8 w - - 0 1',
+  ]) {
+    const fen = transformFen(start, t);
+    const move = (to: 'b7' | 'd8') => getChess(fen).move({from: transformSquare('c8', t), to: transformSquare(to, t)}).san;
+    const trapped = scoreKnightAndBishopWhiteMove(fen, move('b7'));
+    const free = scoreKnightAndBishopWhiteMove(fen, move('d8'));
+    assert.equal(trapped.immobileBishopPenalty, 1, t.name);
+    assert.equal(free.immobileBishopPenalty, 0, t.name);
+    assert.ok(compareScoresByRules(free, trapped, [r45]) < 0, t.name);
+    assert.ok(!getIdealKnightAndBishopWhiteMoves(fen).includes(move('b7')), t.name);
+  }
+});

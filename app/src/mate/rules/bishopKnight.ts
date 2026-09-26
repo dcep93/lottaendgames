@@ -57,6 +57,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly startsWithBishopAdjacentToNoncentralKing: boolean;
   readonly bishopWhiteKingDistanceScore: number;
   readonly bishopMoveNearNoncentralKingPenalty: number;
+  readonly immobileBishopPenalty: number;
   readonly bishopKingCentralNavigationScore: number;
   readonly bishopShuffleControlPenalty: number;
   readonly minorBlackDistanceScore: number;
@@ -276,6 +277,7 @@ function scoreKnightAndBishopWhiteMoveCore(
   let kingCenterProximity: number | undefined;
   let kingCenterEuclidean: number | undefined;
   let knightTargetProximity: number | undefined;
+  let immobileBishopPenalty: number | undefined;
   const knight = findPiece(resultFen, "w", "n");
   const blackKing = findPiece(resultFen, "b", "k");
   const doubleOppositionTargets = (() => {
@@ -324,6 +326,10 @@ function scoreKnightAndBishopWhiteMoveCore(
         + Math.min(...kingTargets.map(square => squaredEuclideanDistance(whiteKing.square, square)));
     },
     startsWithBishopAdjacentToNoncentralKing: context.startsWithBishopAdjacentToNoncentralKing,
+    get immobileBishopPenalty() {
+      return immobileBishopPenalty ??= bishop
+        && getChess(resultFen.replace(" b ", " w ")).moves({ square: bishop.square }).length === 0 ? 1 : 0;
+    },
     bishopMoveNearNoncentralKingPenalty: move.piece === "b" && bishop && whiteKing && centerDistance(whiteKing.square) !== 0
       && kingDistance(bishop.square, whiteKing.square) <= 2 ? 1 : 0,
     bishopWhiteKingDistanceScore: context.startsWithBishopAdjacentToNoncentralKing && bishop && whiteKing
@@ -582,7 +588,8 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       id: "r4.5",
       shortLabel: "rule r4.5",
       helpText: "Prefer an uncluttered bishop.",
-      compare: (first, second) => first.bishopMoveNearNoncentralKingPenalty - second.bishopMoveNearNoncentralKingPenalty
+      compare: (first, second) => first.immobileBishopPenalty - second.immobileBishopPenalty
+        || first.bishopMoveNearNoncentralKingPenalty - second.bishopMoveNearNoncentralKingPenalty
         || first.bishopWhiteKingDistanceScore - second.bishopWhiteKingDistanceScore,
     },
     {
