@@ -165,33 +165,13 @@ test('r6 ignores Black proximity after knight and central proximity tie, across 
  }
 });
 
-test('removing Black proximity lets the knight advance, then the king follow, across D4', () => {
+test('king approach remains preferred after the drift reset, across D4', () => {
   const cases = [
-    ['B3k3/8/8/8/8/8/3K4/4N3 w - - 0 1', 'e1', 'd3'],
     ['B2k4/8/8/8/8/3N4/3K4/8 w - - 0 1', 'd2', 'e3'],
   ] as const;
   for (const [start, from, to] of cases) for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen(start, t);
     const move = getChess(fen).move({from: transformSquare(from, t), to: transformSquare(to, t)}).san;
     assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [move], t.name);
-  }
-});
-
-test('r6 defers to drift when Black stands between the attacked knight and White king, across D4', () => {
-  const r6 = knightAndBishopWhiteRules.find(rule => rule.id === 'r6')!;
-  for (const t of SQUARE_TRANSFORMS) {
-    const fen = transformFen('4B3/8/8/8/3N4/2k5/8/K7 w - - 2 2', t);
-    const move = (to: 'f3' | 'c6' | 'b5') => getChess(fen).move({from: transformSquare('d4', t), to: transformSquare(to, t)}).san;
-    const onward = scoreKnightAndBishopWhiteMove(fen, move('f3'));
-    const retreat = scoreKnightAndBishopWhiteMove(fen, move('b5'));
-    assert.ok(onward.kingKnightDistanceScore > retreat.kingKnightDistanceScore, t.name);
-    assert.equal(r6.applies!(onward), false, t.name);
-    assert.equal(r6.applies!(retreat), false, t.name);
-    assert.ok(onward.knightDriftScore[0] < retreat.knightDriftScore[0], t.name);
-    assert.deepEqual([...getIdealKnightAndBishopWhiteMoves(fen)].sort(), [move('f3'), move('c6')].sort(), t.name);
-    const clear = transformFen('B2k4/8/8/8/8/3N4/3K4/8 w - - 0 1', t);
-    const approach = getChess(clear).move({from: transformSquare('d2', t), to: transformSquare('e3', t)}).san;
-    assert.equal(r6.applies!(scoreKnightAndBishopWhiteMove(clear, approach)), true, t.name);
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(clear), [approach], t.name);
   }
 });
