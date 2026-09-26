@@ -1,7 +1,7 @@
 import {readFileSync, writeFileSync, mkdirSync} from 'node:fs';
 import {DatabaseSync} from 'node:sqlite';
 import {createHash} from 'node:crypto';
-import {build} from '../../app/node_modules/esbuild/lib/main.js';
+import {currentPolicyFingerprints} from './current-policy-fingerprints.mts';
 import assert from 'node:assert/strict';
 import {BASE, fen} from './encoding.mts';
 import {loopExclusion} from './loop-exclusions.mts';
@@ -14,11 +14,10 @@ assert.ok(source && out, 'Usage: precage-terminal.mts SOURCE_AUDIT OUTPUT_DIRECT
 const original = JSON.parse(readFileSync(source + '/result.json', 'utf8'));
 assert.equal(original.blackPolicy, 'all-legal');
 assert.equal(original.population, 'all');
-const bundle = await build({entryPoints:['scripts/bishop-knight-audit/worker.mts'],bundle:true,platform:'node',format:'esm',write:false});
 const manifest = JSON.parse(readFileSync(source + '/manifest.json', 'utf8'));
 const policyFingerprint = manifest.referenceWorkerFingerprint;
 assert.equal(createHash('sha256').update(readFileSync(source + '/reference-worker.mjs')).digest('hex'), policyFingerprint, 'Source worker fingerprint is invalid');
-assert.equal(createHash('sha256').update(bundle.outputFiles[0]!.contents).digest('hex'), policyFingerprint, 'Source policy is stale: refresh move choices first');
+assert.ok((await currentPolicyFingerprints()).includes(policyFingerprint), 'Source policy is stale: refresh move choices first');
 assert.ok([manifest.fingerprint, policyFingerprint].includes(original.policyFingerprint), 'Source result does not match its manifest');
 const db = new DatabaseSync(source + '/census.sqlite', {readOnly:true});
 const terminalCache = new Map<number,boolean>();

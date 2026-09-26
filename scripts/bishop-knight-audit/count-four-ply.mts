@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
-import {build} from '../../app/node_modules/esbuild/lib/main.js';
+import {currentPolicyFingerprints} from './current-policy-fingerprints.mts';
 import {readFileSync,writeFileSync} from 'node:fs';
 import {getChess} from '../../app/src/mate/chess.ts';
 import {getIdealKnightAndBishopWhiteMoves as preferred} from '../../app/src/mate/rules/bishopKnight.ts';
@@ -8,8 +8,7 @@ import {loopExclusion} from './loop-exclusions.mts';
 import {code,fen,transform,canonical} from './encoding.mts';
 const dir=process.argv[2]!;
 const result=JSON.parse(readFileSync(dir+'/result.json','utf8')),keys=new Set<number>(result.placements.boards.map((p:any)=>p.key));
-const bundle=await build({entryPoints:['scripts/bishop-knight-audit/worker.mts'],bundle:true,platform:'node',format:'esm',write:false});
-assert.equal(createHash('sha256').update(bundle.outputFiles[0]!.contents).digest('hex'),result.policyFingerprint,'Source policy is stale: refresh the full graph first');
+assert.ok((await currentPolicyFingerprints()).includes(result.policyFingerprint),'Source policy is stale: refresh the full graph first');
 assert.equal(createHash('sha256').update(readFileSync('scripts/bishop-knight-audit/loop-exclusions.mts')).digest('hex'),result.exclusionFingerprint,'Loop exclusions changed: refilter the full graph first');
 const memo=new Map<string,string[]>(),nextCache=new Map<number,any[]>();
 const terminal=(f:string)=>loopExclusion(f)!==null;

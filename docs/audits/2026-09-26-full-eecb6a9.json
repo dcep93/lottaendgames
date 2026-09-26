@@ -1,0 +1,1106 @@
+{
+  "policyCommit": "eecb6a9640b8cef4bd97e77d40cbe7f9061312eb",
+  "source": "/Users/danielcepeda/repos/_codex_output/bn-full-eecb6a9-2026-09-25",
+  "filtered": "/Users/danielcepeda/repos/_codex_output/bn-full-eecb6a9-2026-09-25-filtered",
+  "policyFingerprint": "437fe681cb2e6ef3db0d28c201a94c5966af58ec882a53e2c6501289e9a6b9ca",
+  "exclusionFingerprint": "4b6ef04757ab61336240fb423b2c3014304d71c194989ca6333613edf466b30f",
+  "remainingLoopPositions": 8353,
+  "physicalLoopPositions": 66684,
+  "cyclicComponents": 519,
+  "whiteTurnCyclePositions": 8679,
+  "independentCycleMembershipVerified": true,
+  "supportLosses": 0,
+  "supportedLoops": 0,
+  "terminalDefinition": "Central bishop diagonally adjacent to knight, or degenerate A/B/C; stop at either side to move. This is an audit terminal, not a support declaration.",
+  "distinctFourPlyCycles": 15917,
+  "hiddenMiddle16FourPlyCycles": 66,
+  "displayEligibleFourPlyCycles": 15851,
+  "comparisonToPreviousFullAudit": {
+    "policyCommit": "76ac0b4137d2248af30c01abe31e1f6a776c39c5",
+    "previousPositions": 5919,
+    "survivingPositions": 192,
+    "resolvedPositions": 5727,
+    "newPositions": 8161,
+    "previousFourPlyCycles": 4847,
+    "survivingFourPlyCycles": 66,
+    "newFourPlyCycles": 15851
+  },
+  "domain": {
+    "d4Placements": 1707888,
+    "physicalPlacements": 13660584,
+    "whitePolicies": 1359344,
+    "transitions": 6508269
+  },
+  "validation": {
+    "passed": true,
+    "seed": 20260920,
+    "roots": 1000,
+    "nodes": 1928,
+    "fingerprint": "66eb7850190e3546d697252537270e87f2046384cdb721be7cbe59c67d229045"
+  },
+  "symmetrySamplePassed": 1000,
+  "harnessTestsPassed": 39,
+  "motifs": [
+    {
+      "motif": "r4 ↔ r4",
+      "cycles": 7870,
+      "positions": 3809
+    },
+    {
+      "motif": "r4 ↔ r6",
+      "cycles": 5550,
+      "positions": 3135
+    },
+    {
+      "motif": "r20 ↔ r4",
+      "cycles": 2025,
+      "positions": 1349
+    },
+    {
+      "motif": "r20 ↔ r6",
+      "cycles": 209,
+      "positions": 113
+    },
+    {
+      "motif": "r20 ↔ r20",
+      "cycles": 86,
+      "positions": 105
+    },
+    {
+      "motif": "r4 ↔ r5",
+      "cycles": 77,
+      "positions": 97
+    },
+    {
+      "motif": "r8 ↔ r8",
+      "cycles": 66,
+      "positions": 42
+    },
+    {
+      "motif": "minors safe ↔ r4",
+      "cycles": 8,
+      "positions": 12
+    },
+    {
+      "motif": "r6.5 ↔ r8",
+      "cycles": 8,
+      "positions": 12
+    },
+    {
+      "motif": "r4 ↔ r8",
+      "cycles": 7,
+      "positions": 10
+    },
+    {
+      "motif": "r20 ↔ r8",
+      "cycles": 3,
+      "positions": 6
+    },
+    {
+      "motif": "r7 ↔ r7",
+      "cycles": 3,
+      "positions": 5
+    },
+    {
+      "motif": "r20 ↔ r6.5",
+      "cycles": 3,
+      "positions": 5
+    },
+    {
+      "motif": "r20 ↔ r5",
+      "cycles": 1,
+      "positions": 2
+    },
+    {
+      "motif": "r6 ↔ r8",
+      "cycles": 1,
+      "positions": 2
+    }
+  ],
+  "displayEligibleMotifs": [
+    {
+      "motif": "r4 ↔ r4",
+      "cycles": 7870,
+      "positions": 3809
+    },
+    {
+      "motif": "r4 ↔ r6",
+      "cycles": 5550,
+      "positions": 3135
+    },
+    {
+      "motif": "r20 ↔ r4",
+      "cycles": 2025,
+      "positions": 1349
+    },
+    {
+      "motif": "r20 ↔ r6",
+      "cycles": 209,
+      "positions": 113
+    },
+    {
+      "motif": "r20 ↔ r20",
+      "cycles": 86,
+      "positions": 105
+    },
+    {
+      "motif": "r4 ↔ r5",
+      "cycles": 77,
+      "positions": 97
+    },
+    {
+      "motif": "minors safe ↔ r4",
+      "cycles": 8,
+      "positions": 12
+    },
+    {
+      "motif": "r6.5 ↔ r8",
+      "cycles": 8,
+      "positions": 12
+    },
+    {
+      "motif": "r4 ↔ r8",
+      "cycles": 7,
+      "positions": 10
+    },
+    {
+      "motif": "r20 ↔ r8",
+      "cycles": 3,
+      "positions": 6
+    },
+    {
+      "motif": "r7 ↔ r7",
+      "cycles": 3,
+      "positions": 5
+    },
+    {
+      "motif": "r8 ↔ r8",
+      "cycles": 2,
+      "positions": 42
+    },
+    {
+      "motif": "r20 ↔ r6.5",
+      "cycles": 1,
+      "positions": 5
+    },
+    {
+      "motif": "r20 ↔ r5",
+      "cycles": 1,
+      "positions": 2
+    },
+    {
+      "motif": "r6 ↔ r8",
+      "cycles": 1,
+      "positions": 2
+    }
+  ],
+  "largestMotifMechanism": {
+    "summary": "The largest rule-level four-ply archetype is r4 undoing itself: 7,870 cycles involving 3,809 distinct post-White positions. In 7,225 of those cycles the bishop alternates between an edge square two king steps from White's king and an interior square one step away. Both states trigger r4, which forces a bishop relocation even when it moves closer to White's king. The second archetype is r4 versus r6 (5,550 cycles): r6 establishes stable bishop protection of the knight and r4 breaks it to separate the bishop from the king. Rule labels identify the last priority that narrows the candidate set; earlier priorities still apply. The separate geometric grouping's largest class has 6,496 cycles and overlaps these rule-level groups. A targeted next experiment would require r4 to make measurable uncluttering progress, rather than forcing a bishop move merely because its starting square triggers the rule. No chess rule was changed in this audit.",
+    "r4SelfReversalCycles": 7870,
+    "edgeTwoStepsInteriorOneStepCycles": 7225,
+    "traces": [
+      {
+        "group": 0,
+        "motif": "r4 ↔ r4",
+        "fen": "B5k1/8/2K5/8/8/8/8/7N w - - 0 1",
+        "moves": [
+          "Bb7",
+          "Kh8",
+          "Ba8",
+          "Kg8"
+        ],
+        "area": 64,
+        "url": "http://localhost:5173/mate/bishop-knight#fen=B5k1/8/2K5/8/8/8/8/7N_w_-_-_0_1&moves=Bb7,Kh8,Ba8,Kg8&cursor=0",
+        "frames": [
+          {
+            "fen": "B5k1/8/2K5/8/8/8/8/7N w - - 0 1",
+            "move": "Bb7",
+            "trace": [
+              {
+                "rule": "r4",
+                "survivors": [
+                  "Bb7"
+                ]
+              }
+            ]
+          },
+          {
+            "fen": "7k/1B6/2K5/8/8/8/8/7N w - - 2 2",
+            "move": "Ba8",
+            "trace": [
+              {
+                "rule": "r4",
+                "survivors": [
+                  "Ba8"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "group": 0,
+        "motif": "r4 ↔ r4",
+        "fen": "4B3/8/6K1/2k5/8/8/8/N7 w - - 0 1",
+        "moves": [
+          "Bf7",
+          "Kb4",
+          "Be8",
+          "Kc5"
+        ],
+        "area": 56,
+        "url": "http://localhost:5173/mate/bishop-knight#fen=4B3/8/6K1/2k5/8/8/8/N7_w_-_-_0_1&moves=Bf7,Kb4,Be8,Kc5&cursor=0",
+        "frames": [
+          {
+            "fen": "4B3/8/6K1/2k5/8/8/8/N7 w - - 0 1",
+            "move": "Bf7",
+            "trace": [
+              {
+                "rule": "minors safe",
+                "survivors": [
+                  "Bf7",
+                  "Bd7",
+                  "Ba4",
+                  "Kf7",
+                  "Kg7",
+                  "Kh7",
+                  "Kh6",
+                  "Kh5",
+                  "Kg5",
+                  "Kf5",
+                  "Kf6",
+                  "Nb3+",
+                  "Nc2"
+                ]
+              },
+              {
+                "rule": "r4",
+                "survivors": [
+                  "Bf7"
+                ]
+              }
+            ]
+          },
+          {
+            "fen": "8/5B2/6K1/8/1k6/8/8/N7 w - - 2 2",
+            "move": "Be8",
+            "trace": [
+              {
+                "rule": "minors safe",
+                "survivors": [
+                  "Be8",
+                  "Bg8",
+                  "Be6",
+                  "Bd5",
+                  "Bb3",
+                  "Ba2",
+                  "Kg7",
+                  "Kh7",
+                  "Kh6",
+                  "Kh5",
+                  "Kg5",
+                  "Kf5",
+                  "Kf6",
+                  "Nb3",
+                  "Nc2+"
+                ]
+              },
+              {
+                "rule": "r4",
+                "survivors": [
+                  "Be8"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "group": 0,
+        "motif": "r4 ↔ r4",
+        "fen": "6B1/8/5K2/8/1k6/8/8/N7 w - - 0 1",
+        "moves": [
+          "Bh7",
+          "Kc3",
+          "Bg8",
+          "Kb4"
+        ],
+        "area": 56,
+        "url": "http://localhost:5173/mate/bishop-knight#fen=6B1/8/5K2/8/1k6/8/8/N7_w_-_-_0_1&moves=Bh7,Kc3,Bg8,Kb4&cursor=0",
+        "frames": [
+          {
+            "fen": "6B1/8/5K2/8/1k6/8/8/N7 w - - 0 1",
+            "move": "Bh7",
+            "trace": [
+              {
+                "rule": "minors safe",
+                "survivors": [
+                  "Bh7",
+                  "Bf7",
+                  "Be6",
+                  "Bd5",
+                  "Bb3",
+                  "Ba2",
+                  "Ke7",
+                  "Kf7",
+                  "Kg7",
+                  "Kg6",
+                  "Kg5",
+                  "Kf5",
+                  "Ke5",
+                  "Ke6",
+                  "Nb3",
+                  "Nc2+"
+                ]
+              },
+              {
+                "rule": "r4",
+                "survivors": [
+                  "Bh7"
+                ]
+              }
+            ]
+          },
+          {
+            "fen": "8/7B/5K2/8/8/2k5/8/N7 w - - 2 2",
+            "move": "Bg8",
+            "trace": [
+              {
+                "rule": "minors safe",
+                "survivors": [
+                  "Bg8",
+                  "Bg6",
+                  "Bf5",
+                  "Be4",
+                  "Bc2",
+                  "Bb1",
+                  "Ke7",
+                  "Kf7",
+                  "Kg7",
+                  "Kg6",
+                  "Kg5",
+                  "Kf5",
+                  "Ke5",
+                  "Ke6",
+                  "Nc2"
+                ]
+              },
+              {
+                "rule": "r4",
+                "survivors": [
+                  "Bg8"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "group": 0,
+        "motif": "r4 ↔ r4",
+        "fen": "B7/8/2K5/8/8/8/k7/6N1 w - - 0 1",
+        "moves": [
+          "Bb7",
+          "Ka1",
+          "Ba8",
+          "Ka2"
+        ],
+        "area": 56,
+        "url": "http://localhost:5173/mate/bishop-knight#fen=B7/8/2K5/8/8/8/k7/6N1_w_-_-_0_1&moves=Bb7,Ka1,Ba8,Ka2&cursor=0",
+        "frames": [
+          {
+            "fen": "B7/8/2K5/8/8/8/k7/6N1 w - - 0 1",
+            "move": "Bb7",
+            "trace": [
+              {
+                "rule": "r4",
+                "survivors": [
+                  "Bb7"
+                ]
+              }
+            ]
+          },
+          {
+            "fen": "8/1B6/2K5/8/8/8/8/k5N1 w - - 2 2",
+            "move": "Ba8",
+            "trace": [
+              {
+                "rule": "r4",
+                "survivors": [
+                  "Ba8"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "group": 0,
+        "motif": "r4 ↔ r4",
+        "fen": "4B3/8/6K1/2k5/8/8/N7/8 w - - 0 1",
+        "moves": [
+          "Bf7",
+          "Kd4",
+          "Be8",
+          "Kc5"
+        ],
+        "area": 49,
+        "url": "http://localhost:5173/mate/bishop-knight#fen=4B3/8/6K1/2k5/8/8/N7/8_w_-_-_0_1&moves=Bf7,Kd4,Be8,Kc5&cursor=0",
+        "frames": [
+          {
+            "fen": "4B3/8/6K1/2k5/8/8/N7/8 w - - 0 1",
+            "move": "Bf7",
+            "trace": [
+              {
+                "rule": "minors safe",
+                "survivors": [
+                  "Bf7",
+                  "Bd7",
+                  "Ba4",
+                  "Kf7",
+                  "Kg7",
+                  "Kh7",
+                  "Kh6",
+                  "Kh5",
+                  "Kg5",
+                  "Kf5",
+                  "Kf6",
+                  "Nc3",
+                  "Nc1"
+                ]
+              },
+              {
+                "rule": "r4",
+                "survivors": [
+                  "Bf7"
+                ]
+              }
+            ]
+          },
+          {
+            "fen": "8/5B2/6K1/8/3k4/8/N7/8 w - - 2 2",
+            "move": "Be8",
+            "trace": [
+              {
+                "rule": "minors safe",
+                "survivors": [
+                  "Be8",
+                  "Bg8",
+                  "Be6",
+                  "Bb3",
+                  "Kg7",
+                  "Kh7",
+                  "Kh6",
+                  "Kh5",
+                  "Kg5",
+                  "Kf5",
+                  "Kf6",
+                  "Nb4",
+                  "Nc1"
+                ]
+              },
+              {
+                "rule": "r4",
+                "survivors": [
+                  "Be8"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "group": 0,
+        "motif": "r4 ↔ r4",
+        "fen": "6k1/1B6/2K5/8/8/8/8/7N w - - 0 1",
+        "moves": [
+          "Ba8",
+          "Kh8",
+          "Bb7",
+          "Kg8"
+        ],
+        "area": 49,
+        "url": "http://localhost:5173/mate/bishop-knight#fen=6k1/1B6/2K5/8/8/8/8/7N_w_-_-_0_1&moves=Ba8,Kh8,Bb7,Kg8&cursor=0",
+        "frames": [
+          {
+            "fen": "6k1/1B6/2K5/8/8/8/8/7N w - - 0 1",
+            "move": "Ba8",
+            "trace": [
+              {
+                "rule": "r4",
+                "survivors": [
+                  "Ba8"
+                ]
+              }
+            ]
+          },
+          {
+            "fen": "B6k/8/2K5/8/8/8/8/7N w - - 2 2",
+            "move": "Bb7",
+            "trace": [
+              {
+                "rule": "r4",
+                "survivors": [
+                  "Bb7"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "group": 0,
+        "motif": "r4 ↔ r4",
+        "fen": "B5k1/8/2K5/8/8/8/6N1/8 w - - 0 1",
+        "moves": [
+          "Bb7",
+          "Kh8",
+          "Ba8",
+          "Kg8"
+        ],
+        "area": 49,
+        "url": "http://localhost:5173/mate/bishop-knight#fen=B5k1/8/2K5/8/8/8/6N1/8_w_-_-_0_1&moves=Bb7,Kh8,Ba8,Kg8&cursor=0",
+        "frames": [
+          {
+            "fen": "B5k1/8/2K5/8/8/8/6N1/8 w - - 0 1",
+            "move": "Bb7",
+            "trace": [
+              {
+                "rule": "r4",
+                "survivors": [
+                  "Bb7"
+                ]
+              }
+            ]
+          },
+          {
+            "fen": "7k/1B6/2K5/8/8/8/6N1/8 w - - 2 2",
+            "move": "Ba8",
+            "trace": [
+              {
+                "rule": "r4",
+                "survivors": [
+                  "Ba8"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "group": 0,
+        "motif": "r4 ↔ r4",
+        "fen": "4B3/8/6K1/2k5/8/8/8/1N6 w - - 0 1",
+        "moves": [
+          "Bf7",
+          "Kb4",
+          "Be8",
+          "Kc5"
+        ],
+        "area": 48,
+        "url": "http://localhost:5173/mate/bishop-knight#fen=4B3/8/6K1/2k5/8/8/8/1N6_w_-_-_0_1&moves=Bf7,Kb4,Be8,Kc5&cursor=0",
+        "frames": [
+          {
+            "fen": "4B3/8/6K1/2k5/8/8/8/1N6 w - - 0 1",
+            "move": "Bf7",
+            "trace": [
+              {
+                "rule": "minors safe",
+                "survivors": [
+                  "Bf7",
+                  "Bd7",
+                  "Ba4",
+                  "Kf7",
+                  "Kg7",
+                  "Kh7",
+                  "Kh6",
+                  "Kh5",
+                  "Kg5",
+                  "Kf5",
+                  "Kf6",
+                  "Na3",
+                  "Nc3",
+                  "Nd2"
+                ]
+              },
+              {
+                "rule": "r4",
+                "survivors": [
+                  "Bf7"
+                ]
+              }
+            ]
+          },
+          {
+            "fen": "8/5B2/6K1/8/1k6/8/8/1N6 w - - 2 2",
+            "move": "Be8",
+            "trace": [
+              {
+                "rule": "minors safe",
+                "survivors": [
+                  "Be8",
+                  "Bg8",
+                  "Be6",
+                  "Bd5",
+                  "Ba2",
+                  "Kg7",
+                  "Kh7",
+                  "Kh6",
+                  "Kh5",
+                  "Kg5",
+                  "Kf5",
+                  "Kf6",
+                  "Nd2"
+                ]
+              },
+              {
+                "rule": "r4",
+                "survivors": [
+                  "Be8"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "group": 0,
+        "motif": "r4 ↔ r4",
+        "fen": "6B1/8/5K2/8/1k6/8/8/1N6 w - - 0 1",
+        "moves": [
+          "Bh7",
+          "Kc4",
+          "Bg8+",
+          "Kb4"
+        ],
+        "area": 48,
+        "url": "http://localhost:5173/mate/bishop-knight#fen=6B1/8/5K2/8/1k6/8/8/1N6_w_-_-_0_1&moves=Bh7,Kc4,Bg8%2B,Kb4&cursor=0",
+        "frames": [
+          {
+            "fen": "6B1/8/5K2/8/1k6/8/8/1N6 w - - 0 1",
+            "move": "Bh7",
+            "trace": [
+              {
+                "rule": "minors safe",
+                "survivors": [
+                  "Bh7",
+                  "Bf7",
+                  "Be6",
+                  "Bd5",
+                  "Ba2",
+                  "Ke7",
+                  "Kf7",
+                  "Kg7",
+                  "Kg6",
+                  "Kg5",
+                  "Kf5",
+                  "Ke5",
+                  "Ke6",
+                  "Nd2"
+                ]
+              },
+              {
+                "rule": "r4",
+                "survivors": [
+                  "Bh7"
+                ]
+              }
+            ]
+          },
+          {
+            "fen": "8/7B/5K2/8/2k5/8/8/1N6 w - - 2 2",
+            "move": "Bg8+",
+            "trace": [
+              {
+                "rule": "minors safe",
+                "survivors": [
+                  "Bg8+",
+                  "Bg6",
+                  "Bf5",
+                  "Be4",
+                  "Bc2",
+                  "Ke7",
+                  "Kf7",
+                  "Kg7",
+                  "Kg6",
+                  "Kg5",
+                  "Kf5",
+                  "Ke5",
+                  "Ke6",
+                  "Na3+",
+                  "Nd2+"
+                ]
+              },
+              {
+                "rule": "r4",
+                "survivors": [
+                  "Bg8+"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "group": 0,
+        "motif": "r4 ↔ r4",
+        "fen": "B7/8/2K5/8/8/8/k7/5N2 w - - 0 1",
+        "moves": [
+          "Bb7",
+          "Ka1",
+          "Ba8",
+          "Ka2"
+        ],
+        "area": 48,
+        "url": "http://localhost:5173/mate/bishop-knight#fen=B7/8/2K5/8/8/8/k7/5N2_w_-_-_0_1&moves=Bb7,Ka1,Ba8,Ka2&cursor=0",
+        "frames": [
+          {
+            "fen": "B7/8/2K5/8/8/8/k7/5N2 w - - 0 1",
+            "move": "Bb7",
+            "trace": [
+              {
+                "rule": "r4",
+                "survivors": [
+                  "Bb7"
+                ]
+              }
+            ]
+          },
+          {
+            "fen": "8/1B6/2K5/8/8/8/8/k4N2 w - - 2 2",
+            "move": "Ba8",
+            "trace": [
+              {
+                "rule": "r4",
+                "survivors": [
+                  "Ba8"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "group": 1,
+        "motif": "r4 ↔ r6",
+        "fen": "6B1/k7/8/8/K7/8/8/3N4 w - - 0 1",
+        "moves": [
+          "Bb3",
+          "Ka6",
+          "Bg8",
+          "Ka7"
+        ],
+        "area": 56,
+        "url": "http://localhost:5173/mate/bishop-knight#fen=6B1/k7/8/8/K7/8/8/3N4_w_-_-_0_1&moves=Bb3,Ka6,Bg8,Ka7&cursor=0",
+        "frames": [
+          {
+            "fen": "6B1/k7/8/8/K7/8/8/3N4 w - - 0 1",
+            "move": "Bb3",
+            "trace": [
+              {
+                "rule": "r6",
+                "survivors": [
+                  "Bb3"
+                ]
+              }
+            ]
+          },
+          {
+            "fen": "8/8/k7/8/K7/1B6/8/3N4 w - - 2 2",
+            "move": "Bg8",
+            "trace": [
+              {
+                "rule": "r4",
+                "survivors": [
+                  "Bg8"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "group": 1,
+        "motif": "r4 ↔ r6",
+        "fen": "B1k5/8/8/8/6K1/8/8/3N4 w - - 0 1",
+        "moves": [
+          "Bf3",
+          "Kd8",
+          "Ba8",
+          "Kc8"
+        ],
+        "area": 56,
+        "url": "http://localhost:5173/mate/bishop-knight#fen=B1k5/8/8/8/6K1/8/8/3N4_w_-_-_0_1&moves=Bf3,Kd8,Ba8,Kc8&cursor=0",
+        "frames": [
+          {
+            "fen": "B1k5/8/8/8/6K1/8/8/3N4 w - - 0 1",
+            "move": "Bf3",
+            "trace": [
+              {
+                "rule": "minors safe",
+                "survivors": [
+                  "Bc6",
+                  "Bd5",
+                  "Be4",
+                  "Bf3",
+                  "Bg2",
+                  "Bh1",
+                  "Kf5",
+                  "Kg5",
+                  "Kh5",
+                  "Kh4",
+                  "Kh3",
+                  "Kg3",
+                  "Kf3",
+                  "Kf4",
+                  "Nb2",
+                  "Nc3",
+                  "Ne3",
+                  "Nf2"
+                ]
+              },
+              {
+                "rule": "r6",
+                "survivors": [
+                  "Bf3"
+                ]
+              }
+            ]
+          },
+          {
+            "fen": "3k4/8/8/8/6K1/5B2/8/3N4 w - - 2 2",
+            "move": "Ba8",
+            "trace": [
+              {
+                "rule": "r4",
+                "survivors": [
+                  "Ba8"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "geometricMotifs": [
+    {
+      "motif": "bishop shuffle; bishop outside center throughout; knight without king protection; alternates stable bishop defense",
+      "cycles": 6496,
+      "positions": 3616
+    },
+    {
+      "motif": "bishop shuffle; bishop outside center throughout; knight without king protection; no stable bishop defense",
+      "cycles": 5728,
+      "positions": 2557
+    },
+    {
+      "motif": "bishop shuffle; bishop outside center throughout; knight king-protected throughout; no stable bishop defense",
+      "cycles": 1364,
+      "positions": 634
+    },
+    {
+      "motif": "bishop shuffle; bishop enters/leaves center; knight without king protection; alternates stable bishop defense",
+      "cycles": 1357,
+      "positions": 696
+    },
+    {
+      "motif": "bishop shuffle; bishop outside center throughout; knight without king protection; stable bishop defense",
+      "cycles": 844,
+      "positions": 697
+    },
+    {
+      "motif": "bishop shuffle; central bishop throughout; knight king-protected throughout; no stable bishop defense",
+      "cycles": 61,
+      "positions": 35
+    },
+    {
+      "motif": "bishop shuffle; bishop outside center throughout; knight king-protected throughout; alternates stable bishop defense",
+      "cycles": 32,
+      "positions": 37
+    },
+    {
+      "motif": "bishop shuffle; bishop outside center throughout; knight king-protected throughout; stable bishop defense",
+      "cycles": 23,
+      "positions": 33
+    },
+    {
+      "motif": "bishop shuffle; bishop enters/leaves center; knight without king protection; stable bishop defense",
+      "cycles": 5,
+      "positions": 9
+    },
+    {
+      "motif": "knight shuffle; central bishop throughout; knight king-protected throughout; no stable bishop defense",
+      "cycles": 3,
+      "positions": 6
+    },
+    {
+      "motif": "bishop shuffle; bishop enters/leaves center; knight king-protected throughout; no stable bishop defense",
+      "cycles": 2,
+      "positions": 3
+    },
+    {
+      "motif": "bishop shuffle; central bishop throughout; knight without king protection; stable bishop defense",
+      "cycles": 2,
+      "positions": 4
+    }
+  ],
+  "examples": [
+    {
+      "group": 0,
+      "motif": "r4 ↔ r4",
+      "fen": "B5k1/8/2K5/8/8/8/8/7N w - - 0 1",
+      "moves": [
+        "Bb7",
+        "Kh8",
+        "Ba8",
+        "Kg8"
+      ],
+      "area": 64,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=B5k1/8/2K5/8/8/8/8/7N_w_-_-_0_1&moves=Bb7,Kh8,Ba8,Kg8&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "r4 ↔ r4",
+      "fen": "4B3/8/6K1/2k5/8/8/8/N7 w - - 0 1",
+      "moves": [
+        "Bf7",
+        "Kb4",
+        "Be8",
+        "Kc5"
+      ],
+      "area": 56,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=4B3/8/6K1/2k5/8/8/8/N7_w_-_-_0_1&moves=Bf7,Kb4,Be8,Kc5&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "r4 ↔ r4",
+      "fen": "6B1/8/5K2/8/1k6/8/8/N7 w - - 0 1",
+      "moves": [
+        "Bh7",
+        "Kc3",
+        "Bg8",
+        "Kb4"
+      ],
+      "area": 56,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=6B1/8/5K2/8/1k6/8/8/N7_w_-_-_0_1&moves=Bh7,Kc3,Bg8,Kb4&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "r4 ↔ r4",
+      "fen": "B7/8/2K5/8/8/8/k7/6N1 w - - 0 1",
+      "moves": [
+        "Bb7",
+        "Ka1",
+        "Ba8",
+        "Ka2"
+      ],
+      "area": 56,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=B7/8/2K5/8/8/8/k7/6N1_w_-_-_0_1&moves=Bb7,Ka1,Ba8,Ka2&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "r4 ↔ r4",
+      "fen": "4B3/8/6K1/2k5/8/8/N7/8 w - - 0 1",
+      "moves": [
+        "Bf7",
+        "Kd4",
+        "Be8",
+        "Kc5"
+      ],
+      "area": 49,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=4B3/8/6K1/2k5/8/8/N7/8_w_-_-_0_1&moves=Bf7,Kd4,Be8,Kc5&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "r4 ↔ r4",
+      "fen": "6k1/1B6/2K5/8/8/8/8/7N w - - 0 1",
+      "moves": [
+        "Ba8",
+        "Kh8",
+        "Bb7",
+        "Kg8"
+      ],
+      "area": 49,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=6k1/1B6/2K5/8/8/8/8/7N_w_-_-_0_1&moves=Ba8,Kh8,Bb7,Kg8&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "r4 ↔ r4",
+      "fen": "B5k1/8/2K5/8/8/8/6N1/8 w - - 0 1",
+      "moves": [
+        "Bb7",
+        "Kh8",
+        "Ba8",
+        "Kg8"
+      ],
+      "area": 49,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=B5k1/8/2K5/8/8/8/6N1/8_w_-_-_0_1&moves=Bb7,Kh8,Ba8,Kg8&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "r4 ↔ r4",
+      "fen": "4B3/8/6K1/2k5/8/8/8/1N6 w - - 0 1",
+      "moves": [
+        "Bf7",
+        "Kb4",
+        "Be8",
+        "Kc5"
+      ],
+      "area": 48,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=4B3/8/6K1/2k5/8/8/8/1N6_w_-_-_0_1&moves=Bf7,Kb4,Be8,Kc5&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "r4 ↔ r4",
+      "fen": "6B1/8/5K2/8/1k6/8/8/1N6 w - - 0 1",
+      "moves": [
+        "Bh7",
+        "Kc4",
+        "Bg8+",
+        "Kb4"
+      ],
+      "area": 48,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=6B1/8/5K2/8/1k6/8/8/1N6_w_-_-_0_1&moves=Bh7,Kc4,Bg8%2B,Kb4&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "r4 ↔ r4",
+      "fen": "B7/8/2K5/8/8/8/k7/5N2 w - - 0 1",
+      "moves": [
+        "Bb7",
+        "Ka1",
+        "Ba8",
+        "Ka2"
+      ],
+      "area": 48,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=B7/8/2K5/8/8/8/k7/5N2_w_-_-_0_1&moves=Bb7,Ka1,Ba8,Ka2&cursor=0"
+    },
+    {
+      "group": 1,
+      "motif": "r4 ↔ r6",
+      "fen": "6B1/k7/8/8/K7/8/8/3N4 w - - 0 1",
+      "moves": [
+        "Bb3",
+        "Ka6",
+        "Bg8",
+        "Ka7"
+      ],
+      "area": 56,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=6B1/k7/8/8/K7/8/8/3N4_w_-_-_0_1&moves=Bb3,Ka6,Bg8,Ka7&cursor=0"
+    },
+    {
+      "group": 1,
+      "motif": "r4 ↔ r6",
+      "fen": "B1k5/8/8/8/6K1/8/8/3N4 w - - 0 1",
+      "moves": [
+        "Bf3",
+        "Kd8",
+        "Ba8",
+        "Kc8"
+      ],
+      "area": 56,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=B1k5/8/8/8/6K1/8/8/3N4_w_-_-_0_1&moves=Bf3,Kd8,Ba8,Kc8&cursor=0"
+    }
+  ]
+}
