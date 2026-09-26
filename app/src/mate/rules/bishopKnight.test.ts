@@ -114,7 +114,7 @@ test("bishop-and-knight rules are registered", () => {
     {
       id: "r4.5",
       shortLabel: "rule r4.5",
-      helpText: "With the bishop adjacent to a noncentral White king, maximize its distance from White's king.",
+      helpText: "Ensure a distant bishop.",
     },
     {
       id: "r5",
