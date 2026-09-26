@@ -104,3 +104,17 @@ test('r7 defers to r6 double opposition when Black is diagonally between knight 
     assert.deepEqual(selectCandidatesByRules(candidates, knightAndBishopWhiteRules).idealCandidates.map(c => c.san).sort(), [move('b5'), move('e2')].sort(), t.name);
   }
 });
+
+
+test('r6 rejects Nd4 when a diagonal chase leaves no onward king-step progress, ignoring bishop control across D4', () => {
+  for (const t of SQUARE_TRANSFORMS) for (const start of [
+    'K7/8/2k5/5N2/8/8/8/1B6 w - - 0 1',
+    'K7/8/2k5/5N2/8/8/8/6B1 w - - 0 1', // Bg1 controls c5, but drift cannot rely on it.
+  ]) {
+    const fen = transformFen(start, t);
+    const move = getChess(fen).move({from: transformSquare('f5', t), to: transformSquare('d4', t)}).san;
+    assert.equal(scoreKnightAndBishopWhiteMove(fen, move).knightDriftQualifies, false, t.name);
+    const candidates = getChess(fen).moves().map(san => ({san, score: scoreKnightAndBishopWhiteMove(fen, san)}));
+    assert.ok(!selectCandidatesByRules(candidates, knightAndBishopWhiteRules).idealCandidates.some(c => c.san === move), t.name);
+  }
+});

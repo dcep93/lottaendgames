@@ -349,15 +349,16 @@ function scoreKnightAndBishopWhiteMoveCore(
           < squaredEuclideanDistance(move.from, whiteKing.square)) return true;
       if (kingDistance(knight.square, whiteKing.square) >= kingDistance(move.from, whiteKing.square)) return false;
       const squares = allSquares();
-      return blackReplies.every(reply => {
-        const black = reply.to;
-        if (kingDistance(black, knight.square) !== 1 || knightKingDefended) return true;
+      // Do not rely on bishop control to prevent a king chase.
+      const attackingSteps = squares.filter(square => kingDistance(square, blackKing.square) === 1
+        && kingDistance(square, whiteKing.square) > 1 && kingDistance(square, knight.square) === 1);
+      return attackingSteps.every(black => {
         const kingCanDefend = squares.some(square => square !== bishop.square && square !== knight.square
           && kingDistance(square, whiteKing.square) === 1
           && kingDistance(square, knight.square) === 1 && kingDistance(square, black) > 1);
         const knightCanContinue = squares.some(square => square !== whiteKing.square && square !== bishop.square
           && isKnightMove(knight.square, square)
-          && squaredEuclideanDistance(square, whiteKing.square) < squaredEuclideanDistance(knight.square, whiteKing.square)
+          && kingDistance(square, whiteKing.square) < kingDistance(knight.square, whiteKing.square)
           && (kingDistance(square, black) > 1 || kingDistance(square, whiteKing.square) === 1));
         return kingCanDefend || knightCanContinue;
       });
