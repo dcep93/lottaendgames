@@ -280,6 +280,13 @@ function scoreKnightAndBishopWhiteMoveCore(
   let immobileBishopPenalty: number | undefined;
   const knight = findPiece(resultFen, "w", "n");
   const blackKing = findPiece(resultFen, "b", "k");
+  const bishopInKingKnightRectangle = (() => {
+    if (!bishop || !whiteKing || !knight) return false;
+    const b = squareCoordinates(bishop.square), k = squareCoordinates(whiteKing.square);
+    const n = squareCoordinates(knight.square);
+    return b.file >= Math.min(k.file, n.file) && b.file <= Math.max(k.file, n.file)
+      && b.rank >= Math.min(k.rank, n.rank) && b.rank <= Math.max(k.rank, n.rank);
+  })();
   const doubleOppositionTargets = (() => {
     if (move.piece !== "n" || !whiteKing || !blackKing) return undefined;
     const n = squareCoordinates(move.from), b = squareCoordinates(blackKing.square);
@@ -327,13 +334,14 @@ function scoreKnightAndBishopWhiteMoveCore(
     },
     startsWithBishopAdjacentToNoncentralKing: context.startsWithBishopAdjacentToNoncentralKing,
     get immobileBishopPenalty() {
-      return immobileBishopPenalty ??= bishop
+      return immobileBishopPenalty ??= bishopInKingKnightRectangle && bishop
         && getChess(resultFen.replace(" b ", " w ")).moves({ square: bishop.square }).length === 0 ? 1 : 0;
     },
-    bishopMoveNearNoncentralKingPenalty: move.piece === "b" && bishop && whiteKing && centerDistance(whiteKing.square) !== 0
+    bishopMoveNearNoncentralKingPenalty: bishopInKingKnightRectangle && move.piece === "b" && bishop && whiteKing && centerDistance(whiteKing.square) !== 0
       && kingDistance(bishop.square, whiteKing.square) <= 2 ? 1 : 0,
-    bishopWhiteKingDistanceScore: context.startsWithBishopAdjacentToNoncentralKing && bishop && whiteKing
-      ? -squaredEuclideanDistance(bishop.square, whiteKing.square) : 0,
+    // Outside is neutral (0); inside separation costs remain positive, decreasing with distance.
+    bishopWhiteKingDistanceScore: bishopInKingKnightRectangle && context.startsWithBishopAdjacentToNoncentralKing && bishop && whiteKing
+      ? 98 - squaredEuclideanDistance(bishop.square, whiteKing.square) : 0,
     bishopCentralProximityScore: bishop ? knightAndBishopCenterProximityScore(bishop.square) : 99,
     bishopCenterPenalty: bishop && centerDistance(bishop.square) === 0 ? 0 : 1,
     attackedMinorWithoutKingDefensePenalty: [bishop, knight].filter(piece => piece && blackKing
