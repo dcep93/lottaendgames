@@ -122,6 +122,11 @@ test("bishop-and-knight rules are registered", () => {
       helpText: "Play the r5 move.",
     },
     {
+      id: "r5.5",
+      shortLabel: "rule r5.5",
+      helpText: "Prefer an attacked knight not to be defended only by the bishop.",
+    },
+    {
       id: "r6",
       shortLabel: "rule r6",
       helpText: "Prefer king step proximity to the knight, then king central proximity.",
@@ -162,6 +167,7 @@ test("bishop-and-knight rules are registered", () => {
       "r4",
       "r4.5",
       "r5",
+      "r5.5",
       "r6",
       "r7",
       "r8",
@@ -172,7 +178,7 @@ test("bishop-and-knight rules are registered", () => {
     ruleSet.whiteRuleDescriptions.map(({ id }) => id),
     knightAndBishopWhiteRules.map(({ id }) => id),
   );
-  assert.equal(knightAndBishopWhiteRules.length, 10);
+  assert.equal(knightAndBishopWhiteRules.length, 11);
   assert.deepEqual(ruleSet.help.noteBoards.map(board=>board.id), ["bishop-knight-rule-r5-hop", "bishop-knight-rule-r5-opposition"]);
 });
 

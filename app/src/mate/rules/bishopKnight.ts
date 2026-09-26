@@ -58,6 +58,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly minorBlackDistanceScore: number;
   readonly unprotectedMinorCount: number;
   readonly minorCenterDistanceScore: number;
+  readonly attackedKnightBishopOnlyPenalty: number;
   readonly knightKingProtectionDistance: number;
   readonly knightKingProximityScore: number;
   readonly knightStableBishopProtectionPenalty: number;
@@ -319,6 +320,10 @@ function scoreKnightAndBishopWhiteMoveCore(
       && kingDistance(bishop.square, blackKing.square) <= 1 ? 1 : 0,
     bishopCentralProximityScore: bishop ? knightAndBishopCenterProximityScore(bishop.square) : 99,
     bishopCenterPenalty: bishop && centerDistance(bishop.square) === 0 ? 0 : 1,
+    attackedKnightBishopOnlyPenalty: knight && bishop && blackKing
+      && kingDistance(knight.square, blackKing.square) === 1
+      && !knightKingDefended
+      && bishopControlsOrOccupiesSquare(resultFen, bishop.square, knight.square) ? 1 : 0,
     kingKnightAdjacencyPenalty: knightKingDefended ? 0 : 1,
     kingKnightDistanceScore: whiteKing && knight ? kingDistance(whiteKing.square, knight.square) : 99,
     kingBlackDistanceSquared: whiteKing && blackKing ? squaredEuclideanDistance(whiteKing.square, blackKing.square) : 99,
@@ -540,6 +545,12 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       helpText: "Play the r5 move.",
       compare: (first, second) => first.declaredPreparationPenalty - second.declaredPreparationPenalty
         || first.preparationBishopWaitDistance - second.preparationBishopWaitDistance,
+    },
+    {
+      id: "r5.5",
+      shortLabel: "rule r5.5",
+      helpText: "Prefer an attacked knight not to be defended only by the bishop.",
+      compare: (first, second) => first.attackedKnightBishopOnlyPenalty - second.attackedKnightBishopOnlyPenalty,
     },
     {
       id: "r6",
