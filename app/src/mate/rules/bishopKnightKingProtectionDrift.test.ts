@@ -136,3 +136,17 @@ test('r6 rejects approaching Black between the knight and king without gaining p
     }
   }
 });
+
+
+test('r6 reaches king protection before taking a double-opposition detour, across D4', () => {
+  for (const t of SQUARE_TRANSFORMS) {
+    const fen = transformFen('5K2/8/6k1/7N/8/8/B7/8 w - - 2 2', t);
+    const move = (to: 'g7' | 'g3') => getChess(fen).move({from: transformSquare('h5', t), to: transformSquare(to, t)}).san;
+    const candidates = getChess(fen).moves().map(san => ({san, score: scoreKnightAndBishopWhiteMove(fen, san)}));
+    assert.equal(scoreKnightAndBishopWhiteMove(fen, move('g7')).kingKnightAdjacencyPenalty, 0, t.name);
+    assert.equal(scoreKnightAndBishopWhiteMove(fen, move('g3')).knightDoubleOpposition, true, t.name);
+    const selection = selectCandidatesByRules(candidates, knightAndBishopWhiteRules);
+    assert.deepEqual(selection.idealCandidates.map(c => c.san), [move('g7')], t.name);
+    assert.equal(selection.eliminatedBy.get(candidates.find(c => c.san === move('g3'))!)?.id, 'r6', t.name);
+  }
+});

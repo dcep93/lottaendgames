@@ -600,7 +600,8 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       helpText: "Drift the knight towards king protection, then prefer knight central 16 proximity.",
       compare: (first, second) => Number(second.knightDriftQualifies) - Number(first.knightDriftQualifies)
         || (first.knightDriftQualifies && second.knightDriftQualifies
-          ? Number(second.knightDoubleOpposition) - Number(first.knightDoubleOpposition)
+          ? first.kingKnightAdjacencyPenalty - second.kingKnightAdjacencyPenalty
+            || Number(second.knightDoubleOpposition) - Number(first.knightDoubleOpposition)
             || first.knightKingProximityScore - second.knightKingProximityScore
             || first.knightMiddle16ProximityScore - second.knightMiddle16ProximityScore : 0),
     },
