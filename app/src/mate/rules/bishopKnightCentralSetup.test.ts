@@ -95,7 +95,7 @@ test('r4 targets e5 rather than the occupied d4 square, across D4',()=>{
  }
 });
 
-test('r4 maneuvers the knight before r4.5 bishop clearance, across D4',()=>{
+test('r4 maneuvers the knight in the supplied Bc6 position, across D4',()=>{
  for(const t of SQUARE_TRANSFORMS){
   const fen=transformFen('Bk6/8/8/3N4/4K3/8/8/8 w - - 0 1',t);
   const ch=getChess(fen);
@@ -103,11 +103,8 @@ test('r4 maneuvers the knight before r4.5 bishop clearance, across D4',()=>{
   assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[move],t.name);
   ch.move({from:transformSquare('b8',t),to:transformSquare('c8',t)});
   const next=ch.fen();
-  const candidates=['a8','b7','d7'].map(to=>getChess(next).move({from:transformSquare('c6',t),to:transformSquare(to as 'a8'|'b7'|'d7',t)}).san);
-  assert.deepEqual(candidates.map(san=>scoreKnightAndBishopWhiteMove(next,san).bishopTooCloseToBlackPenalty),[0,1,1],t.name);
   const expected=['f4','e3'].map(to=>getChess(next).move({from:transformSquare('d5',t),to:transformSquare(to as 'f4'|'e3',t)}).san);
   assert.deepEqual([...getIdealKnightAndBishopWhiteMoves(next)].sort(),expected.sort(),t.name);
-  for(const san of expected)assert.equal(scoreKnightAndBishopWhiteMove(next,san).bishopTooCloseToBlackPenalty,0,t.name);
  }
 });
 
@@ -133,16 +130,6 @@ test('r4 navigates bishop and king together toward their central targets, across
  }
 });
 
-test('r4.5 leaves bishops two or more steps away tied, across D4',()=>{
- for(const t of SQUARE_TRANSFORMS){
-  const fen=transformFen('8/3Bk3/8/8/3NK3/8/8/8 w - - 0 1',t);
-  const san=(to:'f5'|'g4'|'b5')=>getChess(fen).move({from:transformSquare('d7',t),to:transformSquare(to,t)}).san;
-  assert.equal(scoreKnightAndBishopWhiteMove(fen,san('f5')).bishopTooCloseToBlackPenalty,0,t.name);
-  for(const to of ['g4','b5'] as const)assert.equal(scoreKnightAndBishopWhiteMove(fen,san(to)).bishopTooCloseToBlackPenalty,0,t.name);
-  assert.equal(compareScoresByRules(scoreKnightAndBishopWhiteMove(fen,san('g4')),scoreKnightAndBishopWhiteMove(fen,san('f5')),[r45]),0,t.name);
-  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[san('f5')],t.name);
- }
-});
 
 test('r4 targets an unoccupied opposite-color central king square rather than leaving the center, across D4',()=>{
  for(const t of SQUARE_TRANSFORMS){
@@ -155,106 +142,29 @@ test('r4 targets an unoccupied opposite-color central king square rather than le
  }
 });
 
-
-test('r4.5 keeps bishop clearance active outside the r4 central setup, across D4',()=>{
- for(const t of SQUARE_TRANSFORMS){
-  const fen=transformFen('7K/8/8/8/Bk6/8/8/3N4 w - - 0 1',t);
-  const score=(from:'a4'|'d1',to:'e8'|'f2')=>scoreKnightAndBishopWhiteMove(fen,getChess(fen).move({from:transformSquare(from,t),to:transformSquare(to,t)}).san);
-  const clear=score('a4','e8'),near=score('d1','f2');
-  assert.equal(r4.applies!(clear),false,t.name);
-  assert.equal(clear.bishopTooCloseToBlackPenalty,0,t.name);
-  assert.equal(near.bishopTooCloseToBlackPenalty,1,t.name);
-  assert.ok(compareScoresByRules(clear,near,[r45])<0,t.name);
- }
-});
-
-test('r4.5 lets Ne4 advance before answering a later bishop attack, across D4', () => {
- for (const t of SQUARE_TRANSFORMS) {
-  const fen=transformFen('7K/8/8/8/1k6/2N5/B7/8 w - - 2 2',t);
-  const ch=getChess(fen);
-  const advance=ch.move({from:transformSquare('c3',t),to:transformSquare('e4',t)}).san;
-  const retreat=getChess(fen).move({from:transformSquare('c3',t),to:transformSquare('b1',t)}).san;
-  assert.equal(compareScoresByRules(scoreKnightAndBishopWhiteMove(fen,advance),scoreKnightAndBishopWhiteMove(fen,retreat),[r45]),0,t.name);
-  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[advance],t.name);
-  ch.move({from:transformSquare('b4',t),to:transformSquare('a3',t)});
-  const attacked=ch.fen();
-  const escape=ch.move({from:transformSquare('a2',t),to:transformSquare('g8',t)}).san;
-  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(attacked),[escape],t.name);
- }
-});
-
-
-test('r4.5 clears the bishop from a blocked corner king exit, across D4', () => {
-  for (const t of SQUARE_TRANSFORMS) {
-    const fen = transformFen('KB6/8/k7/3N4/8/8/8/8 w - - 0 1', t);
-    const move = getChess(fen).move({from: transformSquare('b8', t), to: transformSquare('h2', t)}).san;
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [move], t.name);
-    for (const quiet of ['KB6/8/8/k2N4/8/8/8/8 w - - 0 1', '1B6/K7/8/k2N4/8/8/8/8 w - - 0 1']) {
-      const position = transformFen(quiet, t);
-      for (const san of getChess(position).moves()) {
-        assert.equal(scoreKnightAndBishopWhiteMove(position, san).cornerBishopUnclutterScore, 0, t.name);
-      }
-    }
-  }
-});
-
-
-test('r4.5 avoids crowding an adjacent edge king and knight with Bb7, across D4', () => {
-  for (const t of SQUARE_TRANSFORMS) {
-    const fen = transformFen('NK6/8/8/8/4B3/4k3/8/8 w - - 2 2', t);
-    const san = (to: 'b7' | 'h7') => getChess(fen).move({from: transformSquare('e4', t), to: transformSquare(to, t)}).san;
-    assert.equal(scoreKnightAndBishopWhiteMove(fen, san('b7')).bishopCrowdsEdgePairPenalty, 1, t.name);
-    assert.equal(scoreKnightAndBishopWhiteMove(fen, san('h7')).bishopCrowdsEdgePairPenalty, 0, t.name);
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [san('h7')], t.name);
-    for (const quiet of ['k7/8/8/3NK3/8/8/1B6/8 w - - 0 1', '1K6/8/N7/8/4B3/4k3/8/8 w - - 2 2']) {
-      const position = transformFen(quiet, t);
-      for (const move of getChess(position).moves()) {
-        assert.equal(scoreKnightAndBishopWhiteMove(position, move).bishopCrowdsEdgePairPenalty, 0, t.name);
-      }
-    }
-  }
-});
-
-
-test('r4.5 clears b7 with the declared Kb8, only in the named position and D4 symmetries', () => {
-  for (const t of SQUARE_TRANSFORMS) {
-    const fen = transformFen('B7/1KN5/8/2k5/8/8/8/8 w - - 2 2', t);
-    const move = getChess(fen).move({from: transformSquare('b7', t), to: transformSquare('b8', t)}).san;
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [move], t.name);
-    for (const quiet of ['B7/1KN5/8/4k3/8/8/8/8 w - - 2 2', 'B7/1K6/N7/1k6/8/8/8/8 w - - 0 1']) {
-      const position = transformFen(quiet, t);
-      for (const san of getChess(position).moves()) {
-        assert.equal(scoreKnightAndBishopWhiteMove(position, san).declaredBishopUnclutterPenalty, 0, t.name);
-      }
-    }
-  }
-});
-
-
-test('r4.5 follows Kb8 with Bg2 based on the White formation, across D4', () => {
-  for (const t of SQUARE_TRANSFORMS) for (const reply of ['b6', 'd6', 'd4', 'c4', 'b4'] as const) {
-    const chess = getChess(transformFen('B7/1KN5/8/2k5/8/8/8/8 w - - 0 1', t));
-    chess.move({from: transformSquare('b7', t), to: transformSquare('b8', t)});
-    chess.move({from: transformSquare('c5', t), to: transformSquare(reply, t)});
-    const fen = chess.fen();
-    const move = chess.move({from: transformSquare('a8', t), to: transformSquare('g2', t)}).san;
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [move], t.name);
-    const target = scoreKnightAndBishopWhiteMove(fen, move);
-    const back = getChess(fen).move({from: transformSquare('a8', t), to: transformSquare('f3', t)}).san;
-    assert.ok(compareScoresByRules(target, scoreKnightAndBishopWhiteMove(fen, back), [r45]) < 0, t.name);
-  }
-});
-
-
-test('r4.5 unclutters Be8 with Ba4 beside Kf8 and Nc5, across D4', () => {
-  for (const t of SQUARE_TRANSFORMS) for (const start of [
-    '4BK2/8/5k2/2N5/8/8/8/8 w - - 0 1',
-    '4BK2/8/7k/2N5/8/8/8/8 w - - 0 1',
-  ]) {
+test('r4.5 separates an adjacent bishop from a noncentral king, across D4', () => {
+  for (const t of SQUARE_TRANSFORMS) for (const [start, from, to] of [
+    ['1KB5/8/1k6/4N3/8/8/8/8 w - - 0 1', 'c8', 'h3'],
+    ['4BK2/8/5k2/2N5/8/8/8/8 w - - 0 1', 'e8', 'a4'],
+    ['KB6/8/k7/3N4/8/8/8/8 w - - 0 1', 'b8', 'h2'],
+  ] as const) {
     const fen = transformFen(start, t);
-    const move = getChess(fen).move({from: transformSquare('e8', t), to: transformSquare('a4', t)}).san;
+    const move = getChess(fen).move({from: transformSquare(from, t), to: transformSquare(to, t)}).san;
     assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [move], t.name);
-    const knightMove = getChess(fen).move({from: transformSquare('c5', t), to: transformSquare('a4', t)}).san;
-    assert.ok(compareScoresByRules(scoreKnightAndBishopWhiteMove(fen, move), scoreKnightAndBishopWhiteMove(fen, knightMove), [r45]) < 0, t.name);
+  }
+});
+
+test('r4.5 gates on starting adjacency and the central four, across D4', () => {
+  for (const t of SQUARE_TRANSFORMS) for (const [start, enabled] of [
+    ['8/8/8/3BK3/8/8/1N6/k7 w - - 0 1', false],
+    ['8/8/3BK3/8/8/8/1N6/k7 w - - 0 1', true],
+    ['8/8/4K3/3B4/8/8/1N6/k7 w - - 0 1', true],
+    ['7K/8/8/8/Bk6/8/8/3N4 w - - 0 1', false],
+    ['NK6/8/8/8/4B3/4k3/8/8 w - - 0 1', false],
+  ] as const) {
+    const fen = transformFen(start, t);
+    for (const move of getChess(fen).moves()) {
+      assert.equal(r45.applies!(scoreKnightAndBishopWhiteMove(fen, move)), enabled, `${t.name} ${move}`);
+    }
   }
 });

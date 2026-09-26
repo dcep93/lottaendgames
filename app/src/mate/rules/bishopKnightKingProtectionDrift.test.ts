@@ -55,7 +55,10 @@ test('r7 permits double opposition behind a diagonal blocker, across D4', () => 
     const score = scoreKnightAndBishopWhiteMove(fen, move);
     assert.equal(score.knightDriftQualifies, true, t.name);
     const candidates = getChess(fen).moves().map(san => ({san, score: scoreKnightAndBishopWhiteMove(fen, san)}));
-    assert.deepEqual(selectCandidatesByRules(candidates, knightAndBishopWhiteRules).idealCandidates.map(c => c.san), [move], t.name);
+    // r7 still permits Nc1; the new earlier r4.5 first separates Bc8 from Kd8.
+    assert.deepEqual(selectCandidatesByRules(candidates, knightAndBishopWhiteRules.filter(r => r.id === 'r7')).idealCandidates.map(c => c.san), [move], t.name);
+    const bishop = getChess(fen).move({from: transformSquare('c8', t), to: transformSquare('e6', t)}).san;
+    assert.deepEqual(selectCandidatesByRules(candidates, knightAndBishopWhiteRules).idealCandidates.map(c => c.san), [bishop], t.name);
     for (const quiet of ['2B5/8/8/8/2k5/1N6/8/K7 w - - 2 2', '2BK4/8/8/8/3k4/1N6/8/8 w - - 2 2']) {
       const position = transformFen(quiet, t);
       const retreat = getChess(position).move({from: transformSquare('b3', t), to: transformSquare('c1', t)}).san;
