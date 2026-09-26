@@ -52,6 +52,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly knightOppositeCentralDistance: number;
   readonly bishopCentralProximityScore: number;
   readonly bishopTooCloseToBlackPenalty: number;
+  readonly cornerBishopUnclutterScore: number;
   readonly bishopKingCentralNavigationScore: number;
   readonly bishopShuffleControlPenalty: number;
   readonly minorBlackDistanceScore: number;
@@ -173,6 +174,7 @@ type KnightAndBishopPositionScoreContext = {
   readonly knightOppositeCentralTargets: readonly Square[];
   readonly bishopShuffleTargets: readonly Square[];
   readonly startsWithUnprotectedBishop: boolean;
+  readonly clutteredCornerKing: Square | undefined;
   readonly startsWithUnprotectedKnight: boolean;
   readonly sixPointNineMove: string | undefined;
   readonly fivePointFiveMove: string | undefined;
@@ -208,6 +210,13 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
     knightOppositeCentralTargets: (["d4", "e4", "d5", "e5"] as const).filter(target =>
       bishop && target !== whiteKing?.square && squareColor(target) !== squareColor(bishop.square)),
     bishopShuffleTargets: knightAndBishopShuffleTargets(fen),
+    // The bishop occupies one exit from a corner; Black blocks the other.
+    clutteredCornerKing: whiteKing && bishop && blackKing
+      && ["a1", "a8", "h1", "h8"].includes(whiteKing.square)
+      && squaredEuclideanDistance(whiteKing.square, bishop.square) === 1
+      && squaredEuclideanDistance(whiteKing.square, blackKing.square) === 4
+      && squaredEuclideanDistance(bishop.square, blackKing.square) === 5
+      ? whiteKing.square : undefined,
     startsWithUnprotectedBishop: !!bishop
       && (!whiteKing || kingDistance(whiteKing.square,bishop.square)!==1)
       && (!knight || squaredEuclideanDistance(bishop.square,knight.square)!==5),
@@ -304,6 +313,8 @@ function scoreKnightAndBishopWhiteMoveCore(
         + Math.min(...kingTargets.map(square => squaredEuclideanDistance(whiteKing.square, square)));
     },
     // Only immediate proximity counts; do not preempt a possible future approach.
+    cornerBishopUnclutterScore: context.clutteredCornerKing && bishop
+      ? -squaredEuclideanDistance(bishop.square, context.clutteredCornerKing) : 0,
     bishopTooCloseToBlackPenalty: bishop && blackKing
       && kingDistance(bishop.square, blackKing.square) <= 1 ? 1 : 0,
     bishopCentralProximityScore: bishop ? knightAndBishopCenterProximityScore(bishop.square) : 99,
@@ -520,7 +531,8 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       id: "r4.5",
       shortLabel: "rule r4.5",
       helpText: "Ensure a distant bishop.",
-      compare: (first, second) => first.bishopTooCloseToBlackPenalty - second.bishopTooCloseToBlackPenalty,
+      compare: (first, second) => first.cornerBishopUnclutterScore - second.cornerBishopUnclutterScore
+        || first.bishopTooCloseToBlackPenalty - second.bishopTooCloseToBlackPenalty,
     },
     {
       id: "r5",

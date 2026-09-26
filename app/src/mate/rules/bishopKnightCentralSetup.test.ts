@@ -182,3 +182,18 @@ test('r4.5 lets Ne4 advance before answering a later bishop attack, across D4', 
   assert.deepEqual(getIdealKnightAndBishopWhiteMoves(attacked),[escape],t.name);
  }
 });
+
+
+test('r4.5 clears the bishop from a blocked corner king exit, across D4', () => {
+  for (const t of SQUARE_TRANSFORMS) {
+    const fen = transformFen('KB6/8/k7/3N4/8/8/8/8 w - - 0 1', t);
+    const move = getChess(fen).move({from: transformSquare('b8', t), to: transformSquare('h2', t)}).san;
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [move], t.name);
+    for (const quiet of ['KB6/8/8/k2N4/8/8/8/8 w - - 0 1', '1B6/K7/8/k2N4/8/8/8/8 w - - 0 1']) {
+      const position = transformFen(quiet, t);
+      for (const san of getChess(position).moves()) {
+        assert.equal(scoreKnightAndBishopWhiteMove(position, san).cornerBishopUnclutterScore, 0, t.name);
+      }
+    }
+  }
+});
