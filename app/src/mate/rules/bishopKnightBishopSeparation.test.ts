@@ -3,8 +3,27 @@ import test from 'node:test';
 import {getChess,SQUARE_TRANSFORMS,transformFen,transformSquare} from '../chess';
 import {bishopKnightRuleSet,getIdealKnightAndBishopWhiteMoves,knightAndBishopWhiteRules,scoreKnightAndBishopWhiteMove} from './bishopKnight';
 import {explainMove} from './selection';
+import {stableBishopProtectedSquares} from './bishopKnightStableProtection';
 
 const start='8/8/1K6/1BN5/1k6/8/8/8 w - - 0 1';
+test('r4 leaves a quiet interior bishop in place while the king opens its knight protection, across D4',()=>{
+ for(const t of SQUARE_TRANSFORMS){
+  const fen=transformFen('7k/1B6/2K5/8/8/8/8/7N w - - 2 2',t);
+  const moves=['c5','d6'].map(to=>getChess(fen).move({from:transformSquare('c6',t),to:transformSquare(to as 'c5'|'d6',t)}).san);
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen).sort(),moves.sort(),t.name);
+  for(const san of getChess(fen).moves()){
+   const score=scoreKnightAndBishopWhiteMove(fen,san);
+   assert.equal(score.bishopSeparationPenalty,0,`${t.name} ${san}`);
+   assert.equal(score.bishopWhiteKingDistanceScore,0,`${t.name} ${san}`);
+  }
+  assert.ok(!stableBishopProtectedSquares(fen).includes(transformSquare('h1',t)),t.name);
+  for(const san of moves){
+   const board=getChess(fen);board.move(san);
+   assert.ok(stableBishopProtectedSquares(board.fen()).includes(transformSquare('h1',t)),`${t.name} ${san}`);
+  }
+ }
+});
+
 test('r4 separates the bishop from a noncentral king, across D4',()=>{
  for(const t of SQUARE_TRANSFORMS){
   const fen=transformFen(start,t);

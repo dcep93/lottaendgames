@@ -1,0 +1,251 @@
+{
+  "baselinePolicy": "eecb6a9640b8cef4bd97e77d40cbe7f9061312eb",
+  "baselineFourPlyCycles": 15917,
+  "survivingSavedFourPlyCycles": 7236,
+  "brokenSavedFourPlyCycles": 8681,
+  "scope": "Replay every saved four-ply cycle under current preferences, all original legal Black replies, D4 deduplication, terminals/degeneracies excluded at every ply. Does not discover new loops or measure arbitrary-length current cycle membership.",
+  "change": "An interior bishop adjacent to a noncentral White king triggers r4 only if Black king or the knight is within two king steps of the bishop. Edge-bishop cases remain as before; visible rule text unchanged.",
+  "example": {
+    "fen": "7k/1B6/2K5/8/8/8/8/7N w - - 2 2",
+    "preferred": [
+      "Kc5",
+      "Kd6"
+    ],
+    "reason": "The quiet interior bishop is left in place. Both king moves open its ray to protect Nh1."
+  },
+  "motifs": [
+    {
+      "motif": "r4 \u2194 r4",
+      "cycles": 2929,
+      "positions": 1691
+    },
+    {
+      "motif": "r4 \u2194 r6",
+      "cycles": 2302,
+      "positions": 1608
+    },
+    {
+      "motif": "r20 \u2194 r4",
+      "cycles": 1560,
+      "positions": 967
+    },
+    {
+      "motif": "r20 \u2194 r6",
+      "cycles": 190,
+      "positions": 82
+    },
+    {
+      "motif": "r20 \u2194 r20",
+      "cycles": 86,
+      "positions": 105
+    },
+    {
+      "motif": "r4 \u2194 r5",
+      "cycles": 77,
+      "positions": 97
+    },
+    {
+      "motif": "r8 \u2194 r8",
+      "cycles": 66,
+      "positions": 42
+    },
+    {
+      "motif": "r6.5 \u2194 r8",
+      "cycles": 8,
+      "positions": 12
+    },
+    {
+      "motif": "r4 \u2194 r8",
+      "cycles": 7,
+      "positions": 10
+    },
+    {
+      "motif": "r20 \u2194 r8",
+      "cycles": 3,
+      "positions": 6
+    },
+    {
+      "motif": "r7 \u2194 r7",
+      "cycles": 3,
+      "positions": 5
+    },
+    {
+      "motif": "r20 \u2194 r6.5",
+      "cycles": 3,
+      "positions": 5
+    },
+    {
+      "motif": "r20 \u2194 r5",
+      "cycles": 1,
+      "positions": 2
+    },
+    {
+      "motif": "r6 \u2194 r8",
+      "cycles": 1,
+      "positions": 2
+    }
+  ],
+  "examples": [
+    {
+      "group": 0,
+      "motif": "r4 \u2194 r4",
+      "fen": "B3k3/8/2K5/8/8/8/8/7N w - - 0 1",
+      "moves": [
+        "Bb7",
+        "Kd8",
+        "Ba8",
+        "Ke8"
+      ],
+      "area": 64,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=B3k3/8/2K5/8/8/8/8/7N_w_-_-_0_1&moves=Bb7,Kd8,Ba8,Ke8&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "r4 \u2194 r4",
+      "fen": "6B1/8/5K2/8/1k6/8/8/N7 w - - 0 1",
+      "moves": [
+        "Bh7",
+        "Kc3",
+        "Bg8",
+        "Kb4"
+      ],
+      "area": 56,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=6B1/8/5K2/8/1k6/8/8/N7_w_-_-_0_1&moves=Bh7,Kc3,Bg8,Kb4&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "r4 \u2194 r4",
+      "fen": "B7/8/2K5/8/k7/8/8/6N1 w - - 0 1",
+      "moves": [
+        "Bb7",
+        "Ka5",
+        "Ba8",
+        "Ka4"
+      ],
+      "area": 56,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=B7/8/2K5/8/k7/8/8/6N1_w_-_-_0_1&moves=Bb7,Ka5,Ba8,Ka4&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "r4 \u2194 r4",
+      "fen": "3k4/1B6/2K5/8/8/8/8/7N w - - 0 1",
+      "moves": [
+        "Ba8",
+        "Ke7",
+        "Bb7",
+        "Kd8"
+      ],
+      "area": 49,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=3k4/1B6/2K5/8/8/8/8/7N_w_-_-_0_1&moves=Ba8,Ke7,Bb7,Kd8&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "r4 \u2194 r4",
+      "fen": "B3k3/8/2K5/8/8/8/6N1/8 w - - 0 1",
+      "moves": [
+        "Bb7",
+        "Kd8",
+        "Ba8",
+        "Ke8"
+      ],
+      "area": 49,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=B3k3/8/2K5/8/8/8/6N1/8_w_-_-_0_1&moves=Bb7,Kd8,Ba8,Ke8&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "r4 \u2194 r4",
+      "fen": "6B1/8/5K2/8/1k6/8/8/1N6 w - - 0 1",
+      "moves": [
+        "Bh7",
+        "Kc4",
+        "Bg8+",
+        "Kb4"
+      ],
+      "area": 48,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=6B1/8/5K2/8/1k6/8/8/1N6_w_-_-_0_1&moves=Bh7,Kc4,Bg8%2B,Kb4&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "r4 \u2194 r4",
+      "fen": "B7/8/2K5/8/k7/8/8/5N2 w - - 0 1",
+      "moves": [
+        "Bb7",
+        "Ka5",
+        "Ba8",
+        "Ka4"
+      ],
+      "area": 48,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=B7/8/2K5/8/k7/8/8/5N2_w_-_-_0_1&moves=Bb7,Ka5,Ba8,Ka4&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "r4 \u2194 r4",
+      "fen": "8/1B6/2K5/k7/8/8/8/6N1 w - - 0 1",
+      "moves": [
+        "Ba8",
+        "Kb4",
+        "Bb7",
+        "Ka5"
+      ],
+      "area": 42,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/1B6/2K5/k7/8/8/8/6N1_w_-_-_0_1&moves=Ba8,Kb4,Bb7,Ka5&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "r4 \u2194 r4",
+      "fen": "B7/8/2K5/8/k7/8/5N2/8 w - - 0 1",
+      "moves": [
+        "Bb7",
+        "Ka5",
+        "Ba8",
+        "Ka4"
+      ],
+      "area": 42,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=B7/8/2K5/8/k7/8/5N2/8_w_-_-_0_1&moves=Bb7,Ka5,Ba8,Ka4&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "r4 \u2194 r4",
+      "fen": "6B1/8/5K2/8/1k6/8/8/2N5 w - - 0 1",
+      "moves": [
+        "Bh7",
+        "Kc3",
+        "Bg8",
+        "Kb4"
+      ],
+      "area": 40,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=6B1/8/5K2/8/1k6/8/8/2N5_w_-_-_0_1&moves=Bh7,Kc3,Bg8,Kb4&cursor=0"
+    },
+    {
+      "group": 1,
+      "motif": "r4 \u2194 r6",
+      "fen": "6B1/k7/8/8/K7/8/8/3N4 w - - 0 1",
+      "moves": [
+        "Bb3",
+        "Ka6",
+        "Bg8",
+        "Ka7"
+      ],
+      "area": 56,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=6B1/k7/8/8/K7/8/8/3N4_w_-_-_0_1&moves=Bb3,Ka6,Bg8,Ka7&cursor=0"
+    },
+    {
+      "group": 1,
+      "motif": "r4 \u2194 r6",
+      "fen": "B1k5/8/8/8/6K1/8/8/3N4 w - - 0 1",
+      "moves": [
+        "Bf3",
+        "Kd8",
+        "Ba8",
+        "Kc8"
+      ],
+      "area": 56,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=B1k5/8/8/8/6K1/8/8/3N4_w_-_-_0_1&moves=Bf3,Kd8,Ba8,Kc8&cursor=0"
+    }
+  ],
+  "validation": {
+    "focusedTestsPassed": 29,
+    "buildPassed": true,
+    "knownBroaderFailures": 4
+  }
+}
