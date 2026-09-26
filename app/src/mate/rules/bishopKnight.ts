@@ -210,10 +210,10 @@ type KnightAndBishopPositionScoreContext = {
 // User-declared positions; D4 symmetries only, with no translations.
 const bishopUnclutterDeclarations = SQUARE_TRANSFORMS.flatMap(t => [
   {king: "b7", bishop: "a8", knight: "c7", black: "c5", from: "b7", target: "b8"},
-  {king: "b8", bishop: "a8", knight: "c7", black: "d6", from: "a8", target: "g2"},
+  {king: "b8", bishop: "a8", knight: "c7", black: undefined, from: "a8", target: "g2"},
 ].map(p => ({
   king: transformSquare(p.king as Square, t), bishop: transformSquare(p.bishop as Square, t),
-  knight: transformSquare(p.knight as Square, t), black: transformSquare(p.black as Square, t),
+  knight: transformSquare(p.knight as Square, t), black: p.black ? transformSquare(p.black as Square, t) : undefined,
   from: transformSquare(p.from as Square, t), target: transformSquare(p.target as Square, t),
 })));
 
@@ -233,7 +233,7 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
     bishopShuffleTargets: knightAndBishopShuffleTargets(fen),
     declaredBishopUnclutterMove: (() => {
       const pattern = bishopUnclutterDeclarations.find(p => p.king === whiteKing?.square
-        && p.bishop === bishop?.square && p.knight === knight?.square && p.black === blackKing?.square);
+        && p.bishop === bishop?.square && p.knight === knight?.square && (!p.black || p.black === blackKing?.square));
       return pattern ? pattern.from + pattern.target : undefined;
     })(),
     // The bishop occupies one exit from a corner; Black blocks the other.

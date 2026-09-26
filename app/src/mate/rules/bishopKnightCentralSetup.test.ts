@@ -231,16 +231,16 @@ test('r4.5 clears b7 with the declared Kb8, only in the named position and D4 sy
 });
 
 
-test('r4.5 follows Kb8 with Bg2 after the declared Kd6 reply, across D4', () => {
-  for (const t of SQUARE_TRANSFORMS) {
+test('r4.5 follows Kb8 with Bg2 based on the White formation, across D4', () => {
+  for (const t of SQUARE_TRANSFORMS) for (const reply of ['b6', 'd6', 'd4', 'c4', 'b4'] as const) {
     const chess = getChess(transformFen('B7/1KN5/8/2k5/8/8/8/8 w - - 0 1', t));
     chess.move({from: transformSquare('b7', t), to: transformSquare('b8', t)});
-    chess.move({from: transformSquare('c5', t), to: transformSquare('d6', t)});
+    chess.move({from: transformSquare('c5', t), to: transformSquare(reply, t)});
     const fen = chess.fen();
     const move = chess.move({from: transformSquare('a8', t), to: transformSquare('g2', t)}).san;
     assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [move], t.name);
     const target = scoreKnightAndBishopWhiteMove(fen, move);
-    const back = getChess(fen).move({from: transformSquare('b8', t), to: transformSquare('b7', t)}).san;
+    const back = getChess(fen).move({from: transformSquare('a8', t), to: transformSquare('f3', t)}).san;
     assert.ok(compareScoresByRules(target, scoreKnightAndBishopWhiteMove(fen, back), [r45]) < 0, t.name);
   }
 });
