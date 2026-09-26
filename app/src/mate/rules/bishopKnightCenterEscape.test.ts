@@ -11,7 +11,7 @@ test('r6 breaks equal knight proximity by central proximity only; r20 scores min
     const fen = transformFen('B7/8/5k2/8/3K4/8/8/1N6 w - - 0 1', transform);
     const score = (from: 'a8' | 'd4', to: 'h1' | 'f3' | 'c3' | 'e3' | 'd5') => {
       const san = getChess(fen).move({from: transformSquare(from, transform), to: transformSquare(to, transform)}).san;
-      return {...scoreKnightAndBishopWhiteMove(fen, san), kingKnightDistanceScore: 0};
+      return {...scoreKnightAndBishopWhiteMove(fen, san), kingApproachDistanceScore: 0};
     };
     const far = score('a8', 'h1'), near = score('a8', 'f3');
     const offColorFar = score('d4', 'c3'), offColorNear = score('d4', 'e3'), sameColorCentral = score('d4', 'd5');

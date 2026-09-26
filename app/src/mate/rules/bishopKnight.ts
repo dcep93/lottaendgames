@@ -4,6 +4,8 @@ import { stableBishopProtectionDistance, stableBishopProtectedSquares } from "./
 import { knightAndBishopThreeKingPlacementPenalty, knightAndBishopFiveBishopPenalty, knightAndBishopFiveKingTargetDistance, knightAndBishopShouldCheckThreeDiagonal, evaluateKnightAndBishopSupportedDiagonal } from "./bishopKnightDiagonalSupport";
 import type { Square } from "chess.js";
 import {
+  allSquares,
+  isKnightMove,
   findPiece,
   getChess,
   getEndgamePiecePlacements,
@@ -64,6 +66,8 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly knightStableBishopProtectionPenalty: number;
   readonly kingKnightAdjacencyPenalty: number;
   readonly kingKnightDistanceScore: number;
+  readonly kingApproachDistanceScore: number;
+  readonly knightDriftQualifies: boolean;
   readonly kingBlackDistanceSquared: number;
   readonly kingCoordinationPenalty: number;
   readonly attackedBishopDefensePenalty: number;
@@ -276,6 +280,7 @@ function scoreKnightAndBishopWhiteMoveCore(
   let knightTargetProximity: number | undefined;
   const knight = findPiece(resultFen, "w", "n");
   const blackKing = findPiece(resultFen, "b", "k");
+  const startingKnight = findPiece(fen, "w", "n");
   const nearbyPairCentrallyDefended = !!whiteKing && centerDistance(whiteKing.square) === 0
     && ((!!bishop && kingDistance(bishop.square, whiteKing.square) === 1)
       || (!!knight && kingDistance(knight.square, whiteKing.square) === 1));
@@ -326,6 +331,24 @@ function scoreKnightAndBishopWhiteMoveCore(
       && bishopControlsOrOccupiesSquare(resultFen, bishop.square, knight.square) ? 1 : 0,
     kingKnightAdjacencyPenalty: knightKingDefended ? 0 : 1,
     kingKnightDistanceScore: whiteKing && knight ? kingDistance(whiteKing.square, knight.square) : 99,
+    kingApproachDistanceScore: whiteKing && startingKnight ? kingDistance(whiteKing.square, startingKnight.square) : 99,
+    get knightDriftQualifies() {
+      if (move.piece !== "n" || !whiteKing || !knight || !bishop
+        || kingDistance(knight.square, whiteKing.square) >= kingDistance(move.from, whiteKing.square)) return false;
+      const squares = allSquares();
+      return blackReplies.every(reply => {
+        const black = reply.to;
+        if (kingDistance(black, knight.square) !== 1 || knightKingDefended) return true;
+        const kingCanDefend = squares.some(square => square !== bishop.square && square !== knight.square
+          && kingDistance(square, whiteKing.square) === 1
+          && kingDistance(square, knight.square) === 1 && kingDistance(square, black) > 1);
+        const knightCanContinue = squares.some(square => square !== whiteKing.square && square !== bishop.square
+          && isKnightMove(knight.square, square)
+          && squaredEuclideanDistance(square, whiteKing.square) < squaredEuclideanDistance(knight.square, whiteKing.square)
+          && (kingDistance(square, black) > 1 || kingDistance(square, whiteKing.square) === 1));
+        return kingCanDefend || knightCanContinue;
+      });
+    },
     kingBlackDistanceSquared: whiteKing && blackKing ? squaredEuclideanDistance(whiteKing.square, blackKing.square) : 99,
     get knightStableBishopProtectionPenalty() { return knightBishopStablyDefended() ? 0 : 1; },
     get knightKingProtectionDistance() { return knightKingProtectionDistance(resultFen); },
@@ -556,15 +579,16 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       id: "r6",
       shortLabel: "rule r6",
       helpText: "Prefer king step proximity to the knight, then king central proximity.",
-      compare: (first, second) => first.kingKnightDistanceScore - second.kingKnightDistanceScore
+      compare: (first, second) => first.kingApproachDistanceScore - second.kingApproachDistanceScore
         || first.kingCenterEuclideanScore - second.kingCenterEuclideanScore,
     },
     {
       id: "r7",
       shortLabel: "rule r7",
       helpText: "Drift the knight towards king protection, then prefer knight central 16 proximity.",
-      // Reset: new drift instructions will be added explicitly.
-      compare: () => 0,
+      compare: (first, second) => Number(second.knightDriftQualifies) - Number(first.knightDriftQualifies)
+        || (first.knightDriftQualifies && second.knightDriftQualifies
+          ? first.knightMiddle16ProximityScore - second.knightMiddle16ProximityScore : 0),
     },
     {
       id: "r8",
