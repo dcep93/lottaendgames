@@ -1,0 +1,118 @@
+{
+  "scope": "four-ply witness replay plus five-second mixed discovery; not a full graph audit",
+  "baselineFourPlyCycles": 1562,
+  "previousVerifiedCycles": 136,
+  "survivingPreviousCycles": 108,
+  "removedPreviousCycles": 28,
+  "additionalDiscoveredFourPlyCycles": 1,
+  "verifiedWitnesses": 109,
+  "displayEligibleWitnesses": 16,
+  "globalOnCyclePositionCount": null,
+  "discovery": {
+    "scope": "bounded fresh search, not global audit",
+    "milliseconds": 5000,
+    "attempted": 344,
+    "checkedRoots": 239,
+    "completedRoots": 238,
+    "cycles": 18,
+    "policy": "working r6 defers when Black blocks knight approach",
+    "sampling": "mixed uniform physical placements, close knight/king placements, and shuffled old loop roots"
+  },
+  "geometricMotifs": [
+    {
+      "motif": "bishop shuffle; central bishop throughout; knight king-protected throughout; no stable bishop defense",
+      "cycles": 84,
+      "positions": 41
+    },
+    {
+      "motif": "bishop shuffle; bishop enters/leaves center; knight king-protected throughout; no stable bishop defense",
+      "cycles": 8,
+      "positions": 9
+    },
+    {
+      "motif": "knight shuffle; bishop outside center throughout; knight without king protection; no stable bishop defense",
+      "cycles": 6,
+      "positions": 11
+    },
+    {
+      "motif": "knight shuffle; bishop outside center throughout; knight without king protection; alternates stable bishop defense",
+      "cycles": 5,
+      "positions": 10
+    },
+    {
+      "motif": "bishop shuffle; bishop outside center throughout; knight king-protected throughout; no stable bishop defense",
+      "cycles": 4,
+      "positions": 6
+    },
+    {
+      "motif": "king shuffle; central bishop throughout; knight king-protected throughout; no stable bishop defense",
+      "cycles": 1,
+      "positions": 2
+    },
+    {
+      "motif": "knight shuffle; bishop outside center throughout; knight king-protected throughout; no stable bishop defense",
+      "cycles": 1,
+      "positions": 2
+    }
+  ],
+  "examples": [
+    {
+      "group": 0,
+      "motif": "knight shuffle without king protection; bishop outside center throughout",
+      "fen": "6B1/5K2/N2k4/8/8/8/8/8 w - - 0 1",
+      "moves": [
+        "Nb8",
+        "Kc7",
+        "Na6+",
+        "Kd6"
+      ],
+      "area": 21,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=6B1/5K2/N2k4/8/8/8/8/8_w_-_-_0_1&moves=Nb8,Kc7,Na6%2B,Kd6&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "knight shuffle without king protection; bishop outside center throughout",
+      "fen": "8/8/8/K7/B1k5/8/8/3N4 w - - 0 1",
+      "moves": [
+        "Nb2+",
+        "Kc3",
+        "Nd1+",
+        "Kc4"
+      ],
+      "area": 20,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/K7/B1k5/8/8/3N4_w_-_-_0_1&moves=Nb2%2B,Kc3,Nd1%2B,Kc4&cursor=0"
+    },
+    {
+      "group": 1,
+      "motif": "minor-piece shuffle while knight remains king-protected",
+      "fen": "8/8/8/1B6/1k1NK3/8/8/8 w - - 0 1",
+      "moves": [
+        "Bd3",
+        "Kc3",
+        "Bb5",
+        "Kb4"
+      ],
+      "area": 8,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/1B6/1k1NK3/8/8/8_w_-_-_0_1&moves=Bd3,Kc3,Bb5,Kb4&cursor=0"
+    },
+    {
+      "group": 1,
+      "motif": "minor-piece shuffle while knight remains king-protected",
+      "fen": "B7/1K6/N7/1k6/8/8/8/8 w - - 0 1",
+      "moves": [
+        "Nc7+",
+        "Kc5",
+        "Na6+",
+        "Kb5"
+      ],
+      "area": 6,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=B7/1K6/N7/1k6/8/8/8/8_w_-_-_0_1&moves=Nc7%2B,Kc5,Na6%2B,Kb5&cursor=0"
+    }
+  ],
+  "validation": {
+    "targetedTests": 58,
+    "auditHarnessTests": 39,
+    "productionBuild": "passed",
+    "d4Regression": "Nf3 and Nc6 preferred when Black blocks knight approach; normal r6 king approach remains active"
+  }
+}

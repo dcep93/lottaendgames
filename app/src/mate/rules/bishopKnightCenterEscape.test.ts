@@ -176,3 +176,22 @@ test('removing Black proximity lets the knight advance, then the king follow, ac
     assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [move], t.name);
   }
 });
+
+test('r6 defers to drift when Black stands between the attacked knight and White king, across D4', () => {
+  const r6 = knightAndBishopWhiteRules.find(rule => rule.id === 'r6')!;
+  for (const t of SQUARE_TRANSFORMS) {
+    const fen = transformFen('4B3/8/8/8/3N4/2k5/8/K7 w - - 2 2', t);
+    const move = (to: 'f3' | 'c6' | 'b5') => getChess(fen).move({from: transformSquare('d4', t), to: transformSquare(to, t)}).san;
+    const onward = scoreKnightAndBishopWhiteMove(fen, move('f3'));
+    const retreat = scoreKnightAndBishopWhiteMove(fen, move('b5'));
+    assert.ok(onward.kingKnightDistanceScore > retreat.kingKnightDistanceScore, t.name);
+    assert.equal(r6.applies!(onward), false, t.name);
+    assert.equal(r6.applies!(retreat), false, t.name);
+    assert.ok(onward.knightDriftScore[0] < retreat.knightDriftScore[0], t.name);
+    assert.deepEqual([...getIdealKnightAndBishopWhiteMoves(fen)].sort(), [move('f3'), move('c6')].sort(), t.name);
+    const clear = transformFen('B2k4/8/8/8/8/3N4/3K4/8 w - - 0 1', t);
+    const approach = getChess(clear).move({from: transformSquare('d2', t), to: transformSquare('e3', t)}).san;
+    assert.equal(r6.applies!(scoreKnightAndBishopWhiteMove(clear, approach)), true, t.name);
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(clear), [approach], t.name);
+  }
+});
