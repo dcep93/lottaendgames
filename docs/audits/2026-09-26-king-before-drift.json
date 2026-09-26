@@ -1,0 +1,61 @@
+{
+  "scope": "Saved four-ply witness replay and five-second mixed search; not full audit",
+  "baseline": "9a34d570e2d9d60ef882712437d2c36194ef8ac8",
+  "priorFourPlyCycles": 583,
+  "survivingWitnesses": 70,
+  "brokenWitnesses": 513,
+  "additionalWitnesses": 3,
+  "combinedWitnesses": 73,
+  "freshSearch": {
+    "scope": "bounded fresh search, not global audit",
+    "milliseconds": 5000,
+    "attempted": 367,
+    "checkedRoots": 254,
+    "completedRoots": 253,
+    "cycles": 28,
+    "policy": "working king-before-drift",
+    "sampling": "mixed uniform physical placements, close knight/king placements, and shuffled old loop roots"
+  },
+  "motifs": [
+    {
+      "motif": "r4 \u2194 r4",
+      "cycles": 68,
+      "positions": 36
+    },
+    {
+      "motif": "r20 \u2194 r4",
+      "cycles": 2,
+      "positions": 3
+    },
+    {
+      "motif": "r6 \u2194 r7",
+      "cycles": 1,
+      "positions": 2
+    },
+    {
+      "motif": "r6 \u2194 r6",
+      "cycles": 1,
+      "positions": 2
+    },
+    {
+      "motif": "r4 \u2194 r4.5",
+      "cycles": 1,
+      "positions": 2
+    }
+  ],
+  "examples": [
+    {
+      "group": 1,
+      "motif": "r6 \u2194 r7",
+      "fen": "1k6/8/B7/1K6/1N6/8/8/8 w - - 0 1",
+      "moves": [
+        "Nc6+",
+        "Ka8",
+        "Nb4",
+        "Kb8"
+      ],
+      "area": 6,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=1k6/8/B7/1K6/1N6/8/8/8_w_-_-_0_1&moves=Nc6%2B,Ka8,Nb4,Kb8&cursor=0"
+    }
+  ]
+}
