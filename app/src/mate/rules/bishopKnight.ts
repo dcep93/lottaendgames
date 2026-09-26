@@ -288,8 +288,9 @@ function scoreKnightAndBishopWhiteMoveCore(
     && ((!!bishop && kingDistance(bishop.square, whiteKing.square) === 1)
       || (!!knight && kingDistance(knight.square, whiteKing.square) === 1));
   const bishopKingDefended = !!bishop && !!whiteKing && kingDistance(bishop.square, whiteKing.square) === 1;
-  const bishopSeparated = context.shouldSeparateBishop && move.piece === "b" && bishop && blackKing
-    && kingDistance(bishop.square, blackKing.square) >= 3;
+  const bishopSeparated = context.shouldSeparateBishop && move.piece === "b" && bishop && blackKing && whiteKing
+    && kingDistance(bishop.square, blackKing.square) >= 3
+    && kingDistance(bishop.square, whiteKing.square) > (edgeDistance(bishop.square) === 0 ? 2 : 1);
   const bishopExitCleared = context.shouldSeparateBishop && move.piece === "k" && bishop && whiteKing
     && squaredEuclideanDistance(bishop.square, move.from) === 2
     && squaredEuclideanDistance(bishop.square, whiteKing.square) !== 2;

@@ -1,0 +1,247 @@
+{
+  "baselinePolicy": "eecb6a9640b8cef4bd97e77d40cbe7f9061312eb",
+  "baselineFourPlyCycles": 15917,
+  "previousReplaySurvivors": 7236,
+  "survivingSavedFourPlyCycles": 3898,
+  "brokenSavedFourPlyCycles": 12019,
+  "additionalBrokenSincePreviousChange": 3338,
+  "baselineR4SelfReversals": 7870,
+  "survivingBaselineR4SelfReversals": 0,
+  "scope": "Saved four-ply witnesses only. Not a fresh global loop count, arbitrary-length cohort recheck, or search for newly introduced loops.",
+  "change": "A bishop move credited by r4 must end at least three king steps from Black, and outside White king crowding range: beyond two steps for an edge bishop, beyond adjacency otherwise. King exit-clearing moves are unchanged.",
+  "preferredExampleMoves": [
+    "Kc5",
+    "Kd6"
+  ],
+  "motifs": [
+    {
+      "motif": "r4 \u2194 r6",
+      "cycles": 2227,
+      "positions": 1511
+    },
+    {
+      "motif": "r20 \u2194 r4",
+      "cycles": 1463,
+      "positions": 856
+    },
+    {
+      "motif": "r4 \u2194 r5",
+      "cycles": 73,
+      "positions": 91
+    },
+    {
+      "motif": "r8 \u2194 r8",
+      "cycles": 66,
+      "positions": 42
+    },
+    {
+      "motif": "r20 \u2194 r20",
+      "cycles": 41,
+      "positions": 39
+    },
+    {
+      "motif": "r6.5 \u2194 r8",
+      "cycles": 8,
+      "positions": 12
+    },
+    {
+      "motif": "r20 \u2194 r6",
+      "cycles": 6,
+      "positions": 8
+    },
+    {
+      "motif": "r4 \u2194 r8",
+      "cycles": 3,
+      "positions": 5
+    },
+    {
+      "motif": "r20 \u2194 r8",
+      "cycles": 3,
+      "positions": 6
+    },
+    {
+      "motif": "r7 \u2194 r7",
+      "cycles": 3,
+      "positions": 5
+    },
+    {
+      "motif": "r20 \u2194 r6.5",
+      "cycles": 3,
+      "positions": 5
+    },
+    {
+      "motif": "r20 \u2194 r5",
+      "cycles": 1,
+      "positions": 2
+    },
+    {
+      "motif": "r6 \u2194 r8",
+      "cycles": 1,
+      "positions": 2
+    }
+  ],
+  "examples": [
+    {
+      "group": 0,
+      "motif": "r4 \u2194 r6",
+      "fen": "6B1/k7/8/8/K7/8/8/3N4 w - - 0 1",
+      "moves": [
+        "Bb3",
+        "Ka6",
+        "Bg8",
+        "Ka7"
+      ],
+      "area": 56,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=6B1/k7/8/8/K7/8/8/3N4_w_-_-_0_1&moves=Bb3,Ka6,Bg8,Ka7&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "r4 \u2194 r6",
+      "fen": "B1k5/8/8/8/6K1/8/8/3N4 w - - 0 1",
+      "moves": [
+        "Bf3",
+        "Kd8",
+        "Ba8",
+        "Kc8"
+      ],
+      "area": 56,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=B1k5/8/8/8/6K1/8/8/3N4_w_-_-_0_1&moves=Bf3,Kd8,Ba8,Kc8&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "r4 \u2194 r6",
+      "fen": "6B1/8/8/7K/1k6/8/8/1N6 w - - 0 1",
+      "moves": [
+        "Bh7",
+        "Kc4",
+        "Bg8+",
+        "Kb4"
+      ],
+      "area": 56,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=6B1/8/8/7K/1k6/8/8/1N6_w_-_-_0_1&moves=Bh7,Kc4,Bg8%2B,Kb4&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "r4 \u2194 r6",
+      "fen": "6B1/4K3/8/8/k7/8/N7/8 w - - 0 1",
+      "moves": [
+        "Bh7",
+        "Ka3",
+        "Bg8",
+        "Ka4"
+      ],
+      "area": 49,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=6B1/4K3/8/8/k7/8/N7/8_w_-_-_0_1&moves=Bh7,Ka3,Bg8,Ka4&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "r4 \u2194 r6",
+      "fen": "4K1B1/8/8/1k6/8/8/N7/8 w - - 0 1",
+      "moves": [
+        "Bh7",
+        "Ka4",
+        "Bg8",
+        "Kb5"
+      ],
+      "area": 49,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=4K1B1/8/8/1k6/8/8/N7/8_w_-_-_0_1&moves=Bh7,Ka4,Bg8,Kb5&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "r4 \u2194 r6",
+      "fen": "6B1/8/8/1K6/8/k7/8/5N2 w - - 0 1",
+      "moves": [
+        "Bc4",
+        "Kb2",
+        "Bg8",
+        "Ka3"
+      ],
+      "area": 48,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=6B1/8/8/1K6/8/k7/8/5N2_w_-_-_0_1&moves=Bc4,Kb2,Bg8,Ka3&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "r4 \u2194 r6",
+      "fen": "2B1k3/8/8/8/6K1/8/8/1N6 w - - 0 1",
+      "moves": [
+        "Bf5",
+        "Kf7",
+        "Bc8",
+        "Ke8"
+      ],
+      "area": 48,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=2B1k3/8/8/8/6K1/8/8/1N6_w_-_-_0_1&moves=Bf5,Kf7,Bc8,Ke8&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "r4 \u2194 r6",
+      "fen": "2B5/8/8/6K1/2k5/8/8/1N6 w - - 0 1",
+      "moves": [
+        "Bf5",
+        "Kd4",
+        "Bc8",
+        "Kc4"
+      ],
+      "area": 48,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=2B5/8/8/6K1/2k5/8/8/1N6_w_-_-_0_1&moves=Bf5,Kd4,Bc8,Kc4&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "r4 \u2194 r6",
+      "fen": "6B1/4k3/8/8/1K6/8/8/5N2 w - - 0 1",
+      "moves": [
+        "Bc4",
+        "Kd6",
+        "Bg8",
+        "Ke7"
+      ],
+      "area": 48,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=6B1/4k3/8/8/1K6/8/8/5N2_w_-_-_0_1&moves=Bc4,Kd6,Bg8,Ke7&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "r4 \u2194 r6",
+      "fen": "6B1/8/8/6K1/k7/8/8/1N6 w - - 0 1",
+      "moves": [
+        "Bh7",
+        "Kb3",
+        "Bg8+",
+        "Ka4"
+      ],
+      "area": 48,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=6B1/8/8/6K1/k7/8/8/1N6_w_-_-_0_1&moves=Bh7,Kb3,Bg8%2B,Ka4&cursor=0"
+    },
+    {
+      "group": 1,
+      "motif": "r20 \u2194 r4",
+      "fen": "2B5/8/8/7K/8/8/k7/5N2 w - - 0 1",
+      "moves": [
+        "Bh3",
+        "Ka1",
+        "Bc8",
+        "Ka2"
+      ],
+      "area": 48,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=2B5/8/8/7K/8/8/k7/5N2_w_-_-_0_1&moves=Bh3,Ka1,Bc8,Ka2&cursor=0"
+    },
+    {
+      "group": 1,
+      "motif": "r20 \u2194 r4",
+      "fen": "2B5/8/8/7K/8/8/k3N3/8 w - - 0 1",
+      "moves": [
+        "Bg4",
+        "Ka1",
+        "Bc8",
+        "Ka2"
+      ],
+      "area": 42,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=2B5/8/8/7K/8/8/k3N3/8_w_-_-_0_1&moves=Bg4,Ka1,Bc8,Ka2&cursor=0"
+    }
+  ],
+  "validation": {
+    "buildPassed": true,
+    "bishopKnightTestsPassed": 148,
+    "knownFailures": 4,
+    "focusedR4TestsPassed": 8
+  }
+}
