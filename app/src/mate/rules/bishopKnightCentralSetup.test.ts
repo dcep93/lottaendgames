@@ -197,3 +197,20 @@ test('r4.5 clears the bishop from a blocked corner king exit, across D4', () => 
     }
   }
 });
+
+
+test('r4.5 avoids crowding an adjacent edge king and knight with Bb7, across D4', () => {
+  for (const t of SQUARE_TRANSFORMS) {
+    const fen = transformFen('NK6/8/8/8/4B3/4k3/8/8 w - - 2 2', t);
+    const san = (to: 'b7' | 'h7') => getChess(fen).move({from: transformSquare('e4', t), to: transformSquare(to, t)}).san;
+    assert.equal(scoreKnightAndBishopWhiteMove(fen, san('b7')).bishopCrowdsEdgePairPenalty, 1, t.name);
+    assert.equal(scoreKnightAndBishopWhiteMove(fen, san('h7')).bishopCrowdsEdgePairPenalty, 0, t.name);
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [san('h7')], t.name);
+    for (const quiet of ['k7/8/8/3NK3/8/8/1B6/8 w - - 0 1', '1K6/8/N7/8/4B3/4k3/8/8 w - - 2 2']) {
+      const position = transformFen(quiet, t);
+      for (const move of getChess(position).moves()) {
+        assert.equal(scoreKnightAndBishopWhiteMove(position, move).bishopCrowdsEdgePairPenalty, 0, t.name);
+      }
+    }
+  }
+});

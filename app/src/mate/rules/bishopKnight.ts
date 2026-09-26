@@ -5,6 +5,7 @@ import { knightAndBishopThreeKingPlacementPenalty, knightAndBishopFiveBishopPena
 import type { Square } from "chess.js";
 import {
   allSquares,
+  edgeDistance,
   isKnightMove,
   findPiece,
   getChess,
@@ -55,6 +56,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly bishopCentralProximityScore: number;
   readonly bishopTooCloseToBlackPenalty: number;
   readonly cornerBishopUnclutterScore: number;
+  readonly bishopCrowdsEdgePairPenalty: number;
   readonly bishopKingCentralNavigationScore: number;
   readonly bishopShuffleControlPenalty: number;
   readonly minorBlackDistanceScore: number;
@@ -321,6 +323,11 @@ function scoreKnightAndBishopWhiteMoveCore(
     // Only immediate proximity counts; do not preempt a possible future approach.
     cornerBishopUnclutterScore: context.clutteredCornerKing && bishop
       ? -squaredEuclideanDistance(bishop.square, context.clutteredCornerKing) : 0,
+    bishopCrowdsEdgePairPenalty: bishop && whiteKing && knight
+      && edgeDistance(whiteKing.square) === 0 && edgeDistance(knight.square) === 0
+      && kingDistance(whiteKing.square, knight.square) === 1
+      && kingDistance(bishop.square, whiteKing.square) === 1
+      && kingDistance(bishop.square, knight.square) === 1 ? 1 : 0,
     bishopTooCloseToBlackPenalty: bishop && blackKing
       && kingDistance(bishop.square, blackKing.square) <= 1 ? 1 : 0,
     bishopCentralProximityScore: bishop ? knightAndBishopCenterProximityScore(bishop.square) : 99,
@@ -560,7 +567,8 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       shortLabel: "rule r4.5",
       helpText: "Ensure a distant bishop.",
       compare: (first, second) => first.cornerBishopUnclutterScore - second.cornerBishopUnclutterScore
-        || first.bishopTooCloseToBlackPenalty - second.bishopTooCloseToBlackPenalty,
+        || first.bishopTooCloseToBlackPenalty - second.bishopTooCloseToBlackPenalty
+        || first.bishopCrowdsEdgePairPenalty - second.bishopCrowdsEdgePairPenalty,
     },
     {
       id: "r5",
