@@ -68,7 +68,6 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly knightStableBishopProtectionPenalty: number;
   readonly kingKnightAdjacencyPenalty: number;
   readonly kingKnightDistanceScore: number;
-  readonly kingApproachDistanceScore: number;
   readonly knightDriftQualifies: boolean;
   readonly knightDoubleOpposition: boolean;
   readonly kingBlackDistanceSquared: number;
@@ -278,7 +277,6 @@ function scoreKnightAndBishopWhiteMoveCore(
   let knightTargetProximity: number | undefined;
   const knight = findPiece(resultFen, "w", "n");
   const blackKing = findPiece(resultFen, "b", "k");
-  const startingKnight = findPiece(fen, "w", "n");
   const doubleOppositionTargets = (() => {
     if (move.piece !== "n" || !whiteKing || !blackKing) return undefined;
     const n = squareCoordinates(move.from), b = squareCoordinates(blackKing.square);
@@ -337,7 +335,6 @@ function scoreKnightAndBishopWhiteMoveCore(
       && bishopControlsOrOccupiesSquare(resultFen, bishop.square, knight.square) ? 1 : 0,
     kingKnightAdjacencyPenalty: knightKingDefended ? 0 : 1,
     kingKnightDistanceScore: whiteKing && knight ? kingDistance(whiteKing.square, knight.square) : 99,
-    kingApproachDistanceScore: whiteKing && startingKnight ? kingDistance(whiteKing.square, startingKnight.square) : 99,
     knightDoubleOpposition: !!knight && !!doubleOppositionTargets?.includes(knight.square),
     get knightDriftQualifies() {
       if (knightKingDefended) return true;
@@ -595,7 +592,7 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       id: "r6",
       shortLabel: "rule r6",
       helpText: "Prefer king step proximity to the knight, then king central proximity.",
-      compare: (first, second) => first.kingApproachDistanceScore - second.kingApproachDistanceScore
+      compare: (first, second) => first.kingKnightDistanceScore - second.kingKnightDistanceScore
         || first.kingCenterEuclideanScore - second.kingCenterEuclideanScore,
     },
     {

@@ -11,7 +11,7 @@ test('r6 breaks equal knight proximity by central proximity only; r20 scores min
     const fen = transformFen('B7/8/5k2/8/3K4/8/8/1N6 w - - 0 1', transform);
     const score = (from: 'a8' | 'd4', to: 'h1' | 'f3' | 'c3' | 'e3' | 'd5') => {
       const san = getChess(fen).move({from: transformSquare(from, transform), to: transformSquare(to, transform)}).san;
-      return {...scoreKnightAndBishopWhiteMove(fen, san), kingApproachDistanceScore: 0};
+      return {...scoreKnightAndBishopWhiteMove(fen, san), kingKnightDistanceScore: 0};
     };
     const far = score('a8', 'h1'), near = score('a8', 'f3');
     const offColorFar = score('d4', 'c3'), offColorNear = score('d4', 'e3'), sameColorCentral = score('d4', 'd5');
@@ -173,5 +173,24 @@ test('king approach remains preferred after the drift reset, across D4', () => {
     const fen = transformFen(start, t);
     const move = getChess(fen).move({from: transformSquare(from, t), to: transformSquare(to, t)}).san;
     assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [move], t.name);
+  }
+});
+
+
+test('r6 lets Nc5 beat king retreats using resulting proximity, across D4', () => {
+  for (const t of SQUARE_TRANSFORMS) {
+    const fen = transformFen('4k3/8/B7/8/N1K5/8/8/8 w - - 2 2', t);
+    const knight = getChess(fen).move({from: transformSquare('a4', t), to: transformSquare('c5', t)}).san;
+    const king = getChess(fen).move({from: transformSquare('c4', t), to: transformSquare('b4', t)}).san;
+    const n = scoreKnightAndBishopWhiteMove(fen, knight), k = scoreKnightAndBishopWhiteMove(fen, king);
+    assert.equal(n.kingKnightDistanceScore, 1, t.name);
+    assert.equal(k.kingKnightDistanceScore, 1, t.name);
+    assert.ok(n.kingCenterEuclideanScore < k.kingCenterEuclideanScore, t.name);
+    const r6 = knightAndBishopWhiteRules.find(rule => rule.id === 'r6')!;
+    assert.ok(r6.compare!(n, k) < 0, t.name);
+    const otherKnight = getChess(fen).move({from: transformSquare('a4', t), to: transformSquare('c3', t)}).san;
+    assert.equal(r6.compare!(n, scoreKnightAndBishopWhiteMove(fen, otherKnight)), 0, t.name);
+    // r20 subsequently prefers Nc3, farther from Black's king.
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [otherKnight], t.name);
   }
 });
