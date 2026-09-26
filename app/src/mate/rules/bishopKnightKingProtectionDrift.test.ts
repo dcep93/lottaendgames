@@ -321,3 +321,16 @@ test('r6 goes around Black via Na5 rather than counting a return to Nb3 as progr
   assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[san('a5')],t.name);
  }
 });
+
+test('r6 allows Nd1+ through a safe forward jump and one king step, across D4',()=>{
+ for(const t of SQUARE_TRANSFORMS){
+  const fen=transformFen('4B3/8/8/8/8/2k5/1N6/7K w - - 2 2',t);
+  const san=getChess(fen).move({from:transformSquare('b2',t),to:transformSquare('d1',t)}).san;
+  assert.equal(scoreKnightAndBishopWhiteMove(fen,san).knightDriftObstructionPenalty,0,t.name);
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[san],t.name);
+  const chess=getChess(fen);
+  for(const [from,to] of [['b2','d1'],['c3','d2'],['d1','f2'],['d2','e2'],['h1','g2']] as const)
+    chess.move({from:transformSquare(from,t),to:transformSquare(to,t)});
+  assert.equal(knightKingProtectionDistance(chess.fen()),0,t.name);
+ }
+});

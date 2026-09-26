@@ -37,6 +37,13 @@ export function knightDriftThreatPenalty(white: Square, bishop: Square, knight: 
       && kingDistance(s, threat) > 1
       && squaredEuclideanDistance(s, white) < squaredEuclideanDistance(knight, white)
       && jumps.get(s)!.some(t => t !== bishop && t !== white && kingDistance(t, white) === 1))) continue;
+    // A safe forward jump can meet a single king step, even if the knight-only
+    // route is no shorter. Keep that meeting square beyond Black's next step.
+    if (knightMoved && jumps.get(knight)!.some(s => s !== departure && s !== white && s !== bishop && s !== threat
+      && kingDistance(s, threat) > 1
+      && squaredEuclideanDistance(s, white) < squaredEuclideanDistance(knight, white)
+      && neighbours.get(white)!.some(k => k !== bishop && k !== s && k !== knight
+        && kingDistance(k, s) === 1 && kingDistance(k, threat) > 2))) continue;
     if (kingDistance(threat, white) < kingDistance(knight, white)) penalty = 1;
     if (!knightMoved) continue;
     // Stable defense or a single safe king step makes the knight reachable.
