@@ -30,3 +30,19 @@ test('drift allows a safe king rescue but respects an occupied rescue square, ac
     }
   }
 });
+
+
+test('r7 centralizes an already king-protected knight without requiring closer king distance, across D4', () => {
+  for (const t of SQUARE_TRANSFORMS) {
+    const fen = transformFen('4B3/8/8/4k2N/6K1/8/8/8 w - - 0 1', t);
+    const move = getChess(fen).move({from: transformSquare('h5', t), to: transformSquare('f4', t)}).san;
+    const candidates = getChess(fen).moves().map(san => ({san, score: scoreKnightAndBishopWhiteMove(fen, san)}));
+    const score = scoreKnightAndBishopWhiteMove(fen, move);
+    assert.equal(score.kingKnightAdjacencyPenalty, 0, t.name);
+    assert.equal(score.knightMiddle16ProximityScore, 0, t.name);
+    assert.equal(score.knightDriftQualifies, true, t.name);
+    const selection = selectCandidatesByRules(candidates, knightAndBishopWhiteRules);
+    assert.deepEqual(selection.idealCandidates.map(c => c.san), [move], t.name);
+    assert.equal(selection.lastEliminatingRule?.id, 'r7', t.name);
+  }
+});

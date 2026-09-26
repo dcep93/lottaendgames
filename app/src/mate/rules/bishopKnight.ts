@@ -340,6 +340,7 @@ function scoreKnightAndBishopWhiteMoveCore(
     kingKnightDistanceScore: whiteKing && knight ? kingDistance(whiteKing.square, knight.square) : 99,
     kingApproachDistanceScore: whiteKing && startingKnight ? kingDistance(whiteKing.square, startingKnight.square) : 99,
     get knightDriftQualifies() {
+      if (knightKingDefended) return true;
       if (move.piece !== "n" || !whiteKing || !knight || !bishop
         || kingDistance(knight.square, whiteKing.square) >= kingDistance(move.from, whiteKing.square)) return false;
       const squares = allSquares();
