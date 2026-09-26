@@ -52,6 +52,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly bishopCenterPenalty: number;
   readonly knightOppositeCentralDistance: number;
   readonly bishopCentralProximityScore: number;
+  readonly bishopTooCloseToBlackPenalty: number;
   readonly bishopShuffleControlPenalty: number;
   readonly minorBlackDistanceScore: number;
   readonly unprotectedMinorCount: number;
@@ -326,6 +327,8 @@ function scoreKnightAndBishopWhiteMoveCore(
       const targets = context.knightOppositeCentralTargets.filter(target => target !== whiteKing?.square);
       return targets.length ? Math.min(...targets.map(target => knightMoveDistance(knight.square, target))) : 99;
     },
+    // Clear immediate contact; extra distance must not reward a bishop retreat cycle.
+    bishopTooCloseToBlackPenalty: bishop && blackKing && kingDistance(bishop.square, blackKing.square) < 2 ? 1 : 0,
     bishopCentralProximityScore: bishop ? knightAndBishopCenterProximityScore(bishop.square) : 99,
     bishopCenterPenalty: bishop && centerDistance(bishop.square) === 0 ? 0 : 1,
     kingKnightAdjacencyPenalty: knightKingDefended ? 0 : 1,
@@ -555,9 +558,10 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     {
       id: "r4",
       shortLabel: "rule r4",
-      helpText: "With a central king and central 16 knight, maneuver the knight to a central square opposite the bishop's color, then prefer king protection, then prefer bishop central proximity.",
+      helpText: "With a central king and central 16 knight, ensure a distant bishop, then maneuver the knight to a central square opposite the bishop's color, then prefer king protection, then prefer bishop central proximity.",
       applies: score => score.startsWithCentralKingAndMiddle16Knight,
-      compare: (first, second) => first.knightOppositeCentralDistance - second.knightOppositeCentralDistance
+      compare: (first, second) => first.bishopTooCloseToBlackPenalty - second.bishopTooCloseToBlackPenalty
+        || first.knightOppositeCentralDistance - second.knightOppositeCentralDistance
         || first.kingKnightAdjacencyPenalty - second.kingKnightAdjacencyPenalty
         || first.bishopCentralProximityScore - second.bishopCentralProximityScore,
     },

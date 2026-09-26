@@ -93,3 +93,19 @@ test('r4 targets e5 rather than the occupied d4 square, across D4',()=>{
   assert.deepEqual([...getIdealKnightAndBishopWhiteMoves(fen)].sort(),[san('d5'),san('e4')].sort(),t.name);
  }
 });
+
+test('r4 clears bishop contact once, then resumes knight progress, across D4',()=>{
+ for(const t of SQUARE_TRANSFORMS){
+  const fen=transformFen('Bk6/8/8/3N4/4K3/8/8/8 w - - 0 1',t);
+  const ch=getChess(fen);
+  const move=ch.move({from:transformSquare('a8',t),to:transformSquare('c6',t)}).san;
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[move],t.name);
+  ch.move({from:transformSquare('b8',t),to:transformSquare('c8',t)});
+  const next=ch.fen();
+  const candidates=['a8','b7','d7'].map(to=>getChess(next).move({from:transformSquare('c6',t),to:transformSquare(to as 'a8'|'b7'|'d7',t)}).san);
+  assert.deepEqual(candidates.map(san=>scoreKnightAndBishopWhiteMove(next,san).bishopTooCloseToBlackPenalty),[0,1,1],t.name);
+  const expected=['f4','e3'].map(to=>getChess(next).move({from:transformSquare('d5',t),to:transformSquare(to as 'f4'|'e3',t)}).san);
+  assert.deepEqual([...getIdealKnightAndBishopWhiteMoves(next)].sort(),expected.sort(),t.name);
+  for(const san of expected)assert.equal(scoreKnightAndBishopWhiteMove(next,san).bishopTooCloseToBlackPenalty,0,t.name);
+ }
+});
