@@ -1,0 +1,68 @@
+{
+  "scope": "Saved-witness replay plus bounded discovery; not a full graph audit",
+  "change": "r4 last preference minimizes bishop Euclidean distance to board midpoint, after knight opposite-color central target and king protection; eligibility unchanged",
+  "loadedPositionPreferredMove": "Bd5",
+  "savedWitnessesChecked": 15917,
+  "survivingFourPlyCycles": 3,
+  "unchangedFromPreviousReport": true,
+  "freshSearch": {
+    "milliseconds": 5001,
+    "checkedRoots": 371,
+    "signatures": []
+  },
+  "motifs": [
+    {
+      "motif": "r20 / r20",
+      "cycles": 2
+    },
+    {
+      "motif": "r20 / r5",
+      "cycles": 1
+    }
+  ],
+  "validation": {
+    "build": "pass",
+    "focusedTests": 33
+  },
+  "examples": [
+    {
+      "group": 0,
+      "motif": "r20 \u2194 r20",
+      "fen": "8/8/8/3k4/B3N3/4K3/8/8 w - - 0 1",
+      "moves": [
+        "Bd1",
+        "Ke5",
+        "Ba4",
+        "Kd5"
+      ],
+      "area": 10,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/3k4/B3N3/4K3/8/8_w_-_-_0_1&moves=Bd1,Ke5,Ba4,Kd5&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "r20 \u2194 r20",
+      "fen": "8/8/8/3k4/4N3/4K3/6B1/8 w - - 0 1",
+      "moves": [
+        "Bh1",
+        "Ke5",
+        "Bg2",
+        "Kd5"
+      ],
+      "area": 9,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/3k4/4N3/4K3/6B1/8_w_-_-_0_1&moves=Bh1,Ke5,Bg2,Kd5&cursor=0"
+    },
+    {
+      "group": 1,
+      "motif": "r20 \u2194 r5",
+      "fen": "8/8/4k3/8/4NK2/8/8/7B w - - 0 1",
+      "moves": [
+        "Bg2",
+        "Kd5",
+        "Bh1",
+        "Ke6"
+      ],
+      "area": 16,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/4k3/8/4NK2/8/8/7B_w_-_-_0_1&moves=Bg2,Kd5,Bh1,Ke6&cursor=0"
+    }
+  ]
+}

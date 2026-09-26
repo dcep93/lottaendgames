@@ -37,20 +37,20 @@ test('r4 reaches an opposite-color center before king protection, across D4',()=
  }
 });
 
-test('r4 requires both a long-diagonal bishop and knight protection for its last preference, across D4',()=>{
+test('r4 prefers bishop central proximity after knight placement and protection, across D4',()=>{
  for(const t of SQUARE_TRANSFORMS){
   const fen=transformFen('B7/8/k7/4N3/3K4/8/8/8 w - - 0 1',t);
-  const san=(to:'c6'|'b7'|'d5'|'f3')=>getChess(fen).move({from:transformSquare('a8',t),to:transformSquare(to,t)}).san;
-  const defended=scoreKnightAndBishopWhiteMove(fen,san('c6'));
-  const longOnly=scoreKnightAndBishopWhiteMove(fen,san('b7'));
-  const centralOnly=scoreKnightAndBishopWhiteMove(fen,san('d5'));
-  assert.equal(defended.knightProtectedLongDiagonalBishopPenalty,0,t.name);
-  assert.equal(longOnly.knightProtectedLongDiagonalBishopPenalty,1,t.name);
-  assert.equal(centralOnly.knightProtectedLongDiagonalBishopPenalty,1,t.name);
-  assert.ok(compareScoresByRules(defended,longOnly,[r4])<0,t.name);
-  assert.ok(compareScoresByRules(defended,centralOnly,[r4])<0,t.name);
-  assert.equal(scoreKnightAndBishopWhiteMove(fen,san('f3')).knightProtectedLongDiagonalBishopPenalty,0,t.name);
-  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[san('f3')],t.name);
+  const san=(to:'c6'|'b7'|'d5'|'e4')=>getChess(fen).move({from:transformSquare('a8',t),to:transformSquare(to,t)}).san;
+  const center=scoreKnightAndBishopWhiteMove(fen,san('d5'));
+  const nearby=scoreKnightAndBishopWhiteMove(fen,san('c6'));
+  const distant=scoreKnightAndBishopWhiteMove(fen,san('b7'));
+  assert.equal(center.knightOppositeCentralDistance,nearby.knightOppositeCentralDistance,t.name);
+  assert.equal(center.kingKnightAdjacencyPenalty,nearby.kingKnightAdjacencyPenalty,t.name);
+  assert.ok(center.bishopCentralProximityScore<nearby.bishopCentralProximityScore,t.name);
+  assert.ok(nearby.bishopCentralProximityScore<distant.bishopCentralProximityScore,t.name);
+  assert.ok(compareScoresByRules(center,nearby,[r4])<0,t.name);
+  assert.ok(compareScoresByRules(nearby,distant,[r4])<0,t.name);
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[san('e4')],t.name);
  }
 });
 
@@ -66,5 +66,13 @@ test('r4 stays inactive throughout the reported Kc6 boundary shuffle, across D4'
   const retreat=ch.move({from:transformSquare('d6',t),to:transformSquare('b5',t)}).san;
   ch.undo();
   assert.ok(!getIdealKnightAndBishopWhiteMoves(ch.fen()).includes(retreat),t.name);
+ }
+});
+
+test('r4 centralizes the bishop in the supplied Ba2 position, across D4',()=>{
+ for(const t of SQUARE_TRANSFORMS){
+  const fen=transformFen('8/8/8/4N3/3K1k2/8/B7/8 w - - 22 12',t);
+  const move=getChess(fen).move({from:transformSquare('a2',t),to:transformSquare('d5',t)}).san;
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[move],t.name);
  }
 });

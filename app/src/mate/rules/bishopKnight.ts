@@ -50,7 +50,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly startsWithCentralKingAndMiddle16Knight: boolean;
   readonly bishopCenterPenalty: number;
   readonly knightOppositeCentralDistance: number;
-  readonly knightProtectedLongDiagonalBishopPenalty: number;
+  readonly bishopCentralProximityScore: number;
   readonly minorBlackDistanceScore: number;
   readonly unprotectedMinorCount: number;
   readonly minorCenterDistanceScore: number;
@@ -315,10 +315,7 @@ function scoreKnightAndBishopWhiteMoveCore(
       return Math.min(...targets.filter(target => squareColor(target) !== squareColor(bishop.square))
         .map(target => knightMoveDistance(knight.square, target)));
     },
-    get knightProtectedLongDiagonalBishopPenalty() {
-      return this.bishopLongDiagonalPenalty === 0 && bishop && knight
-        && squaredEuclideanDistance(bishop.square, knight.square) === 5 ? 0 : 1;
-    },
+    bishopCentralProximityScore: bishop ? knightAndBishopCenterProximityScore(bishop.square) : 99,
     bishopCenterPenalty: bishop && centerDistance(bishop.square) === 0 ? 0 : 1,
     kingKnightAdjacencyPenalty: knightKingDefended ? 0 : 1,
     kingKnightDistanceScore: whiteKing && knight ? kingDistance(whiteKing.square, knight.square) : 99,
@@ -546,11 +543,11 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     {
       id: "r4",
       shortLabel: "rule r4",
-      helpText: "With a central king and central 16 knight, maneuver the knight to a central square opposite the bishop's color, then prefer king protection, then prefer the bishop on the long diagonal and protected by the knight.",
+      helpText: "With a central king and central 16 knight, maneuver the knight to a central square opposite the bishop's color, then prefer king protection, then prefer bishop central proximity.",
       applies: score => score.startsWithCentralKingAndMiddle16Knight,
       compare: (first, second) => first.knightOppositeCentralDistance - second.knightOppositeCentralDistance
         || first.kingKnightAdjacencyPenalty - second.kingKnightAdjacencyPenalty
-        || first.knightProtectedLongDiagonalBishopPenalty - second.knightProtectedLongDiagonalBishopPenalty,
+        || first.bishopCentralProximityScore - second.bishopCentralProximityScore,
     },
     {
       id: "r5",
