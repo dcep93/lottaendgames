@@ -107,11 +107,6 @@ test("bishop-and-knight rules are registered", () => {
       helpText: "",
     },
     {
-      id: "r4",
-      shortLabel: "rule r4",
-      helpText: "Without a central White king, unclutter the bishop.",
-    },
-    {
       id: "r5",
       shortLabel: "rule r5",
       helpText: "Play the r5 move.",
@@ -159,7 +154,6 @@ test("bishop-and-knight rules are registered", () => {
       "mate",
       "minors safe",
       "no stalemate",
-      "r4",
       "r5",
       "r6",
       "r6.5",
@@ -172,7 +166,7 @@ test("bishop-and-knight rules are registered", () => {
     ruleSet.whiteRuleDescriptions.map(({ id }) => id),
     knightAndBishopWhiteRules.map(({ id }) => id),
   );
-  assert.equal(knightAndBishopWhiteRules.length, 10);
+  assert.equal(knightAndBishopWhiteRules.length, 9);
   assert.deepEqual(ruleSet.help.noteBoards.map(board=>board.id), ["bishop-knight-rule-r5-hop", "bishop-knight-rule-r5-opposition"]);
 });
 
