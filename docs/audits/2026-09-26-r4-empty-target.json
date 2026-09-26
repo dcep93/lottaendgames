@@ -1,0 +1,44 @@
+{
+  "scope": "Replay of saved four-ply cycles and bounded fresh search; not a global audit",
+  "change": "R4 targets opposite-bishop-color central squares unoccupied by White king before the move; a king move cannot redefine the target.",
+  "example": {
+    "fen": "2k1B3/8/8/8/3K4/2N5/8/8 w - - 2 2",
+    "target": "e5",
+    "preferred": [
+      "Nd5",
+      "Ne4"
+    ]
+  },
+  "previousCycles": 110,
+  "survivingCycles": 1,
+  "removedCycles": 109,
+  "d4PostWhitePositions": 2,
+  "oldFullAuditWitnessesReplayed": 15917,
+  "oldFullAuditWitnessesSurviving": 0,
+  "fresh": {
+    "scope": "bounded fresh search, not global audit",
+    "milliseconds": 5001,
+    "attempted": 305,
+    "checkedRoots": 223,
+    "completedRoots": 222,
+    "cycles": 0,
+    "policy": "working r4 empty target",
+    "sampling": "mixed uniform physical placements, close knight/king placements, and shuffled old loop roots"
+  },
+  "examples": [
+    {
+      "group": 0,
+      "motif": "r4 \u2194 r6",
+      "fen": "Bk6/8/8/3N4/4K3/8/8/8 w - - 0 1",
+      "moves": [
+        "Nb6",
+        "Kc7",
+        "Nd5+",
+        "Kb8"
+      ],
+      "area": 25,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=Bk6/8/8/3N4/4K3/8/8/8_w_-_-_0_1&moves=Nb6,Kc7,Nd5%2B,Kb8&cursor=0"
+    }
+  ],
+  "validation": "30 focused tests including all eight D4 transforms; npm run build passed"
+}

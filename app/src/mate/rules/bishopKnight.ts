@@ -172,6 +172,7 @@ function distanceToNearestUnprotectedKnightOrBishop(fen: string): number {
 }
 
 type KnightAndBishopPositionScoreContext = {
+  readonly knightOppositeCentralTargets: readonly Square[];
   readonly bishopShuffleTargets: readonly Square[];
   readonly startsWithUnprotectedBishop: boolean;
   readonly startsWithUnprotectedKnight: boolean;
@@ -213,6 +214,8 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
   const knightCentrallyDefended = !!knight && centralKing && kingDistance(whiteKing.square, knight.square) === 1;
   let unprotectedKnight: boolean | undefined;
   return {
+    knightOppositeCentralTargets: (["d4", "e4", "d5", "e5"] as const).filter(target =>
+      bishop && target !== whiteKing?.square && squareColor(target) !== squareColor(bishop.square)),
     bishopShuffleTargets: knightAndBishopShuffleTargets(fen),
     startsWithUnprotectedBishop: !!bishop
       && (!whiteKing || kingDistance(whiteKing.square,bishop.square)!==1)
@@ -320,9 +323,8 @@ function scoreKnightAndBishopWhiteMoveCore(
     startsWithCentralKingAndMiddle16Knight: context.startsWithCentralKingAndMiddle16Knight,
     get knightOppositeCentralDistance() {
       if (!knight || !bishop) return 99;
-      const targets: readonly Square[] = ["d4", "e4", "d5", "e5"];
-      return Math.min(...targets.filter(target => squareColor(target) !== squareColor(bishop.square))
-        .map(target => knightMoveDistance(knight.square, target)));
+      const targets = context.knightOppositeCentralTargets.filter(target => target !== whiteKing?.square);
+      return targets.length ? Math.min(...targets.map(target => knightMoveDistance(knight.square, target))) : 99;
     },
     bishopCentralProximityScore: bishop ? knightAndBishopCenterProximityScore(bishop.square) : 99,
     bishopCenterPenalty: bishop && centerDistance(bishop.square) === 0 ? 0 : 1,
