@@ -172,7 +172,7 @@ test('r4.5 maximizes separation only when starting adjacent to a noncentral king
 });
 
 
-test('r4.5 exempts bishop moves outside the king-knight rectangle across D4', () => {
+test('r4.5 includes the center when rejecting crowded bishop moves across D4', () => {
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen('Bk6/8/8/8/8/8/8/6KN w - - 0 1', t);
     const san = (to: 'g2' | 'f3' | 'e4') => getChess(fen).move({from: transformSquare('a8', t), to: transformSquare(to, t)}).san;
@@ -180,8 +180,8 @@ test('r4.5 exempts bishop moves outside the king-knight rectangle across D4', ()
     assert.equal(clear.bishopMoveNearNoncentralKingPenalty, 0, t.name);
     for (const to of ['g2', 'f3'] as const) {
       const crowded = scoreKnightAndBishopWhiteMove(fen, san(to));
-      assert.equal(crowded.bishopMoveNearNoncentralKingPenalty, 0, t.name);
-      assert.equal(compareScoresByRules(clear, crowded, [r45]), 0, t.name);
+      assert.equal(crowded.bishopMoveNearNoncentralKingPenalty, 1, t.name);
+      assert.ok(compareScoresByRules(clear, crowded, [r45]) < 0, t.name);
     }
 
   }
@@ -229,5 +229,18 @@ test('r4.5 exempts the loaded Be8 outside d7-h5 but still penalizes crowding ins
     const inside = transformFen('8/7k/5N2/8/8/1K6/8/B7 w - - 0 1', t);
     const crowded = getChess(inside).move({from: transformSquare('a1', t), to: transformSquare('c3', t)}).san;
     assert.equal(scoreKnightAndBishopWhiteMove(inside, crowded).bishopMoveNearNoncentralKingPenalty, 1, t.name);
+  }
+});
+
+
+test('r4.5 includes the four central squares in the loaded clutter rectangle, across D4', () => {
+  for (const t of SQUARE_TRANSFORMS) {
+    const fen = transformFen('8/8/4B3/4k3/8/8/KN6/8 w - - 0 1', t);
+    const move = (to: 'b3' | 'c8' | 'h3') => getChess(fen).move({from: transformSquare('e6', t), to: transformSquare(to, t)}).san;
+    assert.equal(scoreKnightAndBishopWhiteMove(fen, move('b3')).bishopMoveNearNoncentralKingPenalty, 1, t.name);
+    for (const to of ['c8', 'h3'] as const) {
+      assert.equal(scoreKnightAndBishopWhiteMove(fen, move(to)).bishopMoveNearNoncentralKingPenalty, 0, t.name);
+    }
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen).sort(), [move('c8'), move('h3')].sort(), t.name);
   }
 });
