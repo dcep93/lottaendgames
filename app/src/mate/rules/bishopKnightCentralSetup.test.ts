@@ -125,13 +125,13 @@ test('r4 puts king protection before a shorter knight route, across D4',()=>{
  }
 });
 
-test('r4 changes king color before bringing the bishop inward, across D4',()=>{
+test('r4 navigates bishop and king together toward their central targets, across D4',()=>{
  for(const t of SQUARE_TRANSFORMS){
   const fen=transformFen('B7/5k2/8/8/3NK3/8/8/8 w - - 0 1',t);
   const san=(from:'e4'|'a8',to:'e5'|'c6'|'d5')=>getChess(fen).move({from:transformSquare(from,t),to:transformSquare(to,t)}).san;
   const king=san('e4','e5'),bishop=san('a8','c6');
-  assert.ok(compareScoresByRules(scoreKnightAndBishopWhiteMove(fen,king),scoreKnightAndBishopWhiteMove(fen,bishop),[r4])<0,t.name);
-  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[king],t.name);
+  assert.ok(compareScoresByRules(scoreKnightAndBishopWhiteMove(fen,bishop),scoreKnightAndBishopWhiteMove(fen,king),[r4])<0,t.name);
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[san('a8','d5')],t.name);
  }
 });
 
@@ -142,5 +142,16 @@ test('r4 rejects Bf5 because Black can immediately approach with Kf6, across D4'
   assert.equal(scoreKnightAndBishopWhiteMove(fen,san('f5')).bishopTooCloseToBlackPenalty,1,t.name);
   for(const to of ['g4','b5'] as const)assert.equal(scoreKnightAndBishopWhiteMove(fen,san(to)).bishopTooCloseToBlackPenalty,0,t.name);
   assert.deepEqual([...getIdealKnightAndBishopWhiteMoves(fen)].sort(),[san('g4'),san('b5')].sort(),t.name);
+ }
+});
+
+test('r4 targets an unoccupied opposite-color central king square rather than leaving the center, across D4',()=>{
+ for(const t of SQUARE_TRANSFORMS){
+  const fen=transformFen('8/5k2/8/3B4/3NK3/8/8/8 w - - 0 1',t);
+  const score=(to:'e5'|'e3')=>scoreKnightAndBishopWhiteMove(fen,getChess(fen).move({from:transformSquare('e4',t),to:transformSquare(to,t)}).san);
+  assert.equal(score('e5').bishopKingCentralNavigationScore,0,t.name);
+  // d4 is occupied by the knight, so Ke3 is measured toward e5.
+  assert.equal(score('e3').bishopKingCentralNavigationScore,4,t.name);
+  assert.ok(compareScoresByRules(score('e5'),score('e3'),[r4])<0,t.name);
  }
 });
