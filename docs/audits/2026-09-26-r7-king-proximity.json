@@ -1,0 +1,19 @@
+{
+  "scope": "Saved four-ply witness replay plus five-second discovery; not a full graph audit",
+  "rule": "r7 minimizes king step distance to knight, then Euclidean distance to nearest central-four square, then Euclidean distance to Black king",
+  "previousCycles": 2,
+  "savedWitnessesChecked": 15917,
+  "survivingFourPlyCycles": 0,
+  "freshSearch": {
+    "milliseconds": 5000,
+    "checkedRoots": 402,
+    "signatures": []
+  },
+  "validation": {
+    "build": "pass",
+    "focusedTests": 28,
+    "D4": true
+  },
+  "priorityConsequence": "Earlier Bb3+ example now prefers Kd3 under r7 before r8 is reached",
+  "examples": []
+}

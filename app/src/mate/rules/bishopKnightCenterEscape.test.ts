@@ -3,7 +3,7 @@ import test from 'node:test';
 import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess';
 import { getIdealKnightAndBishopWhiteMoves, knightAndBishopWhiteRules, scoreKnightAndBishopWhiteMove } from './bishopKnight';
 
-test('r7 breaks equal knight proximity by central proximity and color; r20 scores minor distances from Black', () => {
+test('r7 breaks equal knight proximity by central proximity and Black king proximity; r20 scores minor distances from Black', () => {
   const r99 = knightAndBishopWhiteRules.find(rule => rule.id === 'r7')!;
   const r20 = knightAndBishopWhiteRules.find(rule => rule.id === 'r20')!;
   assert.ok(r99.compare); assert.ok(r20.compare);
@@ -17,7 +17,7 @@ test('r7 breaks equal knight proximity by central proximity and color; r20 score
     const offColorFar = score('d4', 'c3'), offColorNear = score('d4', 'e3'), sameColorCentral = score('d4', 'd5');
     assert.ok(r99.compare(offColorFar, sameColorCentral) > 0, transform.name);
     assert.ok(r99.compare(offColorNear, offColorFar) < 0, transform.name);
-    assert.ok(r99.compare(far, sameColorCentral) < 0, transform.name);
+    assert.ok(r99.compare(far, sameColorCentral) > 0, transform.name);
     assert.equal(sameColorCentral.kingBishopColorPenalty, 1);
     assert.equal(offColorNear.kingBishopColorPenalty, 0);
     assert.ok(!knightAndBishopWhiteRules.some(r => r.id === 'r19'));
@@ -43,7 +43,7 @@ test('r20 breaks equal Black-distance ties by minor Euclidean proximity to the c
 });
 
 
-test('r7 puts central-square proximity ahead of color across D4', () => {
+test('r7 puts central-square proximity ahead of Black king proximity across D4', () => {
   const compare = knightAndBishopWhiteRules.find(rule => rule.id === 'r7')!.compare!;
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen('8/7k/8/3BK3/2N5/8/8/8 w - - 6 4', t);
@@ -65,7 +65,7 @@ test('r7 puts central-square proximity ahead of color across D4', () => {
 });
 
 
-test('r7 prefers inward diagonal king steps in the loaded loop across D4', () => {
+test('r7 resolves equal central distance by approaching Black across D4', () => {
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen('5k2/8/6B1/6K1/8/8/1N6/8 w - - 0 1', t);
     const move = (to: 'f4' | 'f5' | 'f6') => getChess(fen).move({from: transformSquare('g5', t), to: transformSquare(to, t)}).san;
@@ -74,9 +74,9 @@ test('r7 prefers inward diagonal king steps in the loaded loop across D4', () =>
     assert.equal(f4.kingCenterProximityScore, 1);
     assert.equal(f5.kingCenterProximityScore, 1);
     assert.equal(f6.kingCenterProximityScore, 1);
-    assert.ok(rule.compare!(f4, f5) < 0);
+    assert.ok(rule.compare!(f4, f5) > 0);
     assert.ok(rule.compare!(f4, f6) < 0);
-    // Euclidean proximity breaks the step tie before opposite color does.
+    // Euclidean central proximity breaks the step tie before Black king proximity.
     assert.ok(rule.compare!(f5, f6) < 0);
   }
 });
@@ -147,5 +147,20 @@ test('r20 keeps an initially defended bishop excluded even when its move leaves 
   const score=scoreKnightAndBishopWhiteMove(fen,move);
   assert.equal(score.unprotectedMinorCount,0,t.name);
   assert.equal(score.minorBlackDistanceScore,-0,t.name);
+ }
+});
+
+
+test('r7 approaches Black after knight and central proximity tie, across D4',()=>{
+ const rule=knightAndBishopWhiteRules.find(r=>r.id==='r7')!;
+ for(const t of SQUARE_TRANSFORMS){
+  const fen=transformFen('8/8/8/5K2/3kN3/8/6B1/8 w - - 4 3',t);
+  const move=(to:'f4'|'f6')=>getChess(fen).move({from:transformSquare('f5',t),to:transformSquare(to,t)}).san;
+  const near=scoreKnightAndBishopWhiteMove(fen,move('f4'));
+  const stay=scoreKnightAndBishopWhiteMove(fen,getChess(fen).move({from:transformSquare('g2',t),to:transformSquare('h1',t)}).san);
+  assert.equal(near.kingKnightDistanceScore,stay.kingKnightDistanceScore,t.name);
+  assert.equal(near.kingCenterEuclideanScore,stay.kingCenterEuclideanScore,t.name);
+  assert.ok(near.kingBlackDistanceSquared<stay.kingBlackDistanceSquared,t.name);
+  assert.ok(rule.compare!(near,stay)<0,t.name);
  }
 });
