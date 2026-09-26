@@ -571,7 +571,7 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     {
       id: "r4.5",
       shortLabel: "rule r4.5",
-      helpText: "Ensure a distant bishop.",
+      helpText: "Prefer an uncluttered bishop.",
       applies: score => score.startsWithBishopAdjacentToNoncentralKing,
       compare: (first, second) => first.bishopWhiteKingDistanceScore - second.bishopWhiteKingDistanceScore,
     },
