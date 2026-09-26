@@ -61,12 +61,13 @@ test('the loaded distant knight retains bishop protection, across D4', () => {
 });
 
 
-test('preserving distant bishop protection allows Kg2 instead of the Nc3 shuttle across D4', () => {
+test('r6 drifts via Nc3 instead of preserving distant bishop protection across D4', () => {
  for(const t of SQUARE_TRANSFORMS){
   const f=transformFen('4B3/8/8/8/N7/8/8/k6K w - - 0 1',t);
   const ch=getChess(f);
   const king=ch.move({from:transformSquare('h1',t),to:transformSquare('g2',t)}).san;
-  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(f),[king],t.name);
+  const drift=getChess(f).move({from:transformSquare('a4',t),to:transformSquare('c3',t)}).san;
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(f),[drift],t.name);
   assert.equal(scoreKnightAndBishopWhiteMove(f,king).knightStableBishopProtectionPenalty,0,t.name);
   for(const reply of ch.moves()){
    ch.move(reply);

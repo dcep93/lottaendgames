@@ -5,7 +5,7 @@ import {getIdealKnightAndBishopWhiteMoves, knightAndBishopWhiteRules, scoreKnigh
 
 const r6=knightAndBishopWhiteRules.find(r=>r.id==='r6')!;
 
-test('r6 preserves distant bishop defense in the loaded Ba4 Nd1 position across D4',()=>{
+test('r6 drifts toward the king instead of preserving distant bishop defense across D4',()=>{
  for(const t of SQUARE_TRANSFORMS){
   const fen=transformFen('7K/8/8/2k5/B7/8/8/3N4 w - - 0 1',t);
   const san=(from:'h8'|'a4'|'d1',to:'g7'|'c2'|'e3')=>getChess(fen).move({from:transformSquare(from,t),to:transformSquare(to,t)}).san;
@@ -15,9 +15,9 @@ test('r6 preserves distant bishop defense in the loaded Ba4 Nd1 position across 
   assert.equal(alsoKeep.knightStableBishopProtectionPenalty,0,t.name);
   assert.equal(leave.knightStableBishopProtectionPenalty,1,t.name);
   assert.ok(leave.knightKingProtectionDistance<keep.knightKingProtectionDistance,t.name);
-  assert.ok(r6.compare!(keep,leave)<0,t.name);
-  assert.equal(r6.compare!(keep,alsoKeep),0,t.name);
-  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[king],t.name);
+  assert.ok(r6.compare!(leave,keep)<0,t.name);
+  assert.ok(r6.compare!(leave,alsoKeep)<0,t.name);
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[knight],t.name);
  }
 });
 
@@ -64,5 +64,19 @@ test('r6 centralizes an already king-protected knight with Ne3 in the reported p
   assert.ok(unchanged.knightMiddle16ProximityScore>0,t.name);
   assert.ok(r6.compare!(inward,unchanged)<0,t.name);
   assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[knight],t.name);
+ }
+});
+
+
+test('r6 breaks the recorded bishop shuttle by drifting Nc3, across D4',()=>{
+ for(const t of SQUARE_TRANSFORMS){
+  const fen=transformFen('6B1/k7/8/8/K7/8/8/3N4 w - - 0 1',t);
+  const san=(from:'d1'|'g8',to:'c3'|'b3')=>getChess(fen).move({from:transformSquare(from,t),to:transformSquare(to,t)}).san;
+  const drift=san('d1','c3'), defend=san('g8','b3');
+  const progress=scoreKnightAndBishopWhiteMove(fen,drift), protection=scoreKnightAndBishopWhiteMove(fen,defend);
+  assert.equal(protection.knightStableBishopProtectionPenalty,0,t.name);
+  assert.ok(progress.knightKingProtectionDistance<protection.knightKingProtectionDistance,t.name);
+  assert.ok(r6.compare!(progress,protection)<0,t.name);
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[drift],t.name);
  }
 });

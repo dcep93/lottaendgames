@@ -20,7 +20,7 @@ test('r6.5 avoids crowding the bishop beside both White pieces, across D4',()=>{
  }
 });
 
-test('r6 preserves bishop protection before the r6.5 retreat preference across D4', () => {
+test('r6 allows r6.5 retreat without a bishop-protection preference across D4', () => {
  for(const t of SQUARE_TRANSFORMS) {
   const fen=transformFen('7K/8/8/8/Bk6/8/8/3N4 w - - 0 1',t);
   const move=getChess(fen).move({from:transformSquare('a4',t),to:transformSquare('c2',t)}).san;
@@ -29,8 +29,8 @@ test('r6 preserves bishop protection before the r6.5 retreat preference across D
   assert.ok(knightAndBishopWhiteRules.find(r=>r.id==='r6.5')!.compare!(far,score)<0);
   assert.equal(score.knightStableBishopProtectionPenalty,0);
   assert.equal(far.knightStableBishopProtectionPenalty,1);
-  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[move],t.name);
-  assert.equal(explainMove(bishopKnightRuleSet.scoreWhiteCandidates!(fen,getChess(fen).moves()),knightAndBishopWhiteRules,move)?.id,'r6',t.name);
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[retreat],t.name);
+  assert.equal(explainMove(bishopKnightRuleSet.scoreWhiteCandidates!(fen,getChess(fen).moves()),knightAndBishopWhiteRules,retreat)?.id,'r6.5',t.name);
  }
 });
 

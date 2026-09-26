@@ -1,0 +1,230 @@
+{
+  "date": "2026-09-26",
+  "rule": "r6",
+  "helpText": "Drift the knight towards king protection, then prefer knight central 16 proximity.",
+  "baselineFullAudit": "eecb6a9640b8cef4bd97e77d40cbe7f9061312eb",
+  "baselineFourPlyCycles": 15917,
+  "survivingSavedFourPlyCycles": 183,
+  "previousReplaySurvivors": 3898,
+  "previousReplayStillSurviving": 183,
+  "previousReplayBroken": 3715,
+  "reappearedSavedWitnesses": 0,
+  "displayEligibleCycles": 119,
+  "scope": "Saved four-ply witnesses only; no new global count or new-cycle search.",
+  "groups": [
+    {
+      "motif": "r4 \u2194 r5",
+      "cycles": 73,
+      "positions": 91
+    },
+    {
+      "motif": "r8 \u2194 r8",
+      "cycles": 64,
+      "positions": 38
+    },
+    {
+      "motif": "r4 \u2194 r6",
+      "cycles": 19,
+      "positions": 28
+    },
+    {
+      "motif": "r20 \u2194 r4",
+      "cycles": 13,
+      "positions": 17
+    },
+    {
+      "motif": "r6.5 \u2194 r8",
+      "cycles": 8,
+      "positions": 12
+    },
+    {
+      "motif": "r4 \u2194 r8",
+      "cycles": 2,
+      "positions": 3
+    },
+    {
+      "motif": "r20 \u2194 r6.5",
+      "cycles": 2,
+      "positions": 3
+    },
+    {
+      "motif": "r20 \u2194 r20",
+      "cycles": 1,
+      "positions": 2
+    },
+    {
+      "motif": "r20 \u2194 r5",
+      "cycles": 1,
+      "positions": 2
+    }
+  ],
+  "examples": [
+    {
+      "group": 0,
+      "motif": "r4 \u2194 r5",
+      "fen": "8/8/B7/3k4/8/4KN2/8/8 w - - 0 1",
+      "moves": [
+        "Bf1",
+        "Ke6",
+        "Ba6",
+        "Kd5"
+      ],
+      "area": 24,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/B7/3k4/8/4KN2/8/8_w_-_-_0_1&moves=Bf1,Ke6,Ba6,Kd5&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "r4 \u2194 r5",
+      "fen": "8/8/8/3k4/B7/4KN2/8/8 w - - 0 1",
+      "moves": [
+        "Bd1",
+        "Ke6",
+        "Ba4",
+        "Kd5"
+      ],
+      "area": 12,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/3k4/B7/4KN2/8/8_w_-_-_0_1&moves=Bd1,Ke6,Ba4,Kd5&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "r4 \u2194 r5",
+      "fen": "8/4k3/8/8/2KN4/8/B7/8 w - - 0 1",
+      "moves": [
+        "Bb1",
+        "Kd6",
+        "Ba2",
+        "Ke7"
+      ],
+      "area": 12,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/4k3/8/8/2KN4/8/B7/8_w_-_-_0_1&moves=Bb1,Kd6,Ba2,Ke7&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "r4 \u2194 r5",
+      "fen": "8/8/3k4/2N5/2K5/8/B7/8 w - - 0 1",
+      "moves": [
+        "Bb1",
+        "Ke5",
+        "Ba2",
+        "Kd6"
+      ],
+      "area": 12,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/3k4/2N5/2K5/8/B7/8_w_-_-_0_1&moves=Bb1,Ke5,Ba2,Kd6&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "r4 \u2194 r5",
+      "fen": "8/8/8/3k4/B7/3NK3/8/8 w - - 0 1",
+      "moves": [
+        "Bd1",
+        "Ke6",
+        "Ba4",
+        "Kd5"
+      ],
+      "area": 10,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/3k4/B7/3NK3/8/8_w_-_-_0_1&moves=Bd1,Ke6,Ba4,Kd5&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "r4 \u2194 r5",
+      "fen": "8/8/8/3k4/B7/2K5/2N5/8 w - - 0 1",
+      "moves": [
+        "Be8",
+        "Ke4",
+        "Ba4",
+        "Kd5"
+      ],
+      "area": 9,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/3k4/B7/2K5/2N5/8_w_-_-_0_1&moves=Be8,Ke4,Ba4,Kd5&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "r4 \u2194 r5",
+      "fen": "8/8/4k3/8/2K5/2N5/B7/8 w - - 0 1",
+      "moves": [
+        "Bb1",
+        "Ke5",
+        "Ba2",
+        "Ke6"
+      ],
+      "area": 9,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/4k3/8/2K5/2N5/B7/8_w_-_-_0_1&moves=Bb1,Ke5,Ba2,Ke6&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "r4 \u2194 r5",
+      "fen": "8/8/8/3k4/B1N5/2K5/8/8 w - - 0 1",
+      "moves": [
+        "Be8",
+        "Ke4",
+        "Ba4",
+        "Kd5"
+      ],
+      "area": 6,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/3k4/B1N5/2K5/8/8_w_-_-_0_1&moves=Be8,Ke4,Ba4,Kd5&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "r4 \u2194 r5",
+      "fen": "8/8/4k3/8/B1K5/2N5/8/8 w - - 0 1",
+      "moves": [
+        "Bd1",
+        "Ke5",
+        "Ba4",
+        "Ke6"
+      ],
+      "area": 6,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/4k3/8/B1K5/2N5/8/8_w_-_-_0_1&moves=Bd1,Ke5,Ba4,Ke6&cursor=0"
+    },
+    {
+      "group": 0,
+      "motif": "r4 \u2194 r5",
+      "fen": "8/8/3k4/2N5/B1K5/8/8/8 w - - 0 1",
+      "moves": [
+        "Bd1",
+        "Ke5",
+        "Ba4",
+        "Kd6"
+      ],
+      "area": 6,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/3k4/2N5/B1K5/8/8/8_w_-_-_0_1&moves=Bd1,Ke5,Ba4,Kd6&cursor=0"
+    },
+    {
+      "group": 1,
+      "motif": "r4 \u2194 r6",
+      "fen": "8/3K4/4B3/2k5/8/8/N7/8 w - - 0 1",
+      "moves": [
+        "Bh3",
+        "Kc4",
+        "Be6+",
+        "Kc5"
+      ],
+      "area": 30,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/3K4/4B3/2k5/8/8/N7/8_w_-_-_0_1&moves=Bh3,Kc4,Be6%2B,Kc5&cursor=0"
+    },
+    {
+      "group": 1,
+      "motif": "r4 \u2194 r6",
+      "fen": "8/8/3K4/1k1B4/8/8/N7/8 w - - 0 1",
+      "moves": [
+        "Bh1",
+        "Kc4",
+        "Bd5+",
+        "Kb5"
+      ],
+      "area": 20,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/3K4/1k1B4/8/8/N7/8_w_-_-_0_1&moves=Bh1,Kc4,Bd5%2B,Kb5&cursor=0"
+    }
+  ],
+  "validation": {
+    "focusedTests": 55,
+    "focusedPassed": 55,
+    "build": "passed",
+    "remainingPreexistingTestFailures": [
+      "stable protection and king adjacency break the recorded shuttles across D4",
+      "r7 brings the king nearer the knight before centralization across D4",
+      "r6 preserves existing knight protection before later bishop preferences across D4",
+      "r6 brings the knight under king protection before precage preferences across D4"
+    ]
+  }
+}

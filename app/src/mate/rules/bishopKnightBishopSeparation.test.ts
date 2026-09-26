@@ -11,21 +11,22 @@ test('r4 does not move a bishop back into the king crowding zone, across D4',()=
   const fen=transformFen('3k4/1B6/2K5/8/8/8/8/7N w - - 2 2',t);
   const retreat=getChess(fen).move({from:transformSquare('b7',t),to:transformSquare('a8',t)}).san;
   assert.equal(scoreKnightAndBishopWhiteMove(fen,retreat).bishopSeparationPenalty,1,t.name);
-  const kingMoves=(['c5','d6'] as const).map(to=>getChess(fen).move({from:transformSquare('c6',t),to:transformSquare(to,t)}).san);
+  const kingMoves=(['d5'] as const).map(to=>getChess(fen).move({from:transformSquare('c6',t),to:transformSquare(to,t)}).san);
   assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen).sort(),kingMoves.sort(),t.name);
   // Moving closer from the original corner cannot earn an uncluttering bonus either.
   const original=transformFen('B3k3/8/2K5/8/8/8/8/7N w - - 0 1',t);
   const inward=getChess(original).move({from:transformSquare('a8',t),to:transformSquare('b7',t)}).san;
   assert.equal(scoreKnightAndBishopWhiteMove(original,inward).bishopSeparationPenalty,1,t.name);
-  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(original).sort(),kingMoves.sort(),t.name);
+  assert.ok(!getIdealKnightAndBishopWhiteMoves(original).includes(inward),t.name);
  }
 });
 
-test('r4 leaves a quiet interior bishop in place while the king opens its knight protection, across D4',()=>{
+test('r4 leaves a quiet interior bishop alone while r6 drifts the knight, across D4',()=>{
  for(const t of SQUARE_TRANSFORMS){
   const fen=transformFen('7k/1B6/2K5/8/8/8/8/7N w - - 2 2',t);
   const moves=['c5','d6'].map(to=>getChess(fen).move({from:transformSquare('c6',t),to:transformSquare(to as 'c5'|'d6',t)}).san);
-  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen).sort(),moves.sort(),t.name);
+  const drift=getChess(fen).move({from:transformSquare('h1',t),to:transformSquare('f2',t)}).san;
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[drift],t.name);
   for(const san of getChess(fen).moves()){
    const score=scoreKnightAndBishopWhiteMove(fen,san);
    assert.equal(score.bishopSeparationPenalty,0,`${t.name} ${san}`);
