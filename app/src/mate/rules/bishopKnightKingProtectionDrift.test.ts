@@ -4,6 +4,31 @@ import {getChess, SQUARE_TRANSFORMS, transformFen, transformSquare} from '../che
 import {knightAndBishopWhiteRules, scoreKnightAndBishopWhiteMove} from './bishopKnight';
 import {selectCandidatesByRules} from './selection';
 
+test('an onward jump outranked by double opposition cannot justify a drift, across D4', () => {
+  for (const t of SQUARE_TRANSFORMS) {
+    const fen = transformFen('B7/2N5/8/8/3k4/8/8/3K4 w - - 2 2', t);
+    const san = (from: 'c7' | 'd1', to: 'b5' | 'd2' | 'e6') => getChess(fen).move({
+      from: transformSquare(from, t), to: transformSquare(to, t),
+    }).san;
+    const rejected = san('c7', 'b5');
+    assert.equal(scoreKnightAndBishopWhiteMove(fen, rejected).knightDriftQualifies, false, t.name);
+    const candidates = getChess(fen).moves().map(san => ({san, score: scoreKnightAndBishopWhiteMove(fen, san)}));
+    const selection = selectCandidatesByRules(candidates, knightAndBishopWhiteRules);
+    assert.deepEqual(selection.idealCandidates.map(c => c.san), [san('c7', 'e6')], t.name);
+    assert.equal(selection.eliminatedBy.get(candidates.find(c => c.san === rejected)!)?.id, 'r6', t.name);
+    const pair = candidates.filter(c => c.san === rejected || c.san === san('d1', 'd2'));
+    assert.deepEqual(selectCandidatesByRules(pair, knightAndBishopWhiteRules).idealCandidates.map(c => c.san), [san('d1', 'd2')], t.name);
+    // Retain the double-opposition preference that made the nominal Na3 escape unavailable.
+    const reply = getChess(fen);
+    reply.move(rejected);
+    reply.move({from: transformSquare('d4', t), to: transformSquare('c4', t)});
+    const returnMove = reply.move({from: transformSquare('b5', t), to: transformSquare('c7', t)}).san;
+    reply.undo();
+    const onward = reply.moves().map(san => ({san, score: scoreKnightAndBishopWhiteMove(reply.fen(), san)}));
+    assert.deepEqual(selectCandidatesByRules(onward, knightAndBishopWhiteRules).idealCandidates.map(c => c.san), [returnMove], t.name);
+  }
+});
+
 test('knight detours reject two-step bishop proximity, across D4', () => {
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen('8/1N3B2/2k5/8/8/8/8/7K w - - 0 1', t);
@@ -157,7 +182,7 @@ test('r6 rejects approaching Black between the knight and king without gaining p
   for (const t of SQUARE_TRANSFORMS) {
     for (const [start, qualifies] of [
       ['B2K4/8/8/4k3/8/8/5N2/8 w - - 0 1', false], // Black is strictly between d8 and f2.
-      ['B3K3/8/8/4k3/8/8/5N2/8 w - - 0 1', true], // Sharing White's file is now outside.
+      ['B3K3/8/8/4k3/8/8/5N2/8 w - - 0 1', false], // Outside the rectangle, but ...Kf5 induces a double-opposition return to f2.
       ['B3K3/8/8/k7/8/8/5N2/8 w - - 0 1', true],
       ['B7/8/8/7K/8/7k/5N2/8 w - - 0 1', true], // Reaching king protection overrides approaching Black.
     ] as const) {

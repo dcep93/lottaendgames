@@ -179,6 +179,14 @@ function distanceToNearestUnprotectedKnightOrBishop(fen: string): number {
     : 99;
 }
 
+function knightDoubleOppositionSquares(knight: Square, blackKing: Square, whiteKing: Square) {
+  const n = squareCoordinates(knight), b = squareCoordinates(blackKing);
+  const w = squareCoordinates(whiteKing), dx = b.file - n.file, dy = b.rank - n.rank;
+  if (Math.abs(dx) !== 1 || Math.abs(dy) !== 1
+    || dx * (w.file - b.file) < 0 || dy * (w.rank - b.rank) < 0) return undefined;
+  return [squareFromCoords(b.file, n.rank - 2 * dy), squareFromCoords(n.file - 2 * dx, b.rank)];
+}
+
 type KnightAndBishopPositionScoreContext = {
   readonly knightOppositeCentralTargets: readonly Square[];
   readonly bishopShuffleTargets: readonly Square[];
@@ -287,14 +295,8 @@ function scoreKnightAndBishopWhiteMoveCore(
     return b.file >= Math.min(k.file, n.file, 3) && b.file <= Math.max(k.file, n.file, 4)
       && b.rank >= Math.min(k.rank, n.rank, 3) && b.rank <= Math.max(k.rank, n.rank, 4);
   })();
-  const doubleOppositionTargets = (() => {
-    if (move.piece !== "n" || !whiteKing || !blackKing) return undefined;
-    const n = squareCoordinates(move.from), b = squareCoordinates(blackKing.square);
-    const w = squareCoordinates(whiteKing.square), dx = b.file - n.file, dy = b.rank - n.rank;
-    if (Math.abs(dx) !== 1 || Math.abs(dy) !== 1
-      || dx * (w.file - b.file) < 0 || dy * (w.rank - b.rank) < 0) return undefined;
-    return [squareFromCoords(b.file, n.rank - 2 * dy), squareFromCoords(n.file - 2 * dx, b.rank)];
-  })();
+  const doubleOppositionTargets = move.piece === "n" && whiteKing && blackKing
+    ? knightDoubleOppositionSquares(move.from, blackKing.square, whiteKing.square) : undefined;
   const blockedDoubleOpposition = doubleOppositionTargets?.every(square => !square
     || [bishop?.square, whiteKing?.square, blackKing?.square].includes(square)) ?? false;
   const detourNearBishop = blockedDoubleOpposition && !!knight && !!bishop
@@ -383,9 +385,15 @@ function scoreKnightAndBishopWhiteMoveCore(
         const kingCanDefend = squares.some(square => square !== bishop.square && square !== knight.square
           && kingDistance(square, whiteKing.square) === 1
           && kingDistance(square, knight.square) === 1 && kingDistance(square, black) > 1);
+        const onwardOpposition = knightDoubleOppositionSquares(knight.square, black, whiteKing.square)
+          ?.filter((square): square is Square => !!square
+            && square !== bishop.square && square !== whiteKing.square) ?? [];
         const knightCanContinue = squares.some(square => square !== whiteKing.square && square !== bishop.square
           && isKnightMove(knight.square, square)
           && kingDistance(square, whiteKing.square) < kingDistance(knight.square, whiteKing.square)
+          // Do not count an escape that r6 would outrank with double opposition.
+          && (!onwardOpposition.length || onwardOpposition.includes(square)
+            || kingDistance(square, whiteKing.square) === 1)
           && (kingDistance(square, black) > 1 || kingDistance(square, whiteKing.square) === 1));
         return kingCanDefend || knightCanContinue;
       });
