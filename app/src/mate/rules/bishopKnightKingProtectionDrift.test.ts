@@ -4,7 +4,7 @@ import {getChess, SQUARE_TRANSFORMS, transformFen, transformSquare} from '../che
 import {knightAndBishopWhiteRules, scoreKnightAndBishopWhiteMove} from './bishopKnight';
 import {selectCandidatesByRules} from './selection';
 
-test('equally close knight detours avoid two-step bishop proximity, across D4', () => {
+test('knight detours reject two-step bishop proximity, across D4', () => {
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen('8/1N3B2/2k5/8/8/8/8/7K w - - 0 1', t);
     const move = (to: 'a5' | 'd8') => getChess(fen).move({
@@ -15,7 +15,27 @@ test('equally close knight detours avoid two-step bishop proximity, across D4', 
     assert.deepEqual(selection.idealCandidates.map(c => c.san), [move('a5')], t.name);
     assert.equal(selection.eliminatedBy.get(candidates.find(c => c.san === move('d8'))!)?.id, 'r6', t.name);
     assert.equal(scoreKnightAndBishopWhiteMove(fen, move('a5')).knightDriftQualifies, true, t.name);
-    assert.equal(scoreKnightAndBishopWhiteMove(fen, move('d8')).knightDriftQualifies, true, t.name);
+    assert.equal(scoreKnightAndBishopWhiteMove(fen, move('d8')).knightDriftQualifies, false, t.name);
+  }
+});
+
+test('bishop-obstructed detours lose even when the attacked knight has no qualifying drift, across D4', () => {
+  for (const t of SQUARE_TRANSFORMS) {
+    const fen = transformFen('8/1N3B2/2k5/8/8/7K/8/8 w - - 0 1', t);
+    const san = getChess(fen).move({from: transformSquare('b7', t), to: transformSquare('d8', t)}).san;
+    const candidates = getChess(fen).moves().map(san => ({san, score: scoreKnightAndBishopWhiteMove(fen, san)}));
+    const invalid = candidates.find(c => c.san === san)!;
+    assert.equal(invalid.score.knightDriftQualifies, false, t.name);
+    assert.equal(invalid.score.knightDriftRank, 3, t.name);
+    const selection = selectCandidatesByRules(candidates, knightAndBishopWhiteRules);
+    assert.equal(selection.eliminatedBy.get(invalid)?.id, 'r6', t.name);
+    const escape = getChess(fen).move({from: transformSquare('b7', t), to: transformSquare('a5', t)}).san;
+    assert.deepEqual(selection.idealCandidates.map(c => c.san), [escape], t.name);
+    assert.equal(scoreKnightAndBishopWhiteMove(fen, escape).knightDriftRank, 2, t.name);
+
+    const clear = transformFen('8/1N6/2k5/8/8/7K/8/5B2 w - - 0 1', t);
+    const clearSan = getChess(clear).move({from: transformSquare('b7', t), to: transformSquare('d8', t)}).san;
+    assert.equal(scoreKnightAndBishopWhiteMove(clear, clearSan).knightDriftQualifies, true, t.name);
   }
 });
 
