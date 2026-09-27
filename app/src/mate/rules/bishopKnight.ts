@@ -299,7 +299,8 @@ function scoreKnightAndBishopWhiteMoveCore(
     ? knightDoubleOppositionSquares(move.from, blackKing.square, whiteKing.square) : undefined;
   const blockedDoubleOpposition = doubleOppositionTargets?.every(square => !square
     || [bishop?.square, whiteKing?.square, blackKing?.square].includes(square)) ?? false;
-  const detourNearBishop = blockedDoubleOpposition && !!knight && !!bishop
+  const driftNearBishop = move.piece === "n" && !!knight && !!bishop
+    && !doubleOppositionTargets?.includes(knight.square)
     && kingDistance(knight.square, bishop.square) <= 2;
   const nearbyPairCentrallyDefended = !!whiteKing && centerDistance(whiteKing.square) === 0
     && ((!!bishop && kingDistance(bishop.square, whiteKing.square) === 1)
@@ -357,13 +358,13 @@ function scoreKnightAndBishopWhiteMoveCore(
     kingKnightDistanceScore: whiteKing && knight ? kingDistance(whiteKing.square, knight.square) : 99,
     knightDoubleOpposition: !!knight && !!doubleOppositionTargets?.includes(knight.square),
     get knightDriftRank() {
-      return this.knightDriftQualifies ? 0 : move.piece !== "n" ? 1 : detourNearBishop ? 3 : 2;
+      return this.knightDriftQualifies ? 0 : move.piece !== "n" ? 1 : driftNearBishop ? 3 : 2;
     },
     get knightDriftQualifies() {
       if (knightKingDefended) return true;
       if (move.piece !== "n" || !whiteKing || !knight || !bishop || !blackKing) return false;
-      // A blocked-opposition detour must clear the bishop, even if it approaches the king.
-      if (detourNearBishop) return false;
+      // Ordinary approaches and blocked-opposition detours must clear the bishop.
+      if (driftNearBishop) return false;
       const n = squareCoordinates(move.from), b = squareCoordinates(blackKing.square);
       const w = squareCoordinates(whiteKing.square);
       const blackBetween = b.file > Math.min(n.file, w.file) && b.file < Math.max(n.file, w.file)

@@ -67,13 +67,13 @@ test('bishop-obstructed detours lose even when the attacked knight has no qualif
 test('a chase with no king rescue or safe onward jump gives no drift credit, across D4', () => {
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen('KB6/8/8/2kN4/8/8/8/8 w - - 0 1', t);
-    const san = (to: 'c7' | 'f4') => getChess(fen).move({from: transformSquare('d5', t), to: transformSquare(to, t)}).san;
+    const san = (to: 'c7' | 'f4' | 'e7') => getChess(fen).move({from: transformSquare('d5', t), to: transformSquare(to, t)}).san;
     const candidates = getChess(fen).moves().map(move => ({san: move, score: scoreKnightAndBishopWhiteMove(fen, move)}));
     assert.equal(scoreKnightAndBishopWhiteMove(fen, san('c7')).knightDriftQualifies, false, t.name);
     const selection = selectCandidatesByRules(candidates, knightAndBishopWhiteRules);
-    // Resulting proximity now lets r7 select Nc7 before the drift rule runs.
-    assert.deepEqual(selection.idealCandidates.map(c => c.san), [san('c7')], t.name);
-    assert.equal(selection.lastEliminatingRule?.id, 'r7', t.name);
+    // Nc7 also crowds Bb8; the clear escape wins before king-proximity tiebreaks.
+    assert.deepEqual(selection.idealCandidates.map(c => c.san), [san('e7')], t.name);
+    assert.equal(selection.eliminatedBy.get(candidates.find(c => c.san === san('c7'))!)?.id, 'r6', t.name);
     const r7 = knightAndBishopWhiteRules.find(r => r.id === 'r7')!;
     assert.ok(r7.subpriorities![0]!.compare!(scoreKnightAndBishopWhiteMove(fen, san('c7')), scoreKnightAndBishopWhiteMove(fen, san('f4'))) < 0, t.name);
   }
@@ -251,5 +251,21 @@ test('r6 uses the strict interior rectangle and selects Ne3, across D4', () => {
     assert.equal(scoreKnightAndBishopWhiteMove(fen, move).knightDriftQualifies, true, t.name);
     const candidates = getChess(fen).moves().map(san => ({san, score: scoreKnightAndBishopWhiteMove(fen, san)}));
     assert.deepEqual(selectCandidatesByRules(candidates, knightAndBishopWhiteRules).idealCandidates.map(c => c.san), [move], t.name);
+  }
+});
+
+
+test('ordinary knight drift clears the bishop instead of winning on central proximity, across D4', () => {
+  for (const t of SQUARE_TRANSFORMS) {
+    const fen = transformFen('2B5/8/8/8/Nk5K/8/8/8 w - - 0 1', t);
+    const move = (to: 'b2' | 'b6') => getChess(fen).move({
+      from: transformSquare('a4', t), to: transformSquare(to, t),
+    }).san;
+    const candidates = getChess(fen).moves().map(san => ({san, score: scoreKnightAndBishopWhiteMove(fen, san)}));
+    const selection = selectCandidatesByRules(candidates, knightAndBishopWhiteRules);
+    assert.equal(scoreKnightAndBishopWhiteMove(fen, move('b6')).knightDriftQualifies, false, t.name);
+    assert.equal(scoreKnightAndBishopWhiteMove(fen, move('b2')).knightDriftQualifies, true, t.name);
+    assert.equal(selection.eliminatedBy.get(candidates.find(c => c.san === move('b6'))!)?.id, 'r6', t.name);
+    assert.deepEqual(selection.idealCandidates.map(c => c.san), [move('b2')], t.name);
   }
 });
