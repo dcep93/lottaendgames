@@ -4,6 +4,21 @@ import {getChess, SQUARE_TRANSFORMS, transformFen, transformSquare} from '../che
 import {knightAndBishopWhiteRules, scoreKnightAndBishopWhiteMove} from './bishopKnight';
 import {selectCandidatesByRules} from './selection';
 
+test('equally close knight detours avoid two-step bishop proximity, across D4', () => {
+  for (const t of SQUARE_TRANSFORMS) {
+    const fen = transformFen('8/1N3B2/2k5/8/8/8/8/7K w - - 0 1', t);
+    const move = (to: 'a5' | 'd8') => getChess(fen).move({
+      from: transformSquare('b7', t), to: transformSquare(to, t),
+    }).san;
+    const candidates = getChess(fen).moves().map(san => ({san, score: scoreKnightAndBishopWhiteMove(fen, san)}));
+    const selection = selectCandidatesByRules(candidates, knightAndBishopWhiteRules);
+    assert.deepEqual(selection.idealCandidates.map(c => c.san), [move('a5')], t.name);
+    assert.equal(selection.eliminatedBy.get(candidates.find(c => c.san === move('d8'))!)?.id, 'r6', t.name);
+    assert.equal(scoreKnightAndBishopWhiteMove(fen, move('a5')).knightDriftQualifies, true, t.name);
+    assert.equal(scoreKnightAndBishopWhiteMove(fen, move('d8')).knightDriftQualifies, true, t.name);
+  }
+});
+
 test('a chase with no king rescue or safe onward jump gives no drift credit, across D4', () => {
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen('KB6/8/8/2kN4/8/8/8/8 w - - 0 1', t);

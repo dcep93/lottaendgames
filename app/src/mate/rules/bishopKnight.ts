@@ -71,6 +71,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly kingKnightDistanceScore: number;
   readonly knightDriftQualifies: boolean;
   readonly knightDriftRank: number;
+  readonly knightDetourBishopProximityPenalty: number;
   readonly knightDoubleOpposition: boolean;
   readonly kingBlackDistanceSquared: number;
   readonly kingCoordinationPenalty: number;
@@ -295,6 +296,8 @@ function scoreKnightAndBishopWhiteMoveCore(
       || dx * (w.file - b.file) < 0 || dy * (w.rank - b.rank) < 0) return undefined;
     return [squareFromCoords(b.file, n.rank - 2 * dy), squareFromCoords(n.file - 2 * dx, b.rank)];
   })();
+  const blockedDoubleOpposition = doubleOppositionTargets?.every(square => !square
+    || [bishop?.square, whiteKing?.square, blackKing?.square].includes(square)) ?? false;
   const nearbyPairCentrallyDefended = !!whiteKing && centerDistance(whiteKing.square) === 0
     && ((!!bishop && kingDistance(bishop.square, whiteKing.square) === 1)
       || (!!knight && kingDistance(knight.square, whiteKing.square) === 1));
@@ -350,6 +353,9 @@ function scoreKnightAndBishopWhiteMoveCore(
     kingKnightAdjacencyPenalty: knightKingDefended ? 0 : 1,
     kingKnightDistanceScore: whiteKing && knight ? kingDistance(whiteKing.square, knight.square) : 99,
     knightDoubleOpposition: !!knight && !!doubleOppositionTargets?.includes(knight.square),
+    // Break equal detours away from nearby bishops; ordinary drift ignores bishop proximity.
+    knightDetourBishopProximityPenalty: blockedDoubleOpposition && knight && bishop
+      && kingDistance(knight.square, bishop.square) <= 2 ? 1 : 0,
     get knightDriftRank() {
       return this.knightDriftQualifies ? 0 : move.piece === "n" ? 2 : 1;
     },
@@ -365,8 +371,7 @@ function scoreKnightAndBishopWhiteMoveCore(
       if (this.knightDoubleOpposition) return true;
       // If both opposition destinations are unavailable, take the other flank,
       // away from the obstructing bishop and closer to White's king.
-      if (doubleOppositionTargets?.every(square => !square
-        || [bishop.square, whiteKing.square, blackKing.square].includes(square))
+      if (blockedDoubleOpposition
         && kingDistance(knight.square, bishop.square) > 1
         && squaredEuclideanDistance(knight.square, whiteKing.square)
           < squaredEuclideanDistance(move.from, whiteKing.square)) return true;
@@ -622,6 +627,7 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
           ? first.kingKnightAdjacencyPenalty - second.kingKnightAdjacencyPenalty
             || Number(second.knightDoubleOpposition) - Number(first.knightDoubleOpposition)
             || first.knightKingProximityScore - second.knightKingProximityScore
+            || first.knightDetourBishopProximityPenalty - second.knightDetourBishopProximityPenalty
             || first.knightMiddle16ProximityScore - second.knightMiddle16ProximityScore : 0),
     },
     {
