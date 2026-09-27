@@ -123,7 +123,7 @@ test('r6 permits double opposition behind a diagonal blocker, across D4', () => 
     for (const quiet of ['2B5/8/8/8/2k5/1N6/8/K7 w - - 2 2', '2BK4/8/8/8/3k4/1N6/8/8 w - - 2 2']) {
       const position = transformFen(quiet, t);
       const retreat = getChess(position).move({from: transformSquare('b3', t), to: transformSquare('c1', t)}).san;
-      assert.equal(scoreKnightAndBishopWhiteMove(position, retreat).knightDriftQualifies, false, t.name);
+      assert.equal(scoreKnightAndBishopWhiteMove(position, retreat).knightDoubleOpposition, false, t.name);
     }
   }
 });
@@ -263,9 +263,33 @@ test('ordinary knight drift clears the bishop instead of winning on central prox
     }).san;
     const candidates = getChess(fen).moves().map(san => ({san, score: scoreKnightAndBishopWhiteMove(fen, san)}));
     const selection = selectCandidatesByRules(candidates, knightAndBishopWhiteRules);
-    assert.equal(scoreKnightAndBishopWhiteMove(fen, move('b6')).knightDriftQualifies, false, t.name);
+    assert.equal(scoreKnightAndBishopWhiteMove(fen, move('b6')).knightDriftQualifies, true, t.name);
+    assert.equal(scoreKnightAndBishopWhiteMove(fen, move('b6')).knightDriftBishopProximityPenalty, 1, t.name);
     assert.equal(scoreKnightAndBishopWhiteMove(fen, move('b2')).knightDriftQualifies, true, t.name);
     assert.equal(selection.eliminatedBy.get(candidates.find(c => c.san === move('b6'))!)?.id, 'r6', t.name);
     assert.deepEqual(selection.idealCandidates.map(c => c.san), [move('b2')], t.name);
+  }
+});
+
+
+test('a retreat with a safe onward approach beats a clear but trapped corner, across D4', () => {
+  for (const t of SQUARE_TRANSFORMS) {
+    const fen = transformFen('8/2k4K/1N6/8/2B5/8/8/8 w - - 2 2', t);
+    const move = (to: 'a4' | 'a8') => getChess(fen).move({
+      from: transformSquare('b6', t), to: transformSquare(to, t),
+    }).san;
+    const candidates = getChess(fen).moves().map(san => ({san, score: scoreKnightAndBishopWhiteMove(fen, san)}));
+    assert.equal(scoreKnightAndBishopWhiteMove(fen, move('a8')).knightDriftQualifies, false, t.name);
+    assert.equal(scoreKnightAndBishopWhiteMove(fen, move('a4')).knightDriftQualifies, true, t.name);
+    assert.deepEqual(selectCandidatesByRules(candidates, knightAndBishopWhiteRules).idealCandidates.map(c => c.san), [move('a4')], t.name);
+    // The advertised escape really exists after every legal reply, including Kc6.
+    const board = getChess(fen);
+    board.move(move('a4'));
+    for (const reply of board.moves()) {
+      board.move(reply);
+      const escape = {from: transformSquare('a4', t), to: transformSquare('c3', t)};
+      assert.ok(board.moves({verbose: true}).some(m => m.from === escape.from && m.to === escape.to), reply);
+      board.undo();
+    }
   }
 });

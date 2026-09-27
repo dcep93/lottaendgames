@@ -70,6 +70,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly kingKnightAdjacencyPenalty: number;
   readonly kingKnightDistanceScore: number;
   readonly knightDriftQualifies: boolean;
+  readonly knightDriftBishopProximityPenalty: number;
   readonly knightDriftRank: number;
   readonly knightDoubleOpposition: boolean;
   readonly kingBlackDistanceSquared: number;
@@ -357,14 +358,14 @@ function scoreKnightAndBishopWhiteMoveCore(
     kingKnightAdjacencyPenalty: knightKingDefended ? 0 : 1,
     kingKnightDistanceScore: whiteKing && knight ? kingDistance(whiteKing.square, knight.square) : 99,
     knightDoubleOpposition: !!knight && !!doubleOppositionTargets?.includes(knight.square),
+    knightDriftBishopProximityPenalty: driftNearBishop && knight && bishop
+      ? 3 - kingDistance(knight.square, bishop.square) : 0,
     get knightDriftRank() {
       return this.knightDriftQualifies ? 0 : move.piece !== "n" ? 1 : driftNearBishop ? 3 : 2;
     },
     get knightDriftQualifies() {
       if (knightKingDefended) return true;
       if (move.piece !== "n" || !whiteKing || !knight || !bishop || !blackKing) return false;
-      // Ordinary approaches and blocked-opposition detours must clear the bishop.
-      if (driftNearBishop) return false;
       const n = squareCoordinates(move.from), b = squareCoordinates(blackKing.square);
       const w = squareCoordinates(whiteKing.square);
       const blackBetween = b.file > Math.min(n.file, w.file) && b.file < Math.max(n.file, w.file)
@@ -374,14 +375,18 @@ function scoreKnightAndBishopWhiteMoveCore(
       if (this.knightDoubleOpposition) return true;
       // If both opposition destinations are unavailable, take the other flank,
       // away from the obstructing bishop and closer to White's king.
-      if (blockedDoubleOpposition
+      if (blockedDoubleOpposition && !driftNearBishop
         && squaredEuclideanDistance(knight.square, whiteKing.square)
           < squaredEuclideanDistance(move.from, whiteKing.square)) return true;
-      if (kingDistance(knight.square, whiteKing.square) >= kingDistance(move.from, whiteKing.square)) return false;
+      const startingDistance = kingDistance(move.from, whiteKing.square);
+      const resultingDistance = kingDistance(knight.square, whiteKing.square);
+      const retreat = resultingDistance >= startingDistance;
       const squares = allSquares();
+      // Retreats need onward progress beyond the starting distance against every Black step.
       // Do not rely on bishop control to prevent a king chase.
       const attackingSteps = squares.filter(square => kingDistance(square, blackKing.square) === 1
-        && kingDistance(square, whiteKing.square) > 1 && kingDistance(square, knight.square) === 1);
+        && kingDistance(square, whiteKing.square) > 1
+        && (retreat || kingDistance(square, knight.square) === 1));
       return attackingSteps.every(black => {
         const kingCanDefend = squares.some(square => square !== bishop.square && square !== knight.square
           && kingDistance(square, whiteKing.square) === 1
@@ -391,7 +396,7 @@ function scoreKnightAndBishopWhiteMoveCore(
             && square !== bishop.square && square !== whiteKing.square) ?? [];
         const knightCanContinue = squares.some(square => square !== whiteKing.square && square !== bishop.square
           && isKnightMove(knight.square, square)
-          && kingDistance(square, whiteKing.square) < kingDistance(knight.square, whiteKing.square)
+          && kingDistance(square, whiteKing.square) < Math.min(startingDistance, resultingDistance)
           // Do not count an escape that r6 would outrank with double opposition.
           && (!onwardOpposition.length || onwardOpposition.includes(square)
             || kingDistance(square, whiteKing.square) === 1)
@@ -634,6 +639,7 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
         || (first.knightDriftQualifies && second.knightDriftQualifies
           ? first.kingKnightAdjacencyPenalty - second.kingKnightAdjacencyPenalty
             || Number(second.knightDoubleOpposition) - Number(first.knightDoubleOpposition)
+            || first.knightDriftBishopProximityPenalty - second.knightDriftBishopProximityPenalty
             || first.knightKingProximityScore - second.knightKingProximityScore
             || first.knightMiddle16ProximityScore - second.knightMiddle16ProximityScore : 0),
     },
