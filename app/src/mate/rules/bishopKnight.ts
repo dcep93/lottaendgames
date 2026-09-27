@@ -51,6 +51,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly relativeKnightPenalty: number;
   readonly startsWithMiddle16King: boolean;
   readonly startsWithCentralKingAndMiddle16Knight: boolean;
+  readonly centralSetupBoundaryPenalty: number;
   readonly bishopCenterPenalty: number;
   readonly knightOppositeCentralDistance: number;
   readonly bishopCentralProximityScore: number;
@@ -327,6 +328,8 @@ function scoreKnightAndBishopWhiteMoveCore(
     relativeKnightPenalty: context.relativeKnightMove && context.relativeKnightMove !== move.from + move.to ? 1 : 0,
     startsWithMiddle16King: context.startsWithMiddle16King,
     startsWithCentralKingAndMiddle16Knight: context.startsWithCentralKingAndMiddle16Knight,
+    centralSetupBoundaryPenalty: whiteKing && knight && centerDistance(whiteKing.square) === 0
+      && isMiddle16Square(knight.square) ? 0 : 1,
     get knightOppositeCentralDistance() {
       if (!knight || !bishop) return 99;
       const targets = context.knightOppositeCentralTargets.filter(target => target !== whiteKing?.square);
@@ -606,7 +609,8 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       shortLabel: "rule r4",
       helpText: "With a central king and central 16 knight, then prefer king protection of the knight, maneuver the knight to a central square opposite the bishop's color, then navigate to a central bishop and the king to a central square opposite the bishop's color.",
       applies: score => score.startsWithCentralKingAndMiddle16Knight,
-      compare: (first, second) => first.kingKnightAdjacencyPenalty - second.kingKnightAdjacencyPenalty
+      compare: (first, second) => first.centralSetupBoundaryPenalty - second.centralSetupBoundaryPenalty
+        || first.kingKnightAdjacencyPenalty - second.kingKnightAdjacencyPenalty
         || first.knightOppositeCentralDistance - second.knightOppositeCentralDistance
         || first.bishopKingCentralNavigationScore - second.bishopKingCentralNavigationScore,
     },

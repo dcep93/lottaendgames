@@ -244,3 +244,20 @@ test('r4.5 includes the four central squares in the loaded clutter rectangle, ac
     assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen).sort(), [move('c8'), move('h3')].sort(), t.name);
   }
 });
+
+test('r4 preserves the central king and middle-16 knight before maneuvering, across D4', () => {
+  for (const t of SQUARE_TRANSFORMS) {
+    const fen = transformFen('8/8/8/4K3/8/k2N4/B7/8 w - - 2 2', t);
+    const san = (from: 'a2' | 'd3' | 'e5', to: 'g8' | 'd5' | 'c1' | 'e6') => getChess(fen).move({
+      from: transformSquare(from, t), to: transformSquare(to, t),
+    }).san;
+    const retained = scoreKnightAndBishopWhiteMove(fen, san('a2', 'g8'));
+    for (const move of [san('d3', 'c1'), san('e5', 'e6')]) {
+      const leaving = scoreKnightAndBishopWhiteMove(fen, move);
+      assert.equal(leaving.centralSetupBoundaryPenalty, 1, `${t.name} ${move}`);
+      assert.ok(compareScoresByRules(retained, leaving, [r4]) < 0, `${t.name} ${move}`);
+    }
+    assert.equal(retained.centralSetupBoundaryPenalty, 0, t.name);
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [san('a2', 'd5')], t.name);
+  }
+});
