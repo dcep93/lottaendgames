@@ -225,7 +225,8 @@ test('r4.5 exempts the loaded Be8 outside d7-h5 but still penalizes crowding ins
     assert.equal(score.immobileBishopPenalty, 0, t.name);
     assert.equal(score.bishopMoveNearNoncentralKingPenalty, 0, t.name);
     assert.equal(score.bishopWhiteKingDistanceScore, 0, t.name);
-    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [move], t.name);
+    const kingMove = getChess(fen).move({from: transformSquare('d7', t), to: transformSquare('e7', t)}).san;
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [kingMove], t.name);
     const inside = transformFen('8/7k/5N2/8/8/1K6/8/B7 w - - 0 1', t);
     const crowded = getChess(inside).move({from: transformSquare('a1', t), to: transformSquare('c3', t)}).san;
     assert.equal(scoreKnightAndBishopWhiteMove(inside, crowded).bishopMoveNearNoncentralKingPenalty, 1, t.name);

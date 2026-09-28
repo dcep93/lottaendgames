@@ -75,6 +75,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly knightDriftRank: number;
   readonly knightDoubleOpposition: boolean;
   readonly knightFlanksBlackKing: boolean;
+  readonly kingApproachesKnightWithoutLeavingCenter: boolean;
   readonly kingBlackDistanceSquared: number;
   readonly kingCoordinationPenalty: number;
   readonly attackedBishopDefensePenalty: number;
@@ -203,6 +204,8 @@ function knightDoubleOppositionSquares(knight: Square, blackKing: Square, whiteK
 }
 
 type KnightAndBishopPositionScoreContext = {
+  readonly kingKnightDistance: number;
+  readonly kingCenterEuclidean: number;
   readonly knightOppositeCentralTargets: readonly Square[];
   readonly bishopShuffleTargets: readonly Square[];
   readonly startsWithUnprotectedBishop: boolean;
@@ -239,6 +242,8 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
   const knightCentrallyDefended = !!knight && centralKing && kingDistance(whiteKing.square, knight.square) === 1;
   let unprotectedKnight: boolean | undefined;
   return {
+    kingKnightDistance: whiteKing && knight ? kingDistance(whiteKing.square, knight.square) : 99,
+    kingCenterEuclidean: knightAndBishopKingCenterEuclideanScore(fen),
     knightOppositeCentralTargets: (["d4", "e4", "d5", "e5"] as const).filter(target =>
       bishop && target !== whiteKing?.square && squareColor(target) !== squareColor(bishop.square)),
     bishopShuffleTargets: knightAndBishopShuffleTargets(fen),
@@ -371,6 +376,11 @@ function scoreKnightAndBishopWhiteMoveCore(
     attackedMinorWithoutKingDefensePenalty: [bishop, knight].filter(piece => piece && blackKing
       && kingDistance(piece.square, blackKing.square) === 1
       && (!whiteKing || kingDistance(piece.square, whiteKing.square) !== 1)).length,
+    get kingApproachesKnightWithoutLeavingCenter() {
+      return move.piece === "k" && !!whiteKing && !!knight
+        && kingDistance(whiteKing.square, knight.square) < context.kingKnightDistance
+        && this.kingCenterEuclideanScore <= context.kingCenterEuclidean;
+    },
     kingKnightAdjacencyPenalty: knightKingDefended ? 0 : 1,
     kingKnightDistanceScore: whiteKing && knight ? kingDistance(whiteKing.square, knight.square) : 99,
     knightDoubleOpposition: !!knight && !!doubleOppositionTargets?.includes(knight.square),
@@ -655,7 +665,12 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       id: "r6",
       shortLabel: "rule r6",
       helpText: "Drift the knight towards king protection, then prefer knight central 16 proximity.",
-      compare: (first, second) => first.knightDriftRank - second.knightDriftRank
+      subpriorities: [{
+        compare: (first, second) => Number(second.kingApproachesKnightWithoutLeavingCenter)
+          - Number(first.kingApproachesKnightWithoutLeavingCenter),
+      }, {
+        when: scores => !scores.some(score => score.kingApproachesKnightWithoutLeavingCenter),
+        compare: (first, second) => first.knightDriftRank - second.knightDriftRank
         || (first.knightDriftQualifies && second.knightDriftQualifies
           ? first.kingKnightAdjacencyPenalty - second.kingKnightAdjacencyPenalty
             || Number(second.knightFlanksBlackKing) - Number(first.knightFlanksBlackKing)
@@ -664,6 +679,7 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
             || (first.knightFlanksBlackKing && second.knightFlanksBlackKing ? 0
               : first.knightKingProximityScore - second.knightKingProximityScore)
             || first.knightMiddle16ProximityScore - second.knightMiddle16ProximityScore : 0),
+      }],
     },
     {
       id: "r7",

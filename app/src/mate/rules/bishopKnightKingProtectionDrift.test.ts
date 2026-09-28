@@ -7,14 +7,14 @@ import {selectCandidatesByRules} from './selection';
 test('an onward jump outranked by double opposition cannot justify a drift, across D4', () => {
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen('B7/2N5/8/8/3k4/8/8/3K4 w - - 2 2', t);
-    const san = (from: 'c7' | 'd1', to: 'b5' | 'd2' | 'e6') => getChess(fen).move({
+    const san = (from: 'c7' | 'd1', to: 'b5' | 'd2' | 'e2' | 'e6') => getChess(fen).move({
       from: transformSquare(from, t), to: transformSquare(to, t),
     }).san;
     const rejected = san('c7', 'b5');
     assert.equal(scoreKnightAndBishopWhiteMove(fen, rejected).knightDriftQualifies, false, t.name);
     const candidates = getChess(fen).moves().map(san => ({san, score: scoreKnightAndBishopWhiteMove(fen, san)}));
     const selection = selectCandidatesByRules(candidates, knightAndBishopWhiteRules);
-    assert.deepEqual(selection.idealCandidates.map(c => c.san), [san('c7', 'e6')], t.name);
+    assert.deepEqual(selection.idealCandidates.map(c => c.san).sort(), [san('d1', 'd2'), san('d1', 'e2')].sort(), t.name);
     assert.equal(selection.eliminatedBy.get(candidates.find(c => c.san === rejected)!)?.id, 'r6', t.name);
     const pair = candidates.filter(c => c.san === rejected || c.san === san('d1', 'd2'));
     assert.deepEqual(selectCandidatesByRules(pair, knightAndBishopWhiteRules).idealCandidates.map(c => c.san), [san('d1', 'd2')], t.name);
@@ -116,8 +116,10 @@ test('r6 permits double opposition behind a diagonal blocker, across D4', () => 
     const score = scoreKnightAndBishopWhiteMove(fen, move);
     assert.equal(score.knightDriftQualifies, true, t.name);
     const candidates = getChess(fen).moves().map(san => ({san, score: scoreKnightAndBishopWhiteMove(fen, san)}));
-    // r6 permits Nc1; r4.5 separately penalizes Be6 inside the expanded rectangle.
-    assert.deepEqual(selectCandidatesByRules(candidates, knightAndBishopWhiteRules.filter(r => r.id === 'r6')).idealCandidates.map(c => c.san), [move], t.name);
+    // King approaches now take precedence; among knight moves the opposition route remains preferred.
+    const r6 = knightAndBishopWhiteRules.filter(r => r.id === 'r6');
+    assert.ok(selectCandidatesByRules(candidates, r6).idealCandidates.every(c => c.score.kingApproachesKnightWithoutLeavingCenter), t.name);
+    assert.deepEqual(selectCandidatesByRules(candidates.filter(c => c.san.startsWith('N')), r6).idealCandidates.map(c => c.san), [move], t.name);
     const bishop = getChess(fen).move({from: transformSquare('c8', t), to: transformSquare('e6', t)}).san;
     assert.equal(scoreKnightAndBishopWhiteMove(fen, bishop).bishopMoveNearNoncentralKingPenalty, 1, t.name);
     for (const quiet of ['2B5/8/8/8/2k5/1N6/8/K7 w - - 2 2', '2BK4/8/8/8/3k4/1N6/8/8 w - - 2 2']) {
@@ -314,5 +316,26 @@ test('route around an intervening adjacent king before measuring White king prox
     const outside = transformFen('6B1/8/8/Nk6/8/8/8/K7 w - - 0 1', t);
     const outsideMove = getChess(outside).move({from: transformSquare('a5', t), to: transformSquare('b3', t)}).san;
     assert.equal(scoreKnightAndBishopWhiteMove(outside, outsideMove).knightFlanksBlackKing, false, t.name);
+  }
+});
+
+
+test('r6 yields to an immediate king approach that does not retreat from the center, across D4', () => {
+  for (const t of SQUARE_TRANSFORMS) {
+    const fen = transformFen('6B1/6K1/8/N1k5/8/8/8/8 w - - 0 1', t);
+    const san = (from: 'g7' | 'a5', to: 'f6' | 'f7' | 'f8' | 'b7') => getChess(fen).move({
+      from: transformSquare(from, t), to: transformSquare(to, t),
+    }).san;
+    for (const to of ['f6', 'f7'] as const) {
+      assert.equal(scoreKnightAndBishopWhiteMove(fen, san('g7', to)).kingApproachesKnightWithoutLeavingCenter, true, t.name);
+    }
+    // Kf8 approaches the knight too, but moves farther from the center.
+    assert.equal(scoreKnightAndBishopWhiteMove(fen, san('g7', 'f8')).kingApproachesKnightWithoutLeavingCenter, false, t.name);
+    assert.equal(scoreKnightAndBishopWhiteMove(fen, san('a5', 'b7')).knightDriftQualifies, true, t.name);
+    const candidates = getChess(fen).moves().map(san => ({san, score: scoreKnightAndBishopWhiteMove(fen, san)}));
+    const selection = selectCandidatesByRules(candidates, knightAndBishopWhiteRules);
+    assert.deepEqual(selection.idealCandidates.map(c => c.san), [san('g7', 'f6')], t.name);
+    assert.equal(selection.eliminatedBy.get(candidates.find(c => c.san === san('a5', 'b7'))!)?.id, 'r6', t.name);
+    assert.equal(selection.lastEliminatingRule?.id, 'r7', t.name);
   }
 });
