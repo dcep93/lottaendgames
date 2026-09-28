@@ -339,3 +339,22 @@ test('r6 yields to an immediate king approach that does not retreat from the cen
     assert.equal(selection.lastEliminatingRule?.id, 'r7', t.name);
   }
 });
+
+test('drift reaches Whites side of Black before minimizing direct king distance, across D4', () => {
+  for (const t of SQUARE_TRANSFORMS) {
+    const fen = transformFen('8/8/BK6/8/1k6/8/8/3N4 w - - 0 1', t);
+    const move = (to: 'e3' | 'b2') => getChess(fen).move({
+      from: transformSquare('d1', t), to: transformSquare(to, t),
+    }).san;
+    const forward = scoreKnightAndBishopWhiteMove(fen, move('e3'));
+    const near = scoreKnightAndBishopWhiteMove(fen, move('b2'));
+    assert.equal(forward.knightDriftQualifies, true, t.name);
+    assert.equal(near.knightDriftQualifies, true, t.name);
+    assert.ok(forward.knightKingProximityScore > near.knightKingProximityScore, t.name);
+    assert.ok(forward.knightWhiteSideOfBlackDistance < near.knightWhiteSideOfBlackDistance, t.name);
+    const candidates = getChess(fen).moves().map(san => ({san, score: scoreKnightAndBishopWhiteMove(fen, san)}));
+    const selection = selectCandidatesByRules(candidates, knightAndBishopWhiteRules);
+    assert.deepEqual(selection.idealCandidates.map(c => c.san), [move('e3')], t.name);
+    assert.equal(selection.eliminatedBy.get(candidates.find(c => c.san === move('b2'))!)?.id, 'r6', t.name);
+  }
+});

@@ -75,6 +75,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly knightDriftRank: number;
   readonly knightDoubleOpposition: boolean;
   readonly knightFlanksBlackKing: boolean;
+  readonly knightWhiteSideOfBlackDistance: number;
   readonly kingApproachesKnightWithoutLeavingCenter: boolean;
   readonly kingBlackDistanceSquared: number;
   readonly kingCoordinationPenalty: number;
@@ -386,6 +387,14 @@ function scoreKnightAndBishopWhiteMoveCore(
     knightDoubleOpposition: !!knight && !!doubleOppositionTargets?.includes(knight.square),
     knightFlanksBlackKing: move.piece === "n" && !!knight && !!whiteKing && !!blackKing
       && knightFlankSquares(move.from, blackKing.square, whiteKing.square).includes(knight.square),
+    get knightWhiteSideOfBlackDistance() {
+      if (!knight || !whiteKing || !blackKing) return 0;
+      const n = squareCoordinates(knight.square), b = squareCoordinates(blackKing.square);
+      const w = squareCoordinates(whiteKing.square);
+      // Signed gap to the half-plane on White's side of Black; stop rewarding it once reached.
+      return Math.max(0, -(n.file - b.file) * (w.file - b.file)
+        - (n.rank - b.rank) * (w.rank - b.rank));
+    },
     knightDriftBishopProximityPenalty: driftNearBishop && knight && bishop
       ? 3 - kingDistance(knight.square, bishop.square) : 0,
     get knightDriftRank() {
@@ -677,7 +686,8 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
             || Number(second.knightDoubleOpposition) - Number(first.knightDoubleOpposition)
             || first.knightDriftBishopProximityPenalty - second.knightDriftBishopProximityPenalty
             || (first.knightFlanksBlackKing && second.knightFlanksBlackKing ? 0
-              : first.knightKingProximityScore - second.knightKingProximityScore)
+              : first.knightWhiteSideOfBlackDistance - second.knightWhiteSideOfBlackDistance
+                || first.knightKingProximityScore - second.knightKingProximityScore)
             || first.knightMiddle16ProximityScore - second.knightMiddle16ProximityScore : 0),
       }],
     },
