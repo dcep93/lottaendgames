@@ -74,6 +74,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly knightDriftBishopProximityPenalty: number;
   readonly knightDriftRank: number;
   readonly knightDoubleOpposition: boolean;
+  readonly knightFlanksBlackKing: boolean;
   readonly kingBlackDistanceSquared: number;
   readonly kingCoordinationPenalty: number;
   readonly attackedBishopDefensePenalty: number;
@@ -179,6 +180,18 @@ function distanceToNearestUnprotectedKnightOrBishop(fen: string): number {
         ),
       )
     : 99;
+}
+
+// With an edge-adjacent blocker between knight and king, either perpendicular flank
+// gets around it; closeness to White's king should not choose the flank.
+function knightFlankSquares(knight: Square, blackKing: Square, whiteKing: Square) {
+  const n = squareCoordinates(knight), b = squareCoordinates(blackKing), w = squareCoordinates(whiteKing);
+  const dx = b.file - n.file, dy = b.rank - n.rank;
+  if (Math.abs(dx) + Math.abs(dy) !== 1
+    || b.file < Math.min(n.file, w.file) || b.file > Math.max(n.file, w.file)
+    || b.rank < Math.min(n.rank, w.rank) || b.rank > Math.max(n.rank, w.rank)) return [];
+  return dx ? [squareFromCoords(b.file, b.rank - 2), squareFromCoords(b.file, b.rank + 2)]
+    : [squareFromCoords(b.file - 2, b.rank), squareFromCoords(b.file + 2, b.rank)];
 }
 
 function knightDoubleOppositionSquares(knight: Square, blackKing: Square, whiteKing: Square) {
@@ -361,6 +374,8 @@ function scoreKnightAndBishopWhiteMoveCore(
     kingKnightAdjacencyPenalty: knightKingDefended ? 0 : 1,
     kingKnightDistanceScore: whiteKing && knight ? kingDistance(whiteKing.square, knight.square) : 99,
     knightDoubleOpposition: !!knight && !!doubleOppositionTargets?.includes(knight.square),
+    knightFlanksBlackKing: move.piece === "n" && !!knight && !!whiteKing && !!blackKing
+      && knightFlankSquares(move.from, blackKing.square, whiteKing.square).includes(knight.square),
     knightDriftBishopProximityPenalty: driftNearBishop && knight && bishop
       ? 3 - kingDistance(knight.square, bishop.square) : 0,
     get knightDriftRank() {
@@ -369,6 +384,7 @@ function scoreKnightAndBishopWhiteMoveCore(
     get knightDriftQualifies() {
       if (knightKingDefended) return true;
       if (move.piece !== "n" || !whiteKing || !knight || !bishop || !blackKing) return false;
+      if (this.knightFlanksBlackKing) return true;
       const n = squareCoordinates(move.from), b = squareCoordinates(blackKing.square);
       const w = squareCoordinates(whiteKing.square);
       const blackBetween = b.file > Math.min(n.file, w.file) && b.file < Math.max(n.file, w.file)
@@ -642,9 +658,11 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       compare: (first, second) => first.knightDriftRank - second.knightDriftRank
         || (first.knightDriftQualifies && second.knightDriftQualifies
           ? first.kingKnightAdjacencyPenalty - second.kingKnightAdjacencyPenalty
+            || Number(second.knightFlanksBlackKing) - Number(first.knightFlanksBlackKing)
             || Number(second.knightDoubleOpposition) - Number(first.knightDoubleOpposition)
             || first.knightDriftBishopProximityPenalty - second.knightDriftBishopProximityPenalty
-            || first.knightKingProximityScore - second.knightKingProximityScore
+            || (first.knightFlanksBlackKing && second.knightFlanksBlackKing ? 0
+              : first.knightKingProximityScore - second.knightKingProximityScore)
             || first.knightMiddle16ProximityScore - second.knightMiddle16ProximityScore : 0),
     },
     {

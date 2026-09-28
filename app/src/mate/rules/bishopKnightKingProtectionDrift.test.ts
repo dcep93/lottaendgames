@@ -64,15 +64,15 @@ test('bishop-obstructed detours lose even when the attacked knight has no qualif
   }
 });
 
-test('a chase with no king rescue or safe onward jump gives no drift credit, across D4', () => {
+test('flanking an adjacent blocker prefers the clear central route, across D4', () => {
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen('KB6/8/8/2kN4/8/8/8/8 w - - 0 1', t);
-    const san = (to: 'c7' | 'f4' | 'e7') => getChess(fen).move({from: transformSquare('d5', t), to: transformSquare(to, t)}).san;
+    const san = (to: 'c7' | 'f4' | 'c3') => getChess(fen).move({from: transformSquare('d5', t), to: transformSquare(to, t)}).san;
     const candidates = getChess(fen).moves().map(move => ({san: move, score: scoreKnightAndBishopWhiteMove(fen, move)}));
-    assert.equal(scoreKnightAndBishopWhiteMove(fen, san('c7')).knightDriftQualifies, false, t.name);
+    assert.equal(scoreKnightAndBishopWhiteMove(fen, san('c7')).knightFlanksBlackKing, true, t.name);
     const selection = selectCandidatesByRules(candidates, knightAndBishopWhiteRules);
-    // Nc7 also crowds Bb8; the clear escape wins before king-proximity tiebreaks.
-    assert.deepEqual(selection.idealCandidates.map(c => c.san), [san('e7')], t.name);
+    // Both flanks route around Black; Nc3 clears Bb8 and stays more central.
+    assert.deepEqual(selection.idealCandidates.map(c => c.san), [san('c3')], t.name);
     assert.equal(selection.eliminatedBy.get(candidates.find(c => c.san === san('c7'))!)?.id, 'r6', t.name);
     const r7 = knightAndBishopWhiteRules.find(r => r.id === 'r7')!;
     assert.ok(r7.subpriorities![0]!.compare!(scoreKnightAndBishopWhiteMove(fen, san('c7')), scoreKnightAndBishopWhiteMove(fen, san('f4'))) < 0, t.name);
@@ -291,5 +291,28 @@ test('a retreat with a safe onward approach beats a clear but trapped corner, ac
       assert.ok(board.moves({verbose: true}).some(m => m.from === escape.from && m.to === escape.to), reply);
       board.undo();
     }
+  }
+});
+
+
+test('route around an intervening adjacent king before measuring White king proximity, across D4', () => {
+  for (const t of SQUARE_TRANSFORMS) {
+    const fen = transformFen('6B1/7K/8/Nk6/8/8/8/8 w - - 0 1', t);
+    const move = (to: 'b3' | 'b7') => getChess(fen).move({
+      from: transformSquare('a5', t), to: transformSquare(to, t),
+    }).san;
+    const low = scoreKnightAndBishopWhiteMove(fen, move('b3'));
+    const high = scoreKnightAndBishopWhiteMove(fen, move('b7'));
+    for (const score of [low, high]) {
+      assert.equal(score.knightFlanksBlackKing, true, t.name);
+      assert.equal(score.knightDriftQualifies, true, t.name);
+    }
+    assert.ok(low.knightKingProximityScore > high.knightKingProximityScore, t.name);
+    assert.ok(low.knightMiddle16ProximityScore < high.knightMiddle16ProximityScore, t.name);
+    const candidates = getChess(fen).moves().map(san => ({san, score: scoreKnightAndBishopWhiteMove(fen, san)}));
+    assert.deepEqual(selectCandidatesByRules(candidates, knightAndBishopWhiteRules).idealCandidates.map(c => c.san), [move('b3')], t.name);
+    const outside = transformFen('6B1/8/8/Nk6/8/8/8/K7 w - - 0 1', t);
+    const outsideMove = getChess(outside).move({from: transformSquare('a5', t), to: transformSquare('b3', t)}).san;
+    assert.equal(scoreKnightAndBishopWhiteMove(outside, outsideMove).knightFlanksBlackKing, false, t.name);
   }
 });
