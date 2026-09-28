@@ -409,6 +409,7 @@ function scoreKnightAndBishopWhiteMoveCore(
       const resultingDistance = kingDistance(knight.square, whiteKing.square);
       // Flanks may first move away from White, but must still escape a king attack.
       const retreat = !this.knightFlanksBlackKing && resultingDistance >= startingDistance;
+      const progressSteps = this.knightFlanksBlackKing ? resultingDistance : Math.min(startingDistance, resultingDistance);
       const squares = allSquares();
       // Retreats need onward progress beyond the starting distance against every Black step.
       // Do not rely on bishop control to prevent a king chase.
@@ -424,8 +425,10 @@ function scoreKnightAndBishopWhiteMoveCore(
             && square !== bishop.square && square !== whiteKing.square) ?? [];
         const knightCanContinue = squares.some(square => square !== whiteKing.square && square !== bishop.square
           && isKnightMove(knight.square, square)
-          && kingDistance(square, whiteKing.square) < (this.knightFlanksBlackKing
-            ? resultingDistance : Math.min(startingDistance, resultingDistance))
+          && (kingDistance(square, whiteKing.square) < progressSteps
+            || (this.knightFlanksBlackKing && kingDistance(square, whiteKing.square) === progressSteps
+              && squaredEuclideanDistance(square, whiteKing.square)
+                < squaredEuclideanDistance(knight.square, whiteKing.square)))
           // Do not count an escape that r6 would outrank with double opposition.
           && (this.knightFlanksBlackKing || !onwardOpposition.length || onwardOpposition.includes(square)
             || kingDistance(square, whiteKing.square) === 1)

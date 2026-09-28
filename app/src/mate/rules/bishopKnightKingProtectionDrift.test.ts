@@ -368,3 +368,18 @@ test('r6 allows Nc2 to approach an intervening Black king, across D4', () => {
     assert.deepEqual(selectCandidatesByRules(candidates, knightAndBishopWhiteRules).idealCandidates.map(c => c.san), [move], t.name);
   }
 });
+
+
+test('flank escapes may reduce Euclidean distance when king-step distance ties, ignoring bishop control across D4', () => {
+  for (const t of SQUARE_TRANSFORMS) for (const start of [
+    '7K/5B2/8/Nk6/8/8/8/8 w - - 2 2',
+    '6BK/8/8/Nk6/8/8/8/8 w - - 2 2',
+  ]) {
+    const fen = transformFen(start, t);
+    const move = (to: 'b3' | 'b7') => getChess(fen).move({from: transformSquare('a5', t), to: transformSquare(to, t)}).san;
+    assert.equal(scoreKnightAndBishopWhiteMove(fen, move('b3')).knightDriftQualifies, true, t.name);
+    assert.equal(scoreKnightAndBishopWhiteMove(fen, move('b7')).knightDriftQualifies, true, t.name);
+    const candidates = getChess(fen).moves().map(san => ({san, score: scoreKnightAndBishopWhiteMove(fen, san)}));
+    assert.deepEqual(selectCandidatesByRules(candidates, knightAndBishopWhiteRules).idealCandidates.map(c => c.san), [move('b3')], t.name);
+  }
+});
