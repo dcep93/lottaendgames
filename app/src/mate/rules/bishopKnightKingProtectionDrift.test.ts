@@ -117,7 +117,7 @@ test('r6 permits bishop-adjacent detours but requires an escape from the chosen 
   for (const t of SQUARE_TRANSFORMS) {
     for (const [start, from, to] of [
       ['2B5/8/1N6/2k5/8/4K3/8/8 w - - 2 2', 'b6', 'd7'],
-      ['2B5/8/8/8/Nk6/4K3/8/8 w - - 4 3', 'a4', 'b2'],
+      ['2B5/8/8/8/Nk6/4K3/8/8 w - - 4 3', 'a4', 'b6'],
     ] as const) {
       const fen = transformFen(start, t);
       const move = getChess(fen).move({from: transformSquare(from, t), to: transformSquare(to, t)}).san;
@@ -370,9 +370,10 @@ test('r6 allows Nc2 to approach an intervening Black king, across D4', () => {
 });
 
 
-test('flank escapes may reduce Euclidean distance when king-step distance ties, ignoring bishop control across D4', () => {
+test('flank escapes get around Black without requiring White king proximity, ignoring bishop control across D4', () => {
   for (const t of SQUARE_TRANSFORMS) for (const start of [
     '7K/5B2/8/Nk6/8/8/8/8 w - - 2 2',
+    '6K1/5B2/8/Nk6/8/8/8/8 w - - 2 2',
     '6BK/8/8/Nk6/8/8/8/8 w - - 2 2',
   ]) {
     const fen = transformFen(start, t);
