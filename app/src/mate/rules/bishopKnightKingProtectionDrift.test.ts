@@ -162,7 +162,7 @@ test('r6 rejects Nd4 when a diagonal chase leaves no onward king-step progress, 
   }
 });
 
-test('r6 rejects approaching Black between the knight and king without gaining protection, across D4', () => {
+test('r6 still checks onward escapes when approaching Black, across D4', () => {
   for (const t of SQUARE_TRANSFORMS) {
     for (const [start, qualifies] of [
       ['B2K4/8/8/4k3/8/8/5N2/8 w - - 0 1', false], // Black is strictly between d8 and f2.
@@ -228,7 +228,7 @@ test('approaching an intervening Black king is allowed when three or more steps 
 });
 
 
-test('r6 uses the strict interior rectangle and selects Ne3, across D4', () => {
+test('r6 selects Ne3 in the former strict-interior example, across D4', () => {
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen('2B5/8/8/2K1k3/8/8/6N1/8 w - - 0 1', t);
     const move = getChess(fen).move({from: transformSquare('g2', t), to: transformSquare('e3', t)}).san;
@@ -355,5 +355,16 @@ test('a flanking drift must still leave an escape after Black attacks it, across
     const candidates = getChess(fen).moves().map(san => ({san, score: scoreKnightAndBishopWhiteMove(fen, san)}));
     const selection = selectCandidatesByRules(candidates, knightAndBishopWhiteRules);
     assert.equal(selection.eliminatedBy.get(candidates.find(c => c.san === move)!)?.id, 'r6', t.name);
+  }
+});
+
+
+test('r6 allows Nc2 to approach an intervening Black king, across D4', () => {
+  for (const t of SQUARE_TRANSFORMS) {
+    const fen = transformFen('4B3/8/8/4K3/2k5/8/8/N7 w - - 0 1', t);
+    const move = getChess(fen).move({from: transformSquare('a1', t), to: transformSquare('c2', t)}).san;
+    assert.equal(scoreKnightAndBishopWhiteMove(fen, move).knightDriftQualifies, true, t.name);
+    const candidates = getChess(fen).moves().map(san => ({san, score: scoreKnightAndBishopWhiteMove(fen, san)}));
+    assert.deepEqual(selectCandidatesByRules(candidates, knightAndBishopWhiteRules).idealCandidates.map(c => c.san), [move], t.name);
   }
 });
