@@ -262,3 +262,20 @@ test('r4 preserves the central king and middle-16 knight before maneuvering, acr
     assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [san('a2', 'd5')], t.name);
   }
 });
+
+
+test('r4.5 separation stays inactive when a knight brings an initially outside bishop into the box, across D4', () => {
+  for (const t of SQUARE_TRANSFORMS) for (const start of [
+    '8/5B2/1N4K1/2k5/8/8/8/8 w - - 2 2',
+    '8/5B2/1N3K2/2k5/8/8/8/8 w - - 2 2',
+  ]) {
+    const fen = transformFen(start, t);
+    const move = getChess(fen).move({from: transformSquare('b6', t), to: transformSquare('d7', t)}).san;
+    const score = scoreKnightAndBishopWhiteMove(fen, move);
+    assert.equal(score.startsWithBishopAdjacentToNoncentralKing, true, t.name);
+    assert.equal(score.bishopWhiteKingDistanceScore, 0, t.name);
+    assert.equal(score.knightDriftQualifies, true, t.name);
+    const candidates = getChess(fen).moves().map(san => ({san, score: scoreKnightAndBishopWhiteMove(fen, san)}));
+    assert.ok(selectCandidatesByRules(candidates, knightAndBishopWhiteRules).idealCandidates.some(c => c.san === move), t.name);
+  }
+});

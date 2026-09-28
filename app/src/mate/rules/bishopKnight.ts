@@ -203,7 +203,14 @@ function knightDoubleOppositionSquares(knight: Square, blackKing: Square, whiteK
   return [squareFromCoords(b.file, n.rank - 2 * dy), squareFromCoords(n.file - 2 * dx, b.rank)];
 }
 
+function bishopInsideClutterRectangle(bishop: Square, whiteKing: Square, knight: Square) {
+  const b = squareCoordinates(bishop), k = squareCoordinates(whiteKing), n = squareCoordinates(knight);
+  return b.file >= Math.min(k.file, n.file, 3) && b.file <= Math.max(k.file, n.file, 4)
+    && b.rank >= Math.min(k.rank, n.rank, 3) && b.rank <= Math.max(k.rank, n.rank, 4);
+}
+
 type KnightAndBishopPositionScoreContext = {
+  readonly startsWithBishopInClutterRectangle: boolean;
   readonly kingKnightDistance: number;
   readonly kingCenterEuclidean: number;
   readonly knightOppositeCentralTargets: readonly Square[];
@@ -242,6 +249,8 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
   const knightCentrallyDefended = !!knight && centralKing && kingDistance(whiteKing.square, knight.square) === 1;
   let unprotectedKnight: boolean | undefined;
   return {
+    startsWithBishopInClutterRectangle: !!bishop && !!whiteKing && !!knight
+      && bishopInsideClutterRectangle(bishop.square, whiteKing.square, knight.square),
     kingKnightDistance: whiteKing && knight ? kingDistance(whiteKing.square, knight.square) : 99,
     kingCenterEuclidean: knightAndBishopKingCenterEuclideanScore(fen),
     knightOppositeCentralTargets: (["d4", "e4", "d5", "e5"] as const).filter(target =>
@@ -308,13 +317,8 @@ function scoreKnightAndBishopWhiteMoveCore(
   let immobileBishopPenalty: number | undefined;
   const knight = findPiece(resultFen, "w", "n");
   const blackKing = findPiece(resultFen, "b", "k");
-  const bishopInClutterRectangle = (() => {
-    if (!bishop || !whiteKing || !knight) return false;
-    const b = squareCoordinates(bishop.square), k = squareCoordinates(whiteKing.square);
-    const n = squareCoordinates(knight.square);
-    return b.file >= Math.min(k.file, n.file, 3) && b.file <= Math.max(k.file, n.file, 4)
-      && b.rank >= Math.min(k.rank, n.rank, 3) && b.rank <= Math.max(k.rank, n.rank, 4);
-  })();
+  const bishopInClutterRectangle = !!bishop && !!whiteKing && !!knight
+    && bishopInsideClutterRectangle(bishop.square, whiteKing.square, knight.square);
   const doubleOppositionTargets = move.piece === "n" && whiteKing && blackKing
     ? knightDoubleOppositionSquares(move.from, blackKing.square, whiteKing.square) : undefined;
   const blockedDoubleOpposition = doubleOppositionTargets?.every(square => !square
@@ -366,7 +370,8 @@ function scoreKnightAndBishopWhiteMoveCore(
     bishopMoveNearNoncentralKingPenalty: bishopInClutterRectangle && move.piece === "b" && bishop && whiteKing && centerDistance(whiteKing.square) !== 0
       && kingDistance(bishop.square, whiteKing.square) <= 2 ? 1 : 0,
     // Outside is neutral (0); inside separation costs remain positive, decreasing with distance.
-    bishopWhiteKingDistanceScore: bishopInClutterRectangle && context.startsWithBishopAdjacentToNoncentralKing && bishop && whiteKing
+    bishopWhiteKingDistanceScore: context.startsWithBishopInClutterRectangle
+      && bishopInClutterRectangle && context.startsWithBishopAdjacentToNoncentralKing && bishop && whiteKing
       ? 98 - squaredEuclideanDistance(bishop.square, whiteKing.square) : 0,
     bishopCentralProximityScore: bishop ? knightAndBishopCenterProximityScore(bishop.square) : 99,
     bishopCenterPenalty: bishop && centerDistance(bishop.square) === 0 ? 0 : 1,
