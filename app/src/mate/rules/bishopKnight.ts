@@ -75,7 +75,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly knightDoubleOpposition: boolean;
   readonly knightFlanksBlackKing: boolean;
   readonly knightWhiteSideOfBlackDistance: number;
-  readonly kingApproachesKnightWithoutLeavingCenter: boolean;
+  readonly kingStepsTowardKnight: boolean;
   readonly kingBlackDistanceSquared: number;
   readonly kingCoordinationPenalty: number;
   readonly attackedBishopDefensePenalty: number;
@@ -212,7 +212,6 @@ function bishopInsideClutterRectangle(bishop: Square, whiteKing: Square, knight:
 type KnightAndBishopPositionScoreContext = {
   readonly startsWithBishopInClutterRectangle: boolean;
   readonly kingKnightDistance: number;
-  readonly kingCenterEuclidean: number;
   readonly knightOppositeCentralTargets: readonly Square[];
   readonly bishopShuffleTargets: readonly Square[];
   readonly startsWithUnprotectedBishop: boolean;
@@ -252,7 +251,6 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
     startsWithBishopInClutterRectangle: !!bishop && !!whiteKing && !!knight
       && bishopInsideClutterRectangle(bishop.square, whiteKing.square, knight.square),
     kingKnightDistance: whiteKing && knight ? kingDistance(whiteKing.square, knight.square) : 99,
-    kingCenterEuclidean: knightAndBishopKingCenterEuclideanScore(fen),
     knightOppositeCentralTargets: (["d4", "e4", "d5", "e5"] as const).filter(target =>
       bishop && target !== whiteKing?.square && squareColor(target) !== squareColor(bishop.square)),
     bishopShuffleTargets: knightAndBishopShuffleTargets(fen),
@@ -378,10 +376,9 @@ function scoreKnightAndBishopWhiteMoveCore(
     attackedMinorWithoutKingDefensePenalty: [bishop, knight].filter(piece => piece && blackKing
       && kingDistance(piece.square, blackKing.square) === 1
       && (!whiteKing || kingDistance(piece.square, whiteKing.square) !== 1)).length,
-    get kingApproachesKnightWithoutLeavingCenter() {
+    get kingStepsTowardKnight() {
       return move.piece === "k" && !!whiteKing && !!knight
-        && kingDistance(whiteKing.square, knight.square) < context.kingKnightDistance
-        && this.kingCenterEuclideanScore <= context.kingCenterEuclidean;
+        && kingDistance(whiteKing.square, knight.square) < context.kingKnightDistance;
     },
     kingKnightAdjacencyPenalty: knightKingDefended ? 0 : 1,
     kingKnightDistanceScore: whiteKing && knight ? kingDistance(whiteKing.square, knight.square) : 99,
@@ -671,15 +668,16 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       compare: (first, second) => first.attackedMinorWithoutKingDefensePenalty - second.attackedMinorWithoutKingDefensePenalty,
     },
     {
+      id: "r5.8",
+      shortLabel: "rule r5.8",
+      helpText: "Step the king towards the knight.",
+      compare: (first, second) => Number(second.kingStepsTowardKnight) - Number(first.kingStepsTowardKnight),
+    },
+    {
       id: "r6",
       shortLabel: "rule r6",
       helpText: "Drift the knight towards king protection, then prefer knight central 16 proximity.",
-      subpriorities: [{
-        compare: (first, second) => Number(second.kingApproachesKnightWithoutLeavingCenter)
-          - Number(first.kingApproachesKnightWithoutLeavingCenter),
-      }, {
-        when: scores => !scores.some(score => score.kingApproachesKnightWithoutLeavingCenter),
-        compare: (first, second) => first.knightDriftRank - second.knightDriftRank
+      compare: (first, second) => first.knightDriftRank - second.knightDriftRank
         || (first.knightDriftQualifies && second.knightDriftQualifies
           ? first.kingKnightAdjacencyPenalty - second.kingKnightAdjacencyPenalty
             || Number(second.knightFlanksBlackKing) - Number(first.knightFlanksBlackKing)
@@ -688,18 +686,12 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
               : first.knightWhiteSideOfBlackDistance - second.knightWhiteSideOfBlackDistance
                 || first.knightKingProximityScore - second.knightKingProximityScore)
             || first.knightMiddle16ProximityScore - second.knightMiddle16ProximityScore : 0),
-      }],
     },
     {
       id: "r7",
       shortLabel: "rule r7",
-      helpText: "Prefer king step proximity to the knight, then king central proximity.",
-      subpriorities: [{
-        // Let r6 route around a diagonal Black king before demanding proximity.
-        when: scores => !scores.some(score => score.knightDoubleOpposition),
-        compare: (first, second) => first.kingKnightDistanceScore - second.kingKnightDistanceScore
-          || first.kingCenterEuclideanScore - second.kingCenterEuclideanScore,
-      }],
+      helpText: "Prefer king central proximity.",
+      compare: (first, second) => first.kingCenterEuclideanScore - second.kingCenterEuclideanScore,
     },
     {
       id: "r8",
