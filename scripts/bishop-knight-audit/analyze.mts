@@ -9,6 +9,7 @@ import { knightAndBishopSupportedDiagonal as support } from '../../app/src/mate/
 import { knightAndBishopKnightTargetSquares } from '../../app/src/mate/rules/bishopKnightStrategy.ts';
 import { getMateRuleSet } from '../../app/src/mate/rules/index.ts';
 import { encodeMateReplay } from '../../app/src/mate/share.ts';
+import { liftCycle } from './lift-cycle.mts';
 const dir = process.env.AUDIT_DIR!;
 const supportedScope = process.env.AUDIT_SCOPE === 'supported' || process.env.AUDIT_SCOPE === 'all';
 if (!dir)
@@ -207,11 +208,9 @@ function verifyWitness(f: string, moves: string[]) { const ch = getChess(f); for
         return false;
 } return code(ch.fen()) === code(f); }
 function witness(start: number, chosen: number[]) {
-    let current = start, actual = Math.floor(keys[start]! / BASE), actualPrev = keys[start]! % BASE;
-    const initial = actual, initialPrev = actualPrev;
-    const moves: string[] = [], boards: string[] = [];
-    let round = 0;
-    do {
+    const lifted = liftCycle(keys[start]!, state => {
+        let current = start, actual = Math.floor(state / BASE), actualPrev = state % BASE;
+        const moves: string[] = [];
         for (const edge of chosen) {
             const canonicalCurrent = Math.floor(keys[current]! / BASE), canonicalPrev = keys[current]! % BASE;
             let orient = -1;
@@ -222,16 +221,16 @@ function witness(start: number, chosen: number[]) {
                 }
             assert.notEqual(orient, -1);
             const ch = getChess(fen(actual));
-            boards.push(ch.fen());
             moves.push(ch.move(coordMove(wm[edge]!, orient) as any).san);
             moves.push(ch.move(coordMove(bm[edge]!, orient) as any).san);
             actualPrev = NONE;
             actual = code(ch.fen());
             current = child[edge]!;
         }
-        round++;
-        assert.ok(round <= 8);
-    } while (actual !== initial || actualPrev !== initialPrev);
+        assert.equal(current, start);
+        return {state: actual * BASE + actualPrev, moves};
+    });
+    const initial = Math.floor(lifted.state / BASE), moves = lifted.moves;
     // Try each phase and D4 orientation, preserving the user's loop display conventions.
     for (const strict of [true, false])
         for (let phase = 0; phase < moves.length; phase += 2) {
