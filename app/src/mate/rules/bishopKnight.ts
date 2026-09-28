@@ -392,12 +392,11 @@ function scoreKnightAndBishopWhiteMoveCore(
         - (n.rank - b.rank) * (w.rank - b.rank));
     },
     get knightDriftRank() {
-      return this.knightDriftQualifies ? 0 : move.piece !== "n" ? 1 : 2;
+      return this.knightDriftQualifies ? 0 : move.piece !== "n" ? 1 : this.knightFlanksBlackKing ? 3 : 2;
     },
     get knightDriftQualifies() {
       if (knightKingDefended) return true;
       if (move.piece !== "n" || !whiteKing || !knight || !bishop || !blackKing) return false;
-      if (this.knightFlanksBlackKing) return true;
       const n = squareCoordinates(move.from), b = squareCoordinates(blackKing.square);
       const w = squareCoordinates(whiteKing.square);
       const blackBetween = b.file > Math.min(n.file, w.file) && b.file < Math.max(n.file, w.file)
@@ -412,7 +411,8 @@ function scoreKnightAndBishopWhiteMoveCore(
           < squaredEuclideanDistance(move.from, whiteKing.square)) return true;
       const startingDistance = kingDistance(move.from, whiteKing.square);
       const resultingDistance = kingDistance(knight.square, whiteKing.square);
-      const retreat = resultingDistance >= startingDistance;
+      // Flanks may first move away from White, but must still escape a king attack.
+      const retreat = !this.knightFlanksBlackKing && resultingDistance >= startingDistance;
       const squares = allSquares();
       // Retreats need onward progress beyond the starting distance against every Black step.
       // Do not rely on bishop control to prevent a king chase.
@@ -428,9 +428,10 @@ function scoreKnightAndBishopWhiteMoveCore(
             && square !== bishop.square && square !== whiteKing.square) ?? [];
         const knightCanContinue = squares.some(square => square !== whiteKing.square && square !== bishop.square
           && isKnightMove(knight.square, square)
-          && kingDistance(square, whiteKing.square) < Math.min(startingDistance, resultingDistance)
+          && kingDistance(square, whiteKing.square) < (this.knightFlanksBlackKing
+            ? resultingDistance : Math.min(startingDistance, resultingDistance))
           // Do not count an escape that r6 would outrank with double opposition.
-          && (!onwardOpposition.length || onwardOpposition.includes(square)
+          && (this.knightFlanksBlackKing || !onwardOpposition.length || onwardOpposition.includes(square)
             || kingDistance(square, whiteKing.square) === 1)
           && (kingDistance(square, black) > 1 || kingDistance(square, whiteKing.square) === 1));
         return kingCanDefend || knightCanContinue;

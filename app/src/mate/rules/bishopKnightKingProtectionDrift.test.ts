@@ -113,11 +113,11 @@ test('r6 permits double opposition behind a diagonal blocker, across D4', () => 
 });
 
 
-test('r6 permits bishop-adjacent detours and prefers the central flank, across D4', () => {
+test('r6 permits bishop-adjacent detours but requires an escape from the chosen flank, across D4', () => {
   for (const t of SQUARE_TRANSFORMS) {
     for (const [start, from, to] of [
       ['2B5/8/1N6/2k5/8/4K3/8/8 w - - 2 2', 'b6', 'd7'],
-      ['2B5/8/8/8/Nk6/4K3/8/8 w - - 4 3', 'a4', 'b6'],
+      ['2B5/8/8/8/Nk6/4K3/8/8 w - - 4 3', 'a4', 'b2'],
     ] as const) {
       const fen = transformFen(start, t);
       const move = getChess(fen).move({from: transformSquare(from, t), to: transformSquare(to, t)}).san;
@@ -337,5 +337,23 @@ test('drift reaches Whites side of Black before minimizing direct king distance,
     const selection = selectCandidatesByRules(candidates, knightAndBishopWhiteRules);
     assert.deepEqual(selection.idealCandidates.map(c => c.san), [move('e3')], t.name);
     assert.equal(selection.eliminatedBy.get(candidates.find(c => c.san === move('b2'))!)?.id, 'r6', t.name);
+  }
+});
+
+
+test('a flanking drift must still leave an escape after Black attacks it, across D4', () => {
+  for (const t of SQUARE_TRANSFORMS) {
+    const fen = transformFen('7K/8/1Nk5/8/2B5/8/8/8 w - - 0 1', t);
+    const board = getChess(fen);
+    const move = board.move({from: transformSquare('b6', t), to: transformSquare('c8', t)}).san;
+    board.move({from: transformSquare('c6', t), to: transformSquare('d7', t)});
+    // Ne7 would be capturable by Kd7; the other forward jump, e9, is off-board.
+    const score = scoreKnightAndBishopWhiteMove(fen, move);
+    assert.equal(score.knightFlanksBlackKing, true, t.name);
+    assert.equal(score.knightDriftQualifies, false, t.name);
+    assert.equal(score.knightDriftRank, 3, t.name);
+    const candidates = getChess(fen).moves().map(san => ({san, score: scoreKnightAndBishopWhiteMove(fen, san)}));
+    const selection = selectCandidatesByRules(candidates, knightAndBishopWhiteRules);
+    assert.equal(selection.eliminatedBy.get(candidates.find(c => c.san === move)!)?.id, 'r6', t.name);
   }
 });
