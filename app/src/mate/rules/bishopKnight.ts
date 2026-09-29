@@ -1,6 +1,15 @@
+import { sevenCageMoves } from "./bishopKnightSevenCage";
+import { matingNetMoves } from "./bishopKnightMatingNet";
+import { rareDegenerateEscapeMove, rareEscapeStartingFormation } from "./bishopKnightRareEscape";
+import { bishopCentralPathDistances } from "./bishopKnightBishopPath";
+import { declaredKnightDefenseMove } from "./bishopKnightDeclaredDefense";
+import { protectedCentralManeuverTargets } from "./bishopKnightProtectedManeuver";
+import { bishopKnightBlackReplies } from "./bishopKnightReplies";
+import { kingApproachKnightTargets } from "./bishopKnightKingApproach";
+import { declaredCentralNavigationMoves } from "./bishopKnightCentralNavigation";
 import { knightAndBishopShuffleTargets } from "./bishopKnightShuffle";
 import { knightAndBishopPrecageSideTarget, type PrecageSideTarget } from "./bishopKnightPrecageSide";
-import { stableBishopProtectionDistance, stableBishopProtectedSquares } from "./bishopKnightStableProtection";
+import { canBishopEstablishStableProtection, stableBishopProtectionDistance, stableBishopProtectedSquares } from "./bishopKnightStableProtection";
 import { knightAndBishopThreeKingPlacementPenalty, knightAndBishopFiveBishopPenalty, knightAndBishopFiveKingTargetDistance, knightAndBishopShouldCheckThreeDiagonal, evaluateKnightAndBishopSupportedDiagonal } from "./bishopKnightDiagonalSupport";
 import type { Square } from "chess.js";
 import {
@@ -46,11 +55,18 @@ import type {
 } from "./types";
 
 export type KnightAndBishopWhiteMoveScore = {
+  readonly matingNetPenalty: number;
+  readonly sevenCagePenalty: number;
+  readonly rareEscapePenalty: number;
+  readonly declaredCentralNavigationPenalty: number | undefined;
+  readonly protectedCentralManeuverPenalty: number | undefined;
+  readonly bishopCentralPathDistance: number;
   readonly sixPointNinePenalty: number;
   readonly declaredStepPenalty: number;
   readonly relativeKnightPenalty: number;
   readonly startsWithMiddle16King: boolean;
   readonly startsWithCentralKingAndMiddle16Knight: boolean;
+  readonly startsWithProtectedOppositeCentralKnight: boolean;
   readonly centralSetupBoundaryPenalty: number;
   readonly bishopCenterPenalty: number;
   readonly knightOppositeCentralDistance: number;
@@ -59,6 +75,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly bishopWhiteKingDistanceScore: number;
   readonly bishopMoveNearNoncentralKingPenalty: number;
   readonly immobileBishopPenalty: number;
+  readonly bishopKingCentralCompletionPenalty: number;
   readonly bishopKingCentralNavigationScore: number;
   readonly bishopShuffleControlPenalty: number;
   readonly minorBlackDistanceScore: number;
@@ -68,6 +85,8 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly knightKingProtectionDistance: number;
   readonly knightKingProximityScore: number;
   readonly knightStableBishopProtectionPenalty: number;
+  readonly knightDefensePenalty: number;
+  readonly knightCentralProximityScore: number;
   readonly kingKnightAdjacencyPenalty: number;
   readonly kingKnightDistanceScore: number;
   readonly knightDriftQualifies: boolean;
@@ -77,6 +96,8 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly knightWhiteSideOfBlackDistance: number;
   readonly kingStepsTowardKnight: boolean;
   readonly kingBlackDistanceSquared: number;
+  readonly bishopBlackDistanceSquared: number;
+  readonly knightBlackDistanceSquared: number;
   readonly kingCoordinationPenalty: number;
   readonly attackedBishopDefensePenalty: number;
   readonly undefendedKnightOnlyBishopDefenderPenalty: number;
@@ -210,10 +231,19 @@ function bishopInsideClutterRectangle(bishop: Square, whiteKing: Square, knight:
 }
 
 type KnightAndBishopPositionScoreContext = {
+  readonly matingNetMoves: readonly string[];
+  readonly sevenCageMoves: readonly string[];
+  readonly rareEscapeMove: string | undefined;
+  readonly declaredKnightDefenseMove: string | undefined;
+  readonly bishopCentralPathDistances: ReadonlyMap<Square, number>;
+  readonly centralNavigationMoves: readonly string[];
+  readonly protectedCentralManeuverTargets: readonly Square[];
   readonly startsWithBishopInClutterRectangle: boolean;
-  readonly kingKnightDistance: number;
+  readonly kingApproachTargets: readonly Square[];
   readonly knightOppositeCentralTargets: readonly Square[];
   readonly bishopShuffleTargets: readonly Square[];
+  readonly startsWithAttackableBishop: boolean;
+  readonly startsWithAttackableKnight: boolean;
   readonly startsWithUnprotectedBishop: boolean;
   readonly startsWithBishopAdjacentToNoncentralKing: boolean;
   readonly startsWithUnprotectedKnight: boolean;
@@ -222,6 +252,7 @@ type KnightAndBishopPositionScoreContext = {
   readonly relativeKnightMove: string | undefined;
   readonly startsWithMiddle16King: boolean;
   readonly startsWithCentralKingAndMiddle16Knight: boolean;
+  readonly startsWithProtectedOppositeCentralKnight: boolean;
   readonly shouldCoordinateKing: boolean;
   readonly shouldEscapeBishop: boolean;
   readonly shouldEscapeNearbyPairBishop: boolean;
@@ -239,6 +270,8 @@ type KnightAndBishopPositionScoreContext = {
 
 function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
   let shouldCheckThreeDiagonal: boolean | undefined;
+  let kingApproachTargets: readonly Square[] | undefined;
+  let bishopPathDistances: ReadonlyMap<Square, number> | undefined;
   const whiteKing = findPiece(fen, "w", "k");
   const blackKing = findPiece(fen, "b", "k");
   const centralKing = !!whiteKing && centerDistance(whiteKing.square) === 0;
@@ -247,15 +280,33 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
   const bishopCentrallyDefended = !!bishop && centralKing && kingDistance(whiteKing.square, bishop.square) === 1;
   const knightCentrallyDefended = !!knight && centralKing && kingDistance(whiteKing.square, knight.square) === 1;
   let unprotectedKnight: boolean | undefined;
+  let blackApproaches: readonly Square[] | undefined;
+  const attackable = (square: Square | undefined) => {
+    if (!square || !blackKing || (whiteKing && kingDistance(square, whiteKing.square) === 1)) return false;
+    const distance = kingDistance(square, blackKing.square);
+    if (distance === 1) return true;
+    if (distance > 2) return false;
+    blackApproaches ??= bishopKnightBlackReplies(getChess(fen.replace(/ [wb] /, " b ")), blackKing.square).map(move => move.to);
+    return blackApproaches.some(target => kingDistance(square, target) === 1);
+  };
   return {
+    matingNetMoves: matingNetMoves(fen),
+    sevenCageMoves: sevenCageMoves(fen),
+    rareEscapeMove: rareDegenerateEscapeMove(fen),
+    declaredKnightDefenseMove: declaredKnightDefenseMove(fen),
+    get bishopCentralPathDistances() { return bishopPathDistances ??= bishopCentralPathDistances(fen); },
+    centralNavigationMoves: declaredCentralNavigationMoves(fen),
+    protectedCentralManeuverTargets: protectedCentralManeuverTargets(fen),
     startsWithBishopInClutterRectangle: !!bishop && !!whiteKing && !!knight
       && bishopInsideClutterRectangle(bishop.square, whiteKing.square, knight.square),
-    kingKnightDistance: whiteKing && knight ? kingDistance(whiteKing.square, knight.square) : 99,
+    get kingApproachTargets() { return kingApproachTargets ??= kingApproachKnightTargets(fen); },
     knightOppositeCentralTargets: (["d4", "e4", "d5", "e5"] as const).filter(target =>
       bishop && target !== whiteKing?.square && squareColor(target) !== squareColor(bishop.square)),
     bishopShuffleTargets: knightAndBishopShuffleTargets(fen),
     startsWithBishopAdjacentToNoncentralKing: !!whiteKing && !!bishop && !centralKing
       && kingDistance(whiteKing.square, bishop.square) === 1,
+    get startsWithAttackableBishop() { return attackable(bishop?.square); },
+    get startsWithAttackableKnight() { return attackable(knight?.square); },
     startsWithUnprotectedBishop: !!bishop
       && (!whiteKing || kingDistance(whiteKing.square,bishop.square)!==1)
       && (!knight || squaredEuclideanDistance(bishop.square,knight.square)!==5),
@@ -270,6 +321,11 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
     relativeKnightMove: knightAndBishopRelativeKnightMove(fen),
     startsWithMiddle16King: !!whiteKing && isMiddle16Square(whiteKing.square),
     startsWithCentralKingAndMiddle16Knight: centralKing && !!knight && isMiddle16Square(knight.square),
+    // Continue the navigation stage after a protected maneuver reaches its target,
+    // including when the protecting king is in the surrounding central 16.
+    startsWithProtectedOppositeCentralKnight: !!whiteKing && !!knight && !!bishop
+      && isMiddle16Square(whiteKing.square) && kingDistance(whiteKing.square, knight.square) === 1
+      && centerDistance(knight.square) === 0 && squareColor(knight.square) !== squareColor(bishop.square),
     shouldEscapeNearbyPairBishop: !!bishop && !!knight && !!blackKing
       && kingDistance(bishop.square, knight.square) === 1
       && kingDistance(bishop.square, blackKing.square) <= 2
@@ -302,7 +358,8 @@ function scoreKnightAndBishopWhiteMoveCore(
   const chess = getChess(fen);
   const move = chess.move(san);
   const resultFen = chess.fen();
-  const blackReplies = chess.moves({ verbose: true });
+  const blackKing = findPiece(resultFen, "b", "k");
+  const blackReplies = bishopKnightBlackReplies(chess, blackKing?.square);
   const givesCheck = chess.isCheck();
   const checkmate = givesCheck && blackReplies.length === 0;
   const whiteKing = findPiece(resultFen, "w", "k");
@@ -314,7 +371,6 @@ function scoreKnightAndBishopWhiteMoveCore(
   let knightTargetProximity: number | undefined;
   let immobileBishopPenalty: number | undefined;
   const knight = findPiece(resultFen, "w", "n");
-  const blackKing = findPiece(resultFen, "b", "k");
   const bishopInClutterRectangle = !!bishop && !!whiteKing && !!knight
     && bishopInsideClutterRectangle(bishop.square, whiteKing.square, knight.square);
   const doubleOppositionTargets = move.piece === "n" && whiteKing && blackKing
@@ -332,6 +388,8 @@ function scoreKnightAndBishopWhiteMoveCore(
     && stableBishopProtectedSquares(resultFen).includes(knight.square);
   let supportedDiagonal: ReturnType<typeof evaluateKnightAndBishopSupportedDiagonal> | undefined;
   return {
+    matingNetPenalty: context.matingNetMoves.length && !context.matingNetMoves.includes(move.from + move.to) ? 1 : 0,
+    sevenCagePenalty: context.sevenCageMoves.length && !context.sevenCageMoves.includes(move.from + move.to) ? 1 : 0,
     get bishopShuffleControlPenalty() {
       return context.bishopShuffleTargets.length && !context.bishopShuffleTargets.some(target =>
         bishop && bishop.square !== target && bishopControlsOrOccupiesSquare(resultFen, bishop.square, target)) ? 1 : 0;
@@ -340,11 +398,26 @@ function scoreKnightAndBishopWhiteMoveCore(
       return context.shouldCoordinateKing
         && !(move.piece === "k" && knightAndBishopKingCoordinatesMinors(resultFen)) ? 1 : 0;
     },
+    get rareEscapePenalty() {
+      return rareEscapeStartingFormation(whiteKing?.square, bishop?.square, knight?.square)
+        || (context.rareEscapeMove && context.rareEscapeMove !== move.from + move.to) ? 1 : 0;
+    },
     sixPointNinePenalty: context.sixPointNineMove && context.sixPointNineMove !== move.from + move.to ? 1 : 0,
+    get bishopCentralPathDistance() {
+      // An explicit r4 route already supplies the way forward.
+      if (context.centralNavigationMoves.length) return 0;
+      const distances = context.bishopCentralPathDistances;
+      return !distances.size ? 0 : move.piece === "b" ? distances.get(move.to) ?? 99 : 99;
+    },
     declaredStepPenalty: context.fivePointFiveMove && context.fivePointFiveMove !== move.from + move.to ? 1 : 0,
     relativeKnightPenalty: context.relativeKnightMove && context.relativeKnightMove !== move.from + move.to ? 1 : 0,
+    declaredCentralNavigationPenalty: !context.centralNavigationMoves.length ? undefined
+      : Number(!context.centralNavigationMoves.includes(move.from + move.to)),
+    protectedCentralManeuverPenalty: context.protectedCentralManeuverTargets.length
+      ? Number(move.piece !== "n" || !context.protectedCentralManeuverTargets.includes(move.to)) : undefined,
     startsWithMiddle16King: context.startsWithMiddle16King,
     startsWithCentralKingAndMiddle16Knight: context.startsWithCentralKingAndMiddle16Knight,
+    startsWithProtectedOppositeCentralKnight: context.startsWithProtectedOppositeCentralKnight,
     centralSetupBoundaryPenalty: whiteKing && knight && centerDistance(whiteKing.square) === 0
       && isMiddle16Square(knight.square) ? 0 : 1,
     get knightOppositeCentralDistance() {
@@ -352,7 +425,17 @@ function scoreKnightAndBishopWhiteMoveCore(
       const targets = context.knightOppositeCentralTargets.filter(target => target !== whiteKing?.square);
       return targets.length ? Math.min(...targets.map(target => knightMoveDistance(knight.square, target))) : 99;
     },
+    get bishopKingCentralCompletionPenalty() {
+      if (!context.startsWithProtectedOppositeCentralKnight) return 0;
+      if (!bishop || !whiteKing) return 2;
+      // Complete the king's goal first, then the bishop's, before partial distance gains.
+      return Number(centerDistance(bishop.square) !== 0)
+        + 2 * Number(centerDistance(whiteKing.square) !== 0
+          || squareColor(whiteKing.square) === squareColor(bishop.square));
+    },
     get bishopKingCentralNavigationScore() {
+      // Start bishop/king navigation only after completing the protected knight maneuver.
+      if (!context.startsWithProtectedOppositeCentralKnight) return 0;
       if (!bishop || !whiteKing) return 99;
       const central = ["d4", "e4", "d5", "e5"] as const;
       const bishopTargets = central.filter(square => squareColor(square) === squareColor(bishop.square));
@@ -377,8 +460,7 @@ function scoreKnightAndBishopWhiteMoveCore(
       && kingDistance(piece.square, blackKing.square) === 1
       && (!whiteKing || kingDistance(piece.square, whiteKing.square) !== 1)).length,
     get kingStepsTowardKnight() {
-      return move.piece === "k" && !!whiteKing && !!knight
-        && kingDistance(whiteKing.square, knight.square) < context.kingKnightDistance;
+      return move.piece === "k" && context.kingApproachTargets.includes(move.to);
     },
     kingKnightAdjacencyPenalty: knightKingDefended ? 0 : 1,
     kingKnightDistanceScore: whiteKing && knight ? kingDistance(whiteKing.square, knight.square) : 99,
@@ -433,7 +515,7 @@ function scoreKnightAndBishopWhiteMoveCore(
           && isKnightMove(knight.square, square)
           && (this.knightFlanksBlackKing ? clearsBlocker(square)
             : kingDistance(square, whiteKing.square) < Math.min(startingDistance, resultingDistance))
-          // Do not count an escape that r6 would outrank with double opposition.
+          // Do not count a double-opposition escape in this legacy drift check.
           && (this.knightFlanksBlackKing || !onwardOpposition.length || onwardOpposition.includes(square)
             || kingDistance(square, whiteKing.square) === 1)
           && (kingDistance(square, black) > 1 || kingDistance(square, whiteKing.square) === 1));
@@ -441,11 +523,24 @@ function scoreKnightAndBishopWhiteMoveCore(
       });
     },
     kingBlackDistanceSquared: whiteKing && blackKing ? squaredEuclideanDistance(whiteKing.square, blackKing.square) : 99,
+    bishopBlackDistanceSquared: bishop && blackKing ? squaredEuclideanDistance(bishop.square, blackKing.square) : 99,
+    knightBlackDistanceSquared: knight && blackKing ? squaredEuclideanDistance(knight.square, blackKing.square) : 99,
+    get knightDefensePenalty() {
+      if (context.declaredKnightDefenseMove === move.from + move.to) return -1;
+      if (knightKingDefended) return 0;
+      const knightAttackable = context.startsWithAttackableKnight;
+      const pieceAttackable = knightAttackable || context.startsWithAttackableBishop;
+      if (pieceAttackable && knightBishopStablyDefended()) return 1;
+      if (pieceAttackable && move.piece === "b" && knight
+        && stableBishopProtectedSquares(resultFen).some(target => isKnightMove(knight.square, target))) return 1;
+      if (pieceAttackable && move.piece === "n" && canBishopEstablishStableProtection(resultFen)) return 1;
+      return knightAttackable ? 4 : 3;
+    },
+    knightCentralProximityScore: knight ? knightAndBishopCenterProximityScore(knight.square) : 999,
     get knightStableBishopProtectionPenalty() { return knightBishopStablyDefended() ? 0 : 1; },
     get knightKingProtectionDistance() { return knightKingProtectionDistance(resultFen); },
     get knightKingProximityScore() {
-      return !knight || !whiteKing ? 99 : knightKingDefended ? 0
-        : squaredEuclideanDistance(knight.square, whiteKing.square);
+      return !knight || !whiteKing ? 99 : kingDistance(knight.square, whiteKing.square);
     },
     get minorCenterDistanceScore() {
       return [bishop, knight].reduce((sum, piece) => sum + (piece
@@ -638,67 +733,76 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       compare: (first, second) => first.stalemateScore - second.stalemateScore,
     },
     {
+      id: "r1",
+      shortLabel: "rule r1",
+      helpText: "Execute the mating net.",
+      compare: (first, second) => first.matingNetPenalty - second.matingNetPenalty,
+    },
+    {
+      id: "r2",
+      shortLabel: "rule r2",
+      helpText: "Lock the Black king into a 7-diagonal cage, then force Black into the mating net.",
+      compare: (first, second) => first.sevenCagePenalty - second.sevenCagePenalty,
+    },
+    {
+      id: "r3",
+      shortLabel: "rule r3",
+      helpText: "(temporary) Prefer king proximity, then bishop proximity, then knight proximity.",
+      compare: (first, second) => first.kingBlackDistanceSquared - second.kingBlackDistanceSquared
+        || first.bishopBlackDistanceSquared - second.bishopBlackDistanceSquared
+        || first.knightBlackDistanceSquared - second.knightBlackDistanceSquared,
+    },
+    {
       id: "r4",
       shortLabel: "rule r4",
-      helpText: "With a central king and central 16 knight, then prefer king protection of the knight, maneuver the knight to a central square opposite the bishop's color, then navigate to a central bishop and the king to a central square opposite the bishop's color.",
-      applies: score => score.startsWithCentralKingAndMiddle16Knight,
-      compare: (first, second) => first.centralSetupBoundaryPenalty - second.centralSetupBoundaryPenalty
+      helpText: "With a central king and central 16 knight, prefer king protection of the knight, maneuver the knight to a central square opposite the bishop's color, then navigate to a central bishop and the king to a central square opposite the bishop's color.",
+      applies: score => score.startsWithCentralKingAndMiddle16Knight || score.declaredCentralNavigationPenalty !== undefined
+        || score.protectedCentralManeuverPenalty !== undefined
+        || score.startsWithProtectedOppositeCentralKnight,
+      compare: (first, second) => (first.declaredCentralNavigationPenalty ?? 0) - (second.declaredCentralNavigationPenalty ?? 0)
+        || (first.protectedCentralManeuverPenalty ?? 0) - (second.protectedCentralManeuverPenalty ?? 0)
+        || first.centralSetupBoundaryPenalty - second.centralSetupBoundaryPenalty
         || first.kingKnightAdjacencyPenalty - second.kingKnightAdjacencyPenalty
         || first.knightOppositeCentralDistance - second.knightOppositeCentralDistance
+        || first.bishopKingCentralCompletionPenalty - second.bishopKingCentralCompletionPenalty
         || first.bishopKingCentralNavigationScore - second.bishopKingCentralNavigationScore,
+    },
+    {
+      id: "r4.1",
+      shortLabel: "rule r4.1",
+      helpText: "Escape rare degenerate positions.",
+      compare: (first, second) => first.rareEscapePenalty - second.rareEscapePenalty,
     },
     {
       id: "r4.5",
       shortLabel: "rule r4.5",
-      helpText: "Prefer an uncluttered bishop.",
-      compare: (first, second) => first.immobileBishopPenalty - second.immobileBishopPenalty
-        || first.bishopMoveNearNoncentralKingPenalty - second.bishopMoveNearNoncentralKingPenalty
-        || first.bishopWhiteKingDistanceScore - second.bishopWhiteKingDistanceScore,
-    },
-    {
-      id: "r5",
-      shortLabel: "rule r5",
-      helpText: "Play the r5 move.",
-      compare: (first, second) => first.declaredPreparationPenalty - second.declaredPreparationPenalty
-        || first.preparationBishopWaitDistance - second.preparationBishopWaitDistance,
-    },
-    {
-      id: "r5.5",
-      shortLabel: "rule r5.5",
-      helpText: "Prefer an attacked piece to be defended by the king.",
-      compare: (first, second) => first.attackedMinorWithoutKingDefensePenalty - second.attackedMinorWithoutKingDefensePenalty,
-    },
-    {
-      id: "r5.8",
-      shortLabel: "rule r5.8",
-      helpText: "Step the king towards the knight.",
+      helpText: "Step the king towards the knight without screening the bishop.",
       compare: (first, second) => Number(second.kingStepsTowardKnight) - Number(first.kingStepsTowardKnight),
+    },
+    {
+      id: "r4.6",
+      shortLabel: "rule r4.6",
+      helpText: "Prefer the king to defend the knight. Otherwise, drift a protective stable bishop when a piece is attackable.",
+      compare: (first, second) => first.knightDefensePenalty - second.knightDefensePenalty,
+    },
+    {
+      id: "r4.7",
+      shortLabel: "rule r4.7",
+      helpText: "Prefer knight proximity to the White king, then proximity to the center.",
+      compare: (first, second) => first.knightKingProximityScore - second.knightKingProximityScore
+        || first.knightCentralProximityScore - second.knightCentralProximityScore,
     },
     {
       id: "r6",
       shortLabel: "rule r6",
-      helpText: "Drift the knight towards king protection, then prefer knight central 16 proximity.",
-      compare: (first, second) => first.knightDriftRank - second.knightDriftRank
-        || (first.knightDriftQualifies && second.knightDriftQualifies
-          ? first.kingKnightAdjacencyPenalty - second.kingKnightAdjacencyPenalty
-            || Number(second.knightFlanksBlackKing) - Number(first.knightFlanksBlackKing)
-            || Number(second.knightDoubleOpposition) - Number(first.knightDoubleOpposition)
-            || (first.knightFlanksBlackKing && second.knightFlanksBlackKing ? 0
-              : first.knightWhiteSideOfBlackDistance - second.knightWhiteSideOfBlackDistance
-                || first.knightKingProximityScore - second.knightKingProximityScore)
-            || first.knightMiddle16ProximityScore - second.knightMiddle16ProximityScore : 0),
+      helpText: "When Black’s king prevents approach of the center, navigate the bishop to open a path.",
+      compare: (first, second) => first.bishopCentralPathDistance - second.bishopCentralPathDistance,
     },
     {
       id: "r7",
       shortLabel: "rule r7",
       helpText: "Prefer king central proximity.",
       compare: (first, second) => first.kingCenterEuclideanScore - second.kingCenterEuclideanScore,
-    },
-    {
-      id: "r8",
-      shortLabel: "rule r8",
-      helpText: "With the kings in opposition or a knight's move apart, and the black king more central than the white king, and the knight between the kings, use the bishop to control black's more central shuffling square.",
-      compare: (first, second) => first.bishopShuffleControlPenalty - second.bishopShuffleControlPenalty,
     },
     {
       id: "r20",
@@ -840,27 +944,57 @@ const bishopKnightHelp: RuleHelp = {
     "Stay away from White's king.",
     "Stay away from a bishop-colored corner.",
   ],
+  noteBoards: [{
+    id: "bishop-knight-rule-r1-net",
+    title: "rule r1 — Execute the mating net",
+    caption: "The declared line from Kc3, Ba2, Nc2 and Black Kd1 through Bf3#. Prefer the full destination positions, with later destinations taking priority. D4 rotations and reflections apply; move counters are ignored.",
+    animationSrc: "/mate/bishop-knight/r1-mating-net.gif",
+    animationAlt: "All 29 plies of the declared bishop-and-knight mating net, ending in Bf3 checkmate.",
+    pieces: [{square: "c3", piece: "K"}, {square: "a2", piece: "B"}, {square: "c2", piece: "N"}, {square: "d1", piece: "k"}],
+    highlights: [],
+  }, {
+    id: "bishop-knight-rule-r41-a",
+    title: "rule r4.1(a) — Bring the bishop beside the knight",
+    caption: "White’s edge king is edge-adjacent to its edge bishop. Black opposes the bishop inward from the edge. The knight is three diagonal steps away, on the side away from White’s king. Play Bc4, adjacent to Nd3. Rotations and reflections apply.",
+    pieces: [{square: "a7", piece: "K"}, {square: "a6", piece: "B"}, {square: "c6", piece: "k"}, {square: "d3", piece: "N"}],
+    highlights: [{square: "c4", kind: "key"}],
+    arrows: [{from: "a6", to: "c4"}],
+  }, {
+    id: "bishop-knight-rule-r41-b",
+    title: "rule r4.1(b) — Nf5",
+    caption: "With Ka1, Bb1 and Nd4, play Nf5 regardless of Black’s king position. Avoid recreating this White formation. Apply D4 rotations and reflections only; ignore move counters.",
+    pieces: [{square: "a1", piece: "K"}, {square: "b1", piece: "B"}, {square: "d4", piece: "N"}, {square: "c4", piece: "k"}],
+    highlights: [{square: "f5", kind: "key"}],
+    arrows: [{from: "d4", to: "f5"}],
+  }, {
+    id: "bishop-knight-rule-r41-c",
+    title: "rule r4.1(c) — Ke1",
+    caption: "Exact arrangement: Kf1, Bh1, Nf2 and Black Ke3. Play Ke1. Apply D4 rotations and reflections only; ignore move counters.",
+    pieces: [{square: "f1", piece: "K"}, {square: "h1", piece: "B"}, {square: "f2", piece: "N"}, {square: "e3", piece: "k"}],
+    highlights: [{square: "e1", kind: "key"}],
+    arrows: [{from: "f1", to: "e1"}],
+  }, {
+    id: "bishop-knight-rule-r41-d",
+    title: "rule r4.1(d) — Bc4",
+    caption: "Exact arrangement: Ke2, Bd3, Ne3 and Black Kd4. Play Bc4. Apply D4 rotations and reflections only; ignore move counters.",
+    pieces: [{square: "e2", piece: "K"}, {square: "d3", piece: "B"}, {square: "e3", piece: "N"}, {square: "d4", piece: "k"}],
+    highlights: [{square: "c4", kind: "key"}],
+    arrows: [{from: "d3", to: "c4"}],
+  }, {
+    id: "bishop-knight-rule-r6-step",
+    title: "rule r6 — Open a path",
+    caption: "Black blocks Kc4 while White keeps Nc3 protected. Be4+ puts the bishop on a diagonal controlling Black’s blocking square d3. Apply rotations and reflections; earlier priorities still apply.",
+    pieces: [{square: "b4", piece: "K"}, {square: "c3", piece: "N"}, {square: "d3", piece: "k"}, {square: "h1", piece: "B"}],
+    highlights: [{square: "c4", kind: "key"}],
+    arrows: [{from: "h1", to: "e4"}],
+  }],
   notes: [
-    "For r8, White’s king must be on files c–f and ranks 3–6 before moving. Evaluate the bishop and knight preferences after White moves. Precage squares require a central bishop and must lie strictly opposite Black across the bishop’s long diagonal. For a light-squared bishop, select the opposite-side pair from c4, d3, e6 and f5; include board symmetries. No targets exist when Black is on the long diagonal. Bishop adjacency is not required.",
-    "For r7, minimize White’s king step distance to the knight, then its Euclidean distance to the nearest of d4, e4, d5 or e5. For r20, identify unprotected minor pieces before White moves, then maximize their resulting Euclidean distance from Black’s king. Finally minimize the sum of both minor pieces’ resulting Euclidean distances to the board’s midpoint.",
-    "The target corner is the bishop-colored corner closest to Black's king.",
+    "For r4.6, the exact placement White Kb5, Ba6, Nb4 and Black Kb8 or Ka7 prefers Kc5, including rotations and reflections. This is a starting-position exception, not a general preference for advancing the defending king.",
+    "For r6, check whether Black blocks every more-central king step, retaining existing king protection of the knight. Route the bishop toward control of a same-color blocking or shuffling square. Use static bishop routes with occupied squares and safe landings; do not claim a forced advance against every reply. Once a central king step is available, r6 is inactive.",
+    "For r4.6, prefer king protection of the knight. Attackability is checked before White moves: a piece must not be king-defended, and Black must already attack it or have a legal move that attacks it. When either piece is attackable, existing or newly established stable bishop protection counts regardless of which piece moves. Either a bishop move preparing a knight jump or a knight move preparing a bishop move can set up stable protection next turn; setup and established protection are equally preferred. An initially attackable knight left without protection or a protection setup ranks below ordinary moves. Stable bishop protection includes squares adjacent to edge bishops and respects White king blockers. For r4.7, prefer knight king-step proximity to White’s king, then Euclidean proximity to the center, regardless of square color.",
+    "For r7, minimize White’s king Euclidean distance to the nearest of d4, e4, d5 or e5. For r20, identify unprotected minor pieces before White moves, then maximize their resulting Euclidean distance from Black’s king. Finally minimize the sum of both minor pieces’ resulting Euclidean distances to the board’s midpoint.",
     "Support has been reset. No position is supported until explicitly declared under the new rules; all earlier support declarations and r2.5 preferences have been discarded.",
   ],
-  noteBoards: [{
-    id: "bishop-knight-rule-r5-hop",
-    title: "rule r5 — Play the r5 move",
-    caption: "Ne1 clears the way for Kd2. The bishop may be elsewhere.",
-    pieces: [{square: "d1", piece: "K"}, {square: "c2", piece: "N"}, {square: "c3", piece: "k"}, {square: "a8", piece: "B"}],
-    highlights: [{square: "d2", kind: "key"}],
-    arrows: [{from: "c2", to: "e1"}, {from: "d1", to: "d2"}],
-  }, {
-    id: "bishop-knight-rule-r5-opposition",
-    title: "rule r5 — Check, then advance",
-    caption: "Nd1+ prepares Kd2. If Black blocks d2, wait with the bishop as far from Black as possible.",
-    pieces: [{square: "c1", piece: "K"}, {square: "b2", piece: "N"}, {square: "c3", piece: "k"}, {square: "e8", piece: "B"}],
-    highlights: [{square: "d2", kind: "key"}],
-    arrows: [{from: "b2", to: "d1"}, {from: "c1", to: "d2"}],
-  }],
 };
 
 function whiteLegalMoves(fen: string): readonly string[] {

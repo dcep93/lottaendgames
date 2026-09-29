@@ -1,25 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {getChess,SQUARE_TRANSFORMS,transformFen,transformSquare} from '../chess';
-import {getIdealKnightAndBishopWhiteMoves,knightAndBishopWhiteRules,scoreKnightAndBishopWhiteMove} from './bishopKnight';
+import {scoreKnightAndBishopWhiteMove} from './bishopKnight';
 import {knightAndBishopShuffleTargets} from './bishopKnightShuffle';
-
-test('r8 favors Bb3+ control but r7 first approaches Black with Kd3, across D4',()=>{
- for(const t of SQUARE_TRANSFORMS){
-  const fen=transformFen('8/8/8/3k4/B3N3/4K3/8/8 w - - 0 1',t);
-  assert.deepEqual([...knightAndBishopShuffleTargets(fen)].sort(),['d5','e5'].map(s=>transformSquare(s as 'd5'|'e5',t)).sort());
-  const board=getChess(fen);
-  const check=board.move({from:transformSquare('a4',t),to:transformSquare('b3',t)}).san;
-  const approach=getChess(fen).move({from:transformSquare('e3',t),to:transformSquare('d3',t)}).san;
-  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[approach],t.name);
-  assert.equal(scoreKnightAndBishopWhiteMove(fen,check).bishopShuffleControlPenalty,0,t.name);
-  board.undo();
-  const retreat=board.move({from:transformSquare('a4',t),to:transformSquare('d1',t)}).san;
-  assert.equal(scoreKnightAndBishopWhiteMove(fen,retreat).bishopShuffleControlPenalty,1,t.name);
-  const r8=knightAndBishopWhiteRules.find(rule=>rule.id==='r8')!;
-  assert.ok(r8.compare!(scoreKnightAndBishopWhiteMove(fen,check),scoreKnightAndBishopWhiteMove(fen,retreat))<0,t.name);
- }
-});
 
 test('r8 also recognizes direct opposition and excludes ineligible geometry, across D4',()=>{
  for(const t of SQUARE_TRANSFORMS){

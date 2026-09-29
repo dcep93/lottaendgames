@@ -725,7 +725,7 @@ test('Mate log exposes every training field and semantic cycle controls', () => 
   assert.match(
     markup,
     new RegExp(
-      `Training info</button></div><div class="leg-mate-starting-fen"><span class="leg-mate-starting-fen-label">Starting FEN</span><span aria-label="Starting position FEN">${ROOK_START}</span>`,
+      `Training info</button><button[^>]*>Copy PGN</button><span role="status"></span></div><div class="leg-mate-starting-fen"><span class="leg-mate-starting-fen-label">Starting FEN</span><span aria-label="Starting position FEN">${ROOK_START}</span>`,
     ),
   )
   assert.match(markup, />Rg2</)
@@ -3436,4 +3436,50 @@ test('Two Bishops restores the r5.5 force-corner rule and diagram', () => {
   const markup = renderToStaticMarkup(<MatePriorityGuideDialog {...MATE_TRAINING_INFO_PROPS} onClose={() => undefined} ruleSet={ruleSet} />)
   assert.match(markup, />rule r5<[^]*>rule r5\.5<[^]*>rule r6</)
   assert.match(markup, /rule r5\.5 — Force Black toward the corner/)
+})
+
+test('Mate log copies a replayable PGN with the starting FEN and current moves', async () => {
+  const { getChess } = await import('./chess')
+  const originalNavigator = Object.getOwnPropertyDescriptor(globalThis, 'navigator')
+  let copied = ''
+  Object.defineProperty(globalThis, 'navigator', {
+    configurable: true,
+    value: { clipboard: { writeText: async (text: string) => { copied = text } } },
+  })
+  const startingFen = '8/8/8/3BN1k1/3K4/8/8/8 w - - 10 6'
+  const board = getChess(startingFen)
+  const logs: MateLogEntry[] = []
+  for (const [san, opponentSan] of [['Be4', 'Kh4'], ['Nc4', 'Kg5']]) {
+    const fen = board.fen()
+    board.move(san!)
+    board.move(opponentSan!)
+    logs.push({ fen, san: san!, opponentSan, phase: '1/2', isCorrect: true,
+      correctChoices: 1, durationMs: 0, reasonId: 'r2' })
+  }
+  let renderer: ReactTestRenderer | undefined
+  try {
+    await act(async () => {
+      renderer = TestRenderer.create(<MateLog
+        fen={board.fen()} startingFen={startingFen} logs={logs}
+        mateMode="standard" ruleSet={getMateRuleSet('bishop-knight')}
+        onCycleIdealWhite={() => undefined} onCycleIdealBlack={() => undefined}
+        onCycleLegalBlack={() => undefined}
+      />)
+    })
+    await act(async () => {
+      renderer!.root.findByProps({ 'aria-label': 'Copy PGN to clipboard' }).props.onClick()
+    })
+    const replay = getChess()
+    replay.loadPgn(copied)
+    assert.deepEqual(copied.split('\n').filter((line) => line.startsWith('[')), [`[FEN "${startingFen}"]`])
+    assert.equal(replay.getHeaders().FEN, startingFen)
+    assert.equal(replay.fen(), board.fen())
+    assert.deepEqual(replay.history(), ['Be4', 'Kh4', 'Nc4', 'Kg5'])
+    assert.match(copied, /6\. Be4 Kh4 7\. Nc4 Kg5 \*/)
+    assert.equal(renderer!.root.findByProps({ role: 'status' }).children.join(''), 'PGN copied')
+  } finally {
+    await act(async () => renderer?.unmount())
+    if (originalNavigator) Object.defineProperty(globalThis, 'navigator', originalNavigator)
+    else Reflect.deleteProperty(globalThis, 'navigator')
+  }
 })

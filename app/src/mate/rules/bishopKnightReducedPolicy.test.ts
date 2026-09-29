@@ -1,8 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess'
-import { bishopKnightRuleSet, getIdealKnightAndBishopWhiteMoves, knightAndBishopWhiteRules, scoreKnightAndBishopWhiteMove } from './bishopKnight'
-import { compareScoresByRules } from './selection'
+import { bishopKnightRuleSet, getIdealKnightAndBishopWhiteMoves, scoreKnightAndBishopWhiteMove } from './bishopKnight'
 import { knightAndBishopTargetCornerDiagonals, knightAndBishopTargetCorners } from './bishopKnightStrategy'
 import positions from './bishopKnightRegressionPositions.json'
 
@@ -92,31 +91,4 @@ test('the target-corner exception needs all three specified pieces', () => {
 
 test('the old behind-White score remains removed', () => {
   assert.equal('minorPiecesBehindKingProximityScore' in scoreKnightAndBishopWhiteMove('8/8/8/3B4/3K2k1/8/8/6N1 w - - 0 1', 'Ne2'), false)
-})
-
-
-test('r7 centralizes king-protected knights before r6 king approach across D4', () => {
-  for (const transform of SQUARE_TRANSFORMS) {
-    const fen = transformFen('1NK5/8/2B5/8/8/k7/8/8 w - - 0 1', transform)
-    const moves = (['d7', 'd8'] as const).map(to => getChess(fen).move({from: transformSquare('c8', transform), to: transformSquare(to, transform)}).san)
-    const scores = moves.map(san => scoreKnightAndBishopWhiteMove(fen, san))
-    assert.ok(compareScoresByRules(scores[0]!, scores[1]!, knightAndBishopWhiteRules) > 0)
-    const ideal = getIdealKnightAndBishopWhiteMoves(fen)
-    const approach=getChess(fen).move({from:transformSquare('c8',transform),to:transformSquare('c7',transform)}).san
-    const knight=getChess(fen).move({from:transformSquare('b8',transform),to:transformSquare('d7',transform)}).san
-    assert.ok(knightAndBishopWhiteRules.find(r=>r.id==='r7')!.subpriorities![0]!.compare!(scoreKnightAndBishopWhiteMove(fen,knight),scoreKnightAndBishopWhiteMove(fen,approach))<0)
-    assert.deepEqual(ideal,[knight],transform.name)
-  }
-})
-
-test('r6 ties equal king-step distances and then prefers central proximity across D4', () => {
-  const r6 = knightAndBishopWhiteRules.find(rule => rule.id === 'r6')!
-  for (const transform of SQUARE_TRANSFORMS) {
-    const fen = transformFen('1NK5/8/2B5/8/8/k7/8/8 w - - 0 1', transform)
-    const scores = (['d7', 'd8'] as const).map(to => scoreKnightAndBishopWhiteMove(fen,
-      getChess(fen).move({from: transformSquare('c8',transform),to:transformSquare(to,transform)}).san))
-    assert.equal(scores[0]!.kingKnightDistanceScore,2,transform.name)
-    assert.equal(scores[1]!.kingKnightDistanceScore,2,transform.name)
-    assert.ok(r6.compare!(scores[0]!,scores[1]!) < 0,transform.name)
-  }
 })

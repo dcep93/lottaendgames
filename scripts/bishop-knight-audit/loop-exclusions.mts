@@ -1,6 +1,6 @@
-import {findPiece, getChess, kingDistance, squareCoordinates} from '../../app/src/mate/chess.ts';
+import {findPiece, getChess, kingDistance, squareCoordinates, squareColor} from '../../app/src/mate/chess.ts';
 
-export type LoopExclusion = 'central-bishop-adjacent-knight' | 'degenerate-a' | 'degenerate-b' | 'degenerate-c';
+export type LoopExclusion = 'degenerate-a' | 'degenerate-b' | 'degenerate-c';
 
 /** Reporting terminals only: these do not alter the production move policy. */
 export function loopExclusion(fen: string): LoopExclusion | null {
@@ -11,9 +11,6 @@ export function loopExclusion(fen: string): LoopExclusion | null {
   if (!wk || !bk || !b || !n) return null;
   const bc = squareCoordinates(b), nc = squareCoordinates(n);
   const dx = Math.abs(bc.file - nc.file), dy = Math.abs(bc.rank - nc.rank);
-  if ([3, 4].includes(bc.file) && [3, 4].includes(bc.rank) && dx === 1 && dy === 1) {
-    return 'central-bishop-adjacent-knight';
-  }
   if (kingDistance(bk, b) !== 1 || kingDistance(bk, n) !== 1) return null;
 
   // Include an existing defense as well as legal king moves that establish it.
@@ -43,4 +40,42 @@ export function loopExclusion(fen: string): LoopExclusion | null {
     && !knightRescues.some(m => kingSquares.some(k => kingDistance(k, m.to) === 1))) return 'degenerate-b';
   if (!kingSquares.some(k => defendsBishop(k) && defendsKnight(k))) return 'degenerate-c';
   return null;
+}
+
+/** Whether this individual position achieves all r4 objectives. */
+export function fullySatisfiesR4(fen: string): boolean {
+  const pieces = ['k', 'b', 'n'].map(type => findPiece(fen, 'w', type as 'k' | 'b' | 'n')?.square);
+  const [king, bishop, knight] = pieces;
+  return !!king && !!bishop && !!knight
+    && pieces.every(square => square && ['d4', 'e4', 'd5', 'e5'].includes(square))
+    && squareColor(king) !== squareColor(bishop)
+    && squareColor(knight) !== squareColor(bishop);
+}
+
+export function loopSearchExclusion(fen: string): LoopExclusion | null {
+  // Keep complete-r4 positions traversable: a cycle may leave the formation.
+  return loopExclusion(fen);
+}
+
+/** Defer only cycles whose every ply satisfies r4; full audits include them. */
+export function deferredCompleteR4Loop(positions: readonly string[]): boolean {
+  return positions.length > 0 && positions.every(fullySatisfiesR4);
+}
+
+/** Defer the four-ply knight-check cycle alternating opposition to N and K. */
+export function deferredKnightOppositionCycle(whitePositions: readonly string[], whiteMoves: readonly string[]): boolean {
+  if (whitePositions.length !== 2 || whiteMoves.length !== 2
+    || !whiteMoves.every(move => move.startsWith('N') && move.endsWith('+'))) return false;
+  const opposition = (a: Parameters<typeof squareCoordinates>[0], b: Parameters<typeof squareCoordinates>[0]) => {
+    const x = squareCoordinates(a);
+    const y = squareCoordinates(b);
+    return (x.file === y.file && Math.abs(x.rank - y.rank) === 2)
+      || (x.rank === y.rank && Math.abs(x.file - y.file) === 2);
+  };
+  const phases = whitePositions.map(fen => {
+    const king = findPiece(fen, 'w', 'k')?.square, knight = findPiece(fen, 'w', 'n')?.square;
+    const black = findPiece(fen, 'b', 'k')?.square;
+    return {king: !!king && !!black && opposition(king, black), knight: !!knight && !!black && opposition(knight, black)};
+  });
+  return (phases[0]!.king && phases[1]!.knight) || (phases[1]!.king && phases[0]!.knight);
 }

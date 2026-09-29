@@ -1,0 +1,1609 @@
+{
+  "hypothesis": {
+    "orthogonalAlternation": 1,
+    "diagonalAlternation": 1,
+    "eitherAlternation": 2,
+    "simultaneousOppositionAndAttackedKnight": 0
+  },
+  "hypothesisDefinition": "Opposition means kings two squares apart on the same rank or file; diagonal opposition is reported separately. The attack phase has Black adjacent to a knight not king-protected. Alternation tests both White-to-move phases. Full-audit exclusions are degenerates only.",
+  "totalLoopPositions": 200,
+  "physicalLoopPositions": 1600,
+  "fourPlyLoops": 186,
+  "cyclicComponents": 65,
+  "positionArchetypes": [
+    {
+      "motif": "King and knight adjacent on edge",
+      "positions": 7
+    },
+    {
+      "motif": "Three central White pieces, r4 complete",
+      "positions": 41
+    },
+    {
+      "motif": "King-protected central knight",
+      "positions": 31
+    },
+    {
+      "motif": "King and noncentral knight orthogonally adjacent",
+      "positions": 18
+    },
+    {
+      "motif": "King and noncentral knight diagonally adjacent",
+      "positions": 91
+    },
+    {
+      "motif": "King and knight separated",
+      "positions": 12
+    }
+  ],
+  "cycleArchetypes": [
+    {
+      "motif": "Bishop shuffle \u2014 King and knight both in middle 16",
+      "cycles": 112,
+      "positions": 67
+    },
+    {
+      "motif": "Bishop shuffle \u2014 Other king-protected knight",
+      "cycles": 36,
+      "positions": 72
+    },
+    {
+      "motif": "King shuffle \u2014 Other king-protected knight",
+      "cycles": 17,
+      "positions": 33
+    },
+    {
+      "motif": "Knight shuffle \u2014 Other king-protected knight",
+      "cycles": 9,
+      "positions": 17
+    },
+    {
+      "motif": "Knight shuffle \u2014 Other attacked-knight positions",
+      "cycles": 5,
+      "positions": 10
+    },
+    {
+      "motif": "King shuffle \u2014 King and knight both in middle 16",
+      "cycles": 5,
+      "positions": 6
+    },
+    {
+      "motif": "Knight shuffle \u2014 Black alternates opposition and attacking the knight",
+      "cycles": 1,
+      "positions": 2
+    },
+    {
+      "motif": "Knight shuffle \u2014 Black alternates diagonal opposition and attacking the knight",
+      "cycles": 1,
+      "positions": 2
+    }
+  ],
+  "centralWhitePieces": [
+    126,
+    5,
+    21,
+    48
+  ],
+  "anyWhiteCorner": 24,
+  "anyCorner": 27,
+  "perPieceCorner": [
+    6,
+    18,
+    0,
+    3
+  ],
+  "completeR4": 41,
+  "definition": "Positions are D4 post-White placements on cycles. Position categories are a disjoint priority partition. Four-ply cycles are D4 and phase deduplicated; categories require the named formation at every ply, followed by moving piece. Category position counts can overlap.",
+  "ordinaryFourPlyArchetypes": [
+    {
+      "motif": "Knight shuffle \u2014 Other king-protected knight",
+      "cycles": 2
+    }
+  ],
+  "source": "/Users/danielcepeda/repos/_codex_output/bn-full-adjacent-king-2026-09-28",
+  "filtered": "/Users/danielcepeda/repos/_codex_output/bn-full-adjacent-king-2026-09-28-filtered",
+  "policyFingerprint": "ee449f754d77b025bbeedd80669daadf27c99ded326bd818647cee865d96e020",
+  "positionsOnFourPlyLoops": 200,
+  "positionsOnLongerLoops": 49,
+  "positionsOnlyOnLongerLoops": 0,
+  "positionsOnBoth": 49,
+  "distinctLongerSimpleCycles": null,
+  "exclusion": "Degenerate A/B/C at every ply. Include completed r4, edge kings, central king/knight pairs, and all temporarily deferred motifs.",
+  "census": {
+    "phase": "complete",
+    "seconds": 883,
+    "rootOrbits": 1707888,
+    "physicalPlacements": 13660584,
+    "unsupported": 13660584,
+    "nodeCount": 1359344,
+    "expanded": 1359344,
+    "workers": 8
+  },
+  "centralAndCornerStats": {
+    "total": {
+      "positions": 200,
+      "centralWhitePieces": [
+        126,
+        5,
+        21,
+        48
+      ],
+      "middle16WhitePieces": [
+        72,
+        52,
+        7,
+        69
+      ],
+      "centralIncludingBlack": [
+        86,
+        44,
+        20,
+        50,
+        0
+      ],
+      "whiteCorner": 24,
+      "anyCorner": 27,
+      "perPieceCorner": [
+        6,
+        18,
+        0,
+        3
+      ]
+    },
+    "shortestFour": {
+      "positions": 200,
+      "centralWhitePieces": [
+        126,
+        5,
+        21,
+        48
+      ],
+      "middle16WhitePieces": [
+        72,
+        52,
+        7,
+        69
+      ],
+      "centralIncludingBlack": [
+        86,
+        44,
+        20,
+        50,
+        0
+      ],
+      "whiteCorner": 24,
+      "anyCorner": 27,
+      "perPieceCorner": [
+        6,
+        18,
+        0,
+        3
+      ]
+    },
+    "shortestLonger": {
+      "positions": 0,
+      "centralWhitePieces": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "middle16WhitePieces": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "centralIncludingBlack": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "whiteCorner": 0,
+      "anyCorner": 0,
+      "perPieceCorner": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "shortestHistogram": {
+      "4": 200
+    },
+    "shortestByPosition": [
+      [
+        4752,
+        4
+      ],
+      [
+        4754,
+        4
+      ],
+      [
+        4762,
+        4
+      ],
+      [
+        5841,
+        4
+      ],
+      [
+        4817,
+        4
+      ],
+      [
+        5906,
+        4
+      ],
+      [
+        271122,
+        4
+      ],
+      [
+        272211,
+        4
+      ],
+      [
+        524954,
+        4
+      ],
+      [
+        2359955,
+        4
+      ],
+      [
+        537427,
+        4
+      ],
+      [
+        538516,
+        4
+      ],
+      [
+        553553,
+        4
+      ],
+      [
+        754258,
+        4
+      ],
+      [
+        586321,
+        4
+      ],
+      [
+        758354,
+        4
+      ],
+      [
+        619089,
+        4
+      ],
+      [
+        762450,
+        4
+      ],
+      [
+        651857,
+        4
+      ],
+      [
+        766546,
+        4
+      ],
+      [
+        684625,
+        4
+      ],
+      [
+        770642,
+        4
+      ],
+      [
+        717393,
+        4
+      ],
+      [
+        774738,
+        4
+      ],
+      [
+        753874,
+        4
+      ],
+      [
+        754259,
+        4
+      ],
+      [
+        757970,
+        4
+      ],
+      [
+        758355,
+        4
+      ],
+      [
+        762066,
+        4
+      ],
+      [
+        762451,
+        4
+      ],
+      [
+        766162,
+        4
+      ],
+      [
+        766547,
+        4
+      ],
+      [
+        770258,
+        4
+      ],
+      [
+        770643,
+        4
+      ],
+      [
+        774354,
+        4
+      ],
+      [
+        774739,
+        4
+      ],
+      [
+        778450,
+        4
+      ],
+      [
+        778835,
+        4
+      ],
+      [
+        803732,
+        4
+      ],
+      [
+        804821,
+        4
+      ],
+      [
+        815762,
+        4
+      ],
+      [
+        1016467,
+        4
+      ],
+      [
+        848530,
+        4
+      ],
+      [
+        1020563,
+        4
+      ],
+      [
+        881298,
+        4
+      ],
+      [
+        1024659,
+        4
+      ],
+      [
+        914066,
+        4
+      ],
+      [
+        1028755,
+        4
+      ],
+      [
+        946834,
+        4
+      ],
+      [
+        1032851,
+        4
+      ],
+      [
+        979602,
+        4
+      ],
+      [
+        1036947,
+        4
+      ],
+      [
+        983699,
+        4
+      ],
+      [
+        1020562,
+        4
+      ],
+      [
+        987795,
+        4
+      ],
+      [
+        1016466,
+        4
+      ],
+      [
+        1012371,
+        4
+      ],
+      [
+        1041042,
+        4
+      ],
+      [
+        1016532,
+        4
+      ],
+      [
+        1045268,
+        4
+      ],
+      [
+        1016596,
+        4
+      ],
+      [
+        1045204,
+        4
+      ],
+      [
+        1020628,
+        4
+      ],
+      [
+        1041172,
+        4
+      ],
+      [
+        1020692,
+        4
+      ],
+      [
+        1041108,
+        4
+      ],
+      [
+        1024724,
+        4
+      ],
+      [
+        1037076,
+        4
+      ],
+      [
+        1024788,
+        4
+      ],
+      [
+        1037012,
+        4
+      ],
+      [
+        1028820,
+        4
+      ],
+      [
+        1032980,
+        4
+      ],
+      [
+        1028884,
+        4
+      ],
+      [
+        1032916,
+        4
+      ],
+      [
+        2884763,
+        4
+      ],
+      [
+        2921626,
+        4
+      ],
+      [
+        2884762,
+        4
+      ],
+      [
+        2921627,
+        4
+      ],
+      [
+        2892929,
+        4
+      ],
+      [
+        2892544,
+        4
+      ],
+      [
+        2892936,
+        4
+      ],
+      [
+        3114139,
+        4
+      ],
+      [
+        2913434,
+        4
+      ],
+      [
+        2913435,
+        4
+      ],
+      [
+        2942106,
+        4
+      ],
+      [
+        2917660,
+        4
+      ],
+      [
+        3138843,
+        4
+      ],
+      [
+        2946202,
+        4
+      ],
+      [
+        3118235,
+        4
+      ],
+      [
+        3118364,
+        4
+      ],
+      [
+        2946331,
+        4
+      ],
+      [
+        3138780,
+        4
+      ],
+      [
+        2950428,
+        4
+      ],
+      [
+        3134747,
+        4
+      ],
+      [
+        2962715,
+        4
+      ],
+      [
+        2962717,
+        4
+      ],
+      [
+        3036452,
+        4
+      ],
+      [
+        2966755,
+        4
+      ],
+      [
+        2978970,
+        4
+      ],
+      [
+        3122331,
+        4
+      ],
+      [
+        3122460,
+        4
+      ],
+      [
+        2979099,
+        4
+      ],
+      [
+        3134684,
+        4
+      ],
+      [
+        2983196,
+        4
+      ],
+      [
+        3130651,
+        4
+      ],
+      [
+        3011738,
+        4
+      ],
+      [
+        3126427,
+        4
+      ],
+      [
+        3126556,
+        4
+      ],
+      [
+        3011867,
+        4
+      ],
+      [
+        3130588,
+        4
+      ],
+      [
+        3015964,
+        4
+      ],
+      [
+        3126555,
+        4
+      ],
+      [
+        3044506,
+        4
+      ],
+      [
+        3130523,
+        4
+      ],
+      [
+        3130652,
+        4
+      ],
+      [
+        3044635,
+        4
+      ],
+      [
+        3126492,
+        4
+      ],
+      [
+        3048732,
+        4
+      ],
+      [
+        3122459,
+        4
+      ],
+      [
+        3134748,
+        4
+      ],
+      [
+        3077403,
+        4
+      ],
+      [
+        3122396,
+        4
+      ],
+      [
+        3077274,
+        4
+      ],
+      [
+        3134619,
+        4
+      ],
+      [
+        3110043,
+        4
+      ],
+      [
+        3138714,
+        4
+      ],
+      [
+        3118300,
+        4
+      ],
+      [
+        3138844,
+        4
+      ],
+      [
+        4798172,
+        4
+      ],
+      [
+        5093156,
+        4
+      ],
+      [
+        5121821,
+        4
+      ],
+      [
+        5064477,
+        4
+      ],
+      [
+        5093150,
+        4
+      ],
+      [
+        5093166,
+        4
+      ],
+      [
+        5097188,
+        4
+      ],
+      [
+        5125853,
+        4
+      ],
+      [
+        5093162,
+        4
+      ],
+      [
+        5093164,
+        4
+      ],
+      [
+        5097186,
+        4
+      ],
+      [
+        7161614,
+        4
+      ],
+      [
+        7161630,
+        4
+      ],
+      [
+        7161612,
+        4
+      ],
+      [
+        7235349,
+        4
+      ],
+      [
+        7124757,
+        4
+      ],
+      [
+        7153445,
+        4
+      ],
+      [
+        7153461,
+        4
+      ],
+      [
+        7125221,
+        4
+      ],
+      [
+        7153459,
+        4
+      ],
+      [
+        7194880,
+        4
+      ],
+      [
+        7194882,
+        4
+      ],
+      [
+        7194883,
+        4
+      ],
+      [
+        7194905,
+        4
+      ],
+      [
+        7194884,
+        4
+      ],
+      [
+        7194913,
+        4
+      ],
+      [
+        7194885,
+        4
+      ],
+      [
+        7194886,
+        4
+      ],
+      [
+        7194921,
+        4
+      ],
+      [
+        7194917,
+        4
+      ],
+      [
+        7194923,
+        4
+      ],
+      [
+        7194902,
+        4
+      ],
+      [
+        7194937,
+        4
+      ],
+      [
+        7194909,
+        4
+      ],
+      [
+        7194930,
+        4
+      ],
+      [
+        7194903,
+        4
+      ],
+      [
+        7194939,
+        4
+      ],
+      [
+        7194918,
+        4
+      ],
+      [
+        7194925,
+        4
+      ],
+      [
+        7194932,
+        4
+      ],
+      [
+        7194919,
+        4
+      ],
+      [
+        7194943,
+        4
+      ],
+      [
+        7194935,
+        4
+      ],
+      [
+        7194941,
+        4
+      ],
+      [
+        7194934,
+        4
+      ],
+      [
+        7194927,
+        4
+      ],
+      [
+        7194940,
+        4
+      ],
+      [
+        7194911,
+        4
+      ],
+      [
+        7194938,
+        4
+      ],
+      [
+        7194895,
+        4
+      ],
+      [
+        7194928,
+        4
+      ],
+      [
+        7194893,
+        4
+      ],
+      [
+        7194920,
+        4
+      ],
+      [
+        7194892,
+        4
+      ],
+      [
+        7194912,
+        4
+      ],
+      [
+        7194891,
+        4
+      ],
+      [
+        7194904,
+        4
+      ],
+      [
+        7194890,
+        4
+      ],
+      [
+        7194889,
+        4
+      ],
+      [
+        7194896,
+        4
+      ],
+      [
+        7194881,
+        4
+      ],
+      [
+        7227177,
+        4
+      ],
+      [
+        7227185,
+        4
+      ],
+      [
+        7227169,
+        4
+      ],
+      [
+        7227173,
+        4
+      ],
+      [
+        7227189,
+        4
+      ],
+      [
+        7227188,
+        4
+      ],
+      [
+        7227187,
+        4
+      ],
+      [
+        7198949,
+        4
+      ],
+      [
+        7198508,
+        4
+      ],
+      [
+        7198933,
+        4
+      ],
+      [
+        7198506,
+        4
+      ]
+    ]
+  },
+  "examples": [
+    {
+      "motif": "Bishop shuffle \u2014 King and knight both in middle 16",
+      "fen": "8/8/8/3k1B2/3N4/4K3/8/8 w - - 0 1",
+      "moves": [
+        "Be4+",
+        "Kc4",
+        "Bf5",
+        "Kd5"
+      ],
+      "area": 9,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/3k1B2/3N4/4K3/8/8_w_-_-_0_1&moves=Be4%2B,Kc4,Bf5,Kd5&cursor=0"
+    },
+    {
+      "motif": "Bishop shuffle \u2014 King and knight both in middle 16",
+      "fen": "8/8/8/3K4/1k1N4/8/4B3/8 w - - 0 1",
+      "moves": [
+        "Bc4",
+        "Kc3",
+        "Be2",
+        "Kb4"
+      ],
+      "area": 8,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/3K4/1k1N4/8/4B3/8_w_-_-_0_1&moves=Bc4,Kc3,Be2,Kb4&cursor=0"
+    },
+    {
+      "motif": "Bishop shuffle \u2014 King and knight both in middle 16",
+      "fen": "8/8/8/1B1K4/1k1N4/8/8/8 w - - 0 1",
+      "moves": [
+        "Bc4",
+        "Kc3",
+        "Bb5",
+        "Kb4"
+      ],
+      "area": 6,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/1B1K4/1k1N4/8/8/8_w_-_-_0_1&moves=Bc4,Kc3,Bb5,Kb4&cursor=0"
+    },
+    {
+      "motif": "Bishop shuffle \u2014 King and knight both in middle 16",
+      "fen": "8/8/3k4/8/3NK3/5B2/8/8 w - - 0 1",
+      "moves": [
+        "Bg4",
+        "Ke7",
+        "Bf3",
+        "Kd6"
+      ],
+      "area": 6,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/3k4/8/3NK3/5B2/8/8_w_-_-_0_1&moves=Bg4,Ke7,Bf3,Kd6&cursor=0"
+    },
+    {
+      "motif": "Bishop shuffle \u2014 King and knight both in middle 16",
+      "fen": "8/4k3/8/3K1B2/3N4/8/8/8 w - - 0 1",
+      "moves": [
+        "Be4",
+        "Kf6",
+        "Bf5",
+        "Ke7"
+      ],
+      "area": 6,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/4k3/8/3K1B2/3N4/8/8/8_w_-_-_0_1&moves=Be4,Kf6,Bf5,Ke7&cursor=0"
+    },
+    {
+      "motif": "Bishop shuffle \u2014 King and knight both in middle 16",
+      "fen": "8/8/8/3k4/3N4/2KB4/8/8 w - - 0 1",
+      "moves": [
+        "Bc4+",
+        "Ke4",
+        "Bd3+",
+        "Kd5"
+      ],
+      "area": 4,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/3k4/3N4/2KB4/8/8_w_-_-_0_1&moves=Bc4%2B,Ke4,Bd3%2B,Kd5&cursor=0"
+    },
+    {
+      "motif": "Bishop shuffle \u2014 King and knight both in middle 16",
+      "fen": "8/8/3k4/3B4/2KN4/8/8/8 w - - 0 1",
+      "moves": [
+        "Be4",
+        "Ke5",
+        "Bd5",
+        "Kd6"
+      ],
+      "area": 4,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/3k4/3B4/2KN4/8/8/8_w_-_-_0_1&moves=Be4,Ke5,Bd5,Kd6&cursor=0"
+    },
+    {
+      "motif": "Bishop shuffle \u2014 King and knight both in middle 16",
+      "fen": "8/8/8/8/2kNB3/4K3/8/8 w - - 0 1",
+      "moves": [
+        "Bd3+",
+        "Kd5",
+        "Be4+",
+        "Kc4"
+      ],
+      "area": 4,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/8/2kNB3/4K3/8/8_w_-_-_0_1&moves=Bd3%2B,Kd5,Be4%2B,Kc4&cursor=0"
+    },
+    {
+      "motif": "Bishop shuffle \u2014 King and knight both in middle 16",
+      "fen": "8/8/8/3K4/2BN4/2k5/8/8 w - - 0 1",
+      "moves": [
+        "Bb5",
+        "Kb2",
+        "Bc4",
+        "Kc3"
+      ],
+      "area": 4,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/3K4/2BN4/2k5/8/8_w_-_-_0_1&moves=Bb5,Kb2,Bc4,Kc3&cursor=0"
+    },
+    {
+      "motif": "Bishop shuffle \u2014 King and knight both in middle 16",
+      "fen": "8/8/8/2k5/3NK1B1/8/8/8 w - - 0 1",
+      "moves": [
+        "Bf3",
+        "Kd6",
+        "Bg4",
+        "Kc5"
+      ],
+      "area": 4,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/2k5/3NK1B1/8/8/8_w_-_-_0_1&moves=Bf3,Kd6,Bg4,Kc5&cursor=0"
+    },
+    {
+      "motif": "Bishop shuffle \u2014 Other king-protected knight",
+      "fen": "8/7B/8/8/8/2k5/2N5/3K4 w - - 0 1",
+      "moves": [
+        "Bg8",
+        "Kd3",
+        "Bh7+",
+        "Kc3"
+      ],
+      "area": 42,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/7B/8/8/8/2k5/2N5/3K4_w_-_-_0_1&moves=Bg8,Kd3,Bh7%2B,Kc3&cursor=0"
+    },
+    {
+      "motif": "Bishop shuffle \u2014 Other king-protected knight",
+      "fen": "8/1N6/K1k5/8/8/8/8/5B2 w - - 0 1",
+      "moves": [
+        "Bh3",
+        "Kc7",
+        "Bf1",
+        "Kc6"
+      ],
+      "area": 42,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/1N6/K1k5/8/8/8/8/5B2_w_-_-_0_1&moves=Bh3,Kc7,Bf1,Kc6&cursor=0"
+    },
+    {
+      "motif": "Bishop shuffle \u2014 Other king-protected knight",
+      "fen": "8/7B/8/8/2k5/2N5/3K4/8 w - - 0 1",
+      "moves": [
+        "Bg8+",
+        "Kd4",
+        "Bh7",
+        "Kc4"
+      ],
+      "area": 36,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/7B/8/8/2k5/2N5/3K4/8_w_-_-_0_1&moves=Bg8%2B,Kd4,Bh7,Kc4&cursor=0"
+    },
+    {
+      "motif": "Bishop shuffle \u2014 Other king-protected knight",
+      "fen": "8/8/1N6/K1k5/8/8/8/5B2 w - - 0 1",
+      "moves": [
+        "Bh3",
+        "Kc6",
+        "Bf1",
+        "Kc5"
+      ],
+      "area": 36,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/1N6/K1k5/8/8/8/5B2_w_-_-_0_1&moves=Bh3,Kc6,Bf1,Kc5&cursor=0"
+    },
+    {
+      "motif": "Bishop shuffle \u2014 Other king-protected knight",
+      "fen": "8/8/8/7B/8/2k5/1N6/2K5 w - - 0 1",
+      "moves": [
+        "Be8",
+        "Kb3",
+        "Bh5",
+        "Kc3"
+      ],
+      "area": 35,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/7B/8/2k5/1N6/2K5_w_-_-_0_1&moves=Be8,Kb3,Bh5,Kc3&cursor=0"
+    },
+    {
+      "motif": "Bishop shuffle \u2014 Other king-protected knight",
+      "fen": "B7/8/8/8/8/2k5/2N5/3K4 w - - 0 1",
+      "moves": [
+        "Bh1",
+        "Kd3",
+        "Ba8",
+        "Kc3"
+      ],
+      "area": 32,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=B7/8/8/8/8/2k5/2N5/3K4_w_-_-_0_1&moves=Bh1,Kd3,Ba8,Kc3&cursor=0"
+    },
+    {
+      "motif": "Bishop shuffle \u2014 Other king-protected knight",
+      "fen": "4B3/8/8/8/K1k5/1N6/8/8 w - - 0 1",
+      "moves": [
+        "Bh5",
+        "Kc3",
+        "Be8",
+        "Kc4"
+      ],
+      "area": 30,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=4B3/8/8/8/K1k5/1N6/8/8_w_-_-_0_1&moves=Bh5,Kc3,Be8,Kc4&cursor=0"
+    },
+    {
+      "motif": "Bishop shuffle \u2014 Other king-protected knight",
+      "fen": "8/3K4/2N5/3k4/8/7B/8/8 w - - 0 1",
+      "moves": [
+        "Bf1",
+        "Kc5",
+        "Bh3",
+        "Kd5"
+      ],
+      "area": 30,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/3K4/2N5/3k4/8/7B/8/8_w_-_-_0_1&moves=Bf1,Kc5,Bh3,Kd5&cursor=0"
+    },
+    {
+      "motif": "Bishop shuffle \u2014 Other king-protected knight",
+      "fen": "B7/8/8/8/2k5/2N5/3K4/8 w - - 0 1",
+      "moves": [
+        "Bh1",
+        "Kd4",
+        "Ba8",
+        "Kc4"
+      ],
+      "area": 28,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=B7/8/8/8/2k5/2N5/3K4/8_w_-_-_0_1&moves=Bh1,Kd4,Ba8,Kc4&cursor=0"
+    },
+    {
+      "motif": "Bishop shuffle \u2014 Other king-protected knight",
+      "fen": "8/7B/8/1K1k4/2N5/8/8/8 w - - 0 1",
+      "moves": [
+        "Bb1",
+        "Kd4",
+        "Bh7",
+        "Kd5"
+      ],
+      "area": 28,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/7B/8/1K1k4/2N5/8/8/8_w_-_-_0_1&moves=Bb1,Kd4,Bh7,Kd5&cursor=0"
+    },
+    {
+      "motif": "King shuffle \u2014 Other king-protected knight",
+      "fen": "8/8/8/K1k5/1N6/8/8/7B w - - 0 1",
+      "moves": [
+        "Ka4",
+        "Kc4",
+        "Ka5",
+        "Kc5"
+      ],
+      "area": 40,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/K1k5/1N6/8/8/7B_w_-_-_0_1&moves=Ka4,Kc4,Ka5,Kc5&cursor=0"
+    },
+    {
+      "motif": "King shuffle \u2014 Other king-protected knight",
+      "fen": "8/8/8/1N6/K1k5/8/8/7B w - - 0 1",
+      "moves": [
+        "Ka5",
+        "Kc5",
+        "Ka4",
+        "Kc4"
+      ],
+      "area": 40,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/1N6/K1k5/8/8/7B_w_-_-_0_1&moves=Ka5,Kc5,Ka4,Kc4&cursor=0"
+    },
+    {
+      "motif": "King shuffle \u2014 Other king-protected knight",
+      "fen": "8/7B/8/K1k5/1N6/8/8/8 w - - 0 1",
+      "moves": [
+        "Ka4",
+        "Kc4",
+        "Ka5",
+        "Kc5"
+      ],
+      "area": 32,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/7B/8/K1k5/1N6/8/8/8_w_-_-_0_1&moves=Ka4,Kc4,Ka5,Kc5&cursor=0"
+    },
+    {
+      "motif": "King shuffle \u2014 Other king-protected knight",
+      "fen": "8/7B/8/1N6/K1k5/8/8/8 w - - 0 1",
+      "moves": [
+        "Ka5",
+        "Kc5",
+        "Ka4",
+        "Kc4"
+      ],
+      "area": 32,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/7B/8/1N6/K1k5/8/8/8_w_-_-_0_1&moves=Ka5,Kc5,Ka4,Kc4&cursor=0"
+    },
+    {
+      "motif": "King shuffle \u2014 Other king-protected knight",
+      "fen": "6B1/8/8/8/3k4/3N4/3K4/8 w - - 0 1",
+      "moves": [
+        "Ke2",
+        "Ke4",
+        "Kd2",
+        "Kd4"
+      ],
+      "area": 28,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=6B1/8/8/8/3k4/3N4/3K4/8_w_-_-_0_1&moves=Ke2,Ke4,Kd2,Kd4&cursor=0"
+    },
+    {
+      "motif": "King shuffle \u2014 Other king-protected knight",
+      "fen": "6B1/8/8/8/3k4/4N3/3K4/8 w - - 0 1",
+      "moves": [
+        "Ke2",
+        "Ke4",
+        "Kd2",
+        "Kd4"
+      ],
+      "area": 28,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=6B1/8/8/8/3k4/4N3/3K4/8_w_-_-_0_1&moves=Ke2,Ke4,Kd2,Kd4&cursor=0"
+    },
+    {
+      "motif": "King shuffle \u2014 Other king-protected knight",
+      "fen": "8/8/8/K1k5/1N6/7B/8/8 w - - 0 1",
+      "moves": [
+        "Ka4",
+        "Kc4",
+        "Ka5",
+        "Kc5"
+      ],
+      "area": 24,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/K1k5/1N6/7B/8/8_w_-_-_0_1&moves=Ka4,Kc4,Ka5,Kc5&cursor=0"
+    },
+    {
+      "motif": "King shuffle \u2014 Other king-protected knight",
+      "fen": "8/8/8/1N6/K1k5/7B/8/8 w - - 0 1",
+      "moves": [
+        "Ka5",
+        "Kc5",
+        "Ka4",
+        "Kc4"
+      ],
+      "area": 24,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/1N6/K1k5/7B/8/8_w_-_-_0_1&moves=Ka5,Kc5,Ka4,Kc4&cursor=0"
+    },
+    {
+      "motif": "King shuffle \u2014 Other king-protected knight",
+      "fen": "2B5/8/8/8/3k4/4N3/3K4/8 w - - 0 1",
+      "moves": [
+        "Ke2",
+        "Ke4",
+        "Kd2",
+        "Kd4"
+      ],
+      "area": 21,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=2B5/8/8/8/3k4/4N3/3K4/8_w_-_-_0_1&moves=Ke2,Ke4,Kd2,Kd4&cursor=0"
+    },
+    {
+      "motif": "King shuffle \u2014 Other king-protected knight",
+      "fen": "8/8/8/1K1k4/2N5/7B/8/8 w - - 0 1",
+      "moves": [
+        "Kb4",
+        "Kd4",
+        "Kb5",
+        "Kd5"
+      ],
+      "area": 21,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/1K1k4/2N5/7B/8/8_w_-_-_0_1&moves=Kb4,Kd4,Kb5,Kd5&cursor=0"
+    },
+    {
+      "motif": "Knight shuffle \u2014 Other king-protected knight",
+      "fen": "6B1/8/8/8/8/2k5/1N6/2K5 w - - 0 1",
+      "moves": [
+        "Nd1+",
+        "Kd3",
+        "Nb2+",
+        "Kc3"
+      ],
+      "area": 48,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=6B1/8/8/8/8/2k5/1N6/2K5_w_-_-_0_1&moves=Nd1%2B,Kd3,Nb2%2B,Kc3&cursor=0"
+    },
+    {
+      "motif": "Knight shuffle \u2014 Other king-protected knight",
+      "fen": "8/1N6/K1k5/8/8/7B/8/8 w - - 0 1",
+      "moves": [
+        "Na5+",
+        "Kc5",
+        "Nb7+",
+        "Kc6"
+      ],
+      "area": 40,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/1N6/K1k5/8/8/7B/8/8_w_-_-_0_1&moves=Na5%2B,Kc5,Nb7%2B,Kc6&cursor=0"
+    },
+    {
+      "motif": "Knight shuffle \u2014 Other king-protected knight",
+      "fen": "4B3/8/8/8/8/2k5/1N6/2K5 w - - 0 1",
+      "moves": [
+        "Nd1+",
+        "Kd3",
+        "Nb2+",
+        "Kc3"
+      ],
+      "area": 32,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=4B3/8/8/8/8/2k5/1N6/2K5_w_-_-_0_1&moves=Nd1%2B,Kd3,Nb2%2B,Kc3&cursor=0"
+    },
+    {
+      "motif": "Knight shuffle \u2014 Other king-protected knight",
+      "fen": "8/8/8/8/N1k5/K7/8/7B w - - 0 1",
+      "moves": [
+        "Nb2+",
+        "Kc3",
+        "Na4+",
+        "Kc4"
+      ],
+      "area": 32,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/8/N1k5/K7/8/7B_w_-_-_0_1&moves=Nb2%2B,Kc3,Na4%2B,Kc4&cursor=0"
+    },
+    {
+      "motif": "Knight shuffle \u2014 Other king-protected knight",
+      "fen": "8/7B/K7/N1k5/8/8/8/8 w - - 0 1",
+      "moves": [
+        "Nb7+",
+        "Kc6",
+        "Na5+",
+        "Kc5"
+      ],
+      "area": 24,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/7B/K7/N1k5/8/8/8/8_w_-_-_0_1&moves=Nb7%2B,Kc6,Na5%2B,Kc5&cursor=0"
+    },
+    {
+      "motif": "Knight shuffle \u2014 Other king-protected knight",
+      "fen": "8/1N6/K1k5/7B/8/8/8/8 w - - 0 1",
+      "moves": [
+        "Na5+",
+        "Kc5",
+        "Nb7+",
+        "Kc6"
+      ],
+      "area": 24,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/1N6/K1k5/7B/8/8/8/8_w_-_-_0_1&moves=Na5%2B,Kc5,Nb7%2B,Kc6&cursor=0"
+    },
+    {
+      "motif": "Knight shuffle \u2014 Other king-protected knight",
+      "fen": "2B5/8/8/8/8/2k5/1N6/2K5 w - - 0 1",
+      "moves": [
+        "Nd1+",
+        "Kd3",
+        "Nb2+",
+        "Kc3"
+      ],
+      "area": 16,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=2B5/8/8/8/8/2k5/1N6/2K5_w_-_-_0_1&moves=Nd1%2B,Kd3,Nb2%2B,Kc3&cursor=0"
+    },
+    {
+      "motif": "Knight shuffle \u2014 Other king-protected knight",
+      "fen": "8/k7/B7/1K6/1N6/8/8/8 w - - 0 1",
+      "moves": [
+        "Nc6+",
+        "Ka8",
+        "Nb4",
+        "Ka7"
+      ],
+      "area": 6,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/k7/B7/1K6/1N6/8/8/8_w_-_-_0_1&moves=Nc6%2B,Ka8,Nb4,Ka7&cursor=0"
+    },
+    {
+      "motif": "Knight shuffle \u2014 Other king-protected knight",
+      "fen": "k1B5/3K4/2N5/8/8/8/8/8 w - - 0 1",
+      "moves": [
+        "Ne7",
+        "Ka7",
+        "Nc6+",
+        "Ka8"
+      ],
+      "area": 6,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=k1B5/3K4/2N5/8/8/8/8/8_w_-_-_0_1&moves=Ne7,Ka7,Nc6%2B,Ka8&cursor=0"
+    },
+    {
+      "motif": "Knight shuffle \u2014 Other attacked-knight positions",
+      "fen": "8/K7/B1k5/8/8/3N4/8/8 w - - 0 1",
+      "moves": [
+        "Nb4+",
+        "Kc5",
+        "Nd3+",
+        "Kc6"
+      ],
+      "area": 20,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/K7/B1k5/8/8/3N4/8/8_w_-_-_0_1&moves=Nb4%2B,Kc5,Nd3%2B,Kc6&cursor=0"
+    },
+    {
+      "motif": "Knight shuffle \u2014 Other attacked-knight positions",
+      "fen": "8/8/8/8/4N3/1k6/8/KB6 w - - 0 1",
+      "moves": [
+        "Nd2+",
+        "Kc3",
+        "Ne4+",
+        "Kb3"
+      ],
+      "area": 20,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/8/4N3/1k6/8/KB6_w_-_-_0_1&moves=Nd2%2B,Kc3,Ne4%2B,Kb3&cursor=0"
+    },
+    {
+      "motif": "Knight shuffle \u2014 Other attacked-knight positions",
+      "fen": "8/8/8/K7/B1k5/8/8/3N4 w - - 0 1",
+      "moves": [
+        "Nb2+",
+        "Kc3",
+        "Nd1+",
+        "Kc4"
+      ],
+      "area": 20,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/K7/B1k5/8/8/3N4_w_-_-_0_1&moves=Nb2%2B,Kc3,Nd1%2B,Kc4&cursor=0"
+    },
+    {
+      "motif": "Knight shuffle \u2014 Other attacked-knight positions",
+      "fen": "4BK2/8/4k3/1N6/8/8/8/8 w - - 0 1",
+      "moves": [
+        "Nc7+",
+        "Kd6",
+        "Nb5+",
+        "Ke6"
+      ],
+      "area": 20,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=4BK2/8/4k3/1N6/8/8/8/8_w_-_-_0_1&moves=Nc7%2B,Kd6,Nb5%2B,Ke6&cursor=0"
+    },
+    {
+      "motif": "Knight shuffle \u2014 Other attacked-knight positions",
+      "fen": "8/8/8/8/2kN4/8/8/KB6 w - - 0 1",
+      "moves": [
+        "Nc2",
+        "Kb3",
+        "Nd4+",
+        "Kc4"
+      ],
+      "area": 16,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/8/2kN4/8/8/KB6_w_-_-_0_1&moves=Nc2,Kb3,Nd4%2B,Kc4&cursor=0"
+    },
+    {
+      "motif": "King shuffle \u2014 King and knight both in middle 16",
+      "fen": "8/8/8/4k3/3NB3/4K3/8/8 w - - 0 1",
+      "moves": [
+        "Kd3",
+        "Kf6",
+        "Ke3",
+        "Ke5"
+      ],
+      "area": 4,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/4k3/3NB3/4K3/8/8_w_-_-_0_1&moves=Kd3,Kf6,Ke3,Ke5&cursor=0"
+    },
+    {
+      "motif": "King shuffle \u2014 King and knight both in middle 16",
+      "fen": "8/8/3k4/8/3NB3/3K4/8/8 w - - 0 1",
+      "moves": [
+        "Ke3",
+        "Ke5",
+        "Kd3",
+        "Kd6"
+      ],
+      "area": 4,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/3k4/8/3NB3/3K4/8/8_w_-_-_0_1&moves=Ke3,Ke5,Kd3,Kd6&cursor=0"
+    },
+    {
+      "motif": "Knight shuffle \u2014 Black alternates opposition and attacking the knight",
+      "fen": "8/8/8/8/3N4/k7/8/KB6 w - - 0 1",
+      "moves": [
+        "Nc2+",
+        "Kb3",
+        "Nd4+",
+        "Ka3"
+      ],
+      "area": 16,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/8/3N4/k7/8/KB6_w_-_-_0_1&moves=Nc2%2B,Kb3,Nd4%2B,Ka3&cursor=0"
+    },
+    {
+      "motif": "Knight shuffle \u2014 Black alternates diagonal opposition and attacking the knight",
+      "fen": "8/8/8/8/3N4/2k5/8/KB6 w - - 0 1",
+      "moves": [
+        "Nc2",
+        "Kb3",
+        "Nd4+",
+        "Kc3"
+      ],
+      "area": 16,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/8/3N4/2k5/8/KB6_w_-_-_0_1&moves=Nc2,Kb3,Nd4%2B,Kc3&cursor=0"
+    }
+  ],
+  "previousAuditComparison": {
+    "previousLoopPositions": 1998,
+    "removedLoopPositions": 1835,
+    "addedLoopPositions": 37,
+    "retainedLoopPositions": 163
+  },
+  "fourPlyComparison": {
+    "previous": 2551,
+    "retained": 141,
+    "removed": 2410,
+    "introduced": 45
+  }
+}

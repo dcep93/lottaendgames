@@ -1,0 +1,329 @@
+{
+  "totalLoopPositions": 6070,
+  "physicalLoopPositions": 48560,
+  "fourPlyLoops": 8637,
+  "cyclicComponents": 356,
+  "positionArchetypes": [
+    {
+      "motif": "King and knight adjacent on edge",
+      "positions": 876
+    },
+    {
+      "motif": "Three central White pieces, r4 complete",
+      "positions": 41
+    },
+    {
+      "motif": "King-protected central knight",
+      "positions": 40
+    },
+    {
+      "motif": "King and noncentral knight orthogonally adjacent",
+      "positions": 4713
+    },
+    {
+      "motif": "King and noncentral knight diagonally adjacent",
+      "positions": 15
+    },
+    {
+      "motif": "King and knight separated",
+      "positions": 385
+    }
+  ],
+  "cycleArchetypes": [
+    {
+      "motif": "Bishop shuffle \u2014 King and noncentral knight orthogonally adjacent",
+      "cycles": 4933,
+      "positions": 2644
+    },
+    {
+      "motif": "King shuffle \u2014 King and noncentral knight orthogonally adjacent",
+      "cycles": 1406,
+      "positions": 589
+    },
+    {
+      "motif": "King shuffle \u2014 King and knight adjacent on edge",
+      "cycles": 1060,
+      "positions": 420
+    },
+    {
+      "motif": "Bishop shuffle \u2014 King and knight adjacent on edge",
+      "cycles": 894,
+      "positions": 646
+    },
+    {
+      "motif": "Knight shuffle \u2014 Knight not always king-protected",
+      "cycles": 227,
+      "positions": 384
+    },
+    {
+      "motif": "Bishop shuffle \u2014 Three central White pieces, r4 complete",
+      "cycles": 84,
+      "positions": 41
+    },
+    {
+      "motif": "Bishop shuffle \u2014 King-protected central knight",
+      "cycles": 28,
+      "positions": 26
+    },
+    {
+      "motif": "King shuffle \u2014 King-protected central knight",
+      "cycles": 5,
+      "positions": 6
+    }
+  ],
+  "centralWhitePieces": [
+    5322,
+    669,
+    31,
+    48
+  ],
+  "anyWhiteCorner": 1375,
+  "anyCorner": 1643,
+  "perPieceCorner": [
+    116,
+    722,
+    632,
+    341
+  ],
+  "completeR4": 41,
+  "definition": "Positions are D4 post-White placements on cycles. Position categories are a disjoint priority partition. Four-ply cycles are D4 and phase deduplicated; categories require the named formation at every ply, followed by moving piece. Category position counts can overlap.",
+  "source": "/Users/danielcepeda/repos/_codex_output/bn-full-r47-king-first-2026-09-28",
+  "filtered": "/Users/danielcepeda/repos/_codex_output/bn-full-r47-king-first-2026-09-28-filtered",
+  "policyFingerprint": "1be6e02498f1731cb48970a51b501513c72c563147635c75f13c81058da7b1d2",
+  "positionsOnFourPlyLoops": 4190,
+  "positionsOnLongerLoops": 5258,
+  "positionsOnlyOnLongerLoops": 1880,
+  "positionsOnBoth": 3378,
+  "distinctLongerSimpleCycles": null,
+  "exclusion": "Degenerate A/B/C at every ply. Include completed r4 setups.",
+  "fourPlyExamples": [
+    {
+      "motif": "Bishop shuffle \u2014 King and noncentral knight orthogonally adjacent",
+      "fen": "B7/8/8/8/8/8/1k4K1/6N1 w - - 0 1",
+      "moves": [
+        "Bb7",
+        "Kc1",
+        "Ba8",
+        "Kb2"
+      ],
+      "area": 56,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=B7/8/8/8/8/8/1k4K1/6N1_w_-_-_0_1&moves=Bb7,Kc1,Ba8,Kb2&cursor=0"
+    },
+    {
+      "motif": "Bishop shuffle \u2014 King and noncentral knight orthogonally adjacent",
+      "fen": "6B1/8/8/8/1k6/8/KN6/8 w - - 0 1",
+      "moves": [
+        "Bh7",
+        "Kc3",
+        "Bg8",
+        "Kb4"
+      ],
+      "area": 49,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=6B1/8/8/8/1k6/8/KN6/8_w_-_-_0_1&moves=Bh7,Kc3,Bg8,Kb4&cursor=0"
+    },
+    {
+      "motif": "Bishop shuffle \u2014 King and noncentral knight orthogonally adjacent",
+      "fen": "8/7B/8/8/3k4/8/1K6/1N6 w - - 0 1",
+      "moves": [
+        "Bg8",
+        "Ke3",
+        "Bh7",
+        "Kd4"
+      ],
+      "area": 49,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/7B/8/8/3k4/8/1K6/1N6_w_-_-_0_1&moves=Bg8,Ke3,Bh7,Kd4&cursor=0"
+    },
+    {
+      "motif": "Bishop shuffle \u2014 King and noncentral knight orthogonally adjacent",
+      "fen": "8/1K6/1N6/2k5/8/8/8/7B w - - 0 1",
+      "moves": [
+        "Bg2",
+        "Kb5",
+        "Bh1",
+        "Kc5"
+      ],
+      "area": 49,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/1K6/1N6/2k5/8/8/8/7B_w_-_-_0_1&moves=Bg2,Kb5,Bh1,Kc5&cursor=0"
+    },
+    {
+      "motif": "Bishop shuffle \u2014 King and noncentral knight orthogonally adjacent",
+      "fen": "8/1N1k4/1K6/8/8/8/8/7B w - - 0 1",
+      "moves": [
+        "Bg2",
+        "Ke6",
+        "Bh1",
+        "Kd7"
+      ],
+      "area": 49,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/1N1k4/1K6/8/8/8/8/7B_w_-_-_0_1&moves=Bg2,Ke6,Bh1,Kd7&cursor=0"
+    },
+    {
+      "motif": "Bishop shuffle \u2014 King and noncentral knight orthogonally adjacent",
+      "fen": "6B1/8/8/8/8/2k5/1N6/1K6 w - - 0 1",
+      "moves": [
+        "Bh7",
+        "Kb3",
+        "Bg8+",
+        "Kc3"
+      ],
+      "area": 48,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=6B1/8/8/8/8/2k5/1N6/1K6_w_-_-_0_1&moves=Bh7,Kb3,Bg8%2B,Kc3&cursor=0"
+    },
+    {
+      "motif": "King shuffle \u2014 King and knight adjacent on edge",
+      "fen": "B6k/8/8/8/8/8/8/6KN w - - 0 1",
+      "moves": [
+        "Kh2",
+        "Kh7",
+        "Kg1",
+        "Kh8"
+      ],
+      "area": 64,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=B6k/8/8/8/8/8/8/6KN_w_-_-_0_1&moves=Kh2,Kh7,Kg1,Kh8&cursor=0"
+    },
+    {
+      "motif": "King shuffle \u2014 King and knight adjacent on edge",
+      "fen": "8/7B/8/3k4/8/8/8/NK6 w - - 0 1",
+      "moves": [
+        "Ka2",
+        "Kd4",
+        "Kb1",
+        "Kd5"
+      ],
+      "area": 56,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/7B/8/3k4/8/8/8/NK6_w_-_-_0_1&moves=Ka2,Kd4,Kb1,Kd5&cursor=0"
+    },
+    {
+      "motif": "Bishop shuffle \u2014 King and knight adjacent on edge",
+      "fen": "K7/N7/1k6/8/8/8/8/7B w - - 0 1",
+      "moves": [
+        "Bg2",
+        "Ka6",
+        "Bh1",
+        "Kb6"
+      ],
+      "area": 64,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=K7/N7/1k6/8/8/8/8/7B_w_-_-_0_1&moves=Bg2,Ka6,Bh1,Kb6&cursor=0"
+    },
+    {
+      "motif": "Bishop shuffle \u2014 King and knight adjacent on edge",
+      "fen": "N1k5/K7/8/8/8/8/8/7B w - - 0 1",
+      "moves": [
+        "Bg2",
+        "Kd7",
+        "Bh1",
+        "Kc8"
+      ],
+      "area": 64,
+      "url": "http://localhost:5173/mate/bishop-knight#fen=N1k5/K7/8/8/8/8/8/7B_w_-_-_0_1&moves=Bg2,Kd7,Bh1,Kc8&cursor=0"
+    }
+  ],
+  "protectedDistanceExperiment": {
+    "description": "Treat all king-protected knight positions as equal proximity under r4.7, then prefer knight central proximity. Read-only counterfactual: rechecks existing four-ply cycles only; does not detect newly created cycles.",
+    "positionsEvaluated": 2832,
+    "results": [
+      {
+        "motif": "Bishop shuffle \u2014 King and noncentral knight orthogonally adjacent",
+        "knownFourPlyLoops": 4933,
+        "brokenKnownLoops": 4933,
+        "retainedKnownLoops": 0
+      },
+      {
+        "motif": "King shuffle \u2014 King and noncentral knight orthogonally adjacent",
+        "knownFourPlyLoops": 1406,
+        "brokenKnownLoops": 1405,
+        "retainedKnownLoops": 1
+      },
+      {
+        "motif": "King shuffle \u2014 King and knight adjacent on edge",
+        "knownFourPlyLoops": 1060,
+        "brokenKnownLoops": 1060,
+        "retainedKnownLoops": 0
+      },
+      {
+        "motif": "Bishop shuffle \u2014 King and knight adjacent on edge",
+        "knownFourPlyLoops": 894,
+        "brokenKnownLoops": 894,
+        "retainedKnownLoops": 0
+      },
+      {
+        "motif": "Knight shuffle \u2014 Knight not always king-protected",
+        "knownFourPlyLoops": 227,
+        "brokenKnownLoops": 0,
+        "retainedKnownLoops": 227
+      },
+      {
+        "motif": "Bishop shuffle \u2014 Three central White pieces, r4 complete",
+        "knownFourPlyLoops": 84,
+        "brokenKnownLoops": 0,
+        "retainedKnownLoops": 84
+      },
+      {
+        "motif": "Bishop shuffle \u2014 King-protected central knight",
+        "knownFourPlyLoops": 28,
+        "brokenKnownLoops": 0,
+        "retainedKnownLoops": 28
+      },
+      {
+        "motif": "King shuffle \u2014 King-protected central knight",
+        "knownFourPlyLoops": 5,
+        "brokenKnownLoops": 0,
+        "retainedKnownLoops": 5
+      }
+    ]
+  },
+  "navigationOrderExperiment": {
+    "description": "At the last r4 navigation stage, prefer the king on the correct-color central square before bishop central proximity. Read-only counterfactual, known four-ply cycles only; does not detect newly created cycles.",
+    "positionsEvaluated": 4913,
+    "results": [
+      {
+        "motif": "Bishop shuffle \u2014 King and noncentral knight orthogonally adjacent",
+        "knownFourPlyLoops": 4933,
+        "brokenKnownLoops": 0,
+        "retainedKnownLoops": 4933
+      },
+      {
+        "motif": "King shuffle \u2014 King and noncentral knight orthogonally adjacent",
+        "knownFourPlyLoops": 1406,
+        "brokenKnownLoops": 0,
+        "retainedKnownLoops": 1406
+      },
+      {
+        "motif": "King shuffle \u2014 King and knight adjacent on edge",
+        "knownFourPlyLoops": 1060,
+        "brokenKnownLoops": 0,
+        "retainedKnownLoops": 1060
+      },
+      {
+        "motif": "Bishop shuffle \u2014 King and knight adjacent on edge",
+        "knownFourPlyLoops": 894,
+        "brokenKnownLoops": 0,
+        "retainedKnownLoops": 894
+      },
+      {
+        "motif": "Knight shuffle \u2014 Knight not always king-protected",
+        "knownFourPlyLoops": 227,
+        "brokenKnownLoops": 0,
+        "retainedKnownLoops": 227
+      },
+      {
+        "motif": "Bishop shuffle \u2014 Three central White pieces, r4 complete",
+        "knownFourPlyLoops": 84,
+        "brokenKnownLoops": 0,
+        "retainedKnownLoops": 84
+      },
+      {
+        "motif": "Bishop shuffle \u2014 King-protected central knight",
+        "knownFourPlyLoops": 28,
+        "brokenKnownLoops": 23,
+        "retainedKnownLoops": 5
+      },
+      {
+        "motif": "King shuffle \u2014 King-protected central knight",
+        "knownFourPlyLoops": 5,
+        "brokenKnownLoops": 5,
+        "retainedKnownLoops": 0
+      }
+    ]
+  }
+}

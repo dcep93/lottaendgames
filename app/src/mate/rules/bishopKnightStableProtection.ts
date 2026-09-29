@@ -1,8 +1,8 @@
 import type { Square } from 'chess.js'
-import { edgeDistance, findPiece, kingDistance, squareCoords, squareFromCoords } from '../chess'
+import { findPiece, getChess, squareColor, squareCoords, squareFromCoords } from '../chess'
 import { knightAndBishopKnightProximityToSquare } from './bishopKnightStrategy'
 
-/** Bishop-protected targets, except squares adjacent to an edge bishop.
+/** Bishop-protected targets, including squares adjacent to an edge bishop.
  * Preserve x-ray protection through Black's king. The knight's current square
  * does not block a ray used to plan where that knight should move.
  */
@@ -18,7 +18,6 @@ export function stableBishopProtectedSquares(fen: string): Square[] {
       const square = squareFromCoords(origin.file + df! * step, origin.rank + dr! * step)
       if (!square || square === whiteKing) break
       if (square === blackKing) continue
-      if (edgeDistance(bishop.square) === 0 && kingDistance(bishop.square, square) === 1) continue
       targets.push(square)
     }
   }
@@ -28,4 +27,20 @@ export function stableBishopProtectedSquares(fen: string): Square[] {
 export function stableBishopProtectionDistance(fen: string): number {
   const targets = stableBishopProtectedSquares(fen)
   return targets.length ? Math.min(...targets.map(square => knightAndBishopKnightProximityToSquare(fen, square))) : 99
+}
+
+/** A setup, not a forced line: the bishop can establish protection next move. */
+export function canBishopEstablishStableProtection(fen: string): boolean {
+  const bishop = findPiece(fen, 'w', 'b')?.square
+  const knight = findPiece(fen, 'w', 'n')?.square
+  if (!bishop || !knight || squareColor(bishop) !== squareColor(knight)) return false
+  const board = getChess(fen.replace(/ [wb] /, ' w '))
+  for (const move of board.moves({ square: bishop, verbose: true })) {
+    if (move.captured) continue
+    board.move(move)
+    const protectedKnight = stableBishopProtectedSquares(board.fen()).includes(knight)
+    board.undo()
+    if (protectedKnight) return true
+  }
+  return false
 }

@@ -116,11 +116,11 @@ test('r20 keeps initially undefended minors in the distance score even after gai
  }
 });
 
-test('r20 does not count an edge bishop protecting an adjacent knight as stable, across D4', () => {
+test('r20 counts an edge bishop protecting an adjacent knight as stable, across D4', () => {
  for (const t of SQUARE_TRANSFORMS) {
   const fen = transformFen('B7/1N6/8/8/4k3/8/8/7K w - - 0 1', t);
   const san = getChess(fen).move({from: transformSquare('h1', t), to: transformSquare('h2', t)}).san;
-  assert.equal(scoreKnightAndBishopWhiteMove(fen, san).unprotectedMinorCount, 2, t.name);
+  assert.equal(scoreKnightAndBishopWhiteMove(fen, san).unprotectedMinorCount, 1, t.name);
  }
 });
 

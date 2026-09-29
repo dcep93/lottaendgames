@@ -1,9 +1,11 @@
+import {isSevenCageTemporaryTerminal} from '../../app/src/mate/rules/bishopKnightSevenCage.ts';
 import { policyEdges } from './policy-edges.mts';
 import { includesRoot } from './population.mts';
+import { bishopKnightBlackReplies } from '../../app/src/mate/rules/bishopKnightReplies.ts';
 import { getChess } from '../../app/src/mate/chess.ts';
 import { getIdealKnightAndBishopWhiteMoves as white } from '../../app/src/mate/rules/bishopKnight.ts';
 import { knightAndBishopSupportedDiagonal as support } from '../../app/src/mate/rules/bishopKnightDiagonalSupport.ts';
-import { BASE, fen, code, canonical, sqIndex } from './encoding.mts';
+import { BASE, fen, code, canonical, sqIndex, unpack, pack, square } from './encoding.mts';
 type Branch = {
     post: number;
     legal: number[];
@@ -19,22 +21,20 @@ const continueSupport = process.env.AUDIT_SCOPE === 'supported' || process.env.A
 const policies = new Map<number, Policy>();
 const moveCode = (m: any) => sqIndex(m.from) * 64 + sqIndex(m.to);
 function root(key: number) {
-    const f = fen(key, 'b'), ch = getChess(f), legal = ch.moves({ verbose: true });
+    const pieces = unpack(key);
+    const f = fen(key, 'b'), ch = getChess(f), legal = bishopKnightBlackReplies(ch, square(pieces[3]!) as import('chess.js').Square);
     const supported = support(f, legal.map(m => m.to)).size;
     if (!includesRoot(supported, process.env.AUDIT_SCOPE ?? 'unsupported', Number(process.env.AUDIT_DIAGONAL ?? 0)))
         return { key, supported, flags: 0, children: [] };
     if (!legal.length)
         return { key, supported, flags: ch.isCheckmate() ? 2 : 4, children: [] };
-    const moves = legal.map(m => m.san);
     let flags = 0;
     const children: number[] = [];
-    for (const san of moves) {
-        const m = ch.move(san);
+    for (const m of legal) {
         if (m.captured)
             flags |= 4;
         else
-            children.push(canonical(code(ch.fen())));
-        ch.undo();
+            children.push(canonical(pack(pieces[0]!, pieces[1]!, pieces[2]!, sqIndex(m.to))));
     }
     return { key, supported, flags, children: [...new Set(children)] };
 }
@@ -44,6 +44,11 @@ function policy(k: number) {
         return found;
     const f = fen(k), ch = getChess(f);
     const out: Policy = { flags: 0, branches: [] };
+    if (process.env.AUDIT_R2_TERMINAL === '1' && isSevenCageTemporaryTerminal(f)) {
+        // Deliberately stopped traversal, not checkmate or a certified win.
+        policies.set(k, out);
+        return out;
+    }
     if (ch.isCheckmate())
         out.flags |= 2;
     else if (ch.isStalemate())
@@ -51,7 +56,7 @@ function policy(k: number) {
     else
         for (const san of white(f)) {
             const m = ch.move(san), post = code(ch.fen()), pf = ch.fen();
-            const legal = ch.moves({ verbose: true });
+            const legal = bishopKnightBlackReplies(ch, square(unpack(post)[3]!) as import('chess.js').Square);
             if (!legal.length) {
                 out.flags |= ch.isCheckmate() ? 2 : 4;
                 ch.undo();

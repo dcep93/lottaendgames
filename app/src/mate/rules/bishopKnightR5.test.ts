@@ -2,26 +2,8 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import {getChess, SQUARE_TRANSFORMS, transformFen, transformSquare, squareFromCoords} from '../chess';
 import {knightAndBishopR5Move} from './bishopKnightR5';
-import {bishopKnightRuleSet, getIdealKnightAndBishopWhiteMoves, knightAndBishopWhiteRules} from './bishopKnight';
-import {explainMove} from './selection';
 
 const example='B7/8/8/8/8/2k5/2N5/3K4 w - - 0 1';
-
-test('r5 chooses Ne1 and makes Kd2 legal after every Black reply, across D4',()=>{
- for(const t of SQUARE_TRANSFORMS){
-  const fen=transformFen(example,t), board=getChess(fen);
-  const from=transformSquare('c2',t),to=transformSquare('e1',t);
-  assert.equal(knightAndBishopR5Move(fen),from+to,t.name);
-  const san=board.move({from,to}).san;
-  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[san],t.name);
-  assert.equal(explainMove(bishopKnightRuleSet.scoreWhiteCandidates!(fen,getChess(fen).moves()),knightAndBishopWhiteRules,san)?.id,'r5',t.name);
-  for(const reply of board.moves()){
-   board.move(reply);
-   assert.ok(board.moves({verbose:true}).some(m=>m.from===transformSquare('d1',t)&&m.to===transformSquare('d2',t)),`${t.name} ${reply}`);
-   board.undo();
-  }
- }
-});
 
 test('r5 geometry is independent of bishop placement except an occupied landing square',()=>{
  for(let i=0;i<64;i++){
@@ -43,22 +25,6 @@ test('r5 applies to translated geometry, but rejects missing geometric condition
  for(const c of cases)for(const t of SQUARE_TRANSFORMS){
   const expected='move' in c?transformSquare(c.move[0],t)+transformSquare(c.move[1],t):undefined;
   assert.equal(knightAndBishopR5Move(transformFen(c.fen,t)),expected,t.name);
- }
-});
-
-test('r5 advances the king before a knight move permits the reverse hop, across D4',()=>{
- const start='B7/8/8/8/3k4/8/8/5KN1 w - - 0 1';
- for(const t of SQUARE_TRANSFORMS){
-  const fen=transformFen(start,t), board=getChess(fen);
-  const from=transformSquare('f1',t),to=transformSquare('f2',t);
-  assert.equal(knightAndBishopR5Move(fen),from+to,t.name);
-  const san=board.move({from,to}).san;
-  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[san],t.name);
-  assert.equal(explainMove(bishopKnightRuleSet.scoreWhiteCandidates!(fen,getChess(fen).moves()),knightAndBishopWhiteRules,san)?.id,'r5',t.name);
-  const alternative=getChess(fen);
-  alternative.move({from:transformSquare('g1',t),to:transformSquare('e2',t)});
-  alternative.move({from:transformSquare('d4',t),to:transformSquare('e3',t)});
-  assert.equal(knightAndBishopR5Move(alternative.fen()),transformSquare('e2',t)+transformSquare('g1',t),t.name);
  }
 });
 

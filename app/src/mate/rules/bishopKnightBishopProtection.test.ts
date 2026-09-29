@@ -43,11 +43,11 @@ test('stable bishop protection metric allows adjacent protection with retreat ro
 });
 
 
-test('stable bishop protection metric excludes edge-adjacent targets but allows distant defense across D4', () => {
+test('stable bishop protection metric includes edge-adjacent targets and distant defense across D4', () => {
   for (const t of SQUARE_TRANSFORMS) {
     for (const [source, penalty] of [
-      ['B7/1N6/8/8/7k/8/8/7K w - - 0 1', 2],
-      ['2B5/1N6/8/8/7k/8/8/7K w - - 0 1', 2],
+      ['B7/1N6/8/8/7k/8/8/7K w - - 0 1', 0],
+      ['2B5/1N6/8/8/7k/8/8/7K w - - 0 1', 0],
       ['B7/8/2N5/8/7k/8/8/7K w - - 0 1', 0],
       ['8/1B6/2N5/8/7k/8/8/7K w - - 0 1', 0],
     ] as const) {

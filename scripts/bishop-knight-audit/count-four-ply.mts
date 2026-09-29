@@ -4,16 +4,21 @@ import {currentPolicyFingerprints} from './current-policy-fingerprints.mts';
 import {readFileSync,writeFileSync} from 'node:fs';
 import {getChess} from '../../app/src/mate/chess.ts';
 import {getIdealKnightAndBishopWhiteMoves as preferred} from '../../app/src/mate/rules/bishopKnight.ts';
-import {loopExclusion} from './loop-exclusions.mts';
+import {cyclePositionExcluder} from './cycle-eligibility.mts';
 import {code,fen,transform,canonical} from './encoding.mts';
 const dir=process.argv[2]!;
 const result=JSON.parse(readFileSync(dir+'/result.json','utf8')),keys=new Set<number>(result.placements.boards.map((p:any)=>p.key));
 assert.ok((await currentPolicyFingerprints()).includes(result.policyFingerprint),'Source policy is stale: refresh the full graph first');
 assert.equal(createHash('sha256').update(readFileSync('scripts/bishop-knight-audit/loop-exclusions.mts')).digest('hex'),result.exclusionFingerprint,'Loop exclusions changed: refilter the full graph first');
 const memo=new Map<string,string[]>(),nextCache=new Map<number,any[]>();
-const terminal=(f:string)=>loopExclusion(f)!==null;
+const terminal=cyclePositionExcluder(dir);
+// A reply outside the complete source graph's cyclic White vertices cannot
+// close a cycle here. Its tablebase status need not have been probed.
+const probedWhiteKeys = result.tablebaseFilter === 'white-forced-win'
+  ? new Set(Object.keys(JSON.parse(readFileSync(dir+'/tablebase-probes.json','utf8')).results)
+    .map(Number).filter(k => k % 2 === 0).map(k => k / 2)) : undefined;
 function next(p:number){if(nextCache.has(p))return nextCache.get(p)!;const out:any[]=[],ch=getChess(fen(p,'b'));
- for(const bm of ch.moves({verbose:true})){if(bm.captured)continue;ch.move(bm);const f=ch.fen();if(!terminal(f)){const moves=memo.get(f)??[...preferred(f)];memo.set(f,moves);for(const wm of moves){ch.move(wm);const q=code(ch.fen());if(keys.has(canonical(q))&&!terminal(ch.fen()))out.push({key:q,white:code(f),moves:[bm.san,wm]});ch.undo();}}ch.undo();}nextCache.set(p,out);return out;}
+ for(const bm of ch.moves({verbose:true})){if(bm.captured)continue;ch.move(bm);const f=ch.fen();if((!probedWhiteKeys || probedWhiteKeys.has(canonical(code(f)))) && !terminal(f)){const moves=memo.get(f)??[...preferred(f)];memo.set(f,moves);for(const wm of moves){ch.move(wm);const q=code(ch.fen());if(keys.has(canonical(q))&&!terminal(ch.fen()))out.push({key:q,white:code(f),moves:[bm.san,wm]});ch.undo();}}ch.undo();}nextCache.set(p,out);return out;}
 const cycles=new Set<string>();
 for(const p of keys)for(const a of next(p))if(a.key!==p)for(const b of next(a.key))if(b.key===p){
  const frames=[p,a.white,a.key,b.white];

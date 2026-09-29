@@ -4,6 +4,7 @@ import MatePriorityGuideDialog from './MatePriorityGuide'
 import type { RegisteredMateRuleSet } from './rules'
 import type { MateLogEntry } from './session'
 import type { MateMode } from './types'
+import { copyMateShareText } from './workspaceSupport'
 
 export { default as MatePriorityGuideDialog } from './MatePriorityGuide'
 
@@ -88,6 +89,8 @@ export default function MateLog({
 }: MateLogProps) {
   const [showReasonHints, setShowReasonHints] = React.useState(false)
   const [guideOpen, setGuideOpen] = React.useState(false)
+  const [copyStatus, setCopyStatus] = React.useState('')
+  React.useEffect(() => setCopyStatus(''), [startingFen, logs])
   const [guideOpener, setGuideOpener] = React.useState<GuideOpener>(null)
   const [highlightedReasonId, setHighlightedReasonId] = React.useState<
     string | null
@@ -122,6 +125,25 @@ export default function MateLog({
     [],
   )
   const closeGuide = React.useCallback(() => setGuideOpen(false), [])
+  const copyPgn = async () => {
+    setCopyStatus('')
+    try {
+      const chess = getChess(startingFen)
+      for (const log of logs) {
+        chess.move(log.san)
+        if (log.opponentSan !== undefined) chess.move(log.opponentSan)
+      }
+      chess.setHeader('Result', chess.isCheckmate()
+        ? (chess.turn() === 'b' ? '1-0' : '0-1')
+        : chess.isDraw() ? '1/2-1/2' : '*')
+      const pgn = chess.pgn().split('\n')
+        .filter((line) => !line.startsWith('[') || line.startsWith('[FEN '))
+        .join('\n').trim()
+      setCopyStatus(await copyMateShareText(pgn) ? 'PGN copied' : 'Could not copy PGN')
+    } catch {
+      setCopyStatus('Could not copy PGN')
+    }
+  }
 
   return (
     <section aria-label="Mate move log" className="leg-mate-log">
@@ -146,6 +168,15 @@ export default function MateLog({
           >
             Training info
           </button>
+          <button
+            aria-label="Copy PGN to clipboard"
+            className="leg-mate-training-info-button"
+            onClick={() => void copyPgn()}
+            type="button"
+          >
+            Copy PGN
+          </button>
+          <span role="status">{copyStatus}</span>
         </div>
         <div className="leg-mate-starting-fen">
           <span className="leg-mate-starting-fen-label">Starting FEN</span>

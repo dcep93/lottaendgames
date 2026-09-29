@@ -1,13 +1,26 @@
-## Current reporting scope: terminals and degenerate positions
+## Current reporting scope: full audits and ordinary loop examples
 
-Stop at a central bishop (d4/e4/d5/e5) diagonally adjacent to the knight,
-regardless of production precage eligibility. Exclude degenerate A/B/C positions
-using `loop-exclusions.mts`: Black is adjacent to both minors and White lacks the
+The latest full-audit scope includes every r4-complete and degenerate pattern,
+except positions where Black can force a draw. After a fresh `--scope all` graph,
+run `winning-cycle-filter.mts SOURCE OUTPUT PYTHON SYZYGY_DIRECTORY`. It probes
+local KBNvK/KBvK/KNvK Syzygy WDL tables using `python-chess`, requires a forced
+White win at every ply, and recomputes cyclic components. It does not apply the
+geometric degenerate labels as exclusions. Counters are reset; repetition history
+is outside this placement audit. The older `precage-terminal.mts` filter remains
+available to reproduce historical audits, whose degenerate exclusions differed.
+
+Full audits include positions that fully satisfy r4. Ordinary loop examples defer a cycle
+only when r4 is complete at every ply (central White K/B/N, with king and knight
+opposite the bishop's color). Keep individual complete-r4 positions traversable;
+check this deferral after finding the whole cycle. Degenerate exclusions still
+apply at every ply. Earlier central-bishop /
+diagonally adjacent knight and temporary presentation filters are superseded.
+
+Degenerate A/B/C positions have Black adjacent to both minors without the
 specified king rescue. A is knight-defends-bishop; B is edge-bishop-defends-knight
 without a king rescue of the bishop or a legal knight rescue destination; C has
 no king move defending both minors. Existing king defenses count as rescues.
-These are reporting exclusions, not changes to move preferences or support.
-Check every ply of an example, including setups that enter a degenerate position.
+These reporting exclusions do not change production move preferences or support.
 
 The existing command name is retained for compatibility:
 
@@ -338,3 +351,13 @@ entire four-position cycle under D4 and choice of starting turn. It does not cou
 mere reachability or call every cyclic component a single simple loop. Reporting
 archetypes use bishop region, king protection of each minor, and bishop–knight
 adjacency, independent of production precage labels.
+
+### Temporary r2 continuation endpoint
+
+The current focus starts at this former endpoint and continues beyond it; leave
+`AUDIT_R2_TERMINAL` unset or `0`. To reproduce the older bounded search, set
+`AUDIT_R2_TERMINAL=1` to stop White-policy
+expansion at `8/8/8/8/8/2K5/B1N5/3k4 w - - 18 10` (all D4 symmetries,
+ignoring counters), after the declared 9...Kd1. This is a traversal boundary,
+not checkmate or a tablebase classification. Leave it unset for an unrestricted
+graph audit. Report explicitly whenever this temporary boundary is enabled.

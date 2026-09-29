@@ -4,15 +4,19 @@ import { SQUARE_TRANSFORMS, transformFen, transformSquare, getChess } from '../c
 import { getIdealKnightAndBishopWhiteMoves, scoreKnightAndBishopWhiteMove } from './bishopKnight'
 import { stableBishopProtectedSquares, stableBishopProtectionDistance } from './bishopKnightStableProtection'
 
-test('edge bishops exclude adjacent targets while retaining distant targets across D4', () => {
+test('edge bishops include adjacent and distant targets across D4', () => {
   for (const t of SQUARE_TRANSFORMS) {
     const f=transformFen('8/1K6/B7/8/8/4k3/8/4N3 w - - 0 1',t)
     const squares=stableBishopProtectedSquares(f)
-    assert.ok(!squares.includes(transformSquare('b5',t)))
+    assert.ok(squares.includes(transformSquare('b5',t)))
     assert.ok(squares.includes(transformSquare('d3',t)))
     assert.equal(stableBishopProtectionDistance(f),1)
     const ch=getChess(f);ch.move({from:transformSquare('e1',t),to:transformSquare('d3',t)})
     assert.equal(stableBishopProtectionDistance(ch.fen()),0)
+    for (const position of [
+      '8/4K3/8/1N6/B1k5/8/8/8 w - - 0 1',
+      'B7/1N6/8/4K3/8/8/7k/8 w - - 0 1',
+    ]) assert.equal(stableBishopProtectionDistance(transformFen(position,t)),0,t.name)
   }
 })
 
