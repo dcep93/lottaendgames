@@ -42,6 +42,10 @@ export function isMiddle16Square(square: Square): boolean {
   return file >= 2 && file <= 5 && rank >= 2 && rank <= 5
 }
 
+export function isBoardEdge(square: Square): boolean {
+  return square[0] === 'a' || square[0] === 'h' || square[1] === '1' || square[1] === '8'
+}
+
 /** Strictly inside the smaller corner triangle bounded by a full 3-, 5- or 7-diagonal. */
 export function isInsideBishopDiagonal(square: Square, diagonal: readonly Square[]): boolean {
   if (diagonal.length !== 3 && diagonal.length !== 5 && diagonal.length !== 7) return false

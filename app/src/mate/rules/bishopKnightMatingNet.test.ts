@@ -20,6 +20,42 @@ function r3Tiebreak(fen: string, historical: string): string {
  return historical;
 }
 
+test('r1 selects loaded seventh Bd5 by full destination across D4', () => {
+ const board=getChess('8/8/8/4N3/3KB3/8/5k2/8 w - - 0 1');
+ for(const san of 'Nc4 Kg3 Ke5 Kg4 Kf6 Kh4 Kf5 Kh5 Ne5 Kh6 Ng6 Kg7'.split(' ')) board.move(san);
+ for(const transform of SQUARE_TRANSFORMS){
+  const fen=transformFen(board.fen(),transform);
+  const move=getChess(fen).move({from:transformSquare('e4',transform),to:transformSquare('d5',transform)});
+  assert.deepEqual(matingNetMoves(fen),[move.from+move.to]);
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[move.san]);
+  assert.equal(scoreKnightAndBishopWhiteMove(fen,move.san).matingNetPenalty,0);
+ }
+});
+
+test('r1 selects loaded seventh Kf4 by full destination across D4', () => {
+ const board=getChess('8/8/8/4N3/3KB3/8/5k2/8 w - - 0 1');
+ for(const san of 'Nc4 Kg3 Ke5 Kg4 Kf6 Kh4 Kf5 Kh5 Ne5 Kh4 Ng4 Kh5'.split(' ')) board.move(san);
+ for(const transform of SQUARE_TRANSFORMS){
+  const fen=transformFen(board.fen(),transform);
+  const move=getChess(fen).move({from:transformSquare('f5',transform),to:transformSquare('f4',transform)});
+  assert.deepEqual(matingNetMoves(fen),[move.from+move.to]);
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[move.san]);
+  assert.equal(scoreKnightAndBishopWhiteMove(fen,move.san).matingNetPenalty,0);
+ }
+});
+
+test('r1 selects loaded eleventh Bd5 by full destination across D4', () => {
+ const board=getChess('8/8/8/4N3/3KB3/8/8/6k1 w - - 0 1');
+ for(const san of 'Nc4 Kf2 Ke5 Ke1 Kf4 Kd1 Ke3 Kc1 Bd3 Kd1 Na3 Kc1 Nc2 Kd1 Be4 Kc1 Kd3 Kb1 Kc3 Kc1'.split(' ')) board.move(san);
+ for(const transform of SQUARE_TRANSFORMS){
+  const fen=transformFen(board.fen(),transform);
+  const move=getChess(fen).move({from:transformSquare('e4',transform),to:transformSquare('d5',transform)});
+  assert.deepEqual(matingNetMoves(fen),[move.from+move.to]);
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[move.san]);
+  assert.equal(scoreKnightAndBishopWhiteMove(fen,move.san).matingNetPenalty,0);
+ }
+});
+
 test('r1 selects all 15 loaded White moves across D4 and finishes in checkmate',()=>{
  for(const transform of SQUARE_TRANSFORMS){
   const board=getChess(matingNetStart);

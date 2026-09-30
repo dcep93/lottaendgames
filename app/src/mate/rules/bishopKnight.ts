@@ -30,7 +30,7 @@ import {
   BLACK_CAPTURE_PRIORITY,
   BLACK_RETURN_PRIORITY,
 } from "./blackPriorities";
-import { bishopControlsOrOccupiesSquare, bishopLongDiagonalIntersection, centerDistance, isMiddle16Square } from "./bishopKnightGeometry";
+import { bishopControlsOrOccupiesSquare, bishopLongDiagonalIntersection, centerDistance, isMiddle16Square, isBoardEdge } from "./bishopKnightGeometry";
 import {
   getKnightAndBishopLookupWhiteMoves,
   getKnightAndBishopPhaseLabel,
@@ -57,6 +57,7 @@ import type {
 export type KnightAndBishopWhiteMoveScore = {
   readonly matingNetPenalty: number;
   readonly sevenCagePenalty: number;
+  readonly kingEdgePenalty: number;
   readonly rareEscapePenalty: number;
   readonly declaredCentralNavigationPenalty: number | undefined;
   readonly protectedCentralManeuverPenalty: number | undefined;
@@ -390,6 +391,7 @@ function scoreKnightAndBishopWhiteMoveCore(
   return {
     matingNetPenalty: context.matingNetMoves.length && !context.matingNetMoves.includes(move.from + move.to) ? 1 : 0,
     sevenCagePenalty: context.sevenCageMoves.length && !context.sevenCageMoves.includes(move.from + move.to) ? 1 : 0,
+    kingEdgePenalty: Number(move.piece === "k" && isBoardEdge(move.to)),
     get bishopShuffleControlPenalty() {
       return context.bishopShuffleTargets.length && !context.bishopShuffleTargets.some(target =>
         bishop && bishop.square !== target && bishopControlsOrOccupiesSquare(resultFen, bishop.square, target)) ? 1 : 0;
@@ -742,7 +744,8 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
       id: "r2",
       shortLabel: "rule r2",
       helpText: "Lock the Black king into a 7-diagonal cage, then force Black into the mating net.",
-      compare: (first, second) => first.sevenCagePenalty - second.sevenCagePenalty,
+      compare: (first, second) => first.sevenCagePenalty - second.sevenCagePenalty
+        || first.kingEdgePenalty - second.kingEdgePenalty,
     },
     {
       id: "r3",

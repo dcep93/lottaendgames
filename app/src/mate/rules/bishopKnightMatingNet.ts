@@ -1,3 +1,5 @@
+import {r2NetHandoffMoves} from './bishopKnightSevenCage';
+import {edgeMatingNetMoves} from './bishopKnightEdgeMatingNet';
 import {findPiece, getChess, SQUARE_TRANSFORMS, transformFen} from '../chess';
 import {matingNetLine, matingNetStart, matingNetBranchLine, matingNetBranchStart, matingNetBishopBranchLine, matingNetBishopBranchStart, matingNetKh2BranchLine, matingNetKf2BranchLine, matingNetKf1PartialLine, matingNetKg1BranchLine, matingNetCorrectedBishopLine} from './bishopKnightMatingNetLine';
 
@@ -87,6 +89,10 @@ destinations.push(...destinationVariants('8/8/8/8/5N2/3B2K1/8/6k1 b - - 25 13', 
 destinations.push(...destinationVariants('8/8/8/5B2/8/5K2/4N2k/8 b - - 3 2', 16));
 destinations.push(...destinationVariants('8/8/8/5B2/5N2/5K2/8/7k b - - 5 3', 18));
 destinations.push(...destinationVariants('8/8/8/8/5N2/3B1K2/7k/8 b - - 7 4', 20));
+// Loaded 7.Kf4: match the full arrival before Black replies ...Kh4.
+destinations.push(...destinationVariants('8/8/8/7k/4BKN1/8/8/8 b - - 13 7', 0));
+// Loaded 7.Bd5, before Black's ...Kh6, independent of the arriving piece.
+destinations.push(...destinationVariants('8/6k1/6N1/3B1K2/8/8/8/8 b - - 13 7', 0));
 const progressByFen = new Map<string, number>();
 for (const {fenKey, progress} of destinations) progressByFen.set(fenKey, Math.max(progress, progressByFen.get(fenKey) ?? -1));
 
@@ -94,7 +100,7 @@ for (const {fenKey, progress} of destinations) progressByFen.set(fenKey, Math.ma
 for (const {fenKey} of destinationVariants('8/8/8/8/2B2N2/5K2/8/6k1 b - - 0 1', 17)) progressByFen.set(fenKey, 17);
 
 /** Prefer the furthest legal destination in the declared net, under D4. */
-export function matingNetMoves(fen: string): readonly string[] {
+function declaredMatingNetMoves(fen: string): readonly string[] {
   if (fen.split(' ')[1] !== 'w') return [];
   const white = [findPiece(fen, 'w', 'k'), findPiece(fen, 'w', 'b'), findPiece(fen, 'w', 'n')];
   const black = findPiece(fen, 'b', 'k')?.square;
@@ -114,4 +120,12 @@ export function matingNetMoves(fen: string): readonly string[] {
     .filter(move => move.progress > -1);
   const best = Math.max(-1, ...arrivals.map(move => move.progress));
   return arrivals.filter(move => move.progress === best).map(move => move.uci);
+}
+
+
+/** Keep established net destinations first, then the newer edge-pattern preferences. */
+export function matingNetMoves(fen: string): readonly string[] {
+  const declared = declaredMatingNetMoves(fen);
+  if (declared.length) return declared;
+  return r2NetHandoffMoves(fen).length ? [] : edgeMatingNetMoves(fen);
 }

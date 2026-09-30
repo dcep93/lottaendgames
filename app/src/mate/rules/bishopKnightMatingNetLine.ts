@@ -1,4 +1,7 @@
-/** User-declared mating net; shared by the policy, guide animation and tests. */
+/** Current user-declared r1 entry position, for loading and focused searches. */
+export const r1Start = '8/8/8/8/8/2K5/B1N5/2k5 w - - 6 4';
+
+/** Historical demonstration start; retained to replay the declared lines below. */
 export const matingNetStart = '8/8/8/8/8/2K5/B1N5/3k4 w - - 6 4';
 export const matingNetLine = [
   'Nd4', 'Kc1', 'Ne2+', 'Kd1', 'Kd3', 'Ke1', 'Ke3', 'Kd1',
