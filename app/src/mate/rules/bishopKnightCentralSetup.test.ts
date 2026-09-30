@@ -48,10 +48,10 @@ test('r4 completes the king destination before the bishop destination, across D4
  }
 });
 
-test('r4 uses its central setup gate or a protected route into the center, across D4',()=>{
+test('r4 requires central king placement before routing an uncentralized knight, across D4',()=>{
  for(const t of SQUARE_TRANSFORMS)for(const [start,enabled] of [
   ['B7/8/8/k7/3K4/5N2/8/8 w - - 0 1',true],
-  ['B7/8/8/k7/5K2/5N2/8/8 w - - 0 1',true], // Protected route from f3 to e5.
+  ['B7/8/8/k7/5K2/5N2/8/8 w - - 0 1',false], // Kf4 must centralize before routing Nf3.
   ['B7/8/8/k7/6K1/5N2/8/8 w - - 0 1',false],
   ['B7/8/8/k7/3K4/8/5N2/8 w - - 0 1',false],
   ['B7/8/k7/8/3K4/5N2/8/8 w - - 0 1',true], // Bishop proximity does not gate r4.
@@ -350,19 +350,11 @@ test('r4 recognizes declared destination diagrams from every legal White source,
   assert.ok(incoming > 20);
 });
 
-test('r4 follows the protected Nd2-f3-d4 maneuver including its outside-16 step, across D4', () => {
+test('r4 waits for a central-four king before the protected knight maneuver, across D4', () => {
   for (const transform of SQUARE_TRANSFORMS) {
-    const board = getChess(transformFen('8/8/8/8/2k1N3/4K3/8/7B w - - 0 1', transform));
-    const line = [['e4', 'd2', 'c4', 'c3'], ['d2', 'f3', 'c3', 'c2'], ['f3', 'd4', 'c2', 'd1']] as const;
-    for (const [from, to, blackFrom, blackTo] of line) {
-      const fen = board.fen();
-      const white = board.move({from: transformSquare(from, transform), to: transformSquare(to, transform)}).san;
-      const score = scoreKnightAndBishopWhiteMove(fen, white);
-      assert.equal(score.protectedCentralManeuverPenalty, 0, `${transform.name} ${white}`);
-      assert.equal(score.kingKnightAdjacencyPenalty, 0);
-      assert.ok(getIdealKnightAndBishopWhiteMoves(fen).includes(white), `${transform.name} ${white}`);
-      board.move({from: transformSquare(blackFrom, transform), to: transformSquare(blackTo, transform)});
-    }
+    const fen = transformFen('8/8/8/8/2k1N3/4K3/8/7B w - - 0 1', transform);
+    const move = getChess(fen).move({from: transformSquare('e4', transform), to: transformSquare('d2', transform)}).san;
+    assert.equal(scoreKnightAndBishopWhiteMove(fen, move).protectedCentralManeuverPenalty, undefined);
   }
 });
 
@@ -395,8 +387,8 @@ test('r4 waits for the protected opposite-color central knight before bishop nav
    }
   }
   const fen=transformFen('6B1/8/3k4/8/8/4K3/5N2/8 w - - 2 2',t);
-  const move=getChess(fen).move({from:transformSquare('f2',t),to:transformSquare('d3',t)}).san;
-  assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen),[move],t.name);
+  for (const move of getChess(fen).moves())
+    assert.equal(scoreKnightAndBishopWhiteMove(fen,move).protectedCentralManeuverPenalty,undefined,t.name);
  }
 });
 

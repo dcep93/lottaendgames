@@ -1,16 +1,16 @@
 import type {Square} from 'chess.js';
 import {allSquares, findPiece, isKnightMove, kingDistance, squareColor} from '../chess';
-import {isMiddle16Square} from './bishopKnightGeometry';
+import {centerDistance, isMiddle16Square} from './bishopKnightGeometry';
 
-/** A shortest knight route around its stationary protecting king (at most eight squares). */
+/** Route around a central-four king, keeping every knight landing in the central 16. */
 export function protectedCentralManeuverTargets(fen: string): readonly Square[] {
   const king = findPiece(fen, 'w', 'k')?.square;
   const knight = findPiece(fen, 'w', 'n')?.square;
   const bishop = findPiece(fen, 'w', 'b')?.square;
   const black = findPiece(fen, 'b', 'k')?.square;
-  if (!king || !knight || !bishop || !isMiddle16Square(king) || kingDistance(king, knight) !== 1) return [];
-  // An outside knight can be an intermediate step of this same protected route.
-  const squares = allSquares().filter(square => kingDistance(king, square) === 1 && square !== bishop && square !== black);
+  if (!king || !knight || !bishop || centerDistance(king) !== 0 || kingDistance(king, knight) !== 1) return [];
+  const squares = allSquares().filter(square => isMiddle16Square(square)
+    && kingDistance(king, square) === 1 && square !== bishop && square !== black);
   const goals = squares.filter(square => ['d4', 'e4', 'd5', 'e5'].includes(square)
     && squareColor(square) !== squareColor(bishop));
   const distance = new Map<Square, number>(goals.map(square => [square, 0]));

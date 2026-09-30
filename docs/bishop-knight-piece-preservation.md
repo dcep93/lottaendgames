@@ -6,18 +6,18 @@ Use an exact White-to-move source lookup at ordinary priority r4.2, between r4.1
 
 The baseline audit found 9,252 canonical winning positions (74,016 physical orientations) with at least one immediately drawing recommendation. For each source, choose a tablebase-winning candidate that survives earlier priorities, then use the existing remaining preferences. Break any final tie by SAN in the canonical orientation. Each row stores a 24-bit K/B/N/k placement and a 12-bit from/to move. Lookup results are scored through the ordinary selector; they do not bypass it or change attribution.
 
-## Priority conflicts awaiting a separate decision
+## Original priority conflicts, now resolved
 
-Four canonical sources already have a losing move forced by r4. Their winning lookup entries are present, but r4.2 cannot override r4. They account for 32 physical positions. No special priority exception is introduced.
+The original lookup implementation left four canonical sources (32 physical orientations) with a losing move forced by the protected r4 maneuver. The maneuver is now restricted to a king on d4, e4, d5, or e5, with every knight landing inside c3–f6. It no longer activates at these noncentral-king sources; the existing r4.2 lookup selects the winning king move at normal priority. No special priority exception or per-position r4 override is introduced.
 
-| Source FEN | Existing r4 choice | Stored winning move |
+| Source FEN | Former losing r4 choice | Current winning move |
 | --- | --- | --- |
 | `8/8/8/8/2N5/2K5/8/1k1B4 w - - 0 1` | Nd2+ | Kd4 |
 | `8/8/8/8/8/k2KN3/8/1B6 w - - 0 1` | Nc2+ | Kd4 |
 | `8/8/8/8/8/1k1KN3/8/1B6 w - - 0 1` | Nc2 | Kd4 |
 | `8/8/8/8/3N4/3K4/8/2k1B3 w - - 0 1` | Ne2+ | Ke4 |
 
-Thus ordinary r4.2 can repair 9,248 canonical sources / 73,984 physical positions. The four r4 sources need their own correction if authorized; they are not silently promoted into r4.2.
+All 9,252 lookup sources now select their stored winning move; all 74,016 transformed lookups pass. The four reported starts have no cycles, captures, or stalemates across every recommended White move and every legal Black reply (233 D4 position classes, 43 certified-stage boundaries). A broader exhaustive check of 23,340 winning D4 starts where the old maneuver activated with a noncentral king traversed 35,578 classes and found no cycles, captures, or stalemates before entering the certified stages. Clocks were ignored. See [the central-four routing audit](audits/2026-09-30-central-four-routing.json).
 
 ## Generation and evidence
 

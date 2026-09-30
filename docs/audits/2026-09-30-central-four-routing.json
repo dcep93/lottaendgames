@@ -1,0 +1,63 @@
+{
+  "change": "Protected knight routing requires a central-four king and keeps all landings in the central 16. Noncentral kings use existing supporting rules; priority order is unchanged.",
+  "fourReportedStarts": {
+    "scope": "All selected White ties and legal Black replies from four former r4 conflict starts; certified stage graph is a terminating boundary; clocks ignored",
+    "starts": [
+      {
+        "fen": "8/8/8/8/2N5/2K5/8/1k1B4 w - - 0 1",
+        "moves": [
+          "Kd4"
+        ],
+        "key": 4732545
+      },
+      {
+        "fen": "8/8/8/8/8/k2KN3/8/1B6 w - - 0 1",
+        "moves": [
+          "Kd4"
+        ],
+        "key": 4986128
+      },
+      {
+        "fen": "8/8/8/8/8/1k1KN3/8/1B6 w - - 0 1",
+        "moves": [
+          "Kd4"
+        ],
+        "key": 4986129
+      },
+      {
+        "fen": "8/8/8/8/4N3/4K3/8/3B1k2 w - - 0 1",
+        "moves": [
+          "Kd4"
+        ],
+        "key": 4998850
+      }
+    ],
+    "nodes": 233,
+    "stageBoundaries": 43,
+    "losses": [],
+    "cycleFound": false
+  },
+  "affectedWinningStartAudit": {
+    "scope": "Winning D4-reduced starts where the old protected maneuver activated with a noncentral king; first-loop search, all choices and Black replies; certified stages terminal; clocks ignored",
+    "affectedWinningRoots": 23340,
+    "checkedRoots": 23340,
+    "complete": true,
+    "nodes": 35578,
+    "stageBoundaries": 455,
+    "losses": [],
+    "cycleFound": false
+  },
+  "piecePreservationLookup": {
+    "entries": 9252,
+    "orientations": 74016,
+    "blocked": []
+  },
+  "stagePolicy": "All r1/r2 continuation tests passed; exact r1 edges, r2 shortcut data and priority order unchanged by this change.",
+  "validation": {
+    "build": "passed",
+    "regressions": "four conflicts verified across D4; Syzygy WDL +2 before and after each new recommendation",
+    "existingCentralSetupFailures": 5,
+    "baselineComparison": "Same five failures before and after; obsolete outside-16 routing assertions updated."
+  },
+  "limits": "Clocks ignored. Covers the four reported starts and all winning D4 classes where the old protected maneuver activated with a noncentral king. Does not prove arbitrary-start termination or fifty-move compliance."
+}
