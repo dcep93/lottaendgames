@@ -1,3 +1,4 @@
+/** Historical declaration helpers for audit/replay. Runtime r1/r2 use bishopKnightStages. */
 import {findPiece, getChess, squareCoords, squareFromCoords, SQUARE_TRANSFORMS, transformSquare} from '../chess';
 import type {Square} from 'chess.js';
 import {bishopKnightBlackReplies} from './bishopKnightReplies';

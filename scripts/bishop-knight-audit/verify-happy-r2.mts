@@ -22,7 +22,7 @@ export function happyR2Starts(): string[] {
 }
 
 /** Check real runtime decisions, including every tie, every Black reply and all D4 orientations. */
-export function verifyHappyR2() {
+export function verifyHappyR2(selectMoves = preferred) {
   const starts = happyR2Starts(), nodes: number[] = [], ids = new Map<number, number>();
   function add(source: string) {
     const key = canonical(code(source));
@@ -47,13 +47,13 @@ export function verifyHappyR2() {
   let blackReplies = 0, symmetryChecks = 0, mateMoves = 0;
   for (let i = 0; i < nodes.length; i++) {
     assert.ok(nodes.length < 10000, 'Route certificate escaped its bounded region');
-    const source = fen(nodes[i]!), board = getChess(source), choices = preferred(source);
+    const source = fen(nodes[i]!), board = getChess(source), choices = selectMoves(source);
     assert.ok(choices.length, `No selected move: ${source}`);
     const moves = choices.map(san => getChess(source).move(san));
     for (const transform of SQUARE_TRANSFORMS) {
       const reflected = transformFen(source, transform);
       const expected = moves.map(move => transformSquare(move.from, transform) + transformSquare(move.to, transform)).sort();
-      const actual = preferred(reflected).map(san => { const move = getChess(reflected).move(san); return move.from + move.to; }).sort();
+      const actual = selectMoves(reflected).map(san => { const move = getChess(reflected).move(san); return move.from + move.to; }).sort();
       assert.deepEqual(actual, expected, `Non-equivalent reflected policy: ${source}`);
       symmetryChecks++;
     }

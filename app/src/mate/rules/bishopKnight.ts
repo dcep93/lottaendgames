@@ -1,5 +1,7 @@
-import { sevenCageMoves } from "./bishopKnightSevenCage";
-import { matingNetMoves } from "./bishopKnightMatingNet";
+import {knightAndBishopWhiteRules} from "./bishopKnightPriorities";
+import {bishopKnightHelp} from "./bishopKnightHelp";
+import type {KnightAndBishopWhiteMoveScore, KnightAndBishopBlackMoveScore} from "./bishopKnightScores";
+import { bishopKnightStageMoves, type BishopKnightStage } from "./bishopKnightStages";
 import { rareDegenerateEscapeMove, rareEscapeStartingFormation } from "./bishopKnightRareEscape";
 import { bishopCentralPathDistances } from "./bishopKnightBishopPath";
 import { declaredKnightDefenseMove } from "./bishopKnightDeclaredDefense";
@@ -27,10 +29,8 @@ import {
 } from "../chess";
 import {
   applyUniversalBlackPriorities,
-  BLACK_CAPTURE_PRIORITY,
-  BLACK_RETURN_PRIORITY,
 } from "./blackPriorities";
-import { bishopControlsOrOccupiesSquare, bishopLongDiagonalIntersection, centerDistance, isMiddle16Square, isBoardEdge } from "./bishopKnightGeometry";
+import { bishopControlsOrOccupiesSquare, bishopLongDiagonalIntersection, centerDistance, isMiddle16Square } from "./bishopKnightGeometry";
 import {
   getKnightAndBishopLookupWhiteMoves,
   getKnightAndBishopPhaseLabel,
@@ -49,115 +49,10 @@ import { compareScoresByRules, selectIdealMoves } from "./selection";
 import type {
   MateRuleSet,
   OpponentCandidates,
-  OrderedRule,
-  RuleHelp,
   ScoredMove,
 } from "./types";
 
-export type KnightAndBishopWhiteMoveScore = {
-  readonly matingNetPenalty: number;
-  readonly sevenCagePenalty: number;
-  readonly kingEdgePenalty: number;
-  readonly rareEscapePenalty: number;
-  readonly declaredCentralNavigationPenalty: number | undefined;
-  readonly protectedCentralManeuverPenalty: number | undefined;
-  readonly bishopCentralPathDistance: number;
-  readonly sixPointNinePenalty: number;
-  readonly declaredStepPenalty: number;
-  readonly relativeKnightPenalty: number;
-  readonly startsWithMiddle16King: boolean;
-  readonly startsWithCentralKingAndMiddle16Knight: boolean;
-  readonly startsWithProtectedOppositeCentralKnight: boolean;
-  readonly centralSetupBoundaryPenalty: number;
-  readonly bishopCenterPenalty: number;
-  readonly knightOppositeCentralDistance: number;
-  readonly bishopCentralProximityScore: number;
-  readonly startsWithBishopAdjacentToNoncentralKing: boolean;
-  readonly bishopWhiteKingDistanceScore: number;
-  readonly bishopMoveNearNoncentralKingPenalty: number;
-  readonly immobileBishopPenalty: number;
-  readonly bishopKingCentralCompletionPenalty: number;
-  readonly bishopKingCentralNavigationScore: number;
-  readonly bishopShuffleControlPenalty: number;
-  readonly minorBlackDistanceScore: number;
-  readonly unprotectedMinorCount: number;
-  readonly minorCenterDistanceScore: number;
-  readonly attackedMinorWithoutKingDefensePenalty: number;
-  readonly knightKingProtectionDistance: number;
-  readonly knightKingProximityScore: number;
-  readonly knightStableBishopProtectionPenalty: number;
-  readonly knightDefensePenalty: number;
-  readonly knightCentralProximityScore: number;
-  readonly kingKnightAdjacencyPenalty: number;
-  readonly kingKnightDistanceScore: number;
-  readonly knightDriftQualifies: boolean;
-  readonly knightDriftRank: number;
-  readonly knightDoubleOpposition: boolean;
-  readonly knightFlanksBlackKing: boolean;
-  readonly knightWhiteSideOfBlackDistance: number;
-  readonly kingStepsTowardKnight: boolean;
-  readonly kingBlackDistanceSquared: number;
-  readonly bishopBlackDistanceSquared: number;
-  readonly knightBlackDistanceSquared: number;
-  readonly kingCoordinationPenalty: number;
-  readonly attackedBishopDefensePenalty: number;
-  readonly undefendedKnightOnlyBishopDefenderPenalty: number;
-  readonly undefendedMinorForkPenalty: number;
-  readonly attackedBishopEscapeScore: number;
-  readonly attackedBishopDistanceScore: number;
-  readonly nearbyPairBishopEscapeScore: number;
-  readonly nearbyPairCentralDefensePenalty: number;
-  readonly attackedKnightDefensePenalty: number;
-  readonly bishopOppositionPenalty: number;
-  readonly knightNextAttackPenalty: number;
-  readonly knightMiddle16ProximityScore: number;
-  readonly oppositePrecageDistance: number;
-  readonly middle16KnightKingAdjacencyPenalty: number;
-  readonly oppositePrecageEuclideanDistanceSquared: number;
-  readonly precageKingSteps: number;
-  readonly precageSideDistance: number;
-  readonly precageSideCornerDistanceSquared: number;
-  readonly declaredPreparationPenalty: number;
-  readonly preparationBishopWaitDistance: number;
-  readonly supportedThreeCheckScore: number;
-  readonly supportedDiagonalSizeScore: number;
-  readonly supportedDiagonalKnightScore: number;
-  readonly declaredSupportedKnightAdvancePenalty: number;
-  readonly declaredSupportedThreePenalty: number;
-  readonly declaredSupportedFivePenalty: number | undefined;
-  readonly declaredSupportedSevenPenalty: number;
-  readonly supportedSevenFlushColorPenalty: number;
-  readonly supportedSevenFlushDistance: number;
-  readonly supportedSevenBishopPenalty: number;
-  readonly supportedThreeKingPlacementPenalty: number;
-  readonly supportedFiveBishopPenalty: number;
-  readonly supportedFiveKingTargetDistance: number;
-  readonly supportedSevenKingTargetDistance: number;
-  readonly supportedSevenKingTieDistance: number;
-  readonly mateScore: number;
-  readonly stalemateScore: number;
-  readonly pieceSafetyScore: number;
-  readonly kingCenterProximityScore: number;
-  readonly kingCenterEuclideanScore: number;
-  readonly bishopLongDiagonalPenalty: number;
-  readonly bishopProtectedCenterPenalty: number;
-  readonly bishopTargetCornerDistanceScore: number;
-  readonly knightTargetProximityScore: number;
-  readonly nonCentralBishopDistanceScore: number;
-  readonly knightBishopProtectionPenalty: number;
-  readonly knightBishopColorPenalty: number;
-  readonly kingBishopColorPenalty: number;
-  readonly bishopLongDiagonalIntersectionScore: number;
-};
-
-export type KnightAndBishopBlackMoveScore = {
-  readonly captureMinorPenalty: number;
-  readonly unprotectedMinorDistance: number;
-  readonly centerDistance: number;
-  readonly mobilityScore: number;
-  readonly whiteKingDistanceScore: number;
-  readonly matingCornerManhattanScore: number;
-};
+export type {KnightAndBishopWhiteMoveScore, KnightAndBishopBlackMoveScore} from "./bishopKnightScores";
 
 const CORNERS: readonly Square[] = ["a1", "a8", "h1", "h8"];
 
@@ -232,6 +127,7 @@ function bishopInsideClutterRectangle(bishop: Square, whiteKing: Square, knight:
 }
 
 type KnightAndBishopPositionScoreContext = {
+  readonly stage: BishopKnightStage;
   readonly matingNetMoves: readonly string[];
   readonly sevenCageMoves: readonly string[];
   readonly rareEscapeMove: string | undefined;
@@ -270,6 +166,7 @@ type KnightAndBishopPositionScoreContext = {
 };
 
 function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
+  const stage = bishopKnightStageMoves(fen);
   let shouldCheckThreeDiagonal: boolean | undefined;
   let kingApproachTargets: readonly Square[] | undefined;
   let bishopPathDistances: ReadonlyMap<Square, number> | undefined;
@@ -291,8 +188,9 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
     return blackApproaches.some(target => kingDistance(square, target) === 1);
   };
   return {
-    matingNetMoves: matingNetMoves(fen),
-    sevenCageMoves: sevenCageMoves(fen),
+    stage: stage.stage,
+    matingNetMoves: stage.stage === 1 ? stage.moves : [],
+    sevenCageMoves: stage.stage === 2 ? stage.moves : [],
     rareEscapeMove: rareDegenerateEscapeMove(fen),
     declaredKnightDefenseMove: declaredKnightDefenseMove(fen),
     get bishopCentralPathDistances() { return bishopPathDistances ??= bishopCentralPathDistances(fen); },
@@ -389,9 +287,9 @@ function scoreKnightAndBishopWhiteMoveCore(
     && stableBishopProtectedSquares(resultFen).includes(knight.square);
   let supportedDiagonal: ReturnType<typeof evaluateKnightAndBishopSupportedDiagonal> | undefined;
   return {
+    stage: context.stage,
     matingNetPenalty: context.matingNetMoves.length && !context.matingNetMoves.includes(move.from + move.to) ? 1 : 0,
     sevenCagePenalty: context.sevenCageMoves.length && !context.sevenCageMoves.includes(move.from + move.to) ? 1 : 0,
-    kingEdgePenalty: Number(move.piece === "k" && isBoardEdge(move.to)),
     get bishopShuffleControlPenalty() {
       return context.bishopShuffleTargets.length && !context.bishopShuffleTargets.some(target =>
         bishop && bishop.square !== target && bishopControlsOrOccupiesSquare(resultFen, bishop.square, target)) ? 1 : 0;
@@ -524,9 +422,6 @@ function scoreKnightAndBishopWhiteMoveCore(
         return kingCanDefend || knightCanContinue;
       });
     },
-    kingBlackDistanceSquared: whiteKing && blackKing ? squaredEuclideanDistance(whiteKing.square, blackKing.square) : 99,
-    bishopBlackDistanceSquared: bishop && blackKing ? squaredEuclideanDistance(bishop.square, blackKing.square) : 99,
-    knightBlackDistanceSquared: knight && blackKing ? squaredEuclideanDistance(knight.square, blackKing.square) : 99,
     get knightDefensePenalty() {
       if (context.declaredKnightDefenseMove === move.from + move.to) return -1;
       if (knightKingDefended) return 0;
@@ -713,109 +608,7 @@ export function scoreKnightAndBishopWhiteMove(
   return scoreKnightAndBishopWhiteMoveCore(fen, san, whiteScoringContext(fen));
 }
 
-export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhiteMoveScore>[] =
-  [
-    {
-      id: "mate",
-      shortLabel: "mate",
-      helpText: "",
-      compare: (first, second) => first.mateScore - second.mateScore,
-    },
-    {
-      id: "minors safe",
-      shortLabel: "pieces safe",
-      helpText: "",
-      compare: (first, second) =>
-        first.pieceSafetyScore - second.pieceSafetyScore,
-    },
-    {
-      id: "no stalemate",
-      shortLabel: "no stalemate",
-      helpText: "",
-      compare: (first, second) => first.stalemateScore - second.stalemateScore,
-    },
-    {
-      id: "r1",
-      shortLabel: "rule r1",
-      helpText: "Execute the mating net.",
-      compare: (first, second) => first.matingNetPenalty - second.matingNetPenalty,
-    },
-    {
-      id: "r2",
-      shortLabel: "rule r2",
-      helpText: "Lock the Black king into a 7-diagonal cage, then force Black into the mating net.",
-      compare: (first, second) => first.sevenCagePenalty - second.sevenCagePenalty
-        || first.kingEdgePenalty - second.kingEdgePenalty,
-    },
-    {
-      id: "r3",
-      shortLabel: "rule r3",
-      helpText: "(temporary) Prefer king proximity, then bishop proximity, then knight proximity.",
-      compare: (first, second) => first.kingBlackDistanceSquared - second.kingBlackDistanceSquared
-        || first.bishopBlackDistanceSquared - second.bishopBlackDistanceSquared
-        || first.knightBlackDistanceSquared - second.knightBlackDistanceSquared,
-    },
-    {
-      id: "r4",
-      shortLabel: "rule r4",
-      helpText: "With a central king and central 16 knight, prefer king protection of the knight, maneuver the knight to a central square opposite the bishop's color, then navigate to a central bishop and the king to a central square opposite the bishop's color.",
-      applies: score => score.startsWithCentralKingAndMiddle16Knight || score.declaredCentralNavigationPenalty !== undefined
-        || score.protectedCentralManeuverPenalty !== undefined
-        || score.startsWithProtectedOppositeCentralKnight,
-      compare: (first, second) => (first.declaredCentralNavigationPenalty ?? 0) - (second.declaredCentralNavigationPenalty ?? 0)
-        || (first.protectedCentralManeuverPenalty ?? 0) - (second.protectedCentralManeuverPenalty ?? 0)
-        || first.centralSetupBoundaryPenalty - second.centralSetupBoundaryPenalty
-        || first.kingKnightAdjacencyPenalty - second.kingKnightAdjacencyPenalty
-        || first.knightOppositeCentralDistance - second.knightOppositeCentralDistance
-        || first.bishopKingCentralCompletionPenalty - second.bishopKingCentralCompletionPenalty
-        || first.bishopKingCentralNavigationScore - second.bishopKingCentralNavigationScore,
-    },
-    {
-      id: "r4.1",
-      shortLabel: "rule r4.1",
-      helpText: "Escape rare degenerate positions.",
-      compare: (first, second) => first.rareEscapePenalty - second.rareEscapePenalty,
-    },
-    {
-      id: "r4.5",
-      shortLabel: "rule r4.5",
-      helpText: "Step the king towards the knight without screening the bishop.",
-      compare: (first, second) => Number(second.kingStepsTowardKnight) - Number(first.kingStepsTowardKnight),
-    },
-    {
-      id: "r4.6",
-      shortLabel: "rule r4.6",
-      helpText: "Prefer the king to defend the knight. Otherwise, drift a protective stable bishop when a piece is attackable.",
-      compare: (first, second) => first.knightDefensePenalty - second.knightDefensePenalty,
-    },
-    {
-      id: "r4.7",
-      shortLabel: "rule r4.7",
-      helpText: "Prefer knight proximity to the White king, then proximity to the center.",
-      compare: (first, second) => first.knightKingProximityScore - second.knightKingProximityScore
-        || first.knightCentralProximityScore - second.knightCentralProximityScore,
-    },
-    {
-      id: "r6",
-      shortLabel: "rule r6",
-      helpText: "When Black’s king prevents approach of the center, navigate the bishop to open a path.",
-      compare: (first, second) => first.bishopCentralPathDistance - second.bishopCentralPathDistance,
-    },
-    {
-      id: "r7",
-      shortLabel: "rule r7",
-      helpText: "Prefer king central proximity.",
-      compare: (first, second) => first.kingCenterEuclideanScore - second.kingCenterEuclideanScore,
-    },
-    {
-      id: "r20",
-      shortLabel: "rule r20",
-      helpText: "Maximize unprotected piece distance from Black's king, then prefer central proximity.",
-      compare: (first, second) => first.unprotectedMinorCount - second.unprotectedMinorCount
-        || first.minorBlackDistanceScore - second.minorBlackDistanceScore
-        || first.minorCenterDistanceScore - second.minorCenterDistanceScore,
-    },
-  ];
+export {knightAndBishopWhiteRules} from "./bishopKnightPriorities";
 
 export function compareKnightAndBishopWhiteScores(
   first: KnightAndBishopWhiteMoveScore,
@@ -931,74 +724,6 @@ export function getKnightAndBishopOpponentCandidates(
   return { moves, idealMoves: selectIdealBlackMoves(fen, priorityMoves) };
 }
 
-const bishopKnightHelp: RuleHelp = {
-  title: "How best moves are chosen",
-  whiteIntro:
-    "These priorities choose among White's legal moves.",
-  blackIntro:
-    "Black uses its own priorities to put up the strongest resistance. Black is not trying to help the mate; it looks for the most stubborn legal reply.",
-  blackPriorities: [
-    BLACK_CAPTURE_PRIORITY,
-    BLACK_RETURN_PRIORITY,
-    "In the W maneuver, or when any reply enters the finishing route, treat every legal reply as equally strong.",
-    "Move toward an unprotected bishop or knight.",
-    "Run toward the center.",
-    "Keep as many legal king moves as possible.",
-    "Stay away from White's king.",
-    "Stay away from a bishop-colored corner.",
-  ],
-  noteBoards: [{
-    id: "bishop-knight-rule-r1-net",
-    title: "rule r1 — Execute the mating net",
-    caption: "The declared line from Kc3, Ba2, Nc2 and Black Kd1 through Bf3#. Prefer the full destination positions, with later destinations taking priority. D4 rotations and reflections apply; move counters are ignored.",
-    animationSrc: "/mate/bishop-knight/r1-mating-net.gif",
-    animationAlt: "All 29 plies of the declared bishop-and-knight mating net, ending in Bf3 checkmate.",
-    pieces: [{square: "c3", piece: "K"}, {square: "a2", piece: "B"}, {square: "c2", piece: "N"}, {square: "d1", piece: "k"}],
-    highlights: [],
-  }, {
-    id: "bishop-knight-rule-r41-a",
-    title: "rule r4.1(a) — Bring the bishop beside the knight",
-    caption: "White’s edge king is edge-adjacent to its edge bishop. Black opposes the bishop inward from the edge. The knight is three diagonal steps away, on the side away from White’s king. Play Bc4, adjacent to Nd3. Rotations and reflections apply.",
-    pieces: [{square: "a7", piece: "K"}, {square: "a6", piece: "B"}, {square: "c6", piece: "k"}, {square: "d3", piece: "N"}],
-    highlights: [{square: "c4", kind: "key"}],
-    arrows: [{from: "a6", to: "c4"}],
-  }, {
-    id: "bishop-knight-rule-r41-b",
-    title: "rule r4.1(b) — Nf5",
-    caption: "With Ka1, Bb1 and Nd4, play Nf5 regardless of Black’s king position. Avoid recreating this White formation. Apply D4 rotations and reflections only; ignore move counters.",
-    pieces: [{square: "a1", piece: "K"}, {square: "b1", piece: "B"}, {square: "d4", piece: "N"}, {square: "c4", piece: "k"}],
-    highlights: [{square: "f5", kind: "key"}],
-    arrows: [{from: "d4", to: "f5"}],
-  }, {
-    id: "bishop-knight-rule-r41-c",
-    title: "rule r4.1(c) — Ke1",
-    caption: "Exact arrangement: Kf1, Bh1, Nf2 and Black Ke3. Play Ke1. Apply D4 rotations and reflections only; ignore move counters.",
-    pieces: [{square: "f1", piece: "K"}, {square: "h1", piece: "B"}, {square: "f2", piece: "N"}, {square: "e3", piece: "k"}],
-    highlights: [{square: "e1", kind: "key"}],
-    arrows: [{from: "f1", to: "e1"}],
-  }, {
-    id: "bishop-knight-rule-r41-d",
-    title: "rule r4.1(d) — Bc4",
-    caption: "Exact arrangement: Ke2, Bd3, Ne3 and Black Kd4. Play Bc4. Apply D4 rotations and reflections only; ignore move counters.",
-    pieces: [{square: "e2", piece: "K"}, {square: "d3", piece: "B"}, {square: "e3", piece: "N"}, {square: "d4", piece: "k"}],
-    highlights: [{square: "c4", kind: "key"}],
-    arrows: [{from: "d3", to: "c4"}],
-  }, {
-    id: "bishop-knight-rule-r6-step",
-    title: "rule r6 — Open a path",
-    caption: "Black blocks Kc4 while White keeps Nc3 protected. Be4+ puts the bishop on a diagonal controlling Black’s blocking square d3. Apply rotations and reflections; earlier priorities still apply.",
-    pieces: [{square: "b4", piece: "K"}, {square: "c3", piece: "N"}, {square: "d3", piece: "k"}, {square: "h1", piece: "B"}],
-    highlights: [{square: "c4", kind: "key"}],
-    arrows: [{from: "h1", to: "e4"}],
-  }],
-  notes: [
-    "For r4.6, the exact placement White Kb5, Ba6, Nb4 and Black Kb8 or Ka7 prefers Kc5, including rotations and reflections. This is a starting-position exception, not a general preference for advancing the defending king.",
-    "For r6, check whether Black blocks every more-central king step, retaining existing king protection of the knight. Route the bishop toward control of a same-color blocking or shuffling square. Use static bishop routes with occupied squares and safe landings; do not claim a forced advance against every reply. Once a central king step is available, r6 is inactive.",
-    "For r4.6, prefer king protection of the knight. Attackability is checked before White moves: a piece must not be king-defended, and Black must already attack it or have a legal move that attacks it. When either piece is attackable, existing or newly established stable bishop protection counts regardless of which piece moves. Either a bishop move preparing a knight jump or a knight move preparing a bishop move can set up stable protection next turn; setup and established protection are equally preferred. An initially attackable knight left without protection or a protection setup ranks below ordinary moves. Stable bishop protection includes squares adjacent to edge bishops and respects White king blockers. For r4.7, prefer knight king-step proximity to White’s king, then Euclidean proximity to the center, regardless of square color.",
-    "For r7, minimize White’s king Euclidean distance to the nearest of d4, e4, d5 or e5. For r20, identify unprotected minor pieces before White moves, then maximize their resulting Euclidean distance from Black’s king. Finally minimize the sum of both minor pieces’ resulting Euclidean distances to the board’s midpoint.",
-    "Support has been reset. No position is supported until explicitly declared under the new rules; all earlier support declarations and r2.5 preferences have been discarded.",
-  ],
-};
 
 function whiteLegalMoves(fen: string): readonly string[] {
   const chess = getChess(fen);

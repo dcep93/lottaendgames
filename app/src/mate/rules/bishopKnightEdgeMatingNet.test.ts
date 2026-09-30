@@ -1,8 +1,9 @@
+// Historical declaration tests. Current stage behavior is exhaustively checked in bishopKnightStages.test.ts.
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {Chess, type Square} from 'chess.js';
 import {getChess, SQUARE_TRANSFORMS, transformFen, transformSquare, squareFromCoords} from '../chess';
-import {getIdealKnightAndBishopWhiteMoves, scoreKnightAndBishopWhiteMove} from './bishopKnight';
+import {getIdealKnightAndBishopWhiteMoves, scoreKnightAndBishopWhiteMove} from '../../../../scripts/bishop-knight-audit/historical-policy.mts';
 import {edgeMatingNetMoves, matingNetCornerwardKnightMoves, matingNetEdgeOppositionMoves, matingNetFrontKnightMoves, matingNetEdgeSequenceMoves} from './bishopKnightEdgeMatingNet';
 import {matingNetMoves} from './bishopKnightMatingNet';
 

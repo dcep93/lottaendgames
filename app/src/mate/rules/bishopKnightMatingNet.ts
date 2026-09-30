@@ -1,3 +1,4 @@
+/** Historical declaration helpers for audit/replay. Runtime r1/r2 use bishopKnightStages. */
 import {r2NetHandoffMoves} from './bishopKnightSevenCage';
 import {edgeMatingNetMoves} from './bishopKnightEdgeMatingNet';
 import {findPiece, getChess, SQUARE_TRANSFORMS, transformFen} from '../chess';

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../chess';
+import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare, squaredEuclideanDistance } from '../chess';
 import { getIdealKnightAndBishopWhiteMoves, knightAndBishopWhiteRules, scoreKnightAndBishopWhiteMove } from './bishopKnight';
 
 test('r7 breaks equal knight proximity by central proximity only; r20 scores minor distances from Black', () => {
@@ -161,7 +161,7 @@ test('r7 ignores Black proximity after knight and central proximity tie, across 
   const stay=scoreKnightAndBishopWhiteMove(fen,getChess(fen).move({from:transformSquare('g2',t),to:transformSquare('h1',t)}).san);
   assert.equal(near.kingKnightDistanceScore,stay.kingKnightDistanceScore,t.name);
   assert.equal(near.kingCenterEuclideanScore,stay.kingCenterEuclideanScore,t.name);
-  assert.ok(near.kingBlackDistanceSquared<stay.kingBlackDistanceSquared,t.name);
+  assert.ok(squaredEuclideanDistance(transformSquare('f4',t),transformSquare('d4',t)) < squaredEuclideanDistance(transformSquare('f5',t),transformSquare('d4',t)),t.name);
   assert.equal(rule.subpriorities![0]!.compare!(near,stay),0,t.name);
  }
 });

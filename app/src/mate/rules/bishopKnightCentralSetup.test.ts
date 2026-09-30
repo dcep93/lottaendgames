@@ -57,7 +57,10 @@ test('r4 uses its central setup gate or a protected route into the center, acros
   ['B7/8/k7/8/3K4/5N2/8/8 w - - 0 1',true], // Bishop proximity does not gate r4.
  ] as const){
   const fen=transformFen(start,t);
-  for(const san of getChess(fen).moves())assert.equal(r4.applies!(scoreKnightAndBishopWhiteMove(fen,san)),enabled,`${t.name} ${san}`);
+  for(const san of getChess(fen).moves()){
+   const score=scoreKnightAndBishopWhiteMove(fen,san);
+   assert.equal(r4.applies!(score),score.stage===0 && enabled,`${t.name} ${san}`);
+  }
  }
 });
 

@@ -1,9 +1,10 @@
+// Historical declaration tests. Current stage behavior is exhaustively checked in bishopKnightStages.test.ts.
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {getChess,SQUARE_TRANSFORMS,transformFen,transformSquare} from '../chess';
 import {matingNetMoves} from './bishopKnightMatingNet';
 import {matingNetLine,matingNetStart,matingNetBranchLine,matingNetBranchStart,matingNetBishopBranchLine,matingNetBishopBranchStart,matingNetKh2BranchLine,matingNetKf2BranchLine,matingNetKf1PartialLine,matingNetKg1BranchLine,matingNetCorrectedBishopLine} from './bishopKnightMatingNetLine';
-import {bishopKnightRuleSet,getIdealKnightAndBishopWhiteMoves,knightAndBishopWhiteRules,scoreKnightAndBishopWhiteMove} from './bishopKnight';
+import {bishopKnightRuleSet,getIdealKnightAndBishopWhiteMoves,knightAndBishopWhiteRules,scoreKnightAndBishopWhiteMove} from '../../../../scripts/bishop-knight-audit/historical-policy.mts';
 
 // r1 accepts both arrivals in these positions; temporary r3 now resolves the tie.
 function r3Tiebreak(fen: string, historical: string): string {

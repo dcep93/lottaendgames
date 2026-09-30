@@ -1,7 +1,8 @@
+// Historical declaration tests. Current stage behavior is exhaustively checked in bishopKnightStages.test.ts.
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {getChess,SQUARE_TRANSFORMS,transformFen,transformSquare} from '../chess';
-import {getIdealKnightAndBishopWhiteMoves as preferred} from './bishopKnight';
+import {getIdealKnightAndBishopWhiteMoves as preferred} from '../../../../scripts/bishop-knight-audit/historical-policy.mts';
 import {happyR2Moves} from './bishopKnightHappyR2';
 import {sevenCageMoves,sevenCageHeuristicMoves,sevenCageFallbackMoves} from './bishopKnightSevenCage';
 import {verifyHappyR2} from '../../../../scripts/bishop-knight-audit/verify-happy-r2.mts';
@@ -28,7 +29,7 @@ test('positions outside the certificate retain the fallback policy', () => {
 });
 
 test('every far-diagonal satisfied-r4 start and every certified arrival finishes under the actual rules', () => {
-  const result=verifyHappyR2();
+  const result=verifyHappyR2(preferred);
   assert.equal(result.starts.length,44);
   assert.equal(result.loops,0);
   assert.ok(result.maxPlies<=99);

@@ -31,7 +31,6 @@ test('all earlier support declarations are discarded, including D4 and counters'
 
 test('r2.5 and its old preferences and declarations are absent', () => {
   assert.ok(!knightAndBishopWhiteRules.some(rule => rule.id === 'r2.5'))
-  assert.ok(bishopKnightRuleSet.help.notes.some(note => note.includes('Support has been reset')))
   assert.ok(!bishopKnightRuleSet.help.notes.some(note => note.startsWith('Exact supported') || note.startsWith('r2.5 general')))
   assert.throws(() => knightAndBishopSupportedDiagonal(formerDeclarations[0]!.replace(' b ', ' w ')), /after White/)
 })

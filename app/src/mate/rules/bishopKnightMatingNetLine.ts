@@ -1,5 +1,5 @@
 /** Current user-declared r1 entry position, for loading and focused searches. */
-export const r1Start = '8/8/8/8/8/2K5/B1N5/2k5 w - - 6 4';
+export {r1Start} from './bishopKnightStages';
 
 /** Historical demonstration start; retained to replay the declared lines below. */
 export const matingNetStart = '8/8/8/8/8/2K5/B1N5/3k4 w - - 6 4';
