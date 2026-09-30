@@ -1,0 +1,150 @@
+{
+  "change": "r4.1 rejects exact four-ply returns caused by its existing filter, including its one-reply lookahead, even when a later rule breaks the remaining tie",
+  "manifest": {
+    "complete": true,
+    "method": "Exhaustive graph with dependency-closed refresh of cached decisions; all distances must be recomputed",
+    "source": ".audit/all-legal-after-r42-pieces-safe",
+    "sourceFingerprint": "1734095dbbc9caa893b1d003a573cba0f9f5039e58210bb622c31a902d8e215a",
+    "fingerprint": "acadf148c3d166be5f0b2baa9edcb4cb6d6929983875144ccf697585cd1e656e",
+    "commit": "2f956af6a6bbeac8d12bd1dbae3ea74a1487349f",
+    "uncommittedR2Shortcuts": 40,
+    "nodeCount": 1359578,
+    "refreshed": 7,
+    "changed": 6,
+    "unaffectedVerified": 1352,
+    "changedArrivals": 0,
+    "seconds": 16.225,
+    "blackPolicy": "all legal",
+    "scope": "All legal KBNvK starts, both sides, both bishop colors, counters reset. All selected White ties."
+  },
+  "dependencyScope": "The new score only increases penalties. Its return probe uses the complete previous policy, with the new return guard disabled and the existing r4.2 lookahead retained. Therefore a previously selected move can change only if it already belongs to a two-White-turn cycle. Refreshed all 7 such nodes across the entire legal graph (including draws), independently verified 1352 other decisions, and recomputed every distance. The r4.1 base and r4.2 probes disable the new return guard, preventing indirect changes to their decisions.",
+  "before": {
+    "winningFailureClasses": 7502,
+    "winningFailurePhysical": 60004,
+    "winningDrawTerminalClasses": 0,
+    "cyclicComponents": 2,
+    "cyclicClasses": 7,
+    "cyclicPhysical": 56,
+    "largestCyclicComponentClasses": 5
+  },
+  "after": {
+    "winningFailureClasses": 3,
+    "winningFailurePhysical": 24,
+    "winningDrawTerminalClasses": 0,
+    "cyclicComponents": 1,
+    "cyclicClasses": 2,
+    "cyclicPhysical": 16,
+    "largestCyclicComponentClasses": 2
+  },
+  "convergenceChanges": {
+    "newlyForcedMateClasses": 7499,
+    "newlyForcedMatePhysical": 59980,
+    "newlyNonMatingClasses": 0,
+    "newlyNonMatingPhysical": 0
+  },
+  "directLostWins": {
+    "counts": {
+      "positionsClasses": 0,
+      "positionsPhysical": 0,
+      "edgesClasses": 0,
+      "edgesPhysical": 0,
+      "allRecommendationsLoseClasses": 0,
+      "allRecommendationsLosePhysical": 0
+    },
+    "checkedWinningFailureClasses": 3,
+    "seconds": 0.5582129955291748,
+    "examples": []
+  },
+  "changedDecisions": [
+    {
+      "key": 4818,
+      "fen": "8/8/8/8/8/2k5/3N4/KB6 w - - 0 1",
+      "rejected": [
+        "Nf3"
+      ],
+      "recommended": [
+        "Nf1"
+      ]
+    },
+    {
+      "key": 5457,
+      "fen": "8/8/8/8/8/1k3N2/8/KB6 w - - 0 1",
+      "rejected": [
+        "Nd2+"
+      ],
+      "recommended": [
+        "Ne5"
+      ]
+    },
+    {
+      "key": 262803,
+      "fen": "8/8/8/8/8/3k4/2N5/BK6 w - - 0 1",
+      "rejected": [
+        "Kb2"
+      ],
+      "recommended": [
+        "Kc1"
+      ]
+    },
+    {
+      "key": 262817,
+      "fen": "8/8/8/1k6/8/8/2N5/BK6 w - - 0 1",
+      "rejected": [
+        "Kb2"
+      ],
+      "recommended": [
+        "Kc1"
+      ]
+    },
+    {
+      "key": 262818,
+      "fen": "8/8/8/2k5/8/8/2N5/BK6 w - - 0 1",
+      "rejected": [
+        "Kb2"
+      ],
+      "recommended": [
+        "Kc1"
+      ]
+    },
+    {
+      "key": 262819,
+      "fen": "8/8/8/3k4/8/8/2N5/BK6 w - - 0 1",
+      "rejected": [
+        "Kb2"
+      ],
+      "recommended": [
+        "Kc1"
+      ]
+    }
+  ],
+  "remainingLoops": [
+    {
+      "fen": "8/8/N7/8/8/8/B1k5/K7 w - - 0 1",
+      "moves": [
+        "Nb4+",
+        "Kc3",
+        "Na6",
+        "Kc2"
+      ],
+      "rules": [
+        "r4.7",
+        "r4.1"
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/N7/8/8/8/B1k5/K7_w_-_-_0_1&moves=Nb4%2B,Kc3,Na6,Kc2&cursor=0",
+      "component": [
+        4433,
+        4818
+      ]
+    }
+  ],
+  "validation": {
+    "focusedAndStageTests": 20,
+    "allD4ReportedCase": true,
+    "allR1R2ContinuationsChecked": true,
+    "build": "pass",
+    "ruleTextChanged": false,
+    "ruleOrderChanged": false,
+    "r1R2Changed": false
+  },
+  "limit": "This fixes forced four-ply returns; it is not a recursive closure of r4.1. Later rules still break ties when all candidates have the same penalty. Mate convergence ignores the fifty-move clock; the maximum finite bound remains 87 White moves."
+}

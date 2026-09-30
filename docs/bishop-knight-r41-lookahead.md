@@ -32,10 +32,30 @@ A newly looping position previously had a finite worst-case mate bound of 63 Whi
 
 [New loop: Nf3 Kb3 Nd2+ Kc3](http://localhost:5173/mate/bishop-knight#fen=8/8/8/8/8/2k5/3N4/KB6_w_-_-_0_1&moves=Nf3,Kb3,Nd2%2B,Kc3&cursor=0).
 
-After reviewing these results, the user explicitly chose to keep the requested rule and review the new loop next. Earlier uncommitted r2 shortcuts remain unchanged. No additional loop-breaking preference has been installed.
+After reviewing these results, the user explicitly chose to keep the requested rule and review the new loop next. Earlier uncommitted r2 shortcuts remain unchanged. At that checkpoint, no additional loop-breaking preference had been installed.
 
 ## Review of the new loop
 
 At `Ka1 Bb1 Nd2 / Kc3`, the old choice was Ne4+. The new lookahead rejects it because ...Kb3 would trigger the geometric r4.1 bishop escape. R4.7 instead chooses Nf3. After ...Kb3, r4.7 chooses Nd2+ to bring the knight closer to White’s king; ...Kc3 restores the start. Thus the return move is now driven by r4.7, not r4.1.
 
 At the position after `1. Nf3 Kb3`, either **2. Bd3** or **2. Be4** would break the cycle and then force eventual mate under the unchanged continuation policy, in at most 59 additional White moves including the bishop move, against every Black reply. This is a prospective single-move alternative for review, not a newly installed rule or a 50-move guarantee.
+
+
+## Forced-return correction (2026-09-30)
+
+The base reply guard above remains unchanged. R4.1 now also rejects a candidate when all of the following hold:
+
+1. Black has a legal non-capturing reply.
+2. At the resulting position, the existing r4.1 filter (including its one-reply lookahead) changes the chosen move: without r4.1 that move would not be preferred.
+3. The complete continuation policy uniquely selects the exact reversal of White's candidate. A later rule may break the tie left by r4.1.
+4. Black can legally reverse its own move, restoring the original placement and turn.
+
+The continuation probe disables only this new return check. It retains the original r4.1 reply guard and the existing r4.2 behavior. The base r4.1 and r4.2 probes do not recursively invoke this return check. Memoized scores, bounded placement/turn caches and a conservative White-formation prefilter keep the search finite and avoid unrelated probes.
+
+For the reported `Nf3 Kb3 Nd2+ Kc3` loop, **2. Nd2+ is rejected by r4.1**, and **2. Ne5** is preferred. The same check also rejects **1. Nf3** at the original source, choosing **1. Nf1**. These results hold across all eight D4 transforms, without changing rule text or priorities.
+
+The cached full-graph audit refreshed all seven potentially affected cycle nodes and independently checked 1,352 unaffected decisions; six choices changed, all rejected by r4.1. All distances were recomputed over 1,359,578 canonical legal White positions, with all selected White ties and every legal Black reply. Winning White starts that can loop fell from **60,004 to 24**. No previously convergent winning start became non-convergent, and no recommendation loses its tablebase win immediately. The 20 focused/stage tests and production build passed; r1/r2 continuations are unchanged.
+
+One cyclic component remains (two canonical cycle positions, three canonical winning starts that can reach it): [Nb4+ Kc3 Na6 Kc2](http://localhost:5173/mate/bishop-knight#fen=8/8/N7/8/8/8/B1k5/K7_w_-_-_0_1&moves=Nb4%2B,Kc3,Na6,Kc2&cursor=0). This bounded return check does not promise to eliminate every loop or guarantee mate within fifty moves. The maximum finite bound remains 87 White moves.
+
+The machine-readable result and dependency proof are in `audits/2026-09-30-r41-forced-return.json`.

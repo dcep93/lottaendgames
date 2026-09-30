@@ -99,3 +99,25 @@ test('r4.1(b) disfavors recreating the formation with any White piece, across D4
     assert.ok(getChess(fen).moves().some(san => scoreKnightAndBishopWhiteMove(fen, san).rareEscapePenalty === 0));
   }
 });
+
+
+test('r4.1 rejects the forced return even when r4.7 breaks its next-turn tie, across D4', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    const source = transformFen('8/8/8/8/8/1k3N2/8/KB6 w - - 2 2', transform);
+    const board = getChess(source);
+    const rejected = board.move({from: transformSquare('f3', transform), to: transformSquare('d2', transform)});
+    board.move({from: transformSquare('b3', transform), to: transformSquare('c3', transform)});
+    // No original escape declaration here: the next-turn filter is itself
+    // the reply lookahead (Ne4+ would let Black trigger the bishop escape).
+    assert.equal(rareDegenerateEscapeMove(board.fen()), undefined);
+    const ne4 = getChess(board.fen()).move({from: transformSquare('d2', transform), to: transformSquare('e4', transform)});
+    assert.equal(scoreKnightAndBishopWhiteMove(board.fen(), ne4.san).rareEscapePenalty, 1);
+    const scores = bishopKnightRuleSet.scoreWhiteCandidates!(source, bishopKnightRuleSet.whiteMoves(source));
+    assert.equal(explainMove(scores, knightAndBishopWhiteRules, rejected.san)?.id, 'r4.1');
+    assert.ok(!getIdealKnightAndBishopWhiteMoves(source).includes(rejected.san));
+    const escape = getChess(source).move({from: transformSquare('f3', transform), to: transformSquare('e5', transform)});
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(source), [escape.san]);
+    // Clock fields must not alter the cached rule decision.
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(source.replace(/ \d+ \d+$/, ' 40 21')), [escape.san]);
+  }
+});
