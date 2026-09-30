@@ -5,6 +5,7 @@ export type KnightAndBishopWhiteMoveScore = {
   readonly matingNetPenalty: number;
   readonly sevenCagePenalty: number;
   readonly rareEscapePenalty: number;
+  readonly piecePreservationPenalty: number;
   readonly declaredCentralNavigationPenalty: number | undefined;
   readonly protectedCentralManeuverPenalty: number | undefined;
   readonly bishopCentralPathDistance: number;

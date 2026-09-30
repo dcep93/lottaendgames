@@ -56,6 +56,12 @@ const whiteRules: readonly OrderedRule<KnightAndBishopWhiteMoveScore>[] =
       compare: (first, second) => first.rareEscapePenalty - second.rareEscapePenalty,
     },
     {
+      id: "r4.2",
+      shortLabel: "rule r4.2",
+      helpText: "Prevent loss of a piece.",
+      compare: (first, second) => first.piecePreservationPenalty - second.piecePreservationPenalty,
+    },
+    {
       id: "r4.5",
       shortLabel: "rule r4.5",
       helpText: "Step the king towards the knight without screening the bishop.",

@@ -1,4 +1,5 @@
 import {knightAndBishopWhiteRules} from "./bishopKnightPriorities";
+import {bishopKnightPiecePreservationMoves} from './bishopKnightPiecePreservation';
 import {bishopKnightHelp} from "./bishopKnightHelp";
 import type {KnightAndBishopWhiteMoveScore, KnightAndBishopBlackMoveScore} from "./bishopKnightScores";
 import { bishopKnightStageMoves, type BishopKnightStage } from "./bishopKnightStages";
@@ -131,6 +132,7 @@ type KnightAndBishopPositionScoreContext = {
   readonly matingNetMoves: readonly string[];
   readonly sevenCageMoves: readonly string[];
   readonly rareEscapeMove: string | undefined;
+  readonly piecePreservationMoves: readonly string[];
   readonly declaredKnightDefenseMove: string | undefined;
   readonly bishopCentralPathDistances: ReadonlyMap<Square, number>;
   readonly centralNavigationMoves: readonly string[];
@@ -189,6 +191,7 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
   };
   return {
     stage: stage.stage,
+    piecePreservationMoves: stage.stage === 0 ? bishopKnightPiecePreservationMoves(fen) : [],
     matingNetMoves: stage.stage === 1 ? stage.moves : [],
     sevenCageMoves: stage.stage === 2 ? stage.moves : [],
     rareEscapeMove: rareDegenerateEscapeMove(fen),
@@ -290,6 +293,7 @@ function scoreKnightAndBishopWhiteMoveCore(
     stage: context.stage,
     matingNetPenalty: context.matingNetMoves.length && !context.matingNetMoves.includes(move.from + move.to) ? 1 : 0,
     sevenCagePenalty: context.sevenCageMoves.length && !context.sevenCageMoves.includes(move.from + move.to) ? 1 : 0,
+    piecePreservationPenalty: context.piecePreservationMoves.length && !context.piecePreservationMoves.includes(move.from + move.to) ? 1 : 0,
     get bishopShuffleControlPenalty() {
       return context.bishopShuffleTargets.length && !context.bishopShuffleTargets.some(target =>
         bishop && bishop.square !== target && bishopControlsOrOccupiesSquare(resultFen, bishop.square, target)) ? 1 : 0;
