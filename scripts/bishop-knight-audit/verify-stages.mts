@@ -49,9 +49,14 @@ export function verifyStages(symmetries=true){
    }
   }
  }
+ const reachableR1=new Set<number>();
+ function traceR1(i:number){if(reachableR1.has(i))return;reachableR1.add(i);assert.equal(phases[i],1,`r1 escaped ${fen(nodes[i]!)}`);edges[i]!.forEach(traceR1);}
+ traceR1(r1Root);
+ for(let i=0;i<nodes.length;i++)assert.equal(phases[i]===1,reachableR1.has(i),`r1 label outside its reachable graph: ${fen(nodes[i]!)}`);
+ assert.equal(reachableR1.size,data.r1Edges.length,'r1 edge index contains unreachable sources');
  const visiting=new Set<number>(),lengths=new Map<number,number>();
  function distance(i:number):number{const cached=lengths.get(i);if(cached!==undefined)return cached;assert.ok(!visiting.has(i),`Cycle ${fen(nodes[i]!)}`);visiting.add(i);let n=1;for(const to of edges[i]!)n=Math.max(n,2+distance(to));visiting.delete(i);lengths.set(i,n);return n;}
  nodes.forEach((_,i)=>distance(i));
- return {complete:true,r1Start,r2Starts:r2Starts.length,whitePositionClasses:nodes.length,blackReplies:replies,symmetryChecks:checks,mateChoices:mates,r1Shortcuts:shortcuts,r1MaxPlies:distance(r1Root),r2MaxPlies:Math.max(...roots.map(distance)),loops:0,draws:0,scope:'All stage destinations, all selected White ties, all legal Black replies; D4; clocks ignored. Does not establish arbitrary-board r4+ convergence.'};
+ return {complete:true,r1Start,r2Starts:r2Starts.length,whitePositionClasses:nodes.length,blackReplies:replies,symmetryChecks:checks,mateChoices:mates,r1ReachablePositions:reachableR1.size,r1ReachableEdges:data.r1Edges.reduce((n,row)=>n+(row[1] as string[]).length,0),outsideR1Labels:shortcuts,r1MaxPlies:distance(r1Root),r2MaxPlies:Math.max(...roots.map(distance)),loops:0,draws:0,scope:'All stage destinations, all selected White ties, all legal Black replies; r1 eligibility iff reachable from r1 start; higher-priority mate preserved; D4; clocks ignored. Does not establish arbitrary-board r4+ convergence.'};
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){const result=verifyStages(!process.argv.includes('--quick'));console.log(result);const out=process.argv.find(a=>a.endsWith('.json'));if(out)writeFileSync(out,JSON.stringify(result,null,2)+'\n');}

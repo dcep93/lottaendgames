@@ -12,6 +12,7 @@ function boardForKey(key:string){const board=getChess();board.clear();for(let i=
 test('every r1/r2 continuation terminates, including all Black replies, White ties and D4 orientations',()=>{
  const result=verifyStages();assert.equal(result.r2Starts,82);assert.equal(result.loops,0);assert.equal(result.draws,0);
  assert.equal(result.symmetryChecks,result.whitePositionClasses*8);assert.equal(result.r1MaxPlies,41);assert.ok(result.r2MaxPlies<=105);
+ assert.equal(result.r1ReachablePositions,99);assert.equal(result.r1ReachableEdges,99);assert.equal(result.outsideR1Labels,0);
 });
 
 test('r3 is absent and the new r1 start is used in the guide',()=>{
@@ -22,7 +23,35 @@ test('r3 is absent and the new r1 start is used in the guide',()=>{
  assert.equal(bishopKnightStagePosition(r1Start)?.stage,1);
 });
 
-test('arbitrary source positions can enter r1 by a full destination via every piece type',()=>{
+test('mate retains priority over r1 even for reachable mating-net edges',()=>{
+ const source='8/8/8/8/1B6/8/2K5/k1N5 w - - 0 1';
+ for(const t of SQUARE_TRANSFORMS){
+  const f=transformFen(source,t),board=getChess(f);
+  assert.equal(bishopKnightStageMoves(f).stage,1);
+  const selected=getIdealKnightAndBishopWhiteMoves(f);
+  assert.equal(selected.length,1);
+  const scores=bishopKnightRuleSet.scoreWhiteCandidates!(f,board.moves());
+  assert.equal(explainMove(scores,bishopKnightRuleSet.whiteRules,selected[0])?.id,'mate');
+  board.move(selected[0]!);assert.ok(board.isCheckmate());
+ }
+});
+
+test('approved r1 bishop shortcut selects Bc4 in every orientation',()=>{
+ const source='8/8/8/8/5N2/1B3K2/7k/8 w - - 26 14';
+ const destination=getChess(source);destination.move('Bc4');
+ for(const t of SQUARE_TRANSFORMS){
+  const f=transformFen(source,t),selected=getIdealKnightAndBishopWhiteMoves(f);
+  assert.equal(selected.length,1);
+  const b=getChess(f);b.move(selected[0]!);
+  assert.equal(bishopKnightPositionKey(b.fen()),bishopKnightPositionKey(transformFen(destination.fen(),t)));
+  const scores=bishopKnightRuleSet.scoreWhiteCandidates!(f,getChess(f).moves());
+  assert.equal(explainMove(scores,bishopKnightRuleSet.whiteRules,selected[0])?.id,'r1');
+  assert.equal(bishopKnightStagePosition(f)?.remaining,9);
+  for(const reply of b.moves({verbose:true}))assert.equal(bishopKnightStageMoves(reply.after).stage,1);
+ }
+});
+
+test('arbitrary source positions enter the r1 graph as r2 via every piece type',()=>{
  const entered=new Set<string>();let checked=0;
  for(const [,phase,,destinations] of data.sources){
   if(phase!==1)continue;
@@ -36,11 +65,11 @@ test('arbitrary source positions can enter r1 by a full destination via every pi
     if(bishopKnightStagePosition(before))continue;
     const forward=board.moves({verbose:true}).find(m=>m.from===backward.to&&m.to===backward.from);
     if(!forward||bishopKnightPositionKey(forward.after)!==targetKey)continue;
-    const choice=bishopKnightStageMoves(before);assert.equal(choice.stage,1);
+    const choice=bishopKnightStageMoves(before);assert.equal(choice.stage,2);
     if(!choice.moves.includes(forward.from+forward.to))continue;
     const selected=getIdealKnightAndBishopWhiteMoves(before);assert.ok(selected.length);
     const scores=bishopKnightRuleSet.scoreWhiteCandidates!(before,getChess(before).moves());
-    for(const san of selected){const b=getChess(before);b.move(san);assert.equal(explainMove(scores,bishopKnightRuleSet.whiteRules,san)?.id,b.isCheckmate()?'mate':'r1');}
+    for(const san of selected){const b=getChess(before);b.move(san);assert.equal(explainMove(scores,bishopKnightRuleSet.whiteRules,san)?.id,b.isCheckmate()?'mate':'r2');}
     entered.add(forward.piece);checked++;if(entered.size===3)break;
    }
    if(entered.size===3)break;
@@ -48,6 +77,18 @@ test('arbitrary source positions can enter r1 by a full destination via every pi
   if(entered.size===3)break;
  }
  assert.deepEqual([...entered].sort(),['b','k','n']);assert.ok(checked>=3);
+});
+
+test('outside Nd4 entry stays r2, while the same destination belongs to an r1 edge from inside the net',()=>{
+ const outside='8/8/2N5/8/k7/2K5/8/1B6 w - - 2 2';
+ for(const t of SQUARE_TRANSFORMS){
+  const f=transformFen(outside,t),b=getChess(f),stage=bishopKnightStageMoves(f);
+  assert.equal(stage.stage,2);assert.equal(bishopKnightStagePosition(f)?.stage,2);
+  const selected=getIdealKnightAndBishopWhiteMoves(f);assert.equal(selected.length,1);
+  const scores=bishopKnightRuleSet.scoreWhiteCandidates!(f,b.moves());
+  assert.equal(explainMove(scores,bishopKnightRuleSet.whiteRules,selected[0])?.id,'r2');
+  b.move(selected[0]!);for(const reply of b.moves({verbose:true}))assert.equal(bishopKnightStageMoves(reply.after).stage,1);
+ }
 });
 
 test('stage matching ignores clocks but rejects Black turns and extra material',()=>{

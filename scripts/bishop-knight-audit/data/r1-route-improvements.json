@@ -1,0 +1,7 @@
+[
+  {
+    "source": "8/8/8/8/5N2/1B3K2/7k/8 w - - 26 14",
+    "destination": "8/8/8/8/2B2N2/5K2/7k/8 b - - 27 14",
+    "reason": "User-approved r1 shortcut: Bc4 instead of Be2. Worst-case remaining White moves to mate fall from 7 to 5; every Black reply rejoins an existing route. D4 equivalents apply. Regenerate r1 eligibility from the revised reachable graph."
+  }
+]

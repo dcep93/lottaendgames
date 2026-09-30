@@ -20,7 +20,7 @@ export const bishopKnightHelp: RuleHelp = {
   noteBoards: [{
     id: "bishop-knight-rule-r1-net",
     title: "rule r1 — Execute the mating net",
-    caption: "From Kc3, Ba2, Nc2 and Black Kc1, r1 carries every continuation to checkmate. Any position can enter by reaching a recognized net position. Rotations and reflections apply.",
+    caption: "From Kc3, Ba2, Nc2 and Black Kc1, r1 carries every continuation to checkmate. Only edges reachable from this start qualify for r1; immediate checkmate still takes priority as mate. Moves entering the net from outside belong to r2. Rotations and reflections apply.",
     animationSrc: "/mate/bishop-knight/r1-mating-net.gif",
     animationAlt: "A verified continuation from the r1 start with Black on c1 to checkmate.",
     pieces: [{square: "c3", piece: "K"}, {square: "a2", piece: "B"}, {square: "c2", piece: "N"}, {square: "c1", piece: "k"}],
@@ -75,4 +75,3 @@ export const bishopKnightHelp: RuleHelp = {
     "The r1 and r2 continuations cover every legal Black reply from their declared starts. Their termination check ignores move counters; it does not promise mate within the fifty-move limit or prove that every arbitrary position reaches r2.",
   ],
 };
-

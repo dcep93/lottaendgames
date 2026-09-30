@@ -2,14 +2,16 @@
   "complete": true,
   "r1Start": "8/8/8/8/8/2K5/B1N5/2k5 w - - 6 4",
   "r2Starts": 82,
-  "whitePositionClasses": 659,
-  "blackReplies": 1546,
-  "symmetryChecks": 5272,
+  "whitePositionClasses": 672,
+  "blackReplies": 1544,
+  "symmetryChecks": 5376,
   "mateChoices": 5,
-  "r1Shortcuts": 46,
+  "r1ReachablePositions": 99,
+  "r1ReachableEdges": 99,
+  "outsideR1Labels": 0,
   "r1MaxPlies": 41,
-  "r2MaxPlies": 105,
+  "r2MaxPlies": 95,
   "loops": 0,
   "draws": 0,
-  "scope": "All stage destinations, all selected White ties, all legal Black replies; D4; clocks ignored. Does not establish arbitrary-board r4+ convergence."
+  "scope": "All stage destinations, all selected White ties, all legal Black replies; r1 eligibility iff reachable from r1 start; higher-priority mate preserved; D4; clocks ignored. Does not establish arbitrary-board r4+ convergence."
 }

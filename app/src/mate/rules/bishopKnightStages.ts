@@ -6,26 +6,36 @@ export type BishopKnightStage = 0 | 1 | 2;
 export const r1Start = data.r1Start;
 export const r2Starts: readonly string[] = data.r2Starts;
 type Route = {stage: 1 | 2; remaining: number; destinations: readonly string[]};
-const routes = new Map<string, Route>();
+type StoredRoute = Omit<Route, 'stage'> & {priority: 1 | 2};
+const routes = new Map<string, StoredRoute>();
+const r1Edges = new Map<string, readonly string[]>();
 const arrivals = [new Map<string, number>(), new Map<string, number>()];
 const bounds = new Map<string, number>();
 const reflect = (key: string, transform: typeof SQUARE_TRANSFORMS[number]) =>
   (key.match(/../g)! as Square[]).map(square => transformSquare(square, transform)).join('');
+
+for (const row of data.r1Edges) {
+  const [source, destinations] = row as [string, string[]];
+  for (const transform of SQUARE_TRANSFORMS) {
+    r1Edges.set(reflect(source, transform), destinations.map(key => reflect(key, transform)));
+  }
+}
 
 for (const [key, bound] of data.arrivals) for (const transform of SQUARE_TRANSFORMS) {
   bounds.set(reflect(key as string, transform), bound as number);
 }
 
 for (const row of data.sources) {
-  const [source, stage, remaining, destinations] = row as [string, 1 | 2, number, string[]];
+  // Priority preserves established choices; it does not assign a rule label.
+  const [source, priority, remaining, destinations] = row as [string, 1 | 2, number, string[]];
   for (const transform of SQUARE_TRANSFORMS) {
     const reflected = destinations.map(key => reflect(key, transform));
-    routes.set(reflect(source, transform), {stage, remaining, destinations: reflected});
+    routes.set(reflect(source, transform), {priority, remaining, destinations: reflected});
     destinations.forEach((key, index) => {
       // Canonicalization of the bound is independent of the source orientation.
       const bound = bounds.get(key) ?? Infinity;
       if (!Number.isFinite(bound)) throw new Error(`Missing stage destination bound: ${key}`);
-      arrivals[stage - 1]!.set(reflected[index]!, bound);
+      arrivals[priority - 1]!.set(reflected[index]!, bound);
     });
   }
 }
@@ -40,7 +50,10 @@ export function bishopKnightPositionKey(fen: string): string | undefined {
 }
 
 export function bishopKnightStagePosition(fen: string): Readonly<Route> | undefined {
-  return fen.split(' ')[1] === 'w' ? routes.get(bishopKnightPositionKey(fen) ?? '') : undefined;
+  if (fen.split(' ')[1] !== 'w') return undefined;
+  const key = bishopKnightPositionKey(fen) ?? '';
+  const route = routes.get(key);
+  return route ? {stage: r1Edges.has(key) ? 1 : 2, remaining: route.remaining, destinations: route.destinations} : undefined;
 }
 
 /** Recognize a whole resulting position, independent of the moving piece or history. */
@@ -51,16 +64,18 @@ export function bishopKnightStageMoves(fen: string): {stage: BishopKnightStage; 
   const route = routes.get(key);
   const legal = getChess(fen).moves({verbose: true});
   const candidates = legal.map(move => ({move, key: bishopKnightPositionKey(move.after)!}));
-  for (const stage of [1, 2] as const) {
+  const classify = (selected: typeof candidates): {stage: 1 | 2; moves: string[]} => ({
+    stage: selected.length > 0 && selected.every(candidate => r1Edges.get(key)?.includes(candidate.key)) ? 1 : 2,
+    moves: selected.map(({move}) => move.from + move.to),
+  });
+  for (const priority of [1, 2] as const) {
     // Preserve the exact established choices, including any former r3 tie-break.
-    if (route?.stage === stage) return {stage, moves: candidates
-      .filter(candidate => route.destinations.includes(candidate.key))
-      .map(({move}) => move.from + move.to)};
-    const table = arrivals[stage - 1]!;
+    if (route?.priority === priority) return classify(candidates
+      .filter(candidate => route.destinations.includes(candidate.key)));
+    const table = arrivals[priority - 1]!;
     const best = Math.min(...candidates.map(candidate => table.get(candidate.key) ?? Infinity));
-    if (Number.isFinite(best)) return {stage, moves: candidates
-      .filter(candidate => table.get(candidate.key) === best)
-      .map(({move}) => move.from + move.to)};
+    if (Number.isFinite(best)) return classify(candidates
+      .filter(candidate => table.get(candidate.key) === best));
   }
   return {stage: 0, moves: []};
 }
