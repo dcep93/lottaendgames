@@ -1,0 +1,290 @@
+{
+  "change": "r4.1 rejects entering a position if a legal Black reply makes the original policy attribute the next White decision to r4.1. One reply, nonrecursive.",
+  "manifest": {
+    "complete": true,
+    "method": "Exhaustive graph with dependency-closed refresh of cached decisions; all distances must be recomputed",
+    "source": ".audit/all-legal-after-66-central",
+    "sourceFingerprint": "05e434096e83ca47edd26e831cec7c9dd9d8527bdf255354175488e28fbdb460",
+    "fingerprint": "f8df303f0a3f5e11d58b22be00741e425e715ece0757ca3671482595967f30ec",
+    "commit": "b810b8c8472c311efa733fdad101f5725b2430ad",
+    "uncommittedR2Shortcuts": 40,
+    "nodeCount": 1359578,
+    "refreshed": 19309,
+    "changed": 39,
+    "unaffectedVerified": 5139,
+    "changedArrivals": 0,
+    "seconds": 192.932,
+    "blackPolicy": "all legal",
+    "scope": "All legal KBNvK starts, both sides, both bishop colors, counters reset. All selected White ties."
+  },
+  "before": {
+    "complete": true,
+    "population": {
+      "white": {
+        "legalClasses": 1359578,
+        "legalPhysical": 10875504,
+        "winningClasses": 1352913,
+        "winningPhysical": 10822184,
+        "drawClasses": 6665,
+        "drawPhysical": 53320
+      },
+      "black": {
+        "legalClasses": 1707888,
+        "legalPhysical": 13660584,
+        "winningClasses": 1398741,
+        "winningPhysical": 11188168,
+        "drawClasses": 309147,
+        "drawPhysical": 2472416
+      }
+    },
+    "statistics": {
+      "white": {
+        "finite": 10793856,
+        "mean": 61.24108604005834,
+        "median": 61,
+        "p90": 71,
+        "p95": 74,
+        "p99": 78,
+        "max": 87,
+        "policyFailuresAmongWinning": 28328
+      },
+      "black": {
+        "finite": 11117872,
+        "mean": 62.907940656269474,
+        "median": 62,
+        "p90": 73,
+        "p95": 76,
+        "p99": 80,
+        "max": 87,
+        "policyFailuresAmongWinning": 70296
+      }
+    },
+    "buckets": [
+      {
+        "label": "Already checkmated",
+        "white": 0,
+        "black": 464
+      },
+      {
+        "label": "1\u201310",
+        "white": 12388,
+        "black": 4844
+      },
+      {
+        "label": "11\u201320",
+        "white": 18644,
+        "black": 5892
+      },
+      {
+        "label": "21\u201330",
+        "white": 23496,
+        "black": 10016
+      },
+      {
+        "label": "31\u201340",
+        "white": 47592,
+        "black": 28368
+      },
+      {
+        "label": "41\u201350",
+        "white": 255540,
+        "black": 172080
+      },
+      {
+        "label": "51\u201360",
+        "white": 4769300,
+        "black": 4114616
+      },
+      {
+        "label": "61\u201370",
+        "white": 4401184,
+        "black": 4994924
+      },
+      {
+        "label": "71\u201380",
+        "white": 1232200,
+        "black": 1715144
+      },
+      {
+        "label": "81+",
+        "white": 33512,
+        "black": 71524
+      },
+      {
+        "label": "Theoretical draw",
+        "white": 53320,
+        "black": 2472416
+      },
+      {
+        "label": "Winning, but policy does not force mate",
+        "white": 28328,
+        "black": 70296
+      }
+    ]
+  },
+  "after": {
+    "complete": true,
+    "population": {
+      "white": {
+        "legalClasses": 1359578,
+        "legalPhysical": 10875504,
+        "winningClasses": 1352913,
+        "winningPhysical": 10822184,
+        "drawClasses": 6665,
+        "drawPhysical": 53320
+      },
+      "black": {
+        "legalClasses": 1707888,
+        "legalPhysical": 13660584,
+        "winningClasses": 1398741,
+        "winningPhysical": 11188168,
+        "drawClasses": 309147,
+        "drawPhysical": 2472416
+      }
+    },
+    "statistics": {
+      "white": {
+        "finite": 10734020,
+        "mean": 61.11947322624702,
+        "median": 61,
+        "p90": 71,
+        "p95": 73,
+        "p99": 78,
+        "max": 87,
+        "policyFailuresAmongWinning": 88164
+      },
+      "black": {
+        "finite": 11035356,
+        "mean": 62.753252364491004,
+        "median": 62,
+        "p90": 72,
+        "p95": 75,
+        "p99": 79,
+        "max": 87,
+        "policyFailuresAmongWinning": 152812
+      }
+    },
+    "buckets": [
+      {
+        "label": "Already checkmated",
+        "white": 0,
+        "black": 464
+      },
+      {
+        "label": "1\u201310",
+        "white": 12388,
+        "black": 4844
+      },
+      {
+        "label": "11\u201320",
+        "white": 18644,
+        "black": 5892
+      },
+      {
+        "label": "21\u201330",
+        "white": 23496,
+        "black": 10016
+      },
+      {
+        "label": "31\u201340",
+        "white": 47592,
+        "black": 28368
+      },
+      {
+        "label": "41\u201350",
+        "white": 255540,
+        "black": 172080
+      },
+      {
+        "label": "51\u201360",
+        "white": 4769652,
+        "black": 4114904
+      },
+      {
+        "label": "61\u201370",
+        "white": 4460472,
+        "black": 5067284
+      },
+      {
+        "label": "71\u201380",
+        "white": 1119844,
+        "black": 1575492
+      },
+      {
+        "label": "81+",
+        "white": 26392,
+        "black": 56012
+      },
+      {
+        "label": "Theoretical draw",
+        "white": 53320,
+        "black": 2472416
+      },
+      {
+        "label": "Winning, but policy does not force mate",
+        "white": 88164,
+        "black": 152812
+      }
+    ]
+  },
+  "loopComponents": {
+    "winningFailureClasses": 11022,
+    "winningFailurePhysical": 88164,
+    "winningDrawTerminalClasses": 0,
+    "cyclicComponents": 58,
+    "cyclicClasses": 120,
+    "cyclicPhysical": 960,
+    "largestCyclicComponentClasses": 5
+  },
+  "directLostWins": {
+    "counts": {
+      "positionsClasses": 0,
+      "positionsPhysical": 0,
+      "edgesClasses": 0,
+      "edgesPhysical": 0,
+      "allRecommendationsLoseClasses": 0,
+      "allRecommendationsLosePhysical": 0
+    },
+    "checkedWinningFailureClasses": 11022,
+    "seconds": 2.2860050201416016,
+    "examples": []
+  },
+  "example": {
+    "fen": "8/8/8/N7/8/8/B7/K1k5 w - - 0 1",
+    "oldMove": "Nb3+",
+    "newMove": "Nc4",
+    "rejectionRule": "r4.1"
+  },
+  "invariants": "Rule order and all r1/r2 data unchanged; complete stage and D4 regression tests passed.",
+  "decision": "User explicitly chose to keep the rule and review the new loop, after disclosure of the increased looping population.",
+  "newLoop": {
+    "newlyLostClasses": 7485,
+    "previousWorstMate": 63,
+    "fen": "8/8/8/8/8/2k5/3N4/KB6 w - - 0 1",
+    "plies": 4,
+    "moves": [
+      "Nf3",
+      "Kb3",
+      "Nd2+",
+      "Kc3"
+    ],
+    "positions": [
+      "8/8/8/8/8/2k5/3N4/KB6 w - - 0 1",
+      "8/8/8/8/8/2k2N2/8/KB6 b - - 1 1",
+      "8/8/8/8/8/1k3N2/8/KB6 w - - 2 2",
+      "8/8/8/8/8/1k6/3N4/KB6 b - - 3 2",
+      "8/8/8/8/8/2k5/3N4/KB6 w - - 4 3"
+    ],
+    "end": "loop",
+    "loopStart": 0,
+    "replayFen": "8/8/8/8/8/2k5/3N4/KB6 w - - 0 1",
+    "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/8/8/2k5/3N4/KB6_w_-_-_0_1&moves=Nf3,Kb3,Nd2%2B,Kc3&cursor=0",
+    "replayTruncated": false
+  },
+  "reviewAlternatives": {
+    "source": "8/8/8/8/8/1k3N2/8/KB6 w - - 2 2",
+    "Bd3": 59,
+    "Be4": 59,
+    "meaning": "Worst-case additional White moves to mate after changing this first move only; ignores draw claims. Not installed."
+  }
+}

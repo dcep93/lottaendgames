@@ -3,7 +3,7 @@ import {bishopKnightPiecePreservationMoves} from './bishopKnightPiecePreservatio
 import {bishopKnightHelp} from "./bishopKnightHelp";
 import type {KnightAndBishopWhiteMoveScore, KnightAndBishopBlackMoveScore} from "./bishopKnightScores";
 import { bishopKnightStageMoves, type BishopKnightStage } from "./bishopKnightStages";
-import { rareDegenerateEscapeMove, rareEscapeStartingFormation } from "./bishopKnightRareEscape";
+import { canEnterRareEscapeFormation, rareDegenerateEscapeMove, rareEscapeStartingFormation } from "./bishopKnightRareEscape";
 import { bishopCentralPathDistances } from "./bishopKnightBishopPath";
 import { declaredKnightDefenseMove } from "./bishopKnightDeclaredDefense";
 import { protectedCentralManeuverTargets } from "./bishopKnightProtectedManeuver";
@@ -46,7 +46,7 @@ import { knightAndBishopShouldCoordinateKing, knightAndBishopKingCoordinatesMino
 import { knightAndBishopSixPointNineMove } from "./bishopKnightSixPointNine";
 import { knightAndBishopFivePointFiveMove } from "./bishopKnightFivePointFive";
 import { knightAndBishopRelativeKnightMove } from "./bishopKnightRelativeKnight";
-import { compareScoresByRules, selectIdealMoves } from "./selection";
+import { compareScoresByRules, selectCandidatesByRules, selectIdealMoves } from "./selection";
 import type {
   MateRuleSet,
   OpponentCandidates,
@@ -128,6 +128,7 @@ function bishopInsideClutterRectangle(bishop: Square, whiteKing: Square, knight:
 }
 
 type KnightAndBishopPositionScoreContext = {
+  readonly checkRareEscapeReplies: boolean;
   readonly stage: BishopKnightStage;
   readonly matingNetMoves: readonly string[];
   readonly sevenCageMoves: readonly string[];
@@ -167,7 +168,7 @@ type KnightAndBishopPositionScoreContext = {
   readonly shouldCheckThreeDiagonal: boolean;
 };
 
-function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
+function whiteScoringContext(fen: string, checkRareEscapeReplies = true): KnightAndBishopPositionScoreContext {
   const stage = bishopKnightStageMoves(fen);
   let shouldCheckThreeDiagonal: boolean | undefined;
   let kingApproachTargets: readonly Square[] | undefined;
@@ -190,6 +191,7 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
     return blackApproaches.some(target => kingDistance(square, target) === 1);
   };
   return {
+    checkRareEscapeReplies,
     stage: stage.stage,
     piecePreservationMoves: stage.stage === 0 ? bishopKnightPiecePreservationMoves(fen) : [],
     matingNetMoves: stage.stage === 1 ? stage.moves : [],
@@ -252,6 +254,32 @@ function whiteScoringContext(fen: string): KnightAndBishopPositionScoreContext {
   };
 }
 
+const rareEscapeTriggerCache = new Map<string, boolean>();
+
+function triggersBaseRareEscapeRule(fen: string): boolean {
+  const key = fen.split(' ').slice(0, 2).join(' ');
+  const cached = rareEscapeTriggerCache.get(key);
+  if (cached !== undefined) return cached;
+  let triggers = false;
+  if (rareDegenerateEscapeMove(fen) || canEnterRareEscapeFormation(
+    findPiece(fen, 'w', 'k')?.square,
+    findPiece(fen, 'w', 'b')?.square,
+    findPiece(fen, 'w', 'n')?.square,
+  )) {
+    const context = whiteScoringContext(fen, false);
+    const candidates = getChess(fen).moves().map(san => ({
+      san, score: scoreKnightAndBishopWhiteMoveCore(fen, san, context),
+    }));
+    // Use actual rule attribution: filtering a discarded move is not enough
+    // when a later rule still has to choose among the remaining candidates.
+    triggers = selectCandidatesByRules(candidates, knightAndBishopWhiteRules)
+      .lastEliminatingRule?.id === 'r4.1';
+  }
+  if (rareEscapeTriggerCache.size >= 8192) rareEscapeTriggerCache.clear();
+  rareEscapeTriggerCache.set(key, triggers);
+  return triggers;
+}
+
 function scoreKnightAndBishopWhiteMoveCore(
   fen: string,
   san: string,
@@ -303,8 +331,15 @@ function scoreKnightAndBishopWhiteMoveCore(
         && !(move.piece === "k" && knightAndBishopKingCoordinatesMinors(resultFen)) ? 1 : 0;
     },
     get rareEscapePenalty() {
-      return rareEscapeStartingFormation(whiteKing?.square, bishop?.square, knight?.square)
-        || (context.rareEscapeMove && context.rareEscapeMove !== move.from + move.to) ? 1 : 0;
+      if (rareEscapeStartingFormation(whiteKing?.square, bishop?.square, knight?.square)
+        || (context.rareEscapeMove && context.rareEscapeMove !== move.from + move.to)) return 1;
+      // One Black reply only. The probe uses the original r4.1 score, never itself.
+      return context.checkRareEscapeReplies && blackReplies.some(reply => {
+        if (reply.captured) return false; // Already handled by the higher piece-safety rule.
+        chess.move(reply);
+        try { return triggersBaseRareEscapeRule(chess.fen()); }
+        finally { chess.undo(); }
+      }) ? 1 : 0;
     },
     sixPointNinePenalty: context.sixPointNineMove && context.sixPointNineMove !== move.from + move.to ? 1 : 0,
     get bishopCentralPathDistance() {

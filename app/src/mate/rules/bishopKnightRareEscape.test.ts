@@ -3,6 +3,7 @@ import test from 'node:test';
 import {getChess, SQUARE_TRANSFORMS, transformFen, transformSquare} from '../chess';
 import {rareDegenerateEscapeMove} from './bishopKnightRareEscape';
 import {bishopKnightRuleSet, getIdealKnightAndBishopWhiteMoves, knightAndBishopWhiteRules, scoreKnightAndBishopWhiteMove} from './bishopKnight';
+import {explainMove} from './selection';
 
 const examples = [
   ['8/K7/B1k5/8/8/3N4/8/8 w - - 0 1', 'a6', 'c4'],
@@ -38,13 +39,31 @@ test('r4.1 does not broaden exact arrangements or relax the geometric conditions
 test('r4.1 has one diagram per case and sits immediately after r4', () => {
   const ids = knightAndBishopWhiteRules.map(rule => rule.id);
   assert.equal(ids[ids.indexOf('r4') + 1], 'r4.1');
-  assert.equal(ids[ids.indexOf('r4.1') + 1], 'r4.5');
+  assert.equal(ids[ids.indexOf('r4.1') + 1], 'r4.2');
   const diagrams = bishopKnightRuleSet.help.noteBoards.filter(board => board.id.startsWith('bishop-knight-rule-r41-'));
   assert.equal(diagrams.length, 4);
   assert.deepEqual(diagrams.map(board => board.arrows?.[0]), [
     {from: 'a6', to: 'c4'}, {from: 'd4', to: 'f5'}, {from: 'f1', to: 'e1'},
     {from: 'd3', to: 'c4'},
   ]);
+});
+
+test('r4.1 rejects a Black reply that activates formation avoidance, across D4', () => {
+  const source = '8/8/8/N7/8/8/B7/K1k5 w - - 0 1';
+  for (const transform of SQUARE_TRANSFORMS) {
+    const fen = transformFen(source, transform);
+    const chess = getChess(fen);
+    const rejected = chess.move({from: transformSquare('a5', transform), to: transformSquare('b3', transform)});
+    chess.move({from: transformSquare('c1', transform), to: transformSquare('c2', transform)});
+    // This source has no declared escape, but r4.1 filters Nc5 and Nd4+.
+    assert.equal(rareDegenerateEscapeMove(chess.fen()), undefined);
+    const candidates = bishopKnightRuleSet.scoreWhiteCandidates!(fen, bishopKnightRuleSet.whiteMoves(fen));
+    assert.equal(explainMove(candidates, knightAndBishopWhiteRules, rejected.san)?.id, 'r4.1');
+    assert.equal(scoreKnightAndBishopWhiteMove(fen, rejected.san).rareEscapePenalty, 1);
+    assert.ok(!getIdealKnightAndBishopWhiteMoves(fen).includes(rejected.san));
+    const alternative = getChess(fen).move({from: transformSquare('a5', transform), to: transformSquare('c4', transform)});
+    assert.equal(scoreKnightAndBishopWhiteMove(fen, alternative.san).rareEscapePenalty, 0);
+  }
 });
 
 

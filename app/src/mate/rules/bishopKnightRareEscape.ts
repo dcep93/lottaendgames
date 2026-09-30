@@ -1,4 +1,4 @@
-import {findPiece, getChess, kingDistance, manhattanDistance, SQUARE_TRANSFORMS, squareCoordinates, squareFromCoords, transformFen, transformSquare} from '../chess';
+import {findPiece, getChess, isKnightMove, kingDistance, manhattanDistance, SQUARE_TRANSFORMS, squareCoordinates, squareFromCoords, transformFen, transformSquare} from '../chess';
 import type {Square} from 'chess.js';
 
 const exact = new Map(([
@@ -18,6 +18,24 @@ const knightEscapes = new Map((['d4', 'e3'] as const).flatMap(knight =>
 
 export function rareEscapeStartingFormation(king?: Square, bishop?: Square, knight?: Square): boolean {
   return !!king && !!bishop && !!knight && knightEscapes.has(king + bishop + knight);
+}
+
+/** Cheap conservative guard: can any White move recreate a forbidden formation? */
+export function canEnterRareEscapeFormation(king?: Square, bishop?: Square, knight?: Square): boolean {
+  if (!king || !bishop || !knight) return false;
+  const pieces = [king, bishop, knight];
+  for (const key of knightEscapes.keys()) {
+    const targets = key.match(/../g)! as Square[];
+    const changed = pieces.flatMap((square, i) => square === targets[i] ? [] : [i]);
+    if (changed.length === 0) return true;
+    if (changed.length !== 1) continue;
+    const i = changed[0]!, from = pieces[i]!, to = targets[i]!;
+    if (i === 0 && kingDistance(from, to) === 1) return true;
+    if (i === 2 && isKnightMove(from, to)) return true;
+    const a = squareCoordinates(from), b = squareCoordinates(to);
+    if (i === 1 && Math.abs(a.file - b.file) === Math.abs(a.rank - b.rank)) return true;
+  }
+  return false;
 }
 
 const edge = (square: Square) => {

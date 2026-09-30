@@ -52,7 +52,7 @@ const whiteRules: readonly OrderedRule<KnightAndBishopWhiteMoveScore>[] =
     {
       id: "r4.1",
       shortLabel: "rule r4.1",
-      helpText: "Escape rare degenerate positions.",
+      helpText: "Escape rare degenerate positions. Avoid moves allowing a legal Black reply that makes r4.1 decide White's next move.",
       compare: (first, second) => first.rareEscapePenalty - second.rareEscapePenalty,
     },
     {
