@@ -9,6 +9,13 @@ const cases = [
   ['8/8/8/8/6N1/5k1B/3K4/8 w - - 6 4', 'Ne3'],
   ['8/8/8/8/8/7B/K3k1N1/8 w - - 0 1', 'Nf4+'],
   ['8/8/8/8/K7/5B2/8/4N1k1 w - - 0 1', 'Nc2'],
+  // Safe alternatives exposed when the old king reversal is rejected.
+  ['8/8/N7/1B6/8/1k6/8/1K6 w - - 0 1', 'Kc1'],
+  ['8/8/8/8/8/8/1K1k1B2/6N1 w - - 0 1', 'Kb3'],
+  ['8/8/8/8/8/8/2K1k1B1/7N w - - 0 1', 'Kc3'],
+  ['8/8/N7/1B6/8/2k5/8/2K5 w - - 0 1', 'Kd1'],
+  ['8/N7/1B6/8/2k5/8/2K5/8 w - - 0 1', 'Kd2'],
+  ['8/8/8/8/8/2K1k3/6B1/7N w - - 0 1', 'Kc4'],
 ] as const;
 
 test('r4.2 preserves the declared wins across D4 with ordinary rule attribution', () => {
@@ -38,4 +45,41 @@ test('r4.2 is an exact source lookup and does not match wrong turn or extra mate
   assert.equal(rules.indexOf('r4.2'), rules.indexOf('r4.1') + 1);
   assert.equal(rules.indexOf('r4.5'), rules.indexOf('r4.2') + 1);
   assert.ok(rules.indexOf('mate') < rules.indexOf('r1'));
+});
+
+test('r4.2 rejects exact undo loops for king and knight moves across D4', () => {
+  const loops = [
+    ['8/8/8/K7/8/3k4/B3N3/8 w - - 0 1', ['Nc1+', 'Kc2', 'Ne2', 'Kd3']],
+    ['8/8/8/8/8/8/K1k1B3/5N2 w - - 0 1', ['Ka1', 'Kc1', 'Ka2', 'Kc2']],
+    ['4B3/8/7N/6k1/8/8/8/1K6 w - - 0 1', ['Nf7+', 'Kf6', 'Nh6', 'Kg5']],
+  ] as const;
+  for (const [fen, line] of loops) {
+    const replay = getChess(fen);
+    const moves = line.map(san => replay.move(san));
+    assert.equal(replay.fen().split(' ')[0], fen.split(' ')[0]);
+    for (const transform of SQUARE_TRANSFORMS) {
+      const f = transformFen(fen, transform);
+      const game = getChess(f);
+      const first = game.move({from: transformSquare(moves[0].from, transform), to: transformSquare(moves[0].to, transform)});
+      game.move({from: transformSquare(moves[1].from, transform), to: transformSquare(moves[1].to, transform)});
+      const undo = transformSquare(moves[2].from, transform) + transformSquare(moves[2].to, transform);
+      assert.deepEqual(lookup(game.fen()), [undo]);
+      const replyScores = policy.scoreWhiteCandidates!(game.fen(), policy.whiteMoves(game.fen()));
+      const undoSan = game.move({from: transformSquare(moves[2].from, transform), to: transformSquare(moves[2].to, transform)}).san;
+      assert.equal(explainMove(replyScores, policy.whiteRules, undoSan)?.id, 'r4.2');
+      const scores = policy.scoreWhiteCandidates!(f, policy.whiteMoves(f));
+      assert.equal(explainMove(scores, policy.whiteRules, first.san)?.id, 'r4.2');
+      assert.ok(!preferred(f).includes(first.san));
+      // Counters cannot hide or create a placement repetition.
+      assert.deepEqual(preferred(f.replace(/ \d+ \d+$/, ' 82 42')), preferred(f));
+    }
+  }
+});
+
+test('r4.2 does not take over a reversal required by r4.1', () => {
+  const fen = '8/8/8/N7/8/8/B7/K1k5 w - - 0 1';
+  const scores = policy.scoreWhiteCandidates!(fen, policy.whiteMoves(fen));
+  const candidate = scores.find(candidate => candidate.san === 'Nb3+')!;
+  assert.equal(candidate.score.piecePreservationPenalty, 0);
+  assert.equal(explainMove(scores, policy.whiteRules, 'Nb3+')?.id, 'r4.1');
 });

@@ -35,3 +35,7 @@ app/node_modules/.bin/tsx --test app/src/mate/rules/bishopKnightPiecePreservatio
 The Python verifier independently checks legality, a winning source and a winning destination for every stored move. The TypeScript verifier checks canonical keys, all eight move transformations, legal reflected moves, and actual production selection. It reports and fails on priority conflicts instead of hiding them.
 
 The existing stage tests traverse every r1/r2 branch and verify all D4 orientations, higher-priority checkmate attribution, and the exact 99 reachable r1 edges. No r1/r2 choices should change. This lookup preserves wins at its registered sources; it is not a proof of arbitrary-start convergence to r4 or mate, nor a fifty-move guarantee.
+
+## Forced-undo avoidance
+
+The [r4.2 lookahead](bishop-knight-r42-lookahead.md) rejects exact four-ply forced reversals. Six newly exposed safety sources extend the lookup to 9,258 entries, preserving all original declarations. The displayed rule text is unchanged.

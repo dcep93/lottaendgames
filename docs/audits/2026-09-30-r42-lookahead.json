@@ -1,0 +1,228 @@
+{
+  "change": "r4.2 exact four-ply forced-undo lookahead, with six newly needed win-preserving source entries",
+  "baselineFingerprint": "f8df303f0a3f5e11d58b22be00741e425e715ece0757ca3671482595967f30ec",
+  "finalFingerprint": "12de626e8d8c3a8eca47ac08a930b961b138f8ef4c5e013d7220baab68b55df1",
+  "method": "Dependency-closed refresh of cached legal-position decisions, followed by full graph distance and SCC recomputation; all selected White ties and every legal Black reply; clocks ignored for convergence.",
+  "refreshes": [
+    {
+      "complete": true,
+      "method": "Exhaustive graph with dependency-closed refresh of cached decisions; all distances must be recomputed",
+      "source": ".audit/all-legal-after-r41-lookahead",
+      "sourceFingerprint": "f8df303f0a3f5e11d58b22be00741e425e715ece0757ca3671482595967f30ec",
+      "fingerprint": "a01859cbd500b4e391238b5bb9b0c9065bbf95c206f1f23ab0d4eaba133c64ad",
+      "commit": "59b10d67c0542625ebffbb99830895a6f075f45a",
+      "uncommittedR2Shortcuts": 40,
+      "nodeCount": 1359578,
+      "refreshed": 29213,
+      "changed": 55,
+      "unaffectedVerified": 5100,
+      "changedArrivals": 0,
+      "seconds": 215.052,
+      "blackPolicy": "all legal",
+      "scope": "All legal KBNvK starts, both sides, both bishop colors, counters reset. All selected White ties."
+    },
+    {
+      "complete": true,
+      "method": "Exhaustive graph with dependency-closed refresh of cached decisions; all distances must be recomputed",
+      "source": ".audit/all-legal-after-r42-lookahead",
+      "sourceFingerprint": "a01859cbd500b4e391238b5bb9b0c9065bbf95c206f1f23ab0d4eaba133c64ad",
+      "fingerprint": "9a60562b5485a8a55d2de715ff2946afc8bd962afa9847341139cba8f35ff599",
+      "commit": "59b10d67c0542625ebffbb99830895a6f075f45a",
+      "uncommittedR2Shortcuts": 40,
+      "nodeCount": 1359578,
+      "refreshed": 12,
+      "changed": 6,
+      "unaffectedVerified": 144,
+      "changedArrivals": 0,
+      "seconds": 1.058,
+      "blackPolicy": "all legal",
+      "scope": "All legal KBNvK starts, both sides, both bishop colors, counters reset. All selected White ties."
+    },
+    {
+      "complete": true,
+      "method": "Exhaustive graph with dependency-closed refresh of cached decisions; all distances must be recomputed",
+      "source": ".audit/all-legal-after-r42-lookahead-safe",
+      "sourceFingerprint": "9a60562b5485a8a55d2de715ff2946afc8bd962afa9847341139cba8f35ff599",
+      "fingerprint": "12de626e8d8c3a8eca47ac08a930b961b138f8ef4c5e013d7220baab68b55df1",
+      "commit": "59b10d67c0542625ebffbb99830895a6f075f45a",
+      "uncommittedR2Shortcuts": 40,
+      "nodeCount": 1359578,
+      "refreshed": 12,
+      "changed": 3,
+      "unaffectedVerified": 144,
+      "changedArrivals": 0,
+      "seconds": 1.117,
+      "blackPolicy": "all legal",
+      "scope": "All legal KBNvK starts, both sides, both bishop colors, counters reset. All selected White ties."
+    }
+  ],
+  "uniqueRefreshedSources": 29231,
+  "changedDecisions": 58,
+  "allChangedMoveRejectionsAttributedTo": "r4.2",
+  "before": {
+    "winningFailureClasses": 11022,
+    "winningFailurePhysical": 88164,
+    "winningDrawTerminalClasses": 0,
+    "cyclicComponents": 58,
+    "cyclicClasses": 120,
+    "cyclicPhysical": 960,
+    "largestCyclicComponentClasses": 5
+  },
+  "after": {
+    "winningFailureClasses": 7914,
+    "winningFailurePhysical": 63300,
+    "winningDrawTerminalClasses": 0,
+    "cyclicComponents": 3,
+    "cyclicClasses": 9,
+    "cyclicPhysical": 72,
+    "largestCyclicComponentClasses": 5
+  },
+  "convergenceChanges": {
+    "newlyForcedMateClasses": 3108,
+    "newlyForcedMatePhysical": 24864,
+    "newlyNonMatingClasses": 0,
+    "newlyNonMatingPhysical": 0
+  },
+  "winningBlackToMoveFailures": {
+    "before": 152812,
+    "after": 91876
+  },
+  "directLostWins": {
+    "counts": {
+      "positionsClasses": 0,
+      "positionsPhysical": 0,
+      "edgesClasses": 0,
+      "edgesPhysical": 0,
+      "allRecommendationsLoseClasses": 0,
+      "allRecommendationsLosePhysical": 0
+    },
+    "checkedWinningFailureClasses": 7914,
+    "seconds": 1.3586490154266357,
+    "examples": []
+  },
+  "safetyAdditions": [
+    {
+      "source": 399889,
+      "fen": "8/8/N7/1B6/8/1k6/8/1K6 w - - 0 1",
+      "san": "Kc1",
+      "encoded": 66,
+      "winning": [
+        "Nb8",
+        "Nc7",
+        "Bc6",
+        "Bd7",
+        "Be8",
+        "Bd3",
+        "Be2",
+        "Bf1",
+        "Kc1",
+        "Ka1"
+      ]
+    },
+    {
+      "source": 2412939,
+      "fen": "8/8/8/8/8/8/1K1k1B2/6N1 w - - 0 1",
+      "san": "Kb3",
+      "encoded": 593,
+      "winning": [
+        "Ka3",
+        "Kb3",
+        "Kb1",
+        "Ka1",
+        "Ka2",
+        "Bd4",
+        "Bc5",
+        "Bb6",
+        "Ba7",
+        "Bg3",
+        "Bh4",
+        "Nh3"
+      ]
+    },
+    {
+      "source": 2679244,
+      "fen": "8/8/8/8/8/8/2K1k1B1/7N w - - 0 1",
+      "san": "Kc3",
+      "encoded": 658,
+      "winning": [
+        "Kb3",
+        "Kc3",
+        "Kc1",
+        "Kb1",
+        "Kb2",
+        "Be4",
+        "Bd5",
+        "Bc6",
+        "Bb7",
+        "Ba8",
+        "Bh3"
+      ]
+    },
+    {
+      "source": 662034,
+      "fen": "8/8/N7/1B6/8/2k5/8/2K5 w - - 0 1",
+      "san": "Kd1",
+      "encoded": 131,
+      "winning": [
+        "Nb8",
+        "Nc7",
+        "Bc6",
+        "Bd7",
+        "Be8",
+        "Be2",
+        "Bf1",
+        "Ba4",
+        "Kd1",
+        "Kb1"
+      ]
+    },
+    {
+      "source": 2792474,
+      "fen": "8/N7/1B6/8/2k5/8/2K5/8 w - - 0 1",
+      "san": "Kd2",
+      "encoded": 651,
+      "winning": [
+        "Nc8",
+        "Bc7",
+        "Bd8",
+        "Be3",
+        "Bf2",
+        "Bg1",
+        "Ba5",
+        "Kd2",
+        "Kd1",
+        "Kc1",
+        "Kb1",
+        "Kb2"
+      ]
+    },
+    {
+      "source": 4776404,
+      "fen": "8/8/8/8/8/2K1k3/6B1/7N w - - 0 1",
+      "san": "Kc4",
+      "encoded": 1178,
+      "winning": [
+        "Kb4",
+        "Kc4",
+        "Kc2",
+        "Kb2",
+        "Kb3",
+        "Bd5",
+        "Bc6",
+        "Bb7",
+        "Ba8",
+        "Bh3",
+        "Bf1"
+      ]
+    }
+  ],
+  "verification": {
+    "focusedTests": 18,
+    "build": "pass",
+    "lookupEntriesIndependentlyVerifiedWithSyzygy": 9258,
+    "r1R2RoutesChanged": false,
+    "ruleOrderChanged": false,
+    "ruleTextChanged": false
+  },
+  "uncommittedR2ShortcutsInAudit": 40
+}

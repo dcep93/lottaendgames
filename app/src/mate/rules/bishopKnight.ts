@@ -129,6 +129,7 @@ function bishopInsideClutterRectangle(bishop: Square, whiteKing: Square, knight:
 
 type KnightAndBishopPositionScoreContext = {
   readonly checkRareEscapeReplies: boolean;
+  readonly checkPiecePreservationReplies: boolean;
   readonly stage: BishopKnightStage;
   readonly matingNetMoves: readonly string[];
   readonly sevenCageMoves: readonly string[];
@@ -168,7 +169,9 @@ type KnightAndBishopPositionScoreContext = {
   readonly shouldCheckThreeDiagonal: boolean;
 };
 
-function whiteScoringContext(fen: string, checkRareEscapeReplies = true): KnightAndBishopPositionScoreContext {
+function whiteScoringContext(
+  fen: string, checkRareEscapeReplies = true, checkPiecePreservationReplies = true,
+): KnightAndBishopPositionScoreContext {
   const stage = bishopKnightStageMoves(fen);
   let shouldCheckThreeDiagonal: boolean | undefined;
   let kingApproachTargets: readonly Square[] | undefined;
@@ -192,6 +195,7 @@ function whiteScoringContext(fen: string, checkRareEscapeReplies = true): Knight
   };
   return {
     checkRareEscapeReplies,
+    checkPiecePreservationReplies,
     stage: stage.stage,
     piecePreservationMoves: stage.stage === 0 ? bishopKnightPiecePreservationMoves(fen) : [],
     matingNetMoves: stage.stage === 1 ? stage.moves : [],
@@ -266,7 +270,7 @@ function triggersBaseRareEscapeRule(fen: string): boolean {
     findPiece(fen, 'w', 'b')?.square,
     findPiece(fen, 'w', 'n')?.square,
   )) {
-    const context = whiteScoringContext(fen, false);
+    const context = whiteScoringContext(fen, false, false);
     const candidates = getChess(fen).moves().map(san => ({
       san, score: scoreKnightAndBishopWhiteMoveCore(fen, san, context),
     }));
@@ -278,6 +282,27 @@ function triggersBaseRareEscapeRule(fen: string): boolean {
   if (rareEscapeTriggerCache.size >= 8192) rareEscapeTriggerCache.clear();
   rareEscapeTriggerCache.set(key, triggers);
   return triggers;
+}
+
+const piecePreservationDecisionCache = new Map<string, string | undefined>();
+
+function requiredPiecePreservationMove(fen: string): string | undefined {
+  const key = fen.split(' ').slice(0, 2).join(' ');
+  if (piecePreservationDecisionCache.has(key)) return piecePreservationDecisionCache.get(key);
+  // Probe the existing rule, without recursively applying its new lookahead.
+  const context = whiteScoringContext(fen, true, false);
+  const candidates = getChess(fen).moves().map(san => ({
+    san, score: scoreKnightAndBishopWhiteMoveCore(fen, san, context),
+  }));
+  const selection = selectCandidatesByRules(candidates, knightAndBishopWhiteRules);
+  let required: string | undefined;
+  if (selection.lastEliminatingRule?.id === 'r4.2' && selection.idealCandidates.length === 1) {
+    const move = getChess(fen).move(selection.idealCandidates[0]!.san);
+    required = move.from + move.to;
+  }
+  if (piecePreservationDecisionCache.size >= 8192) piecePreservationDecisionCache.clear();
+  piecePreservationDecisionCache.set(key, required);
+  return required;
 }
 
 function scoreKnightAndBishopWhiteMoveCore(
@@ -321,7 +346,26 @@ function scoreKnightAndBishopWhiteMoveCore(
     stage: context.stage,
     matingNetPenalty: context.matingNetMoves.length && !context.matingNetMoves.includes(move.from + move.to) ? 1 : 0,
     sevenCagePenalty: context.sevenCageMoves.length && !context.sevenCageMoves.includes(move.from + move.to) ? 1 : 0,
-    piecePreservationPenalty: context.piecePreservationMoves.length && !context.piecePreservationMoves.includes(move.from + move.to) ? 1 : 0,
+    get piecePreservationPenalty() {
+      if (context.piecePreservationMoves.length && !context.piecePreservationMoves.includes(move.from + move.to)) return 1;
+      if (!context.checkPiecePreservationReplies || move.captured) return 0;
+      const reverse = move.to + move.from;
+      return blackReplies.some(reply => {
+        if (reply.captured) return false;
+        chess.move(reply);
+        try {
+          const replyFen = chess.fen();
+          if (!bishopKnightPiecePreservationMoves(replyFen).includes(reverse)
+            || requiredPiecePreservationMove(replyFen) !== reverse) return false;
+          chess.move({from: move.to, to: move.from});
+          try {
+            // Both moves must be reversible: Black must legally restore the
+            // original position too. This rejects only the exact four-ply loop.
+            return bishopKnightBlackReplies(chess, reply.to).some(back => back.to === reply.from);
+          } finally { chess.undo(); }
+        } finally { chess.undo(); }
+      }) ? 1 : 0;
+    },
     get bishopShuffleControlPenalty() {
       return context.bishopShuffleTargets.length && !context.bishopShuffleTargets.some(target =>
         bishop && bishop.square !== target && bishopControlsOrOccupiesSquare(resultFen, bishop.square, target)) ? 1 : 0;
