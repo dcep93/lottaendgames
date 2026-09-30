@@ -121,3 +121,24 @@ test('r4.1 rejects the forced return even when r4.7 breaks its next-turn tie, ac
     assert.deepEqual(getIdealKnightAndBishopWhiteMoves(source.replace(/ \d+ \d+$/, ' 40 21')), [escape.san]);
   }
 });
+
+test('r4.1 closes returns exposed by its own exclusions, across D4', () => {
+  for (const transform of SQUARE_TRANSFORMS) {
+    const source = transformFen('8/8/N7/8/8/8/B1k5/K7 w - - 0 1', transform);
+    const board = getChess(source);
+    const rejected = board.move({from: transformSquare('a6', transform), to: transformSquare('b4', transform)});
+    board.move({from: transformSquare('c2', transform), to: transformSquare('c3', transform)});
+    const reverse = getChess(board.fen()).move({from: transformSquare('b4', transform), to: transformSquare('a6', transform)});
+    assert.deepEqual(getIdealKnightAndBishopWhiteMoves(board.fen()), [reverse.san]);
+    const replies = bishopKnightRuleSet.scoreWhiteCandidates!(board.fen(), bishopKnightRuleSet.whiteMoves(board.fen()));
+    assert.equal(explainMove(replies, knightAndBishopWhiteRules, reverse.san)?.id, 'r4.1');
+    board.move(reverse.san);
+    board.move({from: transformSquare('c3', transform), to: transformSquare('c2', transform)});
+    assert.equal(board.fen().split(' ')[0], source.split(' ')[0]);
+    const candidates = bishopKnightRuleSet.scoreWhiteCandidates!(source, bishopKnightRuleSet.whiteMoves(source));
+    assert.equal(explainMove(candidates, knightAndBishopWhiteRules, rejected.san)?.id, 'r4.1');
+    assert.ok(!getIdealKnightAndBishopWhiteMoves(source).includes(rejected.san));
+    assert.equal(scoreKnightAndBishopWhiteMove(source, rejected.san).rareEscapePenalty, 1);
+  }
+  assert.deepEqual(getIdealKnightAndBishopWhiteMoves('8/8/N7/8/8/8/B1k5/K7 w - - 0 1'), ['Bd5']);
+});

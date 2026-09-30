@@ -3,7 +3,7 @@ import {bishopKnightPiecePreservationMoves} from './bishopKnightPiecePreservatio
 import {bishopKnightHelp} from "./bishopKnightHelp";
 import type {KnightAndBishopWhiteMoveScore, KnightAndBishopBlackMoveScore} from "./bishopKnightScores";
 import { bishopKnightStageMoves, type BishopKnightStage } from "./bishopKnightStages";
-import { canApplyRareEscapeLookahead, canEnterRareEscapeFormation, rareDegenerateEscapeMove, rareEscapeStartingFormation } from "./bishopKnightRareEscape";
+import { rareEscapeReturnExcluded, canEnterRareEscapeFormation, rareDegenerateEscapeMove, rareEscapeStartingFormation } from "./bishopKnightRareEscape";
 import { bishopCentralPathDistances } from "./bishopKnightBishopPath";
 import { declaredKnightDefenseMove } from "./bishopKnightDeclaredDefense";
 import { protectedCentralManeuverTargets } from "./bishopKnightProtectedManeuver";
@@ -287,42 +287,6 @@ function triggersBaseRareEscapeRule(fen: string): boolean {
   return triggers;
 }
 
-// Probe the existing one-reply rule, not this return check. Otherwise a cycle
-// could supply its own rejection and the result would depend on probe order.
-const rareEscapeReturnCache = new Map<string, string | undefined>();
-function requiredRareEscapeReturn(fen: string): string | undefined {
-  if (!canApplyRareEscapeLookahead(findPiece(fen, 'w', 'k')?.square,
-    findPiece(fen, 'w', 'b')?.square, findPiece(fen, 'w', 'n')?.square)) return undefined;
-  const key = fen.split(' ').slice(0, 2).join(' ');
-  if (rareEscapeReturnCache.has(key)) return rareEscapeReturnCache.get(key);
-  const context = whiteScoringContext(fen, true, true, false);
-  const board = getChess(fen);
-  const candidates = board.moves().map(san => ({
-    san, score: scoreKnightAndBishopWhiteMoveCore(fen, san, context),
-  }));
-  const throughEscape = knightAndBishopWhiteRules.slice(0,
-    knightAndBishopWhiteRules.findIndex(rule => rule.id === 'r4.1') + 1);
-  const prefix = selectCandidatesByRules(candidates, throughEscape);
-  let required: string | undefined;
-  if ([...prefix.eliminatedBy.values()].some(rule => rule.id === 'r4.1')) {
-    const selected = selectCandidatesByRules(candidates, knightAndBishopWhiteRules);
-    if (selected.idealCandidates.length === 1) {
-      const chosen = selected.idealCandidates[0]!;
-      // Filtering an irrelevant alternative is not enough: r4.1 must change
-      // which move wins. Later rules may break its remaining tie.
-      const withoutEscape = selectCandidatesByRules(candidates,
-        knightAndBishopWhiteRules.filter(rule => rule.id !== 'r4.1'));
-      if (!withoutEscape.idealCandidates.includes(chosen)) {
-        const move = board.move(chosen.san);
-        required = move.from + move.to;
-      }
-    }
-  }
-  if (rareEscapeReturnCache.size >= 8192) rareEscapeReturnCache.clear();
-  rareEscapeReturnCache.set(key, required);
-  return required;
-}
-
 const piecePreservationDecisionCache = new Map<string, string | undefined>();
 
 function requiredPiecePreservationMove(fen: string): string | undefined {
@@ -441,20 +405,15 @@ function scoreKnightAndBishopWhiteMoveCore(
       if (rareEscapePenalty !== undefined) return rareEscapePenalty;
       if (rareEscapeStartingFormation(whiteKing?.square, bishop?.square, knight?.square)
         || (context.rareEscapeMove && context.rareEscapeMove !== move.from + move.to)) return rareEscapePenalty = 1;
-      // Keep the original reply guard, then detect a forced four-ply return.
-      // Both probes disable their own lookahead to keep evaluation finite.
+      // Return exclusions are generated to closure against the resulting
+      // policy, rather than recursively probing a stale partial policy here.
+      if (context.checkRareEscapeReturns && rareEscapeReturnExcluded(fen, move.from + move.to))
+        return rareEscapePenalty = 1;
       return rareEscapePenalty = context.checkRareEscapeReplies && blackReplies.some(reply => {
-        if (reply.captured) return false; // Already handled by the higher piece-safety rule.
+        if (reply.captured) return false;
         chess.move(reply);
-        try {
-          if (triggersBaseRareEscapeRule(chess.fen())) return true;
-          if (!context.checkRareEscapeReturns || move.captured
-            || requiredRareEscapeReturn(chess.fen()) !== move.to + move.from) return false;
-          chess.move({from: move.to, to: move.from});
-          try {
-            return bishopKnightBlackReplies(chess, reply.to).some(back => back.to === reply.from);
-          } finally { chess.undo(); }
-        } finally { chess.undo(); }
+        try { return triggersBaseRareEscapeRule(chess.fen()); }
+        finally { chess.undo(); }
       }) ? 1 : 0;
     },
     sixPointNinePenalty: context.sixPointNineMove && context.sixPointNineMove !== move.from + move.to ? 1 : 0,

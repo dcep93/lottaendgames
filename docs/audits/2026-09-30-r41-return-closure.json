@@ -1,0 +1,904 @@
+{
+  "change": "Compile r4.1 forced-return exclusions by repeated policy evaluation until no further selected forced-return edges are exposed",
+  "manifest": {
+    "complete": true,
+    "method": "Monotone r4.1 forced-return closure; all distances must be recomputed",
+    "source": ".audit/all-legal-after-r42-pieces-safe",
+    "sourceFingerprint": "1734095dbbc9caa893b1d003a573cba0f9f5039e58210bb622c31a902d8e215a",
+    "fingerprint": "f3ae48a97303e2f03eba178de0ae18b0add98559761ac6fbec64438643adcde4",
+    "nodeCount": 1359578,
+    "refreshed": 8,
+    "unaffectedVerified": 1352,
+    "rounds": [
+      {
+        "round": 1,
+        "cyclicSources": 7,
+        "changed": 6,
+        "additions": [
+          {
+            "key": 4818,
+            "fen": "8/8/8/8/8/2k5/3N4/KB6 w - - 0 1",
+            "move": "d2f3",
+            "san": "Nf3",
+            "blackReply": "Kb3"
+          },
+          {
+            "key": 5457,
+            "fen": "8/8/8/8/8/1k3N2/8/KB6 w - - 0 1",
+            "move": "f3d2",
+            "san": "Nd2+",
+            "blackReply": "Kc3"
+          },
+          {
+            "key": 262803,
+            "fen": "8/8/8/8/8/3k4/2N5/BK6 w - - 0 1",
+            "move": "b1b2",
+            "san": "Kb2",
+            "blackReply": "Kc4"
+          },
+          {
+            "key": 262817,
+            "fen": "8/8/8/1k6/8/8/2N5/BK6 w - - 0 1",
+            "move": "b1b2",
+            "san": "Kb2",
+            "blackReply": "Kc4"
+          },
+          {
+            "key": 262818,
+            "fen": "8/8/8/2k5/8/8/2N5/BK6 w - - 0 1",
+            "move": "b1b2",
+            "san": "Kb2",
+            "blackReply": "Kc4"
+          },
+          {
+            "key": 262819,
+            "fen": "8/8/8/3k4/8/8/2N5/BK6 w - - 0 1",
+            "move": "b1b2",
+            "san": "Kb2",
+            "blackReply": "Kc4"
+          }
+        ]
+      },
+      {
+        "round": 2,
+        "cyclicSources": 2,
+        "changed": 1,
+        "additions": [
+          {
+            "key": 4433,
+            "fen": "8/8/8/8/8/1k6/8/KB3N2 w - - 0 1",
+            "move": "f1d2",
+            "san": "Nd2+",
+            "blackReply": "Kc3"
+          }
+        ]
+      },
+      {
+        "round": 3,
+        "cyclicSources": 0,
+        "added": 0
+      }
+    ],
+    "exclusions": [
+      {
+        "fen": "8/8/8/8/8/1k6/8/KB3N2 w - - 0 1",
+        "moves": [
+          "f1d2"
+        ]
+      },
+      {
+        "fen": "8/8/8/8/8/2k5/3N4/KB6 w - - 0 1",
+        "moves": [
+          "d2f3"
+        ]
+      },
+      {
+        "fen": "8/8/8/8/8/1k3N2/8/KB6 w - - 0 1",
+        "moves": [
+          "f3d2"
+        ]
+      },
+      {
+        "fen": "8/8/8/8/8/3k4/2N5/BK6 w - - 0 1",
+        "moves": [
+          "b1b2"
+        ]
+      },
+      {
+        "fen": "8/8/8/1k6/8/8/2N5/BK6 w - - 0 1",
+        "moves": [
+          "b1b2"
+        ]
+      },
+      {
+        "fen": "8/8/8/2k5/8/8/2N5/BK6 w - - 0 1",
+        "moves": [
+          "b1b2"
+        ]
+      },
+      {
+        "fen": "8/8/8/3k4/8/8/2N5/BK6 w - - 0 1",
+        "moves": [
+          "b1b2"
+        ]
+      }
+    ]
+  },
+  "auditWorkingTree": "Includes the existing 40 uncommitted r2 shortcuts; this change does not alter or commit them.",
+  "dependencyScope": "Each iteration only increases candidate penalties. A selected move can change only if the current selected continuation reverses it and Black can legally reverse its reply. All such sources occur in the complete cached graph\u2019s two-White-turn cycles. Refresh every such source each iteration, update the graph, and repeat. The new table remains disabled in the pre-existing base r4.1 and r4.2 probes. After convergence, recompute all distances and SCCs, not just four-ply cycles.",
+  "before": {
+    "winningFailureClasses": 3,
+    "winningFailurePhysical": 24,
+    "winningDrawTerminalClasses": 0,
+    "cyclicComponents": 1,
+    "cyclicClasses": 2,
+    "cyclicPhysical": 16,
+    "largestCyclicComponentClasses": 2
+  },
+  "after": {
+    "winningFailureClasses": 0,
+    "winningFailurePhysical": 0,
+    "winningDrawTerminalClasses": 0,
+    "cyclicComponents": 0,
+    "cyclicClasses": 0,
+    "cyclicPhysical": 0,
+    "largestCyclicComponentClasses": 0
+  },
+  "convergenceChanges": {
+    "newlyForcedMateClasses": 3,
+    "newlyForcedMatePhysical": 24,
+    "newlyNonMatingClasses": 0,
+    "newlyNonMatingPhysical": 0
+  },
+  "directLostWins": {
+    "counts": {
+      "positionsClasses": 0,
+      "positionsPhysical": 0,
+      "edgesClasses": 0,
+      "edgesPhysical": 0,
+      "allRecommendationsLoseClasses": 0,
+      "allRecommendationsLosePhysical": 0
+    },
+    "checkedWinningFailureClasses": 0,
+    "seconds": 0.5935211181640625,
+    "examples": []
+  },
+  "allPositionCounts": {
+    "complete": true,
+    "scope": "All legal KBNvK placements, both turns, fresh clock, including Syzygy draws (reported separately). Every current selected White tie and every legal Black reply. Cycles/captures/stalemates count as no forced mate. Symmetry classes weighted by actual orbit size.",
+    "counts": {
+      "white": {
+        "noForcedMate": {
+          "classes": 6665,
+          "physical": 53320
+        },
+        "over50": {
+          "classes": 1308187,
+          "physical": 10464524
+        },
+        "within50": {
+          "classes": 44726,
+          "physical": 357660
+        }
+      },
+      "black": {
+        "noForcedMate": {
+          "classes": 309147,
+          "physical": 2472416
+        },
+        "over50": {
+          "classes": 1371014,
+          "physical": 10966504
+        },
+        "within50": {
+          "classes": 27727,
+          "physical": 221664
+        }
+      }
+    },
+    "theoreticalDraws": {
+      "white": 53320,
+      "black": 2472416
+    },
+    "histograms": {
+      "white": {
+        "1": 1840,
+        "2": 88,
+        "3": 456,
+        "4": 752,
+        "5": 1936,
+        "6": 1768,
+        "7": 1656,
+        "8": 1080,
+        "9": 1180,
+        "10": 1632,
+        "11": 1924,
+        "12": 1912,
+        "13": 3016,
+        "14": 2744,
+        "15": 3632,
+        "16": 1920,
+        "17": 1648,
+        "18": 616,
+        "19": 440,
+        "20": 792,
+        "21": 2648,
+        "22": 2552,
+        "23": 2664,
+        "24": 2768,
+        "25": 1904,
+        "26": 2232,
+        "27": 2304,
+        "28": 2144,
+        "29": 1968,
+        "30": 2312,
+        "31": 1600,
+        "32": 2500,
+        "33": 2076,
+        "34": 2544,
+        "35": 2560,
+        "36": 1960,
+        "37": 1864,
+        "38": 3904,
+        "39": 8496,
+        "40": 20088,
+        "41": 32192,
+        "42": 40296,
+        "43": 22944,
+        "44": 10780,
+        "45": 14064,
+        "46": 11856,
+        "47": 9648,
+        "48": 8840,
+        "49": 21972,
+        "50": 82948,
+        "51": 184620,
+        "52": 329368,
+        "53": 437236,
+        "54": 477324,
+        "55": 495856,
+        "56": 524428,
+        "57": 564888,
+        "58": 579168,
+        "59": 579984,
+        "60": 596804,
+        "61": 609448,
+        "62": 580740,
+        "63": 557848,
+        "64": 515412,
+        "65": 472580,
+        "66": 422060,
+        "67": 368264,
+        "68": 342844,
+        "69": 317512,
+        "70": 278756,
+        "71": 244332,
+        "72": 206908,
+        "73": 173016,
+        "74": 150716,
+        "75": 122536,
+        "76": 97856,
+        "77": 77792,
+        "78": 53348,
+        "79": 35824,
+        "80": 27568,
+        "81": 18584,
+        "82": 10664,
+        "83": 5312,
+        "84": 2864,
+        "85": 1376,
+        "86": 584,
+        "87": 104
+      },
+      "black": {
+        "0": 464,
+        "1": 312,
+        "2": 88,
+        "3": 192,
+        "4": 736,
+        "5": 600,
+        "6": 932,
+        "7": 400,
+        "8": 600,
+        "9": 512,
+        "10": 472,
+        "11": 576,
+        "12": 688,
+        "13": 1008,
+        "14": 920,
+        "15": 776,
+        "16": 796,
+        "17": 336,
+        "18": 72,
+        "19": 88,
+        "20": 632,
+        "21": 1064,
+        "22": 1128,
+        "23": 1136,
+        "24": 1032,
+        "25": 816,
+        "26": 904,
+        "27": 752,
+        "28": 976,
+        "29": 1304,
+        "30": 904,
+        "31": 928,
+        "32": 768,
+        "33": 768,
+        "34": 1808,
+        "35": 1392,
+        "36": 792,
+        "37": 928,
+        "38": 2504,
+        "39": 5768,
+        "40": 12712,
+        "41": 20544,
+        "42": 13296,
+        "43": 5704,
+        "44": 7492,
+        "45": 7272,
+        "46": 5032,
+        "47": 4160,
+        "48": 6808,
+        "49": 26268,
+        "50": 75504,
+        "51": 164356,
+        "52": 250600,
+        "53": 292132,
+        "54": 324816,
+        "55": 367460,
+        "56": 446668,
+        "57": 504724,
+        "58": 550512,
+        "59": 584876,
+        "60": 628856,
+        "61": 630248,
+        "62": 612108,
+        "63": 611140,
+        "64": 568044,
+        "65": 550300,
+        "66": 497048,
+        "67": 459452,
+        "68": 419124,
+        "69": 392292,
+        "70": 337488,
+        "71": 297808,
+        "72": 258096,
+        "73": 232180,
+        "74": 207400,
+        "75": 185188,
+        "76": 158444,
+        "77": 133720,
+        "78": 94056,
+        "79": 68716,
+        "80": 51296,
+        "81": 38404,
+        "82": 23328,
+        "83": 12520,
+        "84": 7328,
+        "85": 3840,
+        "86": 1640,
+        "87": 296
+      }
+    },
+    "maximumFinitePlies": {
+      "white": 173,
+      "black": 174
+    },
+    "nodes": 1359578,
+    "supplementalWhiteStarts": 0,
+    "edges": 7386873,
+    "missingWinningWhiteStarts": 0,
+    "examples": {
+      "white": {
+        "noForcedMate": [
+          {
+            "key": 8394,
+            "winning": false,
+            "fen": "8/8/8/8/8/8/2k5/K1BN4 w - - 0 1",
+            "plies": null
+          },
+          {
+            "key": 8451,
+            "winning": false,
+            "fen": "8/8/8/8/8/8/8/K1BkN3 w - - 0 1",
+            "plies": null
+          },
+          {
+            "key": 8654,
+            "winning": false,
+            "fen": "8/8/8/8/8/8/6k1/K1B4N w - - 0 1",
+            "plies": null
+          },
+          {
+            "key": 8661,
+            "winning": false,
+            "fen": "8/8/8/8/8/5k2/8/K1B4N w - - 0 1",
+            "plies": null
+          },
+          {
+            "key": 8906,
+            "winning": false,
+            "fen": "8/8/8/8/8/8/2kN4/K1B5 w - - 0 1",
+            "plies": null
+          },
+          {
+            "key": 8963,
+            "winning": false,
+            "fen": "8/8/8/8/8/8/4N3/K1Bk4 w - - 0 1",
+            "plies": null
+          },
+          {
+            "key": 9418,
+            "winning": false,
+            "fen": "8/8/8/8/8/3N4/2k5/K1B5 w - - 0 1",
+            "plies": null
+          },
+          {
+            "key": 11825,
+            "winning": false,
+            "fen": "N7/1k6/8/8/8/8/8/K1B5 w - - 0 1",
+            "plies": null
+          },
+          {
+            "key": 12427,
+            "winning": false,
+            "fen": "8/8/8/8/8/8/3k4/K1NB4 w - - 0 1",
+            "plies": null
+          },
+          {
+            "key": 12555,
+            "winning": false,
+            "fen": "8/8/8/8/8/8/3k4/K2BN3 w - - 0 1",
+            "plies": null
+          },
+          {
+            "key": 12612,
+            "winning": false,
+            "fen": "8/8/8/8/8/8/8/K2BkN2 w - - 0 1",
+            "plies": null
+          },
+          {
+            "key": 12750,
+            "winning": false,
+            "fen": "8/8/8/8/8/8/6k1/K2B3N w - - 0 1",
+            "plies": null
+          },
+          {
+            "key": 12930,
+            "winning": false,
+            "fen": "8/8/8/8/8/8/2N5/K1kB4 w - - 0 1",
+            "plies": null
+          },
+          {
+            "key": 12939,
+            "winning": false,
+            "fen": "8/8/8/8/8/8/2Nk4/K2B4 w - - 0 1",
+            "plies": null
+          },
+          {
+            "key": 12994,
+            "winning": false,
+            "fen": "8/8/8/8/8/8/3N4/K1kB4 w - - 0 1",
+            "plies": null
+          },
+          {
+            "key": 12996,
+            "winning": false,
+            "fen": "8/8/8/8/8/8/3N4/K2Bk3 w - - 0 1",
+            "plies": null
+          },
+          {
+            "key": 13067,
+            "winning": false,
+            "fen": "8/8/8/8/8/8/3kN3/K2B4 w - - 0 1",
+            "plies": null
+          },
+          {
+            "key": 13124,
+            "winning": false,
+            "fen": "8/8/8/8/8/8/5N2/K2Bk3 w - - 0 1",
+            "plies": null
+          },
+          {
+            "key": 13579,
+            "winning": false,
+            "fen": "8/8/8/8/8/4N3/3k4/K2B4 w - - 0 1",
+            "plies": null
+          },
+          {
+            "key": 16374,
+            "winning": false,
+            "fen": "7N/6k1/8/8/8/8/8/K2B4 w - - 0 1",
+            "plies": null
+          }
+        ],
+        "over50": [
+          {
+            "key": 15298,
+            "winning": true,
+            "fen": "8/8/7N/8/8/8/8/K1kB4 w - - 0 1",
+            "plies": 173
+          },
+          {
+            "key": 15307,
+            "winning": true,
+            "fen": "8/8/7N/8/8/8/3k4/K2B4 w - - 0 1",
+            "plies": 173
+          },
+          {
+            "key": 52162,
+            "winning": true,
+            "fen": "8/8/7N/8/8/8/4B3/K1k5 w - - 0 1",
+            "plies": 173
+          },
+          {
+            "key": 52170,
+            "winning": true,
+            "fen": "8/8/7N/8/8/8/2k1B3/K7 w - - 0 1",
+            "plies": 173
+          },
+          {
+            "key": 52171,
+            "winning": true,
+            "fen": "8/8/7N/8/8/8/3kB3/K7 w - - 0 1",
+            "plies": 173
+          },
+          {
+            "key": 60362,
+            "winning": true,
+            "fen": "8/8/7N/8/8/8/2k3B1/K7 w - - 0 1",
+            "plies": 173
+          },
+          {
+            "key": 89034,
+            "winning": true,
+            "fen": "8/8/7N/8/8/5B2/2k5/K7 w - - 0 1",
+            "plies": 173
+          },
+          {
+            "key": 159690,
+            "winning": true,
+            "fen": "7N/8/8/6B1/8/8/2k5/K7 w - - 0 1",
+            "plies": 173
+          },
+          {
+            "key": 159696,
+            "winning": true,
+            "fen": "7N/8/8/6B1/8/k7/8/K7 w - - 0 1",
+            "plies": 173
+          },
+          {
+            "key": 159697,
+            "winning": true,
+            "fen": "7N/8/8/6B1/8/1k6/8/K7 w - - 0 1",
+            "plies": 173
+          },
+          {
+            "key": 159698,
+            "winning": true,
+            "fen": "7N/8/8/6B1/8/2k5/8/K7 w - - 0 1",
+            "plies": 173
+          },
+          {
+            "key": 929761,
+            "winning": true,
+            "fen": "7N/8/8/1kB5/8/8/8/3K4 w - - 0 1",
+            "plies": 173
+          },
+          {
+            "key": 958433,
+            "winning": true,
+            "fen": "7N/8/1B6/1k6/8/8/8/3K4 w - - 0 1",
+            "plies": 173
+          },
+          {
+            "key": 12170,
+            "winning": true,
+            "fen": "6N1/8/8/8/8/8/2k5/K1B5 w - - 0 1",
+            "plies": 171
+          },
+          {
+            "key": 12177,
+            "winning": true,
+            "fen": "6N1/8/8/8/8/1k6/8/K1B5 w - - 0 1",
+            "plies": 171
+          },
+          {
+            "key": 16322,
+            "winning": true,
+            "fen": "7N/8/8/8/8/8/8/K1kB4 w - - 0 1",
+            "plies": 171
+          },
+          {
+            "key": 16331,
+            "winning": true,
+            "fen": "7N/8/8/8/8/8/3k4/K2B4 w - - 0 1",
+            "plies": 171
+          },
+          {
+            "key": 16338,
+            "winning": true,
+            "fen": "7N/8/8/8/8/2k5/8/K2B4 w - - 0 1",
+            "plies": 171
+          },
+          {
+            "key": 49034,
+            "winning": true,
+            "fen": "6N1/8/8/8/8/8/2kB4/K7 w - - 0 1",
+            "plies": 171
+          },
+          {
+            "key": 49098,
+            "winning": true,
+            "fen": "7N/8/8/8/8/8/2kB4/K7 w - - 0 1",
+            "plies": 171
+          }
+        ]
+      },
+      "black": {
+        "noForcedMate": [
+          {
+            "key": 4227,
+            "winning": false,
+            "fen": "8/8/8/8/8/8/8/KBNk4 b - - 0 1",
+            "plies": null
+          },
+          {
+            "key": 4234,
+            "winning": false,
+            "fen": "8/8/8/8/8/8/2k5/KBN5 b - - 0 1",
+            "plies": null
+          },
+          {
+            "key": 4235,
+            "winning": false,
+            "fen": "8/8/8/8/8/8/3k4/KBN5 b - - 0 1",
+            "plies": null
+          },
+          {
+            "key": 4290,
+            "winning": false,
+            "fen": "8/8/8/8/8/8/8/KBkN4 b - - 0 1",
+            "plies": null
+          },
+          {
+            "key": 4292,
+            "winning": false,
+            "fen": "8/8/8/8/8/8/8/KB1Nk3 b - - 0 1",
+            "plies": null
+          },
+          {
+            "key": 4298,
+            "winning": false,
+            "fen": "8/8/8/8/8/8/2k5/KB1N4 b - - 0 1",
+            "plies": null
+          },
+          {
+            "key": 4299,
+            "winning": false,
+            "fen": "8/8/8/8/8/8/3k4/KB1N4 b - - 0 1",
+            "plies": null
+          },
+          {
+            "key": 4300,
+            "winning": false,
+            "fen": "8/8/8/8/8/8/4k3/KB1N4 b - - 0 1",
+            "plies": null
+          },
+          {
+            "key": 4355,
+            "winning": false,
+            "fen": "8/8/8/8/8/8/8/KB1kN3 b - - 0 1",
+            "plies": null
+          },
+          {
+            "key": 4357,
+            "winning": false,
+            "fen": "8/8/8/8/8/8/8/KB2Nk2 b - - 0 1",
+            "plies": null
+          },
+          {
+            "key": 4363,
+            "winning": false,
+            "fen": "8/8/8/8/8/8/3k4/KB2N3 b - - 0 1",
+            "plies": null
+          },
+          {
+            "key": 4364,
+            "winning": false,
+            "fen": "8/8/8/8/8/8/4k3/KB2N3 b - - 0 1",
+            "plies": null
+          },
+          {
+            "key": 4365,
+            "winning": false,
+            "fen": "8/8/8/8/8/8/5k2/KB2N3 b - - 0 1",
+            "plies": null
+          },
+          {
+            "key": 4420,
+            "winning": false,
+            "fen": "8/8/8/8/8/8/8/KB2kN2 b - - 0 1",
+            "plies": null
+          },
+          {
+            "key": 4422,
+            "winning": false,
+            "fen": "8/8/8/8/8/8/8/KB3Nk1 b - - 0 1",
+            "plies": null
+          },
+          {
+            "key": 4428,
+            "winning": false,
+            "fen": "8/8/8/8/8/8/4k3/KB3N2 b - - 0 1",
+            "plies": null
+          },
+          {
+            "key": 4429,
+            "winning": false,
+            "fen": "8/8/8/8/8/8/5k2/KB3N2 b - - 0 1",
+            "plies": null
+          },
+          {
+            "key": 4430,
+            "winning": false,
+            "fen": "8/8/8/8/8/8/6k1/KB3N2 b - - 0 1",
+            "plies": null
+          },
+          {
+            "key": 4485,
+            "winning": false,
+            "fen": "8/8/8/8/8/8/8/KB3kN1 b - - 0 1",
+            "plies": null
+          },
+          {
+            "key": 4487,
+            "winning": false,
+            "fen": "8/8/8/8/8/8/8/KB4Nk b - - 0 1",
+            "plies": null
+          }
+        ],
+        "over50": [
+          {
+            "key": 15314,
+            "winning": true,
+            "fen": "8/8/7N/8/8/2k5/8/K2B4 b - - 0 1",
+            "plies": 174
+          },
+          {
+            "key": 15315,
+            "winning": true,
+            "fen": "8/8/7N/8/8/3k4/8/K2B4 b - - 0 1",
+            "plies": 174
+          },
+          {
+            "key": 15316,
+            "winning": true,
+            "fen": "8/8/7N/8/8/4k3/8/K2B4 b - - 0 1",
+            "plies": 174
+          },
+          {
+            "key": 52162,
+            "winning": true,
+            "fen": "8/8/7N/8/8/8/4B3/K1k5 b - - 0 1",
+            "plies": 174
+          },
+          {
+            "key": 52170,
+            "winning": true,
+            "fen": "8/8/7N/8/8/8/2k1B3/K7 b - - 0 1",
+            "plies": 174
+          },
+          {
+            "key": 52177,
+            "winning": true,
+            "fen": "8/8/7N/8/8/1k6/4B3/K7 b - - 0 1",
+            "plies": 174
+          },
+          {
+            "key": 52178,
+            "winning": true,
+            "fen": "8/8/7N/8/8/2k5/4B3/K7 b - - 0 1",
+            "plies": 174
+          },
+          {
+            "key": 60354,
+            "winning": true,
+            "fen": "8/8/7N/8/8/8/6B1/K1k5 b - - 0 1",
+            "plies": 174
+          },
+          {
+            "key": 60355,
+            "winning": true,
+            "fen": "8/8/7N/8/8/8/6B1/K2k4 b - - 0 1",
+            "plies": 174
+          },
+          {
+            "key": 60363,
+            "winning": true,
+            "fen": "8/8/7N/8/8/8/3k2B1/K7 b - - 0 1",
+            "plies": 174
+          },
+          {
+            "key": 60369,
+            "winning": true,
+            "fen": "8/8/7N/8/8/1k6/6B1/K7 b - - 0 1",
+            "plies": 174
+          },
+          {
+            "key": 60370,
+            "winning": true,
+            "fen": "8/8/7N/8/8/2k5/6B1/K7 b - - 0 1",
+            "plies": 174
+          },
+          {
+            "key": 60371,
+            "winning": true,
+            "fen": "8/8/7N/8/8/3k4/6B1/K7 b - - 0 1",
+            "plies": 174
+          },
+          {
+            "key": 89026,
+            "winning": true,
+            "fen": "8/8/7N/8/8/5B2/8/K1k5 b - - 0 1",
+            "plies": 174
+          },
+          {
+            "key": 89027,
+            "winning": true,
+            "fen": "8/8/7N/8/8/5B2/8/K2k4 b - - 0 1",
+            "plies": 174
+          },
+          {
+            "key": 89035,
+            "winning": true,
+            "fen": "8/8/7N/8/8/5B2/3k4/K7 b - - 0 1",
+            "plies": 174
+          },
+          {
+            "key": 89041,
+            "winning": true,
+            "fen": "8/8/7N/8/8/1k3B2/8/K7 b - - 0 1",
+            "plies": 174
+          },
+          {
+            "key": 89042,
+            "winning": true,
+            "fen": "8/8/7N/8/8/2k2B2/8/K7 b - - 0 1",
+            "plies": 174
+          },
+          {
+            "key": 89043,
+            "winning": true,
+            "fen": "8/8/7N/8/8/3k1B2/8/K7 b - - 0 1",
+            "plies": 174
+          },
+          {
+            "key": 159682,
+            "winning": true,
+            "fen": "7N/8/8/6B1/8/8/8/K1k5 b - - 0 1",
+            "plies": 174
+          }
+        ]
+      }
+    }
+  },
+  "reportedPosition": {
+    "fen": "8/8/N7/8/8/8/B1k5/K7 w - - 0 1",
+    "rejected": "Nb4+",
+    "rule": "r4.1",
+    "preferred": "Bd5"
+  },
+  "validation": {
+    "focusedAndStageTests": 21,
+    "allD4ReportedCase": true,
+    "build": "pass",
+    "runtimeFingerprintMatchesAudit": true,
+    "ruleTextChanged": false,
+    "ruleOrderChanged": false,
+    "r1R2Changed": false,
+    "auditTypescript": "New generator has no reported type errors; the wider audit tsconfig still reports four pre-existing errors in verify-piece-preservation.mts and worker.mts."
+  },
+  "limit": "All tablebase-winning starts force eventual mate under the audited policy. This does not establish a fifty-move guarantee; maximum finite duration remains 87 White moves."
+}

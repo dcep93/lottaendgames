@@ -1,5 +1,23 @@
 # R4.1: avoid entering another escape decision
 
+## Current implementation: generated return closure
+
+The return check now uses `bishopKnightRareReturnData.json`, a generated table of **seven D4-reduced excluded edges**. These are ordinary r4.1 penalties, not move removals or higher-priority exceptions. The original escape declarations, base reply guard, displayed rule text and priority order remain unchanged.
+
+The generator evaluates the complete current policy. If r4.1 changes the next-turn choice to the unique reversal of a selected White move, and Black can legally undo its reply, it adds that White edge to the exclusions. It keeps those exclusions, recomputes the affected decisions, and repeats against the resulting policy. Two passes add exclusions; the third finds no further additions and no four-ply policy cycles. This catches returns created by the previous pass instead of probing a deliberately incomplete policy. The browser uses the compiled table; it does not perform recursive closure searches.
+
+In the reported `Nb4+ Kc3 Na6 Kc2` position, **Nb4+ is rejected by r4.1** and **Bd5** is preferred. The earlier Nd2+ rejection and every declared escape remain intact across D4.
+
+### Reproduction and verification
+
+Run `app/node_modules/.bin/tsx scripts/bishop-knight-audit/derive-rare-returns.mts BASE_CACHE OUTPUT_CACHE`. `BASE_CACHE` must be a verified complete graph for the same policy with the generated return exclusions empty; the output directory must be new. For this run, the baseline was `.audit/all-legal-after-r42-pieces-safe`. The generator records every round and witness, checks 1,352 unaffected decisions, and writes the runtime table only after convergence. Regenerate and re-audit when the underlying policy changes; a cache from a different policy is not a valid baseline.
+
+The dependency-closed update refreshes eight distinct canonical sources across the rounds. A full distance recomputation and SCC check over **1,359,578 legal canonical White positions**, including all selected White ties and every legal Black reply, finds **zero cycles and zero lost wins from theoretically winning starts**. The remaining 24 previously looping winning White starts now converge. The result also covers Black-to-move starts; theoretically drawn positions remain separately classified.
+
+This is eventual convergence, not a fifty-move guarantee. The maximum finite duration remains 87 White moves. The audit includes the existing 40 uncommitted r2 shortcuts, which this change leaves untouched. All 21 focused/stage tests and the app build pass. The app bundle matches the audited worker's policy fingerprint. Machine-readable results are in `audits/2026-09-30-r41-return-closure.json`.
+
+## Earlier implementation and audit history
+
 For each candidate White move, examine every legal non-capturing Black reply. If the resulting position's original policy attributes its next White decision to r4.1, penalize the candidate under r4.1. The original escape declarations and forbidden-formation penalty remain in place.
 
 “Triggers r4.1” means r4.1 is the last rule that eliminates candidates, matching the app's decision attribution. Merely filtering an unwanted move is insufficient if a later rule still chooses among the survivors. This distinction preserves the declared Nf5 escapes while detecting the reported Na5/Nb3 loop.

@@ -1,4 +1,5 @@
-import {allSquares, findPiece, getChess, isKnightMove, kingDistance, manhattanDistance, SQUARE_TRANSFORMS, squareCoordinates, squareFromCoords, transformFen, transformSquare} from '../chess';
+import returnData from './bishopKnightRareReturnData.json';
+import {findPiece, getChess, isKnightMove, kingDistance, manhattanDistance, SQUARE_TRANSFORMS, squareCoordinates, squareFromCoords, transformFen, transformSquare} from '../chess';
 import type {Square} from 'chess.js';
 
 const exact = new Map(([
@@ -68,44 +69,17 @@ export function rareDegenerateEscapeMove(fen: string): string | undefined {
     ? move : undefined;
 }
 
-// Conservative White formations where the one-reply r4.1 filter can apply.
-// Ignore blockers and Black's square here; scoring supplies those checks.
-let lookaheadFormations: ReadonlySet<string> | undefined;
-export function canApplyRareEscapeLookahead(king?: Square, bishop?: Square, knight?: Square): boolean {
-  if (!king || !bishop || !knight) return false;
-  if (!lookaheadFormations) {
-    const predecessors = (formations: Iterable<string>) => {
-      const result = new Set<string>();
-      for (const key of formations) {
-        const pieces = key.match(/../g)! as Square[];
-        for (let i = 0; i < 3; i++) for (const square of allSquares()) {
-          if (pieces.includes(square)) continue;
-          const from = pieces[i]!, a = squareCoordinates(from), b = squareCoordinates(square);
-          if (!(i === 0 ? kingDistance(from, square) === 1
-            : i === 2 ? isKnightMove(from, square)
-            : Math.abs(a.file - b.file) === Math.abs(a.rank - b.rank))) continue;
-          const next = [...pieces]; next[i] = square;
-          result.add(next.join(''));
-        }
-      }
-      return result;
-    };
-    const triggers = new Set([...knightEscapes.keys(), ...predecessors(knightEscapes.keys())]);
-    for (const placement of exact.keys()) {
-      const fen = placement + ' w - - 0 1';
-      triggers.add(findPiece(fen, 'w', 'k')!.square + findPiece(fen, 'w', 'b')!.square
-        + findPiece(fen, 'w', 'n')!.square);
-    }
-    for (const k of allSquares()) for (const b of allSquares()) {
-      if (!edge(k) || !edge(b) || manhattanDistance(k, b) !== 1) continue;
-      const bc = squareCoordinates(b);
-      for (const n of allSquares()) {
-        const nc = squareCoordinates(n);
-        if (Math.abs(nc.file - bc.file) === 3 && Math.abs(nc.rank - bc.rank) === 3)
-          triggers.add(k + b + n);
-      }
-    }
-    lookaheadFormations = new Set([...triggers, ...predecessors(triggers)]);
-  }
-  return lookaheadFormations.has(king + bishop + knight);
+// Derived by the rare-return audit until no new forced-return exclusions
+// remain. Expand D4 once; clocks do not affect a positional repetition.
+const returnExclusions = new Map<string, Set<string>>();
+for (const {fen, moves} of returnData.exclusions) for (const transform of SQUARE_TRANSFORMS) {
+  const placement = transformFen(fen, transform).split(' ')[0]!;
+  const excluded = returnExclusions.get(placement) ?? new Set<string>();
+  for (const move of moves) excluded.add(transformSquare(move.slice(0, 2) as Square, transform)
+    + transformSquare(move.slice(2, 4) as Square, transform));
+  returnExclusions.set(placement, excluded);
+}
+export function rareEscapeReturnExcluded(fen: string, move: string): boolean {
+  const [placement, turn] = fen.split(' ');
+  return turn === 'w' && (returnExclusions.get(placement!)?.has(move) ?? false);
 }
