@@ -20,14 +20,30 @@ Certificates for these finite stage graphs do not prove every arbitrary winning 
 
 - `app/src/mate/rules/bishopKnightStages.ts` is the only runtime r1/r2 selector. It uses full resulting K/B/N/k placements, enforces exact material, and expands all D4 orientations once at initialization.
 - `bishopKnightStageData.json` contains source decisions and destination bounds. The 99 r1 source classes are closed under all Black replies. The remaining 560 source classes form r2; matching an r1 arrival may enter the net earlier. Within a known source, captured choices retain precedence over alternative destinations in that same stage.
-- `scripts/bishop-knight-audit/data/stage-policy-seed.json` is the immutable migration snapshot. It records choices from checkpoint `3a82ee1`; recapturing it from the new policy is explicitly blocked. Edit/extend a reviewed copy of the declarations deliberately, then regenerate and verify before adopting a new route.
+- `scripts/bishop-knight-audit/data/stage-policy-seed.json` is the immutable migration snapshot. It records choices from checkpoint `3a82ee1`; recapturing it from the new policy is explicitly blocked. Record approved replacements in `stage-route-improvements.json`, then regenerate and verify before adopting a new route. The generator keeps the seed unchanged and rejects r2 replacements of r1 sources.
 - `derive-stage-policy.mts` rejects missing destinations, unsafe replies, and cycles. `npm run check:mate:stages` checks deterministic regeneration. `npm run test:mate:stages` independently checks the actual selector, attribution, all symmetries, external entries via all three White pieces, counters, and material guards.
 - Earlier mating-net, cage, and happy-r2 helpers remain as audit evidence. They are not imported by the production policy. Their declaration tests use the explicitly named `historical-policy.mts` adapter; they are not certificates of the new runtime. The current stage tests are the authority for runtime r1/r2 behavior.
 
-The checked certificate covers 82 r2 starts, 659 White position classes, 1,546 Black-reply edges, and 5,272 symmetry checks. It finds no cycles, captures, or stalemates. Worst-case duration is 41 plies from r1 and 105 from the r2 starts. Phase strictly decreases on r2-to-r1 entry; within either phase the captured route bound decreases. Immediate checkmate always wins over a longer route.
+The checked certificate covers 82 r2 starts, 659 White position classes, 1,544 Black-reply edges, and 5,272 symmetry checks. It finds no cycles, captures, or stalemates. Worst-case duration is 41 plies from r1 and 101 from the r2 starts. Phase strictly decreases on r2-to-r1 entry; within either phase the captured route bound decreases. Immediate checkmate always wins over a longer route.
 
 To improve r2, preserve the closed r1 graph, make the intended route change explicit in the migration/declaration input, and regenerate. Re-run the full stage certificate against the real runtime. A newer declaration alone is not a reason to outrank an already verified route.
 
 ## Migration validation
 
 The final broad mate regression run passed 859 of 898 tests. Its 39 failures were all present in the checkpoint baseline, which had 71 failures among 893 tests; there were no newly failing test cases. These remaining historical rule assertions still need reconciliation, so the broad suite is not a green gate. The five new stage tests pass, including the complete runtime certificate. All 213 two-bishop tests, the book fidelity/navigation/content and strict SAN checks, TypeScript checks, and the production build pass. No curated book content was changed.
+
+## Approved shortcuts
+
+With White Ke6, Bd5, Nf3 and Black Kh7, prefer the full destination Ke6–Bd5–Ne5–Kh7 (8.Ne5 in the reviewed line), in every D4 orientation. This replaces Kf6 and reduces the worst-case continuation from 91 to 49 plies. The full current stage graph still terminates against all legal Black replies. With fresh clocks, after the seven approved shortcuts, two of the 82 r2 starts still exceed the fifty-move limit, each needing up to 101 plies. Other proposed shortcuts remain unadopted until reviewed.
+
+With White Ke5, Bd5, Nc6 and Black Kg6, prefer the full destination Ke5–Be4–Nc6–Kg6 (5.Be4+ in the reviewed line), in every D4 orientation. This replaces Nd4 and reduces the worst-case continuation from 95 to 77 plies. Black on g7 is a different source and is not included in this replacement.
+
+With White Ke3, Bd3, Nc4 and Black Kh1, prefer the full destination Kf3–Bd3–Nc4–Kh1 (6.Kf3 in the reviewed line), in every D4 orientation. This replaces Kf4 and reduces the worst-case continuation from 71 to 17 plies. The independent runtime certificate still finds no cycles, captures, or stalemates across all admitted stage destinations.
+
+With White Kd4, Bd5, Ne5 and Black Kg1, prefer the full destination Ke3–Bd5–Ne5–Kg1 (1.Ke3 in the reviewed line), in every D4 orientation. This replaces Be4 and reduces the worst-case continuation from 85 to 67 plies. Every Black reply immediately rejoins an existing certified source. Shortcut searches are restricted to existing routes; do not introduce new tablebase mating lines.
+
+With White Kd4, Bd5, Ne5 and Black Kh2, prefer the full destination Ke3–Bd5–Ne5–Kh2 (1.Ke3 in the reviewed line), in every D4 orientation. This replaces Be4 and reduces the worst-case continuation from 87 to 69 plies; all Black replies rejoin existing certified routes.
+
+With White Kd4, Bd5, Ne5 and Black Kh3, prefer the full destination Ke3–Bd5–Ne5–Kh3 (1.Ke3 in the reviewed line), in every D4 orientation. This replaces Be4 and reduces the worst-case continuation from 87 to 69 plies; all Black replies rejoin existing certified routes.
+
+With White Kd4, Bd5, Nc6 and Black Kd1, prefer the full destination Kd3–Bd5–Nc6–Kd1 (3.Kd3 in the reviewed line), in every D4 orientation. This replaces Be4 and reduces the worst-case continuation from 87 to 71 plies; all Black replies rejoin existing certified routes.
