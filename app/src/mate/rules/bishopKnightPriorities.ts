@@ -52,7 +52,7 @@ const whiteRules: readonly OrderedRule<KnightAndBishopWhiteMoveScore>[] =
     {
       id: "r4.1",
       shortLabel: "rule r4.1",
-      helpText: "Escape rare degenerate positions. Avoid moves allowing a legal Black reply that makes r4.1 decide White's next move.",
+      helpText: "Escape rare degenerate positions.",
       compare: (first, second) => first.rareEscapePenalty - second.rareEscapePenalty,
     },
     {
@@ -106,4 +106,3 @@ export const knightAndBishopWhiteRules = whiteRules.map((rule, index) => index <
     ...rule,
     applies: (score: KnightAndBishopWhiteMoveScore) => score.stage === 0 && (rule.applies?.(score) ?? true),
   }));
-
