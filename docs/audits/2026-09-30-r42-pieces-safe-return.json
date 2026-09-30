@@ -1,0 +1,73 @@
+{
+  "change": "r4.2 also avoids exact reversals forced by the higher minors-safe rule; user-declared Bc8 replaces Ng1 at one source",
+  "manifest": {
+    "complete": true,
+    "method": "Exhaustive graph with dependency-closed refresh of cached decisions; all distances must be recomputed",
+    "source": ".audit/all-legal-after-r42-lookahead-safe2",
+    "sourceFingerprint": "12de626e8d8c3a8eca47ac08a930b961b138f8ef4c5e013d7220baab68b55df1",
+    "fingerprint": "1734095dbbc9caa893b1d003a573cba0f9f5039e58210bb622c31a902d8e215a",
+    "commit": "8b77dd28066526019aaec1d238efb33b558d30dc",
+    "uncommittedR2Shortcuts": 40,
+    "nodeCount": 1359578,
+    "refreshed": 9,
+    "changed": 1,
+    "unaffectedVerified": 1352,
+    "changedArrivals": 0,
+    "seconds": 16.821,
+    "blackPolicy": "all legal",
+    "scope": "All legal KBNvK starts, both sides, both bishop colors, counters reset. All selected White ties."
+  },
+  "dependencyScope": "Only increases candidate loop penalties except the one changed lookup source. An old selected move whose reversal is forced by minors safe is an existing policy cycle. Refresh all 9 old cyclic nodes, the changed lookup source, and any old selected move whose Black reply can match its reversal in either lookup version. Increasing an unselected candidate penalty cannot change the choice. The changed lookup source does not qualify for the r4.1 probe.",
+  "before": {
+    "winningFailureClasses": 7914,
+    "winningFailurePhysical": 63300,
+    "winningDrawTerminalClasses": 0,
+    "cyclicComponents": 3,
+    "cyclicClasses": 9,
+    "cyclicPhysical": 72,
+    "largestCyclicComponentClasses": 5
+  },
+  "after": {
+    "winningFailureClasses": 7502,
+    "winningFailurePhysical": 60004,
+    "winningDrawTerminalClasses": 0,
+    "cyclicComponents": 2,
+    "cyclicClasses": 7,
+    "cyclicPhysical": 56,
+    "largestCyclicComponentClasses": 5
+  },
+  "convergenceChanges": {
+    "newlyForcedMateClasses": 412,
+    "newlyForcedMatePhysical": 3296,
+    "newlyNonMatingClasses": 0,
+    "newlyNonMatingPhysical": 0
+  },
+  "directLostWins": {
+    "counts": {
+      "positionsClasses": 0,
+      "positionsPhysical": 0,
+      "edgesClasses": 0,
+      "edgesPhysical": 0,
+      "allRecommendationsLoseClasses": 0,
+      "allRecommendationsLosePhysical": 0
+    },
+    "checkedWinningFailureClasses": 7502,
+    "seconds": 0.594660758972168,
+    "examples": []
+  },
+  "lookupChange": {
+    "source": 4871636,
+    "fen": "8/8/8/5B2/8/2K1k2N/8/8 w - - 0 1",
+    "before": "Ng1",
+    "after": "Bc8"
+  },
+  "validation": {
+    "focusedTests": 11,
+    "allD4ReportedCase": true,
+    "syzygyWinningLookupEntries": 9258,
+    "build": "pass",
+    "ruleTextChanged": false,
+    "ruleOrderChanged": false,
+    "r1R2Changed": false
+  }
+}

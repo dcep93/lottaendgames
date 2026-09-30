@@ -83,3 +83,28 @@ test('r4.2 does not take over a reversal required by r4.1', () => {
   assert.equal(candidate.score.piecePreservationPenalty, 0);
   assert.equal(explainMove(scores, policy.whiteRules, 'Nb3+')?.id, 'r4.1');
 });
+
+test('r4.2 avoids a return forced by minors safe without overriding that higher rule', () => {
+  const fen = '8/8/8/5B2/8/2K1k2N/8/8 w - - 0 1';
+  for (const transform of SQUARE_TRANSFORMS) {
+    const f = transformFen(fen, transform), board = getChess(f);
+    const play = (from: Parameters<typeof transformSquare>[0], to: Parameters<typeof transformSquare>[0]) =>
+      board.move({from: transformSquare(from, transform), to: transformSquare(to, transform)});
+    const recommended = getChess(f).move({from: transformSquare('f5', transform), to: transformSquare('c8', transform)});
+    const entry = play('h3', 'g1');
+    play('e3', 'f2');
+    const responseFen = board.fen();
+    const reverse = play('g1', 'h3');
+    play('f2', 'e3');
+    assert.equal(board.fen().split(' ')[0], f.split(' ')[0]);
+    assert.deepEqual(lookup(responseFen), []);
+    const scores = policy.scoreWhiteCandidates!(f, policy.whiteMoves(f));
+    assert.deepEqual(preferred(f), [recommended.san]);
+    assert.equal(scores.find(c => c.san === entry.san)!.score.piecePreservationPenalty, 2);
+    assert.equal(explainMove(scores, policy.whiteRules, entry.san)?.id, 'r4.2');
+    assert.equal(explainMove(scores, policy.whiteRules, recommended.san)?.id, 'r4.2');
+    const responses = policy.scoreWhiteCandidates!(responseFen, policy.whiteMoves(responseFen));
+    assert.deepEqual(preferred(responseFen), [reverse.san]);
+    assert.equal(explainMove(responses, policy.whiteRules, reverse.san)?.id, 'minors safe');
+  }
+});

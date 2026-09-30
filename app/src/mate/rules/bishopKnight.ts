@@ -289,16 +289,35 @@ const piecePreservationDecisionCache = new Map<string, string | undefined>();
 function requiredPiecePreservationMove(fen: string): string | undefined {
   const key = fen.split(' ').slice(0, 2).join(' ');
   if (piecePreservationDecisionCache.has(key)) return piecePreservationDecisionCache.get(key);
-  // Probe the existing rule, without recursively applying its new lookahead.
-  const context = whiteScoringContext(fen, true, false);
-  const candidates = getChess(fen).moves().map(san => ({
-    san, score: scoreKnightAndBishopWhiteMoveCore(fen, san, context),
-  }));
-  const selection = selectCandidatesByRules(candidates, knightAndBishopWhiteRules);
+  // A unique safe move is already forced by the higher piece-safety rule.
+  // Stop after two safe alternatives: no later scoring is needed unless this
+  // position has an r4.2 lookup. Neither probe applies this lookahead recursively.
+  const board = getChess(fen), legalMoves = board.moves();
+  let safeCount = 0, safeMove: string | undefined, safeMate = false;
+  for (const san of legalMoves) {
+    const move = board.move(san);
+    const replies = bishopKnightBlackReplies(board, findPiece(board.fen(), 'b', 'k')?.square);
+    if (!replies.some(reply => reply.captured === 'b' || reply.captured === 'n')) {
+      safeCount++;
+      safeMove = move.from + move.to;
+      safeMate = !replies.length && board.isCheck();
+    }
+    board.undo();
+    if (safeCount > 1) break;
+  }
   let required: string | undefined;
-  if (selection.lastEliminatingRule?.id === 'r4.2' && selection.idealCandidates.length === 1) {
-    const move = getChess(fen).move(selection.idealCandidates[0]!.san);
-    required = move.from + move.to;
+  if (safeCount === 1 && legalMoves.length > 1 && !safeMate) {
+    required = safeMove;
+  } else if (bishopKnightPiecePreservationMoves(fen).length) {
+    const context = whiteScoringContext(fen, true, false);
+    const candidates = legalMoves.map(san => ({
+      san, score: scoreKnightAndBishopWhiteMoveCore(fen, san, context),
+    }));
+    const selection = selectCandidatesByRules(candidates, knightAndBishopWhiteRules);
+    if (selection.lastEliminatingRule?.id === 'r4.2' && selection.idealCandidates.length === 1) {
+      const move = board.move(selection.idealCandidates[0]!.san);
+      required = move.from + move.to;
+    }
   }
   if (piecePreservationDecisionCache.size >= 8192) piecePreservationDecisionCache.clear();
   piecePreservationDecisionCache.set(key, required);
@@ -325,6 +344,7 @@ function scoreKnightAndBishopWhiteMoveCore(
   let kingCenterEuclidean: number | undefined;
   let knightTargetProximity: number | undefined;
   let immobileBishopPenalty: number | undefined;
+  let piecePreservationPenalty: number | undefined;
   const knight = findPiece(resultFen, "w", "n");
   const bishopInClutterRectangle = !!bishop && !!whiteKing && !!knight
     && bishopInsideClutterRectangle(bishop.square, whiteKing.square, knight.square);
@@ -347,15 +367,18 @@ function scoreKnightAndBishopWhiteMoveCore(
     matingNetPenalty: context.matingNetMoves.length && !context.matingNetMoves.includes(move.from + move.to) ? 1 : 0,
     sevenCagePenalty: context.sevenCageMoves.length && !context.sevenCageMoves.includes(move.from + move.to) ? 1 : 0,
     get piecePreservationPenalty() {
-      if (context.piecePreservationMoves.length && !context.piecePreservationMoves.includes(move.from + move.to)) return 1;
-      if (!context.checkPiecePreservationReplies || move.captured) return 0;
+      if (piecePreservationPenalty !== undefined) return piecePreservationPenalty;
+      const lookupPenalty = context.piecePreservationMoves.length && !context.piecePreservationMoves.includes(move.from + move.to) ? 1 : 0;
+      if (!context.checkPiecePreservationReplies || move.captured) return lookupPenalty;
       const reverse = move.to + move.from;
-      return blackReplies.some(reply => {
+      return piecePreservationPenalty = blackReplies.some(reply => {
         if (reply.captured) return false;
         chess.move(reply);
         try {
           const replyFen = chess.fen();
-          if (!bishopKnightPiecePreservationMoves(replyFen).includes(reverse)
+          const threatenedMinor = (bishop && kingDistance(reply.to, bishop.square) === 1)
+            || (knight && kingDistance(reply.to, knight.square) === 1);
+          if ((!threatenedMinor && !bishopKnightPiecePreservationMoves(replyFen).includes(reverse))
             || requiredPiecePreservationMove(replyFen) !== reverse) return false;
           chess.move({from: move.to, to: move.from});
           try {
@@ -364,7 +387,7 @@ function scoreKnightAndBishopWhiteMoveCore(
             return bishopKnightBlackReplies(chess, reply.to).some(back => back.to === reply.from);
           } finally { chess.undo(); }
         } finally { chess.undo(); }
-      }) ? 1 : 0;
+      }) ? 2 : lookupPenalty;
     },
     get bishopShuffleControlPenalty() {
       return context.bishopShuffleTargets.length && !context.bishopShuffleTargets.some(target =>
