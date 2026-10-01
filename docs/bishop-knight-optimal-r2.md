@@ -38,7 +38,7 @@ The browser receives only the optimal-policy closure of the established r2 start
 
 All nine focused stage tests and the application build passed. The wider audit TypeScript project still reports its four pre-existing errors in `verify-piece-preservation.mts` and `worker.mts`; no new errors were introduced.
 
-Runtime checks cover every exported position, all legal Black replies, D4 lookup equivalence, r1 closure and attribution, higher-rule precedence, and termination. The previous all-start duration audit describes the old policy and must not be presented as a distribution for this new policy.
+Runtime checks cover every exported position, all legal Black replies, D4 lookup equivalence, r1 closure and attribution, higher-rule precedence, and termination. The [updated all-start audit](bishop-knight-all-start-durations.md) verifies eventual mate from every theoretically winning legal start: the maximum is 72 White moves, and 72.13% of winning starts finish within 50 against all recommended ties and every Black reply.
 
 ## Reproduction and provenance
 
