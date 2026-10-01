@@ -3,7 +3,7 @@ import test from 'node:test'
 import {getChess, SQUARE_TRANSFORMS, transformFen, transformSquare} from '../chess'
 import {getIdealKnightAndBishopWhiteMoves, scoreKnightAndBishopWhiteMove, knightAndBishopWhiteRules} from './bishopKnight'
 
-test('r7 establishes king protection without a clutter or double-attack preference across D4', () => {
+test('r7.1 establishes king protection without a clutter or double-attack preference across D4', () => {
   const start = '3k4/8/1NB5/2K5/8/8/8/8 w - - 0 1'
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen(start, t)
@@ -14,7 +14,7 @@ test('r7 establishes king protection without a clutter or double-attack preferen
     const retreat = getChess(fen).move({from: transformSquare('c6', t), to: transformSquare('h1', t)}).san
     assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [knightMove])
     const knightScore=scoreKnightAndBishopWhiteMove(fen,knightMove), retreatScore=scoreKnightAndBishopWhiteMove(fen,retreat)
-    assert.ok(knightAndBishopWhiteRules.find(r=>r.id==='r7')!.subpriorities![0]!.compare!(knightScore,retreatScore)<0)
+    assert.ok(knightAndBishopWhiteRules.find(r=>r.id==='r7.1')!.subpriorities![0]!.compare!(knightScore,retreatScore)<0)
   }
 })
 

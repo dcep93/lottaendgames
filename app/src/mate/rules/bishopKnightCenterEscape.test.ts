@@ -3,9 +3,9 @@ import test from 'node:test';
 import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare, squaredEuclideanDistance } from '../chess';
 import { getIdealKnightAndBishopWhiteMoves, knightAndBishopWhiteRules, scoreKnightAndBishopWhiteMove } from './bishopKnight';
 
-test('r7 breaks equal knight proximity by central proximity only; r20 scores minor distances from Black', () => {
-  const r99 = knightAndBishopWhiteRules.find(rule => rule.id === 'r7')!;
-  const r20 = knightAndBishopWhiteRules.find(rule => rule.id === 'r20')!;
+test('r7.1 breaks equal knight proximity by central proximity only; r7.2 scores minor distances from Black', () => {
+  const r99 = knightAndBishopWhiteRules.find(rule => rule.id === 'r7.1')!;
+  const r20 = knightAndBishopWhiteRules.find(rule => rule.id === 'r7.2')!;
   const compare = r99.subpriorities![0]!.compare!;
   assert.ok(compare); assert.ok(r20.compare);
   for (const transform of SQUARE_TRANSFORMS) {
@@ -29,8 +29,8 @@ test('r7 breaks equal knight proximity by central proximity only; r20 scores min
 });
 
 
-test('r20 breaks equal Black-distance ties by minor Euclidean proximity to the center across D4', () => {
-  const r20 = knightAndBishopWhiteRules.find(rule => rule.id === 'r20')!;
+test('r7.2 breaks equal Black-distance ties by minor Euclidean proximity to the center across D4', () => {
+  const r20 = knightAndBishopWhiteRules.find(rule => rule.id === 'r7.2')!;
   assert.ok(r20.compare);
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen('8/8/4K3/3B4/Nk6/8/8/8 w - - 2 2', t);
@@ -44,8 +44,8 @@ test('r20 breaks equal Black-distance ties by minor Euclidean proximity to the c
 });
 
 
-test('r7 ranks knight proximity before Euclidean central-square proximity across D4', () => {
-  const compare = knightAndBishopWhiteRules.find(rule => rule.id === 'r7')!.subpriorities![0]!.compare!;
+test('r7.1 ranks knight proximity before Euclidean central-square proximity across D4', () => {
+  const compare = knightAndBishopWhiteRules.find(rule => rule.id === 'r7.1')!.subpriorities![0]!.compare!;
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen('8/7k/8/3BK3/2N5/8/8/8 w - - 6 4', t);
     const score = (to: 'd4' | 'e4' | 'f4' | 'f6') => scoreKnightAndBishopWhiteMove(fen,
@@ -66,11 +66,11 @@ test('r7 ranks knight proximity before Euclidean central-square proximity across
 });
 
 
-test('r7 leaves equal knight and central distances tied across D4', () => {
+test('r7.1 leaves equal knight and central distances tied across D4', () => {
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen('5k2/8/6B1/6K1/8/8/1N6/8 w - - 0 1', t);
     const move = (to: 'f4' | 'f5' | 'f6') => getChess(fen).move({from: transformSquare('g5', t), to: transformSquare(to, t)}).san;
-    const rule = knightAndBishopWhiteRules.find(r => r.id === 'r7')!;
+    const rule = knightAndBishopWhiteRules.find(r => r.id === 'r7.1')!;
     const f4 = scoreKnightAndBishopWhiteMove(fen, move('f4')), f5 = scoreKnightAndBishopWhiteMove(fen, move('f5')), f6 = scoreKnightAndBishopWhiteMove(fen, move('f6'));
     assert.equal(f4.kingCenterProximityScore, 1);
     assert.equal(f5.kingCenterProximityScore, 1);
@@ -83,7 +83,7 @@ test('r7 leaves equal knight and central distances tied across D4', () => {
 });
 
 
-test('r20 excludes minors defended by either the king or the other minor across D4', () => {
+test('r7.2 excludes minors defended by either the king or the other minor across D4', () => {
   const cases = [
     // After Kh2, Bc6 defends Nd5; only the bishop contributes.
     ['8/8/2B5/3N4/8/1k6/8/7K w - - 0 1', 'h1', 'h2', -Math.sqrt(10)],
@@ -100,8 +100,8 @@ test('r20 excludes minors defended by either the king or the other minor across 
 });
 
 
-test('r20 keeps initially undefended minors in the distance score even after gaining defense across D4', () => {
- const r20 = knightAndBishopWhiteRules.find(r => r.id === 'r20')!;
+test('r7.2 keeps initially undefended minors in the distance score even after gaining defense across D4', () => {
+ const r20 = knightAndBishopWhiteRules.find(r => r.id === 'r7.2')!;
  for (const t of SQUARE_TRANSFORMS) {
   const fen = transformFen('K7/8/8/7B/2k5/2N5/8/8 w - - 0 1', t);
   const san = (to: 'd1' | 'b1' | 'e2') => getChess(fen).move({from: transformSquare('c3', t), to: transformSquare(to, t)}).san;
@@ -116,7 +116,7 @@ test('r20 keeps initially undefended minors in the distance score even after gai
  }
 });
 
-test('r20 counts an edge bishop protecting an adjacent knight as stable, across D4', () => {
+test('r7.2 counts an edge bishop protecting an adjacent knight as stable, across D4', () => {
  for (const t of SQUARE_TRANSFORMS) {
   const fen = transformFen('B7/1N6/8/8/4k3/8/8/7K w - - 0 1', t);
   const san = getChess(fen).move({from: transformSquare('h1', t), to: transformSquare('h2', t)}).san;
@@ -124,8 +124,8 @@ test('r20 counts an edge bishop protecting an adjacent knight as stable, across 
  }
 });
 
-test('r20 keeps pre-move defense scoring with r4 inactive for Kd3, across D4',()=>{
- const r20=knightAndBishopWhiteRules.find(r=>r.id==='r20')!;
+test('r7.2 keeps pre-move defense scoring with r4 inactive for Kd3, across D4',()=>{
+ const r20=knightAndBishopWhiteRules.find(r=>r.id==='r7.2')!;
  for(const t of SQUARE_TRANSFORMS){
   const fen=transformFen('4B3/8/8/2k5/8/2NK4/8/8 w - - 0 1',t);
   const san=(to:'h5'|'b5')=>getChess(fen).move({from:transformSquare('e8',t),to:transformSquare(to,t)}).san;
@@ -141,7 +141,7 @@ test('r20 keeps pre-move defense scoring with r4 inactive for Kd3, across D4',()
  }
 });
 
-test('r20 keeps an initially defended bishop excluded even when its move leaves king protection',()=>{
+test('r7.2 keeps an initially defended bishop excluded even when its move leaves king protection',()=>{
  for(const t of SQUARE_TRANSFORMS){
   const fen=transformFen('8/8/1k6/8/4B3/2NK4/8/8 w - - 0 1',t);
   const move=getChess(fen).move({from:transformSquare('e4',t),to:transformSquare('h1',t)}).san;
@@ -152,8 +152,8 @@ test('r20 keeps an initially defended bishop excluded even when its move leaves 
 });
 
 
-test('r7 ignores Black proximity after knight and central proximity tie, across D4',()=>{
- const rule=knightAndBishopWhiteRules.find(r=>r.id==='r7')!;
+test('r7.1 ignores Black proximity after knight and central proximity tie, across D4',()=>{
+ const rule=knightAndBishopWhiteRules.find(r=>r.id==='r7.1')!;
  for(const t of SQUARE_TRANSFORMS){
   const fen=transformFen('8/8/8/5K2/3kN3/8/6B1/8 w - - 4 3',t);
   const move=(to:'f4'|'f6')=>getChess(fen).move({from:transformSquare('f5',t),to:transformSquare(to,t)}).san;
@@ -178,7 +178,7 @@ test('king approach remains preferred after the drift reset, across D4', () => {
 });
 
 
-test('r7 lets Nc5 beat king retreats using resulting proximity, across D4', () => {
+test('r7.1 lets Nc5 beat king retreats using resulting proximity, across D4', () => {
   for (const t of SQUARE_TRANSFORMS) {
     const fen = transformFen('4k3/8/B7/8/N1K5/8/8/8 w - - 2 2', t);
     const knight = getChess(fen).move({from: transformSquare('a4', t), to: transformSquare('c5', t)}).san;
@@ -187,11 +187,11 @@ test('r7 lets Nc5 beat king retreats using resulting proximity, across D4', () =
     assert.equal(n.kingKnightDistanceScore, 1, t.name);
     assert.equal(k.kingKnightDistanceScore, 1, t.name);
     assert.ok(n.kingCenterEuclideanScore < k.kingCenterEuclideanScore, t.name);
-    const r7 = knightAndBishopWhiteRules.find(rule => rule.id === 'r7')!;
+    const r7 = knightAndBishopWhiteRules.find(rule => rule.id === 'r7.1')!;
     assert.ok(r7.subpriorities![0]!.compare!(n, k) < 0, t.name);
     const otherKnight = getChess(fen).move({from: transformSquare('a4', t), to: transformSquare('c3', t)}).san;
     assert.equal(r7.subpriorities![0]!.compare!(n, scoreKnightAndBishopWhiteMove(fen, otherKnight)), 0, t.name);
-    // r20 subsequently prefers Nc3, farther from Black's king.
+    // r7.2 subsequently prefers Nc3, farther from Black's king.
     assert.deepEqual(getIdealKnightAndBishopWhiteMoves(fen), [otherKnight], t.name);
   }
 });

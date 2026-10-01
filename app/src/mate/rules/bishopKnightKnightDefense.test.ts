@@ -4,10 +4,10 @@ import type {Square} from 'chess.js';
 import {selectCandidatesByRules} from './selection';
 import {getChess, SQUARE_TRANSFORMS, transformFen, transformSquare} from '../chess';
 import {getIdealKnightAndBishopWhiteMoves, knightAndBishopWhiteRules, scoreKnightAndBishopWhiteMove} from './bishopKnight';
-const rule=knightAndBishopWhiteRules.find(r=>r.id==='r4.6')!;
-const placement=knightAndBishopWhiteRules.find(r=>r.id==='r4.7')!;
+const rule=knightAndBishopWhiteRules.find(r=>r.id==='r6.2')!;
+const placement=knightAndBishopWhiteRules.find(r=>r.id==='r6.3')!;
 
-test('r4.6 accepts bishop moves, knight moves, and maintained stable bishop defense of an attacked knight equally across D4',()=>{
+test('r6.2 accepts bishop moves, knight moves, and maintained stable bishop defense of an attacked knight equally across D4',()=>{
  for(const t of SQUARE_TRANSFORMS){
   const score=(fen:string,from:Square,to:Square)=>{
    const f=transformFen(fen,t);
@@ -23,10 +23,10 @@ test('r4.6 accepts bishop moves, knight moves, and maintained stable bishop defe
 });
 
 test('the culled rules are absent and king approach precedes defense and placement',()=>{
- assert.deepEqual(knightAndBishopWhiteRules.map(r=>r.id), ['mate','minors safe','no stalemate','r4','r4.5','r4.6','r4.7','r7','r20']);
+ assert.deepEqual(knightAndBishopWhiteRules.map(r=>r.id), ['mate','minors safe','no stalemate','r4','r6.1','r6.2','r6.3','r7.1','r7.2']);
 });
 
-test('r4.6 ranks defenses and r4.7 prefers White king proximity regardless of color across D4',()=>{
+test('r6.2 ranks defenses and r6.3 prefers White king proximity regardless of color across D4',()=>{
  for(const t of SQUARE_TRANSFORMS){
   const score=(wk:Square,to:Square,b:Square,n:Square)=>{
    const board=getChess('7K/8/8/8/8/8/8/k7 w - - 0 1');board.remove('h8');
@@ -63,7 +63,7 @@ test('r4.6 ranks defenses and r4.7 prefers White king proximity regardless of co
 });
 
 
-test('r4.6 ties bishop setups for an attackable piece across D4',()=>{
+test('r6.2 ties bishop setups for an attackable piece across D4',()=>{
  for(const t of SQUARE_TRANSFORMS){
   const f=transformFen('8/8/8/8/K2k4/8/5NB1/8 w - - 4 3',t);
   const score=(from:Square,to:Square)=>scoreKnightAndBishopWhiteMove(f,
@@ -76,7 +76,7 @@ test('r4.6 ties bishop setups for an attackable piece across D4',()=>{
 });
 
 
-test('r4.7 prioritizes White king proximity ahead of centrality across D4',()=>{
+test('r6.3 prioritizes White king proximity ahead of centrality across D4',()=>{
  for(const t of SQUARE_TRANSFORMS){
   const f=transformFen('3K4/8/2N5/8/5k2/8/8/7B w - - 4 3',t);
   const score=(to:Square)=>scoreKnightAndBishopWhiteMove(f,
@@ -91,7 +91,7 @@ test('r4.7 prioritizes White king proximity ahead of centrality across D4',()=>{
 });
 
 
-test('r4.7 uses centrality when White king proximity ties across D4',()=>{
+test('r6.3 uses centrality when White king proximity ties across D4',()=>{
  for(const t of SQUARE_TRANSFORMS){
   const f=transformFen('8/8/8/7k/8/2K5/8/2N4B w - - 0 1',t);
   const score=(to:Square)=>scoreKnightAndBishopWhiteMove(f,
@@ -103,7 +103,7 @@ test('r4.7 uses centrality when White king proximity ties across D4',()=>{
 });
 
 
-test('r4.7 ties diagonal and orthogonal king protection, then favors the central knight across D4',()=>{
+test('r6.3 ties diagonal and orthogonal king protection, then favors the central knight across D4',()=>{
  for(const t of SQUARE_TRANSFORMS){
   const f=transformFen('B7/8/8/8/8/8/1k4K1/6N1 w - - 0 1',t);
   const score=(from:Square,to:Square)=>scoreKnightAndBishopWhiteMove(f,
@@ -116,7 +116,7 @@ test('r4.7 ties diagonal and orthogonal king protection, then favors the central
 });
 
 
-test('r4.6 moves an attacked bishop adjacent to the knight across D4',()=>{
+test('r6.2 moves an attacked bishop adjacent to the knight across D4',()=>{
  for(const t of SQUARE_TRANSFORMS){
   const f=transformFen('5K2/8/8/8/Bk6/8/8/3N4 w - - 0 1',t);
   const san=(to:Square)=>getChess(f).move({from:transformSquare('a4',t),to:transformSquare(to,t)}).san;
@@ -130,7 +130,7 @@ test('r4.6 moves an attacked bishop adjacent to the knight across D4',()=>{
 });
 
 
-test('r4.6 drifts a bishop before Black can step into an attack across D4',()=>{
+test('r6.2 drifts a bishop before Black can step into an attack across D4',()=>{
  for(const t of SQUARE_TRANSFORMS){
   const f=transformFen('5K2/8/1k6/8/B7/8/8/3N4 w - - 0 1',t);
   const san=getChess(f).move({from:transformSquare('a4',t),to:transformSquare('c2',t)}).san;
@@ -139,7 +139,7 @@ test('r4.6 drifts a bishop before Black can step into an attack across D4',()=>{
 });
 
 
-test('r4.6 anticipates knight attacks within two steps but not three across D4',()=>{
+test('r6.2 anticipates knight attacks within two steps but not three across D4',()=>{
  for(const t of SQUARE_TRANSFORMS){
   for(const [fen,expected] of [
    ['8/8/6k1/8/4N3/8/8/K6B w - - 0 1',1],
@@ -153,7 +153,7 @@ test('r4.6 anticipates knight attacks within two steps but not three across D4',
 });
 
 
-test('r4.6 does not activate knight attackability from a candidate move across D4',()=>{
+test('r6.2 does not activate knight attackability from a candidate move across D4',()=>{
  for(const t of SQUARE_TRANSFORMS){
   const f=transformFen('8/1K6/8/2k2B2/8/8/2N5/8 w - - 0 1',t);
   const san=getChess(f).move({from:transformSquare('c2',t),to:transformSquare('e3',t)}).san;
@@ -164,7 +164,7 @@ test('r4.6 does not activate knight attackability from a candidate move across D
 });
 
 
-test('r4.6 recognizes Bb3 then Nd5 setup and ties immediate Na4 defense across D4',()=>{
+test('r6.2 recognizes Bb3 then Nd5 setup and ties immediate Na4 defense across D4',()=>{
  for(const t of SQUARE_TRANSFORMS){
   const f=transformFen('8/6K1/8/4k3/8/2N5/8/3B4 w - - 2 2',t);
   const san=(from:Square,to:Square)=>getChess(f).move({from:transformSquare(from,t),to:transformSquare(to,t)}).san;
@@ -183,7 +183,7 @@ test('r4.6 recognizes Bb3 then Nd5 setup and ties immediate Na4 defense across D
 });
 
 
-test('r4.6 prepares knight protection when the bishop alone starts attacked across D4',()=>{
+test('r6.2 prepares knight protection when the bishop alone starts attacked across D4',()=>{
  for(const t of SQUARE_TRANSFORMS){
   const f=transformFen('8/8/2B5/2k5/5K2/8/1N6/8 w - - 0 1',t);
   const san=(to:Square)=>getChess(f).move({from:transformSquare('c6',t),to:transformSquare(to,t)}).san;
@@ -192,7 +192,7 @@ test('r4.6 prepares knight protection when the bishop alone starts attacked acro
   }
   assert.equal(scoreKnightAndBishopWhiteMove(f,san('h1')).knightDefensePenalty,3,t.name);
   const candidates=getChess(f).moves().map(san=>({san,score:scoreKnightAndBishopWhiteMove(f,san)}));
-  const prefix=knightAndBishopWhiteRules.slice(0,knightAndBishopWhiteRules.findIndex(r=>r.id==='r4.6')+1);
+  const prefix=knightAndBishopWhiteRules.slice(0,knightAndBishopWhiteRules.findIndex(r=>r.id==='r6.2')+1);
   const accepted=selectCandidatesByRules(candidates,prefix).idealCandidates.map(c=>c.san);
   assert.ok(accepted.includes(san('e8')),t.name);
   assert.ok(accepted.includes(san('e4')),t.name);
@@ -201,7 +201,7 @@ test('r4.6 prepares knight protection when the bishop alone starts attacked acro
 });
 
 
-test('r4.6 checks both pieces before White moves so loaded Nd3 is not vetoed across D4',()=>{
+test('r6.2 checks both pieces before White moves so loaded Nd3 is not vetoed across D4',()=>{
  for(const t of SQUARE_TRANSFORMS){
   const f=transformFen('4B3/8/8/3k1K2/8/8/1N6/8 w - - 0 1',t);
   const san=(from:Square,to:Square)=>getChess(f).move({from:transformSquare(from,t),to:transformSquare(to,t)}).san;
@@ -213,7 +213,7 @@ test('r4.6 checks both pieces before White moves so loaded Nd3 is not vetoed acr
 });
 
 
-test('r4.6 ignores a king-defended bishop even when Black can legally approach it across D4',()=>{
+test('r6.2 ignores a king-defended bishop even when Black can legally approach it across D4',()=>{
  for(const t of SQUARE_TRANSFORMS){
   const f=transformFen('8/8/8/5K2/2k1B3/8/8/N7 w - - 0 1',t);
   const move=getChess(f).move({from:transformSquare('e4',t),to:transformSquare('d5',t)}).san;
@@ -221,7 +221,7 @@ test('r4.6 ignores a king-defended bishop even when Black can legally approach i
  }
 });
 
-test('r4.6 requires a legal Black approach rather than only a two-step radius across D4',()=>{
+test('r6.2 requires a legal Black approach rather than only a two-step radius across D4',()=>{
  for(const t of SQUARE_TRANSFORMS){
   // Be4 controls d3/d5 and Nf3 controls d4: Black cannot approach Be4.
   const f=transformFen('7K/8/8/8/2k1B3/5N2/8/8 w - - 0 1',t);
@@ -230,7 +230,7 @@ test('r4.6 requires a legal Black approach rather than only a two-step radius ac
  }
 });
 
-test('r4.6 credits a knight establishing stable protection when only the bishop is attackable across D4',()=>{
+test('r6.2 credits a knight establishing stable protection when only the bishop is attackable across D4',()=>{
  for(const t of SQUARE_TRANSFORMS){
   const f=transformFen('7K/8/8/8/2k1B3/8/8/N7 w - - 0 1',t);
   const san=(from:Square,to:Square)=>getChess(f).move({from:transformSquare(from,t),to:transformSquare(to,t)}).san;
@@ -252,7 +252,7 @@ test('the loaded king-defended Be4 position selects Nc2 across D4',()=>{
 });
 
 
-test('r4.6 credits Nf5 preparing Bg4 stable protection across D4',()=>{
+test('r6.2 credits Nf5 preparing Bg4 stable protection across D4',()=>{
  for(const t of SQUARE_TRANSFORMS){
   const f=transformFen('8/3K4/8/7B/3k4/4N3/8/8 w - - 2 2',t);
   const san=(from:Square,to:Square)=>getChess(f).move({from:transformSquare(from,t),to:transformSquare(to,t)}).san;

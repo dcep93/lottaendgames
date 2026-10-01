@@ -112,8 +112,8 @@ test("bishop-and-knight rules are registered", () => {
       helpText: "With a central king and central 16 knight, then prefer king protection of the knight, maneuver the knight to a central square opposite the bishop's color, then navigate to a central bishop and the king to a central square opposite the bishop's color.",
     },
     {
-      id: "r4.5",
-      shortLabel: "rule r4.5",
+      id: "r6.1",
+      shortLabel: "rule r6.1",
       helpText: "Prefer an uncluttered bishop.",
     },
     {
@@ -127,13 +127,13 @@ test("bishop-and-knight rules are registered", () => {
       helpText: "Prefer an attacked piece to be defended by the king.",
     },
     {
-      id: "r6",
-      shortLabel: "rule r6",
+      id: "r6.4",
+      shortLabel: "rule r6.4",
       helpText: "Drift the knight towards king protection, then prefer knight central 16 proximity.",
     },
     {
-      id: "r7",
-      shortLabel: "rule r7",
+      id: "r7.1",
+      shortLabel: "rule r7.1",
       helpText: "Prefer king step proximity to the knight, then king central proximity.",
     },
     {
@@ -142,8 +142,8 @@ test("bishop-and-knight rules are registered", () => {
       helpText: "With the kings in opposition or a knight's move apart, and the black king more central than the white king, and the knight between the kings, use the bishop to control black's more central shuffling square.",
     },
     {
-      id: "r20",
-      shortLabel: "rule r20",
+      id: "r7.2",
+      shortLabel: "rule r7.2",
       helpText: "Maximize unprotected piece distance from Black's king, then prefer central proximity.",
     },
   ]);
@@ -165,13 +165,13 @@ test("bishop-and-knight rules are registered", () => {
       "minors safe",
       "no stalemate",
       "r4",
-      "r4.5",
+      "r6.1",
       "r5",
       "r5.5",
-      "r6",
-      "r7",
+      "r6.4",
+      "r7.1",
       "r8",
-      "r20",
+      "r7.2",
     ],
   );
   assert.deepEqual(

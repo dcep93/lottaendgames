@@ -1,4 +1,4 @@
-"""Independently validate every generated r4.2 move against local Syzygy WDL."""
+"""Independently validate every generated r5.2 move against local Syzygy WDL."""
 import argparse
 import json
 from pathlib import Path

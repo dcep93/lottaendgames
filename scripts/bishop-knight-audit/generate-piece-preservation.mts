@@ -11,8 +11,8 @@ const input = process.argv[2];
 assert.ok(input, 'Usage: tsx generate-piece-preservation.mts candidates.json [output.json]');
 type Candidate = {source: number; fen: string; winning: string[]};
 const candidates: Candidate[] = JSON.parse(readFileSync(input, 'utf8'));
-const rules = policy.whiteRules.filter(rule => rule.id !== 'r4.2');
-const prefix = rules.slice(0, rules.findIndex(rule => rule.id === 'r4.1') + 1);
+const rules = policy.whiteRules.filter(rule => rule.id !== 'r5.2');
+const prefix = rules.slice(0, rules.findIndex(rule => rule.id === 'r5.1') + 1);
 const blocked: {source: number; fen: string; san: string}[] = [];
 const moves = candidates.map(row => {
   assert.equal(code(row.fen), row.source);

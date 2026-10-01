@@ -4,7 +4,7 @@ import {getChess, SQUARE_TRANSFORMS, transformFen, transformSquare} from '../che
 import {declaredKnightDefenseMove} from './bishopKnightDeclaredDefense';
 import {getIdealKnightAndBishopWhiteMoves, scoreKnightAndBishopWhiteMove} from './bishopKnight';
 
-test('exact r4.6 placement prefers Kc5 across D4, independent of clocks', () => {
+test('exact r6.2 placement prefers Kc5 across D4, independent of clocks', () => {
   for (const source of ['1k6/8/B7/1K6/1N6/8/8/8 w - - 14 8', '8/k7/B7/1K6/1N6/8/8/8 w - - 0 1'])
   for (const transform of SQUARE_TRANSFORMS) {
     const fen = transformFen(source, transform);
@@ -14,7 +14,7 @@ test('exact r4.6 placement prefers Kc5 across D4, independent of clocks', () => 
   }
 });
 
-test('exact r4.6 exception does not extend to changed piece placements or Black turn', () => {
+test('exact r6.2 exception does not extend to changed piece placements or Black turn', () => {
   for (const fen of [
     'k7/8/B7/1K6/1N6/8/8/8 w - - 0 1',
     '1k6/8/8/1KB5/1N6/8/8/8 w - - 0 1',

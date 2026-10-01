@@ -1,4 +1,4 @@
-/** Compile r4.1 forced-return exclusions to a policy fixed point using a cached full graph.
+/** Compile r5.1 forced-return exclusions to a policy fixed point using a cached full graph.
  * Usage: tsx scripts/bishop-knight-audit/derive-rare-returns.mts BASE_CACHE OUTPUT_CACHE
  * BASE_CACHE must describe the current policy with the generated exclusions empty.
  */
@@ -86,9 +86,9 @@ for(let round=1;;round++){
     if(replyCache.has(key))return replyCache.get(key);
     const {scores,selection}=inspect(a,source);
     let result:string|undefined;
-    if(selection.idealCandidates.length===1 && [...selection.eliminatedBy.values()].some((r:any)=>r.id==='r4.1')){
+    if(selection.idealCandidates.length===1 && [...selection.eliminatedBy.values()].some((r:any)=>r.id==='r5.1')){
       const chosen=selection.idealCandidates[0];
-      const without=a.select(scores,a.rules.whiteRules.filter((r:any)=>r.id!=='r4.1'));
+      const without=a.select(scores,a.rules.whiteRules.filter((r:any)=>r.id!=='r5.1'));
       if(!without.idealCandidates.includes(chosen))result=uci(a.getChess(source).move(chosen.san));
     }
     replyCache.set(key,result);return result;
@@ -138,7 +138,7 @@ const bundle=await build({entryPoints:['scripts/bishop-knight-audit/worker.mts']
 const bytes=bundle.outputFiles[0].contents,fingerprint=hash(bytes);
 writeFileSync(outDir+'/worker.mjs',bytes);
 db.prepare('INSERT OR REPLACE INTO meta VALUES (?,?)').run('hash',fingerprint);db.close();
-const manifest={complete:true,method:'Monotone r4.1 forced-return closure; all distances must be recomputed',source:baseDir,sourceFingerprint:baseline.fingerprint,fingerprint,nodeCount:count,refreshed:touched.size,unaffectedVerified:verified,rounds,exclusions:data().exclusions};
+const manifest={complete:true,method:'Monotone r5.1 forced-return closure; all distances must be recomputed',source:baseDir,sourceFingerprint:baseline.fingerprint,fingerprint,nodeCount:count,refreshed:touched.size,unaffectedVerified:verified,rounds,exclusions:data().exclusions};
 writeFileSync(outDir+'/manifest.json',JSON.stringify(manifest,null,2)+'\n');
 writeFileSync(outDir+'/refresh-scope.json',JSON.stringify({reasons:[...touched].map(key=>({key,reasons:['forced-return closure']}))},null,2));
 writeFileSync('app/src/mate/rules/bishopKnightRareReturnData.json',JSON.stringify(data(),null,2)+'\n');

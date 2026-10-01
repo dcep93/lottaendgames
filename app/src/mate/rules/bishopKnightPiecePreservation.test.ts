@@ -18,7 +18,7 @@ const cases = [
   ['8/8/8/8/8/2K1k3/6B1/7N w - - 0 1', 'Kc4'],
 ] as const;
 
-test('r4.2 preserves the declared wins across D4 with ordinary rule attribution', () => {
+test('r5.2 preserves the declared wins across D4 with ordinary rule attribution', () => {
   for (const [fen, san] of cases) {
     const move = getChess(fen).move(san);
     for (const transform of SQUARE_TRANSFORMS) {
@@ -30,24 +30,24 @@ test('r4.2 preserves the declared wins across D4 with ordinary rule attribution'
       const actual = getChess(f).move(selected[0]!);
       assert.equal(actual.from + actual.to, expected);
       const scores = policy.scoreWhiteCandidates!(f, policy.whiteMoves(f));
-      assert.equal(explainMove(scores, policy.whiteRules, selected[0])?.id, 'r4.2');
+      assert.equal(explainMove(scores, policy.whiteRules, selected[0])?.id, 'r5.2');
       assert.deepEqual(lookup(f.replace(/ \d+ \d+$/, ' 82 42')), [expected]);
     }
   }
 });
 
-test('r4.2 is an exact source lookup and does not match wrong turn or extra material', () => {
+test('r5.2 is an exact source lookup and does not match wrong turn or extra material', () => {
   const [fen] = cases[0];
   assert.deepEqual(lookup(fen.replace(' w ', ' b ')), []);
   assert.deepEqual(lookup(fen.replace(/^8\//, 'R7/')), []);
   assert.deepEqual(lookup('8/8/8/8/8/2K5/B1N5/2k5 w - - 6 4'), []);
   const rules = policy.whiteRules.map(rule => rule.id);
-  assert.equal(rules.indexOf('r4.2'), rules.indexOf('r4.1') + 1);
-  assert.equal(rules.indexOf('r4.5'), rules.indexOf('r4.2') + 1);
+  assert.equal(rules.indexOf('r5.2'), rules.indexOf('r5.1') + 1);
+  assert.equal(rules.indexOf('r6.1'), rules.indexOf('r5.2') + 1);
   assert.ok(rules.indexOf('mate') < rules.indexOf('r1'));
 });
 
-test('r4.2 rejects exact undo loops for king and knight moves across D4', () => {
+test('r5.2 rejects exact undo loops for king and knight moves across D4', () => {
   const loops = [
     ['8/8/8/K7/8/3k4/B3N3/8 w - - 0 1', ['Nc1+', 'Kc2', 'Ne2', 'Kd3']],
     ['8/8/8/8/8/8/K1k1B3/5N2 w - - 0 1', ['Ka1', 'Kc1', 'Ka2', 'Kc2']],
@@ -66,9 +66,9 @@ test('r4.2 rejects exact undo loops for king and knight moves across D4', () => 
       assert.deepEqual(lookup(game.fen()), [undo]);
       const replyScores = policy.scoreWhiteCandidates!(game.fen(), policy.whiteMoves(game.fen()));
       const undoSan = game.move({from: transformSquare(moves[2].from, transform), to: transformSquare(moves[2].to, transform)}).san;
-      assert.equal(explainMove(replyScores, policy.whiteRules, undoSan)?.id, 'r4.2');
+      assert.equal(explainMove(replyScores, policy.whiteRules, undoSan)?.id, 'r5.2');
       const scores = policy.scoreWhiteCandidates!(f, policy.whiteMoves(f));
-      assert.equal(explainMove(scores, policy.whiteRules, first.san)?.id, 'r4.2');
+      assert.equal(explainMove(scores, policy.whiteRules, first.san)?.id, 'r5.2');
       assert.ok(!preferred(f).includes(first.san));
       // Counters cannot hide or create a placement repetition.
       assert.deepEqual(preferred(f.replace(/ \d+ \d+$/, ' 82 42')), preferred(f));
@@ -76,15 +76,15 @@ test('r4.2 rejects exact undo loops for king and knight moves across D4', () => 
   }
 });
 
-test('r4.2 does not take over a reversal required by r4.1', () => {
+test('r5.2 does not take over a reversal required by r5.1', () => {
   const fen = '8/8/8/N7/8/8/B7/K1k5 w - - 0 1';
   const scores = policy.scoreWhiteCandidates!(fen, policy.whiteMoves(fen));
   const candidate = scores.find(candidate => candidate.san === 'Nb3+')!;
   assert.equal(candidate.score.piecePreservationPenalty, 0);
-  assert.equal(explainMove(scores, policy.whiteRules, 'Nb3+')?.id, 'r4.1');
+  assert.equal(explainMove(scores, policy.whiteRules, 'Nb3+')?.id, 'r5.1');
 });
 
-test('r4.2 avoids a return forced by minors safe without overriding that higher rule', () => {
+test('r5.2 avoids a return forced by minors safe without overriding that higher rule', () => {
   const fen = '8/8/8/5B2/8/2K1k2N/8/8 w - - 0 1';
   for (const transform of SQUARE_TRANSFORMS) {
     const f = transformFen(fen, transform), board = getChess(f);
@@ -101,8 +101,8 @@ test('r4.2 avoids a return forced by minors safe without overriding that higher 
     const scores = policy.scoreWhiteCandidates!(f, policy.whiteMoves(f));
     assert.deepEqual(preferred(f), [recommended.san]);
     assert.equal(scores.find(c => c.san === entry.san)!.score.piecePreservationPenalty, 2);
-    assert.equal(explainMove(scores, policy.whiteRules, entry.san)?.id, 'r4.2');
-    assert.equal(explainMove(scores, policy.whiteRules, recommended.san)?.id, 'r4.2');
+    assert.equal(explainMove(scores, policy.whiteRules, entry.san)?.id, 'r5.2');
+    assert.equal(explainMove(scores, policy.whiteRules, recommended.san)?.id, 'r5.2');
     const responses = policy.scoreWhiteCandidates!(responseFen, policy.whiteMoves(responseFen));
     assert.deepEqual(preferred(responseFen), [reverse.san]);
     assert.equal(explainMove(responses, policy.whiteRules, reverse.san)?.id, 'minors safe');

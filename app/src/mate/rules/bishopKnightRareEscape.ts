@@ -44,7 +44,7 @@ const edge = (square: Square) => {
   return file === 0 || file === 7 || rank === 0 || rank === 7;
 };
 
-/** r4.1: geometric escape, White-only formation, and exact D4 declarations. */
+/** r5.1: geometric escape, White-only formation, and exact D4 declarations. */
 export function rareDegenerateEscapeMove(fen: string): string | undefined {
   const [placement, turn] = fen.split(' ');
   if (turn !== 'w') return undefined;

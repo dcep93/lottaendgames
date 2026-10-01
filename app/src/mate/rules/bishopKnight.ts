@@ -280,7 +280,7 @@ function triggersBaseRareEscapeRule(fen: string): boolean {
     // Use actual rule attribution: filtering a discarded move is not enough
     // when a later rule still has to choose among the remaining candidates.
     triggers = selectCandidatesByRules(candidates, knightAndBishopWhiteRules)
-      .lastEliminatingRule?.id === 'r4.1';
+      .lastEliminatingRule?.id === 'r5.1';
   }
   if (rareEscapeTriggerCache.size >= 8192) rareEscapeTriggerCache.clear();
   rareEscapeTriggerCache.set(key, triggers);
@@ -294,7 +294,7 @@ function requiredPiecePreservationMove(fen: string): string | undefined {
   if (piecePreservationDecisionCache.has(key)) return piecePreservationDecisionCache.get(key);
   // A unique safe move is already forced by the higher piece-safety rule.
   // Stop after two safe alternatives: no later scoring is needed unless this
-  // position has an r4.2 lookup. Neither probe applies this lookahead recursively.
+  // position has an r5.2 lookup. Neither probe applies this lookahead recursively.
   const board = getChess(fen), legalMoves = board.moves();
   let safeCount = 0, safeMove: string | undefined, safeMate = false;
   for (const san of legalMoves) {
@@ -317,7 +317,7 @@ function requiredPiecePreservationMove(fen: string): string | undefined {
       san, score: scoreKnightAndBishopWhiteMoveCore(fen, san, context),
     }));
     const selection = selectCandidatesByRules(candidates, knightAndBishopWhiteRules);
-    if (selection.lastEliminatingRule?.id === 'r4.2' && selection.idealCandidates.length === 1) {
+    if (selection.lastEliminatingRule?.id === 'r5.2' && selection.idealCandidates.length === 1) {
       const move = board.move(selection.idealCandidates[0]!.san);
       required = move.from + move.to;
     }
