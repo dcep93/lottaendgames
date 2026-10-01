@@ -1,3 +1,4 @@
+import { getTwoKnightsPawnPermittedMoves } from './rules/twoKnightsPawnMoves'
 import type { Chess } from 'chess.js'
 import {
   collectionIndex,
@@ -15,6 +16,7 @@ export const NO_PREFERRED_RULE_ID = 'no-preferred-rule'
 
 export type MateTerminalOutcome =
   | 'checkmate'
+  | 'white-checkmate'
   | 'stalemate'
   | 'lost-material'
   | 'lost-knight'
@@ -295,6 +297,7 @@ function completeWhiteTurn(options: {
     whiteAnalysis?.idealWhiteMoves ?? ruleSet.idealWhiteMoves(preMoveFen)
   const whiteMove = tryMove(chess, san)
   if (whiteMove === null) return undefined
+  if (mateId === 'two-knights-pawn' && !getTwoKnightsPawnPermittedMoves(preMoveFen).some(move => move.san === whiteMove.san)) return undefined
 
   const canonicalSan = whiteMove.san
   const isCorrect = idealWhiteMoves.includes(canonicalSan)
@@ -447,7 +450,14 @@ export function createMateReplaySession(
   }
 
   let session = createMateSession(selection, deps)
-  for (let index = 0; index < selection.moves.length; index += 2) {
+  let firstWhiteIndex = 0
+  if (selection.mateId === 'two-knights-pawn' && getChess(session.fen).turn() === 'b') {
+    const next = playBlackMove(session, selection.moves[0]!, deps)
+    if (next === session) throw new Error('Mate replay rejected initial Black move')
+    session = next
+    firstWhiteIndex = 1
+  }
+  for (let index = firstWhiteIndex; index < selection.moves.length; index += 2) {
     if (session.outcome !== undefined) {
       throw new Error('Mate replay continues after a terminal position')
     }
@@ -530,6 +540,13 @@ export function playBlackMove(
     if (getChess(session.fen).turn() !== 'b') return session
   } catch {
     return session
+  }
+  if (session.mateId === 'two-knights-pawn' && session.logs.length === 0) {
+    const chess = getChess(session.fen)
+    const move = tryMove(chess, san)
+    if (!move || !getTwoKnightsPawnPermittedMoves(session.fen).some(candidate => candidate.san === move.san)) return session
+    const now = deps.now()
+    return commitSnapshot({ ...session, startedAtMs: session.startedAtMs ?? now }, chess.fen(), [], now, getMateTerminalOutcome(session.mateId, chess.fen()))
   }
   const logIndex = session.logs.length - 1
   const pendingLog = session.logs[logIndex]
@@ -620,7 +637,7 @@ export function replaceHistoricalWhiteMove(
   const idealMoves = deps
     .getRuleSet(session.mateId)
     .idealWhiteMoves(originalLog.fen)
-  if (!idealMoves.includes(canonicalSan)) return session
+  if (session.mateId !== 'two-knights-pawn' && !idealMoves.includes(canonicalSan)) return session
   const completed = completeWhiteTurn({
     mateId: session.mateId,
     preMoveFen: originalLog.fen,

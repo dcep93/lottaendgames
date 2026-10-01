@@ -20,9 +20,9 @@ const sharedQueensideRookFen =
 const sharedRookTrainFen =
   '8/8/8/8/3k4/8/1R6/3K4 w - - 0 1'
 const sharedKnnStandardFen =
-  '4k3/p7/8/8/8/8/8/1N2K1N1 w - - 0 1'
+  'k7/8/8/8/3KN2p/7N/8/8 w - - 0 1'
 const sharedKnnTrainFen =
-  '7k/8/5NKN/8/8/8/p7/8 w - - 0 1'
+  'k7/8/8/8/3KN2p/7N/8/8 w - - 50 26'
 const rookReplayMoves = ['Rb3', 'Kc5'] as const
 const sharedRookLiveFen =
   'R7/6k1/8/8/8/8/8/K7 w - - 2 2'
@@ -290,8 +290,6 @@ assert.deepEqual(
 )
 for (const [pathname, hash] of [
   ['/mate/rook/train', encodeMateFen(sharedRookFen)],
-  ['/mate/two-knights-pawn/train', encodeMateFen(sharedKnnStandardFen)],
-  ['/mate/two-knights-pawn', encodeMateFen(sharedKnnTrainFen)],
   ['/mate/rook', '#fen=%E0%A4%A'],
   [
     '/mate/rook',

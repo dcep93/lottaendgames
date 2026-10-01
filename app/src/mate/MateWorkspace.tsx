@@ -50,6 +50,7 @@ export type MateWorkspaceProps = {
   readonly BoardComponent: React.ComponentType<MateBoardProps>
   readonly mateId: MateId
   readonly mateMode: MateMode
+  readonly sharedError?: string
   readonly sharedFen: string | null
   readonly sharedMoves: readonly string[] | null
   readonly sharedReplayCursor: 0 | null
@@ -77,6 +78,7 @@ export default function MateWorkspace({
   mateMode,
   onReplaceHref,
   sharedFen,
+  sharedError,
   sharedMoves,
   sharedReplayCursor,
 }: MateWorkspaceProps) {
@@ -123,6 +125,7 @@ export default function MateWorkspace({
   const shareRequestRef = React.useRef(0)
   const [showTimer, setShowTimer] = React.useState(readMateTimerPreference)
   const [shareStatus, setShareStatus] = React.useState('')
+  const [activeSharedError, setActiveSharedError] = React.useState(sharedError)
   const [playBestAnimation, setPlayBestAnimation] =
     React.useState<PlayBestAnimation | null>(null)
 
@@ -131,7 +134,7 @@ export default function MateWorkspace({
   }, [session])
 
   React.useEffect(() => {
-    if (session.history === seededReplayHistoryRef.current) return
+    if (activeSharedError || session.history === seededReplayHistoryRef.current) return
     onReplaceHref?.(
       liveMateHref(
         session.mateId,
@@ -139,7 +142,7 @@ export default function MateWorkspace({
         getReloadableMateFen(session),
       ),
     )
-  }, [onReplaceHref, session])
+  }, [onReplaceHref, session, activeSharedError])
 
   React.useEffect(() => {
     mountedRef.current = true
@@ -170,6 +173,7 @@ export default function MateWorkspace({
       shareRequestRef.current += 1
       sessionRef.current = next
       setSession(next)
+      setActiveSharedError(undefined)
       setShareStatus('')
       return true
     },
@@ -384,8 +388,10 @@ export default function MateWorkspace({
         releasePointerButtonFocus(event.detail, event.target)
       }
     >
+      {activeSharedError && <p role="alert">{activeSharedError}</p>}
       <div className="leg-mate-board-column">
         <BoardComponent
+          mateId={mateId}
           complete={session.outcome !== undefined}
           disabled={boardDisabled}
           fen={playBestAnimation?.whiteFen ?? session.fen}
@@ -396,6 +402,9 @@ export default function MateWorkspace({
       </div>
 
       <div className="leg-mate-log-column">
+        {mateId === 'two-knights-pawn' && session.outcome === 'unsupported' && (
+          <p role="alert">Unsupported position: this board is outside the custom tablebase reachable from the default start. Older stage-policy links may use different pawn ranks or promotion rules. Start Over loads the supported starting position.</p>
+        )}
         <MateControls
           busy={playBestAnimation !== null}
           canPlayBest={canPlayBest}

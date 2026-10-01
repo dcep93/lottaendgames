@@ -13,7 +13,7 @@ import {
   type MateTerminalOutcome,
 } from './session'
 import type { MateId, MateMode } from './types'
-import { getTwoKnightsPawnBoardOutcome } from './rules/twoKnightsPawn'
+import { getTwoKnightsPawnBoardOutcome, getTwoKnightsPawnPermittedMoves } from './rules/twoKnightsPawnMoves'
 
 export type MateFenDecodeResult =
   | { readonly ok: true; readonly fen: string }
@@ -41,12 +41,13 @@ export const MATE_REPLAY_MAX_PLIES = 512
 
 const OUTCOME_LABELS: Readonly<Record<MateTerminalOutcome, string>> = {
   checkmate: 'checkmate',
+  'white-checkmate': 'White checkmated',
   stalemate: 'stalemate',
   'lost-material': 'defeated',
   'lost-knight': 'defeated',
   'pawn-promoted': 'defeated',
   'fifty-move': 'draw',
-  unsupported: 'uncertified position',
+  unsupported: 'unsupported position',
 }
 
 const trainStartsByMateId = new Map<MateId, ReadonlySet<string>>()
@@ -151,7 +152,9 @@ export function decodeMateReplay(
       return INVALID_MATE_REPLAY
     }
     try {
+      const permitted = mateId === 'two-knights-pawn' ? getTwoKnightsPawnPermittedMoves(chess.fen()) : null
       const move = chess.move(san)
+      if (permitted && !permitted.some(candidate => candidate.san === move.san)) return INVALID_MATE_REPLAY
       if (move === null) return INVALID_MATE_REPLAY
       canonicalMoves.push(move.san)
     } catch {
@@ -178,6 +181,8 @@ export function decodeMateFen(
   const fen = decodeCanonicalFen(hash, '#fen=')
   if (fen === null) return INVALID_MATE_FEN
 
+  if (mateId === 'two-knights-pawn' && isLegacyTwoKnightsPawnFen(fen)) return { ok: true, fen }
+
   if (!validateMatePosition(mateId, fen).ok) {
     return INVALID_MATE_FEN
   }
@@ -194,6 +199,8 @@ export function decodeMateLiveFen(
 ): MateFenDecodeResult {
   const fen = decodeCanonicalFen(hash, '#live=')
   if (fen === null) return INVALID_MATE_FEN
+
+  if (mateId === 'two-knights-pawn' && isLegacyTwoKnightsPawnFen(fen)) return { ok: true, fen }
 
   if (validateMatePosition(mateId, fen).ok) {
     return { ok: true, fen }
@@ -252,7 +259,7 @@ function pieceCounts(fen: string): Map<string, number> {
   return counts
 }
 
-function decodeCanonicalFen(
+export function decodeCanonicalFen(
   hash: string,
   prefix: '#fen=' | '#live=',
 ): string | null {
@@ -368,4 +375,11 @@ function formatShareElapsed(elapsedMs: number): string {
   const seconds = Math.floor((totalCentiseconds % 6_000) / 100)
   const centiseconds = totalCentiseconds % 100
   return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(centiseconds).padStart(2, '0')}`
+}
+
+function isLegacyTwoKnightsPawnFen(fen: string): boolean {
+  const pieces = getEndgamePiecePlacements(fen)
+  return pieces.length === 5 && pieces.filter(p => p.color === 'w' && p.type === 'n').length === 2 &&
+    pieces.some(p => p.color === 'w' && p.type === 'k') && pieces.some(p => p.color === 'b' && p.type === 'k') &&
+    pieces.some(p => p.color === 'b' && ((p.type === 'p' && p.square[0] === 'h') || (p.type !== 'k' && p.type !== 'p' && p.square === 'h1')))
 }

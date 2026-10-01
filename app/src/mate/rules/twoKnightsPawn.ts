@@ -1,158 +1,94 @@
-import { getChess, getEndgamePiecePlacements } from '../chess'
-import { compareScoresByRules, selectIdealMoves } from './selection'
-import { twoKnightsPawnEntry } from './twoKnightsPawnTable'
 import { knightCaptureNote, knightCaptureReplay } from './twoKnightsPawnNotes'
+import { getChess } from '../chess'
+import { twoKnightsPawnEntry, twoKnightsPawnTableReady } from './twoKnightsPawnTable'
+import { getTwoKnightsPawnPermittedMoves, getTwoKnightsPawnBoardOutcome } from './twoKnightsPawnMoves'
 import type { MateRuleSet, OrderedRule, ScoredMove } from './types'
-
-export type TwoKnightsPawnTerminalOutcome =
-  | 'checkmate'
-  | 'stalemate'
-  | 'lost-knight'
-  | 'pawn-promoted'
-  | 'fifty-move'
-  | 'unsupported'
-export type TwoKnightsPawnWhiteMoveScore = { stage: number; penalty: number }
+export { getTwoKnightsPawnBoardOutcome, getTwoKnightsPawnPermittedMoves } from './twoKnightsPawnMoves'
+export type TwoKnightsPawnTerminalOutcome = 'checkmate' | 'white-checkmate' | 'stalemate' | 'unsupported'
+export type TwoKnightsPawnWhiteMoveScore = { penalty: number }
 export type TwoKnightsPawnBlackMoveScore = { remainingPlies: number }
-export const twoKnightsPawnWhiteRules: readonly OrderedRule<TwoKnightsPawnWhiteMoveScore>[] =
-  [
-    ['r1', 'Deliver checkmate.'],
-    ['r2', 'Lock the king.'],
-    ['r3', 'Blockade the pawn.'],
-  ].map(([id, helpText], i) => ({
-    id: id!,
-    shortLabel: `rule ${id}`,
-    helpText: helpText!,
-    applies: (score) => score.stage === i + 1,
-    compare: (a, b) => a.penalty - b.penalty,
-  }))
-
-export function scoreTwoKnightsPawnWhiteCandidates(
-  fen: string,
-  moves: readonly string[] = getChess(fen).moves(),
-): readonly ScoredMove<TwoKnightsPawnWhiteMoveScore>[] {
-  const entry = twoKnightsPawnEntry(fen)
-  const chess = getChess(fen)
-  const selected =
-    entry &&
-    chess
-      .moves({ verbose: true })
-      .find((m) => m.from === entry.from && m.to === entry.to)?.san
-  return moves.map((san) => ({
-    san,
-    score: { stage: entry?.stage ?? 0, penalty: san === selected ? 0 : 1 },
+export const twoKnightsPawnWhiteRules: readonly OrderedRule<TwoKnightsPawnWhiteMoveScore>[] = [{
+  id: 'tablebase', shortLabel: 'Tablebase',
+  helpText: 'Choose a shortest forced mate in the custom-rule tablebase; ties use a stable move order.',
+  compare: (a, b) => a.penalty - b.penalty,
+}]
+function successors(fen: string) {
+  return getTwoKnightsPawnPermittedMoves(fen).map(move => ({
+    san: move.san,
+    key: move.from + move.to + (move.promotion ?? ''),
+    entry: twoKnightsPawnEntry(move.after),
   }))
 }
-export function scoreTwoKnightsPawnWhiteMove(
-  fen: string,
-  san: string,
-): TwoKnightsPawnWhiteMoveScore {
-  const row = scoreTwoKnightsPawnWhiteCandidates(fen).find((m) => m.san === san)
-  if (!row) throw new Error(`Illegal h-pawn move: ${san}`)
-  return row.score
-}
-export const compareTwoKnightsPawnWhiteScores = (
-  a: TwoKnightsPawnWhiteMoveScore,
-  b: TwoKnightsPawnWhiteMoveScore,
-) => compareScoresByRules(a, b, twoKnightsPawnWhiteRules)
 export function getIdealTwoKnightsPawnWhiteMoves(fen: string): string[] {
-  if (getChess(fen).turn() !== 'w' || !twoKnightsPawnEntry(fen)) return []
-  return [
-    ...selectIdealMoves(
-      scoreTwoKnightsPawnWhiteCandidates(fen),
-      twoKnightsPawnWhiteRules,
-    ),
-  ]
+  const entry = twoKnightsPawnEntry(fen)
+  if (getChess(fen).turn() !== 'w' || entry?.status !== 'win') return []
+  const rows = successors(fen)
+  if (rows.some(row => !row.entry)) return []
+  const best = rows.filter(row => row.entry?.status === 'win' && row.entry.plies + 1 === entry.plies)
+    .sort((a, b) => a.key < b.key ? -1 : a.key > b.key ? 1 : 0)[0]
+  return best ? [best.san] : []
 }
-export function scoreTwoKnightsPawnBlackMove(
-  fen: string,
-  san: string,
-): TwoKnightsPawnBlackMoveScore {
-  const chess = getChess(fen)
-  chess.move(san)
-  return {
-    remainingPlies: chess.isCheckmate()
-      ? 0
-      : (twoKnightsPawnEntry(chess.fen())?.plies ?? 10000),
-  }
+export function scoreTwoKnightsPawnWhiteCandidates(fen: string, moves: readonly string[] = getTwoKnightsPawnPermittedMoves(fen).map(m => m.san)): readonly ScoredMove<TwoKnightsPawnWhiteMoveScore>[] {
+  const selected = getIdealTwoKnightsPawnWhiteMoves(fen)[0]
+  // Legal manual moves remain available even when there is no recommendation.
+  if (!selected) return []
+  return moves.map(san => ({ san, score: { penalty: san === selected ? 0 : 1 } }))
 }
-export const compareTwoKnightsPawnBlackScores = (
-  a: TwoKnightsPawnBlackMoveScore,
-  b: TwoKnightsPawnBlackMoveScore,
-) => b.remainingPlies - a.remainingPlies
+export function scoreTwoKnightsPawnWhiteMove(fen: string, san: string): TwoKnightsPawnWhiteMoveScore {
+  if (!getTwoKnightsPawnPermittedMoves(fen).some(m => m.san === san)) throw new Error(`Prohibited two-knights move: ${san}`)
+  return { penalty: getIdealTwoKnightsPawnWhiteMoves(fen).includes(san) ? 0 : 1 }
+}
+export const compareTwoKnightsPawnWhiteScores = (a: TwoKnightsPawnWhiteMoveScore, b: TwoKnightsPawnWhiteMoveScore) => a.penalty - b.penalty
+export function scoreTwoKnightsPawnBlackMove(fen: string, san: string): TwoKnightsPawnBlackMoveScore {
+  const row = successors(fen).find(row => row.san === san)
+  if (!row) throw new Error(`Prohibited two-knights move: ${san}`)
+  if (!row.entry) throw new Error('Successor is outside tablebase coverage')
+  return { remainingPlies: row.entry.status === 'win' ? row.entry.plies : 65534 }
+}
+export const compareTwoKnightsPawnBlackScores = (a: TwoKnightsPawnBlackMoveScore, b: TwoKnightsPawnBlackMoveScore) => b.remainingPlies - a.remainingPlies
 export function getIdealTwoKnightsPawnBlackMoves(fen: string): string[] {
-  const chess = getChess(fen)
-  if (chess.turn() !== 'b') return []
-  const rows = chess
-    .moves()
-    .map((san) => ({ san, score: scoreTwoKnightsPawnBlackMove(fen, san) }))
-  const maximum = Math.max(...rows.map((r) => r.score.remainingPlies))
-  return rows
-    .filter((r) => r.score.remainingPlies === maximum)
-    .map((r) => r.san)
+  const entry = twoKnightsPawnEntry(fen)
+  if (getChess(fen).turn() !== 'b' || !entry) return []
+  const rows = successors(fen)
+  if (rows.some(row => !row.entry)) return []
+  return rows.filter(row => entry.status === 'no-forced-mate'
+    ? row.entry?.status === 'no-forced-mate'
+    : row.entry?.status === 'win' && row.entry.plies + 1 === entry.plies).map(row => row.san)
 }
-// Board outcomes are independent of the asynchronously loaded recommendation table.
-// Shared replays are parsed before that table is available.
-export function getTwoKnightsPawnBoardOutcome(
-  fen: string,
-): TwoKnightsPawnTerminalOutcome | null {
-  const chess = getChess(fen)
-  if (chess.isCheckmate())
-    return chess.turn() === 'b' ? 'checkmate' : 'unsupported'
-  const pieces = getEndgamePiecePlacements(fen)
-  if (pieces.filter((p) => p.color === 'w' && p.type === 'n').length !== 2)
-    return 'lost-knight'
-  if (chess.isStalemate()) return 'stalemate'
-  if (chess.isDrawByFiftyMoves()) return 'fifty-move'
-  return null
+export function getTwoKnightsPawnTerminalOutcome(fen: string): TwoKnightsPawnTerminalOutcome | null {
+  // Coverage is consulted only after loading; no-forced-mate is not terminal.
+  if (twoKnightsPawnTableReady() && !twoKnightsPawnEntry(fen)) return 'unsupported'
+  return getTwoKnightsPawnBoardOutcome(fen)
 }
-export function getTwoKnightsPawnTerminalOutcome(
-  fen: string,
-): TwoKnightsPawnTerminalOutcome | null {
-  return getTwoKnightsPawnBoardOutcome(fen) ??
-    (twoKnightsPawnEntry(fen) ? null : 'unsupported')
+export function getTwoKnightsPawnStatus(fen: string): string {
+  if (!twoKnightsPawnTableReady()) return 'Tablebase · Loading'
+  const entry = twoKnightsPawnEntry(fen)
+  return !entry ? 'Tablebase · Unsupported position'
+    : entry.status === 'no-forced-mate' ? 'Tablebase · No forced mate'
+    : `Tablebase · DTM ${entry.plies} ${entry.plies === 1 ? 'ply' : 'plies'}`
 }
-export const twoKnightsPawnRuleSet: MateRuleSet<TwoKnightsPawnWhiteMoveScore> =
-  {
-    id: 'two-knights-pawn',
-    phase: (fen) => {
-      const s = twoKnightsPawnEntry(fen)?.stage
-      return s ? `${4 - s}/3` : '0/3'
-    },
-    scoreWhite: scoreTwoKnightsPawnWhiteMove,
-    scoreWhiteCandidates: scoreTwoKnightsPawnWhiteCandidates,
-    whiteRules: twoKnightsPawnWhiteRules,
-    whiteMoves: (fen) =>
-      getChess(fen).turn() === 'w' && twoKnightsPawnEntry(fen)
-        ? getChess(fen).moves()
-        : [],
-    blackCandidates: (fen) => ({
-      moves: getChess(fen).turn() === 'b' ? getChess(fen).moves() : [],
-      idealMoves: getIdealTwoKnightsPawnBlackMoves(fen),
-    }),
-    help: {
-      title: 'How best moves are chosen',
-      whiteIntro:
-        'Follow the certified stages: blockade the h-pawn, lock the king, then deliver mate. Each stage minimizes the worst-case number of White moves to its target.',
-      blackIntro:
-        'Black chooses the longest continuation against the selected White policy.',
-      blackPriorities: [
-        'Maximize the remaining moves to mate; the proof covers every legal Black reply.',
-      ],
-      notes: [
-        knightCaptureNote,
-        'Only a Black h-pawn is supported. A knight must remain in front of the pawn throughout r2. A temporary blockade that Black can dislodge does not qualify.',
-        'The locking formation confines Black to a 3×3 corner cage using the White king and guarding knight. r1 consists only of certified finishing continuations reachable from locked, blockaded formations. Entering the net from outside remains an r2 move.',
-        'r1 may allow promotion on h1 only when White has immediate checkmate against every promotion choice. Knight captures and pawn captures remain outside this method.',
-        'The lookup ignores the fifty-move clock when optimizing. Clock failures are audited separately; the live game still reports the fifty-move draw. Uncertified means no route under this method, not necessarily a theoretical draw.',
-        'The former back-rank standard start is not certified with knight captures excluded. Standard and training starts are selected from the certified table instead.',
-      ],
-      noteLinks: [
-        {
-          noteIndex: 0,
-          label: 'Replay the excluded knight-capture finish on Lichess',
-          href: knightCaptureReplay,
-        },
-      ],
-      noteBoards: [],
-    },
-  }
+export const twoKnightsPawnRuleSet: MateRuleSet<TwoKnightsPawnWhiteMoveScore> = {
+  id: 'two-knights-pawn', phase: getTwoKnightsPawnStatus,
+  scoreWhite: scoreTwoKnightsPawnWhiteMove,
+  scoreWhiteCandidates: scoreTwoKnightsPawnWhiteCandidates,
+  whiteRules: twoKnightsPawnWhiteRules,
+  whiteMoves: fen => getChess(fen).turn() === 'w' ? getTwoKnightsPawnPermittedMoves(fen).map(m => m.san) : [],
+  blackCandidates: fen => ({
+    moves: getChess(fen).turn() === 'b' ? getTwoKnightsPawnPermittedMoves(fen).map(m => m.san) : [],
+    idealMoves: getIdealTwoKnightsPawnBlackMoves(fen),
+  }),
+  help: {
+    title: 'Custom-rule tablebase',
+    whiteIntro: 'White chooses one deterministic shortest forced mate. DTM counts plies, including both sides’ moves. You can play any permitted move and evaluate the resulting position.',
+    blackIntro: 'Black chooses every reply tying for the longest forced mate. With no forced White mate, replies that deny mate are preferred.',
+    blackPriorities: ['Deny a forced White mate when possible; otherwise maximize the remaining plies to mate.'],
+    notes: [
+      knightCaptureNote,
+      'Captures are prohibited for both sides. Both White knights are free to move.',
+      'The h-pawn promotes only to a queen on h1. That queen never moves or captures, but its normal attacks still restrict White’s king.',
+      'The fifty-move rule is ignored. Checkmate and stalemate use only permitted moves.',
+      'No forced mate is a tablebase result, and manual play remains available. Unsupported positions are outside the positions reachable from the default start.',
+      'This is a custom-rule tablebase, not an ordinary-chess Syzygy tablebase.',
+    ], noteLinks: [{ noteIndex: 0, label: 'Replay the excluded knight-capture finish on Lichess', href: knightCaptureReplay }], noteBoards: [],
+  },
+}

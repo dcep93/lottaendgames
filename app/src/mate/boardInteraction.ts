@@ -1,3 +1,5 @@
+import type { MateId } from './types'
+import { getTwoKnightsPawnPermittedMoves } from './rules/twoKnightsPawnMoves'
 import type { CSSProperties } from 'react'
 import type { Square } from 'chess.js'
 import { getChess } from './chess'
@@ -11,6 +13,7 @@ export type LegalTarget = {
 
 type TryMateBoardMoveOptions = {
   readonly fen: string
+  readonly mateId?: MateId
   readonly sourceSquare: string
   readonly targetSquare: string | null
   readonly disabled: boolean
@@ -28,6 +31,7 @@ const SQUARE_PATTERN = /^[a-h][1-8]$/
 
 export function tryMateBoardMove({
   fen,
+  mateId,
   sourceSquare,
   targetSquare,
   disabled,
@@ -35,6 +39,7 @@ export function tryMateBoardMove({
 }: TryMateBoardMoveOptions): boolean {
   const move = resolveMateBoardMove({
     disabled,
+    mateId,
     fen,
     sourceSquare,
     targetSquare,
@@ -46,6 +51,7 @@ export function tryMateBoardMove({
 
 export function resolveMateBoardMove({
   fen,
+  mateId,
   sourceSquare,
   targetSquare,
   disabled,
@@ -67,7 +73,9 @@ export function resolveMateBoardMove({
     if (chess.get(source)?.color !== chess.turn()) {
       return null
     }
-    const move = chess.move({ from: source, to: target })
+    const permitted = mateId === 'two-knights-pawn' ? getTwoKnightsPawnPermittedMoves(fen).find(move => move.from === source && move.to === target) : undefined
+    if (mateId === 'two-knights-pawn' && !permitted) return null
+    const move = chess.move({ from: source, to: target, ...(permitted?.promotion ? { promotion: permitted.promotion } : {}) })
     if (move === null) return null
     return { fen: chess.fen(), san: move.san }
   } catch {
@@ -121,11 +129,12 @@ export function canSelectSideToMovePiece(
   fen: string,
   square: string,
   disabled: boolean,
+  mateId?: MateId,
 ): boolean {
   if (disabled || !SQUARE_PATTERN.test(square)) return false
   try {
     const chess = getChess(fen)
-    return chess.get(square as Square)?.color === chess.turn()
+    return chess.get(square as Square)?.color === chess.turn() && (mateId !== 'two-knights-pawn' || getTwoKnightsPawnPermittedMoves(fen).some(move => move.from === square))
   } catch {
     return false
   }
@@ -135,18 +144,20 @@ export function getLegalTargets(
   fen: string,
   square: Square | null,
   disabled: boolean,
+  mateId?: MateId,
 ): ReadonlyMap<Square, LegalTarget> {
   const targets = new Map<Square, LegalTarget>()
   if (
     square === null ||
-    !canSelectSideToMovePiece(fen, square, disabled)
+    !canSelectSideToMovePiece(fen, square, disabled, mateId)
   ) {
     return targets
   }
 
   try {
     const chess = getChess(fen)
-    for (const move of chess.moves({ square, verbose: true })) {
+    const moves = mateId === 'two-knights-pawn' ? getTwoKnightsPawnPermittedMoves(fen).filter(move => move.from === square) : chess.moves({ square, verbose: true })
+    for (const move of moves) {
       targets.set(move.to, { isCapture: move.captured !== undefined })
     }
   } catch {

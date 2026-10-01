@@ -60,11 +60,11 @@ function sourceCollection(
 export function assertTwoKnightsPawnPositionManifest(
   manifest: TwoKnightsPawnManifest,
 ): void {
-  const transformedPositions = new Set<string>()
   for (const [mode, sources] of [
     ['standard', manifest.standard],
     ['train', manifest.train],
   ] as const) {
+    const transformedPositions = new Set<string>()
     for (const [sourceIndex, source] of sources.entries()) {
       const sourceValidation = validateMatePosition(
         'two-knights-pawn',

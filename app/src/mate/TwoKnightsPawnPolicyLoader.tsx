@@ -10,7 +10,7 @@ export default function TwoKnightsPawnPolicyLoader({
   children: React.ReactNode
 }) {
   const [ready, setReady] = React.useState(twoKnightsPawnTableReady)
-  const [error, setError] = React.useState(false)
+  const [error, setError] = React.useState<string | null>(null)
   const [attempt, setAttempt] = React.useState(0)
   React.useEffect(() => {
     let active = true
@@ -18,8 +18,8 @@ export default function TwoKnightsPawnPolicyLoader({
       () => {
         if (active) setReady(true)
       },
-      () => {
-        if (active) setError(true)
+      (reason: unknown) => {
+        if (active) setError(reason instanceof Error ? reason.message : 'Could not load two-knights tablebase')
       },
     )
     return () => {
@@ -31,14 +31,14 @@ export default function TwoKnightsPawnPolicyLoader({
     <section className="leg-mate-empty-state" aria-busy={!error}>
       <p role={error ? 'alert' : 'status'}>
         {error
-          ? 'Could not load two-knights recommendations.'
-          : 'Loading two-knights recommendations…'}
+          ? error
+          : 'Loading two-knights tablebase…'}
       </p>
       {error && (
         <button
           type="button"
           onClick={() => {
-            setError(false)
+            setError(null)
             setAttempt((n) => n + 1)
           }}
         >

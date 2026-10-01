@@ -108,6 +108,7 @@ export function getCurrentPhase(
   session: MateSession,
 ): string {
   try {
+    if (session.mateId === 'two-knights-pawn') return ruleSet.phase(session.fen)
     if (ruleSet.phaseAfterWhiteMove) {
       const lastPhase = session.logs.at(-1)?.phase
       if (getChess(session.fen).turn() === 'b') {

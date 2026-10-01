@@ -21,7 +21,7 @@ test('lookup download rejects corrupt data, retries, and shares one successful l
   await Promise.all([loadTwoKnightsPawnTable(fetcher), loadTwoKnightsPawnTable(fetcher)])
   assert.equal(calls, 1)
   assert.equal(twoKnightsPawnTableReady(), true)
-  assert(twoKnightsPawnEntry('3k4/7p/8/8/8/6N1/8/1N1K4 w - - 0 1'))
+  assert(twoKnightsPawnEntry(data.startFen))
 })
 
 // A fresh module instance exercises the real Fetch behavior separately from
@@ -37,10 +37,10 @@ test('HTTP gzip responses are not decompressed twice', async () => {
     const address = server.address() as {port:number}
     const response = await fetch(`http://127.0.0.1:${address.port}`)
     const raw = await response.arrayBuffer()
-    assert.equal(raw.byteLength, data.bytes)
+    assert.equal(raw.byteLength, data.rawbytes)
     const fresh = await import('./twoKnightsPawnTable' + '?http-gzip')
     await fresh.loadTwoKnightsPawnTable((async () => new Response(raw, {headers:{'Content-Encoding':'gzip'}})) as typeof fetch)
-    assert(fresh.twoKnightsPawnEntry('3k4/7p/8/8/8/6N1/8/1N1K4 w - - 0 1'))
+    assert(fresh.twoKnightsPawnEntry(data.startFen))
     assert.deepEqual(Buffer.from(raw), gunzipSync(readFileSync(new URL(`../../../public${data.url}`, import.meta.url))))
   } finally {
     server.closeAllConnections()

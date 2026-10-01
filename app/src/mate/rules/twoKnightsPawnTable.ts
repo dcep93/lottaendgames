@@ -1,115 +1,71 @@
-import type { Square } from 'chess.js'
-import { getEndgamePiecePlacements } from '../chess'
 import data from './twoKnightsPawnTableData.json'
+import { TWO_KNIGHTS_PAWN_SLOTS, twoKnightsPawnPositionId } from './twoKnightsPawnMoves'
+export { twoKnightsPawnPositionId } from './twoKnightsPawnMoves'
 
-const SIZE = 6 * 64 * 2016 * 64
-const index = (s: string) => s.charCodeAt(0) - 97 + 8 * (Number(s[1]) - 1)
-const square = (s: number) =>
-  ('abcdefgh'[s % 8]! + String(1 + (s >> 3))) as Square
-let table: DataView | undefined
+export type TwoKnightsPawnEntry = { status: 'win'; plies: number } | { status: 'no-forced-mate'; plies: null }
+const metadata = data as unknown as { url: string; rawbytes: number; sha256raw: string; records: number }
+const HEADER_BYTES = 32
+const BLOCK_BYTES = 256
+const POPCOUNT = Uint8Array.from({ length: 256 }, (_, n) => {
+  let count = 0
+  for (; n; n &= n - 1) count++
+  return count
+})
+let table: { bitmap: Uint8Array; values: DataView; prefix: Uint32Array } | undefined
 let pending: Promise<void> | undefined
-const promotions = new Map(
-  data.promotions.map((row) => [row[0]!, row.slice(1)]),
-)
-export type TwoKnightsPawnEntry = {
-  stage: 1 | 2 | 3
-  distance: number
-  plies: number
-  from: Square
-  to: Square
-}
 export const twoKnightsPawnTableReady = () => table !== undefined
 export function installTwoKnightsPawnTable(bytes: ArrayBuffer) {
-  if (bytes.byteLength !== data.bytes)
-    throw new Error('Invalid h-pawn lookup size')
-  table = new DataView(bytes)
+  const view = new DataView(bytes)
+  if (bytes.byteLength < HEADER_BYTES || new TextDecoder().decode(new Uint8Array(bytes, 0, 8)) !== 'KNNHDTM1' ||
+      view.getUint32(8, true) !== TWO_KNIGHTS_PAWN_SLOTS || view.getUint32(20, true) !== 1)
+    throw new Error('Invalid two-knights tablebase header')
+  const records = view.getUint32(12, true), bitmapBytes = view.getUint32(16, true)
+  if (bitmapBytes !== TWO_KNIGHTS_PAWN_SLOTS / 8 || bytes.byteLength !== HEADER_BYTES + bitmapBytes + records * 2)
+    throw new Error('Invalid two-knights tablebase size')
+  const bitmap = new Uint8Array(bytes, HEADER_BYTES, bitmapBytes)
+  const prefix = new Uint32Array(Math.ceil(bitmapBytes / BLOCK_BYTES) + 1)
+  let total = 0
+  for (let i = 0; i < bitmapBytes; i++) {
+    if (i % BLOCK_BYTES === 0) prefix[i / BLOCK_BYTES] = total
+    total += POPCOUNT[bitmap[i]!]!
+  }
+  prefix[prefix.length - 1] = total
+  if (total !== records) throw new Error('Invalid two-knights tablebase record count')
+  const values = new DataView(bytes, HEADER_BYTES + bitmapBytes, records * 2)
+  for (let i = 0; i < records; i++) {
+    if (values.getUint16(i * 2, true) === 65535) throw new Error('Invalid two-knights tablebase value')
+  }
+  table = { bitmap, values, prefix }
 }
-export function loadTwoKnightsPawnTable(
-  fetcher: typeof fetch = fetch,
-): Promise<void> {
+export function loadTwoKnightsPawnTable(fetcher: typeof fetch = fetch): Promise<void> {
   if (table) return Promise.resolve()
-  return (pending ??= (async () => {
-    const base =
-      (import.meta as ImportMeta & { env?: { BASE_URL?: string } }).env
-        ?.BASE_URL ?? '/'
-    const response = await fetcher(base + data.url.slice(1))
-    if (!response.ok || !response.body)
-      throw new Error('Could not load h-pawn lookup')
-    // Fetch transparently decodes HTTP Content-Encoding. Static hosts may
-    // instead serve the .gz file as opaque bytes, so inspect the body itself.
+  return pending ??= (async () => {
+    const base = (import.meta as ImportMeta & { env?: { BASE_URL?: string } }).env?.BASE_URL ?? '/'
+    const response = await fetcher(base + metadata.url.slice(1))
+    if (response.status === 404) throw new Error('Two-knights tablebase data is missing (404)')
+    if (!response.ok || !response.body) throw new Error('Could not load two-knights tablebase')
     const downloaded = await response.arrayBuffer()
     const header = new Uint8Array(downloaded, 0, Math.min(2, downloaded.byteLength))
     const bytes = header[0] === 0x1f && header[1] === 0x8b
-      ? await new Response(
-          new Blob([downloaded]).stream().pipeThrough(new DecompressionStream('gzip')),
-        ).arrayBuffer()
+      ? await new Response(new Blob([downloaded]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer()
       : downloaded
     const digest = await crypto.subtle.digest('SHA-256', bytes)
-    const sha = Array.from(new Uint8Array(digest), (n) =>
-      n.toString(16).padStart(2, '0'),
-    ).join('')
-    if (sha !== data.sha256) throw new Error('Invalid h-pawn lookup checksum')
+    const sha = Array.from(new Uint8Array(digest), n => n.toString(16).padStart(2, '0')).join('')
+    if (sha !== metadata.sha256raw) throw new Error('Invalid two-knights tablebase checksum')
+    if (bytes.byteLength !== metadata.rawbytes) throw new Error('Invalid two-knights tablebase size')
     installTwoKnightsPawnTable(bytes)
-  })().catch((error) => {
-    pending = undefined
-    throw error
-  }))
+  })().catch(error => { pending = undefined; throw error })
 }
-function record(key: number): number | undefined {
-  if (!table) return undefined
-  let lo = 0,
-    hi = data.records
-  while (lo < hi) {
-    const mid = (lo + hi) >>> 1
-    const id = table.getUint32(mid * 8, true)
-    if (id < key) lo = mid + 1
-    else hi = mid
-  }
-  return lo < data.records && table.getUint32(lo * 8, true) === key
-    ? table.getUint32(lo * 8 + 4, true)
-    : undefined
-}
-/** No board reflection: a-file pawns and altered material are outside the method. */
-export function twoKnightsPawnEntry(
-  fen: string,
-): TwoKnightsPawnEntry | undefined {
-  if (!table) return undefined
-  const pieces = getEndgamePiecePlacements(fen)
-  if (pieces.length !== 5) return undefined
-  const w = pieces.find((p) => p.color === 'w' && p.type === 'k'),
-    k = pieces.find((p) => p.color === 'b' && p.type === 'k')
-  const ns = pieces
-    .filter((p) => p.color === 'w' && p.type === 'n')
-    .map((p) => index(p.square))
-    .sort((a, b) => a - b)
-  const pawn = pieces.find((p) => p.color === 'b' && p.type !== 'k')
-  if (!w || !k || ns.length !== 2 || !pawn) return undefined
-  const pair = (ns[0]! * (127 - ns[0]!)) / 2 + ns[1]! - ns[0]! - 1
-  const lower = (index(w.square) * 2016 + pair) * 64 + index(k.square)
-  const black = fen.split(' ')[1] === 'b'
-  let word: number | undefined
-  if (
-    pawn.type === 'p' &&
-    pawn.square[0] === 'h' &&
-    Number(pawn.square[1]) >= 2 &&
-    Number(pawn.square[1]) <= 7
-  ) {
-    word = record(
-      (Number(pawn.square[1]) - 2) * 64 * 2016 * 64 +
-        lower +
-        (black ? SIZE : 0),
-    )
-  } else if (!black && pawn.square === 'h1') {
-    const type = 'qrbn'.indexOf(pawn.type),
-      move = type >= 0 ? promotions.get(lower)?.[type] : undefined
-    if (move !== undefined) word = move | (1 << 12) | (1 << 14) | (1 << 22)
-  }
-  if (word === undefined) return undefined
-  return {
-    stage: ((word >>> 12) & 3) as 1 | 2 | 3,
-    distance: (word >>> 14) & 255,
-    plies: word >>> 22,
-    from: square((word >>> 6) & 63),
-    to: square(word & 63),
-  }
+export function twoKnightsPawnEntry(fen: string): TwoKnightsPawnEntry | undefined {
+  const id = twoKnightsPawnPositionId(fen)
+  if (!table || id === undefined) return undefined
+  const byte = Math.floor(id / 8), bit = id % 8
+  const mask = table.bitmap[byte]!
+  if ((mask & (1 << bit)) === 0) return undefined
+  const block = Math.floor(byte / BLOCK_BYTES)
+  let rank = table.prefix[block]!
+  for (let i = block * BLOCK_BYTES; i < byte; i++) rank += POPCOUNT[table.bitmap[i]!]!
+  rank += POPCOUNT[mask & ((1 << bit) - 1)]!
+  const plies = table.values.getUint16(rank * 2, true)
+  return plies === 65534 ? { status: 'no-forced-mate', plies: null } : { status: 'win', plies }
 }

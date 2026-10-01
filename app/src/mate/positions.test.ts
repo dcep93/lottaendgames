@@ -296,11 +296,11 @@ test('legal starts are white to move, quiet, non-terminal positions', () => {
   assert.equal(isLegalEndgameStart('not a FEN'), false)
 })
 
-test('legal start validation ignores en passant when checking the opposite turn', () => {
+test('ordinary starts ignore en passant but custom tablebase requires its covered layers', () => {
   const fen = '4k3/8/8/7p/8/8/8/1N2K1N1 w - h6 0 2'
 
   assert.equal(isLegalEndgameStart(fen), true)
-  assert.deepEqual(validateMatePosition('two-knights-pawn', fen), { ok: true })
+  assert.equal(validateMatePosition('two-knights-pawn', fen).ok, false)
 })
 
 test('all five mate validators accept their catalog positions', () => {
@@ -592,7 +592,7 @@ test('Two Knights vs Pawn manifest validates source material and transformed sta
       TWO_KNIGHTS_PAWN_POSITIONS.standard[0]!.fen,
       'train',
     ),
-    false,
+    true,
   )
 })
 
@@ -614,7 +614,7 @@ test('Two Knights vs Pawn manifest rejects bad material, edge pawns, illegal che
       assertTwoKnightsPawnPositionManifest(
         manifestWithFen('4k3/p7/8/8/8/8/8/1B2K1N1 w - - 0 1'),
       ),
-    /Material does not match two-knights-pawn/,
+    /Unsupported custom tablebase material/,
   )
   assert.throws(
     () =>
@@ -626,9 +626,9 @@ test('Two Knights vs Pawn manifest rejects bad material, edge pawns, illegal che
   assert.throws(
     () =>
       assertTwoKnightsPawnPositionManifest(
-        manifestWithFen('4k3/7p/5N2/8/8/8/8/1N2K3 w - - 0 1'),
+        manifestWithFen('4k3/8/5N2/8/7p/8/8/1N2K3 w - - 0 1'),
       ),
-    /legal non-terminal endgame start/,
+    /side that just moved cannot be in check/,
   )
 
   const duplicatedSource = structuredClone(TWO_KNIGHTS_PAWN_POSITIONS.standard[0])

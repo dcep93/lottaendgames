@@ -22,12 +22,13 @@ export type MateControlsProps = {
 
 const OUTCOME_LABELS: Readonly<Record<MateTerminalOutcome, string>> = {
   checkmate: 'Checkmate',
+  'white-checkmate': 'White checkmated',
   stalemate: 'Stalemate',
   'lost-material': 'Defeated',
   'lost-knight': 'Defeated',
   'pawn-promoted': 'Defeated',
   'fifty-move': 'Draw',
-  unsupported: 'Uncertified position',
+  unsupported: 'Unsupported position',
 }
 
 const readCurrentTime = () => Date.now()

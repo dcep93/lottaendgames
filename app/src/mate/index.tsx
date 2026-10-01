@@ -51,7 +51,9 @@ export default function Mate({
         />
 
         <div className="leg-mate-layout">
-          {selectedDrill ? (
+          {route.sharedError && route.sharedFen === null ? (
+            <section className="leg-mate-empty-state"><p role="alert">{route.sharedError}</p><button onClick={() => onNavigate('/mate/two-knights-pawn')} type="button">Start Over</button></section>
+          ) : selectedDrill ? (
             <PolicyLoader>
               <MateWorkspace
                 BoardComponent={BoardComponent}
@@ -65,6 +67,7 @@ export default function Mate({
                 mateId={selectedDrill.set.id}
                 mateMode={selectedDrill.mode}
                 onReplaceHref={onReplaceHref}
+                sharedError={route.sharedError}
                 sharedFen={route.sharedFen}
                 sharedMoves={route.sharedMoves ?? null}
                 sharedReplayCursor={route.sharedReplayCursor ?? null}

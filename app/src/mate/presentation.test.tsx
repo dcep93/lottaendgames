@@ -664,7 +664,7 @@ test('Mate controls use concise terminal outcome labels', () => {
     ['lost-knight', 'Defeated'],
     ['pawn-promoted', 'Defeated'],
     ['fifty-move', 'Draw'],
-    ['unsupported', 'Uncertified position'],
+    ['unsupported', 'Unsupported position'],
   ]
 
   for (const [outcome, label] of outcomes) {
@@ -1498,7 +1498,7 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
   assert.doesNotMatch(queenMarkup, /leg-mate-guide-guards/)
 })
 
-test('existing mate sets retain universal priorities; h-pawn uses its certified stages', () => {
+test('existing mate sets retain universal priorities; h-pawn uses its custom tablebase', () => {
   for (const mateId of [
     'queen',
     'rook',
@@ -1521,7 +1521,7 @@ test('existing mate sets retain universal priorities; h-pawn uses its certified 
     }
   }
   const hPawn = getMateRuleSet('two-knights-pawn')
-  assert.deepEqual(hPawn.whiteRuleDescriptions.map(({shortLabel}) => shortLabel), ['rule r1', 'rule r2', 'rule r3'])
+  assert.deepEqual(hPawn.whiteRuleDescriptions.map(({shortLabel}) => shortLabel), ['Tablebase'])
   const markup = renderToStaticMarkup(<MatePriorityGuideDialog {...MATE_TRAINING_INFO_PROPS} onClose={() => undefined} ruleSet={hPawn} />)
   assert.match(markup, /Replay the excluded knight-capture finish on Lichess/)
   assert.match(markup, /href="https:\/\/lichess.org\/analysis\/pgn\//)

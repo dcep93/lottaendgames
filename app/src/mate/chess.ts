@@ -1,3 +1,4 @@
+import { twoKnightsPawnPositionId } from './rules/twoKnightsPawnMoves'
 import {
   Chess,
   type Color,
@@ -504,6 +505,12 @@ export function validateMatePosition(
     return { ok: false, reason: `Invalid FEN: ${reason}` }
   }
 
+  if (mateId === 'two-knights-pawn') {
+    if (twoKnightsPawnPositionId(fen) === undefined) return { ok: false, reason: 'Unsupported custom tablebase material: requires KNN against an h2–h4 pawn or stationary queen on h1' }
+    const other = getChess(withFenTurn(fen, chess.turn() === 'w' ? 'b' : 'w'))
+    if (other.isCheck()) return { ok: false, reason: 'The side that just moved cannot be in check' }
+    return { ok: true }
+  }
   if (chess.turn() !== 'w') {
     return { ok: false, reason: 'White must be to move' }
   }
@@ -520,19 +527,6 @@ export function validateMatePosition(
       ok: false,
       reason: 'White bishops must be on opposite-colored squares',
     }
-  }
-  if (
-    mateId === 'two-knights-pawn' &&
-    placements.some(
-      (piece) =>
-        piece.type === 'p' &&
-        (piece.square[1] === '1' || piece.square[1] === '8'),
-    )
-  ) {
-    return { ok: false, reason: 'Pawns cannot be placed on ranks 1 or 8' }
-  }
-  if (mateId === 'two-knights-pawn' && placements.some(piece => piece.type === 'p' && piece.square[0] !== 'h')) {
-    return { ok: false, reason: 'Two Knights vs Pawn requires a Black h-pawn' }
   }
   if (!isLegalEndgameStart(fen)) {
     return {

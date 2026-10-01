@@ -1,3 +1,4 @@
+import type { MateId } from './types'
 import {
   default as React,
   useEffect,
@@ -22,6 +23,7 @@ import { releaseFocusWithin } from './workspaceSupport'
 
 export type MateBoardProps = {
   readonly fen: string
+  readonly mateId?: MateId
   readonly phase: string
   readonly complete?: boolean
   readonly lastMove: readonly [Square, Square] | null
@@ -86,6 +88,7 @@ export default function MateBoard(props: MateBoardProps) {
 
 export function MateBoardSurface({
   fen,
+  mateId,
   phase,
   complete = false,
   lastMove,
@@ -120,8 +123,8 @@ export function MateBoardSurface({
   }, [disabled, fen, onMove, optimisticMove])
 
   const legalTargets = useMemo(
-    () => getLegalTargets(fen, selectedSquare, disabled),
-    [disabled, fen, selectedSquare],
+    () => getLegalTargets(fen, selectedSquare, disabled, mateId),
+    [disabled, fen, selectedSquare, mateId],
   )
   const squareStyles = useMemo(
     () => getMateBoardSquareStyles(lastMove, selectedSquare, legalTargets),
@@ -140,7 +143,7 @@ export function MateBoardSurface({
   const canSelect = (square: string | null) =>
     !isOptimistic &&
     square !== null &&
-    canSelectSideToMovePiece(fen, square, disabled)
+    canSelectSideToMovePiece(fen, square, disabled, mateId)
   const selectSquare = (square: string | null) => {
     setSelectedSquare(canSelect(square) ? square as Square : null)
   }
@@ -148,6 +151,7 @@ export function MateBoardSurface({
     const move = resolveMateBoardMove({
       disabled: disabled || isOptimistic,
       fen,
+      mateId,
       sourceSquare,
       targetSquare,
     })
@@ -176,7 +180,7 @@ export function MateBoardSurface({
   return (
     <div className="leg-mate-board-card">
       <p className="leg-mate-board-phase" id={phaseId}>
-        {complete ? 'Complete' : `Phase ${phase}`}
+        {mateId === 'two-knights-pawn' ? phase : complete ? 'Complete' : `Phase ${phase}`}
       </p>
       <div
         ref={boardShellRef}

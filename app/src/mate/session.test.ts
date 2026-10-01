@@ -755,7 +755,7 @@ test('classifies stalemate, lost material, fifty-move, and KNN promotion outcome
       'two-knights-pawn',
       '7k/8/8/8/8/8/p7/K6N w - - 0 2',
     ),
-    'lost-knight',
+    'unsupported',
   )
   assert.equal(
     getMateTerminalOutcome(

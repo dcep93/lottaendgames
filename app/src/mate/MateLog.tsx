@@ -1,3 +1,4 @@
+import { getTwoKnightsPawnBoardOutcome, getTwoKnightsPawnPermittedMoves } from './rules/twoKnightsPawnMoves'
 import React from 'react'
 import { getChess } from './chess'
 import MatePriorityGuideDialog from './MatePriorityGuide'
@@ -129,11 +130,19 @@ export default function MateLog({
     setCopyStatus('')
     try {
       const chess = getChess(startingFen)
+      if (ruleSet.id === 'two-knights-pawn' && chess.turn() === 'b') {
+        const afterInitialReply = logs[0]?.fen ?? fen
+        const initialReply = getTwoKnightsPawnPermittedMoves(startingFen).find(move => move.after === afterInitialReply)
+        if (initialReply) chess.move(initialReply.san)
+      }
       for (const log of logs) {
         chess.move(log.san)
         if (log.opponentSan !== undefined) chess.move(log.opponentSan)
       }
-      chess.setHeader('Result', chess.isCheckmate()
+      const customOutcome = ruleSet.id === 'two-knights-pawn' ? getTwoKnightsPawnBoardOutcome(chess.fen()) : undefined
+      chess.setHeader('Result', customOutcome !== undefined
+        ? customOutcome === 'checkmate' ? '1-0' : customOutcome === 'white-checkmate' ? '0-1' : customOutcome === 'stalemate' ? '1/2-1/2' : '*'
+        : chess.isCheckmate()
         ? (chess.turn() === 'b' ? '1-0' : '0-1')
         : chess.isDraw() ? '1/2-1/2' : '*')
       const pgn = chess.pgn().split('\n')
@@ -216,7 +225,7 @@ export default function MateLog({
           <thead className="leg-mate-visually-hidden">
             <tr>
               <th scope="col">#</th>
-              <th scope="col">Phase</th>
+              <th scope="col">{ruleSet.id === 'two-knights-pawn' ? 'Tablebase' : 'Phase'}</th>
               <th scope="col">White</th>
               <th scope="col">Black</th>
               <th scope="col">Correctness</th>
@@ -257,7 +266,8 @@ export default function MateLog({
                 'legal reply',
                 'legal replies',
               )
-              const correctnessStatus = !log.isCorrect
+              const unscoredCustomMove = ruleSet.id === 'two-knights-pawn' && correctChoices === 0
+              const correctnessStatus = unscoredCustomMove ? 'neutral' : !log.isCorrect
                 ? 'wrong'
                 : correctChoices > 1
                   ? 'multiple'
@@ -280,11 +290,11 @@ export default function MateLog({
                   <td className={statusCellClass(correctnessStatus)}>
                     <span className="leg-mate-log-correctness">
                       <span
-                        aria-label={log.isCorrect ? 'Correct' : 'Incorrect'}
+                        aria-label={unscoredCustomMove ? 'No forced mate recommendation' : log.isCorrect ? 'Correct' : 'Incorrect'}
                         className="leg-mate-log-correctness-mark"
                         role="img"
                       >
-                        {log.isCorrect ? '✓' : '×'}
+                        {unscoredCustomMove ? '—' : log.isCorrect ? '✓' : '×'}
                       </span>
                       {correctChoices === 0 ? null : (
                         <button

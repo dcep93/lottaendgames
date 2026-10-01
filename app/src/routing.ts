@@ -1,6 +1,7 @@
 import { MATE_CATALOG } from './mate/catalog'
 import {
   decodeMateReplay,
+  decodeCanonicalFen,
   encodeMateFen,
   decodeMateLiveFen,
   encodeMateLiveFen,
@@ -139,7 +140,7 @@ function resolveMateRoute(pathname: string, hash: string): RouteResolution {
   if (hash) {
     if (hash.startsWith('#live=')) {
       const decoded = decodeMateLiveFen(hash, catalogRecord.id)
-      if (!decoded.ok) return emptyMateResolution()
+      if (!decoded.ok) return catalogRecord.id === 'two-knights-pawn' ? unsupportedTwoKnightsLink(href, hash, mateMode) : emptyMateResolution()
       return {
         href: `${href}${encodeMateLiveFen(decoded.fen)}`,
         route: {
@@ -151,7 +152,7 @@ function resolveMateRoute(pathname: string, hash: string): RouteResolution {
       }
     }
     const decoded = decodeMateReplay(hash, catalogRecord.id, mateMode)
-    if (!decoded.ok) return emptyMateResolution()
+    if (!decoded.ok) return catalogRecord.id === 'two-knights-pawn' ? unsupportedTwoKnightsLink(href, hash, mateMode) : emptyMateResolution()
     const canonicalHash =
       decoded.moves === null
         ? encodeMateFen(decoded.fen)
@@ -204,4 +205,14 @@ function safeDecodeHash(hash: string) {
   } catch {
     return ''
   }
+}
+
+function unsupportedTwoKnightsLink(href: string, hash: string, mateMode: MateMode): RouteResolution {
+  const startHash = hash.split('&')[0]!
+  const fen = decodeCanonicalFen(startHash, startHash.startsWith('#live=') ? '#live=' : '#fen=')
+  return { href: href + hash, route: {
+    module: 'mate', mateId: 'two-knights-pawn', mateMode,
+    sharedFen: fen,
+    sharedError: 'Unsupported two-knights link: this position or replay does not follow the custom tablebase rules. Captures, moving the promoted queen, and underpromotions are prohibited. Older stage-policy links may be outside the new coverage.',
+  } }
 }
