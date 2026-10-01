@@ -55,7 +55,8 @@ test('r3 moves are legal, symmetry-equivalent, preserve pieces, and reduce rank 
 });
 
 test('r3 respects the framework priority and is attributed without bypassing selection',()=>{
- assert.deepEqual(bishopKnightRuleSet.whiteRules.slice(0,6).map(r=>r.id),['mate','minors safe','no stalemate','r1','r2','r3']);
+ assert.deepEqual(bishopKnightRuleSet.whiteRules.map(r=>r.id),['mate','minors safe','no stalemate','r1','r2','r3']);
+ assert.doesNotMatch(JSON.stringify(bishopKnightRuleSet.help), /\br[4-9](?:\.|\b)/);
  const source='N7/3B4/8/8/8/6k1/8/7K w - - 0 1';
  const scores=bishopKnightRuleSet.scoreWhiteCandidates!(source,getChess(source).moves());
  for(const san of preferred(source))assert.equal(explainMove(scores,bishopKnightRuleSet.whiteRules,san)?.id,'r3');

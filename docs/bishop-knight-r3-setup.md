@@ -2,7 +2,7 @@
 
 R3 targets White king, bishop and knight on **d4/e4/d5/e5**, with both king and knight on the opposite color from the bishop. It minimizes White moves to that formation under the most delaying legal Black replies. Existing r1 and r2 positions take priority, so a route can enter either stage before completing the formation.
 
-The rule order remains **mate → pieces safe → no stalemate → r1 → r2 → r3 → r4 and later setup rules**. Neither r1 nor r2's move table changed. Checkmate keeps its own higher-priority attribution. R1 still has exactly 99 reachable source edges and no outside r1 labels.
+The rule order remains **mate → pieces safe → no stalemate → r1 → r2 → r3**. Rules r4 and later have been removed from selection and the training guide. Neither r1 nor r2's move table changed. Checkmate keeps its own higher-priority attribution. R1 still has exactly 99 reachable source edges and no outside r1 labels.
 
 ## Exhaustive result
 
