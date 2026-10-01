@@ -1,3 +1,4 @@
+import TwoKnightsPawnPolicyLoader from './TwoKnightsPawnPolicyLoader'
 import React, { type ReactNode } from 'react'
 import MateBoard, { type MateBoardProps } from './MateBoard'
 import MateSidebar from './MateSidebar'
@@ -36,7 +37,7 @@ export default function Mate({
       ? { set: selectedSet, mode: route.mateMode }
       : null
 
-  const PolicyLoader = selectedDrill?.set.id === 'bishop-knight' ? MatePolicyLoader : React.Fragment
+  const PolicyLoader = selectedDrill?.set.id === 'bishop-knight' ? MatePolicyLoader : selectedDrill?.set.id === 'two-knights-pawn' ? TwoKnightsPawnPolicyLoader : React.Fragment
 
   return (
     <main className="leg-page leg-mate-page">

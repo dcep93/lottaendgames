@@ -22,9 +22,9 @@ const ROTATED_ROOK_TRAIN_FEN =
 const QUEEN_STANDARD_FEN =
   '8/8/8/8/4k3/8/8/3QK3 w - - 38 20'
 const KNN_STANDARD_FEN =
-  '4k3/p7/8/8/8/8/8/1N2K1N1 w - - 0 1'
+  '4k3/7p/8/8/8/8/8/1N2K1N1 w - - 0 1'
 const KNN_TRAIN_FEN =
-  '7k/8/5NKN/8/8/8/p7/8 w - - 0 1'
+  '8/8/8/8/4N3/7p/5K1N/7k w - - 0 1'
 const ROOK_LOOP_START =
   '8/8/8/8/3k4/8/1R6/3K4 w - - 0 1'
 const ROOK_LIVE_FEN =
@@ -328,58 +328,15 @@ test('Standard accepts legal matching starts while Train requires a curated seed
   )
 })
 
-test('Two Knights vs Pawn hashes must belong to the selected manifest mode', () => {
-  assert.deepEqual(
-    decodeMateFen(
-      encodeMateFen(KNN_STANDARD_FEN),
-      'two-knights-pawn',
-      'standard',
-    ),
-    { ok: true, fen: KNN_STANDARD_FEN },
-  )
-  assert.deepEqual(
-    decodeMateFen(
-      encodeMateFen(KNN_TRAIN_FEN),
-      'two-knights-pawn',
-      'train',
-    ),
-    { ok: true, fen: KNN_TRAIN_FEN },
-  )
-  assert.deepEqual(
-    decodeMateFen(
-      encodeMateFen(KNN_STANDARD_FEN),
-      'two-knights-pawn',
-      'train',
-    ),
-    { ok: false },
-  )
-  assert.deepEqual(
-    decodeMateFen(
-      encodeMateFen(KNN_TRAIN_FEN),
-      'two-knights-pawn',
-      'standard',
-    ),
-    { ok: false },
-  )
-  assert.deepEqual(
-    decodeMateFen(
-      encodeMateFen(KNN_STANDARD_FEN.replace(' 0 1', ' 1 1')),
-      'two-knights-pawn',
-      'standard',
-    ),
-    { ok: false },
-  )
-
-  const unsupportedButMaterialValid =
-    '5k2/p7/8/8/8/8/8/1N2K1N1 w - - 0 1'
-  assert.deepEqual(
-    decodeMateFen(
-      encodeMateFen(unsupportedButMaterialValid),
-      'two-knights-pawn',
-      'standard',
-    ),
-    { ok: false },
-  )
+test('Two Knights vs Pawn hashes accept legal h-pawn inputs in either mode', () => {
+  for (const mode of ['standard', 'train'] as const) {
+    for (const fen of [KNN_STANDARD_FEN, KNN_TRAIN_FEN, KNN_STANDARD_FEN.replace(' 0 1', ' 1 1')]) {
+      assert.deepEqual(decodeMateFen(encodeMateFen(fen), 'two-knights-pawn', mode), {ok: true, fen})
+    }
+    const aPawn = '5k2/p7/8/8/8/8/8/1N2K1N1 w - - 0 1'
+    assert.deepEqual(decodeMateFen(encodeMateFen(aPawn), 'two-knights-pawn', mode), {ok:false})
+    assert.deepEqual(decodeMateLiveFen(encodeMateLiveFen(aPawn), 'two-knights-pawn'), {ok:false})
+  }
 })
 
 test('share text uses the terminal label and exact centisecond timer format', () => {

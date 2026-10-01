@@ -1,3 +1,4 @@
+import './rules/twoKnightsPawnTestSetup'
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import { MATE_CATALOG } from './catalog'
@@ -747,7 +748,7 @@ test('classifies stalemate, lost material, fifty-move, and KNN promotion outcome
       'two-knights-pawn',
       '7k/8/8/8/8/1q6/8/K5NN w - - 0 2',
     ),
-    'pawn-promoted',
+    'unsupported',
   )
   assert.equal(
     getMateTerminalOutcome(

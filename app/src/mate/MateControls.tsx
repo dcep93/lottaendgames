@@ -27,7 +27,7 @@ const OUTCOME_LABELS: Readonly<Record<MateTerminalOutcome, string>> = {
   'lost-knight': 'Defeated',
   'pawn-promoted': 'Defeated',
   'fifty-move': 'Draw',
-  unsupported: 'Defeated',
+  unsupported: 'Uncertified position',
 }
 
 const readCurrentTime = () => Date.now()

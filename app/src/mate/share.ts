@@ -8,7 +8,6 @@ import {
   transformFen,
   validateMatePosition,
 } from './chess'
-import { isSupportedTwoKnightsPawnStart } from './positions'
 import {
   getMateTerminalOutcome,
   type MateTerminalOutcome,
@@ -46,7 +45,7 @@ const OUTCOME_LABELS: Readonly<Record<MateTerminalOutcome, string>> = {
   'lost-knight': 'defeated',
   'pawn-promoted': 'defeated',
   'fifty-move': 'draw',
-  unsupported: 'defeated',
+  unsupported: 'uncertified position',
 }
 
 const trainStartsByMateId = new Map<MateId, ReadonlySet<string>>()
@@ -206,6 +205,7 @@ export function decodeMateLiveFen(
 }
 
 function isPlausibleLiveMaterial(mateId: MateId, fen: string): boolean {
+  if (mateId === 'two-knights-pawn' && getEndgamePiecePlacements(fen).some(piece => piece.type === 'p' && piece.square[0] !== 'h')) return false
   if (materialMatchesMate(mateId, fen)) return true
 
   const entry = MATE_CATALOG.find(({ id }) => id === mateId)
@@ -302,7 +302,7 @@ function isSupportedExactMateStart(
   fen: string,
 ): boolean {
   if (mateId === 'two-knights-pawn') {
-    return isSupportedTwoKnightsPawnStart(fen, mode)
+    return validateMatePosition(mateId, fen).ok
   }
   if (mode === 'standard') return true
   return getTrainStarts(mateId).has(fen)

@@ -1,33 +1,8 @@
-import {knightCaptureNote, knightCaptureReplay} from './twoKnightsPawnNotes'
-import type { Move, Square } from 'chess.js'
-import {
-  allSquares,
-  edgeDistance,
-  findPiece,
-  getChess,
-  getEndgamePiecePlacements,
-  kingDistance,
-  manhattanDistance,
-  squareCoordinates,
-  squareFromCoordinates,
-} from '../chess'
-import {
-  getTwoKnightsPawnConstructionEntry,
-  isTwoKnightsPawnConstructionPosition,
-} from '../twoKnightsPawnConstruction'
+import { getChess, getEndgamePiecePlacements } from '../chess'
 import { compareScoresByRules, selectIdealMoves } from './selection'
-import type {
-  MateRuleSet,
-  OpponentCandidates,
-  OrderedRule,
-  RuleHelp,
-  ScoredMove,
-} from './types'
-import {
-  applyUniversalBlackPriorities,
-  BLACK_CAPTURE_PRIORITY,
-  BLACK_RETURN_PRIORITY,
-} from './blackPriorities'
+import { twoKnightsPawnEntry } from './twoKnightsPawnTable'
+import { knightCaptureNote, knightCaptureReplay } from './twoKnightsPawnNotes'
+import type { MateRuleSet, OrderedRule, ScoredMove } from './types'
 
 export type TwoKnightsPawnTerminalOutcome =
   | 'checkmate'
@@ -36,593 +11,141 @@ export type TwoKnightsPawnTerminalOutcome =
   | 'pawn-promoted'
   | 'fifty-move'
   | 'unsupported'
-
-export type TwoKnightsPawnWhiteMoveScore = {
-  readonly hasVerifiedConstruction: boolean
-  readonly verifiedConstructionPenalty: number
-  readonly matePenalty: number
-  readonly stalematePenalty: number
-  readonly knightSafetyPenalty: number
-  readonly immediatePromotionCount: number
-  readonly pawnPromotionDistance: number
-  readonly blockadeUrgent: boolean
-  readonly liveBlockadePenalty: number
-  readonly blockadeRouteDistance: number
-  readonly confinementReady: boolean
-  readonly blackKingRegionSize: number
-  readonly blackKingEdgeDistance: number
-  readonly blackMobility: number
-  readonly whiteKingDistance: number
-}
-
-export type TwoKnightsPawnBlackMoveScore = {
-  readonly promotionPenalty: number
-  readonly knightCapturePenalty: number
-  readonly unprotectedKnightDistance: number
-  readonly centerDistance: number
-  readonly resistanceMobility: number
-  readonly pawnAdvanceDistance: number
-  readonly whiteCoordinationDistance: number
-}
-
-const WHITE_INTRO =
-  "White's best moves are the moves that survive these priorities in order. If several moves remain tied after one priority, they all stay in consideration."
-
-const BLACK_INTRO =
-  'Black follows its displayed resistance priorities. It never chooses a route-only cooperative reply.'
-
-const twoKnightsPawnHelp: RuleHelp = {
-  title: 'How best moves are chosen',
-  whiteIntro: WHITE_INTRO,
-  blackIntro: BLACK_INTRO,
-  blackPriorities: [
-    BLACK_CAPTURE_PRIORITY,
-    BLACK_RETURN_PRIORITY,
-    'Promote the pawn immediately when possible.',
-    'Move toward an unprotected knight.',
-    'Keep the king near the center, then maximize its legal moves.',
-    'When the earlier resistance priorities tie, advance the pawn as far as legally possible.',
-    "Maximize the combined distance from White's king and the nearest knight.",
-  ],
-  noteLinks: [{noteIndex: 0, label: 'Replay the excluded knight-capture finish on Lichess', href: knightCaptureReplay}],
-  notes: [
-    knightCaptureNote,
-    'The bundled starts and every White edge in the committed construction were verified as unconditional wins before release. The optional Syzygy audit is an offline content check; the browser never queries a tablebase or network service.',
-    "The blockade square is immediately in front of Black's pawn. Confinement begins only after a knight occupies that square and Black cannot capture it.",
-    "For Black's downward-moving pawn, the file-specific Troitsky boundary is a4, b6, c5, d4, e4, f5, g6, h4. The blockade priority activates when the square immediately in front of the pawn reaches or crosses that boundary.",
-    'The compact construction was found by a bounded deterministic offline search, is mirrored from move coordinates, and is replay-checked against every production-ideal Black reply.',
-  ],
-  noteBoards: [],
-}
-
-const KNIGHT_DELTAS = [
-  [-2, -1],
-  [-2, 1],
-  [-1, -2],
-  [-1, 2],
-  [1, -2],
-  [1, 2],
-  [2, -1],
-  [2, 1],
-] as const
-
-const knightDistanceCache = new Map<string, number>()
-
-function knightDistance(from: Square, to: Square): number {
-  if (from === to) return 0
-  const cacheKey = `${from}-${to}`
-  const cached = knightDistanceCache.get(cacheKey)
-  if (cached !== undefined) return cached
-  const queue: Array<readonly [Square, number]> = [[from, 0]]
-  const visited = new Set<Square>([from])
-  while (queue.length > 0) {
-    const [square, distance] = queue.shift()!
-    const { file, rank } = squareCoordinates(square)
-    for (const [fileDelta, rankDelta] of KNIGHT_DELTAS) {
-      const next = squareFromCoordinates(file + fileDelta, rank + rankDelta)
-      if (next === null || visited.has(next)) continue
-      if (next === to) {
-        const result = distance + 1
-        knightDistanceCache.set(cacheKey, result)
-        knightDistanceCache.set(`${to}-${from}`, result)
-        return result
-      }
-      visited.add(next)
-      queue.push([next, distance + 1])
-    }
-  }
-  return 99
-}
-
-function whiteKnightSquares(fen: string): readonly Square[] {
-  return getEndgamePiecePlacements(fen)
-    .filter((piece) => piece.color === 'w' && piece.type === 'n')
-    .map(({ square }) => square)
-}
-
-function blackPawnSquare(fen: string): Square | undefined {
-  return findPiece(fen, 'b', 'p')?.square
-}
-
-function blockadeSquare(fen: string): Square | undefined {
-  const pawn = blackPawnSquare(fen)
-  if (!pawn) return undefined
-  const { file, rank } = squareCoordinates(pawn)
-  return squareFromCoordinates(file, rank - 1) ?? undefined
-}
-
-function blackCanCaptureSquare(fen: string, square: Square): boolean {
-  const chess = getChess(fen)
-  if (chess.turn() !== 'b') return false
-  return (chess.moves({ verbose: true }) as Move[]).some(
-    (move) => move.to === square && move.captured === 'n',
-  )
-}
-
-function secureBlockadeScore(fen: string): {
-  readonly penalty: number
-  readonly routeDistance: number
-} {
-  const target = blockadeSquare(fen)
-  const knights = whiteKnightSquares(fen)
-  if (!target || knights.length !== 2) {
-    return { penalty: 1, routeDistance: 99 }
-  }
-  const occupied = knights.includes(target)
-  const secure = occupied && !blackCanCaptureSquare(fen, target)
-  return {
-    penalty: secure ? 0 : 1,
-    routeDistance: occupied
-      ? 0
-      : Math.min(...knights.map((square) => knightDistance(square, target))),
-  }
-}
-
-function whiteAttackedSquares(fen: string): ReadonlySet<Square> {
-  const attacked = new Set<Square>()
-  const whiteKing = findPiece(fen, 'w', 'k')
-  if (whiteKing) {
-    for (const square of allSquares()) {
-      if (kingDistance(whiteKing.square, square) === 1) attacked.add(square)
-    }
-  }
-  for (const knight of whiteKnightSquares(fen)) {
-    const { file, rank } = squareCoordinates(knight)
-    for (const [fileDelta, rankDelta] of KNIGHT_DELTAS) {
-      const square = squareFromCoordinates(file + fileDelta, rank + rankDelta)
-      if (square) attacked.add(square)
-    }
-  }
-  return attacked
-}
-
-export function getTwoKnightsPawnBlackKingRegion(
-  fen: string,
-): ReadonlySet<Square> {
-  const blackKing = findPiece(fen, 'b', 'k')
-  if (!blackKing) return new Set()
-  const attacked = whiteAttackedSquares(fen)
-  const occupied = new Set(
-    getEndgamePiecePlacements(fen)
-      .filter((piece) => !(piece.color === 'b' && piece.type === 'k'))
-      .map(({ square }) => square),
-  )
-  const queue: Square[] = [blackKing.square]
-  const visited = new Set<Square>(queue)
-  while (queue.length > 0) {
-    const current = queue.shift()!
-    for (const square of allSquares()) {
-      if (
-        visited.has(square) ||
-        occupied.has(square) ||
-        attacked.has(square) ||
-        kingDistance(current, square) !== 1
-      ) {
-        continue
-      }
-      visited.add(square)
-      queue.push(square)
-    }
-  }
-  return visited
-}
-
-function immediateBlackPromotions(fen: string): number {
-  const chess = getChess(fen)
-  if (chess.turn() !== 'b') return 0
-  return (chess.moves({ verbose: true }) as Move[]).filter(
-    ({ promotion }) => promotion !== undefined,
-  ).length
-}
-
-function pawnPromotionDistance(fen: string): number {
-  const pawn = blackPawnSquare(fen)
-  return pawn ? Number(pawn[1]) - 1 : 0
-}
-
-const TROITSKY_PAWN_BOUNDARY_RANK = [4, 6, 5, 4, 4, 5, 6, 4] as const
-
-function blockadeIsUrgent(fen: string): boolean {
-  const pawn = blackPawnSquare(fen)
-  if (!pawn) return true
-  const { file, rank } = squareCoordinates(pawn)
-  const pawnRank = rank + 1
-  const blockadeRank = pawnRank - 1
-  return blockadeRank <= TROITSKY_PAWN_BOUNDARY_RANK[file]
-}
-
-function scoreWhiteMoveUncached(
-  fen: string,
-  san: string,
-): TwoKnightsPawnWhiteMoveScore {
-  const construction = getTwoKnightsPawnConstructionEntry(fen)
-  const chess = getChess(fen)
-  chess.move(san)
-  const resultFen = chess.fen()
-  const blackKing = findPiece(resultFen, 'b', 'k')
-  const whiteKing = findPiece(resultFen, 'w', 'k')
-  const blockade = secureBlockadeScore(resultFen)
-  return Object.freeze({
-    hasVerifiedConstruction: construction !== undefined,
-    verifiedConstructionPenalty:
-      construction === undefined || construction.san === san ? 0 : 1,
-    matePenalty:
-      chess.isCheckmate() && chess.turn() === 'b' ? 0 : 1,
-    stalematePenalty: chess.isStalemate() ? 1 : 0,
-    knightSafetyPenalty: (chess.moves({ verbose: true }) as Move[]).some(
-      ({ captured }) => captured === 'n',
-    )
-      ? 1
-      : 0,
-    immediatePromotionCount: immediateBlackPromotions(resultFen),
-    pawnPromotionDistance: pawnPromotionDistance(resultFen),
-    blockadeUrgent: blockadeIsUrgent(resultFen),
-    liveBlockadePenalty: blockade.penalty,
-    blockadeRouteDistance: blockade.routeDistance,
-    confinementReady: blockade.penalty === 0,
-    blackKingRegionSize: getTwoKnightsPawnBlackKingRegion(resultFen).size,
-    blackKingEdgeDistance: blackKing ? edgeDistance(blackKing.square) : 0,
-    blackMobility: chess.moves().length,
-    whiteKingDistance:
-      whiteKing && blackKing
-        ? manhattanDistance(whiteKing.square, blackKing.square)
-        : 99,
-  })
-}
-
-const whiteScoreCache = new Map<
-  string,
-  ReadonlyMap<string, TwoKnightsPawnWhiteMoveScore>
->()
-const WHITE_SCORE_CACHE_LIMIT = 512
+export type TwoKnightsPawnWhiteMoveScore = { stage: number; penalty: number }
+export type TwoKnightsPawnBlackMoveScore = { remainingPlies: number }
+export const twoKnightsPawnWhiteRules: readonly OrderedRule<TwoKnightsPawnWhiteMoveScore>[] =
+  [
+    ['r1', 'Deliver checkmate.'],
+    ['r2', 'Lock the king.'],
+    ['r3', 'Blockade the pawn.'],
+  ].map(([id, helpText], i) => ({
+    id: id!,
+    shortLabel: `rule ${id}`,
+    helpText: helpText!,
+    applies: (score) => score.stage === i + 1,
+    compare: (a, b) => a.penalty - b.penalty,
+  }))
 
 export function scoreTwoKnightsPawnWhiteCandidates(
   fen: string,
   moves: readonly string[] = getChess(fen).moves(),
 ): readonly ScoredMove<TwoKnightsPawnWhiteMoveScore>[] {
-  let scores = whiteScoreCache.get(fen)
-  if (!scores) {
-    const legalMoves = getChess(fen).moves()
-    scores = new Map(
-      legalMoves.map(
-        (san) => [san, scoreWhiteMoveUncached(fen, san)] as const,
-      ),
-    )
-    if (whiteScoreCache.size >= WHITE_SCORE_CACHE_LIMIT) {
-      const oldest = whiteScoreCache.keys().next().value
-      if (oldest !== undefined) whiteScoreCache.delete(oldest)
-    }
-    whiteScoreCache.set(fen, scores)
-  }
-  return Object.freeze(
-    moves.map((san) => {
-      const score = scores.get(san)
-      if (!score) {
-        throw new Error(`cannot score illegal or uncached KNN move: ${san}`)
-      }
-      return Object.freeze({ san, score })
-    }),
-  )
+  const entry = twoKnightsPawnEntry(fen)
+  const chess = getChess(fen)
+  const selected =
+    entry &&
+    chess
+      .moves({ verbose: true })
+      .find((m) => m.from === entry.from && m.to === entry.to)?.san
+  return moves.map((san) => ({
+    san,
+    score: { stage: entry?.stage ?? 0, penalty: san === selected ? 0 : 1 },
+  }))
 }
-
 export function scoreTwoKnightsPawnWhiteMove(
   fen: string,
   san: string,
 ): TwoKnightsPawnWhiteMoveScore {
-  const score = scoreTwoKnightsPawnWhiteCandidates(fen).find(
-    (candidate) => candidate.san === san,
-  )?.score
-  if (!score) throw new Error(`illegal KNN move: ${san}`)
-  return score
+  const row = scoreTwoKnightsPawnWhiteCandidates(fen).find((m) => m.san === san)
+  if (!row) throw new Error(`Illegal h-pawn move: ${san}`)
+  return row.score
 }
-
-export const twoKnightsPawnWhiteRules: readonly OrderedRule<TwoKnightsPawnWhiteMoveScore>[] = [
-  {
-    id: 'mate',
-    shortLabel: 'mate',
-    helpText: '',
-    compare: (first, second) => first.matePenalty - second.matePenalty,
-  },
-  {
-    id: 'knights safe',
-    shortLabel: 'pieces safe',
-    helpText: '',
-    compare: (first, second) =>
-      first.knightSafetyPenalty - second.knightSafetyPenalty,
-  },
-  {
-    id: 'no stalemate',
-    shortLabel: 'no stalemate',
-    helpText: '',
-    compare: (first, second) =>
-      first.stalematePenalty - second.stalematePenalty,
-  },
-  {
-    id: 'stop pawn promotion',
-    shortLabel: 'stop pawn promotion',
-    helpText:
-      'Prevent an immediate promotion and keep as many pawn moves as possible between Black and promotion.',
-    subpriorities: [
-      {
-        compare: (first, second) =>
-          first.immediatePromotionCount - second.immediatePromotionCount,
-      },
-      {
-        compare: (first, second) =>
-          second.pawnPromotionDistance - first.pawnPromotionDistance,
-      },
-    ],
-  },
-  {
-    id: 'blockade pawn',
-    shortLabel: 'blockade pawn',
-    helpText:
-      "When the square immediately in front of Black's downward-moving pawn reaches or crosses its file-specific Troitsky boundary (a4, b6, c5, d4, e4, f5, g6, h4), occupy it with a knight Black cannot capture; until then, take the shortest knight route there.",
-    applies: (score) => score.blockadeUrgent,
-    subpriorities: [
-      {
-        compare: (first, second) =>
-          first.liveBlockadePenalty - second.liveBlockadePenalty,
-      },
-      {
-        compare: (first, second) =>
-          first.blockadeRouteDistance - second.blockadeRouteDistance,
-      },
-    ],
-  },
-  {
-    id: 'follow verified construction',
-    shortLabel: 'follow verified construction',
-    helpText:
-      'On an exact audited route position, stay on the legal 27-ply Standard identity or file-mirror construction (or the one-ply Training Wheels finish) that preserves the unconditional win, establishes and maintains the pawn blockade, and completes the mating cage. This priority is inactive off the committed route, where the human geometric priorities apply instead.',
-    applies: (score) => score.hasVerifiedConstruction,
-    compare: (first, second) =>
-      first.verifiedConstructionPenalty - second.verifiedConstructionPenalty,
-  },
-  {
-    id: 'confine black king',
-    shortLabel: 'confine black king',
-    helpText:
-      "After the pawn is securely blockaded, shrink Black's reachable region, then move Black closer to the edge.",
-    applies: (score) => score.confinementReady,
-    subpriorities: [
-      {
-        compare: (first, second) =>
-          first.blackKingRegionSize - second.blackKingRegionSize,
-      },
-      {
-        compare: (first, second) =>
-          first.blackKingEdgeDistance - second.blackKingEdgeDistance,
-      },
-    ],
-  },
-  {
-    id: 'reduce black mobility',
-    shortLabel: 'reduce black mobility',
-    helpText: 'Reduce the number of legal replies available to Black.',
-    applies: (score) => score.confinementReady,
-    compare: (first, second) =>
-      first.blackMobility - second.blackMobility,
-  },
-  {
-    id: 'bring white king closer',
-    shortLabel: 'bring white king closer',
-    helpText: "Bring White's king closer to Black's king.",
-    compare: (first, second) =>
-      first.whiteKingDistance - second.whiteKingDistance,
-  },
-]
-
-export function compareTwoKnightsPawnWhiteScores(
-  first: TwoKnightsPawnWhiteMoveScore,
-  second: TwoKnightsPawnWhiteMoveScore,
-): number {
-  return compareScoresByRules(first, second, twoKnightsPawnWhiteRules)
-}
-
+export const compareTwoKnightsPawnWhiteScores = (
+  a: TwoKnightsPawnWhiteMoveScore,
+  b: TwoKnightsPawnWhiteMoveScore,
+) => compareScoresByRules(a, b, twoKnightsPawnWhiteRules)
 export function getIdealTwoKnightsPawnWhiteMoves(fen: string): string[] {
-  const chess = getChess(fen)
-  const moves = chess.turn() === 'w' ? chess.moves() : []
+  if (getChess(fen).turn() !== 'w' || !twoKnightsPawnEntry(fen)) return []
   return [
     ...selectIdealMoves(
-      scoreTwoKnightsPawnWhiteCandidates(fen, moves),
+      scoreTwoKnightsPawnWhiteCandidates(fen),
       twoKnightsPawnWhiteRules,
     ),
   ]
 }
-
-function centerDistance(square: Square): number {
-  const { file, rank } = squareCoordinates(square)
-  const fileDistance = file < 3 ? 3 - file : file > 4 ? file - 4 : 0
-  const rankDistance = rank < 3 ? 3 - rank : rank > 4 ? rank - 4 : 0
-  return fileDistance + rankDistance
-}
-
-function whiteUnprotectedKnightSquares(fen: string): readonly Square[] {
-  const knights = whiteKnightSquares(fen)
-  const whiteKing = findPiece(fen, 'w', 'k')
-  return knights.filter(
-    (knight) =>
-      !(
-        (whiteKing && kingDistance(whiteKing.square, knight) === 1) ||
-        knights.some(
-          (other) =>
-            other !== knight && knightDistance(other, knight) === 1,
-        )
-      ),
-  )
-}
-
-function distanceToNearestUnprotectedKnight(
-  fen: string,
-  square: Square,
-): number {
-  const knights = whiteUnprotectedKnightSquares(fen)
-  return knights.length === 0
-    ? 99
-    : Math.min(...knights.map((knight) => kingDistance(square, knight)))
-}
-
-function actualBlackKingMobility(fen: string): number {
-  const fields = fen.split(' ')
-  fields[1] = 'b'
-  fields[3] = '-'
-  try {
-    return (getChess(fields.join(' ')).moves({ verbose: true }) as Move[])
-      .filter(({ piece }) => piece === 'k').length
-  } catch {
-    return 0
-  }
-}
-
 export function scoreTwoKnightsPawnBlackMove(
   fen: string,
   san: string,
 ): TwoKnightsPawnBlackMoveScore {
-  const beforeKnightCount = whiteKnightSquares(fen).length
   const chess = getChess(fen)
-  const move = chess.move(san)
-  const resultFen = chess.fen()
-  const blackKing = findPiece(resultFen, 'b', 'k')
-  const whiteKing = findPiece(resultFen, 'w', 'k')
-  const afterKnightCount = whiteKnightSquares(resultFen).length
-  const kingSquare = blackKing?.square
-  return Object.freeze({
-    promotionPenalty: move.promotion === undefined ? 1 : 0,
-    knightCapturePenalty: afterKnightCount < beforeKnightCount ? 0 : 1,
-    unprotectedKnightDistance: kingSquare
-      ? distanceToNearestUnprotectedKnight(resultFen, kingSquare)
-      : 99,
-    centerDistance: kingSquare ? centerDistance(kingSquare) : 99,
-    resistanceMobility: -actualBlackKingMobility(resultFen),
-    pawnAdvanceDistance: move.piece === 'p' ? Number(move.to[1]) - 1 : 8,
-    whiteCoordinationDistance:
-      kingSquare && whiteKing
-        ? -manhattanDistance(kingSquare, whiteKing.square) -
-          Math.min(
-            ...whiteKnightSquares(resultFen).map((knight) =>
-              kingDistance(knight, kingSquare),
-            ),
-          )
-        : 0,
-  })
-}
-
-export function compareTwoKnightsPawnBlackScores(
-  first: TwoKnightsPawnBlackMoveScore,
-  second: TwoKnightsPawnBlackMoveScore,
-): number {
-  return (
-    first.promotionPenalty - second.promotionPenalty ||
-    first.knightCapturePenalty - second.knightCapturePenalty ||
-    first.unprotectedKnightDistance - second.unprotectedKnightDistance ||
-    first.centerDistance - second.centerDistance ||
-    first.resistanceMobility - second.resistanceMobility ||
-    first.pawnAdvanceDistance - second.pawnAdvanceDistance ||
-    first.whiteCoordinationDistance - second.whiteCoordinationDistance
-  )
-}
-
-export function getIdealTwoKnightsPawnBlackMoves(
-  fen: string,
-  moves: readonly string[] = getChess(fen).moves(),
-): string[] {
-  if (moves.length === 0) return []
-  const scored = moves.map((san) => ({
-    san,
-    score: scoreTwoKnightsPawnBlackMove(fen, san),
-  }))
-  let best = scored[0]!
-  for (const candidate of scored.slice(1)) {
-    if (compareTwoKnightsPawnBlackScores(candidate.score, best.score) < 0) {
-      best = candidate
-    }
-  }
-  return scored
-    .filter(
-      ({ score }) =>
-        compareTwoKnightsPawnBlackScores(score, best.score) === 0,
-    )
-    .map(({ san }) => san)
-}
-
-function getBlackCandidates(
-  fen: string,
-  previousTurnFen?: string,
-): OpponentCandidates {
-  const chess = getChess(fen)
-  const moves = chess.turn() === 'b' ? chess.moves() : []
-  const priorityMoves = applyUniversalBlackPriorities(
-    fen,
-    previousTurnFen,
-    moves,
-  )
+  chess.move(san)
   return {
-    moves,
-    idealMoves: getIdealTwoKnightsPawnBlackMoves(fen, priorityMoves),
+    remainingPlies: chess.isCheckmate()
+      ? 0
+      : (twoKnightsPawnEntry(chess.fen())?.plies ?? 10000),
   }
 }
-
-function whiteLegalMoves(fen: string): readonly string[] {
+export const compareTwoKnightsPawnBlackScores = (
+  a: TwoKnightsPawnBlackMoveScore,
+  b: TwoKnightsPawnBlackMoveScore,
+) => b.remainingPlies - a.remainingPlies
+export function getIdealTwoKnightsPawnBlackMoves(fen: string): string[] {
   const chess = getChess(fen)
-  return chess.turn() === 'w' ? chess.moves() : []
+  if (chess.turn() !== 'b') return []
+  const rows = chess
+    .moves()
+    .map((san) => ({ san, score: scoreTwoKnightsPawnBlackMove(fen, san) }))
+  const maximum = Math.max(...rows.map((r) => r.score.remainingPlies))
+  return rows
+    .filter((r) => r.score.remainingPlies === maximum)
+    .map((r) => r.san)
 }
-
-function phaseLabel(fen: string): string {
-  if (whiteKnightSquares(fen).length !== 2) return '0/2'
-  return secureBlockadeScore(fen).penalty === 0 ? '2/2' : '1/2'
-}
-
 export function getTwoKnightsPawnTerminalOutcome(
   fen: string,
 ): TwoKnightsPawnTerminalOutcome | null {
   const chess = getChess(fen)
-  if (whiteKnightSquares(fen).length !== 2) return 'lost-knight'
-  const blackNonKingPieces = getEndgamePiecePlacements(fen).filter(
-    (piece) => piece.color === 'b' && piece.type !== 'k',
-  )
-  if (blackNonKingPieces.some(({ type }) => type !== 'p')) {
-    return 'pawn-promoted'
-  }
-  if (!blackNonKingPieces.some(({ type }) => type === 'p')) {
-    return 'unsupported'
-  }
-  if (chess.isCheckmate()) {
+  if (chess.isCheckmate())
     return chess.turn() === 'b' ? 'checkmate' : 'unsupported'
-  }
+  const pieces = getEndgamePiecePlacements(fen)
+  if (pieces.filter((p) => p.color === 'w' && p.type === 'n').length !== 2)
+    return 'lost-knight'
   if (chess.isStalemate()) return 'stalemate'
   if (chess.isDrawByFiftyMoves()) return 'fifty-move'
-  if (!isTwoKnightsPawnConstructionPosition(fen)) return 'unsupported'
+  if (!twoKnightsPawnEntry(fen)) return 'unsupported'
   return null
 }
-
-export const twoKnightsPawnRuleSet: MateRuleSet<TwoKnightsPawnWhiteMoveScore> = {
-  id: 'two-knights-pawn',
-  phase: phaseLabel,
-  scoreWhite: scoreTwoKnightsPawnWhiteMove,
-  scoreWhiteCandidates: scoreTwoKnightsPawnWhiteCandidates,
-  whiteRules: twoKnightsPawnWhiteRules,
-  whiteMoves: whiteLegalMoves,
-  blackCandidates: getBlackCandidates,
-  help: twoKnightsPawnHelp,
-}
+export const twoKnightsPawnRuleSet: MateRuleSet<TwoKnightsPawnWhiteMoveScore> =
+  {
+    id: 'two-knights-pawn',
+    phase: (fen) => {
+      const s = twoKnightsPawnEntry(fen)?.stage
+      return s ? `${4 - s}/3` : '0/3'
+    },
+    scoreWhite: scoreTwoKnightsPawnWhiteMove,
+    scoreWhiteCandidates: scoreTwoKnightsPawnWhiteCandidates,
+    whiteRules: twoKnightsPawnWhiteRules,
+    whiteMoves: (fen) =>
+      getChess(fen).turn() === 'w' && twoKnightsPawnEntry(fen)
+        ? getChess(fen).moves()
+        : [],
+    blackCandidates: (fen) => ({
+      moves: getChess(fen).turn() === 'b' ? getChess(fen).moves() : [],
+      idealMoves: getIdealTwoKnightsPawnBlackMoves(fen),
+    }),
+    help: {
+      title: 'How best moves are chosen',
+      whiteIntro:
+        'Follow the certified stages: blockade the h-pawn, lock the king, then deliver mate. Each stage minimizes the worst-case number of White moves to its target.',
+      blackIntro:
+        'Black chooses the longest continuation against the selected White policy.',
+      blackPriorities: [
+        'Maximize the remaining moves to mate; the proof covers every legal Black reply.',
+      ],
+      notes: [
+        knightCaptureNote,
+        'Only a Black h-pawn is supported. A knight must remain in front of the pawn throughout r2. A temporary blockade that Black can dislodge does not qualify.',
+        'The locking formation confines Black to a 3×3 corner cage using the White king and guarding knight. r1 consists only of certified finishing continuations reachable from locked, blockaded formations. Entering the net from outside remains an r2 move.',
+        'r1 may allow promotion on h1 only when White has immediate checkmate against every promotion choice. Knight captures and pawn captures remain outside this method.',
+        'The lookup ignores the fifty-move clock when optimizing. Clock failures are audited separately; the live game still reports the fifty-move draw. Uncertified means no route under this method, not necessarily a theoretical draw.',
+        'The former back-rank standard start is not certified with knight captures excluded. Standard and training starts are selected from the certified table instead.',
+      ],
+      noteLinks: [
+        {
+          noteIndex: 0,
+          label: 'Replay the excluded knight-capture finish on Lichess',
+          href: knightCaptureReplay,
+        },
+      ],
+      noteBoards: [],
+    },
+  }

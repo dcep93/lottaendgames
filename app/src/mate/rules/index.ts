@@ -121,7 +121,6 @@ export {
   compareTwoKnightsPawnWhiteScores,
   getIdealTwoKnightsPawnBlackMoves,
   getIdealTwoKnightsPawnWhiteMoves,
-  getTwoKnightsPawnBlackKingRegion,
   getTwoKnightsPawnTerminalOutcome,
   scoreTwoKnightsPawnBlackMove,
   scoreTwoKnightsPawnWhiteCandidates,

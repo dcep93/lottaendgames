@@ -531,6 +531,9 @@ export function validateMatePosition(
   ) {
     return { ok: false, reason: 'Pawns cannot be placed on ranks 1 or 8' }
   }
+  if (mateId === 'two-knights-pawn' && placements.some(piece => piece.type === 'p' && piece.square[0] !== 'h')) {
+    return { ok: false, reason: 'Two Knights vs Pawn requires a Black h-pawn' }
+  }
   if (!isLegalEndgameStart(fen)) {
     return {
       ok: false,
