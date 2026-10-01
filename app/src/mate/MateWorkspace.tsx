@@ -403,7 +403,7 @@ export default function MateWorkspace({
 
       <div className="leg-mate-log-column">
         {mateId === 'two-knights-pawn' && session.outcome === 'unsupported' && (
-          <p role="alert">Unsupported position: this board is outside the custom tablebase reachable from the default start. Older stage-policy links may use different pawn ranks or promotion rules. Start Over loads the supported starting position.</p>
+          <p role="alert">Unsupported position: this board is outside custom tablebase coverage. Older stage-policy links may use different pawn ranks or promotion rules. Start Over loads the supported starting position.</p>
         )}
         <MateControls
           busy={playBestAnimation !== null}

@@ -1,5 +1,5 @@
-export const TWO_KNIGHTS_PAWN_TRANSFORM_NAMES = ['identity'] as const
-export type TwoKnightsPawnTransformName = 'identity'
+export const TWO_KNIGHTS_PAWN_TRANSFORM_NAMES = ['identity', 'mirrorFile'] as const
+export type TwoKnightsPawnTransformName = typeof TWO_KNIGHTS_PAWN_TRANSFORM_NAMES[number]
 export type TwoKnightsPawnSource = {
   readonly fen: string
   readonly transformNames: readonly TwoKnightsPawnTransformName[]
@@ -9,7 +9,7 @@ export type TwoKnightsPawnManifest = {
   readonly train: readonly TwoKnightsPawnSource[]
 }
 
-/** Starts are h-pawn positions; file reflections would change the supported domain. */
+/** Only file reflection preserves pawn direction in the supported tablebase. */
 export function parseTwoKnightsPawnManifest(
   value: unknown,
 ): TwoKnightsPawnManifest {
@@ -30,13 +30,14 @@ export function parseTwoKnightsPawnManifest(
           typeof row.fen !== 'string' ||
           Object.keys(row).sort().join(',') !== 'fen,transformNames' ||
           !Array.isArray(row.transformNames) ||
-          row.transformNames.length !== 1 ||
-          row.transformNames[0] !== 'identity'
+          row.transformNames.length === 0 ||
+          row.transformNames.some(name => !TWO_KNIGHTS_PAWN_TRANSFORM_NAMES.includes(name)) ||
+          new Set(row.transformNames).size !== row.transformNames.length
         )
-          throw new Error('Only the identity h-pawn transform is supported')
+          throw new Error('Only identity and mirrorFile transforms are supported')
         return Object.freeze({
           fen: row.fen,
-          transformNames: Object.freeze(['identity'] as const),
+          transformNames: Object.freeze([...row.transformNames]),
         })
       }),
     )

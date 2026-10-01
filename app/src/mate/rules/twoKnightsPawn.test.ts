@@ -4,7 +4,7 @@ import { test } from 'node:test'
 import { Chess } from 'chess.js'
 import fixtures from './twoKnightsPawnTableFixtures.json'
 import { twoKnightsPawnEntry, twoKnightsPawnPositionId } from './twoKnightsPawnTable'
-import { getTwoKnightsPawnPermittedMoves, getTwoKnightsPawnBoardOutcome, TWO_KNIGHTS_PAWN_START_FEN } from './twoKnightsPawnMoves'
+import { getTwoKnightsPawnPermittedMoves, getTwoKnightsPawnBoardOutcome, TWO_KNIGHTS_PAWN_TABLE_ROOT_FEN } from './twoKnightsPawnMoves'
 import { getIdealTwoKnightsPawnWhiteMoves, getIdealTwoKnightsPawnBlackMoves, getTwoKnightsPawnTerminalOutcome, twoKnightsPawnWhiteRules } from './twoKnightsPawn'
 import { getMateRuleSet } from './index'
 import { createMateSession, playWhiteMove, playBestMateMove, undoMateMove, redoMateMove, replaceHistoricalBlackMove } from '../session'
@@ -44,7 +44,7 @@ test('runtime agrees with independent native legal successors, IDs, values and e
 })
 
 test('worst resistance has exactly the starting DTM, including stationary-queen custom checkmate', () => {
-  const chess = new Chess(TWO_KNIGHTS_PAWN_START_FEN)
+  const chess = new Chess(TWO_KNIGHTS_PAWN_TABLE_ROOT_FEN)
   assert.equal(twoKnightsPawnEntry(chess.fen())?.plies, fixtures.worstLine.dtm)
   for (const [i, move] of fixtures.worstLine.uci.entries()) {
     assert.equal(twoKnightsPawnEntry(chess.fen())?.plies, fixtures.worstLine.dtm - i)
@@ -70,7 +70,7 @@ test('no-forced-mate stays playable; clocks, deviations and undo/redo preserve t
   assert.equal(next.startingFen, fen)
   assert.equal(undoMateMove(undoMateMove(next)).fen, fen)
   assert.equal(redoMateMove(redoMateMove(undoMateMove(undoMateMove(next)))).fen, next.fen)
-  const root = createMateSession({mateId:'two-knights-pawn',mode:'standard',startingFen:TWO_KNIGHTS_PAWN_START_FEN},deps)
+  const root = createMateSession({mateId:'two-knights-pawn',mode:'standard',startingFen:TWO_KNIGHTS_PAWN_TABLE_ROOT_FEN},deps)
   const deviation = getMateRuleSet('two-knights-pawn').whiteMoves(root.fen).find(m => !getIdealTwoKnightsPawnWhiteMoves(root.fen).includes(m))!
   const deviated = playWhiteMove(root, deviation, deps)
   assert.notEqual(deviated, root)

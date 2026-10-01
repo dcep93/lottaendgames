@@ -1,3 +1,4 @@
+import { nextTwoKnightsPawnStandardStart } from './positions'
 import { getTwoKnightsPawnPermittedMoves } from './rules/twoKnightsPawnMoves'
 import type { Chess } from 'chess.js'
 import {
@@ -616,7 +617,10 @@ export function startOverMateSession(
   deps: MateSessionDeps,
 ): MateSession {
   return createMateSession(
-    { mateId: session.mateId, mode: session.mode },
+    { mateId: session.mateId, mode: session.mode,
+      ...(session.mateId === 'two-knights-pawn' && session.mode === 'standard'
+        ? { startingFen: nextTwoKnightsPawnStandardStart(session.startingFen) } : {}),
+    },
     deps,
   )
 }

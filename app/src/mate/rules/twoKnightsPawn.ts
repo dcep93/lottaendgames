@@ -1,7 +1,7 @@
 import { knightCaptureNote, knightCaptureReplay } from './twoKnightsPawnNotes'
 import { getChess } from '../chess'
 import { twoKnightsPawnEntry, twoKnightsPawnTableReady } from './twoKnightsPawnTable'
-import { getTwoKnightsPawnPermittedMoves, getTwoKnightsPawnBoardOutcome } from './twoKnightsPawnMoves'
+import { getTwoKnightsPawnPermittedMoves, getTwoKnightsPawnBoardOutcome, twoKnightsPawnMoveKey } from './twoKnightsPawnMoves'
 import type { MateRuleSet, OrderedRule, ScoredMove } from './types'
 export { getTwoKnightsPawnBoardOutcome, getTwoKnightsPawnPermittedMoves } from './twoKnightsPawnMoves'
 export type TwoKnightsPawnTerminalOutcome = 'checkmate' | 'white-checkmate' | 'stalemate' | 'unsupported'
@@ -15,7 +15,7 @@ export const twoKnightsPawnWhiteRules: readonly OrderedRule<TwoKnightsPawnWhiteM
 function successors(fen: string) {
   return getTwoKnightsPawnPermittedMoves(fen).map(move => ({
     san: move.san,
-    key: move.from + move.to + (move.promotion ?? ''),
+    key: twoKnightsPawnMoveKey(fen, move),
     entry: twoKnightsPawnEntry(move.after),
   }))
 }
@@ -85,9 +85,9 @@ export const twoKnightsPawnRuleSet: MateRuleSet<TwoKnightsPawnWhiteMoveScore> = 
     notes: [
       knightCaptureNote,
       'Captures are prohibited for both sides. Both White knights are free to move.',
-      'The h-pawn promotes only to a queen on h1. That queen never moves or captures, but its normal attacks still restrict White’s king.',
+      'The edge pawn promotes only to a queen on its file (h1 or a1). That queen never moves or captures, but its normal attacks still restrict White’s king.',
       'The fifty-move rule is ignored. Checkmate and stalemate use only permitted moves.',
-      'No forced mate is a tablebase result, and manual play remains available. Unsupported positions are outside the positions reachable from the default start.',
+      'No forced mate is a tablebase result, and manual play remains available. Unsupported positions are outside the positions covered by the tablebase, including file reflections.',
       'This is a custom-rule tablebase, not an ordinary-chess Syzygy tablebase.',
     ], noteLinks: [{ noteIndex: 0, label: 'Replay the excluded knight-capture finish on Lichess', href: knightCaptureReplay }], noteBoards: [],
   },

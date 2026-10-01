@@ -30,7 +30,7 @@ import {
   whiteBishopsAreOppositeColored,
   type EndgamePiecePlacement,
 } from './chess'
-import { generateMatePosition } from './positions'
+import { generateMatePosition, nextTwoKnightsPawnStandardStart } from './positions'
 import {
   assertTwoKnightsPawnPositionManifest,
   isSupportedTwoKnightsPawnStart,
@@ -553,7 +553,9 @@ test('Two Knights vs Pawn generation covers exactly the declared source-transfor
     for (const [sourceIndex, source] of sources.entries()) {
       for (const [transformIndex, name] of source.transformNames.entries()) {
         generated.add(
-          generateMatePosition(
+          mode === 'standard' && name === 'mirrorFile'
+            ? nextTwoKnightsPawnStandardStart(source.fen)
+            : generateMatePosition(
             'two-knights-pawn',
             mode,
             sequenceRandom([
@@ -592,7 +594,7 @@ test('Two Knights vs Pawn manifest validates source material and transformed sta
       TWO_KNIGHTS_PAWN_POSITIONS.standard[0]!.fen,
       'train',
     ),
-    true,
+    false,
   )
 })
 

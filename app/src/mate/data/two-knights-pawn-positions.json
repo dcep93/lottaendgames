@@ -1,4 +1,19 @@
 {
-  "standard": [{"fen": "k7/8/8/8/3KN2p/7N/8/8 w - - 0 1", "transformNames": ["identity"]}],
-  "train": [{"fen": "k7/8/8/8/3KN2p/7N/8/8 w - - 0 1", "transformNames": ["identity"]}]
+  "standard": [
+    {
+      "fen": "k7/8/8/8/7p/8/8/5KNN w - - 0 1",
+      "transformNames": [
+        "identity",
+        "mirrorFile"
+      ]
+    }
+  ],
+  "train": [
+    {
+      "fen": "k7/8/8/8/3KN2p/7N/8/8 w - - 0 1",
+      "transformNames": [
+        "identity"
+      ]
+    }
+  ]
 }

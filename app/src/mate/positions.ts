@@ -9,6 +9,7 @@ import {
   collectionIndex,
   getChess,
   getEndgamePieces,
+  getEndgamePiecePlacements,
   getSquareTransform,
   kingDistance,
   randomTransformFen,
@@ -172,6 +173,7 @@ function generateTwoKnightsPawnPosition(
   mode: MateMode,
   random: () => number,
 ): string {
+  if (mode === 'standard') return TWO_KNIGHTS_PAWN_POSITIONS.standard[0]!.fen
   const sources = sourceCollection(TWO_KNIGHTS_PAWN_POSITIONS, mode)
   const source = sources[collectionIndex(sources.length, random())]!
   const transformName =
@@ -235,4 +237,13 @@ function getCatalogEntry(mateId: MateId): MateCatalogEntry {
     throw new Error(`Unknown mate set: ${mateId}`)
   }
   return entry
+}
+
+/** Alternate from the original session orientation, not the current move. */
+export function nextTwoKnightsPawnStandardStart(previousStartFen: string): string {
+  const seed = TWO_KNIGHTS_PAWN_POSITIONS.standard[0]!.fen
+  const previousWasReflected = getEndgamePiecePlacements(previousStartFen).some(
+    p => p.color === 'b' && p.type !== 'k' && p.square[0] === 'a',
+  )
+  return previousWasReflected ? seed : transformFen(seed, getSquareTransform('mirrorFile'))
 }

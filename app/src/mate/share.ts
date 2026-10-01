@@ -381,5 +381,5 @@ function isLegacyTwoKnightsPawnFen(fen: string): boolean {
   const pieces = getEndgamePiecePlacements(fen)
   return pieces.length === 5 && pieces.filter(p => p.color === 'w' && p.type === 'n').length === 2 &&
     pieces.some(p => p.color === 'w' && p.type === 'k') && pieces.some(p => p.color === 'b' && p.type === 'k') &&
-    pieces.some(p => p.color === 'b' && ((p.type === 'p' && p.square[0] === 'h') || (p.type !== 'k' && p.type !== 'p' && p.square === 'h1')))
+    pieces.some(p => p.color === 'b' && ((p.type === 'p' && ['a', 'h'].includes(p.square[0]!)) || (p.type !== 'k' && p.type !== 'p' && ['a1', 'h1'].includes(p.square))))
 }

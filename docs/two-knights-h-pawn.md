@@ -1,7 +1,12 @@
 # Two knights versus the h-pawn: custom tablebase
 
-The trainer now uses one exact tablebase, replacing r1/r2/r3. Its starting
-position is `k7/8/8/8/3KN2p/7N/8/8 w - - 0 1`: White Kd4, Ne4, Nh3;
+The trainer uses one exact tablebase, replacing r1/r2/r3. Standard starts with
+White Kf1, Ng1, Nh1 versus Black Ka8/h4: **mate in 29** (57 plies). Start Over
+alternates the entire board by file reflection: White Kc1, Na1, Nb1 versus
+Black Kh8/a4. Reflected lookups reuse the same table, including stationary Qa1
+after promotion. Training keeps its existing seed.
+
+The table was generated from `k7/8/8/8/3KN2p/7N/8/8 w - - 0 1`: White Kd4, Ne4, Nh3;
 Black Ka8, h4. White forces mate in **41 plies (21 White moves)** against
 Black's strongest resistance.
 
@@ -13,6 +18,8 @@ Black's strongest resistance.
   but its normal attacks still give check and restrict White's king. Pieces
   block its rays normally.
 - There are no blockade, cage, phase or forbidden-file conditions.
+- For the reflected orientation, the pawn is on the a-file and promotes to a
+  stationary queen on a1; all rules reflect along with the board.
 - Checkmate and stalemate use this game's permitted moves. In particular,
   Black cannot evade mate by moving the stationary queen.
 
@@ -27,10 +34,11 @@ Black's preferred replies include **every** move maximizing that distance.
 Other permitted moves remain playable, and the resulting position is looked up
 again. No route history is needed.
 
-The table covers every state reachable from the starting position through
+The table covers every state reachable from the generation root through
 **any** permitted moves, including mistakes by either side. It includes both
 sides to move and promoted-queen states. Knight identities are interchangeable;
-positions are not reduced by board reflections. Move counters do not change the
+the stored h-file table has no symmetry reduction, while runtime a-file
+positions are mapped to their h-file reflection. Move counters do not change the
 lookup key.
 
 | Material | Forced White mate | No forced White mate | Total reachable |
@@ -56,7 +64,7 @@ another starting position.
 A retrograde attractor starts at Black checkmates. White needs one winning
 successor and minimizes distance; Black needs all successors winning and takes
 the maximum. Each ply costs one. Unresolved nodes have no forced White mate.
-A separate traversal from the default start follows all permitted moves and
+A separate traversal from the generation root follows all permitted moves and
 exports only its reachable states.
 
 The native audit checks the minimax equation at every legal indexed state,
