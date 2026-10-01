@@ -1,3 +1,4 @@
+import './load-setup.mts';
 import { includesRoot } from './population.mts';
 import { DatabaseSync } from 'node:sqlite';
 import { writeFileSync } from 'node:fs';

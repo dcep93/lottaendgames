@@ -1,3 +1,4 @@
+import './load-setup.mts';
 import assert from 'node:assert/strict';
 import { getChess, SQUARE_TRANSFORMS, transformFen, transformSquare } from '../../app/src/mate/chess.ts';
 import { getIdealKnightAndBishopWhiteMoves as white } from '../../app/src/mate/rules/bishopKnight.ts';

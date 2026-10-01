@@ -1,3 +1,4 @@
+import './load-setup.mts';
 import assert from 'node:assert/strict';
 import {readFileSync,writeFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';

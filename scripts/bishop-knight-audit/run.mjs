@@ -38,6 +38,7 @@ const memoPlugin={name:'audit-pure-placement-cache',setup(build){build.onLoad({f
  }\n`;
  return {contents,loader:'ts'};
 });}};
+process.env.AUDIT_REPO_ROOT=resolve(here,'../..');
 const bundles={};
 for(const stage of ['worker','reference-worker','validate','validate-symmetry','census','analyze','classify','positions','report','gate','reuse-roots',...(scope==='all'?['full-details','full-report']:[])]) {
  const result=await build({entryPoints:[join(here,(stage==='reference-worker'?'worker':stage)+'.mts')],bundle:true,platform:'node',format:'esm',write:false,plugins:stage==='worker'?[memoPlugin]:[]});

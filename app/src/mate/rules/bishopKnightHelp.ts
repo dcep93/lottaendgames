@@ -4,7 +4,7 @@ import {BLACK_CAPTURE_PRIORITY, BLACK_RETURN_PRIORITY} from "./blackPriorities";
 export const bishopKnightHelp: RuleHelp = {
   title: "How best moves are chosen",
   whiteIntro:
-    "Use r4 and later rules to build the r2 formation, r2 to reach the r1 net, and r1 to finish checkmate.",
+    "Use r3 to reach a central king, bishop and knight, with king and knight opposite the bishop’s color; r2 reaches the r1 net, and r1 finishes checkmate.",
   blackIntro:
     "Black uses its own priorities to put up the strongest resistance. Black is not trying to help the mate; it looks for the most stubborn legal reply.",
   blackPriorities: [
@@ -68,6 +68,7 @@ export const bishopKnightHelp: RuleHelp = {
     arrows: [{from: "h1", to: "e4"}],
   }],
   notes: [
+    "For r3, central means d4, e4, d5 and e5. The lookup minimizes the worst-case number of White moves to the central formation against every legal Black reply. Existing r1 and r2 positions take priority. Rotations and reflections apply.",
     "For r6.2, the exact placement White Kb5, Ba6, Nb4 and Black Kb8 or Ka7 prefers Kc5, including rotations and reflections. This is a starting-position exception, not a general preference for advancing the defending king.",
     "For r6.4, check whether Black blocks every more-central king step, retaining existing king protection of the knight. Route the bishop toward control of a same-color blocking or shuffling square. Use static bishop routes with occupied squares and safe landings; do not claim a forced advance against every reply. Once a central king step is available, r6.4 is inactive.",
     "For r6.2, prefer king protection of the knight. Attackability is checked before White moves: a piece must not be king-defended, and Black must already attack it or have a legal move that attacks it. When either piece is attackable, existing or newly established stable bishop protection counts regardless of which piece moves. Either a bishop move preparing a knight jump or a knight move preparing a bishop move can set up stable protection next turn; setup and established protection are equally preferred. An initially attackable knight left without protection or a protection setup ranks below ordinary moves. Stable bishop protection includes squares adjacent to edge bishops and respects White king blockers. For r6.3, prefer knight king-step proximity to White’s king, then Euclidean proximity to the center, regardless of square color.",

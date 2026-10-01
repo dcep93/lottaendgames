@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "sha256": "214eec622857e28bc7ebc612928c64a3ea63d509b9572c50dcf3791f8aa97600",
+  "sourceHash": "23a408c5e786859c25067d5e46587e8d5da775fc4a4e5e6411d8ae6716d72f83",
+  "bytes": 5242880,
+  "url": "/mate/bishop-knight/setup.214eec622857e28b.bin",
+  "maxSetupMoves": 12,
+  "canonicalMoves": 1352867,
+  "canonicalGoals": 41,
+  "physicalMovesVerified": 10821816
+}

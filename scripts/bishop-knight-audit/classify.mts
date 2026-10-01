@@ -1,3 +1,4 @@
+import './load-setup.mts';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { bishopKnightRuleSet, knightAndBishopWhiteRules } from '../../app/src/mate/rules/bishopKnight.ts';
 import { selectCandidatesByRules } from '../../app/src/mate/rules/selection.ts';

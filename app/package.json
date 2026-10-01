@@ -31,7 +31,10 @@
     "test:mate:stages": "tsx --test src/mate/rules/bishopKnightStages.test.ts",
     "check:mate:stages": "tsx ../scripts/bishop-knight-audit/derive-stage-policy.mts --check",
     "generate:mate:bridge": "tsx ../scripts/bishop-knight-audit/build-optimal-r2.mts",
-    "check:mate:bridge": "tsx ../scripts/bishop-knight-audit/build-optimal-r2.mts --check"
+    "check:mate:bridge": "tsx ../scripts/bishop-knight-audit/build-optimal-r2.mts --check",
+    "generate:mate:setup": "tsx ../scripts/bishop-knight-audit/build-setup.mts",
+    "check:mate:setup": "tsx ../scripts/bishop-knight-audit/build-setup.mts --check",
+    "audit:mate:setup": "npm run check:mate:setup && tsx ../scripts/bishop-knight-audit/audit-setup.mts"
   },
   "dependencies": {
     "chess.js": "^1.4.0",

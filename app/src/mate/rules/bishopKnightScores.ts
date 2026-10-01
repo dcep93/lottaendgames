@@ -2,6 +2,7 @@ import type {BishopKnightStage} from "./bishopKnightStages";
 
 export type KnightAndBishopWhiteMoveScore = {
   readonly stage: BishopKnightStage;
+  readonly centralSetupLookupPenalty: number;
   readonly matingNetPenalty: number;
   readonly sevenCagePenalty: number;
   readonly rareEscapePenalty: number;

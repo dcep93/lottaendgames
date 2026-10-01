@@ -1,3 +1,4 @@
+import './load-setup.mts';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {currentPolicyFingerprints} from './current-policy-fingerprints.mts';

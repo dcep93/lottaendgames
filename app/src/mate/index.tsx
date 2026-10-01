@@ -2,6 +2,7 @@ import React, { type ReactNode } from 'react'
 import MateBoard, { type MateBoardProps } from './MateBoard'
 import MateSidebar from './MateSidebar'
 import MateWorkspace from './MateWorkspace'
+import MatePolicyLoader from './MatePolicyLoader'
 import { MATE_CATALOG } from './catalog'
 import type {
   MateId,
@@ -35,6 +36,8 @@ export default function Mate({
       ? { set: selectedSet, mode: route.mateMode }
       : null
 
+  const PolicyLoader = selectedDrill?.set.id === 'bishop-knight' ? MatePolicyLoader : React.Fragment
+
   return (
     <main className="leg-page leg-mate-page">
       <div className="leg-reader-shell leg-mate-shell">
@@ -48,22 +51,24 @@ export default function Mate({
 
         <div className="leg-mate-layout">
           {selectedDrill ? (
-            <MateWorkspace
-              BoardComponent={BoardComponent}
-              key={drillKey(
-                selectedDrill.set.id,
-                selectedDrill.mode,
-                route.sharedFen,
-                route.sharedMoves ?? null,
-                route.sharedReplayCursor ?? null,
-              )}
-              mateId={selectedDrill.set.id}
-              mateMode={selectedDrill.mode}
-              onReplaceHref={onReplaceHref}
-              sharedFen={route.sharedFen}
-              sharedMoves={route.sharedMoves ?? null}
-              sharedReplayCursor={route.sharedReplayCursor ?? null}
-            />
+            <PolicyLoader>
+              <MateWorkspace
+                BoardComponent={BoardComponent}
+                key={drillKey(
+                  selectedDrill.set.id,
+                  selectedDrill.mode,
+                  route.sharedFen,
+                  route.sharedMoves ?? null,
+                  route.sharedReplayCursor ?? null,
+                )}
+                mateId={selectedDrill.set.id}
+                mateMode={selectedDrill.mode}
+                onReplaceHref={onReplaceHref}
+                sharedFen={route.sharedFen}
+                sharedMoves={route.sharedMoves ?? null}
+                sharedReplayCursor={route.sharedReplayCursor ?? null}
+              />
+            </PolicyLoader>
           ) : (
             <section className="leg-mate-empty-state">
               <h2>Slop Alert</h2>

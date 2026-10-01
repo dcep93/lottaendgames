@@ -1,3 +1,4 @@
+import './load-setup.mts';
 import {getChess} from '../../app/src/mate/chess.ts';
 import {getIdealKnightAndBishopWhiteMoves} from '../../app/src/mate/rules/bishopKnight.ts';
 import {code} from './encoding.mts';

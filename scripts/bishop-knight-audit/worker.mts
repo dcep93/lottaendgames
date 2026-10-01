@@ -1,3 +1,4 @@
+import './load-setup.mts';
 import {isSevenCageTemporaryTerminal} from '../../app/src/mate/rules/bishopKnightSevenCage.ts';
 import { policyEdges } from './policy-edges.mts';
 import { includesRoot } from './population.mts';

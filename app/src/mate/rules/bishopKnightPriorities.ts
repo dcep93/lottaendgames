@@ -35,6 +35,12 @@ const whiteRules: readonly OrderedRule<KnightAndBishopWhiteMoveScore>[] =
       compare: (first, second) => first.sevenCagePenalty - second.sevenCagePenalty,
     },
     {
+      id: "r3",
+      shortLabel: "rule r3",
+      helpText: "Achieve a central knight and king both opposite the bishop’s color, as well as a central bishop.",
+      compare: (first, second) => first.centralSetupLookupPenalty - second.centralSetupLookupPenalty,
+    },
+    {
       id: "r4",
       shortLabel: "rule r4",
       helpText: "With a central king and central 16 knight, prefer king protection of the knight, maneuver the knight to a central square opposite the bishop's color, then navigate to a central bishop and the king to a central square opposite the bishop's color.",

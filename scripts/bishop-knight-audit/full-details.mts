@@ -1,3 +1,4 @@
+import './load-setup.mts';
 import {DatabaseSync} from 'node:sqlite';
 import {readFileSync, writeFileSync} from 'node:fs';
 import assert from 'node:assert/strict';

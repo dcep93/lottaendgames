@@ -12,7 +12,7 @@ const base='.audit/optimal-r2';mkdirSync('.audit',{recursive:true});
 const fromKey=(s:string)=>pack(...s.match(/../g)!.map(sqIndex) as [number,number,number,number]);
 const net=new Map((data.r1Edges as [string,string[]][]).map(([s,d])=>[fromKey(s),d.map(fromKey)]));
 const goals=[...net.keys()].flatMap(k=>Array.from({length:8},(_,t)=>transform(k,t)));
-const hash=createHash('sha256').update(readFileSync('scripts/bishop-knight-audit/optimal-r2.cpp')).update(JSON.stringify(goals)).digest('hex');
+const hash=createHash('sha256').update(readFileSync('scripts/bishop-knight-audit/optimal-r2.cpp')).update(readFileSync('scripts/bishop-knight-audit/kbn-geometry.hpp')).update(JSON.stringify(goals)).digest('hex');
 if(!existsSync(base+'.fingerprint')||readFileSync(base+'.fingerprint','utf8')!==hash){
  writeFileSync(base+'-targets.txt',goals.join('\n')+'\n');
  execFileSync('clang++',['-O3','-std=c++17','scripts/bishop-knight-audit/optimal-r2.cpp','-o',base],{stdio:'inherit'});

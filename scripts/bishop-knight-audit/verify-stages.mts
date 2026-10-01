@@ -1,3 +1,4 @@
+import './load-setup.mts';
 import assert from 'node:assert/strict';
 import {pathToFileURL} from 'node:url';
 import {writeFileSync} from 'node:fs';
@@ -10,7 +11,7 @@ import bridgeData from '../../app/src/mate/rules/bishopKnightOptimalBridgeData.j
 import baseline from './data/optimal-r2-baseline.json';
 import {canonical,code,fen} from './encoding.mts';
 
-export function verifyStages(symmetries=true){
+export function verifyStages(symmetries=true,onDistance?: (key:number,plies:number)=>void){
  const nodes:number[]=[],ids=new Map<number,number>(),edges:number[][]=[],phases:number[]=[];
  const add=(source:string)=>{const key=canonical(code(source));if(!ids.has(key)){ids.set(key,nodes.length);nodes.push(key);}return ids.get(key)!;};
  const r1Root=add(r1Start),roots=r2Starts.map(add);
@@ -64,7 +65,7 @@ export function verifyStages(symmetries=true){
  assert.equal(reachableR1.size,data.r1Edges.length,'r1 edge index contains unreachable sources');
  const visiting=new Set<number>(),lengths=new Map<number,number>();
  function distance(i:number):number{const cached=lengths.get(i);if(cached!==undefined)return cached;assert.ok(!visiting.has(i),`Cycle ${fen(nodes[i]!)}`);visiting.add(i);let n=1;for(const to of edges[i]!)n=Math.max(n,2+distance(to));visiting.delete(i);lengths.set(i,n);return n;}
- nodes.forEach((_,i)=>distance(i));
+ nodes.forEach((key,i)=>{const plies=distance(i);onDistance?.(key,plies);});
  return {complete:true,r1Start,r2Starts:r2Starts.length,whitePositionClasses:nodes.length,blackReplies:replies,symmetryChecks:checks,mateChoices:mates,r1ReachablePositions:reachableR1.size,r1ReachableEdges:data.r1Edges.reduce((n,row)=>n+(row[1] as string[]).length,0),outsideR1Labels:shortcuts,r1MaxPlies:distance(r1Root),r2MaxPlies:Math.max(...roots.map(distance)),loops:0,draws:0,scope:'All stage destinations, all selected White ties, all legal Black replies; r1 eligibility iff reachable from r1 start; higher-priority mate preserved; D4; clocks ignored. Does not establish arbitrary-board r4+ convergence.'};
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){const result=verifyStages(!process.argv.includes('--quick'));console.log(result);const out=process.argv.find(a=>a.endsWith('.json'));if(out)writeFileSync(out,JSON.stringify(result,null,2)+'\n');}

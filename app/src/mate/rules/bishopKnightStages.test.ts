@@ -4,7 +4,7 @@ import {createHash} from 'node:crypto';
 import bridgeData from './bishopKnightOptimalBridgeData.json';
 import {canonical,code,fen} from '../../../../scripts/bishop-knight-audit/encoding.mts';
 import {getChess,SQUARE_TRANSFORMS,transformFen} from '../chess';
-import {bishopKnightRuleSet,getIdealKnightAndBishopWhiteMoves,scoreKnightAndBishopWhiteMove} from './bishopKnight';
+import {bishopKnightRuleSet,getIdealKnightAndBishopWhiteMoves} from './bishopKnight';
 import {bishopKnightStageMoves,bishopKnightStagePosition,bishopKnightPositionKey,r1Start} from './bishopKnightStages';
 import {verifyStages} from '../../../../scripts/bishop-knight-audit/verify-stages.mts';
 import {explainMove} from './selection';
@@ -18,8 +18,8 @@ test('every r1/r2 continuation terminates, including all Black replies, White ti
  assert.equal(result.r1ReachablePositions,99);assert.equal(result.r1ReachableEdges,99);assert.equal(result.outsideR1Labels,0);
 });
 
-test('r3 is absent and the new r1 start is used in the guide',()=>{
- assert.ok(!bishopKnightRuleSet.whiteRules.some(rule=>rule.id==='r3'));
+test('r3 follows r2 and the declared r1 start is used in the guide',()=>{
+ assert.equal(bishopKnightRuleSet.whiteRules[5]?.id,'r3');
  const note=bishopKnightRuleSet.help.noteBoards.find(board=>board.id==='bishop-knight-rule-r1-net')!;
  assert.ok(note.pieces.some(p=>p.piece==='k'&&p.square==='c1'));
  assert.equal(bishopKnightStageMoves(r1Start).stage,1);
@@ -105,11 +105,7 @@ test('stage matching ignores clocks but rejects Black turns and extra material',
  assert.deepEqual(bishopKnightStageMoves(board.fen()),{stage:0,moves:[]});
 });
 
-test('r3 is not secretly retained as a global proximity preference',()=>{
- const score=scoreKnightAndBishopWhiteMove('8/8/3k4/8/8/8/3K4/N6B w - - 0 1','Kd3');
- assert.equal(score.stage,0);
- assert.ok(!bishopKnightRuleSet.whiteRules.some(rule=>rule.id==='r3'));
-});
+
 
 
 test('every optimal bridge edge decreases the exact minimax entry distance and freezes r1',()=>{

@@ -1,3 +1,4 @@
+import './load-setup.mts';
 import { fork } from 'node:child_process';
 import { writeFileSync } from 'node:fs';
 import assert from 'node:assert/strict';
