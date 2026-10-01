@@ -90,7 +90,9 @@ export function getIdealTwoKnightsPawnBlackMoves(fen: string): string[] {
     .filter((r) => r.score.remainingPlies === maximum)
     .map((r) => r.san)
 }
-export function getTwoKnightsPawnTerminalOutcome(
+// Board outcomes are independent of the asynchronously loaded recommendation table.
+// Shared replays are parsed before that table is available.
+export function getTwoKnightsPawnBoardOutcome(
   fen: string,
 ): TwoKnightsPawnTerminalOutcome | null {
   const chess = getChess(fen)
@@ -101,8 +103,13 @@ export function getTwoKnightsPawnTerminalOutcome(
     return 'lost-knight'
   if (chess.isStalemate()) return 'stalemate'
   if (chess.isDrawByFiftyMoves()) return 'fifty-move'
-  if (!twoKnightsPawnEntry(fen)) return 'unsupported'
   return null
+}
+export function getTwoKnightsPawnTerminalOutcome(
+  fen: string,
+): TwoKnightsPawnTerminalOutcome | null {
+  return getTwoKnightsPawnBoardOutcome(fen) ??
+    (twoKnightsPawnEntry(fen) ? null : 'unsupported')
 }
 export const twoKnightsPawnRuleSet: MateRuleSet<TwoKnightsPawnWhiteMoveScore> =
   {

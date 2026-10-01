@@ -13,6 +13,7 @@ import {
   type MateTerminalOutcome,
 } from './session'
 import type { MateId, MateMode } from './types'
+import { getTwoKnightsPawnBoardOutcome } from './rules/twoKnightsPawn'
 
 export type MateFenDecodeResult =
   | { readonly ok: true; readonly fen: string }
@@ -141,9 +142,12 @@ export function decodeMateReplay(
   }
 
   const chess = getChess(fenResult.fen)
+  const replayOutcome = () => mateId === 'two-knights-pawn'
+    ? getTwoKnightsPawnBoardOutcome(chess.fen()) ?? undefined
+    : getMateTerminalOutcome(mateId, chess.fen())
   const canonicalMoves: string[] = []
   for (const san of moves) {
-    if (getMateTerminalOutcome(mateId, chess.fen()) !== undefined) {
+    if (replayOutcome() !== undefined) {
       return INVALID_MATE_REPLAY
     }
     try {
@@ -154,7 +158,7 @@ export function decodeMateReplay(
       return INVALID_MATE_REPLAY
     }
   }
-  if (chess.turn() !== 'w' && getMateTerminalOutcome(mateId, chess.fen()) === undefined) {
+  if (chess.turn() !== 'w' && replayOutcome() === undefined) {
     return INVALID_MATE_REPLAY
   }
 
