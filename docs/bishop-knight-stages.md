@@ -103,3 +103,11 @@ The full runtime certificate passes 5,376 symmetry checks with no loops or draws
 With White Kf3, Bb3, Nf4 and Black Kh2, select Bc4 instead of Be2 (including D4 equivalents). This single decision reduces the local worst-case continuation from 13 to 9 plies: seven to five White moves. It does not reduce the worst case from the r1 start or the 82 completed-r4 starts.
 
 The immutable seed is unchanged. `r1-route-improvements.json` records this separately approved change after the r2 rounds above, which froze r1 during their searches. The generator retraces r1 edges after applying it; bypassed sources would retain their routes as r2 rather than receive unreachable r1 labels. This change retains 99 reachable source classes and 99 selected edges. Checkmate retains its higher-priority `mate` attribution. Nothing is committed.
+
+## Twenty further serial r2 improvements
+
+After checkpoint `3565aee`, twenty more single-position changes re-ranked local worst-case savings after every patch. The target is the current reachable r1 graph, including its approved bishop shortcut, rather than the immutable seed’s old destinations. Every r1 edge and choice remains fixed. Each round passes policy-preservation and graph checks; see [the twenty changes and old worst-case replay links](bishop-knight-r2-shortcuts-27-46.md). Across 82 completed-r4 starts, the maximum r2 length falls from 29 to 28 White moves and mean from 16.80 to 14.46; 54 starts improve and none worsen. These changes remain uncommitted.
+
+## Twenty serial r2 improvements, 47–66
+
+Twenty additional rounds re-ranked the largest local worst-case saving after each single-position patch, retaining the current r1 graph and using only existing routes. Across the 82 completed-r4 starts, mean moves to r1 fell from 14.46 to 13.98 and median from 12 to 11; the maximum remains 28. Mean moves to mate fell from 32.80 to 32.34 and median from 31 to 30; the maximum remains 47. Sixteen starts improve to r1 and fourteen improve to mate; none worsen. These are exact policy worst cases, not tablebase-optimal distances. The full certificate passes 5,576 symmetry checks with all 99 r1 edges preserved and no cycles or draws. [All changes, old-path links, and distributions](bishop-knight-r2-shortcuts-47-66.md). This batch remains uncommitted, alongside shortcuts 27–46. The deferred r4 issue is unchanged.

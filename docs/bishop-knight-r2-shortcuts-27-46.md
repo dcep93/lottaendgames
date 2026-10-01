@@ -1,0 +1,28 @@
+# R2 shortcuts 27–46
+
+Checkpoint: `3565aee`. These twenty changes were applied serially after it and are uncommitted. Each round re-ranked the largest local worst-case reduction in White moves until entering the current r1 graph, against every legal Black reply and every selected White tie. This optimizes individual positions; it does not select by the overall maximum across starting positions. The r1 graph, including the approved Bc4 shortcut, was held fixed.
+
+Across 82 completed-r4 starts, the maximum fell from 29 to 28 r2 moves, mean from 16.80 to 14.46, and 54 starts improved; none worsened. Local savings below are measured at selection time and are not additive. Links show the old worst-case continuation through Black’s reply after r1 entry. Every link passes the app replay decoder and router and uses a light-square bishop.
+
+| Round | Change / old worst-case path | R2 moves before → after | Saved |
+| --- | --- | ---: | ---: |
+| 1 | [Kd3 → Nc2+](http://localhost:5173/mate/bishop-knight#fen=8/8/8/3B4/3NK3/k7/8/8_w_-_-_0_1&moves=Kd3,Kb4,Nf5,Kc5,Ke4,Kb5,Kd4,Kb4,Be6,Kb5,Kc3,Kc5,Bc4,Kb6,Kb4,Kc6,Be6,Kc7,Kc5,Kb7,Kb5,Kc7,Bd5,Kd7,Kb6,Kd8,Kc6,Kc8,Be6%2B,Kd8,Kb7,Ke8,Kc7,Kf8,Kd6,Ke8,Nh6,Kd8,Nf7%2B,Ke8,Bd5,Kf8,Ke6,Ke8,Bc6%2B,Kf8,Kf6,Kg8,Be4,Kf8,Bh7,Ke8&cursor=0) | 26 → 19 | 7 |
+| 2 | [Kf3 → Kf4](http://localhost:5173/mate/bishop-knight#fen=8/8/8/8/3NB3/4K3/7k/8_w_-_-_0_1&moves=Kf3,Kh3,Ne6,Kh4,Bf5,Kh5,Kg3,Kh6,Kf4,Kh5,Nf8,Kh4,Ng6%2B,Kh5,Be4,Kh6,Kf5,Kh5,Bf3%2B,Kh6,Kf6,Kh7,Bd5,Kh6,Bg8,Kh5&cursor=0) | 13 → 7 | 6 |
+| 3 | [Kf3 → Ke2](http://localhost:5173/mate/bishop-knight#fen=8/8/8/8/2N1B3/4K3/8/6k1_w_-_-_0_1&moves=Kf3,Kf1,Bd3%2B,Ke1,Kg2,Kd1,Kf2,Kc1,Ke3,Kd1,Na3,Kc1,Nc2,Kd1,Be4,Kc1,Kd3,Kd1,Bf3%2B,Kc1,Kc3,Kb1,Bd5,Kc1,Ba2,Kd1&cursor=0) | 13 → 7 | 6 |
+| 4 | [Kf3/Nc4 → Ke2](http://localhost:5173/mate/bishop-knight#fen=8/8/8/4N3/4B3/4K3/8/6k1_w_-_-_0_1&moves=Kf3,Kf1,Nc4,Ke1,Bd3,Kd1,Kf2,Kc1,Ke3,Kd1,Na3,Kc1,Nc2,Kd1,Be4,Kc1,Kd3,Kd1,Bf3%2B,Kc1,Kc3,Kb1,Bd5,Kc1,Ba2,Kd1&cursor=0) | 13 → 7 | 6 |
+| 5 | [Ke3 → Kd3](http://localhost:5173/mate/bishop-knight#fen=8/8/8/3B4/3NK3/8/8/4k3_w_-_-_0_1&moves=Ke3,Kd1,Be4,Kc1,Kd3,Kb1,Bd5,Kc1,Nc2,Kb2,Be6,Kb1,Kc3,Kc1,Ba2,Kd1&cursor=0) | 8 → 3 | 5 |
+| 6 | [Bd5 → Kc4](http://localhost:5173/mate/bishop-knight#fen=8/8/8/8/3KB3/5N2/1k6/8_w_-_-_0_1&moves=Bd5,Ka3,Kc4,Ka2,Kc3%2B,Ka3,Nd2,Ka4,Kc4,Ka5,Kc5,Ka4,Nb3,Ka3,Kc4,Ka4,Bc6%2B,Ka3,Kc3,Ka2,Be4,Ka3,Bb1,Ka4&cursor=0) | 12 → 7 | 5 |
+| 7 | [Nc4 → Nf3+](http://localhost:5173/mate/bishop-knight#fen=8/8/8/4N3/4B3/4K3/8/4k3_w_-_-_0_1&moves=Nc4,Kf1,Kf3,Ke1,Bd3,Kd1,Kf2,Kc1,Ke3,Kd1,Na3,Kc1,Nc2,Kd1,Be4,Kc1,Kd3,Kd1,Bf3%2B,Kc1,Kc3,Kb1,Bd5,Kc1,Ba2,Kd1&cursor=0) | 13 → 8 | 5 |
+| 8 | [Nc4 → Ke3](http://localhost:5173/mate/bishop-knight#fen=8/8/8/4N3/3KB3/8/8/5k2_w_-_-_0_1&moves=Nc4,Ke2,Ke5,Ke1,Kf4,Kf2,Kg4,Ke2,Kg3,Ke1,Kf3,Kf1,Bd3%2B,Ke1,Kg2,Kd1,Kf2,Kc1,Ke3,Kd1,Na3,Kc1,Nc2,Kd1,Be4,Kc1,Kd3,Kd1,Bf3%2B,Kc1,Kc3,Kb1,Bd5,Kc1,Ba2,Kd1&cursor=0) | 18 → 9 | 9 |
+| 9 | [Nc4 → Kd3](http://localhost:5173/mate/bishop-knight#fen=8/8/8/4N3/3KB3/8/5k2/8_w_-_-_0_1&moves=Nc4,Kg3,Ke5,Kg4,Kf6,Kf4,Bf5,Kg3,Kg5,Kf3,Bd3,Kf2,Kf4,Kg2,Kg4,Kf2,Be4,Ke2,Kg3,Ke1,Kf3,Kf1,Bd3%2B,Ke1,Kg2,Kd1,Kf2,Kc1,Ke3,Kd1,Na3,Kc1,Nc2,Kd1,Be4,Kc1,Kd3,Kd1,Bf3%2B,Kc1,Kc3,Kb1,Bd5,Kc1,Ba2,Kd1&cursor=0) | 23 → 12 | 11 |
+| 10 | [Bd5 → Kc4](http://localhost:5173/mate/bishop-knight#fen=8/8/1k6/4N3/3KB3/8/8/8_w_-_-_0_1&moves=Bd5,Kb5,Nd3,Kb6,Ke5,Ka5,Kd6,Kb6,Kd7,Kb5,Kc7,Ka5,Kc6,Ka6,Bc4%2B,Ka5,Kb7,Ka4,Kb6,Ka3,Kc5,Ka4,Nc1,Ka3,Nb3,Ka4,Bd5,Ka3,Kc4,Ka4,Bc6%2B,Ka3,Kc3,Ka2,Be4,Ka3,Bb1,Ka4&cursor=0) | 19 → 13 | 6 |
+| 11 | [Nc6 → Kc4](http://localhost:5173/mate/bishop-knight#fen=8/8/8/4N3/3KB3/k7/8/8_w_-_-_0_1&moves=Nc6,Kb2,Kc4,Kc1,Kd3,Kb1,Kc3%2B,Kc1,Nb4,Kd1,Kd3,Ke1,Ke3,Kd1,Nc2,Kc1,Kd3,Kd1,Bf3%2B,Kc1,Kc3,Kb1,Bd5,Kc1,Ba2,Kd1&cursor=0) | 13 → 8 | 5 |
+| 12 | [Bd3 → Kf4](http://localhost:5173/mate/bishop-knight#fen=8/8/8/4N3/2B5/5K2/7k/8_w_-_-_0_1&moves=Bd3,Kh3,Be4,Kh4,Ng4,Kg5,Bc2,Kh4,Kf4,Kh3,Be4,Kh4&cursor=0) | 6 → 2 | 4 |
+| 13 | [Kf3 → Ke3](http://localhost:5173/mate/bishop-knight#fen=8/8/2N5/3B4/4K3/8/8/5k2_w_-_-_0_1&moves=Kf3,Ke1,Ke3,Kf1,Ne5,Ke1,Be4,Kd1,Nc4,Kc1,Bd3,Kd1,Na3,Kc1,Nc2,Kd1,Be4,Kc1,Kd3,Kd1,Bf3%2B,Kc1,Kc3,Kb1,Bd5,Kc1,Ba2,Kd1&cursor=0) | 14 → 9 | 5 |
+| 14 | [Kf2+ → Ne2](http://localhost:5173/mate/bishop-knight#fen=8/8/8/3B4/3N4/5K2/8/7k_w_-_-_0_1&moves=Kf2%2B,Kh2,Bf3,Kh3,Nf5,Kh2,Ne3,Kh3,Ng2,Kh2,Bg4,Kh1&cursor=0) | 6 → 2 | 4 |
+| 15 | [Kf3 → Be6](http://localhost:5173/mate/bishop-knight#fen=8/8/8/5B2/3N4/4K3/8/6k1_w_-_-_0_1&moves=Kf3,Kf1,Be4,Ke1,Ne2,Kd2,Bg6,Kd1,Ke3,Ke1,Bc2,Kf1&cursor=0) | 6 → 2 | 4 |
+| 16 | [Nb4 → Bf3](http://localhost:5173/mate/bishop-knight#fen=8/8/2N5/8/4B3/2K5/8/2k5_w_-_-_0_1&moves=Nb4,Kd1,Kd3,Ke1,Ke3,Kd1,Nc2,Kc1,Kd3,Kd1,Bf3%2B,Kc1,Kc3,Kb1,Bd5,Kc1,Ba2,Kd1&cursor=0) | 9 → 5 | 4 |
+| 17 | [Bd3+ → Ke3](http://localhost:5173/mate/bishop-knight#fen=8/8/8/8/2N1B3/5K2/8/5k2_w_-_-_0_1&moves=Bd3%2B,Ke1,Kg2,Kd1,Kf2,Kc1,Ke3,Kd1,Na3,Kc1,Nc2,Kd1,Be4,Kc1,Kd3,Kd1,Bf3%2B,Kc1,Kc3,Kb1,Bd5,Kc1,Ba2,Kd1&cursor=0) | 12 → 8 | 4 |
+| 18 | [Kf3 → Kf4](http://localhost:5173/mate/bishop-knight#fen=8/8/4N3/8/4B3/4K2k/8/8_w_-_-_0_1&moves=Kf3,Kh4,Bf5,Kh5,Kg3,Kh6,Kf4,Kh5,Nf8,Kh4,Ng6%2B,Kh5,Be4,Kh6,Kf5,Kh5,Bf3%2B,Kh6,Kf6,Kh7,Bd5,Kh6,Bg8,Kh5&cursor=0) | 12 → 8 | 4 |
+| 19 | [Ne5 → Be4](http://localhost:5173/mate/bishop-knight#fen=8/8/2N5/3B4/8/4K3/8/5k2_w_-_-_0_1&moves=Ne5,Ke1,Be4,Kd1,Nc4,Kc1,Bd3,Kd1,Na3,Kc1,Nc2,Kd1,Be4,Kc1,Kd3,Kd1,Bf3%2B,Kc1,Kc3,Kb1,Bd5,Kc1,Ba2,Kd1&cursor=0) | 12 → 8 | 4 |
+| 20 | [Be4+ → Kg3](http://localhost:5173/mate/bishop-knight#fen=8/8/4N3/8/8/3B4/5K2/7k_w_-_-_0_1&moves=Be4%2B,Kh2,Bf5,Kh1,Nf4,Kh2,Ng2,Kh1,Ne3,Kh2&cursor=0) | 5 → 2 | 3 |
