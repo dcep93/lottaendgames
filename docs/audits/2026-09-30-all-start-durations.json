@@ -1,0 +1,382 @@
+{
+  "scope": "All legal KBNvK board-and-turn starts, both bishop colors, weighted by D4 orbit size, fresh halfmove clock. Maximum continuation over all selected White ties and every legal Black reply; this is current-policy duration, not optimal tablebase duration.",
+  "currentPolicyFingerprint": "f3ae48a97303e2f03eba178de0ae18b0add98559761ac6fbec64438643adcde4",
+  "cache": ".audit/all-legal-r41-closure",
+  "uncommittedR2ShortcutsIncluded": 40,
+  "totalLegal": 24536088,
+  "totalWinning": 22010352,
+  "theoreticalDraws": 2525736,
+  "winningStartsFailingEventualMate": 0,
+  "summary": {
+    "white": {
+      "n": 10822184,
+      "mean": 61.24567832149222,
+      "median": 61,
+      "p90": 71,
+      "p95": 74,
+      "p99": 78,
+      "maximum": 87,
+      "bins": [
+        {
+          "range": "0-30",
+          "count": 54528,
+          "percent": 0.5038539355826883
+        },
+        {
+          "range": "31-40",
+          "count": 47592,
+          "percent": 0.4397633601498552
+        },
+        {
+          "range": "41-50",
+          "count": 255540,
+          "percent": 2.3612609063013528
+        },
+        {
+          "range": "51-60",
+          "count": 4769676,
+          "percent": 44.073137178225764
+        },
+        {
+          "range": "61-70",
+          "count": 4465464,
+          "percent": 41.26213341040958
+        },
+        {
+          "range": "71-80",
+          "count": 1189896,
+          "percent": 10.994971070534376
+        },
+        {
+          "range": "81-87",
+          "count": 39488,
+          "percent": 0.3648801387963834
+        }
+      ]
+    },
+    "black": {
+      "n": 11188168,
+      "mean": 62.94706765218399,
+      "median": 63,
+      "p90": 73,
+      "p95": 76,
+      "p99": 80,
+      "maximum": 87,
+      "bins": [
+        {
+          "range": "0-30",
+          "count": 21216,
+          "percent": 0.1896289008173635
+        },
+        {
+          "range": "31-40",
+          "count": 28368,
+          "percent": 0.2535535755272892
+        },
+        {
+          "range": "41-50",
+          "count": 172080,
+          "percent": 1.5380534150005614
+        },
+        {
+          "range": "51-60",
+          "count": 4115000,
+          "percent": 36.77992679409176
+        },
+        {
+          "range": "61-70",
+          "count": 5077244,
+          "percent": 45.38047694671728
+        },
+        {
+          "range": "71-80",
+          "count": 1686904,
+          "percent": 15.077571234182397
+        },
+        {
+          "range": "81-87",
+          "count": 87356,
+          "percent": 0.7807891336633487
+        }
+      ]
+    },
+    "both": {
+      "n": 22010352,
+      "mean": 62.110518177991885,
+      "median": 62,
+      "p90": 72,
+      "p95": 75,
+      "p99": 79,
+      "maximum": 87,
+      "bins": [
+        {
+          "range": "0-30",
+          "count": 75744,
+          "percent": 0.3441289807632336
+        },
+        {
+          "range": "31-40",
+          "count": 75960,
+          "percent": 0.3451103371722542
+        },
+        {
+          "range": "41-50",
+          "count": 427620,
+          "percent": 1.9428130908583379
+        },
+        {
+          "range": "51-60",
+          "count": 8884676,
+          "percent": 40.36589691977666
+        },
+        {
+          "range": "61-70",
+          "count": 9542708,
+          "percent": 43.3555447000575
+        },
+        {
+          "range": "71-80",
+          "count": 2876800,
+          "percent": 13.07021350680807
+        },
+        {
+          "range": "81-87",
+          "count": 126844,
+          "percent": 0.576292464563947
+        }
+      ]
+    }
+  },
+  "phases": [
+    {
+      "label": "Setup → r2",
+      "firstMove": 1,
+      "lastMove": 40,
+      "whiteMoves": 40,
+      "fen": "8/8/7N/8/8/8/8/K1kB4 w - - 0 1",
+      "moves": [
+        "Bh5",
+        "Kc2",
+        "Ka2",
+        "Kc3",
+        "Kb1",
+        "Kd2",
+        "Kb2",
+        "Kd3",
+        "Kc1",
+        "Kc3",
+        "Kd1",
+        "Kd3",
+        "Ke1",
+        "Kc4",
+        "Kd2",
+        "Kd4",
+        "Ke2",
+        "Ke4",
+        "Kf2",
+        "Kf4",
+        "Be8",
+        "Kg5",
+        "Ng8",
+        "Kf4",
+        "Kg2",
+        "Ke5",
+        "Kf3",
+        "Kd6",
+        "Ke4",
+        "Kc7",
+        "Kd5",
+        "Kd8",
+        "Bf7",
+        "Kd7",
+        "Ke5",
+        "Kc8",
+        "Ke6",
+        "Kc7",
+        "Kf6",
+        "Kd6",
+        "Kg7",
+        "Ke5",
+        "Nf6",
+        "Kf5",
+        "Bd5",
+        "Ke5",
+        "Kg6",
+        "Kf4",
+        "Kf7",
+        "Ke5",
+        "Ke7",
+        "Kf5",
+        "Be4+",
+        "Ke5",
+        "Bd3",
+        "Kf4",
+        "Ke6",
+        "Ke3",
+        "Ba6",
+        "Kd4",
+        "Nd5",
+        "Ke4",
+        "Bf1",
+        "Kf3",
+        "Ke5",
+        "Kg3",
+        "Nf4",
+        "Kf2",
+        "Ba6",
+        "Ke3",
+        "Ne6",
+        "Kd2",
+        "Nd4",
+        "Kc3",
+        "Bb5",
+        "Kb4",
+        "Bd3",
+        "Ka4",
+        "Be4",
+        "Ka5"
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/7N/8/8/8/8/K1kB4_w_-_-_0_1&moves=Bh5,Kc2,Ka2,Kc3,Kb1,Kd2,Kb2,Kd3,Kc1,Kc3,Kd1,Kd3,Ke1,Kc4,Kd2,Kd4,Ke2,Ke4,Kf2,Kf4,Be8,Kg5,Ng8,Kf4,Kg2,Ke5,Kf3,Kd6,Ke4,Kc7,Kd5,Kd8,Bf7,Kd7,Ke5,Kc8,Ke6,Kc7,Kf6,Kd6,Kg7,Ke5,Nf6,Kf5,Bd5,Ke5,Kg6,Kf4,Kf7,Ke5,Ke7,Kf5,Be4%2B,Ke5,Bd3,Kf4,Ke6,Ke3,Ba6,Kd4,Nd5,Ke4,Bf1,Kf3,Ke5,Kg3,Nf4,Kf2,Ba6,Ke3,Ne6,Kd2,Nd4,Kc3,Bb5,Kb4,Bd3,Ka4,Be4,Ka5&cursor=0"
+    },
+    {
+      "label": "r2 → r1",
+      "firstMove": 41,
+      "lastMove": 67,
+      "whiteMoves": 27,
+      "fen": "8/8/8/k3K3/3NB3/8/8/8 w - - 0 41",
+      "moves": [
+        "Bd5",
+        "Kb4",
+        "Nf3",
+        "Kc5",
+        "Ke4",
+        "Kb6",
+        "Kd4",
+        "Kc7",
+        "Ne5",
+        "Kd8",
+        "Nd3",
+        "Ke8",
+        "Ke5",
+        "Ke7",
+        "Bc4",
+        "Kd7",
+        "Kf6",
+        "Kd6",
+        "Be6",
+        "Kc7",
+        "Ke7",
+        "Kc6",
+        "Bc4",
+        "Kb6",
+        "Kd6",
+        "Kb7",
+        "Kd7",
+        "Kb6",
+        "Bd5",
+        "Kb5",
+        "Kc7",
+        "Ka6",
+        "Bc4+",
+        "Ka5",
+        "Kc6",
+        "Ka4",
+        "Kb6",
+        "Ka3",
+        "Kc5",
+        "Ka4",
+        "Nc1",
+        "Ka5",
+        "Nb3+",
+        "Ka4",
+        "Bd5",
+        "Ka3",
+        "Kc4",
+        "Ka2",
+        "Kc3",
+        "Kb1",
+        "Nd4",
+        "Kc1",
+        "Nc2",
+        "Kd1"
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/k3K3/3NB3/8/8/8_w_-_-_0_41&moves=Bd5,Kb4,Nf3,Kc5,Ke4,Kb6,Kd4,Kc7,Ne5,Kd8,Nd3,Ke8,Ke5,Ke7,Bc4,Kd7,Kf6,Kd6,Be6,Kc7,Ke7,Kc6,Bc4,Kb6,Kd6,Kb7,Kd7,Kb6,Bd5,Kb5,Kc7,Ka6,Bc4%2B,Ka5,Kc6,Ka4,Kb6,Ka3,Kc5,Ka4,Nc1,Ka5,Nb3%2B,Ka4,Bd5,Ka3,Kc4,Ka2,Kc3,Kb1,Nd4,Kc1,Nc2,Kd1&cursor=0"
+    },
+    {
+      "label": "r1 → mate",
+      "firstMove": 68,
+      "lastMove": 87,
+      "whiteMoves": 20,
+      "fen": "8/8/8/3B4/8/2K5/2N5/3k4 w - - 0 68",
+      "moves": [
+        "Bc4",
+        "Kc1",
+        "Ba2",
+        "Kd1",
+        "Nd4",
+        "Ke1",
+        "Kd3",
+        "Kf2",
+        "Ne2",
+        "Kg2",
+        "Be6",
+        "Kf3",
+        "Bf5",
+        "Kf2",
+        "Be4",
+        "Ke1",
+        "Ke3",
+        "Kf1",
+        "Bd5",
+        "Ke1",
+        "Bb3",
+        "Kf1",
+        "Nf4",
+        "Kg1",
+        "Kf3",
+        "Kh1",
+        "Be6",
+        "Kg1",
+        "Ng2",
+        "Kh1",
+        "Kf2",
+        "Kh2",
+        "Bg4",
+        "Kh1",
+        "Ne3",
+        "Kh2",
+        "Nf1+",
+        "Kh1",
+        "Bf3#"
+      ],
+      "url": "http://localhost:5173/mate/bishop-knight#fen=8/8/8/3B4/8/2K5/2N5/3k4_w_-_-_0_68&moves=Bc4,Kc1,Ba2,Kd1,Nd4,Ke1,Kd3,Kf2,Ne2,Kg2,Be6,Kf3,Bf5,Kf2,Be4,Ke1,Ke3,Kf1,Bd5,Ke1,Bb3,Kf1,Nf4,Kg1,Kf3,Kh1,Be6,Kg1,Ng2,Kh1,Kf2,Kh2,Bg4,Kh1,Ne3,Kh2,Nf1%2B,Kh1,Bf3%23&cursor=0"
+    }
+  ],
+  "readOnlyCandidate": {
+    "cut": {
+      "moveNumber": 9,
+      "fen": "8/8/7N/7B/3k4/8/3K4/8 w - - 16 9",
+      "oldMove": "Ke2",
+      "newMove": "Bf3",
+      "uci": "h5f3",
+      "old": 79,
+      "new": 60,
+      "saved": 19
+    },
+    "sourceRemainingBefore": 79,
+    "sourceRemainingAfter": 60,
+    "witnessStartBefore": 87,
+    "witnessStartAfter": 87,
+    "globalWhiteMaxAfter": 87,
+    "winningWhiteStartsImproved": 112,
+    "winningWhiteStartsStillAt87": 104,
+    "recomputedNodes": 8382,
+    "applied": false
+  },
+  "limits": [
+    "Actual play may be shorter than these worst-case bounds.",
+    "Phase counts describe one verified global-worst-case line, not independent maxima for each phase.",
+    "The phase replay links reset the halfmove clock for viewing past move 50.",
+    "The candidate is a local improvement and is not applied; it does not lower the global maximum."
+  ]
+}
