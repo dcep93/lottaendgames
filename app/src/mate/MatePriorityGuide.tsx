@@ -181,6 +181,9 @@ export default function MatePriorityGuideDialog({
                     {ruleSet.help.notes.map((note, index) => (
                       <li key={`${index}-${note}`}>
                         {note}
+                        {ruleSet.help.noteLinks?.filter(link => link.noteIndex === index).map(link => (
+                          <React.Fragment key={link.href}>{' '}<a href={link.href} target="_blank" rel="noopener noreferrer">{link.label}</a></React.Fragment>
+                        ))}
                         <NoteBoards
                           boards={ruleSet.help.noteBoards.filter(
                             ({ noteIndex }) => noteIndex === index,

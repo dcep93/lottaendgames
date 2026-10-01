@@ -155,6 +155,7 @@ export type RuleHelp = {
   readonly blackIntro: string
   readonly blackPriorities: readonly string[]
   readonly notes: readonly string[]
+  readonly noteLinks?: readonly {readonly noteIndex: number; readonly label: string; readonly href: string}[]
   readonly noteBoards: readonly RuleNoteBoard[]
 }
 

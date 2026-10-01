@@ -1,3 +1,4 @@
+import {knightCaptureNote, knightCaptureReplay} from './twoKnightsPawnNotes'
 import type { Move, Square } from 'chess.js'
 import {
   allSquares,
@@ -83,7 +84,9 @@ const twoKnightsPawnHelp: RuleHelp = {
     'When the earlier resistance priorities tie, advance the pawn as far as legally possible.',
     "Maximize the combined distance from White's king and the nearest knight.",
   ],
+  noteLinks: [{noteIndex: 0, label: 'Replay the excluded knight-capture finish on Lichess', href: knightCaptureReplay}],
   notes: [
+    knightCaptureNote,
     'The bundled starts and every White edge in the committed construction were verified as unconditional wins before release. The optional Syzygy audit is an offline content check; the browser never queries a tablebase or network service.',
     "The blockade square is immediately in front of Black's pawn. Confinement begins only after a knight occupies that square and Black cannot capture it.",
     "For Black's downward-moving pawn, the file-specific Troitsky boundary is a4, b6, c5, d4, e4, f5, g6, h4. The blockade priority activates when the square immediately in front of the pawn reaches or crosses that boundary.",
