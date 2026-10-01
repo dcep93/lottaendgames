@@ -227,6 +227,7 @@ function snapshotRuleHelp(help: RuleHelp): RuleHelp {
     blackIntro: help.blackIntro,
     blackPriorities: Object.freeze([...help.blackPriorities]),
     notes: Object.freeze([...help.notes]),
+    ...(help.noteLinks ? {noteLinks: Object.freeze(help.noteLinks.map(link => Object.freeze({...link})))} : {}),
     noteBoards,
   })
 }
