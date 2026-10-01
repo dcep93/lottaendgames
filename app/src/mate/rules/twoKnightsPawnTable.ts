@@ -35,9 +35,15 @@ export function loadTwoKnightsPawnTable(
     const response = await fetcher(base + data.url.slice(1))
     if (!response.ok || !response.body)
       throw new Error('Could not load h-pawn lookup')
-    const bytes = await new Response(
-      response.body.pipeThrough(new DecompressionStream('gzip')),
-    ).arrayBuffer()
+    // Fetch transparently decodes HTTP Content-Encoding. Static hosts may
+    // instead serve the .gz file as opaque bytes, so inspect the body itself.
+    const downloaded = await response.arrayBuffer()
+    const header = new Uint8Array(downloaded, 0, Math.min(2, downloaded.byteLength))
+    const bytes = header[0] === 0x1f && header[1] === 0x8b
+      ? await new Response(
+          new Blob([downloaded]).stream().pipeThrough(new DecompressionStream('gzip')),
+        ).arrayBuffer()
+      : downloaded
     const digest = await crypto.subtle.digest('SHA-256', bytes)
     const sha = Array.from(new Uint8Array(digest), (n) =>
       n.toString(16).padStart(2, '0'),
