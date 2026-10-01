@@ -31,7 +31,7 @@ const whiteRules: readonly OrderedRule<KnightAndBishopWhiteMoveScore>[] =
     {
       id: "r2",
       shortLabel: "rule r2",
-      helpText: "Lock the Black king into a 7-diagonal cage, then force Black into the mating net.",
+      helpText: "Force Black into the mating net.",
       compare: (first, second) => first.sevenCagePenalty - second.sevenCagePenalty,
     },
     {

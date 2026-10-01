@@ -29,7 +29,9 @@
     "test:audit-san:advisory": "tsx scripts/audit_chapter_san.ts --advisory",
     "test:content": "tsx src/app_x/contentAudit.test.ts",
     "test:mate:stages": "tsx --test src/mate/rules/bishopKnightStages.test.ts",
-    "check:mate:stages": "tsx ../scripts/bishop-knight-audit/derive-stage-policy.mts --check"
+    "check:mate:stages": "tsx ../scripts/bishop-knight-audit/derive-stage-policy.mts --check",
+    "generate:mate:bridge": "tsx ../scripts/bishop-knight-audit/build-optimal-r2.mts",
+    "check:mate:bridge": "tsx ../scripts/bishop-knight-audit/build-optimal-r2.mts --check"
   },
   "dependencies": {
     "chess.js": "^1.4.0",

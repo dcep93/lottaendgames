@@ -1,5 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import {createHash} from 'node:crypto';
+import bridgeData from './bishopKnightOptimalBridgeData.json';
+import {canonical,code,fen} from '../../../../scripts/bishop-knight-audit/encoding.mts';
 import {getChess,SQUARE_TRANSFORMS,transformFen} from '../chess';
 import {bishopKnightRuleSet,getIdealKnightAndBishopWhiteMoves,scoreKnightAndBishopWhiteMove} from './bishopKnight';
 import {bishopKnightStageMoves,bishopKnightStagePosition,bishopKnightPositionKey,r1Start} from './bishopKnightStages';
@@ -62,7 +65,7 @@ test('arbitrary source positions enter the r1 graph as r2 via every piece type',
     if(backward.captured)continue;
     const before=backward.after.replace(' b ',' w '),board=getChess(before);
     if(board.isCheck()||board.isAttacked(destination.slice(6,8) as Parameters<typeof board.get>[0],'w'))continue;
-    if(bishopKnightStagePosition(before))continue;
+    if(bishopKnightStagePosition(before)?.stage===1)continue;
     const forward=board.moves({verbose:true}).find(m=>m.from===backward.to&&m.to===backward.from);
     if(!forward||bishopKnightPositionKey(forward.after)!==targetKey)continue;
     const choice=bishopKnightStageMoves(before);assert.equal(choice.stage,2);
@@ -106,4 +109,26 @@ test('r3 is not secretly retained as a global proximity preference',()=>{
  const score=scoreKnightAndBishopWhiteMove('8/8/3k4/8/8/8/3K4/N6B w - - 0 1','Kd3');
  assert.equal(score.stage,0);
  assert.ok(!bishopKnightRuleSet.whiteRules.some(rule=>rule.id==='r3'));
+});
+
+
+test('every optimal bridge edge decreases the exact minimax entry distance and freezes r1',()=>{
+ assert.equal(bridgeData.r1Fingerprint,createHash('sha256').update(JSON.stringify(data.r1Edges)).digest('hex'));
+ const ranks=new Map(bridgeData.rows.map(row=>[row.key,row.bridge]));
+ for(const row of bridgeData.rows){
+  const source=fen(row.key),stage=bishopKnightStageMoves(source),b=getChess(source);
+  assert.equal(stage.stage,2);
+  for(const uci of stage.moves){
+  const move=b.moves({verbose:true}).find(m=>m.from+m.to===uci);
+  assert.ok(move);b.move(move.san);
+  const replies=b.moves({verbose:true});assert.ok(replies.length);
+  const costs=replies.map(r=>{
+   assert.ok(!r.captured);
+   if(bishopKnightStageMoves(r.after).stage===1)return 0;
+   const rank=ranks.get(canonical(code(r.after)));assert.notEqual(rank,undefined);
+   assert.ok(rank!<row.bridge);return rank!;
+  });
+  assert.equal(row.bridge,1+Math.max(...costs));b.undo();
+  }
+ }
 });

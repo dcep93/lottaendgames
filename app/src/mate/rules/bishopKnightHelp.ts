@@ -27,8 +27,8 @@ export const bishopKnightHelp: RuleHelp = {
     highlights: [],
   }, {
     id: "bishop-knight-rule-r2-start",
-    title: "rule r2 — Reach the mating net",
-    caption: "Start from a satisfied r4 formation: Kd4, Ne5 and either Be4 or Bd5. The verified r2 routes cover every legal Black starting square and every legal reply, leading into r1 or directly to mate.",
+    title: "rule r2 — Force Black into the mating net",
+    caption: "Start from a satisfied r4 formation: Kd4, Ne5 and either Be4 or Bd5. The r2 lookup minimizes the worst-case number of White moves until reaching the fixed r1 net, against every legal Black reply. Immediate checkmate still takes priority.",
     pieces: [{square: "d4", piece: "K"}, {square: "e4", piece: "B"}, {square: "e5", piece: "N"}, {square: "g1", piece: "k"}],
     highlights: [],
   }, {

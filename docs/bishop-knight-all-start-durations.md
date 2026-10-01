@@ -1,5 +1,7 @@
 # KBN all-start mate-duration audit
 
+This is a historical audit of the policy before the [globally optimal r2 bridge](bishop-knight-optimal-r2.md). Its all-start duration distribution has not been rerun for that new policy.
+
 The current policy was checked against the cached complete graph after verifying its runtime fingerprint. This audit includes the 40 pending r2 shortcuts, which remain unchanged and uncommitted. No policy changes were made.
 
 There are **24,536,088 legal board-and-turn starts**: **22,010,352 theoretically winning** and **2,525,736 theoretically drawn**. Every winning start forces eventual mate under all recommended White ties and every legal Black reply. The drawn starts are excluded from the duration distribution. Counts include all orientations and both bishop colors; they describe a uniform population of positions, not the likelihood of positions in real games. The halfmove clock starts at zero.

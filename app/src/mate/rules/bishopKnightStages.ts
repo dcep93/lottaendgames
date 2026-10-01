@@ -1,42 +1,26 @@
 import type {Square} from 'chess.js';
-import {getChess, getEndgamePiecePlacements, SQUARE_TRANSFORMS, transformSquare} from '../chess';
+import {getEndgamePiecePlacements, SQUARE_TRANSFORMS, transformSquare} from '../chess';
 import data from './bishopKnightStageData.json';
+import {optimalBishopKnightBridge} from './bishopKnightOptimalBridge';
 
 export type BishopKnightStage = 0 | 1 | 2;
 export const r1Start = data.r1Start;
 export const r2Starts: readonly string[] = data.r2Starts;
 type Route = {stage: 1 | 2; remaining: number; destinations: readonly string[]};
-type StoredRoute = Omit<Route, 'stage'> & {priority: 1 | 2};
-const routes = new Map<string, StoredRoute>();
-const r1Edges = new Map<string, readonly string[]>();
-const arrivals = [new Map<string, number>(), new Map<string, number>()];
-const bounds = new Map<string, number>();
+const r1Routes = new Map<string, Route & {moves: string[]}>();
 const reflect = (key: string, transform: typeof SQUARE_TRANSFORMS[number]) =>
   (key.match(/../g)! as Square[]).map(square => transformSquare(square, transform)).join('');
-
+const bounds = new Map(data.sources.map(row => [row[0] as string, row[2] as number]));
 for (const row of data.r1Edges) {
   const [source, destinations] = row as [string, string[]];
   for (const transform of SQUARE_TRANSFORMS) {
-    r1Edges.set(reflect(source, transform), destinations.map(key => reflect(key, transform)));
-  }
-}
-
-for (const [key, bound] of data.arrivals) for (const transform of SQUARE_TRANSFORMS) {
-  bounds.set(reflect(key as string, transform), bound as number);
-}
-
-for (const row of data.sources) {
-  // Priority preserves established choices; it does not assign a rule label.
-  const [source, priority, remaining, destinations] = row as [string, 1 | 2, number, string[]];
-  for (const transform of SQUARE_TRANSFORMS) {
-    const reflected = destinations.map(key => reflect(key, transform));
-    routes.set(reflect(source, transform), {priority, remaining, destinations: reflected});
-    destinations.forEach((key, index) => {
-      // Canonicalization of the bound is independent of the source orientation.
-      const bound = bounds.get(key) ?? Infinity;
-      if (!Number.isFinite(bound)) throw new Error(`Missing stage destination bound: ${key}`);
-      arrivals[priority - 1]!.set(reflected[index]!, bound);
+    const from = reflect(source, transform);
+    const to = destinations.map(key => reflect(key, transform));
+    const moves = to.map(destination => {
+      const index = [0, 2, 4].find(i => from.slice(i, i + 2) !== destination.slice(i, i + 2))!;
+      return from.slice(index, index + 2) + destination.slice(index, index + 2);
     });
+    r1Routes.set(from, {stage: 1, remaining: bounds.get(source)!, destinations: to, moves});
   }
 }
 
@@ -51,31 +35,21 @@ export function bishopKnightPositionKey(fen: string): string | undefined {
 
 export function bishopKnightStagePosition(fen: string): Readonly<Route> | undefined {
   if (fen.split(' ')[1] !== 'w') return undefined;
-  const key = bishopKnightPositionKey(fen) ?? '';
-  const route = routes.get(key);
-  return route ? {stage: r1Edges.has(key) ? 1 : 2, remaining: route.remaining, destinations: route.destinations} : undefined;
+  const key = bishopKnightPositionKey(fen);
+  if (!key) return undefined;
+  const net = r1Routes.get(key);
+  if (net) return net;
+  const bridge = optimalBishopKnightBridge(key);
+  return bridge ? {stage: 2, remaining: bridge.remaining, destinations: bridge.destinations} : undefined;
 }
 
-/** Recognize a whole resulting position, independent of the moving piece or history. */
+/** Exact r1 reachable edges, then globally optimal r2 source/move edges. */
 export function bishopKnightStageMoves(fen: string): {stage: BishopKnightStage; moves: readonly string[]} {
   if (fen.split(' ')[1] !== 'w') return {stage: 0, moves: []};
   const key = bishopKnightPositionKey(fen);
   if (!key) return {stage: 0, moves: []};
-  const route = routes.get(key);
-  const legal = getChess(fen).moves({verbose: true});
-  const candidates = legal.map(move => ({move, key: bishopKnightPositionKey(move.after)!}));
-  const classify = (selected: typeof candidates): {stage: 1 | 2; moves: string[]} => ({
-    stage: selected.length > 0 && selected.every(candidate => r1Edges.get(key)?.includes(candidate.key)) ? 1 : 2,
-    moves: selected.map(({move}) => move.from + move.to),
-  });
-  for (const priority of [1, 2] as const) {
-    // Preserve the exact established choices, including any former r3 tie-break.
-    if (route?.priority === priority) return classify(candidates
-      .filter(candidate => route.destinations.includes(candidate.key)));
-    const table = arrivals[priority - 1]!;
-    const best = Math.min(...candidates.map(candidate => table.get(candidate.key) ?? Infinity));
-    if (Number.isFinite(best)) return classify(candidates
-      .filter(candidate => table.get(candidate.key) === best));
-  }
-  return {stage: 0, moves: []};
+  const net = r1Routes.get(key);
+  if (net) return {stage: 1, moves: net.moves};
+  const bridge = optimalBishopKnightBridge(key);
+  return bridge ? {stage: 2, moves: bridge.moves} : {stage: 0, moves: []};
 }
