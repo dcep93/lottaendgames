@@ -456,11 +456,6 @@
   outline-offset: 0.15rem;
 }
 
-.leg-mate-current-hint {
-  border-color: var(--leg-border-strong) !important;
-  color: var(--leg-rose) !important;
-}
-
 .leg-mate-log-scroll {
   max-width: 100%;
   max-height: 40rem;
