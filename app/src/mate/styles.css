@@ -895,17 +895,12 @@
   pointer-events: none;
 }
 
-.leg-mate-note-board-arrows line {
-  stroke: #4a3428;
-  stroke-linecap: round;
-  stroke-width: 7;
-}
-
-.leg-mate-note-board-arrows marker path {
-  fill: #4a3428;
-  stroke: #4a3428;
+.leg-mate-note-board-arrows path {
+  fill: #292724;
+  stroke: rgba(255, 247, 232, 0.8);
   stroke-linejoin: round;
-  stroke-width: 2;
+  stroke-width: 1.5;
+  paint-order: stroke fill;
 }
 
 .leg-mate-note-board-pieces {

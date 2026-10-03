@@ -186,7 +186,6 @@ export default function MateRuleNoteBoard({
 }: {
   readonly board: RuleNoteBoard
 }) {
-  const markerId = React.useId()
   const layout = board.layout ?? DEFAULT_BOARD_LAYOUT
   const isFullBoard = layout.files === 8 && layout.ranks === 8
   const highlights = new Map(
@@ -250,32 +249,20 @@ export default function MateRuleNoteBoard({
           className="leg-mate-note-board-arrows"
           viewBox={`0 0 ${layout.files * 100} ${layout.ranks * 100}`}
         >
-          <defs>
-            <marker
-              id={markerId}
-              markerHeight="26"
-              markerWidth="26"
-              markerUnits="userSpaceOnUse"
-              orient="auto"
-              refX="23"
-              refY="13"
-              viewBox="0 0 26 26"
-            >
-              <path d="M 3 3 L 23 13 L 3 23 L 7 13 Z" />
-            </marker>
-          </defs>
           {(board.arrows ?? []).map((arrow) => {
             const from = squareGridPosition(arrow.from, layout)
             const to = squareGridPosition(arrow.to, layout)
+            const dx = (to.column - from.column) * 100
+            const dy = (to.row - from.row) * 100
+            const length = Math.hypot(dx, dy)
+            if (length === 0) return null
+            const neck = length - 30
             return (
-              <line
+              <path
                 data-arrow={`${arrow.from}-${arrow.to}`}
                 key={`${arrow.from}-${arrow.to}`}
-                markerEnd={`url(#${markerId})`}
-                x1={(from.column - 0.5) * 100}
-                x2={(to.column - 0.5) * 100}
-                y1={(from.row - 0.5) * 100}
-                y2={(to.row - 0.5) * 100}
+                d={`M 22 -6 H ${neck} V -18 L ${length} 0 L ${neck} 18 V 6 H 22 A 6 6 0 0 1 22 -6 Z`}
+                transform={`translate(${(from.column - 0.5) * 100} ${(from.row - 0.5) * 100}) rotate(${Math.atan2(dy, dx) * 180 / Math.PI})`}
               />
             )
           })}
