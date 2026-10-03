@@ -48,7 +48,7 @@ export default function MatePriorityGuideDialog({
       if (event.key === 'Escape') {
         event.preventDefault()
         event.stopPropagation()
-        onClose()
+        if (!event.repeat) onClose()
         return
       }
       if (event.key !== 'Tab') return
@@ -205,6 +205,10 @@ export default function MatePriorityGuideDialog({
           <section className="leg-mate-guide-section">
             <h3>Keyboard shortcuts</h3>
             <dl className="leg-mate-guide-shortcuts">
+              <div>
+                <dt><kbd>Esc</kbd></dt>
+                <dd>Toggle Training Info</dd>
+              </div>
               <div>
                 <dt><kbd>Enter</kbd></dt>
                 <dd>Start over</dd>

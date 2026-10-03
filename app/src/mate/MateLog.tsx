@@ -137,6 +137,27 @@ export default function MateLog({
     [],
   )
   const closeGuide = React.useCallback(() => setGuideOpen(false), [])
+  React.useEffect(() => {
+    if (guideOpen || typeof document === 'undefined') return
+
+    const openOnEscape = (event: KeyboardEvent) => {
+      if (
+        event.key !== 'Escape' || event.repeat || event.defaultPrevented ||
+        event.altKey || event.ctrlKey || event.metaKey || event.shiftKey
+      ) return
+      const target = event.target as HTMLElement | null
+      if (target?.closest?.('[role="dialog"]')) return
+
+      event.preventDefault()
+      const activeElement = document.activeElement as HTMLElement | null
+      setGuideOpener(typeof activeElement?.focus === 'function' ? activeElement : null)
+      setHighlightedReasonId(null)
+      setGuideOpen(true)
+    }
+
+    document.addEventListener('keydown', openOnEscape)
+    return () => document.removeEventListener('keydown', openOnEscape)
+  }, [guideOpen])
   const copyPgn = async () => {
     setCopyStatus('')
     try {
@@ -168,6 +189,7 @@ export default function MateLog({
   const secondaryActions = (
     <>
       <button
+        aria-keyshortcuts="Escape"
         aria-label="Open training info and priority guide"
         className="leg-mate-training-info-button"
         onClick={openGuide}

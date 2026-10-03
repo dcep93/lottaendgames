@@ -1524,7 +1524,7 @@ test('existing mate sets retain universal priorities; h-pawn uses its custom tab
   assert.match(markup, /href="https:\/\/lichess.org\/analysis\/pgn\//)
 })
 
-test('priority guide traps Tab, closes with Escape, and restores focus', async () => {
+test('Escape toggles the priority guide, ignores key repeats, and restores focus', async () => {
   ;(
     globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
   ).IS_REACT_ACT_ENVIRONMENT = true
@@ -1655,13 +1655,11 @@ test('priority guide traps Tab, closes with Escape, and restores focus', async (
     })
     const mountedRenderer = renderer as ReactTestRenderer
 
-    const openButton = mountedRenderer.root.findByProps({
-      'aria-label': 'Open training info and priority guide',
-    })
     const openerNode = makeNode('Open training info and priority guide')
-    await act(async () => {
-      openButton.props.onClick({ currentTarget: openerNode })
-    })
+    fakeDocument.activeElement = openerNode
+    const openEscape = keyEvent('Escape')
+    await act(async () => keydown?.(openEscape.event))
+    assert.equal(openEscape.calls.preventDefault, 1)
     assert.equal(
       mountedRenderer.root.findAllByProps({ role: 'dialog' }).length,
       1,
@@ -1698,6 +1696,8 @@ test('priority guide traps Tab, closes with Escape, and restores focus', async (
     assert.equal(fakeDocument.activeElement, closeNode)
 
     queriedNodes = [disabledNode, hiddenNode, closeNode, lastNode]
+    await act(async () => keydown?.({ ...keyEvent('Escape').event, repeat: true } as KeyboardEvent))
+    assert.equal(mountedRenderer.root.findAllByProps({ role: 'dialog' }).length, 1)
     const escape = keyEvent('Escape')
     await act(async () => {
       keydown?.(escape.event)
@@ -1709,15 +1709,10 @@ test('priority guide traps Tab, closes with Escape, and restores focus', async (
       0,
     )
     assert.equal(openerNode.focusCalls, 1)
-    assert.equal(keydown, undefined)
-
-    await act(async () => {
-      mountedRenderer.root
-        .findByProps({
-          'aria-label': 'Open training info and priority guide',
-        })
-        .props.onClick({ currentTarget: openerNode })
-    })
+    assert.ok(keydown)
+    await act(async () => keydown?.({ ...keyEvent('Escape').event, repeat: true } as KeyboardEvent))
+    assert.equal(mountedRenderer.root.findAllByProps({ role: 'dialog' }).length, 0)
+    await act(async () => keydown?.(keyEvent('Escape').event))
     assert.equal(
       mountedRenderer.root.findAllByProps({ role: 'dialog' }).length,
       1,
@@ -2912,7 +2907,7 @@ test('Mate keyboard shortcuts execute only from the training surface', async () 
       )
     })
     const mountedRenderer = renderer as ReactTestRenderer
-    assert.equal(keydownListeners.size, 1)
+    assert.equal(keydownListeners.size, 2)
     const workspace = mountedRenderer.root.find(
       (node) => node.props.className === 'leg-mate-workspace',
     )
@@ -2931,7 +2926,7 @@ test('Mate keyboard shortcuts execute only from the training surface', async () 
     assert.equal(dispatch('ArrowLeft'), 0)
     assert.equal(dispatch('ArrowRight'), 0)
     assert.equal(dispatch('ArrowDown'), 0)
-    assert.equal(dispatch('Escape'), 0)
+    assert.equal(dispatch('Escape', null, { ctrlKey: true }), 0)
     assert.equal(dispatch('w'), 0)
     assert.equal(dispatch('a'), 0)
     assert.equal(dispatch('h'), 0)
