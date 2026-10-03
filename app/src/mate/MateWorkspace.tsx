@@ -407,6 +407,7 @@ export default function MateWorkspace({
           <p role="alert">Unsupported position: this board is outside custom tablebase coverage. Older stage-policy links may use different pawn ranks or promotion rules. Start Over loads the supported starting position.</p>
         )}
         <MateLog
+          showTimer={showTimer}
           modeSelector={modeSelector}
           controls={(secondaryActions) => (
             <MateControls

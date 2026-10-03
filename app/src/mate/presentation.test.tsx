@@ -2651,7 +2651,7 @@ test('Mate Play Best does not flash historical log choices as disabled', async (
   }
 })
 
-test('Mate restores and writes the timer visibility preference', async () => {
+test('Mate timer visibility hides durations while preserving timing recorded while hidden', async () => {
   ;(
     globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
   ).IS_REACT_ACT_ENVIRONMENT = true
@@ -2659,6 +2659,9 @@ test('Mate restores and writes the timer visibility preference', async () => {
     globalThis,
     'window',
   )
+  const originalNow = Date.now
+  let now = 1_000
+  Date.now = () => now
   const storedValues = new Map([[MATE_TIMER_PREFERENCE_KEY, 'false']])
   let renderer: ReactTestRenderer | undefined
 
@@ -2686,6 +2689,21 @@ test('Mate restores and writes the timer visibility preference', async () => {
       mountedRenderer.root.findByType(MateControls).props.showTimer,
       false,
     )
+    assert.equal(mountedRenderer.root.findByType(MateLog).props.showTimer, false)
+    assert.equal(mountedRenderer.root.findAllByType('col').length, 7)
+    assert.equal(mountedRenderer.root.findAllByType('th').some((cell) => reactNodeText(cell) === 'Duration'), false)
+    await act(async () => {
+      mountedRenderer.root.findByType(MateBoardProbe).props.onMove('Rd1')
+    })
+    now += 1_234
+    await act(async () => {
+      mountedRenderer.root.findByType(MateBoardProbe).props.onMove('Rd2')
+    })
+    const recordedLogs = mountedRenderer.root.findByType(MateLog).props.logs as readonly MateLogEntry[]
+    assert.equal(recordedLogs.length, 2)
+    assert.equal(recordedLogs[1].durationMs, 1_234)
+    const durationCells = () => mountedRenderer.root.findAllByType('td').filter((cell) => reactNodeText(cell) === '0:01.234')
+    assert.equal(durationCells().length, 0)
     await act(async () => {
       mountedRenderer.root.findByType(MateControls).props.onToggleTimer()
     })
@@ -2694,7 +2712,18 @@ test('Mate restores and writes the timer visibility preference', async () => {
       true,
     )
     assert.equal(storedValues.get(MATE_TIMER_PREFERENCE_KEY), 'true')
+    assert.equal(mountedRenderer.root.findAllByType('col').length, 8)
+    assert.equal(durationCells().length, 1)
+    assert.deepEqual(mountedRenderer.root.findByType(MateLog).props.logs, recordedLogs)
+    await act(async () => {
+      mountedRenderer.root.findByType(MateControls).props.onToggleTimer()
+    })
+    assert.equal(durationCells().length, 0)
+    assert.equal(mountedRenderer.root.findAllByType('col').length, 7)
+    assert.deepEqual(mountedRenderer.root.findByType(MateLog).props.logs, recordedLogs)
+
   } finally {
+    Date.now = originalNow
     if (renderer) await act(async () => renderer?.unmount())
     if (originalWindowDescriptor === undefined) {
       Reflect.deleteProperty(globalThis, 'window')

@@ -13,6 +13,7 @@ export { default as MatePriorityGuideDialog } from './MatePriorityGuide'
 export type MateLogProps = {
   readonly controls?: (secondaryActions: React.ReactNode) => React.ReactNode
   readonly timerControls?: React.ReactNode
+  readonly showTimer?: boolean
   readonly modeSelector?: React.ReactNode
   readonly fen: string
   readonly logs: readonly MateLogEntry[]
@@ -85,6 +86,7 @@ function isSelectedBlackReplyIdeal(
 export default function MateLog({
   controls,
   timerControls,
+  showTimer = true,
   modeSelector,
   fen,
   logs,
@@ -232,7 +234,7 @@ export default function MateLog({
               <col className="leg-mate-log-intrinsic-column" />
               <col className="leg-mate-log-intrinsic-column" />
               <col className="leg-mate-log-intrinsic-column" />
-              <col className="leg-mate-log-intrinsic-column" />
+              {showTimer ? <col className="leg-mate-log-intrinsic-column" /> : null}
               <col className="leg-mate-log-flexible-column" />
             </colgroup>
             <thead className="leg-mate-visually-hidden">
@@ -243,7 +245,7 @@ export default function MateLog({
                 <th scope="col">Black</th>
                 <th scope="col">Correctness</th>
                 <th scope="col">Black replies</th>
-                <th scope="col">Duration</th>
+                {showTimer ? <th scope="col">Duration</th> : null}
                 <th scope="col">Reason</th>
               </tr>
             </thead>
@@ -354,9 +356,11 @@ export default function MateLog({
                         </>
                       ) : null}
                     </td>
-                    <td className="leg-mate-log-plain-text">
-                      {formatMateMoveDuration(log.durationMs)}
-                    </td>
+                    {showTimer ? (
+                      <td className="leg-mate-log-plain-text">
+                        {formatMateMoveDuration(log.durationMs)}
+                      </td>
+                    ) : null}
                     <td>
                       <button
                         aria-label={`${reasonLabel}. Open priority guide`}
