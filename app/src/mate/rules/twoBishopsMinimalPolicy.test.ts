@@ -50,7 +50,7 @@ test('Two Bishops exposes only the simplified experiment policy', () => {
   )
   assert.deepEqual(
     twoBishopsRuleSet.help.noteBoards.map(({ id }) => id),
-    ['two-bishops-target-square', 'two-bishops-phase-two', 'two-bishops-rule-r9-opposition', 'two-bishops-rule-r5-5-force-corner'],
+    ['two-bishops-rule-r9-opposition', 'two-bishops-target-square', 'two-bishops-rule-r5-5-force-corner', 'two-bishops-phase-two'],
   )
   assert.ok(twoBishopsRuleSet.help.noteBoards.every(({ noteIndex }) => noteIndex === undefined))
   assert.equal(

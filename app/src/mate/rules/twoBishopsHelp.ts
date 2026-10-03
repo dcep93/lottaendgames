@@ -86,5 +86,5 @@ export const twoBishopsHelp: RuleHelp = {
   notes: [
     "Target squares: take the outer-wall squares closest to Black's king by king steps, then exclude bishop-occupied and screened squares. If White's king is on the outer wall, it must be no farther from the target than Black.",
   ],
-  noteBoards: [TARGET_SQUARE_NOTE_BOARD, PHASE_TWO_NOTE_BOARD, RULE_R9_OPPOSITION_NOTE_BOARD, RULE_R5_5_FORCE_CORNER_NOTE_BOARD],
+  noteBoards: [RULE_R9_OPPOSITION_NOTE_BOARD, TARGET_SQUARE_NOTE_BOARD, RULE_R5_5_FORCE_CORNER_NOTE_BOARD, PHASE_TWO_NOTE_BOARD],
 }
