@@ -25,7 +25,6 @@ export type MateBoardProps = {
   readonly fen: string
   readonly mateId?: MateId
   readonly phase: string
-  readonly complete?: boolean
   readonly lastMove: readonly [Square, Square] | null
   readonly disabled: boolean
   readonly onMove: (san: string) => void
@@ -90,7 +89,6 @@ export function MateBoardSurface({
   fen,
   mateId,
   phase,
-  complete = false,
   lastMove,
   disabled,
   onMove,
@@ -103,7 +101,6 @@ export function MateBoardSurface({
   const moveId = React.useRef(0)
   const boardShellRef = React.useRef<HTMLDivElement>(null)
   const pointerInteractionRef = React.useRef(false)
-  const phaseId = React.useId()
 
   useEffect(() => {
     setSelectedSquare(null)
@@ -179,12 +176,8 @@ export function MateBoardSurface({
 
   return (
     <div className="leg-mate-board-card">
-      <p className="leg-mate-board-phase" id={phaseId}>
-        {mateId === 'two-knights-pawn' ? phase : complete ? 'Complete' : `Phase ${phase}`}
-      </p>
       <div
         ref={boardShellRef}
-        aria-describedby={phaseId}
         aria-disabled={disabled}
         aria-label="Mate board, White orientation"
         className={[

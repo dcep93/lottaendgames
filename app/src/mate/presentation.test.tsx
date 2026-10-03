@@ -109,6 +109,7 @@ test('Mate board is a controlled, White-oriented phase surface', () => {
   assert.match(markup, /data-orientation="white"/)
   assert.match(markup, /data-phase="2\/2"/)
   assert.match(markup, /leg-mate-board-shell--phase-two/)
+  assert.doesNotMatch(markup, /leg-mate-board-phase|>Phase 2\/2</)
   assert.match(
     markup,
     new RegExp(`data-reply-animation-ms="${MATE_REPLY_ANIMATION_MS}"`),
@@ -163,10 +164,9 @@ test('accessible piece names follow their controlled squares', () => {
   assert.equal((markup.match(/<svg\b/g) ?? []).length, 4)
 })
 
-test('Mate board replaces its terminal phase badge without changing phase data', () => {
+test('Mate board omits the phase label while retaining phase data', () => {
   const markup = renderToStaticMarkup(
     <MateBoard
-      complete
       disabled
       fen={ROOK_AFTER_WHITE}
       lastMove={['a2', 'a8']}
@@ -175,7 +175,7 @@ test('Mate board replaces its terminal phase badge without changing phase data',
     />,
   )
 
-  assert.match(markup, /class="leg-mate-board-phase"[^>]*>Complete</)
+  assert.doesNotMatch(markup, /leg-mate-board-phase|>Complete</)
   assert.doesNotMatch(markup, />Phase 2\/2</)
   assert.match(markup, /data-phase="2\/2"/)
 })
@@ -3062,7 +3062,7 @@ test('Mate terminal sharing copies the exact starting position with status', asy
       'checkmate',
     )
     assert.equal(
-      mountedRenderer.root.findByType(MateBoardProbe).props.complete,
+      mountedRenderer.root.findByType(MateBoardProbe).props.disabled,
       true,
     )
 

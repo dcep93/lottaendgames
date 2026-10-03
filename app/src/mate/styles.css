@@ -220,18 +220,6 @@
     var(--leg-panel);
 }
 
-.leg-mate-board-phase {
-  width: fit-content;
-  margin: 0;
-  border-left: 0.16rem solid var(--leg-pink);
-  padding-left: 0.5rem;
-  color: var(--leg-brown);
-  font-size: 0.76rem;
-  font-weight: 850;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
 .leg-mate-board-shell {
   width: 100%;
   max-width: 25.6rem;

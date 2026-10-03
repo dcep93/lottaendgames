@@ -394,7 +394,6 @@ export default function MateWorkspace({
       <div className="leg-mate-board-column">
         <BoardComponent
           mateId={mateId}
-          complete={session.outcome !== undefined}
           disabled={boardDisabled}
           fen={playBestAnimation?.whiteFen ?? session.fen}
           lastMove={lastMove}
