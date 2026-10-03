@@ -279,6 +279,7 @@
 .leg-mate-controls {
   display: flex;
   flex-wrap: wrap;
+  flex: 1 1 auto;
   gap: 0.4rem 0.65rem;
   align-items: center;
 }
@@ -302,7 +303,8 @@
 }
 
 .leg-mate-controls-summary {
-  justify-content: flex-start;
+  margin-left: auto;
+  justify-content: flex-end;
 }
 
 .leg-mate-timer-controls {
