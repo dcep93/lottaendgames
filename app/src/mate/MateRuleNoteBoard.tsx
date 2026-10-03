@@ -1,6 +1,6 @@
 import React from 'react'
 import { Chessboard, defaultArrowOptions, defaultPieces } from 'react-chessboard'
-import { useBoardHighlights } from '../useBoardHighlights'
+import { BOARD_SQUARE_HIGHLIGHT_STYLE, useBoardHighlights } from '../useBoardHighlights'
 import {
   MATE_MOVE_ANIMATION_MS,
   getMateBoardSquareStyles,
@@ -184,7 +184,9 @@ function AnimatedMateRuleNoteBoard({
 
 function NativeNoteBoard({ board }: { readonly board: RuleNoteBoard }) {
   const highlights = useBoardHighlights(JSON.stringify(board.pieces))
-  const squareStyles = highlights.withHighlights()
+  const squareStyles = highlights.withHighlights(Object.fromEntries(
+    board.highlights.map(({ square }) => [square, BOARD_SQUARE_HIGHLIGHT_STYLE]),
+  ))
   const position = React.useMemo(() => Object.fromEntries(board.pieces.map(({ square, piece }) => [
     square, { pieceType: PIECE_RENDER_KEYS[piece] },
   ])), [board.pieces])
@@ -208,8 +210,8 @@ function NativeNoteBoard({ board }: { readonly board: RuleNoteBoard }) {
         return <div
           className={kind ? `leg-mate-note-board-square--${kind}` : undefined}
           data-highlight-kind={kind}
-          style={{ width: '100%', height: '100%' }}
-        ><div style={{ width: '100%', height: '100%', ...squareStyles[square] }}>{children}</div></div>
+          style={{ width: '100%', height: '100%', ...squareStyles[square] }}
+        >{children}</div>
       },
     }} />
   )
@@ -274,6 +276,7 @@ export default function MateRuleNoteBoard({
               <span
                 className={`leg-mate-note-board-square leg-mate-note-board-square--${(column - layout.fileOffset + row) % 2 === 0 ? 'light' : 'dark'}${highlight ? ` leg-mate-note-board-square--${highlight}` : ''}`}
                 data-highlight-kind={highlight}
+                style={highlight ? BOARD_SQUARE_HIGHLIGHT_STYLE : undefined}
                 key={square ?? `${column}-${row}`}
               />
             )

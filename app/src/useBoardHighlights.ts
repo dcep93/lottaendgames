@@ -1,6 +1,10 @@
 import { useEffect, useState, type CSSProperties } from 'react'
 import { defaultArrowOptions, type ChessboardOptions } from 'react-chessboard'
 
+export const BOARD_SQUARE_HIGHLIGHT_STYLE = {
+  boxShadow: `inset 0 0 0 100vmax ${defaultArrowOptions.color}66`,
+} satisfies CSSProperties
+
 /** Right-click annotations follow the board's arrow-clearing behavior. */
 export function useBoardHighlights(position: string) {
   const [squares, setSquares] = useState<readonly string[]>([])
@@ -19,9 +23,9 @@ export function useBoardHighlights(position: string) {
     for (const square of squares) {
       styles[square] = {
         ...base[square],
-        boxShadow: [base[square]?.boxShadow,
-          `inset 0 0 0 100vmax ${defaultArrowOptions.color}66`,
-        ].filter(Boolean).join(', '),
+        boxShadow: [...new Set([
+          base[square]?.boxShadow, BOARD_SQUARE_HIGHLIGHT_STYLE.boxShadow,
+        ].filter(Boolean))].join(', '),
       }
     }
     return styles
