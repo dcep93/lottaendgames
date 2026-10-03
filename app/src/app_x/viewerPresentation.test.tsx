@@ -117,9 +117,9 @@ const frontMatterSectionOrder = [
   'About this project',
   'About this edition',
   'Reader features',
-  'Note on this digital edition',
   'Publisher&#x27;s description',
   'Table of contents',
+  'Note on this digital edition',
 ]
 const frontMatterSectionIndexes = frontMatterSectionOrder.map((heading) => {
   const index = frontMatterMarkup.indexOf(heading)

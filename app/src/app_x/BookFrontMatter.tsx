@@ -120,6 +120,77 @@ export default function BookFrontMatter({
         </ul>
       </FrontMatterSection>
 
+      <FrontMatterSection title="Publisher's description">
+        <p>The good news about chess endgames is:</p>
+        <ul>
+          <li>
+            there are relatively few endings you should really know by heart
+          </li>
+          <li>
+            once you know these endings, that&apos;s it. Your knowledge never
+            goes out of date!
+          </li>
+        </ul>
+        <p>
+          The bad news is that, all the same, the endgame technique of most
+          players is deficient.
+        </p>
+        <p>
+          Since you are reading this, your endgame knowledge may be inadequate
+          as well, with predictable consequences for your results. To make
+          matters worse, modern time-controls prevent you from compensating for
+          your lack of knowledge by delving deeply into the subtleties of an
+          ending during a game.
+        </p>
+        <p>
+          This book is a great help for players such as you. The author debunks
+          the myth that endgame theory is complex and teaches you to steer the
+          game into a position you are familiar with.
+        </p>
+        <p>
+          Jesus de la Villa has only selected those endgames that show up most
+          frequently, are easy to learn and contain ideas that are also useful
+          in more difficult positions.
+        </p>
+        <p>
+          Your performance will improve dramatically because this book brings
+          you:
+        </p>
+        <ul>
+          <li>simple rules</li>
+          <li>detailed and lively explanations</li>
+          <li>many diagrams</li>
+          <li>clear summaries of the most important themes</li>
+        </ul>
+        <p>
+          <em>100 Endgames You Must Know</em> is not an encyclopedia, but a
+          practical tool to improve your knowledge of the most common
+          theoretical endings.
+        </p>
+        <p>
+          <strong>Jesus de la Villa</strong> (1958) is an International
+          Grandmaster born in Spain. He is a successful author and a well-known
+          chess coach. He has won the Spanish Championship twice.
+        </p>
+        <p>Printed cover price: Games / Chess $24.95 · €21.95.</p>
+      </FrontMatterSection>
+
+      <nav
+        aria-labelledby="book-contents-heading"
+        className="leg-book-contents"
+      >
+        <h2 id="book-contents-heading">Table of contents</h2>
+        <ol className="leg-contents-list">
+          {chapters.map((chapter) => (
+            <ContentsPart
+              chapter={chapter}
+              key={chapter.id}
+              onNavigate={onNavigate}
+            />
+          ))}
+        </ol>
+      </nav>
+
       <FrontMatterSection title="Note on this digital edition">
         <ul className="leg-deviation-list">
           <li>
@@ -448,77 +519,6 @@ export default function BookFrontMatter({
           </li>
         </ul>
       </FrontMatterSection>
-
-      <FrontMatterSection title="Publisher's description">
-        <p>The good news about chess endgames is:</p>
-        <ul>
-          <li>
-            there are relatively few endings you should really know by heart
-          </li>
-          <li>
-            once you know these endings, that&apos;s it. Your knowledge never
-            goes out of date!
-          </li>
-        </ul>
-        <p>
-          The bad news is that, all the same, the endgame technique of most
-          players is deficient.
-        </p>
-        <p>
-          Since you are reading this, your endgame knowledge may be inadequate
-          as well, with predictable consequences for your results. To make
-          matters worse, modern time-controls prevent you from compensating for
-          your lack of knowledge by delving deeply into the subtleties of an
-          ending during a game.
-        </p>
-        <p>
-          This book is a great help for players such as you. The author debunks
-          the myth that endgame theory is complex and teaches you to steer the
-          game into a position you are familiar with.
-        </p>
-        <p>
-          Jesus de la Villa has only selected those endgames that show up most
-          frequently, are easy to learn and contain ideas that are also useful
-          in more difficult positions.
-        </p>
-        <p>
-          Your performance will improve dramatically because this book brings
-          you:
-        </p>
-        <ul>
-          <li>simple rules</li>
-          <li>detailed and lively explanations</li>
-          <li>many diagrams</li>
-          <li>clear summaries of the most important themes</li>
-        </ul>
-        <p>
-          <em>100 Endgames You Must Know</em> is not an encyclopedia, but a
-          practical tool to improve your knowledge of the most common
-          theoretical endings.
-        </p>
-        <p>
-          <strong>Jesus de la Villa</strong> (1958) is an International
-          Grandmaster born in Spain. He is a successful author and a well-known
-          chess coach. He has won the Spanish Championship twice.
-        </p>
-        <p>Printed cover price: Games / Chess $24.95 · €21.95.</p>
-      </FrontMatterSection>
-
-      <nav
-        aria-labelledby="book-contents-heading"
-        className="leg-book-contents"
-      >
-        <h2 id="book-contents-heading">Table of contents</h2>
-        <ol className="leg-contents-list">
-          {chapters.map((chapter) => (
-            <ContentsPart
-              chapter={chapter}
-              key={chapter.id}
-              onNavigate={onNavigate}
-            />
-          ))}
-        </ol>
-      </nav>
     </article>
   )
 }
