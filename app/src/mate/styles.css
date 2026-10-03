@@ -310,6 +310,11 @@
   justify-content: flex-start;
 }
 
+.leg-mate-timer-controls {
+  margin-left: auto;
+  justify-content: flex-end;
+}
+
 .leg-mate-options button,
 .leg-mate-log button,
 .leg-mate-guide button {
