@@ -2122,7 +2122,7 @@ test('Mate exposes stable desktop and narrow-layout structure', () => {
   )
   assert.match(
     css,
-    /\.leg-mate-controls-summary\s*\{[^}]*margin-left:\s*auto;[^}]*justify-content:\s*flex-end/s,
+    /\.leg-mate-controls-summary\s*\{[^}]*justify-content:\s*flex-start/s,
   )
   assert.doesNotMatch(
     css,
@@ -2226,15 +2226,15 @@ test('Mate exposes stable desktop and narrow-layout structure', () => {
     css,
     /\.leg-mate-note-board-live-animation\s*\{[^}]*width:\s*100%;[^}]*aspect-ratio:\s*1;[^}]*overflow:\s*hidden/s,
   )
-  assert.match(
+  assert.doesNotMatch(
     css,
     /@media\s*\(max-width:\s*32rem\)[\s\S]*\.leg-mate-controls-actions\s*\{[^}]*flex:\s*1 1 100%/,
   )
-  assert.match(
+  assert.doesNotMatch(
     css,
     /@media\s*\(max-width:\s*32rem\)[\s\S]*\.leg-mate-controls-actions button\s*\{[^}]*flex:\s*1 1 calc\(50% - 0\.4em\)/,
   )
-  assert.match(
+  assert.doesNotMatch(
     css,
     /@media\s*\(max-width:\s*32rem\)[\s\S]*\.leg-mate-controls-summary\s*\{[^}]*justify-content:\s*flex-end/,
   )
