@@ -82,7 +82,11 @@ export function encodeMateFen(fen: string): string {
 }
 
 export function encodeMateLiveFen(fen: string): string {
-  return `#live=${fen.trim().replace(/\s+/g, '_')}`
+  const fields = fen.trim().split(/\s+/)
+  const value = fields.slice(1, 4).join(' ') === 'w - -'
+    ? fields[0]
+    : fields.join('_')
+  return `#live=${value}`
 }
 
 export function encodeMateReplay(
@@ -280,7 +284,7 @@ export function decodeCanonicalFen(
   }
   if (!/\s/.test(decodedFen)) decodedFen = decodedFen.replaceAll('_', ' ')
   const fields = decodedFen.trim().split(/\s+/)
-  if (fields.length === 1 && prefix === '#fen=') {
+  if (fields.length === 1) {
     fields.push('w', '-', '-', '0', '1')
   }
   if (fields.length !== 6) {

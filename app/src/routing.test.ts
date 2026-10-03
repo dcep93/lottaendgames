@@ -167,7 +167,19 @@ assert.deepEqual(
       module: 'mate',
       mateId: 'rook',
       mateMode: 'train',
-      sharedFen: sharedRookLiveFen,
+      sharedFen: 'R7/6k1/8/8/8/8/8/K7 w - - 0 1',
+    },
+  },
+)
+assert.deepEqual(
+  resolveAppRoute('/mate/bishop-knight', '#live=4k3/8/K7/B7/8/8/5N2/8'),
+  {
+    href: '/mate/bishop-knight#live=4k3/8/K7/B7/8/8/5N2/8',
+    route: {
+      module: 'mate',
+      mateId: 'bishop-knight',
+      mateMode: 'standard',
+      sharedFen: '4k3/8/K7/B7/8/8/5N2/8 w - - 0 1',
     },
   },
 )

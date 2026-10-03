@@ -99,7 +99,7 @@ test('live Mate href stores only the current FEN', () => {
       'standard',
       '8/8/8/8/3k4/8/1R6/3K4 w - - 0 1',
     ),
-    '/mate/rook#live=8/8/8/8/3k4/8/1R6/3K4_w_-_-_0_1',
+    '/mate/rook#live=8/8/8/8/3k4/8/1R6/3K4',
   )
   assert.equal(
     liveMateHref(
@@ -107,7 +107,7 @@ test('live Mate href stores only the current FEN', () => {
       'train',
       '8/8/8/8/4k3/8/8/3QK3 w - - 4 3',
     ),
-    '/mate/queen/train#live=8/8/8/8/4k3/8/8/3QK3_w_-_-_4_3',
+    '/mate/queen/train#live=8/8/8/8/4k3/8/8/3QK3',
   )
 })
 

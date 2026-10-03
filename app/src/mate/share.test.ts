@@ -72,10 +72,14 @@ test('accepts legacy escaped FEN hashes for canonical routing', () => {
 test('encodes and decodes resumable live and terminal FENs', () => {
   assert.equal(
     encodeMateLiveFen(ROOK_LIVE_FEN),
-    `#live=${ROOK_LIVE_FEN.replaceAll(' ', '_')}`,
+    '#live=R7/6k1/8/8/8/8/8/K7',
   )
   assert.deepEqual(
     decodeMateLiveFen(encodeMateLiveFen(ROOK_LIVE_FEN), 'rook'),
+    { ok: true, fen: 'R7/6k1/8/8/8/8/8/K7 w - - 0 1' },
+  )
+  assert.deepEqual(
+    decodeMateLiveFen(`#live=${ROOK_LIVE_FEN.replaceAll(' ', '_')}`, 'rook'),
     { ok: true, fen: ROOK_LIVE_FEN },
   )
   assert.deepEqual(
@@ -88,6 +92,19 @@ test('encodes and decodes resumable live and terminal FENs', () => {
   )
   assert.deepEqual(decodeMateLiveFen('#live=not-a-fen', 'rook'), {
     ok: false,
+  })
+})
+
+test('compact live links reopen the bishop-knight board with fresh counters', () => {
+  const placement = '4k3/8/K7/B7/8/8/5N2/8'
+  assert.equal(encodeMateLiveFen(`${placement} w - - 28 15`), `#live=${placement}`)
+  assert.deepEqual(decodeMateLiveFen(`#live=${placement}`, 'bishop-knight'), {
+    ok: true,
+    fen: `${placement} w - - 0 1`,
+  })
+  assert.deepEqual(decodeMateLiveFen(encodeMateLiveFen(ROOK_STANDARD_FEN), 'rook'), {
+    ok: true,
+    fen: ROOK_STANDARD_FEN,
   })
 })
 
