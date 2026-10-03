@@ -21,6 +21,11 @@ test('every r1/r2 continuation terminates, including all Black replies, White ti
 test('r3 follows r2 and the declared r1 start is used in the guide',()=>{
  assert.equal(bishopKnightRuleSet.whiteRules[5]?.id,'r3');
  const note=bishopKnightRuleSet.help.noteBoards.find(board=>board.id==='bishop-knight-rule-r1-net')!;
+ const diagrams=bishopKnightRuleSet.help.noteBoards;
+ assert.deepEqual(diagrams.map(board=>board.title),['r3','r2','r1']);
+ assert.equal(diagrams[0]!.animationSrc,undefined);
+ assert.equal(diagrams[1]!.animationSrc,undefined);
+ assert.deepEqual(diagrams[1]!.pieces,note.pieces);
  assert.ok(note.pieces.some(p=>p.piece==='k'&&p.square==='c1'));
  assert.equal(bishopKnightStageMoves(r1Start).stage,1);
  assert.equal(bishopKnightStagePosition(r1Start)?.stage,1);
