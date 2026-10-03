@@ -98,11 +98,11 @@ const queenHelp: RuleHelp = {
   noteBoards: [
     {
       id: 'queen-phase-two-corner-cage',
-      title: 'phase 2: corner cage',
+      title: 'corner cage',
       caption: '',
       layout: { files: 8, ranks: 8, fileOffset: 0 },
       pieces: [
-        { square: 'a8', piece: 'k' },
+        { square: 'b8', piece: 'k' },
         { square: 'd7', piece: 'Q' },
         { square: 'h1', piece: 'K' },
       ],
