@@ -1950,16 +1950,23 @@ test('Mate landing keeps the catalog visible without mounting a drill', () => {
     />,
   )
 
-  const explanation =
-    'Most mating trainers rely on engine moves or ask you to memorize a fixed line. Lotta Endgames teaches a repeatable plan instead. Every recommended move follows visible, human-readable priorities, while Black chooses stubborn replies so you learn the pattern—not a script. Reason hints show what to look for, the move log explains each decision, and Undo, Redo, and Play Best let you explore alternatives. Standard positions build adaptability; Training Wheels isolates useful patterns. The goal is confidence you can carry into real games.'
+  const whyAt = markup.indexOf('>Why This?</h2>')
   const slopAlertAt = markup.indexOf('>Slop Alert</h2>')
-  const explanationAt = markup.indexOf(explanation)
-  const chooserAt = markup.indexOf('Choose a mating set')
-  const explanationWordCount = explanation.trim().split(/\s+/).length
-  assert.ok(slopAlertAt >= 0)
-  assert.ok(explanationAt > slopAlertAt)
-  assert.ok(chooserAt > explanationAt)
-  assert.ok(explanationWordCount >= 50 && explanationWordCount <= 100)
+  const chooserAt = markup.indexOf('>Choose a mating set</h2>')
+  assert.ok(whyAt >= 0)
+  assert.ok(slopAlertAt > whyAt)
+  assert.ok(chooserAt > slopAlertAt)
+  const decodedMarkup = markup.replaceAll('&#x27;', "'")
+  for (const text of [
+    'Learn a checkmating plan instead of engine moves',
+    "Time yourself, challenge your wife's boyfriend",
+    'Training wheels, hints, diagrams',
+    'Clankers are just faster at implementing.',
+    "But they're more prone to bugs in a project this size. Point em out to me and I'll patch.",
+    'Pick a material set to practise its explicit mating rules.',
+  ]) {
+    assert.ok(decodedMarkup.includes(`<li>${text}</li>`), text)
+  }
   assert.match(markup, /href="\/mate\/queen"/)
   assert.doesNotMatch(markup, /Build Git log|leg-mate-build-log|AuthorDate:|CommitDate:/)
   assert.doesNotMatch(markup, /leg-mate-mode-links/)

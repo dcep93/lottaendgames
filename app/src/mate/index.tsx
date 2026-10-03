@@ -78,23 +78,24 @@ export default function Mate({
             </PolicyLoader>
           ) : (
             <section className="leg-mate-empty-state">
+              <h2>Why This?</h2>
+              <ul>
+                <li>Learn a checkmating plan instead of engine moves</li>
+                <li>Time yourself, challenge your wife&apos;s boyfriend</li>
+                <li>Training wheels, hints, diagrams</li>
+              </ul>
               <h2>Slop Alert</h2>
-              <p className="leg-mate-empty-state-intro">
-                Most mating trainers rely on engine moves or ask you to
-                memorize a fixed line. Lotta Endgames teaches a repeatable
-                plan instead. Every recommended move follows visible,
-                human-readable priorities, while Black chooses stubborn
-                replies so you learn the pattern—not a script. Reason hints
-                show what to look for, the move log explains each decision,
-                and Undo, Redo, and Play Best let you explore alternatives.
-                Standard positions build adaptability; Training Wheels
-                isolates useful patterns. The goal is confidence you can
-                carry into real games.
-              </p>
+              <ul>
+                <li>Clankers are just faster at implementing.</li>
+                <li>
+                  But they&apos;re more prone to bugs in a project this size.
+                  Point em out to me and I&apos;ll patch.
+                </li>
+              </ul>
               <h2>Choose a mating set</h2>
-              <p>
-                Pick a material set to practise its explicit mating rules.
-              </p>
+              <ul>
+                <li>Pick a material set to practise its explicit mating rules.</li>
+              </ul>
             </section>
           )}
         </div>
