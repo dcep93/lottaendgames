@@ -15,6 +15,7 @@ export type MateLogProps = {
   readonly timerControls?: React.ReactNode
   readonly showTimer?: boolean
   readonly modeSelector?: React.ReactNode
+  readonly result?: React.ReactNode
   readonly fen: string
   readonly logs: readonly MateLogEntry[]
   readonly mateMode: MateMode
@@ -88,6 +89,7 @@ export default function MateLog({
   timerControls,
   showTimer = true,
   modeSelector,
+  result,
   fen,
   logs,
   mateMode,
@@ -190,6 +192,7 @@ export default function MateLog({
       <MateOptions
         controls={controls ? controls(secondaryActions) : secondaryActions}
         modeSelector={modeSelector}
+        result={result}
       >
         <div className="leg-mate-log-primary-tools">
           <label className="leg-mate-hint-toggle">

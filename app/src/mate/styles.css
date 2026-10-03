@@ -276,6 +276,22 @@
   box-shadow: none;
 }
 
+.leg-mate-options-session {
+  display: flex;
+  flex: 1 1 100%;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.65rem;
+  align-items: center;
+}
+
+.leg-mate-result {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  margin-left: auto;
+}
+
 .leg-mate-controls {
   display: flex;
   flex-wrap: wrap;

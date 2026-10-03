@@ -1,6 +1,6 @@
 import React from 'react'
 import type { MateBoardProps } from './MateBoard'
-import MateControls, { MateTimerControls } from './MateControls'
+import MateControls, { MateResult, MateTimerControls } from './MateControls'
 import MateLog from './MateLog'
 import { MATE_MOVE_ANIMATION_MS } from './boardInteraction'
 import { MATE_CATALOG } from './catalog'
@@ -409,8 +409,10 @@ export default function MateWorkspace({
         <MateLog
           showTimer={showTimer}
           modeSelector={modeSelector}
+          result={<MateResult outcome={session.outcome} onShare={() => void share()} />}
           controls={(secondaryActions) => (
             <MateControls
+              result={null}
               secondaryActions={secondaryActions}
               busy={playBestAnimation !== null}
               canPlayBest={canPlayBest}

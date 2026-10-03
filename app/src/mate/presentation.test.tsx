@@ -3098,13 +3098,19 @@ test('Mate terminal sharing copies the exact starting position with status', asy
       mountedRenderer.root.findByType(MateControls).props.outcome,
       'checkmate',
     )
+    const sessionRow = mountedRenderer.root.findByProps({
+      className: 'leg-mate-options-session',
+    })
+    assert.match(reactNodeText(sessionRow), /Standard.*Training Wheels.*Checkmate.*Share/)
+    assert.doesNotMatch(reactNodeText(sessionRow), /Start Over|Copy PGN/)
+    assert.equal(mountedRenderer.root.findAllByProps({ className: 'leg-mate-result' }).length, 1)
     assert.equal(
       mountedRenderer.root.findByType(MateBoardProbe).props.disabled,
       true,
     )
 
     await act(async () => {
-      mountedRenderer.root.findByType(MateControls).props.onShare()
+      sessionRow.findByType('button').props.onClick()
       await Promise.resolve()
       await Promise.resolve()
     })

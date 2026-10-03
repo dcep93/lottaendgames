@@ -3,6 +3,7 @@ import type { MateTerminalOutcome } from './session'
 
 export type MateControlsProps = {
   readonly secondaryActions?: React.ReactNode
+  readonly result?: React.ReactNode
   readonly busy?: boolean
   readonly canUndo: boolean
   readonly canRedo: boolean
@@ -47,6 +48,7 @@ function formatMateElapsed(elapsedMs: number): string {
 
 export default function MateControls({
   secondaryActions,
+  result,
   busy = false,
   canUndo,
   canRedo,
@@ -64,10 +66,6 @@ export default function MateControls({
   onToggleTimer,
   onShare,
 }: MateControlsProps) {
-  const terminalLabel = outcome === undefined
-    ? undefined
-    : OUTCOME_LABELS[outcome]
-
   return (
     <div
       aria-busy={busy}
@@ -112,21 +110,7 @@ export default function MateControls({
       </div>
 
       <div className="leg-mate-controls-summary">
-        {terminalLabel === undefined ? null : (
-          <>
-            <span
-              aria-atomic="true"
-              aria-live="polite"
-              className="leg-mate-terminal-status"
-              role="status"
-            >
-              {terminalLabel}
-            </span>
-            <button onClick={onShare} type="button">
-              Share
-            </button>
-          </>
-        )}
+        {result === undefined ? <MateResult outcome={outcome} onShare={onShare} /> : result}
         {secondaryActions ?? (
           <MateTimerControls
             finishedAtMs={finishedAtMs}
@@ -146,6 +130,27 @@ export default function MateControls({
       >
         {shareStatus ?? ''}
       </span>
+    </div>
+  )
+}
+
+export function MateResult({
+  outcome,
+  onShare,
+}: Pick<MateControlsProps, 'outcome' | 'onShare'>) {
+  if (outcome === undefined) return null
+
+  return (
+    <div className="leg-mate-result">
+      <span
+        aria-atomic="true"
+        aria-live="polite"
+        className="leg-mate-terminal-status"
+        role="status"
+      >
+        {OUTCOME_LABELS[outcome]}
+      </span>
+      <button onClick={onShare} type="button">Share</button>
     </div>
   )
 }
