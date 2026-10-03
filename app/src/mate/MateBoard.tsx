@@ -20,6 +20,7 @@ import {
   resolveMateBoardMove,
 } from './boardInteraction'
 import { releaseFocusWithin } from './workspaceSupport'
+import { useBoardHighlights } from '../useBoardHighlights'
 
 export type MateBoardProps = {
   readonly fen: string
@@ -94,6 +95,7 @@ export function MateBoardSurface({
   onMove,
   boardRenderer: BoardRenderer = Chessboard,
 }: MateBoardSurfaceProps) {
+  const highlights = useBoardHighlights(fen)
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null)
   const [optimisticMove, setOptimisticMove] = useState<OptimisticMove | null>(
     null,
@@ -201,6 +203,8 @@ export function MateBoardSurface({
             allowDragOffBoard: false,
             allowDragging: !disabled && !isOptimistic,
             allowDrawingArrows: true,
+            onSquareRightClick: highlights.onSquareRightClick,
+            onSquareMouseDown: highlights.onSquareMouseDown,
             animationDurationInMs: isOptimistic
               ? 0
               : MATE_MOVE_ANIMATION_MS,
@@ -236,7 +240,7 @@ export function MateBoardSurface({
             position: displayedFen,
             showAnimations: !isOptimistic,
             showNotation: true,
-            squareStyles,
+            squareStyles: highlights.withHighlights(squareStyles),
           }}
         />
       </div>

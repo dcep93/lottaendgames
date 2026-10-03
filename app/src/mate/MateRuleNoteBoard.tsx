@@ -1,5 +1,6 @@
 import React from 'react'
-import { Chessboard, defaultPieces } from 'react-chessboard'
+import { Chessboard, defaultArrowOptions, defaultPieces } from 'react-chessboard'
+import { useBoardHighlights } from '../useBoardHighlights'
 import {
   MATE_MOVE_ANIMATION_MS,
   getMateBoardSquareStyles,
@@ -181,6 +182,39 @@ function AnimatedMateRuleNoteBoard({
   )
 }
 
+function NativeNoteBoard({ board }: { readonly board: RuleNoteBoard }) {
+  const highlights = useBoardHighlights(JSON.stringify(board.pieces))
+  const squareStyles = highlights.withHighlights()
+  const position = React.useMemo(() => Object.fromEntries(board.pieces.map(({ square, piece }) => [
+    square, { pieceType: PIECE_RENDER_KEYS[piece] },
+  ])), [board.pieces])
+  const teachingHighlights = new Map(board.highlights.map(({ square, kind }) => [square, kind]))
+  return (
+    <Chessboard options={{
+      id: board.id,
+      allowDragging: false,
+      showAnimations: false,
+      showNotation: false,
+      position,
+      arrows: (board.arrows ?? []).map(({ from, to }) => ({
+        startSquare: from, endSquare: to, color: defaultArrowOptions.color,
+      })),
+      darkSquareStyle: { backgroundColor: 'var(--leg-board-dark)' },
+      lightSquareStyle: { backgroundColor: 'var(--leg-board-light)' },
+      onSquareRightClick: highlights.onSquareRightClick,
+      onSquareMouseDown: highlights.onSquareMouseDown,
+      squareRenderer: ({ square, children }) => {
+        const kind = teachingHighlights.get(square)
+        return <div
+          className={kind ? `leg-mate-note-board-square--${kind}` : undefined}
+          data-highlight-kind={kind}
+          style={{ width: '100%', height: '100%' }}
+        ><div style={{ width: '100%', height: '100%', ...squareStyles[square] }}>{children}</div></div>
+      },
+    }} />
+  )
+}
+
 export default function MateRuleNoteBoard({
   board,
 }: {
@@ -223,6 +257,7 @@ export default function MateRuleNoteBoard({
           role="img"
           style={{ aspectRatio: `${layout.files} / ${layout.ranks}` }}
         >
+        {isFullBoard ? <NativeNoteBoard board={board} /> : <>
         <div
           aria-hidden="true"
           className="leg-mate-note-board-squares"
@@ -244,29 +279,6 @@ export default function MateRuleNoteBoard({
             )
           })}
         </div>
-        <svg
-          aria-hidden="true"
-          className="leg-mate-note-board-arrows"
-          viewBox={`0 0 ${layout.files * 100} ${layout.ranks * 100}`}
-        >
-          {(board.arrows ?? []).map((arrow) => {
-            const from = squareGridPosition(arrow.from, layout)
-            const to = squareGridPosition(arrow.to, layout)
-            const dx = (to.column - from.column) * 100
-            const dy = (to.row - from.row) * 100
-            const length = Math.hypot(dx, dy)
-            if (length === 0) return null
-            const neck = length - 30
-            return (
-              <path
-                data-arrow={`${arrow.from}-${arrow.to}`}
-                key={`${arrow.from}-${arrow.to}`}
-                d={`M 22 -6 H ${neck} V -18 L ${length} 0 L ${neck} 18 V 6 H 22 A 6 6 0 0 1 22 -6 Z`}
-                transform={`translate(${(from.column - 0.5) * 100} ${(from.row - 0.5) * 100}) rotate(${Math.atan2(dy, dx) * 180 / Math.PI})`}
-              />
-            )
-          })}
-        </svg>
         <div
           aria-hidden="true"
           className="leg-mate-note-board-pieces"
@@ -293,6 +305,7 @@ export default function MateRuleNoteBoard({
             )
           })}
         </div>
+        </>}
         </div>
       ) : (
         <img

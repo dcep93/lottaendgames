@@ -147,6 +147,49 @@ test('Mate board enables standard right-drag arrow drawing', () => {
   assert.equal(options?.allowDrawingArrows, true)
 })
 
+test('Mate square annotations toggle, preserve move cues, and clear on click or position change', async () => {
+  ;(globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT: boolean }).IS_REACT_ACT_ENVIRONMENT = true
+  let options: ChessboardOptions = {}
+  function BoardProbe({ options: next }: BoardRendererProps) {
+    options = next ?? {}
+    return <div />
+  }
+  const board = (fen: string) => <MateBoardSurface
+    boardRenderer={BoardProbe} disabled={false} fen={fen}
+    lastMove={['a2', 'a8']} onMove={() => undefined} phase="1/2"
+  />
+  let renderer: ReactTestRenderer | undefined
+  const rightClick = (square: string) => act(async () => {
+    options.onSquareRightClick!({ square, piece: null })
+  })
+  try {
+    await act(async () => { renderer = TestRenderer.create(board(ROOK_START)) })
+    const originalMoveCue = options.squareStyles!.a2
+    await rightClick('a2')
+    await rightClick('e4')
+    assert.match(String(options.squareStyles!.a2.boxShadow), /#ffaa0066/)
+    assert.equal(options.squareStyles!.a2.background, originalMoveCue.background)
+    assert.ok(options.squareStyles!.e4.boxShadow)
+    assert.equal(options.allowDrawingArrows, true)
+    await rightClick('a2')
+    assert.deepEqual(options.squareStyles!.a2, originalMoveCue)
+    assert.ok(options.squareStyles!.e4.boxShadow)
+    await act(async () => options.onSquareMouseDown!(
+      { square: 'e4', piece: null }, { button: 2 } as React.MouseEvent,
+    ))
+    assert.ok(options.squareStyles!.e4.boxShadow)
+    await act(async () => options.onSquareMouseDown!(
+      { square: 'e4', piece: null }, { button: 0 } as React.MouseEvent,
+    ))
+    assert.equal(options.squareStyles!.e4, undefined)
+    await rightClick('e4')
+    await act(async () => renderer!.update(board(ROOK_AFTER_REPLY)))
+    assert.equal(options.squareStyles!.e4, undefined)
+  } finally {
+    if (renderer) await act(async () => renderer!.unmount())
+  }
+})
+
 test('accessible piece names follow their controlled squares', () => {
   const markup = renderToStaticMarkup(
     <MateBoard
@@ -1444,6 +1487,7 @@ test('Two Bishops shows the r9 opposition diagram and removes the r18.5 construc
   assert.equal(ruleSet.help.noteBoards.some(({ id }) => id === 'two-bishops-rule-r6.4-5-new-wall'), false)
   assert.match(markup, /inner wall a2–g8/)
   assert.match(markup, /Ke7 takes opposition on outer wall a3–f8/)
+  assert.match(markup, /stroke="#ffaa00"[^>]*marker-end="url\(#two-bishops-rule-r9-opposition-arrowhead-0-d7-e7\)"/)
   const diagram = ruleSet.help.noteBoards.find(({ id }) => id === 'two-bishops-rule-r9-opposition')!
   assert.deepEqual(diagram.arrows, [{ from: 'd7', to: 'e7' }])
   assert.deepEqual(diagram.highlights,

@@ -7,6 +7,7 @@ import type {
   PositionRoute,
 } from './chapterTypes'
 import { getSquareIndex } from './fen'
+import { useBoardHighlights } from '../useBoardHighlights'
 
 type ChessBoardProps = {
   animateNextMove?: boolean
@@ -31,6 +32,7 @@ export default function ChessBoard({
   quadrantDividers = false,
   routes = [],
 }: ChessBoardProps) {
+  const highlights = useBoardHighlights(fen)
   const [isExpanded, setIsExpanded] = useState(false)
   const boardId = `position-${number.replace(/[^a-z0-9_-]/gi, '-')}`
   const arrowMarkerId = `${boardId}-route-arrowhead`
@@ -68,6 +70,9 @@ export default function ChessBoard({
         options={{
           id: boardId,
           allowDragging: false,
+          onSquareRightClick: highlights.onSquareRightClick,
+          onSquareMouseDown: highlights.onSquareMouseDown,
+          squareStyles: highlights.withHighlights(),
           animationDurationInMs: animateNextMove ? 220 : 0,
           boardOrientation: orientation,
           boardStyle: {
