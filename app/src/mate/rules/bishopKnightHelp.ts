@@ -39,7 +39,11 @@ export const bishopKnightHelp: RuleHelp = {
     highlights: [],
   }],
   notes: [
-    "For r3, central means d4, e4, d5 and e5. The lookup minimizes the worst-case number of White moves to the central formation against every legal Black reply. Existing r1 and r2 positions take priority. Rotations and reflections apply.",
-    "The combined r3, r2 and r1 policy forces mate from every winning KBN-v-K start within 44 White moves against every legal Black reply, starting with a fresh halfmove clock. Immediate mate, piece safety and avoiding stalemate remain higher priorities.",
+    "There are a few different approaches, but I believe [Naroditsky's W Maneuver](https://www.youtube.com/watch?v=oRK7XLhGz_c) is the best way to learn the bishop + knight checkmate.",
+    "Personally, I have significant trouble forcing black into a corner to begin the mating net pattern. This difficulty is what inspired me to create this app!",
+    "Step 1, put your pieces in the middle.",
+    "Step 2, force black into the mating net.",
+    "Step 3, execute the mating net.",
+    'Jump to a future step when possible. In a previous iteration of this app, I had human-understandable rules for steps 1 and 2, but there were way too many rules (2 bishops is complex enough!), and it wasn\'t really useful. If you have ideas on an algorithm, let\'s work together! For now, "best move" is just the one that forces black to the next step fastest. That\'s not so useful, unless you get stuck.',
   ],
 };

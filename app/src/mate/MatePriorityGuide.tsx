@@ -20,6 +20,15 @@ function isFocusable(element: HTMLElement): boolean {
   )
 }
 
+function NoteText({ text }: { readonly text: string }) {
+  return text.split(/(\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g).map((part, index) => {
+    const link = part.match(/^\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)$/)
+    return link ? (
+      <a key={index} href={link[2]} target="_blank" rel="noopener noreferrer">{link[1]}</a>
+    ) : part
+  })
+}
+
 export default function MatePriorityGuideDialog({
   highlightedReasonId = null,
   ruleSet,
@@ -180,7 +189,7 @@ export default function MatePriorityGuideDialog({
                   <ul>
                     {ruleSet.help.notes.map((note, index) => (
                       <li key={`${index}-${note}`}>
-                        {note}
+                        <NoteText text={note} />
                         {ruleSet.help.noteLinks?.filter(link => link.noteIndex === index).map(link => (
                           <React.Fragment key={link.href}>{' '}<a href={link.href} target="_blank" rel="noopener noreferrer">{link.label}</a></React.Fragment>
                         ))}

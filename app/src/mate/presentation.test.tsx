@@ -1354,9 +1354,11 @@ test('priority guide follows registered facade order and renders typed diagrams'
     cursor = next
   }
   for (const note of ruleSet.help.notes) {
-    assert.ok(decodedMarkup.includes(note))
+    const renderedNote = note.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
+      '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+    assert.ok(decodedMarkup.includes(renderedNote))
     assert.ok(
-      decodedMarkup.indexOf(note) <
+      decodedMarkup.indexOf(renderedNote) <
         decodedMarkup.indexOf('>Keyboard shortcuts<'),
     )
   }
