@@ -83,12 +83,10 @@ export const twoKnightsPawnRuleSet: MateRuleSet<TwoKnightsPawnWhiteMoveScore> = 
     blackIntro: 'Black chooses every reply tying for the longest forced mate. With no forced White mate, replies that deny mate are preferred.',
     blackPriorities: ['Deny a forced White mate when possible; otherwise maximize the remaining plies to mate.'],
     notes: [
+      "I'm personally less interested in this checkmate pattern. Let me know if you'd like to work together to implement a human understandable pattern.",
+      "For now, it's not very useful, except perhaps for inspiration and a handy timer.",
+      'The fifty-move rule is ignored.',
       knightCaptureNote,
-      'Captures are prohibited for both sides. Both White knights are free to move.',
-      'The edge pawn promotes only to a queen on its file (h1 or a1). That queen never moves or captures, but its normal attacks still restrict White’s king.',
-      'The fifty-move rule is ignored. Checkmate and stalemate use only permitted moves.',
-      'No forced mate is a tablebase result, and manual play remains available. Unsupported positions are outside the positions covered by the tablebase, including file reflections.',
-      'This is a custom-rule tablebase, not an ordinary-chess Syzygy tablebase.',
-    ], noteLinks: [{ noteIndex: 0, label: 'Replay the excluded knight-capture finish on Lichess', href: knightCaptureReplay }], noteBoards: [],
+    ], noteLinks: [{ noteIndex: 3, label: 'Replay the excluded knight-capture finish on Lichess', href: knightCaptureReplay }], noteBoards: [],
   },
 }
