@@ -67,7 +67,6 @@ export function MateModeSelector({
   const selectedSet = MATE_CATALOG.find(({ id }) => id === mateId)!
   return (
     <div className="leg-mate-mode-selector">
-      <span className="leg-mate-mode-label">Mode</span>
       <nav aria-label={`${selectedSet.label} mode`} className="leg-mate-mode-links">
         <MateModeLink
           active={mateMode === 'standard'}
