@@ -77,7 +77,7 @@ const WHITE_INTRO =
   "White's best moves are the moves that survive these priorities in order. Moves tied at one priority remain candidates for the next priority."
 
 const BLACK_INTRO =
-  'Black uses its own priorities to put up the strongest resistance. Black is not trying to help the mate; it looks for the most stubborn legal reply.'
+  'Black uses its own priorities to put up the strongest resistance. Black is trying to resist the mate, and looks for the most stubborn legal reply.'
 
 const QUEEN_CORNER_CAGE_HELP =
   'Move the queen to shrink Black’s box toward a fixed corner. Keep White’s king outside and leave Black at least two safe squares.'

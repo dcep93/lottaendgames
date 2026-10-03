@@ -6,7 +6,7 @@ export const bishopKnightHelp: RuleHelp = {
   whiteIntro:
     "Use r3 to reach a central king, bishop and knight, with king and knight opposite the bishop’s color; r2 reaches the r1 net, and r1 finishes checkmate.",
   blackIntro:
-    "Black uses its own priorities to put up the strongest resistance. Black is not trying to help the mate; it looks for the most stubborn legal reply.",
+    "Black uses its own priorities to put up the strongest resistance. Black is trying to resist the mate, and looks for the most stubborn legal reply.",
   blackPriorities: [
     BLACK_CAPTURE_PRIORITY,
     BLACK_RETURN_PRIORITY,

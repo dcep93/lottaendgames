@@ -4,7 +4,7 @@ import {BLACK_CAPTURE_PRIORITY, BLACK_RETURN_PRIORITY} from './blackPriorities'
 const WHITE_INTRO =
   'White follows the ordered priorities below. The first priority that separates legal moves decides the recommendation.'
 const BLACK_INTRO =
-  'Black uses its own priorities to put up the strongest resistance. Black is not trying to help the mate; it looks for the most stubborn legal reply.'
+  'Black uses its own priorities to put up the strongest resistance. Black is trying to resist the mate, and looks for the most stubborn legal reply.'
 
 const TARGET_SQUARE_NOTE_BOARD = {
   id: 'two-bishops-target-square',
