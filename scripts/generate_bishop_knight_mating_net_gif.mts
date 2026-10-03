@@ -12,6 +12,7 @@ const light=boardColor('light'),dark=boardColor('dark');
 const output=fileURLToPath(new URL('../app/public/mate/bishop-knight/r1-mating-net.gif',import.meta.url));
 const matingNetStart='8/8/8/8/2B5/2K5/2N5/2k5 w - - 0 1';
 const board=getChess(matingNetStart),frames:string[]=[],durations:number[]=[];
+const playbackSpeed=1.3;
 // User-specified demonstration; keep the exact replies rather than choosing a policy line.
 const matingNetLine=[
  'Ba2','Kd1','Nd4','Kc1','Ne2+','Kd1','Kd3','Ke1',
@@ -29,7 +30,7 @@ async function frame(last:readonly string[]=[],duration=900){
   if(last.includes(square))svg+=`<rect x="${x}" y="${y}" width="64" height="64" fill="${defaultArrowOptions.color}" fill-opacity="0.4"/>`;
   const p=board.get(square as any);if(p)svg+=`<g transform="translate(${x},${y})">${pieceSvg.get(p.color+p.type.toUpperCase())}</g>`;
  }
- svg+='</svg>';frames.push((await sharp(Buffer.from(svg)).png().toBuffer()).toString('base64'));durations.push(duration);
+ svg+='</svg>';frames.push((await sharp(Buffer.from(svg)).png().toBuffer()).toString('base64'));durations.push(Math.round(duration/playbackSpeed/10)*10);
 }
 await frame([],1400);
 for(let i=0;i<matingNetLine.length;i++){
