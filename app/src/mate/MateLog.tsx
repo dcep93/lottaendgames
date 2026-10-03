@@ -194,6 +194,7 @@ export default function MateLog({
         modeSelector={modeSelector}
         result={result}
       >
+        <div className="leg-mate-timer-controls">{timerControls}</div>
         <div className="leg-mate-log-primary-tools">
           <label className="leg-mate-hint-toggle">
             <input
@@ -218,7 +219,6 @@ export default function MateLog({
             </button>
           )}
         </div>
-        <div className="leg-mate-timer-controls">{timerControls}</div>
       </MateOptions>
 
       <section aria-label="Mate move log" className="leg-mate-log">

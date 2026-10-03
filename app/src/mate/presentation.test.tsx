@@ -2000,7 +2000,7 @@ test('Mate composes a selected reducer-backed training workspace', () => {
     markup,
     /aria-label="Open training info and priority guide"[^>]*>Training Info<\/button>/,
   )
-  assert.match(markup, /Training Info[\s\S]*Copy PGN[\s\S]*Show reason hints[\s\S]*(?:Show|Hide) timer/)
+  assert.match(markup, /Training Info[\s\S]*Copy PGN[\s\S]*(?:Show|Hide) timer[\s\S]*Show reason hints/)
   const options = markup.match(/<section aria-label="Training options"[^>]*>([\s\S]*?)<\/section>/)?.[1]
   assert.ok(options, 'Training options must be a dedicated section')
   for (const label of ['Standard', 'Training Wheels', 'Start Over', 'Undo', 'Redo', 'Play Best', 'Show reason hints', 'Training Info', 'Copy PGN']) {
