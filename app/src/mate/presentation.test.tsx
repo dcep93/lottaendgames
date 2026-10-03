@@ -1258,7 +1258,7 @@ test('priority guide follows registered facade order and renders typed diagrams'
   assert.match(markup, /<kbd>←\/→<\/kbd>[\s\S]*Undo\/Redo/)
   assert.match(markup, /<kbd>↑<\/kbd>[\s\S]*Play best move/)
   let shortcutCursor = -1
-  for (const key of ['Enter', '←/→', '↑']) {
+  for (const key of ['Enter', '↑', '←/→']) {
     const next = markup.indexOf(`<kbd>${key}</kbd>`, shortcutCursor + 1)
     assert.ok(next > shortcutCursor, `Shortcut out of order: ${key}`)
     shortcutCursor = next
