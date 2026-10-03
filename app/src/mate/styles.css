@@ -423,15 +423,6 @@
   justify-content: flex-end;
 }
 
-.leg-mate-copy-status {
-  color: var(--leg-muted);
-  font-size: 0.75rem;
-}
-
-.leg-mate-copy-status:empty {
-  display: none;
-}
-
 .leg-mate-hint-toggle {
   display: inline-flex;
   gap: 0.55em;

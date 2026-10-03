@@ -101,8 +101,13 @@ export default function MateLog({
 }: MateLogProps) {
   const [showReasonHints, setShowReasonHints] = React.useState(false)
   const [guideOpen, setGuideOpen] = React.useState(false)
-  const [copyStatus, setCopyStatus] = React.useState('')
-  React.useEffect(() => setCopyStatus(''), [startingFen, logs])
+  const [copyStatus, setCopyStatus] = React.useState<{ message: string } | null>(null)
+  React.useEffect(() => setCopyStatus(null), [startingFen, logs])
+  React.useEffect(() => {
+    if (copyStatus === null) return
+    const timer = setTimeout(() => setCopyStatus(null), 2_000)
+    return () => clearTimeout(timer)
+  }, [copyStatus])
   const [guideOpener, setGuideOpener] = React.useState<GuideOpener>(null)
   const [highlightedReasonId, setHighlightedReasonId] = React.useState<
     string | null
@@ -159,7 +164,7 @@ export default function MateLog({
     return () => document.removeEventListener('keydown', openOnEscape)
   }, [guideOpen])
   const copyPgn = async () => {
-    setCopyStatus('')
+    setCopyStatus(null)
     try {
       const chess = getChess(startingFen)
       if (ruleSet.id === 'two-knights-pawn' && chess.turn() === 'b') {
@@ -180,14 +185,22 @@ export default function MateLog({
       const pgn = chess.pgn().split('\n')
         .filter((line) => !line.startsWith('[') || line.startsWith('[FEN '))
         .join('\n').trim()
-      setCopyStatus(await copyMateShareText(pgn) ? 'PGN copied' : 'Could not copy PGN')
+      setCopyStatus({ message: await copyMateShareText(pgn) ? 'PGN copied' : 'Could not copy PGN' })
     } catch {
-      setCopyStatus('Could not copy PGN')
+      setCopyStatus({ message: 'Could not copy PGN' })
     }
   }
 
   const secondaryActions = (
     <>
+      <button
+        aria-label="Copy PGN to clipboard"
+        className="leg-mate-training-info-button"
+        onClick={() => void copyPgn()}
+        type="button"
+      >
+        {copyStatus?.message ?? 'Copy PGN'}
+      </button>
       <button
         aria-keyshortcuts="Escape"
         aria-label="Open training info and priority guide"
@@ -197,15 +210,7 @@ export default function MateLog({
       >
         Training Info
       </button>
-      <button
-        aria-label="Copy PGN to clipboard"
-        className="leg-mate-training-info-button"
-        onClick={() => void copyPgn()}
-        type="button"
-      >
-        Copy PGN
-      </button>
-      <span className="leg-mate-copy-status" role="status">{copyStatus}</span>
+      <span className="leg-mate-visually-hidden" role="status">{copyStatus?.message}</span>
     </>
   )
 

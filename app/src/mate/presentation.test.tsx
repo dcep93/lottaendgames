@@ -765,7 +765,7 @@ test('Mate log exposes every training field and semantic cycle controls', () => 
   }
   assert.match(markup, /<thead class="leg-mate-visually-hidden">/)
   assert.doesNotMatch(markup, /aria-label="Open Mate priority guide"/)
-  assert.match(markup, /Training Info<\/button>[\s\S]*Copy PGN<\/button>/)
+  assert.match(markup, /Copy PGN<\/button>[\s\S]*Training Info<\/button>/)
   assert.doesNotMatch(markup, /Starting FEN|Starting position FEN/)
   assert.match(markup, />Rg2</)
   assert.match(markup, />Kg7</)
@@ -2040,7 +2040,7 @@ test('Mate composes a selected reducer-backed training workspace', () => {
     markup,
     /aria-label="Open training info and priority guide"[^>]*>Training Info<\/button>/,
   )
-  assert.match(markup, /Training Info[\s\S]*Copy PGN[\s\S]*(?:Show|Hide) timer[\s\S]*Show reason hints/)
+  assert.match(markup, /Copy PGN[\s\S]*Training Info[\s\S]*(?:Show|Hide) timer[\s\S]*Show reason hints/)
   const options = markup.match(/<section aria-label="Training options"[^>]*>([\s\S]*?)<\/section>/)?.[1]
   assert.ok(options, 'Training options must be a dedicated section')
   for (const label of ['Standard', 'Training Wheels', 'Start Over', 'Undo', 'Redo', 'Play Best', 'Show reason hints', 'Training Info', 'Copy PGN']) {
@@ -3498,7 +3498,8 @@ test('Two Bishops restores the r5.5 force-corner rule and diagram', () => {
   assert.match(markup, /rule r5\.5 — Force Black toward the corner/)
 })
 
-test('Mate log copies a replayable PGN with the starting FEN and current moves', async () => {
+test('Mate log copies a replayable PGN with the starting FEN and current moves', async (context) => {
+  context.mock.timers.enable({ apis: ['setTimeout'] })
   const { getChess } = await import('./chess')
   const originalNavigator = Object.getOwnPropertyDescriptor(globalThis, 'navigator')
   let copied = ''
@@ -3537,6 +3538,16 @@ test('Mate log copies a replayable PGN with the starting FEN and current moves',
     assert.deepEqual(replay.history(), ['Be4', 'Kh4', 'Nc4', 'Kg5'])
     assert.match(copied, /6\. Be4 Kh4 7\. Nc4 Kg5 \*/)
     assert.equal(renderer!.root.findByProps({ role: 'status' }).children.join(''), 'PGN copied')
+    const copyButton = () => renderer!.root.findByProps({ 'aria-label': 'Copy PGN to clipboard' })
+    assert.equal(copyButton().children.join(''), 'PGN copied')
+    await act(async () => context.mock.timers.tick(1_500))
+    assert.equal(copyButton().children.join(''), 'PGN copied')
+    await act(async () => copyButton().props.onClick())
+    await act(async () => context.mock.timers.tick(1_500))
+    assert.equal(copyButton().children.join(''), 'PGN copied')
+    await act(async () => context.mock.timers.tick(500))
+    assert.equal(copyButton().children.join(''), 'Copy PGN')
+    assert.equal(renderer!.root.findByProps({ role: 'status' }).children.join(''), '')
   } finally {
     await act(async () => renderer?.unmount())
     if (originalNavigator) Object.defineProperty(globalThis, 'navigator', originalNavigator)
