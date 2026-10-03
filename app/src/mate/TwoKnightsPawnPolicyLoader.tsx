@@ -27,24 +27,19 @@ export default function TwoKnightsPawnPolicyLoader({
     }
   }, [attempt])
   if (ready) return children
+  if (!error) return null
   return (
-    <section className="leg-mate-empty-state" aria-busy={!error}>
-      <p role={error ? 'alert' : 'status'}>
-        {error
-          ? error
-          : 'Loading two-knights tablebase…'}
-      </p>
-      {error && (
-        <button
-          type="button"
-          onClick={() => {
-            setError(null)
-            setAttempt((n) => n + 1)
-          }}
-        >
-          Retry
-        </button>
-      )}
+    <section className="leg-mate-empty-state">
+      <p role="alert">{error}</p>
+      <button
+        type="button"
+        onClick={() => {
+          setError(null)
+          setAttempt((n) => n + 1)
+        }}
+      >
+        Retry
+      </button>
     </section>
   )
 }

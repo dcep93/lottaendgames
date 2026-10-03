@@ -16,8 +16,9 @@ export default function MatePolicyLoader({children}: {children: React.ReactNode}
     return () => { active = false; };
   }, [attempt]);
   if (ready) return children;
-  return <section className="leg-mate-empty-state" aria-busy={!error}>
-    <p role={error ? 'alert' : 'status'}>{error || 'Loading bishop-and-knight recommendations…'}</p>
-    {error && <button type="button" onClick={() => { setError(''); setAttempt(n => n+1); }}>Retry</button>}
+  if (!error) return null;
+  return <section className="leg-mate-empty-state">
+    <p role="alert">{error}</p>
+    <button type="button" onClick={() => { setError(''); setAttempt(n => n+1); }}>Retry</button>
   </section>;
 }

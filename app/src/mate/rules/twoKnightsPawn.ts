@@ -61,7 +61,7 @@ export function getTwoKnightsPawnTerminalOutcome(fen: string): TwoKnightsPawnTer
   return getTwoKnightsPawnBoardOutcome(fen)
 }
 export function getTwoKnightsPawnStatus(fen: string): string {
-  if (!twoKnightsPawnTableReady()) return 'Tablebase · Loading'
+  if (!twoKnightsPawnTableReady()) return ''
   const entry = twoKnightsPawnEntry(fen)
   return !entry ? 'Tablebase · Unsupported position'
     : entry.status === 'no-forced-mate' ? 'Tablebase · No forced mate'

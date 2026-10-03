@@ -22,7 +22,7 @@ test('KBN session stays unmounted through loading and failure, then mounts after
   await act(async()=>{renderer=TestRenderer.create(<MatePolicyLoader><Session/></MatePolicyLoader>);});
   assert.equal(mounted,0);assert.equal(renderer!.root.findAllByProps({role:'alert'}).length,1);
   await act(async()=>renderer!.root.findByType('button').props.onClick());
-  assert.equal(mounted,0);assert.equal(renderer!.root.findAllByProps({role:'status'}).length,1);
+  assert.equal(mounted,0);assert.equal(renderer!.toJSON(),null);
   await act(async()=>{finish();await loadBishopKnightSetup();});
   assert.equal(mounted,1);assert.equal(attempts,2);assert.equal(renderer!.root.findByType('div').children[0],'Ready board');
  }finally{
