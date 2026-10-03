@@ -4,7 +4,7 @@ import {BLACK_CAPTURE_PRIORITY, BLACK_RETURN_PRIORITY} from "./blackPriorities";
 export const bishopKnightHelp: RuleHelp = {
   title: "How best moves are chosen",
   whiteIntro:
-    "Use r3 to reach a central king, bishop and knight, with king and knight opposite the bishop’s color; r2 reaches the r1 net, and r1 finishes checkmate.",
+    "Build a central trio with king and knight opposite the bishop’s color, herd Black into the mating net, and finish checkmate.",
   blackIntro:
     "Black uses its own priorities to put up the strongest resistance. Black is trying to resist the mate, and looks for the most stubborn legal reply.",
   blackPriorities: [
@@ -19,19 +19,19 @@ export const bishopKnightHelp: RuleHelp = {
   ],
   noteBoards: [{
     id: "bishop-knight-rule-r3-start",
-    title: "r3",
+    title: "Central trio",
     caption: "",
     pieces: [{square: "e5", piece: "K"}, {square: "d5", piece: "B"}, {square: "d4", piece: "N"}, {square: "b8", piece: "k"}],
     highlights: [],
   }, {
     id: "bishop-knight-rule-r2-start",
-    title: "r2",
+    title: "Herd the king",
     caption: "Starting position of the mating net.",
     pieces: [{square: "f6", piece: "K"}, {square: "h7", piece: "B"}, {square: "f7", piece: "N"}, {square: "f8", piece: "k"}],
     highlights: [],
   }, {
     id: "bishop-knight-rule-r1-net",
-    title: "r1",
+    title: "Mating net",
     caption: "A continuation of the mating net to checkmate.",
     animationSrc: "/mate/bishop-knight/r1-mating-net.gif",
     animationAlt: "The mating net, beginning with Bh7 and ending with Bc6 checkmate.",

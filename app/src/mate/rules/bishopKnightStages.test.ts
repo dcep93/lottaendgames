@@ -22,12 +22,12 @@ test('r3 follows r2 and the declared r1 start is used in the guide',()=>{
  assert.equal(bishopKnightRuleSet.whiteRules[5]?.id,'r3');
  const note=bishopKnightRuleSet.help.noteBoards.find(board=>board.id==='bishop-knight-rule-r1-net')!;
  const diagrams=bishopKnightRuleSet.help.noteBoards;
- assert.deepEqual(diagrams.map(board=>board.title),['r3','r2','r1']);
+ assert.deepEqual(diagrams.map(board=>board.title),['Central trio','Herd the king','Mating net']);
  assert.equal(diagrams[0]!.animationSrc,undefined);
  assert.equal(diagrams[1]!.animationSrc,undefined);
- assert.ok(diagrams[1]!.pieces.some(p=>p.piece==='B'&&p.square==='b1'));
- assert.ok(note.pieces.some(p=>p.piece==='B'&&p.square==='d3'));
- assert.ok(note.pieces.some(p=>p.piece==='k'&&p.square==='a3'));
+ assert.ok(diagrams[1]!.pieces.some(p=>p.piece==='B'&&p.square==='h7'));
+ assert.ok(note.pieces.some(p=>p.piece==='B'&&p.square==='f5'));
+ assert.ok(note.pieces.some(p=>p.piece==='k'&&p.square==='f8'));
  assert.equal(bishopKnightStageMoves(r1Start).stage,1);
  assert.equal(bishopKnightStagePosition(r1Start)?.stage,1);
 });

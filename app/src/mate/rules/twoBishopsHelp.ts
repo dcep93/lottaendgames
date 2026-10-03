@@ -25,7 +25,7 @@ const TARGET_SQUARE_NOTE_BOARD = {
 
 const RULE_R5_5_FORCE_CORNER_NOTE_BOARD = {
   id: 'two-bishops-rule-r5-5-force-corner',
-  title: 'rule r5.5 — Force Black toward the corner',
+  title: 'Corner push',
   caption: 'Be7 forces Kb8 toward a8.',
   pieces: [
     { square: 'c6', piece: 'K' },
@@ -39,7 +39,7 @@ const RULE_R5_5_FORCE_CORNER_NOTE_BOARD = {
 
 const RULE_R9_OPPOSITION_NOTE_BOARD = {
   id: 'two-bishops-rule-r9-opposition',
-  title: 'rule r9 — Take opposition on the outer wall',
+  title: 'Opposition',
   caption:
     "Kg5 takes opposition on outer wall c1–h6; inner wall b1–h7.",
   pieces: [

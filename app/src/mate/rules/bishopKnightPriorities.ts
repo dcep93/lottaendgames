@@ -24,20 +24,20 @@ export const knightAndBishopWhiteRules: readonly OrderedRule<KnightAndBishopWhit
     },
     {
       id: "r1",
-      shortLabel: "rule r1",
+      shortLabel: "mating net",
       helpText: "Execute the mating net.",
       compare: (first, second) => first.matingNetPenalty - second.matingNetPenalty,
     },
     {
       id: "r2",
-      shortLabel: "rule r2",
+      shortLabel: "herd the king",
       helpText: "Force Black into the mating net.",
       compare: (first, second) => first.sevenCagePenalty - second.sevenCagePenalty,
     },
     {
       id: "r3",
       applies: score => score.stage === 0,
-      shortLabel: "rule r3",
+      shortLabel: "central trio",
       helpText: "Achieve a central knight and king both opposite the bishop’s color, as well as a central bishop.",
       compare: (first, second) => first.centralSetupLookupPenalty - second.centralSetupLookupPenalty,
     },

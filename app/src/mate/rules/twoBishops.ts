@@ -1806,7 +1806,7 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
     },
     {
       id: 'rule r0.5',
-      shortLabel: 'rule r0.5',
+      shortLabel: 'mating net',
       applies: (score) => score.ruleR4Applies,
       helpText: 'Execute the mating pattern.',
       compare: (first, second) =>
@@ -1814,7 +1814,7 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
     },
     {
       id: 'rule r1',
-      shortLabel: 'rule r1',
+      shortLabel: 'corner post',
       helpText:
         "With Black's king in the corner, prefer White's king on a Phase 2 square associated with that corner.",
       compare: (first, second) =>
@@ -1822,7 +1822,7 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
     },
     {
       id: 'rule r3',
-      shortLabel: 'rule r3',
+      shortLabel: 'leave corners',
       helpText:
         "Prefer White's king out of the corner, then bishops not adjacent to a cornered White king, then bishops out of the corner.",
       compare: (first, second) =>
@@ -1832,7 +1832,7 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
     },
     {
       id: 'rule r5',
-      shortLabel: 'rule r5',
+      shortLabel: 'corner cage',
       helpText:
         'Prefer bishops on adjacent squares on their Phase 2 diagonals, enclosing Black on 2 edge squares, then prefer the White king on the Phase 2 square in line with those bishops.',
       subpriorities: [
@@ -1856,7 +1856,7 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
     },
     {
       id: 'rule r5.5',
-      shortLabel: 'rule r5.5',
+      shortLabel: 'corner push',
       helpText:
         'With the black king on the edge and in opposition to the non-edge White king, use the inner bishop to force the black king towards the target corner.',
       applies: (score) => score.ruleR5_5Applies,
@@ -1864,7 +1864,7 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
     },
     {
       id: 'rule r6',
-      shortLabel: 'rule r6',
+      shortLabel: 'net setup',
       applies: (score) => score.ruleR6Applies,
       helpText:
         "Prefer bishops on unscreened Phase 2 diagonals, then prefer Bishops on their Phase 2 squares, then prefer the shortest king path to its Phase 2 square without entering Black's area, then Euclidean proximity to that same Phase 2 king square.",
@@ -1893,7 +1893,7 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
     },
     {
       id: 'rule r6.2',
-      shortLabel: 'rule r6.2',
+      shortLabel: 'flank step',
       helpText:
         "Play the flank step. With adjacent bishops on different halves of the board, White's king adjacent to both, and the kings in line three steps apart on opposite sides of the bishops, move White's king into line with the bishops.",
       applies: (score) => score.ruleR6_2Applies,
@@ -1901,7 +1901,7 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
     },
     {
       id: 'rule r6.4',
-      shortLabel: 'rule r6.4',
+      shortLabel: 'choke',
       helpText:
         "Play the choke move. When the inner wall has five squares and touches neither of the target corner's edges, if White's king is outside the wall, prefer the inner-wall bishop on the long diagonal.",
       applies: (score) => score.ruleR6_4Applies,
@@ -1909,26 +1909,26 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
     },
     {
       id: 'rule r7',
-      shortLabel: 'rule r7',
+      shortLabel: 'hold the wall',
       helpText: 'Prefer not allowing Black onto the outer diagonal or attacking the inner bishop if that bishop is adjacent to a screened outer diagonal square.',
       compare: (first, second) => first.ruleR7Penalty - second.ruleR7Penalty,
     },
     {
       id: 'rule r8',
-      shortLabel: 'rule r8',
+      shortLabel: 'shrink the cage',
       helpText: "Prefer fewer diagonals for Black's king.",
       compare: (first, second) => first.ruleR10DiagonalCount - second.ruleR10DiagonalCount,
     },
     {
       id: 'rule r9',
-      shortLabel: 'rule r9',
+      shortLabel: 'opposition',
       helpText:
         "When the Black king is edge adjacent to the inner wall and the outer bishop is not on the target corner's edge, prefer White's king on the outer wall square in opposition to Black's king and closer to both bishops.",
       compare: (first, second) => first.ruleR9Penalty - second.ruleR9Penalty,
     },
     {
       id: 'rule r10',
-      shortLabel: 'rule r10',
+      shortLabel: 'target square',
       helpText:
         "Prefer outer bishop off target corner's edge, then White king's step proximity to the target square, then bishops to have legal moves along their wall.",
       subpriorities: [
@@ -1948,34 +1948,34 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
     },
     {
       id: 'rule r19',
-      shortLabel: 'rule r19',
+      shortLabel: 'bishop buffer',
       helpText: "If the white King is on or adjacent to the outer diagonal, prefer the outer bishop at least 3 steps away from Black's king.",
       applies: (score) => score.ruleR19Applies,
       compare: (first, second) => first.ruleR19Penalty - second.ruleR19Penalty,
     },
     {
       id: 'rule r24',
-      shortLabel: 'rule r24',
+      shortLabel: 'wall or moat',
       helpText: 'Prefer a bishop wall, otherwise prefer a bishop inside a king moat.',
       compare: (first, second) => first.ruleR24Penalty - second.ruleR24Penalty,
     },
     {
       id: 'rule r24.5',
-      shortLabel: 'rule r24.5',
+      shortLabel: 'back the wall',
       helpText: 'Prefer the White king closer to the diagonal one beyond the outer wall.',
       applies: (score) => score.ruleR24_5KingDistance < 99,
       compare: (first, second) => first.ruleR24_5KingDistance - second.ruleR24_5KingDistance,
     },
     {
       id: 'rule r25',
-      shortLabel: 'rule r25',
+      shortLabel: 'king closer',
       helpText: 'Prefer king proximity.',
       compare: (first, second) =>
         first.ruleR25KingDistance - second.ruleR25KingDistance,
     },
     {
       id: 'rule r30',
-      shortLabel: 'rule r30',
+      shortLabel: 'bishop shelter',
       helpText:
         "Prefer bishops further from Black's king, then prefer bishops closer to White's king.",
       subpriorities: [

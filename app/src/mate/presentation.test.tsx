@@ -1369,9 +1369,9 @@ test('priority guide follows registered facade order and renders typed diagrams'
   for (const rule of ruleSet.whiteRuleDescriptions) {
     if (rule.helpText) assert.ok(decodedMarkup.includes(rule.helpText), rule.id)
   }
-  assert.ok(decodedMarkup.includes('rule r5.1</strong>'))
+  assert.ok(decodedMarkup.includes('herd the king</strong>'))
   assert.doesNotMatch(markup, /flush-non-target-corner\.gif/)
-  assert.ok(decodedMarkup.includes('rule r5</strong> — Prepare the 7 diagonal.'))
+  assert.ok(decodedMarkup.includes('central trio</strong> — Achieve a central knight and king both opposite the bishop’s color, as well as a central bishop.'))
   assert.ok(!decodedMarkup.includes('rule r4</strong>'))
   assert.doesNotMatch(markup, /rule-r4-flush\.gif/)
   assert.ok(!decodedMarkup.includes('rule r6</strong>'))
@@ -1439,7 +1439,7 @@ test('Two Bishops shows the opposition r9 between r1 and r10', () => {
   const markup = renderToStaticMarkup(
     <MatePriorityGuideDialog {...MATE_TRAINING_INFO_PROPS} onClose={() => undefined} ruleSet={getMateRuleSet('two-bishops')} />,
   )
-  assert.match(markup, />rule r1<[^]*>rule r8<[^]*>rule r9<[^]*>rule r10</)
+  assert.match(markup, />corner post<[^]*>shrink the cage<[^]*>opposition<[^]*>target square</)
   assert.match(markup, /When the Black king is edge adjacent to the inner wall and the outer bishop is not on the target corner[^]*edge, prefer White[^]*king on the outer wall square in opposition to Black[^]*king and closer to both bishops/)
   assert.match(markup, /then bishops to have legal moves along their wall/)
   assert.doesNotMatch(markup, /unless Black[^]*king is closer to the inner bishop than White[^]*king/)
@@ -1472,7 +1472,7 @@ test('Two Bishops shows r24.5 after the king moat rule and before king proximity
   const markup = renderToStaticMarkup(
     <MatePriorityGuideDialog {...MATE_TRAINING_INFO_PROPS} onClose={() => undefined} ruleSet={getMateRuleSet('two-bishops')} />,
   )
-  assert.match(markup, />rule r24<[^]*>rule r24\.5<[^]*>rule r25</)
+  assert.match(markup, />wall or moat<[^]*>back the wall<[^]*>king closer</)
   assert.doesNotMatch(markup, />rule r22</)
   assert.match(markup, /prefer a bishop inside a king moat/)
   assert.match(markup, /Prefer the White king closer to the diagonal one beyond the outer wall/)
@@ -1529,7 +1529,7 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
   assert.doesNotMatch(bishopsMarkup, /mate progress|forced mate|proof distance/)
   assert.match(
     bishopsMarkup,
-    />rule r0\.5<[^]*>rule r6<[^]*>rule r6\.2<[^]*>rule r6\.4<[^]*>rule r8<[^]*>rule r9<[^]*>rule r10<[^]*>rule r19<[^]*>rule r24<[^]*>rule r24\.5<[^]*>rule r25</,
+    />mating net<[^]*>net setup<[^]*>flank step<[^]*>choke<[^]*>shrink the cage<[^]*>opposition<[^]*>target square<[^]*>bishop buffer<[^]*>wall or moat<[^]*>back the wall<[^]*>king closer</,
   )
   assert.doesNotMatch(bishopsMarkup, />rule [a-y]</)
   const queenMarkup = renderToStaticMarkup(
@@ -3496,8 +3496,8 @@ test('Two Bishops restores the r5.5 force-corner rule and diagram', () => {
   assert.deepEqual(board.arrows, [{ from: 'a3', to: 'e7' }])
   assert.deepEqual(board.highlights, [])
   const markup = renderToStaticMarkup(<MatePriorityGuideDialog {...MATE_TRAINING_INFO_PROPS} onClose={() => undefined} ruleSet={ruleSet} />)
-  assert.match(markup, />rule r5<[^]*>rule r5\.5<[^]*>rule r6</)
-  assert.match(markup, /rule r5\.5 — Force Black toward the corner/)
+  assert.match(markup, />corner cage<[^]*>corner push<[^]*>net setup</)
+  assert.match(markup, /Corner push/)
 })
 
 test('Mate log copies a replayable PGN with the starting FEN and current moves', async (context) => {
