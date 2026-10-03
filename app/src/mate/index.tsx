@@ -95,6 +95,7 @@ export default function Mate({
               <h2>Choose a mating set</h2>
               <ul>
                 <li>Pick a material set to practise its explicit mating rules.</li>
+                <li>Click Training Info to reveal ordered priorities that lead to checkmate</li>
               </ul>
             </section>
           )}

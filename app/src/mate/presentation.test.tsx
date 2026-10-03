@@ -722,7 +722,7 @@ test('Mate log exposes every training field and semantic cycle controls', () => 
   }
   assert.match(markup, /<thead class="leg-mate-visually-hidden">/)
   assert.doesNotMatch(markup, /aria-label="Open Mate priority guide"/)
-  assert.match(markup, /Training info<\/button>[\s\S]*Copy PGN<\/button>/)
+  assert.match(markup, /Training Info<\/button>[\s\S]*Copy PGN<\/button>/)
   assert.doesNotMatch(markup, /Starting FEN|Starting position FEN/)
   assert.match(markup, />Rg2</)
   assert.match(markup, />Kg7</)
@@ -1965,6 +1965,7 @@ test('Mate landing keeps the catalog visible without mounting a drill', () => {
     'Clankers are just faster at implementing.',
     "But they're more prone to bugs in a project this size. Point em out to me and I'll patch.",
     'Pick a material set to practise its explicit mating rules.',
+    'Click Training Info to reveal ordered priorities that lead to checkmate',
   ]) {
     assert.ok(decodedMarkup.includes(`<li>${text}</li>`), text)
   }
@@ -1997,12 +1998,12 @@ test('Mate composes a selected reducer-backed training workspace', () => {
   assert.match(markup, /aria-label="Mate move log"/)
   assert.match(
     markup,
-    /aria-label="Open training info and priority guide"[^>]*>Training info<\/button>/,
+    /aria-label="Open training info and priority guide"[^>]*>Training Info<\/button>/,
   )
-  assert.match(markup, /Training info[\s\S]*Copy PGN[\s\S]*Show reason hints[\s\S]*(?:Show|Hide) timer/)
+  assert.match(markup, /Training Info[\s\S]*Copy PGN[\s\S]*Show reason hints[\s\S]*(?:Show|Hide) timer/)
   const options = markup.match(/<section aria-label="Training options"[^>]*>([\s\S]*?)<\/section>/)?.[1]
   assert.ok(options, 'Training options must be a dedicated section')
-  for (const label of ['Standard', 'Training Wheels', 'Start Over', 'Undo', 'Redo', 'Play Best', 'Show reason hints', 'Training info', 'Copy PGN']) {
+  for (const label of ['Standard', 'Training Wheels', 'Start Over', 'Undo', 'Redo', 'Play Best', 'Show reason hints', 'Training Info', 'Copy PGN']) {
     assert.ok(options.includes(label), `${label} belongs in training options`)
   }
   assert.match(options, /(?:Show|Hide) timer/)

@@ -173,7 +173,7 @@ export default function MateLog({
         onClick={openGuide}
         type="button"
       >
-        Training info
+        Training Info
       </button>
       <button
         aria-label="Copy PGN to clipboard"
