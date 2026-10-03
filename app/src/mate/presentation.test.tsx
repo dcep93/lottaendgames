@@ -605,8 +605,8 @@ test('Mate controls expose preserved actions and their disabled states', () => {
   const summaryOrder = [
     markup.indexOf('>Checkmate</span>'),
     markup.indexOf('>Share</button>'),
-    markup.indexOf('>Hide timer</button>'),
     markup.indexOf('aria-label="Elapsed time"'),
+    markup.indexOf('>Hide timer</button>'),
   ]
   assert.ok(summaryOrder.every((index) => index >= 0))
   assert.deepEqual(
