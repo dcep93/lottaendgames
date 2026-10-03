@@ -253,14 +253,15 @@ export default function MateRuleNoteBoard({
           <defs>
             <marker
               id={markerId}
-              markerHeight="8"
-              markerWidth="8"
+              markerHeight="26"
+              markerWidth="26"
+              markerUnits="userSpaceOnUse"
               orient="auto"
-              refX="7"
-              refY="4"
-              viewBox="0 0 8 8"
+              refX="23"
+              refY="13"
+              viewBox="0 0 26 26"
             >
-              <path d="M 0 0 L 8 4 L 0 8 z" />
+              <path d="M 3 3 L 23 13 L 3 23 L 7 13 Z" />
             </marker>
           </defs>
           {(board.arrows ?? []).map((arrow) => {

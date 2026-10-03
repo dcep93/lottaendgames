@@ -896,13 +896,16 @@
 }
 
 .leg-mate-note-board-arrows line {
-  stroke: #16100d;
+  stroke: #4a3428;
   stroke-linecap: round;
-  stroke-width: 9;
+  stroke-width: 7;
 }
 
 .leg-mate-note-board-arrows marker path {
-  fill: #16100d;
+  fill: #4a3428;
+  stroke: #4a3428;
+  stroke-linejoin: round;
+  stroke-width: 2;
 }
 
 .leg-mate-note-board-pieces {
