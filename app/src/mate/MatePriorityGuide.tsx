@@ -214,16 +214,12 @@ export default function MatePriorityGuideDialog({
                 <dd>Start over</dd>
               </div>
               <div>
-                <dt><kbd>←</kbd></dt>
-                <dd>Undo</dd>
+                <dt><kbd>←/→</kbd></dt>
+                <dd>Undo/Redo</dd>
               </div>
               <div>
                 <dt><kbd>↑</kbd></dt>
                 <dd>Play best move</dd>
-              </div>
-              <div>
-                <dt><kbd>→</kbd></dt>
-                <dd>Redo</dd>
               </div>
             </dl>
           </section>
