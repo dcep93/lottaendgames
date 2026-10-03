@@ -54,6 +54,7 @@ export type MateWorkspaceProps = {
   readonly sharedFen: string | null
   readonly sharedMoves: readonly string[] | null
   readonly sharedReplayCursor: 0 | null
+  readonly modeSelector?: React.ReactNode
   readonly onReplaceHref?: (href: string) => void
 }
 
@@ -76,6 +77,7 @@ export default function MateWorkspace({
   BoardComponent,
   mateId,
   mateMode,
+  modeSelector,
   onReplaceHref,
   sharedFen,
   sharedError,
@@ -405,25 +407,28 @@ export default function MateWorkspace({
         {mateId === 'two-knights-pawn' && session.outcome === 'unsupported' && (
           <p role="alert">Unsupported position: this board is outside custom tablebase coverage. Older stage-policy links may use different pawn ranks or promotion rules. Start Over loads the supported starting position.</p>
         )}
-        <MateControls
-          busy={playBestAnimation !== null}
-          canPlayBest={canPlayBest}
-          canRedo={session.historyIndex < session.history.length - 1}
-          canUndo={session.historyIndex > 0}
-          finishedAtMs={session.finishedAtMs}
-          onPlayBest={playBest}
-          onRedo={redo}
-          onShare={() => void share()}
-          onStartOver={startOver}
-          onToggleTimer={toggleTimer}
-          onUndo={undo}
-          outcome={session.outcome}
-          shareStatus={shareStatus}
-          showTimer={showTimer}
-          startedAtMs={session.startedAtMs}
-          timerNow={deps.now}
-        />
         <MateLog
+          modeSelector={modeSelector}
+          controls={
+            <MateControls
+              busy={playBestAnimation !== null}
+              canPlayBest={canPlayBest}
+              canRedo={session.historyIndex < session.history.length - 1}
+              canUndo={session.historyIndex > 0}
+              finishedAtMs={session.finishedAtMs}
+              onPlayBest={playBest}
+              onRedo={redo}
+              onShare={() => void share()}
+              onStartOver={startOver}
+              onToggleTimer={toggleTimer}
+              onUndo={undo}
+              outcome={session.outcome}
+              shareStatus={shareStatus}
+              showTimer={showTimer}
+              startedAtMs={session.startedAtMs}
+              timerNow={deps.now}
+            />
+          }
           fen={session.fen}
           logs={session.logs}
           mateMode={mateMode}

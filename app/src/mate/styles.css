@@ -26,8 +26,8 @@
 
 .leg-mate-sidebar {
   display: grid;
-  grid-template-areas: 'sets modes';
-  grid-template-columns: minmax(0, 1fr) minmax(8rem, 10rem);
+  grid-template-areas: 'sets';
+  grid-template-columns: minmax(0, 1fr);
   gap: 0.85rem;
   align-items: stretch;
   border: 0.0625rem solid var(--leg-border);
@@ -43,7 +43,13 @@
 .leg-mate-set-links,
 .leg-mate-mode-links {
   display: grid;
-  gap: 0.35rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.2rem;
+  min-width: 0;
+  border: 0.0625rem solid var(--leg-border);
+  border-radius: 0.5rem;
+  padding: 0.2rem;
+  background: var(--leg-panel-strong);
 }
 
 .leg-mate-set-links {
@@ -87,7 +93,9 @@
 .leg-mate-mode-link {
   display: grid;
   place-items: center;
-  padding-inline: 0.35rem;
+  min-height: 2.25rem;
+  padding: 0.45rem 0.8rem;
+  background: transparent;
   font-size: 0.78rem;
   text-align: center;
 }
@@ -143,21 +151,9 @@
 }
 
 .leg-mate-mode-link.is-active {
-  border-color: var(--leg-pink);
-  color: #140d12;
-  background: var(--leg-pink);
-}
-
-.leg-mate-mode-link.is-disabled {
-  color: var(--leg-muted);
-  cursor: default;
-  opacity: 0.58;
-}
-
-.leg-mate-mode-link.is-disabled:hover {
-  border-color: transparent;
-  color: var(--leg-muted);
-  outline: none;
+  border-color: var(--leg-border);
+  color: var(--leg-text);
+  background: var(--leg-panel-soft);
 }
 
 .leg-mate-empty-state {
@@ -184,24 +180,6 @@
   color: var(--leg-muted);
 }
 
-.leg-mate-build-log {
-  max-width: 100%;
-  margin: 0.25rem 0 0.5rem;
-  overflow-x: auto;
-  border: 0.0625rem solid var(--leg-border);
-  border-radius: 0.5rem;
-  padding: 0.75rem;
-  color: var(--leg-text);
-  background: rgba(0, 0, 0, 0.2);
-  font: 0.8rem/1.45 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-    'Liberation Mono', monospace;
-  white-space: pre;
-}
-
-.leg-mate-build-log code {
-  font: inherit;
-}
-
 .leg-mate-empty-state .leg-mate-empty-state-intro {
   max-width: 54rem;
   color: var(--leg-text);
@@ -226,8 +204,7 @@
 }
 
 .leg-mate-board-card,
-.leg-mate-controls,
-.leg-mate-log {
+.leg-mate-options {
   border: 0.0625rem solid var(--leg-border);
   border-radius: 0.75rem;
   background: var(--leg-panel);
@@ -275,12 +252,46 @@
     0 0.6rem 1.8rem rgba(0, 0, 0, 0.22);
 }
 
+.leg-mate-options {
+  display: grid;
+  gap: 1rem;
+  min-width: 0;
+  padding: 1rem;
+  background: var(--leg-panel-strong);
+  box-shadow: none;
+}
+
+.leg-mate-options-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.leg-mate-options-header h2 {
+  margin: 0;
+  color: var(--leg-muted);
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
 .leg-mate-controls {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.65rem;
+  gap: 0.75rem;
   align-items: center;
-  padding: 0.75rem;
+}
+
+.leg-mate-options-tools {
+  display: grid;
+  gap: 0.75rem;
+  min-width: 0;
+  border-top: 0.0625rem solid var(--leg-border);
+  padding-top: 0.85rem;
 }
 
 .leg-mate-controls-actions,
@@ -296,7 +307,7 @@
   justify-content: flex-end;
 }
 
-.leg-mate-controls button,
+.leg-mate-options button,
 .leg-mate-log button,
 .leg-mate-guide button {
   min-height: 2.2rem;
@@ -308,18 +319,18 @@
   cursor: pointer;
   font: inherit;
   font-size: 0.78rem;
-  font-weight: 850;
+  font-weight: 600;
   line-height: 1.1;
 }
 
-.leg-mate-controls-actions button:first-child {
+.leg-mate-controls-actions .leg-mate-play-best {
   border-color: var(--leg-border-strong);
   color: #140d12;
   background: var(--leg-pink);
 }
 
-.leg-mate-controls button:hover:not(:disabled),
-.leg-mate-controls button:focus-visible,
+.leg-mate-options button:hover:not(:disabled),
+.leg-mate-options button:focus-visible,
 .leg-mate-log button:hover:not(:disabled),
 .leg-mate-log button:focus-visible,
 .leg-mate-guide button:hover,
@@ -330,12 +341,12 @@
   outline-offset: 0.1rem;
 }
 
-.leg-mate-controls-actions button:first-child:hover,
-.leg-mate-controls-actions button:first-child:focus-visible {
+.leg-mate-controls-actions .leg-mate-play-best:hover,
+.leg-mate-controls-actions .leg-mate-play-best:focus-visible {
   color: #140d12;
 }
 
-.leg-mate-controls button:disabled,
+.leg-mate-options button:disabled,
 .leg-mate-log button:disabled {
   cursor: not-allowed;
   opacity: 0.4;
@@ -388,48 +399,31 @@
 }
 
 .leg-mate-log {
-  display: grid;
-  gap: 0.7rem;
+  min-width: 0;
   overflow: hidden;
-  padding: 0.75rem;
-}
-
-.leg-mate-log-tools {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  align-items: center;
-  justify-content: space-between;
 }
 
 .leg-mate-log-primary-tools {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.6rem;
+  gap: 0.5rem 0.75rem;
   align-items: center;
 }
 
-.leg-mate-starting-fen {
-  display: flex;
-  flex: 1 1 100%;
-  min-width: 0;
-  gap: 0.45em;
-  align-items: baseline;
-  color: var(--leg-soft);
-  font-family: inherit;
-  font-size: 0.72rem;
-  overflow-wrap: anywhere;
+.leg-mate-copy-status {
+  color: var(--leg-muted);
+  font-size: 0.75rem;
 }
 
-.leg-mate-starting-fen-label {
-  flex: 0 0 auto;
-  color: var(--leg-text);
-  font-weight: 800;
+.leg-mate-copy-status:empty {
+  display: none;
 }
 
 .leg-mate-hint-toggle {
   display: inline-flex;
-  gap: 0.45em;
+  gap: 0.55em;
+  min-height: 2.2rem;
+  margin-right: auto;
   align-items: center;
   color: var(--leg-soft);
   cursor: pointer;
@@ -455,9 +449,10 @@
   color: var(--leg-rose) !important;
 }
 
-.leg-mate-training-info-button {
-  border-color: var(--leg-border-strong) !important;
-  color: var(--leg-rose) !important;
+.leg-mate-options .leg-mate-training-info-button {
+  border-color: transparent;
+  color: var(--leg-muted);
+  background: transparent;
 }
 
 .leg-mate-log-scroll {
@@ -955,26 +950,6 @@
 }
 
 @media (max-width: 48rem) {
-  .leg-mate-sidebar {
-    display: grid;
-    grid-template-areas:
-      'sets'
-      'modes';
-    grid-template-columns: minmax(0, 1fr);
-    gap: 0.65rem;
-  }
-
-  .leg-mate-sidebar--sets-only {
-    grid-template-areas: 'sets';
-  }
-
-  .leg-mate-mode-links {
-    border-top: 0.0625rem solid var(--leg-border);
-    border-left: 0;
-    padding-top: 0.65rem;
-    padding-left: 0;
-  }
-
   .leg-mate-material-icon--2 .leg-mate-material-piece {
     flex-basis: 1.65rem;
     width: 1.65rem;
@@ -998,8 +973,7 @@
   }
 
   .leg-mate-board-card,
-  .leg-mate-controls,
-  .leg-mate-log {
+  .leg-mate-options {
     border-radius: 0.6rem;
     padding: 0.6rem;
   }
@@ -1016,13 +990,16 @@
     justify-content: flex-end;
   }
 
-  .leg-mate-log-tools {
+  .leg-mate-options-header {
     align-items: stretch;
   }
 
-  .leg-mate-log-primary-tools {
-    flex-wrap: nowrap;
+  .leg-mate-mode-links {
     width: 100%;
+  }
+
+  .leg-mate-hint-toggle {
+    flex: 1 1 100%;
   }
 
   .leg-mate-current-hint {

@@ -1,7 +1,7 @@
 import TwoKnightsPawnPolicyLoader from './TwoKnightsPawnPolicyLoader'
 import React, { type ReactNode } from 'react'
 import MateBoard, { type MateBoardProps } from './MateBoard'
-import MateSidebar from './MateSidebar'
+import MateSidebar, { MateModeSelector } from './MateSidebar'
 import MateWorkspace from './MateWorkspace'
 import MatePolicyLoader from './MatePolicyLoader'
 import { MATE_CATALOG } from './catalog'
@@ -13,7 +13,6 @@ import type {
 
 type MateProps = {
   readonly boardComponent?: React.ComponentType<MateBoardProps>
-  readonly buildGitLog?: string
   readonly moduleSelector: ReactNode
   readonly onNavigate: (href: string) => void
   readonly onReplaceHref?: (href: string) => void
@@ -22,8 +21,6 @@ type MateProps = {
 
 export default function Mate({
   boardComponent: BoardComponent = MateBoard,
-  buildGitLog = import.meta.env?.VITE_BUILD_GIT_LOG ??
-    'Build metadata unavailable.',
   moduleSelector,
   onNavigate,
   onReplaceHref,
@@ -46,7 +43,6 @@ export default function Mate({
         <h1 className="leg-mate-visually-hidden">Mate</h1>
         <MateSidebar
           mateId={route.mateId}
-          mateMode={route.mateMode}
           onNavigate={onNavigate}
         />
 
@@ -66,6 +62,13 @@ export default function Mate({
                 )}
                 mateId={selectedDrill.set.id}
                 mateMode={selectedDrill.mode}
+                modeSelector={
+                  <MateModeSelector
+                    mateId={selectedDrill.set.id}
+                    mateMode={selectedDrill.mode}
+                    onNavigate={onNavigate}
+                  />
+                }
                 onReplaceHref={onReplaceHref}
                 sharedError={route.sharedError}
                 sharedFen={route.sharedFen}
@@ -76,12 +79,6 @@ export default function Mate({
           ) : (
             <section className="leg-mate-empty-state">
               <h2>Slop Alert</h2>
-              <pre
-                aria-label="Build Git log"
-                className="leg-mate-build-log"
-              >
-                <code>{buildGitLog}</code>
-              </pre>
               <p className="leg-mate-empty-state-intro">
                 Most mating trainers rely on engine moves or ask you to
                 memorize a fixed line. Lotta Endgames teaches a repeatable

@@ -1,11 +1,10 @@
-import React, { type MouseEvent } from 'react'
+import React from 'react'
 import { defaultPieces } from 'react-chessboard'
 import { MATE_CATALOG } from './catalog'
 import type { MateId, MateMode } from './types'
 
 export type MateSidebarProps = {
   readonly mateId: MateId | null
-  readonly mateMode: MateMode | null
   readonly onNavigate: (href: string) => void
 }
 
@@ -19,82 +18,68 @@ const MATE_MATERIAL_PIECES: Readonly<Record<MateId, readonly string[]>> = {
 
 export default function MateSidebar({
   mateId,
-  mateMode,
   onNavigate,
 }: MateSidebarProps) {
-  const selectedSet = MATE_CATALOG.find(({ id }) => id === mateId)
   return (
-    <React.Fragment>
-      <aside
-        aria-label="Mate training"
-        className="leg-mate-sidebar"
-      >
-        <nav aria-label="Mating sets" className="leg-mate-set-links">
-          {MATE_CATALOG.map((entry) => {
-            const isSelected = entry.id === mateId
-            const href = isSelected ? '/mate' : entry.path
-            return (
-              <a
-                aria-label={
-                  isSelected ? `${entry.label}, selected` : entry.label
-                }
-                className={
-                  isSelected
-                    ? 'leg-mate-set-link is-active'
-                    : 'leg-mate-set-link'
-                }
-                href={href}
-                key={entry.id}
-                onClick={(event) =>
-                  handleMateNavigation(event, href, onNavigate)
-                }
-                title={entry.label}
-              >
-                <MateMaterialIcon mateId={entry.id} />
-              </a>
-            )
-          })}
-        </nav>
-
-        <nav
-          aria-label={`${selectedSet?.label ?? 'Mate'} mode`}
-          className="leg-mate-mode-links"
-        >
-          {selectedSet === undefined ? (
-            <React.Fragment>
-              <MateDisabledModeLabel label="Standard" />
-              <MateDisabledModeLabel label="Training Wheels" />
-            </React.Fragment>
-          ) : (
-            <React.Fragment>
-            <MateModeLink
-              active={mateMode === 'standard'}
-              href={selectedSet.path}
-              label="Standard"
-              onNavigate={onNavigate}
-            />
-            <MateModeLink
-              active={mateMode === 'train'}
-              href={`${selectedSet.path}/train`}
-              label="Training Wheels"
-              onNavigate={onNavigate}
-            />
-            </React.Fragment>
-          )}
-        </nav>
-      </aside>
-    </React.Fragment>
+    <aside
+      aria-label="Mate training"
+      className="leg-mate-sidebar"
+    >
+      <nav aria-label="Mating sets" className="leg-mate-set-links">
+        {MATE_CATALOG.map((entry) => {
+          const isSelected = entry.id === mateId
+          const href = isSelected ? '/mate' : entry.path
+          return (
+            <a
+              aria-label={
+                isSelected ? `${entry.label}, selected` : entry.label
+              }
+              className={
+                isSelected
+                  ? 'leg-mate-set-link is-active'
+                  : 'leg-mate-set-link'
+              }
+              href={href}
+              key={entry.id}
+              onClick={(event) =>
+                handleMateNavigation(event, href, onNavigate)
+              }
+              title={entry.label}
+            >
+              <MateMaterialIcon mateId={entry.id} />
+            </a>
+          )
+        })}
+      </nav>
+    </aside>
   )
 }
 
-function MateDisabledModeLabel({ label }: { readonly label: string }) {
+export function MateModeSelector({
+  mateId,
+  mateMode,
+  onNavigate,
+}: {
+  readonly mateId: MateId
+  readonly mateMode: MateMode
+  readonly onNavigate: (href: string) => void
+}) {
+  const selectedSet = MATE_CATALOG.find(({ id }) => id === mateId)!
   return (
-    <span
-      aria-disabled="true"
-      className="leg-mate-mode-link is-disabled"
-    >
-      {label}
-    </span>
+    <nav aria-label={`${selectedSet.label} mode`} className="leg-mate-mode-links">
+      <MateModeLink
+        active={mateMode === 'standard'}
+        href={selectedSet.path}
+        label="Standard"
+        onNavigate={onNavigate}
+      />
+      <MateModeLink
+        active={mateMode === 'train'}
+        href={`${selectedSet.path}/train`}
+        label="Training Wheels"
+        onNavigate={onNavigate}
+      />
+    </nav>
   )
 }
 
@@ -155,7 +140,7 @@ function MateModeLink({
 }
 
 function handleMateNavigation(
-  event: MouseEvent<HTMLAnchorElement>,
+  event: React.MouseEvent<HTMLAnchorElement>,
   href: string,
   onNavigate: (href: string) => void,
 ) {

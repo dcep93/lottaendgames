@@ -15,7 +15,7 @@ import {
 } from './boardInteraction'
 import MateControls from './MateControls'
 import MateLog, { MatePriorityGuideDialog } from './MateLog'
-import MateSidebar from './MateSidebar'
+import MateSidebar, { MateModeSelector } from './MateSidebar'
 import { MATE_SHARE_NOTIFICATION_MS } from './MateWorkspace'
 import Mate from './index'
 import { getMateRuleSet, knightAndBishopWhiteRules } from './rules'
@@ -722,12 +722,8 @@ test('Mate log exposes every training field and semantic cycle controls', () => 
   }
   assert.match(markup, /<thead class="leg-mate-visually-hidden">/)
   assert.doesNotMatch(markup, /aria-label="Open Mate priority guide"/)
-  assert.match(
-    markup,
-    new RegExp(
-      `Training info</button><button[^>]*>Copy PGN</button><span role="status"></span></div><div class="leg-mate-starting-fen"><span class="leg-mate-starting-fen-label">Starting FEN</span><span aria-label="Starting position FEN">${ROOK_START}</span>`,
-    ),
-  )
+  assert.match(markup, /Training info<\/button>[\s\S]*Copy PGN<\/button>/)
+  assert.doesNotMatch(markup, /Starting FEN|Starting position FEN/)
   assert.match(markup, />Rg2</)
   assert.match(markup, />Kg7</)
   assert.equal((markup.match(/<th scope="col"/g) ?? []).length, 8)
@@ -1758,9 +1754,9 @@ function currentOptions(renderer: ReactTestRenderer): ChessboardOptions {
   return (probe.props as BoardRendererProps).options ?? {}
 }
 
-test('Mate selector exposes material icons and horizontal mode links', () => {
+test('Mate selector exposes material icons without training options', () => {
   const markup = renderToStaticMarkup(
-    <MateSidebar mateId="rook" mateMode="train" onNavigate={() => undefined} />,
+    <MateSidebar mateId="rook" onNavigate={() => undefined} />,
   )
 
   for (const [label, href, title] of [
@@ -1779,38 +1775,27 @@ test('Mate selector exposes material icons and horizontal mode links', () => {
     )
     assert.doesNotMatch(markup, new RegExp(`>${label}</a>`))
   }
-  for (const [label, href] of [
-    ['Standard', '/mate/rook'],
-    ['Training Wheels', '/mate/rook/train'],
-  ]) {
-    assert.match(markup, new RegExp(`href="${href}"[^>]*>${label}</a>`))
-  }
+  assert.doesNotMatch(markup, /Standard|Training Wheels/)
   assert.equal((markup.match(/<svg\b/g) ?? []).length, 9)
   assert.doesNotMatch(markup, /leg-mate-sidebar-label|<select\b/)
   assert.match(
     markup,
     /aria-label="Rook, selected"[^>]*class="leg-mate-set-link is-active"[^>]*href="\/mate"/,
   )
-  assert.match(markup, /aria-current="page"[^>]*href="\/mate\/rook\/train"/)
   assert.doesNotMatch(markup, /\/standard/)
 })
 
-test('Mate selector keeps disabled mode labels on the landing path', () => {
-  const markup = renderToStaticMarkup(
-    <MateSidebar mateId={null} mateMode={null} onNavigate={() => undefined} />,
-  )
-
-  assert.match(markup, /aria-label="Mate mode"/)
-  assert.match(
-    markup,
-    /<span aria-disabled="true" class="leg-mate-mode-link is-disabled">Standard<\/span>/,
-  )
-  assert.match(
-    markup,
-    /<span aria-disabled="true" class="leg-mate-mode-link is-disabled">Training Wheels<\/span>/,
-  )
-  assert.doesNotMatch(markup, /leg-mate-sidebar--sets-only/)
-  assert.doesNotMatch(markup, /aria-current=/)
+test('Mate mode selector preserves routes and the selected mode', () => {
+  for (const mateMode of ['standard', 'train'] as const) {
+    const markup = renderToStaticMarkup(
+      <MateModeSelector mateId="rook" mateMode={mateMode} onNavigate={() => undefined} />,
+    )
+    assert.match(markup, /aria-label="Rook mode"/)
+    assert.match(markup, /href="\/mate\/rook"[^>]*>Standard<\/a>/)
+    assert.match(markup, /href="\/mate\/rook\/train"[^>]*>Training Wheels<\/a>/)
+    const activeHref = mateMode === 'train' ? '/mate/rook/train' : '/mate/rook'
+    assert.match(markup, new RegExp(`aria-current="page"[^>]*href="${activeHref}"`))
+  }
 })
 
 test('Mate sidebar intercepts only unmodified primary link clicks', async () => {
@@ -1823,7 +1808,6 @@ test('Mate sidebar intercepts only unmodified primary link clicks', async () => 
     renderer = TestRenderer.create(
       <MateSidebar
         mateId="rook"
-        mateMode="standard"
         onNavigate={(href) => navigations.push(href)}
       />,
     )
@@ -1953,17 +1937,8 @@ test('Mate sidebar intercepts only unmodified primary link clicks', async () => 
 })
 
 test('Mate landing keeps the catalog visible without mounting a drill', () => {
-  const buildGitLog = [
-    'commit bb62efe68e885f71ce9df21ea707537a51b653bf',
-    'Author: Daniel Cepeda <dcep93@gmail.com>',
-    'AuthorDate: 2026-07-25T23:41:53-04:00',
-    'Commit: Daniel Cepeda <dcep93@gmail.com>',
-    'CommitDate: 2026-07-25T23:41:53-04:00',
-    'Message: Fix rook convergence and simplify bishop knight guide',
-  ].join('\n')
   const markup = renderToStaticMarkup(
     <Mate
-      buildGitLog={buildGitLog}
       moduleSelector={<nav aria-label="Modules" />}
       onNavigate={() => undefined}
       route={{
@@ -1980,23 +1955,14 @@ test('Mate landing keeps the catalog visible without mounting a drill', () => {
   const slopAlertAt = markup.indexOf('>Slop Alert</h2>')
   const explanationAt = markup.indexOf(explanation)
   const chooserAt = markup.indexOf('Choose a mating set')
-  const buildLogAt = markup.indexOf('aria-label="Build Git log"')
   const explanationWordCount = explanation.trim().split(/\s+/).length
   assert.ok(slopAlertAt >= 0)
-  assert.ok(buildLogAt > slopAlertAt)
-  assert.ok(explanationAt > buildLogAt)
+  assert.ok(explanationAt > slopAlertAt)
   assert.ok(chooserAt > explanationAt)
   assert.ok(explanationWordCount >= 50 && explanationWordCount <= 100)
   assert.match(markup, /href="\/mate\/queen"/)
-  assert.match(markup, /commit bb62efe68e885f71ce9df21ea707537a51b653bf/)
-  assert.match(markup, /AuthorDate: 2026-07-25T23:41:53-04:00/)
-  assert.match(markup, /CommitDate: 2026-07-25T23:41:53-04:00/)
-  assert.match(
-    markup,
-    /Message: Fix rook convergence and simplify bishop knight guide/,
-  )
-  assert.match(markup, />Standard<\/span>/)
-  assert.match(markup, />Training Wheels<\/span>/)
+  assert.doesNotMatch(markup, /Build Git log|leg-mate-build-log|AuthorDate:|CommitDate:/)
+  assert.doesNotMatch(markup, /leg-mate-mode-links/)
   assert.doesNotMatch(markup, /leg-mate-workspace/)
   assert.doesNotMatch(markup, /aria-label="Mate board, White orientation"/)
   assert.doesNotMatch(markup, /aria-current=/)
@@ -2026,6 +1992,16 @@ test('Mate composes a selected reducer-backed training workspace', () => {
     /aria-label="Open training info and priority guide"[^>]*>Training info<\/button>/,
   )
   assert.match(markup, /Show reason hints[\s\S]*Training info/)
+  const options = markup.match(/<section aria-label="Training options"[^>]*>([\s\S]*?)<\/section>/)?.[1]
+  assert.ok(options, 'Training options must be a dedicated section')
+  for (const label of ['Standard', 'Training Wheels', 'Start Over', 'Undo', 'Redo', 'Play Best', 'Show reason hints', 'Training info', 'Copy PGN']) {
+    assert.ok(options.includes(label), `${label} belongs in training options`)
+  }
+  assert.match(options, /(?:Show|Hide) timer/)
+  assert.ok(markup.indexOf('aria-label="Training options"') < markup.indexOf('aria-label="Mate move log table"'))
+  assert.equal((markup.match(/class="leg-mate-mode-links"/g) ?? []).length, 1)
+  assert.doesNotMatch(markup, /Starting FEN|Starting position FEN|Build Git log/)
+
   assert.doesNotMatch(markup, /How training works|Position details|Copy FEN/)
   assert.doesNotMatch(markup, /<details\b/)
   assert.doesNotMatch(markup, /Coming soon/)
@@ -2100,7 +2076,7 @@ test('Mate exposes stable desktop and narrow-layout structure', () => {
   )
   assert.match(
     markup,
-    /class="leg-mate-log-column"><div aria-busy="false" aria-label="Mate controls"[\s\S]*?<section aria-label="Mate move log"/,
+    /class="leg-mate-log-column"><section aria-label="Training options"[\s\S]*aria-label="Mate controls"[\s\S]*?<section aria-label="Mate move log"/,
   )
   assert.doesNotMatch(markup, /leg-mate-sidebar-label|<select\b/)
   assert.match(
@@ -2196,10 +2172,6 @@ test('Mate exposes stable desktop and narrow-layout structure', () => {
   assert.match(
     css,
     /@media\s*\(max-width:\s*68rem\)[\s\S]*\.leg-mate-board-column\s*\{[^}]*width:\s*min\(25\.6rem, 80%\)[^}]*margin-inline:\s*auto/s,
-  )
-  assert.match(
-    css,
-    /@media\s*\(max-width:\s*48rem\)[\s\S]*\.leg-mate-sidebar\s*\{[^}]*grid-template-areas:[^}]*'sets'[^}]*'modes'/,
   )
   assert.match(
     css,

@@ -101,6 +101,7 @@ export default function MateControls({
         </button>
         <button
           aria-keyshortcuts="ArrowUp"
+          className="leg-mate-play-best"
           disabled={busy || !canPlayBest || outcome !== undefined}
           onClick={onPlayBest}
           type="button"
