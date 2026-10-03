@@ -1413,8 +1413,8 @@ test('Two Bishops keeps only the target-square note and all diagrams', () => {
     />,
   )
   const targetNoteAt = markup.indexOf('Target squares: take the outer-wall squares closest')
-  const targetDiagramAt = markup.indexOf('Outer wall a2')
-  const phaseDiagramAt = markup.indexOf('Black may occupy any square from h1 to h4')
+  const targetDiagramAt = markup.indexOf('Outer wall b1')
+  const phaseDiagramAt = markup.indexOf('Black may occupy any square from a8 to d8')
   assert.equal(ruleSet.help.notes.length, 1)
   assert.equal((markup.match(/class="leg-mate-guide-note-boards /g) ?? []).length, 1)
   const figures = [...markup.matchAll(/<figure\b[^]*?<\/figure>/g)].map(([figure]) => figure)
@@ -1485,17 +1485,17 @@ test('Two Bishops shows the r9 opposition diagram and removes the r18.5 construc
   assert.doesNotMatch(markup, />rule r6.4\.5</)
   assert.doesNotMatch(markup, /reduce diagonals to the target corner by at least 3/)
   assert.equal(ruleSet.help.noteBoards.some(({ id }) => id === 'two-bishops-rule-r6.4-5-new-wall'), false)
-  assert.match(markup, /inner wall a2–g8/)
-  assert.match(markup, /Ke7 takes opposition on outer wall a3–f8/)
-  assert.match(markup, /stroke="#ffaa00"[^>]*marker-end="url\(#two-bishops-rule-r9-opposition-arrowhead-0-d7-e7\)"/)
+  assert.match(markup, /inner wall b1–h7/)
+  assert.match(markup, /Kg5 takes opposition on outer wall c1–h6/)
+  assert.match(markup, /stroke="#ffaa00"[^>]*marker-end="url\(#two-bishops-rule-r9-opposition-arrowhead-0-g4-g5\)"/)
   const diagram = ruleSet.help.noteBoards.find(({ id }) => id === 'two-bishops-rule-r9-opposition')!
-  assert.deepEqual(diagram.arrows, [{ from: 'd7', to: 'e7' }])
+  assert.deepEqual(diagram.arrows, [{ from: 'g4', to: 'g5' }])
   assert.deepEqual(diagram.highlights,
-    ['a3', 'b4', 'c5', 'd6', 'e7', 'f8'].map(square => ({ square, kind: 'key' })),
+    ['c1', 'd2', 'e3', 'f4', 'g5', 'h6'].map(square => ({ square, kind: 'key' })),
   )
   assert.deepEqual(diagram.pieces, [
-    { square: 'd7', piece: 'K' }, { square: 'g7', piece: 'k' },
-    { square: 'a2', piece: 'B' }, { square: 'a3', piece: 'B' },
+    { square: 'g4', piece: 'K' }, { square: 'g7', piece: 'k' },
+    { square: 'b1', piece: 'B' }, { square: 'c1', piece: 'B' },
   ])
 })
 
@@ -3488,10 +3488,10 @@ test('Two Bishops restores the r5.5 force-corner rule and diagram', () => {
   assert.ok(board)
   assert.equal(board.noteIndex, undefined)
   assert.deepEqual(board.pieces, [
-    { square: 'f3', piece: 'K' }, { square: 'h3', piece: 'k' },
-    { square: 'c1', piece: 'B' }, { square: 'g6', piece: 'B' },
+    { square: 'c6', piece: 'K' }, { square: 'c8', piece: 'k' },
+    { square: 'a3', piece: 'B' }, { square: 'f7', piece: 'B' },
   ])
-  assert.deepEqual(board.arrows, [{ from: 'c1', to: 'g5' }])
+  assert.deepEqual(board.arrows, [{ from: 'a3', to: 'e7' }])
   assert.deepEqual(board.highlights, [])
   const markup = renderToStaticMarkup(<MatePriorityGuideDialog {...MATE_TRAINING_INFO_PROPS} onClose={() => undefined} ruleSet={ruleSet} />)
   assert.match(markup, />rule r5<[^]*>rule r5\.5<[^]*>rule r6</)

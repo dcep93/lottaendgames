@@ -10,65 +10,65 @@ const TARGET_SQUARE_NOTE_BOARD = {
   id: 'two-bishops-target-square',
   title: 'Target square',
   caption:
-    "Outer wall a2–g8; target d5.",
+    "Outer wall b1–h7; target e4.",
   pieces: [
-    { square: 'c5', piece: 'K' },
-    { square: 'e4', piece: 'k' },
-    { square: 'b3', piece: 'B' },
+    { square: 'e3', piece: 'K' },
+    { square: 'd5', piece: 'k' },
+    { square: 'c2', piece: 'B' },
     { square: 'b2', piece: 'B' },
   ],
-  highlights: [{ square: 'd5', kind: 'key' }],
+  highlights: [{ square: 'e4', kind: 'key' }],
   arrows: [
-    { from: 'b3', to: 'c2' },
+    { from: 'c2', to: 'b3' },
   ],
 } as const
 
 const RULE_R5_5_FORCE_CORNER_NOTE_BOARD = {
   id: 'two-bishops-rule-r5-5-force-corner',
   title: 'rule r5.5 — Force Black toward the corner',
-  caption: 'Bg5 forces Kh2 toward h1.',
+  caption: 'Be7 forces Kb8 toward a8.',
   pieces: [
-    { square: 'f3', piece: 'K' },
-    { square: 'h3', piece: 'k' },
-    { square: 'c1', piece: 'B' },
-    { square: 'g6', piece: 'B' },
+    { square: 'c6', piece: 'K' },
+    { square: 'c8', piece: 'k' },
+    { square: 'a3', piece: 'B' },
+    { square: 'f7', piece: 'B' },
   ],
   highlights: [],
-  arrows: [{ from: 'c1', to: 'g5' }],
+  arrows: [{ from: 'a3', to: 'e7' }],
 } as const
 
 const RULE_R9_OPPOSITION_NOTE_BOARD = {
   id: 'two-bishops-rule-r9-opposition',
   title: 'rule r9 — Take opposition on the outer wall',
   caption:
-    "Ke7 takes opposition on outer wall a3–f8; inner wall a2–g8.",
+    "Kg5 takes opposition on outer wall c1–h6; inner wall b1–h7.",
   pieces: [
-    { square: 'd7', piece: 'K' },
+    { square: 'g4', piece: 'K' },
     { square: 'g7', piece: 'k' },
-    { square: 'a2', piece: 'B' },
-    { square: 'a3', piece: 'B' },
+    { square: 'b1', piece: 'B' },
+    { square: 'c1', piece: 'B' },
   ],
   highlights: [
-    { square: 'a3', kind: 'key' },
-    { square: 'b4', kind: 'key' },
-    { square: 'c5', kind: 'key' },
-    { square: 'd6', kind: 'key' },
-    { square: 'e7', kind: 'key' },
-    { square: 'f8', kind: 'key' },
+    { square: 'c1', kind: 'key' },
+    { square: 'd2', kind: 'key' },
+    { square: 'e3', kind: 'key' },
+    { square: 'f4', kind: 'key' },
+    { square: 'g5', kind: 'key' },
+    { square: 'h6', kind: 'key' },
   ],
-  arrows: [{ from: 'd7', to: 'e7' }],
+  arrows: [{ from: 'g4', to: 'g5' }],
 } as const
 
 const PHASE_TWO_NOTE_BOARD = {
   id: 'two-bishops-phase-two',
   title: 'Phase 2',
   caption:
-    'Black may occupy any square from h1 to h4.',
+    'Black may occupy any square from a8 to d8.',
   pieces: [
-    { square: 'f2', piece: 'K' },
-    { square: 'h4', piece: 'k' },
-    { square: 'e3', piece: 'B' },
-    { square: 'e2', piece: 'B' },
+    { square: 'b6', piece: 'K' },
+    { square: 'd8', piece: 'k' },
+    { square: 'c5', piece: 'B' },
+    { square: 'b5', piece: 'B' },
   ],
   highlights: [],
 } as const

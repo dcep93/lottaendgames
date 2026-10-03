@@ -3,7 +3,7 @@ import {createRequire} from 'node:module';
 import {mkdirSync,readFileSync,writeFileSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
 import {spawnSync} from 'node:child_process';
-import {getChess} from '../app/src/mate/chess.ts';
+import {getChess,SQUARE_TRANSFORMS,transformFen,transformSquare} from '../app/src/mate/chess.ts';
 const require=createRequire(new URL('../app/package.json',import.meta.url));
 const sharp=require('sharp'),{renderToStaticMarkup}=require('react-dom/server'),{defaultPieces,defaultArrowOptions}=require('react-chessboard');
 const boardCss=readFileSync(new URL('../app/src/app_x/styles.css',import.meta.url),'utf8');
@@ -11,7 +11,9 @@ const boardColor=(name:string)=>{const value=boardCss.match(new RegExp(`--leg-bo
 const light=boardColor('light'),dark=boardColor('dark');
 const output=fileURLToPath(new URL('../app/public/mate/bishop-knight/r1-mating-net.gif',import.meta.url));
 const matingNetStart='8/8/8/8/2B5/2K5/2N5/2k5 w - - 0 1';
-const board=getChess(matingNetStart),frames:string[]=[],durations:number[]=[];
+const reflection=SQUARE_TRANSFORMS.find(transform=>transform.name==='diagonal')!;
+const sourceBoard=getChess(matingNetStart);
+const board=getChess(transformFen(matingNetStart,reflection)),frames:string[]=[],durations:number[]=[];
 const playbackSpeed=1.3;
 // User-specified demonstration; keep the exact replies rather than choosing a policy line.
 const matingNetLine=[
@@ -34,7 +36,10 @@ async function frame(last:readonly string[]=[],duration=900){
 }
 await frame([],1400);
 for(let i=0;i<matingNetLine.length;i++){
- const m=board.move(matingNetLine[i]!);assert.equal(m.san,matingNetLine[i]);await frame([m.from,m.to],board.isCheckmate()?3200:900);
+ const original=sourceBoard.move(matingNetLine[i]!);assert.equal(original.san,matingNetLine[i]);
+ const m=board.move({from:transformSquare(original.from,reflection),to:transformSquare(original.to,reflection)});
+ assert.equal(board.fen(),transformFen(sourceBoard.fen(),reflection));
+ await frame([m.from,m.to],board.isCheckmate()?3200:900);
 }
 assert.ok(board.isCheckmate());assert.equal(frames.length,matingNetLine.length+1);
 const result=spawnSync('python3',['-c',`import sys,json,base64,io\nfrom PIL import Image\nd=json.load(sys.stdin)\nf=[Image.open(io.BytesIO(base64.b64decode(x))).convert('RGB') for x in d['frames']]\nb=io.BytesIO()\nf[0].save(b,format='GIF',save_all=True,append_images=f[1:],duration=d['durations'],loop=0,disposal=2,optimize=False)\nsys.stdout.buffer.write(b.getvalue())`],{input:JSON.stringify({frames,durations}),maxBuffer:20_000_000});
