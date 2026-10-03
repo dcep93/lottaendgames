@@ -447,7 +447,7 @@
   width: 1.05rem;
   height: 1.05rem;
   margin: 0;
-  accent-color: var(--leg-pink);
+  accent-color: var(--leg-brown);
 }
 
 .leg-mate-hint-toggle:focus-within {
