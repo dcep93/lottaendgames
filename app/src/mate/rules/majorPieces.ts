@@ -132,8 +132,8 @@ const rookHelp: RuleHelp = {
       layout: { files: 8, ranks: 8, fileOffset: 0 },
       pieces: [
         { square: 'e5', piece: 'K' },
-        { square: 'd1', piece: 'R' },
-        { square: 'c5', piece: 'k' },
+        { square: 'a4', piece: 'R' },
+        { square: 'e3', piece: 'k' },
       ],
       highlights: [],
     },
