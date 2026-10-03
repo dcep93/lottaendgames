@@ -11,7 +11,8 @@ const boardColor=(name:string)=>{const value=boardCss.match(new RegExp(`--leg-bo
 const light=boardColor('light'),dark=boardColor('dark');
 const output=fileURLToPath(new URL('../app/public/mate/bishop-knight/r1-mating-net.gif',import.meta.url));
 const matingNetStart='8/8/8/8/2B5/2K5/2N5/2k5 w - - 0 1';
-const reflection=SQUARE_TRANSFORMS.find(transform=>transform.name==='diagonal')!;
+// Reflect the previous a1–h8 presentation across a8–h1: together, a 180° rotation.
+const reflection=SQUARE_TRANSFORMS.find(transform=>transform.name==='rotate180')!;
 const sourceBoard=getChess(matingNetStart);
 const board=getChess(transformFen(matingNetStart,reflection)),frames:string[]=[],durations:number[]=[];
 const playbackSpeed=1.3;
