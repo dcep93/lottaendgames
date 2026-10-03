@@ -11,7 +11,8 @@ import { copyMateShareText } from './workspaceSupport'
 export { default as MatePriorityGuideDialog } from './MatePriorityGuide'
 
 export type MateLogProps = {
-  readonly controls?: React.ReactNode
+  readonly controls?: (secondaryActions: React.ReactNode) => React.ReactNode
+  readonly timerControls?: React.ReactNode
   readonly modeSelector?: React.ReactNode
   readonly fen: string
   readonly logs: readonly MateLogEntry[]
@@ -83,6 +84,7 @@ function isSelectedBlackReplyIdeal(
 
 export default function MateLog({
   controls,
+  timerControls,
   modeSelector,
   fen,
   logs,
@@ -159,9 +161,34 @@ export default function MateLog({
     }
   }
 
+  const secondaryActions = (
+    <>
+      <button
+        aria-label="Open training info and priority guide"
+        className="leg-mate-training-info-button"
+        onClick={openGuide}
+        type="button"
+      >
+        Training info
+      </button>
+      <button
+        aria-label="Copy PGN to clipboard"
+        className="leg-mate-training-info-button"
+        onClick={() => void copyPgn()}
+        type="button"
+      >
+        Copy PGN
+      </button>
+      <span className="leg-mate-copy-status" role="status">{copyStatus}</span>
+    </>
+  )
+
   return (
     <>
-      <MateOptions controls={controls} modeSelector={modeSelector}>
+      <MateOptions
+        controls={controls ? controls(secondaryActions) : secondaryActions}
+        modeSelector={modeSelector}
+      >
         <div className="leg-mate-log-primary-tools">
           <label className="leg-mate-hint-toggle">
             <input
@@ -174,35 +201,19 @@ export default function MateLog({
             />
             <span>Show reason hints</span>
           </label>
-          <button
-            aria-label="Open training info and priority guide"
-            className="leg-mate-training-info-button"
-            onClick={openGuide}
-            type="button"
-          >
-            Training info
-          </button>
-          <button
-            aria-label="Copy PGN to clipboard"
-            className="leg-mate-training-info-button"
-            onClick={() => void copyPgn()}
-            type="button"
-          >
-            Copy PGN
-          </button>
-          <span className="leg-mate-copy-status" role="status">{copyStatus}</span>
+          {hint === undefined ? null : (
+            <button
+              aria-label={`Current rule hint: ${hint.shortLabel}. Open priority guide`}
+              className="leg-mate-current-hint"
+              data-mate-current-hint={true}
+              onClick={(event) => openGuide(event, hint.id)}
+              type="button"
+            >
+              {hint.shortLabel}
+            </button>
+          )}
         </div>
-        {hint === undefined ? null : (
-          <button
-            aria-label={`Current rule hint: ${hint.shortLabel}. Open priority guide`}
-            className="leg-mate-current-hint"
-            data-mate-current-hint={true}
-            onClick={(event) => openGuide(event, hint.id)}
-            type="button"
-          >
-            {hint.shortLabel}
-          </button>
-        )}
+        <div className="leg-mate-timer-controls">{timerControls}</div>
       </MateOptions>
 
       <section aria-label="Mate move log" className="leg-mate-log">

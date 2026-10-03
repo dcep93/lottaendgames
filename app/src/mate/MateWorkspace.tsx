@@ -1,6 +1,6 @@
 import React from 'react'
 import type { MateBoardProps } from './MateBoard'
-import MateControls from './MateControls'
+import MateControls, { MateTimerControls } from './MateControls'
 import MateLog from './MateLog'
 import { MATE_MOVE_ANIMATION_MS } from './boardInteraction'
 import { MATE_CATALOG } from './catalog'
@@ -408,8 +408,9 @@ export default function MateWorkspace({
         )}
         <MateLog
           modeSelector={modeSelector}
-          controls={
+          controls={(secondaryActions) => (
             <MateControls
+              secondaryActions={secondaryActions}
               busy={playBestAnimation !== null}
               canPlayBest={canPlayBest}
               canRedo={session.historyIndex < session.history.length - 1}
@@ -423,6 +424,15 @@ export default function MateWorkspace({
               onUndo={undo}
               outcome={session.outcome}
               shareStatus={shareStatus}
+              showTimer={showTimer}
+              startedAtMs={session.startedAtMs}
+              timerNow={deps.now}
+            />
+          )}
+          timerControls={
+            <MateTimerControls
+              finishedAtMs={session.finishedAtMs}
+              onToggleTimer={toggleTimer}
               showTimer={showTimer}
               startedAtMs={session.startedAtMs}
               timerNow={deps.now}

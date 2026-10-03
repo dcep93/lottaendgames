@@ -979,6 +979,7 @@ test('reason hint is opt-in and reveals only the current rule label', async () =
     'data-mate-current-hint': true,
   })
   const hintText = reactNodeText(hint)
+  assert.equal(hint.parent, toggle.parent?.parent, 'Hint stays beside its toggle')
   assert.equal(hintText, 'rook box')
   assert.doesNotMatch(hintText, /Rg2|a2|g2|bring White's king/i)
   assert.equal(hint.props.type, 'button')
@@ -1998,7 +1999,7 @@ test('Mate composes a selected reducer-backed training workspace', () => {
     markup,
     /aria-label="Open training info and priority guide"[^>]*>Training info<\/button>/,
   )
-  assert.match(markup, /Show reason hints[\s\S]*Training info/)
+  assert.match(markup, /Training info[\s\S]*Copy PGN[\s\S]*Show reason hints[\s\S]*(?:Show|Hide) timer/)
   const options = markup.match(/<section aria-label="Training options"[^>]*>([\s\S]*?)<\/section>/)?.[1]
   assert.ok(options, 'Training options must be a dedicated section')
   for (const label of ['Standard', 'Training Wheels', 'Start Over', 'Undo', 'Redo', 'Play Best', 'Show reason hints', 'Training info', 'Copy PGN']) {

@@ -2,6 +2,7 @@ import React from 'react'
 import type { MateTerminalOutcome } from './session'
 
 export type MateControlsProps = {
+  readonly secondaryActions?: React.ReactNode
   readonly busy?: boolean
   readonly canUndo: boolean
   readonly canRedo: boolean
@@ -45,6 +46,7 @@ function formatMateElapsed(elapsedMs: number): string {
 }
 
 export default function MateControls({
+  secondaryActions,
   busy = false,
   canUndo,
   canRedo,
@@ -62,7 +64,6 @@ export default function MateControls({
   onToggleTimer,
   onShare,
 }: MateControlsProps) {
-  const timerId = React.useId()
   const terminalLabel = outcome === undefined
     ? undefined
     : OUTCOME_LABELS[outcome]
@@ -126,27 +127,15 @@ export default function MateControls({
             </button>
           </>
         )}
-        <button
-          aria-controls={timerId}
-          aria-pressed={showTimer}
-          onClick={onToggleTimer}
-          type="button"
-        >
-          {showTimer ? 'Hide timer' : 'Show timer'}
-        </button>
-        <output
-          aria-label="Elapsed time"
-          className="leg-mate-timer"
-          hidden={!showTimer}
-          id={timerId}
-        >
-          <MateElapsedTimer
+        {secondaryActions ?? (
+          <MateTimerControls
             finishedAtMs={finishedAtMs}
-            now={timerNow}
+            onToggleTimer={onToggleTimer}
             showTimer={showTimer}
             startedAtMs={startedAtMs}
+            timerNow={timerNow}
           />
-        </output>
+        )}
       </div>
       <span
         aria-atomic="true"
@@ -158,6 +147,41 @@ export default function MateControls({
         {shareStatus ?? ''}
       </span>
     </div>
+  )
+}
+
+export function MateTimerControls({
+  finishedAtMs,
+  onToggleTimer,
+  showTimer,
+  startedAtMs,
+  timerNow = readCurrentTime,
+}: Pick<MateControlsProps, 'finishedAtMs' | 'onToggleTimer' | 'showTimer' | 'startedAtMs' | 'timerNow'>) {
+  const timerId = React.useId()
+  return (
+    <>
+      <button
+        aria-controls={timerId}
+        aria-pressed={showTimer}
+        onClick={onToggleTimer}
+        type="button"
+      >
+        {showTimer ? 'Hide timer' : 'Show timer'}
+      </button>
+      <output
+        aria-label="Elapsed time"
+        className="leg-mate-timer"
+        hidden={!showTimer}
+        id={timerId}
+      >
+        <MateElapsedTimer
+          finishedAtMs={finishedAtMs}
+          now={timerNow}
+          showTimer={showTimer}
+          startedAtMs={startedAtMs}
+        />
+      </output>
+    </>
   )
 }
 

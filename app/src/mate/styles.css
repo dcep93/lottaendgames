@@ -40,7 +40,22 @@
   margin-bottom: 1rem;
 }
 
-.leg-mate-set-links,
+.leg-mate-set-links {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.leg-mate-mode-selector {
+  display: flex;
+  gap: 0.45rem;
+  align-items: center;
+}
+
+.leg-mate-mode-label {
+  color: var(--leg-muted);
+  font-size: 0.75rem;
+}
+
 .leg-mate-mode-links {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -55,14 +70,6 @@
 .leg-mate-set-links {
   grid-area: sets;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-}
-
-.leg-mate-mode-links {
-  grid-area: modes;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  align-self: stretch;
-  border-left: 0.0625rem solid var(--leg-border);
-  padding-left: 0.85rem;
 }
 
 .leg-mate-set-link,
@@ -91,13 +98,28 @@
 }
 
 .leg-mate-mode-link {
-  display: grid;
-  place-items: center;
+  display: flex;
+  gap: 0.4em;
+  align-items: center;
+  justify-content: center;
   min-height: 1.8rem;
   padding: 0.3rem 0.6rem;
   background: transparent;
   font-size: 0.78rem;
   text-align: center;
+}
+
+.leg-mate-mode-link::before {
+  content: '';
+  width: 0.55em;
+  height: 0.55em;
+  flex: 0 0 auto;
+  border: 0.1em solid currentColor;
+  border-radius: 50%;
+}
+
+.leg-mate-mode-link.is-active::before {
+  background: currentColor;
 }
 
 .leg-mate-material-icon {
@@ -151,9 +173,9 @@
 }
 
 .leg-mate-mode-link.is-active {
-  border-color: var(--leg-border);
-  color: var(--leg-text);
-  background: var(--leg-panel-soft);
+  border-color: var(--leg-border-strong);
+  color: var(--leg-pink);
+  background: rgba(255, 123, 195, 0.12);
 }
 
 .leg-mate-empty-state {
@@ -276,7 +298,8 @@
 }
 
 .leg-mate-controls-actions,
-.leg-mate-controls-summary {
+.leg-mate-controls-summary,
+.leg-mate-timer-controls {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4em;
@@ -430,12 +453,6 @@
 .leg-mate-current-hint {
   border-color: var(--leg-border-strong) !important;
   color: var(--leg-rose) !important;
-}
-
-.leg-mate-options .leg-mate-training-info-button {
-  border-color: transparent;
-  color: var(--leg-muted);
-  background: transparent;
 }
 
 .leg-mate-log-scroll {
