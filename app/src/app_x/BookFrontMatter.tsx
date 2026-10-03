@@ -100,7 +100,7 @@ export default function BookFrontMatter({
           </div>
         </dl>
         <p className="leg-frontmatter-fine-print">
-          <a href="https://www.newinchess.com/">www.newinchess.com</a>
+          <a href="https://www.newinchess.com/100-endgames-you-must-know">www.newinchess.com</a>
           <br />
           All photos: New In Chess Archives.
         </p>
