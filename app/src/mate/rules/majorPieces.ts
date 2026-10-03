@@ -127,7 +127,7 @@ const rookHelp: RuleHelp = {
   noteBoards: [
     {
       id: 'rook-phase-two-box',
-      title: 'phase 2: box',
+      title: 'rook box',
       caption: '',
       layout: { files: 8, ranks: 8, fileOffset: 0 },
       pieces: [
