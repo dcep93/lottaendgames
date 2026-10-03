@@ -48,7 +48,14 @@ const RULE_R9_OPPOSITION_NOTE_BOARD = {
     { square: 'a2', piece: 'B' },
     { square: 'a3', piece: 'B' },
   ],
-  highlights: [],
+  highlights: [
+    { square: 'a3', kind: 'key' },
+    { square: 'b4', kind: 'key' },
+    { square: 'c5', kind: 'key' },
+    { square: 'd6', kind: 'key' },
+    { square: 'e7', kind: 'key' },
+    { square: 'f8', kind: 'key' },
+  ],
   arrows: [{ from: 'd7', to: 'e7' }],
 } as const
 
