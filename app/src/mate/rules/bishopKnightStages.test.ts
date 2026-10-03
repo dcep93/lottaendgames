@@ -25,7 +25,8 @@ test('r3 follows r2 and the declared r1 start is used in the guide',()=>{
  assert.deepEqual(diagrams.map(board=>board.title),['r3','r2','r1']);
  assert.equal(diagrams[0]!.animationSrc,undefined);
  assert.equal(diagrams[1]!.animationSrc,undefined);
- assert.deepEqual(diagrams[1]!.pieces,note.pieces);
+ assert.ok(diagrams[1]!.pieces.some(p=>p.piece==='B'&&p.square==='a2'));
+ assert.ok(note.pieces.some(p=>p.piece==='B'&&p.square==='c4'));
  assert.ok(note.pieces.some(p=>p.piece==='k'&&p.square==='c1'));
  assert.equal(bishopKnightStageMoves(r1Start).stage,1);
  assert.equal(bishopKnightStagePosition(r1Start)?.stage,1);

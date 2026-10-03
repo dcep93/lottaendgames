@@ -34,8 +34,8 @@ export const bishopKnightHelp: RuleHelp = {
     title: "r1",
     caption: "A continuation of the mating net to checkmate.",
     animationSrc: "/mate/bishop-knight/r1-mating-net.gif",
-    animationAlt: "A verified continuation from the r1 start with Black on c1 to checkmate.",
-    pieces: [{square: "c3", piece: "K"}, {square: "a2", piece: "B"}, {square: "c2", piece: "N"}, {square: "c1", piece: "k"}],
+    animationAlt: "The mating net, beginning with Ba2 and ending with Bf3 checkmate.",
+    pieces: [{square: "c3", piece: "K"}, {square: "c4", piece: "B"}, {square: "c2", piece: "N"}, {square: "c1", piece: "k"}],
     highlights: [],
   }],
   notes: [
