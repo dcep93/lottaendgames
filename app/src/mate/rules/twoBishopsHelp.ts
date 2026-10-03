@@ -48,7 +48,14 @@ const RULE_R9_OPPOSITION_NOTE_BOARD = {
     { square: 'a2', piece: 'B' },
     { square: 'a3', piece: 'B' },
   ],
-  highlights: [],
+  highlights: [
+    { square: 'a3', kind: 'wall' },
+    { square: 'b4', kind: 'wall' },
+    { square: 'c5', kind: 'wall' },
+    { square: 'd6', kind: 'wall' },
+    { square: 'e7', kind: 'wall' },
+    { square: 'f8', kind: 'wall' },
+  ],
   arrows: [{ from: 'd7', to: 'e7' }],
 } as const
 
@@ -81,4 +88,3 @@ export const twoBishopsHelp: RuleHelp = {
   ],
   noteBoards: [TARGET_SQUARE_NOTE_BOARD, PHASE_TWO_NOTE_BOARD, RULE_R9_OPPOSITION_NOTE_BOARD, RULE_R5_5_FORCE_CORNER_NOTE_BOARD],
 }
-

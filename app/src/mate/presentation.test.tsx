@@ -1446,7 +1446,9 @@ test('Two Bishops shows the r9 opposition diagram and removes the r18.5 construc
   assert.match(markup, /Ke7 takes opposition on outer wall a3–f8/)
   const diagram = ruleSet.help.noteBoards.find(({ id }) => id === 'two-bishops-rule-r9-opposition')!
   assert.deepEqual(diagram.arrows, [{ from: 'd7', to: 'e7' }])
-  assert.deepEqual(diagram.highlights, [])
+  assert.deepEqual(diagram.highlights,
+    ['a3', 'b4', 'c5', 'd6', 'e7', 'f8'].map(square => ({ square, kind: 'wall' })),
+  )
   assert.deepEqual(diagram.pieces, [
     { square: 'd7', piece: 'K' }, { square: 'g7', piece: 'k' },
     { square: 'a2', piece: 'B' }, { square: 'a3', piece: 'B' },
