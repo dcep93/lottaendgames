@@ -17,7 +17,7 @@ const expectedCatalog = [
     materialSignature: 'KQvK',
     path: '/mate/queen',
     standardFallbackFen: '8/8/8/8/4k3/8/8/3QK3 w - - 0 1',
-    trainSeeds: ['8/8/8/8/3k4/1Q6/8/3K4 w - - 0 1'],
+    trainSeeds: ['8/3k4/1Q6/8/8/8/8/3K4 w - - 0 1'],
   },
   {
     id: 'rook',
