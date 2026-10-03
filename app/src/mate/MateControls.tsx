@@ -165,6 +165,14 @@ export function MateTimerControls({
   const timerId = React.useId()
   return (
     <>
+      <button
+        aria-controls={timerId}
+        aria-pressed={showTimer}
+        onClick={onToggleTimer}
+        type="button"
+      >
+        {showTimer ? 'Hide timer' : 'Show timer'}
+      </button>
       <output
         aria-label="Elapsed time"
         className="leg-mate-timer"
@@ -178,14 +186,6 @@ export function MateTimerControls({
           startedAtMs={startedAtMs}
         />
       </output>
-      <button
-        aria-controls={timerId}
-        aria-pressed={showTimer}
-        onClick={onToggleTimer}
-        type="button"
-      >
-        {showTimer ? 'Hide timer' : 'Show timer'}
-      </button>
     </>
   )
 }

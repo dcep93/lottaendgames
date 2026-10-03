@@ -196,17 +196,6 @@ export default function MateLog({
       >
         <div className="leg-mate-timer-controls">{timerControls}</div>
         <div className="leg-mate-log-primary-tools">
-          <label className="leg-mate-hint-toggle">
-            <input
-              aria-label="Show reason hints"
-              checked={showReasonHints}
-              onChange={(event) =>
-                setShowReasonHints(event.currentTarget.checked)
-              }
-              type="checkbox"
-            />
-            <span>Show reason hints</span>
-          </label>
           {hint === undefined ? null : (
             <button
               aria-label={`Current rule hint: ${hint.shortLabel}. Open priority guide`}
@@ -218,6 +207,17 @@ export default function MateLog({
               {hint.shortLabel}
             </button>
           )}
+          <label className="leg-mate-hint-toggle">
+            <input
+              aria-label="Show reason hints"
+              checked={showReasonHints}
+              onChange={(event) =>
+                setShowReasonHints(event.currentTarget.checked)
+              }
+              type="checkbox"
+            />
+            <span>Show reason hints</span>
+          </label>
         </div>
       </MateOptions>
 
