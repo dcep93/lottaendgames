@@ -24,9 +24,9 @@ const ACTIVE_RULE_IDS = [
   'mate',
   'bishops safe',
   'no stalemate',
+  'rule r0.5',
   'rule r1',
   'rule r3',
-  'rule r4',
   'rule r5',
   'rule r5.5',
   'rule r6',
@@ -54,7 +54,7 @@ test('Two Bishops exposes only the simplified experiment policy', () => {
   )
   assert.ok(twoBishopsRuleSet.help.noteBoards.every(({ noteIndex }) => noteIndex === undefined))
   assert.equal(
-    twoBishopsWhiteRules.find(({ id }) => id === 'rule r4')?.helpText,
+    twoBishopsWhiteRules.find(({ id }) => id === 'rule r0.5')?.helpText,
     'Execute the mating pattern.',
   )
   assert.equal(
@@ -105,7 +105,7 @@ test('Two Bishops exposes only the simplified experiment policy', () => {
   )
 })
 
-test('rule r4 recognizes the exact Phase 2 geometry symmetrically', () => {
+test('rule r0.5 recognizes the exact Phase 2 geometry symmetrically', () => {
   const fen = '8/8/8/8/7k/4B3/4BK2/8 w - - 0 1'
   for (const transform of SQUARE_TRANSFORMS) {
     const transformedFen = transformFen(fen, transform)
@@ -113,7 +113,7 @@ test('rule r4 recognizes the exact Phase 2 geometry symmetrically', () => {
   }
 })
 
-test('rule r4 executes every h-file stage symmetrically', () => {
+test('rule r0.5 executes every h-file stage symmetrically', () => {
   const stages = [
     { fen: '8/8/8/8/8/4B2k/4BK2/8 w - - 0 1', move: 'Bg5' },
     { fen: '8/8/8/8/8/4B3/4BK1k/8 w - - 0 1', move: 'Bg4' },
@@ -141,7 +141,7 @@ test('rule r4 executes every h-file stage symmetrically', () => {
   }
 })
 
-test('rule r4 uses a non-checking bishop waiting move with Black on h4', () => {
+test('rule r0.5 uses a non-checking bishop waiting move with Black on h4', () => {
   const fen = '8/8/8/8/7k/4B3/4BK2/8 w - - 0 1'
   const waitingScore = scoreTwoBishopsWhiteMove(fen, 'Bf4')
   assert.equal(waitingScore.ruleR4Applies, true)
@@ -149,14 +149,14 @@ test('rule r4 uses a non-checking bishop waiting move with Black on h4', () => {
   assert.equal(scoreTwoBishopsWhiteMove(fen, 'Kg2').ruleR4Penalty, 1)
 })
 
-test('rule r4 preserves h3 control when Black is in the corner', () => {
+test('rule r0.5 preserves h3 control when Black is in the corner', () => {
   const fen = '8/8/8/6B1/6B1/8/5K2/7k w - - 0 1'
   assert.equal(scoreTwoBishopsWhiteMove(fen, 'Bh6').ruleR4Penalty, 0)
   assert.equal(scoreTwoBishopsWhiteMove(fen, 'Be2').ruleR4Penalty, 1)
   assert.equal(scoreTwoBishopsWhiteMove(fen, 'Kg3').ruleR4Penalty, 1)
 })
 
-test('rule r4 checks once the required control already exists symmetrically', () => {
+test('rule r0.5 checks once the required control already exists symmetrically', () => {
   const fen = '8/8/8/8/6B1/4B3/5K1k/8 w - - 2 2'
   for (const transform of SQUARE_TRANSFORMS) {
     const transformedFen = transformFen(fen, transform)
@@ -179,7 +179,7 @@ test('rule r4 checks once the required control already exists symmetrically', ()
   }
 })
 
-test('rule r4 accepts the b1-h7 diagonal waiting pattern symmetrically', () => {
+test('rule r0.5 accepts the b1-h7 diagonal waiting pattern symmetrically', () => {
   const fen = '7k/8/5KBB/8/8/8/8/8 w - - 4 3'
   const waitingTargets = ['b1', 'c2', 'd3', 'e4', 'f5', 'h7'] as const
   for (const transform of SQUARE_TRANSFORMS) {
@@ -210,7 +210,7 @@ test('rule r4 accepts the b1-h7 diagonal waiting pattern symmetrically', () => {
   }
 })
 
-test('rule r4 retreats Bc1 with the other bishop anywhere on c2–h7 symmetrically', () => {
+test('rule r0.5 retreats Bc1 with the other bishop anywhere on c2–h7 symmetrically', () => {
   for (const fixedBishop of ['c2', 'd3', 'e4', 'f5', 'g6', 'h7'] as const) {
     const original = getChess('8/8/8/8/8/2K5/kBB5/8 w - - 2 2')
     original.remove('c2')
@@ -235,7 +235,7 @@ test('rule r4 retreats Bc1 with the other bishop anywhere on c2–h7 symmetrical
   }
 })
 
-test('rule r4 does not apply the Bc1 retreat without its king and bishop geometry', () => {
+test('rule r0.5 does not apply the Bc1 retreat without its king and bishop geometry', () => {
   for (const fen of [
     '8/8/8/8/B7/2K5/kB6/8 w - - 0 1', // Other bishop off c2–h7.
     '8/8/8/8/2K5/8/kBB5/8 w - - 0 1', // White king too far away.
@@ -252,7 +252,7 @@ test('rule r4 does not apply the Bc1 retreat without its king and bishop geometr
   }
 })
 
-test('rule r4 executes the loaded a-file drive to mate against either corner reply symmetrically', () => {
+test('rule r0.5 executes the loaded a-file drive to mate against either corner reply symmetrically', () => {
   const fen = '8/8/8/k1B5/2BK4/8/8/8 w - - 0 1'
   for (const fourthReply of ['Ka3', 'Ka1']) {
     const original = getChess(fen)
@@ -285,7 +285,7 @@ test('rule r4 executes the loaded a-file drive to mate against either corner rep
   }
 })
 
-test('rule r4 completes the extended waiting mating pattern symmetrically', () => {
+test('rule r0.5 completes the extended waiting mating pattern symmetrically', () => {
   const fen = '7k/8/5KBB/8/8/8/8/8 w - - 4 3'
   const line = [
     ['Be4', 'Kg8'],
@@ -328,7 +328,7 @@ test('rule r4 completes the extended waiting mating pattern symmetrically', () =
   }
 })
 
-test('rule r4 selects Be7 from the b5 king and c5-c6 bishop pattern symmetrically', () => {
+test('rule r0.5 selects Be7 from the b5 king and c5-c6 bishop pattern symmetrically', () => {
   const fen = '8/2k5/2B5/1KB5/8/8/8/8 w - - 0 1'
   for (const transform of SQUARE_TRANSFORMS) {
     const transformedFen = transformFen(fen, transform)
@@ -348,7 +348,7 @@ test('rule r4 selects Be7 from the b5 king and c5-c6 bishop pattern symmetricall
   }
 })
 
-test('rule r4 continues Be7 with Kb6 after either Black reply symmetrically', () => {
+test('rule r0.5 continues Be7 with Kb6 after either Black reply symmetrically', () => {
   const startingFen = '8/2k5/2B5/1KB5/8/8/8/8 w - - 0 1'
   for (const blackReply of ['Kb8', 'Kc8']) {
     const original = getChess(startingFen)
@@ -372,7 +372,7 @@ test('rule r4 continues Be7 with Kb6 after either Black reply symmetrically', ()
   }
 })
 
-test('rule r4 recognizes Bd5 and Be6 mating-pattern stages symmetrically', () => {
+test('rule r0.5 recognizes Bd5 and Be6 mating-pattern stages symmetrically', () => {
   const fen = '5B2/5B1k/5K2/8/8/8/8/8 w - - 0 1'
   const stages = [
     { from: 'f7', to: 'd5' },
@@ -389,12 +389,8 @@ test('rule r4 recognizes Bd5 and Be6 mating-pattern stages symmetrically', () =>
             candidate.to === transformSquare(stage.to, transform),
         )
       assert.ok(move, `${index + 1} ${transform.name}`)
-      // R1 now precedes the pattern: after Bd5 Kh8, it restores Kf7 first.
-      const preferred = index === 0 ? move : chess.moves({ verbose: true }).find(
-        candidate => candidate.from === transformSquare('f6', transform) &&
-          candidate.to === transformSquare('f7', transform),
-      )!
-      assert.deepEqual(getIdealTwoBishopsWhiteMoves(chess.fen()), [preferred.san], transform.name)
+      // The mating pattern now precedes r1, so continue Be6 after Bd5 Kh8.
+      assert.deepEqual(getIdealTwoBishopsWhiteMoves(chess.fen()), [move.san], transform.name)
       const score = scoreTwoBishopsWhiteMove(chess.fen(), move.san)
       assert.equal(score.ruleR4Applies, true, `${index + 1} ${transform.name}`)
       assert.equal(score.ruleR4Penalty, 0, `${index + 1} ${transform.name}`)
@@ -406,7 +402,7 @@ test('rule r4 recognizes Bd5 and Be6 mating-pattern stages symmetrically', () =>
   }
 })
 
-test('rule r4 aligns the outer bishop before walking the king through the wall', () => {
+test('rule r0.5 aligns the outer bishop before walking the king through the wall', () => {
   const fen = '8/7k/8/4BK2/4B3/8/8/8 w - - 0 1'
   const line = [
     { from: 'e4' as const, to: 'd5' as const, reply: 'Kh6' },
@@ -441,7 +437,7 @@ test('rule r4 aligns the outer bishop before walking the king through the wall',
   }
 })
 
-test('rule r4 forces Black from the edge into its associated corner', () => {
+test('rule r0.5 forces Black from the edge into its associated corner', () => {
   const fen = '8/8/8/8/8/8/2BB1K1k/8 w - - 2 2'
   for (const transform of SQUARE_TRANSFORMS) {
     const transformedFen = transformFen(fen, transform)
@@ -462,7 +458,7 @@ test('rule r4 forces Black from the edge into its associated corner', () => {
   }
 })
 
-test('rule r4 prepares h7 while preserving h6 with the king already on f7 symmetrically', () => {
+test('rule r0.5 prepares h7 while preserving h6 with the king already on f7 symmetrically', () => {
   const fen = '4BB1k/5K2/8/8/8/8/8/8 w - - 0 1'
   const original = getChess(fen)
   const line = ['Ba4', 'Kh7', 'Bc2+', 'Kh8', 'Bg7#'].map((san) => original.move(san))
@@ -499,7 +495,7 @@ test('rule r4 prepares h7 while preserving h6 with the king already on f7 symmet
   }
 })
 
-test('rule r4 executes the sealed two-square corner sequence by destination', () => {
+test('rule r0.5 executes the sealed two-square corner sequence by destination', () => {
   const stages = [
     {
       fen: '4B3/5K1k/8/8/8/B7/8/8 w - - 2 2',
@@ -542,7 +538,7 @@ test('rule r4 executes the sealed two-square corner sequence by destination', ()
   }
 })
 
-test('rule r4 preserves the third edge square before the mate-in-two sequence', () => {
+test('rule r0.5 preserves the third edge square before the mate-in-two sequence', () => {
   const stages = [
     {
       fen: '2B5/B7/8/8/8/8/5K2/7k w - - 0 1',
@@ -585,7 +581,7 @@ test('rule r4 preserves the third edge square before the mate-in-two sequence', 
   }
 })
 
-test('rule r4 prefers the move that forces mate next symmetrically', () => {
+test('rule r0.5 prefers the move that forces mate next symmetrically', () => {
   const fen = '8/2B5/8/1B6/8/6K1/8/6k1 w - - 2 2'
   for (const transform of SQUARE_TRANSFORMS) {
     const transformedFen = transformFen(fen, transform)

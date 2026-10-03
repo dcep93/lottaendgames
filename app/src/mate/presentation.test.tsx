@@ -1527,7 +1527,7 @@ test('Rook and Two Bishops omit proof-distance teaching rules', () => {
   assert.doesNotMatch(bishopsMarkup, /mate progress|forced mate|proof distance/)
   assert.match(
     bishopsMarkup,
-    />rule r4<[^]*>rule r6<[^]*>rule r6\.2<[^]*>rule r6\.4<[^]*>rule r8<[^]*>rule r9<[^]*>rule r10<[^]*>rule r19<[^]*>rule r24<[^]*>rule r24\.5<[^]*>rule r25</,
+    />rule r0\.5<[^]*>rule r6<[^]*>rule r6\.2<[^]*>rule r6\.4<[^]*>rule r8<[^]*>rule r9<[^]*>rule r10<[^]*>rule r19<[^]*>rule r24<[^]*>rule r24\.5<[^]*>rule r25</,
   )
   assert.doesNotMatch(bishopsMarkup, />rule [a-y]</)
   const queenMarkup = renderToStaticMarkup(

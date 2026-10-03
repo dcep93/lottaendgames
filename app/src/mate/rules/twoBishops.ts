@@ -1805,6 +1805,14 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
         first.stalematePenalty - second.stalematePenalty,
     },
     {
+      id: 'rule r0.5',
+      shortLabel: 'rule r0.5',
+      applies: (score) => score.ruleR4Applies,
+      helpText: 'Execute the mating pattern.',
+      compare: (first, second) =>
+        first.ruleR4Penalty - second.ruleR4Penalty,
+    },
+    {
       id: 'rule r1',
       shortLabel: 'rule r1',
       helpText:
@@ -1821,14 +1829,6 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
         first.ruleR3CornerPenalty - second.ruleR3CornerPenalty ||
         first.ruleR3AdjacentBishopPenalty - second.ruleR3AdjacentBishopPenalty ||
         first.ruleR3BishopCornerPenalty - second.ruleR3BishopCornerPenalty,
-    },
-    {
-      id: 'rule r4',
-      shortLabel: 'rule r4',
-      applies: (score) => score.ruleR4Applies,
-      helpText: 'Execute the mating pattern.',
-      compare: (first, second) =>
-        first.ruleR4Penalty - second.ruleR4Penalty,
     },
     {
       id: 'rule r5',

@@ -1,0 +1,127 @@
+{
+  "certificate": {
+    "completeStandardUniverse": true,
+    "allPositionsTerminate": true,
+    "allExaminedRootsTerminate": true,
+    "stateKeyMode": "symmetry",
+    "initialHalfmoveClock": 0,
+    "traversesAllTiedBestWhiteMoves": true,
+    "traversesAllLegalBlackReplies": true,
+    "rootScope": "All app-eligible opposite-colored KBBK White-to-move starts, plus train seeds; all reachable White states",
+    "checksFiftyMoveLimit": true,
+    "historyRepetition": "Structural loops; no supplied prehistory"
+  },
+  "fingerprints": {
+    "engine": "b4cb88f4437a23150852652ddfd4f448ac2a80a1470f7036ae7bb1bb62fd5ca1",
+    "policy": "6071067b780eb3ac88b7d13aef4fee8e088489a7a265288b28b0e5e179ade1c3"
+  },
+  "implementation": "22ef30d6c462647fc5243aaa6c2c914b68d0fd9730071b8b478306c8caf2e535",
+  "elapsedMs": 1240246,
+  "workerCount": 6,
+  "rootOutcomes": {
+    "total": 312286,
+    "mateBeforeDraw": 312286,
+    "loopLeading": 0,
+    "otherFailureLeading": 0,
+    "fiftyMoveOnly": 0
+  },
+  "graphOutcomes": {
+    "totalPositions": 312426,
+    "mateTerminatingPositions": 312426,
+    "loopLeadingPositions": 0,
+    "directFailureLeadingPositions": 0,
+    "loopAndFailureLeadingPositions": 0,
+    "fiftyMoveLeadingPositions": 0,
+    "maximumMatePlies": 95
+  },
+  "whiteChoices": 312998,
+  "blackReplies": 1314789,
+  "ruleFilterCensus": {
+    "unit": "unique symmetry-canonical expanded White positions",
+    "positions": 312426,
+    "rules": {
+      "mate": {
+        "eliminatedMoves": 9503,
+        "positionsAffected": 455
+      },
+      "bishops safe": {
+        "eliminatedMoves": 904610,
+        "positionsAffected": 229480
+      },
+      "no stalemate": {
+        "eliminatedMoves": 6777,
+        "positionsAffected": 4911
+      },
+      "rule r0.5": {
+        "eliminatedMoves": 17056,
+        "positionsAffected": 911
+      },
+      "rule r1": {
+        "eliminatedMoves": 53416,
+        "positionsAffected": 2888
+      },
+      "rule r3": {
+        "eliminatedMoves": 983288,
+        "positionsAffected": 166387
+      },
+      "rule r5": {
+        "eliminatedMoves": 35424,
+        "positionsAffected": 2042
+      },
+      "rule r5.5": {
+        "eliminatedMoves": 5945,
+        "positionsAffected": 364
+      },
+      "rule r6": {
+        "eliminatedMoves": 624705,
+        "positionsAffected": 33938
+      },
+      "rule r6.2": {
+        "eliminatedMoves": 95,
+        "positionsAffected": 5
+      },
+      "rule r6.4": {
+        "eliminatedMoves": 21697,
+        "positionsAffected": 1353
+      },
+      "rule r7": {
+        "eliminatedMoves": 1923057,
+        "positionsAffected": 220655
+      },
+      "rule r8": {
+        "eliminatedMoves": 1742559,
+        "positionsAffected": 218766
+      },
+      "rule r9": {
+        "eliminatedMoves": 3524,
+        "positionsAffected": 503
+      },
+      "rule r10": {
+        "eliminatedMoves": 251953,
+        "positionsAffected": 60693
+      },
+      "rule r19": {
+        "eliminatedMoves": 10946,
+        "positionsAffected": 4013
+      },
+      "rule r24": {
+        "eliminatedMoves": 8740,
+        "positionsAffected": 966
+      },
+      "rule r24.5": {
+        "eliminatedMoves": 35268,
+        "positionsAffected": 20387
+      },
+      "rule r25": {
+        "eliminatedMoves": 15722,
+        "positionsAffected": 8244
+      },
+      "rule r30": {
+        "eliminatedMoves": 91616,
+        "positionsAffected": 27199
+      }
+    }
+  },
+  "witnesses": [],
+  "witnessErrors": []
+}
