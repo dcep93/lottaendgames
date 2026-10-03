@@ -32,7 +32,20 @@ const ROOK_LIVE_FEN =
 const ROOK_MATE_FEN =
   'R6k/8/6K1/8/8/8/8/8 b - - 1 1'
 
-test('encodes and round-trips one documented hash with all six FEN fields', () => {
+test('uses placement-only links for fresh positions and accepts old full-FEN links', () => {
+  const placement = '8/K7/8/3k4/8/4Q3/8/8'
+  const fen = `${placement} w - - 0 1`
+  assert.equal(encodeMateFen(fen), `#fen=${placement}`)
+  for (const hash of [
+    `#fen=${placement}`,
+    `#fen=${fen.replaceAll(' ', '_')}`,
+    `#fen=${encodeURIComponent(fen)}`,
+  ]) {
+    assert.deepEqual(decodeMateFen(hash, 'queen'), { ok: true, fen })
+  }
+})
+
+test('preserves nondefault FEN fields when they affect the shared position', () => {
   const hash = encodeMateFen(ROOK_STANDARD_FEN)
 
   assert.equal(

@@ -74,7 +74,11 @@ const CASTLING_REQUIREMENTS = {
 type CastlingRight = keyof typeof CASTLING_REQUIREMENTS
 
 export function encodeMateFen(fen: string): string {
-  return `#fen=${fen.trim().replace(/\s+/g, '_')}`
+  const fields = fen.trim().split(/\s+/)
+  const value = fields.slice(1).join(' ') === 'w - - 0 1'
+    ? fields[0]
+    : fields.join('_')
+  return `#fen=${value}`
 }
 
 export function encodeMateLiveFen(fen: string): string {
@@ -276,6 +280,9 @@ export function decodeCanonicalFen(
   }
   if (!/\s/.test(decodedFen)) decodedFen = decodedFen.replaceAll('_', ' ')
   const fields = decodedFen.trim().split(/\s+/)
+  if (fields.length === 1 && prefix === '#fen=') {
+    fields.push('w', '-', '-', '0', '1')
+  }
   if (fields.length !== 6) {
     return null
   }

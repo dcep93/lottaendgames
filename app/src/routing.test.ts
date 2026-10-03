@@ -29,6 +29,21 @@ const sharedRookLiveFen =
 const sharedRookMateFen =
   'R6k/8/6K1/8/8/8/8/8 b - - 1 1'
 
+for (const hash of [
+  '#fen=8/K7/8/3k4/8/4Q3/8/8',
+  '#fen=8/K7/8/3k4/8/4Q3/8/8_w_-_-_0_1',
+]) {
+  assert.deepEqual(resolveAppRoute('/mate/queen', hash), {
+    href: '/mate/queen#fen=8/K7/8/3k4/8/4Q3/8/8',
+    route: {
+      module: 'mate',
+      mateId: 'queen',
+      mateMode: 'standard',
+      sharedFen: '8/K7/8/3k4/8/4Q3/8/8 w - - 0 1',
+    },
+  })
+}
+
 assert.deepEqual(resolveAppRoute('/', ''), {
   href: '/book/about',
   route: { anchorId: null, chapterId: 'about', module: 'book' },
