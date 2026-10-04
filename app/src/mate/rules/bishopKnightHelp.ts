@@ -26,13 +26,13 @@ export const bishopKnightHelp: RuleHelp = {
   }, {
     id: "bishop-knight-rule-r2-start",
     title: "Herd the king",
-    caption: "Starting position of the mating net.",
+    caption: "",
     pieces: [{square: "f6", piece: "K"}, {square: "h7", piece: "B"}, {square: "f7", piece: "N"}, {square: "f8", piece: "k"}],
     highlights: [],
   }, {
     id: "bishop-knight-rule-r1-net",
     title: "Mating net",
-    caption: "A continuation of the mating net to checkmate.",
+    caption: "",
     animationSrc: "/mate/bishop-knight/r1-mating-net.gif",
     animationAlt: "The mating net, beginning with Bh7 and ending with Bc6 checkmate.",
     pieces: [{square: "f6", piece: "K"}, {square: "f5", piece: "B"}, {square: "f7", piece: "N"}, {square: "f8", piece: "k"}],
