@@ -26,11 +26,13 @@ integration does not require enabling billing or upgrading to Blaze.
 2. In the linked GA4 web stream, **turn off Enhanced measurement**. The app sends
    its own page views and events. Automatic history tracking would count live FEN
    changes as visits, and automatic link tracking could collect shared positions.
-3. Set the GitHub Actions repository variable `GA_MEASUREMENT_ID` to that ID.
-   The next build/push uses it via `VITE_GA_MEASUREMENT_ID`. IDs are public, not
-   credentials. A missing/invalid ID leaves analytics disabled.
+3. The Firebase-linked measurement ID `G-MW95V6RNBY` is configured in
+   `.env.production` as `VITE_GA_MEASUREMENT_ID`. Vite loads it for production
+   builds, including GitHub Actions, so no repository variable is required.
+   IDs are public, not credentials. An explicit build environment variable can
+   override it; an empty/invalid value disables analytics.
 4. Deploy, visit the production site, and verify events in GA4 Realtime.
-   This cannot be verified against a real account until an ID is configured.
+   Receiving events in the real account must be verified after deployment.
 
 Tracked events: `page_view`, `training_started`, `training_completed`,
 `training_info_opened`, and `reason_hints_enabled`. Starts require an accepted
