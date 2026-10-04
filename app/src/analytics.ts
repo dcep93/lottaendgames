@@ -1,5 +1,5 @@
 export type AnalyticsParameters = Record<string, string | number | boolean>
-export type AnalyticsEvent = 'training_started' | 'training_completed' | 'training_info_opened' | 'reason_hints_enabled'
+export type AnalyticsEvent = 'training_started' | 'training_completed' | 'training_info_opened' | 'reason_hints_enabled' | 'exercise_started' | 'exercise_completed'
 type Send = (...args: unknown[]) => void
 
 const CAMPAIGN_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_id', 'utm_term', 'utm_content']

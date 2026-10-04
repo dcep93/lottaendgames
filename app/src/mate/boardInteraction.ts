@@ -27,6 +27,12 @@ export type ResolvedMateBoardMove = {
   readonly san: string
 }
 
+export type MateBoardInteraction = {
+  canSelect: (fen: string, square: string, disabled: boolean) => boolean
+  legalTargets: (fen: string, square: Square | null, disabled: boolean) => ReadonlyMap<Square, LegalTarget>
+  resolveMove: (options: ResolveMateBoardMoveOptions) => ResolvedMateBoardMove | null
+}
+
 const SQUARE_PATTERN = /^[a-h][1-8]$/
 
 export function tryMateBoardMove({

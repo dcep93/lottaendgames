@@ -64,7 +64,7 @@
 
 .leg-mate-set-links {
   grid-area: sets;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
 }
 
 .leg-mate-set-link,
@@ -475,6 +475,44 @@
 
 .leg-mate-log-number-column {
   width: 3rem;
+}
+
+.leg-knight-queen-table {
+  min-width: 0;
+}
+
+.leg-knight-queen-progress {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem 1rem;
+  font-size: 0.85rem;
+}
+
+.leg-knight-queen-progress span {
+  color: var(--leg-soft);
+}
+
+dialog.leg-knight-queen-guide {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: min(40rem, calc(100vw - 2rem));
+  max-height: calc(100dvh - 2rem);
+  padding: 0;
+  color: var(--leg-text);
+}
+
+dialog.leg-knight-queen-guide:not([open]) {
+  display: none;
+}
+
+dialog.leg-knight-queen-guide::backdrop {
+  background: rgba(0, 0, 0, 0.65);
+}
+
+.leg-knight-queen-route {
+  line-height: 1.8;
 }
 
 .leg-mate-log-intrinsic-column {

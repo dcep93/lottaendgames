@@ -1,19 +1,20 @@
 import React from 'react'
 import { defaultPieces } from 'react-chessboard'
-import { MATE_CATALOG } from './catalog'
-import type { MateId, MateMode } from './types'
+import { MATE_CATALOG, MATE_NAVIGATION } from './catalog'
+import type { MateId, MateMode, MateModuleId } from './types'
 
 export type MateSidebarProps = {
-  readonly mateId: MateId | null
+  readonly mateId: MateModuleId | null
   readonly onNavigate: (href: string) => void
 }
 
-const MATE_MATERIAL_PIECES: Readonly<Record<MateId, readonly string[]>> = {
+const MATE_MATERIAL_PIECES: Readonly<Record<MateModuleId, readonly string[]>> = {
   queen: ['wQ'],
   rook: ['wR'],
   'two-bishops': ['wB', 'wB'],
   'bishop-knight': ['wB', 'wN'],
   'two-knights-pawn': ['wN', 'wN', 'bP'],
+  'knight-queen': ['wN', 'bQ'],
 }
 
 export default function MateSidebar({
@@ -26,7 +27,7 @@ export default function MateSidebar({
       className="leg-mate-sidebar"
     >
       <nav aria-label="Mating sets" className="leg-mate-set-links">
-        {MATE_CATALOG.map((entry) => {
+        {MATE_NAVIGATION.map((entry) => {
           const isSelected = entry.id === mateId
           const href = isSelected ? '/mate' : entry.path
           return (
@@ -85,7 +86,7 @@ export function MateModeSelector({
   )
 }
 
-function MateMaterialIcon({ mateId }: { readonly mateId: MateId }) {
+function MateMaterialIcon({ mateId }: { readonly mateId: MateModuleId }) {
   const pieces = MATE_MATERIAL_PIECES[mateId]
 
   return (

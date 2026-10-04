@@ -18,9 +18,10 @@ import {
   getLegalTargets,
   getMateBoardSquareStyles,
   resolveMateBoardMove,
+  type MateBoardInteraction,
 } from './boardInteraction'
 import { releaseFocusWithin } from './workspaceSupport'
-import { useBoardHighlights } from '../useBoardHighlights'
+import { BOARD_SQUARE_HIGHLIGHT_STYLE, useBoardHighlights } from '../useBoardHighlights'
 
 export type MateBoardProps = {
   readonly fen: string
@@ -29,6 +30,8 @@ export type MateBoardProps = {
   readonly lastMove: readonly [Square, Square] | null
   readonly disabled: boolean
   readonly onMove: (san: string) => void
+  readonly interaction?: MateBoardInteraction
+  readonly targetSquare?: Square | null
 }
 
 type BoardRenderer = React.ComponentType<{ readonly options?: ChessboardOptions }>
@@ -93,6 +96,8 @@ export function MateBoardSurface({
   lastMove,
   disabled,
   onMove,
+  interaction,
+  targetSquare,
   boardRenderer: BoardRenderer = Chessboard,
 }: MateBoardSurfaceProps) {
   const highlights = useBoardHighlights(fen)
@@ -122,12 +127,18 @@ export function MateBoardSurface({
   }, [disabled, fen, onMove, optimisticMove])
 
   const legalTargets = useMemo(
-    () => getLegalTargets(fen, selectedSquare, disabled, mateId),
-    [disabled, fen, selectedSquare, mateId],
+    () => interaction
+      ? interaction.legalTargets(fen, selectedSquare, disabled)
+      : getLegalTargets(fen, selectedSquare, disabled, mateId),
+    [disabled, fen, selectedSquare, mateId, interaction],
   )
   const squareStyles = useMemo(
-    () => getMateBoardSquareStyles(lastMove, selectedSquare, legalTargets),
-    [lastMove, legalTargets, selectedSquare],
+    () => {
+      const styles = getMateBoardSquareStyles(lastMove, selectedSquare, legalTargets)
+      if (targetSquare) styles[targetSquare] = { ...styles[targetSquare], ...BOARD_SQUARE_HIGHLIGHT_STYLE }
+      return styles
+    },
+    [lastMove, legalTargets, selectedSquare, targetSquare],
   )
   const isPhaseTwo = phase === '2/2'
   const lastMoveLabel = lastMove === null
@@ -142,12 +153,12 @@ export function MateBoardSurface({
   const canSelect = (square: string | null) =>
     !isOptimistic &&
     square !== null &&
-    canSelectSideToMovePiece(fen, square, disabled, mateId)
+    (interaction ? interaction.canSelect(fen, square, disabled) : canSelectSideToMovePiece(fen, square, disabled, mateId))
   const selectSquare = (square: string | null) => {
     setSelectedSquare(canSelect(square) ? square as Square : null)
   }
   const moveFromTo = (sourceSquare: string, targetSquare: string | null) => {
-    const move = resolveMateBoardMove({
+    const move = (interaction?.resolveMove ?? resolveMateBoardMove)({
       disabled: disabled || isOptimistic,
       fen,
       mateId,
@@ -181,12 +192,13 @@ export function MateBoardSurface({
       <div
         ref={boardShellRef}
         aria-disabled={disabled}
-        aria-label="Mate board, White orientation"
+        aria-label={targetSquare ? `Mate board, White orientation. Next target: ${targetSquare}` : 'Mate board, White orientation'}
         className={[
           'leg-mate-board-shell',
           isPhaseTwo ? 'leg-mate-board-shell--phase-two' : '',
         ].filter(Boolean).join(' ')}
         data-last-move={lastMoveLabel}
+        data-target-square={targetSquare ?? undefined}
         data-orientation="white"
         data-phase={phase}
         data-position-state={isOptimistic ? 'optimistic' : 'controlled'}

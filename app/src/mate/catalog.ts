@@ -1,6 +1,6 @@
 import twoKnightsPawnPositions from './data/two-knights-pawn-positions.json'
 import { parseTwoKnightsPawnManifest } from './twoKnightsPawnData'
-import type { MateId } from './types'
+import type { MateId, MateModuleId } from './types'
 import { TWO_BISHOPS_TRAINING_FENS } from './rules/twoBishopsPhaseTwoPatternData'
 
 export const TWO_KNIGHTS_PAWN_POSITIONS =
@@ -58,4 +58,14 @@ export const MATE_CATALOG: readonly MateCatalogEntry[] = [
       TWO_KNIGHTS_PAWN_POSITIONS.train.map(({ fen }) => fen),
     ),
   },
+]
+
+// Exercises without kings do not participate in the checkmate rule catalog.
+export const MATE_NAVIGATION: readonly {
+  id: MateModuleId
+  label: string
+  path: `/mate/${MateModuleId}`
+}[] = [
+  ...MATE_CATALOG,
+  { id: 'knight-queen', label: 'Knight vs Queen', path: '/mate/knight-queen' },
 ]

@@ -7,8 +7,10 @@ export type MateId =
 
 export type MateMode = 'standard' | 'train'
 
+export type MateModuleId = MateId | 'knight-queen'
+
 export type MateRouteSelection = {
-  mateId: MateId | null
+  mateId: MateModuleId | null
   mateMode: MateMode | null
   sharedFen: string | null
   sharedError?: string

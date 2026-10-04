@@ -3,6 +3,7 @@ import React, { type ReactNode } from 'react'
 import MateBoard, { type MateBoardProps } from './MateBoard'
 import MateSidebar, { MateModeSelector } from './MateSidebar'
 import MateWorkspace from './MateWorkspace'
+import KnightQueenWorkspace from './KnightQueenWorkspace'
 import MatePolicyLoader from './MatePolicyLoader'
 import { MATE_CATALOG } from './catalog'
 import type {
@@ -47,7 +48,9 @@ export default function Mate({
         />
 
         <div className="leg-mate-layout">
-          {route.sharedError && route.sharedFen === null ? (
+          {route.mateId === 'knight-queen' ? (
+            <KnightQueenWorkspace BoardComponent={BoardComponent} />
+          ) : route.sharedError && route.sharedFen === null ? (
             <section className="leg-mate-empty-state"><p role="alert">{route.sharedError}</p><button onClick={() => onNavigate('/mate/two-knights-pawn')} type="button">Start Over</button></section>
           ) : selectedDrill ? (
             <PolicyLoader>

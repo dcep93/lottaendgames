@@ -123,6 +123,12 @@ function parseBookAnchor(hash: string) {
 }
 
 function resolveMateRoute(pathname: string, hash: string): RouteResolution {
+  if (pathname === '/mate/knight-queen' || pathname === '/mate/knight-queen/train') {
+    return {
+      href: '/mate/knight-queen',
+      route: { module: 'mate', mateId: 'knight-queen', mateMode: null, sharedFen: null },
+    }
+  }
   if (pathname === '/mate') {
     return emptyMateResolution()
   }

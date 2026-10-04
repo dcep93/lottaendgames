@@ -1808,6 +1808,7 @@ test('Mate selector exposes material icons without training options', () => {
     ['Two Bishops', '/mate/two-bishops', 'Two Bishops'],
     ['Bishop and Knight', '/mate/bishop-knight', 'Bishop and Knight'],
     ['Two Knights vs Pawn', '/mate/two-knights-pawn', 'Two Knights vs Pawn'],
+    ['Knight vs Queen', '/mate/knight-queen', 'Knight vs Queen'],
   ]) {
     assert.match(
       markup,
@@ -1819,7 +1820,7 @@ test('Mate selector exposes material icons without training options', () => {
     assert.doesNotMatch(markup, new RegExp(`>${label}</a>`))
   }
   assert.doesNotMatch(markup, /Standard|Training Wheels/)
-  assert.equal((markup.match(/<svg\b/g) ?? []).length, 9)
+  assert.equal((markup.match(/<svg\b/g) ?? []).length, 11)
   assert.doesNotMatch(markup, /leg-mate-sidebar-label|<select\b/)
   assert.match(
     markup,
@@ -2164,9 +2165,9 @@ test('Mate exposes stable desktop and narrow-layout structure', () => {
     css,
     /\.leg-mate-controls\s*\{[^}]*display:\s*flex;[^}]*flex-wrap:\s*wrap/s,
   )
-  assert.match(
+  assert.doesNotMatch(
     css,
-    /\.leg-mate-controls-summary\s*\{[^}]*margin-left:\s*auto;[^}]*justify-content:\s*flex-end/s,
+    /\.leg-mate-controls-summary\s*\{[^}]*(?:margin-left:\s*auto|justify-content:\s*flex-end)/s,
   )
   assert.doesNotMatch(
     css,
