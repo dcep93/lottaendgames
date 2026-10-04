@@ -1,12 +1,37 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { getChess, SQUARE_TRANSFORMS, transformFen } from '../chess'
+import { getChess, SQUARE_TRANSFORMS, transformFen, withFenTurn } from '../chess'
 import { createMateSession, playWhiteMove, replaceHistoricalBlackMove } from '../session'
 import { getBlackReplyChoices } from '../workspaceSupport'
 import { getMateRuleSet } from './index'
-import { getKnightAndBishopOpponentCandidates } from './bishopKnight'
+import { getKnightAndBishopOpponentCandidates, scoreKnightAndBishopOpponentPosition } from './bishopKnight'
 import { isBishopKnightMatingNetReply, r1Start } from './bishopKnightStages'
 import data from './bishopKnightStageData.json'
+
+test('Black prefers four escape squares over three when earlier resistance priorities tie', () => {
+  const fen = '8/4B1k1/8/4N3/6K1/8/8/8 b - - 0 1'
+  for (const transform of SQUARE_TRANSFORMS) {
+    const board = getChess(transformFen(fen, transform))
+    const preferred = getChess(fen)
+    preferred.move('Kh7')
+    const expectedBoard = transformFen(preferred.fen(), transform).split(' ')[0]
+    const expected = board.moves({ verbose: true }).find(move => move.after.split(' ')[0] === expectedBoard)!
+    assert.ok(expected)
+    assert.deepEqual(getKnightAndBishopOpponentCandidates(board.fen()).idealMoves, [expected.san])
+  }
+})
+
+test('Black mobility counts its legal escapes regardless of whose turn the FEN records', () => {
+  // After ...Kh7 White has 24 moves, but Black has just g8, h8, h6, and g7.
+  const fen = '8/4B2k/8/4N3/6K1/8/8/8 w - - 1 2'
+  for (const transform of SQUARE_TRANSFORMS) {
+    for (const turn of ['w', 'b'] as const) {
+      assert.equal(scoreKnightAndBishopOpponentPosition(withFenTurn(transformFen(fen, transform), turn)).mobilityScore, -4)
+    }
+  }
+  // After ...Kg8 the alternatives are only h8, h7, and g7.
+  assert.equal(scoreKnightAndBishopOpponentPosition('6k1/4B3/8/4N3/6K1/8/8/8 w - - 1 2').mobilityScore, -3)
+})
 
 function boardForKey(key: string) {
   const board = getChess()

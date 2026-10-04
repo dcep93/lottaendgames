@@ -28,6 +28,7 @@ import {
   squareCoordinates,
   squareFromCoords,
   squaredEuclideanDistance,
+  withFenTurn,
 } from "../chess";
 import {
   applyUniversalBlackPriorities,
@@ -763,7 +764,8 @@ export function scoreKnightAndBishopOpponentPosition(
     captureMinorPenalty: knightAndBishopPiecesPresent(fen) ? 1 : 0,
     unprotectedMinorDistance: distanceToNearestUnprotectedKnightOrBishop(fen),
     centerDistance: blackKing ? centerDistance(blackKing.square) : 99,
-    mobilityScore: -getChess(fen).moves().length,
+    // Candidate positions follow Black's move, so the FEN normally has White to move.
+    mobilityScore: -getChess(withFenTurn(fen, "b")).moves().length,
     whiteKingDistanceScore:
       whiteKing && blackKing
         ? -manhattanDistance(whiteKing.square, blackKing.square)
