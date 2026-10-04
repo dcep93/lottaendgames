@@ -176,6 +176,8 @@ export type RegisteredMateRuleSet = {
   readonly blackCandidates: (
     fen: string,
     previousTurnFen?: string,
+    /** Position immediately before the White move being answered. */
+    beforeWhiteFen?: string,
   ) => OpponentCandidates
   readonly help: RuleHelp
   readonly whiteRuleDescriptions: readonly RuleDescription[]
@@ -216,6 +218,8 @@ export type MateRuleSet<Score> = {
   readonly blackCandidates: (
     fen: string,
     previousTurnFen?: string,
+    /** Position immediately before the White move being answered. */
+    beforeWhiteFen?: string,
   ) => OpponentCandidates
   readonly help: RuleHelp
 }

@@ -77,7 +77,7 @@ function isSelectedBlackReplyIdeal(
     if (chess.move(log.san) === null) return false
 
     return ruleSet
-      .blackCandidates(chess.fen(), logs[logIndex - 1]?.fen)
+      .blackCandidates(chess.fen(), logs[logIndex - 1]?.fen, log.fen)
       .idealMoves.includes(log.opponentSan)
   } catch {
     return false

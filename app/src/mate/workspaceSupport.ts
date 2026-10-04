@@ -62,6 +62,7 @@ export function getBlackReplyChoices(
     const candidates = ruleSet.blackCandidates(
       chess.fen(),
       session.logs[logIndex - 1]?.fen,
+      log.fen,
     )
     return idealOnly ? candidates.idealMoves : candidates.moves
   } catch {

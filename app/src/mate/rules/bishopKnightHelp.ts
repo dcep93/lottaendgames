@@ -8,9 +8,9 @@ export const bishopKnightHelp: RuleHelp = {
   blackIntro:
     "Black uses its own priorities to put up the strongest resistance. Black is trying to resist the mate, and looks for the most stubborn legal reply.",
   blackPriorities: [
+    "After White plays a mating-net move, choose randomly from all legal replies.",
     BLACK_CAPTURE_PRIORITY,
     BLACK_RETURN_PRIORITY,
-    "In the W maneuver, or when any reply enters the finishing route, treat every legal reply as equally strong.",
     "Move toward an unprotected bishop or knight.",
     "Run toward the center.",
     "Keep as many legal king moves as possible.",

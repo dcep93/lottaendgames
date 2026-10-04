@@ -3,7 +3,7 @@ import {knightAndBishopWhiteRules} from "./bishopKnightPriorities";
 import {bishopKnightPiecePreservationMoves} from './bishopKnightPiecePreservation';
 import {bishopKnightHelp} from "./bishopKnightHelp";
 import type {KnightAndBishopWhiteMoveScore, KnightAndBishopBlackMoveScore} from "./bishopKnightScores";
-import { bishopKnightStageMoves, type BishopKnightStage } from "./bishopKnightStages";
+import { bishopKnightStageMoves, isBishopKnightMatingNetReply, type BishopKnightStage } from "./bishopKnightStages";
 import { rareEscapeReturnExcluded, canEnterRareEscapeFormation, rareDegenerateEscapeMove, rareEscapeStartingFormation } from "./bishopKnightRareEscape";
 import { bishopCentralPathDistances } from "./bishopKnightBishopPath";
 import { declaredKnightDefenseMove } from "./bishopKnightDeclaredDefense";
@@ -37,7 +37,6 @@ import {
   getKnightAndBishopLookupWhiteMoves,
   getKnightAndBishopPhaseLabel,
   getKnightAndBishopPhaseAfterWhiteMove,
-  isKnightAndBishopWManeuverPosition,
   knightAndBishopPiecesPresent,
 } from "./bishopKnightLookup";
 import { knightMoveDistance, knightAndBishopKnightTargetSquares, knightAndBishopKnightProximityToSquare, knightKingProtectionDistance, knightAndBishopCenterProximityScore, knightAndBishopKingCenterProximityScore, knightAndBishopKingCenterEuclideanScore, knightAndBishopKnightTargetProximityScore, knightAndBishopTargetCorners } from "./bishopKnightStrategy";
@@ -825,20 +824,18 @@ function selectIdealBlackMoves(
 export function getKnightAndBishopOpponentCandidates(
   fen: string,
   previousTurnFen?: string,
+  beforeWhiteFen?: string,
 ): OpponentCandidates {
   const moves = getChess(fen).moves();
   if (moves.length === 0) return { moves, idealMoves: [] };
+  if (isBishopKnightMatingNetReply(fen, beforeWhiteFen)) {
+    return { moves, idealMoves: moves };
+  }
   const priorityMoves = applyUniversalBlackPriorities(
     fen,
     previousTurnFen,
     moves,
   );
-  if (
-    isKnightAndBishopWManeuverPosition(fen) ||
-    knightAndBishopBlackHasLookupReply(fen, priorityMoves)
-  ) {
-    return { moves, idealMoves: priorityMoves };
-  }
   return { moves, idealMoves: selectIdealBlackMoves(fen, priorityMoves) };
 }
 

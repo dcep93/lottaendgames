@@ -214,6 +214,7 @@ function returningPlayBestTurns(
     const candidates = ruleSet.blackCandidates(
       afterWhite.fen(),
       previousTurnFen,
+      session.fen,
     )
     const blackMoves =
       candidates.idealMoves.length > 0
@@ -324,6 +325,7 @@ function completeWhiteTurn(options: {
     const candidates = ruleSet.blackCandidates(
       chess.fen(),
       previousWhiteTurnFen(prefixLogs),
+      preMoveFen,
     )
     if (candidates.moves.length === 0) {
       throw new Error(
@@ -688,6 +690,7 @@ export function replaceHistoricalBlackMove(
   const candidates = ruleSet.blackCandidates(
     chess.fen(),
     previousWhiteTurnFen(prefixLogs),
+    originalLog.fen,
   )
   if (!candidates.moves.includes(san)) return session
   const blackMove = tryMove(chess, san)

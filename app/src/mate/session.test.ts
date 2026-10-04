@@ -601,11 +601,13 @@ test('historical Black replacement accepts any legal reply and truncates later t
   assertCurrentSnapshot(replaced)
 })
 
-test('passes the prior White-turn FEN to Black reply selection', () => {
+test('passes both the previous turn and current White-move source to Black reply selection', () => {
   const seenPreviousFens: Array<string | undefined> = []
+  const seenBeforeWhiteFens: Array<string | undefined> = []
   const ruleSet = createRuleSet({
-    blackCandidates: (fen, previousTurnFen) => {
+    blackCandidates: (fen, previousTurnFen, beforeWhiteFen) => {
       seenPreviousFens.push(previousTurnFen)
+      seenBeforeWhiteFens.push(beforeWhiteFen)
       const moves = getChess(fen).moves()
       return { moves, idealMoves: moves.slice(0, 1) }
     },
@@ -623,6 +625,7 @@ test('passes the prior White-turn FEN to Black reply selection', () => {
   session = playWhiteMove(session, whiteMoves(session.fen)[0]!, deps)
 
   assert.deepEqual(seenPreviousFens, [undefined, getChess(START_FEN).fen()])
+  assert.deepEqual(seenBeforeWhiteFens, session.logs.map(log => log.fen))
 })
 
 test('uses one combined White analysis for correctness and explanation', () => {

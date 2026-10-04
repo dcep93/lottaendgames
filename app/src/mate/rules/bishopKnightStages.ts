@@ -8,6 +8,7 @@ export const r1Start = data.r1Start;
 export const r2Starts: readonly string[] = data.r2Starts;
 type Route = {stage: 1 | 2; remaining: number; destinations: readonly string[]};
 const r1Routes = new Map<string, Route & {moves: string[]}>();
+const r1Results = new Set<string>();
 const reflect = (key: string, transform: typeof SQUARE_TRANSFORMS[number]) =>
   (key.match(/../g)! as Square[]).map(square => transformSquare(square, transform)).join('');
 const bounds = new Map(data.sources.map(row => [row[0] as string, row[2] as number]));
@@ -16,6 +17,7 @@ for (const row of data.r1Edges) {
   for (const transform of SQUARE_TRANSFORMS) {
     const from = reflect(source, transform);
     const to = destinations.map(key => reflect(key, transform));
+    for (const destination of to) r1Results.add(destination);
     const moves = to.map(destination => {
       const index = [0, 2, 4].find(i => from.slice(i, i + 2) !== destination.slice(i, i + 2))!;
       return from.slice(index, index + 2) + destination.slice(index, index + 2);
@@ -31,6 +33,17 @@ export function bishopKnightPositionKey(fen: string): string | undefined {
   const ordered = ([['w', 'k'], ['w', 'b'], ['w', 'n'], ['b', 'k']] as const)
     .map(([color, piece]) => pieces.find(p => p.color === color && p.type === piece)?.square);
   return ordered.every(Boolean) ? ordered.join('') : undefined;
+}
+
+/** Recognize the actual r1 move, or its result when loading without history. */
+export function isBishopKnightMatingNetReply(fen: string, beforeWhiteFen?: string): boolean {
+  if (fen.split(' ')[1] !== 'b') return false;
+  const result = bishopKnightPositionKey(fen);
+  if (!result) return false;
+  if (beforeWhiteFen === undefined) return r1Results.has(result);
+  if (beforeWhiteFen.split(' ')[1] !== 'w') return false;
+  const source = bishopKnightPositionKey(beforeWhiteFen);
+  return source !== undefined && (r1Routes.get(source)?.destinations.includes(result) ?? false);
 }
 
 export function bishopKnightStagePosition(fen: string): Readonly<Route> | undefined {

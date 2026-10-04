@@ -149,9 +149,9 @@ test("bishop-and-knight rules are registered", () => {
   ]);
   assert.equal(ruleSet.help.noteBoards.some(board => board.id === "bishop-knight-rule-r4-flush"), false);
   assert.deepEqual(ruleSet.help.blackPriorities, [
+    "After White plays a mating-net move, choose randomly from all legal replies.",
     "Take a piece when White isn't looking.",
     "Return to the previous board position when possible.",
-    "In the W maneuver, or when any reply enters the finishing route, treat every legal reply as equally strong.",
     "Move toward an unprotected bishop or knight.",
     "Run toward the center.",
     "Keep as many legal king moves as possible.",
