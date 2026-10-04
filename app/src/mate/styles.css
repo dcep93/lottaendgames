@@ -291,7 +291,6 @@
   flex-wrap: wrap;
   gap: 0.5rem;
   align-items: center;
-  margin-left: auto;
 }
 
 .leg-mate-controls {
@@ -320,9 +319,11 @@
   align-items: center;
 }
 
-.leg-mate-controls-summary {
-  margin-left: auto;
-  justify-content: flex-end;
+/* Let the leading group fill each row so trailing controls align left on wrap. */
+.leg-mate-options-session > .leg-mate-mode-selector,
+.leg-mate-controls-actions,
+.leg-mate-timer-controls {
+  flex-grow: 1;
 }
 
 .leg-mate-options button,
@@ -419,8 +420,6 @@
   flex-wrap: wrap;
   gap: 0.4rem 0.65rem;
   align-items: center;
-  margin-left: auto;
-  justify-content: flex-end;
 }
 
 .leg-mate-hint-toggle {
