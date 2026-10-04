@@ -1,0 +1,769 @@
+{
+  "definition": "Keep earlier rules; omit this rule; apply all later rules. Relevant if a move excluded by the full policy survives.",
+  "scope": "roots",
+  "population": 312286,
+  "positions": 312286,
+  "complete": true,
+  "unit": "equally weighted symmetry-canonical White-to-move positions",
+  "census": "/Users/danielcepeda/repos/lottaendgames/tmp/mate-verifier-census/6071067b780e-22ef30d6c462/graph.sqlite",
+  "fingerprints": {
+    "engine": "a6e6a2f96d6bda081241240f5b81ddb2f9498774b8f542e004c302f375eaa69c",
+    "policy": "2716d94ca8aed3a4c527ca0ac5928d28ef49b4b8526131918cd55814e84c1e07"
+  },
+  "sourceSha256": "b3f8dbd528536609852fc3b4f7e69c76a50e1dfb61c7b4f2aeefba02449211db",
+  "elapsedMs": 368347,
+  "rules": [
+    {
+      "id": "mate",
+      "name": "mate",
+      "filteringPositions": 396,
+      "relevantPositions": 383,
+      "restoredMoves": 383,
+      "examples": [
+        {
+          "fen": "7k/8/4BK2/4B3/8/8/8/8 w - - 0 1",
+          "selected": [
+            "Kg6#"
+          ],
+          "newlyAdmitted": [
+            "Kf7+"
+          ]
+        },
+        {
+          "fen": "7k/8/4BK2/8/3B4/8/8/8 w - - 0 1",
+          "selected": [
+            "Kg6#"
+          ],
+          "newlyAdmitted": [
+            "Kf7+"
+          ]
+        },
+        {
+          "fen": "7k/8/4BK2/8/8/2B5/8/8 w - - 0 1",
+          "selected": [
+            "Kg6#"
+          ],
+          "newlyAdmitted": [
+            "Kf7+"
+          ]
+        }
+      ],
+      "percent": 0.12264398660202507
+    },
+    {
+      "id": "bishops safe",
+      "name": "pieces safe",
+      "filteringPositions": 229399,
+      "relevantPositions": 5983,
+      "restoredMoves": 6058,
+      "examples": [
+        {
+          "fen": "4K1Bk/8/7B/8/8/8/8/8 w - - 0 1",
+          "selected": [
+            "Ba2"
+          ],
+          "newlyAdmitted": [
+            "Bf8"
+          ]
+        },
+        {
+          "fen": "2B5/8/8/8/8/8/8/4K1Bk w - - 0 1",
+          "selected": [
+            "Ba7"
+          ],
+          "newlyAdmitted": [
+            "Bb7+"
+          ]
+        },
+        {
+          "fen": "4KB1k/7B/8/8/8/8/8/8 w - - 0 1",
+          "selected": [
+            "Bb1"
+          ],
+          "newlyAdmitted": [
+            "Kf7"
+          ]
+        }
+      ],
+      "percent": 1.915871989138162
+    },
+    {
+      "id": "no stalemate",
+      "name": "no stalemate",
+      "filteringPositions": 4830,
+      "relevantPositions": 858,
+      "restoredMoves": 858,
+      "examples": [
+        {
+          "fen": "4KBBk/8/8/8/8/8/8/8 w - - 0 1",
+          "selected": [
+            "Ba2"
+          ],
+          "newlyAdmitted": [
+            "Kf7"
+          ]
+        },
+        {
+          "fen": "3BK1Bk/8/8/8/8/8/8/8 w - - 0 1",
+          "selected": [
+            "Be6"
+          ],
+          "newlyAdmitted": [
+            "Kf7"
+          ]
+        },
+        {
+          "fen": "1B2K1Bk/8/8/8/8/8/8/8 w - - 0 1",
+          "selected": [
+            "Be6"
+          ],
+          "newlyAdmitted": [
+            "Kf7"
+          ]
+        }
+      ],
+      "percent": 0.2747481475314295
+    },
+    {
+      "id": "rule r0.5",
+      "name": "mating net",
+      "filteringPositions": 904,
+      "relevantPositions": 742,
+      "restoredMoves": 742,
+      "examples": [
+        {
+          "fen": "7k/4BK2/4B3/8/8/8/8/8 w - - 0 1",
+          "selected": [
+            "Bg5"
+          ],
+          "newlyAdmitted": [
+            "Bd8"
+          ]
+        },
+        {
+          "fen": "2k5/8/1K6/1BB5/8/8/8/8 w - - 0 1",
+          "selected": [
+            "Be7"
+          ],
+          "newlyAdmitted": [
+            "Ba4"
+          ]
+        },
+        {
+          "fen": "2B4k/8/6K1/6B1/8/8/8/8 w - - 0 1",
+          "selected": [
+            "Be7"
+          ],
+          "newlyAdmitted": [
+            "Bf5"
+          ]
+        }
+      ],
+      "percent": 0.2376027103360381
+    },
+    {
+      "id": "rule r1",
+      "name": "corner post",
+      "filteringPositions": 2888,
+      "relevantPositions": 2447,
+      "restoredMoves": 2483,
+      "examples": [
+        {
+          "fen": "5K1k/8/8/8/8/1B2B3/8/8 w - - 0 1",
+          "selected": [
+            "Kf7"
+          ],
+          "newlyAdmitted": [
+            "Bd4+"
+          ]
+        },
+        {
+          "fen": "5K1k/8/8/8/8/4B3/6B1/8 w - - 0 1",
+          "selected": [
+            "Kf7"
+          ],
+          "newlyAdmitted": [
+            "Bf4"
+          ]
+        },
+        {
+          "fen": "5K1k/8/8/8/8/4B3/4B3/8 w - - 0 1",
+          "selected": [
+            "Kf7"
+          ],
+          "newlyAdmitted": [
+            "Bf3"
+          ]
+        }
+      ],
+      "percent": 0.7835765932510583
+    },
+    {
+      "id": "rule r3",
+      "name": "leave corners",
+      "filteringPositions": 166378,
+      "relevantPositions": 38137,
+      "restoredMoves": 38280,
+      "examples": [
+        {
+          "fen": "7B/8/8/7K/8/7B/8/7k w - - 0 1",
+          "selected": [
+            "Be5"
+          ],
+          "newlyAdmitted": [
+            "Bf5"
+          ]
+        },
+        {
+          "fen": "3K1B1k/8/8/8/8/8/8/7B w - - 0 1",
+          "selected": [
+            "Bd5"
+          ],
+          "newlyAdmitted": [
+            "Bd6"
+          ]
+        },
+        {
+          "fen": "7B/8/8/7K/6B1/8/8/7k w - - 0 1",
+          "selected": [
+            "Be5"
+          ],
+          "newlyAdmitted": [
+            "Bf5"
+          ]
+        }
+      ],
+      "percent": 12.212202916557258
+    },
+    {
+      "id": "rule r5",
+      "name": "corner cage",
+      "filteringPositions": 2039,
+      "relevantPositions": 748,
+      "restoredMoves": 748,
+      "examples": [
+        {
+          "fen": "2KB1k2/8/4B3/8/8/8/8/8 w - - 0 1",
+          "selected": [
+            "Bf6"
+          ],
+          "newlyAdmitted": [
+            "Kd7"
+          ]
+        },
+        {
+          "fen": "2K2k2/8/4BB2/8/8/8/8/8 w - - 0 1",
+          "selected": [
+            "Kc7"
+          ],
+          "newlyAdmitted": [
+            "Bd8"
+          ]
+        },
+        {
+          "fen": "2K2k2/8/5B2/5B2/8/8/8/8 w - - 0 1",
+          "selected": [
+            "Be6"
+          ],
+          "newlyAdmitted": [
+            "Bh4"
+          ]
+        }
+      ],
+      "percent": 0.23952402605304113
+    },
+    {
+      "id": "rule r5.5",
+      "name": "corner push",
+      "filteringPositions": 364,
+      "relevantPositions": 332,
+      "restoredMoves": 332,
+      "examples": [
+        {
+          "fen": "6kB/8/6K1/5B2/8/8/8/8 w - - 0 1",
+          "selected": [
+            "Bb2"
+          ],
+          "newlyAdmitted": [
+            "Bf6"
+          ]
+        },
+        {
+          "fen": "6kB/8/6K1/8/4B3/8/8/8 w - - 0 1",
+          "selected": [
+            "Bb2"
+          ],
+          "newlyAdmitted": [
+            "Be5"
+          ]
+        },
+        {
+          "fen": "1k6/8/1K6/2B5/8/8/8/7B w - - 0 1",
+          "selected": [
+            "Bg2"
+          ],
+          "newlyAdmitted": [
+            "Bc6"
+          ]
+        }
+      ],
+      "percent": 0.10631280300749954
+    },
+    {
+      "id": "rule r6",
+      "name": "net setup",
+      "filteringPositions": 33935,
+      "relevantPositions": 4275,
+      "restoredMoves": 4322,
+      "examples": [
+        {
+          "fen": "3k4/8/1K6/1BB5/8/8/8/8 w - - 0 1",
+          "selected": [
+            "Ba4"
+          ],
+          "newlyAdmitted": [
+            "Bb4"
+          ]
+        },
+        {
+          "fen": "3BK2k/8/8/5B2/8/8/8/8 w - - 0 1",
+          "selected": [
+            "Be6"
+          ],
+          "newlyAdmitted": [
+            "Kd7"
+          ]
+        },
+        {
+          "fen": "4K2k/4B3/8/5B2/8/8/8/8 w - - 0 1",
+          "selected": [
+            "Be6"
+          ],
+          "newlyAdmitted": [
+            "Kd7"
+          ]
+        }
+      ],
+      "percent": 1.3689374483646402
+    },
+    {
+      "id": "rule r6.2",
+      "name": "flank step",
+      "filteringPositions": 5,
+      "relevantPositions": 4,
+      "restoredMoves": 4,
+      "examples": [
+        {
+          "fen": "8/3k4/8/3BB3/3K4/8/8/8 w - - 0 1",
+          "selected": [
+            "Kc5"
+          ],
+          "newlyAdmitted": [
+            "Bg7"
+          ]
+        },
+        {
+          "fen": "8/8/3K4/3BB3/8/3k4/8/8 w - - 0 1",
+          "selected": [
+            "Kc5"
+          ],
+          "newlyAdmitted": [
+            "Bh2"
+          ]
+        },
+        {
+          "fen": "3K4/3BB3/8/3k4/8/8/8/8 w - - 0 1",
+          "selected": [
+            "Kc7"
+          ],
+          "newlyAdmitted": [
+            "Bh4"
+          ]
+        }
+      ],
+      "percent": 0.0012808771446686691
+    },
+    {
+      "id": "rule r6.4",
+      "name": "choke",
+      "filteringPositions": 1353,
+      "relevantPositions": 842,
+      "restoredMoves": 842,
+      "examples": [
+        {
+          "fen": "2K1B2k/8/8/B7/8/8/8/8 w - - 0 1",
+          "selected": [
+            "Bc6"
+          ],
+          "newlyAdmitted": [
+            "Bb5"
+          ]
+        },
+        {
+          "fen": "2KB3k/8/2B5/8/8/8/8/8 w - - 0 1",
+          "selected": [
+            "Bc7"
+          ],
+          "newlyAdmitted": [
+            "Bd7"
+          ]
+        },
+        {
+          "fen": "2KB3k/8/8/1B6/8/8/8/8 w - - 0 1",
+          "selected": [
+            "Bc6"
+          ],
+          "newlyAdmitted": [
+            "Bd7"
+          ]
+        }
+      ],
+      "percent": 0.26962463895275485
+    },
+    {
+      "id": "rule r7",
+      "name": "hold the wall",
+      "filteringPositions": 220605,
+      "relevantPositions": 1830,
+      "restoredMoves": 1830,
+      "examples": [
+        {
+          "fen": "5B1k/8/6K1/8/8/3B4/8/8 w - - 0 1",
+          "selected": [
+            "Bc5"
+          ],
+          "newlyAdmitted": [
+            "Bg7+"
+          ]
+        },
+        {
+          "fen": "5B1k/8/6K1/8/8/8/2B5/8 w - - 0 1",
+          "selected": [
+            "Bh6"
+          ],
+          "newlyAdmitted": [
+            "Bg7+"
+          ]
+        },
+        {
+          "fen": "1B6/8/8/8/8/6K1/8/5B1k w - - 0 1",
+          "selected": [
+            "Bh3"
+          ],
+          "newlyAdmitted": [
+            "Bg2+"
+          ]
+        }
+      ],
+      "percent": 0.5860012936859161
+    },
+    {
+      "id": "rule r8",
+      "name": "shrink the cage",
+      "filteringPositions": 218712,
+      "relevantPositions": 153035,
+      "restoredMoves": 153218,
+      "examples": [
+        {
+          "fen": "1B2K1Bk/8/8/8/8/8/8/8 w - - 0 1",
+          "selected": [
+            "Be6"
+          ],
+          "newlyAdmitted": [
+            "Bd5"
+          ]
+        },
+        {
+          "fen": "4K1Bk/4B3/8/8/8/8/8/8 w - - 0 1",
+          "selected": [
+            "Be6"
+          ],
+          "newlyAdmitted": [
+            "Ba2"
+          ]
+        },
+        {
+          "fen": "4K1Bk/8/3B4/8/8/8/8/8 w - - 0 1",
+          "selected": [
+            "Be6"
+          ],
+          "newlyAdmitted": [
+            "Ba2"
+          ]
+        }
+      ],
+      "percent": 49.00475845859244
+    },
+    {
+      "id": "rule r9",
+      "name": "opposition",
+      "filteringPositions": 503,
+      "relevantPositions": 480,
+      "restoredMoves": 480,
+      "examples": [
+        {
+          "fen": "1kB1K3/8/8/8/7B/8/8/8 w - - 0 1",
+          "selected": [
+            "Kd8"
+          ],
+          "newlyAdmitted": [
+            "Bh3"
+          ]
+        },
+        {
+          "fen": "1k6/8/2K5/8/4B3/4B3/8/8 w - - 0 1",
+          "selected": [
+            "Kb6"
+          ],
+          "newlyAdmitted": [
+            "Kb5"
+          ]
+        },
+        {
+          "fen": "1k6/8/2K5/8/4B3/8/5B2/8 w - - 0 1",
+          "selected": [
+            "Kb6"
+          ],
+          "newlyAdmitted": [
+            "Kb5"
+          ]
+        }
+      ],
+      "percent": 0.1537052573602403
+    },
+    {
+      "id": "rule r10",
+      "name": "target square",
+      "filteringPositions": 60665,
+      "relevantPositions": 15711,
+      "restoredMoves": 15724,
+      "examples": [
+        {
+          "fen": "4KB1k/8/8/8/8/3B4/8/8 w - - 0 1",
+          "selected": [
+            "Bc5"
+          ],
+          "newlyAdmitted": [
+            "Bc4"
+          ]
+        },
+        {
+          "fen": "1B2K2k/8/8/5B2/8/8/8/8 w - - 0 1",
+          "selected": [
+            "Bc7"
+          ],
+          "newlyAdmitted": [
+            "Kd7"
+          ]
+        },
+        {
+          "fen": "4K2k/8/6BB/8/8/8/8/8 w - - 0 1",
+          "selected": [
+            "Bc1"
+          ],
+          "newlyAdmitted": [
+            "Ke7"
+          ]
+        }
+      ],
+      "percent": 5.030965204972365
+    },
+    {
+      "id": "rule r19",
+      "name": "bishop buffer",
+      "filteringPositions": 4012,
+      "relevantPositions": 1280,
+      "restoredMoves": 1282,
+      "examples": [
+        {
+          "fen": "5B1k/5B2/8/2K5/8/8/8/8 w - - 0 1",
+          "selected": [
+            "Bd6"
+          ],
+          "newlyAdmitted": [
+            "Kc6"
+          ]
+        },
+        {
+          "fen": "5B1k/8/8/2K5/2B5/8/8/8 w - - 0 1",
+          "selected": [
+            "Bd6"
+          ],
+          "newlyAdmitted": [
+            "Kc6"
+          ]
+        },
+        {
+          "fen": "5B1k/8/8/2K5/8/1B6/8/8 w - - 0 1",
+          "selected": [
+            "Bd6"
+          ],
+          "newlyAdmitted": [
+            "Kc6"
+          ]
+        }
+      ],
+      "percent": 0.4098806862939741
+    },
+    {
+      "id": "rule r24",
+      "name": "wall or moat",
+      "filteringPositions": 965,
+      "relevantPositions": 897,
+      "restoredMoves": 914,
+      "examples": [
+        {
+          "fen": "4B2k/8/6KB/8/8/8/8/8 w - - 0 1",
+          "selected": [
+            "Bd7"
+          ],
+          "newlyAdmitted": [
+            "Ba4"
+          ]
+        },
+        {
+          "fen": "5B1k/7B/5K2/8/8/8/8/8 w - - 0 1",
+          "selected": [
+            "Bg6"
+          ],
+          "newlyAdmitted": [
+            "Bb1"
+          ]
+        },
+        {
+          "fen": "2B5/8/8/8/8/5K2/8/6Bk w - - 0 1",
+          "selected": [
+            "Bf2"
+          ],
+          "newlyAdmitted": [
+            "Ba7"
+          ]
+        }
+      ],
+      "percent": 0.28723669969194904
+    },
+    {
+      "id": "rule r24.5",
+      "name": "back the wall",
+      "filteringPositions": 20360,
+      "relevantPositions": 11411,
+      "restoredMoves": 11414,
+      "examples": [
+        {
+          "fen": "3K3k/2B5/4B3/8/8/8/8/8 w - - 0 1",
+          "selected": [
+            "Kd7"
+          ],
+          "newlyAdmitted": [
+            "Ke7"
+          ]
+        },
+        {
+          "fen": "3K3k/2B5/8/5B2/8/8/8/8 w - - 0 1",
+          "selected": [
+            "Kd7"
+          ],
+          "newlyAdmitted": [
+            "Ke7"
+          ]
+        },
+        {
+          "fen": "3K3k/2B5/8/8/6B1/8/8/8 w - - 0 1",
+          "selected": [
+            "Kd7"
+          ],
+          "newlyAdmitted": [
+            "Ke7"
+          ]
+        }
+      ],
+      "percent": 3.654022274453546
+    },
+    {
+      "id": "rule r25",
+      "name": "king closer",
+      "filteringPositions": 8244,
+      "relevantPositions": 2347,
+      "restoredMoves": 2347,
+      "examples": [
+        {
+          "fen": "7K/8/8/8/8/7B/5B2/7k w - - 0 1",
+          "selected": [
+            "Kh7"
+          ],
+          "newlyAdmitted": [
+            "Kg7"
+          ]
+        },
+        {
+          "fen": "4B2k/8/7B/8/8/8/8/7K w - - 0 1",
+          "selected": [
+            "Kh2"
+          ],
+          "newlyAdmitted": [
+            "Kg2"
+          ]
+        },
+        {
+          "fen": "7K/8/8/8/8/4B2B/8/7k w - - 0 1",
+          "selected": [
+            "Kh7"
+          ],
+          "newlyAdmitted": [
+            "Kg7"
+          ]
+        }
+      ],
+      "percent": 0.7515546646343416
+    },
+    {
+      "id": "rule r30",
+      "name": "bishop shelter",
+      "filteringPositions": 27197,
+      "relevantPositions": 27197,
+      "restoredMoves": 91609,
+      "examples": [
+        {
+          "fen": "4KBBk/8/8/8/8/8/8/8 w - - 0 1",
+          "selected": [
+            "Ba2"
+          ],
+          "newlyAdmitted": [
+            "Bf7",
+            "Be6",
+            "Bd5",
+            "Bc4",
+            "Bb3"
+          ]
+        },
+        {
+          "fen": "4K1Bk/8/7B/8/8/8/8/8 w - - 0 1",
+          "selected": [
+            "Ba2"
+          ],
+          "newlyAdmitted": [
+            "Bf7",
+            "Be6",
+            "Bd5",
+            "Bc4",
+            "Bb3"
+          ]
+        },
+        {
+          "fen": "4K1Bk/8/8/8/1B6/8/8/8 w - - 0 1",
+          "selected": [
+            "Ba2"
+          ],
+          "newlyAdmitted": [
+            "Bf7",
+            "Be6",
+            "Bd5",
+            "Bc4",
+            "Bb3"
+          ]
+        }
+      ],
+      "percent": 8.709003925888448
+    }
+  ]
+}
