@@ -4,6 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "pretest": "npm run test:analytics",
+    "test:analytics": "tsx --test src/analytics.test.ts src/mate/analytics.test.ts",
     "dev": "vite",
     "audit:diagonal": "node ../scripts/bishop-knight-audit/run.mjs --scope supported",
     "audit:unsupported": "node ../scripts/bishop-knight-audit/run.mjs",

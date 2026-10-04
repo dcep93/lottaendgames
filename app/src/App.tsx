@@ -3,6 +3,7 @@ import AppX from './app_x'
 import Mate from './mate'
 import './mate/styles.css'
 import ModuleSelector from './ModuleSelector'
+import { trackPage } from './analytics'
 import {
   bookPathForChapterId,
   resolveAppRoute,
@@ -12,6 +13,13 @@ import {
 export default function App() {
   const [resolution, setResolution] = useState(readCurrentRoute)
   const { route } = resolution
+
+  useEffect(() => {
+    const path = resolution.href.split('#')[0]
+    trackPage(path, route.module === 'mate'
+      ? `Lotta Endgames · ${route.mateId ?? 'Mate'}`
+      : `Lotta Endgames · Book · ${route.chapterId}`)
+  }, [resolution, route])
 
   useEffect(() => {
     const previousScrollRestoration = window.history.scrollRestoration

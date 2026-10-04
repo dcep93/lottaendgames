@@ -1,4 +1,5 @@
 import React from 'react'
+import { createTrainingAnalytics, type TrainingAction } from './analytics'
 import type { MateBoardProps } from './MateBoard'
 import MateControls, { MateResult, MateTimerControls } from './MateControls'
 import MateLog from './MateLog'
@@ -119,6 +120,7 @@ export default function MateWorkspace({
       : null,
   )
   const sessionRef = React.useRef(session)
+  const [trackTraining] = React.useState(() => createTrainingAnalytics(sharedMoves !== null))
   const playBestAnimationRef = React.useRef<PlayBestAnimation | null>(null)
   const playBestTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(
     null,
@@ -169,9 +171,10 @@ export default function MateWorkspace({
   }, [shareStatus])
 
   const commitSession = React.useCallback(
-    (current: MateSession, next: MateSession) => {
+    (current: MateSession, next: MateSession, action: TrainingAction = 'review') => {
       if (next === current) return false
 
+      trackTraining(current, next, action)
       shareRequestRef.current += 1
       sessionRef.current = next
       setSession(next)
@@ -179,11 +182,11 @@ export default function MateWorkspace({
       setShareStatus('')
       return true
     },
-    [],
+    [trackTraining],
   )
 
   const commit = React.useCallback(
-    (transition: (current: MateSession) => MateSession) => {
+    (transition: (current: MateSession) => MateSession, action: TrainingAction = 'review') => {
       if (playBestAnimationRef.current !== null) return false
       const current = sessionRef.current
       let next: MateSession
@@ -192,13 +195,13 @@ export default function MateWorkspace({
       } catch {
         return false
       }
-      return commitSession(current, next)
+      return commitSession(current, next, action)
     },
     [commitSession],
   )
 
   const startOver = React.useCallback(
-    () => commit((current) => startOverMateSession(current, deps)),
+    () => commit((current) => startOverMateSession(current, deps), 'restart'),
     [commit, deps],
   )
   const undo = React.useCallback(
@@ -222,7 +225,7 @@ export default function MateWorkspace({
       if (next === current) return false
 
       const whiteFen = playBestWhiteFen(current, next)
-      if (whiteFen === null) return commitSession(current, next)
+      if (whiteFen === null) return commitSession(current, next, 'play_best')
 
       const animation = {
         nextSession: next,
@@ -242,7 +245,7 @@ export default function MateWorkspace({
         }
         playBestAnimationRef.current = null
         setPlayBestAnimation(null)
-        commitSession(animation.sourceSession, animation.nextSession)
+        commitSession(animation.sourceSession, animation.nextSession, 'play_best')
       }, MATE_MOVE_ANIMATION_MS)
       return true
     },
@@ -254,6 +257,7 @@ export default function MateWorkspace({
         getChess(current.fen).turn() === 'w'
           ? playWhiteMove(current, san, deps)
           : playBlackMove(current, san, deps),
+        'play',
       ),
     [commit, deps],
   )

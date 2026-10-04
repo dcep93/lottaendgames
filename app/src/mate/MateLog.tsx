@@ -1,5 +1,6 @@
 import { getTwoKnightsPawnBoardOutcome, getTwoKnightsPawnPermittedMoves } from './rules/twoKnightsPawnMoves'
 import React from 'react'
+import { trackEvent } from '../analytics'
 import MateOptions from './MateOptions'
 import { getChess } from './chess'
 import MatePriorityGuideDialog from './MatePriorityGuide'
@@ -101,6 +102,11 @@ export default function MateLog({
 }: MateLogProps) {
   const [showReasonHints, setShowReasonHints] = React.useState(false)
   const [guideOpen, setGuideOpen] = React.useState(false)
+  const previousGuideOpen = React.useRef(false)
+  React.useEffect(() => {
+    if (guideOpen && !previousGuideOpen.current) trackEvent('training_info_opened', { mating_set: ruleSet.id })
+    previousGuideOpen.current = guideOpen
+  }, [guideOpen, ruleSet.id])
   const [copyStatus, setCopyStatus] = React.useState<{ message: string } | null>(null)
   React.useEffect(() => setCopyStatus(null), [startingFen, logs])
   React.useEffect(() => {
@@ -238,9 +244,10 @@ export default function MateLog({
             <input
               aria-label="Show reason hints"
               checked={showReasonHints}
-              onChange={(event) =>
+              onChange={(event) => {
                 setShowReasonHints(event.currentTarget.checked)
-              }
+                if (event.currentTarget.checked) trackEvent('reason_hints_enabled', { mating_set: ruleSet.id })
+              }}
               type="checkbox"
             />
             <span>Show reason hints</span>
