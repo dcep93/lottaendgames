@@ -98,7 +98,7 @@ function MateMaterialIcon({ mateId }: { readonly mateId: MateModuleId }) {
         const renderPiece = defaultPieces[pieceType]
         return renderPiece === undefined ? null : (
           <span
-            className="leg-mate-material-piece"
+            className={`leg-mate-material-piece${pieceType.startsWith('b') ? ' leg-mate-material-piece--black' : ''}`}
             key={`${pieceType}-${index}`}
           >
             {renderPiece({
