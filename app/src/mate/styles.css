@@ -498,6 +498,7 @@ dialog.leg-knight-queen-guide {
   inset: 0;
   margin: auto;
   width: min(69.6rem, calc(100vw - 2rem));
+  max-width: none;
   max-height: calc(100svh - 2rem);
   padding: 0;
   color: var(--leg-text);
