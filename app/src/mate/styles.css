@@ -746,6 +746,10 @@ dialog.leg-knight-queen-guide::backdrop {
   color: var(--leg-text);
 }
 
+.leg-mate-guide-body .leg-mate-note-emphasis {
+  color: var(--leg-pink);
+}
+
 .leg-mate-guide-priority-highlighted {
   border-radius: 0.3rem;
   outline: 0.125rem solid var(--leg-rose);

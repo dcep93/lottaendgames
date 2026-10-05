@@ -1356,6 +1356,7 @@ test('priority guide follows registered facade order and renders typed diagrams'
   for (const note of ruleSet.help.notes) {
     const renderedNote = note.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
       '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+      .replace(/\*\*([^*]+)\*\*/g, '<strong class="leg-mate-note-emphasis">$1</strong>')
     assert.ok(decodedMarkup.includes(renderedNote))
     assert.ok(
       decodedMarkup.indexOf(renderedNote) <

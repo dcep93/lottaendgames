@@ -21,8 +21,11 @@ function isFocusable(element: HTMLElement): boolean {
 }
 
 function NoteText({ text }: { readonly text: string }) {
-  return text.split(/(\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g).map((part, index) => {
+  return text.split(/(\[[^\]]+\]\(https?:\/\/[^\s)]+\)|\*\*[^*]+\*\*)/g).map((part, index) => {
     const link = part.match(/^\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)$/)
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return <strong className="leg-mate-note-emphasis" key={index}>{part.slice(2, -2)}</strong>
+    }
     return link ? (
       <a key={index} href={link[2]} target="_blank" rel="noopener noreferrer">{link[1]}</a>
     ) : part
