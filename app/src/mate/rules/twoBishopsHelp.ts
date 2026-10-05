@@ -39,7 +39,7 @@ const RULE_R5_5_FORCE_CORNER_NOTE_BOARD = {
 
 const RULE_R9_OPPOSITION_NOTE_BOARD = {
   id: 'two-bishops-rule-r9-opposition',
-  title: 'Opposition',
+  title: 'Cage opposition',
   caption:
     "Kg5 takes opposition on outer wall c1–h6; inner wall b1–h7.",
   pieces: [

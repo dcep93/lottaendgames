@@ -1822,7 +1822,7 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
     },
     {
       id: 'rule r3',
-      shortLabel: 'leave corners',
+      shortLabel: 'vacate corner',
       helpText:
         "Prefer White's king out of the corner, then bishops not adjacent to a cornered White king, then bishops out of the corner.",
       compare: (first, second) =>
@@ -1832,7 +1832,7 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
     },
     {
       id: 'rule r5',
-      shortLabel: 'corner cage',
+      shortLabel: 'prepare mate',
       helpText:
         'Prefer bishops on adjacent squares on their Phase 2 diagonals, enclosing Black on 2 edge squares, then prefer the White king on the Phase 2 square in line with those bishops.',
       subpriorities: [
@@ -1921,7 +1921,7 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
     },
     {
       id: 'rule r9',
-      shortLabel: 'opposition',
+      shortLabel: 'cage opposition',
       helpText:
         "When the Black king is edge adjacent to the inner wall and the outer bishop is not on the target corner's edge, prefer White's king on the outer wall square in opposition to Black's king and closer to both bishops.",
       compare: (first, second) => first.ruleR9Penalty - second.ruleR9Penalty,
@@ -1948,14 +1948,14 @@ export const twoBishopsWhiteRules: readonly OrderedRule<TwoBishopsWhiteMoveScore
     },
     {
       id: 'rule r19',
-      shortLabel: 'bishop buffer',
+      shortLabel: 'distant bishop',
       helpText: "If the white King is on or adjacent to the outer diagonal, prefer the outer bishop at least 3 steps away from Black's king.",
       applies: (score) => score.ruleR19Applies,
       compare: (first, second) => first.ruleR19Penalty - second.ruleR19Penalty,
     },
     {
       id: 'rule r24',
-      shortLabel: 'wall or moat',
+      shortLabel: 'bishop wall',
       helpText: 'Prefer a bishop wall, otherwise prefer a bishop inside a king moat.',
       compare: (first, second) => first.ruleR24Penalty - second.ruleR24Penalty,
     },
