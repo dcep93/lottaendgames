@@ -45,8 +45,7 @@ export const bishopKnightHelp: RuleHelp = {
     "Step 2, force black into the mating net.",
     "Step 3, execute the **mating net**.",
     'Jump to a future step when possible.',
-    "The **training wheels** toggle preloads the start of step 3. These moves should be played accurately for **any combination** of Black's evasion.",
-    'In a previous iteration of this app, I had human-understandable rules for steps 1 and 2, but there were way too many rules (2 bishops is complex enough!), and it wasn\'t really useful. If you have ideas on an algorithm, let\'s work together!',
-    'For now, "best move" is just the one that forces black to the next step fastest. Feel free to get creative for steps 1 and 2, but step 3 should be memorized for this approach.',
+    "The training wheels toggle preloads the start of step 3. These moves should be studied accurately for any combination of Black's evasion.",
+    'In a previous iteration of this app, I had human-understandable rules for steps 1 and 2, but there were way too many rules (2 bishops is complex enough!), and it wasn\'t really useful. If you have ideas on an algorithm, let\'s work together! I\'ve spent about 100 hours on these checkmating patterns, so experimenting with your fresh ideas should be direct and helpful.',
   ],
 };
