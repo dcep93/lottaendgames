@@ -4,6 +4,8 @@ import type { RegisteredMateRuleSet, RuleNoteBoard } from './rules'
 import MateRuleNoteBoard from './MateRuleNoteBoard'
 import type { MateMode } from './types'
 
+const twoBishopsEmphasizedRules = new Set(['rule r0.5', 'rule r6', 'rule r8', 'rule r10'])
+
 export type MatePriorityGuideDialogProps = {
   readonly highlightedReasonId?: string | null
   readonly mateMode: MateMode
@@ -166,6 +168,7 @@ export default function MatePriorityGuideDialog({
                   <PriorityList
                     highlightedReasonId={highlightedReasonId}
                     priorities={techniqueWhitePriorities}
+                    emphasizedRuleIds={ruleSet.id === 'two-bishops' ? twoBishopsEmphasizedRules : undefined}
                     start={4}
                   />
                 </div>
@@ -263,10 +266,12 @@ function PriorityList({
   highlightedReasonId,
   priorities,
   start,
+  emphasizedRuleIds,
 }: {
   readonly highlightedReasonId: string | null
   readonly priorities: RegisteredMateRuleSet['whiteRuleDescriptions']
   readonly start?: number
+  readonly emphasizedRuleIds?: ReadonlySet<string>
 }) {
   return (
     <ol {...(start === undefined ? {} : { start })}>
@@ -282,7 +287,7 @@ function PriorityList({
             }
             key={rule.id}
           >
-            <strong>{rule.shortLabel}</strong>
+            <strong className={emphasizedRuleIds?.has(rule.id) ? 'leg-mate-rule-emphasis' : undefined}>{rule.shortLabel}</strong>
             {rule.helpText === '' ? null : <> — {rule.helpText}</>}
           </li>
         )

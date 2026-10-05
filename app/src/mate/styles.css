@@ -746,7 +746,8 @@ dialog.leg-knight-queen-guide::backdrop {
   color: var(--leg-text);
 }
 
-.leg-mate-guide-body .leg-mate-note-emphasis {
+.leg-mate-guide-body .leg-mate-note-emphasis,
+.leg-mate-guide-body .leg-mate-rule-emphasis {
   color: var(--leg-pink);
 }
 
