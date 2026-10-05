@@ -43,7 +43,7 @@ Start Over permits a new start/completion. Completions include `mating_set`,
 Register the categorical parameters as event-scoped custom dimensions in GA4
 to break reports down by material, training style, or assistance.
 
-The kingless Knight vs Queen exercise uses separate `exercise_started` and
+The kingless B. F. Knight exercise uses separate `exercise_started` and
 `exercise_completed` events with `exercise: knight-queen`. Completion includes
 move count, duration, and whether Play Best was used; it is not a checkmate.
 

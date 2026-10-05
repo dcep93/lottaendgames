@@ -1,4 +1,4 @@
-# Knight vs Queen exercise
+# B. F. Knight exercise
 
 Add `/mate/knight-queen` to the existing material navigation, using a white
 knight and black queen icon like the Two Knights vs Pawn entry. This is a
@@ -21,8 +21,8 @@ the current target supplies shortest-path Best Moves. Restart, undo, redo,
 move history, hidden-but-recorded timing, and keyboard shortcuts retain the
 existing trainer behavior. Completion stops play and freezes the timer.
 
-Training Info explains the unusual setup, safe destinations, snaking target
-order, stepping stones, and Best Move. Escape toggles its accessible dialog.
+Training Info contains only: "maneuver a knight across the board while avoiding
+squares attacked by a stationary enemy queen". Escape toggles its accessible dialog.
 Route completion uses exercise analytics rather than reporting a checkmate.
 
 Implementation order: pure route/graph/session model; navigation and routing;

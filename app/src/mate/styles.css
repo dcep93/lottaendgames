@@ -511,10 +511,6 @@ dialog.leg-knight-queen-guide::backdrop {
   background: rgba(0, 0, 0, 0.65);
 }
 
-.leg-knight-queen-route {
-  line-height: 1.8;
-}
-
 .leg-mate-log-intrinsic-column {
   width: 1%;
 }

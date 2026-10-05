@@ -83,7 +83,7 @@ export default function KnightQueenWorkspace({ BoardComponent }: {
     writeMateTimerPreference(!showTimer)
   }
   return (
-    <section aria-label="Knight vs Queen exercise" className="leg-mate-workspace"
+    <section aria-label="B. F. Knight exercise" className="leg-mate-workspace"
       onClick={event => releasePointerButtonFocus(event.detail, event.target)}>
       <div className="leg-mate-board-column">
         <BoardComponent

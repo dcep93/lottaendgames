@@ -18,17 +18,19 @@ function BoardProbe(props: MateBoardProps) {
 const page = () => <React.StrictMode><Mate boardComponent={BoardProbe} moduleSelector={<nav />} onNavigate={() => undefined}
   route={{ module: 'mate', mateId: 'knight-queen', mateMode: null, sharedFen: null }} /></React.StrictMode>
 
-test('Knight vs Queen renders its material entry, compact exercise controls, and highlighted target without modes', () => {
+test('B. F. Knight renders its material entry, compact exercise controls, and highlighted target without modes', () => {
   const markup = renderToStaticMarkup(page())
-  assert.match(markup, /aria-label="Knight vs Queen, selected"/)
-  assert.match(markup, /title="Knight vs Queen"/)
+  assert.match(markup, /aria-label="B\. F\. Knight, selected"/)
+  assert.match(markup, /title="B\. F\. Knight"/)
   assert.match(markup, /data-target-square="f8"/)
   assert.match(markup, /Next target: f8/)
   assert.match(markup, /1\/36 squares/)
   assert.doesNotMatch(markup, /Training Wheels|Standard|Copy PGN|Show reason hints/)
   for (const label of ['Play Best', 'Undo', 'Redo', 'Start Over', 'Training Info']) assert.ok(markup.includes(label))
   const guide = renderToStaticMarkup(<KnightQueenGuide onClose={() => undefined} />)
-  for (const text of ['weird one', 'no kings', 'Black never moves', 'snaking order', 'shortest safe route']) assert.ok(guide.includes(text))
+  assert.match(guide, /<p>maneuver a knight across the board while avoiding squares attacked by a stationary enemy queen<\/p>/)
+  assert.equal((guide.match(/<p>/g) ?? []).length, 1)
+  assert.doesNotMatch(guide, /<ul>|Target order|weird one/)
 })
 
 test('real board callbacks, Best Move, undo/redo, and timer controls preserve exercise progress', async () => {

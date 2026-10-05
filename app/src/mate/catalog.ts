@@ -67,5 +67,5 @@ export const MATE_NAVIGATION: readonly {
   path: `/mate/${MateModuleId}`
 }[] = [
   ...MATE_CATALOG,
-  { id: 'knight-queen', label: 'Knight vs Queen', path: '/mate/knight-queen' },
+  { id: 'knight-queen', label: 'B. F. Knight', path: '/mate/knight-queen' },
 ]

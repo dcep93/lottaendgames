@@ -1808,7 +1808,7 @@ test('Mate selector exposes material icons without training options', () => {
     ['Two Bishops', '/mate/two-bishops', 'Two Bishops'],
     ['Bishop and Knight', '/mate/bishop-knight', 'Bishop and Knight'],
     ['Two Knights vs Pawn', '/mate/two-knights-pawn', 'Two Knights vs Pawn'],
-    ['Knight vs Queen', '/mate/knight-queen', 'Knight vs Queen'],
+    ['B. F. Knight', '/mate/knight-queen', 'B. F. Knight'],
   ]) {
     assert.match(
       markup,
