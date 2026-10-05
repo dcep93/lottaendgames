@@ -497,8 +497,8 @@ dialog.leg-knight-queen-guide {
   position: fixed;
   inset: 0;
   margin: auto;
-  width: min(40rem, calc(100vw - 2rem));
-  max-height: calc(100dvh - 2rem);
+  width: min(69.6rem, calc(100vw - 2rem));
+  max-height: calc(100svh - 2rem);
   padding: 0;
   color: var(--leg-text);
 }
@@ -952,6 +952,11 @@ dialog.leg-knight-queen-guide::backdrop {
 
   .leg-mate-guide-backdrop {
     padding: 0.5rem;
+  }
+
+  dialog.leg-knight-queen-guide {
+    width: calc(100vw - 1rem);
+    max-height: calc(100svh - 1rem);
   }
 
   .leg-mate-guide {
