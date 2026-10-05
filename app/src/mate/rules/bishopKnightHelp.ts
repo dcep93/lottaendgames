@@ -44,6 +44,7 @@ export const bishopKnightHelp: RuleHelp = {
     "Step 1, put your pieces in the middle.",
     "Step 2, force black into the mating net.",
     "Step 3, execute the mating net.",
-    'Jump to a future step when possible. In a previous iteration of this app, I had human-understandable rules for steps 1 and 2, but there were way too many rules (2 bishops is complex enough!), and it wasn\'t really useful. If you have ideas on an algorithm, let\'s work together! For now, "best move" is just the one that forces black to the next step fastest. That\'s not so useful, unless you get stuck.',
+    'Jump to a future step when possible.',
+    'In a previous iteration of this app, I had human-understandable rules for steps 1 and 2, but there were way too many rules (2 bishops is complex enough!), and it wasn\'t really useful. If you have ideas on an algorithm, let\'s work together! For now, "best move" is just the one that forces black to the next step fastest. That\'s not so useful, unless you get stuck.',
   ],
 };
