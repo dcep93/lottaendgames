@@ -899,6 +899,7 @@ body.leg-board-expanded-scroll-lock {
   display: grid;
   place-items: center;
   margin: 0;
+  opacity: 0.5;
   color: #140d12;
   background: transparent;
   font-family: Arial, Helvetica, sans-serif;
@@ -942,15 +943,7 @@ body.leg-board-expanded-scroll-lock {
 
 .leg-board-marker-glyph {
   display: block;
-  line-height: 0.75;
-  transform: translateY(0.14em);
-}
-
-.leg-board-marker--label .leg-board-marker-glyph,
-.leg-board-marker--label-italic .leg-board-marker-glyph,
-.leg-board-marker--emphasis .leg-board-marker-glyph {
   line-height: 1;
-  transform: none;
 }
 
 .leg-board-marker--outline {
