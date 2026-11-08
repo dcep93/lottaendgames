@@ -26,7 +26,9 @@ cd app
 
 export GOOGLE_APPLICATION_CREDENTIALS="gac.json"
 echo "$SA_KEY" >"$GOOGLE_APPLICATION_CREDENTIALS"
-npm install -g firebase-tools
+# Newer CLI releases require an additional Service Usage permission for Hosting.
+npm install -g firebase-tools@15.34.0
+firebase --version
 gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS"
 project_id="$(jq -r .project_id "$GOOGLE_APPLICATION_CREDENTIALS")"
 
