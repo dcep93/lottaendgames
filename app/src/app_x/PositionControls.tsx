@@ -27,7 +27,7 @@ export default function PositionControls({
         </a>
       ) : null}
       {hasPlayback ? (
-        <>
+        <div className="leg-position-playback-controls">
           <button
             aria-label="Previous move"
             className="leg-position-step"
@@ -51,7 +51,7 @@ export default function PositionControls({
           >
             →
           </button>
-        </>
+        </div>
       ) : null}
     </div>
   )

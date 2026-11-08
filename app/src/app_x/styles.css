@@ -659,6 +659,14 @@
   align-items: center;
 }
 
+.leg-position-playback-controls {
+  display: flex;
+  flex-wrap: nowrap;
+  flex-shrink: 0;
+  gap: 0.35rem;
+  align-items: center;
+}
+
 .leg-position-controls button,
 .leg-position-controls a {
   min-height: 2rem;
