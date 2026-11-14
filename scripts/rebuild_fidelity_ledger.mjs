@@ -2,7 +2,7 @@
 
 import { createHash } from 'node:crypto'
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
-import { resolve } from 'node:path'
+import { resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const scriptPath = fileURLToPath(import.meta.url)
@@ -141,7 +141,7 @@ function inspectCandidate(evidence, book) {
   const manifest = parseManifest(readFileSync(manifestPath, 'utf8'))
   const runtimePath = resolve(publicPath, manifest.runtimePath)
   assert(
-    runtimePath.startsWith(`${publicPath}/`),
+    runtimePath.startsWith(`${publicPath}${sep}`),
     'Runtime payload path must stay under app/public',
   )
   const runtime = readJson(runtimePath)

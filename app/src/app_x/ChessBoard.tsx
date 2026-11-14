@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { Chessboard } from 'react-chessboard'
 import type {
   BoardOrientation,
@@ -13,6 +13,7 @@ type ChessBoardProps = {
   animateNextMove?: boolean
   ariaLabel?: string
   boundaryPaths?: PositionBoundaryPath[]
+  expandedControls?: ReactNode
   fen: string
   markers?: PositionMarker[]
   number: string
@@ -25,6 +26,7 @@ export default function ChessBoard({
   animateNextMove = false,
   ariaLabel,
   boundaryPaths = [],
+  expandedControls,
   fen,
   markers = [],
   number,
@@ -70,6 +72,8 @@ export default function ChessBoard({
         options={{
           id: boardId,
           allowDragging: false,
+          // The board handles touch taps itself and suppresses native clicks.
+          onSquareClick: toggleExpanded,
           onSquareRightClick: highlights.onSquareRightClick,
           onSquareMouseDown: highlights.onSquareMouseDown,
           squareStyles: highlights.withHighlights(),
@@ -182,7 +186,9 @@ export default function ChessBoard({
   return (
     <div
       className={
-        isExpanded ? 'leg-board-wrap is-expanded' : 'leg-board-wrap'
+        isExpanded
+          ? `leg-board-wrap is-expanded${expandedControls ? ' has-playback-controls' : ''}`
+          : 'leg-board-wrap'
       }
       data-expanded={isExpanded ? 'true' : 'false'}
     >
@@ -190,7 +196,10 @@ export default function ChessBoard({
         aria-label={`${expansionAction} ${ariaLabel ?? `position ${number}`}`}
         aria-pressed={isExpanded}
         className="leg-board-expand-toggle"
-        onClick={toggleExpanded}
+        onClick={(event) => {
+          // Support assistive activation without toggling again on square clicks.
+          if (event.target === event.currentTarget) toggleExpanded()
+        }}
         onKeyDown={(event) => {
           if (event.key !== 'Enter' && event.key !== ' ') {
             return
@@ -205,6 +214,14 @@ export default function ChessBoard({
       >
         {board}
       </div>
+      {isExpanded && expandedControls ? (
+        <div className="leg-board-expanded-controls leg-position-controls">
+          {expandedControls}
+          <button type="button" onClick={toggleExpanded} aria-label="Restore board">
+            Close
+          </button>
+        </div>
+      ) : null}
     </div>
   )
 }

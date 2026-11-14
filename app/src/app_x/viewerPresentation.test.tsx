@@ -25,7 +25,8 @@ import type {
 } from './chapterTypes'
 import type { TextPlaybackToken } from './moveParser'
 import type { BookReferenceSpan } from './bookReferences'
-import type { RuntimeChapterPayload } from './chapterRuntime'
+import { hydrateRuntimeChapter, type RuntimeChapterPayload } from './chapterRuntime'
+import { getPreferredNextUpdates } from './playbackNavigation'
 
 const activeBoards = {}
 const onMoveClick = () => undefined
@@ -69,6 +70,43 @@ const runtimePayload = JSON.parse(
   ),
 ) as RuntimeChapterPayload
 assert.equal(runtimePayload.schemaVersion, 3)
+
+const chapterOne = hydrateRuntimeChapter(runtimePayload.chapters.find(part => part.id === '1')!)
+const oneNineteen = chapterOne.navigationByPosition.get('1.19')!
+const oneNineteenGroup = chapterOne.renderItems.find(item =>
+  item.type === 'positionGroup' &&
+  (chapterOne.sections[item.index] as PositionSection).content.number === '1.19',
+)
+assert.ok(oneNineteenGroup?.type === 'positionGroup')
+for (const [display, disabled] of [['4.Nc3', false], ['4.Nd5??', true], ['7. Kf1=', true]] as const) {
+  const move = [...oneNineteen.nodesById.values()].find(node => node.display === display)!
+  const markup = renderToStaticMarkup(
+    <PositionStudyGroup
+      activeBoards={{ '1.19': {
+        activeMoveId: move.id,
+        animateNextMove: false,
+        cursorId: move.id,
+        fen: move.fen,
+        path: move.path,
+        preferredNextByCursor: getPreferredNextUpdates(oneNineteen, move.id),
+      } }}
+      activePositionNumber="1.19"
+      group={oneNineteenGroup}
+      navigationByPosition={chapterOne.navigationByPosition}
+      onAnchorSelect={onAnchorSelect}
+      onBookNavigate={onBookNavigate}
+      onMoveClick={onMoveClick}
+      onPositionReset={() => undefined}
+      onPositionStep={onPositionStep}
+      playback={chapterOne.playback}
+      referencesBySectionIndex={chapterOne.referencesBySectionIndex}
+      sections={chapterOne.sections}
+    />,
+  )
+  const nextButton = markup.match(/<button[^>]*aria-label="Next move"[^>]*>/)?.[0]
+  assert.ok(nextButton)
+  assert.equal(nextButton.includes('disabled=""'), disabled, `Next button after ${display}`)
+}
 
 let runtimeReferenceSpanCount = 0
 

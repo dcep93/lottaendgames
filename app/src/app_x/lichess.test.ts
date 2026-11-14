@@ -25,6 +25,7 @@ const mainUrl = buildLichessAnalysisUrl({
   preferredNextByCursor: {},
 })
 assert.ok(mainUrl)
+assert.equal(new URL(mainUrl).searchParams.get('evals'), '0')
 assert.equal(new URL(mainUrl).hash, '#1')
 assert.equal(getLeafFen(mainUrl), getLineFen(mainLine))
 
@@ -242,6 +243,7 @@ function getLeafFen(url: string) {
 
 function assertLichessUrl(url: string | null, context: string) {
   assert.ok(url, `Expected a valid Lichess URL for ${context}`)
+  assert.equal(new URL(url).searchParams.get('evals'), '0', context)
   assert.ok(
     new URL(url).pathname.slice('/analysis/pgn/'.length).length <= 5000,
     `Expected an in-limit Lichess URL for ${context}`,

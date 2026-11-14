@@ -821,6 +821,32 @@ body.leg-board-expanded-scroll-lock {
   overflow: hidden;
 }
 
+.leg-board-wrap.is-expanded.has-playback-controls {
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 0.75rem;
+}
+
+.leg-board-wrap.is-expanded.has-playback-controls .leg-board-expand-toggle {
+  width: min(calc(100vw - 2rem), calc(100vh - 6.5rem));
+  width: min(calc(100dvw - 2rem), calc(100dvh - 6.5rem - env(safe-area-inset-bottom, 0rem)));
+}
+
+.leg-board-expanded-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-bottom: env(safe-area-inset-bottom, 0rem);
+}
+
+.leg-board-expanded-controls .leg-position-controls {
+  margin: 0;
+}
+
+.leg-board-expanded-controls button {
+  min-height: 2.75rem;
+  min-width: 2.75rem;
+}
+
 .leg-board-stage [data-piece],
 .leg-board-stage [id*='-square-'] {
   cursor: inherit !important;

@@ -4,6 +4,7 @@ export type MoveToken = Extract<TextPlaybackToken, { type: 'move' }>
 
 export type NavigationNode = MoveToken & {
   previousId: string | null
+  resumeId?: string
 }
 
 export type PositionNavigation = {
@@ -17,11 +18,23 @@ const initialCursorKey = 'initial'
 export function buildPlaybackNavigation(playback: ChapterPlayback) {
   const navigationByPosition = new Map<string, PositionNavigation>()
   const lastNodeIdByPath = new Map<string, string>()
+  const printedRuns: MoveToken[][] = []
 
   for (const tokens of playback.tokensBySectionIndex.values()) {
     for (const token of tokens) {
       if (token.type !== 'move') {
         continue
+      }
+
+      // A different printed board ends the current reading context. In
+      // particular, do not skip an analysis diagram to find a later return.
+      if (!token.hidden) {
+        let run = printedRuns.at(-1)
+        if (run?.[0].positionNumber !== token.positionNumber) {
+          run = []
+          printedRuns.push(run)
+        }
+        run!.push(token)
       }
 
       const navigation = getOrCreateNavigation(
@@ -72,7 +85,60 @@ export function buildPlaybackNavigation(playback: ChapterPlayback) {
     }
   }
 
+  for (const run of printedRuns) {
+    const navigation = navigationByPosition.get(run[0].positionNumber)!
+    // Source segments can restart their path even though the printed line
+    // continues. Only join adjacent moves with identical full FENs (including
+    // move counters), never a repeated position elsewhere in the chapter.
+    for (let index = 1; index < run.length; index++) {
+      const previous = navigation.nodesById.get(run[index - 1].id)!
+      const next = navigation.nodesById.get(run[index].id)!
+      if (!next.previousId && previous.fen === next.parentFen &&
+          !navigation.defaultNextByCursor.has(previous.id)) {
+        next.previousId = previous.id
+        navigation.defaultNextByCursor.set(previous.id, next.id)
+      }
+    }
+    addVariationReturns(navigation, run)
+  }
+
   return navigationByPosition
+}
+
+function addVariationReturns(navigation: PositionNavigation, run: MoveToken[]) {
+  const printedIndex = new Map(run.map((token, index) => [token.id, index]))
+
+  for (const [index, token] of run.entries()) {
+    if (navigation.defaultNextByCursor.has(token.id)) {
+      continue
+    }
+
+    const leaf = navigation.nodesById.get(token.id)!
+    let branch: NavigationNode | undefined = leaf
+    while (branch && !leaf.resumeId) {
+      let main = getNavigationNode(
+        navigation,
+        navigation.defaultNextByCursor.get(getCursorKey(branch.previousId)),
+      )
+      if (main?.id !== branch.id) {
+        // Return to the nearest enclosing line, skipping other alternatives
+        // and moves already printed before this variation.
+        const visited = new Set<string>()
+        while (main && !visited.has(main.id)) {
+          visited.add(main.id)
+          if ((printedIndex.get(main.id) ?? -1) > index) {
+            leaf.resumeId = main.id
+            break
+          }
+          main = getNavigationNode(
+            navigation,
+            navigation.defaultNextByCursor.get(main.id),
+          )
+        }
+      }
+      branch = getNavigationNode(navigation, branch.previousId)
+    }
+  }
 }
 
 export function getNavigationNode(
@@ -83,6 +149,18 @@ export function getNavigationNode(
 }
 
 export function getNextNavigationNode(
+  navigation: PositionNavigation,
+  cursorId: string | null,
+  preferredNextByCursor: Record<string, string>,
+) {
+  return (
+    getNextLineNode(navigation, cursorId, preferredNextByCursor) ??
+    getNavigationNode(navigation, getNavigationNode(navigation, cursorId)?.resumeId)
+  )
+}
+
+// Chess-line consumers (such as PGN export) must not follow reading-order jumps.
+export function getNextLineNode(
   navigation: PositionNavigation,
   cursorId: string | null,
   preferredNextByCursor: Record<string, string>,

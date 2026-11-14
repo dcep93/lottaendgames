@@ -4,6 +4,7 @@ import type {
   SerializedChapterReferences,
 } from './bookReferences'
 import type { TextPlaybackToken } from './moveParser'
+import { localizeBoardPlayback } from './localBoardPlayback'
 import {
   buildPlaybackNavigation,
   type PositionNavigation,
@@ -67,8 +68,9 @@ export function hydrateRuntimeChapter(
 
   return {
     ...chapter,
-    navigationByPosition: buildPlaybackNavigation(playback),
-    playback,
+    ...localizeBoardPlayback(
+      chapter.sections, chapter.renderItems, playback, buildPlaybackNavigation(playback),
+    ),
     referencesBySectionIndex: new Map(chapter.referencesBySectionIndex),
   }
 }

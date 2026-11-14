@@ -37,11 +37,17 @@ import {
   getNextNavigationNode,
   getParentFenForNavigationNode,
   getPreferredNextUpdates,
-  getPreviousNavigationFen,
   getPreviousNavigationNode,
   type PositionNavigation,
 } from './playbackNavigation'
-import { isOneMoveFenTransition } from './playbackPaths'
+import {
+  createInitialBoardState,
+  createMoveBoardState,
+  createParentStagingBoardState,
+  stepBoardState,
+  type ActiveBoardState,
+  type PlaybackDirection,
+} from './boardState'
 import PositionControls from './PositionControls'
 
 const emptyChapterSections: RawChapterSection[] = []
@@ -65,17 +71,6 @@ const emptyPreparedChapter = hydrateRuntimeChapter({
   renderItems: [],
   sections: emptyChapterSections,
 })
-
-type ActiveBoardState = {
-  activeMoveId: string | null
-  animateNextMove: boolean
-  cursorId: string | null
-  fen: string
-  path: string[]
-  preferredNextByCursor: Record<string, string>
-}
-
-type PlaybackDirection = 'next' | 'previous'
 
 export default function ChapterViewer({
   anchorId,
@@ -228,11 +223,15 @@ export default function ChapterViewer({
         return
       }
 
-      const visibleActivePosition =
-        activePositionNumber &&
-        isPlayablePositionCardVisible(activePositionNumber)
+      const expandedPosition = getPositionCards().find(card =>
+        card.dataset.playable === 'true' &&
+        card.querySelector('.leg-board-wrap.is-expanded'),
+      )?.dataset.positionNumber
+      const visibleActivePosition = expandedPosition ?? (
+        activePositionNumber && isPlayablePositionCardVisible(activePositionNumber)
           ? activePositionNumber
           : getFirstVisiblePlayablePositionNumber()
+      )
 
       if (!visibleActivePosition) {
         return
@@ -252,45 +251,15 @@ export default function ChapterViewer({
           currentBoards[visibleActivePosition] ??
           createInitialBoardState(initialPositionFens[visibleActivePosition])
 
-        if (event.key === 'ArrowRight') {
-          const nextNode = getNextNavigationNode(
-            navigation,
-            currentBoard.cursorId,
-            currentBoard.preferredNextByCursor,
-          )
-
-          if (!nextNode) {
-            return currentBoards
-          }
-
-          return {
-            ...currentBoards,
-            [visibleActivePosition]: createMoveBoardState(
-              currentBoard,
-              nextNode,
-            ),
-          }
-        }
-
-        const previousNode = getPreviousNavigationNode(
+        const nextBoard = stepBoardState(
+          currentBoard,
           navigation,
-          currentBoard.cursorId,
+          initialPositionFens[visibleActivePosition],
+          event.key === 'ArrowRight' ? 'next' : 'previous',
         )
-
-        if (previousNode === undefined) {
-          return currentBoards
-        }
-
-        return {
-          ...currentBoards,
-          [visibleActivePosition]:
-            previousNode === null
-              ? createInitialBoardState(
-                  initialPositionFens[visibleActivePosition],
-                  currentBoard.preferredNextByCursor,
-                )
-              : createMoveBoardState(currentBoard, previousNode),
-        }
+        return nextBoard
+          ? { ...currentBoards, [visibleActivePosition]: nextBoard }
+          : currentBoards
       })
     }
 
@@ -408,47 +377,15 @@ export default function ChapterViewer({
         currentBoards[positionNumber] ??
         createInitialBoardState(initialPositionFens[positionNumber])
 
-      if (direction === 'next') {
-        const nextNode = getNextNavigationNode(
-          navigation,
-          currentBoard.cursorId,
-          currentBoard.preferredNextByCursor,
-        )
-
-        if (!nextNode) {
-          return currentBoards
-        }
-
-        return {
-          ...currentBoards,
-          [positionNumber]: createMoveBoardState(currentBoard, nextNode),
-        }
-      }
-
-      const previousNode = getPreviousNavigationNode(
+      const nextBoard = stepBoardState(
+        currentBoard,
         navigation,
-        currentBoard.cursorId,
-      )
-      const previousFen = getPreviousNavigationFen(
-        navigation,
-        currentBoard.cursorId,
         initialPositionFens[positionNumber],
+        direction,
       )
-
-      if (previousNode === undefined) {
-        return currentBoards
-      }
-
-      return {
-        ...currentBoards,
-        [positionNumber]:
-          previousNode === null
-            ? createInitialBoardState(
-                previousFen ?? initialPositionFens[positionNumber],
-                currentBoard.preferredNextByCursor,
-              )
-            : createMoveBoardState(currentBoard, previousNode),
-      }
+      return nextBoard
+        ? { ...currentBoards, [positionNumber]: nextBoard }
+        : currentBoards
     })
   }
 
@@ -1143,6 +1080,17 @@ function PositionCard({
         animateNextMove={activeBoard?.animateNextMove}
         ariaLabel={hideVisualLabel ? caption : undefined}
         boundaryPaths={boundaryPaths}
+        expandedControls={hasPlayback ? (
+          <PositionControls
+            canGoNext={canGoNext}
+            canGoPrevious={canGoPrevious}
+            hasPlayback
+            lichessUrl={null}
+            onNext={() => onStep(number, 'next')}
+            onPrevious={() => onStep(number, 'previous')}
+            onReset={() => onReset(number)}
+          />
+        ) : undefined}
         fen={activeBoard?.fen ?? fen}
         markers={markers}
         number={number}
@@ -1394,60 +1342,6 @@ function handleBookReferenceClick(
 
   event.preventDefault()
   onBookNavigate(href)
-}
-
-function createInitialBoardState(
-  fen: string | undefined,
-  preferredNextByCursor: Record<string, string> = {},
-): ActiveBoardState {
-  return {
-    activeMoveId: null,
-    animateNextMove: false,
-    cursorId: null,
-    fen: fen ?? '',
-    path: [],
-    preferredNextByCursor,
-  }
-}
-
-function createMoveBoardState(
-  currentBoard: ActiveBoardState,
-  token: Extract<TextPlaybackToken, { type: 'move' }>,
-  preferredNextUpdates: Record<string, string> = {},
-  currentFen = currentBoard.fen,
-  forceAnimate = false,
-): ActiveBoardState {
-  return {
-    activeMoveId: token.sourceId ?? token.id,
-    animateNextMove:
-      forceAnimate || isOneMoveFenTransition(currentFen, token.fen),
-    cursorId: token.id,
-    fen: token.fen,
-    path: token.path,
-    preferredNextByCursor: {
-      ...currentBoard.preferredNextByCursor,
-      ...preferredNextUpdates,
-    },
-  }
-}
-
-function createParentStagingBoardState(
-  currentBoard: ActiveBoardState,
-  token: Extract<TextPlaybackToken, { type: 'move' }>,
-  parentFen: string,
-  preferredNextUpdates: Record<string, string>,
-): ActiveBoardState {
-  return {
-    activeMoveId: null,
-    animateNextMove: false,
-    cursorId: null,
-    fen: parentFen,
-    path: token.path.slice(0, -1),
-    preferredNextByCursor: {
-      ...currentBoard.preferredNextByCursor,
-      ...preferredNextUpdates,
-    },
-  }
 }
 
 function cancelAnimationFrameRef(

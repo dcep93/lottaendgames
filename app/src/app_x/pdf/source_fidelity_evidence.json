@@ -10,13 +10,13 @@
     },
     "book": {
       "file": "book.json",
-      "sourceContentHash": "sha256:38122a0e5fda619b12c49b1d5a9e2162e1a546eb7cb842654052ec461275df9f"
+      "sourceContentHash": "sha256:224e157acea31d6dec980abb1a9de505d87039411bd1edab72d6af5cd203eeab"
     },
     "runtime": {
-      "path": "app_x/chapter-runtime.0aaad1daefd3eb5b.json",
+      "path": "app_x/chapter-runtime.467d285687a0dcf4.json",
       "schemaVersion": 3,
-      "sourceContentHash": "sha256:38122a0e5fda619b12c49b1d5a9e2162e1a546eb7cb842654052ec461275df9f",
-      "contentHash": "sha256:0aaad1daefd3eb5b5d8c9640afd010ea978772c3d4b64622e85584f82516525d"
+      "sourceContentHash": "sha256:224e157acea31d6dec980abb1a9de505d87039411bd1edab72d6af5cd203eeab",
+      "contentHash": "sha256:467d285687a0dcf409054b50e87a5bc537ac5306033dca2aca9d0c0528838842"
     }
   },
   "batches": [
@@ -13271,22 +13271,31 @@
         "status": "legal",
         "evidence": "The dedicated batch fixture replays every printed playable path from its exact source parent and verifies stored result positions."
       },
-      "classification": "matched",
-      "severity": "none",
-      "differences": [],
-      "findingIds": [],
+      "classification": "app-defect",
+      "severity": "high",
+      "differences": [
+        {
+          "field": "14...Kg2! playback parent",
+          "printedValue": "The game continues after 14.Ke2?; 14.Ke3! is an alternative.",
+          "appValue": "Before repair, the continuation was attached to 14.Ke3!, placing the white king on e3 instead of e2."
+        }
+      ],
+      "findingIds": [
+        "b02a-f-1.25-mainline-return"
+      ],
       "disposition": {
-        "status": "no-change",
-        "summary": "Current board unit matches the fresh source reconstruction."
+        "status": "repaired",
+        "summary": "Anchored 14...Kg2! to the game position after 14.Ke2?."
       },
       "regressionCoverage": [
         "app/src/app_x/introChapters1to4SourceFidelity.test.ts",
         "app/src/app_x/introDiagramFidelity.test.tsx",
-        "app/src/app_x/bookSourceValidation.test.ts"
+        "app/src/app_x/bookSourceValidation.test.ts",
+        "app/src/app_x/navigationAudit.test.ts"
       ],
       "postFixVerification": {
-        "pdf": "Fresh board reconstruction and source association are recorded at tmp/pdfs/lotta-release-audit/batch-02a-source.md for PDF page 45.",
-        "runningApp": "Final desktop/mobile browser audit confirmed /book/chapter1#p1.25, its governed anchors, responsive layout, and an error-free runtime; source-direct regression coverage passes."
+        "pdf": "2026-11-13: rechecked rendered PDF page 45 / printed page 44; 14.Ke3! is a separate alternative before the game resumes with 14...Kg2!.",
+        "runningApp": "2026-11-13: automated checks of the served runtime confirm the Ke2 parent, the king on e2 after Kg2, and the reading return from Ke3. No new browser visual pass was performed."
       },
       "diagramEvidence": {
         "sourceFen": "8/7R/8/8/8/8/4K1n1/6k1 b - - 0 11",
@@ -60742,6 +60751,36 @@
       "disposition": {
         "status": "repaired",
         "summary": "Non-playable diagrams and invalid hidden states no longer offer Lichess links; legal position and revealed-solution links remain available."
+      }
+    },
+    {
+      "id": "b02a-f-1.25-mainline-return",
+      "classification": "app-defect",
+      "severity": "high",
+      "origin": "app",
+      "correctionCertainty": "not-applicable",
+      "unitIds": [
+        "b02a-p045-board-1.25"
+      ],
+      "evidence": "Printed page 44 separates the 14.Ke3! alternative from the game continuation following 14.Ke2?. Both king positions permit Kg2, so legality alone did not catch the wrong parent.",
+      "differences": [
+        {
+          "field": "14...Kg2! playback parent",
+          "printedValue": "The game continues after 14.Ke2?; 14.Ke3! is an alternative.",
+          "appValue": "Before repair, the continuation was attached to 14.Ke3!, placing the white king on e3 instead of e2."
+        }
+      ],
+      "repair": "Added an explicit playback anchor for 14...Kg2! in book.json and regenerated the runtime payload.",
+      "regressionCoverage": [
+        "app/src/app_x/navigationAudit.test.ts"
+      ],
+      "postFixVerification": {
+        "pdf": "2026-11-13: rechecked rendered PDF page 45 / printed page 44; 14.Ke3! is a separate alternative before the game resumes with 14...Kg2!.",
+        "runningApp": "2026-11-13: automated checks of the served runtime confirm the Ke2 parent, the king on e2 after Kg2, and the reading return from Ke3. No new browser visual pass was performed."
+      },
+      "disposition": {
+        "status": "repaired",
+        "summary": "Anchored 14...Kg2! to the game position after 14.Ke2?."
       }
     }
   ]

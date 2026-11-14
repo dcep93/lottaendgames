@@ -19,6 +19,7 @@ import { buildChapterPlayback, type TextPlaybackToken } from './moveParser'
 import {
   buildPlaybackNavigation,
   getNextNavigationNode,
+  getNextLineNode,
   getPreferredNextUpdates,
   getPreviousNavigationNode,
 } from './playbackNavigation'
@@ -730,9 +731,9 @@ for (const [positionNumber, paths] of Object.entries(sourcePathsByPosition)) {
     }
 
     assert.equal(
-      getNextNavigationNode(navigation, cursorId, preferredNextByCursor),
+      getNextLineNode(navigation, cursorId, preferredNextByCursor),
       undefined,
-      `${positionNumber} source leaf must not navigate into an unrecorded branch`,
+      `${positionNumber} source leaf must not gain a chess continuation (reading-order returns are separate)`,
     )
 
     for (let pathLength = path.length; pathLength > 0; pathLength -= 1) {

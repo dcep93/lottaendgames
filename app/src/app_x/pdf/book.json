@@ -2860,7 +2860,15 @@
           "content": {
             "orientation": "white",
             "number": "1.25",
-            "fen": "8/7R/8/8/8/8/4K1n1/6k1 b - - 0 11"
+            "fen": "8/7R/8/8/8/8/4K1n1/6k1 b - - 0 11",
+            "playbackAnchors": [
+              {
+                "sectionIndex": 83,
+                "token": "14... Kg2!",
+                "parentFen": "8/8/8/4n3/7R/8/4K3/6k1 b - - 6 14",
+                "pathPrefix": ["Nf4+", "Kf3", "Nd3", "Rh4", "Ne5+", "Ke2"]
+              }
+            ]
           }
         },
         {

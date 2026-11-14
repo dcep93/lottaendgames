@@ -12,7 +12,8 @@ type BookSource = {
 
 const expectedSectionHashes: Record<string, string> = {
   introduction: '2fbf959b948a1ac20a42f504d98b3beff09a8eb918757b01072734ec43a39fe4',
-  '1': '7f902e9303fcdb8911562216f3d6b65b0dc97b3602b6c7f44f148de356cc1cb0',
+  // Includes the source-verified 1.25 continuation anchor (navigationAudit.test).
+  '1': 'e1416619c2589713e3c4a835b5667bf8a3a76407fc9ff93c414e4e70080cff7a',
   '2': '16fbd9017e859e11ce0a7d24b2560756fe1bfa1202503e68656df55bdaa17322',
   '3': '7ea53ec2fba56fbba9e2099f31c0e76624a83d11263e3ba77d2d49688a5605ac',
   '4': '58660269c8f7f9ec746d9175f8c45b92cd3d4b0e2ba6e914a9e18f300734fcbb',

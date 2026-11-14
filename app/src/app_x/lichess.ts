@@ -1,7 +1,7 @@
 import { Chess } from 'chess.js'
 import {
   getNavigationNode,
-  getNextNavigationNode,
+  getNextLineNode,
   type NavigationNode,
   type PositionNavigation,
 } from './playbackNavigation'
@@ -47,7 +47,7 @@ export function buildLichessAnalysisUrl(
     }
 
     const currentPly = getInitialPly(line.initialFen) + line.currentMoveCount
-    return `https://lichess.org/analysis/pgn/${encodedPgn}#${currentPly}`
+    return `https://lichess.org/analysis/pgn/${encodedPgn}?evals=0#${currentPly}`
   } catch {
     return null
   }
@@ -96,7 +96,7 @@ function selectCompleteLine(input: LichessAnalysisInput) {
   let currentFen = nodes.at(-1)?.fen ?? initialFen
 
   while (navigation) {
-    let nextNode = getNextNavigationNode(
+    let nextNode = getNextLineNode(
       navigation,
       cursorId,
       input.preferredNextByCursor,

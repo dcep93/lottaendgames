@@ -22,6 +22,7 @@ import { buildChapterPlayback, type TextPlaybackToken } from './moveParser'
 import {
   buildPlaybackNavigation,
   getNextNavigationNode,
+  getNextLineNode,
   getPreferredNextUpdates,
   getPreviousNavigationNode,
   type NavigationNode,
@@ -948,7 +949,7 @@ assert.deepEqual(
   'The prose-only Rg3 after 5.f8=Q must not become a source continuation',
 )
 assert.equal(
-  getNextNavigationNode(
+  getNextLineNode(
     positionSixFourNavigation,
     rookErrorPromotionToken.id,
     getPreferredNextUpdates(
@@ -957,6 +958,11 @@ assert.equal(
     ),
   ),
   undefined,
+)
+assert.equal(
+  getNextNavigationNode(positionSixFourNavigation, rookErrorPromotionToken.id, {})?.display,
+  '2.g7',
+  'After the hypothetical promotion, Next resumes the printed main line',
 )
 
 const frontMatterMarkup = renderToStaticMarkup(
