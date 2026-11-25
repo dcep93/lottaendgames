@@ -78,10 +78,13 @@ export default function App() {
 
   return (
     <AppX
-      anchorId={route.anchorId}
+      readingTarget={route}
       chapterId={route.chapterId}
       moduleSelector={moduleSelector}
       onBookNavigate={navigate}
+      onReadingPositionChange={(anchorId) =>
+        replaceCurrentHref(`${bookPathForChapterId(route.chapterId)}${anchorId ? `#${anchorId}` : ''}`)
+      }
       onAnchorSelect={(anchorId) =>
         navigate(`${bookPathForChapterId(route.chapterId)}#${anchorId}`)
       }

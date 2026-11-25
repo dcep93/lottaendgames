@@ -49,6 +49,7 @@ import {
   type PlaybackDirection,
 } from './boardState'
 import PositionControls from './PositionControls'
+import { trackBookReadingPosition } from './bookReadingPosition'
 
 const emptyChapterSections: RawChapterSection[] = []
 const aboutChapter = {
@@ -73,17 +74,19 @@ const emptyPreparedChapter = hydrateRuntimeChapter({
 })
 
 export default function ChapterViewer({
-  anchorId,
+  readingTarget,
   chapterId: activeChapterId,
   moduleSelector,
   onBookNavigate,
+  onReadingPositionChange,
   onAnchorSelect,
   onChapterSelect,
 }: {
-  anchorId: string | null
+  readingTarget: { anchorId: string | null }
   chapterId: string
   moduleSelector: ReactNode
   onBookNavigate: (href: string) => void
+  onReadingPositionChange: (anchorId: string | null) => void
   onAnchorSelect: (anchorId: string) => void
   onChapterSelect: (chapterId: string) => void
 }) {
@@ -129,6 +132,7 @@ export default function ChapterViewer({
   )
   const moveAnimationFrameRef = useRef<number | null>(null)
   const anchorAnimationFrameRef = useRef<number | null>(null)
+  const chapterElementRef = useRef<HTMLElement | null>(null)
   const positionCount = preparedChapter.positionCount
   const endingRange = useMemo(
     () => getEndingRange(chapterSections),
@@ -194,10 +198,13 @@ export default function ChapterViewer({
       return
     }
 
+    // The target object changes on explicit navigation, including returning to
+    // the same anchor after scrolling has silently replaced the URL hash.
     cancelAnimationFrameRef(anchorAnimationFrameRef)
+    let stopTracking: (() => void) | undefined
     anchorAnimationFrameRef.current = window.requestAnimationFrame(() => {
-      const anchorTarget = anchorId
-        ? document.getElementById(anchorId)
+      const anchorTarget = readingTarget.anchorId
+        ? document.getElementById(readingTarget.anchorId)
         : null
 
       if (anchorTarget) {
@@ -207,12 +214,18 @@ export default function ChapterViewer({
       }
 
       anchorAnimationFrameRef.current = null
+      if (chapterElementRef.current) {
+        stopTracking = trackBookReadingPosition(
+          chapterElementRef.current, onReadingPositionChange,
+        )
+      }
     })
 
     return () => {
       cancelAnimationFrameRef(anchorAnimationFrameRef)
+      stopTracking?.()
     }
-  }, [activeChapter, anchorId, isAbout])
+  }, [activeChapter, readingTarget, isAbout, onReadingPositionChange])
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
@@ -451,7 +464,7 @@ export default function ChapterViewer({
             onNavigate={onBookNavigate}
           />
         ) : activeChapter ? (
-          <article className="leg-chapter">
+          <article className="leg-chapter" ref={chapterElementRef}>
             {chapterRenderItems.map((item) =>
               item.type === 'positionGroup' ? (
                 <PositionStudyGroup
